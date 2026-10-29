@@ -165,6 +165,11 @@ const PAGE = {
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 const one = (element, id) => element.shadowRoot.querySelector(`[data-id="${id}"]`);
+// Exports, bulk tools, Save As and Delete are menu items: choosing one fires its menu's select.
+const press = (element, id) =>
+  one(element, id).parentElement.dispatchEvent(
+    new CustomEvent('select', { detail: { value: one(element, id).value } })
+  );
 
 async function render() {
   const element = createElement('c-find-records', { is: FindRecords });
@@ -202,6 +207,16 @@ describe('c-find-records', () => {
     }
     jest.clearAllMocks();
     jest.restoreAllMocks();
+  });
+
+  it('leaves the page name to the App Page header, with no card around the page', async () => {
+    const element = await render();
+
+    const shell = one(element, 'shell');
+    expect(shell.titleHidden).toBe(true);
+    expect(shell.title).toBe('c.Core_Find_Title');
+    expect(shell.purpose).toBe('c.Core_Find_Purpose');
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
   });
 
   it('offers the objects and starts a query with the name column and its SOQL', async () => {
@@ -290,7 +305,7 @@ describe('c-find-records', () => {
       });
     const element = await render();
     await choose(one(element, 'object'), 'Gift__c');
-    one(element, 'export').click();
+    press(element, 'export');
     await flush();
     await flush();
 
@@ -343,7 +358,7 @@ describe('c-find-records', () => {
     name.dispatchEvent(new CustomEvent('change'));
     await flush();
 
-    one(element, 'save-as').click();
+    press(element, 'save-as');
     await flush();
     await flush();
     one(element, 'save').click();
@@ -389,7 +404,7 @@ describe('c-find-records', () => {
       BarnConfirmModal.open.mockResolvedValue(true);
       const element = await openOwn(false);
 
-      one(element, 'delete').click();
+      press(element, 'delete');
       await flush();
 
       expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
@@ -405,7 +420,7 @@ describe('c-find-records', () => {
       BarnConfirmModal.open.mockResolvedValue(true);
       const element = await openOwn(true);
 
-      one(element, 'delete').click();
+      press(element, 'delete');
       await flush();
 
       expect(BarnConfirmModal.open.mock.calls[0][0].details).toHaveLength(1);
@@ -415,7 +430,7 @@ describe('c-find-records', () => {
       BarnConfirmModal.open.mockResolvedValue(false);
       const element = await openOwn(true);
 
-      one(element, 'delete').click();
+      press(element, 'delete');
       await flush();
 
       expect(deleteQuery).not.toHaveBeenCalled();
@@ -515,7 +530,7 @@ describe('c-find-records', () => {
     getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true });
     const allowed = await render();
     await choose(one(allowed, 'object'), 'Gift__c');
-    one(allowed, 'bulk-update').click();
+    press(allowed, 'bulk-update');
     await flush();
 
     const panel = allowed.shadowRoot.querySelector('c-bulk-update');
@@ -533,7 +548,7 @@ describe('c-find-records', () => {
     getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true });
     const element = await render();
     await choose(one(element, 'object'), 'Gift__c');
-    one(element, 'bulk-update').click();
+    press(element, 'bulk-update');
     await flush();
     expect(element.shadowRoot.querySelector('c-bulk-update')).not.toBeNull();
 
@@ -554,9 +569,9 @@ describe('c-find-records', () => {
     getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true, canBulkDelete: true });
     const allowed = await render();
     await choose(one(allowed, 'object'), 'Gift__c');
-    one(allowed, 'bulk-update').click();
+    press(allowed, 'bulk-update');
     await flush();
-    one(allowed, 'bulk-delete').click();
+    press(allowed, 'bulk-delete');
     await flush();
 
     expect(allowed.shadowRoot.querySelector('c-bulk-update')).toBeNull();
@@ -640,7 +655,7 @@ describe('c-find-records', () => {
       expect.objectContaining({ hour: '2-digit', minute: '2-digit', timeZone: 'America/New_York' })
     );
 
-    one(element, 'export').click();
+    press(element, 'export');
     await flush();
     await flush();
     const blob = global.URL.createObjectURL.mock.calls[0][0];
@@ -692,7 +707,7 @@ describe('c-find-records', () => {
     const element = await render();
     await choose(one(element, 'object'), 'Gift__c');
     await choose(one(element, 'columns'), ['Name', 'Amount__c']);
-    one(element, 'export-excel').click();
+    press(element, 'export-excel');
     await flush();
     await flush();
 
@@ -709,7 +724,7 @@ describe('c-find-records', () => {
     const element = await render();
     await choose(one(element, 'object'), 'Gift__c');
     await choose(one(element, 'columns'), ['Name', 'Amount__c']);
-    one(element, 'export-files').click();
+    press(element, 'export-files');
     await flush();
 
     expect(startServerExport).toHaveBeenCalledTimes(1);
@@ -804,5 +819,71 @@ describe('c-find-records', () => {
     const table = one(element, 'results');
     expect(table.columns[1].label).toBe('Payments (Gift)');
     expect(table.data[0].Payments__r).toBe('P-1, Paid; P-2');
+  });
+
+  describe('the page (UX PR 8)', () => {
+    it('shows an empty state until an object is chosen, then the query builder', async () => {
+      const element = await render();
+      expect(one(element, 'choose-object')).not.toBeNull();
+      expect(one(element, 'columns')).toBeNull();
+      await choose(one(element, 'object'), 'Gift__c');
+      expect(one(element, 'choose-object')).toBeNull();
+      expect(one(element, 'columns')).not.toBeNull();
+    });
+
+    it('shows 25 rows at a time with Show More, and resets on the next run', async () => {
+      const rows = Array.from({ length: 60 }, (_, i) => ({ Id: `a${i}`, Name: `G-${i}` }));
+      runQuery.mockResolvedValue({ soql: 'SELECT ...', rows });
+      const element = await render();
+      await choose(one(element, 'object'), 'Gift__c');
+      one(element, 'run').click();
+      await flush();
+      await flush();
+
+      expect(one(element, 'results').data).toHaveLength(25);
+      expect(one(element, 'showing-line').textContent.trim()).toBe('c.Core_Find_ShowingOf');
+      one(element, 'show-more').click();
+      await flush();
+      expect(one(element, 'results').data).toHaveLength(50);
+      one(element, 'show-more').click();
+      await flush();
+      expect(one(element, 'results').data).toHaveLength(60);
+      expect(one(element, 'show-more')).toBeNull();
+
+      one(element, 'run').click();
+      await flush();
+      await flush();
+      expect(one(element, 'results').data).toHaveLength(25);
+    });
+
+    it('shows an empty state when nothing matches', async () => {
+      runQuery.mockResolvedValue({ soql: 'SELECT ...', rows: [] });
+      const element = await render();
+      await choose(one(element, 'object'), 'Gift__c');
+      one(element, 'run').click();
+      await flush();
+      await flush();
+      expect(one(element, 'results')).toBeNull();
+      expect(one(element, 'no-results').heading).toBe('c.Core_Find_NoResultsHeading');
+    });
+
+    it('says where Bulk Update is when a Data Manager card opened Find', async () => {
+      const element = await render();
+      expect(one(element, 'start-note')).toBeNull();
+      navigation.CurrentPageReference.emit({ state: { c__tool: 'update' } });
+      await flush();
+      expect(one(element, 'start-note').textContent).toContain('c.Core_Find_StartUpdate');
+      navigation.CurrentPageReference.emit({ state: { c__tool: 'delete' } });
+      await flush();
+      expect(one(element, 'start-note').textContent).toContain('c.Core_Find_StartDelete');
+    });
+
+    it('keeps the SOQL in a closed Show Query section', async () => {
+      const element = await render();
+      await choose(one(element, 'object'), 'Gift__c');
+      const accordion = element.shadowRoot.querySelector('lightning-accordion');
+      expect(accordion.activeSectionName).toEqual([]);
+      expect(one(element, 'show-query').contains(one(element, 'soql'))).toBe(true);
+    });
   });
 });

@@ -164,7 +164,7 @@ Core's six are always listed:
 
 | Extra permission | What it lets the person do |
 |---|---|
-| BarnCRM Find and Export | Build, run, save and export Find queries and use Data Hygiene, seeing only the records the person can already see. BarnCRM Admin already includes it. |
+| BarnCRM Find and Export | Build, run, save and export Find queries and use Org Optimizer's Data Quality checks, seeing only the records the person can already see. BarnCRM Admin already includes it. |
 | BarnCRM Bulk Update | Set, clear or copy fields on many records at once from a Find query, with undo. Give it together with Find and Export. |
 | BarnCRM Bulk Delete | Delete many records at once from a Find query, with undo from the Recycle Bin. Give it together with Find and Export. Marked with a warning. |
 | BarnCRM Erase People | Erase a person on their request (the right to be forgotten), which cannot be undone. Marked with a warning. |
@@ -224,7 +224,7 @@ Error Log when it works.
 ## Tabs That Follow a Feature
 
 Five tabs stay hidden for everyone until their feature is turned on in BarnCRM Settings,
-General, Features: Data Manager, Import, Find, Bulk Update and Data Hygiene. So no role or
+General, Features: Data Manager, Import, Find, Bulk Update and Org Optimizer. So no role or
 extra permission grants them any more. Each comes from its own permission set, **BarnCRM Tab:
 (tab name)**, which BarnCRM gives automatically to the people who should see it once its
 feature is on:
@@ -235,7 +235,7 @@ feature is on:
 | Import | BarnCRM Admin |
 | Find | BarnCRM Admin, Find and Export |
 | Bulk Update | BarnCRM Admin, Bulk Update, Bulk Delete |
-| Data Hygiene (Org Optimizer) | BarnCRM Admin, Find and Export |
+| Org Optimizer | BarnCRM Admin, Find and Export |
 | Duplicate Matching | BarnCRM Admin, Duplicate Review, Metadata Admin |
 
 This page keeps them in step when you give a role or extra permission. A role given in Setup or

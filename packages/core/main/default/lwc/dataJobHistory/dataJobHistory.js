@@ -1,4 +1,4 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import canBulkUpdate from '@salesforce/customPermission/Bulk_Update_Records';
 import canBulkDelete from '@salesforce/customPermission/Bulk_Delete_Records';
@@ -48,6 +48,11 @@ import TYPE_TO_CONFIRM from '@salesforce/label/c.Core_BulkUpdate_Confirm';
 import CANCEL from '@salesforce/label/c.Core_BulkUpdate_Cancel';
 import LOADING from '@salesforce/label/c.Core_BulkUpdate_Loading';
 import EVERYONE from '@salesforce/label/c.Core_BulkUpdate_EveryonesJobs';
+import OPEN_FIND from '@salesforce/label/c.Core_BulkUpdate_OpenFind';
+import { NavigationMixin } from 'lightning/navigation';
+import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+
+const FIND_TAB = 'Find';
 
 const IMPORT = 'Import';
 const UPDATE = 'Update';
@@ -138,7 +143,7 @@ function newestFirst(left, right) {
  * would remove and put back (canonical model R-IB8); a bulk undo is confirmed by typing the
  * number it acts on (R-BU5, R-BD5).
  */
-export default class DataJobHistory extends LightningElement {
+export default class DataJobHistory extends NavigationMixin(LightningElement) {
   /** Which kinds this placement lists, comma separated (Import, Update, Delete); blank is all. */
   @api kinds;
 
@@ -154,8 +159,28 @@ export default class DataJobHistory extends LightningElement {
     cancel: CANCEL,
     loading: LOADING,
     importConfirmButton: IMPORT_CONFIRM_BUTTON,
-    everyone: EVERYONE
+    everyone: EVERYONE,
+    openFind: OPEN_FIND
   };
+
+  /** Find's tool state key, with the namespace's prefix (never a literal `c__`). */
+  toolStateKey;
+
+  @wire(findToolStateKey)
+  wiredToolStateKey({ data }) {
+    if (data) {
+      this.toolStateKey = data;
+    }
+  }
+
+  /** A bulk update starts in Find (D-135): opens it with the note that says where. */
+  handleOpenFind() {
+    const pageReference = { type: 'standard__navItemPage', attributes: { apiName: FIND_TAB } };
+    if (this.toolStateKey) {
+      pageReference.state = { [this.toolStateKey]: 'update' };
+    }
+    this[NavigationMixin.Navigate](pageReference);
+  }
 
   jobs = [];
   allowedKinds = [];

@@ -1,11 +1,37 @@
 <template>
-    <lightning-card title={labels.title} icon-name="utility:search">
-        <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium slds-is-relative">
+    <c-barn-page-shell
+        title={labels.title}
+        title-hidden
+        purpose={labels.purpose}
+        help-storage-key="findRecords"
+        data-id="shell"
+    >
+        <lightning-button
+            slot="actions"
+            data-id="new"
+            label={labels.newQuery}
+            icon-name="utility:add"
+            disabled={busy}
+            onclick={handleNew}
+        ></lightning-button>
+        <div slot="help" class="slds-var-p-bottom_small">
+            <p>
+                {labels.intro}
+                <c-barn-help class="slds-var-m-left_xx-small" learn-more-url={labels.guideUrl}></c-barn-help>
+            </p>
+        </div>
+
+        <div class="slds-is-relative">
             <template lwc:if={busy}>
                 <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
             </template>
-            <p class="slds-var-m-bottom_small">{labels.intro}</p>
 
+            <template lwc:if={hasStartNote}>
+                <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-bottom_small" data-id="start-note">
+                    <lightning-icon icon-name="utility:info" size="x-small" class="slds-var-m-right_x-small"></lightning-icon>
+                    <span>{startNote}</span>
+                </div>
+            </template>
             <template lwc:if={hasError}>
                 <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
                     <span data-id="error-message">{errorMessage}</span>
@@ -21,19 +47,8 @@
                 </div>
             </template>
 
-            <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
-                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
-                    <lightning-combobox
-                        data-id="saved"
-                        label={labels.savedQueries}
-                        placeholder={labels.chooseSaved}
-                        options={savedOptions}
-                        value={openQueryId}
-                        disabled={busy}
-                        onchange={handleOpenSaved}
-                    ></lightning-combobox>
-                </div>
-                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+            <div class="slds-grid slds-wrap slds-gutters_x-small">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
                     <lightning-combobox
                         data-id="object"
                         label={labels.object}
@@ -44,13 +59,16 @@
                         onchange={handleObjectChange}
                     ></lightning-combobox>
                 </div>
-                <div class="slds-col slds-shrink-none">
-                    <lightning-button
-                        data-id="new"
-                        label={labels.newQuery}
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                    <lightning-combobox
+                        data-id="saved"
+                        label={labels.savedQueries}
+                        placeholder={labels.chooseSaved}
+                        options={savedOptions}
+                        value={openQueryId}
                         disabled={busy}
-                        onclick={handleNew}
-                    ></lightning-button>
+                        onchange={handleOpenSaved}
+                    ></lightning-combobox>
                 </div>
             </div>
 
@@ -127,23 +145,26 @@
                     </div>
                 </div>
 
-                <lightning-textarea
-                    class="slds-var-m-top_medium"
-                    data-id="soql"
-                    label={labels.soql}
-                    field-level-help={labels.soqlHelp}
-                    value={soql}
-                    read-only
-                ></lightning-textarea>
-                <div class="slds-var-m-top_x-small">
-                    <c-find-query-text-panel
-                        soql={soql}
-                        disabled={busy}
-                        onapply={handleTypedQuery}
-                    ></c-find-query-text-panel>
-                </div>
+                <lightning-accordion class="slds-var-m-top_small" allow-multiple-sections-open active-section-name={closedSections}>
+                    <lightning-accordion-section name="query" label={labels.showQuery} data-id="show-query">
+                        <lightning-textarea
+                            data-id="soql"
+                            label={labels.soql}
+                            field-level-help={labels.soqlHelp}
+                            value={soql}
+                            read-only
+                        ></lightning-textarea>
+                        <div class="slds-var-m-top_x-small">
+                            <c-find-query-text-panel
+                                soql={soql}
+                                disabled={busy}
+                                onapply={handleTypedQuery}
+                            ></c-find-query-text-panel>
+                        </div>
+                    </lightning-accordion-section>
+                </lightning-accordion>
 
-                <div class="slds-var-m-top_small">
+                <div class="slds-var-m-top_small" data-id="actions">
                     <lightning-button
                         data-id="run"
                         variant="brand"
@@ -151,54 +172,120 @@
                         disabled={actionDisabled}
                         onclick={handleRun}
                     ></lightning-button>
-                    <lightning-button
+                    <lightning-button-menu
                         class="slds-var-m-left_x-small"
-                        data-id="export"
-                        label={labels.export}
+                        data-id="export-menu"
+                        label={labels.exportMenu}
                         icon-name="utility:download"
                         disabled={actionDisabled}
-                        onclick={handleExport}
-                    ></lightning-button>
-                    <lightning-button
-                        class="slds-var-m-left_x-small"
-                        data-id="export-excel"
-                        label={labels.exportExcel}
-                        icon-name="utility:download"
-                        disabled={actionDisabled}
-                        onclick={handleExportExcel}
-                    ></lightning-button>
-                    <lightning-button
-                        class="slds-var-m-left_x-small"
-                        data-id="export-files"
-                        label={labels.exportFiles}
-                        icon-name="utility:upload"
-                        disabled={actionDisabled}
-                        onclick={handleExportFiles}
-                    ></lightning-button>
-                    <template lwc:if={canBulkUpdate}>
-                        <lightning-button
+                        onselect={handleMenuSelect}
+                    >
+                        <lightning-menu-item data-id="export" value="export" label={labels.export}></lightning-menu-item>
+                        <lightning-menu-item
+                            data-id="export-excel"
+                            value="export-excel"
+                            label={labels.exportExcel}
+                        ></lightning-menu-item>
+                        <lightning-menu-item
+                            data-id="export-files"
+                            value="export-files"
+                            label={labels.exportFiles}
+                        ></lightning-menu-item>
+                    </lightning-button-menu>
+                    <template lwc:if={canChangeRecords}>
+                        <lightning-button-menu
                             class="slds-var-m-left_x-small"
-                            data-id="bulk-update"
-                            label={labels.bulkUpdate}
+                            data-id="change-menu"
+                            label={labels.changeRecords}
                             icon-name="utility:edit"
                             disabled={actionDisabled}
-                            onclick={handleBulkUpdate}
-                        ></lightning-button>
-                    </template>
-                    <template lwc:if={canBulkDelete}>
-                        <lightning-button
-                            class="slds-var-m-left_x-small"
-                            data-id="bulk-delete"
-                            label={labels.bulkDelete}
-                            icon-name="utility:delete"
-                            disabled={actionDisabled}
-                            onclick={handleBulkDelete}
-                        ></lightning-button>
+                            onselect={handleMenuSelect}
+                        >
+                            <template lwc:if={canBulkUpdate}>
+                                <lightning-menu-item
+                                    data-id="bulk-update"
+                                    value="bulk-update"
+                                    label={labels.bulkUpdate}
+                                    prefix-icon-name="utility:edit"
+                                ></lightning-menu-item>
+                            </template>
+                            <template lwc:if={canBulkDelete}>
+                                <lightning-menu-item
+                                    data-id="bulk-delete"
+                                    value="bulk-delete"
+                                    label={labels.bulkDelete}
+                                    prefix-icon-name="utility:delete"
+                                ></lightning-menu-item>
+                            </template>
+                        </lightning-button-menu>
                     </template>
                 </div>
                 <c-find-export-files data-id="export-files-panel"></c-find-export-files>
 
-                <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end slds-var-m-top_medium">
+                <template lwc:if={showBulkUpdate}>
+                    <div class="slds-var-m-top_medium">
+                        <c-bulk-update query-json={bulkQueryJson} onclose={handleBulkClose}></c-bulk-update>
+                    </div>
+                </template>
+                <template lwc:if={showBulkDelete}>
+                    <div class="slds-var-m-top_medium">
+                        <c-bulk-delete query-json={deleteQueryJson} onclose={handleDeleteClose}></c-bulk-delete>
+                    </div>
+                </template>
+
+                <template lwc:if={rows}>
+                    <h2 class="slds-text-heading_small slds-var-m-top_medium">{labels.results}</h2>
+                    <p class="slds-var-m-bottom_x-small" data-id="result-line" role="status">{resultLine}</p>
+                </template>
+                <template lwc:if={hasRows}>
+                    <div class="slds-scrollable_x">
+                        <lightning-datatable
+                            data-id="results"
+                            key-field="Id"
+                            columns={tableColumns}
+                            data={visibleRows}
+                            draft-values={draftValues}
+                            errors={tableErrors}
+                            hide-checkbox-column
+                            oncellchange={handleCellChange}
+                            onsave={handleSaveEdits}
+                            oncancel={handleCancelEdits}
+                        ></lightning-datatable>
+                    </div>
+                    <template lwc:if={hasMore}>
+                        <div class="slds-grid slds-grid_align-center slds-grid_vertical-align-center slds-var-m-top_x-small">
+                            <span class="slds-text-body_small slds-var-m-right_small" data-id="showing-line">
+                                {showingLine}
+                            </span>
+                            <lightning-button
+                                data-id="show-more"
+                                label={labels.showMore}
+                                onclick={handleShowMore}
+                            ></lightning-button>
+                        </div>
+                    </template>
+                </template>
+                <template lwc:if={showNoResults}>
+                    <c-barn-empty-state
+                        data-id="no-results"
+                        illustration="no-data"
+                        heading={labels.noResultsHeading}
+                        message={labels.noResults}
+                    ></c-barn-empty-state>
+                </template>
+
+                <h2 class="slds-text-heading_small slds-var-m-top_medium slds-var-m-bottom_x-small">
+                    {labels.summarize}
+                </h2>
+                <c-find-summary-panel
+                    object-api-name={objectApiName}
+                    query-json={summaryQueryJson}
+                    aggregate={aggregate}
+                    onchange={handleSummaryChange}
+                ></c-find-summary-panel>
+
+                <h2 class="slds-text-heading_small slds-var-m-top_medium">{labels.saveHeading}</h2>
+                <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
                     <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
                         <lightning-input
                             data-id="query-name"
@@ -224,68 +311,38 @@
                             disabled={saveDisabled}
                             onclick={handleSave}
                         ></lightning-button>
-                        <lightning-button
-                            class="slds-var-m-left_x-small"
-                            data-id="save-as"
-                            label={labels.saveAs}
-                            disabled={actionDisabled}
-                            onclick={handleSaveAs}
-                        ></lightning-button>
-                        <lightning-button
-                            class="slds-var-m-left_x-small"
-                            data-id="delete"
-                            variant="destructive-text"
-                            label={labels.delete}
-                            disabled={deleteDisabled}
-                            onclick={handleDelete}
-                        ></lightning-button>
+                        <lightning-button-menu
+                            class="slds-var-m-left_xx-small"
+                            data-id="query-menu"
+                            alternative-text={labels.moreQueryActions}
+                            menu-alignment="right"
+                            onselect={handleMenuSelect}
+                        >
+                            <lightning-menu-item
+                                data-id="save-as"
+                                value="save-as"
+                                label={labels.saveAs}
+                                disabled={actionDisabled}
+                            ></lightning-menu-item>
+                            <lightning-menu-item
+                                data-id="delete"
+                                value="delete"
+                                label={labels.delete}
+                                disabled={deleteDisabled}
+                            ></lightning-menu-item>
+                        </lightning-button-menu>
                     </div>
                 </div>
-
-                <template lwc:if={rows}>
-                    <p class="slds-var-m-top_medium slds-var-m-bottom_x-small" data-id="result-line" role="status">
-                        {resultLine}
-                    </p>
-                </template>
-                <template lwc:if={hasRows}>
-                    <div class="slds-scrollable_x">
-                        <lightning-datatable
-                            data-id="results"
-                            key-field="Id"
-                            columns={tableColumns}
-                            data={tableRows}
-                            draft-values={draftValues}
-                            errors={tableErrors}
-                            hide-checkbox-column
-                            oncellchange={handleCellChange}
-                            onsave={handleSaveEdits}
-                            oncancel={handleCancelEdits}
-                        ></lightning-datatable>
-                    </div>
-                </template>
-                <template lwc:if={showNoResults}>
-                    <p data-id="no-results">{labels.noResults}</p>
-                </template>
-                <h2 class="slds-text-heading_small slds-var-m-top_medium slds-var-m-bottom_x-small">
-                    {labels.summarize}
-                </h2>
-                <c-find-summary-panel
-                    object-api-name={objectApiName}
-                    query-json={summaryQueryJson}
-                    aggregate={aggregate}
-                    onchange={handleSummaryChange}
-                ></c-find-summary-panel>
-                <template lwc:if={showBulkUpdate}>
-                    <div class="slds-var-m-top_medium">
-                        <c-bulk-update query-json={bulkQueryJson} onclose={handleBulkClose}></c-bulk-update>
-                    </div>
-                </template>
-                <template lwc:if={showBulkDelete}>
-                    <div class="slds-var-m-top_medium">
-                        <c-bulk-delete query-json={deleteQueryJson} onclose={handleDeleteClose}></c-bulk-delete>
-                    </div>
-                </template>
+            </template>
+            <template lwc:else>
+                <c-barn-empty-state
+                    data-id="choose-object"
+                    illustration="setup"
+                    heading={labels.emptyHeading}
+                    message={labels.emptyMessage}
+                    heading-level="2"
+                ></c-barn-empty-state>
             </template>
         </div>
-    </lightning-card>
+    </c-barn-page-shell>
 </template>

@@ -53,11 +53,11 @@
   <tabs>standard-Contact</tabs>
   <tabs>Households</tabs>
   <tabs>Organizations</tabs>
-  <tabs>Data_Manager</tabs>
   <tabs>Address__c</tabs>
   <tabs>Relationship__c</tabs>
   <tabs>Affiliation__c</tabs>
   <tabs>Household_Member__c</tabs>
+  <tabs>Data_Manager</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
     <mappings>

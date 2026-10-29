@@ -1,17 +1,28 @@
 #!/usr/bin/env bash
-# run-org-tests.sh <org alias> [--relevant | --light]
-# run-org-tests.sh --light-selfcheck      (no org, no GitHub: checks the --light allow-list)
+# run-org-tests.sh <org alias> [--release] [--full-deploy]
 #
-# Three modes. The default (full) is the merge gate described below. --relevant (or
-# ORG_TESTS_MODE=relevant) is a faster run for iteration: see "RELEVANT MODE" further down.
-# --light (or ORG_TESTS_MODE=light) is the lighter gate for screen-only changes: see "LIGHT
-# MODE" further down.
+# The merge gate for main. Deploys the commit you have checked out to an org, runs Apex tests
+# there, and posts the result to GitHub as the commit status "Org tests (local)" on that exact
+# commit. The main branch ruleset requires that status, so a pull request that changes deployable
+# source cannot merge until this has passed on its head commit. See docs/contributor-guide/ci.md,
+# "The org test gate".
 #
-# The merge gate for main. Deploys the commit you have checked out to an org, runs every
-# Apex test class in that commit's source there, and posts the result to GitHub as the commit status
-# "Org tests (local)" on that exact commit. The main branch ruleset requires that status,
-# so a pull request that changes deployable source cannot merge until this has passed on
-# its head commit. See docs/contributor-guide/ci.md, "The org test gate".
+# TWO MODES (Brandon, 2026-10-28, D-142, amending D-141): "I'd mostly like these initial tests to
+# be as fast as possible with an end-to-end test of the entire new version once a significant new
+# version's initial development is done and integrated. I don't want as much testing for all the
+# incremental changes."
+#   (default) INCREMENTAL, for every landing batch, on one org (barn-sales). The staged deploy
+#             skips packages unchanged since the last deploy to that org, then the changed Apex
+#             and the @IsTest(critical=true) classes deploy again with RunRelevantTests: see
+#             "INCREMENTAL MODE" below. No coverage floor. Posts "Org tests (local)" with a
+#             description starting "Incremental:".
+#   --release THE VERSION END-TO-END RUN, once a significant version's development is done and
+#             integrated, on barn-sales and oi-test in parallel: every package deployed, every test
+#             class in the source run, and the coverage floor checked ("HOW COVERAGE IS CHECKED").
+#             Its description starts "Release:". It is a flag on purpose, so nobody runs it for an
+#             increment by accident.
+# --full-deploy deploys every package even when unchanged (deploy-packages.sh --full); --release
+# always does.
 #
 # WHY A LOCAL RUN POSTS THE STATUS. Org tests used to run in GitHub Actions on every push
 # to main, against one shared org. They now run from a contributor's machine against an
@@ -26,31 +37,19 @@
 # GitHub cannot attach a status to anyway, so that is checked before the long part starts
 # rather than after it.
 #
-# RELEVANT MODE. Spring '26 added the RunRelevantTests test level, for deployments only
-# (`sf apex run test` has no such level). After the same full staged deploy, this mode deploys
-# again just the Apex this branch changed since its merge base with RELEVANT_BASE (default
-# origin/main), plus the @IsTest(critical=true) classes, with --test-level RunRelevantTests:
-# Salesforce runs the tests in that payload, the tests that depend directly on it, and every
-# test class whose @IsTest(testFor=...) names a class in it or that is marked critical. The
-# feature is beta and its selection misses indirect paths and changes to non-Apex metadata, so
-# this is never the merge gate: it posts its own status context, "Org tests (relevant,
-# local)", which the main ruleset does not require, and its description says "Relevant tests
-# only". A fast run cannot satisfy "Org tests (local)".
+# INCREMENTAL MODE. Spring '26 added the RunRelevantTests test level, for deployments only
+# (`sf apex run test` has no such level). After the staged deploy, this mode deploys again just
+# the Apex changed since the merge base with RELEVANT_BASE (default origin/main, so a landing
+# batch counts every change it carries), plus the @IsTest(critical=true) classes, with
+# --test-level RunRelevantTests: Salesforce runs the tests in that payload, the tests that depend
+# directly on it, and every test class whose @IsTest(testFor=...) names a class in it or that is
+# marked critical (check-test-relevance.py keeps those annotations complete).
+# ACCEPTED RISK (D-142): the selection is beta and misses indirect paths and changes to non-Apex
+# metadata (objects, permission sets, flows, custom metadata) that a test not selected depends
+# on. The release run on both orgs, with every test and the coverage floor, catches those before
+# a version ships. Jest is not run here: the required Static checks job runs it on the same head.
 #
-# LIGHT MODE. Owner decision (Brandon, 2026-10-26): a change that touches only screens, labels
-# or docs (no Apex, objects or permissions) does not need the ~3,600-test org run. Before any
-# deploy, this mode lists the files changed since the merge base with RELEVANT_BASE (default
-# origin/main) and REFUSES (exit 1, no status) unless every one is on LIGHT_ALLOWED_PATTERNS
-# below. It then does the same staged deploy the full mode does (so the org ends in the same
-# state), runs no Apex test, runs `npx jest --silent`, and posts the same required context,
-# "Org tests (local)", with a description that starts "Light gate:" and says "no Apex-affecting
-# changes; deploy and Jest passed", so a reviewer can tell it from a full run. Success needs
-# both the deploy and Jest to pass; it posts failure otherwise. The full run still happens on
-# every combined landing batch (a pull request that combines several branches) before merge:
-# light mode is for a single screen-only branch, never for a batch. `--light-selfcheck` runs
-# the allow-list against sample paths with no org and no GitHub.
-#
-# HOW COVERAGE IS CHECKED. Every full run checks code coverage (owner decision, 2026-10-13:
+# HOW COVERAGE IS CHECKED. Every release run checks code coverage (owner decision, 2026-10-13:
 # due diligence happens automatically). The tests are enqueued with coverage on, so the org
 # records it, but the results are fetched without it: `sf apex run test --code-coverage` used
 # to pull per-test coverage into the result JSON (102 MB of a 313 MB file), which is what ran
@@ -65,128 +64,23 @@
 
 set -euo pipefail
 
-# LIGHT MODE ALLOW-LIST. The one place that says which paths a light run may cover. Each entry
-# is a bash regex over a repo-relative path, and each is here because it cannot change the
-# outcome of any Apex test, so skipping the Apex run loses nothing:
-#   lwc, aura           browser-side bundles; Apex never reads them, and Jest covers the LWC ones
-#   labels              a test fails on a label only if it asserts the label's text; the owner
-#                       accepted that risk for screen text (2026-10-26)
-#   flexipages          Lightning page layouts; no Apex reads a Lightning page
-#   contentassets       images and similar files served to the UI; no Apex reads them
-#   jest-mocks          Jest-only stubs; not deployed
-#   docs/, *.md         documentation; not deployed
-#   ISSUE_TEMPLATE      GitHub forms; not deployed
-# Deliberately NOT here: staticresources (Apex reads SampleData and GivingSampleData), and
-# every metadata type Apex can touch or the platform enforces (classes, triggers, objects,
-# fields, permission sets and groups, custom metadata, flows, layouts, tabs, applications), plus
-# scripts, config and sfdx-project.json. Any of those needs the full mode.
-LIGHT_ALLOWED_PATTERNS=(
-  '^packages/[^/]+/main/default/lwc/.+'
-  '^packages/[^/]+/main/default/aura/.+'
-  '^packages/[^/]+/main/default/labels/.+'
-  '^packages/[^/]+/main/default/flexipages/.+'
-  '^packages/[^/]+/main/default/contentassets/.+'
-  '^packages/[^/]+/test/jest-mocks/.+'
-  '^docs/.+'
-  '\.md$'
-  '^\.github/ISSUE_TEMPLATE/.+'
-)
-
-light_path_allowed() {
-  local re
-  for re in "${LIGHT_ALLOWED_PATTERNS[@]}"; do
-    if [[ "$1" =~ $re ]]; then return 0; fi
-  done
-  return 1
-}
-
-# Reads paths on stdin, prints those the allow-list does not cover.
-light_disallowed_paths() {
-  local path
-  while IFS= read -r path; do
-    [[ -z "$path" ]] && continue
-    light_path_allowed "$path" || echo "$path"
-  done
-}
-
-# No org, no GitHub: feeds sample path lists to the allow-list and fails on any wrong verdict.
-light_selfcheck() {
-  local failures=0 path left
-  check() { # check <allowed|refused> <path>
-    local got=refused
-    light_path_allowed "$2" && got=allowed
-    if [[ "$got" != "$1" ]]; then
-      echo "FAIL: $2 should be $1, was $got" >&2
-      failures=$((failures + 1))
-    fi
-  }
-  for path in \
-    packages/core/main/default/lwc/barnConfirmModal/barnConfirmModal.js \
-    packages/core/main/default/lwc/barnConfirmModal/__tests__/barnConfirmModal.test.js \
-    packages/giving/main/default/aura/Foo/Foo.cmp \
-    packages/core/main/default/labels/CustomLabels.labels-meta.xml \
-    packages/core/main/default/flexipages/Home.flexipage-meta.xml \
-    packages/core/main/default/contentassets/logo.asset-meta.xml \
-    packages/core/test/jest-mocks/lightning/modal.js \
-    docs/admin-guide/settings.md docs/images/shot.png README.md \
-    packages/core/README.md .github/ISSUE_TEMPLATE/bug_report.yml; do
-    check allowed "$path"
-  done
-  for path in \
-    packages/core/main/default/classes/Foo.cls \
-    packages/core/main/default/classes/Foo.cls-meta.xml \
-    packages/core/main/default/triggers/Foo.trigger \
-    packages/core/main/default/objects/Gift__c/Gift__c.object-meta.xml \
-    packages/core/main/default/objects/Gift__c/fields/Amount__c.field-meta.xml \
-    packages/core/main/default/permissionsets/Admin.permissionset-meta.xml \
-    packages/core/main/default/permissionsetgroups/G.permissionsetgroup-meta.xml \
-    packages/core/main/default/customMetadata/X.Y.md-meta.xml \
-    packages/core/main/default/flows/F.flow-meta.xml \
-    packages/core/main/default/layouts/L.layout-meta.xml \
-    packages/core/main/default/tabs/T.tab-meta.xml \
-    packages/core/main/default/applications/A.app-meta.xml \
-    packages/core/main/default/staticresources/SampleData.json \
-    packages/core/main/default/staticresources/SampleData.resource-meta.xml \
-    scripts/org/run-org-tests.sh scripts/ci/check-labels.py config/project-scratch-def.json \
-    sfdx-project.json package.json .github/workflows/ci.yml \
-    packages/core/main/default/lwcx/x.js packages/core/main/default/lwc \
-    xpackages/core/main/default/lwc/x.js docs-extra/x.txt notes.mdx; do
-    check refused "$path"
-  done
-  # The list filter: only the uncovered paths come back, in order.
-  left="$(printf '%s\n' docs/a.md packages/core/main/default/classes/A.cls \
-    packages/core/main/default/lwc/x/x.html sfdx-project.json | light_disallowed_paths | paste -sd, -)"
-  if [[ "$left" != "packages/core/main/default/classes/A.cls,sfdx-project.json" ]]; then
-    echo "FAIL: light_disallowed_paths returned '${left}'" >&2
-    failures=$((failures + 1))
-  fi
-  if [[ -n "$(printf '%s\n' docs/a.md packages/core/main/default/lwc/x/x.js | light_disallowed_paths)" ]]; then
-    echo "FAIL: an all-allowed list was refused" >&2
-    failures=$((failures + 1))
-  fi
-  if [[ "$failures" -ne 0 ]]; then
-    echo "light-selfcheck: ${failures} failure(s)" >&2
-    return 1
-  fi
-  echo "light-selfcheck: ok"
-}
-
-if [[ "${1:-}" == "--light-selfcheck" ]]; then
-  light_selfcheck
-  exit $?
-fi
-
 ALIAS="${1:-}"
-MODE="${ORG_TESTS_MODE:-full}"
-case "${2:-}" in
-  "") ;;
-  --relevant) MODE=relevant ;;
-  --light) MODE=light ;;
-  *) ALIAS="" ;;
-esac
-if [[ -z "$ALIAS" || ! "$MODE" =~ ^(full|relevant|light)$ ]]; then
-  echo "Usage: run-org-tests.sh <org alias> [--relevant | --light]   (ORG_TESTS_MODE=full|relevant|light)" >&2
-  echo "       run-org-tests.sh --light-selfcheck" >&2
+MODE=incremental
+DEPLOY_FULL=0
+[[ "$ALIAS" == --* ]] && ALIAS=""
+shift || true
+for arg in "$@"; do
+  case "$arg" in
+    --release) MODE=release ;;
+    --full-deploy) DEPLOY_FULL=1 ;;
+    *) ALIAS="" ;;
+  esac
+done
+if [[ -z "$ALIAS" ]]; then
+  echo "Usage: run-org-tests.sh <org alias> [--release] [--full-deploy]" >&2
+  echo "  (no flag)      incremental gate for a landing batch: relevant tests, no coverage floor" >&2
+  echo "  --release      version end-to-end run: every test and the coverage floor" >&2
+  echo "  --full-deploy  deploy every package even when unchanged since the last deploy" >&2
   exit 2
 fi
 RELEVANT_BASE="${RELEVANT_BASE:-origin/main}"
@@ -195,17 +89,18 @@ COVERAGE_CLASS_FLOOR="${COVERAGE_CLASS_FLOOR:-75}"
 TEST_WAIT_MINUTES="${TEST_WAIT_MINUTES:-90}"
 TEST_POLL_SECONDS="${TEST_POLL_SECONDS:-15}"
 
-# The status context names the mode, so a relevant run can never stand in for the full gate
-# that the main ruleset requires; the description names it too, for anyone reading the list.
-if [[ "$MODE" == "full" ]]; then
-  CONTEXT="Org tests (local)"
-  MODE_LABEL="Full run"
-elif [[ "$MODE" == "light" ]]; then
-  CONTEXT="Org tests (local)"
-  MODE_LABEL="Light gate"
+# Both modes post the one context the main ruleset requires; the description names the mode, so
+# anyone reading the status can tell an incremental pass from a release pass.
+CONTEXT="Org tests (local)"
+if [[ "$MODE" == "release" ]]; then
+  MODE_LABEL="Release"
+  # The release run deploys everything, and every class recompiles, so coverage is this run's.
+  DEPLOY_FULL=1
+  DEPLOY_APEX_ALWAYS=1
 else
-  CONTEXT="Org tests (relevant, local)"
-  MODE_LABEL="Relevant tests only, not the merge gate"
+  MODE_LABEL="Incremental"
+  # No coverage is read, so an unchanged package's Apex need not recompile.
+  DEPLOY_APEX_ALWAYS=0
 fi
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
@@ -217,29 +112,11 @@ if [[ -n "$(git status --porcelain)" ]]; then
   exit 1
 fi
 
-# Light mode refuses before anything else runs, so nothing is deployed and no status is posted
-# for a change that needs the full gate.
-if [[ "$MODE" == "light" ]]; then
-  if ! MERGE_BASE="$(git merge-base "$RELEVANT_BASE" HEAD)"; then
-    echo "No merge base between ${RELEVANT_BASE} and HEAD. Fetch it, or set RELEVANT_BASE." >&2
-    exit 1
-  fi
-  LIGHT_CHANGED="$(git diff --name-only --no-renames "$MERGE_BASE" HEAD)"
-  if [[ -z "$LIGHT_CHANGED" ]]; then
-    echo "No changes since ${MERGE_BASE:0:7} (${RELEVANT_BASE}), so a light gate has nothing to vouch for." >&2
-    exit 1
-  fi
-  LIGHT_REFUSED="$(printf '%s\n' "$LIGHT_CHANGED" | light_disallowed_paths)"
-  if [[ -n "$LIGHT_REFUSED" ]]; then
-    echo "The light gate covers only screens, labels and docs. These changed paths need the full run" >&2
-    echo "(run-org-tests.sh <alias> with no flag):" >&2
-    printf '%s\n' "$LIGHT_REFUSED" | sed 's/^/  /' >&2
-    exit 1
-  fi
-  if [[ ! -d node_modules ]]; then
-    echo "node_modules is missing, and the light gate runs Jest. Run: npm ci" >&2
-    exit 1
-  fi
+# The incremental mode needs the merge base before anything deploys, so a missing base costs
+# nothing and posts no status.
+if [[ "$MODE" == "incremental" ]] && ! MERGE_BASE="$(git merge-base "$RELEVANT_BASE" HEAD)"; then
+  echo "No merge base between ${RELEVANT_BASE} and HEAD. Fetch it, or set RELEVANT_BASE." >&2
+  exit 1
 fi
 
 SHA="$(git rev-parse HEAD)"
@@ -277,11 +154,12 @@ post_status() {
     -f description="${description:0:140}"
 }
 
-echo "== Testing ${SHA:0:7} on ${ALIAS} =="
+echo "== Testing ${SHA:0:7} on ${ALIAS} (${MODE_LABEL}) =="
 bash scripts/org/check-org-expiry.sh "$ALIAS"
 
 # No post-install steps: the tests assume an org that has never saved BarnCRM Settings.
-if ! SOURCE_POST_INSTALL=0 bash scripts/org/deploy-packages.sh "$ALIAS"; then
+if ! SOURCE_POST_INSTALL=0 DEPLOY_FULL="$DEPLOY_FULL" DEPLOY_APEX_ALWAYS="$DEPLOY_APEX_ALWAYS" \
+  bash scripts/org/deploy-packages.sh "$ALIAS"; then
   post_status failure "Deploy to ${ALIAS} failed, so no test ran"
   exit 1
 fi
@@ -296,31 +174,11 @@ fi
 RESULTS_DIR="test-results"
 mkdir -p "$RESULTS_DIR"
 
-if [[ "$MODE" == "light" ]]; then
-  # The staged deploy above is the same one the full mode does, and it runs no Apex test, so the
-  # org ends in the same state. Jest is the only test the light gate adds.
-  echo ""
-  echo "== Light gate: no Apex tests; running Jest =="
-  if npx jest --silent > "${RESULTS_DIR}/jest-light.log" 2>&1; then
-    tail -n 8 "${RESULTS_DIR}/jest-light.log"
-    post_status success "${MODE_LABEL}: no Apex-affecting changes; deploy and Jest passed on ${ALIAS}"
-    echo "== Posted \"${CONTEXT}\": success on ${SHA:0:7} (light gate). A landing batch still needs the full run. =="
-    exit 0
-  fi
-  tail -n 40 "${RESULTS_DIR}/jest-light.log" >&2
-  post_status failure "${MODE_LABEL}: Jest failed after a good deploy to ${ALIAS}"
-  echo "== Jest failed. Posted \"${CONTEXT}\": failure on ${SHA:0:7}. Full output: ${RESULTS_DIR}/jest-light.log ==" >&2
-  exit 1
-fi
-
-if [[ "$MODE" == "relevant" ]]; then
-  # The payload: the Apex this branch changed since it left RELEVANT_BASE, and the critical
-  # classes, so a branch that changed no Apex still runs the smoke tests. Everything is already
-  # in the org from the staged deploy above; this second deploy exists to carry the test level.
-  if ! MERGE_BASE="$(git merge-base "$RELEVANT_BASE" HEAD)"; then
-    echo "No merge base between ${RELEVANT_BASE} and HEAD. Fetch it, or set RELEVANT_BASE." >&2
-    exit 1
-  fi
+if [[ "$MODE" == "incremental" ]]; then
+  # The payload: the Apex changed since RELEVANT_BASE, and the critical classes, so a batch that
+  # changed no Apex still runs the smoke tests. Everything is already in the org from the staged
+  # deploy above; this second deploy exists to carry the test level.
+  MODE_LABEL="Incremental: relevant tests"
   PAYLOAD=()
   while IFS= read -r file; do
     [[ -f "$file" ]] && PAYLOAD+=(--source-dir "$file")
@@ -348,10 +206,15 @@ if [[ "$MODE" == "relevant" ]]; then
     echo "== sf CLI gave no readable deploy result, rerun. No \"${CONTEXT}\" status was posted. ==" >&2
     exit 3
   fi
+  # This deploy sent Apex the staged deploy had just put there (and a failed one rolls back), so
+  # the org still matches the deploy record; this keeps the record valid for the next run.
+  RELEVANT_DEPLOY_ID="$(jq -r '(.result // .data // {}).id // empty' "${RESULTS_DIR}/org-tests-relevant.json" 2>/dev/null)" || true
+  if [[ -n "$RELEVANT_DEPLOY_ID" ]]; then
+    bash scripts/org/deploy-packages.sh "$ALIAS" --adopt "$RELEVANT_DEPLOY_ID" || true
+  fi
   if [[ "$STATUS" == "Succeeded" && "$FAILING" -eq 0 && "$RAN" -gt 0 ]]; then
-    post_status success "${MODE_LABEL}: ${RAN}/${RAN} passed on ${ALIAS}"
-    echo "== ${RAN}/${RAN} relevant tests passed. Posted \"${CONTEXT}\": success on ${SHA:0:7}."
-    echo "   This is not the merge gate: run without --relevant before merging. =="
+    post_status success "${MODE_LABEL} on ${ALIAS}: ${RAN}/${RAN} passed (no coverage floor)"
+    echo "== ${RAN}/${RAN} relevant tests passed. Posted \"${CONTEXT}\": success on ${SHA:0:7} (incremental). =="
     exit 0
   fi
   if [[ "$FAILING" -gt 0 ]]; then
@@ -359,7 +222,7 @@ if [[ "$MODE" == "relevant" ]]; then
   else
     post_status failure "${MODE_LABEL}: deploy ${STATUS} with ${RAN} tests run on ${ALIAS}"
   fi
-  echo "== Relevant run ${STATUS}, ${FAILING} of ${RAN} tests failed. Posted \"${CONTEXT}\": failure on ${SHA:0:7} ==" >&2
+  echo "== Incremental run ${STATUS}, ${FAILING} of ${RAN} tests failed. Posted \"${CONTEXT}\": failure on ${SHA:0:7} ==" >&2
   jq -r '(.result // .data // {}) as $r
     | ([$r.details.runTestResult.failures // empty] | flatten | .[] | "  \(.name).\(.methodName): \(.message // "")"),
       ([$r.details.componentFailures // empty] | flatten | .[] | "  \(.fullName): \(.problem // "")"),

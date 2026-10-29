@@ -927,7 +927,7 @@ public with sharing class RollupBuilderController {
         List<Option> common = new List<Option>();
         List<Option> others = new List<Option>();
         Set<String> shortlist = commonStandard();
-        for (Schema.SObjectType type : Schema.getGlobalDescribe().values()) {
+        for (Schema.SObjectType type : NamespaceUtil.globalDescribe().values()) {
             String name = String.valueOf(type).toLowerCase();
             if (!plausible(name) || NOT_TARGETS.contains(localName(name))) {
                 continue;

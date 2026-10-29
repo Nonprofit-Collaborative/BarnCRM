@@ -1,6 +1,7 @@
 <template>
-  <div class="slds-var-p-around_medium">
-    <h2 class="slds-text-heading_small" data-id="title">{labels.title}</h2>
+  <div class="slds-var-p-vertical_small">
+    <!-- The tab already names this area, so the heading is for screen readers only. -->
+    <h2 class="slds-assistive-text" data-id="title">{labels.title}</h2>
 
     <template lwc:if={errorMessage}>
       <p class="slds-text-color_error slds-var-m-vertical_small" data-id="error" role="alert">
@@ -13,7 +14,7 @@
       </p>
     </template>
 
-    <div class="slds-box slds-box_x-small slds-var-m-vertical_small">
+    <div class="slds-box slds-box_x-small slds-var-m-bottom_small">
       <h3 class="slds-text-title_caps">{labels.rulesHeading}</h3>
       <template lwc:if={showNoRulesNotice}>
         <p class="slds-var-m-vertical_x-small" data-id="no-rules" role="status">
@@ -88,156 +89,183 @@
       </template>
     </div>
 
-    <h3 class="slds-text-title_caps">{labels.suggestionsHeading}</h3>
+    <h3 class="slds-text-title_caps">
+      {labels.suggestionsHeading}
+      <template lwc:if={hasCount}>
+        <span aria-hidden="true">
+          <lightning-badge class="slds-var-m-left_x-small" label={countLabel} data-id="count-badge"></lightning-badge>
+        </span>
+        <span class="slds-assistive-text">{countAlt}</span>
+      </template>
+    </h3>
     <template lwc:if={showNoAccessNotice}>
       <p class="slds-var-m-top_x-small" data-id="no-access">{labels.noAccess}</p>
     </template>
     <template lwc:elseif={hasSuggestions}>
-      <template lwc:if={showingCount}>
-        <p class="slds-text-body_small slds-var-m-top_x-small" data-id="showing-count">
-          {showingCount}
+      <template lwc:if={showAnyPeopleNotice}>
+        <p class="slds-text-body_small slds-var-m-top_x-small" data-id="people-notice">
+          {labels.peopleMergeNotice}
         </p>
       </template>
       <ul class="slds-var-m-top_x-small">
-        <template for:each={suggestions} for:item="suggestion">
+        <template for:each={visibleSuggestions} for:item="suggestion">
           <li
             key={suggestion.setId}
             data-id="suggestion"
             class="slds-box slds-box_x-small slds-var-m-bottom_x-small"
           >
-            <template lwc:if={suggestion.reason}>
-              <p class="slds-text-body_small slds-text-color_weak" data-id="reason">
-                {suggestion.reason}
-              </p>
-            </template>
-            <ul>
-              <template for:each={suggestion.records} for:item="record">
-                <li key={record.recordId} class="slds-text-body_regular">
-                  <a
-                    href={record.url}
-                    data-id="record-link"
-                    data-record-id={record.recordId}
-                    onclick={handleRecordClick}
-                    >{record.name}</a
-                  >
-                  <span class="slds-text-body_small slds-var-m-left_x-small"
-                    >{record.kind}: {record.detail}</span
-                  >
-                </li>
-              </template>
-            </ul>
-            <template lwc:if={suggestion.showPeopleNotice}>
-              <p class="slds-text-body_small slds-var-m-top_x-small" data-id="people-notice">
-                {labels.peopleMergeNotice}
-              </p>
-            </template>
-            <div class="slds-var-m-top_x-small">
-              <template lwc:if={suggestion.canMerge}>
+            <div class="slds-grid slds-wrap slds-grid_align-spread slds-grid_vertical-align-start">
+              <div class="slds-col slds-var-p-right_small">
+                <template lwc:if={suggestion.reason}>
+                  <p class="slds-text-body_small slds-text-color_weak" data-id="reason">
+                    {suggestion.reason}
+                  </p>
+                </template>
+                <ul>
+                  <template for:each={suggestion.records} for:item="record">
+                    <li key={record.recordId} class="slds-text-body_regular">
+                      <a
+                        href={record.url}
+                        data-id="record-link"
+                        data-record-id={record.recordId}
+                        onclick={handleRecordClick}
+                        >{record.name}</a
+                      >
+                      <span class="slds-text-body_small slds-text-color_weak slds-var-m-left_x-small"
+                        >{record.kind}: {record.detail}</span
+                      >
+                    </li>
+                  </template>
+                </ul>
+              </div>
+              <div class="slds-col slds-no-flex">
+                <template lwc:if={suggestion.canMerge}>
+                  <lightning-button
+                    class="slds-var-m-right_x-small"
+                    data-id="merge-button"
+                    data-set-id={suggestion.setId}
+                    label={labels.merge}
+                    disabled={controlsDisabled}
+                    onclick={handleMergeClick}
+                  ></lightning-button>
+                </template>
                 <lightning-button
-                  data-id="merge-button"
+                  data-id="dismiss-button"
                   data-set-id={suggestion.setId}
-                  label={labels.merge}
+                  label={labels.dismiss}
                   disabled={controlsDisabled}
-                  onclick={handleMergeClick}
+                  onclick={handleDismissClick}
                 ></lightning-button>
-              </template>
-              <lightning-button
-                class="slds-var-m-left_x-small"
-                data-id="dismiss-button"
-                data-set-id={suggestion.setId}
-                label={labels.dismiss}
-                disabled={controlsDisabled}
-                onclick={handleDismissClick}
-              ></lightning-button>
+              </div>
             </div>
+
+            <template lwc:if={suggestion.dismissOpen}>
+              <!-- An inline box inside the pair's card, not a modal: focus moves to its heading. -->
+              <section
+                role="region"
+                aria-label={labels.dismissHeading}
+                class="slds-var-m-top_small slds-var-p-top_x-small slds-border_top"
+                data-id="dismiss-dialog"
+              >
+                <h4 class="slds-text-heading_x-small" tabindex="-1" data-id="dismiss-heading">
+                  {labels.dismissHeading}
+                </h4>
+                <p class="slds-text-body_small">{labels.dismissBody}</p>
+                <lightning-input
+                  data-id="dismiss-reason"
+                  label={labels.dismissReasonLabel}
+                  value={dismissReason}
+                  max-length="255"
+                  onchange={handleReasonChange}
+                ></lightning-input>
+                <div class="slds-var-m-top_x-small">
+                  <lightning-button
+                    data-id="dismiss-confirm"
+                    variant="brand"
+                    label={labels.dismiss}
+                    disabled={busy}
+                    onclick={handleDismissConfirm}
+                  ></lightning-button>
+                  <lightning-button
+                    class="slds-var-m-left_x-small"
+                    label={labels.cancel}
+                    onclick={handleCancel}
+                  ></lightning-button>
+                </div>
+              </section>
+            </template>
+
+            <template lwc:if={suggestion.mergeOpen}>
+              <!-- An inline box inside the pair's card, not a modal: focus moves to its heading. -->
+              <section
+                role="region"
+                aria-label={labels.mergeHeading}
+                class="slds-var-m-top_small slds-var-p-top_x-small slds-border_top"
+                data-id="merge-dialog"
+              >
+                <h4 class="slds-text-heading_x-small" tabindex="-1" data-id="merge-heading">
+                  {labels.mergeHeading}
+                </h4>
+                <p class="slds-text-body_small">{labels.mergeBody}</p>
+                <lightning-combobox
+                  data-id="keep-choice"
+                  label={labels.mergeKeepLabel}
+                  value={keepId}
+                  options={keepOptions}
+                  onchange={handleKeepChange}
+                ></lightning-combobox>
+                <template lwc:if={hasConflictingFields}>
+                  <ul class="slds-var-m-top_x-small">
+                    <template for:each={conflictingFields} for:item="field">
+                      <li key={field.key} class="slds-text-body_small" data-id="conflict">
+                        {field.text}
+                      </li>
+                    </template>
+                  </ul>
+                </template>
+                <p class="slds-text-body_small slds-var-m-top_x-small">{labels.mergeFullScreen}</p>
+                <div class="slds-var-m-top_x-small">
+                  <lightning-button
+                    data-id="merge-confirm"
+                    variant="brand"
+                    label={labels.mergeConfirm}
+                    disabled={busy}
+                    onclick={handleMergeConfirm}
+                  ></lightning-button>
+                  <lightning-button
+                    class="slds-var-m-left_x-small"
+                    label={labels.cancel}
+                    onclick={handleCancel}
+                  ></lightning-button>
+                </div>
+              </section>
+            </template>
           </li>
         </template>
       </ul>
+      <template lwc:if={showingCount}>
+        <p class="slds-text-body_small slds-var-m-top_x-small" data-id="showing-count" role="status">
+          {showingCount}
+        </p>
+      </template>
+      <template lwc:if={hasMoreToShow}>
+        <lightning-button
+          class="slds-var-m-top_x-small"
+          data-id="show-more"
+          label={labels.showMore}
+          onclick={handleShowMore}
+        ></lightning-button>
+      </template>
     </template>
     <template lwc:else>
-      <p class="slds-var-m-top_x-small" data-id="empty">{labels.empty}</p>
-    </template>
-
-    <template lwc:if={showDismissDialog}>
-      <!-- An inline box, not a modal: role="region", and focus moves to its heading when it opens. -->
-      <section
-        role="region"
-        aria-label={labels.dismissHeading}
-        class="slds-box slds-var-m-top_small"
-        data-id="dismiss-dialog"
-      >
-        <h3 class="slds-text-heading_x-small" tabindex="-1" data-id="dismiss-heading">
-          {labels.dismissHeading}
-        </h3>
-        <p class="slds-text-body_small">{labels.dismissBody}</p>
-        <lightning-input
-          data-id="dismiss-reason"
-          label={labels.dismissReasonLabel}
-          value={dismissReason}
-          max-length="255"
-          onchange={handleReasonChange}
-        ></lightning-input>
-        <div class="slds-var-m-top_x-small">
-          <lightning-button
-            data-id="dismiss-confirm"
-            variant="brand"
-            label={labels.dismiss}
-            disabled={busy}
-            onclick={handleDismissConfirm}
-          ></lightning-button>
-          <lightning-button
-            class="slds-var-m-left_x-small"
-            label={labels.cancel}
-            onclick={handleCancel}
-          ></lightning-button>
-        </div>
-      </section>
-    </template>
-
-    <template lwc:if={showMergeDialog}>
-      <!-- An inline box, not a modal: role="region", and focus moves to its heading when it opens. -->
-      <section
-        role="region"
-        aria-label={labels.mergeHeading}
-        class="slds-box slds-var-m-top_small"
-        data-id="merge-dialog"
-      >
-        <h3 class="slds-text-heading_x-small" tabindex="-1" data-id="merge-heading">
-          {labels.mergeHeading}
-        </h3>
-        <p class="slds-text-body_small">{labels.mergeBody}</p>
-        <lightning-combobox
-          data-id="keep-choice"
-          label={labels.mergeKeepLabel}
-          value={keepId}
-          options={keepOptions}
-          onchange={handleKeepChange}
-        ></lightning-combobox>
-        <template lwc:if={hasConflictingFields}>
-          <ul class="slds-var-m-top_x-small">
-            <template for:each={conflictingFields} for:item="field">
-              <li key={field.key} class="slds-text-body_small" data-id="conflict">
-                {field.text}
-              </li>
-            </template>
-          </ul>
-        </template>
-        <p class="slds-text-body_small slds-var-m-top_x-small">{labels.mergeFullScreen}</p>
-        <div class="slds-var-m-top_x-small">
-          <lightning-button
-            data-id="merge-confirm"
-            variant="brand"
-            label={labels.mergeConfirm}
-            disabled={busy}
-            onclick={handleMergeConfirm}
-          ></lightning-button>
-          <lightning-button
-            class="slds-var-m-left_x-small"
-            label={labels.cancel}
-            onclick={handleCancel}
-          ></lightning-button>
-        </div>
-      </section>
+      <c-barn-empty-state
+        data-id="empty"
+        illustration="all-clear"
+        size="small"
+        heading={labels.emptyHeading}
+        message={labels.empty}
+        heading-level="4"
+      ></c-barn-empty-state>
     </template>
   </div>
 </template>

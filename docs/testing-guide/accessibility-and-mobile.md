@@ -33,7 +33,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | Open the **Find** tab in the **BarnCRM** app. Tab to the **Object** box. | Focus ring on **Object**, placeholder **Choose an object**. |
 | 2 | Press Enter or Down Arrow, use the arrow keys to reach **Households**, press Enter. | The **Columns** chooser, **Conditions**, **Sort by** and the **Query (read only)** box appear. |
 | 3 | Tab into **Columns**. In the available list use the arrow keys to pick a field, then Tab to the move right button and press Enter. | The field moves to the chosen list. |
-| 4 | Tab to **Run** and press Enter. | A line **N rows shown.** appears above the results table (N is a number), and the results table lists households. |
+| 4 | Tab to **Run** and press Enter. | A line **N rows found.** appears above the results table (N is a number), and the results table lists households. |
 | 5 | Tab to **Query name** and type `A11y check`. Tab to **Save** and press Enter. | A green notice reads **Saved A11y check.** The **Saved queries** box shows the query. |
 | 6 | Tab through the results table. | Focus enters the table and arrow keys move between cells. |
 
@@ -63,11 +63,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the app launcher, search `Import`, open the **Import** tab. Tab to the card **People and Organizations** and press Enter. | Card **Import a Spreadsheet** shows, with step heading **What Are You Importing?**. Focus ring on each card as you tab, and a **Template** box shows once a card is chosen. |
-| 2 | Tab to the **Template** box, open it with Enter, choose **NPSP: contacts** with the arrow keys, press Enter. Tab to **Next** and press Enter. | The step heading **Upload the file** and an **Upload file** control show. |
-| 3 | Press Tab until focus is on **Upload file**, press Enter or Space and pick the sample file in the file dialog. | **Reading your file.** shows briefly, then the step **Check the Columns** with a table of **Column in Your File**, **What It Means** and **First Values**. |
+| 1 | Open the app launcher, search `Import`, open the **Import** tab. Tab to the cards and press the arrow keys until **People and Organizations** is chosen. | Card **Import a Spreadsheet** shows. A screen reader reads "Step 1 of 6: Choose File Type", then the group **What Are You Importing?** as radio buttons, each card's line read as its description. Focus ring on the chosen card, and a **Template** box shows below the cards once one is chosen. |
+| 2 | Tab to the **Template** box, open it with Enter, choose **NPSP: contacts** with the arrow keys, press Enter. Tab to **Next** and press Enter. | "Step 2 of 6: Upload File" and an **Upload file** control show. |
+| 3 | Press Tab until focus is on **Upload file**, press Enter or Space and pick the sample file in the file dialog. | **Reading your file.** shows briefly, then the step **Check Columns** with a table of **Column in Your File**, **What It Means** and **First Values**. |
 | 4 | Tab into the table. Change one **What It Means** box with Enter and the arrow keys. | The box opens, the choice is applied and focus stays in that row. |
-| 5 | Press Tab until focus reaches **Next** and press Enter. | The step **Choose how rows are matched** shows. |
+| 5 | Press Tab until focus reaches **Next** and press Enter. | The step **Match Rows** shows. **More Options** is a collapsed section that opens with Enter. |
 | 6 | Press Tab until focus reaches **Preview** and press Enter. | The preview runs. Counts appear and the buttons **Import These Rows** and **Back** can be reached with Tab. |
 | 7 | Tab to **Back** and press Enter. | The previous step shows again. Nothing was imported. |
 
@@ -114,9 +114,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Tab onto the checkbox **Create a household automatically**. | The label and its description text are both read. |
 | 3 | Open a Garcia household from the **Households** tab (for example **The Garcia Family**). In the **Members** panel, Tab to the first **Make Primary** button. | Announced as **Make Harper Garcia the primary contact** (the member's own name), not just "Make Primary". |
 | 4 | Tab to a **Move to another household** button. | Announced as **Move** plus the member's name plus **to another household**. |
-| 5 | In Find, run any Households query. | The screen reader announces the **N rows shown.** line without you moving focus to it. |
+| 5 | In Find, run any Households query. | The screen reader announces the **N rows found.** line without you moving focus to it. |
 | 6 | In Quick Gift Entry, press **Save** with **Donor** empty. | The error **Choose the person or organization who gave this gift.** is read together with the **Donor** field. |
-| 7 | In the Import wizard on **Check the Columns**, move to the table. | The table is announced as **Check the Columns** with column headers **Column in Your File**, **What It Means**, **First Values**. |
+| 7 | In the Import wizard on **Check Columns**, move to the table. | The table is announced as **Check Columns** with column headers **Column in Your File**, **What It Means**, **First Values**. |
 
 **Cleanup:** None.
 
@@ -130,7 +130,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | Set browser zoom to 200 percent. Open **BarnCRM Settings**. | The **Sections** list stacks above the settings instead of beside them. All text is readable; no setting is cut off. |
 | 2 | Open **Find**, choose **Households**, press **Run**. | The **Saved queries** and **Object** boxes stack one per line. The page itself does not scroll sideways; only the results table may scroll inside its own area. |
 | 3 | Open **Quick Gift Entry**. | Every field label and the **Save** and **Save and New** buttons are visible. Buttons wrap to a new line rather than overlap. |
-| 4 | Open the **Import** tab and go to **Check the Columns** with the sample file. | The columns table scrolls inside its own area; the step heading and **Next** stay readable. |
+| 4 | Open the **Import** tab and go to **Check Columns** with the sample file. | The columns table scrolls inside its own area; the path, **Back** and **Next** stay readable (the path may show only the current step). |
 | 5 | Open a household record page. | The **Members** panel shows each member's name and buttons without overlap. |
 
 **Cleanup:** Set browser zoom back to 100 percent.

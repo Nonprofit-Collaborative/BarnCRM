@@ -1,7 +1,15 @@
 <template>
-    <lightning-card title={labels.title} icon-name="standard:storage">
-        <lightning-button slot="actions" label={labels.refresh} onclick={handleRefresh} data-id="refresh"></lightning-button>
-        <div class="slds-var-p-horizontal_medium slds-is-relative">
+    <div class="slds-is-relative">
+        <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
+            <h2 class="slds-text-heading_medium">{labels.title}</h2>
+            <lightning-button
+                class="slds-col_bump-left"
+                label={labels.refresh}
+                onclick={handleRefresh}
+                data-id="refresh"
+            ></lightning-button>
+        </div>
+        <div>
             <template lwc:if={loading}>
                 <lightning-spinner alternative-text={labels.refresh} size="small"></lightning-spinner>
             </template>
@@ -12,9 +20,18 @@
             <ul class="slds-var-m-bottom_medium" data-id="limits">
                 <template for:each={limits} for:item="use">
                     <li key={use.name} class="slds-var-p-bottom_small" data-id={use.name}>
-                        <div class="slds-grid slds-grid_align-spread">
+                        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
                             <span>{use.label}</span>
-                            <span class="slds-text-body_small">{use.usage}</span>
+                            <span class="slds-text-body_small">
+                                <template lwc:if={use.nearLimit}>
+                                    <lightning-badge
+                                        class="slds-theme_warning slds-var-m-right_x-small"
+                                        label={labels.nearLimit}
+                                        data-id="near-limit"
+                                    ></lightning-badge>
+                                </template>
+                                {use.usage}
+                            </span>
                         </div>
                         <lightning-progress-bar value={use.percent} size="small"></lightning-progress-bar>
                     </li>
@@ -30,5 +47,5 @@
                 data-id="own"
             ></lightning-datatable>
         </div>
-    </lightning-card>
+    </div>
 </template>

@@ -45,10 +45,12 @@ You should see: the **Households** list with the household name, **Member Count*
 6. Choose **Sort by**, **Direction** and **Rows to show** (up to 2,000).
 7. Press **Run**.
 
-You should see: a table of results and a line such as "200 rows shown." If more records
-match, the line says "Showing the first 200 rows. Export to get every matching record."
+You should see: a **Results** table and a line such as "200 rows found." If more records
+match, the line says "Found the first 200 matching rows. Export to get every matching record."
+The table shows 25 rows at a time: press **Show More** under it for the next 25.
 
-**Query (read only)** under the conditions shows the query in SOQL. You never need to read it.
+Before you choose an object, the page shows only **Object** and **Saved queries** and a short
+prompt. **Show Query**, closed at first, holds the query in SOQL. You never need to read it.
 
 ## To Keep Only Records That Have (or Lack) Related Records
 
@@ -75,7 +77,8 @@ You should see: a table with one line per group. Blank values show as "(blank)".
 
 1. Run the query, type a **Query name**.
 2. Optional: tick **Show to everyone who uses Find** to share it.
-3. Press **Save**. To make a copy under a new name, press **Save as**.
+3. Press **Save**. To make a copy under a new name, open the menu next to **Save** and choose
+   **Save As**.
 
 You should see: "Saved" followed by the name. To open it later, choose it in **Saved
 queries**. Queries shared with you show the sharer's name, for example "Springfield, no email
@@ -83,7 +86,7 @@ queries**. Queries shared with you show the sharer's name, for example "Springfi
 
 ## To Delete a Saved Query
 
-1. Open the query from **Saved queries** and press **Delete**.
+1. Open the query from **Saved queries**, open the menu next to **Save** and choose **Delete**.
 2. In "Delete this saved query?", press **Delete**, or **Keep it** to leave it.
 
 You should see: "Deleted" followed by the name. This cannot be undone. A shared query is
@@ -92,9 +95,9 @@ removed for everyone.
 ## To Export the Results
 
 1. Run the query.
-2. Press **Export to CSV** or **Export to Excel**. Every matching record is exported, not only
-   the rows on screen, up to the export row limit your admin set.
-3. For a very large export, press **Export to Files** instead. You can leave the page.
+2. Open the **Export** menu and choose **Export to CSV** or **Export to Excel**. Every matching
+   record is exported, not only the rows on screen, up to the export row limit your admin set.
+3. For a very large export, choose **Export to Files** instead. You can leave the page.
 
 You should see: a file download, and "Exported 1,234 rows." For **Export to Files**: "Export
 to Files started. You can leave this page: BarnCRM tells you when the files are ready." When

@@ -27,6 +27,19 @@ public without sharing class RollupChanges {
     private static final String LOG_CONTEXT = 'RollupChanges';
 
     /**
+     * Paths already read in this transaction, by their text. Keyed by what was parsed, never by
+     * definition id, so a definition edited in the same transaction is read afresh. Callers only
+     * read a parsed path, so definitions with the same path share one.
+     */
+    private static final Map<String, RollupPath.Parsed> PARSED_BY_TEXT = new Map<String, RollupPath.Parsed>();
+
+    /** What each definition reads, by the definition attributes it is worked out from. */
+    private static final Map<String, Set<String>> READS_BY_KEY = new Map<String, Set<String>>();
+
+    /** The reads that start on one entity, by entity and definition attributes. */
+    private static final Map<String, Set<String>> LOCAL_BY_KEY = new Map<String, Set<String>>();
+
+    /**
      * Target records marked for recalculation, by target entity, and the definitions that marked
      * them: a save recalculates only those (ADR-0099
      * `0099-rollups-recalculate-only-what-a-save-changed.md`).
@@ -124,25 +137,38 @@ public without sharing class RollupChanges {
             return marked;
         }
         Map<String, Schema.SObjectField> changedFields = fieldMap(changedType);
+        List<Rollup_Definition__c> sourced = new List<Rollup_Definition__c>();
+        List<RollupPath.Parsed> paths = new List<RollupPath.Parsed>();
+        List<Set<String>> readSets = new List<Set<String>>();
+        Set<String> readByAny = new Set<String>();
         for (Rollup_Definition__c definition : definitions) {
             RollupPath.Parsed path = pathOf(definition);
             if (path == null || !changedObject.equalsIgnoreCase(definition.Source_Object__c)) {
                 continue;
             }
+            Set<String> read = localReadsOf(definition, changedType, changedFields);
+            sourced.add(definition);
+            paths.add(path);
+            readSets.add(read);
+            readByAny.addAll(read);
+        }
+        List<SObject> candidates = sourced.isEmpty()
+            ? new List<SObject>()
+            : candidatesOf(readByAny, records, oldRecords);
+        for (Integer i = 0; i < sourced.size() && !candidates.isEmpty(); i++) {
             List<SObject> touched = new List<SObject>();
             List<SObject> before = new List<SObject>();
-            Set<String> read = localFields(readsOf(definition, path), changedFields);
-            for (SObject record : records) {
+            for (SObject record : candidates) {
                 SObject previous = oldRecords == null ? null : oldRecords.get(record.Id);
-                if (previous == null || changed(read, record, previous)) {
+                if (previous == null || changed(readSets[i], record, previous)) {
                     touched.add(record);
                     if (previous != null) {
                         before.add(previous);
                     }
                 }
             }
-            marked.add(definition, targetsOf(path, changedType, touched));
-            marked.add(definition, targetsOf(path, changedType, before));
+            marked.add(sourced[i], targetsOf(paths[i], changedType, touched));
+            marked.add(sourced[i], targetsOf(paths[i], changedType, before));
         }
         if (oldRecords != null || restored == true) {
             RollupDependents.forSave(changedType, records, oldRecords, definitions, marked);
@@ -233,14 +259,25 @@ public without sharing class RollupChanges {
 
     // ------------------------------------------------------------------------------------ paths
 
-    /** The definition's path, or null when it cannot be read (logged; R-R10 refuses it on save). */
+    /**
+     * The definition's path, or null when it cannot be read (logged; R-R10 refuses it on save).
+     * A path is parsed once per transaction; one that cannot be read is tried, and logged, on
+     * every call, as before.
+     */
     public static RollupPath.Parsed pathOf(Rollup_Definition__c definition) {
+        String text = definition.Relationship_Path__c;
+        RollupPath.Parsed parsed = text == null ? null : PARSED_BY_TEXT.get(text);
+        if (parsed != null) {
+            return parsed;
+        }
         try {
-            return RollupPath.parse(definition.Relationship_Path__c);
+            parsed = RollupPath.parse(text);
         } catch (Exception unreadable) {
             ErrorLogger.log(unreadable, LOG_CONTEXT, definition.Id);
             return null;
         }
+        PARSED_BY_TEXT.put(text, parsed);
+        return parsed;
     }
 
     private static String tokenOf(RollupPath.Branch branch) {
@@ -396,6 +433,87 @@ public without sharing class RollupChanges {
             }
         }
         return reads;
+    }
+
+    /**
+     * The definition attributes its reads are worked out from, as one key: each part carries its
+     * length, so no two different definitions share a key. Two definitions that read the same way
+     * do, and share one read set.
+     */
+    public static String readKeyOf(Rollup_Definition__c definition) {
+        List<String> parts = new List<String>();
+        for (
+            String part : new List<String>{
+                definition.Source_Field__c,
+                definition.Order_By_Field__c,
+                definition.Fiscal_Date_Field__c,
+                definition.Filter_JSON__c,
+                definition.Relationship_Path__c
+            }
+        ) {
+            parts.add(part == null ? '-' : part.length() + ':' + part);
+        }
+        return String.join(parts, '|');
+    }
+
+    /**
+     * `readsOf` for a definition whose path `pathOf` read, worked out once per transaction.
+     * The set is shared: callers read it and never change it.
+     */
+    public static Set<String> readsFor(Rollup_Definition__c definition) {
+        String key = readKeyOf(definition);
+        Set<String> reads = READS_BY_KEY.get(key);
+        if (reads == null) {
+            reads = readsOf(definition, pathOf(definition));
+            READS_BY_KEY.put(key, reads);
+        }
+        return reads;
+    }
+
+    /** `localFields` of `readsFor` on this entity, worked out once per transaction; shared. */
+    private static Set<String> localReadsOf(
+        Rollup_Definition__c definition,
+        Schema.SObjectType entity,
+        Map<String, Schema.SObjectField> fields
+    ) {
+        String key = String.valueOf(entity) + '|' + readKeyOf(definition);
+        Set<String> local = LOCAL_BY_KEY.get(key);
+        if (local == null) {
+            local = localFields(readsFor(definition), fields);
+            LOCAL_BY_KEY.put(key, local);
+        }
+        return local;
+    }
+
+    /**
+     * The records a definition of this entity can have to mark, in their order: every record with
+     * no prior version, and every one that changed an attribute some definition reads. A record
+     * that changed none of them is left out, which is what each definition would decide for it.
+     * A record whose versions cannot be compared here (an attribute missing from a queried row)
+     * is kept, so each definition compares it as it always did.
+     */
+    private static List<SObject> candidatesOf(
+        Set<String> readByAny,
+        List<SObject> records,
+        Map<Id, SObject> oldRecords
+    ) {
+        if (oldRecords == null) {
+            return records;
+        }
+        List<SObject> candidates = new List<SObject>();
+        for (SObject record : records) {
+            SObject previous = oldRecords.get(record.Id);
+            Boolean keep;
+            try {
+                keep = previous == null || changed(readByAny, record, previous);
+            } catch (Exception notCompared) {
+                keep = true;
+            }
+            if (keep) {
+                candidates.add(record);
+            }
+        }
+        return candidates;
     }
 
     /** The attributes on the entity itself that these reads start from, in lower case. */

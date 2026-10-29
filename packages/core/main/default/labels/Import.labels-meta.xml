@@ -433,28 +433,52 @@
         <value>Template</value>
     </labels>
     <labels>
+        <fullName>Core_Import_StepFileType</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: step one name on the path</shortDescription>
+        <value>Choose File Type</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_StepUpload</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: step two heading</shortDescription>
-        <value>Upload the file</value>
+        <shortDescription>Import wizard: step two name on the path</shortDescription>
+        <value>Upload File</value>
     </labels>
     <labels>
         <fullName>Core_Import_StepColumns</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: step three heading</shortDescription>
-        <value>Check the Columns</value>
+        <shortDescription>Import wizard: step three name on the path and the columns table name</shortDescription>
+        <value>Check Columns</value>
     </labels>
     <labels>
         <fullName>Core_Import_StepMatching</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: step four heading</shortDescription>
-        <value>Choose how rows are matched</value>
+        <shortDescription>Import wizard: step four name on the path</shortDescription>
+        <value>Match Rows</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_MoreOptions</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: collapsed section of the matching step's extra choices</shortDescription>
+        <value>More Options</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_DownloadMenu</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: results step menu holding the two file downloads</shortDescription>
+        <value>Download</value>
     </labels>
     <labels>
         <fullName>Core_Import_StepPreview</fullName>
@@ -487,14 +511,6 @@
         <protected>false</protected>
         <shortDescription>Import wizard: button that moves to the next step</shortDescription>
         <value>Next</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_BackButton</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: button that moves to the previous step</shortDescription>
-        <value>Back</value>
     </labels>
     <labels>
         <fullName>Core_Import_DryRunButton</fullName>

@@ -5,22 +5,35 @@
  *
  * Each test drives Core's row processor, which finds this package's processor by name, the
  * way a real import does.
+ *
+ * Maria and the default General fund are the same in every test, so the setup builds them once
+ * and each test finds Maria by her username.
  */
 @IsTest(testFor='ApexClass:GiftImportProcessor')
 private class GiftImportProcessorTest {
     @TestSetup
     static void createTestUser() {
-        TestUsers.adminWith('Giving_Admin');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            TestDataFactory.createUser(
+                'Maria',
+                new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
+            );
+            fund('General', null, true);
+        }
     }
 
     private static Import_Template__c template;
     private static Import_Batch__c batch;
 
+    /** Maria, built by the setup, found by the username TestUsers gives her last name. */
     private static User maria() {
-        return TestDataFactory.createUser(
-            'Maria',
-            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-        );
+        return [
+            SELECT Id
+            FROM User
+            WHERE Username LIKE 'barn-test.maria.%' AND LastName = 'Maria'
+            ORDER BY CreatedDate DESC
+            LIMIT 1
+        ];
     }
 
     private static Fund__c fund(String name, String code, Boolean isDefault) {
@@ -97,7 +110,6 @@ private class GiftImportProcessorTest {
     @IsTest
     static void aRowBecomesAnOrdinaryGiftForItsDonor() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            fund('General', null, true);
             Fund__c scholarships = fund('Scholarships', 'SCH-1', false);
             given(
                 new List<String>{
@@ -153,7 +165,6 @@ private class GiftImportProcessorTest {
     @IsTest
     static void aDryRunDecidesEverythingAndSavesNothing() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            fund('General', null, true);
             given(
                 new List<String>{ 'Gift.Amount__c', 'Gift.Gift_Date__c', 'Allocation.Fund' },
                 new List<List<String>>{
@@ -192,7 +203,6 @@ private class GiftImportProcessorTest {
     @IsTest
     static void anExternalIdLoadsOnce() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            fund('General', null, true);
             // The first row's donor already exists too, so nothing on that row is new.
             Contact existingDonor = new Contact(LastName = 'Donor0', Email = 'donor0@example.org');
             insert existingDonor;
@@ -238,7 +248,6 @@ private class GiftImportProcessorTest {
     @IsTest
     static void aSplitIsSavedWhole() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            fund('General', null, true);
             Fund__c building = fund('Building', null, false);
             Fund__c scholarships = fund('Scholarships', null, false);
             given(
@@ -291,7 +300,6 @@ private class GiftImportProcessorTest {
     @IsTest
     static void aRowThePlatformRefusesLeavesNoGift() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            fund('General', null, true);
             // An in-kind gift with no description saves nowhere (R-G12): the dry run cannot know.
             given(
                 new List<String>{ 'Gift.Gift_Date__c', 'Gift.Type__c', 'Allocation.Fund' },
@@ -314,7 +322,6 @@ private class GiftImportProcessorTest {
     @IsTest
     static void oneGiftWhoseFundIsRefusedCostsOnlyItsOwnRow() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            fund('General', null, true);
             Fund__c refused = fund('Roof', 'R-1', false);
             fund('Library', 'L-1', false);
             given(
@@ -359,7 +366,6 @@ private class GiftImportProcessorTest {
     @IsTest
     static void aRefusedDesignationLeavesNothingItWrote() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            fund('General', null, true);
             Fund__c refused = fund('Roof', 'R-1', false);
             fund('Library', 'L-1', false);
             given(
@@ -406,7 +412,6 @@ private class GiftImportProcessorTest {
     @IsTest
     static void aChunkWithNoRoomLeftSaysTheRowWasNotAttempted() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            fund('General', null, true);
             Fund__c refused = fund('Roof', 'R-1', false);
             fund('Library', 'L-1', false);
             given(
@@ -450,7 +455,6 @@ private class GiftImportProcessorTest {
     @IsTest
     static void anImporterWhoCannotDeleteGiftsIsRefusedBeforeAnythingIsWritten() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            fund('General', null, true);
             given(
                 new List<String>{ 'Gift.Amount__c', 'Gift.Gift_Date__c' },
                 new List<List<String>>{ new List<String>{ '10', '2026-03-15' } }
@@ -485,7 +489,6 @@ private class GiftImportProcessorTest {
     @IsTest
     static void aRepeatSharesItsEarlierRowsRefusalInTheDryRunAsInTheCommit() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            fund('General', null, true);
             given(
                 new List<String>{
                     'Gift.Amount__c',
@@ -533,7 +536,6 @@ private class GiftImportProcessorTest {
     @IsTest
     static void theDonorCanBeTheOrganization() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            fund('General', null, true);
             TestDataFactory.defaultSettings();
             ImportMapping mapping = new ImportMapping();
             mapping.getColumns().add(new ImportMapping.Column('Contact', 'Contact1.LastName'));
@@ -588,7 +590,6 @@ private class GiftImportProcessorTest {
     @IsTest
     static void aRowDatedInAClosedPeriodIsRefusedInTheDryRunAndTheCommit() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            fund('General', null, true);
             Date closed = Date.today().toStartOfMonth().addDays(-1);
             given(
                 new List<String>{ 'Gift.Amount__c', 'Gift.Gift_Date__c' },
@@ -626,7 +627,6 @@ private class GiftImportProcessorTest {
     @IsTest
     static void anUndoKeepsPostedAndClosedPeriodGifts() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            fund('General', null, true);
             given(
                 new List<String>{ 'Gift.Amount__c', 'Gift.Gift_Date__c' },
                 new List<List<String>>{

@@ -24,7 +24,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">How many days without a run before Org Optimizer's Unused setup section lists a report. The default is 365, and anything from 90 to 1095 is accepted; a value outside that range is read as the nearest end.</value>
+    <value xsi:type="xsd:string">How many days without a run before Org Optimizer's Unused Setup section lists a report. The default is 365, and anything from 90 to 1095 is accepted; a value outside that range is read as the nearest end.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

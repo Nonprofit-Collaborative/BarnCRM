@@ -67,7 +67,18 @@ public with sharing class GivingSampleDataSelector {
         return byExternalId;
     }
 
+    /**
+     * The number of sample gifts, or 0 for someone who cannot read the field (only Giving Admin
+     * grants it). The status card asks this of every Core administrator, and a query the user
+     * cannot run threw, which failed the whole status read.
+     */
     public Integer countSampleGifts() {
+        if (
+            !Schema.SObjectType.Gift__c.isAccessible() ||
+            !Schema.SObjectType.Gift__c.fields.Sample_Data__c.isAccessible()
+        ) {
+            return 0;
+        }
         return [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE WITH USER_MODE];
     }
 

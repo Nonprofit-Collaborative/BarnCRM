@@ -317,6 +317,76 @@ describe('c-duplicate-review', () => {
     expect(q(element, 'dismiss-dialog')).toBeNull();
   });
 
+  describe('a long list', () => {
+    const pairs = (count, canMerge) =>
+      Array.from({ length: count }, (unused, index) => ({
+        setId: `0GK0000000${String(index).padStart(5, '0')}AAA`,
+        canMerge,
+        records: [
+          { recordId: `003${index}A`, name: `Person ${index}`, detail: 'x', isHousehold: false },
+          { recordId: `003${index}B`, name: `Person ${index}`, detail: 'x', isHousehold: false }
+        ]
+      }));
+
+    it('shows ten pairs, the count badge and Show More, then the next ten', async () => {
+      const element = await mount(
+        viewWith({ suggestions: pairs(25, false), totalSuggestions: 25 })
+      );
+      expect(qa(element, 'suggestion')).toHaveLength(10);
+      expect(q(element, 'count-badge').label).toBe('25');
+      expect(q(element, 'showing-count').textContent).toContain('c.Core_Duplicates_ShowingCount');
+      expect(q(element, 'show-more')).not.toBeNull();
+
+      q(element, 'show-more').click();
+      await flush();
+      expect(qa(element, 'suggestion')).toHaveLength(20);
+      expect(element.shadowRoot.activeElement).toBe(qa(element, 'record-link')[20]);
+
+      q(element, 'show-more').click();
+      await flush();
+      expect(qa(element, 'suggestion')).toHaveLength(25);
+      expect(q(element, 'show-more')).toBeNull();
+      expect(q(element, 'showing-count')).toBeNull();
+    });
+
+    it('marks the badge when more are waiting than the server counted', async () => {
+      const element = await mount(
+        viewWith({ suggestions: pairs(50, true), totalSuggestions: 50, moreNotCounted: true })
+      );
+      expect(q(element, 'count-badge').label).toBe('50+');
+      expect(q(element, 'showing-count').textContent).toContain(
+        'c.Core_Duplicates_ShowingCountMore'
+      );
+    });
+
+    it('gives the people merge note once, not on every pair', async () => {
+      const element = await mount(
+        viewWith({ suggestions: pairs(12, false), totalSuggestions: 12 })
+      );
+      expect(qa(element, 'people-notice')).toHaveLength(1);
+    });
+
+    it('leaves out the people merge note when every shown pair is households', async () => {
+      const element = await mount(viewWith({ suggestions: pairs(3, true), totalSuggestions: 3 }));
+      expect(q(element, 'people-notice')).toBeNull();
+    });
+
+    it('opens the dismiss box inside the pair it is about', async () => {
+      const element = await mount(viewWith({ suggestions: pairs(3, false), totalSuggestions: 3 }));
+      qa(element, 'dismiss-button')[1].click();
+      await flush();
+      const cards = qa(element, 'suggestion');
+      expect(cards[1].querySelector('[data-id="dismiss-dialog"]')).not.toBeNull();
+      expect(cards[0].querySelector('[data-id="dismiss-dialog"]')).toBeNull();
+    });
+  });
+
+  it('shows no count badge when nothing is waiting', async () => {
+    const element = await mount(viewWith({}));
+    expect(q(element, 'count-badge')).toBeNull();
+    expect(q(element, 'empty').heading).toBe('c.Core_Duplicates_EmptyHeading');
+  });
+
   it('shows a plain message when loading fails without one', async () => {
     getView.mockRejectedValue({});
     const element = createElement('c-duplicate-review', { is: DuplicateReview });

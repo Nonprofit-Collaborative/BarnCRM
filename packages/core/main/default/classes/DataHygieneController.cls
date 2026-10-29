@@ -33,7 +33,7 @@ public with sharing class DataHygieneController {
             requirePermission();
             return DataHygieneService.runAll();
         } catch (Exception caught) {
-            throw asUserError(caught, 'Data hygiene checks');
+            throw asUserError(caught, 'Data Quality checks');
         }
     }
 
@@ -61,7 +61,7 @@ public with sharing class DataHygieneController {
         } catch (AuraHandledException alreadyForThePerson) {
             throw alreadyForThePerson;
         } catch (Exception caught) {
-            throw asUserError(caught, 'Open a data hygiene check in Find');
+            throw asUserError(caught, 'Open a Data Quality check in Find');
         }
     }
 

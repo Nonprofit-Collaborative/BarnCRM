@@ -58,6 +58,15 @@ public with sharing class DataManagerController {
         }
     }
 
+    /**
+     * The page state key that tells Find which bulk tool a card or the Bulk Update page opened
+     * it for (D-135): `c__tool` here, the namespace's own prefix inside a managed package.
+     */
+    @AuraEnabled(cacheable=true)
+    public static String findToolStateKey() {
+        return NamespaceUtil.stateKey('tool');
+    }
+
     private static Boolean canImport() {
         if (permissionOverride != null) {
             return permissionOverride;

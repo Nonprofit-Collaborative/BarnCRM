@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# deploy-packages.sh <alias> [--core-only]
+# deploy-packages.sh <alias> [--core-only] [--full]
 #
 # Deploys the packages to an org in stages, smallest blast radius first.
 #
@@ -111,6 +111,14 @@
 # every component (about 1 MB of log per run and one more CLI round trip per stage);
 # DEPLOY_SHOW_COMPONENTS=1 brings it back. A failed stage still prints its full report.
 #
+# The D-141 amendment of 2026-10-28 (D-142) made three more cuts: Core's three config stages go
+# in one request and every module in one request, each falling back to separate stages on the
+# opaque failure only; and a package unchanged since the last successful deploy to the same org
+# is not deployed again ("SKIPPING UNCHANGED PACKAGES" below; --full or DEPLOY_FULL=1 deploys
+# everything). CONFIG_STAGES=separate and MODULE_STAGES=separate bring back the old stages.
+#
+# Usage: deploy-packages.sh <alias> [--core-only] [--full]
+#
 # Exit codes: 0 = every stage deployed, non-zero = the first stage that failed.
 
 set -uo pipefail
@@ -130,19 +138,47 @@ RETRY_BACKOFF_SECONDS="${RETRY_BACKOFF_SECONDS:-5}"
 SOURCE_POST_INSTALL="${SOURCE_POST_INSTALL:-1}"
 STALLS_RECOVERED=0
 
+CONFIG_STAGES="${CONFIG_STAGES:-combined}"
+MODULE_STAGES="${MODULE_STAGES:-combined}"
+DEPLOY_FULL="${DEPLOY_FULL:-0}"
+# 1 (the default) deploys every package's classes and triggers even when the package is unchanged,
+# because the release gate's coverage check relies on that recompile. The incremental gate checks
+# no coverage, so run-org-tests.sh passes 0 there.
+DEPLOY_APEX_ALWAYS="${DEPLOY_APEX_ALWAYS:-1}"
+DEPLOY_STATE_DIR="${DEPLOY_STATE_DIR:-${HOME}/.local/state/barncrm/deploy-state}"
+
 ALIAS="${1:-}"
-if [[ -z "$ALIAS" ]]; then
-  echo "Usage: deploy-packages.sh <alias> [--core-only]" >&2
+if [[ -z "$ALIAS" || "$ALIAS" == --* ]]; then
+  echo "Usage: deploy-packages.sh <alias> [--core-only] [--full]" >&2
   exit 1
 fi
 shift || true
 
 CORE_ONLY=0
-[[ "${1:-}" == "--core-only" ]] && CORE_ONLY=1
-if [[ ! "$DATA_MODEL_STAGES" =~ ^(per-object|combined)$ ]]; then
-  echo "DATA_MODEL_STAGES must be per-object or combined, not ${DATA_MODEL_STAGES}." >&2
-  exit 1
-fi
+ADOPT_ID=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --core-only) CORE_ONLY=1 ;;
+    --full) DEPLOY_FULL=1 ;;
+    --adopt)
+      ADOPT_ID="${2:-}"
+      shift
+      ;;
+    *)
+      echo "Unknown option ${1}. Usage: deploy-packages.sh <alias> [--core-only] [--full]" >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
+for setting in "DATA_MODEL_STAGES:per-object|combined" "CONFIG_STAGES:separate|combined" \
+  "MODULE_STAGES:separate|combined" "DEPLOY_APEX_ALWAYS:0|1" "DEPLOY_FULL:0|1"; do
+  name="${setting%%:*}"
+  if [[ ! "${!name}" =~ ^(${setting#*:})$ ]]; then
+    echo "${name} must be one of ${setting#*:}, not ${!name}." >&2
+    exit 1
+  fi
+done
 
 # Run a command with its output in a file, abandoning it (and the node process under the
 # sf wrapper) after $1 seconds. On 2026-09-24 a single `sf project deploy report` call hung
@@ -368,6 +404,210 @@ deploy_stage() {
   return 0
 }
 
+# True when the stage that just failed named no component: the platform's opaque
+# UNKNOWN_EXCEPTION (or a stage that stalled twice), which is what a combined request falls back
+# on. A failure that names components is a real error and is never retried in smaller stages. An
+# unreadable report counts as a real error, so the run stops rather than guessing.
+last_failure_opaque() {
+  local errors
+  [[ -n "$JOB_ID" ]] || return 1
+  errors="$(sf project deploy report --job-id "$JOB_ID" --target-org "$ALIAS" --json 2> /dev/null \
+    | jq -r '.result.numberComponentErrors // 0' 2> /dev/null)"
+  [[ "$errors" =~ ^[0-9]+$ ]] && [[ "$errors" -eq 0 ]]
+}
+
+# SKIPPING UNCHANGED PACKAGES (D-141 amendment, 2026-10-28; D-56 allows "deploy only changed
+# metadata"). A package whose source is identical to what the last successful run of this script
+# put in this same org is not deployed again, except its Apex: run-org-tests.sh reads coverage
+# from ApexCodeCoverageAggregate and relies on the deploy recompiling every class to clear it, so
+# every package's classes and triggers deploy on every run.
+#
+# The record is one JSON file per org, named by the org id, in DEPLOY_STATE_DIR (default
+# ~/.local/state/barncrm/deploy-state/<org id>.json): outside every repository and worktree, so
+# all gate worktrees on this machine share it, and a fresh worktree does not lose it. It holds the
+# org id, the git tree id of each deployed package, a fingerprint of the deploy inputs outside the
+# packages (sfdx-project.json, .forceignore, scripts/org), and the id of the org's newest
+# DeployRequest once the run finished. Any doubt means a full deploy:
+#   - no record, an unreadable record, or one whose org id is not this org's;
+#   - a different fingerprint (the stages or the project settings changed);
+#   - a newer DeployRequest in the org than the one recorded: someone deployed something since,
+#     from any machine or branch, so the org no longer holds what the record says;
+#   - uncommitted or untracked changes under packages or the deploy inputs (the tree ids would not
+#     describe what is deployed);
+#   - DEPLOY_FULL=1 or --full.
+# The record is deleted before the first stage and written only after every stage deployed, so a
+# run that fails partway leaves none. Tree ids, not commit ids, are compared, so a commit that
+# changes nothing in a package (docs, scripts/ci) does not count as a change to it.
+DEPLOY_INPUTS=(sfdx-project.json .forceignore scripts/org)
+SKIP_PACKAGES=" "
+STATE_FILE=""
+TREE_CLEAN=0
+
+org_id() {
+  local capture
+  capture="$(mktemp)"
+  run_capped "$REPORT_TIMEOUT_SECONDS" "$capture" sf org display --target-org "$ALIAS" --json
+  jq -r '.result.id // empty' "$capture" 2> /dev/null
+  rm -f "$capture"
+}
+
+newest_deploy_request() {
+  local capture
+  capture="$(mktemp)"
+  run_capped "$REPORT_TIMEOUT_SECONDS" "$capture" sf data query --use-tooling-api --target-org "$ALIAS" --json \
+    --query "SELECT Id FROM DeployRequest ORDER BY CreatedDate DESC LIMIT 1"
+  jq -r '.result.records[0].Id // empty' "$capture" 2> /dev/null
+  rm -f "$capture"
+}
+
+deploy_fingerprint() {
+  local input
+  for input in "${DEPLOY_INPUTS[@]}"; do
+    git rev-parse "HEAD:${input}" 2> /dev/null || echo "missing:${input}"
+  done | paste -sd, -
+}
+
+# Prints "name=tree" for every package directory in the repository.
+package_trees() {
+  local dir
+  for dir in packages/*/; do
+    dir="$(basename "$dir")"
+    echo "${dir}=$(git rev-parse "HEAD:packages/${dir}" 2> /dev/null)"
+  done
+}
+
+package_skipped() {
+  [[ "$SKIP_PACKAGES" == *" $1 "* ]]
+}
+
+decide_skips() {
+  local id newest dirty
+  id="$(org_id)"
+  if [[ -n "$id" ]]; then
+    STATE_FILE="${DEPLOY_STATE_DIR}/${id}.json"
+  fi
+  dirty="$(git status --porcelain -- packages "${DEPLOY_INPUTS[@]}" 2> /dev/null || echo unknown)"
+  [[ -z "$dirty" ]] && TREE_CLEAN=1
+  if [[ -z "$STATE_FILE" ]]; then
+    echo "== Full deploy: could not read the org id of ${ALIAS}, so no deploy record applies =="
+    return 0
+  fi
+  if [[ "$TREE_CLEAN" -ne 1 ]]; then
+    echo "== Full deploy: uncommitted or untracked changes under packages or the deploy inputs; no record will be kept =="
+  elif [[ "$DEPLOY_FULL" == "1" ]]; then
+    echo "== Full deploy: requested (--full or DEPLOY_FULL=1) =="
+  elif [[ ! -f "$STATE_FILE" ]]; then
+    echo "== Full deploy: no deploy record for this org (${STATE_FILE}) =="
+  else
+    newest="$(newest_deploy_request)"
+    SKIP_PACKAGES=" $(python3 - "$STATE_FILE" "$id" "$(deploy_fingerprint)" "$newest" \
+      $(package_trees) <<'PYEOF' 2> /dev/null
+import json, sys
+state_file, org, fingerprint, newest = sys.argv[1:5]
+try:
+    rec = json.load(open(state_file, encoding="utf-8"))
+    ok = (newest and rec["orgId"] == org and rec["fingerprint"] == fingerprint
+          and rec["lastDeployRequest"] == newest and isinstance(rec["packages"], dict))
+except Exception:
+    ok = False
+if not ok:
+    sys.exit(0)
+skip = []
+for pair in sys.argv[5:]:
+    name, _, tree = pair.partition("=")
+    if tree and rec["packages"].get(name) == tree:
+        skip.append(name)
+print(" ".join(skip))
+PYEOF
+    ) "
+    if [[ "$SKIP_PACKAGES" == " " ]]; then
+      echo "== Full deploy: the deploy record does not match this org's current state, or every package changed =="
+    else
+      echo "== Unchanged since the last deploy to this org, so only their Apex deploys:${SKIP_PACKAGES}=="
+    fi
+  fi
+  # Deleted before the first stage, so a run that fails partway leaves no record behind.
+  rm -f "$STATE_FILE"
+}
+
+# Called once every stage has deployed. Records the packages this run left in the org (deployed in
+# full, or unchanged and so already there). A failed lookup writes nothing: the next run deploys
+# everything.
+write_deploy_record() {
+  local newest recorded=("$@") tmp
+  [[ -n "$STATE_FILE" && "$TREE_CLEAN" -eq 1 ]] || return 0
+  newest="$(newest_deploy_request)"
+  if [[ -z "$newest" ]]; then
+    echo "== No deploy record kept: the org's newest DeployRequest could not be read =="
+    return 0
+  fi
+  mkdir -p "$DEPLOY_STATE_DIR" || return 0
+  tmp="$(mktemp "${DEPLOY_STATE_DIR}/.record.XXXXXX")" || return 0
+  if python3 - "$tmp" "$(basename "$STATE_FILE" .json)" "$ALIAS" "$(git rev-parse HEAD)" \
+    "$(deploy_fingerprint)" "$newest" $(package_trees) "${recorded[@]/#/only=}" <<'PYEOF'; then
+import datetime, json, sys
+out, org, alias, commit, fingerprint, newest = sys.argv[1:7]
+trees, only = {}, set()
+for arg in sys.argv[7:]:
+    key, _, value = arg.partition("=")
+    if key == "only":
+        only.add(value)
+    else:
+        trees[key] = value
+json.dump({
+    "orgId": org, "alias": alias, "commit": commit, "fingerprint": fingerprint,
+    "lastDeployRequest": newest,
+    "recordedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+    "packages": {k: v for k, v in trees.items() if k in only and v},
+}, open(out, "w", encoding="utf-8"), indent=2)
+PYEOF
+    mv -f "$tmp" "$STATE_FILE" && echo "== Deploy record written: ${STATE_FILE} =="
+  else
+    rm -f "$tmp"
+  fi
+}
+
+# deploy-packages.sh <alias> --adopt <deploy id>: run-org-tests.sh calls this after its own
+# RunRelevantTests deploy, which sends Apex already in the org from the same commit (and is rolled
+# back whole if a test fails), so the org still holds what the record says. The record takes that
+# deploy id as its newest only when the org's two newest DeployRequests are exactly that deploy
+# and the one recorded: anything else came in between, and the record is deleted.
+adopt_deploy() {
+  local id org capture ids
+  org="$(org_id)"
+  [[ -n "$org" ]] || return 0
+  STATE_FILE="${DEPLOY_STATE_DIR}/${org}.json"
+  [[ -f "$STATE_FILE" ]] || return 0
+  capture="$(mktemp)"
+  run_capped "$REPORT_TIMEOUT_SECONDS" "$capture" sf data query --use-tooling-api --target-org "$ALIAS" --json \
+    --query "SELECT Id FROM DeployRequest ORDER BY CreatedDate DESC LIMIT 2"
+  ids="$(jq -r '[.result.records[].Id] | join(" ")' "$capture" 2> /dev/null)"
+  rm -f "$capture"
+  if python3 - "$STATE_FILE" "$org" "$1" $ids <<'PYEOF'; then
+import json, os, sys
+state_file, org, adopted = sys.argv[1:4]
+ids = sys.argv[4:]
+same = lambda a, b: bool(a) and bool(b) and a[:15] == b[:15]
+rec = json.load(open(state_file, encoding="utf-8"))
+if not (len(ids) == 2 and rec["orgId"] == org and same(ids[0], adopted)
+        and same(ids[1], rec["lastDeployRequest"])):
+    sys.exit(1)
+rec["lastDeployRequest"] = ids[0]
+tmp = state_file + ".tmp"
+json.dump(rec, open(tmp, "w", encoding="utf-8"), indent=2)
+os.replace(tmp, state_file)
+PYEOF
+    echo "== Deploy record kept: ${ALIAS}'s newest deploy is the gate's own test deploy =="
+  else
+    rm -f "$STATE_FILE"
+    echo "== Deploy record removed: another deploy reached ${ALIAS}, so the next run deploys everything =="
+  fi
+}
+if [[ -n "$ADOPT_ID" ]]; then
+  adopt_deploy "$ADOPT_ID"
+  exit 0
+fi
+
 # Every folder under Core's main/default has to be named by a stage below. A folder no stage
 # names never reaches the org, so nothing that depends on it is ever tested: Core's flows went
 # undeployed this way until 2026-10-13.
@@ -438,22 +678,26 @@ deploy_objects_one_by_one() {
     deploy_stage "Core (data model, ${object})" "${OBJECTS_DIR}/${object}/" || return $?
   done <<< "$OBJECT_ORDER"
 }
-if [[ "$DATA_MODEL_STAGES" == "combined" ]]; then
-  # One request for every object. A failure that names components is a real error and stops
-  # the run; one that names none is the opaque platform fault, so the objects go again one by one.
-  if ! deploy_stage "Core (data model, every object in one request)" "$OBJECTS_DIR"; then
-    errors="$(sf project deploy report --job-id "$JOB_ID" --target-org "$ALIAS" --json 2> /dev/null \
-      | jq -r '.result.numberComponentErrors // 0' 2> /dev/null)"
-    [[ "$errors" =~ ^[0-9]+$ ]] || errors=1
-    if [[ -z "$JOB_ID" || "${errors:-0}" -gt 0 ]]; then
-      exit 1
+deploy_data_model() {
+  if [[ "$DATA_MODEL_STAGES" == "combined" ]]; then
+    # One request for every object. A failure that names components is a real error and stops
+    # the run; one that names none is the opaque platform fault, so the objects go again one by one.
+    if ! deploy_stage "Core (data model, every object in one request)" "$OBJECTS_DIR"; then
+      last_failure_opaque || return 1
+      echo "== The one-request data model deploy failed with no component error. Falling back to one object per stage =="
+      deploy_objects_one_by_one || return $?
     fi
-    echo "== The one-request data model deploy failed with no component error. Falling back to one object per stage =="
-    deploy_objects_one_by_one || exit $?
+  else
+    deploy_objects_one_by_one || return $?
   fi
-else
-  deploy_objects_one_by_one || exit $?
-fi
+}
+
+# HISTORY OF THE CONFIG STAGES. Config was one stage per directory, as below, until 2026-10-28.
+# Since then (D-141 amendment) the three go in one request by default (CONFIG_STAGES=combined),
+# falling back to the three stages only on the opaque failure, as the data model does: both
+# faults that justified the split were later traced to real defects. CONFIG_STAGES=separate
+# brings back the three stages from the start.
+#
 # One stage per config directory, not one stage for all four. Every object deployed clean
 # individually (the finding the per-object split above was designed to produce), so the very
 # next stage in line, the four config directories deployed together, is what hit the platform
@@ -464,29 +708,68 @@ fi
 # Splitting by directory isolates that file's stage from the other three, which are small on
 # any count (customMetadata's ~60 files are ~60 components, one per record; static resources
 # and custom permissions are a handful each).
-deploy_stage "Core (data model, custom metadata)" "packages/core/main/default/customMetadata" || exit $?
-deploy_stage "Core (data model, labels)" "packages/core/main/default/labels" || exit $?
-deploy_stage "Core (data model, static resources and custom permissions)" \
-  "packages/core/main/default/staticresources" \
-  "packages/core/main/default/customPermissions" \
-  "packages/core/main/default/notificationtypes" || exit $?
-deploy_stage "Core (Apex)" \
-  "packages/core/main/default/classes" \
-  "packages/core/main/default/triggers" \
-  "packages/core/main/default/PlatformEventSubscriberConfigs" || exit $?
-# After Apex, which a flow can call, and before the UI, which can launch a flow.
-deploy_stage "Core (flows)" "packages/core/main/default/flows" || exit $?
-deploy_stage "Core (UI and permissions)" \
-  "packages/core/main/default/contentassets" \
-  "packages/core/main/default/permissionsets" \
-  "packages/core/main/default/permissionsetgroups" \
-  "packages/core/main/default/layouts" \
-  "packages/core/main/default/flexipages" \
-  "packages/core/main/default/applications" \
-  "packages/core/main/default/tabs" \
-  "packages/core/main/default/quickActions" \
-  "packages/core/main/default/lwc" \
-  "packages/core/main/default/prompts" || exit $?
+deploy_config_separately() {
+  deploy_stage "Core (data model, custom metadata)" "${CORE_DIR}/customMetadata" || return $?
+  deploy_stage "Core (data model, labels)" "${CORE_DIR}/labels" || return $?
+  deploy_stage "Core (data model, static resources and custom permissions)" \
+    "${CORE_DIR}/staticresources" \
+    "${CORE_DIR}/customPermissions" \
+    "${CORE_DIR}/notificationtypes" || return $?
+}
+deploy_config() {
+  if [[ "$CONFIG_STAGES" == "combined" ]]; then
+    if ! deploy_stage "Core (config: custom metadata, labels, static resources, custom permissions, notification types)" \
+      "${CORE_DIR}/customMetadata" "${CORE_DIR}/labels" "${CORE_DIR}/staticresources" \
+      "${CORE_DIR}/customPermissions" "${CORE_DIR}/notificationtypes"; then
+      last_failure_opaque || return 1
+      echo "== The one-request config deploy failed with no component error. Falling back to three stages =="
+      deploy_config_separately || return $?
+    fi
+  else
+    deploy_config_separately || return $?
+  fi
+}
+
+# Classes and triggers of a package, the part that deploys even when the package is unchanged.
+apex_dirs() {
+  local dir
+  for dir in classes triggers PlatformEventSubscriberConfigs; do
+    [[ -d "packages/$1/main/default/${dir}" ]] && echo "packages/$1/main/default/${dir}"
+  done
+}
+
+decide_skips
+# The packages whose source this run leaves in the org, for the deploy record.
+RECORD_PACKAGES=(core)
+
+if package_skipped core; then
+  echo ""
+  echo "== Core is unchanged since the last deploy to ${ALIAS}: skipping every Core stage but Apex =="
+else
+  deploy_data_model || exit $?
+  deploy_config || exit $?
+fi
+if ! package_skipped core || [[ "$DEPLOY_APEX_ALWAYS" == "1" ]]; then
+  deploy_stage "Core (Apex)" \
+    "${CORE_DIR}/classes" \
+    "${CORE_DIR}/triggers" \
+    "${CORE_DIR}/PlatformEventSubscriberConfigs" || exit $?
+fi
+if ! package_skipped core; then
+  # After Apex, which a flow can call, and before the UI, which can launch a flow.
+  deploy_stage "Core (flows)" "${CORE_DIR}/flows" || exit $?
+  deploy_stage "Core (UI and permissions)" \
+    "${CORE_DIR}/contentassets" \
+    "${CORE_DIR}/permissionsets" \
+    "${CORE_DIR}/permissionsetgroups" \
+    "${CORE_DIR}/layouts" \
+    "${CORE_DIR}/flexipages" \
+    "${CORE_DIR}/applications" \
+    "${CORE_DIR}/tabs" \
+    "${CORE_DIR}/quickActions" \
+    "${CORE_DIR}/lwc" \
+    "${CORE_DIR}/prompts" || exit $?
+fi
 
 # A deployment is not an install, so CorePostInstall never runs and the org would start with
 # every feature on before first-run setup, automatic households on, no nightly tab access check,
@@ -508,17 +791,58 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # The Rollup Builder module depends on Core only, and Giving depends on it (ADR-0125
   # 0125-rollup-builder-module.md), so it goes between them. --core-only leaves it out, which is
   # how a Core-only org (no rollup engine at all) is built.
-  deploy_stage "Rollup Builder" "packages/rollups" || exit $?
-  deploy_stage "Giving" "packages/giving" || exit $?
+  #
+  # FEWER MODULE STAGES (D-141 amendment, 2026-10-28). By default (MODULE_STAGES=combined) every
+  # module goes in one request: the Metadata API orders the components of one request itself. On
+  # the opaque failure (no component error) the modules go again one per stage, in dependency
+  # order; a failure that names components stops the run. MODULE_STAGES=separate deploys one per
+  # stage from the start. A module unchanged since the last deploy to this org sends only its
+  # Apex (or nothing, with DEPLOY_APEX_ALWAYS=0).
   # Volunteers depends on Core and the Rollup Builder module. While packages/volunteers holds
-  # no metadata the stage is skipped (volunteers_has_metadata), so it costs nothing until PR4.
+  # no metadata it is left out (volunteers_has_metadata).
+  MODULES=(rollups giving)
   if volunteers_has_metadata; then
-    deploy_stage "Volunteers" "packages/volunteers" || exit $?
+    MODULES+=(volunteers)
   else
     echo "== Skipping Volunteers: packages/volunteers holds no metadata yet =="
   fi
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
-  deploy_stage "Mirror" "packages/mirror" || exit $?
+  MODULES+=(mirror)
+  RECORD_PACKAGES+=("${MODULES[@]}")
+  module_dirs() {
+    if ! package_skipped "$1"; then
+      echo "packages/$1"
+    elif [[ "$DEPLOY_APEX_ALWAYS" == "1" ]]; then
+      apex_dirs "$1"
+    fi
+  }
+  deploy_modules_separately() {
+    local module dirs
+    for module in "${MODULES[@]}"; do
+      dirs=()
+      while IFS= read -r dir; do [[ -n "$dir" ]] && dirs+=("$dir"); done < <(module_dirs "$module")
+      if [[ ${#dirs[@]} -eq 0 ]]; then
+        echo "== Skipping module ${module}: unchanged since the last deploy to ${ALIAS} =="
+        continue
+      fi
+      deploy_stage "Module ${module}" "${dirs[@]}" || return $?
+    done
+  }
+  if [[ "$MODULE_STAGES" == "combined" ]]; then
+    ALL_MODULE_DIRS=()
+    for module in "${MODULES[@]}"; do
+      while IFS= read -r dir; do [[ -n "$dir" ]] && ALL_MODULE_DIRS+=("$dir"); done < <(module_dirs "$module")
+    done
+    if [[ ${#ALL_MODULE_DIRS[@]} -eq 0 ]]; then
+      echo "== Skipping the modules: every one is unchanged since the last deploy to ${ALIAS} =="
+    elif ! deploy_stage "Modules (${MODULES[*]}) in one request" "${ALL_MODULE_DIRS[@]}"; then
+      last_failure_opaque || exit 1
+      echo "== The one-request module deploy failed with no component error. Falling back to one module per stage =="
+      deploy_modules_separately || exit $?
+    fi
+  else
+    deploy_modules_separately || exit $?
+  fi
 
   # Core may not name a module's tab in its own apps (a Core-only deploy would fail on the
   # missing tab, ADR-0013), so each deployed module's tabs join the BarnCRM apps here, from its
@@ -615,3 +939,4 @@ if [[ "$STALLS_RECOVERED" -gt 0 ]]; then
   echo "== ${STALLS_RECOVERED} stalled deploy(s) cancelled and resubmitted successfully =="
 fi
 echo "== Every stage deployed =="
+write_deploy_record "${RECORD_PACKAGES[@]}"

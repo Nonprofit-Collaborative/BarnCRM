@@ -51,11 +51,13 @@ households this way, never with Salesforce's own account merge. The full steps a
 ## To Work Through the Duplicates List (Admins)
 
 1. Open the **Duplicate Matching** tab. The **Review** list opens.
-2. Under **Possible Duplicates**, read each pair. It is marked **Person** or **Household**, and
-   says why it was suggested (see below). Press **Refresh** to see the latest.
-3. For two people, open either one and use **Compare and merge**, as above. The list reminds
-   you: "To merge two people, open either one and use Compare and merge on the Potential
-   Duplicates card."
+2. Under **Possible Duplicates** (the badge says how many are waiting), read each pair. It is
+   marked **Person** or **Household**, and says why it was suggested (see below). The list
+   shows 10 pairs at a time; click **Show More** for the next 10. Press **Refresh** to see the
+   latest.
+3. For two people, open either one and use **Compare and merge**, as above. The note above the
+   list reminds you: "To merge two people, open either one and use Compare and merge on the
+   Potential Duplicates card."
 4. For two households, click **Merge Households**. In **Merge Two Households**, choose the
    **Household to keep** and click **Merge these two**. To choose field by field, use **Merge
    or split** on the household instead.
@@ -102,8 +104,8 @@ any real duplicates in it first.
   Optimizer** where you used to find it. The list moved to the **Duplicate Matching** tab, which
   is for admins and holders of the BarnCRM Duplicate Review add-on. Ask your admin, or use the
   **Potential Duplicates** card on the person.
-- Problem: "No possible duplicates are waiting. Scan again after a large import." Nothing to
-  review. Ask your admin to scan after an import.
+- Problem: **No Possible Duplicates**, "No possible duplicates are waiting. Scan again after a
+  large import." Nothing to review. Ask your admin to scan after an import.
 - Problem: a pair of organizations never appears. The list shows people and households only.
   Ask your admin.
 - Problem: after merging two people, an empty household is left. That is on purpose. Merge it

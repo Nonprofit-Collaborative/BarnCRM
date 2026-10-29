@@ -225,6 +225,14 @@
         <value>The sample data file could not be found. Contact your administrator.</value>
     </labels>
     <labels>
+        <fullName>Core_SampleData_StatusError</fullName>
+        <categories>Sample Data</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Inline note when the sample data status could not be read</shortDescription>
+        <value>The sample data status could not be read, so the counts below may be out of date. The Error Log has the detail.</value>
+    </labels>
+    <labels>
         <fullName>Core_SampleData_StatusLoaded</fullName>
         <categories>Sample Data</categories>
         <language>en_US</language>

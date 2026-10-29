@@ -35,6 +35,16 @@ describe('c-duplicate-matching for an administrator', () => {
     }
   });
 
+  it('leaves the page name to the App Page header, with no card around the page', async () => {
+    const element = await render();
+
+    const shell = element.shadowRoot.querySelector('c-barn-page-shell');
+    expect(shell.titleHidden).toBe(true);
+    expect(shell.title).toBe('c.Core_DuplicateMatching_Title');
+    expect(shell.purpose).toBe('c.Core_DuplicateMatching_Intro');
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+  });
+
   it('opens on the review list, and offers Matching Logic', async () => {
     const element = await render();
 
@@ -45,6 +55,15 @@ describe('c-duplicate-matching for an administrator', () => {
     expect(element.shadowRoot.querySelector('lightning-tabset').activeTabValue).toBe('review');
     expect(element.shadowRoot.querySelector('c-duplicate-review')).not.toBeNull();
     expect(element.shadowRoot.querySelector('c-match-source-manager')).toBeNull();
+  });
+
+  it('sits in the page shell with the title for screen readers only', async () => {
+    const element = await render();
+    const shell = element.shadowRoot.querySelector('c-barn-page-shell');
+    expect(shell.titleHidden).toBe(true);
+    expect(shell.title).toBe('c.Core_DuplicateMatching_Title');
+    expect(shell.purpose).toBe('c.Core_DuplicateMatching_Intro');
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
   });
 
   it('creates Matching Logic when it is first opened, and keeps the review list', async () => {

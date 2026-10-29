@@ -38,7 +38,8 @@
 ## Org tests
 
 - [ ] Feature pull request: no org gate; Jest (`npm run test:unit`) and the `scripts/ci` checks passed locally, and the branch lands through a landing batch (plan D-141).
-- [ ] Landing batch (`landing/batch-N`): the full `scripts/org/run-org-tests.sh` run passed on the head commit on both `barn-sales` and `oi-test`, run in parallel, so the `Org tests (local)` status is green. See docs/contributor-guide/ci.md, "The org test gate".
+- [ ] Landing batch (`landing/batch-N`): the incremental gate (`scripts/org/run-org-tests.sh barn-sales`) passed on the head commit, so the `Org tests (local)` status is green (plan D-142). See docs/contributor-guide/ci.md, "The org test gate".
+- [ ] Version release (only when a significant version's development is done and integrated): `scripts/org/run-org-tests.sh <alias> --release` passed on both `barn-sales` and `oi-test`, then `barn-npc` and `mwdbdevsb` (with Brandon's approval) were re-validated and deployed, then QA and UX testing.
 
 ## DCO sign-off
 

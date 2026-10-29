@@ -145,7 +145,8 @@ describe('c-bulk-delete', () => {
     expect(one(element, 'preview-line').textContent).toBe('200 Contacts match. The first ones:');
     const names = [...element.shadowRoot.querySelectorAll('[data-id="sample-row"]')];
     expect(names.map((row) => row.textContent)).toEqual(['Person 0', 'Person 1']);
-    expect(one(element, 'cascades').textContent).toContain('Program Enrollments');
+    expect(one(element, 'cascade').label).toBe('Program Enrollments');
+    expect(one(element, 'path').currentStep).toBe('confirm');
     expect(one(element, 'start').label).toBe('Delete 200 records');
   });
 
@@ -217,7 +218,7 @@ describe('c-bulk-delete', () => {
     await flush();
     expect(previewFile).toHaveBeenCalledWith({ batchId: 'a0B000000000009' });
     expect(previewDelete).not.toHaveBeenCalled();
-    expect(one(element, 'cascades').textContent).toContain('Program Enrollments');
+    expect(one(element, 'cascade').label).toBe('Program Enrollments');
 
     await change(one(element, 'confirm'), '200');
     one(element, 'start').click();

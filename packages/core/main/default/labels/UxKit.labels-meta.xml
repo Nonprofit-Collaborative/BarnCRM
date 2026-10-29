@@ -24,4 +24,52 @@
         <shortDescription>Assistive text after a link that opens in a new browser tab</shortDescription>
         <value>(opens in a new tab)</value>
     </labels>
+    <labels>
+        <fullName>Core_Kit_Back</fullName>
+        <categories>Core, UX kit</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step flow: button that returns to the previous step</shortDescription>
+        <value>Back</value>
+    </labels>
+    <labels>
+        <fullName>Core_Kit_StepOf</fullName>
+        <categories>Core, UX kit</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step flow: screen reader heading. {0} step number, {1} step count, {2} step name</shortDescription>
+        <value>Step {0} of {1}: {2}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Kit_Save</fullName>
+        <categories>Core, UX kit</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save bar: button that saves the unsaved changes</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Core_Kit_Discard</fullName>
+        <categories>Core, UX kit</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save bar: button that drops the unsaved changes</shortDescription>
+        <value>Discard</value>
+    </labels>
+    <labels>
+        <fullName>Core_Kit_UnsavedOne</fullName>
+        <categories>Core, UX kit</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save bar: count when one change is unsaved</shortDescription>
+        <value>1 unsaved change</value>
+    </labels>
+    <labels>
+        <fullName>Core_Kit_UnsavedMany</fullName>
+        <categories>Core, UX kit</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save bar: count of unsaved changes. {0} the count</shortDescription>
+        <value>{0} unsaved changes</value>
+    </labels>
 </CustomLabels>

@@ -1,7 +1,6 @@
 <template>
-  <lightning-card title={labels.title} icon-name="standard:merge">
-    <p class="slds-var-p-horizontal_medium slds-var-p-bottom_small">{labels.intro}</p>
-    <div class="slds-var-p-horizontal_medium">
+  <c-barn-page-shell title={labels.title} purpose={labels.intro} title-hidden data-id="shell">
+    <div>
       <template lwc:if={hasAnyArea}>
         <lightning-tabset active-tab-value={activeArea}>
           <template lwc:if={canSeeReview}>
@@ -29,5 +28,5 @@
         <p class="slds-var-p-bottom_medium" data-id="no-access" role="status">{labels.noAccess}</p>
       </template>
     </div>
-  </lightning-card>
+  </c-barn-page-shell>
 </template>

@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: what the bulk update card does, and how to start it</shortDescription>
-        <value>No file needed. Change up to five fields on many records at once: find the records in Find, then press Bulk update. To update records from a spreadsheet, use Import a File.</value>
+        <value>No file needed. Change up to five fields on many records at once: find the records in Find, then choose Change Records, Bulk Update. To update records from a spreadsheet, use Import a File.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_DeleteTitle</fullName>
@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: what the bulk delete card does, and how to start it</shortDescription>
-        <value>No file needed: find the records in Find, then press Bulk delete. To delete the records a spreadsheet lists by record ID, an administrator can use Import a File, Load one object, then Delete by record ID.</value>
+        <value>No file needed: find the records in Find, then choose Change Records, Bulk Delete. To delete the records a spreadsheet lists by record ID, an administrator can use Import a File, Load one object, then Delete by record ID.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_DeleteWarning</fullName>
@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: card that opens Org Optimizer</shortDescription>
-        <value>Tidy and Check Your Data</value>
+        <value>Org Optimizer</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_OptimizerText</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: what the Org Optimizer card does</shortDescription>
-        <value>No file needed. Open Org Optimizer to see which records and settings need attention.</value>
+        <value>No file needed. See which records and settings need attention.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_Open</fullName>

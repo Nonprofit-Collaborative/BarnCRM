@@ -104,7 +104,7 @@ request as ticket PR-2041.
   records (Nonprofit Cloud's email, phone and address records); and records of your
   organization's own custom objects that hold personal details in their own fields. Review
   these yourself; the erasure's record page lists none of them.
-- **Health Check** and the data hygiene console do not count an erased person as a person with
+- **Health Check** and Org Optimizer's **Data Quality** checks do not count an erased person as a person with
   no household: erasing them took them out of it on purpose.
 
 ## 5. Common Mistakes

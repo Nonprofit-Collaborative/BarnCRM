@@ -211,7 +211,7 @@ left is the one that becomes **Former**, and it still goes to the winter address
 status menu) when mail comes back; BarnCRM never sets or clears it. An undeliverable primary
 address is flagged in red on the card, and the **Primary Addresses Marked Undeliverable** check
 in **Org Optimizer**, **Data Quality** lists every household, organization and person whose
-primary is marked that way, with **Open in Find** (see [Data hygiene](data-hygiene.md)).
+primary is marked that way, with **Open in Find** (see [Data Quality](data-hygiene.md)).
 
 **A Former address stays out of use.** The seasonal swap skips a **Former** seasonal address
 (the household no longer winters there) and never puts a **Former** address back when a season

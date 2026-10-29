@@ -102,7 +102,7 @@ public with sharing class ImportObjectSchema {
             return null;
         }
         if (globalDescribe == null) {
-            globalDescribe = Schema.getGlobalDescribe();
+            globalDescribe = NamespaceUtil.globalDescribe();
         }
         String lower = objectName.trim().toLowerCase();
         Schema.SObjectType found = globalDescribe.get(lower);
@@ -190,7 +190,7 @@ public with sharing class ImportObjectSchema {
     @NamespaceAccessible
     public static List<ImportMapping.Target> loadableObjects() {
         if (globalDescribe == null) {
-            globalDescribe = Schema.getGlobalDescribe();
+            globalDescribe = NamespaceUtil.globalDescribe();
         }
         Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
         for (Schema.SObjectType type : globalDescribe.values()) {

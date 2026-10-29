@@ -17,10 +17,10 @@
   work but are not tested.
 - **Java 11 or newer**: required for PMD, which `sf code-analyzer` runs as part of the rule
   engine. Java 21 (as installed here) is fine; anything 11+ works.
-- **Salesforce CLI new enough for `RunRelevantTests`**, for the relevant-tests org run
-  (`scripts/org/run-org-tests.sh <alias> --relevant`, see [CI](ci.md), "The org test gate").
+- **Salesforce CLI new enough for `RunRelevantTests`**, for the incremental org gate
+  (`scripts/org/run-org-tests.sh <alias>`, see [CI](ci.md), "The org test gate").
   Check with `sf project deploy start --help`: its `--test-level` options must list
-  `RunRelevantTests` (2.153.5 does). The full gate needs no particular version. The
+  `RunRelevantTests` (2.153.5 does). The release gate (`--release`) needs no particular version. The
   `@IsTest(testFor=...)` and `@IsTest(critical=true)` annotations need API 66.0 or later;
   `sfdx-project.json` sets 67.0.
 

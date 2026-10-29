@@ -306,7 +306,7 @@ public with sharing class ModuleManagerService {
         ModuleStatus row = switchable(moduleName);
         List<RecordCount> lines = new List<RecordCount>();
         List<String> objects = ownedObjects.get(row.name);
-        Map<String, Schema.SObjectType> describes = Schema.getGlobalDescribe();
+        Map<String, Schema.SObjectType> describes = NamespaceUtil.globalDescribe();
         List<String> apiNames = new List<String>();
         for (String unqualified : objects == null ? new List<String>() : objects) {
             String apiName = ModuleDetectionService.resolveObject(unqualified);

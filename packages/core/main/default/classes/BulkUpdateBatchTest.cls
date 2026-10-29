@@ -6,13 +6,25 @@
  * A test runs one queued job, at Test.stopTest, so a test that also undoes drives the bulk
  * update through the job's own start query, as ImportUndoTest does.
  *
+ * The 200 volunteers and Maria are built once, in setup, and every test finds them again.
+ *
  * No org has run these yet; they are written against the behaviour the classes document.
  */
 @IsTest(testFor='ApexClass:BulkUpdateBatch')
 private class BulkUpdateBatchTest {
+    private static final String ORGANIZATION = 'Springfield Food Bank';
+    private static final Integer VOLUNTEER_COUNT = 200;
+
+    /** 200 contacts titled Volunteer at one organization, and Maria, who runs the updates. */
     @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
+    static void setUp() {
+        System.runAs(TestUsers.admin()) {
+            noRollupTargets();
+            Account organization = new Account(Name = ORGANIZATION);
+            insert organization;
+            insert people(organization.Id, 0, VOLUNTEER_COUNT, 'Volunteer');
+            TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+        }
     }
 
     private static final String VOLUNTEERS = JSON.serialize(
@@ -42,27 +54,38 @@ private class BulkUpdateBatchTest {
         new Map<String, Object>{ 'field' => 'Title', 'action' => 'set', 'value' => 'Coordinator' }
     );
 
-    /** `volunteers` contacts titled Volunteer and `staff` titled Staff, with work emails. */
-    private static void makePeople(Integer volunteers, Integer staff) {
+    /**
+     * No rollup target fields, so no field is protected as one. A static, so each test sets it
+     * again: what setup set is gone by the time a test runs.
+     */
+    private static void noRollupTargets() {
         DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-        Account organization = new Account(Name = 'Springfield Food Bank');
-        insert organization;
+    }
+
+    /** `count` contacts with the title given, numbered from `first`, with work emails. */
+    private static List<Contact> people(
+        Id organizationId,
+        Integer first,
+        Integer count,
+        String title
+    ) {
         List<Contact> people = new List<Contact>();
-        for (Integer index = 0; index < volunteers + staff; index++) {
+        for (Integer index = first; index < first + count; index++) {
             people.add(
                 new Contact(
-                    AccountId = organization.Id,
+                    AccountId = organizationId,
                     LastName = 'Person ' + String.valueOf(index).leftPad(4, '0'),
-                    Title = index < volunteers ? 'Volunteer' : 'Staff',
+                    Title = title,
                     Work_Email__c = 'person' + index + '@example.org'
                 )
             );
         }
-        insert people;
+        return people;
     }
 
+    /** Maria, created in setup and found again by her username. */
     private static User maria() {
-        return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+        return [SELECT Id FROM User WHERE Username LIKE 'barn-test.maria.%' LIMIT 1];
     }
 
     /** Starts a bulk update as Maria and lets its job run. */
@@ -133,7 +156,9 @@ private class BulkUpdateBatchTest {
     @IsTest
     static void setChangesTwoHundredRecordsAndJournalsEachOne() {
         System.runAs(TestUsers.admin()) {
-            makePeople(200, 30);
+            noRollupTargets();
+            Id organizationId = [SELECT Id FROM Account WHERE Name = :ORGANIZATION LIMIT 1].Id;
+            insert people(organizationId, VOLUNTEER_COUNT, 30, 'Staff');
             Import_Batch__c job = run(maria(), SET_COORDINATOR, 200);
 
             System.Assert.areEqual(200, [SELECT COUNT() FROM Contact WHERE Title = 'Coordinator']);
@@ -163,7 +188,7 @@ private class BulkUpdateBatchTest {
     @IsTest
     static void clearEmptiesTheFieldOnTwoHundredRecords() {
         System.runAs(TestUsers.admin()) {
-            makePeople(200, 0);
+            noRollupTargets();
             Import_Batch__c job = run(
                 maria(),
                 changes(new Map<String, Object>{ 'field' => 'Title', 'action' => 'clear' }),
@@ -178,7 +203,7 @@ private class BulkUpdateBatchTest {
     @IsTest
     static void copyTakesEachRecordsOwnValueOverTwoHundredRecords() {
         System.runAs(TestUsers.admin()) {
-            makePeople(200, 0);
+            noRollupTargets();
             Import_Batch__c job = run(
                 maria(),
                 changes(
@@ -201,7 +226,7 @@ private class BulkUpdateBatchTest {
     @IsTest
     static void refusesToStartWhenMoreMatchThanWereConfirmed() {
         System.runAs(TestUsers.admin()) {
-            makePeople(200, 0);
+            noRollupTargets();
             System.runAs(maria()) {
                 try {
                     BulkUpdateService.start(VOLUNTEERS, SET_COORDINATOR, 199);
@@ -221,7 +246,7 @@ private class BulkUpdateBatchTest {
     @IsTest
     static void aRecordThatNoLongerMatchesIsLeftAlone() {
         System.runAs(TestUsers.admin()) {
-            makePeople(200, 0);
+            noRollupTargets();
             System.runAs(maria()) {
                 BulkUpdateBatch job = new BulkUpdateBatch(createJob(SET_COORDINATOR, 200).Id);
                 List<SObject> scope = startQuery(job);
@@ -244,7 +269,7 @@ private class BulkUpdateBatchTest {
     @IsTest
     static void aRecordThePlatformRefusesIsJournaledWithItsReason() {
         System.runAs(TestUsers.admin()) {
-            makePeople(200, 0);
+            noRollupTargets();
             // An email field takes any text in the check; the save itself refuses it.
             Import_Batch__c job = run(
                 maria(),
@@ -349,7 +374,7 @@ private class BulkUpdateBatchTest {
     @IsTest
     static void aStoppedChunkSaysHowManyRecordsWereNotReached() {
         System.runAs(TestUsers.admin()) {
-            makePeople(200, 0);
+            noRollupTargets();
             Import_Batch__c created;
             System.runAs(maria()) {
                 created = createJob(SET_COORDINATOR, 200);
@@ -386,7 +411,7 @@ private class BulkUpdateBatchTest {
     @IsTest
     static void aChangeTooLargeToUndoIsRefusedNotSaved() {
         System.runAs(TestUsers.admin()) {
-            makePeople(200, 0);
+            noRollupTargets();
             ImportJournalService.maxDocumentLength = 1500;
             String longText = changes(
                 new Map<String, Object>{
@@ -420,7 +445,7 @@ private class BulkUpdateBatchTest {
     static void undoPutsBackTwoHundredValuesExceptOneChangedSince() {
         System.runAs(TestUsers.admin()) {
             ImportEntityProcessors.noneForTest = true;
-            makePeople(200, 0);
+            noRollupTargets();
             User maria = maria();
             Import_Batch__c created;
             System.runAs(maria) {

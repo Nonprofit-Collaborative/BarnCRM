@@ -1,0 +1,37 @@
+<template>
+    <fieldset class="slds-form-element" data-id="picker">
+        <legend class="slds-form-element__legend slds-text-heading_small slds-var-m-bottom_small" data-id="legend">{label}</legend>
+        <div class="slds-grid slds-wrap slds-gutters_x-small">
+            <template for:each={choices} for:item="choice">
+                <div key={choice.value} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3 slds-var-p-bottom_small slds-grid">
+                    <input
+                        type="radio"
+                        class="picker__input slds-assistive-text"
+                        id={choice.id}
+                        name={groupName}
+                        value={choice.value}
+                        checked={choice.checked}
+                        aria-describedby={choice.lineId}
+                        data-id="choice"
+                        data-value={choice.value}
+                        onchange={handleChange}
+                    />
+                    <label class="picker__card" for={choice.id} data-id="card">
+                        <span class="picker__figure">
+                            <lightning-icon
+                                icon-name={choice.iconName}
+                                variant={choice.iconVariant}
+                                size="small"
+                                data-id="icon"
+                            ></lightning-icon>
+                        </span>
+                        <span class="picker__body">
+                            <span class="picker__name slds-text-heading_small" data-id="name">{choice.label}</span>
+                            <span class="slds-text-body_small" id={choice.lineId} data-id="line">{choice.description}</span>
+                        </span>
+                    </label>
+                </div>
+            </template>
+        </div>
+    </fieldset>
+</template>

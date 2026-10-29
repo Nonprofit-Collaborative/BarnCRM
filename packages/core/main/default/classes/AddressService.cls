@@ -1072,12 +1072,70 @@ public with sharing class AddressService {
             contactUpdates
         );
 
-        if (!contactUpdates.isEmpty()) {
-            Database.update(contactUpdates.values(), AccessLevel.USER_MODE);
+        List<SObject> contactWrites = withChanges(contactUpdates.values());
+        if (!contactWrites.isEmpty()) {
+            Database.update(contactWrites, AccessLevel.USER_MODE);
         }
-        if (!accountUpdates.isEmpty()) {
-            Database.update(accountUpdates.values(), AccessLevel.USER_MODE);
+        List<SObject> accountWrites = withChanges(accountUpdates.values());
+        if (!accountWrites.isEmpty()) {
+            Database.update(accountWrites, AccessLevel.USER_MODE);
         }
+    }
+
+    /**
+     * The copies that would change something, in the order given. A person saved with an
+     * address is the source of the household address captured from it, so copying that
+     * address back writes exactly what the person already holds, and the same is true of an
+     * account saved with a billing address. Such a write changed no value but cost a whole
+     * second save of every record, with every Contact or Account automation running again.
+     * A copy is kept when any field it names differs from the stored value (text compared
+     * with its case), and when the record is not found.
+     *
+     * One query per object, and only when there is something to write. The stored values are
+     * read in system mode (ADR-0021): they decide whether a write is sent and never reach a
+     * screen, and the write itself stays in user mode.
+     */
+    @TestVisible
+    private static List<SObject> withChanges(List<SObject> copies) {
+        List<SObject> changed = new List<SObject>();
+        if (copies == null || copies.isEmpty()) {
+            return changed;
+        }
+        Set<String> fieldNames = new Set<String>();
+        Set<Id> recordIds = new Set<Id>();
+        for (SObject copy : copies) {
+            recordIds.add(copy.Id);
+            fieldNames.addAll(copy.getPopulatedFieldsAsMap().keySet());
+        }
+        Map<Id, SObject> stored = new Map<Id, SObject>(
+            AddressSelector.selectStoredValues(copies[0].getSObjectType(), fieldNames, recordIds)
+        );
+        for (SObject copy : copies) {
+            SObject current = stored.get(copy.Id);
+            if (current == null || differsFrom(copy, current)) {
+                changed.add(copy);
+            }
+        }
+        return changed;
+    }
+
+    private static Boolean differsFrom(SObject copy, SObject current) {
+        for (String field : copy.getPopulatedFieldsAsMap().keySet()) {
+            Object wanted = copy.get(field);
+            Object held = current.get(field);
+            if (wanted == null || held == null) {
+                if (wanted != held) {
+                    return true;
+                }
+            } else if (wanted instanceof String && held instanceof String) {
+                if (!((String) wanted).equals((String) held)) {
+                    return true;
+                }
+            } else if (!wanted.equals(held)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

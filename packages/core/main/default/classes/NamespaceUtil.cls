@@ -79,8 +79,34 @@ public with sharing class NamespaceUtil {
         return globalDescribe().get(qualify(apiName.trim()).toLowerCase());
     }
 
-    private static Map<String, Schema.SObjectType> globalDescribe() {
-        return describeOverride != null ? describeOverride : Schema.getGlobalDescribe();
+    /**
+     * The org's global describe, read once per transaction. Building it costs about 12 ms of
+     * CPU in an org with a thousand objects and one save used to ask for it ten times or more,
+     * while the objects an org has cannot change within a transaction. A stub always wins.
+     */
+    @TestVisible
+    private static Map<String, Schema.SObjectType> orgDescribe;
+
+    /** The user `orgDescribe` was read as (a test's `System.runAs` changes it). */
+    private static Id orgDescribeUserId;
+
+    /**
+     * The org's global describe, the same map `Schema.getGlobalDescribe()` returns, read once per
+     * transaction and running user: the describe is filtered by the running user's licences
+     * (ADR-0130), so a test's `System.runAs` reads it afresh. Every class asks here rather than
+     * calling `Schema.getGlobalDescribe()` itself. Callers read the map and never change it.
+     */
+    @NamespaceAccessible
+    public static Map<String, Schema.SObjectType> globalDescribe() {
+        if (describeOverride != null) {
+            return describeOverride;
+        }
+        Id runningUserId = UserInfo.getUserId();
+        if (orgDescribe == null || orgDescribeUserId != runningUserId) {
+            orgDescribe = Schema.getGlobalDescribe();
+            orgDescribeUserId = runningUserId;
+        }
+        return orgDescribe;
     }
 
     /**

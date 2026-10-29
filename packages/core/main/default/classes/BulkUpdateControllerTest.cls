@@ -3,13 +3,32 @@
  * permission set alone enough to read jobs, and preview, start and undo through the page's own
  * entry points over 200 records.
  *
+ * The 200 volunteers and Maria are built once, in setup, and every test finds them again.
+ *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
 @IsTest(testFor='ApexClass:BulkUpdateController')
 private class BulkUpdateControllerTest {
+    /** 200 contacts titled Volunteer at one organization, and Maria, who runs the updates. */
     @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
+    static void setUp() {
+        System.runAs(TestUsers.admin()) {
+            noRollupTargets();
+            Account organization = new Account(Name = 'Springfield Food Bank');
+            insert organization;
+            List<Contact> people = new List<Contact>();
+            for (Integer index = 0; index < 200; index++) {
+                people.add(
+                    new Contact(
+                        AccountId = organization.Id,
+                        LastName = 'Person ' + index,
+                        Title = 'Volunteer'
+                    )
+                );
+            }
+            insert people;
+            TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+        }
     }
 
     private static final String VOLUNTEERS = JSON.serialize(
@@ -41,25 +60,17 @@ private class BulkUpdateControllerTest {
         }
     );
 
-    private static void makeVolunteers(Integer howMany) {
+    /**
+     * No rollup target fields, so no field is protected as one. A static, so each test sets it
+     * again: what setup set is gone by the time a test runs.
+     */
+    private static void noRollupTargets() {
         DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-        Account organization = new Account(Name = 'Springfield Food Bank');
-        insert organization;
-        List<Contact> people = new List<Contact>();
-        for (Integer index = 0; index < howMany; index++) {
-            people.add(
-                new Contact(
-                    AccountId = organization.Id,
-                    LastName = 'Person ' + index,
-                    Title = 'Volunteer'
-                )
-            );
-        }
-        insert people;
     }
 
+    /** Maria, created in setup and found again by her username. */
     private static User maria() {
-        return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+        return [SELECT Id FROM User WHERE Username LIKE 'barn-test.maria.%' LIMIT 1];
     }
 
     @IsTest
@@ -99,7 +110,7 @@ private class BulkUpdateControllerTest {
     @IsTest
     static void thePermissionSetsAloneReadAJobAndItsRefusals() {
         System.runAs(TestUsers.admin()) {
-            makeVolunteers(1);
+            noRollupTargets();
             User bea = TestDataFactory.createUser(
                 'Bea',
                 new List<String>{ 'BarnCRM_Find_And_Export', 'BarnCRM_Bulk_Update' }
@@ -146,7 +157,7 @@ private class BulkUpdateControllerTest {
     @IsTest
     static void previewStartAndTheJobOverTwoHundredRecords() {
         System.runAs(TestUsers.admin()) {
-            makeVolunteers(200);
+            noRollupTargets();
             User maria = maria();
             BulkUpdateService.Preview preview;
             BulkUpdateController.JobView started;
@@ -178,7 +189,7 @@ private class BulkUpdateControllerTest {
     static void undoNeedsTheNumberShownAndPutsBackTwoHundredValues() {
         System.runAs(TestUsers.admin()) {
             ImportEntityProcessors.noneForTest = true;
-            makeVolunteers(200);
+            noRollupTargets();
             User maria = maria();
             Id jobId;
             System.runAs(maria) {
@@ -222,7 +233,7 @@ private class BulkUpdateControllerTest {
     static void anAbortedJobAsksForTheNumberItSavedAndUndoesIt() {
         System.runAs(TestUsers.admin()) {
             ImportEntityProcessors.noneForTest = true;
-            makeVolunteers(200);
+            noRollupTargets();
             User maria = maria();
             Id jobId;
             System.runAs(maria) {

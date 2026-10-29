@@ -260,7 +260,7 @@ public with sharing class OrgShapeDetector {
 
     private static Set<String> describedObjectNames() {
         Set<String> names = new Set<String>();
-        for (String objectName : Schema.getGlobalDescribe().keySet()) {
+        for (String objectName : NamespaceUtil.globalDescribe().keySet()) {
             names.add(objectName.toLowerCase());
         }
         return names;

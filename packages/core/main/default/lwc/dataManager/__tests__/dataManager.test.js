@@ -43,6 +43,15 @@ jest.mock(
   },
   { virtual: true }
 );
+jest.mock(
+  '@salesforce/apex/DataManagerController.findToolStateKey',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -64,6 +73,16 @@ describe('c-data-manager', () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it('leaves the page name to the App Page header, and leads with the purpose', async () => {
+    const element = await render();
+
+    const shell = one(element, 'shell');
+    expect(shell.titleHidden).toBe(true);
+    expect(shell.title).toBe('c.Core_DataManager_Title');
+    expect(shell.purpose).toBe('c.Core_DataManager_Intro');
+    expect(shell.iconName).toBeUndefined();
   });
 
   it('marks the bulk delete card destructive, with no warning bar on the page', async () => {
@@ -91,6 +110,8 @@ describe('c-data-manager', () => {
 
   it('asks before opening the delete tool, and opens Find only on Continue', async () => {
     const element = await render();
+    // The key comes from Apex with the namespace's prefix; a made-up one proves it is used as is.
+    findToolStateKey.emit('ns__tool');
     BarnConfirmModal.open.mockResolvedValueOnce(true);
 
     element.shadowRoot.querySelector('lightning-button[data-id="delete"]').click();
@@ -107,7 +128,8 @@ describe('c-data-manager', () => {
     });
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
-      attributes: { apiName: 'Find' }
+      attributes: { apiName: 'Find' },
+      state: { ns__tool: 'delete' }
     });
   });
 
