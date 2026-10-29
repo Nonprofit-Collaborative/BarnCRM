@@ -44,6 +44,10 @@ public with sharing class AccountKinds {
     @TestVisible
     private static List<Candidate> candidatesOverride;
 
+    /** Injected by the tests, in place of whether the running user can use the record type. */
+    @TestVisible
+    private static Boolean usableOverride;
+
     private static String cachedDetection;
 
     /**
@@ -120,6 +124,37 @@ public with sharing class AccountKinds {
             .getRecordTypeInfosByDeveloperName()
             .get(name);
         return info == null ? null : info.getRecordTypeId();
+    }
+
+    /**
+     * Whether the running user can create organizations: always with No record type, otherwise
+     * when their profile or a permission set gives them the chosen record type. BarnCRM's
+     * permission sets give no Account record type (ADR-0141), so an org that upgraded from a
+     * version that shipped Organization must give it to its users itself, or choose another one.
+     * Import, sample data and Health Check ask here, so the user is told why rather than the
+     * platform refusing the save.
+     */
+    @NamespaceAccessible
+    public static Boolean organizationRecordTypeUsable() {
+        if (usableOverride != null) {
+            return usableOverride;
+        }
+        Id recordTypeId = organizationRecordTypeId();
+        if (recordTypeId == null) {
+            return true;
+        }
+        Schema.RecordTypeInfo info = accountDescribe().getRecordTypeInfosById().get(recordTypeId);
+        return info != null && info.isAvailable();
+    }
+
+    /** The organization record type's label as Setup shows it, or its developer name. */
+    @NamespaceAccessible
+    public static String organizationRecordTypeLabel() {
+        Id recordTypeId = organizationRecordTypeId();
+        Schema.RecordTypeInfo info = recordTypeId == null
+            ? null
+            : accountDescribe().getRecordTypeInfosById().get(recordTypeId);
+        return info == null ? organizationRecordTypeName() : info.getName();
     }
 
     /**
@@ -334,6 +369,7 @@ public with sharing class AccountKinds {
     private static void reset() {
         cachedDetection = null;
         candidatesOverride = null;
+        usableOverride = null;
         resolvedFor = null;
         cachedResolution = null;
     }

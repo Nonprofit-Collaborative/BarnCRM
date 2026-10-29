@@ -290,7 +290,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Import a file with one person and the organization `Zztest Rt Org`. | `Zztest Rt Org` is created with the chosen record type (or none, for **No record type**) and appears on the **Organizations** tab. |
 | 6 | In an org with a second business record type, choose it in the setting and save. | Saved, and listed in **Recent Changes**. The **Organizations** tab now lists accounts of that record type instead. Open one: **Is Organization** is checked, and the **Affiliations** panel and website show, with Giving and Volunteers the organization sections too; an account of the first record type now shows **Is Organization** unchecked. |
 | 7 | With that record type still chosen, import a file with one person and the organization `Zztest Rt Org 2`, give an organization an address in its billing fields, and load sample data in a sandbox without it. | `Zztest Rt Org 2` is created with that record type; the organization with the billing address gets a first address of type **Work**; sample data's organizations get that record type and the sample data count lists them. |
-| 8 | As a user whose profile and permission sets do not give that record type, import the same file. | The run log says no organization was matched or created because you cannot use that record type, naming it by its label. |
+| 8 | As a user whose profile and permission sets do not give that record type, import a file with two people: one at `Zztest Rt Org 2` (now in Salesforce) and one at the new organization `Zztest Rt Org 3`. | The first row loads, linked to `Zztest Rt Org 2`. The second is rejected with **This row's organization is not in Salesforce yet, and you cannot use the ... record type**, naming it by its label; the run log says no new organization was created for the same reason. `Zztest Rt Org 3` is not created. |
 
 **Cleanup:** set the setting back to its first value; delete `Zztest Rt Org` and the imported person.
 
@@ -306,5 +306,6 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | Set **Record type for organizations** to the record type your organizations use and save. | Saved, and listed in **Recent Changes**. |
 | 4 | Open the **Organizations** tab and the **Households** tab. | The Organizations tab lists the same records as in step 1; the Households tab lists the same records as before. |
 | 5 | As a staff user, open a household and an organization. | The same sections and panels as before (T-HH-13): the organization shows **Is Organization** checked, with the **Affiliations** panel. |
+| 6 | If step 3 kept **Organization**: before giving it to your profile, run **Health Check**, then load sample data. Then give **Organization** to your profile (Setup, Profiles, Record Type Settings) and run Health Check again. | Before: Health Check warns **You cannot use the record type for organizations**, naming Organization, and **Load Sample Data** refuses with a message naming it. After: no such warning. |
 
 **Cleanup:** none.

@@ -174,6 +174,10 @@ household records, names, greetings, member counts, and Members panel.
   load or a removal is still running, both **Load Sample Data** and **Remove Sample Data**
   are unavailable: removing halfway through would delete households the loader is still
   attaching people to.
+- **Loading without the record type for organizations.** Sample organizations get the record
+  type chosen in **Record type for organizations** (BarnCRM Settings, General). When your
+  profile and permission sets do not give it to you, **Load Sample Data** refuses with a
+  message naming it. Give it to yourself in Setup, or choose another one in that setting.
 - **Installing a module after loading sample data.** A load brings in the sample data of the
   modules installed at the time, so a module installed afterwards (Giving or Volunteers, for
   example) has none, and **Load Sample Data** refuses with the message that sample data is

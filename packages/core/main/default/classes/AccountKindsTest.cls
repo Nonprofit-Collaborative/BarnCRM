@@ -137,6 +137,10 @@ private class AccountKindsTest {
                 AccountKinds.isOrganization(null),
                 'An account with none is an organization.'
             );
+            Assert.isTrue(
+                AccountKinds.organizationRecordTypeUsable(),
+                'Every user can create an organization with no record type.'
+            );
             Assert.isTrue(AccountKinds.isOrganizationRecordTypeName(null), 'By name: none.');
             Assert.isTrue(AccountKinds.isOrganizationRecordTypeName('Master'), 'The master.');
             Assert.isFalse(AccountKinds.isOrganizationRecordTypeName('Household'), 'Not one.');
@@ -182,6 +186,31 @@ private class AccountKindsTest {
                 'By name: the chosen one.'
             );
             Assert.isFalse(AccountKinds.isOrganizationRecordTypeName(null), 'By name: none.');
+        }
+    }
+
+    /**
+     * Whatever this org's record types and the test user's profile, the test data leaves a
+     * record type for organizations the user can save, so tests pass on any org shape.
+     */
+    @IsTest
+    static void testDataLeavesARecordTypeTheUserCanUse() {
+        System.runAs(TestUsers.admin()) {
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
+
+            Assert.isTrue(AccountKinds.organizationRecordTypeUsable(), 'Usable now.');
+            Account organization = AccountKindsTestData.organization('Zztest Usable Org');
+            insert organization;
+            Account read = [
+                SELECT RecordTypeId
+                FROM Account
+                WHERE Id = :organization.Id
+                WITH SYSTEM_MODE
+            ];
+            Assert.isTrue(
+                AccountKinds.isOrganization(read.RecordTypeId),
+                'And what it creates is an organization.'
+            );
         }
     }
 

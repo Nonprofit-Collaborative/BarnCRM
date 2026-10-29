@@ -13,7 +13,9 @@
 private class SampleDataLoaderTest {
     @TestSetup
     static void createTestUser() {
-        TestUsers.adminWithInstalledModules();
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
+        }
     }
 
     /**
@@ -303,6 +305,34 @@ private class SampleDataLoaderTest {
                 );
             }
             System.assertEquals(true, threw, 'loading twice should throw SampleDataException');
+        }
+    }
+
+    @IsTest
+    static void testLoadRefusesWhenTheUserCannotUseTheOrganizationRecordType() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            SampleDataLoader.jsonOverride = buildJson(1, 1, false);
+            AccountKinds.usableOverride = false;
+
+            String message;
+            try {
+                SampleDataLoader.load();
+            } catch (SampleDataException e) {
+                message = e.getMessage();
+            }
+            System.assertEquals(
+                String.format(
+                    Label.Core_SampleData_OrganizationRecordTypeUnavailable,
+                    new List<String>{ AccountKinds.organizationRecordTypeLabel() }
+                ),
+                message,
+                'the admin is told which record type and how to fix it, before any job starts'
+            );
+            System.assertEquals(
+                false,
+                SampleDataLoader.hasRunningLoadJob(),
+                'no load job is started'
+            );
         }
     }
 

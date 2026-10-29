@@ -17,7 +17,9 @@
 private class MigrationTemplatesTest {
     @TestSetup
     static void createTestUser() {
-        TestUsers.adminWith('Giving_Admin');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
+        }
     }
 
     /** The shipped migration templates: the people ones ship from Core, the gift ones from Giving. */

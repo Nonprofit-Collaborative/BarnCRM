@@ -323,6 +323,23 @@ organizations changes. If you later deactivate or delete the chosen record type,
 Account record type while **No record type** is chosen, BarnCRM picks again the same way on
 its next upgrade, so check this row after one.
 
+BarnCRM's permission sets give no Account record type, so the people who create organizations
+need the chosen one from their profile or a permission set of your own. Without it, import
+rejects the rows that would create an organization, sample data refuses to load, and Health
+Check warns **You cannot use the record type for organizations**, each naming the record type.
+
+**Upgrading from a version that shipped the Organization record type.** The upgrade leaves the
+**Organization** record type and your accounts as they are, and this row keeps it, but
+BarnCRM's permission sets stop giving it. Do one of these:
+
+- Your organizations use **Organization**: give it to the profiles (or a permission set of
+  your own) of everyone who creates organizations, in Setup, Profiles, Record Type Settings.
+- You would rather use a record type of your own: choose it here. Accounts of Organization stop
+  counting as organizations, so change their record type first if they should still count.
+- No account uses **Organization** and your org has no other Account record type to choose:
+  deactivate it in Setup, Object Manager, Account, Record Types, then choose **No record
+  type** here.
+
 ## You Never Type an Identifier
 
 No setting asks you for a record ID, an API name or a developer name. Where a setting points

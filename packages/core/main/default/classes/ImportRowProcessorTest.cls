@@ -9,7 +9,9 @@
 private class ImportRowProcessorTest {
     @TestSetup
     static void createTestUser() {
-        TestUsers.admin();
+        System.runAs(TestUsers.admin()) {
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
+        }
     }
 
     private static Import_Template__c template;
@@ -258,6 +260,57 @@ private class ImportRowProcessorTest {
             for (Import_Row__c row : ImportTestDataFactory.reload(batch.Id)) {
                 Assert.isNotNull(row.Organization__c, 'Both rows point at it.');
             }
+        }
+    }
+
+    @IsTest
+    static void aUserWithoutTheOrganizationRecordTypeIsToldWhyAndStillMatches() {
+        System.runAs(TestUsers.admin()) {
+            insert AccountKindsTestData.organization('Rose City');
+            given(
+                new List<Map<String, String>>{
+                    ImportTestDataFactory.donorRow(
+                        'Ana',
+                        'Ramirez',
+                        'ana@example.org',
+                        'Rose City'
+                    ),
+                    ImportTestDataFactory.donorRow(
+                        'Ben',
+                        'Okafor',
+                        'ben@example.org',
+                        'Hillside Bakery'
+                    )
+                }
+            );
+            AccountKinds.usableOverride = false;
+            Test.startTest();
+            run(false);
+            Test.stopTest();
+
+            List<Import_Row__c> rows = ImportTestDataFactory.reload(batch.Id);
+            Assert.isNotNull(
+                rows[0].Organization__c,
+                'An organization Salesforce has still matches.'
+            );
+            Assert.areEqual(
+                ImportRowProcessor.STATUS_REJECTED,
+                rows[1].Status__c,
+                'A row that needs a new organization is rejected, not loaded without it.'
+            );
+            Assert.areEqual(
+                String.format(
+                    Label.Core_Import_ErrorOrganizationRecordTypeUnavailable,
+                    new List<String>{ AccountKinds.organizationRecordTypeLabel() }
+                ),
+                rows[1].Error_Message__c,
+                'With the reason and the fix.'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Account WHERE Name = 'Hillside Bakery'],
+                'Nothing the user cannot use is created.'
+            );
         }
     }
 
