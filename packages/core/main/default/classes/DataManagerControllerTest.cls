@@ -95,7 +95,8 @@ private class DataManagerControllerTest {
                 'A people file with gift columns loads gifts'
             );
             Assert.areEqual(
-                Address__c.SObjectType.getDescribe().getLabelPlural(),
+                Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .getLabelPlural(),
                 loadsByName.get('Mapping 1002'),
                 'A one-object mapping names its object by its label'
             );
