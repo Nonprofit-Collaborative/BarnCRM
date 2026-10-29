@@ -1,6 +1,20 @@
 <template>
+    <template lwc:if={showsCompanyAddress}>
+        <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id="company-address">
+            {companyAddressText}
+            <lightning-button
+                class="slds-var-m-left_x-small"
+                variant="base"
+                label={labels.useCompany}
+                data-id="use-company-address"
+                onclick={handleUseCompanyAddress}
+            ></lightning-button>
+        </p>
+    </template>
+
     <c-organization-address
         values={values}
+        placeholder={labels.notSet}
         disabled={isReadOnly}
         onpartchange={handlePartChange}
     ></c-organization-address>

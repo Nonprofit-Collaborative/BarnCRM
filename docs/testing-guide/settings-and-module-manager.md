@@ -322,6 +322,21 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 **Cleanup:** none. The values kept are the defaults BarnCRM was already using, so nothing behaves differently.
 
+## T-SET-18B: Blank Settings Say What They Mean
+
+**Purpose:** confirm no setting on Organization or Error Log is a blank box with nothing said, and that Company Information is offered but never used until saved.
+**Prerequisites:** admin user; an org where **Organization legal name**, the organization address and **Digest recipients** were never saved (note and clear them if they were), and Company Information (Setup, Company Settings) has a name and a full address.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Error Log**. | **Digest recipients** is empty, reads **Everyone with the Manage BarnCRM Settings permission** in grey inside the box, and has a **Default** badge with no **Keep This Setting** button. |
+| 2 | Open **Organization**. | **Organization legal name** reads **Not set** in grey, with a **Default** badge and, under the box, "Company Information in Salesforce Setup has (your company name)." with **Use This Value**. Every empty address box reads **Not set**. Above the address, "No address is saved yet. Company Information in Salesforce Setup has (the address)." with **Use This Address**. With Giving, the tax identification number and receipt rows read **Not set** too. |
+| 3 | Click **Use This Value**. | The legal name box holds the company name; the offer is gone; the save bar says "1 unsaved change". Nothing is saved yet. Click **Discard**: the box reads **Not set** again. |
+| 4 | Click **Use This Address**, then **Save Address**. | The address boxes hold the company address (a second street line in **Street 2**), "Organization address saved.", and the offer does not come back after a reload. |
+| 5 | Sign in as the read-only user and open **Organization**. | The **Not set** text and badges show; there is no **Use This Value** or **Use This Address**. |
+
+**Cleanup:** clear the organization address (or set back what you noted) and save.
+
 ## T-SET-19: Finish Setup for a Module Whose Setup Never Ran
 
 **Purpose:** confirm Health Check and the Modules page flag a module whose setup steps never ran (source copied in by hand), Finish Setup runs them, and the flag clears.

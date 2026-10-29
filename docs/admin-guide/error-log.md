@@ -66,7 +66,9 @@ If nothing new has arrived, no email is sent at all.
    the Manage BarnCRM Settings permission (the BarnCRM Admin role), or type the email
    addresses of the people who should get it, separated by commas. Each address has to be
    the email address of an active user of your Salesforce: the digest is never sent to
-   anyone outside it, and an address that is not a user's is refused when you save.
+   anyone outside it, and an address that is not a user's is refused when you save. While
+   the box is empty it reads **Everyone with the Manage BarnCRM Settings permission**, with a
+   **Default** badge.
 3. In **Digest frequency**, choose **Every day** or **Once a week**, then click **Save**.
 4. In the **Error Digest** panel, click **Schedule Daily Run**. The panel now says the digest is
    scheduled and when it runs next: every morning at 7:00 AM in your organization's time zone, after the nightly jobs, so their
