@@ -6,7 +6,7 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-10-29
 
-### Landing batch 11 (PR pending, branch `landing/batch-11`; incremental gate on `barn-sales`)
+### Landing batch 11 (#701, branch `landing/batch-11b`; incremental gate on `barn-sales`)
 
 Merges #697, #699 (contains #697) and #698.
 
