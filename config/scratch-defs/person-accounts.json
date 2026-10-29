@@ -4,6 +4,9 @@
   "hasSampleData": false,
   "features": ["PersonAccounts"],
   "settings": {
+    "deploymentSettings": {
+      "doesSkipAsyncApexValidation": true
+    },
     "lightningExperienceSettings": {
       "enableS1DesktopEnabled": true
     },

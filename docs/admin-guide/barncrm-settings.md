@@ -330,15 +330,25 @@ Check warns **You cannot use the record type for organizations**, each naming th
 
 **Upgrading from a version that shipped the Organization record type.** The upgrade leaves the
 **Organization** record type and your accounts as they are, and this row keeps it, but
-BarnCRM's permission sets stop giving it. Do one of these:
+BarnCRM's permission sets stop giving it. Salesforce never lets an upgrade or a deployment
+delete a record type, so the upgrade cannot remove it for you: only an administrator can, in
+Setup. Do one of these:
 
-- Your organizations use **Organization**: give it to the profiles (or a permission set of
-  your own) of everyone who creates organizations, in Setup, Profiles, Record Type Settings.
-- You would rather use a record type of your own: choose it here. Accounts of Organization stop
-  counting as organizations, so change their record type first if they should still count.
-- No account uses **Organization** and your org has no other Account record type to choose:
-  deactivate it in Setup, Object Manager, Account, Record Types, then choose **No record
-  type** here.
+- **Keep Organization.** Give it to the profiles (or a permission set of your own) of everyone
+  who creates organizations, in Setup, Profiles, Record Type Settings. Nothing else to do.
+- **Use a record type of your own, or none.**
+  1. Choose your record type here and save. For no record type, skip this step: **No record
+     type** is offered once Organization is deactivated (step 3) and your org has no other
+     Account record type.
+  2. If accounts of Organization should still count as organizations, change their record
+     type to the one you chose (for example with a list view's mass edit or an import).
+     Accounts left on Organization stop counting as organizations.
+  3. In Setup, Object Manager, Account, Record Types, deactivate **Organization**. BarnCRM
+     counts only active record types, so it then leaves Organization out of this row's
+     choices, and **No record type** applies when no other Account record type is left. If
+     you would rather remove it entirely, delete it there once it is inactive; Salesforce asks
+     for the record type to give any accounts still on it, so choose the one you picked in
+     step 1, never Household. With no record type, deactivating is enough: leave it inactive.
 
 ## You Never Type an Identifier
 

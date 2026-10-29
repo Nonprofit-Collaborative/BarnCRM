@@ -3,6 +3,9 @@
   "edition": "Developer",
   "hasSampleData": false,
   "settings": {
+    "deploymentSettings": {
+      "doesSkipAsyncApexValidation": true
+    },
     "lightningExperienceSettings": {
       "enableS1DesktopEnabled": true
     },

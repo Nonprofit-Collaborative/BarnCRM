@@ -30,7 +30,23 @@ FAKE_SF = textwrap.dedent(
             return json.load(f)
     def out(result):
         print(json.dumps({"status": 0, "result": result}))
-    if args[:2] == ["org", "display"]:
+    def event(kind, detail):
+        with open(os.path.join(state, "events.jsonl"), "a") as log:
+            log.write(json.dumps([kind, detail]) + "\n")
+    if args[:2] == ["apex", "run"]:
+        event("apex", sys.stdin.read())
+        out({})
+    elif args[:3] == ["org", "assign", "permset"]:
+        event("assign", args[args.index("--name") + 1])
+        out({})
+    elif args[:2] == ["data", "query"] and "AsyncApexJob" in args[args.index("--query") + 1]:
+        jobs = []
+        if os.environ.get("FAKE_SCHEDULED_JOB"):
+            jobs = [{"CronTriggerId": "08e000000000001AAA", "ApexClass": {"Name": "TabAccessScheduler"},
+                     "CronTrigger": {"CronJobDetail": {"Name": "BarnCRM Tab Access Check"},
+                                     "CronExpression": "0 0 * * * ?", "State": "WAITING"}}]
+        out({"records": jobs})
+    elif args[:2] == ["org", "display"]:
         out({"id": os.environ["FAKE_ORG_ID"]})
     elif args[:3] == ["project", "deploy", "start"]:
         known = ids()
@@ -40,6 +56,7 @@ FAKE_SF = textwrap.dedent(
         dirs = [args[i + 1] for i, a in enumerate(args) if a in ("--source-dir", "--metadata-dir")]
         with open(os.path.join(state, "deploy-log.jsonl"), "a") as log:
             log.write(json.dumps(dirs) + "\n")
+        event("deploy", dirs)
         out({"id": new})
     elif args[:3] == ["project", "deploy", "report"]:
         out({"status": "Succeeded", "done": True, "startDate": "now",
@@ -84,7 +101,7 @@ class DeploySkipUnchanged(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.tmp, ignore_errors=True)
 
-    def run_script(self, *args, org=None, apex_always="1"):
+    def run_script(self, *args, org=None, apex_always="1", **extra_env):
         env = dict(
             os.environ,
             PATH=self.fake + os.pathsep + os.environ["PATH"],
@@ -95,6 +112,7 @@ class DeploySkipUnchanged(unittest.TestCase):
             SOURCE_POST_INSTALL="0",
             POLL_SECONDS="0",
         )
+        env.update(extra_env)
         result = subprocess.run(
             ["bash", "scripts/org/deploy-packages.sh", "fake-org", *args],
             cwd=self.repo, env=env, capture_output=True, text=True,
@@ -192,6 +210,40 @@ class DeploySkipUnchanged(unittest.TestCase):
             f.write("\n")
         self.assertIn(OBJECTS, self.sent())
         self.assertFalse(os.path.exists(self.record()))
+
+    def events(self):
+        with open(os.path.join(self.fake, "events.jsonl"), encoding="utf-8") as f:
+            return [json.loads(line) for line in f]
+
+    def test_scheduled_jobs_are_paused_around_each_apex_stage(self):
+        self.run_script("--core-only", FAKE_SCHEDULED_JOB="1")
+        events = self.events()
+        core_apex = next(
+            i for i, (kind, detail) in enumerate(events)
+            if kind == "deploy" and "packages/core/main/default/classes" in detail
+        )
+        before = [d for kind, d in events[:core_apex] if kind == "apex"]
+        after = [d for kind, d in events[core_apex + 1:] if kind == "apex"]
+        self.assertIn("System.abortJob('08e000000000001AAA');", before[-1])
+        self.assertIn(
+            "System.schedule('BarnCRM Tab Access Check', '0 0 * * * ?', "
+            "(Schedulable) Type.forName('TabAccessScheduler').newInstance());",
+            after[0],
+        )
+
+    def test_no_scheduled_job_means_no_abort(self):
+        self.run_script("--core-only")
+        self.assertFalse([d for kind, d in self.events() if kind == "apex" and "abortJob" in d])
+
+    def test_the_deploying_admin_gets_barncrm_admin_before_post_install(self):
+        self.run_script("--core-only", SOURCE_POST_INSTALL="1")
+        events = self.events()
+        assign = events.index(["assign", "BarnCRM_Admin"])
+        post_install = next(
+            i for i, (kind, d) in enumerate(events)
+            if kind == "apex" and "CorePostInstall.runAsSourceDeploy" in d
+        )
+        self.assertLess(assign, post_install)
 
 
 if __name__ == "__main__":
