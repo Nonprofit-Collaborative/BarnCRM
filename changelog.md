@@ -6,7 +6,22 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-10-28
 
-### Landing batch 9 (PR pending, branch `landing/batch-9`; incremental gate on `barn-sales`)
+### Landing batch 10 (PR pending, branch `landing/batch-10`; incremental gate on `barn-sales`)
+
+Merges #694, #684, #692, #693, #682, #683, #686, #689, #690, #685, #687, #688 and #691. #670 is superseded by #694 (which contains it).
+
+- #694 (RT2b): role sets lose the Household record type; `BarnCRM_Households` carries the Households tab; test-data households inserted in system mode (about 260 inserts in about 60 classes); new Staff proof test. Production household creation already goes through system-mode writers (`HouseholdWriter`, `HouseholdMergeWriter`). Full branch deploy to `oi-test` 2026-10-28: 4,099 of 4,137 test methods passed first, 38 fixed and rerun clean.
+- #684, #692, #693 (automation performance PRs 4 to 6, D-143): address move history in fewer writes (mailing change on 200 contacts 5 DML/1,200 rows to 4/800); one household write after a contact insert via new `TriggerDispatcher.afterHandlers` (contact insert 6 DML/1,001 rows to 5/801, CPU about 15% lower); allocation handlers reuse gift values (gift insert SOQL 10 to 7, amount change 7 to 4).
+- #682 (UX 3 Data Manager): grouped tool tiles (Bring Data In, Find and Change, Check and Tidy, Careful), About This Tool help, Import Templates empty state, Salesforce's Own Tools as new-tab tiles; `c-barn-tool-tile` gains new-tab.
+- #683 (UX 6 Settings console): grouped navigation with icons, help popovers, docked save bar, page shell (name once), compact setup notes, defaults banner with Keep All Defaults; feature text no longer says tabs.
+- #686, #689, #690 (UX 9b to 9d Duplicate review): Review tab count, side-by-side pairs with compared fields (`DuplicateController.fields`, user-mode readable fields only), Matching Logic add and edit in a modal, rule cards with an Active switch and Show Details.
+- #685 (UX 12 record panels): member tiles with a row menu and an Add Member modal; address cards with confirmations in the kit confirm modal; empty states on five panels; `barnConfirmModal` gains items, choices and checks (additive: callers without them still get `true`). Presentation only.
+- #687, #688, #691 (UX 7 and UX 11): first run is a platform modal with the edition picker, checklist step 1 no longer asks the edition; Setup Checklist on the SLDS Setup Assistant list with progress rings and one step count; Home status tiles with icons and badges, no stale warning before a first run, one Health Check badge rule and finding rows shared with Org Optimizer, quick-link icon tiles, Resume Automation in the paused banner.
+- Labels deleted: `Core_DataManager_Open`, `Core_DataManager_OpenAria`, `Core_DataManager_ToolsHeading`, `Core_MatchLogic_Activate`, `Core_MatchLogic_Deactivate`, `Core_Settings_DefaultNotSaved`, `Core_Settings_DiscardButton`, `Core_Settings_LearnMoreAria`, `Core_Settings_LearnMoreLink`, `Core_Settings_SaveButton`. `Account.Household` record type visibility removed from `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only`.
+- Integrator changes on the landing branch: catalog and testing guide rows combined (T-A11Y-07 keeps #683's info icon steps and #685's member menu steps; T-HH-18 keeps #685's Add Member step and #694's upgrade step; T-DUP pair step keeps #690's side by side card); guides call the Home button New Household as #691 renamed it; `docs/product-plan.md` already matched BMemory.
+- Root docs: `changelog.md`, `roadmap.md` and `architecture.md` refreshed for these PRs.
+
+### Landing batch 9 (#681, merged; incremental gate on `barn-sales`)
 
 Merges #665, #667, #668, #669, #680, #679, #671, #672, #676, #673, #674, #675, #677 and #678. #670 (RT2b permission sets) was merged, then reverted after the gate (tests still insert households in user mode, 45 relevant tests failed on `barn-sales`); it lands with the PR 2b test conversion.
 

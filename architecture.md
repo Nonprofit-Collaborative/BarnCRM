@@ -2,7 +2,7 @@
 
 Purpose: environments, access, layout and gotchas for BarnCRM. Reference facts only, not a task log (work done goes in `changelog.md`). Check here before re-querying a live system.
 
-Last verified 2026-10-28 (landing/batch-9; main at #666, d68cfcd9b; `mwdbdevsb` deployed at 9a10ef84; ADR-0141 account record types, ADR-0142 Admin View All and Modify All on Account and Contact).
+Last verified 2026-10-28 (landing/batch-10; main at #681, c451e3d72; `mwdbdevsb` deployed at 9a10ef84; ADR-0141 account record types, ADR-0142 Admin View All and Modify All on Account and Contact).
 
 ## Pointers
 
@@ -171,7 +171,7 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - Lightning App Pages print the page name above the component, so the page shell passes title-hidden (#663); Lightning desktop at 390 px is not the mobile app (the console tab bar overflows).
 - `getAll()` on custom metadata truncates long text areas to 255 characters; use SOQL `WITH SYSTEM_MODE` when the full text matters (#665).
 - Parallel Apex testing is on in `barn-sales` and `oi-test`; only the `npsp` scratch def turns it off (#667).
-- Removing the Household record type from the role permission sets (#670, RT2b) fails every test that inserts a household in user mode as `TestUsers.admin()` (`HouseholdTestDataFactory.newHousehold` plus `insert`, `GivingTestDataFactory.insertHouseholdContact`); #670 waits for the PR 2b test conversion. A deploy of the role sets without it removes Household record type visibility from an org.
+- No role set grants the Household record type (#694, RT2b, supersedes #670): `isAvailable()` is false for Household for every user, and a plain insert under `System.runAs` is refused for a record type the user lacks. Test data inserts households with `AccessLevel.SYSTEM_MODE`; product code creates them, or changes `RecordTypeId`, only through `HouseholdWriter` (system mode). User-mode updates of existing households (for example `HouseholdService.saveAccountCopiesAsUser`, #692) are fine; if it ever sets `RecordTypeId` or inserts, it must move to `HouseholdWriter`.
 - `duplicateReview` pages client-side (10 per page) over `DuplicateController.MAX_SUGGESTIONS` = 50; paging past 50 needs server support (#671).
 - A tab motif's icon comes from its `CustomN` number only (the name after the colon is ignored): Custom20 Airplane, 25 Alarmclock, 48 Trophy, 53 Bell, 67 Gears; `test_core_navigation.py` enforces Core motifs (#673). Page shells under title-hidden carry no icon of their own: the tab icon in the App Page header is the page's icon.
 - In oi-test an update DML costs about 1 to 1.5 s platform time per 200 rows before triggers; inserts barely any. `sf apex run` forces its own log levels (use REST tooling `executeAnonymous` for trace flags). `oi-test` deploys from a worktree need `--ignore-conflicts` (#669).
@@ -180,3 +180,9 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - An LWC that needs a page-state key gets it from Apex (`NamespaceUtil.stateKey`) because `check-namespace-readiness.py` refuses a literal `c__`; `DataManagerController.findToolStateKey` is Find's `__tool` key (#677, #678).
 - Anonymous Apex in `oi-test` needs Giving_Admin assigned to compile against Gift fields (assign for the run, then remove). Deploying a class to `oi-test` can overwrite an open PR's version (check `gh pr list` for overlapping files). Get the global describe only from `NamespaceUtil.globalDescribe()` (#679, #680).
 - `oi-test` had no "BarnCRM Tab Access Check" CronTrigger on 2026-10-28; verify after the release deploy.
+- `oi-test` was fully deployed from `feature/rt2b-remainder` on 2026-10-28; its `HouseholdService`, `HouseholdWriter` and `HouseholdController` are not `main`'s (redeploy before relying on them).
+- `TriggerDispatcher.afterHandlers` is how two handlers of one trigger run save the same record once (#692).
+- `c-barn-tool-tile` new-tab (grid `newTab`) is the pattern for link tiles that leave the app (#682); the Data Manager About This Tool storage key is `dataManager`.
+- Settings section groups and icons live in `settingsConsole/settingsNavigation.js`; a section no group names goes in More, before System, so Error Log stays last (#683).
+- Every `LightningModal` subclass shares the Jest stub's single static `open` mock; tests tell modals apart by the arguments to `open` (#685). `barnConfirmModal` resolves `true`, or `{ choice, checked }` when given choices or checks.
+- `utility:health_check` is not a valid SLDS icon (renders an empty gap); check icon names against `@salesforce-ux/sds-metadata/current/icons.json` (#691).
