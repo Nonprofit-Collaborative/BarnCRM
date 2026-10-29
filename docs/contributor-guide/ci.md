@@ -440,21 +440,22 @@ changes." So there are two gates, and both post the one status the ruleset requi
 | When | Every landing batch | Once a significant version's development is done and integrated |
 | Command | `scripts/org/run-org-tests.sh barn-sales` | `scripts/org/run-org-tests.sh <alias> --release`, on `barn-sales` and `oi-test` in parallel |
 | Deploy | Staged; packages unchanged since the last deploy to that org are skipped | Every package, every stage |
-| Tests | The changed Apex and its relevant tests, plus the `critical=true` classes (`RunRelevantTests`) | Every test class in the commit's source |
+| Tests | The changed and affected test classes, plus the `critical=true` classes (`RunSpecifiedTests`, chosen by `select-org-tests.py`) | Every test class in the commit's source |
 | Coverage floor | No | Yes |
 | Status description | Starts "Incremental:" | Starts "Release:" |
-| Time (estimate) | About 6 to 10 minutes | About 24 minutes (both orgs at once) |
+| Time (estimate) | About 10 to 15 minutes for a large batch (batches 9 and 10: 273 classes, about 8 minutes of tests) | About 24 minutes (both orgs at once) |
 
 **The incremental gate uses `barn-sales`** because it is the faster gate (about 18 minutes for a
 full run against about 24 on `oi-test`), its Sales Cloud contacts shape is the one most installs
 have, and it has DLRS installed for coexistence. `oi-test` (Person Accounts shape) is covered by
 the release gate.
 
-**Accepted risk of the incremental gate (D-142).** `RunRelevantTests` is beta and follows direct
-Apex references only. It can miss a test that reaches the changed code indirectly, and it selects
-nothing for a change to an object, a flow, a permission set, custom metadata or a label that an
-unselected test depends on. The `testFor` and `critical` annotations (see "Relevant tests" below)
-narrow the gap; the release gate closes it before a version ships.
+**Accepted risk of the incremental gate (D-142).** The selection follows direct mentions of a
+changed class and the `testFor` annotations only. It can miss a test that reaches the changed
+code indirectly, and it selects nothing for a change to an object, a flow, a permission set,
+custom metadata or a label that an unselected test depends on. The `testFor` and `critical`
+annotations (see "Relevant tests" below) narrow the gap; the release gate closes it before a
+version ships.
 
 ### The incremental gate
 
@@ -464,16 +465,32 @@ scripts/org/run-org-tests.sh barn-sales
 
 It deploys the commit you have checked out with `scripts/org/deploy-packages.sh` (skipping the
 packages that have not changed since the last deploy to that org, see "Skipping unchanged
-packages" below), then deploys again only the Apex changed since the merge base with
+packages" below), then runs `sf apex run test --test-level RunSpecifiedTests` over the test
+classes `scripts/org/select-org-tests.py` picks for the Apex changed since the merge base with
 `origin/main` (`RELEVANT_BASE` to change it; on a landing batch that is every change it
-carries), plus the `critical=true` test classes, with `sf project deploy start --test-level
-RunRelevantTests`. Salesforce runs the tests in that payload, the tests that depend directly on
-it, and the classes whose `testFor` names something in it. `RunRelevantTests` exists only for
-deployments, not for `sf apex run test`, which is why this mode deploys. No coverage floor is
-checked. It posts `Org tests (local)` with a description such as "Incremental: relevant tests on
-barn-sales: 412/412 passed (no coverage floor)". Results go to
-`test-results/org-tests-relevant.json`. Jest is not part of the gate: the required `Static
-checks` job runs it on the same head.
+carries):
+
+- every test class changed in that range;
+- every test class whose `@IsTest(testFor=...)` names a changed class or trigger;
+- every test class that mentions a changed class by name (comments ignored), which includes the
+  users of a changed test utility such as `TestDataFactory`;
+- every `critical=true` class, so a batch with no Apex change still runs the smoke tests.
+
+The vendored rollup engine's tests are never selected. No coverage is recorded and no floor is
+checked. It posts `Org tests (local)` with a description such as "Incremental on barn-sales:
+2984/2984 passed in 273 classes (no coverage floor)" (the size of landing batches 9 and 10
+together). Results go to `test-results/org-tests.json`,
+as in the release gate, and a run that returns nothing is retried once the same way. Jest is not
+part of the gate: the required `Static checks` job runs it on the same head. To see what a range
+selects without an org: `python3 scripts/org/select-org-tests.py <base> [<head>]`.
+
+**Why not `RunRelevantTests` (2026-10-28).** The gate first deployed the changed Apex again with
+the deploy-only `RunRelevantTests` level (Spring '26, beta) and let Salesforce choose the tests.
+On landing batches 9 and 10 that deploy carried 83 changed Apex files, about 60 of them test
+classes, and ran only the 5 `critical=true` classes (153 tests): neither the test classes in the
+payload nor the `testFor` annotations were honoured, and the gate passed without running the
+changed tests. The choice is now made in the repository, where it can be read and tested
+(`scripts/ci/tests/test_select_org_tests.py`), and the `testFor` annotations are still used.
 
 `--full-deploy` deploys every package even when unchanged. The `--light` mode (deploy plus Jest,
 no Apex test, for screen-only changes) was retired on 2026-10-28: the incremental gate does the
@@ -671,17 +688,17 @@ administrator would see.
 
 ### Relevant tests
 
-Spring '26 (API 66.0) added the `RunRelevantTests` test level (beta) to deployments: Salesforce
-runs the tests in the deployment, the tests that depend directly on the Apex being deployed, and
-any test class that asks to be included. It follows direct references only, so a test that
-reaches a class through a trigger, the automation registry or `Type.forName` is missed. Two
-class-level `@IsTest` parameters close that gap, and every test class carries one:
+The incremental gate selects tests with `scripts/org/select-org-tests.py` (see "The incremental
+gate" above). A name match finds the tests that call a changed class directly, but not a test
+that reaches it through a trigger, the automation registry or `Type.forName`. Two class-level
+`@IsTest` parameters (API 66.0, introduced for Salesforce's `RunRelevantTests` level, which the
+gate no longer uses) close that gap, and every test class carries one:
 
 - `@IsTest(testFor='ApexClass:HouseholdService, ApexClass:HouseholdMergeService')` runs the
-  class whenever one of the named classes (or `ApexTrigger:Name`) is in the deployment. It adds
-  to what the platform selects; it never narrows it. Name the classes the test exercises, not
+  class whenever one of the named classes (or `ApexTrigger:Name`) changed. It adds to what the
+  name match selects; it never narrows it. Name the classes the test exercises, not
   every class it touches on the way.
-- `@IsTest(critical=true)` runs the class on every relevant-tests deployment, whatever changed.
+- `@IsTest(critical=true)` runs the class on every incremental gate, whatever changed.
   Five classes carry it, one smoke test for each core path: `SettingsControllerTest` (settings
   console save), `HouseholdServiceTest` (a new person gets a household), `GiftRealTimeRollupTest`
   (a saved gift moves its totals), `ImportProcessorBatchTest` (an import commit) and
@@ -914,10 +931,11 @@ deploy recompiling every class; the incremental gate checks no coverage and pass
   anything since, from any machine or branch); uncommitted or untracked files under `packages/`
   or the deploy inputs; or `--full` (`DEPLOY_FULL=1`; `run-org-tests.sh --full-deploy`).
 - **The record is deleted before the first stage** and written only after every stage deployed,
-  so a run that fails partway leaves none. The incremental gate's own `RunRelevantTests` deploy
-  sends Apex the staged deploy just put there, so the gate keeps the record valid for it
-  (`deploy-packages.sh <alias> --adopt <deploy id>`), and only when nothing else deployed in
-  between.
+  so a run that fails partway leaves none. The incremental gate deploys nothing after the staged
+  deploy (its tests run with `sf apex run test`), so the record the staged deploy wrote stands.
+  `deploy-packages.sh <alias> --adopt <deploy id>` keeps a record valid after a deploy that
+  resends Apex already in the org from the same commit, and only when nothing else deployed in
+  between; no gate calls it now.
 - **Not detected:** a change made by hand in Setup to packaged metadata. After one, run with
   `--full-deploy`, or delete the record.
 
