@@ -81,6 +81,14 @@ private class ImportFirstNameMatchTest {
     private static List<Import_Row__c> load(Import_Batch__c batch, Integer chunkSize) {
         Import_Batch__c dryRun = runInChunks(batch.Id, true, chunkSize);
         Import_Batch__c committed = runInChunks(batch.Id, false, chunkSize);
+        assertCommitCountedAsPreviewed(dryRun, committed);
+        return ImportTestDataFactory.reload(batch.Id);
+    }
+
+    private static void assertCommitCountedAsPreviewed(
+        Import_Batch__c dryRun,
+        Import_Batch__c committed
+    ) {
         Assert.areEqual(
             committed.Rows_Created__c,
             dryRun.Rows_Created__c,
@@ -97,7 +105,6 @@ private class ImportFirstNameMatchTest {
             'Updated, as previewed.'
         );
         Assert.areEqual(0, committed.Rows_Rejected__c, 'Nothing refused.');
-        return ImportTestDataFactory.reload(batch.Id);
     }
 
     /** The first names of the Smiths in the org, in the order they were created. */
@@ -330,25 +337,28 @@ private class ImportFirstNameMatchTest {
     @IsTest
     static void aDryRunInOneRowChunksCountsWhatTheCommitDoes() {
         System.runAs(TestUsers.admin()) {
-            // Eight chunks in one transaction run close to the query limit. In a Nonprofit
-            // Cloud org the native household guard (ADR-0036, ADR-0130) adds two queries a
-            // chunk for a test user who cannot read the native group (unknown counts as
-            // native), which elsewhere never run. The guard is tested in
-            // HouseholdSelectorTest, so here no household has native dependents.
+            // Eight chunks (four per pass) in one transaction ran close to the query limit.
+            // The dry run therefore runs before startTest and the commit inside it, so each
+            // pass has its own limit context; the preview-equals-commit check is the same as
+            // in load(). In a Nonprofit Cloud org the native household guard (ADR-0036,
+            // ADR-0130) adds two queries a chunk for a test user who cannot read the native
+            // group (unknown counts as native), which elsewhere never run. The guard is
+            // tested in HouseholdSelectorTest, so here no household has native dependents.
             HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>();
-            Test.startTest();
-            List<Import_Row__c> rows = load(
-                file(
-                    new List<List<String>>{
-                        new List<String>{ 'John' },
-                        new List<String>{ 'John', 'Jane' },
-                        new List<String>{ 'Jane' },
-                        new List<String>{ 'Mary' }
-                    }
-                ),
-                1
+            Import_Batch__c batch = file(
+                new List<List<String>>{
+                    new List<String>{ 'John' },
+                    new List<String>{ 'John', 'Jane' },
+                    new List<String>{ 'Jane' },
+                    new List<String>{ 'Mary' }
+                }
             );
+            Import_Batch__c dryRun = runInChunks(batch.Id, true, 1);
+            Test.startTest();
+            Import_Batch__c committed = runInChunks(batch.Id, false, 1);
             Test.stopTest();
+            assertCommitCountedAsPreviewed(dryRun, committed);
+            List<Import_Row__c> rows = ImportTestDataFactory.reload(batch.Id);
 
             Assert.areEqual(
                 rows[0].Contact_1__c,
