@@ -404,7 +404,7 @@ public with sharing class SettingsController {
     /**
      * The names of the records that Record settings logged, by Id, read now so a renamed record
      * reads its current name. A record the user cannot read, or that is gone, is left out and
-     * shows as stored.
+     * shows as the plain fallback (Core_Settings_RecordUnavailable).
      */
     private static Map<Id, String> recordNamesFor(
         List<Setting_Change__c> changes,
@@ -446,7 +446,7 @@ public with sharing class SettingsController {
                     names.put(record.Id, (String) record.get('Name'));
                 }
             } catch (Exception e) {
-                // An object with no Name field or no read access: its rows show the stored Id.
+                // An object with no Name field or no read access: its rows show the plain fallback.
                 continue;
             }
         }
