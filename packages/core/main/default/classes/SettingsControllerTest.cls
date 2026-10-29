@@ -888,8 +888,9 @@ private class SettingsControllerTest {
             insert new List<Setting_Change__c>{
                 new Setting_Change__c(
                     Setting_Name__c = SettingsService.CORE_SETTINGS_OBJECT + '.Suite__c',
-                    Old_Value__c = ModuleDetectionService.SUITE_COMMUNITY,
-                    New_Value__c = ModuleDetectionService.SUITE_IMPACT,
+                    // Logged before ADR-NEXT, under the old code for the Standard Edition
+                    Old_Value__c = 'Community',
+                    New_Value__c = ModuleDetectionService.SUITE_NONPROFIT,
                     Changed_By__c = UserInfo.getUserId(),
                     Changed_At__c = now
                 ),

@@ -160,7 +160,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 3 | Click **Switch to the Standard Edition**. | A dialog "Change the Edition?" says modules already installed stay listed and keep working, with **Change Edition** and **Cancel**. |
 | 4 | Click **Change Edition**. | "Edition changed. Reload open BarnCRM pages to see the new module lists." **Edition** reads **Standard Edition**. |
 | 5 | Reload and open **Modules**. | **BarnCRM Programs** and **BarnCRM Funders** (not installed) are gone. Installed modules are still listed. |
-| 6 | Switch back to the Nonprofit Edition the same way. | **Edition** reads **Nonprofit Edition**; after a reload Programs and Funders are listed again. **Recent Changes** lists both edition changes as **Edition**, with old and new values that read **Nonprofit Edition** and **Standard Edition** (never "Community" or "Impact"). |
+| 6 | Switch back to the Nonprofit Edition the same way. | **Edition** reads **Nonprofit Edition**; after a reload Programs and Funders are listed again. **Recent Changes** lists both edition changes as **Edition**, with old and new values that read **Nonprofit Edition** and **Standard Edition** (never the stored codes "Standard" or "Nonprofit" alone, nor the old codes "Community" or "Impact"). |
 
 **Cleanup:** leave the Nonprofit Edition.
 

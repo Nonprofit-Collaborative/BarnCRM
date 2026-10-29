@@ -42,7 +42,7 @@ describe('c-edition-setting', () => {
   });
 
   it('shows the edition read-only, with the change tucked into a closed disclosure', async () => {
-    getEdition.mockResolvedValue({ currentSuite: 'Community', canEdit: true });
+    getEdition.mockResolvedValue({ currentSuite: 'Standard', canEdit: true });
     const element = await build();
 
     expect(find(element, 'edition-name').textContent).toBe('c.Core_SuiteChoice_StandardName');
@@ -50,11 +50,11 @@ describe('c-edition-setting', () => {
     expect(disclosure).not.toBeNull();
     expect(disclosure.open).toBe(false);
     const buttons = switchButtons(element);
-    expect(buttons.map((button) => button.dataset.value)).toEqual(['Impact']);
+    expect(buttons.map((button) => button.dataset.value)).toEqual(['Nonprofit']);
   });
 
   it('offers no change to someone who cannot manage settings', async () => {
-    getEdition.mockResolvedValue({ currentSuite: 'Impact', canEdit: false });
+    getEdition.mockResolvedValue({ currentSuite: 'Nonprofit', canEdit: false });
     const element = await build();
 
     expect(find(element, 'edition-name').textContent).toBe('c.Core_SuiteChoice_NonprofitName');
@@ -67,13 +67,13 @@ describe('c-edition-setting', () => {
 
     expect(find(element, 'edition-not-chosen')).not.toBeNull();
     expect(switchButtons(element).map((button) => button.dataset.value)).toEqual([
-      'Community',
-      'Impact'
+      'Standard',
+      'Nonprofit'
     ]);
   });
 
   it('changes nothing when the confirmation is cancelled', async () => {
-    getEdition.mockResolvedValue({ currentSuite: 'Community', canEdit: true });
+    getEdition.mockResolvedValue({ currentSuite: 'Standard', canEdit: true });
     BarnConfirmModal.open.mockResolvedValue(false);
     const element = await build();
 
@@ -87,9 +87,9 @@ describe('c-edition-setting', () => {
   });
 
   it('saves the other edition after confirmation and shows it', async () => {
-    getEdition.mockResolvedValue({ currentSuite: 'Impact', canEdit: true });
+    getEdition.mockResolvedValue({ currentSuite: 'Nonprofit', canEdit: true });
     BarnConfirmModal.open.mockResolvedValue(true);
-    changeEdition.mockResolvedValue({ currentSuite: 'Community', canEdit: true });
+    changeEdition.mockResolvedValue({ currentSuite: 'Standard', canEdit: true });
     const element = await build();
 
     switchButtons(element)[0].click();
@@ -98,13 +98,13 @@ describe('c-edition-setting', () => {
     expect(BarnConfirmModal.open).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'c.Core_Edition_ConfirmToStandard' })
     );
-    expect(changeEdition).toHaveBeenCalledWith({ suite: 'Community' });
+    expect(changeEdition).toHaveBeenCalledWith({ suite: 'Standard' });
     expect(find(element, 'edition-name').textContent).toBe('c.Core_SuiteChoice_StandardName');
     expect(find(element, 'saved')).not.toBeNull();
   });
 
   it('shows the message when the save is refused', async () => {
-    getEdition.mockResolvedValue({ currentSuite: 'Impact', canEdit: true });
+    getEdition.mockResolvedValue({ currentSuite: 'Nonprofit', canEdit: true });
     BarnConfirmModal.open.mockResolvedValue(true);
     changeEdition.mockRejectedValue({ body: { message: 'No permission' } });
     const element = await build();
@@ -121,7 +121,7 @@ describe('c-edition-setting', () => {
     const element = await build();
     expect(find(element, 'edition-not-chosen')).not.toBeNull();
 
-    getEdition.mockResolvedValueOnce({ currentSuite: 'Community', canEdit: true });
+    getEdition.mockResolvedValueOnce({ currentSuite: 'Standard', canEdit: true });
     element.refresh();
     await flushPromises();
 

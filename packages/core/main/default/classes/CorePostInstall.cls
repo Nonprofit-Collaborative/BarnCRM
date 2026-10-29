@@ -44,7 +44,8 @@
  * version reaches an org that already has others. Core adds its own here; each module that
  * ships templates calls the same method from its own script.
  *
- * Alongside these (ADR-0124): a new install starts with every feature off, an upgrade with no
+ * Alongside these (ADR-0124): a new install starts with every feature off, an edition stored
+ * under its old value is renamed (ADR-NEXT), an upgrade with no
  * edition saved gets the recommended one, and every run schedules the hourly tab access check
  * unless it is already scheduled. When Seasonal Addresses is on and its nightly job is missing,
  * the job is scheduled too; an upgraded org that already runs the job has the switch turned on.
@@ -178,6 +179,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 
     private void run(Boolean isNewInstall, Boolean isUpgrade, Id installerId) {
         markFeaturesOffOnANewInstall(isNewInstall);
+        renameStoredEdition();
         saveEditionOnAnUpgrade(isUpgrade);
         applyRecommendedMode();
         storeOrganizationRecordType();
@@ -224,8 +226,28 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
                 String suite = SetupAssistantService.recommendedSuite();
                 SettingsService.saveSystemValue(
                     'Suite__c',
-                    suite == null ? ModuleDetectionService.SUITE_COMMUNITY : suite
+                    suite == null ? ModuleDetectionService.SUITE_STANDARD : suite
                 );
+            }
+        } catch (Exception e) {
+            ErrorLogger.log(e, EDITION_CONTEXT);
+        }
+    }
+
+    /**
+     * Rewrites an edition stored before ADR-NEXT (`NEXT-edition-internal-values.md`): `Community`
+     * becomes `Standard` and `Impact` becomes `Nonprofit`. Saved as bookkeeping, with no Recent
+     * Changes row, because nobody changed the edition. Any other value is left alone, so a second
+     * run changes nothing. Never throws.
+     */
+    private void renameStoredEdition() {
+        try {
+            String stored = SettingsService.getSettings().Suite__c;
+            String renamed = String.isBlank(stored)
+                ? null
+                : ModuleDetectionService.SUITE_BY_OLD_VALUE.get(stored.trim().toLowerCase());
+            if (renamed != null) {
+                SettingsService.saveBookkeeping(new Map<String, Object>{ 'Suite__c' => renamed });
             }
         } catch (Exception e) {
             ErrorLogger.log(e, EDITION_CONTEXT);

@@ -46,13 +46,13 @@ export default class FirstRunModal extends LightningModal {
 
   editionOptions = [
     {
-      value: 'Community',
+      value: 'Standard',
       label: STANDARD_NAME,
       description: STANDARD_LINE,
       iconName: 'standard:household'
     },
     {
-      value: 'Impact',
+      value: 'Nonprofit',
       label: NONPROFIT_NAME,
       description: NONPROFIT_LINE,
       iconName: 'standard:currency'

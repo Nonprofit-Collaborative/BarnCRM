@@ -76,7 +76,7 @@ Settings, with the old and new edition by name (for example "Standard Edition").
 2. Click **Manage** next to **BarnCRM Settings**.
 3. Click **Edit** on the organization default row (the row under **Default Organization Level
    Value**).
-4. Set **Edition** to `Community` for the Standard Edition or `Impact` for the Nonprofit
+4. Set **Edition** to `Standard` for the Standard Edition or `Nonprofit` for the Nonprofit
    Edition, exactly as written. These are the stored values; the names people read are
    Standard Edition and Nonprofit Edition.
 5. Click **Save**.
@@ -92,6 +92,7 @@ already selected, so that you choose the features too.
   the Setup Assistant's first step or from the Module Manager.
 - **Switching to the Standard Edition to remove a module.** An installed module stays installed
   and keeps working. Turn it off or uninstall it in the Module Manager.
-- **Typing `Standard` or `Nonprofit` in Setup.** The stored values are `Community` and `Impact`.
+- **Typing `Standard Edition` or `Nonprofit Edition` in Setup.** The stored values are
+  `Standard` and `Nonprofit`, without the word Edition.
 - **Looking for the choice in the Setup Assistant after the first run.** Starting the assistant
   again keeps the edition; change it in BarnCRM Settings as above.

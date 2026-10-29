@@ -121,13 +121,13 @@ private class ModuleManagerControllerTest {
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
                 new BarnCRM_Module__mdt(
                     DeveloperName = 'Volunteers',
-                    Editions__c = 'Impact',
+                    Editions__c = 'Nonprofit',
                     Package_Folder__c = 'volunteers',
                     Sort_Order__c = 20
                 ),
                 new BarnCRM_Module__mdt(
                     DeveloperName = 'Rollups',
-                    Editions__c = 'Community;Impact',
+                    Editions__c = 'Standard;Nonprofit',
                     Package_Folder__c = 'rollups',
                     Sort_Order__c = 10
                 )
@@ -179,7 +179,7 @@ private class ModuleManagerControllerTest {
             // set and nothing said about hiding.
             insert new BarnCRM_Settings__c(
                 SetupOwnerId = UserInfo.getOrganizationId(),
-                Suite__c = ModuleDetectionService.SUITE_IMPACT
+                Suite__c = ModuleDetectionService.SUITE_NONPROFIT
             );
             SettingsService.clearCaches();
 

@@ -14,8 +14,8 @@ import NONPROFIT_NAME from '@salesforce/label/c.Core_SuiteChoice_NonprofitName';
 import CHOSEN_ONCE from '@salesforce/label/c.Core_SuiteChoice_ChosenOnce';
 import CHANGE_HELP from '@salesforce/label/c.Core_SuiteChoice_ChangeHelpLink';
 
-const IMPACT_SUITE = 'Impact';
-const COMMUNITY_SUITE = 'Community';
+const NONPROFIT_SUITE = 'Nonprofit';
+const STANDARD_SUITE = 'Standard';
 const EDITIONS_GUIDE =
   'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/editions.md';
 
@@ -65,14 +65,14 @@ export default class SetupStepSuite extends LightningElement {
   /** The saved edition's name, or null while none is saved (the first-run window asks it). */
   get savedName() {
     const saved = this._suite.currentSuite;
-    if (saved === COMMUNITY_SUITE) {
+    if (saved === STANDARD_SUITE) {
       return STANDARD_NAME;
     }
-    return saved === IMPACT_SUITE ? NONPROFIT_NAME : null;
+    return saved === NONPROFIT_SUITE ? NONPROFIT_NAME : null;
   }
 
-  get isImpactSaved() {
-    return this._suite.currentSuite === IMPACT_SUITE;
+  get isNonprofitSaved() {
+    return this._suite.currentSuite === NONPROFIT_SUITE;
   }
 
   get givingPresent() {

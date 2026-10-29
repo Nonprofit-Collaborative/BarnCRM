@@ -617,7 +617,7 @@ describe('c-setup-assistant', () => {
     expect(element.shadowRoot.querySelector('c-setup-step-suite')).not.toBeNull();
 
     getState.mockResolvedValue(
-      withSuiteStep({ currentSuite: 'Community', giving: { present: false } }, true)
+      withSuiteStep({ currentSuite: 'Standard', giving: { present: false } }, true)
     );
     const [context, handler] = registerRefreshHandler.mock.calls.at(-1);
     await expect(handler.call(context)).resolves.toBe(true);
@@ -633,11 +633,11 @@ describe('c-setup-assistant', () => {
   });
 
   it('checks again for Giving without leaving the step', async () => {
-    getState.mockResolvedValue(withSuiteStep({ currentSuite: 'Impact', giving: {} }));
+    getState.mockResolvedValue(withSuiteStep({ currentSuite: 'Nonprofit', giving: {} }));
     const element = build();
     await settle();
     getState.mockResolvedValue(
-      withSuiteStep({ currentSuite: 'Impact', giving: { present: true } }, true)
+      withSuiteStep({ currentSuite: 'Nonprofit', giving: { present: true } }, true)
     );
 
     element.shadowRoot
