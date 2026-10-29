@@ -142,16 +142,18 @@ A contact point record can belong to a person, an account, or a Salesforce **Ind
 counts as every person who carries it, contacts and, where your org has person accounts,
 person accounts too. A record that belongs to anything else is skipped.
 
-**Add a source.** Choose **Add**. Fill in **Name**, then the object's API name under
-**Object** (for example `Volunteer_Profile__c`) and choose **Find fields**: the
+**Add a source.** Choose **Add**: the form opens in a window over the page (Escape or
+**Cancel** closes it). Fill in **Name**, then the object's API name under **Object** (for
+example `Volunteer_Profile__c`) and choose **Find fields**: the
 **Field compared** and **Through the lookup** lists then offer only the fields that can
 work (text, email or phone fields Salesforce can search on, and lookups to a contact, an
 account or an Individual). Choose **How values are compared**; for **Address**, also choose
 the **Postal code field**. **Save** checks the source against the org and refuses anything
-that cannot work, saying why. Saving takes about a minute, because Salesforce applies it in
-the background: the area says "Saving", then "Saved" and lists the source. If you leave
-before then, choose **Check again** when you come back. A source you added has **Edit** as
-well.
+that cannot work, saying why in the window, which stays open. Once the source is accepted the
+window closes. Saving takes about a minute, because Salesforce applies it in the background:
+the area says "Saving", then "Saved" and lists the source. If you leave before then, choose
+**Check again** when you come back. A source you added has **Edit** as well, which opens the
+same window with the source's values filled in.
 
 **Deactivate a source.** Choose **Deactivate** on its card; **Activate** brings it back.
 Salesforce does not let an app delete custom metadata, so a source is deactivated instead.

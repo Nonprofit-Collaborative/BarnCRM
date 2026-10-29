@@ -109,13 +109,13 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Matching Logic**, click **Add**. | A **New Row** form: **Name**, **Object**, **Find fields**, **Field compared**, **Through the lookup**, **How values are compared**. |
-| 2 | Enter **Object** `Not_An_Object__c` and choose **Find fields**. | **Not_An_Object__c is not an object in this org. Check its API name.** |
+| 1 | On **Matching Logic**, click **Add**. | A window **New Match Source** over the page, with focus inside it: **Name**, **Object**, **Find fields**, **Field compared**, **Through the lookup**, **How values are compared**, and **Cancel** and **Save** at the bottom. Press Escape: the window closes and nothing is saved. |
+| 2 | Click **Add** again. Enter **Object** `Not_An_Object__c` and choose **Find fields**. | In the window: **Not_An_Object__c is not an object in this org. Check its API name.** |
 | 3 | Change **Object** to `Contact` and choose **Find fields**. | **Field compared** offers text, email and phone fields such as **Email** and **Assistant Phone**, and no date or number field. **Through the lookup** offers lookups such as **Account ID** and **Reports To ID**, and not **Last Name**. |
 | 4 | Choose **How values are compared** **Address**. | A **Postal code field** list appears. |
-| 5 | Choose **Field compared** **Mailing Street**, **Through the lookup** **Account ID**, leave **Postal code field** empty, and **Save**. | Refused: **An address source needs a postal code field: the street is compared together with it.** The form stays open. |
-| 6 | Enter **Name** `Test: assistant phone`, choose **How values are compared** **Phone**, **Field compared** **Assistant Phone**, **Through the lookup** **Reports To ID**, and **Save**. | **Saving.**, then **Saved. Test: assistant phone is in the list.** Its card says **Belongs to** a person, has **Edit**, **Deactivate** and **Try a value**, and is not marked **Shipped with BarnCRM**. |
-| 7 | Choose **Edit** on it, change **Name** to `Test: assistant phone 2`, and **Save**. | **Saved.** The card has the new name. |
+| 5 | Choose **Field compared** **Mailing Street**, **Through the lookup** **Account ID**, leave **Postal code field** empty, and **Save**. | Refused: **An address source needs a postal code field: the street is compared together with it.** in the window, which stays open. |
+| 6 | Enter **Name** `Test: assistant phone`, choose **How values are compared** **Phone**, **Field compared** **Assistant Phone**, **Through the lookup** **Reports To ID**, and **Save**. | The window closes. **Saving.**, then **Saved. Test: assistant phone is in the list.** Its card says **Belongs to** a person, has **Edit**, **Deactivate** and **Try a value**, and is not marked **Shipped with BarnCRM**. |
+| 7 | Choose **Edit** on it. In the window, change **Name** to `Test: assistant phone 2`, and **Save**. | The window opens with the source's values and its object's fields filled in. **Saved.** The card has the new name. |
 
 **Cleanup:** Choose **Deactivate** on `Test: assistant phone 2` (Salesforce does not let an app delete custom metadata; delete it in Setup, **Custom Metadata Types**, **Match Source**, **Manage Records**, if you want it gone).
 
