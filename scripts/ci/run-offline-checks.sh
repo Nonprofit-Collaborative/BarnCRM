@@ -109,6 +109,7 @@ for f in scripts/ci/check-*.sh; do
 done
 run "scripts/ci/check-apex-offline.sh" bash scripts/ci/check-apex-offline.sh
 [ -f scripts/ci/check-openapi.js ] && run "scripts/ci/check-openapi.js" node scripts/ci/check-openapi.js
+run "CI check tests" python3 -m unittest discover -s scripts/ci/tests
 [ -d scripts/migration/tests ] && run "migration kit tests" python3 -m unittest discover -s scripts/migration/tests
 [ -d scripts/data/tests ] && run "scale data generator tests" python3 -m unittest discover -s scripts/data/tests
 run "em dash characters" no_em_dashes

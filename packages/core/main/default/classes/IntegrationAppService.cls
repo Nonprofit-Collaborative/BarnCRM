@@ -149,7 +149,6 @@ public with sharing class IntegrationAppService {
                       Maintainer__c,
                       License_Cost__c,
                       Link_Url__c,
-                      Install_Url__c,
                       Related_Module__c,
                       Compatibility__c,
                       Migration_Path__c,
