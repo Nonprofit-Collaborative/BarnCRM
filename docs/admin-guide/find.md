@@ -57,7 +57,7 @@ to send them a letter.
    right. To add a field from a related record, choose the lookup in **Add fields from** (for
    example **Primary Contact**) and its fields appear in the list as "Primary Contact > Email".
    Add **Primary Contact > Email**.
-3. Under **Conditions**, press **Add condition**. Choose **Billing City**, **equals**, and type
+3. Under **Conditions**, press **Add Condition**. Choose **Billing City**, **equals**, and type
    **Springfield**. Add a second condition: **Primary Contact: more fields**, then **Email**,
    **is blank**.
 4. In **Sort by**, choose **Account Name**, **Ascending**. Leave **Rows to show** at 200.
@@ -142,7 +142,7 @@ a value; the operators offered depend on the field:
 
 ### 7.1 Related Records in Conditions
 
-Under **Related records**, press **Add related records** to keep only the records that have,
+Under **Related Records**, press **Add Related Records** to keep only the records that have,
 or do not have, related records matching conditions of their own. For example, on Account:
 
 - **Has related records**, **Gifts (Household)**, with the condition **Gift Date** is this
@@ -179,7 +179,7 @@ records and show at most 2,000 groups; for more, narrow the conditions or use a 
 
 ### 7.4 Typing a Query
 
-Press **Type a query** to type or paste a query instead of building it, for example:
+Press **Type a Query** to type or paste a query instead of building it, for example:
 
 ```
 SELECT Name, BillingCity FROM Account
@@ -187,10 +187,10 @@ WHERE BillingCity = 'Springfield' AND (Type = 'Household' OR Type = null)
 ORDER BY Name LIMIT 500
 ```
 
-Press **Use this query**. Find reads the text into the builder (object, columns, conditions,
+Press **Use This Query**. Find reads the text into the builder (object, columns, conditions,
 sort and rows to show), and from there it is an ordinary Find query: it is checked against
 your access, it runs with every value kept apart from the query, and it can be saved and
-shared. Find never sends the text itself to Salesforce. **Type a query** starts with the query
+shared. Find never sends the text itself to Salesforce. **Type a Query** starts with the query
 shown below the conditions, so you can change a built query as text, and the other way round.
 
 What a typed query may hold:

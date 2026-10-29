@@ -314,7 +314,7 @@ ever). The import itself stays: its counts, run log and file name, and its undo,
 reads the rows. A preview whose rows were removed cannot be committed: upload the file again.
 
 The job is called **Import row cleanup**. Health Check reports it when it is not scheduled, and
-its **Schedule all nightly jobs** fix schedules it. It runs at a quarter past one in the
+its **Schedule All Nightly Jobs** fix schedules it. It runs at a quarter past one in the
 morning.
 
 ## 6. Files That Arrive Every Month
@@ -494,6 +494,13 @@ report export is the safest source) and that you have access to it, then load th
 of record, for example a household's ID in a person's ID column, or a contact's ID in the
 organization's. Map the column to the right one, or fix the ID. An account whose record type
 is not the one chosen in **Record type for organizations** is "not an organization" too.
+
+**"No organization was matched or created, because you cannot use the ... record type".** The
+run log says this when the record type chosen in **Record type for organizations** (General,
+BarnCRM Settings) is not available to the user who loaded the file, so no organization in the
+file is matched or created. Give that user the record type in Setup (on their profile or a
+permission set), or choose a record type they have in the setting, then load the file again.
+With **No record type** chosen this never happens.
 
 **"Nothing matches this row, and this file only matches".** The file was marked **Match only**,
 so a row whose person or organization is not already in Salesforce is rejected instead of
@@ -869,7 +876,7 @@ you want as one. You can fix these in the template instead of in the spreadsheet
 file of the same kind is fixed too.
 
 1. On the columns step, select **Change Values** beside a column.
-2. Select **Add a change** and pick one. Changes run in the order listed, and you can add up
+2. Select **Add a Change** and pick one. Changes run in the order listed, and you can add up
    to ten to one column:
 
 | Change | What it does | Example |

@@ -302,7 +302,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Custom metadata page: what the match sources list is for</shortDescription>
-        <value>Related records whose values pair people or households as likely duplicates, in the duplicate scan and in imports. A source whose object is not in this org does nothing. A shipped source can be archived and restored.</value>
+        <value>Related records that pair people or households as likely duplicates, in scans and imports.</value>
     </labels>
     <labels>
         <fullName>Core_MatchSource_NoSuchObject</fullName>

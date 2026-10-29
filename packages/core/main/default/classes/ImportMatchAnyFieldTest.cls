@@ -115,9 +115,7 @@ private class ImportMatchAnyFieldTest {
         Account created = new Account(
             Name = name,
             Phone = phone,
-            RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId()
+            RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
         );
         insert created;
         return created;

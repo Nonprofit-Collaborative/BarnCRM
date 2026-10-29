@@ -33,10 +33,7 @@ private class ImportAffiliationTest {
     }
 
     private static Id organizationRecordTypeId() {
-        return Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-            .getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
+        return AccountKindsTestData.organizationRecordTypeId();
     }
 
     private static List<Map<String, String>> staffRows() {

@@ -18,9 +18,7 @@ private class RollupChangesCoverageTest {
     private static Account organization(String name) {
         return new Account(
             Name = name,
-            RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId()
+            RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
         );
     }
 

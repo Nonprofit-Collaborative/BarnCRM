@@ -185,12 +185,12 @@
         <value>This org has no external identifier field, so nothing could be matched by external ID. Choose a different matching rule.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_LogOrganizationRecordTypeMissing</fullName>
+        <fullName>Core_Import_LogOrganizationRecordTypeUnavailable</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: the organization record type is missing</shortDescription>
-        <value>The organization record type is missing, so no organization column was loaded.</value>
+        <shortDescription>Import run log: user lacks the organization record type; {0} is its label</shortDescription>
+        <value>No organization was matched or created, because you cannot use the {0} record type, which BarnCRM Settings uses for organizations (Record type for organizations, on General). Ask your Salesforce administrator to give you that record type, or choose another one in that setting, then load the file again.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogPersonRecordTypeMissing</fullName>
@@ -558,7 +558,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: what kind of file to upload</shortDescription>
-        <value>A CSV or other text file (columns separated by commas, semicolons, tabs or pipes) or an Excel workbook (.xlsx) whose first row is the column headings. You can choose the separator or the sheet on the next step.</value>
+        <value>A text file (CSV) or Excel workbook with column headings in the first row. Choose options next.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ColumnHeader</fullName>
@@ -622,7 +622,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: what the external id rule does and risks</shortDescription>
-        <value>Matches on the external identifier your other system gave the record. The most reliable rule for a file you load every month, but only if your org has an external identifier field.</value>
+        <value>Matches on the external ID from your other system: the most reliable rule for repeat files.</value>
     </labels>
     <labels>
         <fullName>Core_Import_PreviewWouldCreate</fullName>

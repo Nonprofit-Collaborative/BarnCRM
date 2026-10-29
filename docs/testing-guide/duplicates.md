@@ -64,7 +64,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 2 | Scan and refresh **Duplicates**. | A pair of two households side by side, each marked **Household** with its billing street, city, postal code and phone; a value that differs between the two has a **Different** badge (the streets match, so they have none). **Merge Households** (blue) and **Not a Duplicate** are at the top of the card. |
 | 3 | Click **Merge Households**. | A box **Merge Two Households**: **Members, related records, files and activities of the other household move to the one you keep, totals are recalculated, and the other household is deleted. This cannot be undone.**, a **Household to keep** list, the fields where they differ, and **To choose field by field, use Merge or split on the household record instead.** |
 | 4 | In **Household to keep**, choose the sample household (the one with members). | The list of differing fields marks which values are kept and which dropped. |
-| 5 | Click **Merge these two**. | **The two households are now one.** The pair is gone. |
+| 5 | Click **Merge These Two**. | **The two households are now one.** The pair is gone. |
 | 6 | Open **The Garcia Family**. | Harper, Luis and Diego are still members; the household you created no longer exists. |
 
 **Cleanup:** None.

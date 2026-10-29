@@ -114,14 +114,15 @@ The first time you open some BarnCRM pages, Salesforce shows a short tip:
 You should see: the tip close for good. Each tip shows once per person, and Salesforce waits
 a day between tips in the same app, so you may see the next one on a later visit.
 
-## To Open a "Learn more" Link
+## To Open a "Learn More" Link
 
 On the **BarnCRM Settings** tab, many settings have a **Learn More** link beside them.
 
 1. Click **Learn More** next to the setting.
 
 You should see: the matching Admin Guide page open in a new browser tab. Everyone can read
-the settings; only admins can change them.
+the settings; only admins can change them. Links that open a new tab show a small new-window
+icon and tell screen readers "(opens in a new tab)".
 
 ## To Check a Job Notification
 

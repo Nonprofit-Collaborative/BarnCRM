@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: what the row rules do</shortDescription>
-        <value>Skip rows you do not want, and load only the first row for each key. Rules compare the cells as they are in the file, ignoring capitals and spaces at the ends. A skipped row is listed with its reason, not rejected.</value>
+        <value>Skip unwanted rows, or load only the first row per key. Skipped rows are listed with a reason.</value>
     </labels>
     <labels>
         <fullName>Core_Import_RowRulesSkipHeading</fullName>

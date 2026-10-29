@@ -60,10 +60,7 @@ private class RollupApiTest {
         return new Account(
             Name = name,
             ParentId = parentId,
-            RecordTypeId = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-                .getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId()
+            RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
         );
     }
 

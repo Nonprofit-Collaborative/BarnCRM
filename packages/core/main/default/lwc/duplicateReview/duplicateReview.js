@@ -54,6 +54,7 @@ import EMPTY_HEADING from '@salesforce/label/c.Core_Duplicates_EmptyHeading';
 import COUNT_ALT from '@salesforce/label/c.Core_Duplicates_CountAlt';
 import DIFFERENT from '@salesforce/label/c.Core_Duplicates_Different';
 import BLANK from '@salesforce/label/c.Core_Duplicates_Blank';
+import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupPath } from 'c/setupLinks';
 
 const SETUP_DUPLICATE_RULES = setupPath('duplicateRules');
@@ -70,6 +71,7 @@ const PAGE_SIZE = 10;
  */
 export default class DuplicateReview extends NavigationMixin(LightningElement) {
   labels = {
+    newTab: NEW_TAB,
     title: TITLE,
     rulesHeading: RULES_HEADING,
     activateLink: ACTIVATE_LINK,

@@ -165,7 +165,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 2 | In **Kind of Record**, choose **Account**. | A progress bar fills while it reads **Counted N of N fields.** The table has **Field**, **API Name**, **Record Type**, **Filled**, **With a Value** and **Records** columns; rows appear for **Household** and **Organization**. |
 | 3 | Read the line above the table. | **No counts have been saved for this kind of record yet.** |
 | 4 | Read the small text under the button group, then click **Save Utilization Snapshot**. | The small text reads "Keeps this count so your next count shows what changed." Then **Saved N counts.** |
-| 5 | Open any sample organization and fill in **Website**. Return and click **Count again**. | The Website row for **Organization** shows a higher **Filled**; **Saved** shows the earlier percentage and **Change (Points)** shows the rise. |
+| 5 | Open any sample organization and fill in **Website**. Return and click **Count Again**. | The Website row for **Organization** shows a higher **Filled**; **Saved** shows the earlier percentage and **Change (Points)** shows the rise. |
 | 6 | Check the bell. | No notification for the count. |
 
 **Cleanup:** Clear the Website you added. Delete the **Field Utilization Snapshot** records if you want a tidy org.
@@ -192,9 +192,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **Org Optimizer**, choose **Field Utilization**, and choose **Account**. | After the count, **Snapshot History** appears below the table with one row: **Taken**, **Saved By** (you), **Fields** and **Average Fill Rate**, and the buttons **Compare with this one** (greyed out, it is the one in use), **View** and **Delete**. |
-| 2 | Open any sample organization and fill in **Website**. Return, click **Count again**, then save the count again. | The list now has two rows, newest first. |
-| 3 | Fill in another field on an organization, such as **Phone**, then click **Count again**. On the older row choose **Compare with this one**. | The line above the table names the older save's date, and **Saved** and **Change (Points)** now use the older save. The older row's button is greyed out. |
-| 4 | Click **Count again**. | The comparison is back on the latest save. |
+| 2 | Open any sample organization and fill in **Website**. Return, click **Count Again**, then save the count again. | The list now has two rows, newest first. |
+| 3 | Fill in another field on an organization, such as **Phone**, then click **Count Again**. On the older row choose **Compare with this one**. | The line above the table names the older save's date, and **Saved** and **Change (Points)** now use the older save. The older row's button is greyed out. |
+| 4 | Click **Count Again**. | The comparison is back on the latest save. |
 | 5 | On the newer row choose **View**. | Under the list, a table with **Kind of Record**, **Record Type**, **Field** and **Fill Rate** shows that save's rows. |
 | 6 | Click **Close**. | The table goes away. |
 | 7 | On the newer row choose **Delete**, then **Cancel**. | Nothing is deleted. |

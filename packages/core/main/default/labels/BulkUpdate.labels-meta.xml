@@ -326,7 +326,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Alternative text: remove one change.</shortDescription>
-        <value>Remove this change</value>
+        <value>Remove This Change</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_AddChange</fullName>
@@ -422,7 +422,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading over the records that failed.</shortDescription>
-        <value>Records that failed, and why</value>
+        <value>Records That Failed, and Why</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_EveryonesJobs</fullName>

@@ -278,7 +278,7 @@ Read Only users see schedules and change nothing.
 
 **The nightly run** is one of BarnCRM's nightly jobs, **Volunteer Schedules** (Setup's
 **Scheduled Jobs** page lists it as BarnCRM Volunteer Schedules). If **Health Check** says
-"Volunteer Schedules, 3:00 AM" is not scheduled, use its **Schedule all nightly jobs** fix. While Volunteers is turned
+"Volunteer Schedules, 3:00 AM" is not scheduled, use its **Schedule All Nightly Jobs** fix. While Volunteers is turned
 off, no shifts are created; the first night after you turn it back on catches up.
 
 ## Hour Letters and Certificates

@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Seasonal swap: two seasonal addresses cover the same day</shortDescription>
-        <value>Two seasonal addresses for the same household or person cover today, so BarnCRM used the one that was added first. Open the record and change the dates on one of them so only one seasonal address covers each day.</value>
+        <value>Two seasonal addresses cover today, so BarnCRM used the first added. Change one&apos;s dates.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_HubLink</fullName>
@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Settings console: what the seasonal swap panel is for</shortDescription>
-        <value>A seasonal address takes over on the day its season starts, and the address it replaced comes back on the day the season ends. Turn on Seasonal Addresses above to schedule the nightly job, and check here that it is really running.</value>
+        <value>A seasonal address takes over when its season starts and gives way when it ends.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_PageTitle</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that runs the swap immediately</shortDescription>
-        <value>Run the swap now</value>
+        <value>Run the Swap Now</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_RunNowStarted</fullName>

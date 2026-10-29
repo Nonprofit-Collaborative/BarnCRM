@@ -166,7 +166,7 @@ private class ImportRecordIdMatchTest {
         System.runAs(TestUsers.admin()) {
             Account organization = new Account(
                 Name = 'Harbor Trust',
-                RecordTypeId = recordTypeId('Organization')
+                RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
             );
             Account household = new Account(
                 Name = 'Lopez Household',
@@ -227,7 +227,7 @@ private class ImportRecordIdMatchTest {
         System.runAs(TestUsers.admin()) {
             Account organization = new Account(
                 Name = 'Harbor Trust',
-                RecordTypeId = recordTypeId('Organization')
+                RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
             );
             insert organization;
             Contact ana = new Contact(
@@ -260,7 +260,11 @@ private class ImportRecordIdMatchTest {
             );
             Assert.areEqual(
                 1,
-                [SELECT COUNT() FROM Account WHERE RecordTypeId = :recordTypeId('Organization')],
+                [
+                    SELECT COUNT()
+                    FROM Account
+                    WHERE RecordTypeId = :AccountKindsTestData.organizationRecordTypeId()
+                ],
                 'No organization added.'
             );
         }

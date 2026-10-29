@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Organization address: save button in the settings console</shortDescription>
-        <value>Save address</value>
+        <value>Save Address</value>
     </labels>
     <labels>
         <fullName>Core_OrganizationAddress_Saved</fullName>

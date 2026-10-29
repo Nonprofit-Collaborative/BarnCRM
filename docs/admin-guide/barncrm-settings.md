@@ -278,7 +278,7 @@ households opens the **People** box.
 The **Organization** section shows your mailing address as one **Organization Address**
 block, laid out like a Salesforce address: **Street**, **Street 2**, then **City**, **State**
 and **Zip Code** on one row, then **Country**. Like the household naming patterns, the block
-has its own **Save address** button, and its changes appear in **Recent Changes** on the
+has its own **Save Address** button, and its changes appear in **Recent Changes** on the
 **General** page.
 
 - You can leave the whole address blank.

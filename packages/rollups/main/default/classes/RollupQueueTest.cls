@@ -11,9 +11,7 @@ private class RollupQueueTest {
     }
 
     private static Id organizationType() {
-        return Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
+        return AccountKindsTestData.organizationRecordTypeId();
     }
 
     /** Counts each organization's child organizations into its Number of Employees. */

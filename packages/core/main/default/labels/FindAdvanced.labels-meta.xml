@@ -206,7 +206,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button and heading: type a query as text.</shortDescription>
-        <value>Type a query</value>
+        <value>Type a Query</value>
     </labels>
     <labels>
         <fullName>Core_Find_QueryText</fullName>
@@ -230,7 +230,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button: read the typed query into the builder.</shortDescription>
-        <value>Use this query</value>
+        <value>Use This Query</value>
     </labels>
     <labels>
         <fullName>Core_Find_TextSyntax</fullName>
@@ -294,7 +294,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading: related records conditions.</shortDescription>
-        <value>Related records</value>
+        <value>Related Records</value>
     </labels>
     <labels>
         <fullName>Core_Find_RelatedHelp</fullName>
@@ -310,7 +310,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button: add a related records condition.</shortDescription>
-        <value>Add related records</value>
+        <value>Add Related Records</value>
     </labels>
     <labels>
         <fullName>Core_Find_Has</fullName>

@@ -32,9 +32,9 @@
                                 <span data-id="related-module" class="slds-var-m-left_small">{app.relatedModuleText}</span>
                             </template>
                         </p>
-                        <p class="slds-text-body_small slds-var-m-top_xx-small" data-id="compatibility">
+                        <p class="slds-text-body_small slds-var-m-top_xx-small slds-grid slds-wrap" data-id="compatibility">
                             <span class="slds-text-title_caps slds-var-m-right_x-small">{labels.compatibility}</span>
-                            {app.compatibility}
+                            <span>{app.compatibility}</span>
                         </p>
                         <template lwc:if={app.migrationPathText}>
                             <p class="slds-text-body_small" data-id="migration-path">{app.migrationPathText}</p>
@@ -42,7 +42,8 @@
                         <p class="slds-var-m-top_xx-small">
                             <template lwc:if={app.linkUrl}>
                                 <a href={app.linkUrl} target="_blank" rel="noopener noreferrer" data-id="learn-more"
-                                    >{app.learnMore}<span class="slds-assistive-text">: {app.name} {app.newTab}</span></a
+                                    >{app.learnMore}<lightning-icon class="slds-var-m-left_xx-small" icon-name="utility:new_window" size="xx-small"></lightning-icon
+                                    ><span class="slds-assistive-text">: {app.name} {app.newTab}</span></a
                                 >
                             </template>
                         </p>
@@ -57,13 +58,15 @@
         <p data-id="request-intro">{request.intro}</p>
         <p class="slds-var-m-top_x-small">
             <a href={request.requestUrl} target="_blank" rel="noopener noreferrer" data-id="request-link"
-                >{request.requestLink}<span class="slds-assistive-text"> {labels.newTab}</span></a
+                >{request.requestLink}<lightning-icon class="slds-var-m-left_xx-small" icon-name="utility:new_window" size="xx-small"></lightning-icon
+                ><span class="slds-assistive-text"> {labels.newTab}</span></a
             >
         </p>
         <p class="slds-var-m-top_x-small" data-id="partner-intro">{request.partnerIntro}</p>
         <p>
             <a href={request.partnerUrl} target="_blank" rel="noopener noreferrer" data-id="partner-link"
-                >{request.partnerLink}<span class="slds-assistive-text"> {labels.newTab}</span></a
+                >{request.partnerLink}<lightning-icon class="slds-var-m-left_xx-small" icon-name="utility:new_window" size="xx-small"></lightning-icon
+                ><span class="slds-assistive-text"> {labels.newTab}</span></a
             >
             <a
                 class="slds-var-m-left_small"
@@ -71,7 +74,8 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 data-id="guide-link"
-                >{request.guideLink}<span class="slds-assistive-text"> {labels.newTab}</span></a
+                >{request.guideLink}<lightning-icon class="slds-var-m-left_xx-small" icon-name="utility:new_window" size="xx-small"></lightning-icon
+                ><span class="slds-assistive-text"> {labels.newTab}</span></a
             >
         </p>
     </section>

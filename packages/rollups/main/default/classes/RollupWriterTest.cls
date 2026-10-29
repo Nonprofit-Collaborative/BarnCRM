@@ -64,9 +64,7 @@ private class RollupWriterTest {
     @IsTest
     static void onlyRecordsWithAChangedTotalAreSaved() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId();
+            Id organizationType = AccountKindsTestData.organizationRecordTypeId();
             Account same = new Account(
                 Name = 'Same',
                 RecordTypeId = organizationType,

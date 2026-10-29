@@ -47,11 +47,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In Find, with **A11y check** open, Tab to **Delete** and press Enter. | A dialog opens with the heading **Delete this saved query?**, the text **A11y check will be deleted. This cannot be undone.** and two buttons, **Keep it** and **Delete**. Focus is inside the dialog. |
-| 2 | Press Tab repeatedly (at least six times). | Focus cycles only through the dialog's close button, **Keep it** and **Delete**. It never reaches the Find page behind the dialog. |
+| 1 | In Find, with **A11y check** open, Tab to **Delete** and press Enter. | A dialog opens with the heading **Delete this saved query?**, the text **A11y check will be deleted. This cannot be undone.** and two buttons, **Keep It** and **Delete**. Focus is inside the dialog. |
+| 2 | Press Tab repeatedly (at least six times). | Focus cycles only through the dialog's close button, **Keep It** and **Delete**. It never reaches the Find page behind the dialog. |
 | 3 | Press Shift+Tab repeatedly. | Focus cycles backwards through the same three controls. |
 | 4 | Press Escape. | The dialog closes. The query is not deleted. Focus is back on the **Delete** button. |
-| 5 | Press Enter on **Delete** again, Tab to **Keep it**, press Enter. | The dialog closes, the query is kept and focus is back on **Delete**. |
+| 5 | Press Enter on **Delete** again, Tab to **Keep It**, press Enter. | The dialog closes, the query is kept and focus is back on **Delete**. |
 | 6 | Press Enter on **Delete** again, Tab to the dialog's **Delete** button, press Enter. | The dialog closes and a notice reads **Deleted A11y check.** The query is gone from **Saved queries**. |
 
 **Cleanup:** None (the query is deleted in step 6).
@@ -117,6 +117,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 5 | In Find, run any Households query. | The screen reader announces the **N rows found.** line without you moving focus to it. |
 | 6 | In Quick Gift Entry, press **Save** with **Donor** empty. | The error **Choose the person or organization who gave this gift.** is read together with the **Donor** field. |
 | 7 | In the Import wizard on **Check Columns**, move to the table. | The table is announced as **Check Columns** with column headers **Column in Your File**, **What It Means**, **First Values**. |
+| 8 | Open the **Integrations** page and find an external link such as **Learn More**. | The link shows a small new-window icon after its text. A screen reader reads **Learn More (opens in a new tab)**. |
 
 **Cleanup:** None.
 

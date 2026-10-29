@@ -33,8 +33,6 @@
  * holds rather than as the whole match.
  */
 public with sharing class MatchingGiftService {
-    public static final String RECORD_TYPE_ORGANIZATION = 'Organization';
-
     public class MatchingGiftException extends Exception {
     }
 
@@ -415,12 +413,14 @@ public with sharing class MatchingGiftService {
         return new Map<Id, Gift__c>(GiftLookupSelector.selectForMatching(giftIds));
     }
 
+    /** A gift whose donor account is of the record type the org chose for organizations. */
     private static Boolean isOrganizationGift(Gift__c gift) {
         return gift != null &&
             gift.Donor_Account__c != null &&
             gift.Donor_Account__r != null &&
-            gift.Donor_Account__r.RecordType != null &&
-            RECORD_TYPE_ORGANIZATION.equals(gift.Donor_Account__r.RecordType.DeveloperName);
+            AccountKinds.isOrganizationRecordTypeName(
+                gift.Donor_Account__r.RecordType?.DeveloperName
+            );
     }
 
     private static Boolean linkedElsewhere(Gift__c gift, Id intendedPartnerId) {

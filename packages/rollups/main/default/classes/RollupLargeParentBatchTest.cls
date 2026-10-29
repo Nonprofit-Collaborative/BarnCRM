@@ -16,9 +16,7 @@ private class RollupLargeParentBatchTest {
     }
 
     private static Id organizationType() {
-        return Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
+        return AccountKindsTestData.organizationRecordTypeId();
     }
 
     private static Rollup_Definition__c definition(

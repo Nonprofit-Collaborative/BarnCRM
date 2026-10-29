@@ -137,6 +137,9 @@ private class AccountKindsTest {
                 AccountKinds.isOrganization(null),
                 'An account with none is an organization.'
             );
+            Assert.isTrue(AccountKinds.isOrganizationRecordTypeName(null), 'By name: none.');
+            Assert.isTrue(AccountKinds.isOrganizationRecordTypeName('Master'), 'The master.');
+            Assert.isFalse(AccountKinds.isOrganizationRecordTypeName('Household'), 'Not one.');
             Id household = HouseholdService.householdRecordTypeId();
             if (household != null) {
                 Assert.isFalse(AccountKinds.isOrganization(household), 'A household never is.');
@@ -174,6 +177,11 @@ private class AccountKindsTest {
                 'Its accounts are organizations.'
             );
             Assert.isFalse(AccountKinds.isOrganization(null), 'An account with none is not.');
+            Assert.isTrue(
+                AccountKinds.isOrganizationRecordTypeName(chosen.getDeveloperName()),
+                'By name: the chosen one.'
+            );
+            Assert.isFalse(AccountKinds.isOrganizationRecordTypeName(null), 'By name: none.');
         }
     }
 
@@ -191,6 +199,26 @@ private class AccountKindsTest {
                 'A stale value is read as the detected one, never as blank.'
             );
             Assert.areEqual('Business', AccountKinds.detectOrganizationRecordType(), 'Detected.');
+        }
+    }
+
+    @IsTest
+    static void theIsOrganizationFieldFollowsTheSetting() {
+        System.runAs(TestUsers.admin()) {
+            store(AccountKinds.organizationRecordTypeName());
+            Account organization = AddressTestDataFactory.newOrganization('Zztest Formula Org');
+            Account household = HouseholdTestDataFactory.newHousehold('The Zztest Family');
+            Database.insert(new List<Account>{ organization, household }, AccessLevel.SYSTEM_MODE);
+
+            Set<Id> ids = new Set<Id>{ organization.Id, household.Id };
+            Map<Id, Account> read = new Map<Id, Account>(
+                [SELECT Id, Is_Organization__c FROM Account WHERE Id IN :ids WITH SYSTEM_MODE]
+            );
+            Assert.isTrue(
+                read.get(organization.Id).Is_Organization__c,
+                'An account of the chosen record type is an organization.'
+            );
+            Assert.isFalse(read.get(household.Id).Is_Organization__c, 'A household never is.');
         }
     }
 

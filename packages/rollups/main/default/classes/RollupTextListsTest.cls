@@ -43,9 +43,7 @@ private class RollupTextListsTest {
     }
 
     private static List<Account> organizations(Integer count) {
-        Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
+        Id organizationType = AccountKindsTestData.organizationRecordTypeId();
         List<Account> created = new List<Account>();
         for (Integer i = 0; i < count; i++) {
             created.add(

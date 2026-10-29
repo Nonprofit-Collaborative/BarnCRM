@@ -12,7 +12,10 @@
                 <ul class="slds-list_dotted">
                     <template for:each={files} for:item="file">
                         <li key={file.documentId} data-id="file">
-                            <a href={file.url} target="_blank" rel="noopener noreferrer">{file.title}</a>
+                            <a href={file.url} target="_blank" rel="noopener noreferrer"
+                                >{file.title}<lightning-icon class="slds-var-m-left_xx-small" icon-name="utility:new_window" size="xx-small"></lightning-icon
+                                ><span class="slds-assistive-text">{labels.newTab}</span></a
+                            >
                         </li>
                     </template>
                 </ul>

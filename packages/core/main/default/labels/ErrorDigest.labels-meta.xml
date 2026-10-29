@@ -230,7 +230,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel: send now button.</shortDescription>
-        <value>Send now</value>
+        <value>Send Now</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_RecipientsTitle</fullName>

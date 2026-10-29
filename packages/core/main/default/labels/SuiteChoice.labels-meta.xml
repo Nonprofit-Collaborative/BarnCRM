@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: what the edition choice step asks</shortDescription>
-        <value>Both editions include BarnCRM's full core suite of tools. Choose the Standard Edition for the core suite on its own, or the Nonprofit Edition, which adds the nonprofit tools, starting with the Giving module. Any organization can choose either. You choose once: the edition decides which modules BarnCRM shows everywhere.</value>
+        <value>Nonprofit Edition adds Giving to the full core suite. You choose once; it decides which modules show.</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_UnknownSuiteError</fullName>
@@ -39,22 +39,6 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: the label of the edition choice</shortDescription>
         <value>Edition</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuiteChoice_CommunityOption</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the Standard Edition option</shortDescription>
-        <value>Standard Edition: the full core suite of BarnCRM tools</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuiteChoice_ImpactOption</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the Nonprofit Edition option</shortDescription>
-        <value>Nonprofit Edition: the core suite plus the nonprofit tools, starting with the Giving module</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_GivingInstalled</fullName>
@@ -118,7 +102,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Assistive text: a link opens in a new tab</shortDescription>
-        <value>(Opens in a New Tab)</value>
+        <value>(opens in a new tab)</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_ModuleInstallLink</fullName>

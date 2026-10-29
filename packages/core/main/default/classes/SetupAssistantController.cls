@@ -106,23 +106,6 @@ public with sharing class SetupAssistantController {
         }
     }
 
-    /**
-     * Step one: save the edition. The step finishes because the setting now has a value. It
-     * installs and removes nothing; it decides which modules Core shows (ADR-0124).
-     */
-    @AuraEnabled
-    public static SetupState applySuite(String suite) {
-        requireEdit();
-        String chosen = knownSuite(suite);
-        try {
-            SetupAssistantService.ensureStarted();
-            SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => chosen });
-            return buildState();
-        } catch (Exception e) {
-            throw logged(e, System.Label.Core_SetupAssistant_SaveErrorMessage);
-        }
-    }
-
     /** What the console's Edition row shows: the edition in force and whether it may be changed. */
     public class EditionModel {
         @AuraEnabled

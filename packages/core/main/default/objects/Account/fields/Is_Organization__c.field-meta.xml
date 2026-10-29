@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Is_Organization__c</fullName>
+  <description>True when the account is of the record type chosen in Record type for organizations (BarnCRM Settings, General), or has no record type when No record type is chosen (canonical model R-O4, ADR-0141). Read only. The Organizations list view and the record page rules for organizations use it.</description>
+  <externalId>false</externalId>
+  <formula>IF(
+  $Setup.BarnCRM_Settings__c.Organization_Record_Type__c = &quot;Master&quot;,
+  ISBLANK(RecordTypeId),
+  NOT(ISBLANK(RecordTypeId)) &amp;&amp; RecordType.DeveloperName = $Setup.BarnCRM_Settings__c.Organization_Record_Type__c
+)</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <inlineHelpText>Checked when this account is an organization: its record type is the one BarnCRM Settings uses for organizations.</inlineHelpText>
+  <label>Is Organization</label>
+  <type>Checkbox</type>
+</CustomField>

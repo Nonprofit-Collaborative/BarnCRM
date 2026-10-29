@@ -8,7 +8,7 @@
     <description>Home for a household, Work for an organization, the same types BarnCRM gives a first address.</description>
     <name>fAddressType</name>
     <dataType>String</dataType>
-    <expression>IF({!$Record.RecordType.DeveloperName} = "Organization", "Work", "Home")</expression>
+    <expression>IF({!$Record.Is_Organization__c}, "Work", "Home")</expression>
   </formulas>
   <interviewLabel>BarnCRM template: Keep the address an account started with {!$Flow.CurrentDateTime}</interviewLabel>
   <isTemplate>true</isTemplate>
@@ -95,7 +95,7 @@
     <connector>
       <targetReference>Create_First_Address</targetReference>
     </connector>
-    <filterFormula>AND(OR({!$Record.RecordType.DeveloperName} = "Household", {!$Record.RecordType.DeveloperName} = "Organization"), OR(NOT(ISBLANK({!$Record.BillingStreet})), NOT(ISBLANK({!$Record.BillingCity})), NOT(ISBLANK({!$Record.BillingState})), NOT(ISBLANK({!$Record.BillingPostalCode})), NOT(ISBLANK({!$Record.BillingCountry}))))</filterFormula>
+    <filterFormula>AND(OR({!$Record.RecordType.DeveloperName} = "Household", {!$Record.Is_Organization__c}), OR(NOT(ISBLANK({!$Record.BillingStreet})), NOT(ISBLANK({!$Record.BillingCity})), NOT(ISBLANK({!$Record.BillingState})), NOT(ISBLANK({!$Record.BillingPostalCode})), NOT(ISBLANK({!$Record.BillingCountry}))))</filterFormula>
     <object>Account</object>
     <recordTriggerType>Create</recordTriggerType>
     <triggerType>RecordAfterSave</triggerType>

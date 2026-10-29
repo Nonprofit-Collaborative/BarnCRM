@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: what matching one object with duplicate rules does</shortDescription>
-        <value>A row that would create a record is first looked for with your org&apos;s duplicate rules for this object; a record they match is updated instead. They are looser than a record ID or key, so check the ticked rows in the dry run.</value>
+        <value>Your org&apos;s duplicate rules can match an existing record, which is then updated. Check the dry run.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorDuplicateRulesUnavailable</fullName>

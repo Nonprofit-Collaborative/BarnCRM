@@ -301,9 +301,7 @@ private class BulkUpdateBatchTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-            Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId();
+            Id organizationType = AccountKindsTestData.organizationRecordTypeId();
             List<Account> accounts = new List<Account>();
             for (Integer index = 0; index < 100; index++) {
                 Account household = HouseholdTestDataFactory.newHousehold('Renameme Home ' + index);

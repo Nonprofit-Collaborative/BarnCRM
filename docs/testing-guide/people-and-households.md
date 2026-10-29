@@ -93,7 +93,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open **BarnCRM Settings**, **People and Households**. | In the **Household Names and Greetings** box, the **Household Names and Greetings** panel shows **Household name pattern**, **Formal greeting pattern**, **Informal greeting pattern**, and **How Five Sample Households Would Read**. |
 | 2 | Change **Household name pattern** to `{LastName} Household`. | The preview updates as you type. |
 | 3 | Select **Save**. | **Saved. New households use these patterns straight away.** |
-| 4 | Select **Update all household names**, then **Yes, recompute** in the dialog. | **Updating household names in the background.** After a few minutes The Garcia Family reads **Garcia Household**; the **Staff Household** (Custom Name) is unchanged. |
+| 4 | Select **Update All Household Names**, then **Yes, Recompute** in the dialog. | **Updating household names in the background.** After a few minutes The Garcia Family reads **Garcia Household**; the **Staff Household** (Custom Name) is unchanged. |
 | 5 | Put the pattern back to `The {LastName} Family`, save, and recompute again. | Names return to **The Garcia Family** form. |
 | 6 | As read-only, open the same panel. | **You can see these settings but not change them. Changing them needs the Manage BarnCRM Settings permission.** The patterns cannot be saved. |
 | 7 | As admin, look at the table under **How Five Sample Households Would Read** at normal desktop width. | The whole table fits inside the settings panel: long names and greetings wrap onto more lines, and there is no horizontal scroll bar on the table or the page. |
@@ -111,7 +111,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Create a contact `Cara` `Testwell` with no account. | A second household named **The Testwell Family** is created for her. |
 | 2 | Open the first Testwell household (Ada's) and select **Merge or Split** in the action bar. | A window titled **Merge or Split Households** opens on the **Merge** tab with **Pick a household to see the two side by side.** |
 | 3 | Type `Testwell` in **Find the other household** and pick Cara's household. | The comparison shows **Field**, **This Household**, **The Other Household**; differing values offer **Keep this one** or **Keep the other one**. **Members After the Merge** lists Ada and Ben (**From this household**) and Cara (**From the other household**). |
-| 4 | Select **Merge**. | A dialog headed **This cannot be undone** says Cara's household will be combined into this one. |
+| 4 | Select **Merge**. | A dialog headed **This Cannot Be Undone** says Cara's household will be combined into this one. |
 | 5 | Select **Cancel**. | Nothing changes: both households still exist with their members. |
 | 6 | Select **Merge**, then **Merge Households**. | Toast **Merged. The household you kept now holds everyone from both.** The window closes and the page refreshes: Member Count **3**, Cara in **Members**. Cara's old household no longer exists. |
 | 7 | Type `Bayview` in **Find the other household**. | **No households match what you typed.** Organizations are never offered. |
@@ -288,7 +288,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | Open the **Organizations** tab. | Accounts of the chosen record type are listed; households and person accounts are not. |
 | 4 | Open one of those organizations. | The **Affiliations** panel and the website show; no **Name and Greetings**, no **Members**, no **Erase Person**. |
 | 5 | Import a file with one person and the organization `Zztest Rt Org`. | `Zztest Rt Org` is created with the chosen record type (or none, for **No record type**) and appears on the **Organizations** tab. |
-| 6 | In an org with a second business record type, choose it in the setting and save. | Saved, and listed in **Recent Changes**. The **Organizations** tab now lists accounts of that record type instead. |
+| 6 | In an org with a second business record type, choose it in the setting and save. | Saved, and listed in **Recent Changes**. The **Organizations** tab now lists accounts of that record type instead. Open one: **Is Organization** is checked, and the **Affiliations** panel and website show, with Giving and Volunteers the organization sections too; an account of the first record type now shows **Is Organization** unchecked. |
+| 7 | With that record type still chosen, import a file with one person and the organization `Zztest Rt Org 2`, give an organization an address in its billing fields, and load sample data in a sandbox without it. | `Zztest Rt Org 2` is created with that record type; the organization with the billing address gets a first address of type **Work**; sample data's organizations get that record type and the sample data count lists them. |
+| 8 | As a user whose profile and permission sets do not give that record type, import the same file. | The run log says no organization was matched or created because you cannot use that record type, naming it by its label. |
 
 **Cleanup:** set the setting back to its first value; delete `Zztest Rt Org` and the imported person.
 

@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Confirm button</shortDescription>
-        <value>Yes, recompute</value>
+        <value>Yes, Recompute</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdNamingSettings_FormalLabel</fullName>
@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Recompute button</shortDescription>
-        <value>Update all household names</value>
+        <value>Update All Household Names</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdNamingSettings_RecomputeConfirm</fullName>

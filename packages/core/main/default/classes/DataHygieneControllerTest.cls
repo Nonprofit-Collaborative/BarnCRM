@@ -1,5 +1,5 @@
 /**
- * The Data Hygiene tab's controller (C-28, canonical model R-SQ6): the Find permission, every
+ * The Org Optimizer's Data Quality section controller (C-28, canonical model R-SQ6): the Find permission, every
  * check returned, and "Open in Find" saving one unshared saved query per check and person, put
  * back to the check's own query each time.
  *

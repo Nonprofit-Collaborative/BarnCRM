@@ -35,9 +35,7 @@ private class RollupSchedulerTest {
         return new Account(
             Name = name,
             ParentId = parentId,
-            RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId()
+            RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
         );
     }
 

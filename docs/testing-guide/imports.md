@@ -137,7 +137,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the Import tab, choose **People and Organizations** and **Generic contact list**, select **Next**, and upload `import-test-2.csv`. | The columns step. **Status** is set to **Do not load**. |
-| 2 | Beside **Email**, select **Change Values**. Select **Add a change** and choose **All lower case**. | A panel headed "Change values: Email" shows **The First Values, Before and After**: `ANA.RT@EXAMPLE.ORG` becomes `ana.rt@example.org`. |
+| 2 | Beside **Email**, select **Change Values**. Select **Add a Change** and choose **All lower case**. | A panel headed "Change values: Email" shows **The First Values, Before and After**: `ANA.RT@EXAMPLE.ORG` becomes `ana.rt@example.org`. |
 | 3 | Select **Done**. Beside **Last Name**, add **Capitalize each word** the same way and select **Done**. | The buttons now read **Change values (1)**. |
 | 4 | Under **Rows to Load**, **Skip Rows Where**, select **Add a rule**: **Column** Status, **Test** **equals**, **Text** `cancelled`. | The rule is listed. |
 | 5 | Under **One row per**, choose **Email**. | Email is chosen. |

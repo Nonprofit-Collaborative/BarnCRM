@@ -34,9 +34,7 @@ private class RollupQueueRecoveryTest {
     private static Account organization() {
         Account created = new Account(
             Name = 'Organization',
-            RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId()
+            RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
         );
         insert created;
         return created;

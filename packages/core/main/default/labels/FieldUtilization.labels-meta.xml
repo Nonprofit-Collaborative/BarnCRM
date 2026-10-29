@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: page introduction</shortDescription>
-        <value>Choose a kind of record to see how many records have each field filled in, by record type. The count sees the records you can see and changes nothing. Save the counts to compare with them later and to report on them.</value>
+        <value>Choose a kind of record to see how many records fill each field, by record type. Counts change nothing.</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_ChooseLabel</fullName>
@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: count again button</shortDescription>
-        <value>Count again</value>
+        <value>Count Again</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_Save</fullName>

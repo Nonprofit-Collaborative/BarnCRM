@@ -8,6 +8,7 @@ import PROGRESS from '@salesforce/label/c.Core_Find_ExportFilesProgress';
 import DONE from '@salesforce/label/c.Core_Find_ExportFilesDone';
 import FAILED from '@salesforce/label/c.Core_Find_ExportFilesFailed';
 import FILES from '@salesforce/label/c.Core_Find_ExportFilesList';
+import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 
 const POLL_MILLISECONDS = 5000;
 
@@ -32,7 +33,7 @@ export default class FindExportFiles extends LightningElement {
   errorMessage;
   timer;
 
-  labels = { files: FILES };
+  labels = { files: FILES, newTab: NEW_TAB };
 
   disconnectedCallback() {
     this.stopPolling();
