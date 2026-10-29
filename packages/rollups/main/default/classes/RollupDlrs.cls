@@ -288,16 +288,23 @@ public with sharing class RollupDlrs {
             }
         }
         // The object and field names are this class's own constants, kept only when describe
-        // finds them, so nothing user supplied reaches the query; they are escaped regardless.
-        String query = String.escapeSingleQuotes(
+        // finds them, so nothing user supplied reaches the query. Names are not escaped: there is
+        // no quoted value to escape, and escaping a whole query only hides what it holds. The
+        // query has no values at all, so its bind map is empty.
+        String query =
             'SELECT ' +
-                String.join(new List<String>(selected), ', ') +
-                ' FROM ' +
-                prefix +
-                localName +
-                ' LIMIT 2000'
-        );
-        for (SObject row : Database.query(query, AccessLevel.SYSTEM_MODE)) {
+            String.join(new List<String>(selected), ', ') +
+            ' FROM ' +
+            prefix +
+            localName +
+            ' LIMIT 2000';
+        for (
+            SObject row : Database.queryWithBinds(
+                query,
+                new Map<String, Object>(),
+                AccessLevel.SYSTEM_MODE
+            )
+        ) {
             Map<String, Object> values = new Map<String, Object>();
             for (String qualified : localByQualified.keySet()) {
                 values.put(localByQualified.get(qualified), row.get(qualified));

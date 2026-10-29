@@ -55,9 +55,8 @@ SHARING = re.compile(r"\b(with|without|inherited)\s+sharing\b", re.I)
 # A queued, batch, scheduled or finalizer job is entered by the platform, so with no keyword
 # it runs without sharing, whatever it touches.
 ASYNC_ENTRY = re.compile(r"\bimplements\b.*\b(Queueable|Database\.Batchable|Schedulable|Finalizer)\b", re.I | re.S)
-# Core only for now: the module jobs it would flag are recorded with the 2026-10-28 security
-# review's module findings, to be fixed with them.
-ASYNC_CHECKED = ("packages/core/",)
+# Every package: the module jobs the 2026-10-28 security review found now state theirs.
+ASYNC_CHECKED = ("packages/",)
 MARKER = re.compile(r"//\s*Access mode:", re.I)
 
 

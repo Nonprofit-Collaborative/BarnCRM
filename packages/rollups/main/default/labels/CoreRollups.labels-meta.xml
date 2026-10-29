@@ -121,6 +121,22 @@
         <value>You do not have permission to change rollups.</value>
     </labels>
     <labels>
+        <fullName>Core_Rollups_ErrorTargetNotAllowed</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a rollup would fill a field on users, setup or BarnCRM records.</shortDescription>
+        <value>A rollup cannot fill fields on this kind of record. Choose another object for the total.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorFieldNotReadable</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a rollup reads a field or object the person saving it cannot see.</shortDescription>
+        <value>This rollup reads a field you cannot see, so it was not saved. Choose fields you have access to.</value>
+    </labels>
+    <labels>
         <fullName>Core_Rollups_ErrorUnknownDefinition</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

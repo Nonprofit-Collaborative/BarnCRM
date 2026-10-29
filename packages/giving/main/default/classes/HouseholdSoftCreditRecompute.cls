@@ -116,7 +116,7 @@ public with sharing class HouseholdSoftCreditRecompute implements Queueable {
      * System.enqueueJob call, and logs it through ErrorLogger. Does nothing else and never
      * throws, matching the pattern every other Error Log writer in this package follows.
      */
-    private class RecomputeFinalizer implements System.Finalizer {
+    private with sharing class RecomputeFinalizer implements System.Finalizer {
         private final String context;
 
         private RecomputeFinalizer(String context) {

@@ -4,7 +4,9 @@
  * (plan Section 7.2, ADR-0017). No logic lives here, with one exception: any save or delete of a
  * definition clears the engine's per-transaction cache of definitions (`RollupSelector`), here
  * and not in a handler, because a handler can be switched off, bypassed or paused, and a stale
- * definition would then be calculated for the rest of the transaction.
+ * definition would then be calculated for the rest of the transaction. The security check of who
+ * may change a definition, and what it may read and write (`RollupDefinitionGuard`), runs here
+ * for the same reason: it must not be switched off with a handler.
  */
 trigger RollupDefinitionTrigger on Rollup_Definition__c(
     before insert,
@@ -12,5 +14,8 @@ trigger RollupDefinitionTrigger on Rollup_Definition__c(
     before delete
 ) {
     RollupSelector.clearCache();
+    if (Trigger.isInsert || Trigger.isUpdate) {
+        RollupDefinitionGuard.check(Trigger.new, Trigger.oldMap);
+    }
     TriggerDispatcher.run('Rollup_Definition__c');
 }
