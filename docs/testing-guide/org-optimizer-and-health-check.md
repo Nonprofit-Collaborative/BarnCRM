@@ -61,10 +61,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **BarnCRM Settings**, **Health**, find **Nightly jobs are not scheduled**. | It names the jobs, for example **Error digest email**, **Empty household tidy-up**, and has **Schedule all nightly jobs**. |
-| 2 | Click **Schedule all nightly jobs**. | A dialog **Before this fix runs**: **This is what the fix will do. Nothing changes until you confirm.**, the same list, **Confirm** and **Cancel**. |
+| 1 | On **BarnCRM Settings**, **Health**, find **Nightly jobs are not scheduled**. | It names the jobs, for example **Error digest email**, **Empty household tidy-up**, and has **Schedule All Nightly Jobs**. |
+| 2 | Click **Schedule All Nightly Jobs**. | A dialog **Before This Fix Runs**: **This is what the fix will do. Nothing changes until you confirm.**, the same list, **Confirm** and **Cancel**. |
 | 3 | Press Escape. | The dialog closes and focus returns to the button. Nothing is scheduled. |
-| 4 | Click **Schedule all nightly jobs**, then **Confirm**. | **Done. Scheduled: ...** naming each job, and the report re-runs. **Nightly jobs are not scheduled** is gone. |
+| 4 | Click **Schedule All Nightly Jobs**, then **Confirm**. | **Done. Scheduled: ...** naming each job, and the report re-runs. **Nightly jobs are not scheduled** is gone. |
 | 5 | In **BarnCRM Settings**, open **General** and scroll to **Recent Changes**. | The top entry starts **Health Check:** with the button's name, your name and the time. |
 | 6 | Open **BarnCRM Settings**, **Error Log**. | The **Error Digest** panel shows as scheduled, so the job can be stopped on its own page. The seasonal address swap is not on the list unless **Seasonal Addresses** is ticked on the **Addresses** page, and then it is scheduled already. |
 
@@ -96,7 +96,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | Find **Nightly jobs are not scheduled**. | It is not shown (only administrators see it), and no finding has a fix button. |
 | 4 | Check the app's navigation. | No **Org Optimizer** tab. |
 
-**Cleanup:** As admin, run **Schedule all nightly jobs** again.
+**Cleanup:** As admin, run **Schedule All Nightly Jobs** again.
 
 ## T-HC-07: Health Check's Last Result on Home
 

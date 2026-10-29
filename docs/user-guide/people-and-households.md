@@ -92,7 +92,7 @@ You do not need permission to delete households.
    it.
 3. Read the **Household comparison**. Where the two disagree, choose **Keep this one** or **Keep
    the other one**. Check **Members After the Merge**.
-4. Click **Merge**. Read "This cannot be undone", then click **Merge Households**.
+4. Click **Merge**. Read "This Cannot Be Undone", then click **Merge Households**.
 
 You should see: "Merged. The household you kept now holds everyone from both." The other
 household is deleted, and its history, files and notes move to the one you kept. A merge

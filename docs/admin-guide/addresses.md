@@ -64,7 +64,7 @@ Then turn on the seasonal address swap, which is off until you turn it on.
    12:30 AM, in your organization's time zone" and the date of the next run appears under it.
    Before you turned the switch on, it read "Seasonal Addresses is off, so seasonal
    addresses will not move on their own."
-7. Choose **Run the swap now** once, so you do not have to wait until tomorrow to see that it
+7. Choose **Run the Swap Now** once, so you do not have to wait until tomorrow to see that it
    works. Refresh the page after a minute: **Seasonal Addresses Last Swapped** shows the time
    it finished and a sentence saying how many addresses moved.
 
@@ -73,7 +73,7 @@ the job is never scheduled twice. Untick it and choose **Save** to stop the job.
 swap now** works whether the switch is on or off.
 
 You need the **Manage BarnCRM Settings** permission, which the BarnCRM Admin access level
-gives you, to save the switch or to use **Run the swap now**. Everyone else sees the same
+gives you, to save the switch or to use **Run the Swap Now**. Everyone else sees the same
 last run and cannot change either.
 
 There is nothing to do in Setup. Scheduling Apex is normally a Setup task, and BarnCRM
@@ -256,7 +256,7 @@ that the nightly job really works, before the winter mailing goes out.
 3. Change the Arizona address's dates so that today falls inside them: set **Seasonal Start
    Month** and **Seasonal Start Day** to yesterday's month and day, and the end month and day
    to a date next month. Save.
-4. Go back to **BarnCRM Settings**, **Addresses**, and choose **Run the swap now**.
+4. Go back to **BarnCRM Settings**, **Addresses**, and choose **Run the Swap Now**.
 5. Wait a minute and refresh the page. **Seasonal Addresses Last Swapped** now shows a time a
    minute ago and reads "1 moved to a seasonal address, 0 moved back, 0 could not be changed."
 6. Open **The Garcia Family** again. The **Primary** badge is on the Arizona address, the
@@ -264,7 +264,7 @@ that the nightly job really works, before the winter mailing goes out.
    household has Phoenix as their mailing address (except anyone with an address of their
    own: see "Expecting everyone in a household to move with it" below). Nobody typed any of
    that.
-7. Now set the Arizona address's end date to yesterday, save, and choose **Run the swap now**
+7. Now set the Arizona address's end date to yesterday, save, and choose **Run the Swap Now**
    again. The summary reads "0 moved to a seasonal address, 1 moved back", the badge is back
    on the home address, and the household's address boxes read Springfield again.
 8. Open the **BarnCRM** home page. The **Seasonal Addresses Last Swapped** tile shows
@@ -368,7 +368,7 @@ where a mailing actually went.
 Settings, which schedules the nightly job. Until you do that, the page says so in as many
 words and the home page tile says the swap has not run. If
 the tile ever says the swap is scheduled but has not run in more than 36 hours, choose
-**Run the swap now** and check the Error Log.
+**Run the Swap Now** and check the Error Log.
 
 **Two seasonal addresses covering the same day.** If a household has a November to March
 address and a December to February address, both cover Christmas. BarnCRM uses the one

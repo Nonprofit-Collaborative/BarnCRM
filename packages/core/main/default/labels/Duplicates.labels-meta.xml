@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: confirm merge button</shortDescription>
-        <value>Merge these two</value>
+        <value>Merge These Two</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_MergeDropping</fullName>
@@ -246,7 +246,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: why no suggestions are shown without the license bound access.</shortDescription>
-        <value>Suggestions need access to duplicate record sets, which Salesforce gives only to Sales Cloud and Service Cloud licenses. An administrator with one of those licenses can be given the BarnCRM Duplicate Review permission set. The rules above still run when records are saved.</value>
+        <value>Suggestions need duplicate record set access, given only with Sales or Service Cloud licenses. Rules still run on save.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_ObjectHousehold</fullName>

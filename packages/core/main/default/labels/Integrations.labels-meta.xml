@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Integrations: what the page is, what In Progress and Installed mean</shortDescription>
-        <value>This page is a roadmap of other products BarnCRM plans to work with. In Progress means planned and not built: nothing listed here is integrated with BarnCRM yet, and a product has not been tested with it unless its note says so. BarnCRM does not depend on any of them. Installed in this org means one of the product's own objects is in this org.</value>
+        <value>A roadmap, not a feature list: nothing listed is integrated yet, and BarnCRM depends on none of it.</value>
     </labels>
     <labels>
         <fullName>Core_Integrations_GroupComplement</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Integrations: what the alternatives are</shortDescription>
-        <value>Each of these does the same work as a BarnCRM module, and is listed here only because it is installed in this org. Use one or the other for the same records, not both.</value>
+        <value>Each does the work of a BarnCRM module and is listed because it is installed. Use one, not both.</value>
     </labels>
     <labels>
         <fullName>Core_Integrations_Installed</fullName>
@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Integrations: link to a product's own page</shortDescription>
-        <value>Learn more</value>
+        <value>Learn More</value>
     </labels>
     <labels>
         <fullName>Core_Integrations_EmptyMessage</fullName>
@@ -166,7 +166,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Integrations: what the request section offers</shortDescription>
-        <value>Tell us what you need; requests shape the roadmap. BarnCRM is self-service, so a request is a public suggestion, not a support ticket, and nothing here promises a reply or a date.</value>
+        <value>Requests shape the roadmap. BarnCRM is self-service, so a request is a public suggestion, not a ticket.</value>
     </labels>
     <labels>
         <fullName>Core_Integrations_RequestLink</fullName>

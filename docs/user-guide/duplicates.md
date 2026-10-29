@@ -61,7 +61,7 @@ households this way, never with Salesforce's own account merge. The full steps a
    list reminds you: "To merge two people, open either one and use Compare and merge on the
    Potential Duplicates card."
 4. For two households, click **Merge Households**. In **Merge Two Households**, choose the
-   **Household to keep** and click **Merge these two**. To choose field by field, use **Merge
+   **Household to keep** and click **Merge These Two**. To choose field by field, use **Merge
    or split** on the household instead.
 
 You should see: "The two households are now one." Merged pairs leave the list.

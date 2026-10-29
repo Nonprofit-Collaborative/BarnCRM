@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that adds a condition row to the filter builder.</shortDescription>
-        <value>Add condition</value>
+        <value>Add Condition</value>
     </labels>
     <labels>
         <fullName>Core_Filter_RemoveCondition</fullName>

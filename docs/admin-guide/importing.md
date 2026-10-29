@@ -314,7 +314,7 @@ ever). The import itself stays: its counts, run log and file name, and its undo,
 reads the rows. A preview whose rows were removed cannot be committed: upload the file again.
 
 The job is called **Import row cleanup**. Health Check reports it when it is not scheduled, and
-its **Schedule all nightly jobs** fix schedules it. It runs at a quarter past one in the
+its **Schedule All Nightly Jobs** fix schedules it. It runs at a quarter past one in the
 morning.
 
 ## 6. Files That Arrive Every Month
@@ -876,7 +876,7 @@ you want as one. You can fix these in the template instead of in the spreadsheet
 file of the same kind is fixed too.
 
 1. On the columns step, select **Change Values** beside a column.
-2. Select **Add a change** and pick one. Changes run in the order listed, and you can add up
+2. Select **Add a Change** and pick one. Changes run in the order listed, and you can add up
    to ten to one column:
 
 | Change | What it does | Example |

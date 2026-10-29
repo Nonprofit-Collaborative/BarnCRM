@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: adds a change to a column</shortDescription>
-        <value>Add a change</value>
+        <value>Add a Change</value>
     </labels>
     <labels>
         <fullName>Core_Import_ChangesKind</fullName>
@@ -262,7 +262,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: what matching with duplicate rules risks</shortDescription>
-        <value>People and organizations the rule above does not find are looked for with your org&apos;s duplicate rules. They are looser, so a row can be loaded into somebody only similar: check the ticked rows in the dry run.</value>
+        <value>Your org&apos;s looser duplicate rules check rows the rule above misses. Check ticked rows in the dry run.</value>
     </labels>
     <labels>
         <fullName>Core_Import_DuplicateRulesNone</fullName>

@@ -102,7 +102,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: what related records do</shortDescription>
-        <value>Each row can also create a record that points at its parent, such as a session of a program. Rows with the same value in the field rows are matched by share one parent. Then map the related columns on the columns step.</value>
+        <value>Each row can also create a parent-linked record, such as a program session. Map its columns next.</value>
     </labels>
     <labels>
         <fullName>Core_Import_RelatedInsertHelp</fullName>

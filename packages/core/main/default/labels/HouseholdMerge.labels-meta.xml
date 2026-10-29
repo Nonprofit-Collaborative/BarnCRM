@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Heading of the merge confirmation</shortDescription>
-        <value>This cannot be undone</value>
+        <value>This Cannot Be Undone</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_ErrorContext</fullName>

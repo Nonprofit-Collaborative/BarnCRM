@@ -283,6 +283,7 @@ describe('c-access-manager', () => {
     const link = element.shadowRoot.querySelector('[data-id="automatic-access-link"]');
     expect(link.href).toContain('docs/admin-guide/automatic-access.md');
     expect(link.target).toBe('_blank');
-    expect(link.textContent).toBe('c.Core_Access_AutomaticAccessLink');
+    expect(link.textContent).toContain('c.Core_Access_AutomaticAccessLink');
+    expect(link.textContent).toContain('c.Core_Kit_NewTab');
   });
 });

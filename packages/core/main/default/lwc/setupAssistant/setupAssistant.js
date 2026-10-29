@@ -39,6 +39,7 @@ import SAMPLE_UNAVAILABLE from '@salesforce/label/c.Core_SetupAssistant_SampleDa
 import START_AGAIN from '@salesforce/label/c.Core_SetupAssistant_StartAgainButton';
 import OPEN_SECTION from '@salesforce/label/c.Core_SetupAssistant_OpenSectionButton';
 import PROGRESS_FORMAT from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
+import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupPath } from 'c/setupLinks';
 
 const CREATE_USER_URL = setupPath('users');
@@ -80,6 +81,7 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
   userFilter = { criteria: [{ fieldPath: 'IsActive', operator: 'eq', value: true }] };
 
   labels = {
+    newTab: NEW_TAB,
     heading: HEADING,
     next: NEXT,
     skip: SKIP,

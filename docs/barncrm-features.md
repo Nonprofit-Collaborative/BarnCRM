@@ -84,7 +84,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Person account address capture | Minor | A person held as a person account who is saved with a mailing address, or whose mailing address changes, gets an address record of their own. | Shipped (#377) | PEOPLE-17 |
 | Seasons that cross New Year | Minor | A season such as November to March is handled as one range. | Shipped | C-17, C-18 |
 | Overlapping season report | Minor | Two seasonal addresses covering the same day are reported rather than silently chosen. | Shipped | C-18 |
-| Swap scheduling in the app | Minor | Schedule, unschedule and "Run the swap now" from settings, with a "not run in 36 hours" warning. | Shipped | C-18 |
+| Swap scheduling in the app | Minor | Schedule, unschedule and "Run the Swap Now" from settings, with a "not run in 36 hours" warning. | Shipped | C-18 |
 | Verification-ready fields | Minor | Verification status and date fields that Core never writes, so an address verification app can own them; the optional Address Verification module (C-46) will. | Shipped | C-17 |
 
 ### 1.4 Data Quality
@@ -308,7 +308,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Multi-currency warning | Minor | Warns that multiple currencies are not supported yet. | Shipped | C-11 |
 | Stalled digest finding | Minor | Warns when the error digest is scheduled but has not run for two days. | Shipped | C-23 |
 | Module findings extension | Minor | Lets installed modules add their own Health Check findings without Core knowing about them. | Shipped | ADR-0057 |
-| Schedule all nightly jobs | Minor | One Health Check finding lists every nightly job that is not scheduled (rollups, seasonal addresses, error digest, and those Giving and Mirror add), and one fix schedules them all. | Shipped | C-21, ADR-0075 |
+| Schedule All Nightly Jobs | Minor | One Health Check finding lists every nightly job that is not scheduled (rollups, seasonal addresses, error digest, and those Giving and Mirror add), and one fix schedules them all. | Shipped | C-21, ADR-0075 |
 | Jobs of a deactivated owner | Minor | Health Check names every scheduled BarnCRM job whose owner was deactivated (it has stopped but still looks scheduled), and one fix schedules them again as the admin. | Shipped (#377) | ADMIN-12, ADR-0105 |
 | Finish Setup safety net | Minor | Each package (Core and every module) records that its install setup steps ran. One copied into an org by hand, so they never ran, gets a Health Check warning and a notice on its Modules row, each with a Finish Setup button that runs the install's own steps (safe to run twice, Manage BarnCRM Settings only; Core's BarnCRM Admin grant goes only to the person running it, and only when they hold Assign Permission Sets or Manage Users). A recovery step: BarnCRM is installed as packages. | In review | FS1 |
 | Capped error count | Minor | The unread error count reads "999+" on the home page and "1,000 or more" in Health Check past a cap. | Shipped | plan 11.3 |
@@ -482,7 +482,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Control totals | Minor | Expected row count and total from the deposit slip are checked in the dry run before commit. | Shipped | G-23 |
 | Undo keeps receipted gifts | Minor | Undoing a gift import keeps any gift a receipt or statement lists, and its donor, with the reason journaled. | Shipped | G-23 |
 | Split-gift lines refused | Minor | A gift exported as one line per designation is rejected until combined, so no gift loads to one fund only. | Shipped | plan 6.3 |
-| Restore import templates | Minor | Health Check finds missing shipped templates and restores them without touching yours. | Shipped | C-21 |
+| Restore Import Templates | Minor | Health Check finds missing shipped templates and restores them without touching yours. | Shipped | C-21 |
 
 ### 2.9 Reporting and Dashboards
 

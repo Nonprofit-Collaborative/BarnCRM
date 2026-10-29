@@ -8,7 +8,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 ## T-SET-01: Open the Settings Console
 
-**Purpose:** confirm the console opens with its sections, descriptions, Learn more links and Recent Changes.
+**Purpose:** confirm the console opens with its sections, descriptions, Learn More links and Recent Changes.
 **Prerequisites:** admin user (see [Test users](before-you-test.md#test-users)).
 **Smoke:** yes
 
@@ -206,9 +206,9 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As admin, open **Home**. | **Errors to Review** shows a count of at least 1, with **Open the Error Log**. |
-| 2 | Open the **Org Optimizer** tab and its **Errors** tab. | An **Error Log** card with a badge "{n} new" lists **Testing guide entry** with **Testing guide** and the time, **Open this entry** and **Mark acknowledged**. |
-| 3 | Click **Open this entry**. | The Error Log record opens (as a subtab in the console). **Status** is **New**. |
-| 4 | Back on the tile, click **Mark acknowledged**. | The badge count drops by one (the entry stays in the recent list). The record's **Status** reads **Acknowledged**. On **Home**, **Errors to Review** drops by one after a reload. |
+| 2 | Open the **Org Optimizer** tab and its **Errors** tab. | An **Error Log** card with a badge "{n} new" lists **Testing guide entry** with **Testing guide** and the time, **Open This Entry** and **Mark Acknowledged**. |
+| 3 | Click **Open This Entry**. | The Error Log record opens (as a subtab in the console). **Status** is **New**. |
+| 4 | Back on the tile, click **Mark Acknowledged**. | The badge count drops by one (the entry stays in the recent list). The record's **Status** reads **Acknowledged**. On **Home**, **Errors to Review** drops by one after a reload. |
 | 5 | As staff, open the **Error Log** tab and the entry. | The entry is readable. **Status** cannot be edited and **Technical Detail** is not shown. |
 
 **Cleanup:** set the entry's **Status** to **Resolved** as admin.
@@ -238,13 +238,13 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Organization**. | After **Organization legal name**, an **Organization Address** block shows **Street**, **Street 2**, then **City**, **State** and **Zip Code** on one row, then **Country**. No box is marked required while the whole address is blank. There is no separate row for each part. |
 | 2 | Type `Springfield` in **City**. | **Street**, **City**, **State** and **Zip Code** are now marked required. **Street 2** and **Country** are not. |
-| 3 | Click **Save address**. | The page shows "Fill in the address parts marked required, or clear the whole address." and nothing is saved. |
-| 4 | Fill **Street** `14 Bridge Street`, **State** `IL`, **Zip Code** `62701`. Leave **Street 2** and **Country** blank. Click **Save address**, then open **General**. | "Organization address saved." On **General**, **Recent Changes** lists the four parts. |
+| 3 | Click **Save Address**. | The page shows "Fill in the address parts marked required, or clear the whole address." and nothing is saved. |
+| 4 | Fill **Street** `14 Bridge Street`, **State** `IL`, **Zip Code** `62701`. Leave **Street 2** and **Country** blank. Click **Save Address**, then open **General**. | "Organization address saved." On **General**, **Recent Changes** lists the four parts. |
 | 5 | Reload and open **Organization**. | The four parts you saved are in their boxes. |
-| 6 | Clear **Zip Code** and click **Save address**. | A required-part message appears and the saved address is unchanged after a reload. |
+| 6 | Clear **Zip Code** and click **Save Address**. | A required-part message appears and the saved address is unchanged after a reload. |
 | 7 | Search the console for `zip`, and click the **Organization zip code** result. | The console opens **Organization** and focuses the **Organization Address** block, not a separate row. |
-| 8 | As read-only (T-SET-13), open **Organization**. | The address boxes are greyed out and there is no **Save address** button. |
-| 9 | Open **BarnCRM Settings**, **Organization** and clear all six boxes. Click **Save address**. | "Organization address saved." A blank address is allowed. |
+| 8 | As read-only (T-SET-13), open **Organization**. | The address boxes are greyed out and there is no **Save Address** button. |
+| 9 | Open **BarnCRM Settings**, **Organization** and clear all six boxes. Click **Save Address**. | "Organization address saved." A blank address is allowed. |
 | 10 | Enter a Street 2 `Suite 3` and the four required parts again and save. Issue a receipt (see [Giving receipts and acknowledgments](giving-receipts-and-acknowledgments.md)) or make a volunteer hours letter, and open the document. | The receipt letterhead shows the address as `14 Bridge Street`, `Suite 3`, `Springfield, IL 62701` on separate lines. A letter using `{OrganizationAddress}` shows `14 Bridge Street, Suite 3, Springfield, IL 62701` on one line. |
 
 **Cleanup:** restore the address you noted in the prerequisites (or clear it) and save.
@@ -289,14 +289,14 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-17: People and Households, and Boxes on Every Page
 
 **Purpose:** confirm Households and Relationships are one **People and Households** section, every section groups its settings into headed boxes, and links to the old sections land in the right box.
-**Prerequisites:** admin user. The **Household Upkeep** and **Relationships** features on, and **Tell people when their long jobs finish** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update all household names** in step 4.
+**Prerequisites:** admin user. The **Household Upkeep** and **Relationships** features on, and **Tell people when their long jobs finish** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update All Household Names** in step 4.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings** and read the **Sections** list. | **People and Households** is the first item under **People**, right after **Organization**, then **Addresses**. There is no **Households** and no **Relationships** section. |
 | 2 | Click **People and Households**. | Four bordered boxes, in order, each with a Title Case heading: **People** (**How people belong to a household**, **Create a household automatically**), **Households** (**Delete a household once it is empty**, **Keep the households of deleted people**), **Household Names and Greetings** (the **Preview and Recompute** panel, **Include people who have died in names**) and **Relationships** (**Keep both sides of relationships in step**). Every setting shows its value; none is blank. There is no duplicates row and no note about duplicate rules: those are on **Duplicate Matching**. |
 | 3 | Tick **Keep the households of deleted people**, click **Save**, then untick it and save again. | Both saves say the settings were saved. **General**, **Recent Changes** lists both changes. |
-| 4 | Back on **People and Households**, click **Update all household names** and confirm. Wait for the bell, then open its **Household name recompute finished** notification. | The console opens on **People and Households**, scrolled to the **Household Names and Greetings** box, with focus on its heading. |
+| 4 | Back on **People and Households**, click **Update All Household Names** and confirm. Wait for the bell, then open its **Household name recompute finished** notification. | The console opens on **People and Households**, scrolled to the **Household Names and Greetings** box, with focus on its heading. |
 | 5 | Open each other section in turn: **General**, **Organization**, **Duplicate Matching**, **Addresses**, **Giving**, **Receipts**, **Rollups**, **Volunteers**, **Error Log**, **Import**, **Modules**, **Automation**, **Access**, **Org Optimizer**, **Integrations**, **Health**. | Every setting is inside a bordered box with a Title Case heading, as listed in the admin guide's "Sections and their boxes". A section with no list, such as **Access**, shows one box headed with its own name. No setting that showed before is missing. |
 | 6 | In the browser address bar, change the end of the console's address to `?c__section=Relationships` and press Enter. | **People and Households** opens, scrolled to the **Relationships** box. |
 | 7 | Do the same with `?c__section=Households`. | **People and Households** opens, scrolled to the **Households** box. |
