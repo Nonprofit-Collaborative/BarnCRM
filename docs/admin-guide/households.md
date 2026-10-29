@@ -33,16 +33,21 @@ the BarnCRM Settings page, so nobody needs to open Salesforce Setup.
 type, **Household**. Setup lists it on every install, because a package cannot leave out a
 record type it ships, but BarnCRM never gives it to anyone, so nobody is ever offered it when
 creating an account and your users' record type choices stay as they were. Households are
-made only by BarnCRM: automatically for new people, with **New household** on BarnCRM Home,
+made only by BarnCRM: automatically for new people, with **New Household** on BarnCRM Home,
 and by merge and split. Staff open and edit a household like any account. Do not add the
 Household record type to profiles or permission sets yourself: anyone who has it, and whose
 profile has no default Account record type, gets Household for every account they create.
 
 The **Households** tab is hidden until you turn Household Upkeep on. Turning it on shows the
 tab to everyone with a BarnCRM role (Admin, Staff or Read Only), through the permission set
-**BarnCRM Households**, within a few minutes. The confirmation says so, and names the record
-type your organizations keep using. People without a BarnCRM role are not given the tab; add
-the permission set to them yourself if they need it.
+**BarnCRM Households**, within a few minutes. The confirmation says so, and reminds staff to
+create households with **New Household** on BarnCRM Home, not the standard **New** button.
+The permission set shows the tab and nothing else, and gives no record type. BarnCRM keeps it
+in step like the tool tab sets, so do not assign it by hand: the nightly run removes it from
+anyone without a BarnCRM role, who should be given a role on the Access page instead. Upgrading
+an org that already ran BarnCRM removes the Household record type from the three role
+permission sets (Salesforce drops a record type a permission set no longer names); accounts
+that are households stay households.
 
 BarnCRM does not add an Organization record type. Organizations are the accounts of the
 record type you choose in **Record type for organizations** on **General** (see
@@ -80,13 +85,13 @@ Maria does this from the sample data.
    called **The Garcia Family**. Maria did not create it.
 4. Click through to the household. The **Members** panel lists Maria, and the member count
    reads 1.
-5. On the Members panel, click **Add member** and enter the first name `Wei` and the last
+5. On the Members panel, click **Add Member** and enter the first name `Wei` and the last
    name `Lee`. Click **Save**.
 6. Refresh the household. The name now reads **Garcia and Lee Household** and the member
    count reads 2.
 7. Open Wei's record, check **Deceased**, and save. Return to the household: the greetings
    no longer mention Wei.
-8. Back on the Members panel, use **Move to another household** on Maria and move her to
+8. Back on the Members panel, use **Move to Another Household** on Maria and move her to
    any other household. Return to the first household: it is still there, with nobody in
    it and a member count of 0, because "delete a household when the last person leaves"
    ships off. It keeps the name and greetings it had last, so a report still shows which
@@ -96,7 +101,7 @@ Maria does this from the sample data.
 That is the whole lifecycle: created for you, named for you, counted for you, and tidied
 up for you if you ask.
 
-To start from the household instead of the person, click **New household** on the Hub
+To start from the household instead of the person, click **New Household** on the Hub
 home. BarnCRM creates the household straight away, with a placeholder name that the naming
 automation replaces once you add a member, and opens it. There is no record type to choose
 and no name to invent.
@@ -153,11 +158,11 @@ the same Members panel. A household is still its own record, never a person.
 
 **"There is no Households tab."**
 Household Upkeep is off. Turn it on in **General**; the tab reaches everyone with a BarnCRM
-role within a few minutes. Someone without a BarnCRM role needs the **BarnCRM Households**
-permission set added by hand.
+role within a few minutes. Someone without a BarnCRM role does not get it: give them a role on
+the Access page.
 
 **"Nobody can choose Household when creating an account."**
-That is by design. Create households with **New household** on BarnCRM Home, or add a person
+That is by design. Create households with **New Household** on BarnCRM Home, or add a person
 and let BarnCRM make their household. An account can't be changed to Household either.
 
 **"Every new account someone creates turns into a household."**

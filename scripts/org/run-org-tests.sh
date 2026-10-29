@@ -12,10 +12,10 @@
 # version's initial development is done and integrated. I don't want as much testing for all the
 # incremental changes."
 #   (default) INCREMENTAL, for every landing batch, on one org (barn-sales). The staged deploy
-#             skips packages unchanged since the last deploy to that org, then the changed Apex
-#             and the @IsTest(critical=true) classes deploy again with RunRelevantTests: see
-#             "INCREMENTAL MODE" below. No coverage floor. Posts "Org tests (local)" with a
-#             description starting "Incremental:".
+#             skips packages unchanged since the last deploy to that org, then the changed and
+#             affected test classes and the @IsTest(critical=true) classes run with
+#             RunSpecifiedTests: see "INCREMENTAL MODE" below. No coverage floor. Posts
+#             "Org tests (local)" with a description starting "Incremental:".
 #   --release THE VERSION END-TO-END RUN, once a significant version's development is done and
 #             integrated, on barn-sales and oi-test in parallel: every package deployed, every test
 #             class in the source run, and the coverage floor checked ("HOW COVERAGE IS CHECKED").
@@ -37,17 +37,22 @@
 # GitHub cannot attach a status to anyway, so that is checked before the long part starts
 # rather than after it.
 #
-# INCREMENTAL MODE. Spring '26 added the RunRelevantTests test level, for deployments only
-# (`sf apex run test` has no such level). After the staged deploy, this mode deploys again just
-# the Apex changed since the merge base with RELEVANT_BASE (default origin/main, so a landing
-# batch counts every change it carries), plus the @IsTest(critical=true) classes, with
-# --test-level RunRelevantTests: Salesforce runs the tests in that payload, the tests that depend
-# directly on it, and every test class whose @IsTest(testFor=...) names a class in it or that is
-# marked critical (check-test-relevance.py keeps those annotations complete).
-# ACCEPTED RISK (D-142): the selection is beta and misses indirect paths and changes to non-Apex
-# metadata (objects, permission sets, flows, custom metadata) that a test not selected depends
-# on. The release run on both orgs, with every test and the coverage floor, catches those before
-# a version ships. Jest is not run here: the required Static checks job runs it on the same head.
+# INCREMENTAL MODE. After the staged deploy, this mode runs, with RunSpecifiedTests, the test
+# classes scripts/org/select-org-tests.py picks for the Apex changed since the merge base with
+# RELEVANT_BASE (default origin/main, so a landing batch counts every change it carries): the
+# changed test classes, the test classes whose @IsTest(testFor=...) names a changed class or
+# trigger, the test classes that mention a changed class by name, and every
+# @IsTest(critical=true) class (check-test-relevance.py keeps those annotations complete).
+# WHY NOT RunRelevantTests. This mode used to redeploy the changed Apex with the deploy-only
+# RunRelevantTests level (Spring '26, beta) and let Salesforce choose. On landing batches 9 and
+# 10 it was given 83 changed Apex files, about 60 of them test classes, and ran only the 5
+# critical classes (153 tests): the gate passed without running the changed tests. The choice
+# is now made here, where it can be read and tested.
+# ACCEPTED RISK (D-142): the selection follows direct mentions and testFor only, so it misses
+# indirect paths and changes to non-Apex metadata (objects, permission sets, flows, custom
+# metadata) that a test not selected depends on. The release run on both orgs, with every test
+# and the coverage floor, catches those before a version ships. Jest is not run here: the
+# required Static checks job runs it on the same head.
 #
 # HOW COVERAGE IS CHECKED. Every release run checks code coverage (owner decision, 2026-10-13:
 # due diligence happens automatically). The tests are enqueued with coverage on, so the org
@@ -174,65 +179,6 @@ fi
 RESULTS_DIR="test-results"
 mkdir -p "$RESULTS_DIR"
 
-if [[ "$MODE" == "incremental" ]]; then
-  # The payload: the Apex changed since RELEVANT_BASE, and the critical classes, so a batch that
-  # changed no Apex still runs the smoke tests. Everything is already in the org from the staged
-  # deploy above; this second deploy exists to carry the test level.
-  MODE_LABEL="Incremental: relevant tests"
-  PAYLOAD=()
-  while IFS= read -r file; do
-    [[ -f "$file" ]] && PAYLOAD+=(--source-dir "$file")
-  done < <({
-    git diff --name-only --diff-filter=d "$MERGE_BASE" HEAD -- 'packages/*.cls' 'packages/*.trigger'
-    git grep -liE '@IsTest[[:space:]]*\([^)]*critical[[:space:]]*=[[:space:]]*true' -- 'packages/*.cls'
-  } | sort -u)
-  if [[ ${#PAYLOAD[@]} -eq 0 ]]; then
-    post_status failure "${MODE_LABEL}: no changed Apex and no critical test class at ${SHA:0:7}"
-    exit 1
-  fi
-  echo ""
-  echo "== Deploying $(( ${#PAYLOAD[@]} / 2 )) Apex file(s) with RunRelevantTests: those changed since ${MERGE_BASE:0:7} (${RELEVANT_BASE}), and the critical tests =="
-  sf project deploy start --target-org "$ALIAS" "${PAYLOAD[@]}" --test-level RunRelevantTests \
-    --ignore-conflicts --wait 90 --json > "${RESULTS_DIR}/org-tests-relevant.json" \
-    2> "${RESULTS_DIR}/org-tests-relevant.err" || true
-  # The deploy result is under .result on success and, depending on the CLI version, under
-  # .result or .data when the deploy failed.
-  read -r STATUS RAN FAILING < <(jq -r '(.result // .data // {}) as $r
-    | "\($r.status // "Unknown") \($r.details.runTestResult.numTestsRun // $r.numberTestsCompleted // 0) \($r.details.runTestResult.numFailures // $r.numberTestErrors // 0)"' \
-    "${RESULTS_DIR}/org-tests-relevant.json" 2>/dev/null || echo "Unknown 0 0") || true
-  STATUS="${STATUS:-Unknown}" RAN="${RAN:-0}" FAILING="${FAILING:-0}"
-  if [[ "$STATUS" == "Unknown" ]]; then
-    cat "${RESULTS_DIR}/org-tests-relevant.err" >&2
-    echo "== sf CLI gave no readable deploy result, rerun. No \"${CONTEXT}\" status was posted. ==" >&2
-    exit 3
-  fi
-  # This deploy sent Apex the staged deploy had just put there (and a failed one rolls back), so
-  # the org still matches the deploy record; this keeps the record valid for the next run.
-  RELEVANT_DEPLOY_ID="$(jq -r '(.result // .data // {}).id // empty' "${RESULTS_DIR}/org-tests-relevant.json" 2>/dev/null)" || true
-  if [[ -n "$RELEVANT_DEPLOY_ID" ]]; then
-    bash scripts/org/deploy-packages.sh "$ALIAS" --adopt "$RELEVANT_DEPLOY_ID" || true
-  fi
-  if [[ "$STATUS" == "Succeeded" && "$FAILING" -eq 0 && "$RAN" -gt 0 ]]; then
-    post_status success "${MODE_LABEL} on ${ALIAS}: ${RAN}/${RAN} passed (no coverage floor)"
-    echo "== ${RAN}/${RAN} relevant tests passed. Posted \"${CONTEXT}\": success on ${SHA:0:7} (incremental). =="
-    exit 0
-  fi
-  if [[ "$FAILING" -gt 0 ]]; then
-    post_status failure "${MODE_LABEL}: ${FAILING} of ${RAN} failed on ${ALIAS}"
-  else
-    post_status failure "${MODE_LABEL}: deploy ${STATUS} with ${RAN} tests run on ${ALIAS}"
-  fi
-  echo "== Incremental run ${STATUS}, ${FAILING} of ${RAN} tests failed. Posted \"${CONTEXT}\": failure on ${SHA:0:7} ==" >&2
-  jq -r '(.result // .data // {}) as $r
-    | ([$r.details.runTestResult.failures // empty] | flatten | .[] | "  \(.name).\(.methodName): \(.message // "")"),
-      ([$r.details.componentFailures // empty] | flatten | .[] | "  \(.fullName): \(.problem // "")"),
-      ([$r.details.runTestResult.codeCoverageWarnings // empty] | flatten | .[] | "  coverage: \(.name // ""): \(.message // "")"),
-      ($r.errorMessage // empty)' \
-    "${RESULTS_DIR}/org-tests-relevant.json" 2>/dev/null | cut -c1-200 >&2 || true
-  echo "Full results: ${RESULTS_DIR}/org-tests-relevant.json" >&2
-  exit 1
-fi
-
 # Run the test classes this commit holds, not every test class in the org. The test org is
 # shared: another branch's deploy can leave its own test classes there, and its permission sets
 # are overwritten by the next deploy, so a run of everything fails on code this commit does not
@@ -243,13 +189,30 @@ fi
 # BarnCRM runtime path calls the engine any more, ADR-0082 deletes it in slice S9, and its
 # tests prove the upstream project, not this one. Its classes are still deployed.
 TEST_ARGS=()
-while IFS= read -r file; do
-  if grep -qi "@istest" "$file"; then
-    TEST_ARGS+=(--class-names "$(basename "$file" .cls)")
+if [[ "$MODE" == "incremental" ]]; then
+  # The changed and affected test classes, and the critical ones, so a batch that changed no
+  # Apex still runs the smoke tests (see "INCREMENTAL MODE" above). Coverage is not recorded.
+  MODE_LABEL="Incremental"
+  COVERAGE_ARGS=()
+  if ! SELECTED="$(python3 scripts/org/select-org-tests.py "$MERGE_BASE" HEAD)"; then
+    post_status failure "${MODE_LABEL}: could not select the test classes at ${SHA:0:7}"
+    exit 1
   fi
-done < <(git ls-files 'packages/*.cls' ':(exclude)packages/core/vendor/**')
+  while IFS= read -r name; do
+    [[ -n "$name" ]] && TEST_ARGS+=(--class-names "$name")
+  done <<< "$SELECTED"
+  echo ""
+  echo "== Running $(( ${#TEST_ARGS[@]} / 2 )) test class(es): those changed or affected since ${MERGE_BASE:0:7} (${RELEVANT_BASE}), and the critical tests =="
+else
+  COVERAGE_ARGS=(--code-coverage)
+  while IFS= read -r file; do
+    if grep -qi "@istest" "$file"; then
+      TEST_ARGS+=(--class-names "$(basename "$file" .cls)")
+    fi
+  done < <(git ls-files 'packages/*.cls' ':(exclude)packages/core/vendor/**')
+fi
 if [[ ${#TEST_ARGS[@]} -eq 0 ]]; then
-  post_status failure "No test classes found in the source at ${SHA:0:7}"
+  post_status failure "${MODE_LABEL}: no test classes found in the source at ${SHA:0:7}"
   exit 1
 fi
 
@@ -264,7 +227,7 @@ run_tests() {
     --target-org "$ALIAS" \
     --test-level RunSpecifiedTests \
     "${TEST_ARGS[@]}" \
-    --code-coverage \
+    ${COVERAGE_ARGS[@]+"${COVERAGE_ARGS[@]}"} \
     --wait 0 \
     --json > "${RESULTS_DIR}/org-tests-enqueue.json" 2> "${RESULTS_DIR}/org-tests.err" || true
   run_id="$(jq -r '.result.testRunId // empty' "${RESULTS_DIR}/org-tests-enqueue.json" 2>/dev/null)" || true
@@ -330,6 +293,12 @@ if cli_crashed; then
   echo "   so no \"${CONTEXT}\" status was posted on ${SHA:0:7}. ==" >&2
   echo "Output: ${RESULTS_DIR}/org-tests.err and ${RESULTS_DIR}/org-tests.json" >&2
   exit 3
+fi
+
+if [[ "$MODE" == "incremental" && "$OUTCOME" == "Passed" && "$FAILING" -eq 0 && "$RAN" -gt 0 ]]; then
+  post_status success "${MODE_LABEL} on ${ALIAS}: ${PASSING}/${RAN} passed in $(( ${#TEST_ARGS[@]} / 2 )) classes (no coverage floor)"
+  echo "== ${PASSING}/${RAN} passed. Posted \"${CONTEXT}\": success on ${SHA:0:7} (incremental). =="
+  exit 0
 fi
 
 if [[ "$OUTCOME" == "Passed" && "$FAILING" -eq 0 && "$RAN" -gt 0 ]]; then

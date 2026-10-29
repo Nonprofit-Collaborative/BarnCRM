@@ -172,8 +172,8 @@ BarnCRM's **Work Phone**.
   Primary** on another address instead.
 - Problem: "The address could not be saved. Check the fields marked in the form and try
   again." Fix the marked fields.
-- Problem: "We could not make that the primary address. Check that you have permission to
-  edit addresses ..." Ask your admin for edit access.
+- Problem: "We could not make that the primary address. Check you can edit addresses ..." Ask
+  your admin for edit access.
 - Problem: "The address status could not be saved. You may not have access to change it." Ask
   your admin for edit access to addresses. A card with no status menu means the same.
 - Problem: the **Addresses** card has no **Add Address** or **Set as Primary** button. Your

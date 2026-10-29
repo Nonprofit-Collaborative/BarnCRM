@@ -191,7 +191,7 @@ private class AccountPersonAddressCaptureTest {
             quietHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Alder Family');
             household.BillingStreet = '12 Alder Street';
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Integer afterInsert = [SELECT COUNT() FROM Address__c WHERE Account__c = :household.Id];
 
             update new Account(Id = household.Id, BillingStreet = '9 Birch Road');

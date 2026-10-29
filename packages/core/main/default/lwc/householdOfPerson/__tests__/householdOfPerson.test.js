@@ -119,9 +119,9 @@ describe('c-household-of-person', () => {
     getHouseholdsForPerson.emit([]);
     await flush();
 
-    expect(element.shadowRoot.querySelector('.empty-message').textContent).toBe(
-      'c.Core_HouseholdPanel_OfPersonEmpty'
-    );
+    const empty = element.shadowRoot.querySelector('.empty-message');
+    expect(empty.heading).toBe('c.Core_HouseholdPanel_OfPersonEmptyHeading');
+    expect(empty.message).toBe('c.Core_HouseholdPanel_OfPersonEmpty');
     expect(element.shadowRoot.querySelector('.household-row')).toBeNull();
   });
 

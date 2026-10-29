@@ -19,6 +19,16 @@ jest.mock('@salesforce/apex/HubController.createHousehold', () => ({ default: je
   virtual: true
 });
 
+jest.mock(
+  '@salesforce/apex/SettingsController.getSettingsLink',
+  () => ({
+    default: jest.fn(() =>
+      Promise.resolve({ tabApiName: 'ns__BarnCRM_Settings', sectionKey: 'ns__section' })
+    )
+  }),
+  { virtual: true }
+);
+
 const mockNavigate = jest.fn();
 jest.mock(
   'lightning/navigation',
@@ -109,9 +119,33 @@ describe('c-hub-welcome', () => {
     getHomeModel.emit(model({ automationPaused: true }));
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="paused-banner"]').textContent).toContain(
-      'Core_HubHome_AutomationPausedBanner'
-    );
+    const banner = element.shadowRoot.querySelector('[data-id="paused-banner"]');
+    expect(banner.textContent).toContain('Core_HubHome_AutomationPausedBanner');
+    expect(banner.classList).toContain('slds-alert_warning');
+  });
+
+  it('offers administrators Resume Automation, opening the Automation section', async () => {
+    const element = build();
+    getHomeModel.emit(model({ automationPaused: true }));
+    await settle();
+
+    element.shadowRoot.querySelector('[data-id="resume-link"]').click();
+    await settle();
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'ns__BarnCRM_Settings' },
+      state: { ns__section: 'Automation' }
+    });
+  });
+
+  it('shows staff the paused warning without Resume Automation', async () => {
+    const element = build();
+    getHomeModel.emit(model({ automationPaused: true, canEdit: false }));
+    await settle();
+
+    expect(element.shadowRoot.querySelector('[data-id="paused-banner"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="resume-link"]')).toBeNull();
   });
 
   it('says the page could not load everything when the model fails', async () => {

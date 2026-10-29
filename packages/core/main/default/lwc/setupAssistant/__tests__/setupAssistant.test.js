@@ -3,7 +3,7 @@ import SetupAssistant from 'c/setupAssistant';
 import getState from '@salesforce/apex/SetupAssistantController.getState';
 import completeStep from '@salesforce/apex/SetupAssistantController.completeStep';
 import skipStep from '@salesforce/apex/SetupAssistantController.skipStep';
-import applySuite from '@salesforce/apex/SetupAssistantController.applySuite';
+import { registerRefreshHandler } from 'lightning/refresh';
 import applyCoexistence from '@salesforce/apex/SetupAssistantController.applyCoexistence';
 import saveStepValues from '@salesforce/apex/SetupAssistantController.saveStepValues';
 import assignAccess from '@salesforce/apex/SetupAssistantController.assignAccess';
@@ -21,9 +21,6 @@ jest.mock('@salesforce/apex/SetupAssistantController.skipStep', () => ({ default
   virtual: true
 });
 jest.mock('@salesforce/apex/SetupAssistantController.reset', () => ({ default: jest.fn() }), {
-  virtual: true
-});
-jest.mock('@salesforce/apex/SetupAssistantController.applySuite', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock(
@@ -74,6 +71,9 @@ jest.mock(
   },
   { virtual: true }
 );
+
+// The open step's name: the one step whose toggle is expanded.
+const OPEN_STEP = '[data-id="step-toggle"][aria-expanded="true"]';
 
 const STEP_DEFINITIONS = [
   ['coexistence', 'Confirm how BarnCRM fits your existing org', 'Setting'],
@@ -211,24 +211,52 @@ describe('c-setup-assistant', () => {
     const element = build();
     await settle();
 
-    const label = element.shadowRoot.querySelector('[data-id="step-label"]');
+    const label = element.shadowRoot.querySelector(OPEN_STEP);
     expect(label.textContent).toContain('Choose a default contact');
-    expect(element.shadowRoot.querySelectorAll('[data-id="step-label"]')).toHaveLength(1);
+    expect(element.shadowRoot.querySelectorAll(OPEN_STEP)).toHaveLength(1);
   });
 
-  it('walks forward and back through the steps', async () => {
+  it('lists every step with a ring and a badge, and opens only one', async () => {
+    getState.mockResolvedValue(
+      state({ completedKeys: ['coexistence'], skippedKeys: ['moduledefaults'] })
+    );
+    const element = build();
+    await settle();
+
+    const root = element.shadowRoot;
+    expect(root.querySelectorAll('[data-id="step"]')).toHaveLength(8);
+    const rings = Array.from(root.querySelectorAll('[data-id="ring"]'));
+    expect(rings.slice(0, 3).map((ring) => [ring.value, ring.variant])).toEqual([
+      [100, 'base-autocomplete'],
+      [0, 'base'],
+      [0, 'warning']
+    ]);
+    const badges = Array.from(root.querySelectorAll('[data-id="badge"]')).map((b) => b.label);
+    expect(badges.slice(0, 3)).toEqual([
+      'c.Core_SetupAssistant_DoneBadge',
+      'c.Core_SetupAssistant_ToDoBadge',
+      'c.Core_SetupAssistant_SkippedBadge'
+    ]);
+    expect(root.querySelectorAll('[data-id="step-detail"]')).toHaveLength(1);
+    expect(root.querySelector('[data-id="progress"]').textContent.trim()).toBe(
+      'c.Core_SetupAssistant_ProgressFormat'
+    );
+    expect(root.querySelector('[data-id="back"]')).toBeNull();
+  });
+
+  it('walks forward through the steps, and opens any step by its name', async () => {
     const element = build();
     await settle();
 
     click(element, 'forward');
     await settle();
-    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Confirm how households are named'
     );
 
-    click(element, 'back');
+    element.shadowRoot.querySelectorAll('[data-id="step-toggle"]')[0].click();
     await settle();
-    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Confirm how BarnCRM fits your existing org'
     );
   });
@@ -291,7 +319,7 @@ describe('c-setup-assistant', () => {
       values: { Default_Contact__c: '003000000000001', Default_Account__c: null }
     });
     // The module step asks one question, so answering it moves on.
-    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Give your colleagues access'
     );
   });
@@ -362,8 +390,8 @@ describe('c-setup-assistant', () => {
     await settle();
 
     // The Hub asked for the assistant, so it opens on step one rather than the summary.
-    expect(element.shadowRoot.querySelector('[data-id="complete-heading"]')).toBeNull();
-    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="complete"]')).toBeNull();
+    expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Confirm how BarnCRM fits your existing org'
     );
     await STEP_DEFINITIONS.reduce(
@@ -375,7 +403,7 @@ describe('c-setup-assistant', () => {
       Promise.resolve()
     );
 
-    expect(element.shadowRoot.querySelector('[data-id="complete-heading"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="complete"]')).not.toBeNull();
   });
 
   it('saves the organization step and stays on it for the remaining answers', async () => {
@@ -399,7 +427,7 @@ describe('c-setup-assistant', () => {
       stepKey: 'identity',
       values: { Organization_Legal_Name__c: 'Riverside Community Aid' }
     });
-    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       "Set your organization's identity"
     );
   });
@@ -416,7 +444,7 @@ describe('c-setup-assistant', () => {
     await settle();
 
     expect(element.shadowRoot.textContent).toContain('That record is not a contact.');
-    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Choose a default contact'
     );
   });
@@ -476,7 +504,7 @@ describe('c-setup-assistant', () => {
     const element = build();
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Choose a default contact'
     );
   });
@@ -486,8 +514,8 @@ describe('c-setup-assistant', () => {
     const element = build(true);
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="complete-heading"]')).toBeNull();
-    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="complete"]')).toBeNull();
+    expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Confirm how BarnCRM fits your existing org'
     );
   });
@@ -519,15 +547,15 @@ describe('c-setup-assistant', () => {
     const element = build();
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="complete-heading"]')).not.toBeNull();
-    expect(element.shadowRoot.querySelector('[data-id="elapsed"]').textContent.trim()).toBe(
-      'Time taken: 21 minutes'
-    );
+    const complete = element.shadowRoot.querySelector('[data-id="complete"]');
+    expect(complete.heading).toBe('c.Core_SetupAssistant_CompleteHeading');
+    expect(complete.illustration).toBe('all-clear');
+    expect(complete.message).toBe('Time taken: 21 minutes');
     expect(element.shadowRoot.querySelectorAll('li')).toHaveLength(8);
 
     click(element, 'reopen');
     await settle();
-    expect(element.shadowRoot.querySelector('[data-id="step-label"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector(OPEN_STEP)).not.toBeNull();
   });
 
   it('starts setup again when Maria asks, and forgets the progress it recorded', async () => {
@@ -539,7 +567,7 @@ describe('c-setup-assistant', () => {
     await settle();
 
     expect(resetSetup).toHaveBeenCalled();
-    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Confirm how BarnCRM fits your existing org'
     );
   });
@@ -570,43 +598,25 @@ describe('c-setup-assistant', () => {
     expect(element.shadowRoot.textContent).toContain('No luck today.');
   });
 
-  it('saves the Standard Edition through Apex and moves on', async () => {
+  it('reloads when the page refreshes, so the first-run edition shows as done', async () => {
     getState.mockResolvedValue(withSuiteStep({ currentSuite: null, giving: {} }));
-    applySuite.mockResolvedValue(
+    const element = build();
+    await settle();
+    expect(element.shadowRoot.querySelector('c-setup-step-suite')).not.toBeNull();
+
+    getState.mockResolvedValue(
       withSuiteStep({ currentSuite: 'Community', giving: { present: false } }, true)
     );
-    const element = build();
+    const [context, handler] = registerRefreshHandler.mock.calls.at(-1);
+    await expect(handler.call(context)).resolves.toBe(true);
     await settle();
 
-    element.shadowRoot
-      .querySelector('c-setup-step-suite')
-      .dispatchEvent(new CustomEvent('confirm', { detail: { suite: 'Community' } }));
-    await settle();
-
-    expect(applySuite).toHaveBeenCalledWith({ suite: 'Community' });
-    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+    expect(getState).toHaveBeenCalledTimes(2);
+    expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Confirm how BarnCRM fits your existing org'
     );
-  });
-
-  it('stays on the step when the Nonprofit Edition still needs Giving installed', async () => {
-    getState.mockResolvedValue(withSuiteStep({ currentSuite: null, giving: {} }));
-    applySuite.mockResolvedValue(
-      withSuiteStep({ currentSuite: 'Impact', giving: { present: false } }, true)
-    );
-    const element = build();
-    await settle();
-
-    element.shadowRoot
-      .querySelector('c-setup-step-suite')
-      .dispatchEvent(new CustomEvent('confirm', { detail: { suite: 'Impact' } }));
-    await settle();
-
-    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
-      'Choose your edition'
-    );
-    expect(element.shadowRoot.querySelector('c-setup-step-suite').suite.currentSuite).toBe(
-      'Impact'
+    expect(element.shadowRoot.querySelector('[data-id="badge"]').label).toBe(
+      'c.Core_SetupAssistant_DoneBadge'
     );
   });
 
@@ -624,7 +634,7 @@ describe('c-setup-assistant', () => {
     await settle();
 
     expect(getState).toHaveBeenCalledTimes(2);
-    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Choose your edition'
     );
     expect(element.shadowRoot.querySelector('c-setup-step-suite').suite.giving.present).toBe(true);

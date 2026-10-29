@@ -49,6 +49,17 @@ describe('c-settings-setup-notes', () => {
     expect(getSetupChecks).not.toHaveBeenCalled();
   });
 
+  it('keeps the note compact: why and the steps sit closed behind Show Steps (UX PR 6)', async () => {
+    const shown = note(await render('Duplicate Matching'), 'duplicates');
+
+    const details = shown.querySelector('details[data-id="details"]');
+    expect(details.open).toBe(false);
+    expect(details.querySelector('summary').textContent).toBe('c.Core_SetupNote_ShowSteps');
+    expect(details.querySelector('[data-id="steps"]')).not.toBeNull();
+    expect(details.textContent).toContain('c.Core_SetupNote_Duplicates_Why');
+    expect(shown.querySelector('[data-id="open-setup"]').closest('details')).toBeNull();
+  });
+
   it.each([
     ['General', 'metadata', '/lightning/setup/ApexSettings/home'],
     ['Duplicate Matching', 'duplicates', '/lightning/setup/DuplicateRules/home'],

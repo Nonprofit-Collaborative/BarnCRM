@@ -27,7 +27,7 @@ private class AddressServiceTest {
             garcia.BillingPostalCode = '62704';
 
             Test.startTest();
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Test.stopTest();
 
             List<Address__c> addresses = [
@@ -86,7 +86,7 @@ private class AddressServiceTest {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
 
             Test.startTest();
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Test.stopTest();
 
             Assert.areEqual(
@@ -101,7 +101,7 @@ private class AddressServiceTest {
     static void aStateTypedAsACodeReachesTheMembersInEitherKindOfOrg() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             insert ana;
 
@@ -139,7 +139,7 @@ private class AddressServiceTest {
     static void capturesPersonalAddressWhenAContactIsCreatedWithOne() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             ana.MailingStreet = HOME_STREET;
             ana.MailingCity = HOME_CITY;
@@ -166,7 +166,7 @@ private class AddressServiceTest {
     static void updatingAMemberMovesTheWholeHouseholdInContactMode() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             List<Contact> members = new List<Contact>{
                 AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id),
                 AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id)
@@ -216,7 +216,7 @@ private class AddressServiceTest {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
             garcia.BillingStreet = HOME_STREET;
             garcia.BillingCity = HOME_CITY;
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             List<Contact> members = new List<Contact>{
                 AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id),
                 AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id)
@@ -276,7 +276,7 @@ private class AddressServiceTest {
     static void anEditDuringASeasonDoesNotOverwriteTheSeasonalAddress() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             insert ana;
             Address__c seasonal = new Address__c(
@@ -324,7 +324,7 @@ private class AddressServiceTest {
 
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
             garcia.BillingStreet = HOME_STREET;
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             List<Contact> members = new List<Contact>{
                 AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id),
                 AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id)
@@ -365,7 +365,7 @@ private class AddressServiceTest {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
             garcia.BillingStreet = HOME_STREET;
             garcia.BillingCity = HOME_CITY;
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c winter = new Address__c(
                 Account__c = garcia.Id,
                 Type__c = 'Seasonal',
@@ -408,7 +408,7 @@ private class AddressServiceTest {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
             garcia.BillingStreet = HOME_STREET;
             garcia.BillingCity = HOME_CITY;
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c winter = new Address__c(
                 Account__c = garcia.Id,
                 Type__c = 'Other',
@@ -442,7 +442,7 @@ private class AddressServiceTest {
     static void loopGuardStopsTheTwoDirectionsCallingEachOther() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             ana.MailingStreet = HOME_STREET;
 
@@ -467,7 +467,7 @@ private class AddressServiceTest {
     static void loopGuardSkipsWorkWhilePropagationIsInFlight() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             AddressService.isPropagating = true;
@@ -503,7 +503,7 @@ private class AddressServiceTest {
             }
 
             Test.startTest();
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             Test.stopTest();
 
             Assert.areEqual(
@@ -521,7 +521,7 @@ private class AddressServiceTest {
             for (Integer i = 0; i < 200; i++) {
                 households.add(AddressTestDataFactory.newHousehold('Household ' + i));
             }
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             List<Contact> people = new List<Contact>();
             for (Integer i = 0; i < 200; i++) {
                 people.add(
@@ -563,7 +563,7 @@ private class AddressServiceTest {
     static void personOwnedAddressSkipsAnAccountThatHoldsNoPerson() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c personal = new Address__c(
                 Person_Account__c = garcia.Id,
                 Type__c = 'Home',
@@ -600,7 +600,7 @@ private class AddressServiceTest {
     static void billingAndMemberAddressesAreNotWrittenForAHouseholdWithANativeGroup() {
         System.runAs(TestUsers.admin()) {
             Account nativeHousehold = AddressTestDataFactory.newHousehold('Native Household');
-            insert nativeHousehold;
+            Database.insert(nativeHousehold, AccessLevel.SYSTEM_MODE);
             Contact member = AddressTestDataFactory.newContact(
                 'Maria',
                 'Garcia',
@@ -800,7 +800,7 @@ private class AddressServiceTest {
     static void anAddressOnAHouseholdStaysOnTheAccountLookup() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             Address__c home = new Address__c(
@@ -892,7 +892,7 @@ private class AddressServiceTest {
     static void twoDefaultsForOneOwnerInOneSaveLeaveTheLastInUse() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c first = new Address__c(
                 Account__c = garcia.Id,
                 Type__c = 'Home',
@@ -937,7 +937,7 @@ private class AddressServiceTest {
     static void untickingTheOnlyAddressInUseIsRefused() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c home = new Address__c(
                 Account__c = garcia.Id,
                 Type__c = 'Home',
@@ -967,7 +967,7 @@ private class AddressServiceTest {
     static void movingTheDefaultInOneSaveIsAllowed() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c home = new Address__c(
                 Account__c = garcia.Id,
                 Type__c = 'Home',
@@ -1001,7 +1001,7 @@ private class AddressServiceTest {
     static void deletingTheDefaultPrefersAnAddressThatIsNotSeasonal() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c home = new Address__c(
                 Account__c = garcia.Id,
                 Type__c = 'Home',
@@ -1047,7 +1047,7 @@ private class AddressServiceTest {
     static void aDayItsMonthDoesNotHaveIsRefused() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c aprilThirtyFirst = new Address__c(
                 Account__c = garcia.Id,
                 Type__c = 'Seasonal',

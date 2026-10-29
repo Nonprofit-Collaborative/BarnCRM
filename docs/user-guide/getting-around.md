@@ -83,19 +83,20 @@ Open the **BarnCRM** app and choose **Home**. As a staff member you see:
   upgrade brings something new. Dismissing hides it for you, not for your colleagues.
 - **Welcome to BarnCRM**: a short line saying "Your households, people and organizations are
   in the tabs above."
-- **New household**: creates a household with a placeholder name and opens it. The name is
+- **New Household**: creates a household with a placeholder name and opens it. The name is
   replaced automatically once you add a member. You see this button only if you can create
   and edit accounts.
-- **Quick Links**: **Households**, **Organizations** and **BarnCRM Settings**, opened without
-  going back to the App Launcher.
+- **Quick Links**: icon tiles for **Households**, **Organizations** and **BarnCRM Settings**,
+  each with a one-line description, opened without going back to the App Launcher.
 - **Files That Arrive Regularly**: shown only if you can read import templates and a file is
   marked as arriving regularly, with the date it was last imported.
 
 If someone has paused automation (for example during a large import), a banner under the
 welcome says "BarnCRM automation is paused. Households and greetings are not being updated
-until it resumes." It goes away by itself.
+until it resumes." It goes away by itself. Admins also see **Resume Automation** in the banner.
 
-Admins also see the setup checklist, Health Check and a few status tiles. See
+Admins also see the setup checklist, a Health Check summary and status tiles with a badge
+each (for example **All Clear**, **Not Run Yet** or **Overdue**). See
 [The BarnCRM Apps and Navigation](../admin-guide/barncrm-app.md) and [Health Check](../admin-guide/health-check.md).
 
 ## To Read In-App Tips
@@ -137,26 +138,27 @@ person who started the job is told. Nightly jobs send nothing.
 ## To Use the Data Manager Tab
 
 You see **Data Manager** if you have the **BarnCRM Find and Export**, **BarnCRM Bulk Update**
-or **BarnCRM Bulk Delete** add-on. It shows a card for each tool you may use:
+or **BarnCRM Bulk Delete** add-on. It shows a tile (an icon, a name and one line) for each
+tool you may use, in short groups:
 
-| Card | Opens |
-|---|---|
-| **Find and Export Records** | The **Find** tab |
-| **Update Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Update** (no file needed) |
-| **Org Optimizer** | The **Org Optimizer** tab |
-| **Delete Many Records** (last) | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Delete** (no file needed) |
+| Group | Tile | Opens |
+|---|---|---|
+| **Find and Change** | **Find and Export Records** | The **Find** tab |
+| **Find and Change** | **Update Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Update** (no file needed) |
+| **Check and Tidy** | **Org Optimizer** | The **Org Optimizer** tab |
+| **Careful** (last) | **Delete Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Delete** (no file needed) |
 
-Deleted records go to the Recycle Bin, not away for good: choosing **Open** on **Delete Many
-Records** first shows a box that says so. Choose **Continue** to go on to Find, or **Cancel** to
-stay on Data Manager. You can undo a bulk delete from **Data Jobs** for up to 15 days.
+Deleted records go to the Recycle Bin, not away for good: choosing **Delete Many Records**
+first shows a box that says so. Choose **Continue** to go on to Find, or **Cancel** to stay on
+Data Manager. You can undo a bulk delete from **Data Jobs** for up to 15 days.
 
-1. Choose **Open** on the card you want.
+1. Choose the tile you want: anywhere on it works.
 2. Under **Data Jobs**, use **Show** to filter to **All**, **Bulk updates** or **Bulk
    deletes**, and press **Refresh** to see the latest.
 
 You should see: your recent jobs, newest first, each with its counts and an **Undo** while
-it can still be undone. **Import a File**, **Import Templates** and **Salesforce's Own Tools**
-are for admins. See
+it can still be undone. **Bring Data In** (**Import a File**), **Import Templates** and
+**Salesforce's Own Tools** are for admins. See
 [Data Manager](../admin-guide/data-manager.md).
 
 ## Common Problems

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The first-run setup window as a platform modal: the edition as picker cards and the
+    features to turn on, for an administrator; a notice for anyone else. Opened by firstRunSetup.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

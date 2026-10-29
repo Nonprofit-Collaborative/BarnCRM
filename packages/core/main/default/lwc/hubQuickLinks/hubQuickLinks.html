@@ -1,18 +1,18 @@
 <template>
-    <lightning-card title={labels.heading}>
-        <div class="slds-var-p-horizontal_medium">
-            <ul class="slds-list_vertical slds-has-dividers_bottom-space">
-                <template for:each={links} for:item="link">
-                    <li key={link.tab} class="slds-item">
-                        <lightning-button
-                            variant="base"
-                            label={link.label}
-                            data-tab={link.tab}
-                            onclick={handleOpen}
-                        ></lightning-button>
-                    </li>
-                </template>
-            </ul>
-        </div>
+    <lightning-card title={labels.heading} icon-name="standard:link">
+        <ul class="slds-grid slds-wrap slds-var-p-horizontal_small">
+            <template for:each={links} for:item="link">
+                <li key={link.tab} class="slds-col slds-size_1-of-1 slds-var-p-around_xx-small">
+                    <c-barn-tool-tile
+                        name={link.tab}
+                        label={link.label}
+                        description={link.line}
+                        icon-name={link.iconName}
+                        data-id="quick-link"
+                        onselect={handleOpen}
+                    ></c-barn-tool-tile>
+                </li>
+            </template>
+        </ul>
     </lightning-card>
 </template>

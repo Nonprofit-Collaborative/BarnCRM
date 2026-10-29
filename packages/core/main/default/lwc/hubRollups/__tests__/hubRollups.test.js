@@ -75,12 +75,28 @@ describe('c-hub-rollups', () => {
     expect(byId(element, 'rollups-stale')).toBeNull();
   });
 
-  it('warns when the rollups are more than 36 hours old, and not by color alone', async () => {
+  it('says Not Run Yet, and warns of nothing, before rollups have ever run', async () => {
     const element = build();
     getHomeModel.emit({ rollupsInstalled: true, rollupsLastCalculated: null, rollupsStale: true });
     await settle();
 
-    expect(byId(element, 'rollups-never')).not.toBeNull();
+    const empty = byId(element, 'rollups-never');
+    expect(empty.heading).toBe('c.Core_OrgOptimizer_BadgeNotRun');
+    expect(empty.message).toBe('c.Core_Rollups_FreshnessNever');
+    expect(byId(element, 'rollups-stale')).toBeNull();
+    expect(byId(element, 'rollups-overdue')).toBeNull();
+  });
+
+  it('warns when the rollups are more than 36 hours old, and not by color alone', async () => {
+    const element = build();
+    getHomeModel.emit({
+      rollupsInstalled: true,
+      rollupsLastCalculated: '2026-10-20T02:00:00.000Z',
+      rollupsStale: true
+    });
+    await settle();
+
+    expect(byId(element, 'rollups-overdue').label).toBe('c.Core_HubHome_BadgeOverdue');
     const warning = byId(element, 'rollups-stale');
     expect(warning.getAttribute('aria-live')).toBe('polite');
     // A screen reader hears "Warning", not the tile's own heading.

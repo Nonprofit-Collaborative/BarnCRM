@@ -3,10 +3,6 @@ import DataManager from 'c/dataManager';
 import getMappings from '@salesforce/apex/DataManagerController.getMappings';
 import BarnConfirmModal from 'c/barnConfirmModal';
 
-jest.mock('@salesforce/label/c.Core_DataManager_OpenAria', () => ({ default: 'Open {0}' }), {
-  virtual: true
-});
-
 const mockNavigate = jest.fn();
 jest.mock(
   'lightning/navigation',
@@ -60,6 +56,14 @@ function one(element, id) {
   return element.shadowRoot.querySelector(`[data-id="${id}"]`);
 }
 
+function tiles(element, id = 'tools') {
+  return one(element, id).groups.flatMap((group) => group.tiles);
+}
+
+function select(element, name) {
+  one(element, 'tools').dispatchEvent(new CustomEvent('select', { detail: { name } }));
+}
+
 async function render() {
   const element = createElement('c-data-manager', { is: DataManager });
   document.body.appendChild(element);
@@ -85,27 +89,50 @@ describe('c-data-manager', () => {
     expect(shell.iconName).toBeUndefined();
   });
 
-  it('marks the bulk delete card destructive, with no warning bar on the page', async () => {
+  it('keeps the longer help in About This Tool, remembered per browser', async () => {
     const element = await render();
 
-    const card = element.shadowRoot.querySelector('div[data-id="delete"]');
-    expect(card.querySelector('lightning-button').variant).toBe('destructive-text');
-    expect(element.shadowRoot.querySelector('.slds-theme_warning')).toBeNull();
-    expect(element.shadowRoot.querySelector('lightning-icon')).toBeNull();
-    expect(element.shadowRoot.textContent).not.toContain('c.Core_DataManager_DeleteWarning');
-
-    // No other tool has a red button.
-    const find = element.shadowRoot.querySelector('div[data-id="find"] lightning-button');
-    expect(find.variant).toBe('neutral');
+    expect(one(element, 'shell').helpStorageKey).toBe('dataManager');
+    const help = one(element, 'help').textContent;
+    expect(help).toContain('c.Core_DataManager_HelpChange');
+    expect(help).toContain('c.Core_DataManager_HelpDelete');
   });
 
-  it('lists Delete Many Records as the last card', async () => {
+  it('groups the tiles, with Delete Many Records last and alone under Careful', async () => {
     const element = await render();
 
-    const keys = Array.from(element.shadowRoot.querySelectorAll('lightning-button[data-tab]')).map(
-      (button) => button.dataset.id
-    );
-    expect(keys).toEqual(['import', 'find', 'optimizer', 'delete']);
+    const groups = one(element, 'tools').groups;
+    expect(groups.map((group) => group.label)).toEqual([
+      'c.Core_DataManager_GroupBringIn',
+      'c.Core_DataManager_GroupFindChange',
+      'c.Core_DataManager_GroupCheck',
+      'c.Core_DataManager_GroupCareful'
+    ]);
+    expect(groups[3].tiles.map((tile) => tile.name)).toEqual(['delete']);
+    tiles(element).forEach((tile) => {
+      expect(tile.iconName).toMatch(/^standard:\w+$/);
+      expect(tile.description).toBeTruthy();
+    });
+  });
+
+  it('shows a tile for each tool the person may use', async () => {
+    const element = await render();
+
+    // Bulk Update Records is off in this test, so there is no Update Many Records tile.
+    expect(tiles(element).map((tile) => tile.name)).toEqual([
+      'import',
+      'find',
+      'optimizer',
+      'delete'
+    ]);
+  });
+
+  it('has no Open buttons and no warning bar: the warning lives in the confirm box', async () => {
+    const element = await render();
+
+    expect(element.shadowRoot.querySelector('lightning-button[data-tab]')).toBeNull();
+    expect(element.shadowRoot.querySelector('.slds-theme_warning')).toBeNull();
+    expect(element.shadowRoot.textContent).not.toContain('c.Core_DataManager_DeleteWarning');
   });
 
   it('asks before opening the delete tool, and opens Find only on Continue', async () => {
@@ -114,7 +141,7 @@ describe('c-data-manager', () => {
     findToolStateKey.emit('ns__tool');
     BarnConfirmModal.open.mockResolvedValueOnce(true);
 
-    element.shadowRoot.querySelector('lightning-button[data-id="delete"]').click();
+    select(element, 'delete');
     await flush();
 
     expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
@@ -135,23 +162,22 @@ describe('c-data-manager', () => {
 
   it('does nothing when the delete box is cancelled or closed', async () => {
     const element = await render();
-    const button = element.shadowRoot.querySelector('lightning-button[data-id="delete"]');
 
     BarnConfirmModal.open.mockResolvedValueOnce(false);
-    button.click();
+    select(element, 'delete');
     await flush();
     BarnConfirmModal.open.mockResolvedValueOnce(undefined);
-    button.click();
+    select(element, 'delete');
     await flush();
 
     expect(BarnConfirmModal.open).toHaveBeenCalledTimes(2);
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it('opens Find from its card without asking', async () => {
+  it('opens Find from its tile without asking', async () => {
     const element = await render();
 
-    element.shadowRoot.querySelector('lightning-button[data-id="find"]').click();
+    select(element, 'find');
     await flush();
 
     expect(BarnConfirmModal.open).not.toHaveBeenCalled();
@@ -161,9 +187,44 @@ describe('c-data-manager', () => {
     });
   });
 
-  it('says what an import template is above the list', async () => {
+  it('opens Find with the Bulk Update note from the Update Many Records tile', async () => {
+    const element = await render();
+    findToolStateKey.emit('ns__tool');
+
+    select(element, 'update');
+    await flush();
+
+    expect(BarnConfirmModal.open).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenLastCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Find' },
+      state: { ns__tool: 'update' }
+    });
+  });
+
+  it('opens the tool tab by its API name, and ignores a name it does not know', async () => {
+    const element = await render();
+
+    select(element, 'import');
+    await flush();
+    expect(mockNavigate).toHaveBeenLastCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Import' }
+    });
+
+    select(element, 'optimizer');
+    await flush();
+    expect(mockNavigate.mock.calls[1][0].attributes.apiName).toBe('Data_Hygiene');
+
+    select(element, 'nothing');
+    await flush();
+    expect(mockNavigate).toHaveBeenCalledTimes(2);
+  });
+
+  it('says in one line what an import template is, with Learn More', async () => {
     const element = await render();
     expect(one(element, 'mappings-intro').textContent).toBe('c.Core_DataManager_MappingsIntro');
+    expect(one(element, 'mappings-help').learnMoreUrl).toMatch(/admin-guide\/data-manager\.md$/);
   });
 
   it('capitalizes every word of each Data Manager title and calls templates templates', () => {
@@ -183,14 +244,22 @@ describe('c-data-manager', () => {
     const small = new Set(['a', 'an', 'and', 'or', 'the', 'of', 'to', 'in', 'for', 'on']);
     const titles = [
       'Title',
-      'ToolsHeading',
+      'GroupBringIn',
+      'GroupFindChange',
+      'GroupCheck',
+      'GroupCareful',
       'ImportTitle',
       'FindTitle',
       'UpdateTitle',
       'DeleteTitle',
       'OptimizerTitle',
       'MappingsHeading',
-      'SalesforceHeading'
+      'MappingsEmpty',
+      'CreateTemplate',
+      'SalesforceHeading',
+      'WeeklyExport',
+      'RecycleBin',
+      'DataImportWizard'
     ];
     titles.forEach((key) => {
       const words = values[`Core_DataManager_${key}`].split(' ');
@@ -207,40 +276,28 @@ describe('c-data-manager', () => {
     );
   });
 
-  it('shows a card for each tool the person may use', async () => {
-    const element = await render();
-
-    expect(one(element, 'import')).not.toBeNull();
-    expect(one(element, 'find')).not.toBeNull();
-    expect(one(element, 'update')).toBeNull();
-    expect(one(element, 'delete')).not.toBeNull();
-    expect(one(element, 'optimizer')).not.toBeNull();
-  });
-
-  it('names each Open button for its tool', async () => {
-    const element = await render();
-
-    const names = Array.from(element.shadowRoot.querySelectorAll('lightning-button[data-tab]')).map(
-      (button) => button.ariaLabel
+  it('keeps each tile line to 12 words or fewer', () => {
+    const fs = require('fs');
+    const xml = fs.readFileSync(
+      'packages/core/main/default/labels/DataManager.labels-meta.xml',
+      'utf8'
     );
-    expect(names.length).toBeGreaterThan(1);
-    names.forEach((name) => expect(name).toMatch(/^Open \S/));
-    expect(new Set(names).size).toBe(names.length);
-  });
-
-  it('opens the tool tab by its API name', async () => {
-    const element = await render();
-
-    element.shadowRoot.querySelector('lightning-button[data-id="import"]').click();
-    await flush();
-    expect(mockNavigate).toHaveBeenLastCalledWith({
-      type: 'standard__navItemPage',
-      attributes: { apiName: 'Import' }
+    const lines = [
+      'ImportText',
+      'FindText',
+      'UpdateText',
+      'DeleteText',
+      'OptimizerText',
+      'WeeklyExportText',
+      'RecycleBinText',
+      'DataImportWizardText'
+    ];
+    lines.forEach((key) => {
+      const match = xml.match(
+        new RegExp(`<fullName>Core_DataManager_${key}</fullName>[\\s\\S]*?<value>([^<]*)</value>`)
+      );
+      expect(`${key}: ${match[1].split(' ').length <= 12}`).toBe(`${key}: true`);
     });
-
-    element.shadowRoot.querySelector('lightning-button[data-id="optimizer"]').click();
-    await flush();
-    expect(mockNavigate.mock.calls[1][0].attributes.apiName).toBe('Data_Hygiene');
   });
 
   it('lists the import templates, a people template as people', async () => {
@@ -262,6 +319,7 @@ describe('c-data-manager', () => {
     expect(table.data).toHaveLength(2);
     expect(table.data[0].loads).toBe('c.Core_DataManager_LoadsPeople');
     expect(table.data[1].loads).toBe('Session__c');
+    expect(one(element, 'mappings-empty')).toBeNull();
   });
 
   it('shows the unexpected-error label, not raw text, when the error has no message', async () => {
@@ -271,21 +329,37 @@ describe('c-data-manager', () => {
     expect(one(element, 'mappings-error').textContent).toContain('c.Core_UnexpectedError');
   });
 
-  it('says when there are no templates, and shows a templates error', async () => {
+  it('shows an empty state that opens Import, and a templates error', async () => {
     const element = await render();
     getMappings.emit([]);
     await flush();
-    expect(one(element, 'mappings-empty')).not.toBeNull();
+
+    const empty = one(element, 'mappings-empty');
+    expect(empty.illustration).toBe('no-data');
+    expect(empty.heading).toBe('c.Core_DataManager_MappingsEmpty');
+    expect(empty.message).toBe('c.Core_DataManager_MappingsEmptyHint');
+    one(element, 'create-template').click();
+    expect(mockNavigate).toHaveBeenLastCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Import' }
+    });
 
     getMappings.error({ message: 'No access' });
     await flush();
     expect(one(element, 'mappings-error')).not.toBeNull();
   });
 
-  it('includes the job history and links to Salesforce tools', async () => {
+  it("includes the job history and Salesforce's own tools as new-tab tiles", async () => {
     const element = await render();
 
     expect(element.shadowRoot.querySelector('c-data-job-history')).not.toBeNull();
-    expect(one(element, 'salesforce-links').querySelectorAll('a')).toHaveLength(3);
+    const salesforce = one(element, 'salesforce-tools');
+    expect(salesforce.groups[0].label).toBe('c.Core_DataManager_SalesforceHeading');
+    const links = tiles(element, 'salesforce-tools');
+    expect(links.map((tile) => tile.name)).toEqual(['export', 'recycle', 'wizard']);
+    links.forEach((tile) => {
+      expect(tile.newTab).toBe(true);
+      expect(tile.href).toMatch(/^\/lightning\//);
+    });
   });
 });

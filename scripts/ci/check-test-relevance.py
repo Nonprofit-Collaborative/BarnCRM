@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """Fails if an Apex test class says nothing about which code it tests.
 
-The incremental org gate (scripts/org/run-org-tests.sh, plan D-142) deploys a batch's changed
-Apex with the RunRelevantTests test level, and Salesforce picks the tests to run. Its
-own dependency analysis follows direct references only, so a test that reaches the
-changed class through a trigger, a handler registry or Type.forName is missed. The
-class-level @IsTest annotation closes that gap (API 66.0 and later):
+The incremental org gate (scripts/org/run-org-tests.sh, plan D-142) runs the test classes
+scripts/org/select-org-tests.py picks for a batch's changed Apex. A name match finds the
+tests that call a changed class directly, so a test that reaches it through a trigger, a
+handler registry or Type.forName is missed. The class-level @IsTest annotation closes that
+gap (API 66.0 and later):
 
     @IsTest(testFor='ApexClass:HouseholdService, ApexTrigger:ContactTrigger')
-        runs this class whenever one of those is in the deployment
+        runs this class whenever one of those changed
     @IsTest(critical=true)
-        runs this class on every RunRelevantTests deployment (keep these few)
+        runs this class on every incremental gate (keep these few)
 
 So every test class in packages/ (the vendored rollup engine excepted, it is not part
 of the gate) has one of the two, or is named in scripts/ci/test-relevance-cross-cutting.txt

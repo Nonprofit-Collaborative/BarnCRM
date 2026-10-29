@@ -67,7 +67,7 @@ private class HouseholdControllerTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact john = new Contact(
                 Salutation = 'Mr.',
                 FirstName = 'John',

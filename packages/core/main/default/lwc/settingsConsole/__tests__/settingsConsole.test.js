@@ -26,11 +26,9 @@ jest.mock(
   () => ({ default: 'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/SUPPORT.md' }),
   { virtual: true }
 );
-jest.mock(
-  '@salesforce/label/c.Core_Settings_LearnMoreAria',
-  () => ({ default: 'Learn more about {0} (opens a new tab)' }),
-  { virtual: true }
-);
+jest.mock('@salesforce/label/c.Core_Settings_HelpAria', () => ({ default: 'About {0}' }), {
+  virtual: true
+});
 
 jest.mock(
   '@salesforce/label/c.Core_Settings_KeepDefaultAria',
@@ -344,6 +342,15 @@ function build() {
   return element;
 }
 
+/** The save bar (c-barn-save-bar) asks for a save; its own buttons are its own tests' business. */
+function saveBar(element) {
+  return element.shadowRoot.querySelector('c-barn-save-bar');
+}
+
+function clickSave(element) {
+  saveBar(element).dispatchEvent(new CustomEvent('save'));
+}
+
 function settle() {
   // eslint-disable-next-line @lwc/lwc/no-async-operation
   return new Promise((resolve) => setTimeout(resolve, 0));
@@ -367,7 +374,7 @@ describe('c-settings-console', () => {
     const element = build();
     await settle();
 
-    const navItems = element.shadowRoot.querySelectorAll('lightning-vertical-navigation-item');
+    const navItems = element.shadowRoot.querySelectorAll('lightning-vertical-navigation-item-icon');
     expect(navItems).toHaveLength(5);
 
     const inputs = element.shadowRoot.querySelectorAll('lightning-input');
@@ -375,12 +382,9 @@ describe('c-settings-console', () => {
     expect(inputs[0].value).toBe('The {LastName} Family');
     expect(inputs[1].checked).toBe(true);
 
-    const help = element.shadowRoot.querySelector('a[target="_blank"]');
-    expect(help).not.toBeNull();
-    expect(help.href).toContain('household-naming.md');
-    expect(help.getAttribute('aria-label')).toBe(
-      'Learn more about Household name pattern (opens a new tab)'
-    );
+    // Learn More is c-barn-help's own link, apart from the description (no glued text).
+    const help = element.shadowRoot.querySelector('c-barn-help');
+    expect(help.learnMoreUrl).toContain('household-naming.md');
   });
 
   describe('Recent Changes', () => {
@@ -476,8 +480,8 @@ describe('c-settings-console', () => {
     input.dispatchEvent(new CustomEvent('change'));
     await settle();
 
-    const buttons = element.shadowRoot.querySelectorAll('lightning-button');
-    buttons[0].click();
+    expect(saveBar(element).dirtyCount).toBe(1);
+    clickSave(element);
     await settle();
 
     expect(saveSettings).toHaveBeenCalledWith({
@@ -495,8 +499,7 @@ describe('c-settings-console', () => {
     input.dispatchEvent(new CustomEvent('change'));
     await settle();
 
-    const buttons = element.shadowRoot.querySelectorAll('lightning-button');
-    buttons[1].click();
+    saveBar(element).dispatchEvent(new CustomEvent('discard'));
     await settle();
 
     expect(saveSettings).not.toHaveBeenCalled();
@@ -524,17 +527,12 @@ describe('c-settings-console', () => {
     const element = build();
     await settle();
 
-    const labels = () =>
-      Array.from(element.shadowRoot.querySelectorAll('lightning-button')).map((b) => b.label);
-    expect(labels()).toEqual(
-      expect.arrayContaining(['c.Core_Settings_SaveButton', 'c.Core_Settings_DiscardButton'])
-    );
+    expect(saveBar(element)).not.toBeNull();
 
     openSection('Integrations');
     await settle();
 
-    expect(labels()).not.toContain('c.Core_Settings_SaveButton');
-    expect(labels()).not.toContain('c.Core_Settings_DiscardButton');
+    expect(saveBar(element)).toBeNull();
   });
 
   it('opens the section a search result points at', async () => {
@@ -674,7 +672,7 @@ describe('c-settings-console', () => {
     document.body.appendChild(element);
     await settle();
 
-    const navItems = element.shadowRoot.querySelectorAll('lightning-vertical-navigation-item');
+    const navItems = element.shadowRoot.querySelectorAll('lightning-vertical-navigation-item-icon');
     expect(navItems).toHaveLength(2);
     expect(element.shadowRoot.querySelector('c-settings-search')).not.toBeNull();
   });
@@ -782,7 +780,7 @@ describe('c-settings-console', () => {
     inputs[1].value = 'Barn Rescue Society';
     inputs[1].dispatchEvent(new CustomEvent('change'));
     await settle();
-    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    clickSave(element);
     await settle();
 
     expect(saveSettings).toHaveBeenCalledWith({
@@ -822,17 +820,18 @@ describe('c-settings-console', () => {
     expect(notice.textContent).toContain('Core_Settings_ComponentNotInstalled');
   });
 
-  it('ties each description to its setting for a screen reader', async () => {
+  it('puts each description behind an info icon named for its setting (UX PR 6)', async () => {
     const element = build();
     await settle();
 
     const groups = element.shadowRoot.querySelectorAll('div[role="group"]');
     expect(groups).toHaveLength(3);
-    const describedBy = groups[0].getAttribute('aria-describedby');
-    expect(describedBy).toBeTruthy();
-    const description = element.shadowRoot.querySelector(`[id="${describedBy}"]`);
-    expect(description.textContent).toContain('How a household name is built.');
     expect(groups[0].getAttribute('aria-label')).toBe('Household name pattern');
+    const help = groups[0].querySelector('c-barn-help');
+    expect(help.content).toContain('How a household name is built.');
+    expect(help.alternativeText).toBe('About Household name pattern');
+    // No description is printed as a paragraph any more.
+    expect(element.shadowRoot.querySelector('.slds-form-element__help')).toBeNull();
   });
 
   it('lets Maria pick a record and tick record types instead of typing identifiers', async () => {
@@ -853,7 +852,7 @@ describe('c-settings-console', () => {
       new CustomEvent('change', { detail: { value: ['Donation', 'Major_Gift'] } })
     );
     await settle();
-    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    clickSave(element);
     await settle();
 
     expect(saveSettings).toHaveBeenCalledWith({
@@ -878,7 +877,7 @@ describe('c-settings-console', () => {
     await settle();
 
     expect(element.shadowRoot.querySelector('lightning-checkbox-group').value).toEqual([]);
-    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    clickSave(element);
     await settle();
 
     expect(saveSettings).toHaveBeenCalledWith({
@@ -924,7 +923,7 @@ describe('c-settings-console', () => {
       new CustomEvent('change', { detail: { value: ['Verification_Status__c', 'Name'] } })
     );
     await settle();
-    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    clickSave(element);
     await settle();
 
     expect(saveSettings).toHaveBeenCalledWith({
@@ -972,7 +971,7 @@ describe('c-settings-console', () => {
     ]);
     choice.dispatchEvent(new CustomEvent('change', { detail: { value: 'Master' } }));
     await settle();
-    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    clickSave(element);
     await settle();
 
     expect(saveSettings).toHaveBeenCalledWith({
@@ -1002,7 +1001,7 @@ describe('c-settings-console', () => {
     input.reportValidity = jest.fn(() => false);
     await settle();
 
-    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    clickSave(element);
     await settle();
 
     expect(input.reportValidity).toHaveBeenCalled();
@@ -1012,7 +1011,7 @@ describe('c-settings-console', () => {
     );
 
     input.reportValidity = jest.fn(() => true);
-    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    clickSave(element);
     await settle();
 
     expect(saveSettings).toHaveBeenCalledWith({ values: { Import_Chunk_Size__c: '5000' } });
@@ -1224,10 +1223,7 @@ describe('c-settings-console', () => {
       await settle();
       expect(FeatureSettings.refreshCount).toBe(0);
 
-      const save = Array.from(element.shadowRoot.querySelectorAll('lightning-button')).find(
-        (button) => button.variant === 'brand'
-      );
-      save.click();
+      clickSave(element);
       await settle();
       await settle();
 
@@ -1286,10 +1282,7 @@ describe('c-settings-console', () => {
       input.dispatchEvent(new CustomEvent('change'));
       await settle();
 
-      const save = Array.from(element.shadowRoot.querySelectorAll('lightning-button')).find(
-        (button) => button.variant === 'brand'
-      );
-      save.click();
+      clickSave(element);
       await settle();
       await settle();
 
@@ -1474,10 +1467,7 @@ describe('c-settings-console', () => {
         element.shadowRoot.querySelector('lightning-combobox[data-key="Error_Digest_Frequency__c"]')
           .value
       ).toBe('NPSP');
-      const save = Array.from(element.shadowRoot.querySelectorAll('lightning-button')).find(
-        (button) => button.variant === 'brand'
-      );
-      expect(save.disabled).toBe(false);
+      expect(saveBar(element).dirtyCount).toBe(1);
     });
 
     it('hides the offer once Maria picks a value herself', async () => {
@@ -1524,6 +1514,101 @@ describe('c-settings-console', () => {
       expect(notes(element)).toEqual(['Coexistence_Mode__c', 'Stale_Record_Years__c']);
       expect(element.shadowRoot.querySelectorAll('lightning-button[data-keep]')).toHaveLength(0);
       expect(saveSettings).not.toHaveBeenCalled();
+    });
+
+    const banner = (element) => element.shadowRoot.querySelector('[data-id="defaults-banner"]');
+    const keepAll = (element) => element.shadowRoot.querySelector('[data-id="keep-all"]');
+
+    it('marks each unsaved default with a badge under one section banner (UX PR 6)', async () => {
+      getConsoleModel.mockResolvedValue(defaultsModel(true));
+      const element = build();
+      await settle();
+
+      expect(banner(element).textContent).toContain('c.Core_Settings_DefaultsBannerTitle');
+      const badge = element.shadowRoot.querySelector(
+        '[data-default-note="Coexistence_Mode__c"] lightning-badge'
+      );
+      expect(badge.label).toBe('c.Core_Settings_DefaultBadge');
+      expect(keepAll(element).label).toBe('c.Core_Settings_KeepAllDefaults');
+    });
+
+    it('keeps every keepable default in one save, skipping edits and detected defaults', async () => {
+      const withDetection = defaultsModel(true);
+      withDetection.sections[0].settings.push({
+        ...withDetection.sections[0].settings[0],
+        key: 'Household_Membership_Mode__c',
+        value: 'Contact',
+        detectionMayChange: true
+      });
+      getConsoleModel.mockResolvedValue(withDetection);
+      saveSettings.mockResolvedValue(defaultsModel(true, false));
+      const element = build();
+      await settle();
+
+      element.shadowRoot
+        .querySelector('lightning-input[data-key="Stale_Record_Years__c"]')
+        .dispatchEvent(new CustomEvent('change'));
+      await settle();
+      keepAll(element).click();
+      await settle();
+
+      expect(saveSettings).toHaveBeenCalledTimes(1);
+      expect(saveSettings).toHaveBeenCalledWith({ values: { Coexistence_Mode__c: 'Standalone' } });
+      expect(saveBar(element).dirtyCount).toBe(1);
+    });
+
+    it('shows David the banner without Keep All Defaults', async () => {
+      getConsoleModel.mockResolvedValue(defaultsModel(false));
+      const element = build();
+      await settle();
+
+      expect(banner(element)).not.toBeNull();
+      expect(keepAll(element)).toBeNull();
+    });
+
+    it('shows no banner when every default is saved', async () => {
+      const saved = defaultsModel(true, false);
+      saved.sections[0].settings[1].unsavedDefault = false;
+      getConsoleModel.mockResolvedValue(saved);
+      const element = build();
+      await settle();
+
+      expect(banner(element)).toBeNull();
+    });
+  });
+
+  describe('Section list groups (UX PR 6)', () => {
+    it('groups sections with icons, puts unknown ones in More and Error Log last', async () => {
+      const names = ['General', 'Error Log', 'Giving', 'Kennels', 'Access', 'Import'];
+      getConsoleModel.mockResolvedValue({
+        canEdit: true,
+        sections: names.map((name) => ({ name, settings: [] }))
+      });
+      const element = build();
+      await settle();
+
+      const groups = Array.from(
+        element.shadowRoot.querySelectorAll('lightning-vertical-navigation-section')
+      ).map((section) => section.label);
+      expect(groups).toEqual([
+        'c.Core_Settings_NavGroup_Organization',
+        'c.Core_Settings_NavGroup_Data',
+        'c.Core_Settings_NavGroup_Fundraising',
+        'c.Core_Settings_NavGroup_More',
+        'c.Core_Settings_NavGroup_System'
+      ]);
+      const items = Array.from(
+        element.shadowRoot.querySelectorAll('lightning-vertical-navigation-item-icon')
+      );
+      expect(items.map((item) => item.name)).toEqual([
+        'General',
+        'Import',
+        'Giving',
+        'Kennels',
+        'Access',
+        'Error Log'
+      ]);
+      expect(items.every((item) => item.iconName)).toBe(true);
     });
   });
 });

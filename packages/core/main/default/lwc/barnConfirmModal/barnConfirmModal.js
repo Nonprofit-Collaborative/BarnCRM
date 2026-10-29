@@ -26,8 +26,50 @@ export default class BarnConfirmModal extends LightningModal {
   @api typeToConfirm;
   /** The field label for that text, such as "Type 1250 to delete these records". */
   @api typeToConfirmLabel;
+  /** Names shown as a bulleted list after the details, such as the people a change moves. */
+  @api items;
+  /**
+   * One choice from a few, as { label, value } entries in a radio group labelled choicesLabel,
+   * starting on choice. With choices or checks the modal resolves { choice, checked }.
+   */
+  @api choices;
+  @api choicesLabel;
+  @api choice;
+  /** Tick boxes, as { label, value } entries labelled checksLabel; none ticked to start. */
+  @api checks;
+  @api checksLabel;
 
   typed = '';
+  picked;
+  ticked = [];
+
+  get itemLines() {
+    return (this.items || []).map((text, index) => ({ key: `item-${index}`, text }));
+  }
+
+  get hasItems() {
+    return this.itemLines.length > 0;
+  }
+
+  get hasChoices() {
+    return Boolean(this.choices && this.choices.length);
+  }
+
+  get hasChecks() {
+    return Boolean(this.checks && this.checks.length);
+  }
+
+  get chosen() {
+    return this.picked === undefined ? this.choice : this.picked;
+  }
+
+  handleChoice(event) {
+    this.picked = event.detail.value;
+  }
+
+  handleChecks(event) {
+    this.ticked = event.detail.value || [];
+  }
 
   get asksToType() {
     return Boolean(this.typeToConfirm);
@@ -57,6 +99,10 @@ export default class BarnConfirmModal extends LightningModal {
 
   handleConfirm() {
     if (this.confirmDisabled) {
+      return;
+    }
+    if (this.hasChoices || this.hasChecks) {
+      this.close({ choice: this.chosen, checked: this.ticked });
       return;
     }
     this.close(true);

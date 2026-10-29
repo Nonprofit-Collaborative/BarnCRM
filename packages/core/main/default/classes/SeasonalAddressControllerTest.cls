@@ -87,7 +87,7 @@ private class SeasonalAddressControllerTest {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
             garcia.BillingStreet = '812 Willow Lane';
             garcia.BillingCity = 'Springfield';
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             insert new Address__c(
                 Account__c = garcia.Id,
                 Type__c = 'Seasonal',

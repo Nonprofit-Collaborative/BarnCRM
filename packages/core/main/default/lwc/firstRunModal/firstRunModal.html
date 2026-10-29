@@ -1,0 +1,62 @@
+<template>
+    <lightning-modal-header label={labels.title}></lightning-modal-header>
+    <lightning-modal-body>
+        <template lwc:if={canFinish}>
+            <p class="slds-var-m-bottom_medium">{labels.intro}</p>
+            <c-barn-visual-picker
+                label={labels.editionQuestion}
+                options={editionOptions}
+                value={edition}
+                data-id="edition"
+                onchange={handleEdition}
+            ></c-barn-visual-picker>
+            <lightning-radio-group
+                class="slds-var-m-top_medium"
+                name="mode"
+                label={labels.featuresQuestion}
+                options={modeOptions}
+                value={mode}
+                data-id="mode"
+                onchange={handleMode}
+            ></lightning-radio-group>
+            <template lwc:if={isChoosing}>
+                <p class="slds-text-body_small slds-var-m-vertical_small" data-id="choose-help">
+                    {labels.chooseHelp}
+                </p>
+                <template for:each={features} for:item="feature">
+                    <lightning-input
+                        key={feature.key}
+                        type="checkbox"
+                        label={feature.name}
+                        field-level-help={feature.description}
+                        checked={feature.checked}
+                        disabled={feature.disabled}
+                        data-id="feature"
+                        data-key={feature.key}
+                        onchange={handleFeature}
+                    ></lightning-input>
+                </template>
+            </template>
+            <p class="slds-text-body_small slds-var-m-top_medium">{labels.modulesNote}</p>
+        </template>
+        <template lwc:else>
+            <p role="status" data-id="admin-needed">{labels.adminNeeded}</p>
+        </template>
+        <template lwc:if={errorMessage}>
+            <p class="slds-text-color_error slds-var-m-top_small" role="alert" data-id="error">
+                {errorMessage}
+            </p>
+        </template>
+    </lightning-modal-body>
+    <template lwc:if={canFinish}>
+        <lightning-modal-footer>
+            <lightning-button
+                variant="brand"
+                label={labels.finish}
+                disabled={finishDisabled}
+                data-id="finish"
+                onclick={handleFinish}
+            ></lightning-button>
+        </lightning-modal-footer>
+    </template>
+</template>

@@ -54,7 +54,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Relationship card: shown when the person has no relationships yet</shortDescription>
-        <value>No relationships on file yet.</value>
+        <value>Link this person to family, friends and colleagues.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Relationship_EmptyHeading</fullName>
+        <categories>Relationships</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Relationship card: heading when the person has no relationships yet</shortDescription>
+        <value>No Relationships Yet</value>
     </labels>
     <labels>
         <fullName>Core_Relationship_FormerBadge</fullName>

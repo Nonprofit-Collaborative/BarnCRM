@@ -47,7 +47,7 @@ Import is part of the **Data Manager** feature, which on a new install is off un
 it on: choose **Turn On** in the **Data Manager** row in **BarnCRM Settings**, **General**
 (or leave it ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). Once it
 is on, the **Import** tab is for anyone with the **Manage BarnCRM Settings** permission. Open it from the **Data Manager** tab in the BarnCRM app: choose **Import a File**
-(see [Data Manager](data-manager.md)). If you do not see the card, ask whoever set up your org
+(see [Data Manager](data-manager.md)). If you do not see the tile, ask whoever set up your org
 to give you the BarnCRM Admin role on the **Access** page.
 
 Every import, bulk update ([Bulk update](bulk-update.md)) and bulk delete

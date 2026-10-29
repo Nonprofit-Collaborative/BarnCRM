@@ -169,7 +169,7 @@ private class EmptyHouseholdTidyTest {
             insert maria;
             Id household = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
             Account other = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert other;
+            Database.insert(other, AccessLevel.SYSTEM_MODE);
             maria.AccountId = other.Id;
             update maria;
 
@@ -192,7 +192,7 @@ private class EmptyHouseholdTidyTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             HouseholdDependentsExtensions.noneForTest = true;
             Account household = HouseholdTestDataFactory.newHousehold('The Rivera Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact luis = HouseholdTestDataFactory.newContact('Mr.', 'Luis', 'Rivera');
             insert luis;
             insert new Household_Member__c(Household__c = household.Id, Contact__c = luis.Id);
@@ -231,7 +231,7 @@ private class EmptyHouseholdTidyTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             HouseholdDependentsExtensions.noneForTest = true;
             Account household = HouseholdTestDataFactory.newHousehold('The Rivera Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact luis = HouseholdTestDataFactory.newContact('Mr.', 'Luis', 'Rivera');
             Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Rivera');
             insert new List<Contact>{ luis, ana };
@@ -393,7 +393,7 @@ private class EmptyHouseholdTidyTest {
         System.runAs(TestUsers.admin()) {
             contactMode();
             Account gone = HouseholdTestDataFactory.newHousehold('The Gone Family');
-            insert gone;
+            Database.insert(gone, AccessLevel.SYSTEM_MODE);
             delete gone;
             EmptyHouseholdTidyBatch.relationshipsOverride = new List<String>();
 

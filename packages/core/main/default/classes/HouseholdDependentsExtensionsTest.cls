@@ -106,7 +106,7 @@ private class HouseholdDependentsExtensionsTest {
         for (Integer i = 0; i < howMany; i++) {
             households.add(HouseholdTestDataFactory.newHousehold('Household ' + i));
         }
-        insert households;
+        Database.insert(households, AccessLevel.SYSTEM_MODE);
         return households;
     }
 

@@ -1,28 +1,28 @@
 import { createElement } from 'lwc';
 import MatchSourceManager from 'c/matchSourceManager';
+import LightningModal from 'lightning/modal';
 import getView from '@salesforce/apex/MatchSourceController.getView';
-import describeObject from '@salesforce/apex/MatchSourceController.describeObject';
 import tryValue from '@salesforce/apex/MatchSourceController.tryValue';
-import saveRow from '@salesforce/apex/CustomMetadataManagerController.saveRow';
 import setArchived from '@salesforce/apex/CustomMetadataManagerController.setArchived';
 import getOutcome from '@salesforce/apex/CustomMetadataManagerController.getOutcome';
 
 jest.mock('@salesforce/apex/MatchSourceController.getView', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/apex/MatchSourceController.describeObject', () => ({ default: jest.fn() }), {
-  virtual: true
-});
 jest.mock('@salesforce/apex/MatchSourceController.tryValue', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock('@salesforce/label/c.Core_MatchLogic_NewTitle', () => ({ default: 'New Match Source' }), {
+  virtual: true
+});
 jest.mock(
-  '@salesforce/apex/CustomMetadataManagerController.saveRow',
-  () => ({ default: jest.fn() }),
-  {
-    virtual: true
-  }
+  '@salesforce/label/c.Core_MatchLogic_Summary',
+  () => ({ default: '{0} on {1}, compared as {2}' }),
+  { virtual: true }
 );
+jest.mock('@salesforce/label/c.Core_MatchLogic_ActiveSwitch', () => ({ default: 'Active: {0}' }), {
+  virtual: true
+});
 jest.mock(
   '@salesforce/apex/CustomMetadataManagerController.setArchived',
   () => ({ default: jest.fn() }),
@@ -120,8 +120,23 @@ describe('c-match-source-manager', () => {
     );
     const element = await render();
 
-    const sources = all(element, '[data-id="source"]');
+    let sources = all(element, '[data-id="source"]');
     expect(sources).toHaveLength(2);
+    expect(sources[0].querySelector('[data-id="summary"]').textContent).toBe(
+      'Street on Address, compared as Address'
+    );
+    expect(sources[0].querySelector('[data-id="shipped"]')).not.toBeNull();
+    expect(sources[1].querySelector('[data-id="shipped"]')).toBeNull();
+    expect(sources[0].querySelector('[data-id="status-badge"]').className).toContain(
+      'slds-theme_success'
+    );
+    expect(one(element, '[data-id="help"]').content).toContain('c.Core_MatchLogic_Help');
+    // The details stay folded until asked for.
+    expect(sources[0].querySelector('[data-id="details"]')).toBeNull();
+    all(element, '[data-id="details-toggle"]').forEach((button) => button.click());
+    await flush();
+    sources = all(element, '[data-id="source"]');
+    expect(sources[0].querySelector('[data-id="details-toggle"]').ariaExpanded).toBe('true');
     expect(sources[0].querySelector('[data-id="object"]').textContent).toBe('Address');
     expect(sources[0].querySelector('[data-id="links-to"]').textContent).toBe('A person');
     expect(sources[0].querySelector('[data-id="compare"]').textContent).toBe(
@@ -149,7 +164,12 @@ describe('c-match-source-manager', () => {
     const element = await render();
 
     expect(one(element, '[data-id="edit"]')).toBeNull();
-    one(element, '[data-id="toggle"]').click();
+    expect(one(element, '[data-id="status-badge"]')).toBeNull();
+    const toggle = one(element, '[data-id="toggle"]');
+    expect(toggle.checked).toBe(true);
+    expect(toggle.label).toBe('Active: Address (person)');
+    toggle.checked = false;
+    toggle.dispatchEvent(new CustomEvent('change'));
     await flush();
 
     expect(setArchived).toHaveBeenCalledWith({
@@ -157,60 +177,28 @@ describe('c-match-source-manager', () => {
       developerName: 'Address_Person',
       archived: true
     });
+    // The switch waits for Salesforce to apply the change before it moves.
+    expect(toggle.checked).toBe(true);
     expect(one(element, '[data-id="status"]')).not.toBeNull();
   });
 
-  it('adds a source with the fields its object offers, and waits for the save', async () => {
+  it('adds a source in the modal, and waits for the save it started', async () => {
     jest.useFakeTimers();
     getView.mockResolvedValue(view(true, []));
-    describeObject.mockResolvedValue({
-      objectName: 'Volunteer_Email__c',
-      objectLabel: 'Volunteer Email',
-      valueFields: [{ label: 'Email (Email__c)', value: 'Email__c' }],
-      parentFields: [{ label: 'Contact (Contact__c)', value: 'Contact__c' }]
-    });
-    saveRow.mockResolvedValue('0Af000000000002');
+    LightningModal.open.mockResolvedValue({ jobId: '0Af000000000002', label: 'Volunteer email' });
     getOutcome.mockResolvedValue({ status: 'Succeeded' });
     const element = await render();
 
     one(element, '[data-id="add"]').click();
     await flush();
-    const change = (id, value) => {
-      const input = one(element, `[data-id="${id}"]`);
-      input.dispatchEvent(new CustomEvent('change', { detail: { value } }));
-    };
-    change('form-name', 'Volunteer email');
-    change('form-object', 'Volunteer_Email__c');
-    await flush();
-    one(element, '[data-id="find-fields"]').click();
-    await flush();
-    expect(describeObject).toHaveBeenCalledWith({ objectName: 'Volunteer_Email__c' });
-    expect(one(element, '[data-id="form-value"]').options).toEqual([
-      { label: 'Email (Email__c)', value: 'Email__c' }
-    ]);
-    expect(one(element, '[data-id="form-postal"]')).toBeNull();
-    change('form-value', 'Email__c');
-    change('form-parent', 'Contact__c');
-    change('form-normalization', 'Email');
-    await flush();
-    one(element, '[data-id="form-save"]').click();
-    await flush();
 
-    expect(saveRow).toHaveBeenCalledWith({
-      typeName: 'Match_Source__mdt',
-      input: {
-        developerName: null,
-        label: 'Volunteer email',
-        values: {
-          Object_Name__c: 'Volunteer_Email__c',
-          Value_Field__c: 'Email__c',
-          Postal_Code_Field__c: '',
-          Parent_Field__c: 'Contact__c',
-          Normalization__c: 'Email'
-        }
-      }
+    expect(LightningModal.open).toHaveBeenCalledWith({
+      size: 'small',
+      label: 'New Match Source',
+      source: undefined,
+      normalizations: view(true, []).normalizations
     });
-    expect(one(element, '[data-id="form"]')).toBeNull();
+    expect(one(element, '[data-id="status"]')).not.toBeNull();
 
     jest.advanceTimersByTime(3000);
     await flush();
@@ -222,29 +210,35 @@ describe('c-match-source-manager', () => {
     expect(getView).toHaveBeenCalledTimes(2);
   });
 
-  it('shows a refused save as it is', async () => {
+  it('edits a source in the modal, and does nothing when the modal is cancelled', async () => {
     getView.mockResolvedValue(
       view(true, [source({ shipped: false, developerName: 'Org_Mine_abcd' })])
     );
-    describeObject.mockResolvedValue({ valueFields: [], parentFields: [] });
-    saveRow.mockRejectedValue({
-      body: { message: 'An address source needs a postal code field.' }
-    });
+    LightningModal.open.mockResolvedValue(undefined);
     const element = await render();
 
     one(element, '[data-id="edit"]').click();
     await flush();
-    expect(describeObject).toHaveBeenCalledWith({ objectName: 'Address__c' });
-    expect(one(element, '[data-id="form-value"]').options).toEqual([
-      { label: 'Street__c', value: 'Street__c' }
-    ]);
-    one(element, '[data-id="form-save"]').click();
+
+    expect(LightningModal.open.mock.calls[0][0].source).toEqual({
+      developerName: 'Org_Mine_abcd',
+      label: 'Address (person)',
+      values: source().values
+    });
+    expect(one(element, '[data-id="status"]')).toBeNull();
+    expect(getOutcome).not.toHaveBeenCalled();
+  });
+
+  it('shows a refused deactivation as it is', async () => {
+    getView.mockResolvedValue(view(true, [source()]));
+    setArchived.mockRejectedValue({ body: { message: 'Deploy Metadata is off.' } });
+    const element = await render();
+
+    one(element, '[data-id="toggle"]').dispatchEvent(new CustomEvent('change'));
     await flush();
 
-    expect(one(element, '[data-id="error"]').textContent).toContain(
-      'An address source needs a postal code field.'
-    );
-    expect(one(element, '[data-id="form"]')).not.toBeNull();
+    expect(one(element, '[data-id="error"]').textContent).toContain('Deploy Metadata is off.');
+    expect(one(element, '[data-id="status"]')).toBeNull();
   });
 
   it('tries a value and lists the records that would match', async () => {

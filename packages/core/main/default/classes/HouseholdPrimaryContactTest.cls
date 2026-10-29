@@ -15,7 +15,7 @@ private class HouseholdPrimaryContactTest {
 
     private static Account household(String name) {
         Account record = HouseholdTestDataFactory.newHousehold(name);
-        insert record;
+        Database.insert(record, AccessLevel.SYSTEM_MODE);
         return record;
     }
 

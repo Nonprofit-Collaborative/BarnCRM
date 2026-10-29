@@ -1,4 +1,5 @@
 import { LightningElement, api } from 'lwc';
+import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 
 const BADGE_THEMES = {
   success: 'slds-theme_success',
@@ -32,9 +33,24 @@ export default class BarnToolTile extends LightningElement {
   @api disabled = false;
   /** Shown in place of the description while the tile is disabled. */
   @api disabledReason;
+  /**
+   * With `href`: open the link in a new browser tab, with the new-window icon and "(opens in a
+   * new tab)" for screen readers (the kit's new-tab link pattern).
+   */
+  @api newTab = false;
+
+  newTabText = NEW_TAB;
 
   get isLink() {
     return Boolean(this.href) && !this.disabled;
+  }
+
+  get linkTarget() {
+    return this.newTab ? '_blank' : undefined;
+  }
+
+  get linkRel() {
+    return this.newTab ? 'noopener noreferrer' : undefined;
   }
 
   get hasBadge() {

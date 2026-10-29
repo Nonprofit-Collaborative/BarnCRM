@@ -282,7 +282,10 @@ private class CorePostInstallTest {
     @IsTest
     static void anOrgHoldingAHouseholdCountsAsSetUpEvenWithoutSettings() {
         System.runAs(TestUsers.admin()) {
-            insert HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Database.insert(
+                HouseholdTestDataFactory.newHousehold('The Garcia Family'),
+                AccessLevel.SYSTEM_MODE
+            );
             forgetSavedSettings();
 
             Assert.isTrue(

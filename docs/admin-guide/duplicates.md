@@ -62,10 +62,16 @@ Metadata Admin** (see [Access](access.md)).
 Run the scan again after a large import: Salesforce checks a record against the others when
 it is saved, but an import that saved past a warning leaves the pair for the scan to find.
 
-**The review list.** **Possible Duplicates** shows a badge with how many pairs are waiting
-(for example 40, or 50+ when there are more than the list reads at once), then the first 10
-pairs, newest first. Each pair is one compact card: why it was suggested, the records with
-their detail, and its buttons on the right. **Show More** adds the next 10, and the line
+**The review list.** The **Review** tab and **Possible Duplicates** both show how many pairs
+are waiting (for example **Review (40)**, or 50+ when there are more than the list reads at
+once), then the first 10 pairs, newest first. Each pair is one card: why it was suggested and
+its buttons at the top (**Merge Households** is the main button on a household pair), then the
+records side by side. Each side shows the record's name (a link to it), Person or Household,
+and the fields compared: for a person the email, phone, mailing street, city and postal code,
+and household; for a household the billing street, city and postal code, and phone. Only
+fields you can read are shown. A value that is not the same on both sides carries a
+**Different** badge, so you see at a glance what sets the two apart. On a narrow screen the
+sides stack. **Show More** adds the next 10, and the line
 under the list says how many are showing. The note on merging two people is shown once, above
 the list, not on every pair. **Not a Duplicate** and **Merge Households** open their short
 form inside the pair's own card. When nothing is waiting the list shows **No Possible
@@ -89,11 +95,16 @@ only, in **Review**, with a link to change them in Setup.
 Who sees it: anyone with **Manage BarnCRM Settings** (BarnCRM Admin) or the **BarnCRM
 Metadata Admin** permission set. Adding, changing, deactivating and activating a source
 needs **BarnCRM Metadata Admin**, because saving one changes the org's metadata; without it
-the list is read only, and **Try a value** still works. If BarnCRM was installed as a
+the list is read only, and **Try a Value** still works. If BarnCRM was installed as a
 package, saving also needs **Deploy Metadata from Non-Certified Package Versions via Apex**
 turned on in Setup, **Apex Settings**; see [Custom metadata](custom-metadata.md#how-to-turn-it-on).
 
-Each source is a card that says, in words, what it compares:
+The area opens with one line on what match sources are; the help icon beside it says how they
+work with your duplicate rules and how saving works. Each source is a card: its name, a
+**Shipped with BarnCRM** badge where it applies, and one line saying what it compares, for
+example "Email Address on Contact Point Email, compared as Email". With BarnCRM Metadata Admin
+the card has an **Active** switch; without it, an **Active** or **Inactive** badge. **Show
+Details** on a card lists, in words:
 
 - **Object**: the related object, for example Contact Point Email.
 - **Field compared**: the field holding the value: the email, the phone number, or the street.
@@ -102,7 +113,7 @@ Each source is a card that says, in words, what it compares:
 - **Through the lookup**: the field linking the value to its person or household.
 - **How values are compared**: Email, Phone or Address, with what is ignored.
 
-Each card says **Active** or **Inactive**. A source that cannot work in this org (its object
+A source that cannot work in this org (its object
 or a field is missing, or you cannot read it) says **Not used in this org** and is skipped.
 
 BarnCRM ships six sources, marked **Shipped with BarnCRM**:
@@ -136,21 +147,24 @@ A contact point record can belong to a person, an account, or a Salesforce **Ind
 counts as every person who carries it, contacts and, where your org has person accounts,
 person accounts too. A record that belongs to anything else is skipped.
 
-**Add a source.** Choose **Add**. Fill in **Name**, then the object's API name under
-**Object** (for example `Volunteer_Profile__c`) and choose **Find fields**: the
+**Add a source.** Choose **Add**: the form opens in a window over the page (Escape or
+**Cancel** closes it). Fill in **Name**, then the object's API name under **Object** (for
+example `Volunteer_Profile__c`) and choose **Find Fields**: the
 **Field compared** and **Through the lookup** lists then offer only the fields that can
 work (text, email or phone fields Salesforce can search on, and lookups to a contact, an
 account or an Individual). Choose **How values are compared**; for **Address**, also choose
 the **Postal code field**. **Save** checks the source against the org and refuses anything
-that cannot work, saying why. Saving takes about a minute, because Salesforce applies it in
-the background: the area says "Saving", then "Saved" and lists the source. If you leave
-before then, choose **Check again** when you come back. A source you added has **Edit** as
-well.
+that cannot work, saying why in the window, which stays open. Once the source is accepted the
+window closes. Saving takes about a minute, because Salesforce applies it in the background:
+the area says "Saving", then "Saved" and lists the source. If you leave before then, choose
+**Check Again** when you come back. A source you added has **Edit** as well, which opens the
+same window with the source's values filled in.
 
-**Deactivate a source.** Choose **Deactivate** on its card; **Activate** brings it back.
+**Deactivate a source.** Turn off the **Active** switch on its card; turning it on brings the
+source back. The switch moves once Salesforce has applied the change (about a minute).
 Salesforce does not let an app delete custom metadata, so a source is deactivated instead.
 
-**Try a value.** Choose **Try a value** on a card, type an email, phone or street (and, for
+**Try a value.** Choose **Try a Value** on a card, type an email, phone or street (and, for
 an address, the postal code), and choose **Try**. The area shows the value as the source
 compares it ("Compared as: 12 n main st|02139") and lists the people and households you can
 see that hold it. Nothing is saved. A value too short to compare says so.

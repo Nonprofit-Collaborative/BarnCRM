@@ -36,7 +36,7 @@ private class MergeSettlementTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account kept = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account other = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert new List<Account>{ kept, other };
+            Database.insert(new List<Account>{ kept, other }, AccessLevel.SYSTEM_MODE);
             insert new List<Contact>{
                 AddressTestDataFactory.newContact('Maria', 'Garcia', kept.Id),
                 AddressTestDataFactory.newContact('Wei', 'Lee', other.Id)
@@ -173,7 +173,7 @@ private class MergeSettlementTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account kept = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account other = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert new List<Account>{ kept, other };
+            Database.insert(new List<Account>{ kept, other }, AccessLevel.SYSTEM_MODE);
             Contact both = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             Contact onlyOther = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
             insert new List<Contact>{ both, onlyOther };
@@ -228,7 +228,7 @@ private class MergeSettlementTest {
             for (Integer i = 0; i < 200; i++) {
                 households.add(HouseholdTestDataFactory.newHousehold('Bulk Family ' + i));
             }
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Bulk');
             insert people;
             List<Household_Member__c> rows = new List<Household_Member__c>();
@@ -492,7 +492,10 @@ private class MergeSettlementTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account keptHousehold = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account otherHousehold = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert new List<Account>{ keptHousehold, otherHousehold };
+            Database.insert(
+                new List<Account>{ keptHousehold, otherHousehold },
+                AccessLevel.SYSTEM_MODE
+            );
             insert new List<Contact>{
                 AddressTestDataFactory.newContact('Maria', 'Garcia', keptHousehold.Id),
                 AddressTestDataFactory.newContact('Wei', 'Lee', otherHousehold.Id)

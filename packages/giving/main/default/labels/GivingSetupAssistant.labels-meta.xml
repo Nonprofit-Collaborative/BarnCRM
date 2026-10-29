@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the name of step three</shortDescription>
-        <value>Choose your default fund and appeal</value>
+        <value>Choose Your Default Fund and Appeal</value>
     </labels>
     <labels>
         <fullName>Giving_SetupAssistant_FundAppealStepDescription</fullName>

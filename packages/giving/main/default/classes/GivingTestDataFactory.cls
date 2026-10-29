@@ -152,7 +152,7 @@ public class GivingTestDataFactory {
             Name = householdName,
             RecordTypeId = HouseholdService.householdRecordTypeId()
         );
-        insert household;
+        Database.insert(household, AccessLevel.SYSTEM_MODE);
         Contact person = new Contact(
             FirstName = firstName,
             LastName = lastName,

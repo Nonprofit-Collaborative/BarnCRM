@@ -1,12 +1,13 @@
 import { LightningElement } from 'lwc';
 import getView from '@salesforce/apex/MatchSourceController.getView';
-import describeObject from '@salesforce/apex/MatchSourceController.describeObject';
 import tryValue from '@salesforce/apex/MatchSourceController.tryValue';
-import saveRow from '@salesforce/apex/CustomMetadataManagerController.saveRow';
 import setArchived from '@salesforce/apex/CustomMetadataManagerController.setArchived';
 import getOutcome from '@salesforce/apex/CustomMetadataManagerController.getOutcome';
+import MatchSourceModal from 'c/matchSourceModal';
 
 import INTRO from '@salesforce/label/c.Core_MatchLogic_Intro';
+import HELP from '@salesforce/label/c.Core_MatchLogic_Help';
+import HELP_ALT from '@salesforce/label/c.Core_MatchLogic_HelpAlt';
 import RULES_NOTE from '@salesforce/label/c.Core_MatchLogic_RulesNote';
 import READ_ONLY from '@salesforce/label/c.Core_MatchLogic_ReadOnly';
 import SHIPPED_NOTE from '@salesforce/label/c.Core_MatchLogic_ShippedNote';
@@ -20,9 +21,11 @@ import POSTAL_FIELD from '@salesforce/label/c.Core_MatchLogic_PostalField';
 import LINKS_TO from '@salesforce/label/c.Core_MatchLogic_LinksTo';
 import PARENT_FIELD from '@salesforce/label/c.Core_MatchLogic_ParentField';
 import COMPARE from '@salesforce/label/c.Core_MatchLogic_Compare';
-import ACTIVATE from '@salesforce/label/c.Core_MatchLogic_Activate';
-import DEACTIVATE from '@salesforce/label/c.Core_MatchLogic_Deactivate';
-import FIND_FIELDS from '@salesforce/label/c.Core_MatchLogic_FindFields';
+import SUMMARY from '@salesforce/label/c.Core_MatchLogic_Summary';
+import SHOW_DETAILS from '@salesforce/label/c.Core_MatchLogic_ShowDetails';
+import HIDE_DETAILS from '@salesforce/label/c.Core_MatchLogic_HideDetails';
+import ACTIVE_SWITCH from '@salesforce/label/c.Core_MatchLogic_ActiveSwitch';
+import NEW_TITLE from '@salesforce/label/c.Core_MatchLogic_NewTitle';
 import TRY from '@salesforce/label/c.Core_MatchLogic_Try';
 import TRY_VALUE from '@salesforce/label/c.Core_MatchLogic_TryValue';
 import TRY_POSTAL from '@salesforce/label/c.Core_MatchLogic_TryPostal';
@@ -33,10 +36,7 @@ import TRY_NONE from '@salesforce/label/c.Core_MatchLogic_TryNone';
 import TRY_TOO_LITTLE from '@salesforce/label/c.Core_MatchLogic_TryTooLittle';
 import ADD from '@salesforce/label/c.Core_CmdtManager_AddButton';
 import EDIT from '@salesforce/label/c.Core_CmdtManager_EditAction';
-import SAVE from '@salesforce/label/c.Core_CmdtManager_SaveButton';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
-import NEW_TITLE from '@salesforce/label/c.Core_CmdtManager_NewTitle';
 import EDIT_TITLE from '@salesforce/label/c.Core_CmdtManager_EditTitle';
 import SAVING from '@salesforce/label/c.Core_CmdtManager_Saving';
 import SAVED from '@salesforce/label/c.Core_CmdtManager_Saved';
@@ -46,28 +46,21 @@ import LOAD_ERROR from '@salesforce/label/c.Core_CmdtManager_LoadError';
 
 const TYPE_NAME = 'Match_Source__mdt';
 const ADDRESS = 'Address';
-const FIELDS = [
-  'Object_Name__c',
-  'Value_Field__c',
-  'Postal_Code_Field__c',
-  'Parent_Field__c',
-  'Normalization__c'
-];
 const POLL_INTERVAL_MS = 3000;
 const POLL_ATTEMPTS = 20;
 
 /**
- * Matching Logic on the Duplicate Matching tab (ADR-0139, admin guide duplicates.md): the
- * match sources in plain words, add, edit, activate and deactivate, and "Try a value". Saving
- * goes through the custom metadata manager, which checks the source against the org, deploys
- * it and needs Manage BarnCRM Metadata, so the page waits on the deployment as that page does.
+ * Matching Logic on the Duplicate Matching tab (ADR-0139, admin guide duplicates.md): each
+ * match source as a card with a one-line summary, an Active switch, its details on request,
+ * and "Try a Value"; adding and editing happen in a modal (c-match-source-modal). Saving goes
+ * through the custom metadata manager, which checks the source against the org, deploys it and
+ * needs Manage BarnCRM Metadata, so the page waits on the deployment as that page does.
  */
 export default class MatchSourceManager extends LightningElement {
   labels = {
     intro: INTRO,
-    rulesNote: RULES_NOTE,
+    helpAlt: HELP_ALT,
     readOnly: READ_ONLY,
-    shippedNote: SHIPPED_NOTE,
     shipped: SHIPPED,
     notUsable: NOT_USABLE,
     object: OBJECT,
@@ -76,23 +69,23 @@ export default class MatchSourceManager extends LightningElement {
     linksTo: LINKS_TO,
     parentField: PARENT_FIELD,
     compare: COMPARE,
-    findFields: FIND_FIELDS,
+    active: ACTIVE,
+    inactive: INACTIVE,
     tryValue: TRY_VALUE,
     tryPostal: TRY_POSTAL,
     tryRun: TRY_RUN,
     tryFound: TRY_FOUND,
     add: ADD,
     edit: EDIT,
-    save: SAVE,
     cancel: CANCEL,
-    name: NAME,
     checkAgain: CHECK_AGAIN
   };
 
+  helpText = `${HELP} ${RULES_NOTE} ${SHIPPED_NOTE}`;
+
   view;
-  form;
-  /** The fields of the form's object, from describeObject. */
-  objectFields;
+  /** The developer names of the cards whose details are shown. */
+  expanded = {};
   trying;
   tryInput = { value: '', postal: '' };
   tryResult;
@@ -129,9 +122,13 @@ export default class MatchSourceManager extends LightningElement {
     return Boolean(this.view) && !this.view.canEdit;
   }
 
+  get normalizations() {
+    return (this.view && this.view.normalizations) || [];
+  }
+
   get compareText() {
     const texts = {};
-    ((this.view && this.view.normalizations) || []).forEach((choice) => {
+    this.normalizations.forEach((choice) => {
       texts[choice.value] = choice.label;
     });
     return texts;
@@ -145,18 +142,28 @@ export default class MatchSourceManager extends LightningElement {
     return this.view.sources.map((source) => {
       const values = source.values || {};
       const isTrying = Boolean(this.trying) && this.trying.developerName === source.developerName;
+      const showDetails = Boolean(this.expanded[source.developerName]);
+      const objectText = source.objectLabel || values.Object_Name__c;
+      const valueText = source.valueFieldLabel || values.Value_Field__c;
       return {
         ...source,
         statusText: source.active ? ACTIVE : INACTIVE,
+        statusClass: source.active ? 'slds-theme_success' : '',
+        switchLabel: ACTIVE_SWITCH.replace('{0}', source.label),
+        summary: SUMMARY.replace('{0}', valueText)
+          .replace('{1}', objectText)
+          .replace('{2}', values.Normalization__c || ''),
         notUsable: !source.usable,
-        objectText: source.objectLabel || values.Object_Name__c,
-        valueText: source.valueFieldLabel || values.Value_Field__c,
+        objectText,
+        valueText,
         postalText: source.postalFieldLabel || values.Postal_Code_Field__c,
         parentText: source.parentFieldLabel || values.Parent_Field__c,
         compareText: texts[values.Normalization__c] || values.Normalization__c,
         isAddress: values.Normalization__c === ADDRESS,
         canChange: this.canEdit && !source.shipped,
-        toggleLabel: source.active ? DEACTIVATE : ACTIVATE,
+        showDetails,
+        detailsLabel: showDetails ? HIDE_DETAILS : SHOW_DETAILS,
+        detailsExpanded: String(showDetails),
         tryLabel: TRY,
         isTrying,
         tryOpenLabel: `${TRY}: ${source.label}`
@@ -164,40 +171,9 @@ export default class MatchSourceManager extends LightningElement {
     });
   }
 
-  get formTitle() {
-    if (!this.form) {
-      return '';
-    }
-    return this.form.developerName ? EDIT_TITLE.replace('{0}', this.form.originalLabel) : NEW_TITLE;
-  }
-
-  /** A field's choices: the object's fields once found, else the value already there. */
-  choicesFor(list, current) {
-    const found = (this.objectFields && this.objectFields[list]) || [];
-    if (current && !found.some((choice) => choice.value === current)) {
-      return [{ label: current, value: current }, ...found];
-    }
-    return found;
-  }
-
-  get valueFieldOptions() {
-    return this.choicesFor('valueFields', this.form.values.Value_Field__c);
-  }
-
-  get postalFieldOptions() {
-    return this.choicesFor('valueFields', this.form.values.Postal_Code_Field__c);
-  }
-
-  get parentFieldOptions() {
-    return this.choicesFor('parentFields', this.form.values.Parent_Field__c);
-  }
-
-  get normalizationOptions() {
-    return (this.view && this.view.normalizations) || [];
-  }
-
-  get formIsAddress() {
-    return Boolean(this.form) && this.form.values.Normalization__c === ADDRESS;
+  handleDetailsToggle(event) {
+    const name = event.target.dataset.name;
+    this.expanded = { ...this.expanded, [name]: !this.expanded[name] };
   }
 
   get tryIsAddress() {
@@ -229,80 +205,42 @@ export default class MatchSourceManager extends LightningElement {
     return TRY_NONE;
   }
 
-  // ------------------------------------------------------------------ the form
+  // ------------------------------------------------------------------ add and edit
 
   handleAdd() {
-    const values = {};
-    FIELDS.forEach((name) => {
-      values[name] = '';
-    });
-    this.form = { developerName: null, originalLabel: '', label: '', values };
-    this.objectFields = undefined;
-    this.clearMessages();
+    this.openForm(NEW_TITLE, undefined);
   }
 
   handleEdit(event) {
     const source = this.findSource(event.target.dataset.name);
-    this.form = {
+    this.openForm(EDIT_TITLE.replace('{0}', source.label), {
       developerName: source.developerName,
-      originalLabel: source.label,
       label: source.label,
       values: { ...source.values }
-    };
-    this.objectFields = undefined;
+    });
+  }
+
+  /** The modal saves the source itself; once its deployment has started this page waits on it. */
+  async openForm(label, source) {
     this.clearMessages();
-    this.findFields();
-  }
-
-  handleNameChange(event) {
-    this.form = { ...this.form, label: event.detail.value };
-  }
-
-  handleFieldChange(event) {
-    const values = { ...this.form.values, [event.target.dataset.field]: event.detail.value };
-    this.form = { ...this.form, values };
-  }
-
-  handleFindFields() {
-    this.findFields();
-  }
-
-  async findFields() {
-    const objectName = this.form && this.form.values.Object_Name__c;
-    if (!objectName) {
-      return;
-    }
-    try {
-      this.objectFields = await describeObject({ objectName });
-      this.errorMessage = undefined;
-    } catch (error) {
-      this.objectFields = undefined;
-      this.errorMessage = this.messageFrom(error);
+    const result = await MatchSourceModal.open({
+      size: 'small',
+      label,
+      source,
+      normalizations: this.normalizations
+    });
+    if (result && result.jobId) {
+      this.track(result.jobId, result.label);
     }
   }
 
-  handleCancel() {
-    this.form = undefined;
-    this.objectFields = undefined;
-  }
-
-  async handleSave() {
-    const form = this.form;
-    const started = await this.start(
-      form.label,
-      saveRow({
-        typeName: TYPE_NAME,
-        input: { developerName: form.developerName, label: form.label, values: form.values }
-      })
-    );
-    if (started) {
-      this.form = undefined;
-      this.objectFields = undefined;
-    }
-  }
-
+  /**
+   * The switch is put back at once: it moves when the deployment has finished and the list is
+   * read again, so it never shows a state Salesforce has not applied.
+   */
   handleToggle(event) {
     const source = this.findSource(event.target.dataset.name);
+    event.target.checked = source.active;
     this.start(
       source.label,
       setArchived({
@@ -363,16 +301,19 @@ export default class MatchSourceManager extends LightningElement {
     this.busy = true;
     this.clearMessages();
     try {
-      const jobId = await request;
-      this.pending = { jobId, label };
-      this.statusMessage = SAVING;
-      this.poll(jobId, label, POLL_ATTEMPTS);
-      return true;
+      this.track(await request, label);
     } catch (error) {
       this.busy = false;
       this.errorMessage = this.messageFrom(error);
-      return false;
     }
+  }
+
+  /** Waits on a started deployment, saying "Saving" until it has finished. */
+  track(jobId, label) {
+    this.busy = true;
+    this.pending = { jobId, label };
+    this.statusMessage = SAVING;
+    this.poll(jobId, label, POLL_ATTEMPTS);
   }
 
   poll(jobId, label, attemptsLeft) {

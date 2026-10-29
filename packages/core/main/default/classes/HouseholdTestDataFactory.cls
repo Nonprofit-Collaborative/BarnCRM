@@ -66,6 +66,12 @@ public class HouseholdTestDataFactory {
         );
     }
 
+    /**
+     * An unsaved household. No user is given the Household record type (ADR-0141), so a plain
+     * `insert` of it under `System.runAs` is refused: test data inserts it with
+     * `Database.insert(household, AccessLevel.SYSTEM_MODE)`, and a test of what a person may
+     * create uses insertHouseholds below.
+     */
     @NamespaceAccessible
     public static Account newHousehold(String name) {
         return (Account) TestDataFactory.pastDuplicateRules(

@@ -15,7 +15,7 @@ private class HouseholdMemberTriggerHandlerTest {
     private static void setUp() {
         HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
         household = HouseholdTestDataFactory.newHousehold('Placeholder');
-        insert household;
+        Database.insert(household, AccessLevel.SYSTEM_MODE);
         john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
         insert john;
     }
@@ -84,7 +84,7 @@ private class HouseholdMemberTriggerHandlerTest {
             settings.Delete_Empty_Households__c = false;
             HouseholdTestDataFactory.save(settings);
             Account other = HouseholdTestDataFactory.newHousehold('Other');
-            insert other;
+            Database.insert(other, AccessLevel.SYSTEM_MODE);
             Household_Member__c row = membership(john.Id);
             insert row;
 

@@ -6,7 +6,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-A11Y-01: Keyboard Only in BarnCRM Settings
 
-**Purpose:** Confirm an admin can search, move between sections and change a setting without a mouse, and that **Discard Changes** undoes it.
+**Purpose:** Confirm an admin can search, move between sections and change a setting without a mouse, and that **Discard** in the save bar undoes it.
 **Prerequisites:** admin user (see [Test users](before-you-test.md#test-users)); first-run setup already finished.
 **Smoke:** yes
 
@@ -16,9 +16,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Type `greeting`. | A **Search Results** list appears under the box as you type. |
 | 3 | Press Tab until focus is on the result **Formal greeting pattern**, then press Enter. | The **People and Households** section opens on the right, the page scrolls to the **Preview and Recompute** panel and focus is on its heading. |
 | 4 | Press Shift+Tab until focus is in the **Sections** list, then press Tab or Shift+Tab to reach **General** and press Enter. | The General section shows. Every section in the list can be reached with Tab and opened with Enter. |
-| 5 | Open **Households** again with the keyboard. Tab to the checkbox **Create a household automatically** and press Space. | The checkbox changes state. **Save** and **Discard Changes** become enabled. |
-| 6 | Tab to **Discard Changes** and press Enter. | The checkbox returns to its original state and nothing is saved. On **General**, **Recent Changes** has no new row. |
-| 7 | Tab to the **Learn More** link under the same setting and press Enter. | The help page opens in a new browser tab. Close it; focus is back on the Settings page. |
+| 5 | Open **Households** again with the keyboard. Tab to the checkbox **Create a household automatically** and press Space. | The checkbox changes state. A screen reader announces "1 unsaved change", and a save bar with **Discard** and **Save** docks to the bottom. |
+| 6 | Tab to **Discard** in the save bar and press Enter. | The checkbox returns to its original state, the bar goes away and nothing is saved. On **General**, **Recent Changes** has no new row. |
+| 7 | Tab to the info icon under the same setting and press Enter, then Tab to **Learn More** beside it and press Enter. | The description opens in a popover. The help page opens in a new browser tab. | The help page opens in a new browser tab. Close it; focus is back on the Settings page. |
 | 8 | Press Tab through the rest of the section. | Focus never lands on something invisible, and the order follows the page from top to bottom. |
 
 **Cleanup:** None.
@@ -98,7 +98,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **BarnCRM Settings** tab. | A notice at the top reads **You can read these settings but not change them. Ask your administrator for the Manage BarnCRM Settings permission.** A screen reader announces it as a status message. |
-| 2 | Press Tab through the **People and Households** section. | Every control is greyed out. There is no **Save** or **Discard Changes** button. Each **Learn More** link is still reachable. |
+| 2 | Press Tab through the **People and Households** section. | Every control is greyed out. No save bar appears. Each info icon and **Learn More** link is still reachable. |
 | 3 | Open the **Import** tab from the app launcher. | The warning **You need the Manage BarnCRM Settings permission to import. Ask whoever set up your org for the BarnCRM Admin role.** shows. No wizard controls can be reached with Tab. |
 
 **Cleanup:** None.
@@ -110,10 +110,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **People and Households**, Tab to the **Learn More** link under **Create a household automatically**. | Announced as **Learn more about Create a household automatically (opens a new tab)**, not just "Learn More". |
-| 2 | Tab onto the checkbox **Create a household automatically**. | The label and its description text are both read. |
-| 3 | Open a Garcia household from the **Households** tab (for example **The Garcia Family**). In the **Members** panel, Tab to the first **Make Primary** button. | Announced as **Make Harper Garcia the primary contact** (the member's own name), not just "Make Primary". |
-| 4 | Tab to a **Move to another household** button. | Announced as **Move** plus the member's name plus **to another household**. |
+| 1 | In **BarnCRM Settings**, **People and Households**, Tab to the info icon under **Create a household automatically**. | Announced as **About Create a household automatically**, a button. Press Enter: the description is read. |
+| 2 | Tab to **Learn More** beside it. | Announced as **Learn More (opens in a new tab)**, inside the group **Create a household automatically**. |
+| 3 | Open a Garcia household from the **Households** tab (for example **The Garcia Family**). In the **Members** panel, Tab to the first member's actions menu. | Announced as **Actions for** plus the member's own name (for example **Actions for Harper Garcia**), not just "Actions". |
+| 4 | Press Enter on the menu, then the arrow keys. | The menu opens and reads **Make Primary** and **Move to Another Household** where you may use them; Escape closes it and returns focus to the menu button. |
 | 5 | In Find, run any Households query. | The screen reader announces the **N rows found.** line without you moving focus to it. |
 | 6 | In Quick Gift Entry, press **Save** with **Donor** empty. | The error **Choose the person or organization who gave this gift.** is read together with the **Donor** field. |
 | 7 | In the Import wizard on **Check Columns**, move to the table. | The table is announced as **Check Columns** with column headers **Column in Your File**, **What It Means**, **First Values**. |
@@ -131,7 +131,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Open **Find**, choose **Households**, press **Run**. | The **Saved queries** and **Object** boxes stack one per line. The page itself does not scroll sideways; only the results table may scroll inside its own area. |
 | 3 | Open **Quick Gift Entry**. | Every field label and the **Save** and **Save and New** buttons are visible. Buttons wrap to a new line rather than overlap. |
 | 4 | Open the **Import** tab and go to **Check Columns** with the sample file. | The columns table scrolls inside its own area; the path, **Back** and **Next** stay readable (the path may show only the current step). |
-| 5 | Open a household record page. | The **Members** panel shows each member's name and buttons without overlap. |
+| 5 | Open a household record page. | The **Members** panel shows each member's tile (initials, name, badges, menu) without overlap, and each address card's buttons wrap instead of overlapping. |
 
 **Cleanup:** Set browser zoom back to 100 percent.
 
@@ -142,7 +142,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open a Garcia household from **Households**. | The **Members** panel lists every member, readable without sideways scrolling. |
+| 1 | Open a Garcia household from **Households**. | The **Members** panel lists every member as a tile, readable without sideways scrolling; each tile's menu opens and **Add Member** opens its dialog full width. The **Addresses** cards show the map pin, badges and buttons without sideways scrolling. |
 | 2 | Scroll the page. | Details, related lists and the **Members** panel open and render; nothing overlaps. |
 | 3 | Open a gift from the household's gifts related list. | The gift page shows **Amount**, **Gift Date** and the donor, and the **Soft Credits** panel renders. |
 | 4 | Edit **Payment Reference**, type `A11Y1`, save. | The value saves and shows on the page. |

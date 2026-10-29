@@ -88,7 +88,7 @@ private class ContactMergeTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account hers = HouseholdTestDataFactory.newHousehold('The Dupmerge Family');
             Account other = HouseholdTestDataFactory.newHousehold('Dupmerge Household');
-            insert new List<Account>{ hers, other };
+            Database.insert(new List<Account>{ hers, other }, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Okafor');
             Contact bea = HouseholdTestDataFactory.newContact('Bea', 'Lindqvist');
             insert new List<Contact>{ ana, bea };
@@ -143,7 +143,7 @@ private class ContactMergeTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Dupmerge Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Okafor');
             Contact bea = HouseholdTestDataFactory.newContact('Bea', 'Lindqvist');
             insert new List<Contact>{ ana, bea };
@@ -171,7 +171,7 @@ private class ContactMergeTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Dupmerge Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Okafor');
             Contact bea = HouseholdTestDataFactory.newContact('Bea', 'Lindqvist');
             insert new List<Contact>{ ana, bea };
@@ -198,7 +198,7 @@ private class ContactMergeTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Dupmerge Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Okafor');
             Contact bea = HouseholdTestDataFactory.newContact('Bea', 'Lindqvist');
             insert new List<Contact>{ ana, bea };

@@ -12,47 +12,48 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In the BarnCRM app, open the **Data Manager** tab. | The page title is **Data Manager**, with the line **Start a data task, or see and undo what changed.** |
-| 2 | Look under **Start a Task**. | Five cards in this order, each with an **Open** button: **Import a File**, **Find and Export Records**, **Update Many Records**, **Org Optimizer**, **Delete Many Records** (last). Each card says whether it needs a file: **Import a File** starts "Needs a file."; the other four start "No file needed". **Update Many Records** reads "No file needed. Change up to five fields on many records at once: find the records in Find, then press Bulk update. To update records from a spreadsheet, use Import a File." |
-| 3 | Look at **Delete Many Records**. | Its **Open** button has red text. There is no warning box on the card or anywhere under **Start a Task**. No other card has a red button. |
-| 4 | Look under **Import Templates**. | A line starting "A template remembers how a file's columns match BarnCRM fields", then a table with the columns **Template**, **Loads**, **Arrives Regularly As**, **Last Loaded**, listing the shipped import templates (or **No import templates yet.** if there are none). |
+| 1 | In the BarnCRM app, open the **Data Manager** tab. | The page name **Data Manager** shows once, in the page header with the tab icon, and no other icon or title repeats it. The line **Start a data task, or see and undo what changed.** is under it, then **About This Tool** (open on your first visit) with two short lines on which tool to use and a **Learn More** link. |
+| 2 | Look at the tiles. | Four groups in this order: **Bring Data In** (**Import a File**), **Find and Change** (**Find and Export Records**, **Update Many Records**), **Check and Tidy** (**Org Optimizer**), **Careful** (**Delete Many Records**, alone and last). Each tile has an icon, its name and one line of 12 words or fewer; there are no **Open** buttons. **Update Many Records** reads "Find records, then change up to five fields at once." |
+| 3 | Look around the tiles. | There is no warning box anywhere on the page. |
+| 4 | Look under **Import Templates**. | The line "A template remembers how a file's columns match fields." with a **Learn More** link, then a table with the columns **Template**, **Loads**, **Arrives Regularly As**, **Last Loaded**, listing the shipped import templates. With no template at all it shows an illustration, **No Import Templates Yet**, and a **Create a Template** button that opens **Import**. |
 | 5 | Look at the job list card. | It is headed **Data Jobs**, with a **Refresh** button, a **Show** list and a **Show everyone's jobs** checkbox. With no jobs run yet it shows an illustration, the heading **No Data Jobs Yet** and the line "Each import, bulk update and bulk delete is listed here, with its undo." |
-| 6 | Look under **Salesforce's Own Tools**. | Three links: **Weekly Data Export (your backup)**, **Recycle Bin**, **Data Import Wizard (records BarnCRM does not load)**. |
-| 7 | Click **Recycle Bin**. | A new browser tab opens Salesforce's Recycle Bin. Close it. |
-| 8 | Check the app's navigation bar, in **BarnCRM** and in **BarnCRM Admin**. | **Data Manager** is there in both. **Find**, **Import** and **Bulk Update** are in neither. |
+| 6 | Look under **Salesforce's Own Tools**. | Three tiles: **Weekly Data Export**, **Recycle Bin**, **Data Import Wizard**, each with a small new-window icon after its name. |
+| 7 | Click the **Recycle Bin** tile. | A new browser tab opens Salesforce's Recycle Bin. Close it. |
+| 8 | Close **About This Tool** and reload the page. | It stays closed. |
+| 9 | Check the app's navigation bar, in **BarnCRM** and in **BarnCRM Admin**. | **Data Manager** is there in both. **Find**, **Import** and **Bulk Update** are in neither. |
 
 **Cleanup:** None.
 
-## T-DM-02: Each Card Opens Its Tool
+## T-DM-02: Each Tile Opens Its Tool
 
-**Purpose:** Confirm every card's **Open** button goes to the right tab.
+**Purpose:** Confirm every tool tile goes to the right tab, by mouse and by keyboard.
 **Prerequisites:** admin.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Data Manager**, click **Open** on **Import a File**. | The **Import** tab opens. |
-| 2 | Go back to **Data Manager**. Click **Open** on **Find and Export Records**. | The **Find** tab opens. |
-| 3 | Go back. Click **Open** on **Update Many Records**. | The **Find** tab opens (bulk update starts from a Find query). |
-| 4 | Go back. Click **Open** on **Org Optimizer**. | The **Org Optimizer** tab opens on **Overview**. |
-| 5 | Go back. Click **Open** on **Delete Many Records**. | A box titled **Delete Many Records** opens, reading "Deleted records go to the Recycle Bin. You can undo a bulk delete from Data Jobs, on this page, for up to 15 days.", with **Cancel** and a red **Continue** button. Nothing else has opened yet. |
+| 1 | On **Data Manager**, click **Import a File**. | The **Import** tab opens. |
+| 2 | Go back to **Data Manager**. Press Tab until **Find and Export Records** has the focus ring, and press Enter. | The **Find** tab opens. |
+| 3 | Go back. Click **Update Many Records**. | The **Find** tab opens with the Bulk Update note (bulk update starts from a Find query). |
+| 4 | Go back. Click **Org Optimizer**. | The **Org Optimizer** tab opens on **Overview**. |
+| 5 | Go back. Click **Delete Many Records**. | A box titled **Delete Many Records** opens, reading "Deleted records go to the Recycle Bin. You can undo a bulk delete from Data Jobs, on this page, for up to 15 days.", with **Cancel** and a red **Continue** button. Nothing else has opened yet. |
 | 6 | Click **Cancel**. | The box closes and **Data Manager** stays open. No tab opens. |
-| 7 | Click **Open** on **Delete Many Records** again, and press Escape. | The box closes and nothing opens. |
-| 8 | Click **Open** on **Delete Many Records** again, and click **Continue**. | The **Find** tab opens. |
+| 7 | Click **Delete Many Records** again, and press Escape. | The box closes and nothing opens. |
+| 8 | Click **Delete Many Records** again, and click **Continue**. | The **Find** tab opens. |
 
 **Cleanup:** None.
 
 ## T-DM-12: Find, Import and Bulk Update Open From Data Manager Only
 
-**Purpose:** Confirm Find, Import and Bulk Update are not in any app's navigation, and open from their Data Manager cards and from links elsewhere.
+**Purpose:** Confirm Find, Import and Bulk Update are not in any app's navigation, and open from their Data Manager tiles and from links elsewhere.
 **Prerequisites:** admin, and staff with the **BarnCRM Find and Export** permission set.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As admin, open **BarnCRM**, **BarnCRM Console**, **BarnCRM Admin** and **BarnCRM Admin Console** in turn, and check each navigation bar or menu. | **Data Manager** is in all four. **Find**, **Import** and **Bulk Update** are in none. |
-| 2 | In **BarnCRM**, open **Data Manager** and click **Open** on **Find and Export Records**. | The **Find** tab opens and works: choose **Contact** and run a query. |
-| 3 | In **BarnCRM Admin**, open **Data Manager** and click **Open** on **Import a File**. | The **Import** tab opens on its first step. |
+| 2 | In **BarnCRM**, open **Data Manager** and click **Find and Export Records**. | The **Find** tab opens and works: choose **Contact** and run a query. |
+| 3 | In **BarnCRM Admin**, open **Data Manager** and click **Import a File**. | The **Import** tab opens on its first step. |
 | 4 | Open **Org Optimizer**, and press **Open in Find** next to any check. | The **Find** tab opens with that check's query. |
-| 5 | As staff, open **BarnCRM**. | **Data Manager** is in the navigation; **Find** is not. On **Data Manager**, **Open** on **Find and Export Records** opens Find. |
+| 5 | As staff, open **BarnCRM**. | **Data Manager** is in the navigation; **Find** is not. On **Data Manager**, the **Find and Export Records** tile opens Find. |
 
 **Cleanup:** None.
 
@@ -108,16 +109,16 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-DM-06: Who Sees Data Manager and What
 
-**Purpose:** Confirm the tab, cards and job kinds follow each person's permissions.
+**Purpose:** Confirm the tab, tiles and job kinds follow each person's permissions.
 **Prerequisites:** staff; admin to give and take permissions.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As staff, open the BarnCRM app. | No **Data Manager** and no **Org Optimizer** tab. |
 | 2 | As admin, open **BarnCRM Settings**, **Access**. Under **Extra Permissions**, give the staff user **BarnCRM Find and Export** with **Give Permission**, and confirm. | A message says the staff user now has the permission. |
-| 3 | As staff, wait a minute and reload. Open **Data Manager**. | The tab is there. Only two cards: **Find and Export Records** and **Org Optimizer**. |
+| 3 | As staff, wait a minute and reload. Open **Data Manager**. | The tab is there. Only two tiles: **Find and Export Records** under **Find and Change** and **Org Optimizer** under **Check and Tidy**. There is no **Bring Data In** or **Careful** group. |
 | 4 | Look for **Import Templates**, **Data Jobs** and **Salesforce's Own Tools**. | None of them is shown. |
-| 5 | As admin, also give the staff user **BarnCRM Bulk Update**. As staff, reload **Data Manager**. | A third card, **Update Many Records**, appears, and **Data Jobs** appears with the line **Start a bulk update from Find: run a query, then press Bulk update. Recent bulk updates are listed here, with their undo.** There is no **Show** list (one kind of job only) and no **Show everyone's jobs**. |
+| 5 | As admin, also give the staff user **BarnCRM Bulk Update**. As staff, reload **Data Manager**. | A third tile, **Update Many Records**, appears after **Find and Export Records**, and **Data Jobs** appears with the line **Start a bulk update from Find: run a query, then press Bulk update. Recent bulk updates are listed here, with their undo.** There is no **Show** list (one kind of job only) and no **Show everyone's jobs**. |
 | 6 | As staff, check whether the admin's bulk update from T-DM-03 is listed. | It is not: staff see their own jobs only. |
 
 **Cleanup:** As admin, remove both extra permissions from the staff user on the **Access** page.
@@ -145,7 +146,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Home**, click **New household**, rename it `Empty Test Household`, and add nobody. | The household saves. |
+| 1 | On **Home**, click **New Household**, rename it `Empty Test Household`, and add nobody. | The household saves. |
 | 2 | On **Org Optimizer**, **Data Quality**, click **Recount**. | **Households with Nobody in Them** has gone up by 1. |
 | 3 | Open it in Find. | `Empty Test Household` is in the list. |
 | 4 | In **BarnCRM Settings**, **Org Optimizer**, set **Years before a person is not changed** to `25` and click **Save**. | Nothing is saved: the value is marked and the page says **A number is outside the range its setting takes, so nothing was saved. Correct the marked value and save again.** (or the server message **Years before a person is not changed takes a number from 1 to 20, so nothing was saved. Change it and save again.**). |

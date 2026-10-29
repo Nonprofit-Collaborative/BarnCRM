@@ -45,11 +45,13 @@ public class RecognitionTestData {
 
     public static Account household(String name) {
         Account record = new Account(Name = name);
-        Id recordTypeId = recordTypeId(HOUSEHOLD_RECORD_TYPE);
+        // No user is given the Household record type (ADR-0141), so it is never "available":
+        // look it up by name and insert in system mode.
+        Id recordTypeId = HouseholdService.householdRecordTypeId();
         if (recordTypeId != null) {
             record.RecordTypeId = recordTypeId;
         }
-        insert record;
+        Database.insert(record, AccessLevel.SYSTEM_MODE);
         return record;
     }
 

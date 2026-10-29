@@ -4,6 +4,7 @@ import { gql, graphql } from 'lightning/graphql';
 import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import LOCALE from '@salesforce/i18n/locale';
+import BarnConfirmModal from 'c/barnConfirmModal';
 
 import getCardContext from '@salesforce/apex/AddressMoveController.getCardContext';
 import getCardFields from '@salesforce/apex/AddressMoveController.getCardFields';
@@ -25,6 +26,7 @@ import ADD_FORM_TITLE from '@salesforce/label/c.Core_Address_AddFormTitle';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_Address_CancelButton';
 import DEFAULT_BADGE from '@salesforce/label/c.Core_Address_DefaultBadge';
 import EMPTY_MESSAGE from '@salesforce/label/c.Core_Address_Empty';
+import EMPTY_HEADING from '@salesforce/label/c.Core_Address_EmptyHeading';
 import LOAD_FAILED from '@salesforce/label/c.Core_Address_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_Address_Loading';
 import MOVE_FAILED from '@salesforce/label/c.Core_Address_MoveFailed';
@@ -43,6 +45,7 @@ import UPDATE_EVERYONE_SUCCESS from '@salesforce/label/c.Core_Address_UpdateEver
 import UPDATE_EVERYONE_TITLE from '@salesforce/label/c.Core_Address_UpdateEveryoneTitle';
 import USE_FOR_HOUSEHOLD_BUTTON from '@salesforce/label/c.Core_Address_UseForHouseholdButton';
 import USE_FOR_HOUSEHOLD_HELP from '@salesforce/label/c.Core_Address_UseForHouseholdHelp';
+import USE_FOR_HOUSEHOLD_DETAIL from '@salesforce/label/c.Core_Address_UseForHouseholdDetail';
 import USE_FOR_HOUSEHOLD_PICK from '@salesforce/label/c.Core_Address_UseForHouseholdPick';
 import USE_FOR_HOUSEHOLD_SUCCESS from '@salesforce/label/c.Core_Address_UseForHouseholdSuccess';
 import USE_FOR_HOUSEHOLD_TITLE from '@salesforce/label/c.Core_Address_UseForHouseholdTitle';
@@ -276,17 +279,11 @@ export default class AddressPanel extends LightningElement {
     cancelButton: CANCEL_BUTTON,
     defaultBadge: DEFAULT_BADGE,
     emptyMessage: EMPTY_MESSAGE,
+    emptyHeading: EMPTY_HEADING,
     loading: LOADING,
     setDefaultButton: SET_DEFAULT_BUTTON,
     updateEveryoneButton: UPDATE_EVERYONE_BUTTON,
-    updateEveryoneMoving: UPDATE_EVERYONE_MOVING,
-    updateEveryoneNobody: UPDATE_EVERYONE_NOBODY,
-    updateEveryoneOwn: UPDATE_EVERYONE_OWN,
-    updateEveryoneTitle: UPDATE_EVERYONE_TITLE,
     useForHouseholdButton: USE_FOR_HOUSEHOLD_BUTTON,
-    useForHouseholdHelp: USE_FOR_HOUSEHOLD_HELP,
-    useForHouseholdPick: USE_FOR_HOUSEHOLD_PICK,
-    useForHouseholdTitle: USE_FOR_HOUSEHOLD_TITLE,
     undeliverableBadge: UNDELIVERABLE_BADGE,
     undeliverablePrimary: UNDELIVERABLE_PRIMARY,
     statusMenu: STATUS_MENU
@@ -548,87 +545,76 @@ export default class AddressPanel extends LightningElement {
 
   // ------------------------------------------------------------ household moves (R-AD9)
 
-  /** The move being confirmed: which, on which address, and what the confirmation shows. */
-  move;
-  moveHouseholdId;
-  moveTicked = [];
+  /** True while a move is being saved, so its buttons cannot start a second one. */
   moveBusy = false;
 
-  get isMovingForHousehold() {
-    return Boolean(this.move && this.move.kind === MOVE_FOR_HOUSEHOLD);
-  }
-
-  get isMovingEveryone() {
-    return Boolean(this.move && this.move.kind === MOVE_FOR_EVERYONE);
-  }
-
-  /** The household picker, only when the person belongs to more than one. */
+  /** The households a person belongs to, their own first, as choices for the confirmation. */
   get householdOptions() {
     const households = this.cardContext ? this.cardContext.households || [] : [];
     return households.map((household) => ({ label: household.name, value: household.id }));
   }
 
-  get showHouseholdPicker() {
-    return this.householdOptions.length > 1;
-  }
-
-  get hasMoving() {
-    return Boolean(this.move && this.move.moving && this.move.moving.length);
-  }
-
-  get hasWithTheirOwn() {
-    return Boolean(this.move && this.move.withTheirOwn && this.move.withTheirOwn.length);
-  }
-
-  handleUseForHousehold(event) {
+  /** Asks in the kit's confirm dialog, offering a choice only when there is more than one. */
+  async handleUseForHousehold(event) {
+    const addressId = event.target.dataset.id;
     const options = this.householdOptions;
-    this.moveHouseholdId = options.length ? options[0].value : undefined;
-    this.move = { kind: MOVE_FOR_HOUSEHOLD, addressId: event.target.dataset.id };
+    const several = options.length > 1;
+    const answer = await BarnConfirmModal.open({
+      size: 'small',
+      label: USE_FOR_HOUSEHOLD_TITLE,
+      message: USE_FOR_HOUSEHOLD_HELP,
+      details: [USE_FOR_HOUSEHOLD_DETAIL],
+      choices: several ? options : undefined,
+      choicesLabel: USE_FOR_HOUSEHOLD_PICK,
+      choice: options.length ? options[0].value : undefined,
+      confirmLabel: USE_FOR_HOUSEHOLD_BUTTON,
+      cancelLabel: CANCEL_BUTTON
+    });
+    if (!answer || !options.length) {
+      return;
+    }
+    const householdId = several ? answer.choice : options[0].value;
+    await this.runMove(MOVE_FOR_HOUSEHOLD, { addressId, householdId });
   }
 
-  handlePickHousehold(event) {
-    this.moveHouseholdId = event.detail.value;
-  }
-
+  /** Reads who would move, then lists them and offers a tick for each person with their own. */
   async handleUpdateEveryone() {
+    let preview;
     try {
-      const preview = await getMovePreview({ householdId: this.recordId });
-      this.moveTicked = [];
-      this.move = {
-        kind: MOVE_FOR_EVERYONE,
-        moving: preview.moving || [],
-        withTheirOwn: preview.withTheirOwn || []
-      };
+      preview = await getMovePreview({ householdId: this.recordId });
     } catch (error) {
       this.failMove(error);
+      return;
     }
+    const moving = preview.moving || [];
+    const withTheirOwn = preview.withTheirOwn || [];
+    const answer = await BarnConfirmModal.open({
+      size: 'small',
+      label: UPDATE_EVERYONE_TITLE,
+      message: moving.length ? UPDATE_EVERYONE_MOVING : UPDATE_EVERYONE_NOBODY,
+      items: moving.map((person) => person.name),
+      checks: withTheirOwn.map((person) => ({ label: person.name, value: person.id })),
+      checksLabel: UPDATE_EVERYONE_OWN,
+      confirmLabel: UPDATE_EVERYONE_BUTTON,
+      cancelLabel: CANCEL_BUTTON
+    });
+    if (!answer) {
+      return;
+    }
+    const alsoMove = answer.checked || [];
+    await this.runMove(MOVE_FOR_EVERYONE, { householdId: this.recordId, alsoMove });
   }
 
-  handleTick(event) {
-    const personId = event.target.dataset.id;
-    const others = this.moveTicked.filter((id) => id !== personId);
-    this.moveTicked = event.target.checked ? [...others, personId] : others;
-  }
-
-  handleCancelMove() {
-    this.move = undefined;
-  }
-
-  async handleConfirmMove() {
-    const move = this.move;
+  async runMove(kind, params) {
     this.moveBusy = true;
     try {
-      if (move.kind === MOVE_FOR_HOUSEHOLD) {
-        await applyToWholeHousehold({
-          addressId: move.addressId,
-          householdId: this.moveHouseholdId
-        });
+      if (kind === MOVE_FOR_HOUSEHOLD) {
+        await applyToWholeHousehold(params);
         this.notify(USE_FOR_HOUSEHOLD_SUCCESS, 'success');
       } else {
-        await updateEveryonesAddress({ householdId: this.recordId, alsoMove: this.moveTicked });
+        await updateEveryonesAddress(params);
         this.notify(UPDATE_EVERYONE_SUCCESS, 'success');
       }
-      this.move = undefined;
       this.errorMessage = undefined;
       this.refresh();
     } catch (error) {
@@ -638,7 +624,6 @@ export default class AddressPanel extends LightningElement {
   }
 
   failMove(error) {
-    this.move = undefined;
     this.errorMessage = messageOf(error);
     this.notify(this.errorMessage, 'error');
   }

@@ -314,7 +314,7 @@ private class BulkUpdateBatchTest {
                     new Account(Name = 'Renameme Org ' + index, RecordTypeId = organizationType)
                 );
             }
-            insert accounts;
+            Database.insert(accounts, AccessLevel.SYSTEM_MODE);
             String query = JSON.serialize(
                 new Map<String, Object>{
                     'version' => 1,

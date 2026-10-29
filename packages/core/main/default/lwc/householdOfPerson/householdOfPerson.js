@@ -6,6 +6,7 @@ import getHouseholdsForPerson from '@salesforce/apex/HouseholdOfPersonController
 
 import TITLE from '@salesforce/label/c.Core_HouseholdPanel_OfPersonTitle';
 import EMPTY from '@salesforce/label/c.Core_HouseholdPanel_OfPersonEmpty';
+import EMPTY_HEADING from '@salesforce/label/c.Core_HouseholdPanel_OfPersonEmptyHeading';
 import LOADING from '@salesforce/label/c.Core_HouseholdPanel_OfPersonLoading';
 import LOAD_FAILED from '@salesforce/label/c.Core_HouseholdPanel_OfPersonLoadFailed';
 import MEMBER_COUNT_ONE from '@salesforce/label/c.Core_HouseholdPanel_MemberCountOne';
@@ -26,6 +27,7 @@ export default class HouseholdOfPerson extends NavigationMixin(LightningElement)
   label = {
     title: TITLE,
     empty: EMPTY,
+    emptyHeading: EMPTY_HEADING,
     loading: LOADING,
     formalGreeting: FORMAL_GREETING
   };

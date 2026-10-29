@@ -120,4 +120,43 @@ describe('c-barn-confirm-modal', () => {
     confirm.click();
     expect(closed.mock.calls[0][0].detail).toBe(true);
   });
+
+  it('story: a list of names, one choice and tick boxes resolve what was picked', async () => {
+    const element = render({
+      label: 'Move?',
+      message: 'These people move:',
+      items: ['Luis Garcia', 'Luis Garcia'],
+      choices: [
+        { label: 'The Nowak Family', value: 'n' },
+        { label: 'The Garcia Family', value: 'g' }
+      ],
+      choicesLabel: 'Which household?',
+      choice: 'n',
+      checks: [{ label: 'Ana Garcia', value: 'a' }],
+      checksLabel: 'Also move',
+      confirmLabel: 'Move',
+      cancelLabel: 'Cancel'
+    });
+    await flush();
+    const closed = jest.fn();
+    element.addEventListener('close', closed);
+    const root = element.shadowRoot;
+    expect(root.querySelectorAll('[data-id="items"] li')).toHaveLength(2);
+    const choices = root.querySelector('[data-id="choices"]');
+    expect(choices.label).toBe('Which household?');
+    expect(choices.value).toBe('n');
+    expect(root.querySelector('[data-id="checks"]').value).toEqual([]);
+
+    choices.dispatchEvent(new CustomEvent('change', { detail: { value: 'g' } }));
+    root
+      .querySelector('[data-id="checks"]')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: ['a'] } }));
+    root.querySelector('[data-id="confirm"]').click();
+    root.querySelector('[data-id="cancel"]').click();
+
+    expect(closed.mock.calls.map((call) => call[0].detail)).toEqual([
+      { choice: 'g', checked: ['a'] },
+      false
+    ]);
+  });
 });

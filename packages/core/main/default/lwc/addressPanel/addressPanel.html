@@ -21,7 +21,11 @@
       </template>
 
       <template lwc:if={isEmpty}>
-        <p class="slds-text-body_regular" data-id="empty">{labels.emptyMessage}</p>
+        <c-barn-empty-state heading={labels.emptyHeading} message={labels.emptyMessage} data-id="empty">
+          <template lwc:if={canAdd}>
+            <lightning-button label={labels.addButton} onclick={handleAdd} data-id="empty-add"></lightning-button>
+          </template>
+        </c-barn-empty-state>
       </template>
 
       <template for:each={groups} for:item="group">
@@ -54,9 +58,47 @@
                   {labels.undeliverablePrimary}
                 </div>
               </template>
-              <div class="slds-grid slds-grid_align-spread">
-                <div>
-                  <p class="slds-text-title_caps" data-id="address-type">{address.addressType}</p>
+              <div class="slds-media slds-media_small">
+                <div class="slds-media__figure">
+                  <lightning-icon icon-name="utility:location" size="small" data-id="address-icon"></lightning-icon>
+                </div>
+                <div class="slds-media__body">
+                  <div class="slds-grid slds-grid_vertical-align-start">
+                    <div class="slds-col slds-grid slds-wrap slds-grid_vertical-align-center">
+                      <p class="slds-text-title_caps slds-var-m-right_x-small" data-id="address-type">
+                        {address.addressType}
+                      </p>
+                      <template lwc:if={address.isDefault}>
+                        <lightning-badge label={labels.defaultBadge} data-id="default-badge"></lightning-badge>
+                      </template>
+                      <template lwc:if={address.isUndeliverable}>
+                        <lightning-badge
+                          label={labels.undeliverableBadge}
+                          class="slds-theme_error"
+                          data-id="undeliverable-badge"
+                        ></lightning-badge>
+                      </template>
+                    </div>
+                    <template lwc:if={address.showStatusMenu}>
+                      <lightning-button-menu
+                        alternative-text={labels.statusMenu}
+                        title={labels.statusMenu}
+                        menu-alignment="auto"
+                        icon-size="small"
+                        data-id={address.id}
+                        onselect={handleStatusSelect}
+                        class="status-menu slds-no-flex"
+                      >
+                        <template for:each={address.statusActions} for:item="action">
+                          <lightning-menu-item
+                            key={action.value}
+                            value={action.value}
+                            label={action.label}
+                          ></lightning-menu-item>
+                        </template>
+                      </lightning-button-menu>
+                    </template>
+                  </div>
                   <p data-id="address-street">{address.street}</p>
                   <p data-id="address-city">{address.cityLine}</p>
                   <p data-id="address-country">{address.country}</p>
@@ -83,152 +125,40 @@
                       </template>
                     </lightning-record-view-form>
                   </template>
-                </div>
-                <div>
-                  <template lwc:if={address.isDefault}>
-                    <lightning-badge
-                      label={labels.defaultBadge}
-                      data-id="default-badge"
-                    ></lightning-badge>
-                  </template>
-                  <template lwc:if={address.isUndeliverable}>
-                    <lightning-badge
-                      label={labels.undeliverableBadge}
-                      class="slds-theme_error"
-                      data-id="undeliverable-badge"
-                    ></lightning-badge>
-                  </template>
-                  <template lwc:if={canSetDefault}>
-                    <template lwc:if={address.showSetDefault}>
+                  <div class="slds-grid slds-wrap">
+                    <template lwc:if={canSetDefault}>
+                      <template lwc:if={address.showSetDefault}>
+                        <lightning-button
+                          label={labels.setDefaultButton}
+                          data-id={address.id}
+                          onclick={handleSetDefault}
+                          class="set-default slds-var-m-top_x-small slds-var-m-right_x-small"
+                        ></lightning-button>
+                      </template>
+                    </template>
+                    <template lwc:if={address.showUseForHousehold}>
                       <lightning-button
-                        label={labels.setDefaultButton}
+                        label={labels.useForHouseholdButton}
                         data-id={address.id}
-                        onclick={handleSetDefault}
-                        class="set-default"
+                        disabled={moveBusy}
+                        onclick={handleUseForHousehold}
+                        class="use-for-household slds-var-m-top_x-small slds-var-m-right_x-small"
                       ></lightning-button>
                     </template>
-                  </template>
-                  <template lwc:if={address.showUseForHousehold}>
-                    <lightning-button
-                      label={labels.useForHouseholdButton}
-                      data-id={address.id}
-                      onclick={handleUseForHousehold}
-                      class="use-for-household slds-var-m-left_x-small"
-                    ></lightning-button>
-                  </template>
-                  <template lwc:if={address.showUpdateEveryone}>
-                    <lightning-button
-                      label={labels.updateEveryoneButton}
-                      data-id={address.id}
-                      onclick={handleUpdateEveryone}
-                      class="update-everyone slds-var-m-left_x-small"
-                    ></lightning-button>
-                  </template>
-                  <template lwc:if={address.showStatusMenu}>
-                    <lightning-button-menu
-                      alternative-text={labels.statusMenu}
-                      title={labels.statusMenu}
-                      menu-alignment="right"
-                      icon-size="small"
-                      data-id={address.id}
-                      onselect={handleStatusSelect}
-                      class="status-menu slds-var-m-left_x-small"
-                    >
-                      <template for:each={address.statusActions} for:item="action">
-                        <lightning-menu-item
-                          key={action.value}
-                          value={action.value}
-                          label={action.label}
-                        ></lightning-menu-item>
-                      </template>
-                    </lightning-button-menu>
-                  </template>
+                    <template lwc:if={address.showUpdateEveryone}>
+                      <lightning-button
+                        label={labels.updateEveryoneButton}
+                        data-id={address.id}
+                        disabled={moveBusy}
+                        onclick={handleUpdateEveryone}
+                        class="update-everyone slds-var-m-top_x-small slds-var-m-right_x-small"
+                      ></lightning-button>
+                    </template>
+                  </div>
                 </div>
               </div>
             </div>
           </template>
-        </div>
-      </template>
-
-      <template lwc:if={isMovingForHousehold}>
-        <div class="slds-box slds-var-m-top_small" data-id="use-for-household-confirm">
-          <h3 class="slds-text-heading_small slds-var-m-bottom_small">
-            {labels.useForHouseholdTitle}
-          </h3>
-          <p class="slds-var-m-bottom_small">{labels.useForHouseholdHelp}</p>
-          <template lwc:if={showHouseholdPicker}>
-            <lightning-radio-group
-              label={labels.useForHouseholdPick}
-              options={householdOptions}
-              value={moveHouseholdId}
-              onchange={handlePickHousehold}
-              data-id="household-picker"
-            ></lightning-radio-group>
-          </template>
-          <div class="slds-var-m-top_small">
-            <lightning-button
-              label={labels.cancelButton}
-              onclick={handleCancelMove}
-              data-id="cancel-move"
-            ></lightning-button>
-            <lightning-button
-              class="slds-var-m-left_x-small"
-              variant="brand"
-              label={labels.useForHouseholdButton}
-              onclick={handleConfirmMove}
-              disabled={moveBusy}
-              data-id="confirm-move"
-            ></lightning-button>
-          </div>
-        </div>
-      </template>
-
-      <template lwc:if={isMovingEveryone}>
-        <div class="slds-box slds-var-m-top_small" data-id="update-everyone-confirm">
-          <h3 class="slds-text-heading_small slds-var-m-bottom_small">
-            {labels.updateEveryoneTitle}
-          </h3>
-          <template lwc:if={hasMoving}>
-            <p>{labels.updateEveryoneMoving}</p>
-            <ul class="slds-list_dotted slds-var-m-bottom_small">
-              <template for:each={move.moving} for:item="person">
-                <li key={person.id} data-id="moving-person">{person.name}</li>
-              </template>
-            </ul>
-          </template>
-          <template lwc:else>
-            <p class="slds-var-m-bottom_small" data-id="nobody-moving">
-              {labels.updateEveryoneNobody}
-            </p>
-          </template>
-          <template lwc:if={hasWithTheirOwn}>
-            <p>{labels.updateEveryoneOwn}</p>
-            <template for:each={move.withTheirOwn} for:item="person">
-              <lightning-input
-                key={person.id}
-                type="checkbox"
-                label={person.name}
-                data-id={person.id}
-                onchange={handleTick}
-                class="own-address-person"
-              ></lightning-input>
-            </template>
-          </template>
-          <div class="slds-var-m-top_small">
-            <lightning-button
-              label={labels.cancelButton}
-              onclick={handleCancelMove}
-              data-id="cancel-move"
-            ></lightning-button>
-            <lightning-button
-              class="slds-var-m-left_x-small"
-              variant="brand"
-              label={labels.updateEveryoneButton}
-              onclick={handleConfirmMove}
-              disabled={moveBusy}
-              data-id="confirm-move"
-            ></lightning-button>
-          </div>
         </div>
       </template>
 

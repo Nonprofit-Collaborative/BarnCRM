@@ -172,7 +172,7 @@ private class ImportRecordIdMatchTest {
                 Name = 'Lopez Household',
                 RecordTypeId = recordTypeId('Household')
             );
-            insert new List<Account>{ organization, household };
+            Database.insert(new List<Account>{ organization, household }, AccessLevel.SYSTEM_MODE);
             Contact ana = new Contact(LastName = 'Lopez');
             insert ana;
             Map<String, String> personIsAnAccount = row(organization.Id, 'Lopez', null);

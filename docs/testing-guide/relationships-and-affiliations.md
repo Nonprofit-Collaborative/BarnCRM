@@ -12,7 +12,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Harper Garcia**. | The **Relationships** card reads **No relationships on file yet.** |
+| 1 | Open **Harper Garcia**. | The **Relationships** card shows **No Relationships Yet** with an **Add Relationship** button. |
 | 2 | Select **Add Relationship**. | A **New Relationship** form opens with Related Person, Type, Status, Start Date, End Date and Description. |
 | 3 | Choose Related Person **Luis Garcia**, Type **Spouse**, leave Status **Current**, and select **Add Relationship** in the form. | Toast **Relationship saved, and the other person's record now shows it too.** The card shows **Luis Garcia**, **Spouse**, with no badge. |
 | 4 | Open **Luis Garcia**. | His card shows **Harper Garcia**, **Spouse**. |
@@ -99,7 +99,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open Harper Garcia. | The **Affiliations** card reads **No affiliations on file yet.** |
+| 1 | Open Harper Garcia. | The **Affiliations** card shows **No Affiliations Yet** with an **Add Affiliation** button. |
 | 2 | Select **Add Affiliation**: Organization **Bayview Hardware**, Role `Store Manager`, tick **Primary**, Start Date January 1 last year. Save with **Add Affiliation** in the form. | Toast **Affiliation saved.** The line shows Bayview Hardware, the role Store Manager, and a **Primary** badge. **Primary Affiliation** on Harper reads **Bayview Hardware**. |
 | 3 | Open **Bayview Hardware** from **Organizations**. | Its **Affiliations** card shows Harper Garcia. |
 | 4 | On Harper, add **Heritage Rotary Club**, Role `Club president`, tick **Primary**. | The **Primary** badge moves to Heritage Rotary Club; Bayview Hardware shows **Make Primary**. **Primary Affiliation** reads Heritage Rotary Club. |

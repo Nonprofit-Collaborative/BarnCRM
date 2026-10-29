@@ -475,7 +475,7 @@ private class PersonErasureTest {
             isolate();
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact jordan = HouseholdTestDataFactory.newContact('Jordan', 'Lee');
             Contact sam = HouseholdTestDataFactory.newContact('Sam', 'Lee');
             insert new List<Contact>{ jordan, sam };

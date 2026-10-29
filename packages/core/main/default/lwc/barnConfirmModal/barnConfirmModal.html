@@ -5,6 +5,33 @@
     <template for:each={detailLines} for:item="line">
       <p key={line.key} class="slds-var-m-top_x-small" data-id="detail">{line.text}</p>
     </template>
+    <template lwc:if={hasItems}>
+      <ul class="slds-list_dotted slds-var-m-top_x-small" data-id="items">
+        <template for:each={itemLines} for:item="item">
+          <li key={item.key}>{item.text}</li>
+        </template>
+      </ul>
+    </template>
+    <template lwc:if={hasChoices}>
+      <lightning-radio-group
+        class="slds-show slds-var-m-top_small"
+        label={choicesLabel}
+        options={choices}
+        value={chosen}
+        onchange={handleChoice}
+        data-id="choices"
+      ></lightning-radio-group>
+    </template>
+    <template lwc:if={hasChecks}>
+      <lightning-checkbox-group
+        class="slds-show slds-var-m-top_small"
+        label={checksLabel}
+        options={checks}
+        value={ticked}
+        onchange={handleChecks}
+        data-id="checks"
+      ></lightning-checkbox-group>
+    </template>
     <template lwc:if={asksToType}>
       <lightning-input
         class="slds-show slds-var-m-top_small"

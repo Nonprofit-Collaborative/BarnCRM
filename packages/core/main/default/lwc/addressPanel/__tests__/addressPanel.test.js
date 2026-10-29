@@ -13,6 +13,7 @@ import getMovePreview from '@salesforce/apex/AddressMoveController.getMovePrevie
 import useForWholeHousehold from '@salesforce/apex/AddressMoveController.useForWholeHousehold';
 import updateEveryonesAddress from '@salesforce/apex/AddressMoveController.updateEveryonesAddress';
 import getCardFields from '@salesforce/apex/AddressMoveController.getCardFields';
+import BarnConfirmModal from 'c/barnConfirmModal';
 
 jest.mock(
   '@salesforce/apex/AddressMoveController.getCardFields',
@@ -242,8 +243,28 @@ describe('c-address-panel', () => {
     graphql.emit(response([]));
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="empty"]')).not.toBeNull();
+    const empty = element.shadowRoot.querySelector('[data-id="empty"]');
+    expect(empty.heading).toBe('c.Core_Address_EmptyHeading');
+    expect(empty.message).toBe('c.Core_Address_Empty');
     expect(element.shadowRoot.querySelectorAll('[data-id="address-card"]').length).toBe(0);
+
+    element.shadowRoot.querySelector('[data-id="empty-add"]').click();
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="add-form"]')).not.toBeNull();
+  });
+
+  it('draws each address as a card with a map pin, and offers no add to a reader', async () => {
+    const element = build();
+    graphql.emit(response([HOME]));
+    await flush();
+    const card = element.shadowRoot.querySelector('[data-id="address-card"]');
+    expect(card.querySelector('[data-id="address-icon"]').iconName).toBe('utility:location');
+
+    const reader = build('Account', READ_ONLY_ACCESS);
+    graphql.emit(response([]));
+    await flush();
+    expect(reader.shadowRoot.querySelector('[data-id="empty"]')).not.toBeNull();
+    expect(reader.shadowRoot.querySelector('[data-id="empty-add"]')).toBeNull();
   });
 
   it('shows a message when the addresses cannot be read', async () => {
@@ -455,18 +476,32 @@ describe('c-address-panel', () => {
       useForWholeHousehold.mockResolvedValue();
       await flush();
 
+      BarnConfirmModal.open.mockResolvedValueOnce(true);
       click(element, '.use-for-household');
       await flush();
-      expect(element.shadowRoot.querySelector('[data-id="household-picker"]')).toBeNull();
-      click(element, '[data-id="confirm-move"]');
       await flush();
 
+      const asked = BarnConfirmModal.open.mock.calls[0][0];
+      expect(asked.label).toBe('c.Core_Address_UseForHouseholdTitle');
+      expect(asked.details).toEqual(['c.Core_Address_UseForHouseholdDetail']);
+      expect(asked.choices).toBeUndefined();
       expect(useForWholeHousehold).toHaveBeenCalledWith({
         addressId: OWN.Id,
         householdId: GARCIA.id
       });
       expect(refresh).toHaveBeenCalledTimes(1);
-      expect(element.shadowRoot.querySelector('[data-id="use-for-household-confirm"]')).toBeNull();
+    });
+
+    it('changes nothing when the confirmation is cancelled', async () => {
+      const element = personWith([GARCIA]);
+      await flush();
+
+      BarnConfirmModal.open.mockResolvedValueOnce(false);
+      click(element, '.use-for-household');
+      await flush();
+      await flush();
+
+      expect(useForWholeHousehold).not.toHaveBeenCalled();
     });
 
     it('asks which household when the person belongs to several, their own first', async () => {
@@ -474,19 +509,17 @@ describe('c-address-panel', () => {
       useForWholeHousehold.mockResolvedValue();
       await flush();
 
+      BarnConfirmModal.open.mockResolvedValueOnce({ choice: GARCIA.id, checked: [] });
       click(element, '.use-for-household');
       await flush();
-      const picker = element.shadowRoot.querySelector('[data-id="household-picker"]');
-      expect(picker.options.map((option) => option.label)).toEqual([
+      await flush();
+
+      const asked = BarnConfirmModal.open.mock.calls[0][0];
+      expect(asked.choices.map((option) => option.label)).toEqual([
         'The Nowak Family',
         'The Garcia Family'
       ]);
-      expect(picker.value).toBe(NOWAK.id);
-
-      picker.dispatchEvent(new CustomEvent('change', { detail: { value: GARCIA.id } }));
-      click(element, '[data-id="confirm-move"]');
-      await flush();
-
+      expect(asked.choice).toBe(NOWAK.id);
       expect(useForWholeHousehold).toHaveBeenCalledWith({
         addressId: OWN.Id,
         householdId: GARCIA.id
@@ -516,24 +549,23 @@ describe('c-address-panel', () => {
       const element = household();
       await flush();
 
+      BarnConfirmModal.open.mockResolvedValueOnce({ checked: ['0031000000000002AA'] });
       click(element, '.update-everyone');
       await flush();
-      expect(getMovePreview).toHaveBeenCalledWith({ householdId: RECORD_ID });
-      const moving = element.shadowRoot.querySelectorAll('[data-id="moving-person"]');
-      expect(Array.from(moving).map((item) => item.textContent)).toEqual(['Luis Garcia']);
-      const owners = element.shadowRoot.querySelectorAll('.own-address-person');
-      expect(owners.length).toBe(2);
-
-      owners[0].checked = true;
-      owners[0].dispatchEvent(new CustomEvent('change'));
-      click(element, '[data-id="confirm-move"]');
       await flush();
+      expect(getMovePreview).toHaveBeenCalledWith({ householdId: RECORD_ID });
+      const asked = BarnConfirmModal.open.mock.calls[0][0];
+      expect(asked.message).toBe('c.Core_Address_UpdateEveryoneMoving');
+      expect(asked.items).toEqual(['Luis Garcia']);
+      expect(asked.checks).toEqual([
+        { label: 'Ana Garcia', value: '0031000000000002AA' },
+        { label: 'Sofia Garcia', value: '0031000000000003AA' }
+      ]);
 
       expect(updateEveryonesAddress).toHaveBeenCalledWith({
         householdId: RECORD_ID,
         alsoMove: ['0031000000000002AA']
       });
-      expect(element.shadowRoot.querySelector('[data-id="update-everyone-confirm"]')).toBeNull();
     });
 
     it('says so when everyone has an address of their own, and cancels', async () => {
@@ -541,13 +573,13 @@ describe('c-address-panel', () => {
       const element = household();
       await flush();
 
+      BarnConfirmModal.open.mockResolvedValueOnce(undefined);
       click(element, '.update-everyone');
       await flush();
-      expect(element.shadowRoot.querySelector('[data-id="nobody-moving"]')).not.toBeNull();
-
-      click(element, '[data-id="cancel-move"]');
       await flush();
-      expect(element.shadowRoot.querySelector('[data-id="update-everyone-confirm"]')).toBeNull();
+      expect(BarnConfirmModal.open.mock.calls[0][0].message).toBe(
+        'c.Core_Address_UpdateEveryoneNobody'
+      );
       expect(updateEveryonesAddress).not.toHaveBeenCalled();
     });
 
@@ -557,10 +589,11 @@ describe('c-address-panel', () => {
       const element = household();
       await flush();
 
+      BarnConfirmModal.open.mockResolvedValueOnce(true);
       click(element, '.update-everyone');
       await flush();
-      click(element, '[data-id="confirm-move"]');
       await flush();
+      expect(updateEveryonesAddress).toHaveBeenCalledWith({ householdId: RECORD_ID, alsoMove: [] });
 
       expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
         'Not allowed.'

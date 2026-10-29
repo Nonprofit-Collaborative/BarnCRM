@@ -37,7 +37,7 @@ private class InboundGiftAccessTest {
                 Name = 'Riverside Foundation',
                 OwnerId = integration.Id
             );
-            insert new List<Account>{ household, riverside };
+            Database.insert(new List<Account>{ household, riverside }, AccessLevel.SYSTEM_MODE);
             // Two people in one household, so a gift from Luis earns Maria an automatic household
             // soft credit (R-SC3, on by default), which the integration user's save creates.
             insert new List<Contact>{

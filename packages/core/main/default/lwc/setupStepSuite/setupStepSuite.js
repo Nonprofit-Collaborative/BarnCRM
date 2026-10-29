@@ -1,8 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import EDITION from '@salesforce/label/c.Core_SuiteChoice_EditionLabel';
-import COMMUNITY from '@salesforce/label/c.Core_SuiteChoice_CommunityOption';
-import IMPACT from '@salesforce/label/c.Core_SuiteChoice_ImpactOption';
-import CONFIRM from '@salesforce/label/c.Core_SetupAssistant_ConfirmButton';
+import CHOOSE_IN_FIRST_RUN from '@salesforce/label/c.Core_SuiteChoice_ChooseInFirstRun';
 import GIVING_INSTALLED from '@salesforce/label/c.Core_SuiteChoice_GivingInstalled';
 import GIVING_NEEDED from '@salesforce/label/c.Core_SuiteChoice_GivingNeeded';
 import INSTALL from '@salesforce/label/c.Core_SuiteChoice_InstallButton';
@@ -25,17 +23,16 @@ const EDITIONS_GUIDE =
  * Step one: which edition (C-30). Saving it installs nothing: with the Nonprofit Edition
  * saved and Giving not here, the step links to Salesforce's installer in a new tab and
  * offers Check again, so the administrator installs Giving herself
- * (0072-suite-choice-is-the-first-setup-step.md). The edition is chosen once: once saved,
- * the step shows it read-only and links to how to change it later (ADR-0124).
+ * (0072-suite-choice-is-the-first-setup-step.md). The edition is asked once, in first-run
+ * setup (c/firstRunModal): this step shows that same answer read-only and links to how to
+ * change it later, and never asks it a second time (ADR-0124).
  */
 export default class SetupStepSuite extends LightningElement {
   @api canEdit = false;
 
-  chosen;
-
   labels = {
     edition: EDITION,
-    confirm: CONFIRM,
+    chooseInFirstRun: CHOOSE_IN_FIRST_RUN,
     givingInstalled: GIVING_INSTALLED,
     givingNeeded: GIVING_NEEDED,
     install: INSTALL,
@@ -50,11 +47,6 @@ export default class SetupStepSuite extends LightningElement {
 
   changeHelpUrl = EDITIONS_GUIDE;
 
-  options = [
-    { label: COMMUNITY, value: COMMUNITY_SUITE },
-    { label: IMPACT, value: IMPACT_SUITE }
-  ];
-
   _suite = {};
 
   @api
@@ -64,18 +56,13 @@ export default class SetupStepSuite extends LightningElement {
 
   set suite(value) {
     this._suite = value || {};
-    this.chosen = this._suite.currentSuite || this._suite.recommendedSuite;
-  }
-
-  get isReadOnly() {
-    return !this.canEdit;
   }
 
   get giving() {
     return this._suite.giving || {};
   }
 
-  /** The saved edition's name, or null while none is saved and the choice is still offered. */
+  /** The saved edition's name, or null while none is saved (the first-run window asks it). */
   get savedName() {
     const saved = this._suite.currentSuite;
     if (saved === COMMUNITY_SUITE) {
@@ -98,14 +85,6 @@ export default class SetupStepSuite extends LightningElement {
 
   get docsUrl() {
     return this.giving.docsUrl;
-  }
-
-  handleChange(event) {
-    this.chosen = event.detail.value;
-  }
-
-  handleConfirm() {
-    this.dispatchEvent(new CustomEvent('confirm', { detail: { suite: this.chosen } }));
   }
 
   handleCheckAgain() {

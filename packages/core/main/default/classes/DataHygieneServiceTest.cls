@@ -101,7 +101,7 @@ private class DataHygieneServiceTest {
             insertWithoutAutomaticHouseholds(HouseholdTestDataFactory.manyContacts(3, 'Loose'));
             insert HouseholdTestDataFactory.newContact('Cy', 'Housed');
             Account household = HouseholdTestDataFactory.newHousehold('The Past Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact former = HouseholdTestDataFactory.newContact('Fay', 'Former');
             insertWithoutAutomaticHouseholds(new List<Contact>{ former });
             insert new Household_Member__c(
@@ -177,7 +177,7 @@ private class DataHygieneServiceTest {
             Account lived = HouseholdTestDataFactory.newHousehold('The Lived Family');
             accounts.add(lived);
             accounts.add(newOrganization('Acme Foundation'));
-            insert accounts;
+            Database.insert(accounts, AccessLevel.SYSTEM_MODE);
             Contact member = HouseholdTestDataFactory.newContact('Dee', 'Lived');
             member.AccountId = lived.Id;
             insert member;
@@ -202,7 +202,7 @@ private class DataHygieneServiceTest {
         System.runAs(TestUsers.admin()) {
             mode(HouseholdTestDataFactory.MODE_JUNCTION);
             Account household = HouseholdTestDataFactory.newHousehold('The Kept Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             // A membership is saved naming a person (R-M4); it comes to name nobody when that
             // person is deleted with the household automation off, which is how it happens.
             List<Contact> gone = insertWithoutAutomaticHouseholds(
@@ -277,7 +277,7 @@ private class DataHygieneServiceTest {
             for (Integer index = 0; index < 202; index++) {
                 households.add(HouseholdTestDataFactory.newHousehold('Family ' + index));
             }
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             List<Address__c> addresses = new List<Address__c>();
             for (Integer index = 0; index < 200; index++) {
                 Address__c missing = new Address__c(
@@ -340,7 +340,7 @@ private class DataHygieneServiceTest {
             mode(HouseholdTestDataFactory.MODE_CONTACT);
             Account first = HouseholdTestDataFactory.newHousehold('First Family');
             Account second = HouseholdTestDataFactory.newHousehold('Second Family');
-            insert new List<Account>{ first, second };
+            Database.insert(new List<Account>{ first, second }, AccessLevel.SYSTEM_MODE);
             insert new List<Address__c>{
                 new Address__c(
                     Account__c = first.Id,
@@ -382,7 +382,7 @@ private class DataHygieneServiceTest {
             mode(HouseholdTestDataFactory.MODE_CONTACT);
             Account first = HouseholdTestDataFactory.newHousehold('First Family');
             Account second = HouseholdTestDataFactory.newHousehold('Second Family');
-            insert new List<Account>{ first, second };
+            Database.insert(new List<Account>{ first, second }, AccessLevel.SYSTEM_MODE);
             insert new List<Address__c>{
                 new Address__c(
                     Account__c = first.Id,

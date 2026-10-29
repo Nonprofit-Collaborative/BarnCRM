@@ -35,6 +35,13 @@ finish it.
 2. Type `BarnCRM` and choose **BarnCRM**.
 3. The home page opens on the assistant, at the first step you have not finished.
 
+The **Setup Checklist** card lists every step at once, with how many are done ("3 of 9 steps
+done") under the title. Each step has a progress ring (a check mark when it is done, a warning
+mark when you skipped it) and a **Done**, **Skipped** or **To Do** badge. The open step expands
+in place under its name; click any other step's name to open that one instead. An open step has
+**Skip for Now**, then **Next** (**Finish** on the last step), and a **Where This Lives in
+Settings** link to the settings section its answers live in.
+
 When every step is done, the assistant collapses to a small **Setup Complete** tile that
 shows how many steps you finished. The tile has a **Reopen Setup** button, so the assistant
 is always one click away, and it opens straight back on the first step rather than on the
@@ -76,26 +83,26 @@ ready than to go and find:
 
 BarnCRM comes in two editions built from the same parts, and both include the full core suite of tools. Any organization can choose either
 one. You choose once: the edition decides which modules BarnCRM shows and offers everywhere
-(see [Editions](editions.md)). In a new install the edition is already chosen in the
-first-run setup window, so this step shows it read-only; the choice below appears only in an
-org where no edition was ever saved and the window was not shown.
+(see [Editions](editions.md)). The edition is asked in one place only, the first-run setup
+window, and this step shows that same answer: it never asks again. Until an edition is saved
+the step says "Choose the edition in the Set Up BarnCRM window, or in BarnCRM Settings,
+General." The moment the window is finished, the checklist reloads and marks this step
+**Done**.
 
 - **Standard Edition**: the full core suite of tools, including households, people, organizations, relationships, addresses,
   importing and everything else in BarnCRM Core. Nothing more to install.
 - **Nonprofit Edition**: everything in the Standard Edition, plus the nonprofit tools, starting with the Giving
   module for gifts, funds and receipts. Giving is a separate package.
 
-Choose one and click **Confirm and Continue**.
-
-- **Standard Edition:** the assistant moves on to step two.
+- **Standard Edition:** nothing more to do here. Click **Next**.
 - **Nonprofit Edition, Giving already installed:** the step says "Giving is installed. Its
   steps are part of this setup." Click **Next**.
-- **Nonprofit Edition, Giving not installed yet:** the step stays open and says "The
+- **Nonprofit Edition, Giving not installed yet:** the step says "The
   Nonprofit Edition needs the Giving module, which is not installed yet." Click **Open the
   Giving installer**. Salesforce's install screen opens in a new tab: choose who to install
   for (**Install for Admins Only** is the safe choice; you give people access in step five),
   click **Install**, and wait for the email that says it finished. Come back to this tab and
-  click **Check again**. The step now says Giving is installed, and Giving's own steps join
+  click **Check Again**. The step now says Giving is installed, and Giving's own steps join
   the assistant.
 
 BarnCRM never installs anything for you: Salesforce does not let one app install another, and
@@ -108,15 +115,14 @@ step seven also offers the nonprofit modules; with the Standard Edition, BarnCRM
 them.
 
 Once an edition is saved, this step shows it read-only ("Edition: Standard Edition", for
-example) instead of the choice, even after **Start again**. The **Edition** setting, in the
+example), even after **Start Setup Again**. The **Edition** setting, in the
 General section of BarnCRM Settings, shows the same choice; to change it later, follow
 [Editions](editions.md).
 
-**What Maria sees:** both editions, with **Nonprofit Edition** already selected because Giving
-is installed in her org. She clicks **Confirm and Continue**, reads "Giving is installed",
-and clicks **Next**.
+**What Maria sees:** step one already **Done**, because she chose **Nonprofit Edition** in the
+first-run window. The checklist opens on step two.
 
-**What she decides:** which edition fits her organization.
+**What she decides:** nothing here; the edition was her first-run answer.
 
 ### Step 2: Confirm How BarnCRM Fits Your Org
 
@@ -190,7 +196,7 @@ You get two pickers: the fund a gift belongs to when nobody says otherwise (usua
 general operating fund) and the appeal it is credited to (usually a general or unsolicited
 appeal). Choose them and click **Save**. The pickers only offer real funds and appeals, and
 anything else is refused, so a default can never point at the wrong kind of record. If you
-install Giving after finishing setup, this step appears as **To do** the next time you open
+install Giving after finishing setup, this step appears as **To Do** the next time you open
 the home page.
 
 A new org already has a **General Fund**, created at install and set as the default, so the
@@ -326,10 +332,11 @@ module's own gift entry screen: enter one gift, save it, and you have proved the
 works, from donor to household to gift. Come back to the home page afterwards and click
 **Finish**.
 
-Click **Finish**. The assistant shows the completion screen: every step with its status,
-and how long setup took, measured from the first change you made.
+Click **Finish**. The assistant shows the completion screen: a **You Are Ready** heading with a
+check illustration, every step with its status, and how long setup took, measured from the
+first change you made.
 
-**What Maria sees:** "You are ready", her nine steps, and "Time taken: 21 minutes". Two buttons sit
+**What Maria sees:** **You Are Ready**, her nine steps, and "Time taken: 21 minutes". Two buttons sit
 under the summary: **Reopen Setup** walks the steps again with her answers intact, and
 **Start Setup Again** forgets the progress it recorded so the checklist starts from the
 first step. Neither of them empties a setting: a step whose answer is already saved stays
@@ -337,7 +344,7 @@ finished, because it is.
 
 ## Common Mistakes
 
-- **Treating Skip for now as done.** Skipping moves you on without marking the step
+- **Treating Skip for Now as done.** Skipping moves you on without marking the step
   finished, on purpose. A skipped step shows a **Skipped** badge, not **Done**, and the next time you open
   the home page the assistant opens on it again.
 - **Marking coexistence mode and then changing your mind quietly.** Changing the mode later
@@ -352,7 +359,7 @@ finished, because it is.
 - **Expecting the assistant to install a module.** No app can install another package for
   you. Step one and step seven open Salesforce's installer in a new tab, where you click
   through the install yourself. A module's steps (Giving's, for example) appear once you
-  come back and click **Check again**, or reload the home page.
+  come back and click **Check Again**, or reload the home page.
 - **Choosing the Nonprofit Edition and closing the installer tab before it finishes.** The
   edition is saved, but Giving is not installed until Salesforce's install email arrives.
   Open the installer again from step one, or from step seven.

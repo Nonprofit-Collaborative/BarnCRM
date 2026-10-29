@@ -385,6 +385,22 @@
         <value>No Possible Duplicates</value>
     </labels>
     <labels>
+        <fullName>Core_Duplicates_Different</fullName>
+        <categories>Duplicates</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicates panel: badge on a value the two records of a pair differ on</shortDescription>
+        <value>Different</value>
+    </labels>
+    <labels>
+        <fullName>Core_Duplicates_Blank</fullName>
+        <categories>Duplicates</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicates panel: shown for an empty compared field</shortDescription>
+        <value>Blank</value>
+    </labels>
+    <labels>
         <fullName>Core_Duplicates_CountAlt</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>

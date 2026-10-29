@@ -25,6 +25,14 @@
         <value>Review</value>
     </labels>
     <labels>
+        <fullName>Core_DuplicateMatching_ReviewCount</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicate Matching: review tab name with the pairs waiting; {0} the count</shortDescription>
+        <value>Review ({0})</value>
+    </labels>
+    <labels>
         <fullName>Core_DuplicateMatching_NoAccess</fullName>
         <categories>DuplicateMatching</categories>
         <language>en_US</language>
@@ -41,12 +49,68 @@
         <value>Matching Logic</value>
     </labels>
     <labels>
+        <fullName>Core_MatchLogic_NewTitle</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: heading of the window that adds a source</shortDescription>
+        <value>New Match Source</value>
+    </labels>
+    <labels>
         <fullName>Core_MatchLogic_Intro</fullName>
         <categories>DuplicateMatching</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Matching Logic: what match sources are</shortDescription>
-        <value>Match sources pair people or households that share an email, phone or address kept on a related record, which your Salesforce duplicate rules cannot see. The duplicate scan, and people imports that match with your duplicate rules, use every active source.</value>
+        <value>Match sources pair people or households that share a value kept on a related record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchLogic_Help</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: help popover beside the intro line</shortDescription>
+        <value>Your Salesforce duplicate rules cannot see an email, phone or address kept on a related record; match sources can. The duplicate scan, and people imports that match with your duplicate rules, use every active source.</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchLogic_HelpAlt</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: screen reader name of the help icon</shortDescription>
+        <value>About match sources</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchLogic_Summary</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: source card summary; {0} field, {1} object, {2} comparison</shortDescription>
+        <value>{0} on {1}, compared as {2}</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchLogic_ShowDetails</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: button that shows a source card's details</shortDescription>
+        <value>Show Details</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchLogic_HideDetails</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: button that hides a source card's details</shortDescription>
+        <value>Hide Details</value>
+    </labels>
+    <labels>
+        <fullName>Core_MatchLogic_ActiveSwitch</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: screen reader name of a card's on and off switch; {0} the source</shortDescription>
+        <value>Active: {0}</value>
     </labels>
     <labels>
         <fullName>Core_MatchLogic_RulesNote</fullName>
@@ -201,28 +265,12 @@
         <value>Address: street without punctuation or capitals, common words shortened (Street to St), with the postal code</value>
     </labels>
     <labels>
-        <fullName>Core_MatchLogic_Activate</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: button that puts a source back in use</shortDescription>
-        <value>Activate</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchLogic_Deactivate</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: button that stops a source being used</shortDescription>
-        <value>Deactivate</value>
-    </labels>
-    <labels>
         <fullName>Core_MatchLogic_FindFields</fullName>
         <categories>DuplicateMatching</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Matching Logic: button that lists the object's fields</shortDescription>
-        <value>Find fields</value>
+        <value>Find Fields</value>
     </labels>
     <labels>
         <fullName>Core_MatchLogic_Try</fullName>
@@ -230,7 +278,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Matching Logic: button that opens the try a value box</shortDescription>
-        <value>Try a value</value>
+        <value>Try a Value</value>
     </labels>
     <labels>
         <fullName>Core_MatchLogic_TryValue</fullName>

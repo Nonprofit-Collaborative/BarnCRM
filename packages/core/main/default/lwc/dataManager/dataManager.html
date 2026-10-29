@@ -1,24 +1,26 @@
 <template>
-    <c-barn-page-shell title={labels.title} purpose={labels.intro} title-hidden data-id="shell"></c-barn-page-shell>
-
-    <lightning-card title={labels.toolsHeading} class="slds-var-m-top_small">
-        <div class="slds-var-p-horizontal_medium slds-grid slds-wrap slds-gutters_small">
-            <template for:each={tools} for:item="tool">
-                <div key={tool.key} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3 slds-var-p-bottom_small" data-id={tool.key}>
-                    <article class="slds-box slds-box_small">
-                        <h3 class="slds-text-heading_small">{tool.title}</h3>
-                        <p class="slds-var-m-vertical_x-small slds-text-body_small">{tool.text}</p>
-                        <lightning-button label={labels.open} aria-label={tool.openLabel} variant={tool.buttonVariant} data-tab={tool.tab} data-id={tool.key} onclick={handleOpen}></lightning-button>
-                    </article>
-                </div>
-            </template>
+    <c-barn-page-shell
+        title={labels.title}
+        purpose={labels.intro}
+        title-hidden
+        help-storage-key="dataManager"
+        data-id="shell"
+    >
+        <div slot="help" class="slds-var-p-bottom_small" data-id="help">
+            <p>{labels.helpChange}</p>
+            <p class="slds-var-m-top_xx-small">{labels.helpDelete}</p>
+            <c-barn-help learn-more-url={learnMoreUrl}></c-barn-help>
         </div>
-    </lightning-card>
 
-    <template lwc:if={isAdmin}>
-        <lightning-card title={labels.mappingsHeading} class="slds-var-m-top_small">
-            <div class="slds-var-p-horizontal_medium">
-                <p class="slds-text-body_small slds-var-m-bottom_small" data-id="mappings-intro">{labels.mappingsIntro}</p>
+        <c-barn-tool-grid groups={toolGroups} onselect={handleSelect} data-id="tools"></c-barn-tool-grid>
+
+        <template lwc:if={isAdmin}>
+            <section class="slds-var-m-top_medium" data-id="mappings-section">
+                <h2 class="slds-text-heading_small">{labels.mappingsHeading}</h2>
+                <div class="slds-grid slds-grid_vertical-align-center slds-wrap slds-var-m-vertical_x-small">
+                    <p class="slds-text-body_small slds-var-m-right_x-small" data-id="mappings-intro">{labels.mappingsIntro}</p>
+                    <c-barn-help learn-more-url={learnMoreUrl} data-id="mappings-help"></c-barn-help>
+                </div>
                 <template lwc:if={mappingsError}>
                     <p role="alert" class="slds-text-color_error" data-id="mappings-error">{mappingsError}</p>
                 </template>
@@ -32,25 +34,30 @@
                     ></lightning-datatable>
                 </template>
                 <template lwc:else>
-                    <p class="slds-text-body_small" data-id="mappings-empty">{labels.mappingsEmpty}</p>
+                    <c-barn-empty-state
+                        data-id="mappings-empty"
+                        illustration="no-data"
+                        heading={labels.mappingsEmpty}
+                        message={labels.mappingsEmptyHint}
+                    >
+                        <lightning-button
+                            data-id="create-template"
+                            label={labels.createTemplate}
+                            onclick={handleCreateTemplate}
+                        ></lightning-button>
+                    </c-barn-empty-state>
                 </template>
+            </section>
+        </template>
+
+        <div class="slds-var-m-top_medium">
+            <c-data-job-history></c-data-job-history>
+        </div>
+
+        <template lwc:if={isAdmin}>
+            <div class="slds-var-m-top_medium">
+                <c-barn-tool-grid groups={salesforceGroups} data-id="salesforce-tools"></c-barn-tool-grid>
             </div>
-        </lightning-card>
-    </template>
-
-    <div class="slds-var-m-top_small">
-        <c-data-job-history></c-data-job-history>
-    </div>
-
-    <template lwc:if={isAdmin}>
-        <lightning-card title={labels.salesforceHeading} class="slds-var-m-top_small">
-            <ul class="slds-var-p-horizontal_medium" data-id="salesforce-links">
-                <template for:each={salesforceLinks} for:item="link">
-                    <li key={link.key} class="slds-var-p-bottom_x-small">
-                        <a href={link.url} target="_blank" rel="noopener noreferrer">{link.label}</a>
-                    </li>
-                </template>
-            </ul>
-        </lightning-card>
-    </template>
+        </template>
+    </c-barn-page-shell>
 </template>

@@ -118,7 +118,7 @@ private class HealthCheckHouseholdChecksTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account empty = HouseholdTestDataFactory.newHousehold('The Empty Family');
             Account lived = HouseholdTestDataFactory.newHousehold('The Lived Family');
-            insert new List<Account>{ empty, lived };
+            Database.insert(new List<Account>{ empty, lived }, AccessLevel.SYSTEM_MODE);
             Contact member = HouseholdTestDataFactory.newContact('Dee', 'Lived');
             member.AccountId = lived.Id;
             insert member;
@@ -213,7 +213,7 @@ private class HealthCheckHouseholdChecksTest {
         System.runAs(TestUsers.admin()) {
             junctionModeKeepingEmptyHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Kept Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact erased = HouseholdTestDataFactory.newContact('Cy', 'Erased');
             insertWithoutAutomaticHouseholds(new List<Contact>{ erased });
             insert membership(erased.Id, household.Id, Date.today());
@@ -233,7 +233,7 @@ private class HealthCheckHouseholdChecksTest {
             junctionModeKeepingEmptyHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Kept Family');
             Account organization = newOrganization('Acme Foundation');
-            insert new List<Account>{ household, organization };
+            Database.insert(new List<Account>{ household, organization }, AccessLevel.SYSTEM_MODE);
 
             Contact noAccount = HouseholdTestDataFactory.newContact('Gus', 'Alone');
             Contact atOrganization = HouseholdTestDataFactory.newContact('Hal', 'Staff');
@@ -279,7 +279,7 @@ private class HealthCheckHouseholdChecksTest {
             junctionModeKeepingEmptyHouseholds();
             Account ended = HouseholdTestDataFactory.newHousehold('The Ended Family');
             Account kept = HouseholdTestDataFactory.newHousehold('The Kept Family');
-            insert new List<Account>{ ended, kept };
+            Database.insert(new List<Account>{ ended, kept }, AccessLevel.SYSTEM_MODE);
             Contact former = HouseholdTestDataFactory.newContact('Lu', 'Former');
             Contact present = HouseholdTestDataFactory.newContact('Mo', 'Present');
             insertWithoutAutomaticHouseholds(new List<Contact>{ former, present });

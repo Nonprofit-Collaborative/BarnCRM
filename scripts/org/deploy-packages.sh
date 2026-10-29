@@ -567,9 +567,10 @@ PYEOF
   fi
 }
 
-# deploy-packages.sh <alias> --adopt <deploy id>: run-org-tests.sh calls this after its own
-# RunRelevantTests deploy, which sends Apex already in the org from the same commit (and is rolled
-# back whole if a test fails), so the org still holds what the record says. The record takes that
+# deploy-packages.sh <alias> --adopt <deploy id>: for use after a deploy that resends Apex already
+# in the org from the same commit (and is rolled back whole if a test fails), so the org still
+# holds what the record says. No gate calls it now: the incremental gate runs its tests with
+# `sf apex run test` and deploys nothing after the staged deploy. The record takes that
 # deploy id as its newest only when the org's two newest DeployRequests are exactly that deploy
 # and the one recorded: anything else came in between, and the record is deleted.
 adopt_deploy() {

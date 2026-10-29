@@ -209,7 +209,12 @@ describe('c-affiliation-panel', () => {
     graphql.emit(response([]));
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="empty"]')).not.toBeNull();
+    const empty = element.shadowRoot.querySelector('[data-id="empty"]');
+    expect(empty.heading).toBe('c.Core_Affiliation_EmptyHeading');
+
+    element.shadowRoot.querySelector('[data-id="empty-add"]').click();
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="add-form"]')).not.toBeNull();
   });
 
   it('shows a message when the affiliations cannot be read', async () => {

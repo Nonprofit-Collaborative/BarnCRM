@@ -39,8 +39,8 @@ builder and checks it exactly as if it had been built by hand.
    **BarnCRM Find and Export** permission set (BarnCRM Settings, Access, Extra Permissions), alone or
    alongside their usual role. The permission opens the tool and nothing else: it never
    grants access to a record or field the person could not already see.
-2. Open **Find** from the **Data Manager** tab in the BarnCRM app: choose **Open** on the
-   **Find and Export Records** card. Find is not in the app's navigation.
+2. Open **Find** from the **Data Manager** tab in the BarnCRM app: choose the
+   **Find and Export Records** tile. Find is not in the app's navigation.
 3. Optional: open **BarnCRM Settings**, choose **Import**, and set **Export row limit**
    (default 50,000). An export stops at this many rows and says so. The limit is a
    convenience stop that keeps a file a size a spreadsheet opens, not a security control: a

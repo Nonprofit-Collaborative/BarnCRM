@@ -128,4 +128,44 @@
         <shortDescription>Hub home: what a screen reader says for the warning icon on a tile</shortDescription>
         <value>Warning</value>
     </labels>
+    <labels>
+        <fullName>Core_HubHome_BadgeOverdue</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hub home: badge on a nightly job tile that has run before and is now late</shortDescription>
+        <value>Overdue</value>
+    </labels>
+    <labels>
+        <fullName>Core_HubHome_ResumeAutomationLink</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hub home: link in the paused automation warning, for administrators</shortDescription>
+        <value>Resume Automation</value>
+    </labels>
+    <labels>
+        <fullName>Core_HubHome_QuickLinkHouseholdsLine</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hub home: the line on the Households quick link tile</shortDescription>
+        <value>Every household and its members.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HubHome_QuickLinkOrganizationsLine</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hub home: the line on the Organizations quick link tile</shortDescription>
+        <value>Every organization and its affiliations.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HubHome_QuickLinkSettingsLine</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hub home: the line on the BarnCRM Settings quick link tile</shortDescription>
+        <value>Every BarnCRM setting in one place.</value>
+    </labels>
 </CustomLabels>

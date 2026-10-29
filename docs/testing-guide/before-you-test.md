@@ -70,7 +70,7 @@ Do these in order.
 
 4. **First-run setup and the household catch-up.** The setup window (T-SA-01) shows to every
    user until someone with **Manage BarnCRM Settings** finishes it, and only that person gets
-   **Finish setup**; everyone else sees "An administrator needs to finish setting up
+   **Finish Setup**; everyone else sees "An administrator needs to finish setting up
    BarnCRM." Core was deployed to `mwdbdevsb` once before, so open **BarnCRM Settings**,
    **General** first: if no window shows, setup is finished and T-SA-01 is Skipped.
    **Warning:** turning **Household Upkeep** on (in first-run setup or in **General**) queues a
@@ -84,8 +84,8 @@ Do these in order.
    | Record | Create |
    |---|---|
    | Contact | **Harper Zztest**, email `harper.zztest1@example.org`, no account (this makes the household **The Zztest Family**) |
-   | Contact | **Luis Zztest**, added with **Add member** on The Zztest Family's **Members** panel; then edit the contact and set email `luis.zztest2@example.org` |
-   | Contact | **Diego Zztest**, added with **Add member** the same way |
+   | Contact | **Luis Zztest**, added with **Add Member** on The Zztest Family's **Members** panel; then edit the contact and set email `luis.zztest2@example.org` |
+   | Contact | **Diego Zztest**, added with **Add Member** the same way |
    | Address | On The Zztest Family, **Add Address** on the **Addresses** card: Type **Home**, `6830 Sunset Ln`, Springfield, IL, 62756, United States |
 
    The household then reads **3** members. **Wherever a

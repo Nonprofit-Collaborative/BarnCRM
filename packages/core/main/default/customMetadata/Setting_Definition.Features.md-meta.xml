@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">The Core features: Data Manager, Duplicate Matching, Org Optimizer and Health Check, household upkeep, addresses, relationships, affiliations and preferred email. A feature that is off has its tabs, settings and automations hidden. Turning one on is permanent.</value>
+    <value xsi:type="xsd:string">The Core features: Data Manager, Duplicate Matching, Org Optimizer and Health Check, household upkeep, addresses, relationships, affiliations and preferred email. A feature that is off has its pages, settings and automations hidden. Turning one on is permanent.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

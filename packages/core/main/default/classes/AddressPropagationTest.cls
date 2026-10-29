@@ -29,7 +29,7 @@ private class AddressPropagationTest {
     static void contactModeMembersGetTheHouseholdAddress() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             List<Contact> members = new List<Contact>{
                 AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id),
                 AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id),
@@ -73,7 +73,7 @@ private class AddressPropagationTest {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
             Account otherHousehold = AddressTestDataFactory.newHousehold('The Nowak Family');
-            insert new List<Account>{ garcia, otherHousehold };
+            Database.insert(new List<Account>{ garcia, otherHousehold }, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', otherHousehold.Id);
             insert ana;
 
@@ -127,7 +127,10 @@ private class AddressPropagationTest {
             Account personLikeAccount = AddressTestDataFactory.newHousehold('Ana Garcia');
             personLikeAccount.BillingStreet = MEMBER_OWN_STREET;
             personLikeAccount.BillingCity = MEMBER_OWN_CITY;
-            insert new List<Account>{ garcia, personLikeAccount };
+            Database.insert(
+                new List<Account>{ garcia, personLikeAccount },
+                AccessLevel.SYSTEM_MODE
+            );
 
             Test.startTest();
             AddressService.membersByHouseholdOverride = new Map<Id, Set<Id>>{
@@ -179,7 +182,7 @@ private class AddressPropagationTest {
     static void addressHandlerIgnoresASaveThatChangedNothingAboutTheAddress() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c home = new Address__c(
                 Account__c = garcia.Id,
                 Type__c = 'Home',
@@ -229,7 +232,7 @@ private class AddressPropagationTest {
     static void handlerContextsThatDoNothingAreSafeToCall() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             insert ana;
 
@@ -270,7 +273,7 @@ private class AddressPropagationTest {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
             garcia.BillingStreet = WINTER_STREET;
             garcia.BillingCity = WINTER_CITY;
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Account reloaded = [
                 SELECT
                     Id,
@@ -301,7 +304,7 @@ private class AddressPropagationTest {
     static void contactHandlerCapturesOnlyThePeopleWhoActuallyMoved() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             List<Contact> members = new List<Contact>{
                 AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id),
                 AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id)
@@ -332,7 +335,7 @@ private class AddressPropagationTest {
     static void aHouseholdBillingEditBecomesItsDefaultAndMovesTheMembers() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAt(HOME_STREET);
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             List<Contact> members = new List<Contact>{
                 AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id),
                 AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id)
@@ -376,7 +379,7 @@ private class AddressPropagationTest {
     static void barnCrmsOwnBillingWriteIsNotCapturedAgain() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAt(HOME_STREET);
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             update new Account(Id = garcia.Id, BillingStreet = WINTER_STREET);
 
             Test.startTest();
@@ -416,7 +419,7 @@ private class AddressPropagationTest {
                 household.Name = 'The Bulk Family ' + i;
                 households.add(household);
             }
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             List<Contact> members = new List<Contact>();
             for (Integer i = 0; i < TWO_HUNDRED; i++) {
                 members.add(AddressTestDataFactory.newContact('Ana', 'Bulk' + i, households[i].Id));
@@ -461,7 +464,7 @@ private class AddressPropagationTest {
     static void aBillingEditOnAHouseholdWithANativeGroupIsLeftAlone() {
         System.runAs(TestUsers.admin()) {
             Account nativeHousehold = householdAt(HOME_STREET);
-            insert nativeHousehold;
+            Database.insert(nativeHousehold, AccessLevel.SYSTEM_MODE);
             Contact member = AddressTestDataFactory.newContact(
                 'Maria',
                 'Garcia',
@@ -516,7 +519,7 @@ private class AddressPropagationTest {
     static void aMemberWithAnAddressOfTheirOwnStaysWhenTheHouseholdMoves() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAt(HOME_STREET);
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             insert new List<Contact>{ ana, luis };
@@ -548,7 +551,7 @@ private class AddressPropagationTest {
     static void theSeasonalSwapLeavesAMemberWithAnAddressOfTheirOwn() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAt(HOME_STREET);
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             insert new List<Contact>{ ana, luis };
@@ -591,7 +594,7 @@ private class AddressPropagationTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
             Account nowak = AddressTestDataFactory.newHousehold('The Nowak Family');
-            insert new List<Account>{ garcia, nowak };
+            Database.insert(new List<Account>{ garcia, nowak }, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Nowak');
             Contact luis = HouseholdTestDataFactory.newContact('Luis', 'Garcia');
             insert new List<Contact>{ ana, luis };
@@ -640,7 +643,7 @@ private class AddressPropagationTest {
         System.runAs(TestUsers.admin()) {
             useAddressUpdates(AddressService.BEHAVIOR_MANUAL);
             Account garcia = householdAt(HOME_STREET);
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             insert new List<Contact>{ ana, luis };
@@ -682,7 +685,7 @@ private class AddressPropagationTest {
         System.runAs(TestUsers.admin()) {
             useAddressUpdates(AddressService.BEHAVIOR_MANUAL);
             Account garcia = householdAt(HOME_STREET);
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             insert luis;
 
@@ -716,7 +719,7 @@ private class AddressPropagationTest {
         System.runAs(TestUsers.admin()) {
             useAddressUpdates(AddressService.BEHAVIOR_MANUAL);
             Account garcia = householdAt(HOME_STREET);
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             insert new List<Contact>{ ana, luis };
@@ -753,7 +756,7 @@ private class AddressPropagationTest {
         System.runAs(TestUsers.admin()) {
             useAddressUpdates(AddressService.BEHAVIOR_PERSONAL_ADDRESS);
             Account garcia = householdAt(HOME_STREET);
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             insert new List<Contact>{ ana, luis };

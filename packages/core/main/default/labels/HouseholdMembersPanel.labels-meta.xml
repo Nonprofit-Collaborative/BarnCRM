@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Core_HouseholdMembersPanel_ActionsFor</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Member actions menu for a screen reader; {0} is the member name</shortDescription>
+        <value>Actions for {0}</value>
+    </labels>
+    <labels>
         <fullName>Core_HouseholdMembersPanel_AddMember</fullName>
         <categories>Households</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Add member button</shortDescription>
-        <value>Add member</value>
+        <value>Add Member</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMembersPanel_AddSuccess</fullName>
@@ -38,7 +46,15 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>The household has no members yet</shortDescription>
-        <value>Nobody belongs to this household yet.</value>
+        <value>Add the people who belong to this household.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HouseholdMembersPanel_EmptyHeading</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading when the household has no members yet</shortDescription>
+        <value>No Members Yet</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMembersPanel_MoveHelp</fullName>
@@ -54,7 +70,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Move a person button</shortDescription>
-        <value>Move to another household</value>
+        <value>Move to Another Household</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMembersPanel_MoveSuccess</fullName>
