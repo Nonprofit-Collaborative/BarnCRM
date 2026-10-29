@@ -61,14 +61,16 @@ turned on, so finish first-run setup before you add or import people. An org upg
 earlier release keeps every feature on and is not held.
 
 - **Someone with the BarnCRM Admin role** (Manage BarnCRM Settings) sees two questions:
-  1. **Which edition**: Standard Edition or Nonprofit Edition (see [Editions](editions.md)).
-     This is the only place the edition is asked; the Setup Assistant's first step then shows
-     it read-only.
+  1. **Which edition**: two cards, **Standard Edition** and **Nonprofit Edition**, each with an
+     icon and one line (see [Editions](editions.md)). Click a card, or use the arrow keys.
+     This is the only place the edition is asked; the Setup Assistant's first step shows the
+     same answer and is marked **Done** as soon as you finish.
   2. **What to turn on**: **Turn on all the default core features** (every feature on, the
      usual choice), or **Let me choose features**, which lists the features described below,
-     all ticked. Untick what you do not want yet.
+     all ticked, each with a help icon. Untick what you do not want yet.
 
-  Click **Finish setup**. What you left ticked is turned on fully: its tabs, its settings and
+  The window is a standard Salesforce dialog: focus stays inside it, and Escape does not close
+  it. Click **Finish Setup**. What you left ticked is turned on fully: its tabs, its settings and
   its automations. Finishing also gives the tool tabs (Data Manager, Import, Find, Org
   Optimizer, Bulk Update) of every feature that is on to everyone holding a BarnCRM role, within
   a few minutes, and starts the nightly tab access check if it is not already scheduled. What

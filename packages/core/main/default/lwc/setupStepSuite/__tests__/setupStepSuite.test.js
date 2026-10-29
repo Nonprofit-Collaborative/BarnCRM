@@ -23,36 +23,15 @@ describe('c-setup-step-suite', () => {
     }
   });
 
-  it('offers both editions and preselects the recommendation', () => {
-    const element = build({
-      currentSuite: null,
-      recommendedSuite: 'Impact',
-      giving: { present: true, docsUrl: DOCS }
-    });
+  it('never asks the edition itself: the first-run window does', () => {
+    const element = build({ currentSuite: null, recommendedSuite: 'Impact', giving: {} });
 
-    const choice = find(element, 'suite-choice');
-    expect(choice.options.map((option) => option.value)).toEqual(['Community', 'Impact']);
-    expect(choice.value).toBe('Impact');
-  });
-
-  it('leaves a fresh org to choose for itself', () => {
-    const element = build({ currentSuite: null, recommendedSuite: null, giving: {} });
-
-    expect(find(element, 'suite-choice').value).toBeFalsy();
+    expect(find(element, 'choose-in-first-run').textContent).toBe(
+      'c.Core_SuiteChoice_ChooseInFirstRun'
+    );
+    expect(element.shadowRoot.querySelector('lightning-radio-group')).toBeNull();
+    expect(find(element, 'suite-saved')).toBeNull();
     expect(find(element, 'giving-needed')).toBeNull();
-  });
-
-  it('sends the chosen edition when Maria confirms', () => {
-    const element = build({ currentSuite: null, recommendedSuite: null, giving: {} });
-    const handler = jest.fn();
-    element.addEventListener('confirm', handler);
-
-    const choice = find(element, 'suite-choice');
-    choice.dispatchEvent(new CustomEvent('change', { detail: { value: 'Community' } }));
-    find(element, 'confirm').click();
-
-    expect(handler).toHaveBeenCalledTimes(1);
-    expect(handler.mock.calls[0][0].detail).toEqual({ suite: 'Community' });
   });
 
   it('links to the Giving installer in a new tab when the Nonprofit Edition needs it', () => {
@@ -104,18 +83,10 @@ describe('c-setup-step-suite', () => {
     expect(find(element, 'giving-installed')).toBeNull();
   });
 
-  it('lets David read the choice without saving it', () => {
-    const element = build({ currentSuite: null, recommendedSuite: 'Impact', giving: {} }, false);
-
-    expect(find(element, 'suite-choice').disabled).toBe(true);
-    expect(find(element, 'confirm')).toBeNull();
-  });
-
-  it('shows a saved edition read-only and no longer offers the choice', () => {
+  it('shows a saved edition read-only', () => {
     const element = build({ currentSuite: 'Community', giving: {} });
 
-    expect(find(element, 'suite-choice')).toBeNull();
-    expect(find(element, 'confirm')).toBeNull();
+    expect(find(element, 'choose-in-first-run')).toBeNull();
     expect(find(element, 'suite-saved').textContent).toContain('Core_SuiteChoice_StandardName');
     const help = find(element, 'change-help');
     expect(help.getAttribute('href')).toContain('docs/admin-guide/editions.md');
@@ -126,6 +97,5 @@ describe('c-setup-step-suite', () => {
     const element = build({ currentSuite: 'Impact', giving: { present: true, docsUrl: DOCS } });
 
     expect(find(element, 'suite-saved').textContent).toContain('Core_SuiteChoice_NonprofitName');
-    expect(find(element, 'suite-choice')).toBeNull();
   });
 });

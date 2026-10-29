@@ -4,7 +4,7 @@ Scripts for first-run setup, the Setup Assistant's steps, sample data load and r
 
 Before you start: an org from [Before you test](before-you-test.md), with every module deployed and sample data loaded unless a script says otherwise. T-SA-01 and T-SA-02 need fresh orgs of their own, because first-run setup shows only once.
 
-With Giving installed the assistant has nine steps; with Core alone it has eight and every step after **Confirm how households are named** moves up by one. Step numbers below are the nine-step ones.
+With Giving installed the assistant has nine steps; with Core alone it has eight and every step after **Confirm How Households Are Named** moves up by one. Step numbers below are the nine-step ones.
 
 ## T-SA-01: First-Run Setup, Every Feature On
 
@@ -14,15 +14,16 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff, open the **BarnCRM** app. | A window over the home page reads "An administrator needs to finish setting up BarnCRM." and nothing else. There is no **Finish setup** button. |
+| 1 | As staff, open the **BarnCRM** app. | A window over the home page reads "An administrator needs to finish setting up BarnCRM." and nothing else. There is no **Finish Setup** button. |
 | 2 | As staff, open the **BarnCRM Settings** tab. | The same window, with the same sentence. |
-| 3 | As admin, open the **BarnCRM** app. | A window titled **Set Up BarnCRM**: "Two questions before BarnCRM is ready. You are asked them once." It asks **Which edition?** and **What should BarnCRM turn on?** **Turn on all the default core features** is selected. Under them: "No module is installed now. Install modules later from BarnCRM Settings, Modules." |
-| 4 | Look at **Finish setup** before choosing an edition. | It is disabled. |
+| 3 | As admin, open the **BarnCRM** app. | A window titled **Set Up BarnCRM**: "Two questions before BarnCRM is ready. You are asked them once." It asks **Which edition?** as two cards, **Standard Edition** ("The full core suite of BarnCRM tools.") and **Nonprofit Edition** ("The core suite plus the nonprofit tools, starting with Giving."), each with an icon, and **What should BarnCRM turn on?** **Turn on all the default core features** is selected. Under them: "No module is installed now. Install modules later from BarnCRM Settings, Modules." The window has no close button. |
+| 4 | Look at **Finish Setup** before choosing an edition. | It is disabled. |
 | 5 | Press Escape, then press Tab several times. | The window stays open and focus stays inside it. |
-| 6 | Choose **Nonprofit Edition: the core suite plus the nonprofit tools, starting with the Giving module**. | **Finish setup** is enabled. |
-| 7 | Click **Finish setup**. | The window closes and **BarnCRM Settings** opens on **General**. Without reloading the browser page, **Edition** reads **Nonprofit Edition** (never "Not chosen yet"). Every row under **Features** says **On**. |
-| 8 | Open **Home**, then reload. | The window does not come back. The **Setup Checklist** shows. |
-| 9 | As staff, reload the home page. | No window. Staff sees **Welcome to BarnCRM** and **Quick Links**. |
+| 6 | Tab to the edition cards and press the Right arrow until **Nonprofit Edition** is selected. | The **Nonprofit Edition** card shows as selected. **Finish Setup** is enabled. |
+| 7 | Click **Finish Setup**. | The window closes and **BarnCRM Settings** opens on **General**. Without reloading the browser page, **Edition** reads **Nonprofit Edition** (never "Not chosen yet"). Every row under **Features** says **On**. |
+| 8 | Go back to the **Home** tab without reloading. | The **Setup Checklist** shows step 1, **Choose Your Edition**, as **Done**, and opens on step 2. The edition is not asked again. |
+| 9 | Reload **Home**. | The window does not come back. |
+| 10 | As staff, reload the home page. | No window. Staff sees **Welcome to BarnCRM** and **Quick Links**. |
 
 **Cleanup:** None. Delete the org when done (`sf org delete scratch --target-org <alias>-fr1`).
 
@@ -33,9 +34,9 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM** app. Choose **Standard Edition: the full core suite of BarnCRM tools**. | The **Set Up BarnCRM** window shows both questions. |
+| 1 | Open the **BarnCRM** app. Click the **Standard Edition** card. | The **Set Up BarnCRM** window shows both questions. |
 | 2 | Choose **Let me choose features**. | "Untick what you do not want yet. You can turn it on later in BarnCRM Settings, General. Turning a feature on cannot be undone." Eight ticked boxes: **Data Manager**, **Duplicate Matching**, **Org Optimizer and Health Check**, **Household Upkeep**, **Addresses**, **Relationships**, **Affiliations**, **Preferred Email and Phone**, each with a help icon describing it. |
-| 3 | Untick **Data Manager** and **Duplicate Matching**. Click **Finish setup**. | **BarnCRM Settings** opens on **General**. Without reloading the browser page, **Edition** reads **Standard Edition** (never "Not chosen yet"). **Data Manager** and **Duplicate Matching** show **Turn On**; the other six say **On**. |
+| 3 | Untick **Data Manager** and **Duplicate Matching**. Click **Finish Setup**. | **BarnCRM Settings** opens on **General**. Without reloading the browser page, **Edition** reads **Standard Edition** (never "Not chosen yet"). **Data Manager** and **Duplicate Matching** show **Turn On**; the other six say **On**. |
 | 4 | Wait a few minutes (the tab sync runs in the background), reload, and open the app's navigation menu. | **Data Manager** is not listed (nor **Find**, which opens from Data Manager). **Org Optimizer** is listed. |
 | 5 | Look at the **Sections** list. | **Import** is not listed. |
 | 6 | Open **Modules**. | **Core** and **BarnCRM Rollup Builder** only (no nonprofit module is offered in the Standard Edition). |
@@ -44,17 +45,17 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 
 ## T-SA-03: Walk the First Steps: Edition, Fit and Naming
 
-**Purpose:** confirm the edition shows read-only, the fit is detected, and Back, Next and Skip for now move between steps.
+**Purpose:** confirm the edition shows read-only, the fit is detected, and Back, Next and Skip for Now move between steps.
 **Prerequisites:** admin user, Person Accounts org, first-run setup finished with the Nonprofit Edition. If the home page shows **Setup Complete**, click **Start Setup Again** under **Reopen Setup** first (see T-SA-06).
 **Smoke:** yes
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **BarnCRM** app, **Home**. | A **Setup Checklist** card with progress "{n} of 9". The assistant opens on the first step not done (usually step 2, because the edition is already saved). **Setup Checklist** shows once, as the card title, and the only visible count is "{n} of 9" (a screen reader also hears the step number). |
-| 2 | Click **Back** until step 1, **Choose your edition**. | "Edition: **Nonprofit Edition**", "The edition is chosen once." and a **How to Change It Later** link. No edition choice and no **Confirm and Continue**. "Giving is installed. Its steps are part of this setup." **Back** is disabled. |
-| 3 | Click **Next**. | Step 2, **Confirm how BarnCRM fits your existing org**: "Your org uses Person Accounts. Household membership is tracked with one record per person, so a person can be in more than one household and everything you already have keeps working." **Recommended for your org**, and **How BarnCRM fits this org** set to **Standalone**. (On the platform-only shape: "This looks like a fresh org, with no other household model and no Person Accounts. BarnCRM can run on its own.") |
+| 2 | Click **Back** until step 1, **Choose Your Edition**. | "Edition: **Nonprofit Edition**", "The edition is chosen once." and a **How to Change It Later** link. No edition choice and no **Confirm and Continue**. "Giving is installed. Its steps are part of this setup." **Back** is disabled. |
+| 3 | Click **Next**. | Step 2, **Confirm How BarnCRM Fits Your Org**: "Your org uses Person Accounts. Household membership is tracked with one record per person, so a person can be in more than one household and everything you already have keeps working." **Recommended for your org**, and **How BarnCRM fits this org** set to **Standalone**. (On the platform-only shape: "This looks like a fresh org, with no other household model and no Person Accounts. BarnCRM can run on its own.") |
 | 4 | Open **How BarnCRM fits this org**. | Only **Standalone** (no NPSP or Nonprofit Cloud is in this org). |
-| 5 | Click **Confirm and Continue**. | Step 3, **Confirm how households are named**, opens with the household naming panel and its preview, and "This step finishes by itself once the setting it fills in has a value." **BarnCRM Settings**, **General**, **Coexistence mode** now reads **Standalone**. |
+| 5 | Click **Confirm and Continue**. | Step 3, **Confirm How Households Are Named**, opens with the household naming panel and its preview, and "This step finishes by itself once the setting it fills in has a value." **BarnCRM Settings**, **General**, **Coexistence mode** now reads **Standalone**. |
 | 6 | Click **Next**. | Step 4 (with Giving, the default fund and appeal step; with Core alone, the access step). |
 | 7 | Click **Skip for Now**. | The next step opens. |
 | 8 | Reload the page. | The assistant opens on the skipped step again (a skipped step is not finished). |
@@ -70,10 +71,10 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Go to step 5, **Give your colleagues access**. | **Person** and **Role** pickers, **Give Access**, a **Create a User in Setup** link and a **Set Up Automatic Access** link. |
+| 1 | Go to step 5, **Give Your Colleagues Access**. | **Person** and **Role** pickers, **Give Access**, a **Create a User in Setup** link and a **Set Up Automatic Access** link. |
 | 2 | Choose **Read Only Tester** in **Person** and **Read Only** in **Role**. Click **Give Access**. | "Access given. Add another person, or continue." |
 | 3 | Open **BarnCRM Settings**, **Access** in another tab. | **Read Only Tester** is on the **Read Only** card. |
-| 4 | Back in the assistant, click **Next**, to step 6, **Set your organization's identity**. | **Legal name, as registered** and an **Organization Address** block: **Street**, **Street 2**, **City**, **State** and **Zip Code** on one row, **Country**. No address box is marked required while the address is blank. With Giving, the receipt fields and upload buttons too, with the note "Uploaded files belong to the person who uploads them and stay attached to that person's user record, because Salesforce attaches every uploaded file to a record. Upload from an account that will stay active." |
+| 4 | Back in the assistant, click **Next**, to step 6, **Set Your Organization's Identity**. | **Legal name, as registered** and an **Organization Address** block: **Street**, **Street 2**, **City**, **State** and **Zip Code** on one row, **Country**. No address box is marked required while the address is blank. With Giving, the receipt fields and upload buttons too, with the note "Uploaded files belong to the person who uploads them and stay attached to that person's user record, because Salesforce attaches every uploaded file to a record. Upload from an account that will stay active." |
 | 5 | Enter `Riverside Test Trust` as the legal name and `1 Main St` in **Street**. **Street**, **City**, **State** and **Zip Code** become marked required. Click **Save**. | Nothing is saved: the required boxes are marked. |
 | 6 | Enter `Springfield` in **City**, `IL` in **State** and `62701` in **Zip Code**, leave **Street 2** and **Country** blank, and click **Save**. | The step finishes and the assistant moves on. |
 | 7 | Open **BarnCRM Settings**, **Organization**. | **Organization legal name** reads Riverside Test Trust; the **Organization Address** block shows 1 Main St, Springfield, IL, 62701. Open **General**: **Recent Changes** lists the name and the four address parts. |
@@ -87,22 +88,22 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Go to step 7, **Choose which modules to turn on**. | Core, BarnCRM Rollup Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Mirror, each **Present** or **Not installed** with **What this module does**. Then "To turn an installed module off or on, or to see what uninstalling one would delete, open the Modules section of BarnCRM Settings." |
-| 2 | Click **Next**. | Step 8, **Bring in your data**, with **Load the Sample Data** and **Import a Spreadsheet**. Step 7 shows as done. |
+| 1 | Go to step 7, **Choose Which Modules to Turn On**. | Core, BarnCRM Rollup Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Mirror, each **Present** or **Not installed** with **What this module does**. Then "To turn an installed module off or on, or to see what uninstalling one would delete, open the Modules section of BarnCRM Settings." |
+| 2 | Click **Next**. | Step 8, **Bring In Your Data**, with **Load the Sample Data** and **Import a Spreadsheet**. Step 7 shows as done. |
 | 3 | Click **Load the Sample Data**. | The **Sample Data** card opens inside the step with status **Loaded** and **Load Sample Data** disabled. |
 | 4 | Click **Import a Spreadsheet**. | The **Import** tab opens. Go back to **Home**. |
-| 5 | Click **Next** on step 8. | Step 8 shows as done. Step 9, **Check that everything works**, opens. With Giving, an **Enter Your First Gift** control is offered. The forward button reads **Finish**. |
+| 5 | Click **Next** on step 8. | Step 8 shows as done. Step 9, **Check That Everything Works**, opens. With Giving, an **Enter Your First Gift** control is offered. The forward button reads **Finish**. |
 
 **Cleanup:** None.
 
 ## T-SA-06: Finish, Reopen and Start Again
 
 **Purpose:** confirm the completion screen, the Setup complete tile, Reopen setup and Start setup again.
-**Prerequisites:** admin user, after T-SA-05, with every step before 9 done: go back to any step marked **To do** or **Skipped** and finish it (for the Giving step, pick a fund and an appeal and click **Save**).
+**Prerequisites:** admin user, after T-SA-05, with every step before 9 done: go back to any step marked **To Do** or **Skipped** and finish it (for the Giving step, pick a fund and an appeal and click **Save**).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On step 9, click **Finish**. | "You are ready", each step with a **Done** badge, "Time taken: {n} minutes", **Reopen Setup** and **Start Setup Again**. |
+| 1 | On step 9, click **Finish**. | **You Are Ready**, each step with a **Done** badge, "Time taken: {n} minutes", **Reopen Setup** and **Start Setup Again**. |
 | 2 | Reload **Home**. | A **Setup Complete** tile shows "9 of 9" and **Reopen Setup**. The welcome reads "Your households, people and organizations are in the tabs above." |
 | 3 | Click **Reopen Setup**. | The assistant opens on step 1 with your answers intact. |
 | 4 | Finish again to the completion screen. Click **Start Setup Again**. | The checklist starts from step 1. Steps whose setting already has a value (for example the identity step) still show as done. No setting is emptied: **BarnCRM Settings**, **Organization** still shows Riverside Test Trust. |
@@ -181,7 +182,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 |---|---|---|
 | 1 | Run `scripts/org/deploy-packages.sh <alias>-src --core-only`. | The output includes **== Running Core's post-install steps ==** with no error, and ends **== Every stage deployed ==**. |
 | 2 | Open the **BarnCRM** app as the admin who deployed. | The **Set Up BarnCRM** window shows, as in T-SA-01. |
-| 3 | Choose **Standard Edition: the full core suite of BarnCRM tools**, keep **Turn on all the default core features**, and click **Finish setup**. | **BarnCRM Settings** opens on **General**. Every row under **Features** says **On**. |
+| 3 | Click the **Standard Edition** card, keep **Turn on all the default core features**, and click **Finish Setup**. | **BarnCRM Settings** opens on **General**. Every row under **Features** says **On**. |
 | 4 | Wait a few minutes, reload, and open the app's navigation menu. | **Data Manager** is listed (**Find** opens from it). In Setup, **Scheduled Jobs** lists **BarnCRM Tab Access Check**. |
 | 5 | Open **BarnCRM Settings**, **Automation**. | The automation switches are listed. |
 | 6 | Run the deploy script from step 1 again. | It ends **== Every stage deployed ==**. In BarnCRM Settings, **Edition** still reads **Standard Edition**, every feature is still **On**, the setup window does not come back, and **Scheduled Jobs** still lists one **BarnCRM Tab Access Check**. |

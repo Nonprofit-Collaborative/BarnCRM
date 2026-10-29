@@ -1,11 +1,11 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { registerRefreshHandler, unregisterRefreshHandler } from 'lightning/refresh';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import getState from '@salesforce/apex/SetupAssistantController.getState';
 import completeStep from '@salesforce/apex/SetupAssistantController.completeStep';
 import skipStep from '@salesforce/apex/SetupAssistantController.skipStep';
 import resetSetup from '@salesforce/apex/SetupAssistantController.reset';
-import applySuite from '@salesforce/apex/SetupAssistantController.applySuite';
 import applyCoexistence from '@salesforce/apex/SetupAssistantController.applyCoexistence';
 import saveStepValues from '@salesforce/apex/SetupAssistantController.saveStepValues';
 import assignAccess from '@salesforce/apex/SetupAssistantController.assignAccess';
@@ -112,7 +112,20 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
   automaticAccessUrl = AUTOMATIC_ACCESS_GUIDE;
 
   connectedCallback() {
+    this.refreshHandlerId = registerRefreshHandler(this, this.refreshHandler);
     this.load();
+  }
+
+  disconnectedCallback() {
+    unregisterRefreshHandler(this.refreshHandlerId);
+  }
+
+  /**
+   * The page asked to refresh. First-run setup asks when it finishes, so the edition step
+   * shows the answer just given instead of asking it again.
+   */
+  refreshHandler() {
+    return this.load().then(() => true);
   }
 
   async load() {
@@ -408,17 +421,6 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
       this.focusStepHeading = false;
       heading.focus();
     }
-  }
-
-  // The Standard Edition, or the Nonprofit Edition with Giving already here, moves on. The
-  // Nonprofit Edition without Giving stays on the step, which now links to the installer.
-  handleSuiteConfirm(event) {
-    this.call(applySuite, { suite: event.detail.suite }, false, () => {
-      const saved = this.suite;
-      if (saved.currentSuite !== 'Impact' || (saved.giving && saved.giving.present)) {
-        this.advance();
-      }
-    });
   }
 
   // Re-reads what is installed without moving off the step, so Maria sees Giving arrive.

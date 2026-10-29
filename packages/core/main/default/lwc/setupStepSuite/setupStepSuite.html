@@ -16,25 +16,7 @@
         </p>
     </template>
     <template lwc:else>
-        <lightning-radio-group
-            name="suite"
-            label={labels.edition}
-            options={options}
-            value={chosen}
-            disabled={isReadOnly}
-            data-id="suite-choice"
-            onchange={handleChange}
-        ></lightning-radio-group>
-
-        <template lwc:if={canEdit}>
-            <lightning-button
-                class="slds-var-m-top_small"
-                variant="brand"
-                label={labels.confirm}
-                data-id="confirm"
-                onclick={handleConfirm}
-            ></lightning-button>
-        </template>
+        <p class="slds-text-body_regular" data-id="choose-in-first-run">{labels.chooseInFirstRun}</p>
     </template>
 
     <template lwc:if={isImpactSaved}>

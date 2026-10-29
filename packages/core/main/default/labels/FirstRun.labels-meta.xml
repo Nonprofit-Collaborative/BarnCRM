@@ -70,7 +70,23 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>First-run setup: the finish button</shortDescription>
-        <value>Finish setup</value>
+        <value>Finish Setup</value>
+    </labels>
+    <labels>
+        <fullName>Core_FirstRun_StandardLine</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First-run setup: the line on the Standard Edition card</shortDescription>
+        <value>The full core suite of BarnCRM tools.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FirstRun_NonprofitLine</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First-run setup: the line on the Nonprofit Edition card</shortDescription>
+        <value>The core suite plus the nonprofit tools, starting with Giving.</value>
     </labels>
     <labels>
         <fullName>Core_FirstRun_AdminNeeded</fullName>

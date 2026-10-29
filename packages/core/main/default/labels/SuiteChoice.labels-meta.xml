@@ -6,7 +6,15 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the name of the first step, the edition choice</shortDescription>
-        <value>Choose your edition</value>
+        <value>Choose Your Edition</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_ChooseInFirstRun</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: where the edition is asked, while none is saved</shortDescription>
+        <value>Choose the edition in the Set Up BarnCRM window, or in BarnCRM Settings, General.</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_StepDescription</fullName>
@@ -78,7 +86,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: how to finish installing Giving</shortDescription>
-        <value>Follow Salesforce's install screens in the new tab. When the install has finished, come back here and click Check again.</value>
+        <value>Follow Salesforce's install screens in the new tab. When the install has finished, come back here and click Check Again.</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_NoInstallLink</fullName>
@@ -94,7 +102,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the link to Giving's description</shortDescription>
-        <value>Read about Giving</value>
+        <value>Read About Giving</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_CheckAgain</fullName>
@@ -102,7 +110,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: re-read what is installed</shortDescription>
-        <value>Check again</value>
+        <value>Check Again</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_NewTab</fullName>

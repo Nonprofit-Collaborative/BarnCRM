@@ -70,7 +70,7 @@ Do these in order.
 
 4. **First-run setup and the household catch-up.** The setup window (T-SA-01) shows to every
    user until someone with **Manage BarnCRM Settings** finishes it, and only that person gets
-   **Finish setup**; everyone else sees "An administrator needs to finish setting up
+   **Finish Setup**; everyone else sees "An administrator needs to finish setting up
    BarnCRM." Core was deployed to `mwdbdevsb` once before, so open **BarnCRM Settings**,
    **General** first: if no window shows, setup is finished and T-SA-01 is Skipped.
    **Warning:** turning **Household Upkeep** on (in first-run setup or in **General**) queues a
