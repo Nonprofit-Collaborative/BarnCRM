@@ -22,7 +22,7 @@ You will find it in three places:
   The tile shows the count only, not the entries.
 - **The Org Optimizer tab, Errors section.** The **Error Log** card shows the count of new
   entries and the five most recent, each with its message and where it came from, an
-  **Open this entry** button and a **Mark acknowledged** button. The Errors section needs
+  **Open This Entry** button and a **Mark Acknowledged** button. The Errors section needs
   the Manage BarnCRM Settings permission (the BarnCRM Admin role).
 - **The Error Log tab** in the BarnCRM app. This is the full list, and you can sort
   it, filter it, and build reports on it like any other list in Salesforce.
@@ -72,7 +72,7 @@ If nothing new has arrived, no email is sent at all.
    scheduled and when it runs next: every morning at 7:00 AM in your organization's time zone, after the nightly jobs, so their
    problems are in it. A weekly digest checks every morning and sends once seven days have
    passed since the last one.
-5. Click **Send now** to try it. If there are new entries, the email arrives in a minute or
+5. Click **Send Now** to try it. If there are new entries, the email arrives in a minute or
    two; if not, the panel says there was nothing new and no email went out.
 
 The panel always shows when the digest last ran, what it did in one sentence (for example
@@ -110,7 +110,7 @@ Maria has heard from a colleague that "something did not save this morning."
 2. Open the **Org Optimizer** tab and choose **Errors**. The **Error Log** card shows
    "3 new" and the five most recent entries. Each shows the message and where it came
    from, for example "Household naming".
-3. Click **Open this entry** on the entry your colleague described. The record opens.
+3. Click **Open This Entry** on the entry your colleague described. The record opens.
 4. Read the **Message**. It is written for you, not for a developer: it says what went
    wrong and what to do about it, for example "This household could not be renamed because
    every member is marked deceased. Add a living member, or set a custom name on the

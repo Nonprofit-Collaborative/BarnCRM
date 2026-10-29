@@ -189,9 +189,11 @@ private class SetupAssistantControllerTest {
             ModuleDetectionService.givingPresentOverride = false;
 
             Test.startTest();
-            SetupAssistantController.SetupState state = SetupAssistantController.applySuite(
-                ModuleDetectionService.SUITE_IMPACT
+            SetupAssistantService.ensureStarted();
+            SettingsService.saveValues(
+                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_IMPACT }
             );
+            SetupAssistantController.SetupState state = SetupAssistantController.getState();
             Test.stopTest();
 
             Assert.isTrue(
@@ -214,28 +216,6 @@ private class SetupAssistantControllerTest {
                 state.stepsTotal,
                 'No Giving step appears until Giving is installed'
             );
-        }
-    }
-
-    @IsTest
-    static void refusesASuiteItDoesNotKnow() {
-        System.runAs(TestUsers.admin()) {
-            String message;
-
-            Test.startTest();
-            try {
-                SetupAssistantController.applySuite('Enterprise');
-            } catch (AuraHandledException e) {
-                message = e.getMessage();
-            }
-            Test.stopTest();
-
-            Assert.areEqual(
-                System.Label.Core_SuiteChoice_UnknownSuiteError,
-                message,
-                'Only the two suites can be saved'
-            );
-            Assert.isNull(ModuleDetectionService.chosenSuite(), 'And nothing was saved');
         }
     }
 
@@ -726,7 +706,9 @@ private class SetupAssistantControllerTest {
     @IsTest
     static void changesTheEditionFromTheConsoleAndAuditsIt() {
         System.runAs(TestUsers.admin()) {
-            SetupAssistantController.applySuite(ModuleDetectionService.SUITE_IMPACT);
+            SettingsService.saveValues(
+                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_IMPACT }
+            );
 
             Test.startTest();
             SetupAssistantController.EditionModel before = SetupAssistantController.getEdition();

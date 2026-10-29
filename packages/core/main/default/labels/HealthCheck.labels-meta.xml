@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that opens the Access page from a finding.</shortDescription>
-        <value>Open the Access page</value>
+        <value>Open the Access Page</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AccessNeedsAdminDetail</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that opens the automation settings from a finding.</shortDescription>
-        <value>Open automation settings</value>
+        <value>Open Automation Settings</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AutomationPausedDetail</fullName>
@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading of the box that asks before a fix runs.</shortDescription>
-        <value>Before this fix runs</value>
+        <value>Before This Fix Runs</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ConfirmIntro</fullName>
@@ -302,7 +302,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Fix button: reschedule deactivated owner jobs as me</shortDescription>
-        <value>Schedule them again as me</value>
+        <value>Schedule Them Again as Me</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_FixStale</fullName>
@@ -406,7 +406,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that switches household membership to the flexible way of belonging.</shortDescription>
-        <value>Switch to the flexible way of belonging</value>
+        <value>Switch to the Flexible Way of Belonging</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipTitle</fullName>
@@ -494,7 +494,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Fix button: schedule every nightly job that is not scheduled.</shortDescription>
-        <value>Schedule all nightly jobs</value>
+        <value>Schedule All Nightly Jobs</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NightlyJobsTitle</fullName>
@@ -542,7 +542,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that turns automatic household creation on.</shortDescription>
-        <value>Turn on automatic households</value>
+        <value>Turn On Automatic Households</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NoHouseholdCreationTitle</fullName>
@@ -726,7 +726,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Fix button: create the missing automation switches.</shortDescription>
-        <value>Restore automation switches</value>
+        <value>Restore Automation Switches</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_SwitchesMissingTitle</fullName>
@@ -750,7 +750,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Fix button: create the missing shipped import templates.</shortDescription>
-        <value>Restore import templates</value>
+        <value>Restore Import Templates</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_TemplatesMissingTitle</fullName>
@@ -782,7 +782,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Fix button on a coexistence mode finding.</shortDescription>
-        <value>Use recommended mode</value>
+        <value>Use Recommended Mode</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_UsersWithoutAccessDetail</fullName>
@@ -838,7 +838,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Fix button for the stopped digest finding.</shortDescription>
-        <value>Open Error Log settings</value>
+        <value>Open Error Log Settings</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_LastResult</fullName>

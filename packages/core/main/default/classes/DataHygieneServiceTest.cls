@@ -1,5 +1,5 @@
 /**
- * The Data Hygiene checks (C-28, canonical model R-SQ6): each one counted as the person in user
+ * The Data Quality checks (C-28, canonical model R-SQ6): each one counted as the person in user
  * mode over the same document Find runs, with 200-record cases, the records each check must not
  * count, junction mode's count without a Find query, and a refusal shown in place of a number.
  *

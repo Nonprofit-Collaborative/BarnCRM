@@ -294,7 +294,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: what Upsert by external ID does and risks</shortDescription>
-        <value>Finds the record by the ID field you choose and changes it, or creates one when no record has that value. Risk: a value typed into the wrong row changes the wrong record.</value>
+        <value>Updates the record matching the chosen ID field, or creates one. Risk: a wrong value changes the wrong record.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LoadMatchFieldLabel</fullName>

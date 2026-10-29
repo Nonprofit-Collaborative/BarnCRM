@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk delete: what the download holds</shortDescription>
-        <value>Saves every record this delete would delete as a CSV file, with every field you can see, so you keep a copy outside Salesforce. Related records deleted with them are not included.</value>
+        <value>Saves the records this delete would remove as a CSV, without related records.</value>
     </labels>
     <labels>
         <fullName>Core_BulkDelete_BackingUp</fullName>

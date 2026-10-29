@@ -365,7 +365,8 @@ describe('c-setup-assistant', () => {
     const link = element.shadowRoot.querySelector('[data-id="automatic-access-link"]');
     expect(link.href).toContain('docs/admin-guide/automatic-access.md');
     expect(link.target).toBe('_blank');
-    expect(link.textContent).toBe('c.Core_SetupAssistant_AutomaticAccessLink');
+    expect(link.textContent).toContain('c.Core_SetupAssistant_AutomaticAccessLink');
+    expect(link.textContent).toContain('c.Core_Kit_NewTab');
   });
 
   it('offers each role by its label, not its developer name', async () => {

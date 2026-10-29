@@ -77,11 +77,11 @@ yet.
    membership were still set to the person's account, the red finding **Household
    membership does not fit Person Accounts** would offer its own one-click fix.
 7. Under **Access** there is a red finding: **No one is assigned the BarnCRM Admin role**.
-   She clicks **Open the Access page**, which takes her to the Access section of BarnCRM
+   She clicks **Open the Access Page**, which takes her to the Access section of BarnCRM
    Settings, adds herself, and comes back to Health.
 8. Another finding is amber: **4 users cannot see the app**. Four active users have a
    Salesforce license but none of the BarnCRM roles, so the BarnCRM app is invisible to
-   them. She clicks **Open the Access page** again and assigns roles.
+   them. She clicks **Open the Access Page** again and assigns roles.
 9. She clicks **Re-Run**. The red finding is gone, the amber ones are gone, and what is left
    is blue: her org shape, the mode, and **Automation is running normally**.
 
@@ -157,7 +157,7 @@ Most buttons open a page. A button that changes something in your org works like
 1. The finding says exactly what the fix will do, counted from your org: for example, with
    Giving, **3 shipped totals are missing**, followed by their names (Total Gifts, Largest
    Gift, Last Gift Date) and what the fix will create.
-2. Click the button. A dialog headed **Before this fix runs** opens over the page and shows
+2. Click the button. A dialog headed **Before This Fix Runs** opens over the page and shows
    that sentence again with **Confirm** and **Cancel**. Nothing has changed yet. **Cancel**,
    the close button, or the Escape key closes it and takes you back to the button.
 3. Click **Confirm**. The fix runs, the panel says what it did (for example **Done. Created:
@@ -241,13 +241,13 @@ you can do to make the finding go away.
 **Leaving "no new person is getting a household" unfixed.** That red finding means household
 membership is set to the flexible mode and "create a household automatically" is off, so
 every person saved from now on is left without a household and nothing else says so. Click
-**Turn on automatic households** on the finding. If your org groups people another way and
+**Turn On Automatic Households** on the finding. If your org groups people another way and
 means to leave it off, the finding stays, and it stays red, because the people being saved
 today are the ones somebody has to group by hand later.
 
 **Ignoring the red membership finding in a Person Accounts org.** "Household membership does
 not fit Person Accounts" is red for a reason: in that state, new households are built through
-the person's account, which in a Person Accounts org is the person. Click **Switch to the flexible way of belonging** and the app fixes it for you. The longer it waits, the more households have to be
+the person's account, which in a Person Accounts org is the person. Click **Switch to the Flexible Way of Belonging** and the app fixes it for you. The longer it waits, the more households have to be
 sorted out afterward.
 
 **Fixing access by editing profiles.** Health Check counts the packaged roles the Access page
@@ -282,10 +282,10 @@ runs an automation whose switch is left over, so it does no harm.
 **Waiting for install to schedule the nightly jobs.** Nothing is scheduled when BarnCRM is
 installed, because a scheduled job runs as the person who scheduled it. Press **Schedule all
 nightly jobs** once, as the administrator the jobs should run as. If that person later leaves
-and is deactivated, Health Check says so: press **Schedule them again as me** on that finding.
+and is deactivated, Health Check says so: press **Schedule Them Again as Me** on that finding.
 
 **Wondering why "Nightly totals are not scheduled" has no button.** It explains what an
-unscheduled rollup run costs you. The button that fixes it is **Schedule all nightly jobs**, on
+unscheduled rollup run costs you. The button that fixes it is **Schedule All Nightly Jobs**, on
 the nightly jobs finding. The totals finding only appears while at least one total is set to
 Scheduled or Both.
 

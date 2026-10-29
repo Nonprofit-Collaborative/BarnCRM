@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Acknowledge action</shortDescription>
-        <value>Mark acknowledged</value>
+        <value>Mark Acknowledged</value>
     </labels>
     <labels>
         <fullName>Core_ErrorLogTile_Empty</fullName>
@@ -166,7 +166,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Open an error log entry</shortDescription>
-        <value>Open this entry</value>
+        <value>Open This Entry</value>
     </labels>
     <labels>
         <fullName>Core_ErrorLogTile_ReadOnly</fullName>

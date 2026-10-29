@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: About This Tool text</shortDescription>
-        <value>Each section runs only when you open it, so the page opens quickly however large your org is. Health Check runs only when you press Run Health Check. Nothing changes unless you press a button that says so.</value>
+        <value>Sections run when opened, so the page opens fast. Nothing changes unless a button says so.</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_GroupData</fullName>

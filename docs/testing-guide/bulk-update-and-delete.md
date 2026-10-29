@@ -18,7 +18,7 @@ Test contacts for the delete scripts: create three contacts with first names `De
 |---|---|---|
 | 1 | Open **Find**. Choose **Contact**, add **First Name**, **Last Name** and **Title**, add the condition **Last Name** **equals** `Garcia`, and select **Run**. | The Garcia contacts are listed. Note the count N from "N rows found." |
 | 2 | Open **Change Records** and choose **Bulk Update**. | A panel **Bulk Update** opens under the buttons, with the path **Choose Changes**, **Confirm**, **Run**: "Change up to five fields on every record this query returns, with your own access. Nothing changes until you confirm." |
-| 3 | Under **Changes**, choose **Title** in **Field**, **Set to a value** in **What to do**, and type `test title` in **New Value**. | The change is complete. **Add a change** is enabled. |
+| 3 | Under **Changes**, choose **Title** in **Field**, **Set to a value** in **What to do**, and type `test title` in **New Value**. | The change is complete. **Add a Change** is enabled. |
 | 4 | Select **Preview**. | "N records match. The first ones, before and after:" and a table with **Record**, **Before** (empty) and **After** (`test title`) for up to five records. The four columns are equal width, and a long value wraps onto more lines inside its cell instead of stretching the table past the panel. |
 | 5 | Type a number other than N in **Type the number of records to confirm**. | The **Update N records** button stays disabled. |
 | 6 | Type N. | **Update N records** is enabled. |
@@ -68,7 +68,7 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Set **Title** to `assistant coach` on Harper Garcia and Luis Garcia. In Find, query Contact where **Title** **equals** `assistant coach` and **Run**. | Two rows. |
-| 2 | Select **Bulk Update**. Choose **Title**, **Change with steps**, select **Add a change** and choose **Capitalize each word**. Select **Preview**. | "2 records match..." with **Before** `assistant coach` and **After** `Assistant Coach`. |
+| 2 | Select **Bulk Update**. Choose **Title**, **Change with steps**, select **Add a Change** and choose **Capitalize each word**. Select **Preview**. | "2 records match..." with **Before** `assistant coach` and **After** `Assistant Coach`. |
 | 3 | Type `2` and select **Update 2 records**. | "2 matched: 2 updated, 0 already held the new values, 0 failed." Both titles read `Assistant Coach`. |
 | 4 | In Find, query **Account** where **Account Name** **equals** `The Garcia Family` and **Run**. Select **Bulk Update**, choose **Account Name**, **Set to a value**, `Renamed Household`, **Preview**, type `1`, and select **Update 1 records**. | The summary counts 1 failed, listed under **Records that failed, and why** with "This is a household, and household naming keeps its name, so it was left as it was. To name it yourself, check Custom name on the household." |
 | 5 | Open The Garcia Family. | The name is unchanged. |

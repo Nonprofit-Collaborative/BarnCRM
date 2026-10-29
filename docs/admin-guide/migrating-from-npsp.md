@@ -26,7 +26,7 @@ If one is missing (an install that logged a problem, for example), add it from H
 2. The report opens (click **Re-Run** if it is from earlier). A finding reads "3 shipped
    import templates are missing" (a higher number if other shipped templates are missing too)
    and names them.
-3. Select **Restore import templates**. Your own templates, and any shipped template you have
+3. Select **Restore Import Templates**. Your own templates, and any shipped template you have
    edited, are not touched.
 4. Open the **Import** tab. The list now has **NPSP: contacts**, **NPSP: opportunities and
    payments** and **NPSP: organization payments**.

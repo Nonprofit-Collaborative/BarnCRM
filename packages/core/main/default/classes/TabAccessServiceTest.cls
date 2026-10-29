@@ -31,7 +31,7 @@ private class TabAccessServiceTest {
                 held.contains(TabAccessService.DATA_MANAGER_TAB),
                 'And the Data Manager hub'
             );
-            Assert.isTrue(held.contains(TabAccessService.DATA_HYGIENE_TAB), 'And Data Hygiene');
+            Assert.isTrue(held.contains(TabAccessService.DATA_HYGIENE_TAB), 'And Org Optimizer');
             Assert.isFalse(held.contains(TabAccessService.IMPORT_TAB), 'But not Import');
             Assert.isFalse(held.contains(TabAccessService.BULK_UPDATE_TAB), 'Nor Bulk Update');
             Assert.isFalse(
@@ -137,7 +137,7 @@ private class TabAccessServiceTest {
             Assert.areEqual(
                 new Set<String>{ TabAccessService.DATA_HYGIENE_TAB },
                 tabSetsOf(userId(PRIYA)),
-                'Turning Org Optimizer on gives Data Hygiene, and Data Manager stays hidden'
+                'Turning Org Optimizer on gives the Org Optimizer tab, and Data Manager stays hidden'
             );
         }
     }

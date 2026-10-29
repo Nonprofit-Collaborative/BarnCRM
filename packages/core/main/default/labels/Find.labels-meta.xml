@@ -398,7 +398,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that keeps the saved query instead of deleting it.</shortDescription>
-        <value>Keep it</value>
+        <value>Keep It</value>
     </labels>
     <labels>
         <fullName>Core_Find_DeletedNotice</fullName>

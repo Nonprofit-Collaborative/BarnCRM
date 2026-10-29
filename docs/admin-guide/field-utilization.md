@@ -39,7 +39,7 @@ Start from the sample data (see [Sample data](sample-data.md)).
 4. Choose **Save Utilization Snapshot**. Small text under the button says "Keeps this count so
    your next count shows what changed." The page reads, for example, "Saved 112 counts."
 5. Open any sample organization and fill in its **Website**. Go back to the section and choose
-   **Count again**. The Website row for Organization now shows a higher percentage, **Saved**
+   **Count Again**. The Website row for Organization now shows a higher percentage, **Saved**
    shows the percentage you saved in step 4, and **Change (Points)** shows how many percentage
    points it moved since then.
 

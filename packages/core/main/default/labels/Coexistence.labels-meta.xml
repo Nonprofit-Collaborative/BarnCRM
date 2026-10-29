@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check finding: button that opens the household settings</shortDescription>
-        <value>Open household settings</value>
+        <value>Open Household Settings</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleAsAccountsTitle</fullName>

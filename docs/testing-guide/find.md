@@ -15,7 +15,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open the **Find** tab. | Under the page header: "Find records, then export them, save the query, or change them all at once." and **New Query**. On a first visit **About This Tool** is open with "Choose an object, the columns and conditions, then run, save or export. Find shows only what your own access allows." and **Learn More**. **Object** and **Saved queries** pickers, and an empty state **Choose What to Find**: "Pick an object, or open a saved query, to start." |
 | 2 | In **Object**, choose **Contact**. | **Columns** (with **Available fields** and **Columns, in order**), **Add fields from**, **Conditions**, **Sort by** and **Rows to show** appear. **Conditions** reads "No conditions yet, so every record matches." |
 | 3 | In **Columns**, move **First Name**, **Last Name** and **Email** to **Columns, in order**. | The three fields are listed in that order. |
-| 4 | Under **Conditions**, select **Add condition**. Choose **Last Name**, **equals**, and type `Garcia`. | The condition is complete; no message under it. |
+| 4 | Under **Conditions**, select **Add Condition**. Choose **Last Name**, **equals**, and type `Garcia`. | The condition is complete; no message under it. |
 | 5 | Open **Show Query** (closed until you open it). Read **Query (read only)**, and point at its help icon. | It shows a SOQL query on Contact with a WHERE clause on LastName equal to Garcia. The help reads "The query Find runs, in SOQL, for anyone who wants to check it or copy it. To type or paste a query instead, use Type a query." |
 | 6 | In **Sort by**, choose **First Name**; in **Direction**, **Ascending**. Select **Run**. | The table lists the Garcia contacts sorted by first name, including Harper Garcia and Luis Garcia. Under **Results**, the line above it reads "N rows found." with N the number of rows. |
 | 7 | Change the condition value to `Nobodyzz` and select **Run**. | An empty state **No Matching Records**: "No records match these conditions." |
@@ -30,7 +30,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Remove every column and select **Run**. | "Choose at least one column." Nothing runs. |
-| 2 | Add **First Name** back. Select **Add condition** and leave the field empty. Select **Run**. | The condition shows "Choose a field." and the page says "Fix the conditions marked below, then try again." |
+| 2 | Add **First Name** back. Select **Add Condition** and leave the field empty. Select **Run**. | The condition shows "Choose a field." and the page says "Fix the conditions marked below, then try again." |
 | 3 | Choose **Last Name**, **equals**, and leave the value empty. Select **Run**. | The condition shows "Enter a value." |
 | 4 | Change the condition to **Birthdate**, **is in the last N days**, value `0`. | "Enter a whole number of days from 1 to 3650." |
 | 5 | Change the condition to **Last Name**, **equals**, `Garcia`. Add a second condition **First Name**, **equals**, `Harper`. Tick **Use custom condition logic** and type `1` in **Condition logic**. | "The condition logic must use every condition. Add condition 2 to it, or remove the condition." |
@@ -47,7 +47,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **Find**, choose **Account**, and add **Account Name** to the columns. | Shown in **Columns, in order**. |
-| 2 | Under **Related records**, select **Add related records**. Choose **Has related records** in **Which records**, and the Contacts option in **Kind of related record**. | **Conditions on the related records (none means any related record)** appears. |
+| 2 | Under **Related Records**, select **Add Related Records**. Choose **Has related records** in **Which records**, and the Contacts option in **Kind of related record**. | **Conditions on the related records (none means any related record)** appears. |
 | 3 | Add a related condition **First Name**, **equals**, `Harper`, and select **Run**. | The results include **The Garcia Family** and no household without a Harper. |
 | 4 | Under **Related Record Columns**, select **Add a Related Record Column**. Choose the Contacts option and add **First Name** to **Fields to show (up to 5)**. Select **Run**. | A new column lists each household's contacts' first names in one cell, for example Harper and Luis on The Garcia Family. |
 | 5 | Change **Which records** to **Has no related records**, remove the related condition, and select **Run**. | Only accounts with no contacts are listed (for example sample organizations with no people); The Garcia Family is not listed. |
@@ -99,7 +99,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Log in as staff, open **Find**, and open **Saved queries**. | **Test Garcias** is listed as "Test Garcias (shared by" plus the admin's name. **Test Garcias copy** is not listed. |
 | 6 | As staff, open the shared query and select **Run**. | The same Garcia rows. **Save** and, in the menu next to it, **Delete** are disabled for it; **Save As** is enabled. |
 | 7 | As admin, open **Test Garcias** and choose **Delete** in the menu next to **Save**. | A dialog "Delete this saved query?" says "Test Garcias will be deleted. This cannot be undone." and "This query is shared with everyone who uses Find. Deleting it removes it for all of them." |
-| 8 | Select **Keep it**. | The dialog closes; the query is still listed. |
+| 8 | Select **Keep It**. | The dialog closes; the query is still listed. |
 | 9 | Choose **Delete** again, then **Delete** in the dialog. | "Deleted Test Garcias." It is gone from **Saved queries** for admin and staff. |
 
 **Cleanup:** delete **Test Garcias copy**; remove **BarnCRM Find and Export** from staff.
@@ -111,11 +111,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Find**, choose **Contact**, and select **Type a query**. | A **Query (SOQL)** box starting with the query shown below the conditions, and **Use this query**. |
-| 2 | Type `SELECT FirstName, LastName FROM Contact WHERE LastName = 'Garcia' ORDER BY FirstName LIMIT 50` and select **Use this query**. | The builder shows object Contact, the two columns, the condition Last Name equals Garcia, sort by First Name, and 50 rows to show. **Run** lists the Garcias. |
-| 3 | Type `SELECT LastName FROM Contact WHERE LastName = 'A' AND FirstName = 'B' OR Email = null` and select **Use this query**. | "Add brackets where AND and OR are mixed, for example A AND (B OR C)." The builder is unchanged. |
-| 4 | Type `SELECT LastName, COUNT(Id) FROM Contact GROUP BY LastName` and select **Use this query**. | Refused with a message starting "Find queries do not support this:" and ending "Use Summarize for totals and groups." |
-| 5 | Clear the box and select **Use this query**. | "Type a query first." |
+| 1 | Open **Find**, choose **Contact**, and select **Type a Query**. | A **Query (SOQL)** box starting with the query shown below the conditions, and **Use This Query**. |
+| 2 | Type `SELECT FirstName, LastName FROM Contact WHERE LastName = 'Garcia' ORDER BY FirstName LIMIT 50` and select **Use This Query**. | The builder shows object Contact, the two columns, the condition Last Name equals Garcia, sort by First Name, and 50 rows to show. **Run** lists the Garcias. |
+| 3 | Type `SELECT LastName FROM Contact WHERE LastName = 'A' AND FirstName = 'B' OR Email = null` and select **Use This Query**. | "Add brackets where AND and OR are mixed, for example A AND (B OR C)." The builder is unchanged. |
+| 4 | Type `SELECT LastName, COUNT(Id) FROM Contact GROUP BY LastName` and select **Use This Query**. | Refused with a message starting "Find queries do not support this:" and ending "Use Summarize for totals and groups." |
+| 5 | Clear the box and select **Use This Query**. | "Type a query first." |
 
 **Cleanup:** none.
 

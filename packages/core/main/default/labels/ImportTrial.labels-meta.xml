@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import preview: what a trial import does and why</shortDescription>
-        <value>The preview writes nothing, so a validation rule, a required field or one of your org's flows is first met when rows are saved. Import only the first rows for real, check them, then import the rest into the same import; one undo removes both.</value>
+        <value>The preview saves nothing. Import a few rows first to meet your rules and flows, then the rest.</value>
     </labels>
     <labels>
         <fullName>Core_Import_TrialRowsLabel</fullName>

@@ -208,7 +208,7 @@ choose to save anyway.
 5. Back on the Duplicates panel, refresh. The pair is gone.
 6. If the scan found two households, choose **Merge Households** on the pair. You see the two
    side by side, the fields where they disagree, and which one is kept. Choose the household to
-   keep and choose **Merge these two**. You see "The two households are now one."
+   keep and choose **Merge These Two**. You see "The two households are now one."
 7. For a pair that is not the same person, for example twin sisters at one address, choose
    **Not a Duplicate**, type a short reason, and confirm. You see "Noted. This pair will not be
    suggested again." Scan again and check that the pair does not come back. It stays off the

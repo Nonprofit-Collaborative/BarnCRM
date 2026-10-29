@@ -37,7 +37,7 @@ You should see: the **Households** list with the household name, **Member Count*
 2. In **Object**, choose what to look for, for example **Contact** or **Account**.
 3. In **Columns**, move the fields you want from **Available fields** to **Columns, in
    order**. To add a field from a related record, choose it in **Add fields from**.
-4. Under **Conditions**, press **Add condition**. Choose a **Field**, an **Operator** (such as
+4. Under **Conditions**, press **Add Condition**. Choose a **Field**, an **Operator** (such as
    **equals**, **contains**, **is blank**, **is one of** or **is in the last N days**) and a
    **Value**. Add more conditions the same way.
 5. Optional: with two or more conditions, tick **Use custom condition logic** and type, for
@@ -54,7 +54,7 @@ prompt. **Show Query**, closed at first, holds the query in SOQL. You never need
 
 ## To Keep Only Records That Have (or Lack) Related Records
 
-1. Under **Related records**, press **Add related records**.
+1. Under **Related Records**, press **Add Related Records**.
 2. Choose **Has related records** or **Has no related records**.
 3. Choose the **Kind of related record**, for example gifts on a household.
 4. Optional: add conditions on those related records.
@@ -87,7 +87,7 @@ queries**. Queries shared with you show the sharer's name, for example "Springfi
 ## To Delete a Saved Query
 
 1. Open the query from **Saved queries**, open the menu next to **Save** and choose **Delete**.
-2. In "Delete this saved query?", press **Delete**, or **Keep it** to leave it.
+2. In "Delete this saved query?", press **Delete**, or **Keep It** to leave it.
 
 You should see: "Deleted" followed by the name. This cannot be undone. A shared query is
 removed for everyone.
@@ -106,9 +106,9 @@ Salesforce **Files**, **Owned by Me**. Delete them there once downloaded.
 
 ## To Type a Query Instead (Optional)
 
-1. Press **Type a query**.
+1. Press **Type a Query**.
 2. Type or paste a query in **Query (SOQL)** (SELECT, FROM, WHERE, ORDER BY and LIMIT).
-3. Press **Use this query**.
+3. Press **Use This Query**.
 
 You should see: the builder filled in from your text, ready to run.
 

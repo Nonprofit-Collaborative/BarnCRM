@@ -25,14 +25,6 @@
         <value>Set Up Automatic Access</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_BackButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: button that goes back one step</shortDescription>
-        <value>Back</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_CompleteHeading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -230,7 +222,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: how to add an installed module's tabs to the BarnCRM apps</shortDescription>
-        <value>Each module also keeps its own app. To have a module's pages in the BarnCRM apps as well, add the pages listed under it: in Setup, open App Manager, click Edit next to the app, open Navigation Items, move the pages to Selected Items, and click Save. Skip any page that is already there.</value>
+        <value>In App Manager, edit an app and add the pages to its Navigation Items.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ModulePresent</fullName>
@@ -279,14 +271,6 @@
         <protected>false</protected>
         <shortDescription>Setup progress: {0} finished steps out of {1} in all</shortDescription>
         <value>{0} of {1} steps done</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_ProgressLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the accessible label of the progress count</shortDescription>
-        <value>Setup progress</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ReadOnlyNotice</fullName>
@@ -414,7 +398,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: what step one is for</shortDescription>
-        <value>If your org uses Person Accounts, household membership uses the flexible way of belonging, with one membership record per person, so that what you already have keeps working. Confirm that here, or choose a different fit.</value>
+        <value>If you use Person Accounts, membership uses one flexible record per person. Confirm it, or choose another fit.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step1Label</fullName>
@@ -505,14 +489,6 @@
         <value>Check That Everything Works</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_StepCounterLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the accessible label of the step counter</shortDescription>
-        <value>Step</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_ToDoBadge</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -550,7 +526,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: what happens to an uploaded logo or signature file</shortDescription>
-        <value>Uploaded files belong to the person who uploads them and stay attached to that person's user record, because Salesforce attaches every uploaded file to a record. Upload from an account that will stay active.</value>
+        <value>Uploaded files stay attached to the uploader's user record, so upload from an account that will stay active.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_UserLabel</fullName>

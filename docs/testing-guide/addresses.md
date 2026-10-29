@@ -88,11 +88,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Addresses**. | **Seasonal Addresses** is not ticked. The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** It has **Run the swap now** and no **Schedule Nightly Run** or **Stop Nightly Run** button. |
+| 1 | Open **BarnCRM Settings**, **Addresses**. | **Seasonal Addresses** is not ticked. The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** It has **Run the Swap Now** and no **Schedule Nightly Run** or **Stop Nightly Run** button. |
 | 2 | Tick **Seasonal Addresses** and choose **Save**. Do not refresh the page. | **Your settings are saved.** The section now reads **The swap runs every night at 12:30 AM, in your organization's time zone.** with the next run date below. |
 | 2a | Untick **Seasonal Addresses** and choose **Save**, then tick it and **Save** again. | After the untick the section reads **Seasonal Addresses is off...** with no next run date. After the second save it reads **The swap runs every night...** again, and **Health Check** does not list the swap as unscheduled. |
 | 3 | Edit the Phoenix address so its season runs from yesterday to a date next month. | Saved. |
-| 4 | Select **Run the swap now**. | **The swap has started. Refresh this page in a minute to see what it did.** |
+| 4 | Select **Run the Swap Now**. | **The swap has started. Refresh this page in a minute to see what it did.** |
 | 5 | Wait a minute and refresh. | **Seasonal Addresses Last Swapped** shows a time a minute ago and **1 moved to a seasonal address, 0 moved back, 0 could not be changed.** |
 | 6 | Open The Garcia Family. | **Primary** is on Phoenix; Billing Address reads Phoenix; the Home address record has **Replaced By Seasonal** ticked. |
 | 7 | Open **Home**. | The **Seasonal Addresses Last Swapped** tile shows the same time and sentence. |
@@ -107,7 +107,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Set the Phoenix address's end month and day to yesterday and save. | Saved. |
-| 2 | **BarnCRM Settings**, **Addresses**, **Run the swap now**, wait a minute, refresh. | **0 moved to a seasonal address, 1 moved back, 0 could not be changed.** |
+| 2 | **BarnCRM Settings**, **Addresses**, **Run the Swap Now**, wait a minute, refresh. | **0 moved to a seasonal address, 1 moved back, 0 could not be changed.** |
 | 3 | Open The Garcia Family. | **Primary** is back on the Home address; Billing Address reads Springfield. |
 | 4 | Untick **Seasonal Addresses** and choose **Save**. | The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** |
 
@@ -122,7 +122,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | On the household, add a **Home** address `1 Year Round Test St`. | It is the first address, so it gets **Primary** at once. |
 | 2 | Add a **Work** address `2 Work Test St`, then two **Seasonal** addresses whose seasons both cover today. | Both save. |
-| 3 | **Run the swap now** and refresh after a minute. | The summary counts one move. The **Error Log** has a warning: **Two seasonal addresses for the same household or person cover today, so BarnCRM used the one that was added first.** The first seasonal address is the primary. |
+| 3 | **Run the Swap Now** and refresh after a minute. | The summary counts one move. The **Error Log** has a warning: **Two seasonal addresses cover today, so BarnCRM used the first added. Change one's dates.** The first seasonal address is the primary. |
 | 4 | Delete both seasonal addresses. | **Primary** goes to a non-seasonal address (the most recently created: 2 Work Test St), never a seasonal one. |
 
 **Cleanup:** delete Ada Testaddr, the household and its addresses.
@@ -137,7 +137,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open The Garcia Family. | The **Addresses** card lists the addresses. |
 | 2 | Look at a non-primary address. | It shows no **Set as Primary** button. The **Primary** badge still shows on the primary one. |
 | 3 | Look at the card header. | There is no **Add Address** button. |
-| 4 | Open **BarnCRM Settings**, **Addresses**. | The last run shows; **Seasonal Addresses** and **Run the swap now** are disabled, with **You can see when the swap last ran. Running it needs the Manage BarnCRM Settings permission.** |
+| 4 | Open **BarnCRM Settings**, **Addresses**. | The last run shows; **Seasonal Addresses** and **Run the Swap Now** are disabled, with **You can see when the swap last ran. Running it needs the Manage BarnCRM Settings permission.** |
 
 **Cleanup:** None.
 
@@ -196,7 +196,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 2 | Set **Address Updates** to **Nobody moves until you choose** and save. | Saved. |
 | 3 | On Harper Garcia, change Mailing Street to `14 Manual Test Ct` and save. | Harper's **Addresses** card has a 14 Manual Test Ct card with **Primary**. The Garcia Family's primary is still Sunset Ln, and Luis still reads Sunset Ln. |
 | 4 | On The Garcia Family's **Details**, change Billing Street to `27 Manual Billing Ave` and save. | A new **Home** card, 27 Manual Billing Ave, carries **Primary**, and Billing Address shows it. Luis still reads **Sunset Ln**. |
-| 5 | Set the Phoenix address's dates so today falls inside them (as in T-ADDR-06 step 3), then in **BarnCRM Settings**, **Addresses**, choose **Run the swap now** and refresh after a minute. | **Primary** is on Phoenix, and Luis reads Phoenix: the swap still moves him. Harper still reads 14 Manual Test Ct. |
+| 5 | Set the Phoenix address's dates so today falls inside them (as in T-ADDR-06 step 3), then in **BarnCRM Settings**, **Addresses**, choose **Run the Swap Now** and refresh after a minute. | **Primary** is on Phoenix, and Luis reads Phoenix: the swap still moves him. Harper still reads 14 Manual Test Ct. |
 
 **Cleanup:** set **Address Updates** back to **Everyone in the household moves together** and save. Put the Phoenix dates back to January 1 to March 31 and run the swap again. On the household, **Set as Primary** on the Sunset Ln card, then delete the 27 Manual Billing Ave address. Delete Harper's 14 Manual Test Ct address and set her Mailing Street back to 6830 Sunset Ln.
 
@@ -279,7 +279,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Set the Phoenix address's dates so today falls inside them (as in T-ADDR-06 step 3) and choose **Run the swap now** in **BarnCRM Settings**, **Addresses**. Refresh after a minute. | **Primary** is on Phoenix. Sunset Ln is still with the addresses in use, not under **Former Addresses**, and neither card shows a date. |
+| 1 | Set the Phoenix address's dates so today falls inside them (as in T-ADDR-06 step 3) and choose **Run the Swap Now** in **BarnCRM Settings**, **Addresses**. Refresh after a minute. | **Primary** is on Phoenix. Sunset Ln is still with the addresses in use, not under **Former Addresses**, and neither card shows a date. |
 | 2 | Put the Phoenix dates back to January 1 to March 31 and run the swap again. | **Primary** is back on Sunset Ln. Still no **Former Addresses** group. |
 | 3 | Set the Phoenix dates so today falls inside them again, then mark Phoenix **Former** from its status menu, and run the swap. | **Primary** stays on Sunset Ln: a Former seasonal address is not swapped in. |
 

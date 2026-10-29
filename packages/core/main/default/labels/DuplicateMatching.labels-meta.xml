@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Matching Logic: help popover beside the intro line</shortDescription>
-        <value>Your Salesforce duplicate rules cannot see an email, phone or address kept on a related record; match sources can. The duplicate scan, and people imports that match with your duplicate rules, use every active source.</value>
+        <value>Match sources see an email, phone or address on a related record, which duplicate rules cannot.</value>
     </labels>
     <labels>
         <fullName>Core_MatchLogic_HelpAlt</fullName>
