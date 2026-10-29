@@ -84,7 +84,7 @@ private class GiftTriggerHandlerTest {
                 Name = 'The Okafor Family',
                 RecordTypeId = householdTypes[0].Id
             );
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             Gift__c gift = GivingTestDataFactory.buildAccountGift(household.Id, 500);

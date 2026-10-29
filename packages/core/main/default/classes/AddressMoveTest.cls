@@ -25,7 +25,7 @@ private class AddressMoveTest {
     static void usingAPersonsAddressMovesTheHouseholdAndBringsThemBack() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             insert new List<Contact>{ ana, luis };
@@ -70,7 +70,7 @@ private class AddressMoveTest {
         System.runAs(TestUsers.admin()) {
             useAddressUpdates('Manual');
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             insert new List<Contact>{ ana, luis };
@@ -96,7 +96,7 @@ private class AddressMoveTest {
             Account garcia = householdAtHome('The Garcia Family');
             Account nowak = householdAtHome('The Nowak Family');
             Account stranger = householdAtHome('The Okafor Family');
-            insert new List<Account>{ garcia, nowak, stranger };
+            Database.insert(new List<Account>{ garcia, nowak, stranger }, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Nowak');
             Contact luis = HouseholdTestDataFactory.newContact('Luis', 'Garcia');
             insert new List<Contact>{ ana, luis };
@@ -153,7 +153,7 @@ private class AddressMoveTest {
     static void aHouseholdsOwnAddressIsNotAPersonsToUse() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c householdAddress = [
                 SELECT Id
                 FROM Address__c
@@ -183,7 +183,7 @@ private class AddressMoveTest {
             for (Integer index = 0; index < TWO_HUNDRED; index++) {
                 households.add(householdAtHome('Household ' + index));
             }
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             List<Contact> people = new List<Contact>();
             for (Account household : households) {
                 people.add(AddressTestDataFactory.newContact('Ana', household.Name, household.Id));
@@ -223,7 +223,7 @@ private class AddressMoveTest {
         System.runAs(TestUsers.admin()) {
             useAddressUpdates('Manual');
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             Contact sofia = AddressTestDataFactory.newContact('Sofia', 'Garcia', garcia.Id);
@@ -273,7 +273,7 @@ private class AddressMoveTest {
     static void updateEveryonesAddressNeedsAPrimary() {
         System.runAs(TestUsers.admin()) {
             Account empty = AddressTestDataFactory.newHousehold('The Empty Family');
-            insert empty;
+            Database.insert(empty, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             String refusal;
@@ -296,7 +296,7 @@ private class AddressMoveTest {
             for (Integer index = 0; index < TWO_HUNDRED; index++) {
                 households.add(householdAtHome('Household ' + index));
             }
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             List<Contact> people = new List<Contact>();
             for (Account household : households) {
                 people.add(AddressTestDataFactory.newContact('Luis', household.Name, household.Id));
@@ -331,7 +331,7 @@ private class AddressMoveTest {
         System.runAs(TestUsers.admin()) {
             useAddressUpdates('Manual');
             garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             insert new List<Contact>{ ana, luis };

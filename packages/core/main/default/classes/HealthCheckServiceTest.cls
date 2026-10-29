@@ -242,7 +242,7 @@ private class HealthCheckServiceTest {
             // way would join her to the household with a membership record.
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact maria = HouseholdTestDataFactory.newContact('Maria', 'Garcia');
             maria.AccountId = household.Id;
             insert maria;

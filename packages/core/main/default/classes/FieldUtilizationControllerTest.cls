@@ -136,7 +136,7 @@ private class FieldUtilizationControllerTest {
                     household.Phone = i < 20 ? '555-0199' : null;
                     accounts.add(household);
                 }
-                insert accounts;
+                Database.insert(accounts, AccessLevel.SYSTEM_MODE);
                 Test.startTest();
                 chunk = countOne(ACCOUNT_TYPE, PHONE);
                 Test.stopTest();
@@ -166,7 +166,7 @@ private class FieldUtilizationControllerTest {
                         HouseholdTestDataFactory.newHousehold('The Barn ' + i + ' Family')
                     );
                 }
-                insert accounts;
+                Database.insert(accounts, AccessLevel.SYSTEM_MODE);
                 Test.startTest();
                 chunk = countOne(ACCOUNT_TYPE, 'RecordTypeId');
                 Test.stopTest();

@@ -177,6 +177,14 @@
         <value>{0} will be turned on for everyone, with its tabs, settings and automations. It can't be turned off again.</value>
     </labels>
     <labels>
+        <fullName>Core_Feature_HouseholdUpkeep_ConfirmNote</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Added to the confirmation before Household Upkeep is turned on.</shortDescription>
+        <value>It adds the Households tab. Create households with New Household on BarnCRM Home, not the standard New button.</value>
+    </labels>
+    <labels>
         <fullName>Core_Feature_Cancel</fullName>
         <categories>Core</categories>
         <language>en_US</language>

@@ -176,7 +176,7 @@ private class HouseholdServiceTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
@@ -205,7 +205,7 @@ private class HouseholdServiceTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
@@ -275,7 +275,7 @@ private class HouseholdServiceTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
             Account household = HouseholdTestDataFactory.newHousehold('The Bulk Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Bulk');
             for (Contact person : people) {
                 person.AccountId = household.Id;
@@ -339,7 +339,7 @@ private class HouseholdServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account smiths = HouseholdTestDataFactory.newHousehold('The Smith Family');
             Account garcias = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert new List<Account>{ smiths, garcias };
+            Database.insert(new List<Account>{ smiths, garcias }, AccessLevel.SYSTEM_MODE);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             maria.AccountId = garcias.Id;
             insert maria;
@@ -374,7 +374,7 @@ private class HouseholdServiceTest {
             household.Primary_Contact__c = maria.Id;
 
             Test.startTest();
-            Database.SaveResult result = Database.insert(household, false);
+            Database.SaveResult result = Database.insert(household, false, AccessLevel.SYSTEM_MODE);
             Test.stopTest();
 
             Assert.isFalse(result.isSuccess(), 'The new household is refused');
@@ -580,7 +580,7 @@ private class HouseholdServiceTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             insert john;
             insert new Household_Member__c(
@@ -628,7 +628,7 @@ private class HouseholdServiceTest {
                 HouseholdTestDataFactory.newHousehold('The Smith Family'),
                 HouseholdTestDataFactory.newHousehold('The Garcia Family')
             };
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             insert john;
             insert new Household_Member__c(
@@ -780,7 +780,7 @@ private class HouseholdServiceTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             insert new List<Contact>{
                 new Contact(
                     Salutation = 'Mr.',
@@ -845,7 +845,7 @@ private class HouseholdServiceTest {
                 HouseholdTestDataFactory.newHousehold('The Smith Family'),
                 HouseholdTestDataFactory.newHousehold('The Garcia Family')
             };
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             insert new List<Contact>{ john, maria };
@@ -899,7 +899,7 @@ private class HouseholdServiceTest {
                 HouseholdTestDataFactory.newHousehold('The Smith Family'),
                 HouseholdTestDataFactory.newHousehold('The Garcia Family')
             };
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             insert john;
             insert new List<Household_Member__c>{
@@ -938,7 +938,7 @@ private class HouseholdServiceTest {
                 HouseholdTestDataFactory.newHousehold('The Smith Family'),
                 HouseholdTestDataFactory.newHousehold('The Garcia Family')
             };
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             insert john;
             insert new List<Household_Member__c>{
@@ -994,7 +994,7 @@ private class HouseholdServiceTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact john = new Contact(
                 Salutation = 'Mr.',
                 FirstName = 'John',
@@ -1023,7 +1023,7 @@ private class HouseholdServiceTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             insert john;
             insert new Household_Member__c(
@@ -1074,7 +1074,7 @@ private class HouseholdServiceTest {
                 HouseholdTestDataFactory.newHousehold('The Garcia Family'),
                 HouseholdTestDataFactory.newHousehold('The Lee Family')
             };
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             insert new Household_Member__c(
                 Household__c = households[0].Id,
                 Account__c = person.Id,
@@ -1113,7 +1113,7 @@ private class HouseholdServiceTest {
             Account person = new Account(Name = 'Maria Garcia');
             insert person;
             Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             String message = '';
 
             Test.startTest();
@@ -1188,7 +1188,7 @@ private class HouseholdServiceTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             // Saved without the trigger noticing, the way another package would leave it.
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             john.AccountId = household.Id;
@@ -1276,7 +1276,7 @@ private class HouseholdServiceTest {
             // model, which differs from org to org, not the packaged access this test is about.
             Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
             household.OwnerId = staff.Id;
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Account person = new Account(
                 Name = 'Maria Garcia',
                 Deceased__c = false,
@@ -1328,7 +1328,7 @@ private class HouseholdServiceTest {
             User staff = HouseholdTestDataFactory.standardUser('pafls');
             HouseholdTestDataFactory.grantMembershipRead('C01_Junction_Display_Test', staff.Id);
             Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             // Saved by the same user who will read it back, so that what this test measures is
             // field level access and nothing else, exactly as the contact test above explains.
             Account person = new Account(Name = 'Maria Garcia');
@@ -1439,7 +1439,7 @@ private class HouseholdServiceTest {
                 HouseholdTestDataFactory.newHousehold('The Garcia Family'),
                 HouseholdTestDataFactory.newHousehold('The Lee Family')
             };
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             insert new List<Household_Member__c>{
                 new Household_Member__c(
                     Household__c = households[0].Id,
@@ -1499,7 +1499,7 @@ private class HouseholdServiceTest {
                 HouseholdTestDataFactory.newHousehold('The Lee Family'),
                 HouseholdTestDataFactory.newHousehold('The Okonkwo Family')
             };
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             insert new List<Household_Member__c>{
                 new Household_Member__c(
                     Household__c = households[0].Id,
@@ -1561,7 +1561,7 @@ private class HouseholdServiceTest {
                 HouseholdTestDataFactory.newHousehold('The Garcia Family'),
                 HouseholdTestDataFactory.newHousehold('The Lee Family')
             };
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             insert new List<Household_Member__c>{
                 new Household_Member__c(
                     Household__c = households[0].Id,
@@ -1610,7 +1610,7 @@ private class HouseholdServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
             Account target = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert new List<Account>{ household, target };
+            Database.insert(new List<Account>{ household, target }, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
             john.AccountId = household.Id;
@@ -1637,7 +1637,7 @@ private class HouseholdServiceTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
             Account target = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert new List<Account>{ household, target };
+            Database.insert(new List<Account>{ household, target }, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
             insert new List<Contact>{ john, jane };
@@ -1677,7 +1677,7 @@ private class HouseholdServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
             Account target = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert new List<Account>{ household, target };
+            Database.insert(new List<Account>{ household, target }, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
             john.AccountId = household.Id;
@@ -1709,7 +1709,7 @@ private class HouseholdServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
             Account target = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert new List<Account>{ household, target };
+            Database.insert(new List<Account>{ household, target }, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
             john.AccountId = household.Id;
@@ -1736,7 +1736,7 @@ private class HouseholdServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account organization = new Account(Name = 'Riverside Shelter');
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert new List<Account>{ organization, household };
+            Database.insert(new List<Account>{ organization, household }, AccessLevel.SYSTEM_MODE);
             Contact staff = HouseholdTestDataFactory.newContact('Ms.', 'Ada', 'Nkosi');
             staff.AccountId = organization.Id;
             insert staff;
@@ -1763,7 +1763,7 @@ private class HouseholdServiceTest {
                 HouseholdTestDataFactory.newHousehold('The Smith Family'),
                 HouseholdTestDataFactory.newHousehold('The Garcia Family')
             };
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
@@ -1804,7 +1804,7 @@ private class HouseholdServiceTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             insert john;
             Map<Id, Set<Id>> joining = new Map<Id, Set<Id>>{
@@ -1830,7 +1830,7 @@ private class HouseholdServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account first = HouseholdTestDataFactory.newHousehold('The Smith Family');
             Account second = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert new List<Account>{ first, second };
+            Database.insert(new List<Account>{ first, second }, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             john.AccountId = first.Id;
             insert john;
@@ -2048,7 +2048,7 @@ private class HouseholdServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account acme = new Account(Name = 'Acme Corp');
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert new List<Account>{ acme, household };
+            Database.insert(new List<Account>{ acme, household }, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Ruiz');
             ana.AccountId = acme.Id;
             insert ana;
@@ -2227,7 +2227,7 @@ private class HouseholdServiceTest {
     static void contactRelationsCountOnlyWhereNativeHouseholdsExist() {
         System.runAs(TestUsers.admin()) {
             Account household = HouseholdTestDataFactory.newHousehold('Garcia Household');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Set<Id> ids = new Set<Id>{ household.Id };
             HouseholdSelector.nativeMembershipAccountsOverride = ids;
 
@@ -2277,7 +2277,7 @@ private class HouseholdServiceTest {
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             insert maria;
             Account native = HouseholdTestDataFactory.newHousehold('Old native name');
-            insert native;
+            Database.insert(native, AccessLevel.SYSTEM_MODE);
             OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
             shape.hasNativeHouseholdGroups = true;
             OrgShapeDetector.overrideShape = shape;
@@ -2375,7 +2375,7 @@ private class HouseholdServiceTest {
             HouseholdService.personAccountOverride = true;
             Account person = new Account(Name = 'Maria Garcia');
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Household');
-            insert new List<Account>{ person, household };
+            Database.insert(new List<Account>{ person, household }, AccessLevel.SYSTEM_MODE);
             Contact behind = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             insert behind;
             PersonRecordSelector.accountBehindContactOverride = new Map<Id, Id>{
@@ -2448,7 +2448,7 @@ private class HouseholdServiceTest {
             Account first = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account second = HouseholdTestDataFactory.newHousehold('The Lee Family');
             Account target = HouseholdTestDataFactory.newHousehold('The Okonkwo Family');
-            insert new List<Account>{ first, second, target };
+            Database.insert(new List<Account>{ first, second, target }, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Garcia');
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             insert new List<Contact>{ ana, maria };
@@ -2505,7 +2505,7 @@ private class HouseholdServiceTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account first = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account target = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert new List<Account>{ first, target };
+            Database.insert(new List<Account>{ first, target }, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Garcia');
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             insert new List<Contact>{ ana, maria };
@@ -2542,7 +2542,7 @@ private class HouseholdServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account occupied = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account empty = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert new List<Account>{ occupied, empty };
+            Database.insert(new List<Account>{ occupied, empty }, AccessLevel.SYSTEM_MODE);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             maria.AccountId = occupied.Id;
             insert maria;
@@ -2578,7 +2578,7 @@ private class HouseholdServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             OrgShapeDetector.overrideShape = shapeWithoutNativeHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             insert new Contact(
                 Salutation = 'Mr.',
                 FirstName = 'John',
@@ -2610,7 +2610,7 @@ private class HouseholdServiceTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             OrgShapeDetector.overrideShape = shapeWithoutNativeHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
             insert john;
             insert new Household_Member__c(
@@ -2650,7 +2650,7 @@ private class HouseholdServiceTest {
             for (Integer i = 0; i < 200; i++) {
                 households.add(HouseholdTestDataFactory.newHousehold('Household ' + i));
             }
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Bulk');
             insert people;
             List<Household_Member__c> rows = new List<Household_Member__c>();

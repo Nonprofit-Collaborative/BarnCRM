@@ -516,7 +516,7 @@ private class RollupEngineTest {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Nolan Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Nolan');
             ana.AccountId = household.Id;
             insert ana;
@@ -529,7 +529,7 @@ private class RollupEngineTest {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Garcia');
             insert ana;
             insert new Household_Member__c(
@@ -546,7 +546,7 @@ private class RollupEngineTest {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Nolan Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Nolan');
             Contact luis = HouseholdTestDataFactory.newContact('Luis', 'Nolan');
             ana.AccountId = household.Id;

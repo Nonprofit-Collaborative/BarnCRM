@@ -295,7 +295,7 @@ private class HouseholdNamingServiceTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             // Household Role is what decides the order members are named in, so the couple are
             // given theirs: without a role these two are ordered by the tie breaks that follow
             // it, and the greeting would name whichever of them those happen to put first.
@@ -353,7 +353,7 @@ private class HouseholdNamingServiceTest {
             HouseholdTestDataFactory.save(settings);
             Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
             Account elsewhere = HouseholdTestDataFactory.newHousehold('Elsewhere');
-            insert new List<Account>{ household, elsewhere };
+            Database.insert(new List<Account>{ household, elsewhere }, AccessLevel.SYSTEM_MODE);
             Contact john = new Contact(
                 Salutation = 'Mr.',
                 FirstName = 'John',
@@ -412,7 +412,7 @@ private class HouseholdNamingServiceTest {
             settings.Delete_Empty_Households__c = false;
             HouseholdTestDataFactory.save(settings);
             Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact john = new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith');
             insert john;
             Household_Member__c member = new Household_Member__c(
@@ -466,7 +466,7 @@ private class HouseholdNamingServiceTest {
                 'The Reverend and Mrs. Smith'
             );
             household.Custom_Name__c = true;
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             insert new Contact(
                 Salutation = 'Mr.',
                 FirstName = 'John',
@@ -491,7 +491,7 @@ private class HouseholdNamingServiceTest {
     private static Account namedSmithHousehold() {
         HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
         Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
-        insert household;
+        Database.insert(household, AccessLevel.SYSTEM_MODE);
         insert new List<Contact>{
             new Contact(
                 Salutation = 'Mr.',
@@ -712,7 +712,7 @@ private class HouseholdNamingServiceTest {
     private static Id householdOfThirty() {
         HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
         Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
-        insert household;
+        Database.insert(household, AccessLevel.SYSTEM_MODE);
         List<Contact> people = new List<Contact>();
         for (HouseholdService.Person person : thirtySurnames()) {
             people.add(

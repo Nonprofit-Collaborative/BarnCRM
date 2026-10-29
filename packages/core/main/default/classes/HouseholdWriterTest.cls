@@ -27,7 +27,7 @@ private class HouseholdWriterTest {
     private static List<Household_Member__c> memberships(Integer howMany, Boolean deleted) {
         HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
         Account household = HouseholdTestDataFactory.newHousehold('Writer Household');
-        insert household;
+        Database.insert(household, AccessLevel.SYSTEM_MODE);
         List<Contact> people = new List<Contact>();
         for (Integer i = 0; i < howMany; i++) {
             people.add(HouseholdTestDataFactory.newContact('Writer' + i, 'Person'));
@@ -98,7 +98,7 @@ private class HouseholdWriterTest {
         System.runAs(TestUsers.admin()) {
             Account kept = HouseholdTestDataFactory.newHousehold('Kept Household');
             Account refused = HouseholdTestDataFactory.newHousehold('Refused Household');
-            insert new List<Account>{ kept, refused };
+            Database.insert(new List<Account>{ kept, refused }, AccessLevel.SYSTEM_MODE);
             kept.Name = 'Kept Household Renamed';
             refused.Name = 'x'.repeat(Account.Name.getDescribe().getLength() + 1);
             Integer before = loggedErrors();
@@ -168,7 +168,7 @@ private class HouseholdWriterTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('Link Household');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact person = HouseholdTestDataFactory.newContact('Link', 'Person');
             insert person;
             Integer before = loggedErrors();
@@ -239,7 +239,7 @@ private class HouseholdWriterTest {
         System.runAs(TestUsers.admin()) {
             List<Household_Member__c> rows = memberships(1, true);
             Account emptied = HouseholdTestDataFactory.newHousehold('Emptied Household');
-            insert emptied;
+            Database.insert(emptied, AccessLevel.SYSTEM_MODE);
             delete emptied;
             Integer before = loggedErrors();
 
@@ -285,7 +285,7 @@ private class HouseholdWriterTest {
         System.runAs(TestUsers.admin()) {
             List<Household_Member__c> rows = memberships(2, false);
             Account emptied = HouseholdTestDataFactory.newHousehold('Emptied Household');
-            insert emptied;
+            Database.insert(emptied, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             HouseholdWriter.deleteMemberships(rows);
@@ -403,7 +403,7 @@ private class HouseholdWriterTest {
                 return;
             }
             Account theirs = HouseholdTestDataFactory.newHousehold('Not Theirs');
-            insert theirs;
+            Database.insert(theirs, AccessLevel.SYSTEM_MODE);
             User maria = staff('Hwtouch');
             String message;
 
@@ -486,6 +486,72 @@ private class HouseholdWriterTest {
                 ],
                 'Every household was created'
             );
+        }
+    }
+
+    /**
+     * ADR-0141, D-134 adjustment A: no role set gives the Household record type, yet a staff
+     * member adding a person still gets them a household, may edit it, and may not create one
+     * past BarnCRM with a user mode insert.
+     */
+    @IsTest
+    static void aStaffMemberWithoutTheHouseholdRecordTypeStillGetsAHouseholdForANewPerson() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            User maria = staff('Hwnort');
+            Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Nortega');
+            Boolean recordTypeOffered;
+            Boolean editSaved;
+            Boolean directInsertRefused = false;
+
+            Test.startTest();
+            System.runAs(maria) {
+                recordTypeOffered = Schema.SObjectType.Account.getRecordTypeInfosById()
+                    .get(HouseholdService.householdRecordTypeId())
+                    .isAvailable();
+                Database.insert(ana, AccessLevel.USER_MODE);
+                Id householdId = [
+                    SELECT AccountId
+                    FROM Contact
+                    WHERE Id = :ana.Id
+                    WITH USER_MODE
+                ]
+                .AccountId;
+                editSaved = Database.update(
+                        new Account(
+                            Id = householdId,
+                            Name = 'The Nortega Home',
+                            Custom_Name__c = true
+                        ),
+                        AccessLevel.USER_MODE
+                    )
+                    .isSuccess();
+                try {
+                    Database.insert(
+                        HouseholdTestDataFactory.newHousehold('Past BarnCRM'),
+                        AccessLevel.USER_MODE
+                    );
+                } catch (DmlException refused) {
+                    directInsertRefused = true;
+                }
+            }
+            Test.stopTest();
+
+            Assert.isFalse(recordTypeOffered, 'BarnCRM Staff does not give Household');
+            Contact saved = [
+                SELECT Account.RecordTypeId, Account.Name
+                FROM Contact
+                WHERE Id = :ana.Id
+                WITH SYSTEM_MODE
+            ];
+            Assert.areEqual(
+                HouseholdService.householdRecordTypeId(),
+                saved.Account.RecordTypeId,
+                'Ana was given a household'
+            );
+            Assert.isTrue(editSaved, 'Maria may edit the household');
+            Assert.areEqual('The Nortega Home', saved.Account.Name, 'The edit was saved');
+            Assert.isTrue(directInsertRefused, 'A user mode household insert is refused');
         }
     }
 }

@@ -16,7 +16,7 @@ private class GetHouseholdSummaryActionTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
             maria.AccountId = household.Id;
@@ -87,7 +87,7 @@ private class GetHouseholdSummaryActionTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
             insert wei;
             insert new Household_Member__c(
@@ -176,7 +176,7 @@ private class GetHouseholdSummaryActionTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
         }
         User outsider = HouseholdTestDataFactory.standardUser('summary');
         List<GetHouseholdSummaryAction.Result> results;

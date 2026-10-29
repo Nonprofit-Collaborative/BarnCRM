@@ -135,6 +135,10 @@ roles given in Setup or by user access policies). A large org may take a few min
 up. Do not assign the BarnCRM Tab permission sets by hand: the nightly run removes them from
 anyone who should not have them.
 
+The Households tab works the same way. **Household Upkeep** carries the **BarnCRM Households**
+permission set, which shows the Households tab and nothing else (it gives no record type). Once
+the feature is on, BarnCRM gives it to everyone with a BarnCRM Admin, Staff or Read Only role.
+
 ## Modules
 
 Modules are separate packages, not installed with Core. The **Modules** section lists the

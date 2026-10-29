@@ -42,7 +42,7 @@ private class CreatePersonActionTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Integer householdsBefore = [SELECT COUNT() FROM Account];
 
             Test.startTest();
@@ -80,7 +80,7 @@ private class CreatePersonActionTest {
             // Automatic households on, so a second household for him would show.
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
             Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             List<CreatePersonAction.Result> results = CreatePersonAction.create(
@@ -142,7 +142,7 @@ private class CreatePersonActionTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Bulk Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             List<CreatePersonAction.Request> requests = new List<CreatePersonAction.Request>();
             for (Integer i = 0; i < 200; i++) {
                 // Half join the household, half get one of their own.
@@ -182,7 +182,7 @@ private class CreatePersonActionTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
         }
         User reader = readOnlyUser();
         List<CreatePersonAction.Result> results;

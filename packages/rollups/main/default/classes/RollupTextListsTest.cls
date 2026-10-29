@@ -365,7 +365,7 @@ private class RollupTextListsTest {
                 Name = 'Rivera Household',
                 RecordTypeId = HouseholdService.householdRecordTypeId()
             );
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             insert new List<Contact>{
                 new Contact(
                     LastName = 'Rivera',

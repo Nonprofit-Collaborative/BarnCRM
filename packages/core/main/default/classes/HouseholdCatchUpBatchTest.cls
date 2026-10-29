@@ -140,7 +140,7 @@ private class HouseholdCatchUpBatchTest {
             List<Account> people = personAccounts(131, 'Lee');
             // One person account already has a household: the catch-up leaves her in it.
             Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             insert new Household_Member__c(
                 Household__c = household.Id,
                 Account__c = people[0].Id,

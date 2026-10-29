@@ -208,7 +208,7 @@ private class HealthCheckControllerTest {
             User maria = HealthCheckTestHelper.mariaWithManageSettings();
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             insert AddressTestDataFactory.newContact('Maria', 'Garcia', household.Id);
 
             System.runAs(maria) {
@@ -237,7 +237,7 @@ private class HealthCheckControllerTest {
             // The org has not chosen how people belong to households, so the recommendation
             // would choose the junction for it.
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             insert AddressTestDataFactory.newContact('Maria', 'Garcia', household.Id);
 
             System.runAs(maria) {

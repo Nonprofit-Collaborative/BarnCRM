@@ -17,7 +17,8 @@ private class DuplicateControllerTest {
     private static List<SObject> insertAllowingDuplicates(List<SObject> records) {
         Database.DMLOptions options = new Database.DMLOptions();
         options.DuplicateRuleHeader.allowSave = true;
-        Database.insert(records, options);
+        // System mode: households are among these, and no user has their record type (ADR-0141).
+        Database.insert(records, options, AccessLevel.SYSTEM_MODE);
         return records;
     }
 

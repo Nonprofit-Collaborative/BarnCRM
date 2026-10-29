@@ -23,7 +23,7 @@ private class HouseholdMergeServiceTest {
             Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
             victim.BillingCity = 'Oakland';
             victim.Anniversary__c = Date.newInstance(2010, 6, 12);
-            insert new List<Account>{ survivor, victim };
+            Database.insert(new List<Account>{ survivor, victim }, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             HouseholdMergeService.MergePreview preview = HouseholdMergeService.preview(
@@ -585,7 +585,7 @@ private class HouseholdMergeServiceTest {
             Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
             victim.BillingCity = 'Berkeley';
             victim.Anniversary__c = Date.newInstance(2010, 6, 12);
-            insert new List<Account>{ survivor, victim };
+            Database.insert(new List<Account>{ survivor, victim }, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             HouseholdMergeService.mergeHouseholds(
@@ -631,7 +631,7 @@ private class HouseholdMergeServiceTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account survivor = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
-            insert new List<Account>{ survivor, victim };
+            Database.insert(new List<Account>{ survivor, victim }, AccessLevel.SYSTEM_MODE);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
             insert new List<Contact>{ maria, wei };
@@ -704,7 +704,7 @@ private class HouseholdMergeServiceTest {
             Account ours = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             // Theirs carries a native household group, as in a Nonprofit Cloud org.
             Account theirs = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert new List<Account>{ ours, theirs };
+            Database.insert(new List<Account>{ ours, theirs }, AccessLevel.SYSTEM_MODE);
             HouseholdSelector.accountsWithNativeHouseholdGroupsOverride = new Set<Id>{ theirs.Id };
 
             List<String> messages = new List<String>();
@@ -747,7 +747,7 @@ private class HouseholdMergeServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account organization = new Account(Name = 'Bay Area Food Bank');
-            insert new List<Account>{ household, organization };
+            Database.insert(new List<Account>{ household, organization }, AccessLevel.SYSTEM_MODE);
 
             String message;
             Test.startTest();
@@ -780,7 +780,7 @@ private class HouseholdMergeServiceTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
 
             String message;
             Test.startTest();
@@ -809,7 +809,7 @@ private class HouseholdMergeServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account survivor = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
-            insert new List<Account>{ survivor, victim };
+            Database.insert(new List<Account>{ survivor, victim }, AccessLevel.SYSTEM_MODE);
             User reader = readOnlyUser();
 
             String message;
@@ -853,7 +853,7 @@ private class HouseholdMergeServiceTest {
             );
             Account survivor = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
-            insert new List<Account>{ survivor, victim };
+            Database.insert(new List<Account>{ survivor, victim }, AccessLevel.SYSTEM_MODE);
             Id survivorId = survivor.Id;
             Id victimId = victim.Id;
             shareHousehold(survivorId, staff.Id, 'Edit');
@@ -932,7 +932,7 @@ private class HouseholdMergeServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account survivor = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
-            insert new List<Account>{ survivor, victim };
+            Database.insert(new List<Account>{ survivor, victim }, AccessLevel.SYSTEM_MODE);
             User reader = TestUsers.peopleReaderWith('Mreader', new List<String>());
 
             String message = mergeAs(reader, survivor.Id, victim.Id);
@@ -1099,7 +1099,7 @@ private class HouseholdMergeServiceTest {
             wei.AccountId = householdId;
             insert wei;
             Account destination = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert destination;
+            Database.insert(destination, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             Id result = HouseholdMergeService.split(
@@ -1131,7 +1131,7 @@ private class HouseholdMergeServiceTest {
             insert wei;
             Id householdId = householdOf(wei.Id);
             Account destination = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert destination;
+            Database.insert(destination, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             HouseholdMergeService.split(householdId, new Set<Id>{ wei.Id }, destination.Id);
@@ -1157,7 +1157,7 @@ private class HouseholdMergeServiceTest {
             insert wei;
             Id householdId = householdOf(wei.Id);
             Account destination = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert destination;
+            Database.insert(destination, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             HouseholdMergeService.split(householdId, new Set<Id>{ wei.Id }, destination.Id);
@@ -1201,7 +1201,7 @@ private class HouseholdMergeServiceTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
 
             String message;
             Test.startTest();
@@ -1228,7 +1228,7 @@ private class HouseholdMergeServiceTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Big Family');
             Account destination = HouseholdTestDataFactory.newHousehold('The Other Family');
-            insert new List<Account>{ household, destination };
+            Database.insert(new List<Account>{ household, destination }, AccessLevel.SYSTEM_MODE);
             List<Contact> people = HouseholdTestDataFactory.manyContacts(50, 'Member');
             for (Contact person : people) {
                 person.AccountId = household.Id;
@@ -1286,7 +1286,7 @@ private class HouseholdMergeServiceTest {
             insert maria;
             Id householdId = householdOf(maria.Id);
             Account destination = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert destination;
+            Database.insert(destination, AccessLevel.SYSTEM_MODE);
             User reader = readOnlyUser();
 
             String message;
@@ -1327,7 +1327,7 @@ private class HouseholdMergeServiceTest {
             Account survivor = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
             Account other = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert new List<Account>{ survivor, victim, other };
+            Database.insert(new List<Account>{ survivor, victim, other }, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Garcia');
             Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
             insert new List<Contact>{ ana, wei };
@@ -1388,7 +1388,7 @@ private class HouseholdMergeServiceTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account source = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account other = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert new List<Account>{ source, other };
+            Database.insert(new List<Account>{ source, other }, AccessLevel.SYSTEM_MODE);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Garcia');
             insert new List<Contact>{ maria, ana };

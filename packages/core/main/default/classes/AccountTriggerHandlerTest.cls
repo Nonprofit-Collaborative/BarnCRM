@@ -17,7 +17,7 @@ private class AccountTriggerHandlerTest {
             Account household = new Account(
                 RecordTypeId = HouseholdService.householdRecordTypeId()
             );
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Test.stopTest();
 
             Assert.areEqual(
@@ -36,7 +36,7 @@ private class AccountTriggerHandlerTest {
                 'The Reverend and Mrs. Smith'
             );
             household.Custom_Name__c = true;
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             insert new Contact(
                 Salutation = 'Mr.',
                 FirstName = 'John',
@@ -64,7 +64,7 @@ private class AccountTriggerHandlerTest {
                 'Name kept by Nonprofit Cloud'
             );
             household.Custom_Name__c = true;
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             insert new Contact(
                 Salutation = 'Mr.',
                 FirstName = 'John',
@@ -331,7 +331,7 @@ private class AccountTriggerHandlerTest {
             person.put('LastName', 'Garcia');
             insert person;
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             insert new Household_Member__c(
                 Household__c = household.Id,
                 Account__c = person.Id,
@@ -452,7 +452,7 @@ private class AccountTriggerHandlerTest {
         HouseholdService.personAccountOverride = true;
         PersonRecordSelector.personRecordOverride = true;
         Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-        insert household;
+        Database.insert(household, AccessLevel.SYSTEM_MODE);
         Account person = new Account(Name = 'Maria Garcia');
         insert person;
         insert new Household_Member__c(

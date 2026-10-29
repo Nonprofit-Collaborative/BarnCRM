@@ -173,7 +173,7 @@ private class PreferredEmailServiceTest {
             household.Preferred_Email__c = 'Personal';
 
             Test.startTest();
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Test.stopTest();
 
             Assert.areEqual(
