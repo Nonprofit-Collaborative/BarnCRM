@@ -6,6 +6,12 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-10-29
 
+### barn-npc release and test fixes
+
+- Fix #708: `ImportRowProcessorTest` bulk bound and `ImportFirstNameMatchTest` one-row chunks stub the Nonprofit Cloud native household guard (`HouseholdSelector.accountsWithNativeDependentsOverride`). On `barn-npc` the test user cannot read `PartyRelationshipGroup`, so the guard ran 2 queries per chunk (validation 0Afhk000001zwUjCAI failed 2 of 3,626). Tests only; product unchanged. Incremental gate `barn-sales` 210/210.
+- Test #709: `aDryRunInOneRowChunksCountsWhatTheCommitDoes` (`ImportFirstNameMatchTest`) runs the dry run before `Test.startTest` and the commit inside it, so each pass has its own SOQL limit (about 96 of 100 in one transaction before). Preview-equals-commit assertions moved to helper `assertCommitCountedAsPreviewed`. Incremental gate `barn-sales` 179/179.
+- `barn-npc` release: `main` 112dbdf7 validated check-only (0Afhk000002071xCAA: 6,291 components, 3,626/3,626 tests) and quick deployed (0Afhk0000020DKHCA2), with `destructiveChangesPost` of 120 removed members (BarnCRM_Rollup_Builder app, 7 `BarnCRM_Settings__c` fields, 99 labels, 9 old rollup objects, 2 tabs, 2 FlexiPages). `CorePostInstall.runAsSourceDeploy()` run afterwards; BarnCRM Tab Access Check now scheduled nightly.
+
 ### Landing batch 12 (branch `landing/batch-12`; incremental gate on `barn-sales`)
 
 Merges #703, #704, #705 and #706; root-doc entries for #702 (already in `main`, 906960b2).
