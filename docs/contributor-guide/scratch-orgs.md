@@ -126,8 +126,12 @@ configuration exists.
 ## Running the script
 
 ```bash
-scripts/org/create-scratch-org.sh <shape> [alias] [--days N] [--no-sample-data] [--replace]
+scripts/org/create-scratch-org.sh <shape> [alias] [--days N] [--no-sample-data] [--replace] [--resume]
 ```
+
+`--resume` finishes an org that already exists after a run stopped part way: it skips creation
+and the Core deploy, then assigns permission sets (one already held is not an error), runs the
+license check and loads sample data. It cannot be combined with `--replace`.
 
 Example:
 
