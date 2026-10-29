@@ -45,19 +45,19 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 
 ## T-SA-03: Walk the First Steps: Edition, Fit and Naming
 
-**Purpose:** confirm the edition shows read-only, the fit is detected, and Back, Next and Skip for Now move between steps.
+**Purpose:** confirm the step list, the edition shown read-only, the fit detected, and that clicking a step, Next and Skip for Now move between steps.
 **Prerequisites:** admin user, Person Accounts org, first-run setup finished with the Nonprofit Edition. If the home page shows **Setup Complete**, click **Start Setup Again** under **Reopen Setup** first (see T-SA-06).
 **Smoke:** yes
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM** app, **Home**. | A **Setup Checklist** card with progress "{n} of 9". The assistant opens on the first step not done (usually step 2, because the edition is already saved). **Setup Checklist** shows once, as the card title, and the only visible count is "{n} of 9" (a screen reader also hears the step number). |
-| 2 | Click **Back** until step 1, **Choose Your Edition**. | "Edition: **Nonprofit Edition**", "The edition is chosen once." and a **How to Change It Later** link. No edition choice and no **Confirm and Continue**. "Giving is installed. Its steps are part of this setup." **Back** is disabled. |
+| 1 | Open the **BarnCRM** app, **Home**. | A **Setup Checklist** card listing all nine steps, each with a progress ring and a **Done**, **Skipped** or **To Do** badge; step 1 has a check mark and **Done**. Only the first step not done (usually step 2) is open. **Setup Checklist** shows once, as the card title, and the only count is "{n} of 9 steps done". Step names are in Title Case. There is no **Back** button. |
+| 2 | Click **1. Choose Your Edition** in the list. | Step 1 opens in place and step 2 closes. "Edition: **Nonprofit Edition**", "The edition is chosen once." and a **How to Change It Later** link. No edition choice and no **Confirm and Continue**. "Giving is installed. Its steps are part of this setup." |
 | 3 | Click **Next**. | Step 2, **Confirm How BarnCRM Fits Your Org**: "Your org uses Person Accounts. Household membership is tracked with one record per person, so a person can be in more than one household and everything you already have keeps working." **Recommended for your org**, and **How BarnCRM fits this org** set to **Standalone**. (On the platform-only shape: "This looks like a fresh org, with no other household model and no Person Accounts. BarnCRM can run on its own.") |
 | 4 | Open **How BarnCRM fits this org**. | Only **Standalone** (no NPSP or Nonprofit Cloud is in this org). |
 | 5 | Click **Confirm and Continue**. | Step 3, **Confirm How Households Are Named**, opens with the household naming panel and its preview, and "This step finishes by itself once the setting it fills in has a value." **BarnCRM Settings**, **General**, **Coexistence mode** now reads **Standalone**. |
 | 6 | Click **Next**. | Step 4 (with Giving, the default fund and appeal step; with Core alone, the access step). |
-| 7 | Click **Skip for Now**. | The next step opens. |
+| 7 | Click **Skip for Now**. | The next step opens. The skipped step shows a warning ring and **Skipped**. |
 | 8 | Reload the page. | The assistant opens on the skipped step again (a skipped step is not finished). |
 
 Note: in an org that stores people as accounts, confirming step 2 also switches household membership to one record per person, unless an administrator already chose a way of belonging.
@@ -99,12 +99,12 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 ## T-SA-06: Finish, Reopen and Start Again
 
 **Purpose:** confirm the completion screen, the Setup complete tile, Reopen setup and Start setup again.
-**Prerequisites:** admin user, after T-SA-05, with every step before 9 done: go back to any step marked **To Do** or **Skipped** and finish it (for the Giving step, pick a fund and an appeal and click **Save**).
+**Prerequisites:** admin user, after T-SA-05, with every step before 9 done: click any step marked **To Do** or **Skipped** and finish it (for the Giving step, pick a fund and an appeal and click **Save**).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On step 9, click **Finish**. | **You Are Ready**, each step with a **Done** badge, "Time taken: {n} minutes", **Reopen Setup** and **Start Setup Again**. |
-| 2 | Reload **Home**. | A **Setup Complete** tile shows "9 of 9" and **Reopen Setup**. The welcome reads "Your households, people and organizations are in the tabs above." |
+| 1 | On step 9, click **Finish**. | A check illustration with **You Are Ready** and "Time taken: {n} minutes", each step with a **Done** badge, **Reopen Setup** and **Start Setup Again**. |
+| 2 | Reload **Home**. | A **Setup Complete** tile shows "9 of 9 steps done" and **Reopen Setup**. The welcome reads "Your households, people and organizations are in the tabs above." |
 | 3 | Click **Reopen Setup**. | The assistant opens on step 1 with your answers intact. |
 | 4 | Finish again to the completion screen. Click **Start Setup Again**. | The checklist starts from step 1. Steps whose setting already has a value (for example the identity step) still show as done. No setting is emptied: **BarnCRM Settings**, **Organization** still shows Riverside Test Trust. |
 
