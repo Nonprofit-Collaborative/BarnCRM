@@ -626,3 +626,18 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 8 | Log in as the staff user and open the **Rollup Builder** tab. | No **Starter Templates** button. |
 
 **Cleanup:** delete the **Average Gift** rollup (keep values) and the **Average Gift** field in Setup.
+
+## T-RB-48: A Rollup Saved Outside the Builder Passes the Same Checks
+
+**Purpose:** confirm a rollup cannot be created or retargeted outside the Builder without Manage BarnCRM Settings, and never fills a field on users or setup records.
+**Prerequisites:** admin user; T-RB-02 done; a test user holding **Rollup Builder Admin** but not **Manage BarnCRM Settings** (no BarnCRM Admin set).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open the **Rollup Builder** tab, click **New rollup** and search step 1's object list for **User** and **Permission Set**. | Neither is offered. |
+| 2 | Log in as the test user. Open **Test children per household** by its record URL (`/lightning/r/Rollup_Definition__c/<Id>/view`), click **Edit**, change **Target Field** to `AnnualRevenue` and save. | Refused: "You do not have permission to change rollups." The field is unchanged. |
+| 3 | As the test user, in the Developer Console run `insert new Rollup_Definition__c(Name='Test guard', Definition_Key__c='Test_Guard', Source_Object__c='Contact', Relationship_Path__c='AccountId', Aggregate__c='COUNT', Target_Object__c='Account', Target_Field__c='NumberOfEmployees', Mode__c='Both');` | Fails with the same message. Nothing is saved. |
+| 4 | As the admin, run the same statement with `Target_Object__c='User'`, `Target_Field__c='Title'`, `Relationship_Path__c='OwnerId'`, `Aggregate__c='LAST'`, `Source_Field__c='Title'`, `Order_By_Field__c='CreatedDate'`. | Fails: "A rollup cannot fill fields on this kind of record. Choose another object for the total." |
+| 5 | As the admin, click **Recalculate all** on the **Rollup Builder** tab. | The run finishes as before; shipped rollups and their last calculated times are unaffected. |
+
+**Cleanup:** None.

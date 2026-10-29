@@ -88,7 +88,7 @@ public with sharing class VolunteersAccessSync implements ModuleAccessSync {
      * a transaction with the install's or Turn on's record writes (mixed DML). It queues itself
      * again while more is left.
      */
-    public class Job implements Queueable {
+    public with sharing class Job implements Queueable {
         public void execute(QueueableContext jobContext) {
             try {
                 // A test cannot chain one queued job from another.

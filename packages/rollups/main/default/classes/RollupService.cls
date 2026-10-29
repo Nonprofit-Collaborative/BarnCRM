@@ -394,7 +394,7 @@ public with sharing class RollupService {
      * record the platform still refuses is queued to be tried again, and anything that stops
      * the run queues the lot, as in a save.
      */
-    private class SurvivorRecalculation implements Queueable {
+    private with sharing class SurvivorRecalculation implements Queueable {
         private final String target;
         private final Set<Id> survivorIds;
         private final List<Rollup_Definition__c> definitions;

@@ -14,20 +14,6 @@
 public with sharing class RollupBuilderController {
     private static final String KEY_PREFIX = 'Custom_';
 
-    /** BarnCRM's own bookkeeping, never a place for a total, by local API name. */
-    private static final Set<String> NOT_TARGETS = new Set<String>{
-        'automation_setting__c',
-        'duplicate_dismissal__c',
-        'error_log__c',
-        'import_batch__c',
-        'import_journal__c',
-        'import_row__c',
-        'import_template__c',
-        'rollup_definition__c',
-        'rollup_queue__c',
-        'setting_change__c'
-    };
-
     /** The two standard entities Core itself holds, always offered first (R-R7). */
     private static final Set<String> CORE_ENTITIES = new Set<String>{ 'account', 'contact' };
 
@@ -929,7 +915,7 @@ public with sharing class RollupBuilderController {
         Set<String> shortlist = commonStandard();
         for (Schema.SObjectType type : NamespaceUtil.globalDescribe().values()) {
             String name = String.valueOf(type).toLowerCase();
-            if (!plausible(name) || NOT_TARGETS.contains(localName(name))) {
+            if (!plausible(name) || !RollupDefinitionGuard.isAllowedTarget(name)) {
                 continue;
             }
             Schema.DescribeSObjectResult described = type.getDescribe(
@@ -1184,11 +1170,6 @@ public with sharing class RollupBuilderController {
     private static Schema.DisplayType typeOf(Map<String, Schema.SObjectField> fields, String name) {
         Schema.SObjectField field = String.isBlank(name) ? null : fields.get(name.toLowerCase());
         return field == null ? null : field.getDescribe().getType();
-    }
-
-    private static String localName(String name) {
-        List<String> parts = name.split('__');
-        return parts.size() > 2 ? parts[1] + '__c' : name;
     }
 
     private static Set<String> valuesOf(Schema.SObjectField picklist) {
