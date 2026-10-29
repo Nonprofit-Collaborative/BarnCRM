@@ -751,7 +751,7 @@ private class SetupAssistantControllerTest {
 
             Test.startTest();
             try {
-                SetupAssistantController.changeEdition('Standard');
+                SetupAssistantController.changeEdition('Premium');
             } catch (AuraHandledException e) {
                 unknownMessage = e.getMessage();
             }

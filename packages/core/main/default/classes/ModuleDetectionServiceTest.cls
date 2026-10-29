@@ -386,7 +386,7 @@ private class ModuleDetectionServiceTest {
             BarnCRM_Module__mdt here = catalogRow('Giving', 'Nonprofit', null, 10);
             here.Staff_Tabs__c = 'Gift__c; Commitment__c';
             here.Admin_Tabs__c = 'Giving_Nightly_Jobs;Donor_Levels:Donor Level Ladder';
-            BarnCRM_Module__mdt notHere = catalogRow('Events', 'Community;Impact', null, 5);
+            BarnCRM_Module__mdt notHere = catalogRow('Events', 'Standard;Nonprofit', null, 5);
             notHere.Staff_Tabs__c = 'Event__c';
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ here, notHere };
             ModuleDetectionService.tabLabelsOverride = new Map<String, String>{
@@ -458,7 +458,7 @@ private class ModuleDetectionServiceTest {
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
                 catalogRow('Giving', 'Nonprofit', null, 10),
                 catalogRow('Events', 'Standard; Nonprofit', null, 5),
-                catalogRow('Mailings', 'impact', null, 6),
+                catalogRow('Mailings', 'nonprofit', null, 6),
                 catalogRow('Everywhere', 'Standard', null, 7)
             };
             chooseSuite(ModuleDetectionService.SUITE_NONPROFIT);
@@ -577,7 +577,7 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = false;
-            BarnCRM_Module__mdt rollups = catalogRow('Rollups', 'Community;Impact', null, 5);
+            BarnCRM_Module__mdt rollups = catalogRow('Rollups', 'Standard;Nonprofit', null, 5);
             rollups.MasterLabel = 'BarnCRM Rollup Builder';
             rollups.Probe_Object__c = 'No_Such_Object__c';
             BarnCRM_Module__mdt giving = catalogRow('Giving', 'Nonprofit', null, 10);
