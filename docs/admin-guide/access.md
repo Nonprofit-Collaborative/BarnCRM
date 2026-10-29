@@ -60,6 +60,12 @@ settings show them. That reaches every account and contact in the org, so give t
 people you trust with all of them. To hold it back from someone, add a muting permission set to
 the role in Setup.
 
+Gifts and commitments (pledges and recurring gifts) are private, and no Giving permission set,
+Giving Admin included, gives View All on them. A person sees the gifts and commitments they own,
+plus the ones your role hierarchy and sharing settings give them; a system administrator sees
+them all through the profile's **View All Data**. If fundraisers should see each other's gifts
+and commitments, give them roles above the owners or a sharing rule in Setup.
+
 ## Who Can Read a Donor's Receipts and Tax Statements (with Giving)
 
 This section applies only when the Giving module is installed. Nobody sees a receipt PDF unless they hold one of the Giving module's permission sets. This is

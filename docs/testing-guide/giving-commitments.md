@@ -134,8 +134,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-COM-09: Commitment Access by Permission Set
 
-**Purpose:** confirm staff cannot delete commitments and read-only users cannot create or change them.
-**Prerequisites:** staff, then read-only.
+**Purpose:** confirm staff cannot delete commitments, read-only users cannot create or change them, and Giving Admin gives no View All on commitments.
+**Prerequisites:** staff, then read-only. For step 5, a user on the **Standard User** profile (not System Administrator) with **BarnCRM Admin** and **Giving Admin**, and no role above the sample data's owner.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -143,6 +143,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | As read-only, open the **Commitments** tab. | No **New** button. The list views **Active Pledges** and **Active Recurring Gifts** show. |
 | 3 | As read-only, open an Active recurring gift. | No **Edit** or **Delete**. The **Payment Schedule** card lists the payments. |
 | 4 | Look at the card's buttons. | No **Pause**, **Resume**, **Mark complete** or **Cancel commitment**. On a commitment with no payments yet, the card has no **Generate now**. |
+| 5 | As the step 5 user, open **Commitments**, **All Commitments**, then **Gifts**, **All Gifts**. Create a pledge, then reopen **All Commitments**. | Neither list shows the sample commitments or gifts owned by someone else, the same for both. The new pledge shows, with its **Payment Schedule**. Sharing a sample pledge with this user (**Sharing** on the record) makes it show. |
 **Cleanup:** none.
 
 ## T-COM-10: List Views for Commitments and Installments

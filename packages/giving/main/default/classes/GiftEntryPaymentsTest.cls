@@ -8,19 +8,33 @@
 private class GiftEntryPaymentsTest {
     @TestSetup
     static void createTestUser() {
-        TestUsers.adminWith('Giving_Admin');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            TestDataFactory.createUser(
+                'Maria',
+                new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
+            );
+        }
     }
 
+    /** Maria, built by the setup, found by the username TestUsers gives her last name. */
     private static User maria() {
-        return TestDataFactory.createUser(
-            'Maria',
-            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-        );
+        return [
+            SELECT Id
+            FROM User
+            WHERE Username LIKE 'barn-test.maria.%' AND LastName = 'Maria'
+            ORDER BY CreatedDate DESC
+            LIMIT 1
+        ];
     }
 
-    /** An active pledge of this donor with a payment due on each of these days of March. */
+    /**
+     * An active pledge of this donor with a payment due on each of these days of March, owned by
+     * Maria: commitments are private and Giving Admin has no View All on them, so she sees the
+     * pledges she owns.
+     */
     private static List<Installment__c> pledge(Id personId, Map<Integer, Decimal> dueDays) {
         Commitment__c pledge = new Commitment__c(
+            OwnerId = maria().Id,
             Type__c = 'Pledge',
             Status__c = 'Active',
             Donor_Contact__c = personId,

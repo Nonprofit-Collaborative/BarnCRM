@@ -71,6 +71,9 @@ public with sharing class AcknowledgmentRunService {
                 new Set<Id>()
             );
 
+            // An email gift whose donor opted out of email is thanked by letter (R-AK13).
+            Set<Id> optedOut = AcknowledgmentService.optedOutOfEmail(queued);
+
             List<Gift__c> letters = new List<Gift__c>();
             List<AcknowledgmentRuleService.RuleMatch> matches = new List<AcknowledgmentRuleService.RuleMatch>();
             for (Gift__c gift : queued) {
@@ -79,8 +82,13 @@ public with sharing class AcknowledgmentRunService {
                     rules,
                     earlierDonors
                 );
+                if (match == null) {
+                    continue;
+                }
                 if (
-                    match != null && AcknowledgmentRuleService.CHANNEL_LETTER.equals(match.channel)
+                    AcknowledgmentRuleService.CHANNEL_LETTER.equals(match.channel) ||
+                    (AcknowledgmentRuleService.CHANNEL_EMAIL.equals(match.channel) &&
+                    optedOut.contains(gift.Id))
                 ) {
                     letters.add(gift);
                     matches.add(match);

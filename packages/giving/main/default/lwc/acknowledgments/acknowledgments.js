@@ -16,6 +16,7 @@ import EMAIL_QUEUE from '@salesforce/label/c.Giving_Acknowledgments_EmailQueue';
 import LETTER_QUEUE from '@salesforce/label/c.Giving_Acknowledgments_LetterQueue';
 import UNMATCHED from '@salesforce/label/c.Giving_Acknowledgments_Unmatched';
 import WITHOUT_RECIPIENT from '@salesforce/label/c.Giving_Acknowledgments_WithoutRecipient';
+import OPTED_OUT from '@salesforce/label/c.Giving_Acknowledgments_OptedOut';
 import QUEUE_CAPPED from '@salesforce/label/c.Giving_Acknowledgments_QueueCapped';
 import SEND_EMAILS from '@salesforce/label/c.Giving_Acknowledgments_SendEmails';
 import EMAILS_STARTED from '@salesforce/label/c.Giving_Acknowledgments_EmailsStarted';
@@ -122,6 +123,7 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
     letterQueue: LETTER_QUEUE,
     unmatched: UNMATCHED,
     withoutRecipient: WITHOUT_RECIPIENT,
+    optedOut: OPTED_OUT,
     queueCapped: QUEUE_CAPPED,
     sendEmails: SEND_EMAILS,
     produceLetters: PRODUCE_LETTERS,

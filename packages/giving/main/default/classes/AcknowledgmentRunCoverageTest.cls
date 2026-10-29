@@ -292,6 +292,38 @@ private class AcknowledgmentRunCoverageTest {
     }
 
     @IsTest
+    static void anEmailGiftWhoseDonorOptedOutIsCountedAndSentAsALetter() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            AcknowledgmentTestData.enable();
+            emailRule();
+            Contact ada = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
+            Contact grace = AcknowledgmentTestData.insertDonor('Grace', 'Hopper', 'gh@example.org');
+            update new Contact(Id = grace.Id, HasOptedOutOfEmail = true);
+            giftsFor(ada, 1);
+            Gift__c toGrace = giftsFor(grace, 1)[0];
+
+            AcknowledgmentController.PageView before = AcknowledgmentController.currentView();
+            Assert.areEqual(1, before.emailQueue, 'Only Ada is waiting for an email.');
+            Assert.areEqual(1, before.optedOutOfEmail, 'Grace is counted on her own line.');
+            Assert.areEqual(1, before.letterQueue, 'And as a letter, which is how she is thanked.');
+
+            Test.startTest();
+            Acknowledgment_Run__c run = AcknowledgmentRunService.runLetterMerge();
+            Test.stopTest();
+
+            Assert.areEqual(1, run.Acknowledgments_Sent__c, 'Only Grace is in the letter file.');
+            Acknowledgment__c row = [
+                SELECT Gift__c, Channel__c
+                FROM Acknowledgment__c
+                WHERE Run__c = :run.Id
+                WITH SYSTEM_MODE
+            ];
+            Assert.areEqual(toGrace.Id, row.Gift__c, 'The letter is for her gift.');
+            Assert.areEqual(AcknowledgmentRuleService.CHANNEL_LETTER, row.Channel__c, 'By letter.');
+        }
+    }
+
+    @IsTest
     static void aLetterRunCanOnlyBeMarkedSentOnceAndOnlyIfItExists() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             AcknowledgmentTestData.enable();
