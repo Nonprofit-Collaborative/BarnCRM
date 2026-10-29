@@ -16,6 +16,14 @@ jest.mock('@salesforce/label/c.Core_MatchLogic_NewTitle', () => ({ default: 'New
   virtual: true
 });
 jest.mock(
+  '@salesforce/label/c.Core_MatchLogic_Summary',
+  () => ({ default: '{0} on {1}, compared as {2}' }),
+  { virtual: true }
+);
+jest.mock('@salesforce/label/c.Core_MatchLogic_ActiveSwitch', () => ({ default: 'Active: {0}' }), {
+  virtual: true
+});
+jest.mock(
   '@salesforce/apex/CustomMetadataManagerController.setArchived',
   () => ({ default: jest.fn() }),
   { virtual: true }
@@ -112,8 +120,23 @@ describe('c-match-source-manager', () => {
     );
     const element = await render();
 
-    const sources = all(element, '[data-id="source"]');
+    let sources = all(element, '[data-id="source"]');
     expect(sources).toHaveLength(2);
+    expect(sources[0].querySelector('[data-id="summary"]').textContent).toBe(
+      'Street on Address, compared as Address'
+    );
+    expect(sources[0].querySelector('[data-id="shipped"]')).not.toBeNull();
+    expect(sources[1].querySelector('[data-id="shipped"]')).toBeNull();
+    expect(sources[0].querySelector('[data-id="status-badge"]').className).toContain(
+      'slds-theme_success'
+    );
+    expect(one(element, '[data-id="help"]').content).toContain('c.Core_MatchLogic_Help');
+    // The details stay folded until asked for.
+    expect(sources[0].querySelector('[data-id="details"]')).toBeNull();
+    all(element, '[data-id="details-toggle"]').forEach((button) => button.click());
+    await flush();
+    sources = all(element, '[data-id="source"]');
+    expect(sources[0].querySelector('[data-id="details-toggle"]').ariaExpanded).toBe('true');
     expect(sources[0].querySelector('[data-id="object"]').textContent).toBe('Address');
     expect(sources[0].querySelector('[data-id="links-to"]').textContent).toBe('A person');
     expect(sources[0].querySelector('[data-id="compare"]').textContent).toBe(
@@ -141,7 +164,12 @@ describe('c-match-source-manager', () => {
     const element = await render();
 
     expect(one(element, '[data-id="edit"]')).toBeNull();
-    one(element, '[data-id="toggle"]').click();
+    expect(one(element, '[data-id="status-badge"]')).toBeNull();
+    const toggle = one(element, '[data-id="toggle"]');
+    expect(toggle.checked).toBe(true);
+    expect(toggle.label).toBe('Active: Address (person)');
+    toggle.checked = false;
+    toggle.dispatchEvent(new CustomEvent('change'));
     await flush();
 
     expect(setArchived).toHaveBeenCalledWith({
@@ -149,6 +177,8 @@ describe('c-match-source-manager', () => {
       developerName: 'Address_Person',
       archived: true
     });
+    // The switch waits for Salesforce to apply the change before it moves.
+    expect(toggle.checked).toBe(true);
     expect(one(element, '[data-id="status"]')).not.toBeNull();
   });
 
@@ -204,7 +234,7 @@ describe('c-match-source-manager', () => {
     setArchived.mockRejectedValue({ body: { message: 'Deploy Metadata is off.' } });
     const element = await render();
 
-    one(element, '[data-id="toggle"]').click();
+    one(element, '[data-id="toggle"]').dispatchEvent(new CustomEvent('change'));
     await flush();
 
     expect(one(element, '[data-id="error"]').textContent).toContain('Deploy Metadata is off.');

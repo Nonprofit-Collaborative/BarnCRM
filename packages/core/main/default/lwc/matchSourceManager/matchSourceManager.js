@@ -6,6 +6,8 @@ import getOutcome from '@salesforce/apex/CustomMetadataManagerController.getOutc
 import MatchSourceModal from 'c/matchSourceModal';
 
 import INTRO from '@salesforce/label/c.Core_MatchLogic_Intro';
+import HELP from '@salesforce/label/c.Core_MatchLogic_Help';
+import HELP_ALT from '@salesforce/label/c.Core_MatchLogic_HelpAlt';
 import RULES_NOTE from '@salesforce/label/c.Core_MatchLogic_RulesNote';
 import READ_ONLY from '@salesforce/label/c.Core_MatchLogic_ReadOnly';
 import SHIPPED_NOTE from '@salesforce/label/c.Core_MatchLogic_ShippedNote';
@@ -19,8 +21,10 @@ import POSTAL_FIELD from '@salesforce/label/c.Core_MatchLogic_PostalField';
 import LINKS_TO from '@salesforce/label/c.Core_MatchLogic_LinksTo';
 import PARENT_FIELD from '@salesforce/label/c.Core_MatchLogic_ParentField';
 import COMPARE from '@salesforce/label/c.Core_MatchLogic_Compare';
-import ACTIVATE from '@salesforce/label/c.Core_MatchLogic_Activate';
-import DEACTIVATE from '@salesforce/label/c.Core_MatchLogic_Deactivate';
+import SUMMARY from '@salesforce/label/c.Core_MatchLogic_Summary';
+import SHOW_DETAILS from '@salesforce/label/c.Core_MatchLogic_ShowDetails';
+import HIDE_DETAILS from '@salesforce/label/c.Core_MatchLogic_HideDetails';
+import ACTIVE_SWITCH from '@salesforce/label/c.Core_MatchLogic_ActiveSwitch';
 import NEW_TITLE from '@salesforce/label/c.Core_MatchLogic_NewTitle';
 import TRY from '@salesforce/label/c.Core_MatchLogic_Try';
 import TRY_VALUE from '@salesforce/label/c.Core_MatchLogic_TryValue';
@@ -46,17 +50,17 @@ const POLL_INTERVAL_MS = 3000;
 const POLL_ATTEMPTS = 20;
 
 /**
- * Matching Logic on the Duplicate Matching tab (ADR-0139, admin guide duplicates.md): the
- * match sources in plain words, add and edit (in a modal, c-match-source-modal), activate and
- * deactivate, and "Try a value". Saving goes through the custom metadata manager, which checks the source against the org, deploys
- * it and needs Manage BarnCRM Metadata, so the page waits on the deployment as that page does.
+ * Matching Logic on the Duplicate Matching tab (ADR-0139, admin guide duplicates.md): each
+ * match source as a card with a one-line summary, an Active switch, its details on request,
+ * and "Try a Value"; adding and editing happen in a modal (c-match-source-modal). Saving goes
+ * through the custom metadata manager, which checks the source against the org, deploys it and
+ * needs Manage BarnCRM Metadata, so the page waits on the deployment as that page does.
  */
 export default class MatchSourceManager extends LightningElement {
   labels = {
     intro: INTRO,
-    rulesNote: RULES_NOTE,
+    helpAlt: HELP_ALT,
     readOnly: READ_ONLY,
-    shippedNote: SHIPPED_NOTE,
     shipped: SHIPPED,
     notUsable: NOT_USABLE,
     object: OBJECT,
@@ -65,6 +69,8 @@ export default class MatchSourceManager extends LightningElement {
     linksTo: LINKS_TO,
     parentField: PARENT_FIELD,
     compare: COMPARE,
+    active: ACTIVE,
+    inactive: INACTIVE,
     tryValue: TRY_VALUE,
     tryPostal: TRY_POSTAL,
     tryRun: TRY_RUN,
@@ -75,7 +81,11 @@ export default class MatchSourceManager extends LightningElement {
     checkAgain: CHECK_AGAIN
   };
 
+  helpText = `${HELP} ${RULES_NOTE} ${SHIPPED_NOTE}`;
+
   view;
+  /** The developer names of the cards whose details are shown. */
+  expanded = {};
   trying;
   tryInput = { value: '', postal: '' };
   tryResult;
@@ -132,23 +142,38 @@ export default class MatchSourceManager extends LightningElement {
     return this.view.sources.map((source) => {
       const values = source.values || {};
       const isTrying = Boolean(this.trying) && this.trying.developerName === source.developerName;
+      const showDetails = Boolean(this.expanded[source.developerName]);
+      const objectText = source.objectLabel || values.Object_Name__c;
+      const valueText = source.valueFieldLabel || values.Value_Field__c;
       return {
         ...source,
         statusText: source.active ? ACTIVE : INACTIVE,
+        statusClass: source.active ? 'slds-theme_success' : '',
+        switchLabel: ACTIVE_SWITCH.replace('{0}', source.label),
+        summary: SUMMARY.replace('{0}', valueText)
+          .replace('{1}', objectText)
+          .replace('{2}', values.Normalization__c || ''),
         notUsable: !source.usable,
-        objectText: source.objectLabel || values.Object_Name__c,
-        valueText: source.valueFieldLabel || values.Value_Field__c,
+        objectText,
+        valueText,
         postalText: source.postalFieldLabel || values.Postal_Code_Field__c,
         parentText: source.parentFieldLabel || values.Parent_Field__c,
         compareText: texts[values.Normalization__c] || values.Normalization__c,
         isAddress: values.Normalization__c === ADDRESS,
         canChange: this.canEdit && !source.shipped,
-        toggleLabel: source.active ? DEACTIVATE : ACTIVATE,
+        showDetails,
+        detailsLabel: showDetails ? HIDE_DETAILS : SHOW_DETAILS,
+        detailsExpanded: String(showDetails),
         tryLabel: TRY,
         isTrying,
         tryOpenLabel: `${TRY}: ${source.label}`
       };
     });
+  }
+
+  handleDetailsToggle(event) {
+    const name = event.target.dataset.name;
+    this.expanded = { ...this.expanded, [name]: !this.expanded[name] };
   }
 
   get tryIsAddress() {
@@ -209,8 +234,13 @@ export default class MatchSourceManager extends LightningElement {
     }
   }
 
+  /**
+   * The switch is put back at once: it moves when the deployment has finished and the list is
+   * read again, so it never shows a state Salesforce has not applied.
+   */
   handleToggle(event) {
     const source = this.findSource(event.target.dataset.name);
+    event.target.checked = source.active;
     this.start(
       source.label,
       setArchived({

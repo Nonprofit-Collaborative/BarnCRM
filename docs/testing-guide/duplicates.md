@@ -78,7 +78,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 |---|---|---|
 | 1 | On **Home**, click **New household** and rename it `Sunset Test Household` (a name no rule would match). | The household saves. |
 | 2 | Open the **Addresses** tab and create an address: **Household or Organization** `Sunset Test Household`, **Street** `6830 SUNSET LN.`, **City** `Springfield`, **Postal Code** `62756`, **Primary** ticked. | The address saves. |
-| 3 | On **Duplicate Matching**, **Matching Logic**, choose **Try a value** on **Address (household)**. Enter **Value** `6830 Sunset Ln`, **Postal code** `62756`, and choose **Try**. | **Compared as: 6830 sunset ln\|62756**, then **These records would match:** with **Household: The Garcia Family** and **Household: Sunset Test Household**. |
+| 3 | On **Duplicate Matching**, **Matching Logic**, choose **Try a Value** on **Address (household)**. Enter **Value** `6830 Sunset Ln`, **Postal code** `62756`, and choose **Try**. | **Compared as: 6830 sunset ln\|62756**, then **These records would match:** with **Household: The Garcia Family** and **Household: Sunset Test Household**. |
 | 4 | On **Review**, scan and refresh. | A pair of `Sunset Test Household` and **The Garcia Family**, both **Household:**, with the grey line **Same address on Address (household)**. Capitals and the full stop did not stop the match. |
 | 5 | Click **Not a Duplicate**, give the reason `Test: match source`, confirm. | **Noted. This pair will not be suggested again.** |
 | 6 | Scan again and refresh. | The pair does not come back. |
@@ -92,12 +92,12 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Duplicate Matching** tab and choose **Matching Logic**. | Six cards, each marked **Shipped with BarnCRM** and **Active**: **Contact Point Email**, **Contact Point Phone**, **Contact Point Address**, **Address (person)**, **Address (household)**, **Address (person account)**. In an org without contact point objects, those three say **Not used in this org**. Shipped cards have **Deactivate** and **Try a value**, and no **Edit**. |
-| 2 | Read the **Address (household)** card. | **Object** Address, **Field compared** Street, **Postal code field** Postal Code, **Belongs to** a household or a person account, **Through the lookup** the household lookup, **How values are compared** starting **Address:**. |
-| 3 | Choose **Deactivate** on **Address (household)**. | **Saving. Salesforce applies the change in the background, usually within a minute.**, then **Saved.** The card reads **Inactive**, with **Activate**. |
+| 1 | Open the **Duplicate Matching** tab and choose **Matching Logic**. | Under one intro line with a help icon, six cards, each with a **Shipped with BarnCRM** badge and its **Active** switch on: **Contact Point Email**, **Contact Point Phone**, **Contact Point Address**, **Address (person)**, **Address (household)**, **Address (person account)**. Each has one line such as **Email Address on Contact Point Email, compared as Email**. In an org without contact point objects, those three say **Not used in this org**. Shipped cards have **Show Details** and **Try a Value**, and no **Edit**. |
+| 2 | Choose **Show Details** on the **Address (household)** card. | **Object** Address, **Field compared** Street, **Postal code field** Postal Code, **Belongs to** a household or a person account, **Through the lookup** the household lookup, **How values are compared** starting **Address:**. The button now reads **Hide Details**. |
+| 3 | Turn off the **Active** switch on **Address (household)**. | The switch stays on while **Saving. Salesforce applies the change in the background, usually within a minute.** shows, then **Saved.** and the switch reads **Inactive**. |
 | 4 | Create a household `Pine Test Household` with a primary address **Street** `5616 Pine Dr`, **Postal Code** `78728` (the **Staff Household**'s address). | Both save. |
 | 5 | On **Review**, scan and refresh. | No pair with `Pine Test Household`. |
-| 6 | Back on **Matching Logic**, choose **Activate** on **Address (household)**. | **Saved.** The card reads **Active**. |
+| 6 | Back on **Matching Logic**, turn on the **Active** switch on **Address (household)**. | **Saved.** The switch reads **Active**. |
 | 7 | Scan and refresh. | A pair of `Pine Test Household` and **Staff Household**, reason **Same address on Address (household)**. |
 
 **Cleanup:** Delete `Pine Test Household` and its address; the pair goes with it.
@@ -109,15 +109,15 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Matching Logic**, click **Add**. | A window **New Match Source** over the page, with focus inside it: **Name**, **Object**, **Find fields**, **Field compared**, **Through the lookup**, **How values are compared**, and **Cancel** and **Save** at the bottom. Press Escape: the window closes and nothing is saved. |
-| 2 | Click **Add** again. Enter **Object** `Not_An_Object__c` and choose **Find fields**. | In the window: **Not_An_Object__c is not an object in this org. Check its API name.** |
-| 3 | Change **Object** to `Contact` and choose **Find fields**. | **Field compared** offers text, email and phone fields such as **Email** and **Assistant Phone**, and no date or number field. **Through the lookup** offers lookups such as **Account ID** and **Reports To ID**, and not **Last Name**. |
+| 1 | On **Matching Logic**, click **Add**. | A window **New Match Source** over the page, with focus inside it: **Name**, **Object**, **Find Fields**, **Field compared**, **Through the lookup**, **How values are compared**, and **Cancel** and **Save** at the bottom. Press Escape: the window closes and nothing is saved. |
+| 2 | Click **Add** again. Enter **Object** `Not_An_Object__c` and choose **Find Fields**. | In the window: **Not_An_Object__c is not an object in this org. Check its API name.** |
+| 3 | Change **Object** to `Contact` and choose **Find Fields**. | **Field compared** offers text, email and phone fields such as **Email** and **Assistant Phone**, and no date or number field. **Through the lookup** offers lookups such as **Account ID** and **Reports To ID**, and not **Last Name**. |
 | 4 | Choose **How values are compared** **Address**. | A **Postal code field** list appears. |
 | 5 | Choose **Field compared** **Mailing Street**, **Through the lookup** **Account ID**, leave **Postal code field** empty, and **Save**. | Refused: **An address source needs a postal code field: the street is compared together with it.** in the window, which stays open. |
-| 6 | Enter **Name** `Test: assistant phone`, choose **How values are compared** **Phone**, **Field compared** **Assistant Phone**, **Through the lookup** **Reports To ID**, and **Save**. | The window closes. **Saving.**, then **Saved. Test: assistant phone is in the list.** Its card says **Belongs to** a person, has **Edit**, **Deactivate** and **Try a value**, and is not marked **Shipped with BarnCRM**. |
+| 6 | Enter **Name** `Test: assistant phone`, choose **How values are compared** **Phone**, **Field compared** **Assistant Phone**, **Through the lookup** **Reports To ID**, and **Save**. | The window closes. **Saving.**, then **Saved. Test: assistant phone is in the list.** Its card has **Edit**, the **Active** switch and **Try a Value**, no **Shipped with BarnCRM** badge, and **Show Details** says **Belongs to** a person. |
 | 7 | Choose **Edit** on it. In the window, change **Name** to `Test: assistant phone 2`, and **Save**. | The window opens with the source's values and its object's fields filled in. **Saved.** The card has the new name. |
 
-**Cleanup:** Choose **Deactivate** on `Test: assistant phone 2` (Salesforce does not let an app delete custom metadata; delete it in Setup, **Custom Metadata Types**, **Match Source**, **Manage Records**, if you want it gone).
+**Cleanup:** Turn off the **Active** switch on `Test: assistant phone 2` (Salesforce does not let an app delete custom metadata; delete it in Setup, **Custom Metadata Types**, **Match Source**, **Manage Records**, if you want it gone).
 
 ## T-DUP-08: Without BarnCRM Duplicate Review
 
@@ -156,8 +156,8 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **Access**, **Extra Permissions**, remove **BarnCRM Metadata Admin** from yourself and confirm. | A message says you no longer have it. |
-| 2 | Reload **Duplicate Matching** and choose **Matching Logic**. | **You can see the match sources. Adding or changing one needs the BarnCRM Metadata Admin permission set.** No **Add**, **Edit**, **Deactivate** or **Activate**. |
-| 3 | Choose **Try a value** on **Contact Point Email** (or **Address (person)** where there are no contact point objects), enter `Someone@Example.org` (for the address source, `1 Main St` and postal code `12345`), and choose **Try**. | A **Compared as:** line with the value as compared, then the matching records or a line saying nobody holds it. Nothing is saved. |
+| 2 | Reload **Duplicate Matching** and choose **Matching Logic**. | **You can see the match sources. Adding or changing one needs the BarnCRM Metadata Admin permission set.** No **Add**, no **Edit** and no **Active** switch; each card shows an **Active** or **Inactive** badge instead. |
+| 3 | Choose **Try a Value** on **Contact Point Email** (or **Address (person)** where there are no contact point objects), enter `Someone@Example.org` (for the address source, `1 Main St` and postal code `12345`), and choose **Try**. | A **Compared as:** line with the value as compared, then the matching records or a line saying nobody holds it. Nothing is saved. |
 
 **Cleanup:** Give yourself **BarnCRM Metadata Admin** again on the **Access** page.
 
