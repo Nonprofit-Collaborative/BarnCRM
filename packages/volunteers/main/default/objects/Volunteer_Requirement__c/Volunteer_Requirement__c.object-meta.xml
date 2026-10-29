@@ -5,6 +5,9 @@
   <description>
     One onboarding step for one person: an application, a background check or an orientation,
     with where it stands and when it lapses. Private: only coordinators and admins see these.
+    Volunteers Admin and Volunteers Coordinator hold View All and Modify All because they are
+    the only people who track onboarding, for every volunteer whoever recorded the step (R-VQ4);
+    no other set grants any access, so sharing stays Private.
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>
