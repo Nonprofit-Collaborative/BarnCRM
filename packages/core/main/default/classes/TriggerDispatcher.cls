@@ -98,14 +98,72 @@ public with sharing class TriggerDispatcher {
             return;
         }
         PauseCheck pause = new PauseCheck();
-        for (
-            Automation_Registry__mdt entry : AutomationRegistrySelector.selectForObject(
-                objectApiName
-            )
-        ) {
-            TriggerHandler handler = instantiate(entry, objectApiName);
-            if (handler != null) {
-                run(handler, context, entry.DeveloperName, entry.Always_Runs__c == true, pause);
+        List<Deferred> deferred = new List<Deferred>();
+        DEFERRED_BY_RUN.add(deferred);
+        try {
+            for (
+                Automation_Registry__mdt entry : AutomationRegistrySelector.selectForObject(
+                    objectApiName
+                )
+            ) {
+                TriggerHandler handler = instantiate(entry, objectApiName);
+                if (handler != null) {
+                    run(handler, context, entry.DeveloperName, entry.Always_Runs__c == true, pause);
+                }
+            }
+        } catch (Exception thrown) {
+            // A failure the dispatcher rethrows rolls the save back: the deferred work goes too.
+            DEFERRED_BY_RUN.remove(DEFERRED_BY_RUN.size() - 1);
+            throw thrown;
+        }
+        DEFERRED_BY_RUN.remove(DEFERRED_BY_RUN.size() - 1);
+        runDeferred(deferred, objectApiName, context);
+    }
+
+    /**
+     * Work a handler hands back to run once every handler of the same trigger run has run, so
+     * two handlers that save the same records can save them once (D-143).
+     */
+    @NamespaceAccessible
+    public interface Deferred {
+        void run();
+    }
+
+    /** The deferred work of each trigger run under way, the innermost last. */
+    private static final List<List<Deferred>> DEFERRED_BY_RUN = new List<List<Deferred>>();
+
+    /**
+     * Runs `work` once every handler of the trigger run under way has run, or at once when no
+     * trigger run is under way (a handler run directly, or a call from outside a trigger). A
+     * failure is logged and reported as a handler's is.
+     */
+    @NamespaceAccessible
+    public static void afterHandlers(Deferred work) {
+        if (work == null) {
+            return;
+        }
+        if (DEFERRED_BY_RUN.isEmpty()) {
+            work.run();
+            return;
+        }
+        DEFERRED_BY_RUN[DEFERRED_BY_RUN.size() - 1].add(work);
+    }
+
+    private static void runDeferred(
+        List<Deferred> deferred,
+        String objectApiName,
+        Context context
+    ) {
+        for (Deferred work : deferred) {
+            try {
+                work.run();
+            } catch (Exception caught) {
+                ErrorLogger.log(
+                    caught,
+                    'Trigger dispatch: ' + objectApiName,
+                    firstRecordId(context)
+                );
+                reportToUser(context, caught);
             }
         }
     }

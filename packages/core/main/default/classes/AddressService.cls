@@ -1143,7 +1143,8 @@ public with sharing class AddressService {
         }
         List<SObject> accountWrites = withChanges(accountUpdates.values());
         if (!accountWrites.isEmpty()) {
-            Database.update(accountWrites, AccessLevel.USER_MODE);
+            // As the user; a new household's Primary Contact rides along (D-143).
+            HouseholdService.saveAccountCopiesAsUser(accountWrites);
         }
     }
 

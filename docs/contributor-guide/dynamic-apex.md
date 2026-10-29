@@ -292,6 +292,13 @@ insert runs it once per 200 records.
   so edits do not flood the log.
 - **Partial success on writes to objects the package does not own**, so a refused Campaign
   never refuses the appeal.
+- **Save a record once when two handlers write it.** Every update is a full trigger run on
+  the records it touches. A handler can hand a write to
+  `TriggerDispatcher.afterHandlers(Deferred)`, which runs it once every handler of the same
+  trigger run has run (at once outside a trigger run), so a later handler writing the same
+  records can carry it instead. `HouseholdService.seedPrimaryContactsOfNewHouseholds`
+  does this: the address propagation's billing write carries a new household's Primary
+  Contact, and whatever nothing carried is saved at the end (D-143).
 
 ## 9. Testing dynamic code
 
