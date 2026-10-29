@@ -564,8 +564,7 @@ public with sharing class AddressService {
         if (toInsert.isEmpty()) {
             return;
         }
-        Database.insert(toInsert, AccessLevel.USER_MODE);
-        clearOtherDefaults(toInsert, true);
+        insertAsMoves(toInsert).save();
         applyToStandardFields(toInsert);
     }
 
@@ -797,16 +796,12 @@ public with sharing class AddressService {
         Boolean movesWereChosen = chooseHouseholdMoves(true);
         isPropagating = true;
         try {
-            if (!toAdd.isEmpty()) {
-                Database.insert(toAdd, AccessLevel.USER_MODE);
-                clearOtherDefaults(toAdd, true);
-            }
+            // The household moves and the released people are saved in one write below.
+            Move move = insertAsMoves(toAdd);
             Map<Id, Address__c> primaryByHousehold = new Map<Id, Address__c>();
             for (Address__c primary : primaries) {
                 primaryByHousehold.put(primary.Account__c, primary);
             }
-            List<Address__c> released = new List<Address__c>();
-            List<Address__c> ended = new List<Address__c>();
             for (
                 Address__c own : AddressSelector.withHistory(
                     AddressSelector.selectDefaultsByOwnerIds(householdByReleased.keySet(), null)
@@ -815,18 +810,15 @@ public with sharing class AddressService {
                 if (own.Contact__c == null) {
                     continue;
                 }
-                released.add(new Address__c(Id = own.Id, Is_Default__c = false));
+                move.cleared.put(own.Id, new Address__c(Id = own.Id, Is_Default__c = false));
                 Address__c taken = primaryByHousehold.get(householdByReleased.get(own.Contact__c));
                 if (taken != null && own.Type__c != TYPE_SEASONAL && !sameAddress(own, taken)) {
                     Address__c closing = new Address__c(Id = own.Id);
                     endAddress(closing, own);
-                    ended.add(closing);
+                    move.history.put(own.Id, closing);
                 }
             }
-            if (!released.isEmpty()) {
-                Database.update(released, AccessLevel.USER_MODE);
-            }
-            saveHistory(ended);
+            move.save();
             applyToStandardFields(primaries);
         } finally {
             isPropagating = false;
@@ -862,69 +854,141 @@ public with sharing class AddressService {
 
     /**
      * At most one address per owner is the default (R-AD2). When the defaults were just added
-     * the save is a move (R-AD10): the primary each replaces is ended and the new one started,
-     * right after the user-mode update that clears the old flag (see saveHistory).
+     * the save is a move (R-AD10): the primary each replaces is ended and the new one started.
      */
     private static void clearOtherDefaults(List<Address__c> defaults, Boolean areNew) {
-        Map<Id, Address__c> newByOwner = new Map<Id, Address__c>();
-        Set<Id> keepIds = new Set<Id>();
-        for (Address__c address : defaults) {
-            if (address.Is_Default__c != true) {
-                continue;
-            }
-            Id ownerId = ownerIdOf(address);
-            if (ownerId != null) {
-                newByOwner.put(ownerId, address);
-                keepIds.add(address.Id);
-            }
-        }
-        if (newByOwner.isEmpty()) {
-            return;
-        }
-        Map<Id, Address__c> updates = new Map<Id, Address__c>();
-        Map<Id, Address__c> replacedByOwner = new Map<Id, Address__c>();
-        List<Address__c> replaced = AddressSelector.selectDefaultsByOwnerIds(
-            newByOwner.keySet(),
-            keepIds
-        );
-        if (areNew) {
-            AddressSelector.withHistory(replaced);
-        }
-        for (Address__c address : replaced) {
-            updates.put(address.Id, new Address__c(Id = address.Id, Is_Default__c = false));
-            replacedByOwner.put(ownerIdOf(address), address);
-        }
-        Map<Id, Address__c> history = new Map<Id, Address__c>();
-        if (areNew) {
-            recordMoves(replacedByOwner, newByOwner, history);
-        }
-        if (!updates.isEmpty()) {
-            Database.update(updates.values(), AccessLevel.USER_MODE);
-        }
-        saveHistory(history.values());
+        new Move(defaults, areNew).save();
     }
 
     /**
-     * Saves the history fields a move sets (Status, Start Date, End Date, R-AD10), after the
-     * user-mode save of the same move has passed.
-     *
-     * System mode on purpose, for this internal bookkeeping write only. The three fields are
-     * kept by BarnCRM on every move, not edited by the person saving, so someone who may save
-     * addresses without access to them (a profile that grants Address__c, no BarnCRM permission
-     * set) must not have an ordinary address save fail on them. Only these three fields are
-     * ever on the records passed here, and the class's sharing still applies.
+     * Inserts new primary addresses as the user, as a move (R-AD10). What each one replaces is
+     * read before the insert, so a new primary's start date goes in with the insert instead of
+     * a second update of the same rows. The move is returned unsaved, for the caller to add to.
      */
-    private static void saveHistory(List<Address__c> changes) {
-        List<Address__c> changed = new List<Address__c>();
-        for (Address__c change : changes) {
-            // Id alone is one populated field: nothing to save.
-            if (change.getPopulatedFieldsAsMap().size() > 1) {
-                changed.add(change);
+    private static Move insertAsMoves(List<Address__c> toAdd) {
+        Move move = new Move(toAdd, true);
+        if (!toAdd.isEmpty()) {
+            Database.insert(toAdd, AccessLevel.USER_MODE);
+        }
+        return move;
+    }
+
+    /**
+     * The writes one move makes to addresses already on file: the old primaries cleared, and
+     * the history fields a move sets (Status, Start Date, End Date, R-AD10).
+     */
+    private with sharing class Move {
+        /** The addresses that stop being the primary, by Id. */
+        public Map<Id, Address__c> cleared = new Map<Id, Address__c>();
+        /** The history fields to set, by Id. */
+        public Map<Id, Address__c> history = new Map<Id, Address__c>();
+        /** New primaries saved without the start date they are given, until they have an Id. */
+        private List<Address__c> starting = new List<Address__c>();
+
+        public Move(List<Address__c> defaults, Boolean areNew) {
+            Map<Id, Address__c> newByOwner = new Map<Id, Address__c>();
+            Set<Id> keepIds = new Set<Id>();
+            for (Address__c address : defaults) {
+                Id ownerId = ownerIdOf(address);
+                if (address.Is_Default__c != true || ownerId == null) {
+                    continue;
+                }
+                newByOwner.put(ownerId, address);
+                if (address.Id != null) {
+                    keepIds.add(address.Id);
+                }
+            }
+            if (newByOwner.isEmpty()) {
+                return;
+            }
+            Map<Id, Address__c> replacedByOwner = new Map<Id, Address__c>();
+            List<Address__c> replaced = AddressSelector.selectDefaultsByOwnerIds(
+                newByOwner.keySet(),
+                keepIds
+            );
+            if (areNew) {
+                AddressSelector.withHistory(replaced);
+            }
+            for (Address__c address : replaced) {
+                cleared.put(address.Id, new Address__c(Id = address.Id, Is_Default__c = false));
+                replacedByOwner.put(ownerIdOf(address), address);
+            }
+            if (areNew) {
+                recordMoves(replacedByOwner, newByOwner, this);
             }
         }
-        if (!changed.isEmpty()) {
-            Database.update(changed, AccessLevel.SYSTEM_MODE);
+
+        /** A new primary starts today: with its insert when the user may set it, else after. */
+        public void start(Address__c moved) {
+            if (
+                moved.Id == null &&
+                Schema.SObjectType.Address__c.fields.Start_Date__c.isCreateable()
+            ) {
+                moved.Start_Date__c = Date.today();
+            } else {
+                starting.add(moved);
+            }
         }
+
+        /**
+         * Saves the move. The flag is always cleared as the user. The history fields are kept
+         * by BarnCRM on every move, not edited by the person saving, so someone who may save
+         * addresses without access to them (a profile that grants Address__c, no BarnCRM
+         * permission set) must not have an ordinary address save fail on them: for that person
+         * they are saved after, in system mode, for this internal bookkeeping write only, with
+         * the class's sharing still applied. For anyone who may edit them, the flag and the
+         * history go in one user-mode update.
+         */
+        public void save() {
+            for (Address__c moved : starting) {
+                history.put(moved.Id, new Address__c(Id = moved.Id, Start_Date__c = Date.today()));
+            }
+            Map<Id, Address__c> changed = new Map<Id, Address__c>();
+            for (Address__c change : history.values()) {
+                // Id alone is one populated field: nothing to save.
+                if (change.getPopulatedFieldsAsMap().size() > 1) {
+                    changed.put(change.Id, change);
+                }
+            }
+            if (historyEditableByUser()) {
+                for (Address__c change : changed.values()) {
+                    Address__c write = cleared.get(change.Id);
+                    if (write == null) {
+                        cleared.put(change.Id, change);
+                        continue;
+                    }
+                    Map<String, Object> fields = change.getPopulatedFieldsAsMap();
+                    for (String field : fields.keySet()) {
+                        if (field != 'Id') {
+                            write.put(field, fields.get(field));
+                        }
+                    }
+                }
+                changed.clear();
+            }
+            if (!cleared.isEmpty()) {
+                Database.update(cleared.values(), AccessLevel.USER_MODE);
+            }
+            if (!changed.isEmpty()) {
+                Database.update(changed.values(), AccessLevel.SYSTEM_MODE);
+            }
+        }
+    }
+
+    /** Whether the running user may edit all three history fields (R-AD10). */
+    private static Boolean historyEditableByUser() {
+        for (
+            Schema.SObjectField field : new List<Schema.SObjectField>{
+                Address__c.Status__c,
+                Address__c.Start_Date__c,
+                Address__c.End_Date__c
+            }
+        ) {
+            if (!field.getDescribe().isUpdateable()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -936,8 +1000,9 @@ public with sharing class AddressService {
     private static void recordMoves(
         Map<Id, Address__c> replacedByOwner,
         Map<Id, Address__c> newByOwner,
-        Map<Id, Address__c> history
+        Move move
     ) {
+        Map<Id, Address__c> history = move.history;
         Map<Id, Address__c> endingByOwner = new Map<Id, Address__c>();
         Set<Id> seasonalOwners = new Set<Id>();
         for (Id ownerId : replacedByOwner.keySet()) {
@@ -969,7 +1034,7 @@ public with sharing class AddressService {
             }
             endAddress(history.get(ending.Id), ending);
             if (moved.Start_Date__c == null) {
-                history.put(moved.Id, new Address__c(Id = moved.Id, Start_Date__c = Date.today()));
+                move.start(moved);
             }
         }
     }
