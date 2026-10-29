@@ -182,6 +182,21 @@ public with sharing class AccountKinds {
         return chosen;
     }
 
+    /**
+     * Whether "No record type" (`Master`) can be chosen: only when the org has no candidate.
+     * Where a candidate exists, an account saved without a record type takes the creating
+     * user's default record type, and the platform refuses the master record type Id for a
+     * user who can use another one, so organizations made under `Master` would not count as
+     * organizations. The Settings picker offers it, and the Settings save accepts it, only here.
+     */
+    @NamespaceAccessible
+    public static Boolean noRecordTypeAllowed() {
+        if (candidatesOverride != null) {
+            return candidatesOverride.isEmpty();
+        }
+        return candidateRecordTypes().isEmpty();
+    }
+
     /** Whether this developer name is one of the candidates (case as Setup has it). */
     @NamespaceAccessible
     public static Boolean isCandidate(String developerName) {
@@ -201,13 +216,15 @@ public with sharing class AccountKinds {
      * a record type since deactivated, deleted or otherwise no longer a candidate. What install
      * and source deploy run (CorePostInstall), so the setting is never blank and the formula
      * field `Account.Is_Organization__c`, which reads the stored value, agrees with this class,
-     * which reads a stale value as the detected one. `Master` and a candidate, the values an
-     * administrator can save, are never overwritten.
+     * which reads a stale value as the detected one. A stored `Master` is stale too once the
+     * org has a candidate (see noRecordTypeAllowed). A candidate, and `Master` in an org with
+     * none, the values an administrator can save, are never overwritten.
      */
     @NamespaceAccessible
     public static void storeDetectedIfBlank() {
         String stored = storedValue();
-        if (NO_RECORD_TYPE.equalsIgnoreCase(stored) || isCandidate(stored)) {
+        Boolean usableNone = NO_RECORD_TYPE.equalsIgnoreCase(stored) && noRecordTypeAllowed();
+        if (usableNone || isCandidate(stored)) {
             return;
         }
         SettingsService.saveSystemValue(

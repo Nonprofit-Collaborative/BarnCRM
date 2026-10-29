@@ -263,6 +263,7 @@ public with sharing class SettingsService {
             }
             refuseIfMembershipDataWouldBeStranded(token, oldText, newText);
             refuseIfDigestRecipientsAreNotUsers(token, newText);
+            refuseIfNoRecordTypeCannotWork(token, newText);
             changed.put(token, newValue);
             if (!audit) {
                 continue;
@@ -396,6 +397,21 @@ public with sharing class SettingsService {
         String refusal = ErrorDigestRecipients.refusal(newText);
         if (refusal != null) {
             throw new SettingsException(refusal);
+        }
+    }
+
+    /**
+     * "No record type" for organizations works only in an org with no Account record type to
+     * offer (AccountKinds.noRecordTypeAllowed), so choosing it anywhere else is refused. Checked
+     * only when the value changes, so a section saved with an older stored `Master` still saves.
+     */
+    private static void refuseIfNoRecordTypeCannotWork(Schema.SObjectField token, String newText) {
+        if (
+            token == BarnCRM_Settings__c.Organization_Record_Type__c &&
+            AccountKinds.NO_RECORD_TYPE.equalsIgnoreCase(newText) &&
+            !AccountKinds.noRecordTypeAllowed()
+        ) {
+            throw new SettingsException(System.Label.Core_Settings_NoRecordTypeNotAllowed);
         }
     }
 

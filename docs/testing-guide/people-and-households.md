@@ -284,7 +284,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **General**. | **Record type for organizations** shows **Business Account** in the Person Accounts org and **No record type** in the Platform-only org; never blank. |
-| 2 | Open the dropdown. | It lists the org's active Account record types and **No record type**; no **Household** and no person account record type. |
+| 2 | Open the dropdown. | In the Person Accounts org it lists the org's active Account record types and no **No record type**; in the Platform-only org it lists only **No record type**. Never **Household** or a person account record type. |
 | 3 | Open the **Organizations** tab. | Accounts of the chosen record type are listed; households and person accounts are not. |
 | 4 | Open one of those organizations. | The **Affiliations** panel and the website show; no **Name and Greetings**, no **Members**, no **Erase Person**. |
 | 5 | Import a file with one person and the organization `Zztest Rt Org`. | `Zztest Rt Org` is created with the chosen record type (or none, for **No record type**) and appears on the **Organizations** tab. |
@@ -302,8 +302,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Before the deploy, open the **Organizations** tab and note how many records it lists. | A count to compare. |
-| 2 | Deploy this version. Open **BarnCRM Settings**, **General**. | **Record type for organizations** shows a record type or **No record type**, never blank. |
-| 3 | Set **Record type for organizations** to the record type your organizations use (or **No record type** when they have none) and save. | Saved, and listed in **Recent Changes**. |
+| 2 | Deploy this version. Open **BarnCRM Settings**, **General**. | **Record type for organizations** shows a record type, never blank. **No record type** is offered only when the org has no Account record type besides Household and person account ones. |
+| 3 | Set **Record type for organizations** to the record type your organizations use and save. | Saved, and listed in **Recent Changes**. |
 | 4 | Open the **Organizations** tab and the **Households** tab. | The Organizations tab lists the same records as in step 1; the Households tab lists the same records as before. |
 | 5 | As a staff user, open a household and an organization. | The same sections and panels as before (T-HH-13): the organization shows **Is Organization** checked, with the **Affiliations** panel. |
 

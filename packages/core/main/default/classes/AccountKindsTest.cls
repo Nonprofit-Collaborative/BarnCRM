@@ -316,9 +316,7 @@ private class AccountKindsTest {
                 'Blank is filled with the detected value.'
             );
             AccountKinds.reset();
-            AccountKinds.candidatesOverride = new List<AccountKinds.Candidate>{
-                candidate('Business', 'Business', true)
-            };
+            AccountKinds.candidatesOverride = new List<AccountKinds.Candidate>();
             AccountKinds.storeDetectedIfBlank();
             Test.stopTest();
 
@@ -327,6 +325,52 @@ private class AccountKindsTest {
                 BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c,
                 'A usable stored value is never overwritten.'
             );
+        }
+    }
+
+    @IsTest
+    static void noRecordTypeIsAllowedOnlyWithoutACandidate() {
+        System.runAs(TestUsers.admin()) {
+            AccountKinds.candidatesOverride = new List<AccountKinds.Candidate>();
+            Assert.isTrue(AccountKinds.noRecordTypeAllowed(), 'No candidate: it works.');
+            AccountKinds.candidatesOverride = new List<AccountKinds.Candidate>{
+                candidate('Business', 'Business', false)
+            };
+            Assert.isFalse(AccountKinds.noRecordTypeAllowed(), 'A candidate: it never does.');
+            AccountKinds.reset();
+            Assert.areEqual(
+                AccountKinds.candidateRecordTypes().isEmpty(),
+                AccountKinds.noRecordTypeAllowed(),
+                'In this org, it follows its own record types.'
+            );
+        }
+    }
+
+    /**
+     * A stored No record type in an org with a candidate is stale: the next install stores the
+     * detected candidate. In an org with none it stays. The org's own stored value is not read.
+     */
+    @IsTest
+    static void installReplacesNoRecordTypeWhereACandidateExists() {
+        System.runAs(TestUsers.admin()) {
+            store(AccountKinds.NO_RECORD_TYPE);
+            Boolean hasCandidate = !AccountKinds.candidateRecordTypes().isEmpty();
+
+            Test.startTest();
+            AccountKinds.storeDetectedIfBlank();
+            Test.stopTest();
+
+            String stored = BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c;
+            if (hasCandidate) {
+                Assert.isTrue(AccountKinds.isCandidate(stored), 'A candidate replaced it.');
+                Assert.areEqual(
+                    AccountKinds.detectOrganizationRecordType(),
+                    stored,
+                    'The detected one.'
+                );
+            } else {
+                Assert.areEqual(AccountKinds.NO_RECORD_TYPE, stored, 'Kept where it works.');
+            }
         }
     }
 }

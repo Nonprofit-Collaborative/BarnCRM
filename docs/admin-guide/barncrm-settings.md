@@ -301,8 +301,11 @@ parts separated by commas.
 on, because import, addresses and Giving use organizations either way. Accounts of the record
 type chosen here are your organizations: they appear on the **Organizations** tab, get the
 organization parts of the record page, are matched as organizations by import, and an import
-creates new organizations with it. Choose **No record type** when your org has no Account
-record types; then every account without one is an organization.
+creates new organizations with it. **No record type** is offered only when your org has no
+Account record type to choose (Household and person account record types do not count); then
+every account without one is an organization. Where your org has one, an account saved
+without a record type takes the user's default record type, so **No record type** would not
+work and saving it is refused.
 
 BarnCRM never adds an Organization record type. On install it picks one you already have and
 saves it, so the row is never blank:
@@ -316,8 +319,9 @@ saves it, so the row is never blank:
 
 Change it if the guess is wrong. Saving a person account record type or one named Household
 is refused. Accounts already saved keep their record type; only which accounts count as
-organizations changes. If you later deactivate or delete the chosen record type, BarnCRM
-picks again the same way on its next upgrade, so check this row after one.
+organizations changes. If you later deactivate or delete the chosen record type, or add an
+Account record type while **No record type** is chosen, BarnCRM picks again the same way on
+its next upgrade, so check this row after one.
 
 ## You Never Type an Identifier
 
@@ -331,7 +335,7 @@ at something, you choose it:
   a list of checkboxes, one per active record type in your org, by the name you see in Setup.
   Ticking none means every record type.
 - **One record type**, such as **Record type for organizations**, is a dropdown of your active
-  record types by the name you see in Setup, plus **No record type**.
+  record types by the name you see in Setup, or **No record type** when there are none.
 - **A choice from a fixed list**, such as **Coexistence mode**, is a dropdown.
 
 Every setting shows its default until you change it. A dropdown, a number or a text setting

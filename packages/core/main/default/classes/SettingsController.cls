@@ -791,10 +791,12 @@ public with sharing class SettingsController {
                 option.label = info.getName();
                 setting.options.add(option);
             }
-            Option none = new Option();
-            none.value = AccountKinds.NO_RECORD_TYPE;
-            none.label = System.Label.Core_Settings_NoRecordType;
-            setting.options.add(none);
+            if (offersNoRecordType(type)) {
+                Option none = new Option();
+                none.value = AccountKinds.NO_RECORD_TYPE;
+                none.label = System.Label.Core_Settings_NoRecordType;
+                setting.options.add(none);
+            }
         }
         if (isRecordTypes) {
             for (Schema.RecordTypeInfo info : SettingsService.recordTypes(type)) {
@@ -840,6 +842,20 @@ public with sharing class SettingsController {
     private static Boolean isCoexistenceMode(String settingsObject, String key) {
         return SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject) &&
             CoexistenceService.KEY_COEXISTENCE_MODE.equalsIgnoreCase(key);
+    }
+
+    /**
+     * For organizations, "No record type" is offered only where it works: in an org with no
+     * Account record type to offer (AccountKinds.noRecordTypeAllowed). It is also listed while
+     * it is the value in force, so the row shows what is stored until the next upgrade replaces
+     * it; saving it again changes nothing, and choosing it anew is refused (SettingsService).
+     */
+    private static Boolean offersNoRecordType(Schema.SObjectType type) {
+        if (type != Account.SObjectType) {
+            return true;
+        }
+        return AccountKinds.noRecordTypeAllowed() ||
+            AccountKinds.NO_RECORD_TYPE.equalsIgnoreCase(AccountKinds.organizationRecordTypeName());
     }
 
     private static Boolean isOrganizationRecordType(String settingsObject, String key) {

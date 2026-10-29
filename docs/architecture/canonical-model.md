@@ -718,7 +718,10 @@ not shown for Organization records on the Account record page.
 **R-O4 Defined by the org's own record type (ADR-0141).** Core ships no Organization record
 type. `BarnCRM_Settings__c.Organization_Record_Type__c` names one active Account record
 type, by developer name, or holds `Master` for "No record type"; a person record type or one
-whose developer name or label contains Household is refused. One record type, never several.
+whose developer name or label contains Household is refused. `Master` is offered and saved
+only when the org has no candidate (R-O5): where one exists, an account saved without a record
+type takes the user's default record type, and the master record type Id is refused for a user
+who can use another, so a stored `Master` there is stale and replaced by detection. One record type, never several.
 
 **R-O5 Detection.** When the setting is blank, or names a record type that is gone, inactive
 or otherwise no longer a candidate (each install, upgrade or source deploy stores the result
@@ -9116,7 +9119,7 @@ mirrors the primary member).
 | v0.11 | 2026-10-28 | Security review fixes (Core, owner-approved 2026-10-28). No object or field added. BarnCRM Read Only loses Read and Create on `Merge_Settlement_Ready__e`; its subscriber settles only the records the event's publisher (`CreatedById`) may edit. `ErrorLogEventHandler` sets `Error_Log__c.User__c` from the event's `CreatedById`, not the payload's `User_Id__c`. |
 | v0.8 | 2026-10-28 | Integrations page shows no install links (owner decision). The Install URL field removed from `Integration_App__mdt` (Section 13) and from its shipped records; nothing else read it. The Module Manager's install links are unchanged. |
 | v0.8 | 2026-10-28 | Import templates (plan D-136). No object or field added. R-IT5: Core ships `organization_list` and `couples_and_households`; the shipped `generic_contact_list` is labelled "People and Organizations List" for new materializations only; a people or gift template can be copied under a new name with key `copy_` and a random number. |
-| v0.8 | 2026-10-29 | Organization record type removed (RT5, ADR-0141, D-134). No object or field added. The packaged `Account.Organization` record type and its compact layout are deleted. `Is_Organization__c` also counts an account of the master record type (no developer name) as an organization when the setting is `Master`. R-O5: a stored record type that is no longer a candidate is replaced by the detected one on each install, upgrade or source deploy, so the formula and `AccountKinds` agree. |
+| v0.8 | 2026-10-29 | Organization record type removed (RT5, ADR-0141, D-134). No object or field added. The packaged `Account.Organization` record type and its compact layout are deleted. `Is_Organization__c` also counts an account of the master record type (no developer name) as an organization when the setting is `Master`. R-O5: a stored record type that is no longer a candidate is replaced by the detected one on each install, upgrade or source deploy, so the formula and `AccountKinds` agree. R-O4: `Master` is offered and saved only when the org has no candidate, and a stored `Master` is stale once it has one. |
 
 ---
 ## 32. Entity ownership by package

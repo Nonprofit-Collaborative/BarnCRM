@@ -145,6 +145,14 @@
         <value>No record type</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_NoRecordTypeNotAllowed</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: No record type refused while the org has Account record types</shortDescription>
+        <value>No record type can be chosen only when your org has no Account record type for organizations. Choose one of the record types listed, then save again.</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_NumberOutOfRange</fullName>
         <categories>Core</categories>
         <language>en_US</language>
