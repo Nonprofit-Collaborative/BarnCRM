@@ -8,7 +8,10 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Landing batch 10 (PR pending, branch `landing/batch-10`; incremental gate on `barn-sales`)
 
-Merges #694, #684, #692, #693, #682, #683, #686, #689, #690, #685, #687, #688 and #691. #670 is superseded by #694 (which contains it).
+Merges #694, #684, #692, #693, #682, #683, #686, #689, #690, #685, #687, #688, #691 and #696. #670 is superseded by #694 (which contains it).
+
+- Verification of batches 9 and 10: the first incremental gate on this branch ran only the 5 critical classes (153 tests), because `RunRelevantTests` ignored the changed tests. A separate run of the 273 changed or affected test classes on `barn-sales` at 5584a47b (2,984 tests) found 4 test bugs, household inserts under `runAs` that #684 and #692 added after RT2b's conversion (`AddressHistoryTest` three methods, `ContactInsertHouseholdSaveTest.aPersonJoiningAnExistingHouseholdLeavesItsPrimaryContactAlone`); fixed here with `AccessLevel.SYSTEM_MODE` setup inserts.
+- #696 (incremental gate test selection): the incremental gate selects changed and affected test classes with `scripts/org/select-org-tests.py` and runs them with `RunSpecifiedTests`.
 
 - #694 (RT2b): role sets lose the Household record type; `BarnCRM_Households` carries the Households tab; test-data households inserted in system mode (about 260 inserts in about 60 classes); new Staff proof test. Production household creation already goes through system-mode writers (`HouseholdWriter`, `HouseholdMergeWriter`). Full branch deploy to `oi-test` 2026-10-28: 4,099 of 4,137 test methods passed first, 38 fixed and rerun clean.
 - #684, #692, #693 (automation performance PRs 4 to 6, D-143): address move history in fewer writes (mailing change on 200 contacts 5 DML/1,200 rows to 4/800); one household write after a contact insert via new `TriggerDispatcher.afterHandlers` (contact insert 6 DML/1,001 rows to 5/801, CPU about 15% lower); allocation handlers reuse gift values (gift insert SOQL 10 to 7, amount change 7 to 4).

@@ -180,6 +180,7 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - An LWC that needs a page-state key gets it from Apex (`NamespaceUtil.stateKey`) because `check-namespace-readiness.py` refuses a literal `c__`; `DataManagerController.findToolStateKey` is Find's `__tool` key (#677, #678).
 - Anonymous Apex in `oi-test` needs Giving_Admin assigned to compile against Gift fields (assign for the run, then remove). Deploying a class to `oi-test` can overwrite an open PR's version (check `gh pr list` for overlapping files). Get the global describe only from `NamespaceUtil.globalDescribe()` (#679, #680).
 - `oi-test` had no "BarnCRM Tab Access Check" CronTrigger on 2026-10-28; verify after the release deploy.
+- `RunRelevantTests` ran only the critical tests (it ignored changed test classes; batch 10's first gate ran 5 classes, 153 tests). The incremental gate now selects changed and affected classes with `scripts/org/select-org-tests.py` and runs them with `RunSpecifiedTests` (#696).
 - `oi-test` was fully deployed from `feature/rt2b-remainder` on 2026-10-28; its `HouseholdService`, `HouseholdWriter` and `HouseholdController` are not `main`'s (redeploy before relying on them).
 - `TriggerDispatcher.afterHandlers` is how two handlers of one trigger run save the same record once (#692).
 - `c-barn-tool-tile` new-tab (grid `newTab`) is the pattern for link tiles that leave the app (#682); the Data Manager About This Tool storage key is `dataManager`.
