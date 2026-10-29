@@ -166,8 +166,8 @@
           </criteria>
           <criteria>
             <leftValue>{!Record.Is_Organization__c}</leftValue>
-            <operator>NE</operator>
-            <rightValue>true</rightValue>
+            <operator>EQUAL</operator>
+            <rightValue>false</rightValue>
           </criteria>
         </visibilityRule>
       </fieldInstance>
@@ -185,8 +185,8 @@
           </criteria>
           <criteria>
             <leftValue>{!Record.Is_Organization__c}</leftValue>
-            <operator>NE</operator>
-            <rightValue>true</rightValue>
+            <operator>EQUAL</operator>
+            <rightValue>false</rightValue>
           </criteria>
         </visibilityRule>
       </fieldInstance>
@@ -204,8 +204,8 @@
           </criteria>
           <criteria>
             <leftValue>{!Record.Is_Organization__c}</leftValue>
-            <operator>NE</operator>
-            <rightValue>true</rightValue>
+            <operator>EQUAL</operator>
+            <rightValue>false</rightValue>
           </criteria>
         </visibilityRule>
       </fieldInstance>
@@ -223,8 +223,8 @@
           </criteria>
           <criteria>
             <leftValue>{!Record.Is_Organization__c}</leftValue>
-            <operator>NE</operator>
-            <rightValue>true</rightValue>
+            <operator>EQUAL</operator>
+            <rightValue>false</rightValue>
           </criteria>
         </visibilityRule>
       </fieldInstance>
@@ -242,8 +242,8 @@
           </criteria>
           <criteria>
             <leftValue>{!Record.Is_Organization__c}</leftValue>
-            <operator>NE</operator>
-            <rightValue>true</rightValue>
+            <operator>EQUAL</operator>
+            <rightValue>false</rightValue>
           </criteria>
         </visibilityRule>
       </fieldInstance>
@@ -261,8 +261,8 @@
           </criteria>
           <criteria>
             <leftValue>{!Record.Is_Organization__c}</leftValue>
-            <operator>NE</operator>
-            <rightValue>true</rightValue>
+            <operator>EQUAL</operator>
+            <rightValue>false</rightValue>
           </criteria>
         </visibilityRule>
       </fieldInstance>
@@ -389,8 +389,8 @@
                 </criteria>
                 <criteria>
                   <leftValue>{!Record.Is_Organization__c}</leftValue>
-                  <operator>NE</operator>
-                  <rightValue>true</rightValue>
+                  <operator>EQUAL</operator>
+                  <rightValue>false</rightValue>
                 </criteria>
               </visibilityRule>
             </valueListItems>
@@ -536,8 +536,8 @@
           </criteria>
           <criteria>
             <leftValue>{!Record.Is_Organization__c}</leftValue>
-            <operator>NE</operator>
-            <rightValue>true</rightValue>
+            <operator>EQUAL</operator>
+            <rightValue>false</rightValue>
           </criteria>
         </visibilityRule>
       </componentInstance>
