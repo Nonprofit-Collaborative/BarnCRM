@@ -518,7 +518,11 @@ private class HouseholdWriterTest {
                 ]
                 .AccountId;
                 editSaved = Database.update(
-                        new Account(Id = householdId, Phone = '555-0100'),
+                        new Account(
+                            Id = householdId,
+                            Name = 'The Nortega Home',
+                            Custom_Name__c = true
+                        ),
                         AccessLevel.USER_MODE
                     )
                     .isSuccess();
@@ -535,7 +539,7 @@ private class HouseholdWriterTest {
 
             Assert.isFalse(recordTypeOffered, 'BarnCRM Staff does not give Household');
             Contact saved = [
-                SELECT Account.RecordTypeId, Account.Phone
+                SELECT Account.RecordTypeId, Account.Name
                 FROM Contact
                 WHERE Id = :ana.Id
                 WITH SYSTEM_MODE
@@ -546,7 +550,7 @@ private class HouseholdWriterTest {
                 'Ana was given a household'
             );
             Assert.isTrue(editSaved, 'Maria may edit the household');
-            Assert.areEqual('555-0100', saved.Account.Phone, 'The edit was saved');
+            Assert.areEqual('The Nortega Home', saved.Account.Name, 'The edit was saved');
             Assert.isTrue(directInsertRefused, 'A user mode household insert is refused');
         }
     }
