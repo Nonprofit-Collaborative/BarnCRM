@@ -7,7 +7,7 @@ on ADR-0046
 
 ## Context
 
-ADR-0046 made Core alone the Community Suite, for organizations that are not nonprofits, and
+ADR-0046 made Core alone the Standard Edition, for organizations that are not nonprofits, and
 said nonprofit-only modules are never offered to it. ADR-0059 decision 5 made Core's wording
 neutral but kept the names of Salesforce products Core coexists with (NPSP, Nonprofit Cloud,
 Agentforce Nonprofit, Gift Transaction) as an exception, without saying when they may show.
@@ -33,7 +33,7 @@ such as Giving is installed, and what `OrgShapeDetector` finds in the org (`hasN
 
 ## Decision
 
-1. **Core shows no nonprofit wording where a Community Suite user can see it.** No label,
+1. **Core shows no nonprofit wording where a Standard Edition user can see it.** No label,
    help text, option, message, seeded record or admin-guide page of Core says "nonprofit" or
    uses nonprofit-only vocabulary (gift, donor, donation, grant, fundraising, receipt, pledge,
    appeal). Admin-guide pages count, because the in-app help links open them. Four exceptions:
@@ -91,7 +91,7 @@ such as Giving is installed, and what `OrgShapeDetector` finds in the org (`hasN
   reason in decision 6: the target org of a migration usually has neither.
 - **Keep neutral "kept with the row" import columns** ("Amount (kept with the row, not
   loaded)"). Rejected: the staged row already keeps the whole original line, so the options
-  add nothing a Community Suite org can use.
+  add nothing a Standard Edition org can use.
 - **Wait for C-30 and gate on the edition.** Rejected: C-30 is planned for v0.8, and these
   screens are seen now.
 

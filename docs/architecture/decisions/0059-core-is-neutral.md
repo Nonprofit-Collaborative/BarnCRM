@@ -7,7 +7,7 @@ ADR-0046; builds on ADR-0014, ADR-0017, ADR-0020 and ADR-0057 (as amended by ADR
 
 ## Context
 
-ADR-0046 made Core alone the Community Suite, for organizations that are not nonprofits, and
+ADR-0046 made Core alone the Standard Edition, for organizations that are not nonprofits, and
 said that the nonprofit app and wording, the giving and receipt settings and the nonprofit
 Setup Assistant steps move from Core to Giving (C-29). Four things in Core did not meet that:
 
@@ -98,7 +98,7 @@ Assistant flow and labels as before.
 - **A registry custom metadata type for steps.** Rejected for the reason ADR-0057 gave: one
   dependent package, and a class name gives what a registry would, with no new object.
 - **Giving ships a second copy of the hub, labelled Nonprofit Hub.** Rejected as the default:
-  Core's permission sets must make Core's app visible for the Community Suite, and cannot name a
+  Core's permission sets must make Core's app visible for the Standard Edition, and cannot name a
   Giving app, so a nonprofit would see two hubs with the same tabs, and a person holding only a
   Core role would see just the neutral one. Listed as an owner question.
 - **Rename the API names now.** Rejected for C-29: several hundred references change for no
