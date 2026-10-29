@@ -36,6 +36,9 @@ import DEFAULTS_TEXT from '@salesforce/label/c.Core_Settings_DefaultsBannerText'
 import KEEP_ALL_DEFAULTS from '@salesforce/label/c.Core_Settings_KeepAllDefaults';
 import KEEP_DEFAULT from '@salesforce/label/c.Core_Settings_KeepDefaultButton';
 import KEEP_DEFAULT_ARIA from '@salesforce/label/c.Core_Settings_KeepDefaultAria';
+import SUGGESTION from '@salesforce/label/c.Core_Settings_CompanySuggestion';
+import USE_SUGGESTION from '@salesforce/label/c.Core_Settings_UseSuggestion';
+import USE_SUGGESTION_ARIA from '@salesforce/label/c.Core_Settings_UseSuggestionAria';
 import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
@@ -160,7 +163,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     defaultsTitle: DEFAULTS_TITLE,
     defaultsText: DEFAULTS_TEXT,
     keepAllDefaults: KEEP_ALL_DEFAULTS,
-    keepDefault: KEEP_DEFAULT
+    keepDefault: KEEP_DEFAULT,
+    useSuggestion: USE_SUGGESTION
   };
 
   columns = [
@@ -357,6 +361,12 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       // The description sits behind an info icon, with Learn More beside it (UX PR 6).
       hasHelpContent: Boolean(setting.description || setting.helpUrl),
       showsHelpLine: Boolean(setting.description || setting.helpUrl || showsUnsavedDefault),
+      // What a blank Text row means, shown in its empty box (never a value to keep).
+      placeholder: setting.defaultText || undefined,
+      // Company Information's value for a blank row, offered to fill in until it is saved.
+      showsSuggestion: Boolean(setting.suggestedValue) && this.canEdit && !hasPending,
+      suggestionText: SUGGESTION.replace('{0}', setting.suggestedValue || ''),
+      useSuggestionLabel: USE_SUGGESTION_ARIA.replace('{0}', setting.label),
       helpLabel: HELP_ARIA.replace('{0}', setting.label),
       disabled: !this.canEdit,
       ctor: this.componentTypes[setting.component],
@@ -375,7 +385,9 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       showsUnsavedDefault,
       // No one-click keep for a default BarnCRM's detection would replace (a Person Account org's
       // household membership): the admin chooses it by hand instead.
-      canKeepDefault: showsUnsavedDefault && this.canEdit && !setting.detectionMayChange,
+      // Nor for a blank that only says what it means ("Not set"): there is no value to keep.
+      canKeepDefault:
+        showsUnsavedDefault && this.canEdit && !setting.detectionMayChange && !setting.defaultText,
       keepDefaultLabel: KEEP_DEFAULT_ARIA.replace('{0}', setting.label)
     };
   }
@@ -632,10 +644,31 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     const key = event.currentTarget.dataset.keep;
     const section = this.currentSection;
     const setting = section && section.settings.find((candidate) => candidate.key === key);
-    if (!this.canEdit || !setting || !setting.unsavedDefault || setting.detectionMayChange) {
+    if (
+      !this.canEdit ||
+      !setting ||
+      !setting.unsavedDefault ||
+      setting.detectionMayChange ||
+      setting.defaultText
+    ) {
       return;
     }
     await this.send({ [key]: setting.value });
+  }
+
+  /**
+   * Fills a blank row with Company Information's value as an unsaved edit, so it is saved (or
+   * discarded) with the save bar like any value typed by hand.
+   */
+  handleUseSuggestion(event) {
+    const key = event.currentTarget.dataset.suggest;
+    const section = this.currentSection;
+    const setting = section && section.settings.find((candidate) => candidate.key === key);
+    if (!this.canEdit || !setting || !setting.suggestedValue) {
+      return;
+    }
+    this.pending = { ...this.pending, [key]: setting.suggestedValue };
+    this.message = undefined;
   }
 
   /**

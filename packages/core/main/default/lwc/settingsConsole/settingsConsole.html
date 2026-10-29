@@ -117,11 +117,28 @@
                                     type="text"
                                     label={row.label}
                                     value={row.value}
+                                    placeholder={row.placeholder}
                                     disabled={row.disabled}
                                     data-key={row.key}
                                     data-kind="Text"
                                     onchange={handleChange}
                                 ></lightning-input>
+                                <template lwc:if={row.showsSuggestion}>
+                                    <p
+                                        class="slds-text-body_small slds-var-m-top_xx-small"
+                                        data-suggestion={row.key}
+                                    >
+                                        {row.suggestionText}
+                                        <lightning-button
+                                            class="slds-var-m-left_x-small"
+                                            variant="base"
+                                            label={labels.useSuggestion}
+                                            aria-label={row.useSuggestionLabel}
+                                            data-suggest={row.key}
+                                            onclick={handleUseSuggestion}
+                                        ></lightning-button>
+                                    </p>
+                                </template>
                             </template>
 
                             <template lwc:elseif={row.isNumber}>

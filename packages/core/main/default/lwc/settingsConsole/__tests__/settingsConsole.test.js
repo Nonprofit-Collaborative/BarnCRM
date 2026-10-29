@@ -1418,6 +1418,59 @@ describe('c-settings-console', () => {
       expect(keepButton(element, 'Error_Digest_Frequency__c')).toBeNull();
     });
 
+    it('says what a blank text row means, keeps nothing, and fills in Company Information', async () => {
+      const text = (key, defaultText, suggestedValue) => ({
+        key,
+        label: key,
+        description: null,
+        dataType: 'Text',
+        section: 'Organization',
+        component: null,
+        helpUrl: null,
+        value: '',
+        checked: false,
+        options: [],
+        unsavedDefault: true,
+        defaultText,
+        suggestedValue
+      });
+      getConsoleModel.mockResolvedValue({
+        canEdit: true,
+        sections: [
+          {
+            name: 'Organization',
+            settings: [
+              text('Organization_Legal_Name__c', 'Not set', 'Barn Rescue Inc'),
+              text('Error_Digest_Recipients__c', 'Everyone with the permission', null)
+            ]
+          }
+        ]
+      });
+      const element = build();
+      await settle();
+
+      const input = (key) => element.shadowRoot.querySelector(`lightning-input[data-key="${key}"]`);
+      expect(input('Organization_Legal_Name__c').placeholder).toBe('Not set');
+      expect(input('Error_Digest_Recipients__c').placeholder).toBe('Everyone with the permission');
+      expect(notes(element)).toEqual(['Organization_Legal_Name__c', 'Error_Digest_Recipients__c']);
+      expect(keepButton(element, 'Organization_Legal_Name__c')).toBeNull();
+      expect(
+        element.shadowRoot.querySelector('[data-suggestion="Error_Digest_Recipients__c"]')
+      ).toBeNull();
+
+      element.shadowRoot
+        .querySelector('lightning-button[data-suggest="Organization_Legal_Name__c"]')
+        .click();
+      await settle();
+
+      expect(input('Organization_Legal_Name__c').value).toBe('Barn Rescue Inc');
+      expect(saveSettings).not.toHaveBeenCalled();
+      expect(saveBar(element).dirtyCount).toBe(1);
+      expect(
+        element.shadowRoot.querySelector('[data-suggestion="Organization_Legal_Name__c"]')
+      ).toBeNull();
+    });
+
     it('saves exactly the shown value through the normal save, then stops offering it', async () => {
       getConsoleModel.mockResolvedValue(defaultsModel(true));
       saveSettings.mockResolvedValue(defaultsModel(true, false));

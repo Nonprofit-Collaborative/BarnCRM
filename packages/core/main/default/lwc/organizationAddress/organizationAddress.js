@@ -32,6 +32,8 @@ export default class OrganizationAddress extends LightningElement {
   @api titled = false;
   @api disabled = false;
   @api values = {};
+  /** Shown in each empty box, saying what a blank part means (for example "Not set"). */
+  @api placeholder;
 
   labels = {
     heading: HEADING,

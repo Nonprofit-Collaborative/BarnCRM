@@ -73,6 +73,46 @@
         <value>Keep {0} as a saved setting</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_NotSet</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: default shown in a blank organization detail box</shortDescription>
+        <value>Not set</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_DigestRecipientsDefault</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: who gets the error digest while the setting is blank</shortDescription>
+        <value>Everyone with the Manage BarnCRM Settings permission</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_CompanySuggestion</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: a blank row's Company Information value; {0} is it</shortDescription>
+        <value>Company Information in Salesforce Setup has {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_UseSuggestion</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: button that fills a blank row from Company Information</shortDescription>
+        <value>Use This Value</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_UseSuggestionAria</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: screen reader name of Use This Value; {0} is the setting</shortDescription>
+        <value>Fill in {0} from Company Information</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_EmptySectionMessage</fullName>
         <categories>Core</categories>
         <language>en_US</language>

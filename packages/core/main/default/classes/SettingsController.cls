@@ -107,6 +107,19 @@ public with sharing class SettingsController {
          */
         @AuraEnabled
         public Boolean detectionMayChange;
+        /**
+         * What a blank Text row means, shown in the empty box with the Default badge: "Not set"
+         * for an organization detail nothing fills in, or what the blank does (the error digest
+         * goes to every settings administrator). It is not a value: nothing is offered to keep.
+         */
+        @AuraEnabled
+        public String defaultText;
+        /**
+         * A value Salesforce's Company Information holds for a blank row (the legal name), which
+         * the console offers to fill in. Nothing uses it until it is saved.
+         */
+        @AuraEnabled
+        public String suggestedValue;
     }
 
     public class Option {
@@ -676,7 +689,57 @@ public with sharing class SettingsController {
             ? detectedValue(settingsObject, definition.Setting_Key__c)
             : null;
         setting.detectionMayChange = detected != null && !detected.equals(setting.value);
+        describeBlankText(definition, settingsObject, setting);
         return setting;
+    }
+
+    private static final String TYPE_TEXT = 'Text';
+    private static final String DIGEST_RECIPIENTS = 'Error_Digest_Recipients__c';
+    private static final String LEGAL_NAME = 'Organization_Legal_Name__c';
+
+    /**
+     * Never a blank box with nothing said: a blank Text row of BarnCRM's own settings, or of the
+     * Organization page, shows what the blank means as its default. Only those rows: a module's
+     * other blank rows mean something of their own, which only that module can say.
+     */
+    private static void describeBlankText(
+        Setting_Definition__mdt definition,
+        String settingsObject,
+        SettingModel setting
+    ) {
+        Boolean organizationPage = SettingSections.ORGANIZATION.equalsIgnoreCase(
+            definition.Section__c == null ? '' : definition.Section__c.trim()
+        );
+        if (
+            !TYPE_TEXT.equalsIgnoreCase(definition.Data_Type__c) ||
+            String.isNotBlank(setting.value) ||
+            !(organizationPage ||
+            SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject))
+        ) {
+            return;
+        }
+        String key = definition.Setting_Key__c;
+        setting.unsavedDefault = true;
+        setting.defaultText = DIGEST_RECIPIENTS.equalsIgnoreCase(key)
+            ? System.Label.Core_Settings_DigestRecipientsDefault
+            : System.Label.Core_Settings_NotSet;
+        if (LEGAL_NAME.equalsIgnoreCase(key)) {
+            setting.suggestedValue = CompanyInformation.name();
+        }
+    }
+
+    /**
+     * The Company Information address as organization address parts, offered by the address
+     * panel while no organization address is saved; empty unless it is complete (R-OA1).
+     */
+    @AuraEnabled
+    public static Map<String, String> getCompanyAddress() {
+        try {
+            return CompanyInformation.addressParts();
+        } catch (Exception e) {
+            ErrorLogger.log(e, ERROR_CONTEXT);
+            throw asAuraException(System.Label.Core_OrganizationAddress_LoadError);
+        }
     }
 
     /**

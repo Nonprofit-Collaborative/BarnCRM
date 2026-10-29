@@ -41,6 +41,22 @@
         <value>Leave the whole address blank, or fill in Street, City, State and Zip Code. Street 2 and Country are optional.</value>
     </labels>
     <labels>
+        <fullName>Core_OrganizationAddress_CompanySuggestion</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: Company Information address offered; {0} is it</shortDescription>
+        <value>No address is saved yet. Company Information in Salesforce Setup has {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrganizationAddress_UseCompany</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Organization address: button that fills the block from Company Information</shortDescription>
+        <value>Use This Address</value>
+    </labels>
+    <labels>
         <fullName>Core_OrganizationAddress_IncompleteError</fullName>
         <categories>Core</categories>
         <language>en_US</language>

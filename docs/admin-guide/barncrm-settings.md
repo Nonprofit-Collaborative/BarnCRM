@@ -355,6 +355,23 @@ BarnCRM would choose differently for your org (with Person Accounts or Nonprofit
 moves a household choice nobody made to the flexible way): the badge stays, and you choose the
 way you want from the list and save.
 
+A text setting that is blank says what the blank means, in grey in its empty box, with the
+**Default** badge and no button, since there is nothing to keep:
+
+- **Digest recipients** (Error Log) reads **Everyone with the Manage BarnCRM Settings
+  permission**, which is who gets the digest while it is blank.
+- The organization details on **Organization** (the legal name, the address parts, and with
+  Giving the tax identification number and receipt details) read **Not set**: a blank detail
+  is left off letters and receipts, and Giving will not produce a receipt without a legal
+  name.
+
+When Salesforce Setup's Company Information has a value BarnCRM can use, the blank setting
+offers it: under **Organization legal name**, "Company Information in Salesforce Setup has
+(the company name)." with **Use This Value**; above a blank **Organization Address**, the
+company address with **Use This Address** (offered only when it has a street, city, state and
+postal code; a second street line goes to **Street 2**). Either fills in the boxes without
+saving: check them, then save. Nothing uses the Company Information value until you do.
+
 Each setting's info icon is a button: a screen reader names it with the setting and reads the
 description when it is opened, and each setting is a labelled group, so the Learn More link
 beside it is read with the setting's name.
