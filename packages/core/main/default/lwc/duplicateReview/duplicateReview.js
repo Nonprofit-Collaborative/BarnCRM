@@ -303,30 +303,40 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
 
   /**
    * The records of one suggestion for the side-by-side card: each compared field with its
-   * value. A suggestion may hold more than two records, so every record after the first is
-   * compared with the first, and a value it holds differently (spaces and capitals aside) is
-   * marked Different, with "from" and the first record's name for screen readers. The first
-   * record carries no marks: it is what the others are compared with.
+   * value, and a value held differently (spaces and capitals aside) marked Different, with
+   * "from" and the other record's name for screen readers. In a pair each side is compared
+   * with the other, so both carry the mark. A suggestion may hold three or more records: then
+   * every record after the first is compared with the first, which carries no marks.
    */
   sideBySide(records) {
     const comparable = (value) => (value || '').trim().toLowerCase();
-    const base = {};
-    ((records[0] && records[0].fields) || []).forEach((field) => {
-      base[field.fieldName] = comparable(field.value);
-    });
-    const differentFrom = DIFFERENT_FROM.replace('{0}', records[0] ? records[0].name : '');
+    const valuesOf = (record) => {
+      const values = {};
+      ((record && record.fields) || []).forEach((field) => {
+        values[field.fieldName] = comparable(field.value);
+      });
+      return values;
+    };
+    const first = valuesOf(records[0]);
+    const pair = records.length === 2;
+    const nameOf = (record) => (record ? record.name : '');
     // Two records sit side by side; three or more wrap in up to three columns.
     const sizeClass =
       records.length > 2
         ? 'slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3 slds-var-m-bottom_x-small'
         : 'slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-var-m-bottom_x-small';
     return records.map((record, index) => {
+      // What this record is compared with: the other side of a pair, else the first record.
+      const comparedWith = pair && index === 0 ? records[1] : records[0];
+      const base = pair && index === 0 ? valuesOf(records[1]) : first;
+      const marked = index > 0 || pair;
       const fields = (record.fields || []).map((field) => ({
         key: `${record.recordId}-${field.fieldName}`,
         label: field.label,
         text: field.value || BLANK,
-        differs: index > 0 && comparable(field.value) !== (base[field.fieldName] || '')
+        differs: marked && comparable(field.value) !== (base[field.fieldName] || '')
       }));
+      const differentFrom = DIFFERENT_FROM.replace('{0}', nameOf(comparedWith));
       return {
         recordId: record.recordId,
         name: record.name,

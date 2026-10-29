@@ -13,7 +13,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **Duplicate Matching** tab. | The page header shows the merge icon and **Review possible duplicate people and households, and choose what pairs them.**, with no second **Duplicate Matching** title under the page name. The **Review** tab opens. Under **Duplicate Rules** each rule for people and accounts is listed with **On** or **Off**; at least two read **On**. A link **Open Duplicate Rules in Setup** is under them. |
-| 2 | Read the buttons and counts. | **Scan for Duplicates** and **Refresh** are enabled. **Dismissed pairs** shows a number. |
+| 2 | Read the buttons and counts. | **Scan for Duplicates** and **Refresh** are enabled. **Dismissed suggestions** shows a number. |
 | 3 | Click **Scan for Duplicates**. | **Scan started. It runs in the background, and suggestions appear here as they are found.** **Scan for Duplicates** is disabled and **A scan is running. Refresh the page in a minute to see what it found.** shows. |
 | 4 | Wait a minute and click **Refresh**. | **Last scan finished** with a date and time, and a line **Duplicate scan of ... finished: N new possible duplicates recorded.** in normal (not red) text. **Scan for Duplicates** is enabled again. |
 | 5 | Check the bell. | One notification titled **Duplicate scan finished**. |
@@ -43,12 +43,12 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Create a contact `Luis Garcia` with Email `luis.garcia2@example.org`, save past the warning, scan, and refresh. | A **Luis Garcia** pair is listed. Note the **Dismissed pairs** count. |
-| 2 | Click **Not a Duplicate** on the pair. | A box **Not a Duplicate** opens: **The records stay as they are and this pair is not suggested again. Say why, for the next person who wonders.**, with **Reason**, **Not a Duplicate** and **Cancel**. |
+| 1 | Create a contact `Luis Garcia` with Email `luis.garcia2@example.org`, save past the warning, scan, and refresh. | A **Luis Garcia** pair is listed. Note the **Dismissed suggestions** count. |
+| 2 | Click **Not a Duplicate** on the pair. | A box **Not a Duplicate** opens: **The records stay as they are and this suggestion does not come back. Say why, for the next person who wonders.**, with **Reason**, **Not a Duplicate** and **Cancel**. |
 | 3 | Click **Cancel**. | The box closes; the pair is still listed. |
-| 4 | Click **Not a Duplicate** again, type `Test: father and son`, and click **Not a Duplicate** in the box. | **Noted. This pair will not be suggested again.** The pair is gone and **Dismissed pairs** is one higher. |
+| 4 | Click **Not a Duplicate** again, type `Test: father and son`, and click **Not a Duplicate** in the box. | **Noted. This suggestion will not come back.** The pair is gone and **Dismissed suggestions** is one higher. |
 | 5 | Scan again and refresh. | The pair does not come back. |
-| 6 | Click **View** next to **Dismissed pairs**. Open **All Duplicate Dismissals**, find `Test: father and son`, and delete it. | The dismissal is deleted. |
+| 6 | Click **View** next to **Dismissed suggestions**. Open **All Duplicate Dismissals**, find `Test: father and son`, and delete it. | The dismissal is deleted. |
 | 7 | Scan again and refresh. | The **Luis Garcia** pair is listed again. |
 
 **Cleanup:** Delete the contact you created and its household.
@@ -80,7 +80,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 2 | Open the **Addresses** tab and create an address: **Household or Organization** `Sunset Test Household`, **Street** `6830 SUNSET LN.`, **City** `Springfield`, **Postal Code** `62756`, **Primary** ticked. | The address saves. |
 | 3 | On **Duplicate Matching**, **Matching Logic**, choose **Try a Value** on **Address (household)**. Enter **Value** `6830 Sunset Ln`, **Postal code** `62756`, and choose **Try**. | **Compared as: 6830 sunset ln\|62756**, then **These records would match:** with **Household: The Garcia Family** and **Household: Sunset Test Household**. |
 | 4 | On **Review**, scan and refresh. | A pair of `Sunset Test Household` and **The Garcia Family**, both **Household:**, with the grey line **Same address on Address (household)**. Capitals and the full stop did not stop the match. |
-| 5 | Click **Not a Duplicate**, give the reason `Test: match source`, confirm. | **Noted. This pair will not be suggested again.** |
+| 5 | Click **Not a Duplicate**, give the reason `Test: match source`, confirm. | **Noted. This suggestion will not come back.** |
 | 6 | Scan again and refresh. | The pair does not come back. |
 
 **Cleanup:** Delete `Sunset Test Household` and its address. Delete the `Test: match source` dismissal (see T-DUP-03, step 6).
@@ -185,5 +185,19 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 2 | Compare the two **Email** values. | Each differing value has a **Different** badge on both sides; values that match have none. A screen reader reads the badge with the value. |
 | 3 | Click the first name. | The person opens (as a subtab in the console app). |
 | 4 | Narrow the window to phone width (or open the page on a phone). | The two records stack, one above the other; nothing scrolls sideways. |
+
+**Cleanup:** None.
+
+## T-DUP-13: A Suggestion of Three or More Records
+
+**Purpose:** Confirm a suggestion naming three or more records compares each with the first and says so.
+**Prerequisites:** admin.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create a contact: First Name `Harper`, Last Name `Garcia`, Email `harper.garcia1@example.org`, and save past the warning. Then create a second one the same way with Email `harper.garcia3@example.org`, and save past the warning. | Both save. The second save's warning names two existing records. |
+| 2 | On **Duplicate Matching**, **Review**, click **Refresh**. | A card with three **Harper Garcia** records and the line "Each record is compared with Harper Garcia, the first one." On a wide screen the records sit in up to three columns. |
+| 3 | Read the **Email** values. | The first record has no **Different** badge. Each other record whose email differs from the first one's has one. A screen reader reads it as different from the first record's name. |
+| 4 | Read the counts. | The tab and **Possible Duplicates** count suggestions, and the dismissed count reads **Dismissed suggestions**. |
 
 **Cleanup:** None.

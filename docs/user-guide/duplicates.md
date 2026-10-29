@@ -51,11 +51,13 @@ households this way, never with Salesforce's own account merge. The full steps a
 ## To Work Through the Duplicates List (Admins)
 
 1. Open the **Duplicate Matching** tab. The **Review** list opens; the tab name says how many
-   pairs are waiting, for example **Review (40)**.
-2. Under **Possible Duplicates**, read each pair. It says why it was suggested (see below),
-   then shows the two records side by side, each marked **Person** or **Household**, with
-   their email, phone and address. A value that differs between the two has a **Different**
-   badge. The list shows 10 pairs at a time; click **Show More** for the next 10. Press
+   suggestions are waiting, for example **Review (40)**. A suggestion is usually a pair of
+   records, sometimes three or more.
+2. Under **Possible Duplicates**, read each suggestion. It says why it was suggested (see
+   below), then shows the records side by side, each marked **Person** or **Household**, with
+   their email, phone and address. A value that differs between them has a **Different**
+   badge. With three or more records, each is compared with the first one, and the card says
+   so. The list shows 10 suggestions at a time; click **Show More** for the next 10. Press
    **Refresh** to see the latest.
 3. For two people, open either one and use **Compare and merge**, as above. The note above the
    list reminds you: "To merge two people, open either one and use Compare and merge on the
@@ -89,7 +91,7 @@ living together looks like. A shared email still pairs them.
    address").
 3. Confirm.
 
-You should see: "Noted. This pair will not be suggested again." It stays off the list after
+You should see: "Noted. This suggestion will not come back." It stays off the list after
 later scans, too. A suggestion with three or more records is dismissed as a whole, so merge
 any real duplicates in it first.
 

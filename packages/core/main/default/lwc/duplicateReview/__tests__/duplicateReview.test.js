@@ -406,7 +406,7 @@ describe('c-duplicate-review', () => {
     expect(counts).toEqual(['50+', '']);
   });
 
-  it('shows the two records side by side and marks where the second differs from the first', async () => {
+  it('shows the two records side by side and marks on both sides where they differ', async () => {
     const field = (fieldName, label, value) => ({ fieldName, label, value });
     const pair = {
       ...PEOPLE_PAIR,
@@ -441,11 +441,11 @@ describe('c-duplicate-review', () => {
         value: row.querySelector('[data-id="value"]').firstChild.textContent.trim(),
         differs: row.querySelector('[data-id="differs"]') !== null
       }));
-    // The first record is what the second is compared with, so it carries no marks.
+    // In a pair each side is compared with the other, so both carry the marks.
     expect(rows(sides[0])).toEqual([
       { label: 'Email', value: 'ann@example.org', differs: false },
-      { label: 'Phone', value: 'c.Core_Duplicates_Blank', differs: false },
-      { label: 'Mailing City', value: 'Springfield', differs: false }
+      { label: 'Phone', value: 'c.Core_Duplicates_Blank', differs: true },
+      { label: 'Mailing City', value: 'Springfield', differs: true }
     ]);
     // Spaces and capitals aside the emails agree; a phone against a blank differs, as do cities.
     expect(rows(sides[1])).toEqual([

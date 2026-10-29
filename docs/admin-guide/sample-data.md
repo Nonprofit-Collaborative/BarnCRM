@@ -105,7 +105,8 @@ You need the **Manage BarnCRM Settings** permission to load or remove sample dat
 Without it, the card is read only and tells you who to ask.
 
 Sample data loads whichever way your org tracks household membership. In the simple way,
-each sample person carries their household on their own record. In the flexible way (one
+each sample person carries their household on their own record, and each sample household's
+**Primary Contact** is its first person. In the flexible way (one
 membership record per person, which every org with Person Accounts uses), each sample person
 is joined to their household by a household member record, exactly as your own people are,
 and the card says so before you load.
