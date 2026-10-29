@@ -126,6 +126,9 @@ private class MigrationTemplatesTest {
         List<Import_Row__c> preview;
         importer = maria();
         System.runAs(importer) {
+            // As the importer: their profile, not the admin's, decides which record type for
+            // organizations they can use.
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
             Test.startTest();
             run(true);
             preview = ImportTestDataFactory.reload(batch.Id);
