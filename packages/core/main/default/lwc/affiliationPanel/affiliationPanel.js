@@ -14,6 +14,7 @@ import ADD_BUTTON from '@salesforce/label/c.Core_Affiliation_AddButton';
 import ADD_FORM_TITLE from '@salesforce/label/c.Core_Affiliation_AddFormTitle';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_Affiliation_CancelButton';
 import EMPTY_MESSAGE from '@salesforce/label/c.Core_Affiliation_Empty';
+import EMPTY_HEADING from '@salesforce/label/c.Core_Affiliation_EmptyHeading';
 import FORMER_BADGE from '@salesforce/label/c.Core_Affiliation_FormerBadge';
 import LOAD_FAILED from '@salesforce/label/c.Core_Affiliation_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_Affiliation_Loading';
@@ -167,6 +168,7 @@ export default class AffiliationPanel extends LightningElement {
     addFormTitle: ADD_FORM_TITLE,
     cancelButton: CANCEL_BUTTON,
     emptyMessage: EMPTY_MESSAGE,
+    emptyHeading: EMPTY_HEADING,
     formerBadge: FORMER_BADGE,
     loading: LOADING,
     makePrimaryButton: MAKE_PRIMARY_BUTTON,

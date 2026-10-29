@@ -75,7 +75,7 @@ not offered, or say you do not have access.
   splitting are switched off. Ask whoever manages access for edit access to both households."
 - On the **Addresses**, **Relationships**, **Affiliations** and **Members** cards: nothing to
   try. **Add Address**, **Set as Primary**, **Add Relationship**, **Remove**, **Add
-  affiliation**, **Make Primary**, **Add member** and **Move to another household** are not
+  affiliation**, **Make Primary**, **Add Member** and **Move to Another Household** are not
   shown to you.
 - On the **Find** tab without the add-on: "Find needs the Find and Export Records permission.
   Ask your administrator to assign you the BarnCRM Find and Export permission set."

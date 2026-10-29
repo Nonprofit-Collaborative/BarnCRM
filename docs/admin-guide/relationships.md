@@ -90,8 +90,8 @@ from the sample data.
 
 1. Open the **BarnCRM** app and choose **Households**. Open **The Garcia Family** and
    choose the person named **Harper Garcia**.
-2. Scroll to the **Relationships** card. It is empty, and it says "No relationships on file
-   yet."
+2. Scroll to the **Relationships** card. It is empty: it shows **No Relationships Yet** with an
+   **Add Relationship** button.
 3. Choose **Add Relationship**. Fill in:
    - **Related person**: Luis Garcia
    - **Type**: Spouse
@@ -146,7 +146,7 @@ names instead of creating another one.
 **Expecting a relationship to move someone into a household.** It does not, deliberately. A
 relationship says two people are connected; a household says who receives one letter. Spouses in the same household usually have both, and adding a Spouse relationship
 to someone in a different household leaves both households exactly as they were. To move a
-person, use **Move to another household** on their record, which is the Households feature.
+person, use **Move to Another Household** on their household's Members panel, which is the Households feature.
 
 **Deleting one side and expecting the other to survive.** Deleting a relationship deletes
 both sides, because they are one connection. If you meant to keep the other person's

@@ -30,7 +30,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Affiliation card: shown when there are no affiliations yet</shortDescription>
-        <value>No affiliations on file yet.</value>
+        <value>Connect people with the organizations they work or volunteer with.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Affiliation_EmptyHeading</fullName>
+        <categories>Relationships</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Affiliation card: heading when there are no affiliations yet</shortDescription>
+        <value>No Affiliations Yet</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_FormerBadge</fullName>

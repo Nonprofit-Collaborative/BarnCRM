@@ -21,7 +21,11 @@
       </template>
 
       <template lwc:if={isEmpty}>
-        <p class="slds-text-body_regular" data-id="empty">{labels.emptyMessage}</p>
+        <c-barn-empty-state heading={labels.emptyHeading} message={labels.emptyMessage} data-id="empty">
+          <template lwc:if={canAdd}>
+            <lightning-button label={labels.addButton} onclick={handleAdd} data-id="empty-add"></lightning-button>
+          </template>
+        </c-barn-empty-state>
       </template>
 
       <template for:each={relationships} for:item="relationship">

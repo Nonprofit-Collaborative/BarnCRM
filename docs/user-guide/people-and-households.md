@@ -24,7 +24,7 @@ from the **Household** card or the **Households** tab.
 ## To Start From a Household
 
 1. On the **Home** tab, click **New household**.
-2. The household is created and opens. Add people with **Add member** (below).
+2. The household is created and opens. Add people with **Add Member** (below).
 
 You should see: a household with a placeholder name, renamed automatically once it has a
 member.
@@ -36,27 +36,29 @@ into a household.
 ## To Add a Member to a Household
 
 1. Open the household. Find the **Members** card.
-2. Click **Add member**.
+2. Click **Add Member**. The **Add Member** dialog opens.
 3. Either search under **Add Someone Already in Salesforce** (type in **Search by name** and
    choose the person), or fill in **Salutation**, **First name** and **Last name** under **Or
    add someone new**.
 4. Click **Save**.
 
 You should see: "Added. The household name and greetings have been brought up to date." The
-member list shows a **Primary** badge on the primary contact and a **Deceased** badge on
+dialog closes. Each member shows as a tile with their initials, a **Primary** badge on the primary contact and a **Deceased** badge on
 anyone marked deceased. (In orgs that use the simple way of belonging, the search box is not
 shown; you add someone new.)
 
 ## To Change the Primary Contact
 
-1. On the household's **Members** card, click **Make Primary** on the person's row.
+1. On the household's **Members** card, open the menu on the person's tile and choose **Make
+   Primary**.
 
 You should see: "... is now the primary contact." The **Primary** badge moves, and the
 household's **Primary Contact** field follows.
 
 ## To Move a Person to Another Household
 
-1. On the **Members** card, click **Move to another household** on the person's row.
+1. On the **Members** card, open the menu on the person's tile and choose **Move to Another
+   Household**.
 2. Choose the household to move them to, and click **Save**.
 
 You should see: "Moved. Both households have been brought up to date."
@@ -134,8 +136,7 @@ Erasing a person on request is admin work. See [Erase a person](../admin-guide/e
 
 - Problem: "This person is not in a household yet". Automatic households may be off in your
   org. Add them from a household's **Members** card, or ask your admin.
-- Problem: the **Members** card has no **Add member**, **Move to another household** or **Make
-  primary** button. Your access lets you read households but not change them (the Read Only
+- Problem: the **Members** card has no **Add Member** button and no menu on the tiles. Your access lets you read households but not change them (the Read Only
   role, for example). Ask your admin.
 - Problem: "You can see this household but not change it, so merging and splitting are
   switched off. Ask whoever manages access for edit access to both households." Ask your admin.

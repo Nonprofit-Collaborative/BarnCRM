@@ -46,7 +46,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: message shown when there are no addresses yet</shortDescription>
-        <value>No addresses yet. Add one so mail reaches this household.</value>
+        <value>Add one so mail reaches the right place.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_EmptyHeading</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: heading shown when there are no addresses yet</shortDescription>
+        <value>No Addresses Yet</value>
     </labels>
     <labels>
         <fullName>Core_Address_LoadFailed</fullName>
@@ -54,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: message shown when the addresses cannot be read</shortDescription>
-        <value>We could not load the addresses for this record. Refresh the page, and if it happens again ask your administrator to check that you can read addresses.</value>
+        <value>We could not load these addresses. Refresh the page. If it happens again, ask your administrator to check your access to addresses.</value>
     </labels>
     <labels>
         <fullName>Core_Address_Loading</fullName>
@@ -70,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: a household move could not be saved</shortDescription>
-        <value>We could not change these addresses, so nothing was changed. Check that you can edit addresses, the household and its people, and if it happens again ask your administrator to check the Error Log.</value>
+        <value>Nothing was changed. Check you can edit addresses, the household and its people. If it happens again, an administrator can check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Core_Address_MoveNoPrimary</fullName>
@@ -166,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: message shown when the primary could not be changed</shortDescription>
-        <value>We could not make that the primary address. Check that you have permission to edit addresses, and if it happens again ask your administrator to check the Error Log.</value>
+        <value>We could not make that the primary address. Check you can edit addresses. If it happens again, an administrator can check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Core_Address_SetDefaultSuccess</fullName>
@@ -238,7 +246,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: what Use for Whole Household does</shortDescription>
-        <value>The household gets this address as its primary address, and everyone in it without an address of their own moves to it. If it is this person's own household, they move with it from now on; their own addresses stay on file.</value>
+        <value>The household uses this as its primary address, and members without an address of their own move to it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Address_UseForHouseholdDetail</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address panel: second line of the Use for Whole Household confirmation</shortDescription>
+        <value>If this is the person's own household, they move with it from now on. Their own addresses stay on file.</value>
     </labels>
     <labels>
         <fullName>Core_Address_UseForHouseholdPick</fullName>

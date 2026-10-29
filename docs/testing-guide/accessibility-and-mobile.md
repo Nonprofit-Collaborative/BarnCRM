@@ -112,8 +112,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **People and Households**, Tab to the **Learn More** link under **Create a household automatically**. | Announced as **Learn more about Create a household automatically (opens a new tab)**, not just "Learn More". |
 | 2 | Tab onto the checkbox **Create a household automatically**. | The label and its description text are both read. |
-| 3 | Open a Garcia household from the **Households** tab (for example **The Garcia Family**). In the **Members** panel, Tab to the first **Make Primary** button. | Announced as **Make Harper Garcia the primary contact** (the member's own name), not just "Make Primary". |
-| 4 | Tab to a **Move to another household** button. | Announced as **Move** plus the member's name plus **to another household**. |
+| 3 | Open a Garcia household from the **Households** tab (for example **The Garcia Family**). In the **Members** panel, Tab to the first member's actions menu. | Announced as **Actions for** plus the member's own name (for example **Actions for Harper Garcia**), not just "Actions". |
+| 4 | Press Enter on the menu, then the arrow keys. | The menu opens and reads **Make Primary** and **Move to Another Household** where you may use them; Escape closes it and returns focus to the menu button. |
 | 5 | In Find, run any Households query. | The screen reader announces the **N rows found.** line without you moving focus to it. |
 | 6 | In Quick Gift Entry, press **Save** with **Donor** empty. | The error **Choose the person or organization who gave this gift.** is read together with the **Donor** field. |
 | 7 | In the Import wizard on **Check Columns**, move to the table. | The table is announced as **Check Columns** with column headers **Column in Your File**, **What It Means**, **First Values**. |
@@ -131,7 +131,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Open **Find**, choose **Households**, press **Run**. | The **Saved queries** and **Object** boxes stack one per line. The page itself does not scroll sideways; only the results table may scroll inside its own area. |
 | 3 | Open **Quick Gift Entry**. | Every field label and the **Save** and **Save and New** buttons are visible. Buttons wrap to a new line rather than overlap. |
 | 4 | Open the **Import** tab and go to **Check Columns** with the sample file. | The columns table scrolls inside its own area; the path, **Back** and **Next** stay readable (the path may show only the current step). |
-| 5 | Open a household record page. | The **Members** panel shows each member's name and buttons without overlap. |
+| 5 | Open a household record page. | The **Members** panel shows each member's tile (initials, name, badges, menu) without overlap, and each address card's buttons wrap instead of overlapping. |
 
 **Cleanup:** Set browser zoom back to 100 percent.
 
@@ -142,7 +142,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open a Garcia household from **Households**. | The **Members** panel lists every member, readable without sideways scrolling. |
+| 1 | Open a Garcia household from **Households**. | The **Members** panel lists every member as a tile, readable without sideways scrolling; each tile's menu opens and **Add Member** opens its dialog full width. The **Addresses** cards show the map pin, badges and buttons without sideways scrolling. |
 | 2 | Scroll the page. | Details, related lists and the **Members** panel open and render; nothing overlaps. |
 | 3 | Open a gift from the household's gifts related list. | The gift page shows **Amount**, **Gift Date** and the donor, and the **Soft Credits** panel renders. |
 | 4 | Edit **Payment Reference**, type `A11Y1`, save. | The value saves and shows on the page. |
