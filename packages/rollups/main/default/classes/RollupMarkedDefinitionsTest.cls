@@ -61,9 +61,7 @@ private class RollupMarkedDefinitionsTest {
     }
 
     private static List<Account> organizations() {
-        Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
+        Id organizationType = AccountKindsTestData.organizationRecordTypeId();
         List<Account> created = new List<Account>();
         for (Integer i = 0; i < ORGANIZATIONS; i++) {
             created.add(

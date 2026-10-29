@@ -61,9 +61,7 @@ private class RollupCurrencyTest {
     @IsTest
     static void aTotalIsInTheTargetRecordsCurrency() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId();
+            Id organizationType = AccountKindsTestData.organizationRecordTypeId();
             Account parent = new Account(Name = 'Parent', RecordTypeId = organizationType);
             String corporate;
             String parentCurrency;

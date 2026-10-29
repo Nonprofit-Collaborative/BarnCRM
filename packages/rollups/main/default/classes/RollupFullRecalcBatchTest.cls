@@ -31,9 +31,7 @@ private class RollupFullRecalcBatchTest {
 
     /** Organizations whose stored count says what the last run counted, and their people. */
     private static List<Account> organizations(List<Integer> storedCounts, List<Integer> people) {
-        Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
+        Id organizationType = AccountKindsTestData.organizationRecordTypeId();
         List<Account> organizations = new List<Account>();
         for (Integer i = 0; i < storedCounts.size(); i++) {
             organizations.add(

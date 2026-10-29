@@ -12,7 +12,6 @@
 @IsTest
 public class RecognitionTestData {
     public static final String HOUSEHOLD_RECORD_TYPE = 'Household';
-    public static final String ORGANIZATION_RECORD_TYPE = 'Organization';
 
     /**
      * Writes the giving setting that decides whether household members are credited
@@ -56,11 +55,7 @@ public class RecognitionTestData {
     }
 
     public static Account organization(String name) {
-        Account record = new Account(Name = name);
-        Id recordTypeId = recordTypeId(ORGANIZATION_RECORD_TYPE);
-        if (recordTypeId != null) {
-            record.RecordTypeId = recordTypeId;
-        }
+        Account record = AccountKindsTestData.organization(name);
         insert record;
         return record;
     }

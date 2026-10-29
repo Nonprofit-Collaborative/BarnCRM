@@ -25,9 +25,7 @@ private class HealthCheckHouseholdChecksTest {
     }
 
     private static Id organizationRecordTypeId() {
-        return Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
+        return AccountKindsTestData.organizationRecordTypeId();
     }
 
     private static Account newOrganization(String name) {

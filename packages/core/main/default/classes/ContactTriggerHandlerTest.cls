@@ -360,13 +360,7 @@ private class ContactTriggerHandlerTest {
     }
 
     private static Account organization(String name) {
-        Account result = new Account(Name = name);
-        Schema.RecordTypeInfo type = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-            .get('Organization');
-        if (type != null) {
-            result.RecordTypeId = type.getRecordTypeId();
-        }
-        return result;
+        return AccountKindsTestData.organization(name);
     }
 
     @IsTest

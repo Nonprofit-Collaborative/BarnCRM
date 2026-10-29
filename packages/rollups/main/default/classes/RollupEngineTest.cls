@@ -12,9 +12,7 @@ private class RollupEngineTest {
     }
 
     private static Id organizationType() {
-        return Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
+        return AccountKindsTestData.organizationRecordTypeId();
     }
 
     private static Account organization(String name, Id parentId) {

@@ -289,6 +289,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 4 | Open one of those organizations. | The **Affiliations** panel and the website show; no **Name and Greetings**, no **Members**, no **Erase Person**. |
 | 5 | Import a file with one person and the organization `Zztest Rt Org`. | `Zztest Rt Org` is created with the chosen record type (or none, for **No record type**) and appears on the **Organizations** tab. |
 | 6 | In an org with a second business record type, choose it in the setting and save. | Saved, and listed in **Recent Changes**. The **Organizations** tab now lists accounts of that record type instead. |
+| 7 | With that record type still chosen, import a file with one person and the organization `Zztest Rt Org 2`, give an organization an address in its billing fields, and load sample data in a sandbox without it. | `Zztest Rt Org 2` is created with that record type; the organization with the billing address gets a first address of type **Work**; sample data's organizations get that record type and the sample data count lists them. |
+| 8 | As a user whose profile and permission sets do not give that record type, import the same file. | The run log says no organization was matched or created because you cannot use that record type, naming it by its label. |
 
 **Cleanup:** set the setting back to its first value; delete `Zztest Rt Org` and the imported person.
 

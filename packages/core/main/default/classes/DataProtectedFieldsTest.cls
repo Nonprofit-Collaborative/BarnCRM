@@ -233,9 +233,7 @@ private class DataProtectedFieldsTest {
     static void aHouseholdsNameIsProtectedAndAnOrganizationsIsNot() {
         System.runAs(TestUsers.admin()) {
             Id householdType = HouseholdService.householdRecordTypeId();
-            Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId();
+            Id organizationType = AccountKindsTestData.organizationRecordTypeId();
 
             Test.startTest();
             Boolean household = DataProtectedFields.isProtectedOnRecord(

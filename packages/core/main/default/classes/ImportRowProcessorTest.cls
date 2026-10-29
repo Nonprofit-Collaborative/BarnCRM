@@ -1017,10 +1017,7 @@ private class ImportRowProcessorTest {
     }
 
     private static Id organizationRecordTypeId() {
-        return Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-            .getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
+        return AccountKindsTestData.organizationRecordTypeId();
     }
 
     /** Two hundred rows, each naming its own organization; the last has no last name. */

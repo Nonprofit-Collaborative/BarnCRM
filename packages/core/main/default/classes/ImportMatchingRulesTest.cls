@@ -50,9 +50,7 @@ private class ImportMatchingRulesTest {
     }
 
     private static Id organizationRecordTypeId() {
-        return Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
+        return AccountKindsTestData.organizationRecordTypeId();
     }
 
     /** Runs one pass the way the platform drives the batch, in one chunk of up to 200 rows. */

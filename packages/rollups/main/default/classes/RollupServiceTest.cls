@@ -360,9 +360,7 @@ private class RollupServiceTest {
     @IsTest
     static void aMergeRecalculatesOnlyTheRealTimeTotalsOnTheSurvivors() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId();
+            Id organizationType = AccountKindsTestData.organizationRecordTypeId();
             Account survivor = new Account(
                 Name = 'Survivor',
                 RecordTypeId = organizationType,

@@ -61,6 +61,12 @@ private class FieldUtilizationControllerTest {
         return FieldUtilizationController.countFields(objectName, new List<String>{ field });
     }
 
+    /** The row key of the organization record type (ADR-0141): blank for No record type. */
+    private static String organizationKey() {
+        String name = AccountKinds.organizationRecordTypeName();
+        return name == AccountKinds.NO_RECORD_TYPE ? '' : name;
+    }
+
     private static Map<String, FieldUtilizationController.CountRow> byRecordType(
         List<FieldUtilizationController.CountRow> rows
     ) {
@@ -143,8 +149,8 @@ private class FieldUtilizationControllerTest {
             }
 
             Map<String, FieldUtilizationController.CountRow> rows = byRecordType(chunk.rows);
-            Assert.areEqual(80, rows.get('Organization').filled, 'Organizations with a phone.');
-            Assert.areEqual(100, rows.get('Organization').total, 'Every organization.');
+            Assert.areEqual(80, rows.get(organizationKey()).filled, 'Organizations with a phone.');
+            Assert.areEqual(100, rows.get(organizationKey()).total, 'Every organization.');
             Assert.areEqual(20, rows.get('Household').filled, 'Households with a phone.');
             Assert.areEqual(100, rows.get('Household').total, 'Every household.');
             Assert.isFalse(
@@ -173,7 +179,11 @@ private class FieldUtilizationControllerTest {
             }
 
             Map<String, FieldUtilizationController.CountRow> rows = byRecordType(chunk.rows);
-            Assert.areEqual(20, rows.get('Organization').total, 'Every organization is counted.');
+            Assert.areEqual(
+                20,
+                rows.get(organizationKey()).total,
+                'Every organization is counted.'
+            );
             Assert.areEqual(
                 20,
                 rows.get('Household').filled,

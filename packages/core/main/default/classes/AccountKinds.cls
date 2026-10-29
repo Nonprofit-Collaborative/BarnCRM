@@ -46,6 +46,14 @@ public with sharing class AccountKinds {
 
     private static String cachedDetection;
 
+    /**
+     * The resolved name and the stored value it was resolved from, so the callers that ask once
+     * per record (address capture, matching gifts) check the candidates once per transaction. A
+     * change of the stored value resolves again.
+     */
+    private static String resolvedFor;
+    private static String cachedResolution;
+
     /** One record type detection weighs. */
     @TestVisible
     private class Candidate {
@@ -67,13 +75,35 @@ public with sharing class AccountKinds {
     @NamespaceAccessible
     public static String organizationRecordTypeName() {
         String stored = storedValue();
+        String key = stored == null ? '' : stored;
+        if (cachedResolution != null && key.equals(resolvedFor)) {
+            return cachedResolution;
+        }
+        String resolved;
         if (NO_RECORD_TYPE.equalsIgnoreCase(stored)) {
-            return NO_RECORD_TYPE;
+            resolved = NO_RECORD_TYPE;
+        } else if (String.isNotBlank(stored) && isCandidate(stored)) {
+            resolved = stored;
+        } else {
+            resolved = detectOrganizationRecordType();
         }
-        if (String.isNotBlank(stored) && isCandidate(stored)) {
-            return stored;
+        resolvedFor = key;
+        cachedResolution = resolved;
+        return resolved;
+    }
+
+    /**
+     * Whether an account whose record type has this developer name is an organization: the
+     * chosen one, or, for `Master`, none (a blank name or the master's). For callers that
+     * already hold the name, such as a query of `RecordType.DeveloperName`.
+     */
+    @NamespaceAccessible
+    public static Boolean isOrganizationRecordTypeName(String developerName) {
+        String chosen = organizationRecordTypeName();
+        if (NO_RECORD_TYPE.equalsIgnoreCase(chosen)) {
+            return String.isBlank(developerName) || NO_RECORD_TYPE.equalsIgnoreCase(developerName);
         }
-        return detectOrganizationRecordType();
+        return String.isNotBlank(developerName) && chosen.equalsIgnoreCase(developerName);
     }
 
     /**
@@ -283,5 +313,7 @@ public with sharing class AccountKinds {
     private static void reset() {
         cachedDetection = null;
         candidatesOverride = null;
+        resolvedFor = null;
+        cachedResolution = null;
     }
 }
