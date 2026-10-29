@@ -4,8 +4,8 @@ import { LightningElement, api } from 'lwc';
  * A hub of tool tiles under short title-style group headings ("Bring Data In", "Find and
  * Change", "Careful"). Three tiles across on a wide screen, two on a tablet, one on a phone.
  *
- * groups: [{ name, label, tiles: [{ name, label, description, iconName, href, badgeLabel,
- * badgeVariant, disabled, disabledReason }] }]. A group with no tiles is left out. A tile's
+ * groups: [{ name, label, tiles: [{ name, label, description, iconName, href, newTab,
+ * badgeLabel, badgeVariant, disabled, disabledReason }] }]. A group with no tiles is left out. A tile's
  * `select` comes back out of the grid as `select` with `detail: { name }`.
  *
  * Group headings are h2, for a grid placed under a page shell's h1; a grid inside a card with
@@ -25,7 +25,8 @@ export default class BarnToolGrid extends LightningElement {
         tiles: group.tiles.map((tile, tileIndex) => ({
           ...tile,
           key: tile.name || `tile-${tileIndex}`,
-          disabled: Boolean(tile.disabled)
+          disabled: Boolean(tile.disabled),
+          newTab: Boolean(tile.newTab)
         }))
       }));
   }

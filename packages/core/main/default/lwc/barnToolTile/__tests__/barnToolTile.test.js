@@ -51,6 +51,26 @@ describe('c-barn-tool-tile', () => {
     expect(tile.getAttribute('href')).toBe('/lightning/n/Import');
   });
 
+  it('story: a link tile stays in this tab by default', () => {
+    const element = render({ ...IMPORT, href: '/lightning/n/Import' });
+    const tile = one(element, 'tile');
+    expect(tile.hasAttribute('target')).toBe(false);
+    expect(one(element, 'new-window')).toBeNull();
+  });
+
+  it('story: a link tile that opens a new tab says so', () => {
+    const element = render({
+      ...IMPORT,
+      href: '/lightning/o/DeleteEvent/home',
+      newTab: true
+    });
+    const tile = one(element, 'tile');
+    expect(tile.getAttribute('target')).toBe('_blank');
+    expect(tile.getAttribute('rel')).toBe('noopener noreferrer');
+    expect(one(element, 'new-window').iconName).toBe('utility:new_window');
+    expect(one(element, 'new-tab').className).toBe('slds-assistive-text');
+  });
+
   it.each([
     ['success', 'slds-theme_success'],
     ['warning', 'slds-theme_warning'],

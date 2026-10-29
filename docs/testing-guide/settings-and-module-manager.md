@@ -144,7 +144,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 3 | Click **Turn On** on **Data Manager**. | A dialog "Turn on Data Manager?": "Data Manager will be turned on for everyone, with its tabs, settings and automations. It can't be turned off again." |
 | 4 | Click **Cancel**. | The row still shows **Turn On**. |
 | 5 | Click **Turn On** again and confirm with **Turn On**. | "Data Manager is on. Its tabs appear for the right people within a few minutes." The row says **On** with no button. |
-| 6 | Wait a few minutes, reload, and open the navigation menu. | **Data Manager** is listed, and its **Find and Export Records** card opens Find. The **Import** section is now in the **Sections** list. |
+| 6 | Wait a few minutes, reload, and open the navigation menu. | **Data Manager** is listed, and its **Find and Export Records** tile opens Find. The **Import** section is now in the **Sections** list. |
 
 **Cleanup:** None (a feature cannot be turned off).
 

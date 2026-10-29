@@ -137,26 +137,27 @@ person who started the job is told. Nightly jobs send nothing.
 ## To Use the Data Manager Tab
 
 You see **Data Manager** if you have the **BarnCRM Find and Export**, **BarnCRM Bulk Update**
-or **BarnCRM Bulk Delete** add-on. It shows a card for each tool you may use:
+or **BarnCRM Bulk Delete** add-on. It shows a tile (an icon, a name and one line) for each
+tool you may use, in short groups:
 
-| Card | Opens |
-|---|---|
-| **Find and Export Records** | The **Find** tab |
-| **Update Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Update** (no file needed) |
-| **Org Optimizer** | The **Org Optimizer** tab |
-| **Delete Many Records** (last) | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Delete** (no file needed) |
+| Group | Tile | Opens |
+|---|---|---|
+| **Find and Change** | **Find and Export Records** | The **Find** tab |
+| **Find and Change** | **Update Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Update** (no file needed) |
+| **Check and Tidy** | **Org Optimizer** | The **Org Optimizer** tab |
+| **Careful** (last) | **Delete Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Delete** (no file needed) |
 
-Deleted records go to the Recycle Bin, not away for good: choosing **Open** on **Delete Many
-Records** first shows a box that says so. Choose **Continue** to go on to Find, or **Cancel** to
-stay on Data Manager. You can undo a bulk delete from **Data Jobs** for up to 15 days.
+Deleted records go to the Recycle Bin, not away for good: choosing **Delete Many Records**
+first shows a box that says so. Choose **Continue** to go on to Find, or **Cancel** to stay on
+Data Manager. You can undo a bulk delete from **Data Jobs** for up to 15 days.
 
-1. Choose **Open** on the card you want.
+1. Choose the tile you want: anywhere on it works.
 2. Under **Data Jobs**, use **Show** to filter to **All**, **Bulk updates** or **Bulk
    deletes**, and press **Refresh** to see the latest.
 
 You should see: your recent jobs, newest first, each with its counts and an **Undo** while
-it can still be undone. **Import a File**, **Import Templates** and **Salesforce's Own Tools**
-are for admins. See
+it can still be undone. **Bring Data In** (**Import a File**), **Import Templates** and
+**Salesforce's Own Tools** are for admins. See
 [Data Manager](../admin-guide/data-manager.md).
 
 ## Common Problems

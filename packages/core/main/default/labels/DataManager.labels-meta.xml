@@ -17,14 +17,6 @@
         <value>Start a data task, or see and undo what changed.</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_ToolsHeading</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: heading over the tool cards</shortDescription>
-        <value>Start a Task</value>
-    </labels>
-    <labels>
         <fullName>Core_DataManager_ImportTitle</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
@@ -37,8 +29,8 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: what the import card does</shortDescription>
-        <value>Needs a file. People and organizations, gifts with Giving, any one object, records with their related records, or deleting the records a file lists.</value>
+        <shortDescription>Data Manager: one line on the Import a File tile</shortDescription>
+        <value>Add or update records from a spreadsheet, with a dry run first.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_FindTitle</fullName>
@@ -53,8 +45,8 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: what the Find card does</shortDescription>
-        <value>No file needed. Find exactly the records you need, save the query, and export them to a file.</value>
+        <shortDescription>Data Manager: one line on the Find tile</shortDescription>
+        <value>Find records, save the query, and export them to a file.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_UpdateTitle</fullName>
@@ -69,8 +61,8 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: what the bulk update card does, and how to start it</shortDescription>
-        <value>No file needed. Change up to five fields on many records at once: find the records in Find, then choose Change Records, Bulk Update. To update records from a spreadsheet, use Import a File.</value>
+        <shortDescription>Data Manager: one line on the bulk update tile</shortDescription>
+        <value>Find records, then change up to five fields at once.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_DeleteTitle</fullName>
@@ -85,8 +77,8 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: what the bulk delete card does, and how to start it</shortDescription>
-        <value>No file needed: find the records in Find, then choose Change Records, Bulk Delete. To delete the records a spreadsheet lists by record ID, an administrator can use Import a File, Load one object, then Delete by record ID.</value>
+        <shortDescription>Data Manager: one line on the bulk delete tile</shortDescription>
+        <value>Find records, then move them to the Recycle Bin.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_DeleteWarning</fullName>
@@ -125,24 +117,8 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: what the Org Optimizer card does</shortDescription>
-        <value>No file needed. See which records and settings need attention.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_Open</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: button on each tool card</shortDescription>
-        <value>Open</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_OpenAria</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: screen reader name of a tool card button; {0} is the tool</shortDescription>
-        <value>Open {0}</value>
+        <shortDescription>Data Manager: one line on the Org Optimizer tile</shortDescription>
+        <value>See which records and settings need attention.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_MappingsHeading</fullName>
@@ -157,16 +133,16 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: what an import template is and how to make one</shortDescription>
-        <value>A template remembers how a file's columns match BarnCRM fields, so every file with the same layout (for example, a monthly donations export) opens already matched. BarnCRM ships some; create your own with Load one object, the first step of Import a File. The column matches you settle on are saved to the template each time you import with it.</value>
+        <shortDescription>Data Manager: one line under Import Templates</shortDescription>
+        <value>A template remembers how a file's columns match fields.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_MappingsEmpty</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: no import templates</shortDescription>
-        <value>No import templates yet.</value>
+        <shortDescription>Data Manager: empty state heading with no import templates</shortDescription>
+        <value>No Import Templates Yet</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_ColumnName</fullName>
@@ -221,8 +197,8 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: link to Weekly Data Export in Setup</shortDescription>
-        <value>Weekly Data Export (your backup)</value>
+        <shortDescription>Data Manager: tile that opens Weekly Data Export in Setup</shortDescription>
+        <value>Weekly Data Export</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_RecycleBin</fullName>
@@ -237,7 +213,95 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: link to the Data Import Wizard in Setup</shortDescription>
-        <value>Data Import Wizard (records BarnCRM does not load)</value>
+        <shortDescription>Data Manager: tile that opens the Data Import Wizard in Setup</shortDescription>
+        <value>Data Import Wizard</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_HelpChange</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: About This Tool, which tool changes many records</shortDescription>
+        <value>To change records from a spreadsheet, use Import a File. To change the same fields on many records, use Update Many Records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_HelpDelete</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: About This Tool, deleting the records a file lists</shortDescription>
+        <value>To delete the records a spreadsheet lists by record ID, use Import a File.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_GroupBringIn</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: tile group heading for import</shortDescription>
+        <value>Bring Data In</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_GroupFindChange</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: tile group heading for Find and bulk update</shortDescription>
+        <value>Find and Change</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_GroupCheck</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: tile group heading for Org Optimizer</shortDescription>
+        <value>Check and Tidy</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_GroupCareful</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: tile group heading for bulk delete</shortDescription>
+        <value>Careful</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_MappingsEmptyHint</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: line under the no import templates heading</shortDescription>
+        <value>Make one in Import a File by choosing One Kind of Record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_CreateTemplate</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: button that opens Import to create a template</shortDescription>
+        <value>Create a Template</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_WeeklyExportText</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: one line on the Weekly Data Export tile</shortDescription>
+        <value>Your backup: a copy of all your data, each week.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_RecycleBinText</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: one line on the Recycle Bin tile</shortDescription>
+        <value>Restore records deleted in the last 15 days.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_DataImportWizardText</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: one line on the Data Import Wizard tile</shortDescription>
+        <value>Load records that BarnCRM does not import.</value>
     </labels>
 </CustomLabels>

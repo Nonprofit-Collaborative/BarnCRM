@@ -3,7 +3,7 @@
 ## 1. What It Does
 
 **Bulk Update** changes up to five fields on every record a [Find](find.md) query returns, in
-one go. It always starts in Find: the **Update Many Records** card on the Data Manager tab
+one go. It always starts in Find: the **Update Many Records** tile on the Data Manager tab
 opens Find with a note, and the **Bulk Update** page (recent bulk updates and their undo) has
 an **Open Find** button. For each field you choose one of:
 

@@ -16,7 +16,7 @@ Rules for any screen:
 |---|---|---|
 | `c-barn-page-shell` | The page of an admin tool: one header, About This Tool help, body, footer | `icon-name`, `title`, `purpose`, `title-hidden`, `help-label`, `help-storage-key`, `status-message`; slots `actions`, `help`, `footer` and the default body |
 | `c-barn-tool-grid` | A hub of tools in groups (Data Manager, the Org Optimizer overview, Home) | `groups` (each with `name`, `label`, `tiles`), `heading-level`; fires `select` with `detail.name` |
-| `c-barn-tool-tile` | One tool on a hub; the whole tile is one link or button | `name`, `label`, `description`, `icon-name`, `href`, `badge-label`, `badge-variant`, `disabled`, `disabled-reason`; fires `select` |
+| `c-barn-tool-tile` | One tool on a hub; the whole tile is one link or button | `name`, `label`, `description`, `icon-name`, `href`, `new-tab`, `badge-label`, `badge-variant`, `disabled`, `disabled-reason`; fires `select` |
 | `c-barn-empty-state` | Any "nothing here yet" | `illustration` (`no-data`, `setup`, `all-clear`), `heading`, `message`, `size`, `heading-level`; default slot for the action |
 | `c-barn-help` | Help next to a field or section | `content` (popover), `learn-more-url`, `learn-more-label`, `alternative-text` |
 
@@ -25,7 +25,7 @@ Notes:
 - On a Lightning App Page the platform already prints the page name above the component. Pass `title-hidden` to the shell so the name is not printed twice; the `h1` stays for screen readers.
 - The About This Tool region opens on a person's first visit and stays closed after that. With `help-storage-key` the person's own choice is remembered in their browser only; it is a convenience, not a setting.
 - A disabled tile stays focusable so a screen reader reads why it is disabled.
-- Every link that opens a new tab goes through `c-barn-help` or copies its pattern: `rel="noopener noreferrer"`, the new-window icon, and "(opens in a new tab)" for screen readers.
+- Every link that opens a new tab goes through `c-barn-help` or copies its pattern: `rel="noopener noreferrer"`, the new-window icon, and "(opens in a new tab)" for screen readers. A link tile does this with `new-tab` (a grid tile with `newTab: true`), as Data Manager's Salesforce's Own Tools do.
 - A hub page that must open without running anything (Org Optimizer) badges a tile only from what is cheap or already known, and lets a section report its own result with a `summary` event once it has been opened.
 - A component placed inside the shell drops its own `lightning-card` and opens with an `h2` and its actions, unless it is also exposed for Home or record pages, where it keeps its card.
 
