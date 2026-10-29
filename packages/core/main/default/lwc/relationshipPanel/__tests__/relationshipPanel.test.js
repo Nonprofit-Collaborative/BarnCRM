@@ -154,8 +154,13 @@ describe('c-relationship-panel', () => {
     graphql.emit(response([]));
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="empty"]')).not.toBeNull();
+    const empty = element.shadowRoot.querySelector('[data-id="empty"]');
+    expect(empty.heading).toBe('c.Core_Relationship_EmptyHeading');
     expect(element.shadowRoot.querySelectorAll('[data-id="relationship-card"]').length).toBe(0);
+
+    element.shadowRoot.querySelector('[data-id="empty-add"]').click();
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="add-form"]')).not.toBeNull();
   });
 
   it('shows a message when the relationships cannot be read', async () => {

@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Members panel: button that makes a person the primary contact</shortDescription>
-        <value>Make primary</value>
+        <value>Make Primary</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdPanel_MakePrimaryFor</fullName>
@@ -71,6 +71,14 @@
         <protected>false</protected>
         <shortDescription>Household panel on a person: message when the person is in no household</shortDescription>
         <value>This person is not in a household yet</value>
+    </labels>
+    <labels>
+        <fullName>Core_HouseholdPanel_OfPersonEmptyHeading</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Household panel on a person: heading when the person is in no household</shortDescription>
+        <value>No Household Yet</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdPanel_OfPersonLoading</fullName>

@@ -85,13 +85,13 @@ Maria does this from the sample data.
    called **The Garcia Family**. Maria did not create it.
 4. Click through to the household. The **Members** panel lists Maria, and the member count
    reads 1.
-5. On the Members panel, click **Add member** and enter the first name `Wei` and the last
+5. On the Members panel, click **Add Member** and enter the first name `Wei` and the last
    name `Lee`. Click **Save**.
 6. Refresh the household. The name now reads **Garcia and Lee Household** and the member
    count reads 2.
 7. Open Wei's record, check **Deceased**, and save. Return to the household: the greetings
    no longer mention Wei.
-8. Back on the Members panel, use **Move to another household** on Maria and move her to
+8. Back on the Members panel, use **Move to Another Household** on Maria and move her to
    any other household. Return to the first household: it is still there, with nobody in
    it and a member count of 0, because "delete a household when the last person leaves"
    ships off. It keeps the name and greetings it had last, so a report still shows which

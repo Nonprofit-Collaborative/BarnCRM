@@ -171,8 +171,8 @@ replaces stays on the card as history.
   household gets a new primary address copied from this one, and everyone in it who has no
   address of their own moves to it. The person stops having an address of their own in use
   (their cards stay, as history), so from now on they move with the household. In the
-  flexible way of belonging, if they are a current member of more than one household the card
-  asks which, their own household first; choosing another household moves that household
+  flexible way of belonging, if they are a current member of more than one household the
+  confirmation asks which, their own household first; choosing another household moves that household
   and leaves the person's own address in use.
 - **Update Everyone's Address**, on the household's primary address card. A confirmation lists
   who will get this address (everyone in the household with no address of their own) and who
@@ -180,6 +180,9 @@ replaces stays on the card as history.
   person stops having an address of their own in use and gets the household's address. Choose
   **Update Everyone's Address** in the confirmation to go ahead, or **Cancel**. In the flexible
   way of belonging, a person whose own household is another one is not listed.
+
+Both confirmations open in a dialog over the page, so nothing on the card moves while you
+decide; **Escape** or **Cancel** closes it with nothing changed.
 
 With **Nobody moves until you choose**, **Update Everyone's Address** is how a household's
 new address reaches its people. In the other two settings it is how you bring someone with an
@@ -234,6 +237,11 @@ address on the card: tick them in the list, which holds every custom Address fie
 included, and the address number. Nothing is ticked on a new install, so the card shows only
 its usual fields. A field someone cannot see is left out for them, and a field the card
 already shows is not repeated.
+
+**How the card looks.** Each address is its own box with a map pin, its type and its badges
+(**Primary**, **Undeliverable**) at the top with the **Change Status** menu at the right, the
+address under them, and the buttons below. The buttons wrap onto a new line in a narrow sidebar or on a
+phone. A record with no address yet shows **No Addresses Yet** with an **Add Address** button.
 
 ## A Five-Minute Walkthrough for the Seasonal Swap
 

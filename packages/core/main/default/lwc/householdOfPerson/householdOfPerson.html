@@ -6,7 +6,11 @@
             </template>
 
             <template if:true={isEmpty}>
-                <p class="slds-text-color_weak empty-message">{label.empty}</p>
+                <c-barn-empty-state
+                    class="empty-message"
+                    heading={label.emptyHeading}
+                    message={label.empty}
+                ></c-barn-empty-state>
             </template>
 
             <template for:each={households} for:item="household">

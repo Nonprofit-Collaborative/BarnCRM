@@ -67,8 +67,8 @@ among your contacts works where. Start from the sample data.
 
 1. Open the **BarnCRM** app and choose **Households**. Open **The Garcia Family** and
    choose **Harper Garcia**.
-2. Scroll to the **Affiliations** card. It is empty, and it says "No affiliations on file
-   yet."
+2. Scroll to the **Affiliations** card. It is empty: it shows **No Affiliations Yet** with an
+   **Add Affiliation** button.
 3. Choose **Add Affiliation**. Fill in:
    - **Organization**: Bayview Hardware
    - **Role**: Store Manager
@@ -115,7 +115,7 @@ connect your own people and organizations.
 is the whole reason affiliations exist as records. In systems that put a person "at" a
 company, adding an employer moves them out of their household and their history goes
 with them. Here, Harper stays in The Garcia Family and simply has a connection to Bayview
-Hardware on file. If you actually want to move someone, use **Move to another household**
+Hardware on file. If you actually want to move someone, use **Move to Another Household**
 on their record.
 
 **Marking a second organization primary and expecting to clear the first.** You do not have

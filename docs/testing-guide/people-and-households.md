@@ -21,32 +21,32 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-HH-02: Add Member and Automatic Naming (Simple Way)
 
-**Purpose:** Add member creates a person in the household and the name and greetings follow the members.
+**Purpose:** Add Member creates a person in the household and the name and greetings follow the members.
 **Prerequisites:** admin, simple way, T-HH-01 done. Use T-HH-03 instead in the flexible way.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On The Testwell Family, select **Add member** in the **Members** panel. | A form opens in the panel with Salutation, First Name and Last Name, a **Save** and a **Cancel** button. |
-| 2 | Enter `Mr.`, `Ben`, `Testwell` and select **Save**. | A toast reads **Added. The household name and greetings have been brought up to date.** Ben appears in the list. |
+| 1 | On The Testwell Family, select **Add Member** in the **Members** panel. | The **Add Member** dialog opens with Salutation, First Name and Last Name, a **Save** and a **Cancel** button. |
+| 2 | Enter `Mr.`, `Ben`, `Testwell` and select **Save**. | The dialog closes. A toast reads **Added. The household name and greetings have been brought up to date.** Ben appears as a tile with his initials **BT**. |
 | 3 | Refresh the page. | Member Count **2**. Formal Greeting **Ms. and Mr. Ada Testwell**. Informal Greeting **Ada and Ben**. The name stays **The Testwell Family**. |
 | 4 | Add a third member `Wei` `Lee` (no salutation) and refresh. | Member Count **3**. The name reads **Testwell and Lee Household** because the surnames differ. |
-| 5 | On Wei's row select **Move to another household**, pick **The Garcia Family** in the picker and select **Save**. | A toast reads **Moved. Both households have been brought up to date.** Wei leaves the list; the name returns to **The Testwell Family**, Member Count **2**. |
-| 6 | Reverse it: open The Garcia Family, use **Move to another household** on Wei, and choose The Testwell Family. | Wei is back in The Testwell Family; The Garcia Family is back to its three members and its own name. |
+| 5 | Open the menu on Wei's tile and select **Move to Another Household**, pick **The Garcia Family** in the picker and select **Save**. | A toast reads **Moved. Both households have been brought up to date.** Wei leaves the list; the name returns to **The Testwell Family**, Member Count **2**. |
+| 6 | Reverse it: open The Garcia Family, use **Move to Another Household** on Wei, and choose The Testwell Family. | Wei is back in The Testwell Family; The Garcia Family is back to its three members and its own name. |
 
 **Cleanup:** delete Wei Lee.
 
 ## T-HH-03: Add Member (Flexible Way)
 
-**Purpose:** in the flexible way Add member offers search and create.
+**Purpose:** in the flexible way Add Member offers search and create.
 **Prerequisites:** admin, flexible way, T-HH-01 done.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On The Testwell Family, select **Add member**. | The panel shows **Add Someone Already in Salesforce** with a search box (placeholder **Search by name**) and **Or Add Someone New** with Salutation, First name and Last name. |
+| 1 | On The Testwell Family, select **Add Member**. | The **Add Member** dialog shows **Add Someone Already in Salesforce** with a search box (placeholder **Search by name**) and **Or Add Someone New** with Salutation, First name and Last name. |
 | 2 | Type `zzqq` in the search box. | **No matches. Keep typing, or add them as a new person below.** |
 | 3 | Leave Last name empty and select **Save**. | **Enter at least a last name before saving.** Nothing is created. |
 | 4 | Enter `Mr.`, `Ben`, `Testwell` and select **Save**. | A toast confirms the add; Ben is listed; after refresh Member Count is **2** and Informal Greeting **Ada and Ben**. |
-| 5 | Open **Add member** again, search `Diego`, and select **Diego Garcia**. | Diego joins The Testwell Family and stays in The Garcia Family. His **Household** panel lists both households. |
+| 5 | Open **Add Member** again, search `Diego`, and select **Diego Garcia**. | Diego joins The Testwell Family and stays in The Garcia Family. His **Household** panel lists both households. |
 | 6 | Open the **Household Members** tab, open Diego's new membership, set **End Date** to yesterday, and save. | Diego disappears from The Testwell Family's panel and its Member Count drops by one. The Garcia Family is unchanged. |
 | 7 | Create a second current membership for Ben in The Testwell Family from the **Household Members** tab. | Refused: **This person is already a current member of this household. Edit their existing membership instead of adding another.** |
 
@@ -54,12 +54,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-HH-04: Make Primary
 
-**Purpose:** Make primary moves the primary contact and the Primary Contact field follows.
+**Purpose:** Make Primary moves the primary contact and the Primary Contact field follows.
 **Prerequisites:** admin, The Testwell Family with Ada and Ben.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On Ben's row select **Make Primary**. | A toast reads **Ben Testwell is now the primary contact.** The **Primary** badge moves to Ben; **Make Primary** now shows on Ada's row and not on Ben's. |
+| 1 | Open the menu on Ben's tile and select **Make Primary**. | A toast reads **Ben Testwell is now the primary contact.** The **Primary** badge moves to Ben; **Make Primary** now shows in Ada's menu and not in Ben's. |
 | 2 | Refresh. | Primary Contact reads **Ben Testwell**. |
 | 3 | Simple way: edit the household and set Primary Contact to **Harper Garcia**. | Refused: **The Primary Contact has to be somebody in this household. Choose one of its members, or move the person into the household first.** |
 | 4 | Flexible way: edit the household and change Primary Contact to Ada. | Refused with a message starting **In this org a household's Primary Contact follows the member marked primary.** |
@@ -142,7 +142,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | In an org without Person Accounts that has not changed it, open **BarnCRM Settings**, **People and Households**, and read **How people belong to a household** without touching it. | **One household per person (simple)** is selected, never an empty choice. (An org with Person Accounts, or one set up alongside Nonprofit Cloud, shows **A person can belong to more than one household (flexible)** instead.) |
 | 2 | Switch **How people belong to a household** to the other way and save. | Refused with a message starting **You cannot switch to the flexible way of belonging yet.** (or **...to the simple way...**) naming how many people it affects. The setting is unchanged. |
 | 3 | Tick **Delete a household once it is empty** and save. | Saved. |
-| 4 | Create contact `Dee` `Testempty`, then move Dee into The Testwell Family with **Move to another household**. | Dee's own household is deleted (it is gone from the **Households** tab). |
+| 4 | Create contact `Dee` `Testempty`, then move Dee into The Testwell Family with **Move to Another Household**. | Dee's own household is deleted (it is gone from the **Households** tab). |
 | 5 | Untick **Delete a household once it is empty** and save. | Saved. |
 
 **Cleanup:** delete Dee Testempty.
@@ -155,7 +155,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **Households** tab and The Garcia Family. | The **Members** panel and **Name and Greetings** show. |
-| 2 | Look at the **Members** panel, in either way of belonging. | The members and their badges show. There is no **Add member**, **Move to another household** or **Make Primary** button. |
+| 2 | Look at the **Members** panel, in either way of belonging. | The members and their badges show. There is no **Add Member** button and no menu on the member tiles. |
 | 3 | Open the **Household Members** tab (from the navigation menu if it is not shown). | It opens and lists membership records (none in the simple way of belonging); no **New** button. |
 | 4 | Open **BarnCRM Settings**, **People and Households**. | The settings show and cannot be saved; the naming panel shows the read-only notice from T-HH-06. |
 
@@ -270,8 +270,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 6 | As the staff user, open Accounts and click **New**. | Still no record type choice and no **Household**; the account saves with no record type and appears on **Organizations**, not **Households**. |
 | 7 | As the staff user, click **New household** on BarnCRM Home, save, then edit the household's phone and save. | The household is created and appears on the **Households** tab; the edit saves. |
 | 8 | As the staff user, edit the account from step 6 and try to change its record type. | **Household** is not offered (Change Record Type shows no choice, or is not offered). |
-| 9 | As admin, in Setup, open the staff user's permission set assignments, then the **BarnCRM Households** permission set's record type settings. | **BarnCRM Households** is assigned; it grants no record type. |
-| 10 | In an org that already ran BarnCRM before this change, deploy it, then as admin open **BarnCRM Staff** and its record type settings. | **Household** is no longer listed; staff can still open and edit existing households. |
+| 9 | As the staff user, open the household from step 7. On **Members** select **Add Member**, add `Zztest` `Rt`, then open the household's **Addresses** card. | Before the add the panel shows **No Members Yet**; the **Add Member** dialog opens and the new person shows as a tile. **Addresses** shows **No Addresses Yet** with **Add Address**. Nothing asks for a record type. |
+| 10 | As admin, in Setup, open the staff user's permission set assignments, then the **BarnCRM Households** permission set's record type settings. | **BarnCRM Households** is assigned; it grants no record type. |
+| 11 | In an org that already ran BarnCRM before this change, deploy it, then as admin open **BarnCRM Staff** and its record type settings. | **Household** is no longer listed; staff can still open and edit existing households. |
 
 **Cleanup:** none (Household Upkeep cannot be turned off).
 

@@ -11,6 +11,7 @@ import ADD_BUTTON from '@salesforce/label/c.Core_Relationship_AddButton';
 import ADD_FORM_TITLE from '@salesforce/label/c.Core_Relationship_AddFormTitle';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_Relationship_CancelButton';
 import EMPTY_MESSAGE from '@salesforce/label/c.Core_Relationship_Empty';
+import EMPTY_HEADING from '@salesforce/label/c.Core_Relationship_EmptyHeading';
 import FORMER_BADGE from '@salesforce/label/c.Core_Relationship_FormerBadge';
 import LOAD_FAILED from '@salesforce/label/c.Core_Relationship_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_Relationship_Loading';
@@ -111,6 +112,7 @@ export default class RelationshipPanel extends LightningElement {
     addFormTitle: ADD_FORM_TITLE,
     cancelButton: CANCEL_BUTTON,
     emptyMessage: EMPTY_MESSAGE,
+    emptyHeading: EMPTY_HEADING,
     formerBadge: FORMER_BADGE,
     loading: LOADING,
     removeButton: REMOVE_BUTTON

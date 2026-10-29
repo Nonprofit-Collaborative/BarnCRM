@@ -1,0 +1,108 @@
+<template>
+    <lightning-modal-header label={label}></lightning-modal-header>
+    <lightning-modal-body>
+        <div class="slds-is-relative">
+            <template lwc:if={junctionMode}>
+                <div class="add-existing-section">
+                    <h2 class="slds-text-heading_small">{labels.addExistingHeading}</h2>
+                    <lightning-input
+                        type="search"
+                        label={labels.addExistingHeading}
+                        variant="label-hidden"
+                        placeholder={labels.addExistingPlaceholder}
+                        onchange={handleSearchInput}
+                        class="slds-var-m-top_x-small add-search-input"
+                    ></lightning-input>
+                    <template lwc:if={hasSearchResults}>
+                        <ul class="slds-var-m-top_x-small search-results">
+                            <template for:each={searchResultRows} for:item="person">
+                                <li key={person.id} class="slds-item search-result-row">
+                                    <lightning-button
+                                        variant="base"
+                                        label={person.name}
+                                        aria-label={person.resultLabel}
+                                        title={person.resultLabel}
+                                        data-person-id={person.id}
+                                        disabled={busy}
+                                        onclick={handleAddExisting}
+                                        class="add-existing-button"
+                                    ></lightning-button>
+                                </li>
+                            </template>
+                        </ul>
+                    </template>
+                    <template lwc:if={showNoSearchResults}>
+                        <p role="status" class="slds-var-m-top_x-small no-results-message">
+                            {labels.addExistingNoResults}
+                        </p>
+                    </template>
+                </div>
+
+                <div class="add-new-section slds-var-m-top_medium">
+                    <h2 class="slds-text-heading_small">{labels.addNewHeading}</h2>
+                    <lightning-input
+                        label={labels.salutation}
+                        value={newSalutation}
+                        onchange={handleNewSalutationChange}
+                        class="slds-var-m-top_x-small add-new-salutation"
+                    ></lightning-input>
+                    <lightning-input
+                        label={labels.firstName}
+                        value={newFirstName}
+                        onchange={handleNewFirstNameChange}
+                        class="slds-var-m-top_x-small add-new-first-name"
+                    ></lightning-input>
+                    <lightning-input
+                        label={labels.lastName}
+                        required
+                        value={newLastName}
+                        onchange={handleNewLastNameChange}
+                        class="slds-var-m-top_x-small add-new-last-name"
+                    ></lightning-input>
+                    <div class="slds-var-m-top_small">
+                        <lightning-button
+                            label={labels.cancel}
+                            onclick={handleCancel}
+                            class="slds-var-m-right_x-small add-cancel-button"
+                        ></lightning-button>
+                        <lightning-button
+                            variant="brand"
+                            label={labels.save}
+                            disabled={busy}
+                            onclick={handleAddNewSave}
+                            class="add-new-save-button"
+                        ></lightning-button>
+                    </div>
+                </div>
+            </template>
+            <template lwc:else>
+                <lightning-record-edit-form object-api-name="Contact" onsuccess={handleFormSuccess}>
+                    <lightning-messages></lightning-messages>
+                    <lightning-input-field field-name="Salutation"></lightning-input-field>
+                    <lightning-input-field field-name="FirstName"></lightning-input-field>
+                    <lightning-input-field field-name="LastName"></lightning-input-field>
+                    <div class="slds-hide">
+                        <lightning-input-field field-name="AccountId" value={householdId}></lightning-input-field>
+                    </div>
+                    <div class="slds-var-m-top_small">
+                        <lightning-button
+                            label={labels.cancel}
+                            onclick={handleCancel}
+                            class="slds-var-m-right_x-small add-cancel-button"
+                        ></lightning-button>
+                        <lightning-button
+                            variant="brand"
+                            type="submit"
+                            label={labels.save}
+                            class="add-save-button"
+                        ></lightning-button>
+                    </div>
+                </lightning-record-edit-form>
+            </template>
+
+            <template lwc:if={errorMessage}>
+                <div class="slds-text-color_error slds-var-m-top_small" role="alert">{errorMessage}</div>
+            </template>
+        </div>
+    </lightning-modal-body>
+</template>
