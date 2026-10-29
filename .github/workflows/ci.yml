@@ -54,6 +54,9 @@ jobs:
       - name: Check Person Account fields are reached only by name
         run: python3 scripts/ci/check-person-account-fields.py
 
+      - name: Check every reference to a BarnCRM custom field or object names one the repo defines
+        run: python3 scripts/ci/check-field-references.py
+
       - name: Check every object named in packages is on the allowlist
         run: python3 scripts/ci/check-object-allowlist.py
 

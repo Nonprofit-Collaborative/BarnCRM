@@ -66,6 +66,33 @@ Salesforce org is needed for this job. Steps:
    an `@salesforce/schema` import, a `field-name` attribute, or a metadata reference such as a
    permission set field grant fails. Custom metadata records are data and are skipped. There
    is no exemption marker.
+   The step after it, `scripts/ci/check-field-references.py`, fails the build when Apex, a
+   component or metadata names one of BarnCRM's own custom fields or objects that no
+   package defines any more. **The dev gate orgs (oi-test, barn-sales) keep every field ever
+   deployed to them, so a reference to a removed field still compiles there and the org
+   gates pass. Only this check or a clean org (barn-npc) catches it.** That is how
+   `Integration_App__mdt.Install_Url__c`, removed in #666, came back in a SOQL SELECT in
+   #681 and failed the check-only deploy to barn-npc.
+   - The index is every `objects/<Object>/` folder and `fields/<Field>.field-meta.xml`
+     under `packages/`, plus sharing reasons, report types (`Gifts__c`) and child
+     relationship names (`Gift_Allocations__r`).
+   - A custom name is `Name__c`, `Name__mdt`, `Name__e` or `Name__r`. A namespaced name
+     (`npsp__Name__c`) belongs to another package and is skipped.
+   - `Object.Field__c` on an object the repo defines (a standard object counts when the
+     repo adds a field to it) must name a field of that object. A static SOQL query on a
+     repo object must name only that object's fields; a subquery is checked against its
+     own FROM. Any other unnamespaced custom name must exist somewhere in the repo.
+   - Fields on an object the repo does not define (`GiftTransaction.X__c`, a query FROM an
+     NPC object) are skipped. So are Apex comments and string literals (dynamic SOQL and
+     `record.get('X__c')` are the describe seam), Jest tests, metadata prose (label,
+     description, help text, values) and XML comments. In JavaScript only
+     `@salesforce/schema` imports and strings that are exactly `Object.Field__c` count; in
+     HTML, `field-name` and `object-api-name` values.
+   - Custom metadata records are checked too: each `<field>` must be a field of the
+     record's type.
+   - A justified exception goes in `scripts/ci/field-references-allowlist.txt` as
+     `path token  # reason`, with the token as the check prints it. It has no entries today.
+   - Its tests are in `scripts/ci/tests/test_check_field_references.py`.
 7. `scripts/ci/check-object-allowlist.py`, failing the build if Apex or an `objects/`
    folder anywhere under `packages/` names a standard object that is not on the allowlist
    in that script. This is the other half of check 6 and the stronger shape: check 6 is a
@@ -257,7 +284,7 @@ OpenAPI check, the migration kit tests, the em dash scan, `npm run lint`,
 output. The exit status is non-zero if anything failed. If `node_modules` is missing it tells
 you to run `npm ci` and stops.
 
-- `--fast` skips Jest and Code Analyzer.
+- `--fast` skips Jest, the `scripts/ci/tests` suite and Code Analyzer.
 - `--allow-adr-next` counts a `check-adrs.py` failure as a pass when the only problems are
   unnumbered `NEXT-*.md` decision records, so a branch with a new ADR reads clean.
 - `--analyzer` also runs `sf code-analyzer run --severity-threshold 2` on the Apex and
@@ -993,9 +1020,9 @@ column. What it catches:
 What it does not catch:
 
 - Unknown fields in SOQL queries (for example `[SELECT Missing__c FROM Thing__c]` where
-  `Missing__c` does not exist passes with no error). Field-level SOQL validation still
-  needs an org, for example through `sf code-analyzer` at deploy time or an actual
-  deploy to a scratch org.
+  `Missing__c` does not exist passes with no error). `scripts/ci/check-field-references.py`
+  covers this for BarnCRM's own objects (`static` job, check 6); fields on other objects
+  still need a clean org, since the dev gate orgs keep removed fields.
 - Anything that is only enforced at runtime (CRUD/FLS, governor limits, trigger order of
   execution, and so on).
 
