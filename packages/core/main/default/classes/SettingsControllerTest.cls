@@ -876,7 +876,51 @@ private class SettingsControllerTest {
                 changes[0].newValue,
                 'The record reads by name'
             );
-            Assert.areEqual(gone, changes[0].oldValue, 'A record that is gone reads as stored');
+            Assert.areEqual(
+                System.Label.Core_Settings_RecordUnavailable,
+                changes[0].oldValue,
+                'A record that is gone or unreadable reads as a plain fallback, never an Id'
+            );
+        }
+    }
+
+    @IsTest
+    static void recentChangesShowARecordTypeByItsLabel() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Picked_Type',
+                    MasterLabel = 'Picked type',
+                    Setting_Key__c = 'Picked_Type__c',
+                    Section__c = SettingSections.GENERAL,
+                    Module__c = 'Core',
+                    Data_Type__c = SettingsService.RECORD_TYPE,
+                    Record_Object__c = 'Account',
+                    Sort_Order__c = 1
+                )
+            };
+            insert new Setting_Change__c(
+                Setting_Name__c = SettingsService.CORE_SETTINGS_OBJECT + '.Picked_Type__c',
+                Old_Value__c = AccountKinds.NO_RECORD_TYPE,
+                New_Value__c = 'Not_A_Real_Type',
+                Changed_By__c = UserInfo.getUserId(),
+                Changed_At__c = System.now()
+            );
+
+            Test.startTest();
+            List<SettingsController.ChangeModel> changes = SettingsController.getRecentChanges(5);
+            Test.stopTest();
+
+            Assert.areEqual(
+                System.Label.Core_Settings_NoRecordType,
+                changes[0].oldValue,
+                'No record type reads as its label'
+            );
+            Assert.areEqual(
+                'Not_A_Real_Type',
+                changes[0].newValue,
+                'A value no record type names reads as stored'
+            );
         }
     }
 

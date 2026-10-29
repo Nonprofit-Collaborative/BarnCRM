@@ -97,6 +97,14 @@
         <value>{0} rows: {1} created, {2} updated, {3} matched, {4} rejected.</value>
     </labels>
     <labels>
+        <fullName>Core_DataJobs_ImportSummaryOne</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import counts for a one-row import: {0} row, then four counts</shortDescription>
+        <value>{0} row: {1} created, {2} updated, {3} matched, {4} rejected.</value>
+    </labels>
+    <labels>
         <fullName>Core_DataJobs_Started</fullName>
         <categories>DataJobs</categories>
         <language>en_US</language>

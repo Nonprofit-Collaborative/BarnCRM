@@ -158,7 +158,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings Edition row: the collapsed control that opens the change</shortDescription>
-        <value>Change edition</value>
+        <value>Change Edition</value>
     </labels>
     <labels>
         <fullName>Core_Edition_ChangeIntro</fullName>
