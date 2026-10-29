@@ -330,6 +330,12 @@ private class ImportFirstNameMatchTest {
     @IsTest
     static void aDryRunInOneRowChunksCountsWhatTheCommitDoes() {
         System.runAs(TestUsers.admin()) {
+            // Eight chunks in one transaction run close to the query limit. In a Nonprofit
+            // Cloud org the native household guard (ADR-0036, ADR-0130) adds two queries a
+            // chunk for a test user who cannot read the native group (unknown counts as
+            // native), which elsewhere never run. The guard is tested in
+            // HouseholdSelectorTest, so here no household has native dependents.
+            HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>();
             Test.startTest();
             List<Import_Row__c> rows = load(
                 file(
