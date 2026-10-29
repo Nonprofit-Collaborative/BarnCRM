@@ -192,7 +192,7 @@ public with sharing class AcknowledgmentService {
             }
             if (optedOut.contains(gift.Id)) {
                 // The donor asked not to be emailed: no row, no error, and the gift stays queued
-                // for the letter run (R-AK13, ADR-NEXT).
+                // for the letter run (R-AK13, ADR-0144).
                 continue;
             }
             sendable.add(gift);
@@ -346,7 +346,7 @@ public with sharing class AcknowledgmentService {
     }
 
     /**
-     * The gifts, by Id, whose email recipient has Email Opt Out set (R-AK13, ADR-NEXT). The send
+     * The gifts, by Id, whose email recipient has Email Opt Out set (R-AK13, ADR-0144). The send
      * skips them, and the letter run and the page treat them as letters, so all three read the
      * opt-out through this one method. The recipient is `recipientContactIdFor`'s, so for an
      * organization or household gift it is the primary contact's opt-out that counts.

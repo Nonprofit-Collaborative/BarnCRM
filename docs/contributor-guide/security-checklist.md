@@ -109,5 +109,5 @@ Closed since the v0.11 pass:
 | New-tab links without `rel` (C-L6) | Fixed in `findExportFiles`, `optimizerSetup` and `dataManager` |
 | View All and Modify All on Account and Contact for BarnCRM Admin (C-M2) | Kept, justified in ADR-0142, the permission set description and the submission notes |
 | BarnCRM Access Manager carries Assign Permission Sets (C-L5) | Kept (ADR-0121, D-91), justified in the submission notes |
-| Acknowledgment emails ignored the donor's Email Opt Out (G-L4) | Fixed (owner decision, 2026-10-29): an opted-out recipient is never emailed and is thanked by letter (ADR-NEXT, R-AK13) |
+| Acknowledgment emails ignored the donor's Email Opt Out (G-L4) | Fixed (owner decision, 2026-10-29): an opted-out recipient is never emailed and is thanked by letter (ADR-0144, R-AK13) |
 | Giving Admin had View All on `Commitment__c` but not `Gift__c` (G-L5) | Fixed (owner decision, 2026-10-29): removed, so no Giving set has View All on either Private object |

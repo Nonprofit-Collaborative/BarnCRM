@@ -1,4 +1,4 @@
-# ADR-NEXT: Acknowledgments Honor the Donor's Email Opt-Out
+# ADR-0144: Acknowledgments Honor the Donor's Email Opt-Out
 
 **Status:** Accepted (owner decision, 2026-10-29)
 **Date:** 2026-10-29

@@ -161,7 +161,7 @@ public with sharing class AcknowledgmentSelector {
     }
 
     /**
-     * Which of these contacts have Email Opt Out set (R-AK13, ADR-NEXT).
+     * Which of these contacts have Email Opt Out set (R-AK13, ADR-0144).
      *
      * Read in system mode and returned as Ids only: whether a donor is emailed must not depend on
      * whether the person pressing Send has field access to Email Opt Out, and nothing read here is

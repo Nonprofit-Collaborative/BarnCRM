@@ -423,7 +423,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Rule criteria | Minor | Acknowledgment rules match on amount range, gift type, appeal and first gift only. | Shipped | G-12 |
 | Standard email templates | Minor | Thank-you emails use ordinary Salesforce email templates, with a packaged sample template. | Shipped | G-12 |
 | No double thanks | Minor | A gift cannot be thanked twice, even if a batch is retried. | Shipped | G-12 |
-| Email opt-out honored | Minor | A donor (or an organization's primary contact) with Email Opt Out is never emailed a thank-you; the gift is counted on its own queue line and goes in the letter file instead (2026-10-29 security review, G-L4). | Shipped | G-12, ADR-NEXT |
+| Email opt-out honored | Minor | A donor (or an organization's primary contact) with Email Opt Out is never emailed a thank-you; the gift is counted on its own queue line and goes in the letter file instead (2026-10-29 security review, G-L4). | Shipped | G-12, ADR-0144 |
 | Send Acknowledgments permission | Minor | Separate permission for sending thank-yous. | Shipped | G-12 |
 | Thank-you greets "friend" | Minor | The thank-you email greets "friend" when the person has no first name. | Shipped | G-12 (UX pass) |
 | Acknowledgment rules edited in the app | Minor | Rules are created and edited on the Acknowledgments page with the email template chosen by name; a new stewardship plan's key is made from its name. | Shipped | G-12, G-15 (UX pass) |
