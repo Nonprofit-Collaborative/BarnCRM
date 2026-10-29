@@ -83,19 +83,20 @@ Open the **BarnCRM** app and choose **Home**. As a staff member you see:
   upgrade brings something new. Dismissing hides it for you, not for your colleagues.
 - **Welcome to BarnCRM**: a short line saying "Your households, people and organizations are
   in the tabs above."
-- **New household**: creates a household with a placeholder name and opens it. The name is
+- **New Household**: creates a household with a placeholder name and opens it. The name is
   replaced automatically once you add a member. You see this button only if you can create
   and edit accounts.
-- **Quick Links**: **Households**, **Organizations** and **BarnCRM Settings**, opened without
-  going back to the App Launcher.
+- **Quick Links**: icon tiles for **Households**, **Organizations** and **BarnCRM Settings**,
+  each with a one-line description, opened without going back to the App Launcher.
 - **Files That Arrive Regularly**: shown only if you can read import templates and a file is
   marked as arriving regularly, with the date it was last imported.
 
 If someone has paused automation (for example during a large import), a banner under the
 welcome says "BarnCRM automation is paused. Households and greetings are not being updated
-until it resumes." It goes away by itself.
+until it resumes." It goes away by itself. Admins also see **Resume Automation** in the banner.
 
-Admins also see the setup checklist, Health Check and a few status tiles. See
+Admins also see the setup checklist, a Health Check summary and status tiles with a badge
+each (for example **All Clear**, **Not Run Yet** or **Overdue**). See
 [The BarnCRM Apps and Navigation](../admin-guide/barncrm-app.md) and [Health Check](../admin-guide/health-check.md).
 
 ## To Read In-App Tips

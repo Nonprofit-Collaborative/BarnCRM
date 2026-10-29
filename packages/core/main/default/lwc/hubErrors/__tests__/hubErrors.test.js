@@ -82,6 +82,20 @@ describe('c-hub-errors', () => {
     expect(byId(element, 'load-error').textContent).toContain('Core_HubHome_LoadErrorMessage');
   });
 
+  it('badges All Clear at no new errors, and only once the count has arrived', async () => {
+    const element = build();
+    await settle();
+    expect(byId(element, 'all-clear')).toBeNull();
+
+    getHomeModel.emit({ newErrorCount: 0 });
+    await settle();
+    expect(byId(element, 'all-clear').label).toBe('c.Core_OrgOptimizer_BadgeAllClear');
+
+    getHomeModel.emit({ newErrorCount: 4 });
+    await settle();
+    expect(byId(element, 'all-clear')).toBeNull();
+  });
+
   it('says setup completed when the install logged nothing', async () => {
     const element = build();
     getHomeModel.emit({ newErrorCount: 0, installProblemCount: 0 });

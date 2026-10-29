@@ -95,7 +95,7 @@ describe('c-hub-seasonal-addresses', () => {
     expect(byId(element, 'seasonal-stale')).toBeNull();
   });
 
-  it('warns when a scheduled seasonal swap has missed its window, and not by color alone', async () => {
+  it('says Not Run Yet, and warns of nothing, before the swap has ever run', async () => {
     const element = build();
     getHomeModel.emit({
       seasonalAddressLastRun: null,
@@ -104,6 +104,20 @@ describe('c-hub-seasonal-addresses', () => {
     });
     await settle();
 
+    expect(byId(element, 'seasonal-not-run').label).toBe('c.Core_OrgOptimizer_BadgeNotRun');
+    expect(byId(element, 'seasonal-stale')).toBeNull();
+  });
+
+  it('warns when a scheduled seasonal swap has missed its window, and not by color alone', async () => {
+    const element = build();
+    getHomeModel.emit({
+      seasonalAddressLastRun: '2026-10-20T02:00:00.000Z',
+      seasonalAddressScheduled: true,
+      seasonalAddressStale: true
+    });
+    await settle();
+
+    expect(byId(element, 'seasonal-overdue').label).toBe('c.Core_HubHome_BadgeOverdue');
     const warning = byId(element, 'seasonal-stale');
     expect(warning.getAttribute('aria-live')).toBe('polite');
     expect(warning.querySelector('lightning-icon').alternativeText).toBe(

@@ -613,12 +613,20 @@ describe('c-health-check-panel', () => {
       expect(element.shadowRoot.querySelector('[data-id="rerun"]').label).toBe(
         'c.Core_HealthCheck_RunNowButton'
       );
+      // The same badge as the Health Check tile in Org Optimizer.
+      const badge = element.shadowRoot.querySelector('[data-id="last-run-badge"]');
+      expect(badge.label).toBe('c.Core_OrgOptimizer_BadgeErrors');
+      expect(badge.className).toContain('slds-theme_error');
     });
 
     it('says when Health Check has never run', async () => {
       getLastRun.mockResolvedValue({ ranAt: null, result: null });
       const element = createHomePanel();
       await flush();
+
+      expect(element.shadowRoot.querySelector('[data-id="last-run-badge"]').label).toBe(
+        'c.Core_OrgOptimizer_BadgeNotRun'
+      );
 
       expect(element.shadowRoot.querySelector('[data-id="never-run"]')).not.toBeNull();
       expect(element.shadowRoot.querySelector('[data-id="last-result"]')).toBeNull();

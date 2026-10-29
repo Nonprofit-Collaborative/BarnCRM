@@ -125,7 +125,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 1 | Open **BarnCRM Settings**, **Automation**. | A card titled **Automation** lists each automation with a description, "Runs on" and its object, and a switch. **How long** shows **2 hours**. |
 | 2 | Open **How long**. | Options **1 hour**, **2 hours**, **4 hours**, **8 hours**, **24 hours**. |
 | 3 | Choose **1 hour** and click **Pause All Automation**. | A yellow box: "Automation is paused until" a date and time one hour from now, then "Paused by" your name and "It turns itself back on then." Every switch stays where it was. |
-| 4 | Open the **Home** tab. | Under **Welcome to BarnCRM**: "BarnCRM automation is paused. Households and greetings are not being updated until it resumes." |
+| 4 | Open the **Home** tab. | Under **Welcome to BarnCRM**: "BarnCRM automation is paused. Households and greetings are not being updated until it resumes." in a yellow warning box with a **Resume Automation** link. Click the link: **BarnCRM Settings** opens on **Automation**. |
 | 5 | Back in **Automation**, click **Resume Automation**. | The yellow box disappears. On **Home** the banner is gone after a reload. |
 | 6 | Switch off **Keep both sides of relationships in step**. Reload the page. | The switch is still off. |
 | 7 | Switch it back on, open **General** and scroll to **Recent Changes**. | Rows for **Automation Paused Until** record the pause and the resume, and rows record both switch changes, each with your name. |
@@ -189,11 +189,12 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As admin, open the **BarnCRM** app, **Home** tab. | **What's New in BarnCRM** at the top ("Here is what changed since you last dismissed this card.", a **Version** heading, bold headlines), then **Welcome to BarnCRM**, **Setup Checklist** or **Setup Complete**, **Health Check**, **Errors to Review**, the rollups and seasonal address tiles, **Modules** and **Quick Links**. |
-| 2 | In **Quick Links**, click **Households**, go back, then **BarnCRM Settings**. | Each opens its tab. **Organizations** is also listed. |
+| 2 | In **Quick Links**, click the **Households** tile, go back, then the **BarnCRM Settings** tile. | Three icon tiles, each with a one-line description; each opens its tab. **Organizations** is also listed. |
 | 3 | In **Modules**, click **Open the Module Manager**. | **BarnCRM Settings** opens on **Modules**. |
-| 4 | On **Home**, click **Dismiss** on What's new. Reload. | The card is gone and stays gone. |
-| 5 | As staff, open the **Home** tab. | What's new is still shown (dismissing is per person). Staff sees **Welcome to BarnCRM**, **New household** and **Quick Links** only: no setup checklist, Health Check, Errors to review or Modules card. |
-| 6 | As staff, click **New household**. | A household named **New Household** is created and its page opens, with no record type prompt. As admin, delete it. |
+| 4 | Look at the status tiles. | Each card has an icon. **Health Check** shows a badge (**Not Run Yet**, **Passed**, **Warnings: n** or **Errors: n**) and its findings as rows, as in BarnCRM Settings, **Health**. **Errors to Review** shows **All Clear** at zero. In an org where rollups never ran, the rollups tile shows **Not Run Yet** with no warning; once they ran and are more than 36 hours old it shows an **Overdue** badge. |
+| 5 | On **Home**, click **Dismiss** on What's new. Reload. | The card is gone and stays gone. |
+| 6 | As staff, open the **Home** tab. | What's new is still shown (dismissing is per person). Staff sees **Welcome to BarnCRM**, **New Household** and **Quick Links** only: no setup checklist, Health Check, Errors to Review or Modules card. |
+| 7 | As staff, click **New Household**. | A household named **New Household** is created and its page opens, with no record type prompt. As admin, delete it. |
 
 **Cleanup:** None.
 

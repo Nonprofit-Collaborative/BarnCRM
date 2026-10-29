@@ -9,6 +9,8 @@ import STALE from '@salesforce/label/c.Core_SeasonalAddress_Stale';
 import LINK from '@salesforce/label/c.Core_SeasonalAddress_HubLink';
 import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
 import WARNING from '@salesforce/label/c.Core_HubHome_WarningAltText';
+import NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_BadgeNotRun';
+import OVERDUE from '@salesforce/label/c.Core_HubHome_BadgeOverdue';
 
 const ADDRESSES_SECTION = 'Addresses';
 
@@ -23,7 +25,9 @@ export default class HubSeasonalAddresses extends NavigationMixin(LightningEleme
     notScheduled: NOT_SCHEDULED,
     stale: STALE,
     link: LINK,
-    warning: WARNING
+    warning: WARNING,
+    notRun: NOT_RUN,
+    overdue: OVERDUE
   };
 
   lastRun;
@@ -40,7 +44,8 @@ export default class HubSeasonalAddresses extends NavigationMixin(LightningEleme
       this.lastRun = data.seasonalAddressLastRun;
       this.lastRunSummary = data.seasonalAddressLastRunSummary;
       this.scheduled = Boolean(data.seasonalAddressScheduled);
-      this.stale = Boolean(data.seasonalAddressStale);
+      // As on the rollups tile: Overdue only once the swap has run at all.
+      this.stale = Boolean(data.seasonalAddressStale && data.seasonalAddressLastRun);
       this.errorMessage = undefined;
     } else if (error) {
       this.errorMessage = LOAD_ERROR;

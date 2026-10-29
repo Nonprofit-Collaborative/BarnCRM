@@ -1,5 +1,5 @@
 <template>
-    <lightning-card title={labels.heading}>
+    <lightning-card title={labels.heading} icon-name="standard:address">
         <div class="slds-var-p-horizontal_medium">
             <template lwc:if={errorMessage}>
                 <p class="slds-text-color_error" data-id="load-error" role="alert">{errorMessage}</p>
@@ -21,7 +21,8 @@
                     </p>
                 </template>
             </template>
-            <template lwc:else>
+            <template lwc:elseif={loaded}>
+                <lightning-badge label={labels.notRun} data-id="seasonal-not-run"></lightning-badge>
                 <p data-id="seasonal-never">{labels.never}</p>
             </template>
             <template lwc:if={notScheduled}>
@@ -35,7 +36,12 @@
                 </p>
             </template>
             <template lwc:if={stale}>
-                <p class="slds-text-color_error" data-id="seasonal-stale" role="status" aria-live="polite">
+                <lightning-badge
+                    class="slds-theme_warning"
+                    label={labels.overdue}
+                    data-id="seasonal-overdue"
+                ></lightning-badge>
+                <p data-id="seasonal-stale" role="status" aria-live="polite">
                     <lightning-icon
                         icon-name="utility:warning"
                         size="x-small"

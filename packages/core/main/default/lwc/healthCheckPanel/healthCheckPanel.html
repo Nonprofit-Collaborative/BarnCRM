@@ -1,5 +1,5 @@
 <template>
-    <lightning-card title={labels.title} icon-name="utility:health_check">
+    <lightning-card title={labels.title} icon-name="standard:approval">
         <div slot="actions">
             <lightning-button
                 label={rerunLabel}
@@ -30,6 +30,11 @@
 
             <template if:true={showLastRun}>
                 <div class="slds-m-bottom_small" data-id="last-run">
+                    <lightning-badge
+                        class={lastRunBadgeClass}
+                        label={lastRunBadge.badgeLabel}
+                        data-id="last-run-badge"
+                    ></lightning-badge>
                     <template if:true={hasLastRun}>
                         <p>
                             <span class="slds-text-title">{labels.lastRun}</span>&nbsp;

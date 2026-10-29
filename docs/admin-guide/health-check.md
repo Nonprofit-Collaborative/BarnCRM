@@ -31,10 +31,13 @@ nothing to configure.
 
 An administrator also finds Health Check on the BarnCRM home page, under the setup
 checklist. Home does not run every check each time it opens, because a full run reads a lot
-of your org and Home is the page everyone opens first. Instead it shows the last result: when
-Health Check last ran in full for an administrator, and how many findings it had to fix, to
-be aware of and for your information. Click **Run Now** to run it in full there and see the
-whole report. Until Health Check has run once, Home says so and offers **Run Now**. A run by
+of your org and Home is the page everyone opens first. Instead it shows a summary of the last
+result: a badge (**Errors: 2**, **Warnings: 3**, **Passed**, or **Not Run Yet**, the same
+badge as the Health Check tile in Org Optimizer), when Health Check last ran in full for an
+administrator, and how many findings it had to fix, to be aware of and for your information.
+Click **Run Now** to run it in full there and see the whole report, with each finding as a
+row (the same component, and the same rows, as Org Optimizer's Health Check tab). Until
+Health Check has run once, Home says so and offers **Run Now**. A run by
 someone without the **Manage BarnCRM Settings** permission is not kept as the last result,
 because it skips the access checks.
 

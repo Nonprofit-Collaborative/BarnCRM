@@ -7,13 +7,16 @@ import INSTALL_COMPLETED from '@salesforce/label/c.Core_HubHome_InstallCompleted
 import INSTALL_PROBLEMS from '@salesforce/label/c.Core_HubHome_InstallProblems';
 import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
 import WARNING from '@salesforce/label/c.Core_HubHome_WarningAltText';
+import ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
 
 /**
  * Errors to review on the BarnCRM home page: how many new errors are waiting (capped, so a
- * flooded log never slows the page), and whether the install itself logged any problems.
+ * flooded log never slows the page), with an All Clear badge at none, and whether the install
+ * itself logged any problems.
  */
 export default class HubErrors extends NavigationMixin(LightningElement) {
-  labels = { heading: HEADING, link: LINK, warning: WARNING };
+  labels = { heading: HEADING, link: LINK, warning: WARNING, allClear: ALL_CLEAR };
+  loaded = false;
 
   newErrorCount = 0;
   newErrorCountCapped = false;
@@ -29,6 +32,7 @@ export default class HubErrors extends NavigationMixin(LightningElement) {
       this.newErrorCount = data.newErrorCount || 0;
       this.newErrorCountCapped = Boolean(data.newErrorCountCapped);
       this.installProblemCount = data.installProblemCount;
+      this.loaded = true;
       this.errorMessage = undefined;
     } else if (error) {
       this.errorMessage = LOAD_ERROR;
@@ -36,6 +40,11 @@ export default class HubErrors extends NavigationMixin(LightningElement) {
   }
 
   /** The tile's number: the count, or the cap with a plus once there are more than it counts. */
+  /** Nothing new to review, once the count has arrived. */
+  get allClear() {
+    return this.loaded && this.newErrorCount === 0;
+  }
+
   get errorCountText() {
     return this.newErrorCountCapped ? `${this.newErrorCount}+` : `${this.newErrorCount}`;
   }
