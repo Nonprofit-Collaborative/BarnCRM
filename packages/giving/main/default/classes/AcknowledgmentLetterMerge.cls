@@ -64,24 +64,48 @@ public with sharing class AcknowledgmentLetterMerge {
     }
 
     /**
+     * Characters that make a spreadsheet read a cell as a formula, the same set Mirror's
+     * accounting export guards against (`AccountingExportService`).
+     */
+    private static final Set<String> FORMULA_STARTS = new Set<String>{
+        '=',
+        '+',
+        '-',
+        '@',
+        '\t',
+        '\r'
+    };
+
+    /** A plain number, such as a negative amount, which is a value and never a formula. */
+    private static final Pattern PLAIN_NUMBER = Pattern.compile('^-?[0-9]+(\\.[0-9]+)?$');
+
+    /**
      * CSV escaping, which is one rule and one exception: quote a value containing a comma, a
      * quote or a newline, and double the quotes inside it. A donor called "Smith, Jr." is exactly
      * the row that breaks a merge file written without this.
+     *
+     * First, a value a spreadsheet would run as a formula is prefixed with an apostrophe: donor
+     * names and addresses can arrive from outside (imports, the inbound gift API), and a cell
+     * starting with = runs when the merge file is opened (2026-10-28 security review, G-L1).
      */
     @TestVisible
     private static String escape(String value) {
         if (String.isBlank(value)) {
             return '';
         }
+        String cell = FORMULA_STARTS.contains(value.left(1)) &&
+            !PLAIN_NUMBER.matcher(value).matches()
+            ? '\'' + value
+            : value;
         Boolean needsQuoting =
-            value.contains(',') ||
-            value.contains('"') ||
-            value.contains('\n') ||
-            value.contains('\r');
+            cell.contains(',') ||
+            cell.contains('"') ||
+            cell.contains('\n') ||
+            cell.contains('\r');
         if (!needsQuoting) {
-            return value;
+            return cell;
         }
-        return '"' + value.replace('"', '""') + '"';
+        return '"' + cell.replace('"', '""') + '"';
     }
 
     /** The donor as they are addressed: the person, or the organization. */

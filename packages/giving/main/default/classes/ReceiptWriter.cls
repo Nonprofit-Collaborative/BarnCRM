@@ -190,8 +190,11 @@ public without sharing class ReceiptWriter {
         Database.insert(links, true, AccessLevel.SYSTEM_MODE);
     }
 
-    /** True when the save was refused over the Visibility value and nothing else. */
-    private static Boolean refusedVisibility(DmlException refused) {
+    /**
+     * True when the save was refused over the Visibility value and nothing else. The letter
+     * merge file's link asks the same (`AcknowledgmentWriter.storeMergeFile`).
+     */
+    public static Boolean refusedVisibility(DmlException refused) {
         for (Integer i = 0; i < refused.getNumDml(); i++) {
             if (
                 refused.getDmlType(i) != StatusCode.INVALID_FIELD_FOR_INSERT_UPDATE ||

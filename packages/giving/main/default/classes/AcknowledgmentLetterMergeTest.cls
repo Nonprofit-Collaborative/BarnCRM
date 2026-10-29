@@ -71,8 +71,49 @@ private class AcknowledgmentLetterMergeTest {
                     lines[1].contains('Ada Byron'),
                     'And each row names the donor the letter is addressed to.'
                 );
+                // The file holds donor names and addresses: internal users only, unless the
+                // platform refused that because the org has no external users (G-L2, ADR-0034).
+                ContentDocumentLink link = [
+                    SELECT Visibility, ShareType
+                    FROM ContentDocumentLink
+                    WHERE
+                        ContentDocumentId = :run.Merge_File_Document_Id__c
+                        AND LinkedEntityId = :run.Id
+                    LIMIT 1
+                ];
+                Assert.areEqual(
+                    AcknowledgmentWriter.internalOnlyRefused ? 'AllUsers' : 'InternalUsers',
+                    link.Visibility,
+                    'No external user reaches the merge file through a link the package created.'
+                );
+                Assert.areEqual('V', link.ShareType, 'Viewer.');
             }
 
+        }
+    }
+
+    /** A value a spreadsheet would run as a formula is written as text (G-L1). */
+    @IsTest
+    static void aFormulaInADonorNameIsWrittenAsText() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Assert.areEqual(
+                '"\'=HYPERLINK(""x"")"',
+                AcknowledgmentLetterMerge.escape('=HYPERLINK("x")'),
+                'An equals sign is prefixed with an apostrophe, then quoted for its quotes.'
+            );
+            Assert.areEqual('\'@SUM(A1)', AcknowledgmentLetterMerge.escape('@SUM(A1)'), 'At.');
+            Assert.areEqual('\'+1+2', AcknowledgmentLetterMerge.escape('+1+2'), 'Plus.');
+            Assert.areEqual('\'-Smith', AcknowledgmentLetterMerge.escape('-Smith'), 'Minus.');
+            Assert.areEqual(
+                '"\'=1,2"',
+                AcknowledgmentLetterMerge.escape('=1,2'),
+                'Prefixed first, then quoted for its comma.'
+            );
+            Assert.areEqual(
+                '-25.50',
+                AcknowledgmentLetterMerge.escape('-25.50'),
+                'A negative amount is a number, not a formula.'
+            );
         }
     }
 

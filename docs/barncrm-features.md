@@ -416,9 +416,9 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Acknowledgments | Major | Ordered rules put each gift in the right thank-you queue (email, letter or none); emails send in a batch or overnight, letters export as a merge file, and every send is recorded. | Shipped | G-12, ADR-0032 |
+| Acknowledgments | Major | Ordered rules put each gift in the right thank-you queue (email, letter or none); emails send in a batch or overnight, letters export as a merge file, and every send is recorded. The merge file writes a value a spreadsheet would run as a formula (starting with =, +, -, @) as text, and is linked for internal users only where the org has external users (2026-10-28 security review, G-L1, G-L2). | Shipped | G-12, ADR-0032 |
 | Donor levels | Major | Places every donor on your own giving ladder from an existing total, keeping their previous level and the date they moved. | Shipped | G-14, ADR-0028 |
-| Stewardship plans | Major | Templates of follow-up steps that create real tasks with due dates when a gift or pledge arrives, or when started by hand with the Start Stewardship Plan action on a person, household or organization. | Shipped | G-15 |
+| Stewardship plans | Major | Templates of follow-up steps that create real tasks with due dates when a gift or pledge arrives, or when started by hand with the Start Stewardship Plan action on a person, household or organization, which refuses a donor the person cannot see (2026-10-28 security review, G-L3). | Shipped | G-15 |
 | Membership tracking | Major | Membership levels with expiry and renewal reminders, likely as its own package. | Planned (1.x) | G-22 |
 | Rule criteria | Minor | Acknowledgment rules match on amount range, gift type, appeal and first gift only. | Shipped | G-12 |
 | Standard email templates | Minor | Thank-you emails use ordinary Salesforce email templates, with a packaged sample template. | Shipped | G-12 |

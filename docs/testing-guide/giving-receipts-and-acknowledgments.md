@@ -156,8 +156,9 @@ For every script on this page:
 | 5 | Select **Mark as sent**. | "Those letters are recorded as sent." The 8888 gift's **Acknowledgment Status** is **Acknowledged**. |
 | 6 | Select **Download letters to merge** again (or note it is disabled). | The 8888 gift is not in a new file: a thanked gift never returns to the queue by itself. |
 | 7 | As read-only, open the Acknowledgments page. | The queue counts show. **Send emails now**, **Download letters to merge** and **Send emails nightly** are disabled; no **New rule** or **Edit**. |
+| 8 | As staff, set Rosa Hall's mailing street to `=1+1`, enter another 8888 gift from her, select **Download letters to merge** and open the file in a spreadsheet. | The street cell reads `'=1+1` as text, not `2`. On the run, **Files** shows the CSV; in Setup, the file's sharing lists the run with **Internal users** where the org has a site or portal (otherwise **All users**). |
 
-**Cleanup:** As admin, **Edit** `Test letter` and clear **Active**.
+**Cleanup:** As admin, **Edit** `Test letter` and clear **Active**. Put Rosa Hall's street back and mark the second letter sent.
 
 ## T-RCPT-10: Donor Levels Place a Donor and Follow a Refund Down
 
@@ -213,6 +214,7 @@ For every script on this page:
 | 5 | Refresh Harper Garcia. | Her **Stewardship Plans** list shows the plan, **Status** Running. Start the same plan again: toast says it is already running for her. |
 | 6 | Open **The Summit Foundation** and start `After a meeting` there. | Started; the organization's **Stewardship Plans** list shows it. |
 | 7 | As read-only, open Harper Garcia and select **Start Stewardship Plan**. | "You can see stewardship plans but not start one. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set." No **Start Plan** button. |
+| 8 | Covered by `StewardshipStartControllerTest` rather than on screen: starting a plan on a donor the person cannot see (for example a deleted person) is refused with "You cannot see this donor, so no plan was started." | Nothing starts. |
 
 **Cleanup:** As admin, set both plans' **Status** to Cancelled and select **Turn Off** on `After a meeting`.
 
