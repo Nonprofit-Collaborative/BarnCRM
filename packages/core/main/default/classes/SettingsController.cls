@@ -345,7 +345,7 @@ public with sharing class SettingsController {
             }
         }
         // The Edition row is a component with its own picker, which names the stored codes with
-        // these labels (editionSetting). Rows logged before ADR-NEXT hold the old codes, which
+        // these labels (editionSetting). Rows logged before ADR-0143 hold the old codes, which
         // read as the editions that replaced them.
         Map<String, String> editionLabels = new Map<String, String>{
             ModuleDetectionService.SUITE_STANDARD.toLowerCase() => System.Label.Core_SuiteChoice_StandardName,

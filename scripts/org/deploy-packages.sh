@@ -773,7 +773,7 @@ if ! package_skipped core; then
 fi
 
 # A deployment is not an install, so CorePostInstall never runs and the org would start with
-# every feature on before first-run setup, automatic households on, no nightly tab access check,
+# every feature on before first-run setup, automatic households on, no hourly tab access check,
 # no Automation switches or import templates, and nobody able to open BarnCRM Settings. This runs
 # the same steps, as the person deploying. After the UI and permissions stage, because it gives
 # that person the BarnCRM Admin permission set. Safe on an org that already has BarnCRM: one with

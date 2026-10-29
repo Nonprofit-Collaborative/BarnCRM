@@ -1,4 +1,4 @@
-# ADR-NEXT: The Edition's Stored Values Are Standard and Nonprofit
+# ADR-0143: The Edition's Stored Values Are Standard and Nonprofit
 
 **Status:** Accepted (owner decision, Brandon, 2026-10-29; plan decision D-145)
 **Date:** 2026-10-29

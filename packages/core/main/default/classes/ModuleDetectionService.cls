@@ -26,7 +26,7 @@ public with sharing class ModuleDetectionService {
     public static final String SUITE_NONPROFIT = 'Nonprofit';
 
     /**
-     * The values `Suite__c` stored before ADR-NEXT (`NEXT-edition-internal-values.md`), lower
+     * The values `Suite__c` stored before ADR-0143 (`0143-edition-internal-values.md`), lower
      * case, by the value that replaced each. `CorePostInstall` rewrites a stored one; until it
      * has run (an org gate deploys without it), `chosenSuite` and Recent Changes read them as the
      * new values. Only BarnCRM's own test orgs ever stored them.
@@ -125,7 +125,7 @@ public with sharing class ModuleDetectionService {
 
     /**
      * The edition the administrator chose, `Standard` or `Nonprofit`, or null before anyone
-     * chose. A value from before ADR-NEXT reads as the value that replaced it; any other value
+     * chose. A value from before ADR-0143 reads as the value that replaced it; any other value
      * typed in Setup counts as no choice.
      */
     public static String chosenSuite() {

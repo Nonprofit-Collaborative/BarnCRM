@@ -151,6 +151,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0140](0140-address-updates-and-household-moves.md) | Address Updates has three choices, and a household can be moved on purpose | Accepted (owner decision) |
 | [0141](0141-household-record-type-only-organizations-use-the-orgs-own.md) | Core ships the Household record type for households only, and organizations use a record type the org already has | Accepted (owner decision) |
 | [0142](0142-admin-view-all-modify-all-on-account-and-contact.md) | BarnCRM Admin keeps View All and Modify All on Account and Contact | Accepted (owner decision) |
+| [0143](0143-edition-internal-values.md) | The edition's stored values are Standard and Nonprofit | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
