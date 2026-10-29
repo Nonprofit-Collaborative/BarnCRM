@@ -507,7 +507,9 @@ private class AddressHistoryTest {
         Account garcia = householdAtHome('The Garcia Family');
         Contact luis;
         System.runAs(pat) {
-            insert garcia;
+            // Setup: no user is given the Household record type, so the household is inserted
+            // in system mode (owned by Pat); the move below is what runs as Pat.
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             insert luis;
         }
@@ -536,7 +538,7 @@ private class AddressHistoryTest {
             for (Integer index = 0; index < 200; index++) {
                 households.add(householdAtHome('The Family ' + index));
             }
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             List<Contact> people = new List<Contact>();
             for (Integer index = 0; index < 200; index++) {
                 people.add(
@@ -588,7 +590,7 @@ private class AddressHistoryTest {
     static void aStartDateGivenToTheNewPrimaryIsKept() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Date given = Date.today().addDays(-10);
             Address__c moved = newPrimary(garcia.Id, NEW_STREET);
             moved.Start_Date__c = given;

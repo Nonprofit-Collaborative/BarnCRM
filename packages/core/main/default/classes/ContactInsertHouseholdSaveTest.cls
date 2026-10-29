@@ -93,7 +93,7 @@ private class ContactInsertHouseholdSaveTest {
     static void aPersonJoiningAnExistingHouseholdLeavesItsPrimaryContactAlone() {
         System.runAs(TestUsers.admin()) {
             Account smiths = HouseholdTestDataFactory.newHousehold('The Smith Family');
-            insert smiths;
+            Database.insert(smiths, AccessLevel.SYSTEM_MODE);
             Contact jane = HouseholdTestDataFactory.newContact('Jane', 'Smith');
             jane.AccountId = smiths.Id;
             insert jane;
