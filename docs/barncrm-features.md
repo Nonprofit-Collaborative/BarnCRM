@@ -488,7 +488,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Giving dashboard | Major | A packaged dashboard and reports: gifts this month, giving by month, by fund, by appeal, top donors and recent gifts, with relative dates. | Shipped | G-06 |
+| Giving dashboard | Major | A packaged dashboard and reports: gifts this month, giving by month, by fund, by appeal, top donors and recent gifts, with relative dates. Giving Admin and Volunteers Admin build their own reports and dashboards but no longer hold the rights to edit, delete or create every public folder's contents (2026-10-28 security review, G-M1). | Shipped | G-06 |
 | Retention reports | Major | LYBUNT, SYBUNT, new versus retained, and first-to-second gift conversion, each with written definitions, counting donors not gifts. | Shipped | G-16, ADR-0026 |
 | Giving totals on donors | Major | Total giving, gift count, first, last and largest gift, this year, last year, two years ago, soft credit totals and in-kind totals on households, organizations and people. | Shipped | G-02 |
 | Fund and appeal totals | Minor | Total raised, this year, gift count and last gift date on funds; total raised and gift count on appeals. | Shipped | G-02 |
