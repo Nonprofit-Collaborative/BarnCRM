@@ -49,6 +49,14 @@
         <value>Matching Logic</value>
     </labels>
     <labels>
+        <fullName>Core_MatchLogic_NewTitle</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Matching Logic: heading of the window that adds a source</shortDescription>
+        <value>New Match Source</value>
+    </labels>
+    <labels>
         <fullName>Core_MatchLogic_Intro</fullName>
         <categories>DuplicateMatching</categories>
         <language>en_US</language>

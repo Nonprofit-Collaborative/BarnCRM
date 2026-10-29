@@ -1,28 +1,20 @@
 import { createElement } from 'lwc';
 import MatchSourceManager from 'c/matchSourceManager';
+import LightningModal from 'lightning/modal';
 import getView from '@salesforce/apex/MatchSourceController.getView';
-import describeObject from '@salesforce/apex/MatchSourceController.describeObject';
 import tryValue from '@salesforce/apex/MatchSourceController.tryValue';
-import saveRow from '@salesforce/apex/CustomMetadataManagerController.saveRow';
 import setArchived from '@salesforce/apex/CustomMetadataManagerController.setArchived';
 import getOutcome from '@salesforce/apex/CustomMetadataManagerController.getOutcome';
 
 jest.mock('@salesforce/apex/MatchSourceController.getView', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/apex/MatchSourceController.describeObject', () => ({ default: jest.fn() }), {
-  virtual: true
-});
 jest.mock('@salesforce/apex/MatchSourceController.tryValue', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/apex/CustomMetadataManagerController.saveRow',
-  () => ({ default: jest.fn() }),
-  {
-    virtual: true
-  }
-);
+jest.mock('@salesforce/label/c.Core_MatchLogic_NewTitle', () => ({ default: 'New Match Source' }), {
+  virtual: true
+});
 jest.mock(
   '@salesforce/apex/CustomMetadataManagerController.setArchived',
   () => ({ default: jest.fn() }),
@@ -160,57 +152,23 @@ describe('c-match-source-manager', () => {
     expect(one(element, '[data-id="status"]')).not.toBeNull();
   });
 
-  it('adds a source with the fields its object offers, and waits for the save', async () => {
+  it('adds a source in the modal, and waits for the save it started', async () => {
     jest.useFakeTimers();
     getView.mockResolvedValue(view(true, []));
-    describeObject.mockResolvedValue({
-      objectName: 'Volunteer_Email__c',
-      objectLabel: 'Volunteer Email',
-      valueFields: [{ label: 'Email (Email__c)', value: 'Email__c' }],
-      parentFields: [{ label: 'Contact (Contact__c)', value: 'Contact__c' }]
-    });
-    saveRow.mockResolvedValue('0Af000000000002');
+    LightningModal.open.mockResolvedValue({ jobId: '0Af000000000002', label: 'Volunteer email' });
     getOutcome.mockResolvedValue({ status: 'Succeeded' });
     const element = await render();
 
     one(element, '[data-id="add"]').click();
     await flush();
-    const change = (id, value) => {
-      const input = one(element, `[data-id="${id}"]`);
-      input.dispatchEvent(new CustomEvent('change', { detail: { value } }));
-    };
-    change('form-name', 'Volunteer email');
-    change('form-object', 'Volunteer_Email__c');
-    await flush();
-    one(element, '[data-id="find-fields"]').click();
-    await flush();
-    expect(describeObject).toHaveBeenCalledWith({ objectName: 'Volunteer_Email__c' });
-    expect(one(element, '[data-id="form-value"]').options).toEqual([
-      { label: 'Email (Email__c)', value: 'Email__c' }
-    ]);
-    expect(one(element, '[data-id="form-postal"]')).toBeNull();
-    change('form-value', 'Email__c');
-    change('form-parent', 'Contact__c');
-    change('form-normalization', 'Email');
-    await flush();
-    one(element, '[data-id="form-save"]').click();
-    await flush();
 
-    expect(saveRow).toHaveBeenCalledWith({
-      typeName: 'Match_Source__mdt',
-      input: {
-        developerName: null,
-        label: 'Volunteer email',
-        values: {
-          Object_Name__c: 'Volunteer_Email__c',
-          Value_Field__c: 'Email__c',
-          Postal_Code_Field__c: '',
-          Parent_Field__c: 'Contact__c',
-          Normalization__c: 'Email'
-        }
-      }
+    expect(LightningModal.open).toHaveBeenCalledWith({
+      size: 'small',
+      label: 'New Match Source',
+      source: undefined,
+      normalizations: view(true, []).normalizations
     });
-    expect(one(element, '[data-id="form"]')).toBeNull();
+    expect(one(element, '[data-id="status"]')).not.toBeNull();
 
     jest.advanceTimersByTime(3000);
     await flush();
@@ -222,29 +180,35 @@ describe('c-match-source-manager', () => {
     expect(getView).toHaveBeenCalledTimes(2);
   });
 
-  it('shows a refused save as it is', async () => {
+  it('edits a source in the modal, and does nothing when the modal is cancelled', async () => {
     getView.mockResolvedValue(
       view(true, [source({ shipped: false, developerName: 'Org_Mine_abcd' })])
     );
-    describeObject.mockResolvedValue({ valueFields: [], parentFields: [] });
-    saveRow.mockRejectedValue({
-      body: { message: 'An address source needs a postal code field.' }
-    });
+    LightningModal.open.mockResolvedValue(undefined);
     const element = await render();
 
     one(element, '[data-id="edit"]').click();
     await flush();
-    expect(describeObject).toHaveBeenCalledWith({ objectName: 'Address__c' });
-    expect(one(element, '[data-id="form-value"]').options).toEqual([
-      { label: 'Street__c', value: 'Street__c' }
-    ]);
-    one(element, '[data-id="form-save"]').click();
+
+    expect(LightningModal.open.mock.calls[0][0].source).toEqual({
+      developerName: 'Org_Mine_abcd',
+      label: 'Address (person)',
+      values: source().values
+    });
+    expect(one(element, '[data-id="status"]')).toBeNull();
+    expect(getOutcome).not.toHaveBeenCalled();
+  });
+
+  it('shows a refused deactivation as it is', async () => {
+    getView.mockResolvedValue(view(true, [source()]));
+    setArchived.mockRejectedValue({ body: { message: 'Deploy Metadata is off.' } });
+    const element = await render();
+
+    one(element, '[data-id="toggle"]').click();
     await flush();
 
-    expect(one(element, '[data-id="error"]').textContent).toContain(
-      'An address source needs a postal code field.'
-    );
-    expect(one(element, '[data-id="form"]')).not.toBeNull();
+    expect(one(element, '[data-id="error"]').textContent).toContain('Deploy Metadata is off.');
+    expect(one(element, '[data-id="status"]')).toBeNull();
   });
 
   it('tries a value and lists the records that would match', async () => {
