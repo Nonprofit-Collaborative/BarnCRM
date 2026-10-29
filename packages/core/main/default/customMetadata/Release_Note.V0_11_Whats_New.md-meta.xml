@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>0.11 What's new</label>
+  <protected>true</protected>
+  <values>
+    <field>Details__c</field>
+    <value xsi:type="xsd:string">Data Manager is the one place for data tasks. Choose a card to Find and Export Records, Import a File or Update Many Records. Delete Many Records is the last card and asks you to confirm first.
+Import is a guided wizard with a step path, cards for what you are importing, a trial run and a results file. Find and Bulk Update have a cleaner layout and menus for saving, exporting and changing records.
+Org Optimizer is the one name for the data quality tool, with its checks grouped in a Data Quality section.
+Duplicate Matching shows each pair of possible duplicates side by side, with Merge and Not a Duplicate on the card. Matching rules have an Active switch and Show Details.
+BarnCRM Settings is grouped with icons and help popovers. A save bar stays in view, and every setting shows its default.
+The Setup Checklist and first run are easier to follow, with progress rings and one step count. Home shows Health Check and other status tiles with badges and quick links.
+Household and address panels have member tiles, address cards and clear empty states.
+Saving records is faster: address changes, household updates, rollups and gift allocations do less work on every save.
+Every tab has its own icon. Labels are shorter, links that open in a new tab say so, and Error Log is always the last tab.</value>
+  </values>
+  <values>
+    <field>Headline__c</field>
+    <value xsi:type="xsd:string">A simpler way to work with your data, plus faster saves</value>
+  </values>
+  <values>
+    <field>Module__c</field>
+    <value xsi:type="xsd:string">Core</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">10</value>
+  </values>
+  <values>
+    <field>Version__c</field>
+    <value xsi:type="xsd:string">0.11</value>
+  </values>
+</CustomMetadata>
