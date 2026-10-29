@@ -937,7 +937,15 @@ private class SettingsServiceTest {
             );
             Assert.isNotNull(household, 'The Household record type is refused');
             Assert.isNotNull(person, 'A person account record type is refused');
-            Assert.isNull(none, 'No record type is accepted');
+            if (offered.isEmpty()) {
+                Assert.isNull(none, 'No record type is accepted where the org has no candidate');
+            } else {
+                Assert.isTrue(
+                    none != null &&
+                    none.contains(System.Label.Core_Settings_NoRecordTypeNotAllowed),
+                    'No record type is refused where a candidate exists, saying why'
+                );
+            }
             Assert.isNull(candidate, 'A candidate record type is accepted');
             Assert.areEqual(
                 offered.isEmpty() ? AccountKinds.NO_RECORD_TYPE : offered[0].getDeveloperName(),

@@ -12,7 +12,9 @@
 private class SampleDataControllerTest {
     @TestSetup
     static void createTestUser() {
-        TestUsers.adminWithInstalledModules();
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
+        }
     }
 
     private static String buildJson(Integer householdCount, Integer membersPerHousehold) {

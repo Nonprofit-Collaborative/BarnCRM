@@ -289,6 +289,22 @@
         <value>Scheduled jobs belong to a deactivated person</value>
     </labels>
     <labels>
+        <fullName>Core_HealthCheck_OrganizationRecordTypeTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Finding title: the running user cannot use the record type for organizations</shortDescription>
+        <value>You cannot use the record type for organizations</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_OrganizationRecordTypeDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Finding detail: user lacks the organization record type. {0} is its label.</shortDescription>
+        <value>{0} is the record type for organizations (BarnCRM Settings, General), but your profile and permission sets do not give it to you, so you cannot create organizations. Give {0} to everyone who creates organizations, in Setup, or choose a record type they have in that setting.</value>
+    </labels>
+    <labels>
         <fullName>Core_HealthCheck_InactiveOwnerJobsDetail</fullName>
         <categories>Core</categories>
         <language>en_US</language>

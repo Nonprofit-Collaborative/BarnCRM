@@ -9,6 +9,14 @@
         <value>Sample data is already loaded. Remove it before loading again.</value>
     </labels>
     <labels>
+        <fullName>Core_SampleData_OrganizationRecordTypeUnavailable</fullName>
+        <categories>Sample Data</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load refused: user lacks the organization record type; {0} is its label</shortDescription>
+        <value>Sample data was not loaded, because you cannot use the {0} record type, which BarnCRM Settings uses for organizations (Record type for organizations, on General). Give yourself that record type on your profile or a permission set, or choose another one in that setting, then load again.</value>
+    </labels>
+    <labels>
         <fullName>Core_SampleData_CancelButton</fullName>
         <categories>Sample Data</categories>
         <language>en_US</language>

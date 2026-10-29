@@ -15,10 +15,7 @@ private class RollupChangesTest {
     }
 
     private static Account organization(String name) {
-        return new Account(
-            Name = name,
-            RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
-        );
+        return AccountKindsTestData.organization(name);
     }
 
     private static Account household(String name) {

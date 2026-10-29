@@ -535,6 +535,12 @@ public with sharing class HealthCheckService {
 
         steps.add(new CheckStep('automation', new HealthCheckSettingsChecks.AutomationCheck()));
         steps.add(new CheckStep('fiscal_year', new HealthCheckSettingsChecks.FiscalYearCheck()));
+        steps.add(
+            new CheckStep(
+                'organization_record_type',
+                new HealthCheckSettingsChecks.OrganizationRecordTypeCheck()
+            )
+        );
 
         if (canManageSettings()) {
             steps.add(new CheckStep('error_log', new HealthCheckSettingsChecks.ErrorLogCheck()));

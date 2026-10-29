@@ -17,6 +17,7 @@ private class ImportDuplicateRuleMatchTest {
     static void setUp() {
         System.runAs(TestUsers.admin()) {
             TestDataFactory.defaultSettings();
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
         }
     }
 

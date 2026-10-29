@@ -293,9 +293,10 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
     }
 
     /**
-     * Stores the record type for organizations when none is stored, so the setting is never
-     * blank (ADR-0141, R-O5). Detection picks one the org already has, or No record type; no
-     * record type is created, activated or made visible, and a stored one is never replaced.
+     * Stores the record type for organizations when none is stored, or the stored one is no
+     * longer an active candidate, so the setting is never blank or stale (ADR-0141, R-O5).
+     * Detection picks one the org already has, or No record type; no record type is created,
+     * activated or made visible, and No record type or a usable stored one is never replaced.
      * Never throws.
      */
     private void storeOrganizationRecordType() {

@@ -156,10 +156,13 @@ private class CorePostInstallTest {
             Test.startTest();
             new CorePostInstall().onInstall(new InstallBy(null, null, false));
             String afterInstall = BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c;
-            SettingsService.saveSystemValue(
-                AccountKinds.KEY_ORGANIZATION_RECORD_TYPE,
-                AccountKinds.NO_RECORD_TYPE
-            );
+            // A choice an administrator could save here: the last candidate, or No record type
+            // in an org with none (it is refused where a candidate exists).
+            List<Schema.RecordTypeInfo> offered = AccountKinds.candidateRecordTypes();
+            String chosen = offered.isEmpty()
+                ? AccountKinds.NO_RECORD_TYPE
+                : offered[offered.size() - 1].getDeveloperName();
+            SettingsService.saveSystemValue(AccountKinds.KEY_ORGANIZATION_RECORD_TYPE, chosen);
             CorePostInstall.runAsSourceDeploy();
             Test.stopTest();
 
@@ -169,9 +172,9 @@ private class CorePostInstallTest {
                 'A new install stores the detected record type, so the setting is never blank'
             );
             Assert.areEqual(
-                AccountKinds.NO_RECORD_TYPE,
+                chosen,
                 BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c,
-                'A source deploy never replaces a stored choice'
+                'A source deploy never replaces a usable stored choice'
             );
         }
     }

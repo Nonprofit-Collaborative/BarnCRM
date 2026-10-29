@@ -495,12 +495,15 @@ of record, for example a household's ID in a person's ID column, or a contact's 
 organization's. Map the column to the right one, or fix the ID. An account whose record type
 is not the one chosen in **Record type for organizations** is "not an organization" too.
 
-**"No organization was matched or created, because you cannot use the ... record type".** The
-run log says this when the record type chosen in **Record type for organizations** (General,
-BarnCRM Settings) is not available to the user who loaded the file, so no organization in the
-file is matched or created. Give that user the record type in Setup (on their profile or a
-permission set), or choose a record type they have in the setting, then load the file again.
-With **No record type** chosen this never happens.
+**"No new organization was created, because you cannot use the ... record type".** The run
+log says this when the record type chosen in **Record type for organizations** (General,
+BarnCRM Settings) is not available to the user who loaded the file. Organizations already in
+Salesforce are still matched, but each row whose organization would be new is rejected with
+**"This row's organization is not in Salesforce yet, and you cannot use the ... record type"**,
+rather than loaded without it. BarnCRM's permission sets give no Account record type, so give
+that user the record type in Setup (on their profile or a permission set of your own), or
+choose a record type they have in the setting, then load the rejected rows again. With **No
+record type** chosen this never happens.
 
 **"Nothing matches this row, and this file only matches".** The file was marked **Match only**,
 so a row whose person or organization is not already in Salesforce is rejected instead of

@@ -10,6 +10,7 @@ private class ImportFieldCatalogTest {
     static void setUp() {
         System.runAs(TestUsers.admin()) {
             TestDataFactory.defaultSettings();
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
         }
     }
 
