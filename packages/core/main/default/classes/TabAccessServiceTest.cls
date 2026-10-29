@@ -380,6 +380,9 @@ private class TabAccessServiceTest {
     @IsTest
     static void aJobStillOnTheOldNightlyCronIsReplacedNotDoubled() {
         System.runAs(TestUsers.admin()) {
+            // Tests see the org's real scheduled jobs, so an org already running the check
+            // (an earlier deploy) would refuse a second job of this name before the test begins.
+            TestDataFactory.clearScheduledJobs(new List<String>{ TabAccessScheduler.JOB_NAME });
             // What an earlier version left behind: the same job name on the nightly cron.
             Id old = System.schedule(
                 TabAccessScheduler.JOB_NAME,
