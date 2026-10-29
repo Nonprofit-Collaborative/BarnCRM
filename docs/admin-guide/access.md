@@ -15,7 +15,7 @@ people in one of two ways:
 
 - **Volunteers and Rollup Builder follow the roles for you.** Their sets are given
   automatically to everyone holding the matching role (for example the Coordinator role gets
-  **Volunteers Coordinator**), at the latest overnight.
+  **Volunteers Coordinator**), at the latest within an hour.
 - **Giving and Mirror sets are chosen per person, on this page.** Turning a module on in the
   [Module Manager](module-manager.md) gives its admin set (for Giving, **Giving Admin**) only to
   you, the person who turned it on. Everyone else gets **Giving Admin**, **Giving Staff**,
@@ -185,7 +185,7 @@ A module's sets are listed after them, only where that module is installed:
 | Record Inbound Gift Action | Mirror | Run the Record Inbound Gift action from a flow or an AI assistant. Give it together with Giving Staff. |
 
 The Volunteers and Rollup Builder sets are not listed, because they follow the roles
-automatically (see the top of this page): removing one here would only be undone overnight.
+automatically (see the top of this page): removing one here would only be undone within the hour.
 
 These are the only permissions this section gives. It never lists or assigns any other
 permission set in your org, including one you created yourself with the same name as one of
@@ -239,7 +239,7 @@ feature is on:
 | Duplicate Matching | BarnCRM Admin, Duplicate Review, Metadata Admin |
 
 This page keeps them in step when you give a role or extra permission. A role given in Setup or
-by a user access policy is caught up overnight, and every upgrade catches everyone up, so an
+by a user access policy is caught up within the hour, and every upgrade catches everyone up, so an
 upgraded org keeps exactly the tabs it had. The BarnCRM Tab sets are never listed on this
 page and should not be assigned by hand. Nobody needs Assign Permission Sets for this: BarnCRM
 does it itself, and the tab sets grant nothing but the tab.

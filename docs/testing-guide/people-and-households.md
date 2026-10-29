@@ -103,7 +103,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HH-07: Merge Two Households (with Cancel)
 
 **Purpose:** merge combines two households after a warning, and cancel leaves both untouched.
-**Prerequisites:** admin (staff also passes), The Testwell Family with Ada and Ben (Ben is added in T-HH-02 steps 1 to 3; the smoke list runs those first). Step 7 needs an organization with Bayview in its name: sample data has **Bayview Hardware**; with no sample data, first create an organization `Zztest Bayview Hardware` (Organization record type).
+**Prerequisites:** admin (staff also passes), The Testwell Family with Ada and Ben (Ben is added in T-HH-02 steps 1 to 3; the smoke list runs those first). Step 7 needs an organization with Bayview in its name: sample data has **Bayview Hardware**; with no sample data, first create an organization `Zztest Bayview Hardware` (an organization: the record type in **Record type for organizations**).
 **Smoke:** yes
 
 | Step | Action | Expected result |
@@ -284,25 +284,28 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **General**. | **Record type for organizations** shows **Business Account** in the Person Accounts org and **No record type** in the Platform-only org; never blank. |
-| 2 | Open the dropdown. | It lists the org's active Account record types and **No record type**; no **Household** and no person account record type. |
+| 2 | Open the dropdown. | In the Person Accounts org it lists the org's active Account record types and no **No record type**; in the Platform-only org it lists only **No record type**. Never **Household** or a person account record type. |
 | 3 | Open the **Organizations** tab. | Accounts of the chosen record type are listed; households and person accounts are not. |
 | 4 | Open one of those organizations. | The **Affiliations** panel and the website show; no **Name and Greetings**, no **Members**, no **Erase Person**. |
 | 5 | Import a file with one person and the organization `Zztest Rt Org`. | `Zztest Rt Org` is created with the chosen record type (or none, for **No record type**) and appears on the **Organizations** tab. |
 | 6 | In an org with a second business record type, choose it in the setting and save. | Saved, and listed in **Recent Changes**. The **Organizations** tab now lists accounts of that record type instead. Open one: **Is Organization** is checked, and the **Affiliations** panel and website show, with Giving and Volunteers the organization sections too; an account of the first record type now shows **Is Organization** unchecked. |
 | 7 | With that record type still chosen, import a file with one person and the organization `Zztest Rt Org 2`, give an organization an address in its billing fields, and load sample data in a sandbox without it. | `Zztest Rt Org 2` is created with that record type; the organization with the billing address gets a first address of type **Work**; sample data's organizations get that record type and the sample data count lists them. |
-| 8 | As a user whose profile and permission sets do not give that record type, import the same file. | The run log says no organization was matched or created because you cannot use that record type, naming it by its label. |
+| 8 | As a user whose profile and permission sets do not give that record type, import a file with two people: one at `Zztest Rt Org 2` (now in Salesforce) and one at the new organization `Zztest Rt Org 3`. | The first row loads, linked to `Zztest Rt Org 2`. The second is rejected with **This row's organization is not in Salesforce yet, and you cannot use the ... record type**, naming it by its label; the run log says no new organization was created for the same reason. `Zztest Rt Org 3` is not created. |
 
 **Cleanup:** set the setting back to its first value; delete `Zztest Rt Org` and the imported person.
 
 ## T-HH-20: An Org Already Running BarnCRM Keeps Its Organizations
 
-**Purpose:** an upgrade or redeploy of an org that has BarnCRM's old Organization record type changes nothing users see.
-**Prerequisites:** admin; an org deployed before this change, with organizations of the **Organization** record type (for example the Sales Cloud shape gate org).
+**Purpose:** after BarnCRM stops shipping its Organization record type, an org that ran an earlier version keeps its organizations once **Record type for organizations** is set.
+**Prerequisites:** admin; an org deployed before this change, with organizations and households (for example a test org with sample data).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | After the deploy, open **BarnCRM Settings**, **General**. | **Record type for organizations** shows **Organization**. |
-| 2 | Open the **Organizations** tab and the **Households** tab. | Both list the same records as before. |
-| 3 | As a staff user, open a household and an organization. | The same sections and panels as before (T-HH-13). |
+| 1 | Before the deploy, open the **Organizations** tab and note how many records it lists. | A count to compare. |
+| 2 | Deploy this version. Open **BarnCRM Settings**, **General**. | **Record type for organizations** shows a record type, never blank. **No record type** is offered only when the org has no Account record type besides Household and person account ones. |
+| 3 | Set **Record type for organizations** to the record type your organizations use and save. | Saved, and listed in **Recent Changes**. |
+| 4 | Open the **Organizations** tab and the **Households** tab. | The Organizations tab lists the same records as in step 1; the Households tab lists the same records as before. |
+| 5 | As a staff user, open a household and an organization. | The same sections and panels as before (T-HH-13): the organization shows **Is Organization** checked, with the **Affiliations** panel. |
+| 6 | If step 3 kept **Organization**: before giving it to your profile, run **Health Check**, then load sample data. Then give **Organization** to your profile (Setup, Profiles, Record Type Settings) and run Health Check again. | Before: Health Check warns **You cannot use the record type for organizations**, naming Organization, and **Load Sample Data** refuses with a message naming it. After: no such warning. |
 
 **Cleanup:** none.

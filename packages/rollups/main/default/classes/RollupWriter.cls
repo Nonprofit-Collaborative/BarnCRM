@@ -24,7 +24,13 @@ public without sharing class RollupWriter {
         if (definitions == null || definitions.isEmpty()) {
             return;
         }
-        Database.insert(definitions, AccessLevel.SYSTEM_MODE);
+        // The only save `RollupDefinitionGuard` trusts: the package's own shipped definitions.
+        RollupDefinitionGuard.trustShippedDefaults(true);
+        try {
+            Database.insert(definitions, AccessLevel.SYSTEM_MODE);
+        } finally {
+            RollupDefinitionGuard.trustShippedDefaults(false);
+        }
     }
 
     /** Stamps `Last_Calculated__c` on the definitions a run has just completed. */

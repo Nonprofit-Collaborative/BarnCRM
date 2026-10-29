@@ -16,7 +16,9 @@ private class VolunteerSampleDataTest {
     /** The admin, created once and found again by every method. */
     @TestSetup
     static void makeAdmin() {
-        TestUsers.adminWith(VolunteersTestData.ADMIN);
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
+        }
     }
 
     private static User admin() {

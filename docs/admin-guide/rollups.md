@@ -332,6 +332,13 @@ and adds **New rollup**, and **Edit**, **Copy** and **Delete** on each row. The 
 saving needs the **Manage BarnCRM Settings** permission. The Rollups section in BarnCRM
 Settings opens it.
 
+The same rules hold however a rollup is saved, from this tab, an import, the record page, a
+data loader or the API: changing a rollup needs **Manage BarnCRM Settings**, the person saving
+must be able to edit the field the total fills and see every field the rollup reads, and a total
+never goes on users, setup records (profiles, permission sets, roles, groups) or BarnCRM's own
+bookkeeping. A save that breaks one of these is refused with the reason. The rollups BarnCRM
+ships, and the time each run stamps on a rollup, are the only saves exempt.
+
 You do not assign these sets by hand for BarnCRM's roles. When the module is installed, each
 time it is turned on on **Modules**, and with each nightly run once that is scheduled,
 BarnCRM gives **Rollup Builder User** to everyone holding the **BarnCRM Staff** or **BarnCRM

@@ -37,14 +37,14 @@ private class FirstRunControllerTest {
             // design, so the administrator picks (ADR-0072). The test holds in either org.
             if (ModuleDetectionService.isGivingPresent()) {
                 Assert.areEqual(
-                    ModuleDetectionService.SUITE_IMPACT,
+                    ModuleDetectionService.SUITE_NONPROFIT,
                     state.recommendedSuite,
                     'The Nonprofit Edition is suggested when Giving is installed'
                 );
             } else {
                 Assert.isTrue(
                     state.recommendedSuite == null ||
-                        state.recommendedSuite == ModuleDetectionService.SUITE_IMPACT,
+                        state.recommendedSuite == ModuleDetectionService.SUITE_NONPROFIT,
                     'Without Giving an edition is suggested only for NPSP or Nonprofit Cloud: ' +
                     state.recommendedSuite
                 );
@@ -62,14 +62,14 @@ private class FirstRunControllerTest {
 
             Test.startTest();
             FirstRunController.finish(
-                ModuleDetectionService.SUITE_COMMUNITY,
+                ModuleDetectionService.SUITE_STANDARD,
                 new List<String>{ FeatureSwitchService.DATA_MANAGER }
             );
             Integer queued = Limits.getQueueableJobs();
             Test.stopTest();
 
             Assert.isTrue(queued > 0, 'The tab access sync is queued though nothing was newly on');
-            Assert.isTrue(TabAccessScheduler.isScheduled(), 'And the nightly check is running');
+            Assert.isTrue(TabAccessScheduler.isScheduled(), 'And the hourly check is running');
         }
     }
 
@@ -80,7 +80,7 @@ private class FirstRunControllerTest {
 
             Test.startTest();
             FirstRunController.FirstRunState state = FirstRunController.finish(
-                ModuleDetectionService.SUITE_COMMUNITY,
+                ModuleDetectionService.SUITE_STANDARD,
                 new List<String>{
                     FeatureSwitchService.DATA_MANAGER,
                     FeatureSwitchService.RELATIONSHIPS
@@ -90,7 +90,7 @@ private class FirstRunControllerTest {
 
             Assert.isFalse(state.needsSetup, 'The window does not show again');
             Assert.areEqual(
-                ModuleDetectionService.SUITE_COMMUNITY,
+                ModuleDetectionService.SUITE_STANDARD,
                 ModuleDetectionService.chosenSuite(),
                 'The edition is saved'
             );
@@ -113,7 +113,7 @@ private class FirstRunControllerTest {
     static void anEditionSavedInSetupStillAsksForFeaturesAndIsPreselected() {
         System.runAs(TestUsers.admin()) {
             TestSettings.newInstall();
-            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_IMPACT);
+            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_NONPROFIT);
 
             Test.startTest();
             FirstRunController.FirstRunState state = FirstRunController.getState();
@@ -121,7 +121,7 @@ private class FirstRunControllerTest {
 
             Assert.isTrue(state.needsSetup, 'The features are still to be chosen');
             Assert.areEqual(
-                ModuleDetectionService.SUITE_IMPACT,
+                ModuleDetectionService.SUITE_NONPROFIT,
                 state.recommendedSuite,
                 'The saved edition is pre-selected'
             );
@@ -135,7 +135,7 @@ private class FirstRunControllerTest {
 
             Test.startTest();
             FirstRunController.FirstRunState state = FirstRunController.finish(
-                ModuleDetectionService.SUITE_COMMUNITY,
+                ModuleDetectionService.SUITE_STANDARD,
                 new List<String>()
             );
             Test.stopTest();
@@ -160,7 +160,7 @@ private class FirstRunControllerTest {
     static void anUpgradedOrgWithAnEditionNeverSeesTheWindow() {
         System.runAs(TestUsers.admin()) {
             TestSettings.neverSetUp();
-            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_COMMUNITY);
+            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_STANDARD);
 
             Test.startTest();
             FirstRunController.FirstRunState state = FirstRunController.getState();
@@ -179,7 +179,7 @@ private class FirstRunControllerTest {
             Test.startTest();
             try {
                 FirstRunController.finish(
-                    ModuleDetectionService.SUITE_IMPACT,
+                    ModuleDetectionService.SUITE_NONPROFIT,
                     new List<String>{ 'Rollups' }
                 );
             } catch (AuraHandledException e) {
@@ -220,7 +220,7 @@ private class FirstRunControllerTest {
     static void aNewInstallStillNeedsSetupInAnOrgThatSavedItsSettings() {
         System.runAs(TestUsers.admin()) {
             // The org already finished first-run setup and saved its settings.
-            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_COMMUNITY);
+            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_STANDARD);
             SettingsService.saveSystemValue(
                 'Features_Turned_On__c',
                 FeatureSwitchService.DATA_MANAGER
@@ -248,7 +248,7 @@ private class FirstRunControllerTest {
             FirstRunController.FirstRunState state = FirstRunController.getState();
             try {
                 FirstRunController.finish(
-                    ModuleDetectionService.SUITE_COMMUNITY,
+                    ModuleDetectionService.SUITE_STANDARD,
                     new List<String>()
                 );
             } catch (AuraHandledException e) {

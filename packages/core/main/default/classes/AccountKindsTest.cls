@@ -137,6 +137,10 @@ private class AccountKindsTest {
                 AccountKinds.isOrganization(null),
                 'An account with none is an organization.'
             );
+            Assert.isTrue(
+                AccountKinds.organizationRecordTypeUsable(),
+                'Every user can create an organization with no record type.'
+            );
             Assert.isTrue(AccountKinds.isOrganizationRecordTypeName(null), 'By name: none.');
             Assert.isTrue(AccountKinds.isOrganizationRecordTypeName('Master'), 'The master.');
             Assert.isFalse(AccountKinds.isOrganizationRecordTypeName('Household'), 'Not one.');
@@ -185,6 +189,31 @@ private class AccountKindsTest {
         }
     }
 
+    /**
+     * Whatever this org's record types and the test user's profile, the test data leaves a
+     * record type for organizations the user can save, so tests pass on any org shape.
+     */
+    @IsTest
+    static void testDataLeavesARecordTypeTheUserCanUse() {
+        System.runAs(TestUsers.admin()) {
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
+
+            Assert.isTrue(AccountKinds.organizationRecordTypeUsable(), 'Usable now.');
+            Account organization = AccountKindsTestData.organization('Zztest Usable Org');
+            insert organization;
+            Account read = [
+                SELECT RecordTypeId
+                FROM Account
+                WHERE Id = :organization.Id
+                WITH SYSTEM_MODE
+            ];
+            Assert.isTrue(
+                AccountKinds.isOrganization(read.RecordTypeId),
+                'And what it creates is an organization.'
+            );
+        }
+    }
+
     @IsTest
     static void aStoredRecordTypeThatIsGoneFallsBackToDetection() {
         System.runAs(TestUsers.admin()) {
@@ -222,6 +251,87 @@ private class AccountKindsTest {
         }
     }
 
+    /**
+     * With No record type stored, an account saved without one and an account saved with the
+     * master record type Id are read the same way by the formula field and by AccountKinds.
+     * The org's own stored value is never read: this test stores its own.
+     */
+    @IsTest
+    static void noRecordTypeAgreesBetweenTheFieldAndTheResolver() {
+        System.runAs(TestUsers.admin()) {
+            store(AccountKinds.NO_RECORD_TYPE);
+            Id masterId;
+            for (Schema.RecordTypeInfo info : Schema.SObjectType.Account.getRecordTypeInfos()) {
+                if (info.isMaster()) {
+                    masterId = info.getRecordTypeId();
+                }
+            }
+            Account blank = (Account) TestDataFactory.pastDuplicateRules(
+                new Account(Name = 'Zztest Rt5 No Record Type')
+            );
+            Account master = (Account) TestDataFactory.pastDuplicateRules(
+                new Account(Name = 'Zztest Rt5 Master', RecordTypeId = masterId)
+            );
+            Account household = HouseholdTestDataFactory.newHousehold('The Zztest Rt5 Family');
+            List<Account> accounts = new List<Account>{ blank, household };
+            Database.insert(accounts, AccessLevel.SYSTEM_MODE);
+            // The platform refuses the master record type Id for a user who can use any other
+            // record type (INVALID_CROSS_REFERENCE_KEY), so this account exists only in an org
+            // shape where it is accepted; when it is, it must be read the same way.
+            if (Database.insert(master, false, AccessLevel.SYSTEM_MODE).isSuccess()) {
+                accounts.add(master);
+            }
+
+            Map<Id, Schema.RecordTypeInfo> byId = Schema.SObjectType.Account.getRecordTypeInfosById();
+            for (Account read : [
+                SELECT Id, Name, RecordTypeId, Is_Organization__c
+                FROM Account
+                WHERE Id IN :accounts
+                WITH SYSTEM_MODE
+            ]) {
+                Assert.areEqual(
+                    AccountKinds.isOrganization(read.RecordTypeId),
+                    read.Is_Organization__c,
+                    'The field and the resolver agree for ' + read.Name + '.'
+                );
+                Schema.RecordTypeInfo info = read.RecordTypeId == null
+                    ? null
+                    : byId.get(read.RecordTypeId);
+                if (read.Id == household.Id) {
+                    Assert.isFalse(read.Is_Organization__c, 'A household never is.');
+                } else if (info == null || info.isMaster()) {
+                    // Saved with no record type, or the master's. An account saved without one
+                    // takes the running user's default record type when the user has one,
+                    // and is then rightly not an organization.
+                    Assert.isTrue(read.Is_Organization__c, read.Name + ' is an organization.');
+                }
+            }
+        }
+    }
+
+    /** A stored record type that is no longer a candidate is replaced on the next install. */
+    @IsTest
+    static void installReplacesAStoredRecordTypeThatIsNoLongerACandidate() {
+        System.runAs(TestUsers.admin()) {
+            store('No_Such_Record_Type_Rt5');
+
+            Test.startTest();
+            AccountKinds.storeDetectedIfBlank();
+            Test.stopTest();
+
+            String stored = BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c;
+            Assert.areEqual(
+                AccountKinds.detectOrganizationRecordType(),
+                stored,
+                'The stale value is replaced by the detected one.'
+            );
+            Assert.isTrue(
+                AccountKinds.NO_RECORD_TYPE.equals(stored) || AccountKinds.isCandidate(stored),
+                'What is stored now is usable, so the field and the resolver agree.'
+            );
+        }
+    }
+
     @IsTest
     static void installStoresTheDetectedValueOnceAndNeverOverwrites() {
         System.runAs(TestUsers.admin()) {
@@ -235,17 +345,61 @@ private class AccountKindsTest {
                 'Blank is filled with the detected value.'
             );
             AccountKinds.reset();
-            AccountKinds.candidatesOverride = new List<AccountKinds.Candidate>{
-                candidate('Business', 'Business', true)
-            };
+            AccountKinds.candidatesOverride = new List<AccountKinds.Candidate>();
             AccountKinds.storeDetectedIfBlank();
             Test.stopTest();
 
             Assert.areEqual(
                 AccountKinds.NO_RECORD_TYPE,
                 BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c,
-                'A stored value is never overwritten.'
+                'A usable stored value is never overwritten.'
             );
+        }
+    }
+
+    @IsTest
+    static void noRecordTypeIsAllowedOnlyWithoutACandidate() {
+        System.runAs(TestUsers.admin()) {
+            AccountKinds.candidatesOverride = new List<AccountKinds.Candidate>();
+            Assert.isTrue(AccountKinds.noRecordTypeAllowed(), 'No candidate: it works.');
+            AccountKinds.candidatesOverride = new List<AccountKinds.Candidate>{
+                candidate('Business', 'Business', false)
+            };
+            Assert.isFalse(AccountKinds.noRecordTypeAllowed(), 'A candidate: it never does.');
+            AccountKinds.reset();
+            Assert.areEqual(
+                AccountKinds.candidateRecordTypes().isEmpty(),
+                AccountKinds.noRecordTypeAllowed(),
+                'In this org, it follows its own record types.'
+            );
+        }
+    }
+
+    /**
+     * A stored No record type in an org with a candidate is stale: the next install stores the
+     * detected candidate. In an org with none it stays. The org's own stored value is not read.
+     */
+    @IsTest
+    static void installReplacesNoRecordTypeWhereACandidateExists() {
+        System.runAs(TestUsers.admin()) {
+            store(AccountKinds.NO_RECORD_TYPE);
+            Boolean hasCandidate = !AccountKinds.candidateRecordTypes().isEmpty();
+
+            Test.startTest();
+            AccountKinds.storeDetectedIfBlank();
+            Test.stopTest();
+
+            String stored = BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c;
+            if (hasCandidate) {
+                Assert.isTrue(AccountKinds.isCandidate(stored), 'A candidate replaced it.');
+                Assert.areEqual(
+                    AccountKinds.detectOrganizationRecordType(),
+                    stored,
+                    'The detected one.'
+                );
+            } else {
+                Assert.areEqual(AccountKinds.NO_RECORD_TYPE, stored, 'Kept where it works.');
+            }
         }
     }
 }

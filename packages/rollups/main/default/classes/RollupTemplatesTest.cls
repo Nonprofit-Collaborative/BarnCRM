@@ -125,12 +125,17 @@ private class RollupTemplatesTest {
             }
             // A shipped field stands in for the one the administrator would create. Giving makes
             // it read only to everyone (ADR-0033), so Maria is given Edit on it, as the field
-            // access step of Create a Field gives the administrator on a field they make.
+            // access step of Create a Field gives the administrator on a field they make. She
+            // holds Giving Admin too, because a rollup may read only gift fields its author can
+            // see (RollupDefinitionGuard, security review R-H1).
             RollupTemplates.Spec spec = RollupTemplates.nonprofitStarter()[0];
             spec.draft.targetField = 'Total_Giving__c';
             RollupTemplates.Outcome first;
             RollupTemplates.Outcome second;
-            User maria = maria();
+            User maria = TestDataFactory.createUser(
+                'Maria',
+                new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin', 'Giving_Admin' }
+            );
             grantEdit(maria, 'Contact', 'Total_Giving__c');
             System.runAs(maria) {
                 first = RollupTemplates.add(spec, RollupTemplates.filledBy());

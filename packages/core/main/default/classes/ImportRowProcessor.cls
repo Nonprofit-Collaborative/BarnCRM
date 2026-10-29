@@ -687,16 +687,19 @@ public with sharing class ImportRowProcessor {
             return;
         }
         // Organizations are the accounts of the record type the org chose (ADR-0141); null is
-        // No record type, so they are matched and created with none.
+        // No record type, so they are matched and created with none. A user who cannot use the
+        // record type still matches existing organizations; a row that needs a new one is
+        // rejected with the reason, rather than loaded without its organization.
         Id recordTypeId = AccountKinds.organizationRecordTypeId();
-        if (!canCreateOrganizations(recordTypeId)) {
+        Boolean usable = AccountKinds.organizationRecordTypeUsable();
+        String unusableRecordType = usable ? null : AccountKinds.organizationRecordTypeLabel();
+        if (!usable) {
             outcome.notes.add(
                 String.format(
                     Label.Core_Import_LogOrganizationRecordTypeUnavailable,
-                    new List<String>{ recordTypeLabel(recordTypeId) }
+                    new List<String>{ unusableRecordType }
                 )
             );
-            return;
         }
         ImportMatcher.forgetHeldKeys();
         Map<String, Id> existing = organizationsByField
@@ -740,6 +743,11 @@ public with sharing class ImportRowProcessor {
             }
             if (item.organizationName == null) {
                 item.error = Label.Core_Import_ErrorOrganizationNameMissing;
+            } else if (!usable) {
+                item.error = String.format(
+                    Label.Core_Import_ErrorOrganizationRecordTypeUnavailable,
+                    new List<String>{ unusableRecordType }
+                );
             }
         }
     }
@@ -759,10 +767,10 @@ public with sharing class ImportRowProcessor {
         Map<String, Working> firstRowByKey = new Map<String, Working>();
         List<Account> toCreate = new List<Account>();
         List<String> createdKeys = new List<String>();
-        // When the user cannot use the record type the match step already said so, and nothing
-        // is created. Null is No record type: organizations are created with none.
+        // When the user cannot use the record type the match step rejected every row that needed
+        // a new organization, and nothing is created. Null is No record type: none is given.
         Id recordTypeId = AccountKinds.organizationRecordTypeId();
-        Boolean usable = canCreateOrganizations(recordTypeId);
+        Boolean usable = AccountKinds.organizationRecordTypeUsable();
         for (Working item : working) {
             if (!usable || !createsOrganization(item)) {
                 continue;
@@ -3223,30 +3231,6 @@ public with sharing class ImportRowProcessor {
             parts.add(error.getMessage());
         }
         return parts.isEmpty() ? Label.Core_Import_ErrorSaveFailed : String.join(parts, ' ');
-    }
-
-    /**
-     * Whether the running user can create accounts of the organization record type: always for
-     * No record type (null), otherwise when their profile or a permission set gives it.
-     */
-    private static Boolean canCreateOrganizations(Id recordTypeId) {
-        if (recordTypeId == null) {
-            return true;
-        }
-        Schema.RecordTypeInfo info = accountRecordType(recordTypeId);
-        return info != null && info.isAvailable();
-    }
-
-    /** The label of an Account record type, as Setup shows it, for the run log. */
-    private static String recordTypeLabel(Id recordTypeId) {
-        Schema.RecordTypeInfo info = accountRecordType(recordTypeId);
-        return info == null ? String.valueOf(recordTypeId) : info.getName();
-    }
-
-    private static Schema.RecordTypeInfo accountRecordType(Id recordTypeId) {
-        return Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-            .getRecordTypeInfosById()
-            .get(recordTypeId);
     }
 
     /** A person type the running user can create with, never merely the first in the org. */

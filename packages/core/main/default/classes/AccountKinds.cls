@@ -44,6 +44,10 @@ public with sharing class AccountKinds {
     @TestVisible
     private static List<Candidate> candidatesOverride;
 
+    /** Injected by the tests, in place of whether the running user can use the record type. */
+    @TestVisible
+    private static Boolean usableOverride;
+
     private static String cachedDetection;
 
     /**
@@ -123,6 +127,37 @@ public with sharing class AccountKinds {
     }
 
     /**
+     * Whether the running user can create organizations: always with No record type, otherwise
+     * when their profile or a permission set gives them the chosen record type. BarnCRM's
+     * permission sets give no Account record type (ADR-0141), so an org that upgraded from a
+     * version that shipped Organization must give it to its users itself, or choose another one.
+     * Import, sample data and Health Check ask here, so the user is told why rather than the
+     * platform refusing the save.
+     */
+    @NamespaceAccessible
+    public static Boolean organizationRecordTypeUsable() {
+        if (usableOverride != null) {
+            return usableOverride;
+        }
+        Id recordTypeId = organizationRecordTypeId();
+        if (recordTypeId == null) {
+            return true;
+        }
+        Schema.RecordTypeInfo info = accountDescribe().getRecordTypeInfosById().get(recordTypeId);
+        return info != null && info.isAvailable();
+    }
+
+    /** The organization record type's label as Setup shows it, or its developer name. */
+    @NamespaceAccessible
+    public static String organizationRecordTypeLabel() {
+        Id recordTypeId = organizationRecordTypeId();
+        Schema.RecordTypeInfo info = recordTypeId == null
+            ? null
+            : accountDescribe().getRecordTypeInfosById().get(recordTypeId);
+        return info == null ? organizationRecordTypeName() : info.getName();
+    }
+
+    /**
      * Whether an account of this record type is an organization: its record type is the
      * chosen one, or, for `Master`, it has none (a blank Id or the master record type).
      */
@@ -182,6 +217,21 @@ public with sharing class AccountKinds {
         return chosen;
     }
 
+    /**
+     * Whether "No record type" (`Master`) can be chosen: only when the org has no candidate.
+     * Where a candidate exists, an account saved without a record type takes the creating
+     * user's default record type, and the platform refuses the master record type Id for a
+     * user who can use another one, so organizations made under `Master` would not count as
+     * organizations. The Settings picker offers it, and the Settings save accepts it, only here.
+     */
+    @NamespaceAccessible
+    public static Boolean noRecordTypeAllowed() {
+        if (candidatesOverride != null) {
+            return candidatesOverride.isEmpty();
+        }
+        return candidateRecordTypes().isEmpty();
+    }
+
     /** Whether this developer name is one of the candidates (case as Setup has it). */
     @NamespaceAccessible
     public static Boolean isCandidate(String developerName) {
@@ -197,13 +247,19 @@ public with sharing class AccountKinds {
     }
 
     /**
-     * Stores the detected record type when nothing is stored yet: what install and source
-     * deploy run (CorePostInstall), so the setting is never blank and the formula field that
-     * reads it has a value to compare. A stored value, even a stale one, is never overwritten.
+     * Stores the detected record type when nothing usable is stored: blank (a new install), or
+     * a record type since deactivated, deleted or otherwise no longer a candidate. What install
+     * and source deploy run (CorePostInstall), so the setting is never blank and the formula
+     * field `Account.Is_Organization__c`, which reads the stored value, agrees with this class,
+     * which reads a stale value as the detected one. A stored `Master` is stale too once the
+     * org has a candidate (see noRecordTypeAllowed). A candidate, and `Master` in an org with
+     * none, the values an administrator can save, are never overwritten.
      */
     @NamespaceAccessible
     public static void storeDetectedIfBlank() {
-        if (String.isNotBlank(storedValue())) {
+        String stored = storedValue();
+        Boolean usableNone = NO_RECORD_TYPE.equalsIgnoreCase(stored) && noRecordTypeAllowed();
+        if (usableNone || isCandidate(stored)) {
             return;
         }
         SettingsService.saveSystemValue(
@@ -313,6 +369,7 @@ public with sharing class AccountKinds {
     private static void reset() {
         cachedDetection = null;
         candidatesOverride = null;
+        usableOverride = null;
         resolvedFor = null;
         cachedResolution = null;
     }

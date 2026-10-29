@@ -12,7 +12,9 @@
 private class GivingSampleDataTest {
     @TestSetup
     static void createTestUser() {
-        TestUsers.adminWith('Giving_Admin');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
+        }
     }
 
     private static final String PERSON_KEY = 'H001-1';

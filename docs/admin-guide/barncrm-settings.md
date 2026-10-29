@@ -78,7 +78,7 @@ earlier release keeps every feature on and is not held.
   its close button closes it (the close button is shown greyed out). Click **Finish Setup**. What you left ticked is turned on fully: its tabs, its settings and
   its automations. Finishing also gives the tool tabs (Data Manager, Import, Find, Org
   Optimizer, Bulk Update) of every feature that is on to everyone holding a BarnCRM role, within
-  a few minutes, and starts the nightly tab access check if it is not already scheduled. What
+  a few minutes, and starts the hourly tab access check if it is not already scheduled. What
   you unticked stays off, and you can turn it on later in **General**.
   You land on **General** in BarnCRM Settings, and the setup window never shows again on
   either page. No module is installed by first-run setup: install modules later from the
@@ -138,9 +138,9 @@ BarnCRM gives it, once the feature is on, to the people who should see the tab: 
 a role or extra permission that used to include the tab (BarnCRM Admin for all five, Find and
 Export for Find, Data Manager and Org Optimizer, Bulk Update or Bulk Delete for Bulk Update and
 Data Manager). BarnCRM keeps these in step when a feature is turned on, when a role or extra
-permission is given or removed on the Access page, after every upgrade, and every night (for
+permission is given or removed on the Access page, after every upgrade, and every hour (for
 roles given in Setup or by user access policies). A large org may take a few minutes to catch
-up. Do not assign the BarnCRM Tab permission sets by hand: the nightly run removes them from
+up. Do not assign the BarnCRM Tab permission sets by hand: the hourly run removes them from
 anyone who should not have them.
 
 The Households tab works the same way. **Household Upkeep** carries the **BarnCRM Households**
@@ -301,8 +301,11 @@ parts separated by commas.
 on, because import, addresses and Giving use organizations either way. Accounts of the record
 type chosen here are your organizations: they appear on the **Organizations** tab, get the
 organization parts of the record page, are matched as organizations by import, and an import
-creates new organizations with it. Choose **No record type** when your org has no Account
-record types; then every account without one is an organization.
+creates new organizations with it. **No record type** is offered only when your org has no
+Account record type to choose (Household and person account record types do not count); then
+every account without one is an organization. Where your org has one, an account saved
+without a record type takes the user's default record type, so **No record type** would not
+work and saving it is refused.
 
 BarnCRM never adds an Organization record type. On install it picks one you already have and
 saves it, so the row is never blank:
@@ -316,7 +319,26 @@ saves it, so the row is never blank:
 
 Change it if the guess is wrong. Saving a person account record type or one named Household
 is refused. Accounts already saved keep their record type; only which accounts count as
-organizations changes.
+organizations changes. If you later deactivate or delete the chosen record type, or add an
+Account record type while **No record type** is chosen, BarnCRM picks again the same way on
+its next upgrade, so check this row after one.
+
+BarnCRM's permission sets give no Account record type, so the people who create organizations
+need the chosen one from their profile or a permission set of your own. Without it, import
+rejects the rows that would create an organization, sample data refuses to load, and Health
+Check warns **You cannot use the record type for organizations**, each naming the record type.
+
+**Upgrading from a version that shipped the Organization record type.** The upgrade leaves the
+**Organization** record type and your accounts as they are, and this row keeps it, but
+BarnCRM's permission sets stop giving it. Do one of these:
+
+- Your organizations use **Organization**: give it to the profiles (or a permission set of
+  your own) of everyone who creates organizations, in Setup, Profiles, Record Type Settings.
+- You would rather use a record type of your own: choose it here. Accounts of Organization stop
+  counting as organizations, so change their record type first if they should still count.
+- No account uses **Organization** and your org has no other Account record type to choose:
+  deactivate it in Setup, Object Manager, Account, Record Types, then choose **No record
+  type** here.
 
 ## You Never Type an Identifier
 
@@ -330,7 +352,7 @@ at something, you choose it:
   a list of checkboxes, one per active record type in your org, by the name you see in Setup.
   Ticking none means every record type.
 - **One record type**, such as **Record type for organizations**, is a dropdown of your active
-  record types by the name you see in Setup, plus **No record type**.
+  record types by the name you see in Setup, or **No record type** when there are none.
 - **A choice from a fixed list**, such as **Coexistence mode**, is a dropdown.
 
 Every setting shows its default until you change it. A dropdown, a number or a text setting

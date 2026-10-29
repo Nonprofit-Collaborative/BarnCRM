@@ -19,6 +19,7 @@ private class GiftImportProcessorTest {
                 new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
             );
             fund('General', null, true);
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
         }
     }
 

@@ -378,7 +378,36 @@ private class TabAccessServiceTest {
     }
 
     @IsTest
-    static void theNightlyCheckIsScheduledOnceAndQueuesASync() {
+    static void aJobStillOnTheOldNightlyCronIsReplacedNotDoubled() {
+        System.runAs(TestUsers.admin()) {
+            // Tests see the org's real scheduled jobs, so an org already running the check
+            // (an earlier deploy) would refuse a second job of this name before the test begins.
+            TestDataFactory.clearScheduledJobs(new List<String>{ TabAccessScheduler.JOB_NAME });
+            // What an earlier version left behind: the same job name on the nightly cron.
+            Id old = System.schedule(
+                TabAccessScheduler.JOB_NAME,
+                '0 0 1 * * ?',
+                new TabAccessScheduler()
+            );
+            ScheduledJobSelector.forget();
+
+            Id moved = TabAccessScheduler.start();
+            Id again = TabAccessScheduler.start();
+
+            Assert.areNotEqual(old, moved, 'The nightly job is replaced');
+            Assert.areEqual(moved, again, 'Starting it again finds the hourly job');
+            List<CronTrigger> jobs = [
+                SELECT Id, CronExpression
+                FROM CronTrigger
+                WHERE CronJobDetail.Name = :TabAccessScheduler.JOB_NAME
+            ];
+            Assert.areEqual(1, jobs.size(), 'There is one job, not two');
+            Assert.areEqual('0 0 * * * ?', jobs[0].CronExpression, 'It runs every hour');
+        }
+    }
+
+    @IsTest
+    static void theHourlyCheckIsScheduledOnceAndQueuesASync() {
         System.runAs(TestUsers.admin()) {
             Test.startTest();
             Id first = TabAccessScheduler.start();

@@ -136,7 +136,7 @@ private class CorePostInstallTest {
         System.runAs(TestUsers.admin()) {
             String recommended = SetupAssistantService.recommendedSuite();
             String expected = recommended == null
-                ? ModuleDetectionService.SUITE_COMMUNITY
+                ? ModuleDetectionService.SUITE_STANDARD
                 : recommended;
 
             new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));
@@ -156,10 +156,13 @@ private class CorePostInstallTest {
             Test.startTest();
             new CorePostInstall().onInstall(new InstallBy(null, null, false));
             String afterInstall = BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c;
-            SettingsService.saveSystemValue(
-                AccountKinds.KEY_ORGANIZATION_RECORD_TYPE,
-                AccountKinds.NO_RECORD_TYPE
-            );
+            // A choice an administrator could save here: the last candidate, or No record type
+            // in an org with none (it is refused where a candidate exists).
+            List<Schema.RecordTypeInfo> offered = AccountKinds.candidateRecordTypes();
+            String chosen = offered.isEmpty()
+                ? AccountKinds.NO_RECORD_TYPE
+                : offered[offered.size() - 1].getDeveloperName();
+            SettingsService.saveSystemValue(AccountKinds.KEY_ORGANIZATION_RECORD_TYPE, chosen);
             CorePostInstall.runAsSourceDeploy();
             Test.stopTest();
 
@@ -169,9 +172,9 @@ private class CorePostInstallTest {
                 'A new install stores the detected record type, so the setting is never blank'
             );
             Assert.areEqual(
-                AccountKinds.NO_RECORD_TYPE,
+                chosen,
                 BarnCRM_Settings__c.getOrgDefaults().Organization_Record_Type__c,
-                'A source deploy never replaces a stored choice'
+                'A source deploy never replaces a usable stored choice'
             );
         }
     }
@@ -179,7 +182,7 @@ private class CorePostInstallTest {
     @IsTest
     static void anUpgradeKeepsASavedEditionAndANewInstallSavesNone() {
         System.runAs(TestUsers.admin()) {
-            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_IMPACT);
+            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_NONPROFIT);
 
             new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));
             String afterUpgrade = ModuleDetectionService.chosenSuite();
@@ -187,13 +190,55 @@ private class CorePostInstallTest {
             new CorePostInstall().onInstall(new InstallBy(null, null, false));
 
             Assert.areEqual(
-                ModuleDetectionService.SUITE_IMPACT,
+                ModuleDetectionService.SUITE_NONPROFIT,
                 afterUpgrade,
                 'The edition chosen is kept'
             );
             Assert.isNull(
                 ModuleDetectionService.chosenSuite(),
                 'A new install leaves the edition to first-run setup'
+            );
+        }
+    }
+
+    @IsTest
+    static void everyRunRenamesAnEditionStoredUnderItsOldValueOnce() {
+        System.runAs(TestUsers.admin()) {
+            SettingsService.saveSystemValue('Suite__c', 'Impact');
+            new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));
+            SettingsService.clearCaches();
+            String fromImpact = BarnCRM_Settings__c.getOrgDefaults().Suite__c;
+            new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));
+            SettingsService.clearCaches();
+            String rerun = BarnCRM_Settings__c.getOrgDefaults().Suite__c;
+            SettingsService.saveSystemValue('Suite__c', 'community');
+            CorePostInstall.runAsSourceDeploy();
+            SettingsService.clearCaches();
+            Set<String> loggedValues = new Set<String>();
+            for (Setting_Change__c change : [SELECT New_Value__c FROM Setting_Change__c]) {
+                loggedValues.add(change.New_Value__c);
+            }
+
+            Assert.areEqual(
+                ModuleDetectionService.SUITE_NONPROFIT,
+                fromImpact,
+                'Impact is renamed'
+            );
+            Assert.areEqual(
+                ModuleDetectionService.SUITE_NONPROFIT,
+                rerun,
+                'A second run changes nothing'
+            );
+            Assert.areEqual(
+                ModuleDetectionService.SUITE_STANDARD,
+                BarnCRM_Settings__c.getOrgDefaults().Suite__c,
+                'Community is renamed by a source deploy too'
+            );
+            Assert.isTrue(loggedValues.contains('community'), 'The test setting itself was logged');
+            Assert.isFalse(
+                loggedValues.contains(ModuleDetectionService.SUITE_STANDARD) ||
+                loggedValues.contains(ModuleDetectionService.SUITE_NONPROFIT),
+                'Nobody changed the edition, so Recent Changes lists no rename'
             );
         }
     }
@@ -216,7 +261,7 @@ private class CorePostInstallTest {
                     FROM CronTrigger
                     WHERE CronJobDetail.Name = :TabAccessScheduler.JOB_NAME
                 ],
-                'An install and an upgrade leave one nightly tab access check'
+                'An install and an upgrade leave one hourly tab access check'
             );
         }
     }
@@ -257,7 +302,7 @@ private class CorePostInstallTest {
     static void aSourceDeployOnAnOrgWithSavedSettingsChangesNothingChosen() {
         System.runAs(TestUsers.admin()) {
             forgetSavedSettings();
-            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_IMPACT);
+            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_NONPROFIT);
             SettingsService.clearCaches();
 
             CorePostInstall.runAsSourceDeploy();
@@ -272,7 +317,7 @@ private class CorePostInstallTest {
                 'So every feature it used stays on'
             );
             Assert.areEqual(
-                ModuleDetectionService.SUITE_IMPACT,
+                ModuleDetectionService.SUITE_NONPROFIT,
                 ModuleDetectionService.chosenSuite(),
                 'And its edition is kept'
             );

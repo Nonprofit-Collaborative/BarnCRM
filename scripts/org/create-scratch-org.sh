@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# create-scratch-org.sh <shape> [alias] [--days N] [--no-sample-data] [--replace]
+# create-scratch-org.sh <shape> [alias] [--days N] [--no-sample-data] [--replace] [--resume]
 #
 # Creates a scratch org of the given shape, deploys Core, assigns Core's permission sets, and
 # (for the platform-only shape) verifies that a Salesforce Platform license user can be given
@@ -22,7 +22,10 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: create-scratch-org.sh <shape> [alias] [--days N] [--no-sample-data] [--replace]" >&2
+  echo "Usage: create-scratch-org.sh <shape> [alias] [--days N] [--no-sample-data] [--replace] [--resume]" >&2
+  echo "  --resume     Finish an org that already exists (a run that stopped part way): skip" >&2
+  echo "               creation and the Core deploy, then assign permission sets, verify and" >&2
+  echo "               seed. Safe to repeat; a permission set already held is not an error." >&2
   echo "  --days N     1 to 30. Salesforce caps a scratch org at 30 days; there is no" >&2
   echo "               permanent scratch org. For a long lived development org use" >&2
   echo "               --days 30 --replace and re-run it monthly, or use a Developer" >&2
@@ -41,6 +44,7 @@ ALIAS=""
 DAYS=7
 LOAD_SAMPLE_DATA=1
 REPLACE=0
+RESUME=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -50,6 +54,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --no-sample-data)
       LOAD_SAMPLE_DATA=0
+      shift
+      ;;
+    --resume)
+      RESUME=1
       shift
       ;;
     --replace)
@@ -93,6 +101,19 @@ if ! [[ "$DAYS" =~ ^[0-9]+$ ]] || (( DAYS < 1 || DAYS > 30 )); then
   exit 1
 fi
 
+if [[ "$RESUME" -eq 1 && "$REPLACE" -eq 1 ]]; then
+  echo "--resume and --replace cannot be combined: --resume keeps the existing org." >&2
+  exit 1
+fi
+
+if [[ "$RESUME" -eq 1 ]]; then
+  if ! sf org display --target-org "$ALIAS" >/dev/null 2>&1; then
+    echo "--resume needs an existing org aliased ${ALIAS}; none found." >&2
+    exit 1
+  fi
+  echo "== Resuming on the existing org ${ALIAS}: skipping creation and deploy =="
+fi
+
 if [[ "$REPLACE" -eq 1 ]]; then
   if sf org display --target-org "$ALIAS" >/dev/null 2>&1; then
     echo "== Deleting the existing org aliased ${ALIAS} (--replace) =="
@@ -102,22 +123,24 @@ if [[ "$REPLACE" -eq 1 ]]; then
   fi
 fi
 
-echo "== Creating scratch org: shape=${SHAPE} alias=${ALIAS} days=${DAYS} =="
-sf org create scratch \
-  --definition-file "$DEF_FILE" \
-  --alias "$ALIAS" \
-  --duration-days "$DAYS" \
-  --set-default \
-  --wait 15
+if [[ "$RESUME" -eq 0 ]]; then
+  echo "== Creating scratch org: shape=${SHAPE} alias=${ALIAS} days=${DAYS} =="
+  sf org create scratch \
+    --definition-file "$DEF_FILE" \
+    --alias "$ALIAS" \
+    --duration-days "$DAYS" \
+    --set-default \
+    --wait 15
 
-if [[ "$SHAPE" == "npsp" ]]; then
-  echo "== Installing NPSP (shape=npsp) =="
-  scripts/org/install-npsp.sh "$ALIAS"
+  if [[ "$SHAPE" == "npsp" ]]; then
+    echo "== Installing NPSP (shape=npsp) =="
+    scripts/org/install-npsp.sh "$ALIAS"
+  fi
+
+  # Deployed in stages by one script, shared with continuous integration, so a failure names
+  # a stage instead of leaving 982 components as suspects. See scripts/org/deploy-packages.sh.
+  scripts/org/deploy-packages.sh "$ALIAS" --core-only
 fi
-
-# Deployed in stages by one script, shared with continuous integration, so a failure names
-# a stage instead of leaving 982 components as suspects. See scripts/org/deploy-packages.sh.
-scripts/org/deploy-packages.sh "$ALIAS" --core-only
 
 echo "== Assigning Core permission sets to the default (deployment) user =="
 PERMSET_DIR="packages/core/main/default/permissionsets"
@@ -128,7 +151,18 @@ if [[ -d "$PERMSET_DIR" ]]; then
     FOUND_PERMSET=1
     PS_NAME="$(basename "$PS_FILE" .permissionset-meta.xml)"
     echo "Assigning permission set: ${PS_NAME}"
-    sf org assign permset --name "$PS_NAME" --target-org "$ALIAS"
+    # The deploy's post-install can already have given the admin a set; Salesforce reports
+    # that as a failure naming a duplicate assignment. That means "held", not an error.
+    # Any other failure stays fatal.
+    OUTPUT="$(sf org assign permset --name "$PS_NAME" --target-org "$ALIAS" 2>&1)" && STATUS=0 || STATUS=$?
+    if grep -q "Duplicate PermissionSetAssignment" <<<"$OUTPUT"; then
+      echo "Already assigned: ${PS_NAME}"
+    elif [[ "$STATUS" -ne 0 ]]; then
+      echo "$OUTPUT" >&2
+      exit "$STATUS"
+    else
+      echo "$OUTPUT"
+    fi
   done
 fi
 if [[ "$FOUND_PERMSET" -eq 0 ]]; then

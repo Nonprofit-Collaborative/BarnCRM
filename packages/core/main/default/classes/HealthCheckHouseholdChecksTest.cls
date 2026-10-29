@@ -29,7 +29,7 @@ private class HealthCheckHouseholdChecksTest {
     }
 
     private static Account newOrganization(String name) {
-        return new Account(Name = name, RecordTypeId = organizationRecordTypeId());
+        return AccountKindsTestData.organization(name);
     }
 
     /** Contacts saved the way a load with automation off saves them: with no household made. */

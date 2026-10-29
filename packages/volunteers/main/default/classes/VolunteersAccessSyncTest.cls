@@ -2,7 +2,7 @@
  * BarnCRM's roles get the Volunteers sets (ADR-0127 decision 3): the Coordinator role gets
  * Volunteers Coordinator and the Team Member role Volunteers Staff, though both hold the same
  * Core set, the Read Only role Volunteers Read Only and BarnCRM Admin holders Volunteers Admin,
- * at install, at Turn on and with the nightly access check.
+ * at install, at Turn on and with the hourly access check.
  */
 @IsTest(testFor='ApexClass:VolunteersAccessSync')
 private class VolunteersAccessSyncTest {
@@ -136,7 +136,7 @@ private class VolunteersAccessSyncTest {
             Map<String, Id> ids = people();
 
             Test.startTest();
-            // What Core's nightly access check (TabAccessScheduler) asks of every module.
+            // What Core's hourly access check (TabAccessScheduler) asks of every module.
             ModuleAccessSyncs.requestAll();
             Test.stopTest();
 

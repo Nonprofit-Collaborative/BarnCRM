@@ -26,6 +26,13 @@ public with sharing class ScheduledJobSelector {
         return found == null ? null : found.Id;
     }
 
+    /** The cron expression the named job was scheduled with, or null when it is not scheduled. */
+    @NamespaceAccessible
+    public static String cronExpressionByName(String jobName) {
+        CronTrigger found = triggerByName(jobName);
+        return found == null ? null : found.CronExpression;
+    }
+
     /**
      * When the named job runs next, or null when it is not scheduled. A one-time job that has
      * already fired keeps its trigger with no next run, and counts as not scheduled.
@@ -108,7 +115,7 @@ public with sharing class ScheduledJobSelector {
             byName = new Map<String, CronTrigger>();
             // At most 100 rows: an org may hold only 100 scheduled Apex jobs.
             for (CronTrigger job : [
-                SELECT Id, NextFireTime, OwnerId, CronJobDetail.Name
+                SELECT Id, NextFireTime, OwnerId, CronExpression, CronJobDetail.Name
                 FROM CronTrigger
                 WHERE CronJobDetail.JobType = '7' AND CronJobDetail.Name LIKE :NAME_PATTERN
                 WITH SYSTEM_MODE

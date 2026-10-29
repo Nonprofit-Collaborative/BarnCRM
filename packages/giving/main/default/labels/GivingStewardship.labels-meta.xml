@@ -17,6 +17,14 @@
     <value>Choose one person or one organization to run this plan for, not both and not neither.</value>
   </labels>
   <labels>
+    <fullName>Giving_Stewardship_ErrorDonorNotVisible</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Stewardship: the person starting a plan cannot see the donor</shortDescription>
+    <value>You cannot see this donor, so no plan was started.</value>
+  </labels>
+  <labels>
     <fullName>Giving_Stewardship_ErrorAlreadyRunning</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>

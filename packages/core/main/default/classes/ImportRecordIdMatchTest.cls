@@ -11,6 +11,7 @@ private class ImportRecordIdMatchTest {
     static void setUp() {
         System.runAs(TestUsers.admin()) {
             TestDataFactory.defaultSettings();
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
         }
     }
 
@@ -164,10 +165,7 @@ private class ImportRecordIdMatchTest {
     @IsTest
     static void anIdOfTheWrongKindOrNoIdAtAllRejectsTheRow() {
         System.runAs(TestUsers.admin()) {
-            Account organization = new Account(
-                Name = 'Harbor Trust',
-                RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
-            );
+            Account organization = AccountKindsTestData.organization('Harbor Trust');
             Account household = new Account(
                 Name = 'Lopez Household',
                 RecordTypeId = recordTypeId('Household')
@@ -225,10 +223,7 @@ private class ImportRecordIdMatchTest {
     @IsTest
     static void anOrganizationIdMatchesThatOrganizationAndABlankIdUsesTheRule() {
         System.runAs(TestUsers.admin()) {
-            Account organization = new Account(
-                Name = 'Harbor Trust',
-                RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
-            );
+            Account organization = AccountKindsTestData.organization('Harbor Trust');
             insert organization;
             Contact ana = new Contact(
                 FirstName = 'Ana',

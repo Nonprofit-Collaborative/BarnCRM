@@ -30,6 +30,30 @@ public with sharing class HealthCheckSettingsChecks {
         }
     }
 
+    /**
+     * Whether the person running Health Check can use the record type for organizations
+     * (ADR-0141). Who else can is not readable from Apex, but the admin is the usual first to
+     * lose it: an org upgraded from a version whose permission sets gave Organization keeps
+     * the record type and loses the access, and the admin is who can give it back.
+     */
+    public class OrganizationRecordTypeCheck implements HealthCheckService.Check {
+        public HealthCheckService.Finding run() {
+            if (AccountKinds.organizationRecordTypeUsable()) {
+                return null;
+            }
+            return new HealthCheckService.Finding(
+                'organization_record_type_unavailable',
+                System.Label.Core_HealthCheck_OrganizationRecordTypeTitle,
+                String.format(
+                    System.Label.Core_HealthCheck_OrganizationRecordTypeDetail,
+                    new List<Object>{ AccountKinds.organizationRecordTypeLabel() }
+                ),
+                HealthCheckService.SEVERITY_WARNING,
+                HealthCheckService.CATEGORY_SETTINGS
+            );
+        }
+    }
+
     /** A scheduled error digest that has stopped running. */
     public class ErrorDigestCheck implements HealthCheckService.Check {
         public HealthCheckService.Finding run() {

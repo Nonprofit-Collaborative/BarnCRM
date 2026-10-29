@@ -4,7 +4,11 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     One entry in the organization's own list of volunteer skills and interests, for example
-    Spanish or Forklift licence. Volunteer skills and job skills point at it.
+    Spanish or Forklift licence. Volunteer skills and job skills point at it. Sharing is Read,
+    so everyone sees the list; Volunteers Admin and Volunteers Coordinator hold View All and
+    Modify All because they keep the one list for everyone, renaming or deleting a skill someone
+    else added, and the platform grants edit and delete on another person's record only with
+    Modify All. Read Write sharing would not do: deleting still needs Modify All.
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

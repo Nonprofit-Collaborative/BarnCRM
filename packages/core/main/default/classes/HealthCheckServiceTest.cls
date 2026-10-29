@@ -367,7 +367,7 @@ private class HealthCheckServiceTest {
             OrgShapeDetector.overrideShape = shape(false, false, true, false);
             HealthCheckOrgShapeChecks.mirrorInstalledOverride = false;
             SettingsService.saveValues(
-                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_COMMUNITY }
+                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_STANDARD }
             );
 
             System.assertEquals(
@@ -384,7 +384,7 @@ private class HealthCheckServiceTest {
             OrgShapeDetector.overrideShape = shape(false, false, true, false);
             HealthCheckOrgShapeChecks.mirrorInstalledOverride = false;
             SettingsService.saveValues(
-                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_IMPACT }
+                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_NONPROFIT }
             );
 
             HealthCheckService.Finding finding = find(
@@ -952,6 +952,40 @@ private class HealthCheckServiceTest {
                 );
             }
 
+        }
+    }
+
+    @IsTest
+    static void anOrganizationRecordTypeTheAdminCannotUseIsAWarning() {
+        System.runAs(TestUsers.admin()) {
+            OrgShapeDetector.overrideShape = shape(false, false, false, false);
+            AccountKinds.usableOverride = true;
+            System.assertEquals(
+                null,
+                find(HealthCheckService.run(), 'organization_record_type_unavailable'),
+                'Nothing to say while the admin can use the record type.'
+            );
+
+            AccountKinds.usableOverride = false;
+            HealthCheckService.Finding finding = find(
+                HealthCheckService.run(),
+                'organization_record_type_unavailable'
+            );
+            System.assertNotEquals(
+                null,
+                finding,
+                'ADR-0141: an upgraded org keeps Organization but loses the access BarnCRM ' +
+                'permission sets gave, so the admin is told.'
+            );
+            System.assert(
+                finding.detail.contains(AccountKinds.organizationRecordTypeLabel()),
+                'The finding names the record type. Detail was: ' + finding.detail
+            );
+            System.assertEquals(
+                HealthCheckService.SEVERITY_WARNING,
+                finding.severity,
+                'A warning: organizations cannot be created until it is fixed.'
+            );
         }
     }
 

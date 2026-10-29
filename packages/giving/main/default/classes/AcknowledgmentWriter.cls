@@ -79,6 +79,11 @@ public without sharing class AcknowledgmentWriter {
      * (ADR-0032): a receipt's file is immutable and its store exists to guarantee that, while a
      * merge file is a working document that may be replaced or deleted. Sharing the method would
      * have meant sharing that guarantee's justification with a case it does not apply to.
+     *
+     * The link's visibility follows the receipt's rule (ADR-0034), because the file holds donor
+     * names and addresses: `InternalUsers` first, so no Experience Cloud user reaches it, and
+     * `AllUsers` only when the platform refuses that, which it does in an org with no external
+     * users, where the two reach the same people (2026-10-28 security review, G-L2).
      */
     public static Id storeMergeFile(String title, String csv, Id runId) {
         ContentVersion version = new ContentVersion(
@@ -98,18 +103,37 @@ public without sharing class AcknowledgmentWriter {
         ]
         .ContentDocumentId;
 
+        try {
+            linkMergeFile(documentId, runId, VISIBILITY_INTERNAL);
+        } catch (DmlException refused) {
+            if (!ReceiptWriter.refusedVisibility(refused)) {
+                throw refused;
+            }
+            internalOnlyRefused = true;
+            linkMergeFile(documentId, runId, VISIBILITY_ALL);
+        }
+        return documentId;
+    }
+
+    private static final String VISIBILITY_INTERNAL = 'InternalUsers';
+    private static final String VISIBILITY_ALL = 'AllUsers';
+
+    /** True once the platform refused an `InternalUsers` link in this transaction. */
+    @TestVisible
+    private static Boolean internalOnlyRefused = false;
+
+    private static void linkMergeFile(Id documentId, Id runId, String visibility) {
         Database.insert(
             new List<ContentDocumentLink>{
                 new ContentDocumentLink(
                     ContentDocumentId = documentId,
                     LinkedEntityId = runId,
                     ShareType = 'V',
-                    Visibility = 'AllUsers'
+                    Visibility = visibility
                 )
             },
             true,
             AccessLevel.SYSTEM_MODE
         );
-        return documentId;
     }
 }

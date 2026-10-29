@@ -302,7 +302,7 @@ private class HealthCheckFixesTest {
     }
 
     /**
-     * Cancels every BarnCRM scheduled job the org already has, such as the nightly tab access
+     * Cancels every BarnCRM scheduled job the org already has, such as the hourly tab access
      * check an install schedules. Scheduled jobs are visible to tests, and the test seam that
      * gives a job an inactive owner applies to every job read, so a test that names the jobs it
      * expects clears the org's own first.

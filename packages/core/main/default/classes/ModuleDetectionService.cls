@@ -21,9 +21,20 @@ public with sharing class ModuleDetectionService {
     /** Each module's own README, which says what the module is without assuming a suite. */
     private static final String DOCS_BASE = 'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/packages/';
 
-    /** The two suites the Setup Assistant's first step offers, as `Suite__c` stores them (C-30). */
-    public static final String SUITE_COMMUNITY = 'Community';
-    public static final String SUITE_IMPACT = 'Impact';
+    /** The two editions the Setup Assistant's first step offers, as `Suite__c` stores them (C-30). */
+    public static final String SUITE_STANDARD = 'Standard';
+    public static final String SUITE_NONPROFIT = 'Nonprofit';
+
+    /**
+     * The values `Suite__c` stored before ADR-0143 (`0143-edition-internal-values.md`), lower
+     * case, by the value that replaced each. `CorePostInstall` rewrites a stored one; until it
+     * has run (an org gate deploys without it), `chosenSuite` and Recent Changes read them as the
+     * new values. Only BarnCRM's own test orgs ever stored them.
+     */
+    public static final Map<String, String> SUITE_BY_OLD_VALUE = new Map<String, String>{
+        'community' => SUITE_STANDARD,
+        'impact' => SUITE_NONPROFIT
+    };
 
     /** Salesforce's installer for one package version, relative to the org's own domain. */
     private static final String INSTALL_PATH = '/packaging/installPackage.apexp?p0=';
@@ -68,7 +79,7 @@ public with sharing class ModuleDetectionService {
         public String installFirst;
         /**
          * True when only the Nonprofit Edition offers this module: the catalog names editions and
-         * the Standard edition (`Community`) is not among them. False for Core and for a module
+         * the Standard edition (`Standard`) is not among them. False for Core and for a module
          * both editions offer.
          */
         @AuraEnabled
@@ -113,25 +124,26 @@ public with sharing class ModuleDetectionService {
     }
 
     /**
-     * The edition the administrator chose, `Community` or `Impact`, or null before anyone
-     * chose. A value typed in Setup that is neither counts as no choice.
+     * The edition the administrator chose, `Standard` or `Nonprofit`, or null before anyone
+     * chose. A value from before ADR-0143 reads as the value that replaced it; any other value
+     * typed in Setup counts as no choice.
      */
     public static String chosenSuite() {
         String suite = SettingsService.getSettings().Suite__c;
         if (String.isBlank(suite)) {
             return null;
         }
-        for (String known : new List<String>{ SUITE_COMMUNITY, SUITE_IMPACT }) {
+        for (String known : new List<String>{ SUITE_STANDARD, SUITE_NONPROFIT }) {
             if (known.equalsIgnoreCase(suite.trim())) {
                 return known;
             }
         }
-        return null;
+        return SUITE_BY_OLD_VALUE.get(suite.trim().toLowerCase());
     }
 
     /** True only when the Nonprofit Edition is chosen: the one switch for nonprofit modules. */
     public static Boolean isNonprofitEdition() {
-        return chosenSuite() == SUITE_IMPACT;
+        return chosenSuite() == SUITE_NONPROFIT;
     }
 
     /** The Giving module alone, for the suite step: whether it is here, and where to read and install it. */
@@ -162,7 +174,7 @@ public with sharing class ModuleDetectionService {
      */
     public static List<ModuleInfo> getModules() {
         Set<String> announced = announcedModules();
-        String edition = chosenSuite() == null ? SUITE_COMMUNITY : chosenSuite();
+        String edition = chosenSuite() == null ? SUITE_STANDARD : chosenSuite();
         List<ModuleInfo> offered = new List<ModuleInfo>{
             module(
                 new BarnCRM_Module__mdt(DeveloperName = MODULE_CORE, Package_Folder__c = 'core'),
@@ -241,7 +253,7 @@ public with sharing class ModuleDetectionService {
 
     /** True when the catalog says the chosen edition (Standard before one is chosen) offers it. */
     public static Boolean isOffered(String moduleName) {
-        String edition = chosenSuite() == null ? SUITE_COMMUNITY : chosenSuite();
+        String edition = chosenSuite() == null ? SUITE_STANDARD : chosenSuite();
         return offeredIn(catalogRow(moduleName), edition);
     }
 
@@ -265,9 +277,7 @@ public with sharing class ModuleDetectionService {
      */
     @TestVisible
     private static Boolean isNonprofitOnly(BarnCRM_Module__mdt row) {
-        return row != null &&
-            String.isNotBlank(row.Editions__c) &&
-            !offeredIn(row, SUITE_COMMUNITY);
+        return row != null && String.isNotBlank(row.Editions__c) && !offeredIn(row, SUITE_STANDARD);
     }
 
     /** The shipped module catalog, lowest Sort Order first. */

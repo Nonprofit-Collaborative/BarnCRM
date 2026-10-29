@@ -330,7 +330,7 @@ public with sharing class SettingsController {
     /**
      * Each choice setting's labels by stored value (lower case), keyed like
      * `labelsByStoredName`, so Recent Changes shows what the setting's own picker shows: the
-     * Edition row reads "Nonprofit Edition", not the stored code "Impact". Translated when read,
+     * Edition row reads "Nonprofit Edition", not the stored code "Nonprofit". Translated when read,
      * so rows logged before a label changed read the current label too.
      */
     private static Map<String, Map<String, String>> choiceLabelsByStoredName() {
@@ -345,13 +345,19 @@ public with sharing class SettingsController {
             }
         }
         // The Edition row is a component with its own picker, which names the stored codes with
-        // these labels (editionSetting): Community is the Standard Edition, Impact the Nonprofit.
+        // these labels (editionSetting). Rows logged before ADR-0143 hold the old codes, which
+        // read as the editions that replaced them.
+        Map<String, String> editionLabels = new Map<String, String>{
+            ModuleDetectionService.SUITE_STANDARD.toLowerCase() => System.Label.Core_SuiteChoice_StandardName,
+            ModuleDetectionService.SUITE_NONPROFIT.toLowerCase() => System.Label.Core_SuiteChoice_NonprofitName
+        };
+        for (String oldValue : ModuleDetectionService.SUITE_BY_OLD_VALUE.keySet()) {
+            String renamed = ModuleDetectionService.SUITE_BY_OLD_VALUE.get(oldValue);
+            editionLabels.put(oldValue, editionLabels.get(renamed.toLowerCase()));
+        }
         choices.put(
             (SettingsService.CORE_SETTINGS_OBJECT + '.Suite__c').toLowerCase(),
-            new Map<String, String>{
-                ModuleDetectionService.SUITE_COMMUNITY.toLowerCase() => System.Label.Core_SuiteChoice_StandardName,
-                ModuleDetectionService.SUITE_IMPACT.toLowerCase() => System.Label.Core_SuiteChoice_NonprofitName
-            }
+            editionLabels
         );
         return choices;
     }
@@ -791,10 +797,12 @@ public with sharing class SettingsController {
                 option.label = info.getName();
                 setting.options.add(option);
             }
-            Option none = new Option();
-            none.value = AccountKinds.NO_RECORD_TYPE;
-            none.label = System.Label.Core_Settings_NoRecordType;
-            setting.options.add(none);
+            if (offersNoRecordType(type)) {
+                Option none = new Option();
+                none.value = AccountKinds.NO_RECORD_TYPE;
+                none.label = System.Label.Core_Settings_NoRecordType;
+                setting.options.add(none);
+            }
         }
         if (isRecordTypes) {
             for (Schema.RecordTypeInfo info : SettingsService.recordTypes(type)) {
@@ -840,6 +848,20 @@ public with sharing class SettingsController {
     private static Boolean isCoexistenceMode(String settingsObject, String key) {
         return SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject) &&
             CoexistenceService.KEY_COEXISTENCE_MODE.equalsIgnoreCase(key);
+    }
+
+    /**
+     * For organizations, "No record type" is offered only where it works: in an org with no
+     * Account record type to offer (AccountKinds.noRecordTypeAllowed). It is also listed while
+     * it is the value in force, so the row shows what is stored until the next upgrade replaces
+     * it; saving it again changes nothing, and choosing it anew is refused (SettingsService).
+     */
+    private static Boolean offersNoRecordType(Schema.SObjectType type) {
+        if (type != Account.SObjectType) {
+            return true;
+        }
+        return AccountKinds.noRecordTypeAllowed() ||
+            AccountKinds.NO_RECORD_TYPE.equalsIgnoreCase(AccountKinds.organizationRecordTypeName());
     }
 
     private static Boolean isOrganizationRecordType(String settingsObject, String key) {

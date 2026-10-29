@@ -775,7 +775,7 @@ no metadata, and left out by `--core-only`), then Mirror. A failed stage asks th
 org for the component level report, by job id, in human form and then as JSON. Once Core's last
 stage is in, the script runs `CorePostInstall.runAsSourceDeploy()` as anonymous Apex: the steps
 Core's install handler runs, which a deployment never triggers (first-run setup on a fresh org,
-the Automation switches, the import templates, the recommended coexistence mode, the nightly tab
+the Automation switches, the import templates, the recommended coexistence mode, the hourly tab
 access check, and the BarnCRM Admin permission set for the person deploying). It is safe on an
 org that already has BarnCRM: an org with saved BarnCRM Settings or a household is treated as an
 upgrade, so no setting, feature or edition an administrator chose changes, and a second run

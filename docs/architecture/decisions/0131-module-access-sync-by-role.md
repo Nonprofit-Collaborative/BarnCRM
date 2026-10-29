@@ -32,7 +32,8 @@ would be one more scheduled job for Health Check to count.
    `VolunteersAccessSync`. A future module needs no Core change. Core asks the module's sync
    when the Module Manager turns that module on (`ModuleManagerService.turnOn`), and asks every
    catalog module's sync when a role or add-on is given on the Access page (`AccessController`)
-   and from Core's nightly access check (`TabAccessScheduler`), so a module needs no scheduled
+   and from Core's tab access check (`TabAccessScheduler`; hourly since 2026-10-29, owner
+   decision), so a module needs no scheduled
    job of its own to keep its sets with the roles. A module without such a class is skipped;
    one that cannot be built, or throws, is logged and skipped.
 3. The Rollup Builder module keeps its own wiring: nothing changes for it. Its sync is named

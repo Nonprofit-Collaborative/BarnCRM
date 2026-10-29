@@ -5,6 +5,10 @@
 **Source:** owner decision of 2026-10-14 and his clarification the same day; plan Section 4.1
 "Suites and packaging" and decision D-96; supersedes the suite names in ADR-0046 and ADR-0072
 
+> **Amended by ADR-0143** (`0143-edition-internal-values.md`, plan D-145, 2026-10-29): the
+> stored values are now `Standard` and `Nonprofit`, not `Community` and `Impact`. The rest of
+> this record stands.
+
 ## Context
 
 ADR-0046 named two suites, the Impact Suite (nonprofits) and the Community Suite (any other

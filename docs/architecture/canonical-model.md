@@ -718,10 +718,14 @@ not shown for Organization records on the Account record page.
 **R-O4 Defined by the org's own record type (ADR-0141).** Core ships no Organization record
 type. `BarnCRM_Settings__c.Organization_Record_Type__c` names one active Account record
 type, by developer name, or holds `Master` for "No record type"; a person record type or one
-whose developer name or label contains Household is refused. One record type, never several.
+whose developer name or label contains Household is refused. `Master` is offered and saved
+only when the org has no candidate (R-O5): where one exists, an account saved without a record
+type takes the user's default record type, and the master record type Id is refused for a user
+who can use another, so a stored `Master` there is stale and replaced by detection. One record type, never several.
 
-**R-O5 Detection.** When the setting is blank (a new install or source deploy stores the
-result), or names a record type that is gone or inactive, the organization record type is
+**R-O5 Detection.** When the setting is blank, or names a record type that is gone, inactive
+or otherwise no longer a candidate (each install, upgrade or source deploy stores the result
+in both cases), the organization record type is
 detected: the candidates are the active Account record types that are not person types and
 whose developer name or label does not contain Household; one already used by at least one
 account comes first; then the developer names Organization, Business_Account, Business and
@@ -736,7 +740,8 @@ Detection never creates, activates or shows a record type.
   organizations.
 - **Formula field:** `Is_Organization__c` (Checkbox), true when the account's record type
   developer name equals `$Setup.BarnCRM_Settings__c.Organization_Record_Type__c`, or when the
-  setting is `Master` and the account has no record type. The Organizations list view and
+  setting is `Master` and the account has no record type (a blank `RecordTypeId`, or the
+  master record type, which has no developer name). The Organizations list view and
   every record page rule for organizations filter on it. Read access in the three role sets.
 - **Fields:** standard `Name`; `Primary_Contact__c` (shared with Household, above);
   `Sample_Data__c` (Checkbox, shared field definition with Household, above);
@@ -1098,10 +1103,10 @@ Added by the suite choice (C-30) and the Module Manager (C-24).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Suite__c` | picklist(Community, Impact) | empty | Which edition the administrator chose in the Setup Assistant's first step: the Standard Edition (Core alone, the full core suite of tools) or the Nonprofit Edition (Core with Giving). Any org may choose either; empty until chosen. Shown as Standard Edition and Nonprofit Edition. When `Impact`, the modules step, the Module Manager and the home Modules card offer the nonprofit modules; otherwise Core shows none that is not installed. It installs and removes nothing (ADR-0072, `0072-suite-choice-is-the-first-setup-step.md`). Chosen once in the Setup Assistant; changed later only through the console's Change edition control or Setup, Custom Settings (ADR-0124, `0124-edition-gates-visibility.md`). |
+| `Suite__c` | picklist(Standard, Nonprofit) | empty | Which edition the administrator chose in the Setup Assistant's first step: the Standard Edition (`Standard`, Core alone, the full core suite of tools) or the Nonprofit Edition (`Nonprofit`, Core with Giving). Any org may choose either; empty until chosen. Shown as Standard Edition and Nonprofit Edition. A stored value from before ADR-0143 (`Community` or `Impact`) is rewritten to `Standard` or `Nonprofit` by Core's post-install steps (`0143-edition-internal-values.md`). When `Nonprofit`, the modules step, the Module Manager and the home Modules card offer the nonprofit modules; otherwise Core shows none that is not installed. It installs and removes nothing (ADR-0072, `0072-suite-choice-is-the-first-setup-step.md`). Chosen once in the Setup Assistant; changed later only through the console's Change edition control or Setup, Custom Settings (ADR-0124, `0124-edition-gates-visibility.md`). |
 | `Modules_Turned_Off__c` | text (255) | empty | The comma separated names of the installed modules the administrator turned off in the Module Manager. While a module is listed, its automations do not run, except those that always run (ADR-0024); Core cannot be listed. Written by the Module Manager, not edited as a setting (ADR-0073, `0073-module-manager-turns-automation-off-and-never-installs.md`). |
 | `Features_Turned_On__c` | text (255) | empty | The comma separated keys of the Core features turned on (`DataManager`, `DuplicateReview`, `OrgOptimizer`, `HouseholdUpkeep`, `Addresses`, `Relationships`, `Affiliations`, `PreferredEmail`). Empty means every feature is on: an org upgraded from before features existed. A new install stores `None` (every feature off) until first-run setup; finishing it with every feature unticked stores `NoneChosen` (every feature off, setup done). A key once added is never removed: features are one-way. While a key is missing, its tabs' BarnCRM Tab permission sets are held by nobody, its rows are hidden in BarnCRM Settings, and its group's automations do not run. Written by General, Features and first-run setup, not edited as a setting (ADR-0124, `0124-edition-gates-visibility.md`). |
-| `Hide_Nonprofit_Modules__c` | boolean | false | Whether the Module Manager hides the nonprofit modules: the modules in the module catalog whose `Editions__c` does not name the Standard edition (`Community`), so only the Nonprofit Edition offers them. Stored as the opposite of the page's Show Nonprofit Modules checkbox (checked when this is false) so that a settings row saved before the field existed, or a blank value, shows the modules: only a deliberate tick hides. When true, the Modules section keeps its Show Nonprofit Modules checkbox, shows a count of installed nonprofit modules that are hidden, and lists no nonprofit module. Org-wide; it hides rows only and installs, removes and turns off nothing. Written by the Module Manager's checkbox through `ModuleManagerService`, which checks Manage BarnCRM Settings; not edited as a Setting Definition row. Ships off, so it needs no `SHIPPED_DEFAULTS` entry (ADR-0035). |
+| `Hide_Nonprofit_Modules__c` | boolean | false | Whether the Module Manager hides the nonprofit modules: the modules in the module catalog whose `Editions__c` does not name the Standard edition (`Standard`), so only the Nonprofit Edition offers them. Stored as the opposite of the page's Show Nonprofit Modules checkbox (checked when this is false) so that a settings row saved before the field existed, or a blank value, shows the modules: only a deliberate tick hides. When true, the Modules section keeps its Show Nonprofit Modules checkbox, shows a count of installed nonprofit modules that are hidden, and lists no nonprofit module. Org-wide; it hides rows only and installs, removes and turns off nothing. Written by the Module Manager's checkbox through `ModuleManagerService`, which checks Manage BarnCRM Settings; not edited as a Setting Definition row. Ships off, so it needs no `SHIPPED_DEFAULTS` entry (ADR-0035). |
 | `Modules_Setup_Run__c` | text (255) | empty | The comma separated keys (`Core` and the module catalog's names, such as `Giving`) of the packages whose setup steps have run in this org. Each package's post-install class adds its own key at the end of its steps, at every install and upgrade, when `scripts/org/deploy-packages.sh` runs those steps, and when an administrator presses Finish Setup (FS1). A package that is here, ships setup steps (its post-install class implements `ModuleSetup`) and is not listed gets a Health Check finding and a notice on the Modules page. Bookkeeping written by `ModuleSetups` with no audit row; not edited as a Setting Definition row. Empty until the first setup runs, so it needs no `SHIPPED_DEFAULTS` entry. |
 
 ### Field utilization keys
@@ -1450,7 +1455,7 @@ names the modules a module's package needs installed first (ADR-0125
 |---|---|---|---|
 | DeveloperName | `DeveloperName` | text | The module's name as Core reports it, for example `Giving`; it is also the name `Modules_Turned_Off__c` and Setting Definition `Module__c` use. |
 | Label | `MasterLabel` | text | The module's name shown to administrators, always starting `BarnCRM `, for example `BarnCRM Giving`. |
-| Editions | `Editions__c` | text (40) | The stored edition values that offer the module, separated by semicolons: `Impact` for a nonprofit module, `Community;Impact` for one both editions offer. An installed module is listed whatever this says. |
+| Editions | `Editions__c` | text (40) | The stored edition values that offer the module, separated by semicolons: `Nonprofit` for a nonprofit module, `Standard;Nonprofit` for one both editions offer. An installed module is listed whatever this says. |
 | Package Folder | `Package_Folder__c` | text (40) | The module's folder under `packages/`, whose README is its "What this module does" link. |
 | Install Version Id | `Install_Version_Id__c` | text (18) | The published package version Id (`04t`) Salesforce's installer opens, or empty until the module is first published. |
 | Sort Order | `Sort_Order__c` | number | The order modules are listed in, lowest first, after Core. |
@@ -7738,6 +7743,16 @@ the rows they own; Read Only read. Job Skill (controlled by its job): Admin, Coo
 Staff create, edit and delete; Read Only read. Removing a skill from a person or a job deletes
 the row, so those rows carry delete where a Job, Shift or Sign-up does not.
 
+**View All and Modify All, and why (2026-10-28 security review, V-L1).** Each grant is stated in
+its object's description too. Volunteer Hours: Admin and Coordinator, to approve and correct
+anyone's entry (R-VG7). Skill and Volunteer Skill (sharing Read): Admin and Coordinator, to
+correct and delete a row someone else added; Read Write sharing is not used instead, because
+deleting another person's row still needs Modify All, and on Volunteer Skill it would let every
+staff member edit every row. Volunteer Requirement (sharing Private): Admin and Coordinator, the
+only sets with any access, who track onboarding for every volunteer (R-VQ4). Volunteer Letter
+Template (sharing Read): Admin only, to edit or retire a template another admin or the install
+created; the Coordinator reads them.
+
 **Health Check.** `VolunteersHealthCheckExtension`, registered in
 `HealthCheckExtensions.EXTENSION_CLASSES` (ADR-0057), adds five findings to Core's one report,
 read in system mode (`VolunteerHealthCheckSelector`, which refuses a user who may not manage
@@ -9114,6 +9129,8 @@ mirrors the primary member).
 | v0.11 | 2026-10-28 | Security review fixes (Core, owner-approved 2026-10-28). No object or field added. BarnCRM Read Only loses Read and Create on `Merge_Settlement_Ready__e`; its subscriber settles only the records the event's publisher (`CreatedById`) may edit. `ErrorLogEventHandler` sets `Error_Log__c.User__c` from the event's `CreatedById`, not the payload's `User_Id__c`. |
 | v0.8 | 2026-10-28 | Integrations page shows no install links (owner decision). The Install URL field removed from `Integration_App__mdt` (Section 13) and from its shipped records; nothing else read it. The Module Manager's install links are unchanged. |
 | v0.8 | 2026-10-28 | Import templates (plan D-136). No object or field added. R-IT5: Core ships `organization_list` and `couples_and_households`; the shipped `generic_contact_list` is labelled "People and Organizations List" for new materializations only; a people or gift template can be copied under a new name with key `copy_` and a random number. |
+| v0.8 | 2026-10-29 | Organization record type removed (RT5, ADR-0141, D-134). No object or field added. The packaged `Account.Organization` record type and its compact layout are deleted. `Is_Organization__c` also counts an account of the master record type (no developer name) as an organization when the setting is `Master`. R-O5: a stored record type that is no longer a candidate is replaced by the detected one on each install, upgrade or source deploy, so the formula and `AccountKinds` agree. R-O4: `Master` is offered and saved only when the org has no candidate, and a stored `Master` is stale once it has one. |
+| v0.11 | 2026-10-29 | Edition stored values (ADR-0143, `0143-edition-internal-values.md`). No object or field added. `BarnCRM_Settings__c.Suite__c` stores `Standard` and `Nonprofit` instead of `Community` and `Impact`, and `BarnCRM_Module__mdt.Editions__c` names the same values. Core's post-install steps rewrite an old stored value once. |
 
 ---
 ## 32. Entity ownership by package

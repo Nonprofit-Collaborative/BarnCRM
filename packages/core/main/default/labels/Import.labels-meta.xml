@@ -190,7 +190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import run log: user lacks the organization record type; {0} is its label</shortDescription>
-        <value>No organization was matched or created, because you cannot use the {0} record type, which BarnCRM Settings uses for organizations (Record type for organizations, on General). Ask your Salesforce administrator to give you that record type, or choose another one in that setting, then load the file again.</value>
+        <value>No new organization was created, because you cannot use the {0} record type, which BarnCRM Settings uses for organizations (Record type for organizations, on General). Rows that needed one were rejected. Ask your Salesforce administrator to give you that record type, or choose another one in that setting, then load the file again.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogPersonRecordTypeMissing</fullName>
@@ -1303,6 +1303,14 @@
         <protected>false</protected>
         <shortDescription>Import error: a new organization has no name</shortDescription>
         <value>This row's organization was not found by its ID and has no name, so it cannot be created. Add the name, or an ID your org already has.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorOrganizationRecordTypeUnavailable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: user lacks the record type a new organization gets; {0} label</shortDescription>
+        <value>This row's organization is not in Salesforce yet, and you cannot use the {0} record type that new organizations get (Record type for organizations, BarnCRM Settings). Get that record type from your Salesforce administrator, or have another one chosen, then load the row again.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorMatchFieldNotAllowed</fullName>

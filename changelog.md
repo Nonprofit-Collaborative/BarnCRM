@@ -6,6 +6,29 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-10-29
 
+### Landing batch 13 (branch `landing/batch-13`)
+
+Merges #712, #713, #715, #716, #717, #718 and #720 (#719 held for the owner). Conflicts: `CorePostInstall.cls` header and `scheduleTabAccessCheck` comment (hourly kept, `renameStoredEdition` added) and two canonical-model version rows (both kept).
+
+- #712 (RT5, D-134): packaged `Account.Organization` record type and `Organization_Compact` removed from Core and the three role sets; `Is_Organization__c` counts a master-record-type account when the setting is No record type (`Master`); No record type offered and saved only where the org has no Account record type candidate; install and upgrade replace a stale stored value (R-O4, R-O5); a user who cannot use the organization record type is told (Import row reject, sample data refusal, Health Check warning; no dynamic grant); tests use a record type their user can use on any org shape. Existing orgs: destructive deploy of RecordType `Account.Organization` and CompactLayout `Account.Organization_Compact`, then set the setting.
+- #713 (D-146): Tab Access Check runs hourly (cron `0 0 * * * ?`); `TabAccessScheduler.start` moves a job still on the nightly cron to hourly (abort and schedule again under the same name); `ScheduledJobSelector.cronExpressionByName` added.
+- #715: `scripts/org/create-scratch-org.sh` treats an already-held permission set as success and adds `--resume` (finish the steps on an existing org).
+- #716 (D-145, ADR-0143, amends ADR-0122): edition stored values `Standard` and `Nonprofit` (`Suite__c`, `BarnCRM_Module__mdt.Editions__c`), constants `SUITE_STANDARD` and `SUITE_NONPROFIT`; `CorePostInstall.renameStoredEdition` rewrites `Community` and `Impact` once (bookkeeping, no Recent Changes row); `SUITE_BY_OLD_VALUE` still reads old values; Recent Changes maps old codes. ADR-NEXT numbered 0143 at landing.
+- #717 (Giving security G-L1 to G-L3): `AcknowledgmentLetterMerge.escape` writes formula-leading values as text; the merge CSV links `InternalUsers` first, `AllUsers` only when refused (ADR-0034); `StewardshipStartController.startPlan` refuses a donor the user cannot see.
+- #718 (Volunteers V-L1): object descriptions and the canonical model state why Volunteers Admin and Coordinator hold View All and Modify All on Skill, Volunteer Skill, Volunteer Requirement and Volunteer Letter Template; grants unchanged.
+- #720 (Rollups R-H1, R-I1, R-I2): new `RollupDefinitionGuard` from `RollupDefinitionTrigger` (any change but `Last_Calculated__c` needs Manage BarnCRM Settings; allowed target objects, editable target field, readable read fields; only `RollupWriter.insertDefinitions` trusted); describe-built queries without `escapeSingleQuotes`; `Recalculate_Rollups_Template` fault path; inner async jobs declare sharing and `check-apex-access-modes.py` checks async jobs in every package.
+- Landing fixes: "hourly" in two leftover comments (`HealthCheckFixesTest`, `deploy-packages.sh`); guide "Applies to" lines.
+- BMemory plan: D-145 cites ADR-0143 (e2df9be); D-146 hourly Tab Access Check and D-147 no paid mentions added (e2df9be); D-134 RT5 note (de07db3); 11.2 item 33 resolved (60c86fd); v0.11 row security status (898f195). `docs/product-plan.md` refreshed from 898f195.
+
+### Orgs and docs
+
+- #711: Standard Edition and Nonprofit Edition rename finished in text people read (ADR-0059, 0062, 0063, 0080 wording, naming notes on ADR-0046 and 0072, D-81 in `memory.md`, five plan lines). Website pages already used the new names.
+- #714: removed the "no paid tier" lines from README and overview (owner rule D-147). Website (local commits f69b496, af7d9fe, not deployed): paid-tier, paid-help, sponsorship and Sustaining Partners mentions removed; Partners page reworded.
+- `barn-personaccount` deleted (owner approved; it duplicated `oi-test`'s Person Accounts shape) to free a scratch slot. `barn-platform` created and finished (Platform-only shape, Developer Edition, Platform license user, all 19 Core permission sets assignable, sample data 200/440/25, Tab Access Check scheduled; expires 2026-11-28).
+- For RT5 testing: `barn-sales` gives the Organization record type to the System Administrator and Standard User profiles (default) and stores Record type for organizations = Organization; `oi-test` gives it to System Administrator (not default).
+- `oi-test`: Giving_Admin assigned to the admin user. T-SET-20 six Setup paths verified (all pass). S5 Giving "Open the app" link verified (`/lightning/app/<06m DurableId>`, lands in Fundraising) once the user has Giving access.
+- `mwdbdevsb`: check-only of `main` df174bff (Core and Rollups, 0AfWF00000H6tfx0AB) failed at compile only on the pending Tab Access Check job; nothing changed. Then released (owner approved): Tab Access Check aborted, check-only 0AfWF00000H7EAv0AN Succeeded (3,968 components, 2,551/2,551 tests), quick deploy 0AfWF00000H7MgL0AV; 39 destructive members (4 settings fields, 35 Core labels); Rollups tabs restored in the BarnCRM admin apps; `CorePostInstall.runAsSourceDeploy()` and the Rollups post-install run; Tab Access Check rescheduled.
+
 ### barn-npc release and test fixes
 
 - Fix #708: `ImportRowProcessorTest` bulk bound and `ImportFirstNameMatchTest` one-row chunks stub the Nonprofit Cloud native household guard (`HouseholdSelector.accountsWithNativeDependentsOverride`). On `barn-npc` the test user cannot read `PartyRelationshipGroup`, so the guard ran 2 queries per chunk (validation 0Afhk000001zwUjCAI failed 2 of 3,626). Tests only; product unchanged. Incremental gate `barn-sales` 210/210.

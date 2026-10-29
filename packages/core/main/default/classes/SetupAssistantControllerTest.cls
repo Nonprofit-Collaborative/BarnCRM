@@ -191,7 +191,7 @@ private class SetupAssistantControllerTest {
             Test.startTest();
             SetupAssistantService.ensureStarted();
             SettingsService.saveValues(
-                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_IMPACT }
+                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_NONPROFIT }
             );
             SetupAssistantController.SetupState state = SetupAssistantController.getState();
             Test.stopTest();
@@ -201,7 +201,7 @@ private class SetupAssistantControllerTest {
                 'Saving the edition is what finishes step one'
             );
             Assert.areEqual(
-                ModuleDetectionService.SUITE_IMPACT,
+                ModuleDetectionService.SUITE_NONPROFIT,
                 state.suite.currentSuite,
                 'The page is told what was saved'
             );
@@ -239,11 +239,11 @@ private class SetupAssistantControllerTest {
 
             Assert.isNull(onAFreshOrg, 'A fresh org is left to choose for itself');
             Assert.areEqual(
-                ModuleDetectionService.SUITE_IMPACT,
+                ModuleDetectionService.SUITE_NONPROFIT,
                 withGiving,
                 'Giving here suggests it'
             );
-            Assert.areEqual(ModuleDetectionService.SUITE_IMPACT, withNpsp, 'So does NPSP');
+            Assert.areEqual(ModuleDetectionService.SUITE_NONPROFIT, withNpsp, 'So does NPSP');
         }
     }
 
@@ -707,20 +707,20 @@ private class SetupAssistantControllerTest {
     static void changesTheEditionFromTheConsoleAndAuditsIt() {
         System.runAs(TestUsers.admin()) {
             SettingsService.saveValues(
-                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_IMPACT }
+                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_NONPROFIT }
             );
 
             Test.startTest();
             SetupAssistantController.EditionModel before = SetupAssistantController.getEdition();
             SetupAssistantController.EditionModel after = SetupAssistantController.changeEdition(
-                ModuleDetectionService.SUITE_COMMUNITY
+                ModuleDetectionService.SUITE_STANDARD
             );
             Test.stopTest();
 
-            Assert.areEqual(ModuleDetectionService.SUITE_IMPACT, before.currentSuite, 'Read');
+            Assert.areEqual(ModuleDetectionService.SUITE_NONPROFIT, before.currentSuite, 'Read');
             Assert.isTrue(before.canEdit, 'The admin may change it');
             Assert.areEqual(
-                ModuleDetectionService.SUITE_COMMUNITY,
+                ModuleDetectionService.SUITE_STANDARD,
                 after.currentSuite,
                 'The console is told what was saved'
             );
@@ -729,7 +729,7 @@ private class SetupAssistantControllerTest {
                 if (
                     change.Setting_Name__c != null &&
                     change.Setting_Name__c.endsWithIgnoreCase('Suite__c') &&
-                    change.New_Value__c == ModuleDetectionService.SUITE_COMMUNITY
+                    change.New_Value__c == ModuleDetectionService.SUITE_STANDARD
                 ) {
                     audited = true;
                 }
@@ -751,14 +751,14 @@ private class SetupAssistantControllerTest {
 
             Test.startTest();
             try {
-                SetupAssistantController.changeEdition('Standard');
+                SetupAssistantController.changeEdition('Premium');
             } catch (AuraHandledException e) {
                 unknownMessage = e.getMessage();
             }
             System.runAs(david) {
                 davidMayEdit = SetupAssistantController.getEdition().canEdit;
                 try {
-                    SetupAssistantController.changeEdition(ModuleDetectionService.SUITE_IMPACT);
+                    SetupAssistantController.changeEdition(ModuleDetectionService.SUITE_NONPROFIT);
                 } catch (AuraHandledException e) {
                     davidMessage = e.getMessage();
                 }

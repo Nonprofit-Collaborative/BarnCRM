@@ -569,22 +569,26 @@ public with sharing class RollupDlrsImport {
         if (target == null) {
             throw refusal(Label.Core_Rollups_ErrorTargetNotWritable);
         }
-        // Every name comes from describe, never from the request; escaped regardless.
+        // Every name comes from describe (the entity, its name field and the target attribute),
+        // never from the request, and every value is a bind, so there is nothing to escape.
         String nameField = nameFieldOf(fields);
-        String query = String.escapeSingleQuotes(
+        String query =
             'SELECT Id' +
-                (nameField == null ? '' : ', ' + nameField) +
-                ' FROM ' +
-                String.valueOf(targetType)
-        );
+            (nameField == null ? '' : ', ' + nameField) +
+            ' FROM ' +
+            String.valueOf(targetType);
         String recent = fields.containsKey('lastmodifieddate')
             ? ' ORDER BY LastModifiedDate DESC'
             : '';
         List<SObject> records = new List<SObject>();
         if (target.getDescribe().isFilterable()) {
-            String filled = String.escapeSingleQuotes(
-                query + ' WHERE ' + String.valueOf(target) + ' != null' + recent + ' LIMIT :size'
-            );
+            String filled =
+                query +
+                ' WHERE ' +
+                String.valueOf(target) +
+                ' != null' +
+                recent +
+                ' LIMIT :size';
             records.addAll(
                 Database.queryWithBinds(
                     filled,
@@ -594,9 +598,7 @@ public with sharing class RollupDlrsImport {
             );
         }
         if (records.size() < SAMPLE_SIZE) {
-            String others = String.escapeSingleQuotes(
-                query + ' WHERE Id NOT IN :seen' + recent + ' LIMIT :remaining'
-            );
+            String others = query + ' WHERE Id NOT IN :seen' + recent + ' LIMIT :remaining';
             records.addAll(
                 Database.queryWithBinds(
                     others,

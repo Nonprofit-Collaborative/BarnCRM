@@ -188,7 +188,7 @@ Steps:
    **Access**, find each user in **Find a person**, choose the role, and select **Give Access**.
    Add the Giving set under the extra permissions on the same page. The Volunteers and Rollup
    Builder sets are not listed there: they follow the role, given automatically when the role
-   is given on this page (and by the nightly access check). See
+   is given on this page (and by the hourly access check). See
    [Access](../admin-guide/access.md).
 
    Or assign the permission sets from the CLI. This assigns the sets directly rather than the

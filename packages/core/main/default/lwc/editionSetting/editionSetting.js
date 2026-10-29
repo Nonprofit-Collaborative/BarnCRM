@@ -17,8 +17,8 @@ import CONFIRM_BUTTON from '@salesforce/label/c.Core_Edition_ConfirmButton';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_Edition_CancelButton';
 import SAVED from '@salesforce/label/c.Core_Edition_Saved';
 
-const STANDARD = 'Community';
-const NONPROFIT = 'Impact';
+const STANDARD = 'Standard';
+const NONPROFIT = 'Nonprofit';
 
 /**
  * The console's Edition row (ADR-0124): the edition chosen once in the Setup Assistant, shown

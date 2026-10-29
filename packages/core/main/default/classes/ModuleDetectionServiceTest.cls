@@ -14,7 +14,7 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
-            chooseSuite(ModuleDetectionService.SUITE_IMPACT);
+            chooseSuite(ModuleDetectionService.SUITE_NONPROFIT);
 
             Test.startTest();
             List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
@@ -134,7 +134,7 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = false;
-            chooseSuite(ModuleDetectionService.SUITE_IMPACT);
+            chooseSuite(ModuleDetectionService.SUITE_NONPROFIT);
 
             Test.startTest();
             List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
@@ -152,11 +152,11 @@ private class ModuleDetectionServiceTest {
     }
 
     @IsTest
-    static void keepsTheCommunitySuiteToTheModulesThatFitEveryOrg() {
+    static void keepsTheStandardEditionToTheModulesThatFitEveryOrg() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = false;
-            chooseSuite(ModuleDetectionService.SUITE_COMMUNITY);
+            chooseSuite(ModuleDetectionService.SUITE_STANDARD);
 
             Test.startTest();
             List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
@@ -164,7 +164,7 @@ private class ModuleDetectionServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                ModuleDetectionService.SUITE_COMMUNITY,
+                ModuleDetectionService.SUITE_STANDARD,
                 chosen,
                 'The saved choice is read'
             );
@@ -181,7 +181,7 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
-            chooseSuite(ModuleDetectionService.SUITE_COMMUNITY);
+            chooseSuite(ModuleDetectionService.SUITE_STANDARD);
 
             Test.startTest();
             List<String> names = new List<String>();
@@ -201,11 +201,15 @@ private class ModuleDetectionServiceTest {
     @IsTest
     static void aValueTypedInSetupCountsOnlyWhenItIsAnEdition() {
         System.runAs(TestUsers.admin()) {
-            chooseSuite('impact');
+            chooseSuite('nonprofit');
             String lowerCase = ModuleDetectionService.chosenSuite();
             Boolean nonprofit = ModuleDetectionService.isNonprofitEdition();
             BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-            settings.Suite__c = 'Standard';
+            settings.Suite__c = ' Community ';
+            update settings;
+            SettingsService.clearCaches();
+            String oldValue = ModuleDetectionService.chosenSuite();
+            settings.Suite__c = 'Premium';
             update settings;
             SettingsService.clearCaches();
 
@@ -214,12 +218,17 @@ private class ModuleDetectionServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                ModuleDetectionService.SUITE_IMPACT,
+                ModuleDetectionService.SUITE_NONPROFIT,
                 lowerCase,
                 'Lower case is forgiven'
             );
             Assert.isTrue(nonprofit, 'And it is the Nonprofit Edition');
-            Assert.isNull(unknown, 'Anything but Community or Impact is no edition');
+            Assert.areEqual(
+                ModuleDetectionService.SUITE_STANDARD,
+                oldValue,
+                'A value stored before the rename reads as the edition that replaced it'
+            );
+            Assert.isNull(unknown, 'Anything but Standard or Nonprofit is no edition');
         }
     }
 
@@ -229,11 +238,11 @@ private class ModuleDetectionServiceTest {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = false;
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
-                catalogRow('Giving', 'Impact', FakeIds.ofPrefix('04t', 1), 10),
-                catalogRow('Volunteers', 'Impact', 'not a version id', 20),
-                catalogRow('Programs', 'Impact', null, 30)
+                catalogRow('Giving', 'Nonprofit', FakeIds.ofPrefix('04t', 1), 10),
+                catalogRow('Volunteers', 'Nonprofit', 'not a version id', 20),
+                catalogRow('Programs', 'Nonprofit', null, 30)
             };
-            chooseSuite(ModuleDetectionService.SUITE_IMPACT);
+            chooseSuite(ModuleDetectionService.SUITE_NONPROFIT);
 
             Test.startTest();
             Map<String, ModuleDetectionService.ModuleInfo> byName = new Map<String, ModuleDetectionService.ModuleInfo>();
@@ -272,7 +281,7 @@ private class ModuleDetectionServiceTest {
             ModuleDetectionService.givingPresentOverride = true;
             BarnCRM_Module__mdt row = catalogRow(
                 'Giving',
-                'Impact',
+                'Nonprofit',
                 FakeIds.ofPrefix('04t', 1),
                 10
             );
@@ -306,7 +315,7 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
-            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Nonprofit', null, 10);
             row.App_Name__c = 'Fundraising';
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
             ModuleDetectionService.appIdsOverride = new Map<String, String>();
@@ -329,7 +338,7 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
-            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Nonprofit', null, 10);
             row.App_Name__c = 'Fundraising';
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
             ModuleDetectionService.appIdsOverride = new Map<String, String>();
@@ -352,7 +361,7 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
-            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Nonprofit', null, 10);
             row.App_Name__c = 'NoSuchBarnCrmApp';
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
             NamespaceUtil.cachedPrefix = '';
@@ -374,10 +383,10 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
-            BarnCRM_Module__mdt here = catalogRow('Giving', 'Impact', null, 10);
+            BarnCRM_Module__mdt here = catalogRow('Giving', 'Nonprofit', null, 10);
             here.Staff_Tabs__c = 'Gift__c; Commitment__c';
             here.Admin_Tabs__c = 'Giving_Nightly_Jobs;Donor_Levels:Donor Level Ladder';
-            BarnCRM_Module__mdt notHere = catalogRow('Events', 'Community;Impact', null, 5);
+            BarnCRM_Module__mdt notHere = catalogRow('Events', 'Standard;Nonprofit', null, 5);
             notHere.Staff_Tabs__c = 'Event__c';
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ here, notHere };
             ModuleDetectionService.tabLabelsOverride = new Map<String, String>{
@@ -405,7 +414,7 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
-            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Nonprofit', null, 10);
             row.Admin_Tabs__c = 'No_Such_BarnCRM_Tab';
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
 
@@ -426,7 +435,7 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
-            BarnCRM_Module__mdt row = catalogRow('Giving', 'Impact', null, 10);
+            BarnCRM_Module__mdt row = catalogRow('Giving', 'Nonprofit', null, 10);
             row.App_Name__c = 'BarnCRM_Volunteers';
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
             NamespaceUtil.cachedPrefix = '';
@@ -447,19 +456,19 @@ private class ModuleDetectionServiceTest {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = false;
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
-                catalogRow('Giving', 'Impact', null, 10),
-                catalogRow('Events', 'Community; Impact', null, 5),
-                catalogRow('Mailings', 'impact', null, 6),
-                catalogRow('Everywhere', 'Community', null, 7)
+                catalogRow('Giving', 'Nonprofit', null, 10),
+                catalogRow('Events', 'Standard; Nonprofit', null, 5),
+                catalogRow('Mailings', 'nonprofit', null, 6),
+                catalogRow('Everywhere', 'Standard', null, 7)
             };
-            chooseSuite(ModuleDetectionService.SUITE_IMPACT);
+            chooseSuite(ModuleDetectionService.SUITE_NONPROFIT);
 
             Test.startTest();
             Map<String, ModuleDetectionService.ModuleInfo> modules = byName();
             // A Standard-only module is not listed while the Nonprofit Edition is chosen, so it is
             // checked on its row.
             Boolean standardOnly = ModuleDetectionService.isNonprofitOnly(
-                catalogRow('Everywhere', 'Community', null, 7)
+                catalogRow('Everywhere', 'Standard', null, 7)
             );
             Boolean blank = ModuleDetectionService.isNonprofitOnly(catalogRow('X', null, null, 1));
             Boolean missing = ModuleDetectionService.isNonprofitOnly(null);
@@ -488,10 +497,10 @@ private class ModuleDetectionServiceTest {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = false;
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
-                catalogRow('Giving', 'Impact', null, 10),
-                catalogRow('Events', 'Community; Impact', null, 5)
+                catalogRow('Giving', 'Nonprofit', null, 10),
+                catalogRow('Events', 'Standard; Nonprofit', null, 5)
             };
-            chooseSuite(ModuleDetectionService.SUITE_COMMUNITY);
+            chooseSuite(ModuleDetectionService.SUITE_STANDARD);
 
             Test.startTest();
             List<String> names = new List<String>();
@@ -529,7 +538,7 @@ private class ModuleDetectionServiceTest {
             for (String name : modules) {
                 Assert.isTrue(shipped.containsKey(name), name + ' has a catalog row');
                 Assert.areEqual(
-                    'Impact',
+                    'Nonprofit',
                     shipped.get(name).Editions__c,
                     name + ' is nonprofit only'
                 );
@@ -537,11 +546,11 @@ private class ModuleDetectionServiceTest {
             Assert.isTrue(
                 ModuleDetectionService.offeredIn(
                     shipped.get('Rollups'),
-                    ModuleDetectionService.SUITE_COMMUNITY
+                    ModuleDetectionService.SUITE_STANDARD
                 ) &&
                 ModuleDetectionService.offeredIn(
                     shipped.get('Rollups'),
-                    ModuleDetectionService.SUITE_IMPACT
+                    ModuleDetectionService.SUITE_NONPROFIT
                 ),
                 'BarnCRM Rollup Builder is offered to both editions'
             );
@@ -568,22 +577,22 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = false;
-            BarnCRM_Module__mdt rollups = catalogRow('Rollups', 'Community;Impact', null, 5);
+            BarnCRM_Module__mdt rollups = catalogRow('Rollups', 'Standard;Nonprofit', null, 5);
             rollups.MasterLabel = 'BarnCRM Rollup Builder';
             rollups.Probe_Object__c = 'No_Such_Object__c';
-            BarnCRM_Module__mdt giving = catalogRow('Giving', 'Impact', null, 10);
+            BarnCRM_Module__mdt giving = catalogRow('Giving', 'Nonprofit', null, 10);
             giving.MasterLabel = 'BarnCRM Giving';
             giving.Requires__c = 'Rollups';
-            BarnCRM_Module__mdt funders = catalogRow('Funders', 'Impact', null, 40);
+            BarnCRM_Module__mdt funders = catalogRow('Funders', 'Nonprofit', null, 40);
             funders.Requires__c = 'Rollups; Giving;Elsewhere';
-            BarnCRM_Module__mdt programs = catalogRow('Programs', 'Impact', null, 30);
+            BarnCRM_Module__mdt programs = catalogRow('Programs', 'Nonprofit', null, 30);
             ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
                 rollups,
                 giving,
                 funders,
                 programs
             };
-            chooseSuite(ModuleDetectionService.SUITE_IMPACT);
+            chooseSuite(ModuleDetectionService.SUITE_NONPROFIT);
 
             Test.startTest();
             Map<String, ModuleDetectionService.ModuleInfo> before = byName();

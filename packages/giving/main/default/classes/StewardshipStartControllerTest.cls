@@ -76,6 +76,37 @@ private class StewardshipStartControllerTest {
         }
     }
 
+    /** The start runs in system mode, so a donor the person cannot see is refused first (G-L3). */
+    @IsTest
+    static void aDonorThePersonCannotSeeStartsNothing() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Stewardship_Plan_Template__c major = planWithOneStep('Major gift thanks', true);
+            Contact gone = new Contact(FirstName = 'Ana', LastName = 'Ramirez');
+            insert gone;
+            delete gone;
+            String refusal;
+
+            Test.startTest();
+            try {
+                StewardshipStartController.startPlan(major.Id, gone.Id);
+            } catch (AuraHandledException refused) {
+                refusal = refused.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                Label.Giving_Stewardship_ErrorDonorNotVisible,
+                refusal,
+                'Says the donor cannot be seen.'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Stewardship_Plan__c WHERE Contact__c = :gone.Id],
+                'No plan was started.'
+            );
+        }
+    }
+
     @IsTest
     static void aSecondStartOnTheSameDonorSaysWhy() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

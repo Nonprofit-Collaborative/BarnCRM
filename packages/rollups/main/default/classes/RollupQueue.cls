@@ -379,8 +379,8 @@ public without sharing class RollupQueue implements Queueable {
     }
 
     /**
-     * A partial save (allOrNone false, as the Bulk API, Data Loader and `Database.delete(records,
-     * false)` save) whose records partly fail is rolled back and its triggers run again for the
+     * A partial save (allOrNone false, as the Bulk API, Data Loader and a partial Database
+     * delete save) whose records partly fail is rolled back and its triggers run again for the
      * records that passed. The rollback takes this transaction's entries and the processor or
      * Ready event it asked for, but static variables are kept: the retry would believe its
      * processor already queued and leave its entries Pending with nothing coming for them.
@@ -943,8 +943,10 @@ public without sharing class RollupQueue implements Queueable {
      * finalizer queues: the platform stops re-queuing from finalizers after five failed jobs in a
      * row and refuses a link past the chain depth limit, and on the tier 1 scale test that left
      * 826 entries Pending with nothing to process them.
+     *
+     * Without sharing, as the queue itself: it charges entries another user's save queued.
      */
-    public class Drain implements System.Finalizer {
+    public without sharing class Drain implements System.Finalizer {
         public List<Rollup_Queue__c> held = new List<Rollup_Queue__c>();
         /** The records the run was recalculating when it stopped. */
         public Set<Id> takenIds = new Set<Id>();

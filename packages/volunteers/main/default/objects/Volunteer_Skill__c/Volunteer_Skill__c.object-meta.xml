@@ -4,6 +4,9 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     That a person has a skill or is interested in one. Used to find volunteers for a shift.
+    Sharing is Read: Volunteers Staff edit and delete only the rows they added, and Volunteers
+    Admin and Volunteers Coordinator hold View All and Modify All to correct or remove anyone's
+    row. Read Write sharing would instead let every staff member edit every row.
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

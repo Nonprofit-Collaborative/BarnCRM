@@ -14,7 +14,7 @@
  * mode: it is the package keeping its own permission sets in step with a feature an
  * administrator turned on, not a person assigning access, and it never touches a set outside
  * `AUDIENCE`'s keys. A large org is done a slice at a time, the job queuing itself again until
- * nothing is left, and a nightly run (`TabAccessScheduler`) catches people given a role outside
+ * nothing is left, and an hourly run (`TabAccessScheduler`) catches people given a role outside
  * BarnCRM's Access page.
  *
  * A module that keeps its own permission sets with BarnCRM's roles uses the same audience

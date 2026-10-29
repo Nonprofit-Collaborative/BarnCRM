@@ -126,6 +126,16 @@ public with sharing class SampleDataLoader {
         ) {
             throw new SampleDataException(Label.Core_SampleData_AlreadyLoaded);
         }
+        // Checked here for the same reason: the platform would refuse the batch's organization
+        // insert with a record type error the card cannot explain.
+        if (!AccountKinds.organizationRecordTypeUsable()) {
+            throw new SampleDataException(
+                String.format(
+                    Label.Core_SampleData_OrganizationRecordTypeUnavailable,
+                    new List<String>{ AccountKinds.organizationRecordTypeLabel() }
+                )
+            );
+        }
         // Parsed here so a malformed payload fails in front of the admin, with a readable
         // message, instead of inside a batch the card can only report as "not loaded".
         SampleDataSet.parse(getSampleDataJson());

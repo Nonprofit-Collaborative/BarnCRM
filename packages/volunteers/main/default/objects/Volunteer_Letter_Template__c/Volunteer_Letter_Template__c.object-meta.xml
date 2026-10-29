@@ -3,6 +3,8 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     The wording of a volunteer hours letter or certificate: HTML with merge tokens, one active per type (ADR-0129, R-VL1).
+    Sharing is Read so Volunteers Coordinator can use every template; Volunteers Admin holds View
+    All and Modify All to edit or retire a template another admin or the install created.
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

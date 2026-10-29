@@ -7,7 +7,7 @@
  *
  * It only gives, never takes away: a set may also be given by hand. It runs at install
  * (`VolunteersPostInstall`), and Core asks it when a role is given on the Access page, at each
- * Turn on and with the nightly access check, which also catches roles given in Setup. Core finds
+ * Turn on and with the hourly access check, which also catches roles given in Setup. Core finds
  * it by its name, the module key followed by `AccessSync` (`ModuleAccessSyncs`), so the class
  * keeps this name. It does nothing while the module is turned off.
  */
@@ -88,7 +88,7 @@ public with sharing class VolunteersAccessSync implements ModuleAccessSync {
      * a transaction with the install's or Turn on's record writes (mixed DML). It queues itself
      * again while more is left.
      */
-    public class Job implements Queueable {
+    public with sharing class Job implements Queueable {
         public void execute(QueueableContext jobContext) {
             try {
                 // A test cannot chain one queued job from another.

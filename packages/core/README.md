@@ -6,7 +6,8 @@ object references: those live only in the Mirror module, behind dynamic Apex.
 
 ## What Core contains
 
-- **Constituent model**: Contacts, Accounts (Household and Organization record types),
+- **Constituent model**: Contacts, Accounts (the Household record type; organizations on the
+  record type the org chooses, read through `AccountKinds`),
   Household membership (contact mode and junction mode via `HouseholdService`),
   Relationships, Affiliations, and Addresses (`Address__c`).
 - **BarnCRM app**: the Lightning app and its tabs (Home, Households, Contacts,

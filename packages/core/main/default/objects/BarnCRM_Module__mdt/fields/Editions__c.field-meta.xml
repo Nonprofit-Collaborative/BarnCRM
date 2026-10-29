@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Editions__c</fullName>
-  <description>The stored edition values that offer this module, separated by semicolons: Impact for the Nonprofit Edition, Community;Impact for both. An installed module is listed whatever this says.</description>
+  <description>The stored edition values that offer this module, separated by semicolons: Nonprofit for the Nonprofit Edition, Standard;Nonprofit for both. An installed module is listed whatever this says.</description>
   <externalId>false</externalId>
   <fieldManageability>DeveloperControlled</fieldManageability>
   <label>Editions</label>
