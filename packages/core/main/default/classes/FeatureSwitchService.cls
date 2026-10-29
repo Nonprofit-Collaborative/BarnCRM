@@ -14,8 +14,6 @@
  *   once it is on;
  * - a Core feature group, whose Automation Registry switches are turned on with it and whose
  *   automations do not run while it is off (`automationsOff`, read by `AutomationControl`).
- *   A group can also carry an access set: Household Upkeep carries `BarnCRM_Households`, which
- *   shows the Households tab (ADR-0141).
  *   Validations that enforce a rule belong to no group; the rollup automations belong to the
  *   BarnCRM Rollup Builder module.
  *
@@ -55,10 +53,7 @@ public with sharing class FeatureSwitchService {
     public class Item {
         public String key;
         public String kind;
-        /**
-         * The access sets a feature carries (ADR-0124 amended): the BarnCRM Tab sets of a tool,
-         * or the Households set of Household Upkeep. Given while the feature is on.
-         */
+        /** The BarnCRM Tab permission sets of a tool. */
         public List<String> tabSets = new List<String>();
         /** The Automation Registry names a feature group runs. */
         public List<String> automations = new List<String>();
@@ -131,7 +126,6 @@ public with sharing class FeatureSwitchService {
     public static List<Item> featureGroups() {
         return new List<Item>{
             new Item(HOUSEHOLD_UPKEEP, KIND_FEATURE)
-                .tabs(new List<String>{ TabAccessService.HOUSEHOLDS_SET })
                 .runs(
                     new List<String>{
                         'AccountTriggerHandler',
@@ -316,13 +310,13 @@ public with sharing class FeatureSwitchService {
         }
     }
 
-    /** The access sets (tab sets and the Households set) whose feature is on. */
+    /** The BarnCRM Tab permission sets whose tool is on. */
     public static Set<String> tabSetsOn() {
         Set<String> names = new Set<String>();
         Set<String> turnedOn = featuresOn();
-        for (Item feature : all()) {
-            if (turnedOn.contains(feature.key.toLowerCase())) {
-                names.addAll(feature.tabSets);
+        for (Item tool : tools()) {
+            if (turnedOn.contains(tool.key.toLowerCase())) {
+                names.addAll(tool.tabSets);
             }
         }
         return names;

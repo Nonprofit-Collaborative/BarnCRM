@@ -265,13 +265,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | As the staff user, open the **BarnCRM** app. | No **Households** tab. |
 | 2 | As the staff user, open Accounts and click **New**. | No record type choice; the new account form opens straight away. |
 | 3 | As admin, in Setup, open Object Manager, Account, Record Types. | **Household** is listed and active. No **Organization** record type. |
-| 4 | As admin, finish first-run setup with **Household Upkeep** ticked (or choose **Turn On** in its row on **General**). | The confirmation says Household Upkeep adds the Households tab and that households are created with **New household** on BarnCRM Home, not the standard **New** button. |
+| 4 | As admin, finish first-run setup with **Household Upkeep** ticked (or choose **Turn On** in its row on **General**). | The confirmation says the Households tab is shown to BarnCRM users and that organizations keep using **No record type**. |
 | 5 | Wait a few minutes. As the staff user, reload the **BarnCRM** app. | The **Households** tab is there. |
 | 6 | As the staff user, open Accounts and click **New**. | Still no record type choice and no **Household**; the account saves with no record type and appears on **Organizations**, not **Households**. |
 | 7 | As the staff user, click **New household** on BarnCRM Home, save, then edit the household's phone and save. | The household is created and appears on the **Households** tab; the edit saves. |
 | 8 | As the staff user, edit the account from step 6 and try to change its record type. | **Household** is not offered (Change Record Type shows no choice, or is not offered). |
 | 9 | As admin, in Setup, open the staff user's permission set assignments, then the **BarnCRM Households** permission set's record type settings. | **BarnCRM Households** is assigned; it grants no record type. |
-| 10 | In an org that already ran BarnCRM before this change, deploy it, then as admin open **BarnCRM Staff** and its record type settings. | **Household** is no longer listed; staff can still open and edit existing households. |
 
 **Cleanup:** none (Household Upkeep cannot be turned off).
 

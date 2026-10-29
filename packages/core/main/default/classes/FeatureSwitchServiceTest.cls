@@ -18,11 +18,7 @@ private class FeatureSwitchServiceTest {
             Set<String> stopped = FeatureSwitchService.automationsOff();
             Test.stopTest();
 
-            Assert.areEqual(7, tabSets.size(), 'Every feature tab and the Households tab are on');
-            Assert.isTrue(
-                tabSets.contains(TabAccessService.HOUSEHOLDS_SET),
-                'Household Upkeep carries the Households set'
-            );
+            Assert.areEqual(6, tabSets.size(), 'Every feature tab is on');
             Assert.isTrue(
                 tabSets.contains(TabAccessService.DUPLICATE_MATCHING_TAB),
                 'Duplicate Matching is among them'

@@ -71,9 +71,7 @@ export default class FeatureSettings extends LightningElement {
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: format(CONFIRM_TITLE, feature.name),
-      message: [format(CONFIRM_MESSAGE, feature.name), feature.confirmNote]
-        .filter(Boolean)
-        .join(' '),
+      message: format(CONFIRM_MESSAGE, feature.name),
       confirmLabel: TURN_ON,
       cancelLabel: CANCEL
     });

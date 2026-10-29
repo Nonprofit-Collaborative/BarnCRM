@@ -47,50 +47,6 @@ private class TabAccessServiceTest {
     }
 
     @IsTest
-    static void givesTheHouseholdsTabToTheRolesWhileHouseholdUpkeepIsOn() {
-        System.runAs(TestUsers.admin()) {
-            Test.startTest();
-            TabAccessService.syncNow();
-            Test.stopTest();
-
-            Assert.isTrue(
-                holdsHouseholds(userId(TEAM_MEMBER)),
-                'A Staff holder gets the Households tab set'
-            );
-            Assert.isTrue(holdsHouseholds(UserInfo.getUserId()), 'So does the admin');
-            Assert.isFalse(
-                holdsHouseholds(userId(PRIYA)),
-                'Find and Export alone is not a BarnCRM role'
-            );
-        }
-    }
-
-    @IsTest
-    static void aNewInstallHasNoHouseholdsTabUntilHouseholdUpkeepIsOn() {
-        System.runAs(TestUsers.admin()) {
-            TestSettings.newInstall();
-        }
-        System.runAs(TestUsers.admin()) {
-            TabAccessService.syncNow();
-            Assert.isFalse(holdsHouseholds(userId(TEAM_MEMBER)), 'Household Upkeep is off');
-        }
-        System.runAs(TestUsers.admin()) {
-            Test.startTest();
-            FeatureSwitchService.turnOn(FeatureSwitchService.HOUSEHOLD_UPKEEP);
-            Test.stopTest();
-
-            Assert.isTrue(
-                holdsHouseholds(userId(TEAM_MEMBER)),
-                'Turning Household Upkeep on queues the sync that gives the tab'
-            );
-            Assert.isTrue(
-                tabSetsOf(userId(TEAM_MEMBER)).isEmpty(),
-                'And no tool tab comes with it'
-            );
-        }
-    }
-
-    @IsTest
     static void givesADuplicateReviewerAndAMetadataAdminDuplicateMatchingOnly() {
         System.runAs(TestUsers.admin()) {
             User reviewer = TestUsers.standardUserWith(
@@ -494,11 +450,6 @@ private class TabAccessServiceTest {
 
     private static Set<String> tabSetsOf(Id userId) {
         return setsOf(userId, 'BarnCRM_Tab_%');
-    }
-
-    private static Boolean holdsHouseholds(Id userId) {
-        return setsOf(userId, TabAccessService.HOUSEHOLDS_SET)
-            .contains(TabAccessService.HOUSEHOLDS_SET);
     }
 
     private static Set<String> appSetsOf(Id userId) {

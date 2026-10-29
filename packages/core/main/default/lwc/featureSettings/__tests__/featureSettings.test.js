@@ -95,29 +95,6 @@ describe('c-feature-settings', () => {
     expect(turnedOn.mock.calls[0][0].detail).toEqual({ key: 'Relationships' });
   });
 
-  it('adds a feature note to the confirmation when the feature has one', async () => {
-    getFeatures.mockResolvedValue({
-      canEdit: true,
-      features: [
-        {
-          key: 'HouseholdUpkeep',
-          name: 'Household Upkeep',
-          description: 'Households.',
-          isOn: false,
-          confirmNote: 'Use New Household.'
-        }
-      ]
-    });
-    BarnConfirmModal.open.mockResolvedValue(false);
-    const element = await build();
-
-    all(element, 'turn-on')[0].click();
-    await flushPromises();
-
-    const message = BarnConfirmModal.open.mock.calls[0][0].message;
-    expect(message.endsWith(' Use New Household.')).toBe(true);
-  });
-
   it('shows the message when turning on fails', async () => {
     getFeatures.mockResolvedValue(MODEL);
     BarnConfirmModal.open.mockResolvedValue(true);

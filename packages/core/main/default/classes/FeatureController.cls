@@ -15,9 +15,6 @@ public with sharing class FeatureController {
         public String description;
         @AuraEnabled
         public Boolean isOn;
-        /** Extra sentence for the turn-on confirmation, or null. */
-        @AuraEnabled
-        public String confirmNote;
     }
 
     /** The feature list and whether this person may turn features on. */
@@ -63,9 +60,6 @@ public with sharing class FeatureController {
             row.name = nameOf(item.key);
             row.description = descriptionOf(item.key);
             row.isOn = turnedOn.contains(item.key.toLowerCase());
-            row.confirmNote = item.key == FeatureSwitchService.HOUSEHOLD_UPKEEP
-                ? System.Label.Core_Feature_HouseholdUpkeep_ConfirmNote
-                : null;
             rows.add(row);
         }
         return rows;

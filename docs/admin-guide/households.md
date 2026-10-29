@@ -40,14 +40,9 @@ profile has no default Account record type, gets Household for every account the
 
 The **Households** tab is hidden until you turn Household Upkeep on. Turning it on shows the
 tab to everyone with a BarnCRM role (Admin, Staff or Read Only), through the permission set
-**BarnCRM Households**, within a few minutes. The confirmation says so, and reminds staff to
-create households with **New household** on BarnCRM Home, not the standard **New** button.
-The permission set shows the tab and nothing else, and gives no record type. BarnCRM keeps it
-in step like the tool tab sets, so do not assign it by hand: the nightly run removes it from
-anyone without a BarnCRM role, who should be given a role on the Access page instead. Upgrading
-an org that already ran BarnCRM removes the Household record type from the three role
-permission sets (Salesforce drops a record type a permission set no longer names); accounts
-that are households stay households.
+**BarnCRM Households**, within a few minutes. The confirmation says so, and names the record
+type your organizations keep using. People without a BarnCRM role are not given the tab; add
+the permission set to them yourself if they need it.
 
 BarnCRM does not add an Organization record type. Organizations are the accounts of the
 record type you choose in **Record type for organizations** on **General** (see
@@ -158,8 +153,8 @@ the same Members panel. A household is still its own record, never a person.
 
 **"There is no Households tab."**
 Household Upkeep is off. Turn it on in **General**; the tab reaches everyone with a BarnCRM
-role within a few minutes. Someone without a BarnCRM role does not get it: give them a role on
-the Access page.
+role within a few minutes. Someone without a BarnCRM role needs the **BarnCRM Households**
+permission set added by hand.
 
 **"Nobody can choose Household when creating an account."**
 That is by design. Create households with **New household** on BarnCRM Home, or add a person
