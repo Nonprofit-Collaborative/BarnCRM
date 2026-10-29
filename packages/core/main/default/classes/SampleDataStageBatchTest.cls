@@ -9,7 +9,9 @@
 private class SampleDataStageBatchTest {
     @TestSetup
     static void createTestUser() {
-        TestUsers.adminWithInstalledModules();
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
+        }
     }
 
     /** A module that records that Core started it, standing in for Giving. */

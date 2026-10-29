@@ -377,6 +377,9 @@ private class ImportRowProcessorTest {
             // As install does, so the count is of the import, not of detecting the record type
             // for organizations (ADR-0141), which an org with the setting saved never runs.
             AccountKinds.storeDetectedIfBlank();
+            // Install may store a record type this test user cannot use (an org that kept one
+            // the profile does not give); then the rows would be rejected for it.
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
             // Nor of the Nonprofit Cloud guard (ADR-0036, ADR-0130): where native households
             // may exist, two queries a chunk ask whether a household has native dependents.
             // A Nonprofit Cloud org runs them for a test user who cannot read the native
@@ -864,6 +867,13 @@ private class ImportRowProcessorTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
             if (!OrgShapeDetector.detect().hasPersonAccounts) {
+                if (organizationRecordTypeId() == null) {
+                    // A person record type is simulated with a record type the user can use
+                    // other than the master one. An org with none (Platform-only, or one whose
+                    // only other record types the profile does not give) cannot simulate it;
+                    // the orgs that can, and every person account org, run this test.
+                    return;
+                }
                 HouseholdService.personAccountOverride = true;
                 PersonRecordSelector.personRecordOverride = true;
                 PersonRecordSelector.personOverridesByName = new Map<String, HouseholdService.Person>{

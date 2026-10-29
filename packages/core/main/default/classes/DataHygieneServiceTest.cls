@@ -33,10 +33,7 @@ private class DataHygieneServiceTest {
     }
 
     private static Account newOrganization(String name) {
-        return new Account(
-            Name = name,
-            RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
-        );
+        return AccountKindsTestData.organization(name);
     }
 
     private static List<Contact> insertWithoutAutomaticHouseholds(List<Contact> contacts) {

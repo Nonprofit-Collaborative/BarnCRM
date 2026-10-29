@@ -301,16 +301,13 @@ private class BulkUpdateBatchTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-            Id organizationType = AccountKindsTestData.organizationRecordTypeId();
             List<Account> accounts = new List<Account>();
             for (Integer index = 0; index < 100; index++) {
                 Account household = HouseholdTestDataFactory.newHousehold('Renameme Home ' + index);
                 // Named by hand, so household naming keeps this name and the query finds it.
                 household.Custom_Name__c = true;
                 accounts.add(household);
-                accounts.add(
-                    new Account(Name = 'Renameme Org ' + index, RecordTypeId = organizationType)
-                );
+                accounts.add(AccountKindsTestData.organization('Renameme Org ' + index));
             }
             Database.insert(accounts, AccessLevel.SYSTEM_MODE);
             String query = JSON.serialize(

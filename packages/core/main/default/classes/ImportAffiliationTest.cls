@@ -6,7 +6,9 @@
 private class ImportAffiliationTest {
     @TestSetup
     static void createTestUser() {
-        TestUsers.admin();
+        System.runAs(TestUsers.admin()) {
+            AccountKindsTestData.useRecordTypeTheUserCanUse();
+        }
     }
 
     private static Import_Template__c template;

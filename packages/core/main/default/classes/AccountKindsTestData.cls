@@ -21,10 +21,19 @@ public class AccountKindsTestData {
         return AccountKinds.organizationRecordTypeId();
     }
 
-    /** An unsaved organization with this name, of the organization record type. */
+    /**
+     * An unsaved organization with this name, of the organization record type. With No record
+     * type the field is left unset rather than set to null: a system mode insert refuses an
+     * explicit null record type for a user whose profile gives only the master one.
+     */
     @NamespaceAccessible
     public static Account organization(String name) {
-        return new Account(Name = name, RecordTypeId = organizationRecordTypeId());
+        Account organization = new Account(Name = name);
+        Id recordTypeId = organizationRecordTypeId();
+        if (recordTypeId != null) {
+            organization.RecordTypeId = recordTypeId;
+        }
+        return organization;
     }
 
     /**
