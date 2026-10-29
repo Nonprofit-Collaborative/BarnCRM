@@ -25,9 +25,7 @@ private class ImportDuplicateRuleMatchTest {
     }
 
     private static Id organizationType() {
-        return Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
+        return AccountKindsTestData.organizationRecordTypeId();
     }
 
     /** A people template asking the duplicate rules, and a batch of these rows. */

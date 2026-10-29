@@ -50,7 +50,6 @@ public with sharing class AddressService {
     public static final String STATUS_UNDELIVERABLE = 'Undeliverable';
 
     private static final String RECORD_TYPE_HOUSEHOLD = 'Household';
-    private static final String RECORD_TYPE_ORGANIZATION = 'Organization';
 
     // detection-only: Person Account orgs
     private static final String PERSON_MAILING_STREET = 'PersonMailingStreet';
@@ -1558,8 +1557,9 @@ public with sharing class AddressService {
 
     /**
      * The billing address of each household or organization among these accounts, as a
-     * default address record of type Home (Work for an organization), not yet saved. An
-     * account with an empty billing address, or of any other record type, gives none. The
+     * default address record of type Home (Work for an organization, an account of the record
+     * type `AccountKinds` names), not yet saved. An account with an empty billing address, or
+     * of any other record type, gives none. The
      * people held as accounts are added to `people` instead, for the person capture.
      */
     private static List<Address__c> billingAddressesOf(
@@ -1581,10 +1581,11 @@ public with sharing class AddressService {
                 recordTypes.get(account.RecordTypeId) == null
                 ? null
                 : recordTypes.get(account.RecordTypeId).getDeveloperName();
-            if (
+            // Organizations are the accounts of the record type the org chose (ADR-0141).
+            Boolean isOrganization =
                 developerName != RECORD_TYPE_HOUSEHOLD &&
-                developerName != RECORD_TYPE_ORGANIZATION
-            ) {
+                AccountKinds.isOrganizationRecordTypeName(developerName);
+            if (developerName != RECORD_TYPE_HOUSEHOLD && !isOrganization) {
                 continue;
             }
             if (
@@ -1601,7 +1602,7 @@ public with sharing class AddressService {
             typed.add(
                 new Address__c(
                     Account__c = account.Id,
-                    Type__c = developerName == RECORD_TYPE_ORGANIZATION ? TYPE_WORK : TYPE_HOME,
+                    Type__c = isOrganization ? TYPE_WORK : TYPE_HOME,
                     Is_Default__c = true,
                     Street__c = account.BillingStreet,
                     City__c = account.BillingCity,

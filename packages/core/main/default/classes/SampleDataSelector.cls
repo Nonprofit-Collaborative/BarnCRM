@@ -48,11 +48,14 @@ public with sharing class SampleDataSelector {
         ];
     }
 
+    /** Sample accounts of the record type the org chose for organizations (ADR-0141). */
     public Integer countSampleOrganizations() {
+        // The loader gives sample organizations AccountKinds' record type, null for none.
+        Id organizationRecordTypeId = AccountKinds.organizationRecordTypeId();
         return [
             SELECT COUNT()
             FROM Account
-            WHERE Sample_Data__c = TRUE AND RecordType.DeveloperName = 'Organization'
+            WHERE Sample_Data__c = TRUE AND RecordTypeId = :organizationRecordTypeId
             WITH USER_MODE
         ];
     }

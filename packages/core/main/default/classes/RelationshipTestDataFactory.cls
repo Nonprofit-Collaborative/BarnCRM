@@ -72,7 +72,7 @@ public class RelationshipTestDataFactory {
         for (Integer i = 0; i < howMany; i++) {
             orgs.add(
                 (Account) TestDataFactory.pastDuplicateRules(
-                    new Account(Name = prefix + ' ' + i, RecordTypeId = organizationRecordTypeId())
+                    AccountKindsTestData.organization(prefix + ' ' + i)
                 )
             );
         }
@@ -180,14 +180,5 @@ public class RelationshipTestDataFactory {
             ORDER BY Name
             LIMIT 5000
         ];
-    }
-
-    private static Id organizationRecordTypeId() {
-        Schema.RecordTypeInfo info = Account.SObjectType.getDescribe(
-                SObjectDescribeOptions.DEFERRED
-            )
-            .getRecordTypeInfosByDeveloperName()
-            .get('Organization');
-        return info == null ? null : info.getRecordTypeId();
     }
 }

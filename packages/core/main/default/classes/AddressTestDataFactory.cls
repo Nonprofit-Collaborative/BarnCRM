@@ -33,7 +33,7 @@ public class AddressTestDataFactory {
     /** An organization account, not yet inserted. */
     public static Account newOrganization(String name) {
         return (Account) TestDataFactory.pastDuplicateRules(
-            new Account(Name = name, RecordTypeId = recordTypeId('Organization'))
+            AccountKindsTestData.organization(name)
         );
     }
 
@@ -42,14 +42,5 @@ public class AddressTestDataFactory {
         Contact person = HouseholdTestDataFactory.newContact('Ms.', firstName, lastName);
         person.AccountId = accountId;
         return person;
-    }
-
-    private static Id recordTypeId(String developerName) {
-        Schema.RecordTypeInfo info = Account.SObjectType.getDescribe(
-                SObjectDescribeOptions.DEFERRED
-            )
-            .getRecordTypeInfosByDeveloperName()
-            .get(developerName);
-        return info == null ? null : info.getRecordTypeId();
     }
 }

@@ -35,9 +35,7 @@ private class DataHygieneServiceTest {
     private static Account newOrganization(String name) {
         return new Account(
             Name = name,
-            RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId()
+            RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
         );
     }
 

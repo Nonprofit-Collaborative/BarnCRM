@@ -136,12 +136,7 @@ private class ImportMatcherTest {
     @IsTest
     static void matchesOrganizationsByNameWithinTheirRecordType() {
         System.runAs(TestUsers.admin()) {
-            Id organizationRecordType = Account.SObjectType.getDescribe(
-                    SObjectDescribeOptions.DEFERRED
-                )
-                .getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId();
+            Id organizationRecordType = AccountKindsTestData.organizationRecordTypeId();
             insert new Account(
                 Name = 'Rose City Foundation',
                 RecordTypeId = organizationRecordType

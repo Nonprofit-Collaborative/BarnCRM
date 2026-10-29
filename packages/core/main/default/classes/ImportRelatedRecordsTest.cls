@@ -95,9 +95,7 @@ private class ImportRelatedRecordsTest {
     }
 
     private static List<Account> organizations(Integer count) {
-        Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
+        Id organizationType = AccountKindsTestData.organizationRecordTypeId();
         List<Account> result = new List<Account>();
         for (Integer i = 0; i < count; i++) {
             result.add(

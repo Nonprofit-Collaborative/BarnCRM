@@ -185,12 +185,12 @@
         <value>This org has no external identifier field, so nothing could be matched by external ID. Choose a different matching rule.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_LogOrganizationRecordTypeMissing</fullName>
+        <fullName>Core_Import_LogOrganizationRecordTypeUnavailable</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: the organization record type is missing</shortDescription>
-        <value>The organization record type is missing, so no organization column was loaded.</value>
+        <shortDescription>Import run log: user lacks the organization record type; {0} is its label</shortDescription>
+        <value>No organization was matched or created, because you cannot use the {0} record type, which BarnCRM Settings uses for organizations (Record type for organizations, on General). Ask your Salesforce administrator to give you that record type, or choose another one in that setting, then load the file again.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogPersonRecordTypeMissing</fullName>

@@ -18,9 +18,7 @@ private class RollupJobNotificationTest {
                 Job_Notifications__c = true
             );
             SettingsService.clearCaches();
-            Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId();
+            Id organizationType = AccountKindsTestData.organizationRecordTypeId();
             Account organization = new Account(Name = 'Food Bank', RecordTypeId = organizationType);
             insert organization;
             insert new Contact(LastName = 'Volunteer', AccountId = organization.Id);

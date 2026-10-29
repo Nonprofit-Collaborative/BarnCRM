@@ -36,9 +36,7 @@ private class RollupsStaffSaveTest {
         System.runAs(staff) {
             organization = new Account(
                 Name = 'Food Bank',
-                RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                    .get('Organization')
-                    .getRecordTypeId()
+                RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
             );
             insert organization;
 
@@ -110,9 +108,7 @@ private class RollupsStaffSaveTest {
         System.runAs(person) {
             organization = new Account(
                 Name = 'Shelter',
-                RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                    .get('Organization')
-                    .getRecordTypeId()
+                RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
             );
             insert organization;
 

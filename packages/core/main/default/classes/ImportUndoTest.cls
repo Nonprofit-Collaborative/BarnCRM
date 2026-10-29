@@ -90,10 +90,7 @@ private class ImportUndoTest {
     private static Account importedOrganization(Import_Batch__c batch) {
         Account organization = new Account(
             Name = 'Rose City Rotary',
-            RecordTypeId = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-                .getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId(),
+            RecordTypeId = AccountKindsTestData.organizationRecordTypeId(),
             Created_By_Import_Batch__c = batch.Id
         );
         insert organization;

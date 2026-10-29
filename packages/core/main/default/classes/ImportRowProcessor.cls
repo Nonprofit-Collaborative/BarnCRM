@@ -42,8 +42,6 @@ public with sharing class ImportRowProcessor {
     @NamespaceAccessible
     public static final String ENTITY_PROCESSOR_CLASS = ImportEntityProcessors.CLASS_NAME;
 
-    private static final String ORGANIZATION_RECORD_TYPE = 'Organization';
-
     /** What a person account puts before a contact field's name (see `storedName`). */
     private static final String PERSON_FIELD_PREFIX = 'Person';
 
@@ -572,7 +570,6 @@ public with sharing class ImportRowProcessor {
             return;
         }
         Map<Id, Id> recordTypeById = visibleRecords(personIds, organizationIds, personAccounts);
-        Id organizationType = recordTypeId(ORGANIZATION_RECORD_TYPE);
         for (Working item : working) {
             for (Integer which = 0; which <= 2; which++) {
                 String given = which == 0
@@ -591,7 +588,7 @@ public with sharing class ImportRowProcessor {
                 }
                 Id recordType = recordTypeById.get(parsed);
                 Boolean rightKind = which == 0
-                    ? recordType != null && recordType == organizationType
+                    ? AccountKinds.isOrganization(recordType)
                     : !personAccounts ||
                       OrgShapeDetector.personRecordTypeIds().contains(recordType);
                 if (!rightKind) {
@@ -689,9 +686,16 @@ public with sharing class ImportRowProcessor {
         if (!namesOne) {
             return;
         }
-        Id recordTypeId = recordTypeId(ORGANIZATION_RECORD_TYPE);
-        if (recordTypeId == null) {
-            outcome.notes.add(Label.Core_Import_LogOrganizationRecordTypeMissing);
+        // Organizations are the accounts of the record type the org chose (ADR-0141); null is
+        // No record type, so they are matched and created with none.
+        Id recordTypeId = AccountKinds.organizationRecordTypeId();
+        if (!canCreateOrganizations(recordTypeId)) {
+            outcome.notes.add(
+                String.format(
+                    Label.Core_Import_LogOrganizationRecordTypeUnavailable,
+                    new List<String>{ recordTypeLabel(recordTypeId) }
+                )
+            );
             return;
         }
         ImportMatcher.forgetHeldKeys();
@@ -755,10 +759,12 @@ public with sharing class ImportRowProcessor {
         Map<String, Working> firstRowByKey = new Map<String, Working>();
         List<Account> toCreate = new List<Account>();
         List<String> createdKeys = new List<String>();
-        // Without the record type the match step already said so, and nothing is created.
-        Id recordTypeId = recordTypeId(ORGANIZATION_RECORD_TYPE);
+        // When the user cannot use the record type the match step already said so, and nothing
+        // is created. Null is No record type: organizations are created with none.
+        Id recordTypeId = AccountKinds.organizationRecordTypeId();
+        Boolean usable = canCreateOrganizations(recordTypeId);
         for (Working item : working) {
-            if (recordTypeId == null || !createsOrganization(item)) {
+            if (!usable || !createsOrganization(item)) {
                 continue;
             }
             if (firstRowByKey.containsKey(item.organizationGroup)) {
@@ -3219,13 +3225,28 @@ public with sharing class ImportRowProcessor {
         return parts.isEmpty() ? Label.Core_Import_ErrorSaveFailed : String.join(parts, ' ');
     }
 
-    private static Id recordTypeId(String developerName) {
-        Schema.RecordTypeInfo info = Account.SObjectType.getDescribe(
-                SObjectDescribeOptions.DEFERRED
-            )
-            .getRecordTypeInfosByDeveloperName()
-            .get(developerName);
-        return info == null || !info.isAvailable() ? null : info.getRecordTypeId();
+    /**
+     * Whether the running user can create accounts of the organization record type: always for
+     * No record type (null), otherwise when their profile or a permission set gives it.
+     */
+    private static Boolean canCreateOrganizations(Id recordTypeId) {
+        if (recordTypeId == null) {
+            return true;
+        }
+        Schema.RecordTypeInfo info = accountRecordType(recordTypeId);
+        return info != null && info.isAvailable();
+    }
+
+    /** The label of an Account record type, as Setup shows it, for the run log. */
+    private static String recordTypeLabel(Id recordTypeId) {
+        Schema.RecordTypeInfo info = accountRecordType(recordTypeId);
+        return info == null ? String.valueOf(recordTypeId) : info.getName();
+    }
+
+    private static Schema.RecordTypeInfo accountRecordType(Id recordTypeId) {
+        return Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+            .getRecordTypeInfosById()
+            .get(recordTypeId);
     }
 
     /** A person type the running user can create with, never merely the first in the org. */

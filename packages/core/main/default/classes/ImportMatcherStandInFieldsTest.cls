@@ -14,10 +14,7 @@ private class ImportMatcherStandInFieldsTest {
     }
 
     private static Id organizationType() {
-        return Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-            .getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
+        return AccountKindsTestData.organizationRecordTypeId();
     }
 
     private static void standInFields() {

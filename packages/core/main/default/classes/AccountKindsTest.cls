@@ -137,6 +137,9 @@ private class AccountKindsTest {
                 AccountKinds.isOrganization(null),
                 'An account with none is an organization.'
             );
+            Assert.isTrue(AccountKinds.isOrganizationRecordTypeName(null), 'By name: none.');
+            Assert.isTrue(AccountKinds.isOrganizationRecordTypeName('Master'), 'The master.');
+            Assert.isFalse(AccountKinds.isOrganizationRecordTypeName('Household'), 'Not one.');
             Id household = HouseholdService.householdRecordTypeId();
             if (household != null) {
                 Assert.isFalse(AccountKinds.isOrganization(household), 'A household never is.');
@@ -174,6 +177,11 @@ private class AccountKindsTest {
                 'Its accounts are organizations.'
             );
             Assert.isFalse(AccountKinds.isOrganization(null), 'An account with none is not.');
+            Assert.isTrue(
+                AccountKinds.isOrganizationRecordTypeName(chosen.getDeveloperName()),
+                'By name: the chosen one.'
+            );
+            Assert.isFalse(AccountKinds.isOrganizationRecordTypeName(null), 'By name: none.');
         }
     }
 
