@@ -493,6 +493,123 @@ private class AddressHistoryTest {
         Assert.isNull(AddressSelector.withHistory(null), 'Nothing in, nothing out.');
     }
 
+    /**
+     * A mailing address changed by someone without access to the history fields is captured
+     * as a move all the same: the new household address starts today and the old one ends.
+     */
+    @IsTest
+    static void aCapturedMoveBySomeoneWithoutHistoryAccessIsStillRecorded() {
+        User pat;
+        System.runAs(TestUsers.admin()) {
+            pat = TestDataFactory.createUser('Pat', new List<String>{ 'BarnCRM_Staff' });
+        }
+        withoutHistoryFieldAccess('BarnCRM_Staff');
+        Account garcia = householdAtHome('The Garcia Family');
+        Contact luis;
+        System.runAs(pat) {
+            insert garcia;
+            luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
+            insert luis;
+        }
+
+        Test.startTest();
+        Date moveDay;
+        System.runAs(pat) {
+            moveDay = Date.today();
+            update new Contact(Id = luis.Id, MailingStreet = NEW_STREET, MailingCity = 'Tucson');
+        }
+        Test.stopTest();
+
+        Address__c now = addressAt(garcia.Id, NEW_STREET);
+        Assert.isTrue(now.Is_Default__c, 'The household moved.');
+        Assert.areEqual(moveDay, now.Start_Date__c, 'The new address started on the move.');
+        Address__c old = addressAt(garcia.Id, HOME_STREET);
+        Assert.isFalse(old.Is_Default__c, 'The old address is out of use.');
+        Assert.areEqual('Former', old.Status__c, 'The old address is Former.');
+        Assert.areEqual(moveDay, old.End_Date__c, 'It ended on the move.');
+    }
+
+    @IsTest
+    static void twoHundredCapturedMovesEachStartAndEnd() {
+        System.runAs(TestUsers.admin()) {
+            List<Account> households = new List<Account>();
+            for (Integer index = 0; index < 200; index++) {
+                households.add(householdAtHome('The Family ' + index));
+            }
+            insert households;
+            List<Contact> people = new List<Contact>();
+            for (Integer index = 0; index < 200; index++) {
+                people.add(
+                    AddressTestDataFactory.newContact('Pat', 'Family' + index, households[index].Id)
+                );
+            }
+            insert people;
+            for (Contact person : people) {
+                person.MailingStreet = NEW_STREET;
+                person.MailingCity = 'Tucson';
+            }
+
+            Test.startTest();
+            update people;
+            Test.stopTest();
+
+            Assert.areEqual(
+                200,
+                [
+                    SELECT COUNT()
+                    FROM Address__c
+                    WHERE
+                        Street__c = :HOME_STREET
+                        AND Is_Default__c = FALSE
+                        AND Status__c = 'Former'
+                        AND End_Date__c = TODAY
+                        AND Start_Date__c = NULL
+                ],
+                'Every old address is out of use and ended, with no start date given.'
+            );
+            Assert.areEqual(
+                200,
+                [
+                    SELECT COUNT()
+                    FROM Address__c
+                    WHERE
+                        Street__c = :NEW_STREET
+                        AND Is_Default__c = TRUE
+                        AND Status__c = 'Current'
+                        AND Start_Date__c = TODAY
+                        AND End_Date__c = NULL
+                ],
+                'Every new address is the primary, Current and started today.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aStartDateGivenToTheNewPrimaryIsKept() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = householdAtHome('The Garcia Family');
+            insert garcia;
+            Date given = Date.today().addDays(-10);
+            Address__c moved = newPrimary(garcia.Id, NEW_STREET);
+            moved.Start_Date__c = given;
+
+            Test.startTest();
+            insert moved;
+            Test.stopTest();
+
+            Assert.areEqual(
+                given,
+                addressAt(garcia.Id, NEW_STREET).Start_Date__c,
+                'The start date given stays.'
+            );
+            Assert.areEqual(
+                'Former',
+                addressAt(garcia.Id, HOME_STREET).Status__c,
+                'It is still a move.'
+            );
+        }
+    }
+
     // ------------------------------------------------------------ Address Card Fields
 
     @IsTest
