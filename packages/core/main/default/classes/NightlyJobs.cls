@@ -217,7 +217,7 @@ public with sharing class NightlyJobs {
     }
 
     /**
-     * The nightly tab access check (ADR-0124): keeps the switchable tabs with the people who
+     * The hourly tab access check (ADR-0124): keeps the switchable tabs with the people who
      * should see them when roles change outside BarnCRM's Access page.
      */
     public class TabAccessJob implements NightlyJob {

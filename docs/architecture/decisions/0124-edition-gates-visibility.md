@@ -142,7 +142,8 @@ separate work, and BarnCRM Giving will depend on it.
   up: their records settle on their next save, or not at all.
 - An upgrade that finds no edition saved saves the recommended one (the Standard Edition when
   nothing points to the Nonprofit one), so an upgraded org never sees the first-run window.
-  Every install and upgrade also schedules the nightly tab access check if it is not already.
+  Every install and upgrade also schedules the tab access check if it is not already (nightly when this was decided).
+  Hourly since 2026-10-29 (owner decision); an upgrade moves an existing nightly job to hourly.
 - A BarnCRM Tab set assigned by hand is removed by the next run.
 - An org that had saved an edition before this release never sees the first-run window.
 - First-run setup shows while `Suite__c` is empty or `Features_Turned_On__c` is `None`, so an

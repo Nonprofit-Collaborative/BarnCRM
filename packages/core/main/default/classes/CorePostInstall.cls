@@ -45,7 +45,7 @@
  * ships templates calls the same method from its own script.
  *
  * Alongside these (ADR-0124): a new install starts with every feature off, an upgrade with no
- * edition saved gets the recommended one, and every run schedules the nightly tab access check
+ * edition saved gets the recommended one, and every run schedules the hourly tab access check
  * unless it is already scheduled. When Seasonal Addresses is on and its nightly job is missing,
  * the job is scheduled too; an upgraded org that already runs the job has the switch turned on.
  *
@@ -72,7 +72,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
     private static final String ORGANIZATION_CONTEXT = 'CorePostInstall.storeOrganizationRecordType';
     private static final String SAVED_QUERY_CONTEXT = 'CorePostInstall.renameDataQualityQueries';
 
-    /** Test seam: true lets a test see the nightly tab access check scheduled. */
+    /** Test seam: true lets a test see the hourly tab access check scheduled. */
     @TestVisible
     private static Boolean scheduleTabCheckInTests = false;
 
@@ -233,9 +233,9 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
     }
 
     /**
-     * Schedules the nightly tab access check, the safety net for roles given outside BarnCRM's
+     * Schedules the hourly tab access check, the safety net for roles given outside BarnCRM's
      * Access page (ADR-0124). `start` finds a job already scheduled by name, so a reinstall or an
-     * upgrade never doubles it. Skipped in tests unless a test asks, so that a test of something
+     * upgrade never doubles it, and it moves a job still on the old nightly cron to hourly. Skipped in tests unless a test asks, so that a test of something
      * else does not leave a scheduled job that runs at `Test.stopTest`.
      */
     private void scheduleTabAccessCheck() {

@@ -365,7 +365,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Name of the nightly job that keeps feature tabs with the right people.</shortDescription>
+        <shortDescription>Name of the hourly job that keeps feature tabs with the right people.</shortDescription>
         <value>Tab access check</value>
     </labels>
     <labels>

@@ -89,8 +89,8 @@ When it happens:
 - **At install**, for everyone who already has a role.
 - **When you give a role on the Access page**, within a minute.
 - **When you turn the module back on** in Module Manager, for anyone given a role while it was off.
-- **Every night**, with BarnCRM's nightly access check (one o'clock), for anyone given a role in
-  Setup rather than on the Access page.
+- **Every hour**, with BarnCRM's hourly access check, for anyone given a role in Setup rather
+  than on the Access page.
 
 The module only ever gives a set: it never takes one away. If someone leaves a role, remove
 their Volunteers set too, in Setup under **Users**, **Permission Set Assignments**.
