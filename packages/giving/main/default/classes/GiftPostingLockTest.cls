@@ -664,6 +664,61 @@ private class GiftPostingLockTest {
         }
     }
 
+    /**
+     * An amount correction moves the gift's single allocation with it (R-GA1), so the override
+     * records both: the gift's amount and its allocation's.
+     */
+    @IsTest
+    static void theOverrideLetsAnAmountCorrectionThroughWithItsAllocation() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.closeBooksThrough(lastClosedDay());
+            Gift__c gift = giftOf(250);
+            User maria = maria();
+            handTo(maria, new List<Id>{ gift.Id });
+
+            Test.startTest();
+            System.runAs(maria) {
+                update new Gift__c(Id = gift.Id, Amount__c = 260);
+            }
+            Test.stopTest();
+
+            Gift_Allocation__c allocation = giftOf(260).Gift_Allocations__r[0];
+            Assert.areEqual(260, allocation.Amount__c, 'The allocation moved with the gift.');
+            List<Error_Log__c> logged = [
+                SELECT Message__c
+                FROM Error_Log__c
+                WHERE Severity__c = :ErrorLogger.SEVERITY_WARNING
+                ORDER BY CreatedDate, Id
+            ];
+            Assert.areEqual(2, logged.size(), 'The gift and its allocation: ' + logged);
+            for (Error_Log__c entry : logged) {
+                Assert.isTrue(
+                    entry.Message__c.contains(String.valueOf(gift.Id)),
+                    'Each names the gift: ' + entry.Message__c
+                );
+            }
+        }
+    }
+
+    @IsTest
+    static void anAmountChangeOnALockedGiftIsRefusedAndItsAllocationKept() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.closeBooksThrough(lastClosedDay());
+            Gift__c gift = giftOf(250);
+
+            Test.startTest();
+            String refused = refusalOf(new Gift__c(Id = gift.Id, Amount__c = 260));
+            Test.stopTest();
+
+            Assert.isNotNull(refused, 'The amount the books hold is not changed.');
+            Assert.areEqual(
+                250,
+                giftOf(250).Gift_Allocations__r[0].Amount__c,
+                'Its allocation is as it was.'
+            );
+        }
+    }
+
     @IsTest
     static void theOverrideLetsALockedGiftBeDeletedAndRecordsThat() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

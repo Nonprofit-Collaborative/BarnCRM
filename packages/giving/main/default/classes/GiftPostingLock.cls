@@ -320,7 +320,16 @@ public with sharing class GiftPostingLock {
         }
         Date closed = closedThrough();
         Map<Id, Gift__c> locked = new Map<Id, Gift__c>();
-        for (Gift__c gift : GiftPostingSelector.selectLockStateByIds(giftIds)) {
+        // A gift whose allocation the package is saving with the gift in hand is not read again.
+        List<Gift__c> gifts = GiftService.giftsInHandAmong(giftIds).values();
+        if (gifts.size() < giftIds.size()) {
+            Set<Id> toRead = new Set<Id>(giftIds);
+            for (Gift__c gift : gifts) {
+                toRead.remove(gift.Id);
+            }
+            gifts.addAll(GiftPostingSelector.selectLockStateByIds(toRead));
+        }
+        for (Gift__c gift : gifts) {
             if (isLocked(gift, closed)) {
                 locked.put(gift.Id, gift);
             }
