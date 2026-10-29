@@ -321,6 +321,9 @@ private class ImportRowProcessorTest {
                 );
             }
             given(values);
+            // As install does, so the count is of the import, not of detecting the record type
+            // for organizations (ADR-0141), which an org with the setting saved never runs.
+            AccountKinds.storeDetectedIfBlank();
 
             Test.startTest();
             Integer queriesBefore = Limits.getQueries();
