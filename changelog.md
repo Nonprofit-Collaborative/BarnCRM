@@ -6,6 +6,15 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-10-29
 
+### Landing batch 14 (branch `landing/batch-14`)
+
+Merges #719 and #722 onto main at batch 13 (15d8bebf). No conflicts. ADR number assigned: 0144.
+
+- #719 (G-M1, owner approved): the report and dashboard folder manage and create rights are removed from `Giving_Admin` and `Volunteers_Admin`.
+- #722 (G-L4, G-L5, ADR-0144, D-148): acknowledgments honor Email Opt Out. An email gift whose recipient contact has `Contact.HasOptedOutOfEmail` (the donor, or the account's primary contact) is not emailed, gets no row and no error, and stays To acknowledge; the letter run takes opted-out gifts and thanks those donors; the Acknowledgments page shows the line "Opted out of email, sent by letter". `Giving_Admin` loses View All on `Commitment__c` (matches `Gift__c`); the nightly top up and overdue pass are scheduled as a system administrator.
+- Landing: `NEXT-acknowledgments-honor-email-opt-out.md` renamed `0144-...`, every ADR-NEXT citation replaced.
+- BMemory plan: v0.11 row, G-M1 and G-L4/G-L5 notes in 11.5, ADR-0144, D-148 added (f549d45, 888743c, 5c29785, 59ddd7b). `docs/product-plan.md` refreshed.
+
 ### Landing batch 13 (branch `landing/batch-13`)
 
 Merges #712, #713, #715, #716, #717, #718 and #720 (#719 held for the owner). Conflicts: `CorePostInstall.cls` header and `scheduleTabAccessCheck` comment (hourly kept, `renameStoredEdition` added) and two canonical-model version rows (both kept).
