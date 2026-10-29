@@ -46,7 +46,8 @@ how greetings are configured before he asks Maria to change them.
 ## First-Run Setup
 
 Until BarnCRM's first-run setup is finished, the BarnCRM home page and this page both show
-the same setup window in front of everything else, and nothing behind it can be used.
+the same setup window in front of everything else. An administrator cannot close it without
+finishing; anyone else can close it (see below).
 
 **On a new install, BarnCRM's automation does nothing until first-run setup is finished.**
 Every Core feature starts off, so its automation is held: no household is created for a new
@@ -73,8 +74,8 @@ earlier release keeps every feature on and is not held.
      usual choice), or **Let me choose features**, which lists the features described below,
      all ticked, each with a help icon. Untick what you do not want yet.
 
-  The window is a standard Salesforce dialog: focus stays inside it, and Escape does not close
-  it. Click **Finish Setup**. What you left ticked is turned on fully: its tabs, its settings and
+  The window is a standard Salesforce dialog: focus stays inside it, and neither Escape nor
+  its close button closes it (the close button is shown greyed out). Click **Finish Setup**. What you left ticked is turned on fully: its tabs, its settings and
   its automations. Finishing also gives the tool tabs (Data Manager, Import, Find, Org
   Optimizer, Bulk Update) of every feature that is on to everyone holding a BarnCRM role, within
   a few minutes, and starts the nightly tab access check if it is not already scheduled. What
@@ -82,8 +83,9 @@ earlier release keeps every feature on and is not held.
   You land on **General** in BarnCRM Settings, and the setup window never shows again on
   either page. No module is installed by first-run setup: install modules later from the
   **Modules** section.
-- **Anyone else** sees "An administrator needs to finish setting up BarnCRM." and nothing
-  else, on both pages, until an administrator finishes.
+- **Anyone else** sees "An administrator needs to finish setting up BarnCRM." and a **Close**
+  button. **Close**, the close button or Escape closes the window, and it shows again the next
+  time they open either page, until an administrator finishes.
 
 An org that had already chosen an edition before this release never sees the window, and an
 upgraded org with no edition is given the recommended one by the upgrade. If someone set the

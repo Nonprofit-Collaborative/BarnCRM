@@ -140,6 +140,17 @@ describe('c-org-optimizer as an administrator', () => {
     tiles(element).forEach((tile) => expect(tile.iconName).toMatch(/^standard:/));
   });
 
+  it('uses only icon names that exist in the SLDS icon set', async () => {
+    // The SLDS icon list ships with the SLDS linter (@salesforce-ux/slds-linter).
+    const sets = require('@salesforce-ux/sds-metadata/next').icons;
+    const known = new Set(
+      sets.flatMap((set) => set.icons.map((icon) => `${icon.sprite}:${icon.symbol}`))
+    );
+    const element = await render();
+
+    tiles(element).forEach((tile) => expect(known.has(tile.iconName)).toBe(true));
+  });
+
   it('badges Errors and Health Check from two small reads, and nothing else yet', async () => {
     getTile.mockResolvedValue({ newCount: 3, newCountCapped: false, recent: [] });
     const element = await render();

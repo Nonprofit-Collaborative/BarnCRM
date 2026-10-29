@@ -32,7 +32,15 @@ export default class FirstRunSetup extends NavigationMixin(LightningElement) {
     if (!state || !state.needsSetup) {
       return;
     }
-    const result = await FirstRunModal.open({ size: 'small', label: TITLE, state });
+    // disableClose is given at open, not only set inside the modal: only then does the
+    // platform disable its close button too, so an administrator never meets an X that
+    // silently does nothing. Someone who cannot finish may close it.
+    const result = await FirstRunModal.open({
+      size: 'small',
+      label: TITLE,
+      state,
+      disableClose: Boolean(state.canFinish)
+    });
     if (result && result.finished) {
       await this.afterFinish();
     }

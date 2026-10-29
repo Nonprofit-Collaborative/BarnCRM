@@ -16,10 +16,22 @@ jest.mock('@salesforce/apex/SetupAssistantController.getState', () => ({ default
   virtual: true
 });
 
-function build() {
+function build(placement) {
   const element = createElement('c-hub-setup', { is: HubSetup });
+  if (placement) {
+    element.placement = placement;
+  }
   document.body.appendChild(element);
   return element;
+}
+
+/** Makes the screen narrow (a phone) or wide for the components built after it. */
+function screen(narrow) {
+  window.matchMedia = jest.fn(() => ({
+    matches: narrow,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn()
+  }));
 }
 
 function settle() {
@@ -97,5 +109,43 @@ describe('c-hub-setup', () => {
 
     expect(element.shadowRoot.querySelector('c-setup-assistant')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="reopen-setup"]')).not.toBeNull();
+  });
+
+  describe('placed twice on the home page', () => {
+    afterEach(() => {
+      delete window.matchMedia;
+    });
+
+    async function both(model) {
+      const side = build();
+      const top = build('Top');
+      getHomeModel.emit(model);
+      await settle();
+      return { side: side.shadowRoot, top: top.shadowRoot };
+    }
+
+    it('shows only the side one on a wide screen', async () => {
+      screen(false);
+      const { side, top } = await both({ stepsCompleted: 1, stepsTotal: 2 });
+
+      expect(side.querySelector('c-setup-assistant')).not.toBeNull();
+      expect(top.querySelector('lightning-card')).toBeNull();
+    });
+
+    it('moves the unfinished checklist to the top on a phone', async () => {
+      screen(true);
+      const { side, top } = await both({ stepsCompleted: 1, stepsTotal: 2 });
+
+      expect(top.querySelector('c-setup-assistant')).not.toBeNull();
+      expect(side.querySelector('lightning-card')).toBeNull();
+    });
+
+    it('leaves a finished setup tile at the bottom on a phone', async () => {
+      screen(true);
+      const { side, top } = await both({ stepsCompleted: 2, stepsTotal: 2 });
+
+      expect(side.querySelector('[data-id="reopen-setup"]')).not.toBeNull();
+      expect(top.querySelector('lightning-card')).toBeNull();
+    });
   });
 });

@@ -39,6 +39,10 @@
     <value xsi:type="xsd:string">Planned, not built, and not yet tested by BarnCRM. It looks compatible in principle, as a complement to BarnCRM Rollup Builder or in place of it for a given rollup. Never point both at the same field, because each would overwrite the other.</value>
   </values>
   <values>
+    <field>Show_Only_When_Installed__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+  <values>
     <field>Sort_Order__c</field>
     <value xsi:type="xsd:double">20</value>
   </values>

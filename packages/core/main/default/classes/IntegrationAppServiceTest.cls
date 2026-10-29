@@ -251,10 +251,21 @@ private class IntegrationAppServiceTest {
             AppInfoLookup none = listed();
             IntegrationAppService.objectNamesOverride = new Set<String>{
                 named('GW_Volunteers', 'Volunteers_Settings__c'),
-                named('summit', 'Summit_Events__c')
+                named('summit', 'Summit_Events__c'),
+                named('dlrs', 'LookupRollupSummary__c')
             };
             AppInfoLookup some = listed();
             Test.stopTest();
+
+            // DLRS competes with BarnCRM rollups, so it is listed only where it is installed.
+            Assert.isNull(
+                none.get('Declarative_Lookup_Rollup_Summaries'),
+                'DLRS is hidden while it is not installed'
+            );
+            Assert.isTrue(
+                some.get('Declarative_Lookup_Rollup_Summaries').installed,
+                'DLRS is listed, as Installed, once it is'
+            );
 
             for (IntegrationAppService.AppInfo info : none.all) {
                 Assert.areNotEqual(

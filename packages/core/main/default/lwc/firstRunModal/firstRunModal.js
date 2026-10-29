@@ -12,6 +12,7 @@ import CHOOSE_HELP from '@salesforce/label/c.Core_FirstRun_ChooseHelp';
 import MODULES_NOTE from '@salesforce/label/c.Core_FirstRun_ModulesNote';
 import FINISH from '@salesforce/label/c.Core_FirstRun_Finish';
 import ADMIN_NEEDED from '@salesforce/label/c.Core_FirstRun_AdminNeeded';
+import CLOSE from '@salesforce/label/c.Core_FirstRun_Close';
 import STANDARD_NAME from '@salesforce/label/c.Core_SuiteChoice_StandardName';
 import NONPROFIT_NAME from '@salesforce/label/c.Core_SuiteChoice_NonprofitName';
 import STANDARD_LINE from '@salesforce/label/c.Core_FirstRun_StandardLine';
@@ -39,7 +40,8 @@ export default class FirstRunModal extends LightningModal {
     chooseHelp: CHOOSE_HELP,
     modulesNote: MODULES_NOTE,
     finish: FINISH,
-    adminNeeded: ADMIN_NEEDED
+    adminNeeded: ADMIN_NEEDED,
+    close: CLOSE
   };
 
   editionOptions = [
@@ -69,8 +71,11 @@ export default class FirstRunModal extends LightningModal {
   errorMessage;
 
   connectedCallback() {
-    // Setup is not optional: neither Escape nor a close button dismisses the window.
-    this.disableClose = true;
+    // Setup is not optional for an administrator: neither Escape nor the close button
+    // dismisses the window (c/firstRunSetup also opens it with disableClose, which is what
+    // makes the platform's close button disabled rather than merely inert). Someone who
+    // cannot finish is never trapped: they read why and close it.
+    this.disableClose = this.canFinish;
     this.edition = this.state && this.state.recommendedSuite;
   }
 
@@ -111,6 +116,10 @@ export default class FirstRunModal extends LightningModal {
       unticked.add(key);
     }
     this.unticked = unticked;
+  }
+
+  handleClose() {
+    this.close();
   }
 
   async handleFinish() {

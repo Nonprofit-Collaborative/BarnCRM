@@ -792,7 +792,7 @@ skipped and named the same way.
 in a number, text longer than the field) rejects the whole row with the field and the value,
 rather than loading the rest of it. A row naming the same record as an earlier row of the file
 (the same ID, or the same value in the field rows are matched by) is rejected too: fix the
-duplicate and load it again, or set **One row per** on that column (section 11). An empty
+duplicate and load it again, or set **One Row Per** on that column (section 11). An empty
 cell leaves its field as it is unless the column says **Empty cells clear the field**
 (section 11). Under **Match only**, a row that would create a record is rejected. A value
 for every row cannot be the record ID or the field rows are matched by.
@@ -914,18 +914,18 @@ and a people load both reject the row).
 Partner and event exports carry test rows, cancelled lines and repeats. Set these on the
 columns step, under **Rows to Load**; they are saved with the template like the columns.
 
-- **Skip rows where.** Up to five rules, each a column and a test: **equals** some text,
+- **Skip Rows Where.** Up to five rules (**Add a Rule** adds one, **Remove Rule** takes one away), each a column and a test: **equals** some text,
   **contains** it, or **is empty**. A row any rule matches is skipped. Cells are compared as they
   are in the file (before **Change Values**), ignoring spaces at the ends and capitals. Example:
   skip rows where Status equals `Cancelled`, or where Email contains `@test.`.
-- **One row per.** Up to five columns, for example Email, or Event and Email. Only the first row
+- **One Row Per.** Up to five columns, for example Email, or Event and Email. Only the first row
   of the file with each combination of their values loads; a later row with the same values is
   skipped and says which earlier row it repeats. Spaces at the ends and capitals are ignored,
   and a row whose key columns are all empty is never skipped for this.
 
 A skipped row is not rejected: it is decided when the file is uploaded, before the dry run, and
 the dry run, the commit and the run log all count it as skipped ("12 rows were skipped by Skip
-rows or One row per"). **View rows** lists each one with its reason; it is not in the rejected
+Rows Where or One Row Per"). **View rows** lists each one with its reason; it is not in the rejected
 rows file. To load a skipped row after all, change the rule and upload the file again.
 
 **Empty cells clear the field** (one-object loads that update or upsert, section 9). By default

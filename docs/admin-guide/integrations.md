@@ -25,7 +25,9 @@ Everyone who can open BarnCRM Settings sees the page. It has no settings to chan
 
 Products are grouped:
 
-- **Complementary Apps**: free community apps that add something BarnCRM does not do.
+- **Complementary Apps**: free community apps that add something BarnCRM does not do. DLRS
+  (Declarative Lookup Rollup Summaries) is listed only when it is installed in your org, since
+  BarnCRM Rollup Builder covers the same need for an org that does not have it yet.
 - **In Development**: projects that are not finished themselves.
 - **Alternatives to BarnCRM Modules**: apps that overlap a BarnCRM module. They appear here only
   when installed in your org. If you have none, the heading does not appear at all. For each,

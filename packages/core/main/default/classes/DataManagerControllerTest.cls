@@ -65,6 +65,50 @@ private class DataManagerControllerTest {
     }
 
     @IsTest
+    static void eachMappingSaysWhatItLoadsInWordsNeverAnApiName() {
+        System.runAs(TestUsers.admin()) {
+            List<Import_Template__c> rows = templates(4);
+            ImportMapping gifts = new ImportMapping();
+            gifts.columns.add(new ImportMapping.Column('Email', 'Contact1.Email'));
+            gifts.columns.add(new ImportMapping.Column('Amount', 'Gift.Amount__c'));
+            rows[1].Column_Mapping_JSON__c = gifts.serialize();
+            rows[2].Target_Object__c = String.valueOf(Address__c.SObjectType);
+            rows[3].Target_Object__c = 'No_Such_Object__c';
+            insert rows;
+            DataManagerController.permissionOverride = true;
+
+            Test.startTest();
+            Map<String, String> loadsByName = new Map<String, String>();
+            for (DataManagerController.Mapping mapping : DataManagerController.getMappings()) {
+                loadsByName.put(mapping.name, mapping.loads);
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                System.Label.Core_DataManager_LoadsPeople,
+                loadsByName.get('Mapping 1000'),
+                'A people file loads people and organizations'
+            );
+            Assert.areEqual(
+                System.Label.Core_DataManager_LoadsGifts,
+                loadsByName.get('Mapping 1001'),
+                'A people file with gift columns loads gifts'
+            );
+            Assert.areEqual(
+                Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .getLabelPlural(),
+                loadsByName.get('Mapping 1002'),
+                'A one-object mapping names its object by its label'
+            );
+            Assert.areEqual(
+                'No_Such_Object__c',
+                loadsByName.get('Mapping 1003'),
+                'An object this org does not have can only be named as saved'
+            );
+        }
+    }
+
+    @IsTest
     static void theRealPermissionDecidesWhenNothingIsStated() {
         List<Import_Template__c> rows = templates(2);
         System.runAs(TestUsers.admin()) {

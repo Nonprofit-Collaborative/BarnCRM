@@ -141,7 +141,9 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     if (data) {
       this.mappings = data.map((mapping) => ({
         ...mapping,
-        loads: mapping.targetObject || LOADS_PEOPLE
+        // The server names what each mapping loads (an object label, Gifts, or people and
+        // organizations), never an API name.
+        loads: mapping.loads || LOADS_PEOPLE
       }));
       this.mappingsError = undefined;
     } else if (error) {

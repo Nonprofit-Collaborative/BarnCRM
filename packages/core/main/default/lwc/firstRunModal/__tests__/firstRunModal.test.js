@@ -81,6 +81,24 @@ describe('c-first-run-modal', () => {
     expect(byId(element, 'edition')).toBeNull();
   });
 
+  it('lets someone who cannot finish close the window, so nobody is trapped', async () => {
+    const element = await build({ needsSetup: true, canFinish: false, features: [] });
+    const closed = jest.fn();
+    element.addEventListener('close', closed);
+
+    expect(element.disableClose).toBe(false);
+    const close = byId(element, 'close');
+    expect(close.label).toBe('c.Core_FirstRun_Close');
+    close.click();
+    expect(closed).toHaveBeenCalled();
+  });
+
+  it('offers an administrator no Close button', async () => {
+    const element = await build(ADMIN_STATE);
+
+    expect(byId(element, 'close')).toBeNull();
+  });
+
   it('keeps Finish Setup disabled until an edition is chosen', async () => {
     const element = await build({ ...ADMIN_STATE, recommendedSuite: undefined });
 
