@@ -169,7 +169,7 @@ private class RollupChangesTest {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             Account nolan = household('The Nolan Family');
             Account lee = household('The Lee Family');
-            insert new List<Account>{ nolan, lee };
+            Database.insert(new List<Account>{ nolan, lee }, AccessLevel.SYSTEM_MODE);
             Contact ana = new Contact(FirstName = 'Ana', LastName = 'Nolan', AccountId = nolan.Id);
             Contact bea = new Contact(FirstName = 'Bea', LastName = 'Lee', AccountId = lee.Id);
             insert new List<Contact>{ ana, bea };
@@ -205,7 +205,7 @@ private class RollupChangesTest {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             Account nolan = household('The Nolan Family');
             Account lee = household('The Lee Family');
-            insert new List<Account>{ nolan, lee };
+            Database.insert(new List<Account>{ nolan, lee }, AccessLevel.SYSTEM_MODE);
             Contact ana = new Contact(FirstName = 'Ana', LastName = 'Nolan', AccountId = nolan.Id);
             insert ana;
             List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
@@ -335,7 +335,7 @@ private class RollupChangesTest {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             Account nolan = household('The Nolan Family');
             Account riverbend = organization('Riverbend');
-            insert new List<Account>{ nolan, riverbend };
+            Database.insert(new List<Account>{ nolan, riverbend }, AccessLevel.SYSTEM_MODE);
             // A membership names one person, a contact or an account, never both: this one
             // names the account side, the field the definition totals into.
             insert new Household_Member__c(Household__c = nolan.Id, Account__c = riverbend.Id);

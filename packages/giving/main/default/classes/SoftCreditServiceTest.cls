@@ -141,7 +141,7 @@ private class SoftCreditServiceTest {
             for (Integer i = 0; i < 200; i++) {
                 households.add(new Account(Name = 'Household ' + i, RecordTypeId = householdType));
             }
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             Account givers = RecognitionTestData.household('The Garcia Family');
             Contact ana = RecognitionTestData.person('Ana', 'Garcia', givers.Id);
             RecognitionTestData.gift(ana.Id, null, 500);

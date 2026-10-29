@@ -107,7 +107,7 @@ private class HouseholdSelectorTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('Read Household');
             Account empty = HouseholdTestDataFactory.newHousehold('Empty Household');
-            insert new List<Account>{ household, empty };
+            Database.insert(new List<Account>{ household, empty }, AccessLevel.SYSTEM_MODE);
             Contact resident = HouseholdTestDataFactory.newContact('Ria', 'Reader');
             resident.AccountId = household.Id;
             insert resident;
@@ -227,7 +227,7 @@ private class HouseholdSelectorTest {
         System.runAs(TestUsers.admin()) {
             Account match = HouseholdTestDataFactory.newHousehold('Q_100% Match');
             Account lookalike = HouseholdTestDataFactory.newHousehold('Qx1000 Match');
-            insert new List<Account>{ match, lookalike };
+            Database.insert(new List<Account>{ match, lookalike }, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             List<Account> found = HouseholdSelector.searchHouseholds('q_100%', null, null);
@@ -246,7 +246,7 @@ private class HouseholdSelectorTest {
             Account named = HouseholdTestDataFactory.newHousehold('Named Household');
             Account custom = HouseholdTestDataFactory.newHousehold('Custom Household');
             custom.Custom_Name__c = true;
-            insert new List<Account>{ named, custom };
+            Database.insert(new List<Account>{ named, custom }, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             Set<Id> located = new Set<Id>();
@@ -267,7 +267,7 @@ private class HouseholdSelectorTest {
         System.runAs(TestUsers.admin()) {
             Account household = HouseholdTestDataFactory.newHousehold('Probe Household');
             Account other = HouseholdTestDataFactory.newHousehold('Other Household');
-            insert new List<Account>{ household, other };
+            Database.insert(new List<Account>{ household, other }, AccessLevel.SYSTEM_MODE);
             Set<Id> ids = new Set<Id>{ household.Id, other.Id };
             HouseholdSelector.describedObjectNamesOverride = NATIVE_OBJECTS;
             OrgShapeDetector.reset();
@@ -293,7 +293,7 @@ private class HouseholdSelectorTest {
     static void anObjectThatIsNotDescribedIsNotProbed() {
         System.runAs(TestUsers.admin()) {
             Account household = HouseholdTestDataFactory.newHousehold('Plain Household');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Set<Id> ids = new Set<Id>{ household.Id };
             HouseholdSelector.describedObjectNamesOverride = new Set<String>();
             OrgShapeDetector.reset();
@@ -334,7 +334,7 @@ private class HouseholdSelectorTest {
     static void nativeMembershipRowsAreQueriedForAccountsAndForPairs() {
         System.runAs(TestUsers.admin()) {
             Account household = HouseholdTestDataFactory.newHousehold('Rows Household');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact person = HouseholdTestDataFactory.newContact('Rowan', 'Rows');
             insert person;
             HouseholdSelector.describedObjectNamesOverride = NATIVE_OBJECTS;

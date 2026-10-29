@@ -15,7 +15,7 @@ private class HouseholdNamingBatchTest {
             Account patterned = HouseholdTestDataFactory.newHousehold('Old name');
             Account byHand = HouseholdTestDataFactory.newHousehold('The Reverend and Mrs. Smith');
             byHand.Custom_Name__c = true;
-            insert new List<Account>{ patterned, byHand };
+            Database.insert(new List<Account>{ patterned, byHand }, AccessLevel.SYSTEM_MODE);
             insert new List<Contact>{
                 new Contact(
                     Salutation = 'Ms.',
@@ -54,7 +54,7 @@ private class HouseholdNamingBatchTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('Old name');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             HouseholdNamingBatch job = new HouseholdNamingBatch();
 
             Test.startTest();
@@ -77,7 +77,7 @@ private class HouseholdNamingBatchTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account native = HouseholdTestDataFactory.newHousehold('Old native name');
             Account ordinary = HouseholdTestDataFactory.newHousehold('Old ordinary name');
-            insert new List<Account>{ native, ordinary };
+            Database.insert(new List<Account>{ native, ordinary }, AccessLevel.SYSTEM_MODE);
             insert new List<Contact>{
                 new Contact(
                     Salutation = 'Ms.',

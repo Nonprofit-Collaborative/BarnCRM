@@ -122,7 +122,7 @@ private class CoreHandlerCoverageTest {
                 BillingStreet = '2 Winter Road',
                 BillingCity = 'Springfield'
             );
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Integer keptOnInsert = [
                 SELECT COUNT()
                 FROM Address__c
@@ -166,7 +166,7 @@ private class CoreHandlerCoverageTest {
             }
 
             Test.startTest();
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             Test.stopTest();
 
             Assert.areEqual(

@@ -157,7 +157,7 @@ private class BulkDeleteUndoTest {
             for (Integer index = 0; index < 200; index++) {
                 households.add(HouseholdTestDataFactory.newHousehold('Tidied ' + index));
             }
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             List<Contact> people = new List<Contact>();
             for (Integer index = 0; index < 200; index++) {
                 people.add(

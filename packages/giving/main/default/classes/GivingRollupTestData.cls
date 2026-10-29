@@ -115,7 +115,7 @@ public class GivingRollupTestData {
                 new Account(Name = 'The ' + lastName + ' Family', RecordTypeId = householdType)
             );
         }
-        insert households;
+        Database.insert(households, AccessLevel.SYSTEM_MODE);
         List<Contact> people = new List<Contact>();
         for (Integer i = 0; i < lastNames.size(); i++) {
             people.add(

@@ -49,7 +49,7 @@ public class RecognitionTestData {
         if (recordTypeId != null) {
             record.RecordTypeId = recordTypeId;
         }
-        insert record;
+        Database.insert(record, AccessLevel.SYSTEM_MODE);
         return record;
     }
 

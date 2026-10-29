@@ -357,7 +357,7 @@ private class CoexistenceServiceTest {
             // membership record and would belong to no household the flexible way can see.
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact maria = HouseholdTestDataFactory.newContact('Maria', 'Garcia');
             maria.AccountId = household.Id;
             insert maria;
@@ -386,7 +386,7 @@ private class CoexistenceServiceTest {
             // the reason back as this class's own exception for the panel to show it.
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact maria = HouseholdTestDataFactory.newContact('Maria', 'Garcia');
             maria.AccountId = household.Id;
             insert maria;

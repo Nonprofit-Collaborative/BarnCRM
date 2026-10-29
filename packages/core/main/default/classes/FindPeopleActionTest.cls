@@ -67,7 +67,7 @@ private class FindPeopleActionTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
             insert wei;
             insert new Household_Member__c(

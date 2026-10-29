@@ -101,7 +101,7 @@ private class SeasonalAddressBatchTest {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
             garcia.BillingStreet = HOME_STREET;
             garcia.BillingCity = HOME_CITY;
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             Database.executeBatch(new SeasonalAddressBatch(), SeasonalAddressBatch.CHUNK_SIZE);
@@ -223,7 +223,7 @@ private class SeasonalAddressBatchTest {
         Account household = AddressTestDataFactory.newHousehold(name);
         household.BillingStreet = HOME_STREET;
         household.BillingCity = HOME_CITY;
-        insert household;
+        Database.insert(household, AccessLevel.SYSTEM_MODE);
         insert new Address__c(
             Account__c = household.Id,
             Type__c = 'Seasonal',

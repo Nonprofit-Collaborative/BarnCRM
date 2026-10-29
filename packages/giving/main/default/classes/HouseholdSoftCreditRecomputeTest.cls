@@ -24,7 +24,7 @@ private class HouseholdSoftCreditRecomputeTest {
         for (Integer i = 0; i < howMany; i++) {
             households.add(new Account(Name = 'Household ' + i, RecordTypeId = householdType));
         }
-        insert households;
+        Database.insert(households, AccessLevel.SYSTEM_MODE);
         List<Gift__c> gifts = new List<Gift__c>();
         for (Account household : households) {
             gifts.add(RecognitionTestData.newGift(null, household.Id, 100));

@@ -231,7 +231,7 @@ private class SeasonalAddressServiceTest {
     static void anOwnerWhoseOnlyAddressIsSeasonalKeepsIt() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c winter = seasonalAddress(garcia.Id, 11, 1, 3, 31);
             winter.Is_Default__c = true;
             insert winter;
@@ -296,7 +296,7 @@ private class SeasonalAddressServiceTest {
     static void aPersonalSeasonalAddressMovesWithoutMovingTheHousehold() {
         System.runAs(TestUsers.admin()) {
             Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact harper = AddressTestDataFactory.newContact('Harper', 'Garcia', garcia.Id);
             harper.MailingStreet = HOME_STREET;
             harper.MailingCity = HOME_CITY;
@@ -341,7 +341,7 @@ private class SeasonalAddressServiceTest {
                 household.BillingCity = HOME_CITY;
                 households.add(household);
             }
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             List<Address__c> winters = new List<Address__c>();
             Set<Id> ownerIds = new Set<Id>();
             for (Account household : households) {
@@ -472,7 +472,7 @@ private class SeasonalAddressServiceTest {
         Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
         garcia.BillingStreet = HOME_STREET;
         garcia.BillingCity = HOME_CITY;
-        insert garcia;
+        Database.insert(garcia, AccessLevel.SYSTEM_MODE);
 
         Address__c winter = seasonalAddress(garcia.Id, startMonth, startDay, endMonth, endDay);
         insert winter;

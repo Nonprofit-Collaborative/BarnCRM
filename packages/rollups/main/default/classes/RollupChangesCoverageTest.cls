@@ -292,7 +292,7 @@ private class RollupChangesCoverageTest {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             Account nolan = household('The Nolan Family');
             Account lee = household('The Lee Family');
-            insert new List<Account>{ nolan, lee };
+            Database.insert(new List<Account>{ nolan, lee }, AccessLevel.SYSTEM_MODE);
             Contact ana = new Contact(FirstName = 'Ana', LastName = 'Nolan', AccountId = nolan.Id);
             Contact ben = new Contact(FirstName = 'Ben', LastName = 'Nolan', AccountId = nolan.Id);
             Contact cal = new Contact(FirstName = 'Cal', LastName = 'Lee', AccountId = lee.Id);
@@ -339,7 +339,7 @@ private class RollupChangesCoverageTest {
     static void theSurvivorOfAMergeMarksItsHousehold() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             Account nolan = household('The Nolan Family');
-            insert nolan;
+            Database.insert(nolan, AccessLevel.SYSTEM_MODE);
             Contact survivor = new Contact(
                 FirstName = 'Ana',
                 LastName = 'Nolan',

@@ -19,7 +19,7 @@ private class AddressMoveControllerTest {
     static void aHouseholdIsOfferedUpdateEveryonesAddress() {
         System.runAs(TestUsers.admin()) {
             Account garcia = household('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             AddressMoveController.CardContext context = AddressMoveController.getCardContext(
@@ -41,7 +41,7 @@ private class AddressMoveControllerTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account garcia = household('The Garcia Family');
             Account nowak = household('The Nowak Family');
-            insert new List<Account>{ garcia, nowak };
+            Database.insert(new List<Account>{ garcia, nowak }, AccessLevel.SYSTEM_MODE);
             Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Nowak');
             insert ana;
             insert new List<Household_Member__c>{
@@ -71,7 +71,7 @@ private class AddressMoveControllerTest {
     static void thePreviewNamesWhoMovesAndWhoHasTheirOwn() {
         System.runAs(TestUsers.admin()) {
             Account garcia = household('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             insert new List<Contact>{ ana, luis };
@@ -97,7 +97,7 @@ private class AddressMoveControllerTest {
     static void useForWholeHouseholdMovesTheHousehold() {
         System.runAs(TestUsers.admin()) {
             Account garcia = household('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             insert ana;
             Address__c anasOwn = ownAddress(ana.Id);
@@ -119,7 +119,7 @@ private class AddressMoveControllerTest {
     static void aRefusalTheCardCanShowPassesThrough() {
         System.runAs(TestUsers.admin()) {
             Account empty = AddressTestDataFactory.newHousehold('The Empty Family');
-            insert empty;
+            Database.insert(empty, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             String message;
@@ -145,7 +145,7 @@ private class AddressMoveControllerTest {
         Address__c anasOwn;
         System.runAs(TestUsers.admin()) {
             garcia = household('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             insert new List<Contact>{ ana, luis };

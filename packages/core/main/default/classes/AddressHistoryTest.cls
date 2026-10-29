@@ -31,7 +31,7 @@ private class AddressHistoryTest {
     static void aNewPrimaryAddedOnTheCardEndsTheOldOneAndStartsTheNew() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             Address__c moved = newPrimary(garcia.Id, NEW_STREET);
@@ -56,7 +56,7 @@ private class AddressHistoryTest {
             for (Integer index = 0; index < 200; index++) {
                 households.add(householdAtHome('The Family ' + index));
             }
-            insert households;
+            Database.insert(households, AccessLevel.SYSTEM_MODE);
             List<Address__c> moves = new List<Address__c>();
             for (Account household : households) {
                 moves.add(newPrimary(household.Id, NEW_STREET));
@@ -82,7 +82,7 @@ private class AddressHistoryTest {
     static void aNewPrimaryAtTheSameAddressIsNotAMove() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
 
             Address__c home = [
                 SELECT Street__c, City__c, State__c, Postal_Code__c, Country__c
@@ -115,7 +115,7 @@ private class AddressHistoryTest {
     static void choosingAnAddressAlreadyOnFileAsPrimaryEndsNothing() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c work = new Address__c(
                 Account__c = garcia.Id,
                 Type__c = 'Work',
@@ -140,7 +140,7 @@ private class AddressHistoryTest {
     static void aChangedMailingAddressCapturedForTheHouseholdEndsItsOldAddress() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact luis = AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id);
             insert luis;
 
@@ -161,7 +161,7 @@ private class AddressHistoryTest {
     static void useForWholeHouseholdEndsTheHouseholdsOldAddressNotThePersonsOwn() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             insert ana;
             Address__c anasOwn = new Address__c(
@@ -199,7 +199,7 @@ private class AddressHistoryTest {
     static void updateEveryonesAddressEndsATickedPersonsOwnAddress() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
             insert ana;
             Address__c anasOwn = new Address__c(
@@ -234,7 +234,7 @@ private class AddressHistoryTest {
     static void aMoveKeepsAnUndeliverableStatusAndAnEndDateAPersonGave() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c home = addressAt(garcia.Id, HOME_STREET);
             Date given = Date.today().addDays(-3);
             update new Address__c(Id = home.Id, Status__c = 'Undeliverable', End_Date__c = given);
@@ -255,7 +255,7 @@ private class AddressHistoryTest {
     static void theSeasonalSwapIsNotAMoveEitherWay() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             insert winterAddress(garcia.Id, null);
 
             Test.startTest();
@@ -282,7 +282,7 @@ private class AddressHistoryTest {
     static void aFormerSeasonalAddressIsNotSwappedIn() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             insert winterAddress(garcia.Id, 'Former');
 
             Test.startTest();
@@ -300,7 +300,7 @@ private class AddressHistoryTest {
     static void aMoveDuringTheSeasonEndsTheHomeLeftNotTheSeasonalAddress() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             insert winterAddress(garcia.Id, null);
             SeasonalAddressService.swapOwners(new Set<Id>{ garcia.Id }, IN_SEASON);
 
@@ -324,7 +324,7 @@ private class AddressHistoryTest {
     static void aFormerAddressMadePrimaryIsCurrentAgain() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             insert newPrimary(garcia.Id, NEW_STREET);
             Address__c old = addressAt(garcia.Id, HOME_STREET);
 
@@ -348,7 +348,7 @@ private class AddressHistoryTest {
     static void aDeletedPrimaryIsReplacedByACurrentAddressBeforeAFormerOne() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c work = new Address__c(
                 Account__c = garcia.Id,
                 Type__c = 'Work',
@@ -379,7 +379,7 @@ private class AddressHistoryTest {
     static void anAddressSavedWithNoStatusIsCurrent() {
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             Address__c home = addressAt(garcia.Id, HOME_STREET);
@@ -401,7 +401,7 @@ private class AddressHistoryTest {
 
         Test.startTest();
         System.runAs(sam) {
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             insert newPrimary(garcia.Id, NEW_STREET);
         }
         Test.stopTest();
@@ -420,7 +420,7 @@ private class AddressHistoryTest {
         Address__c home;
         System.runAs(TestUsers.admin()) {
             Account garcia = householdAtHome('The Garcia Family');
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             home = addressAt(garcia.Id, HOME_STREET);
         }
         User rita;
@@ -471,7 +471,7 @@ private class AddressHistoryTest {
             // Today in Pat's time zone, the day BarnCRM stamps on the move Pat makes.
             moveDay = Date.today();
             canReadStatus = Schema.SObjectType.Address__c.fields.Status__c.isAccessible();
-            insert garcia;
+            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
             Address__c moved = newPrimary(garcia.Id, NEW_STREET);
             insert moved;
             endedOnMove = addressAt(garcia.Id, HOME_STREET);

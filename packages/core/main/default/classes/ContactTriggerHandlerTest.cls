@@ -33,7 +33,7 @@ private class ContactTriggerHandlerTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact john = new Contact(
                 Salutation = 'Mr.',
                 FirstName = 'John',
@@ -234,7 +234,7 @@ private class ContactTriggerHandlerTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Rivera Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Rivera');
             Contact luis = HouseholdTestDataFactory.newContact('Mr.', 'Luis', 'Rivera');
             insert new List<Contact>{ maria, luis };
@@ -270,7 +270,7 @@ private class ContactTriggerHandlerTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Rivera Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Rivera');
             Contact luis = HouseholdTestDataFactory.newContact('Mr.', 'Luis', 'Rivera');
             insert new List<Contact>{ maria, luis };
@@ -331,7 +331,7 @@ private class ContactTriggerHandlerTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account employer = new Account(Name = 'Riverside Library');
-            insert new List<Account>{ household, employer };
+            Database.insert(new List<Account>{ household, employer }, AccessLevel.SYSTEM_MODE);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             insert maria;
             insert new Household_Member__c(
@@ -426,7 +426,7 @@ private class ContactTriggerHandlerTest {
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account library = organization('Riverside Library');
-            insert new List<Account>{ household, library };
+            Database.insert(new List<Account>{ household, library }, AccessLevel.SYSTEM_MODE);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             maria.AccountId = household.Id;
             insert maria;

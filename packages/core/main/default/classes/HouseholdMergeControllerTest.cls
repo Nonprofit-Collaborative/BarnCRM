@@ -15,7 +15,7 @@ private class HouseholdMergeControllerTest {
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account duplicate = HouseholdTestDataFactory.newHousehold('Garcia Household');
             Account organization = new Account(Name = 'Garcia Family Foundation');
-            insert new List<Account>{ household, duplicate, organization };
+            Database.insert(new List<Account>{ household, duplicate, organization }, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             List<HouseholdMergeController.HouseholdOption> options = HouseholdMergeController.searchHouseholds(
@@ -40,7 +40,7 @@ private class HouseholdMergeControllerTest {
             Account plain = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account percent = HouseholdTestDataFactory.newHousehold('100% Garcia');
             Account underscore = HouseholdTestDataFactory.newHousehold('Garcia_Lee');
-            insert new List<Account>{ plain, percent, underscore };
+            Database.insert(new List<Account>{ plain, percent, underscore }, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             List<HouseholdMergeController.HouseholdOption> byPercent = HouseholdMergeController.searchHouseholds(
@@ -85,7 +85,7 @@ private class HouseholdMergeControllerTest {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            insert household;
+            Database.insert(household, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             Boolean canEdit = HouseholdMergeController.canEdit(household.Id);
@@ -102,7 +102,7 @@ private class HouseholdMergeControllerTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account survivor = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
-            insert new List<Account>{ survivor, victim };
+            Database.insert(new List<Account>{ survivor, victim }, AccessLevel.SYSTEM_MODE);
 
             Test.startTest();
             HouseholdMergeService.MergePreview preview = HouseholdMergeController.preview(
@@ -178,7 +178,7 @@ private class HouseholdMergeControllerTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account organization = new Account(Name = 'Bay Area Food Bank');
-            insert new List<Account>{ household, organization };
+            Database.insert(new List<Account>{ household, organization }, AccessLevel.SYSTEM_MODE);
 
             String message;
             Test.startTest();
@@ -213,7 +213,7 @@ private class HouseholdMergeControllerTest {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account survivor = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
-            insert new List<Account>{ survivor, victim };
+            Database.insert(new List<Account>{ survivor, victim }, AccessLevel.SYSTEM_MODE);
             HouseholdMergeController.previewFailureForTest = new QueryException(
                 'Insufficient permissions: secure query included inaccessible field'
             );
