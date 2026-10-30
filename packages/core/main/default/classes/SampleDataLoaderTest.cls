@@ -449,6 +449,45 @@ private class SampleDataLoaderTest {
     }
 
     @IsTest
+    static void testSampleHouseholdsArriveNamedWhileHouseholdUpkeepIsOff() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            // A new install: no feature on, so the household triggers do not run.
+            TestSettings.newInstall();
+            Assert.isFalse(
+                FeatureSwitchService.isOn(FeatureSwitchService.HOUSEHOLD_UPKEEP),
+                'Household Upkeep is off for this test'
+            );
+
+            Test.startTest();
+            loadEverything(buildJson(2, 2, false));
+            Test.stopTest();
+
+            List<Account> households = [
+                SELECT
+                    Name,
+                    Member_Count__c,
+                    Household_Formal_Greeting__c,
+                    Household_Informal_Greeting__c
+                FROM Account
+                WHERE Sample_Data__c = TRUE AND RecordType.DeveloperName = 'Household'
+            ];
+            Assert.areEqual(2, households.size(), 'two sample households');
+            for (Account household : households) {
+                Assert.areNotEqual('Household', household.Name, 'named from its people');
+                Assert.areEqual(2, household.Member_Count__c, 'both people counted');
+                Assert.isTrue(
+                    String.isNotBlank(household.Household_Formal_Greeting__c),
+                    'a formal greeting is set'
+                );
+                Assert.isTrue(
+                    String.isNotBlank(household.Household_Informal_Greeting__c),
+                    'an informal greeting is set'
+                );
+            }
+        }
+    }
+
+    @IsTest
     static void testRemoveInJunctionModeTakesTheMembershipRowsWithIt() {
         System.runAs(TestUsers.adminWithInstalledModules()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);

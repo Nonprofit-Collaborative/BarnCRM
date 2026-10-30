@@ -58,9 +58,12 @@ private class ModuleDetectionServiceTest {
                 names,
                 'No nonprofit module is shown until the Nonprofit Edition is chosen'
             );
-            Assert.isTrue(
+            // Rollup_Definition__c ships in the Rollups package, so the answer depends on the
+            // org: installed exactly when its probe object is here (a Core-only org has none).
+            Assert.areEqual(
+                Type.forName('Rollup_Definition__c') != null,
                 modules[1].present,
-                'Rollup Builder counts as installed while its objects ship in Core'
+                'Rollup Builder counts as installed exactly when its probe object exists'
             );
         }
     }

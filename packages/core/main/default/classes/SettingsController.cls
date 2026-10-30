@@ -359,6 +359,31 @@ public with sharing class SettingsController {
             (SettingsService.CORE_SETTINGS_OBJECT + '.Suite__c').toLowerCase(),
             editionLabels
         );
+        // A Record Type row logs the record type's API name; it reads as the record type's label.
+        for (Setting_Definition__mdt definition : SettingDefinitionSelector.getAll()) {
+            if (
+                String.isBlank(definition.Setting_Key__c) ||
+                !SettingsService.RECORD_TYPE.equalsIgnoreCase(definition.Data_Type__c)
+            ) {
+                continue;
+            }
+            Schema.SObjectType type = SettingsService.recordObjectType(definition);
+            if (type == null) {
+                continue;
+            }
+            Map<String, String> byName = new Map<String, String>{
+                AccountKinds.NO_RECORD_TYPE.toLowerCase() => System.Label.Core_Settings_NoRecordType
+            };
+            for (
+                Schema.RecordTypeInfo info : type.getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .getRecordTypeInfos()
+            ) {
+                if (!info.isMaster()) {
+                    byName.put(info.getDeveloperName().toLowerCase(), info.getName());
+                }
+            }
+            choices.put(storedNameOf(definition), byName);
+        }
         return choices;
     }
 
@@ -379,7 +404,7 @@ public with sharing class SettingsController {
     /**
      * The names of the records that Record settings logged, by Id, read now so a renamed record
      * reads its current name. A record the user cannot read, or that is gone, is left out and
-     * shows as stored.
+     * shows as the plain fallback (Core_Settings_RecordUnavailable).
      */
     private static Map<Id, String> recordNamesFor(
         List<Setting_Change__c> changes,
@@ -421,17 +446,25 @@ public with sharing class SettingsController {
                     names.put(record.Id, (String) record.get('Name'));
                 }
             } catch (Exception e) {
-                // An object with no Name field or no read access: its rows show the stored Id.
+                // An object with no Name field or no read access: its rows show the plain fallback.
                 continue;
             }
         }
         return names;
     }
 
-    /** A logged Id as its record's name when the record is still readable, otherwise as stored. */
+    /**
+     * A logged Id as its record's name when the record is still readable, otherwise a plain
+     * fallback: never a raw Id.
+     */
     private static String shownRecordName(String stored, Map<Id, String> names) {
         Id recordId = asId(stored);
-        return recordId != null && names.containsKey(recordId) ? names.get(recordId) : stored;
+        if (recordId == null) {
+            return stored;
+        }
+        return names.containsKey(recordId)
+            ? names.get(recordId)
+            : System.Label.Core_Settings_RecordUnavailable;
     }
 
     private static Id asId(String value) {

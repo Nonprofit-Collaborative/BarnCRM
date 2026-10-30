@@ -142,6 +142,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 5 | Click the notification. | **BarnCRM Settings** opens on **General**. |
 | 6 | Open **Households**, find **The Garcia Family**. | It exists, with its members. In the simple way of belonging, **Primary Contact** names its first person, and so does every other sample household's (a list view with a Primary Contact column shows none blank). |
 | 7 | With Giving, open **BarnCRM Settings**, **Rollups**, and select **Recalculate**. | Giving totals fill in (see [Load sample data](before-you-test.md#load-sample-data)). |
+| 8 | On an org where **Household Upkeep** is **Off** (for example one where first-run setup left it unticked), load sample data, then open the **Accounts** tab and search for "Garcia". | **The Garcia Family** is named from its people, with both greetings and a member count filled in. No sample household is named just "Household". |
 
 **Cleanup:** None (leave sample data loaded).
 
@@ -180,11 +181,11 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Run `scripts/org/deploy-packages.sh <alias>-src --core-only`. | The output includes **== Running Core's post-install steps ==** with no error, and ends **== Every stage deployed ==**. |
+| 1 | Run `scripts/org/deploy-packages.sh <alias>-src --core-only`. | The output includes **== Giving the person deploying the BarnCRM Admin permission set ==** and **== Running Core's post-install steps ==** with no error, and ends **== Every stage deployed ==**. The **Error Log** tab has no **You need the Manage BarnCRM Settings permission** entry from this run. |
 | 2 | Open the **BarnCRM** app as the admin who deployed. | The **Set Up BarnCRM** window shows, as in T-SA-01. |
 | 3 | Click the **Standard Edition** card, keep **Turn on all the default core features**, and click **Finish Setup**. | **BarnCRM Settings** opens on **General**. Every row under **Features** says **On**. |
 | 4 | Wait a few minutes, reload, and open the app's navigation menu. | **Data Manager** is listed (**Find** opens from it). In Setup, **Scheduled Jobs** lists **BarnCRM Tab Access Check**. |
 | 5 | Open **BarnCRM Settings**, **Automation**. | The automation switches are listed. |
-| 6 | Run the deploy script from step 1 again. | It ends **== Every stage deployed ==**. In BarnCRM Settings, **Edition** still reads **Standard Edition**, every feature is still **On**, the setup window does not come back, and **Scheduled Jobs** still lists one **BarnCRM Tab Access Check**. |
+| 6 | Run the deploy script from step 1 again. | Before **Core (Apex)** it prints **== Pausing scheduled jobs whose class this stage deploys: BarnCRM Tab Access Check ==**, after it **== Scheduling the paused jobs again ==**, and it ends **== Every stage deployed ==**. In BarnCRM Settings, **Edition** still reads **Standard Edition**, every feature is still **On**, the setup window does not come back, and **Scheduled Jobs** still lists one **BarnCRM Tab Access Check**. |
 
 **Cleanup:** None. Delete the org when done.

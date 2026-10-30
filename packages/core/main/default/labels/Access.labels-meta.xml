@@ -425,6 +425,14 @@
         <value>You are about to remove your own BarnCRM Admin role. You will lose access to BarnCRM Settings.</value>
     </labels>
     <labels>
+        <fullName>Core_Access_TabRefusalDetail</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error Log: refused tab assignment. {0} permission set, {1} user Id</shortDescription>
+        <value>(permission set {0}, user {1})</value>
+    </labels>
+    <labels>
         <fullName>Core_Access_ToastErrorTitle</fullName>
         <categories>Access</categories>
         <language>en_US</language>

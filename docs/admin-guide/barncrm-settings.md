@@ -210,9 +210,10 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    It shows on **General** only, whichever section the change was made in. Your change is the first row,
    showing the setting by the name you see on this page, the old value, the new value, your
    name, and the time. A setting with a list of choices shows each value as the choice reads
-   on this page (the edition, for example, reads "Nonprofit Edition"), and a setting that holds
-  one record, such as the default fund, shows the record's name. If that record has been deleted
-  or you cannot open it, the stored Id shows instead. Nothing is ever changed silently: one row is written per setting you
+   on this page (the edition, for example, reads "Nonprofit Edition", and a record type reads by
+   its label), and a setting that holds one record, such as the default fund, shows the
+   record's name. If that record has been deleted or you cannot open it, the row reads "A
+   record you cannot view". Nothing is ever changed silently: one row is written per setting you
    actually changed, and saving a page without changing anything writes nothing. Ticking or
    skipping a step in the setup checklist is not a settings change, so it is not listed.
 7. Now sign in as David, who has the Team Member role and not Manage BarnCRM
@@ -330,15 +331,25 @@ Check warns **You cannot use the record type for organizations**, each naming th
 
 **Upgrading from a version that shipped the Organization record type.** The upgrade leaves the
 **Organization** record type and your accounts as they are, and this row keeps it, but
-BarnCRM's permission sets stop giving it. Do one of these:
+BarnCRM's permission sets stop giving it. Salesforce never lets an upgrade or a deployment
+delete a record type, so the upgrade cannot remove it for you: only an administrator can, in
+Setup. Do one of these:
 
-- Your organizations use **Organization**: give it to the profiles (or a permission set of
-  your own) of everyone who creates organizations, in Setup, Profiles, Record Type Settings.
-- You would rather use a record type of your own: choose it here. Accounts of Organization stop
-  counting as organizations, so change their record type first if they should still count.
-- No account uses **Organization** and your org has no other Account record type to choose:
-  deactivate it in Setup, Object Manager, Account, Record Types, then choose **No record
-  type** here.
+- **Keep Organization.** Give it to the profiles (or a permission set of your own) of everyone
+  who creates organizations, in Setup, Profiles, Record Type Settings. Nothing else to do.
+- **Use a record type of your own, or none.**
+  1. Choose your record type here and save. For no record type, skip this step: **No record
+     type** is offered once Organization is deactivated (step 3) and your org has no other
+     Account record type.
+  2. If accounts of Organization should still count as organizations, change their record
+     type to the one you chose (for example with a list view's mass edit or an import).
+     Accounts left on Organization stop counting as organizations.
+  3. In Setup, Object Manager, Account, Record Types, deactivate **Organization**. BarnCRM
+     counts only active record types, so it then leaves Organization out of this row's
+     choices, and **No record type** applies when no other Account record type is left. If
+     you would rather remove it entirely, delete it there once it is inactive; Salesforce asks
+     for the record type to give any accounts still on it, so choose the one you picked in
+     step 1, never Household. With no record type, deactivating is enough: leave it inactive.
 
 ## You Never Type an Identifier
 
