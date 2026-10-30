@@ -6,6 +6,8 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-10-30
 
+- `mwdbdevsb` released from main 5c177868 (owner approved): sample data removed and recycle bin purged; check-only 0AfWF00000H8E7F0AV `RunLocalTests` 2,579 of 2,579; quick deploy 0AfWF00000H8Ji10AF (4,742 components) with the 801 leaked Giving and Mirror labels removed; post-install clean; Organization record type deactivated and its compact layout deleted (0AfWF00000H8KHV0A3; the API cannot delete the record type, so Setup will); edition Standard, organizations on No record type; sample data reloaded (25 organizations, 200 households, 440 contacts); one hourly Tab Access Check; no error log rows.
+- Draft #735 opened and held for the owner: Household Upkeep fills blank greetings on custom-named households (R-H8 change); `barn-sales` 681 of 681 at aadb510c after fixing a save that wrote a blank name.
 - `barn-npc` deployed from main 806fcb36 (batches 18 and 19): validation 0Afhk00000213kHCAQ 3,658 of 3,658, quick deploy 0Afhk00000216v3CAA (6,185 components), post-install clean, one hourly Tab Access Check, edition Nonprofit, no error log rows.
 - Batch 19 screen recheck on `barn-platform` at main 19c95fda (Core only): deploy exit 0, one hourly Tab Access Check after; sample data removed and reloaded, 200 households, no formal greeting of the form "<Title>. and <Title>. <First> <Last>" except "Mr. and Mrs. ..." (56 of them); Hall, Perez-Reyes, Mensah-Sato, Costa, Nguyen and Garcia households read naturally. Pass, no findings.
 - Batch 19, #732 (squash 19c95fda): formal greeting combines titles only for one Mr. and one Mrs.; every other pair is named person by person. `barn-sales` 198 of 198. Batch 18 screen recheck on `barn-platform` passed.
