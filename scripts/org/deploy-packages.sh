@@ -484,10 +484,11 @@ PYEOF
 )"
   echo "== Scheduling the paused jobs again: $(cut -f2 "$PAUSED_JOBS_FILE" | paste -sd, -) =="
   # A failure is caught in the Apex (an uncaught one would undo the jobs that did schedule), so
-  # it is found in the log rather than by the exit status.
+  # it is found in the log rather than by the exit status. Only a USER_DEBUG line counts: the
+  # output also echoes the Apex source, which names NOT_RESCHEDULED on every line.
   output="$(printf '%s\n' "$apex" | sf apex run --target-org "$ALIAS" 2>&1)" && status=0 || status=$?
-  if [[ "$status" -ne 0 ]] || grep -q "NOT_RESCHEDULED" <<< "$output"; then
-    grep "NOT_RESCHEDULED" <<< "$output" | sed 's/.*NOT_RESCHEDULED/Not scheduled again:/'
+  if [[ "$status" -ne 0 ]] || grep -q "|USER_DEBUG|.*NOT_RESCHEDULED" <<< "$output"; then
+    grep "|USER_DEBUG|.*NOT_RESCHEDULED" <<< "$output" | sed 's/.*NOT_RESCHEDULED/Not scheduled again:/'
     echo "Check Scheduled Jobs in Setup. To schedule a missing job again, run as anonymous Apex:"
     printf '%s\n' "$apex"
   fi
