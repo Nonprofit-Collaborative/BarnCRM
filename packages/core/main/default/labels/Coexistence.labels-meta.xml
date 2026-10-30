@@ -110,6 +110,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Hub home: unreviewed install or upgrade problems; {0} is the count</shortDescription>
-        <value>The install and upgrades logged {0} problems, and they are counted above. See the Error Log.</value>
+        <value>Of the new errors above, {0} came from the install and upgrades. See the Error Log.</value>
     </labels>
 </CustomLabels>

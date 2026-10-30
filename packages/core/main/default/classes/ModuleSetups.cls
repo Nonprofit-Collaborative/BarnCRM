@@ -30,7 +30,8 @@ public with sharing class ModuleSetups {
     public static final String FIX_KEY = 'finishModuleSetup';
 
     private static final String MARKER_KEY = 'Modules_Setup_Run__c';
-    private static final String CONTEXT = 'ModuleSetups';
+    /** The Error Log context of a setup step that failed; the Hub counts it as an install problem. */
+    public static final String CONTEXT = 'ModuleSetups';
 
     /** Injected by Core's tests by package key, since no module is there to resolve. */
     @TestVisible

@@ -24,6 +24,28 @@ private class AutomationControlControllerTest {
     }
 
     @IsTest
+    static void anObjectIsShownByItsLabelNotItsApiName() {
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                Schema.SObjectType.Account.getLabel(),
+                AutomationControlController.objectLabel('Account'),
+                'A standard object reads as its label'
+            );
+            Assert.areEqual(
+                Schema.SObjectType.Household_Member__c.getLabel(),
+                AutomationControlController.objectLabel('Household_Member__c'),
+                'A custom object reads as its label, not Household_Member__c'
+            );
+            Assert.areEqual(
+                'Not_An_Object__c',
+                AutomationControlController.objectLabel('Not_An_Object__c'),
+                'A name that is no object here reads as stored'
+            );
+            Assert.isNull(AutomationControlController.objectLabel(null), 'Blank stays blank');
+        }
+    }
+
+    @IsTest
     static void thePageListsEveryAutomationAndThePauseState() {
         System.runAs(TestUsers.admin()) {
             TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ NAMING => true });

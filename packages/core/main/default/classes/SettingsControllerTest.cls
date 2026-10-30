@@ -972,6 +972,47 @@ private class SettingsControllerTest {
     }
 
     @IsTest
+    static void theFeaturesRowReadsAsFeatureNamesNotStoredKeys() {
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+            Datetime now = System.now();
+            String stored = SettingsService.CORE_SETTINGS_OBJECT + '.Features_Turned_On__c';
+            insert new List<Setting_Change__c>{
+                new Setting_Change__c(
+                    Setting_Name__c = stored,
+                    Old_Value__c = FeatureSwitchService.NONE_ON,
+                    New_Value__c = 'DataManager,HouseholdUpkeep',
+                    Changed_By__c = UserInfo.getUserId(),
+                    Changed_At__c = now
+                )
+            };
+
+            Test.startTest();
+            List<SettingsController.ChangeModel> changes = SettingsController.getRecentChanges(5);
+            Test.stopTest();
+
+            Assert.areEqual(1, changes.size(), 'The change is listed');
+            Assert.areEqual(
+                System.Label.Core_Settings_FeaturesTurnedOn,
+                changes[0].settingName,
+                'The row reads as a label, not the stored name'
+            );
+            Assert.areEqual(
+                System.Label.Core_Settings_NoFeaturesOn,
+                changes[0].oldValue,
+                'None reads as No features'
+            );
+            Assert.areEqual(
+                System.Label.Core_Feature_DataManager_Name +
+                    ', ' +
+                    System.Label.Core_Feature_HouseholdUpkeep_Name,
+                changes[0].newValue,
+                'Each key reads as its feature name'
+            );
+        }
+    }
+
+    @IsTest
     static void aRecordRowNamesItsObjectAndARecordTypeRowListsItsChoices() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{

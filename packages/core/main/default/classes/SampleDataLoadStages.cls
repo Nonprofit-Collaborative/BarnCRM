@@ -136,6 +136,10 @@ public with sharing class SampleDataLoadStages implements SampleDataStages {
         Set<Id> chunkHouseholds = new Set<Id>(householdIds);
         chunkHouseholds.remove(null);
         HouseholdService.afterMembershipChange(chunkHouseholds, false);
+        // A household the generator named by hand keeps its name (R-H8) and upkeep passes it
+        // by, so it would have a member count and no greetings: give it the greetings its people
+        // call for.
+        HouseholdService.greetCustomNamedHouseholds(chunkHouseholds);
         return contactsToInsert.size();
     }
 

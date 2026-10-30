@@ -277,6 +277,7 @@ public with sharing class SettingsController {
 
     // Not cacheable: the console calls it again right after a save, and a cached answer would
     // show the rows from before the save (ADMIN-14).
+
     @AuraEnabled
     public static List<ChangeModel> getRecentChanges(Integer limitCount) {
         List<ChangeModel> changes = new List<ChangeModel>();
@@ -297,6 +298,11 @@ public with sharing class SettingsController {
                     : record.Setting_Name__c;
                 change.oldValue = shownValue(record.Old_Value__c, choices.get(stored));
                 change.newValue = shownValue(record.New_Value__c, choices.get(stored));
+                if (stored == featuresStoredName()) {
+                    change.settingName = System.Label.Core_Settings_FeaturesTurnedOn;
+                    change.oldValue = shownFeatures(record.Old_Value__c);
+                    change.newValue = shownFeatures(record.New_Value__c);
+                }
                 if (recordSettings.contains(stored)) {
                     change.oldValue = shownRecordName(record.Old_Value__c, recordNames);
                     change.newValue = shownRecordName(record.New_Value__c, recordNames);
@@ -484,6 +490,35 @@ public with sharing class SettingsController {
             ? SettingsService.CORE_SETTINGS_OBJECT
             : definition.Settings_Object__c.trim();
         return (settingsObject + '.' + definition.Setting_Key__c.trim()).toLowerCase();
+    }
+
+    /** The name an audit row stores for the features-turned-on list, in lower case. */
+    private static String featuresStoredName() {
+        String field = '.Features_Turned_On__c';
+        return (SettingsService.CORE_SETTINGS_OBJECT + field).toLowerCase();
+    }
+
+    /**
+     * The Features row logs the stored key list ("DataManager,Addresses", or "None" before
+     * first-run setup). It reads as the features' names, or "No features" for none.
+     */
+    private static String shownFeatures(String stored) {
+        if (String.isBlank(stored)) {
+            return stored;
+        }
+        List<String> names = new List<String>();
+        for (String part : stored.split(',')) {
+            String key = part.trim();
+            if (
+                String.isBlank(key) ||
+                key == FeatureSwitchService.NONE_ON ||
+                key == FeatureSwitchService.NONE_CHOSEN
+            ) {
+                continue;
+            }
+            names.add(FeatureController.nameOf(key));
+        }
+        return names.isEmpty() ? System.Label.Core_Settings_NoFeaturesOn : String.join(names, ', ');
     }
 
     /** A logged value as its choice's label when it is one, otherwise as stored. */

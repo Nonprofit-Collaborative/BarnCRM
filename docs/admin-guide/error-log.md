@@ -19,7 +19,9 @@ You will find it in three places:
 
 - **The BarnCRM home page.** The **Errors to Review** tile shows a count of the new
   errors waiting, and an **Open the Error Log** link that opens the list of new entries.
-  The tile shows the count only, not the entries.
+  The tile shows the count only, not the entries. When some of those errors came from the
+  install or an upgrade (including a package's setup steps), a line under the count says how many ("Of the new errors above, 3
+  came from the install and upgrades"); that number is part of the count, not added to it.
 - **The Org Optimizer tab, Errors section.** The **Error Log** card shows the count of new
   entries and the five most recent, each with its message and where it came from, an
   **Open This Entry** button and a **Mark Acknowledged** button. The Errors section needs

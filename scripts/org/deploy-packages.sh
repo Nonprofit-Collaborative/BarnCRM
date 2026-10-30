@@ -495,6 +495,24 @@ PYEOF
   rm -f "$PAUSED_JOBS_FILE"
   PAUSED_JOBS_FILE=""
 }
+# Ctrl-C, TERM, or any exit that happens while jobs are paused (a stage that failed, a command
+# that errored between the pause and the restore) schedules them again once. The restore clears
+# PAUSED_JOBS_FILE when it finishes, so a normal run, which has already restored, does nothing
+# here. INT and TERM only turn into an exit, which runs the EXIT trap with the right status.
+restore_if_still_paused() {
+  local code=$?
+  trap '' INT TERM
+  trap - EXIT
+  if [[ -n "$PAUSED_JOBS_FILE" && -s "$PAUSED_JOBS_FILE" ]]; then
+    echo ""
+    echo "== The deploy ended while scheduled jobs were paused =="
+    restore_scheduled_jobs
+  fi
+  exit "$code"
+}
+trap 'exit 130' INT
+trap 'exit 143' TERM
+trap restore_if_still_paused EXIT
 
 # SKIPPING UNCHANGED PACKAGES (D-141 amendment, 2026-10-28; D-56 allows "deploy only changed
 # metadata"). A package whose source is identical to what the last successful run of this script

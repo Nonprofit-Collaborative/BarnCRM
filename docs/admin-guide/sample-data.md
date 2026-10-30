@@ -17,7 +17,7 @@ What loads, exactly:
 
 | Records | How many | What is in them |
 |---|---|---|
-| Households | 200 | Shared surnames, different surnames, hyphenated names, single-person households, ten three-generation households, five with a deceased member, three with a custom name |
+| Households | 200 | Shared surnames, different surnames, hyphenated names, single-person households, ten three-generation households, five with a deceased member, three with a custom name (each keeps the name it was given and still gets a formal and an informal greeting from its people, whether Household Upkeep is on or off) |
 | People | 440 | Heads, partners, children, a few with preferred names |
 | Organizations | 25 | Local businesses, schools and a college, Rotary clubs, two foundations and a church |
 | Connections | 60 | Parents, siblings, friends, colleagues and grandparents in different households, a few marked Former; the other side of each one is created by the connection rules, as it would be for a connection you enter |

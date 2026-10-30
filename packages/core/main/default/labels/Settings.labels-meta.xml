@@ -137,6 +137,22 @@
         <value>That value is not in the format this setting expects, so nothing was saved. Check the value and save again.</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_FeaturesTurnedOn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: Recent Changes name of the features-turned-on row</shortDescription>
+        <value>Features turned on</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_NoFeaturesOn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: Recent Changes value when no feature is on</shortDescription>
+        <value>No features</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_NoRecordType</fullName>
         <categories>Core</categories>
         <language>en_US</language>
