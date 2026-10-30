@@ -220,6 +220,57 @@ private class HouseholdNamingServiceTest {
     }
 
     @IsTest
+    static void formalGreetingNamesEachPersonUnlessThePairIsOneMrAndOneMrs() {
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = new List<HouseholdService.Person>{
+                HouseholdTestDataFactory.person('Ms.', 'Rosa', 'Hall', 'Head'),
+                HouseholdTestDataFactory.person('Ms.', 'Ana', 'Hall', 'Spouse or Partner')
+            };
+            Assert.areEqual(
+                'Ms. Rosa Hall and Ms. Ana Hall',
+                HouseholdNamingService.computeFormalGreeting(members, FORMAL_PATTERN, false),
+                'Two Ms. are each named'
+            );
+            members = new List<HouseholdService.Person>{
+                HouseholdTestDataFactory.person('Mrs.', 'Camila', 'Perez-Reyes', 'Head'),
+                HouseholdTestDataFactory.person('Mr.', 'Luis', 'Perez-Reyes', 'Spouse or Partner')
+            };
+            Assert.areEqual(
+                'Mr. and Mrs. Luis Perez-Reyes',
+                HouseholdNamingService.computeFormalGreeting(members, FORMAL_PATTERN, false),
+                'One Mrs. and one Mr. combine under the Mr. first name, whichever is listed first'
+            );
+            members = new List<HouseholdService.Person>{
+                HouseholdTestDataFactory.person('Mr.', 'Luis', 'Mensah-Sato', 'Head'),
+                HouseholdTestDataFactory.person('Ms.', 'Ana', 'Mensah-Sato', 'Spouse or Partner')
+            };
+            Assert.areEqual(
+                'Mr. Luis Mensah-Sato and Ms. Ana Mensah-Sato',
+                HouseholdNamingService.computeFormalGreeting(members, FORMAL_PATTERN, false),
+                'A Mr. and a Ms. are each named'
+            );
+            members = new List<HouseholdService.Person>{
+                HouseholdTestDataFactory.person('Mrs.', 'Lucia', 'Costa', 'Head'),
+                HouseholdTestDataFactory.person('Mrs.', 'Eva', 'Costa', 'Spouse or Partner')
+            };
+            Assert.areEqual(
+                'Mrs. Lucia Costa and Mrs. Eva Costa',
+                HouseholdNamingService.computeFormalGreeting(members, FORMAL_PATTERN, false),
+                'Two Mrs. are each named'
+            );
+            members = new List<HouseholdService.Person>{
+                HouseholdTestDataFactory.person('Dr.', 'Priya', 'Nguyen', 'Head'),
+                HouseholdTestDataFactory.person('Mr.', 'Thomas', 'Nguyen', 'Spouse or Partner')
+            };
+            Assert.areEqual(
+                'Dr. Priya Nguyen and Mr. Thomas Nguyen',
+                HouseholdNamingService.computeFormalGreeting(members, FORMAL_PATTERN, false),
+                'A Dr. is never combined'
+            );
+        }
+    }
+
+    @IsTest
     static void formalGreetingCombinesTitlesForACouple() {
         System.runAs(TestUsers.admin()) {
             Assert.areEqual(
