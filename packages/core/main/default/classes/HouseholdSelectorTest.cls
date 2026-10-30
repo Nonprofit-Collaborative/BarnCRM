@@ -241,7 +241,7 @@ private class HouseholdSelectorTest {
     }
 
     @IsTest
-    static void theRecomputeLocatorIsBuiltOverHouseholdsWithoutACustomName() {
+    static void theRecomputeLocatorIncludesCustomNamedHouseholds() {
         System.runAs(TestUsers.admin()) {
             Account named = HouseholdTestDataFactory.newHousehold('Named Household');
             Account custom = HouseholdTestDataFactory.newHousehold('Custom Household');
@@ -258,7 +258,10 @@ private class HouseholdSelectorTest {
             Test.stopTest();
 
             Assert.isTrue(located.contains(named.Id), 'A generated name is recomputed');
-            Assert.isFalse(located.contains(custom.Id), 'A custom name is left alone');
+            Assert.isTrue(
+                located.contains(custom.Id),
+                'A custom name is located so its blank greetings are filled'
+            );
         }
     }
 

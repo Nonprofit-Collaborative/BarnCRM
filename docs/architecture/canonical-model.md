@@ -128,7 +128,7 @@ does.
 | Name | text | computed | The household's display name, for example "The Smith Family"; recomputed from members unless Custom Name is set. |
 | Formal Greeting | text | computed | The salutation used on formal correspondence, for example "Mr. and Mrs. John Smith". |
 | Informal Greeting | text | computed | The salutation used on personal correspondence, for example "John and Jane". |
-| Custom Name | boolean | yes (defaults false) | When true, Name, Formal Greeting, and Informal Greeting are never recomputed; the staff member's wording stands. |
+| Custom Name | boolean | yes (defaults false) | When true, Name and any greeting that has a value are never recomputed; the staff member's wording stands. A blank greeting is filled from the members (R-H8). |
 | Primary Contact | reference(Contact) | no | The household member who receives correspondence when only one person can be named. In junction mode it mirrors the primary member (R-M3), and a person stored as a Person Account is named by their person contact. |
 | Member Count | integer | computed | The number of current (not ended, not deceased-excluded) members of the household. |
 | Anniversary | date | no | A household-level date the organization keeps, most often a wedding anniversary. |
@@ -241,8 +241,10 @@ the org chooses to keep a deceased member in formal correspondence, the formal g
 offers a "the late" form, for example "Mrs. Jane Smith and the late Mr. John Smith".
 
 **R-H8 Custom name override.** When Custom Name is true, no automatic recomputation
-changes Name, Formal Greeting, or Informal Greeting. This is the mechanism that keeps
-"The Reverend and Mrs. Smith" as staff typed it.
+changes Name, or a Formal Greeting or Informal Greeting that has a value. Household
+Upkeep and the recompute batch (Update All Household Names) fill only a blank greeting
+from the members, with the same patterns and rules as any other household. This is the mechanism that keeps "The Reverend and Mrs. Smith" as
+staff typed it.
 
 **R-H9 Exclusions.** Exclude From Household Name removes a member from the name
 computation only; Exclude From Greetings removes them from both greetings only. The two
@@ -371,8 +373,8 @@ preview against five fixed sample households, computed in memory from the patter
 typed: nothing is read from or written to the org's own households. The console also
 offers a "Recompute all households" batch. Starting it confirms that the batch has been
 queued; the batch runs in the background and reports neither progress nor completion to
-the console, and its counts are written to the debug log only. Recomputation never touches
-households with Custom Name set.
+the console, and its counts are written to the debug log only. On households with Custom
+Name set, recomputation only fills a blank greeting (R-H8).
 
 ### Salesforce implementation
 

@@ -69,7 +69,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-HH-05: Greetings: Deceased, Preferred Name, Exclusions, Custom Name
 
-**Purpose:** person-level boxes change the greetings and Custom Name locks them.
+**Purpose:** person-level boxes change the greetings, and Custom Name locks the name and every greeting that has a value.
 **Prerequisites:** admin, The Testwell Family with Ada and Ben, **Include people who have died in names** off (ships off).
 
 | Step | Action | Expected result |
@@ -79,7 +79,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | Untick it, tick **Deceased** on Ben, and save. Refresh the household. | Greetings leave Ben out. His row in **Members** carries a **Deceased** badge. |
 | 4 | Untick **Deceased**. On the household tick **Custom Name**, set the name to `The Testwell Household (custom)`, and save. | The name saves as typed. |
 | 5 | Add a member `Cy` `Testwell` and refresh. | Name and greetings are unchanged; Member Count goes up. |
-| 6 | Untick **Custom Name** and save. | The name is recalculated at once to **The Testwell Family** and the greetings include Cy. |
+| 6 | On the household clear **Informal Greeting** and save. On Cy, set **Preferred Name** to `Cyrus` and save. Refresh the household. | Informal Greeting is filled from the members and includes Cyrus. Name and Formal Greeting are unchanged. |
+| 7 | Untick **Custom Name** and save. | The name is recalculated at once to **The Testwell Family** and the greetings include Cy. |
 
 **Cleanup:** delete Cy Testwell; clear Ben's Preferred Name.
 
@@ -93,7 +94,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open **BarnCRM Settings**, **People and Households**. | In the **Household Names and Greetings** box, the **Household Names and Greetings** panel shows **Household name pattern**, **Formal greeting pattern**, **Informal greeting pattern**, and **How Five Sample Households Would Read**. |
 | 2 | Change **Household name pattern** to `{LastName} Household`. | The preview updates as you type. |
 | 3 | Select **Save**. | **Saved. New households use these patterns straight away.** |
-| 4 | Select **Update All Household Names**, then **Yes, Recompute** in the dialog. | **Updating household names in the background.** After a few minutes The Garcia Family reads **Garcia Household**; the **Staff Household** (Custom Name) is unchanged. |
+| 4 | Select **Update All Household Names**, then **Yes, Recompute** in the dialog. | **Updating household names in the background.** After a few minutes The Garcia Family reads **Garcia Household**; the **Staff Household** (Custom Name) keeps its name and every greeting that has a value; only a blank greeting is filled. |
 | 5 | Put the pattern back to `The {LastName} Family`, save, and recompute again. | Names return to **The Garcia Family** form. |
 | 6 | As read-only, open the same panel. | **You can see these settings but not change them. Changing them needs the Manage BarnCRM Settings permission.** The patterns cannot be saved. |
 | 7 | As admin, look at the table under **How Five Sample Households Would Read** at normal desktop width. | The whole table fits inside the settings panel: long names and greetings wrap onto more lines, and there is no horizontal scroll bar on the table or the page. |

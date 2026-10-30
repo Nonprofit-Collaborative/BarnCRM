@@ -72,7 +72,7 @@ sections hold the fields that feed them.
 
 | You want | Do this |
 |---|---|
-| Keep a household name you typed yourself | Edit the household, type the name and greetings, tick **Custom Name**, save. Nothing recalculates it until you untick it. |
+| Keep a household name you typed yourself | Edit the household, type the name and greetings, tick **Custom Name**, save. Nothing recalculates it until you untick it. A greeting you leave blank is filled from the members; one you typed is kept. |
 | Use a nickname in greetings | Edit the person and fill in **Preferred Name**. It replaces the first name in greetings. |
 | Leave someone out of the household name | Tick **Exclude From Household Name** on the person. They still count as a member. |
 | Leave someone out of the greetings | Tick **Exclude From Greetings** on the person. |
@@ -80,7 +80,7 @@ sections hold the fields that feed them.
 | Record each person's place | Set **Household Role** (Head, Spouse or Partner, Child, Other). |
 
 You should see: the household's name and greetings updated on the next save, unless
-**Custom Name** is ticked.
+**Custom Name** is ticked (then only a blank greeting is filled).
 
 ## To Merge Two Households
 
