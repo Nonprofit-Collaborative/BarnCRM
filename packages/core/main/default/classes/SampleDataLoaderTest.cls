@@ -204,6 +204,17 @@ private class SampleDataLoaderTest {
         }
     }
 
+    /**
+     * Same, with a fresh set of limits: the load before this and the removal each use many queries
+     * on an org with Person Accounts, and together they pass the 100-query limit. A test method
+     * can start its test boundary once, so use this only where the test has not started one.
+     */
+    private static void runCoreRemovalWithFreshLimits() {
+        Test.startTest();
+        runCoreRemoval();
+        Test.stopTest();
+    }
+
     @IsTest
     static void testStagesInsertHouseholdsOrganizationsAndContacts() {
         System.runAs(TestUsers.adminWithInstalledModules()) {
@@ -530,7 +541,7 @@ private class SampleDataLoaderTest {
             System.assertEquals(2, before.householdCount, 'both sample households are loaded');
             System.assertEquals(4, before.contactCount, 'every sample person is loaded');
 
-            runCoreRemoval();
+            runCoreRemovalWithFreshLimits();
 
             System.assertEquals(
                 0,
@@ -703,7 +714,7 @@ private class SampleDataLoaderTest {
             );
             insert ownAffiliation;
 
-            runCoreRemoval();
+            runCoreRemovalWithFreshLimits();
 
             System.assertEquals(
                 1,
@@ -898,7 +909,7 @@ private class SampleDataLoaderTest {
             StubModule module = new StubModule(12);
             SampleDataModules.moduleOverride = new List<SampleDataModule>{ module };
             SampleDataLoader.remove();
-            runCoreRemoval();
+            runCoreRemovalWithFreshLimits();
             module.keptSome = true;
 
             SampleDataLoader.Counts status = SampleDataLoader.status();

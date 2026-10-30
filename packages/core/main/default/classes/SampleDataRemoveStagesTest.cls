@@ -212,9 +212,12 @@ private class SampleDataRemoveStagesTest {
 
             SampleDataRemoveStages stages = new SampleDataRemoveStages();
             Integer count = stages.stageCount();
+            // A fresh set of limits for the removal, after the 200 household load above.
+            Test.startTest();
             for (Integer stage = 0; stage < count; stage++) {
                 stages.runStage(stage);
             }
+            Test.stopTest();
 
             System.assertEquals(0, [SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE]);
             System.assertEquals(0, [SELECT COUNT() FROM Account WHERE Sample_Data__c = TRUE]);
