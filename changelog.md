@@ -6,6 +6,7 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-10-30
 
+- `barn-npc` deployed from main 806fcb36 (batches 18 and 19): validation 0Afhk00000213kHCAQ 3,658 of 3,658, quick deploy 0Afhk00000216v3CAA (6,185 components), post-install clean, one hourly Tab Access Check, edition Nonprofit, no error log rows.
 - Batch 19 screen recheck on `barn-platform` at main 19c95fda (Core only): deploy exit 0, one hourly Tab Access Check after; sample data removed and reloaded, 200 households, no formal greeting of the form "<Title>. and <Title>. <First> <Last>" except "Mr. and Mrs. ..." (56 of them); Hall, Perez-Reyes, Mensah-Sato, Costa, Nguyen and Garcia households read naturally. Pass, no findings.
 - Batch 19, #732 (squash 19c95fda): formal greeting combines titles only for one Mr. and one Mrs.; every other pair is named person by person. `barn-sales` 198 of 198. Batch 18 screen recheck on `barn-platform` passed.
 - Batch 18, #731 (squash 69723f28): formal greeting names each person unless both titles are Mr., Mrs., Ms., Miss or Mx.; Doctors Nguyen sample spouse is Dr.; Recent Changes hides rows whose shown values match. `barn-sales` 211 of 211.
