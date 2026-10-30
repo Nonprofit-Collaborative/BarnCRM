@@ -277,8 +277,6 @@ public with sharing class SettingsController {
 
     // Not cacheable: the console calls it again right after a save, and a cached answer would
     // show the rows from before the save (ADMIN-14).
-    private static final String FEATURES_STORED_NAME =
-        (SettingsService.CORE_SETTINGS_OBJECT + '.Features_Turned_On__c').toLowerCase();
 
     @AuraEnabled
     public static List<ChangeModel> getRecentChanges(Integer limitCount) {
@@ -300,7 +298,7 @@ public with sharing class SettingsController {
                     : record.Setting_Name__c;
                 change.oldValue = shownValue(record.Old_Value__c, choices.get(stored));
                 change.newValue = shownValue(record.New_Value__c, choices.get(stored));
-                if (FEATURES_STORED_NAME.equals(stored)) {
+                if (stored == featuresStoredName()) {
                     change.settingName = System.Label.Core_Settings_FeaturesTurnedOn;
                     change.oldValue = shownFeatures(record.Old_Value__c);
                     change.newValue = shownFeatures(record.New_Value__c);
@@ -492,6 +490,12 @@ public with sharing class SettingsController {
             ? SettingsService.CORE_SETTINGS_OBJECT
             : definition.Settings_Object__c.trim();
         return (settingsObject + '.' + definition.Setting_Key__c.trim()).toLowerCase();
+    }
+
+    /** The name an audit row stores for the features-turned-on list, in lower case. */
+    private static String featuresStoredName() {
+        String field = '.Features_Turned_On__c';
+        return (SettingsService.CORE_SETTINGS_OBJECT + field).toLowerCase();
     }
 
     /**
