@@ -34,17 +34,6 @@ public with sharing class HouseholdNamingService {
     private static final String TOKEN_FIRST_NAME = '{FirstName}';
     private static final String TOKEN_LAST_NAME = '{LastName}';
     private static final String TOKEN_SALUTATION = '{Salutation}';
-    private static final Set<String> COURTESY_TITLES = new Set<String>{
-        'mr.',
-        'mr',
-        'mrs.',
-        'mrs',
-        'ms.',
-        'ms',
-        'miss',
-        'mx.',
-        'mx'
-    };
     private static final String DEFAULT_NAME_PATTERN = 'The {LastName} Family';
     private static final String DEFAULT_FORMAL_PATTERN = '{Salutation} {FirstName} {LastName}';
     private static final String DEFAULT_INFORMAL_PATTERN = '{FirstName}';
@@ -164,8 +153,8 @@ public with sharing class HouseholdNamingService {
     }
 
     /**
-     * "Mr. and Mrs. John Smith": two living people, one surname, both with a title, and a
-     * pattern that asks for all three parts. Anything else is greeted person by person.
+     * "Mr. and Mrs. John Smith": two living people, one surname, exactly one Mr. and one Mrs.
+     * (named by the Mr.'s first name), and a pattern that asks for all three parts. Anything else is greeted person by person.
      */
     private static String combinedSalutation(
         List<HouseholdService.Person> eligible,
@@ -185,12 +174,20 @@ public with sharing class HouseholdNamingService {
         if (String.isBlank(first.lastName) || !first.lastName.equals(second.lastName)) {
             return null;
         }
-        // One shared first name only reads right for ordinary courtesy titles. "Dr. and Mr.
-        // Priya Nguyen" would put two titles on one person, so other titles are listed one by one.
-        if (
-            !COURTESY_TITLES.contains(first.salutation.trim().toLowerCase()) ||
-            !COURTESY_TITLES.contains(second.salutation.trim().toLowerCase())
-        ) {
+        // Only the traditional "Mr. and Mrs. John Smith" shares one first name: exactly one Mr.
+        // and one Mrs. Two titles on one person's name ("Ms. and Ms. Rosa Hall", "Dr. and Mr.
+        // Priya Nguyen") read wrongly, so every other pair is named person by person.
+        HouseholdService.Person mr = null;
+        HouseholdService.Person mrs = null;
+        for (HouseholdService.Person person : eligible) {
+            String title = person.salutation.trim().toLowerCase();
+            if ((title == 'mr.' || title == 'mr') && mr == null) {
+                mr = person;
+            } else if ((title == 'mrs.' || title == 'mrs') && mrs == null) {
+                mrs = person;
+            }
+        }
+        if (mr == null || mrs == null) {
             return null;
         }
         String normalized = normalize(pattern);
@@ -202,13 +199,13 @@ public with sharing class HouseholdNamingService {
             return null;
         }
         String salutations =
-            first.salutation +
+            mr.salutation +
             ' ' +
             storedLabel('Core_Households_Conjunction', Label.Core_Households_Conjunction) +
             ' ' +
-            second.salutation;
+            mrs.salutation;
         // A formal greeting uses the name on the record, not the name a person prefers.
-        return squeeze(salutations + ' ' + blankToEmpty(first.firstName) + ' ' + first.lastName);
+        return squeeze(salutations + ' ' + blankToEmpty(mr.firstName) + ' ' + mr.lastName);
     }
 
     // ------------------------------------------------------------------ saving

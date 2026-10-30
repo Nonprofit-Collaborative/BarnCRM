@@ -28,7 +28,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | On The Testwell Family, select **Add Member** in the **Members** panel. | The **Add Member** dialog opens with Salutation, First Name and Last Name, a **Save** and a **Cancel** button. |
 | 2 | Enter `Mr.`, `Ben`, `Testwell` and select **Save**. | The dialog closes. A toast reads **Added. The household name and greetings have been brought up to date.** Ben appears as a tile with his initials **BT**. |
-| 3 | Refresh the page. | Member Count **2**. Formal Greeting **Ms. and Mr. Ada Testwell**. Informal Greeting **Ada and Ben**. The name stays **The Testwell Family**. |
+| 3 | Refresh the page. | Member Count **2**. Formal Greeting **Ms. Ada Testwell and Mr. Ben Testwell**. Informal Greeting **Ada and Ben**. The name stays **The Testwell Family**. |
 | 4 | Add a third member `Wei` `Lee` (no salutation) and refresh. | Member Count **3**. The name reads **Testwell and Lee Household** because the surnames differ. |
 | 5 | Open the menu on Wei's tile and select **Move to Another Household**, pick **The Garcia Family** in the picker and select **Save**. | A toast reads **Moved. Both households have been brought up to date.** Wei leaves the list; the name returns to **The Testwell Family**, Member Count **2**. |
 | 6 | Reverse it: open The Garcia Family, use **Move to Another Household** on Wei, and choose The Testwell Family. | Wei is back in The Testwell Family; The Garcia Family is back to its three members and its own name. |
@@ -74,7 +74,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On Ben, set **Preferred Name** to `Benji` and save. Refresh the household. | Informal Greeting **Ada and Benji**. Formal Greeting still **Ms. and Mr. Ada Testwell**. |
+| 1 | On Ben, set **Preferred Name** to `Benji` and save. Refresh the household. | Informal Greeting **Ada and Benji**. Formal Greeting still **Ms. Ada Testwell and Mr. Ben Testwell**. |
 | 2 | On Ben, tick **Exclude From Greetings** and save. Refresh the household. | Informal Greeting **Ada**, Formal Greeting **Ms. Ada Testwell**. Member Count still **2**. |
 | 3 | Untick it, tick **Deceased** on Ben, and save. Refresh the household. | Greetings leave Ben out. His row in **Members** carries a **Deceased** badge. |
 | 4 | Untick **Deceased**. On the household tick **Custom Name**, set the name to `The Testwell Household (custom)`, and save. | The name saves as typed. |

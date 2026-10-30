@@ -73,11 +73,11 @@ other way:
 - When the people in a household do not share a last name, the name lists the surnames
   instead of using your pattern: "Garcia and Lee Household", or "Garcia, Lee, and Smith
   Household" for three or more.
-- When exactly two people share a last name and both have a title, the formal greeting
-  combines them: "Mr. and Mrs. John Smith" rather than "Mr. John Smith and Mrs. Jane
-  Smith". This applies to the everyday titles (Mr., Mrs., Ms., Miss, Mx.). If either person
-  has another title, such as Dr., each person is named: "Dr. Priya Nguyen and Dr. Thomas
-  Nguyen".
+- When exactly two people share a last name and the pair is one Mr. and one Mrs., the
+  formal greeting combines them under the Mr.'s first name: "Mr. and Mrs. John Smith"
+  rather than "Mr. John Smith and Mrs. Jane Smith". Every other pair is named person by
+  person, in the order of the members: "Ms. Rosa Hall and Ms. Ana Hall", "Mr. Luis Mensah
+  and Ms. Ana Mensah", "Dr. Priya Nguyen and Dr. Thomas Nguyen".
 - A name or greeting holds at most 255 characters. In a very large household the list
   names as many people as fit and counts the rest: "Garcia, Lee and 28 others Household".
 
