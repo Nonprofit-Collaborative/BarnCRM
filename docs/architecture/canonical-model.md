@@ -241,8 +241,10 @@ the org chooses to keep a deceased member in formal correspondence, the formal g
 offers a "the late" form, for example "Mrs. Jane Smith and the late Mr. John Smith".
 
 **R-H8 Custom name override.** When Custom Name is true, no automatic recomputation
-changes Name, Formal Greeting, or Informal Greeting. This is the mechanism that keeps
-"The Reverend and Mrs. Smith" as staff typed it.
+changes Name, or a Formal Greeting or Informal Greeting that has a value. Household
+Upkeep fills only a blank greeting from the members, with the same patterns and rules as
+any other household. This is the mechanism that keeps "The Reverend and Mrs. Smith" as
+staff typed it.
 
 **R-H9 Exclusions.** Exclude From Household Name removes a member from the name
 computation only; Exclude From Greetings removes them from both greetings only. The two

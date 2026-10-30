@@ -69,7 +69,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-HH-05: Greetings: Deceased, Preferred Name, Exclusions, Custom Name
 
-**Purpose:** person-level boxes change the greetings and Custom Name locks them.
+**Purpose:** person-level boxes change the greetings, and Custom Name locks the name and every greeting that has a value.
 **Prerequisites:** admin, The Testwell Family with Ada and Ben, **Include people who have died in names** off (ships off).
 
 | Step | Action | Expected result |
@@ -79,7 +79,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | Untick it, tick **Deceased** on Ben, and save. Refresh the household. | Greetings leave Ben out. His row in **Members** carries a **Deceased** badge. |
 | 4 | Untick **Deceased**. On the household tick **Custom Name**, set the name to `The Testwell Household (custom)`, and save. | The name saves as typed. |
 | 5 | Add a member `Cy` `Testwell` and refresh. | Name and greetings are unchanged; Member Count goes up. |
-| 6 | Untick **Custom Name** and save. | The name is recalculated at once to **The Testwell Family** and the greetings include Cy. |
+| 6 | On the household clear **Informal Greeting** and save. On Cy, set **Preferred Name** to `Cyrus` and save. Refresh the household. | Informal Greeting is filled from the members and includes Cyrus. Name and Formal Greeting are unchanged. |
+| 7 | Untick **Custom Name** and save. | The name is recalculated at once to **The Testwell Family** and the greetings include Cy. |
 
 **Cleanup:** delete Cy Testwell; clear Ben's Preferred Name.
 

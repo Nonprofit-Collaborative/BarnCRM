@@ -211,9 +211,9 @@ public with sharing class HouseholdNamingService {
     // ------------------------------------------------------------------ saving
 
     /**
-     * Recomputes and saves the name and both greetings for each household given, skipping
-     * every household whose wording a person has taken over. Returns how many households
-     * were changed. R-H8 and R-H14.
+     * Recomputes and saves the name and both greetings for each household given; a household
+     * whose wording a person has taken over only has its blank greetings filled. Returns how
+     * many households were changed. R-H8 and R-H14.
      *
      * Membership upkeep does not come through here: HouseholdService.afterMembershipChange
      * reads a household once and saves its count, primary and wording together, with the
@@ -301,10 +301,11 @@ public with sharing class HouseholdNamingService {
         /**
          * Puts the name and both greetings the members call for on `target`, when any of
          * them differs from what `household` holds, and says whether it did. A household
-         * whose wording a person has taken over, or an account that is not a household, is
-         * never changed. `primaryId` marks the primary member in contact mode, where the
-         * household field holds it; in junction mode the members already carry the flag and
-         * it is null.
+         * whose wording a person has taken over (Custom Name) keeps its name and every
+         * greeting that has a value; only a blank greeting is filled (R-H8). An account that
+         * is not a household is never changed. `primaryId` marks the primary member in
+         * contact mode, where the household field holds it; in junction mode the members
+         * already carry the flag and it is null.
          */
         @NamespaceAccessible
         public Boolean apply(
@@ -313,11 +314,11 @@ public with sharing class HouseholdNamingService {
             Id primaryId,
             Account target
         ) {
-            if (household.Custom_Name__c == true) {
-                return false;
-            }
             if (recordTypeId != null && household.RecordTypeId != recordTypeId) {
                 return false;
+            }
+            if (household.Custom_Name__c == true) {
+                return fillBlanks(household, members, primaryId, target);
             }
             if (members == null || members.isEmpty()) {
                 // Nobody left to name it after: it keeps its last name and greetings, so a
@@ -346,15 +347,49 @@ public with sharing class HouseholdNamingService {
             }
             return hasChanges;
         }
+
+        /**
+         * Puts each greeting the members call for on `target` where `household` holds a
+         * blank one, and says whether it did. The name and any greeting that has a value
+         * are never touched, which is what upkeep does for a custom-named household (R-H8).
+         */
+        private Boolean fillBlanks(
+            Account household,
+            List<HouseholdService.Person> members,
+            Id primaryId,
+            Account target
+        ) {
+            if (members == null || members.isEmpty()) {
+                return false;
+            }
+            markPrimary(members, primaryId);
+            Boolean changed = false;
+            if (String.isBlank(household.Household_Formal_Greeting__c)) {
+                String formal = computeFormalGreeting(members, formalPattern, includeDeceased);
+                if (String.isNotBlank(formal)) {
+                    target.Household_Formal_Greeting__c = formal;
+                    changed = true;
+                }
+            }
+            if (String.isBlank(household.Household_Informal_Greeting__c)) {
+                String informal = computeInformalGreeting(members, informalPattern);
+                if (String.isNotBlank(informal)) {
+                    target.Household_Informal_Greeting__c = informal;
+                    changed = true;
+                }
+            }
+            return changed;
+        }
     }
 
     // ------------------------------------------------------------------ helpers
 
     /**
-     * Puts the two greetings the members call for on `target` when `household` holds none of
-     * its own, whether or not it is custom named, and says whether it did. Only the sample
-     * data load calls this: a custom name keeps its Name (R-H8), but a loaded household still
-     * arrives with greetings to merge from. A greeting already there is never replaced.
+     * Puts the two greetings the members call for on `target` where `household` holds a
+     * blank one, whether or not it is custom named, and says whether it did. Upkeep does the
+     * same for a custom-named household through Wording.apply (R-H8); the sample data load
+     * calls this directly so a loaded household is greeted with Household Upkeep on or off.
+     * A greeting already there is never replaced.
      */
     @NamespaceAccessible
     public static Boolean fillBlankGreetings(
@@ -363,28 +398,7 @@ public with sharing class HouseholdNamingService {
         Id primaryId,
         Account target
     ) {
-        if (members == null || members.isEmpty()) {
-            return false;
-        }
-        Wording settings = new Wording();
-        markPrimary(members, primaryId);
-        Boolean changed = false;
-        if (String.isBlank(household.Household_Formal_Greeting__c)) {
-            target.Household_Formal_Greeting__c = computeFormalGreeting(
-                members,
-                settings.formalPattern,
-                settings.includeDeceased
-            );
-            changed = true;
-        }
-        if (String.isBlank(household.Household_Informal_Greeting__c)) {
-            target.Household_Informal_Greeting__c = computeInformalGreeting(
-                members,
-                settings.informalPattern
-            );
-            changed = true;
-        }
-        return changed;
+        return new Wording().fillBlanks(household, members, primaryId, target);
     }
 
     private static void markPrimary(List<HouseholdService.Person> members, Id primaryId) {

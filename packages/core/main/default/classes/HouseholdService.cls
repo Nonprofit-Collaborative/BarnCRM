@@ -1113,11 +1113,11 @@ public with sharing class HouseholdService {
     }
 
     /**
-     * Gives each custom-named household in `householdIds` that has no greetings the greetings
-     * its members call for. The naming patterns leave a custom name and its greetings alone
-     * from then on (R-H8), so this is not part of upkeep: the sample data load calls it once,
-     * so a sample household named by hand still has greetings to merge from, with Household
-     * Upkeep on or off. A greeting that is already there is kept.
+     * Gives each custom-named household in `householdIds` that has a blank greeting the
+     * greeting its members call for. Household Upkeep does the same on every membership change
+     * (R-H8); the sample data load calls this once, so a sample household named by hand has
+     * greetings to merge from with Household Upkeep on or off. The name and a greeting that is
+     * already there are kept.
      */
     @NamespaceAccessible
     public static void greetCustomNamedHouseholds(Set<Id> householdIds) {

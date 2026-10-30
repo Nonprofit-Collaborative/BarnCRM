@@ -103,7 +103,8 @@ Maria does steps 1 to 5. David does step 6.
 6. David opens the household for the Reverend and Mrs. Smith, checks **Custom name**, and
    types the name and greetings the way he wants them. From now on nothing recalculates
    that household: adding a member, a recompute, and a pattern change all leave his wording
-   alone.
+   alone. The one exception: a greeting he leaves blank is filled from the members the next
+   time a member is added, changed or moved. Anything he typed is never replaced.
 
 ## If Your Org Stores People as Accounts
 
@@ -153,7 +154,7 @@ For report builders only.
 | Household | Account Name | The computed household name |
 | Household | Formal Greeting | Used on letters (and receipts, with Giving) |
 | Household | Informal Greeting | Used on personal notes |
-| Household | Custom Name | When checked, nothing recalculates this household |
+| Household | Custom Name | When checked, nothing recalculates this household's name or a greeting that has a value; a blank greeting is filled from the members |
 | Person | Preferred Name | Used in place of the first name in greetings |
 | Person | Deceased | Left out of greetings |
 | Person | Exclude From Household Name | Left out of the name only |

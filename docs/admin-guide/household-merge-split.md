@@ -95,7 +95,8 @@ Maria does this from the sample data, after an import left her with the Garcia f
    the member count is right, and the name has been recalculated from the members unless you
    chose to keep a custom name. A name or greeting you took from the other household is kept
    as you chose it; when it is not what naming would produce, the household is marked as
-   having a custom name, so naming stops rewriting its name and greetings. Every letter, file, and note (and, with Giving, every gift) from the duplicate is now
+   having a custom name, so naming stops rewriting its name and greetings (it only fills a
+   greeting left blank). Every letter, file, and note (and, with Giving, every gift) from the duplicate is now
    on this household.
 
 ### Splitting a Member Out
