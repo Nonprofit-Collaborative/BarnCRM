@@ -6,6 +6,9 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-10-30
 
+- Batch 19 screen recheck on `barn-platform` at main 19c95fda (Core only): deploy exit 0, one hourly Tab Access Check after; sample data removed and reloaded, 200 households, no formal greeting of the form "<Title>. and <Title>. <First> <Last>" except "Mr. and Mrs. ..." (56 of them); Hall, Perez-Reyes, Mensah-Sato, Costa, Nguyen and Garcia households read naturally. Pass, no findings.
+- Batch 19, #732 (squash 19c95fda): formal greeting combines titles only for one Mr. and one Mrs.; every other pair is named person by person. `barn-sales` 198 of 198. Batch 18 screen recheck on `barn-platform` passed.
+- Batch 18, #731 (squash 69723f28): formal greeting names each person unless both titles are Mr., Mrs., Ms., Miss or Mx.; Doctors Nguyen sample spouse is Dr.; Recent Changes hides rows whose shown values match. `barn-sales` 211 of 211.
 - `barn-npc` deployed from main bdf0a7d3: validation 3,655 of 3,655, quick deploy 0Afhk0000020zwnCAA, post-install clean, hourly Tab Access Check scheduled, edition Nonprofit. Its Organization record type is the org's own (created by Brandon 2026-10-12, not BarnCRM) and was kept.
 - BMemory plan Section 9.6 edited (commit de3eae45, owner approval 2026-10-29): standing approval to stop and reschedule the BarnCRM Tab Access Check and other BarnCRM scheduled jobs for every approved `mwdbdevsb` deploy. `docs/product-plan.md` mirrored.
 - Batch 17, #729 (squash bdf0a7d3): sample data removal tests get fresh SOQL limits (`Test.startTest`) after a `barn-npc` run hit SOQL 101; `barn-sales` 194 of 194.
