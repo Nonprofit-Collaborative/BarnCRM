@@ -144,6 +144,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-14, C-19, C-32, C-33 Importing, import undo, matching rules and Load one object | [importing.md](importing.md) | Core |
 | C-34, C-36 Find and export | [find.md](find.md) | Core |
 | C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core |
+| C-50 Super Transform (bulk change without a file or a Find query) | [super-transform.md](super-transform.md) | Core |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
 | Org Optimizer (Data Quality, Field Utilization, Health Check, Errors, Storage and Limits, Unused Setup) | [org-optimizer.md](org-optimizer.md) | Core |
 | C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | Core |
