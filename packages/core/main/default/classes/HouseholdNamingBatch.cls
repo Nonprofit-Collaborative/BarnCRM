@@ -1,6 +1,7 @@
 /**
- * Rewrites the name and greetings of every household the org has not taken over by hand.
- * Started from the settings page after a naming pattern changes. R-H14.
+ * Rewrites the name and greetings of every household the org has not taken over by hand, and
+ * fills only the blank greetings of a custom-named one (R-H8). Started from the settings page
+ * after a naming pattern changes. R-H14.
  */
 public with sharing class HouseholdNamingBatch implements Database.Batchable<SObject>, Database.Stateful {
     public Integer householdsRead = 0;

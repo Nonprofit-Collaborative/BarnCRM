@@ -777,8 +777,9 @@ public with sharing class HouseholdSelector {
     }
 
     /**
-     * Every household the naming batch may rewrite. Households whose wording a person has
-     * taken over are left out of the query rather than filtered later. R-H8.
+     * Every household the naming batch may reword. A custom-named household is included so
+     * the batch fills its blank greetings; naming never changes its name or a greeting that
+     * has a value. R-H8.
      */
     @NamespaceAccessible
     public static Database.QueryLocator getHouseholdsForRecomputeLocator() {
@@ -787,7 +788,7 @@ public with sharing class HouseholdSelector {
             [
                 SELECT Id
                 FROM Account
-                WHERE RecordTypeId = :recordTypeId AND Custom_Name__c = FALSE
+                WHERE RecordTypeId = :recordTypeId
                 WITH SYSTEM_MODE
             ]
         );

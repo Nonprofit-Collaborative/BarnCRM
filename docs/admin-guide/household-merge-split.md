@@ -167,6 +167,6 @@ For report builders only. Maria never needs this to use the feature.
 
 | Where | Field label | Purpose |
 |---|---|---|
-| Household | Custom Name | When ticked, the name and greetings are never recalculated |
+| Household | Custom Name | When ticked, the name and any greeting that has a value are never recalculated; a blank greeting is filled from the members |
 | Household | Member Count | Recalculated on both households after a merge or a split |
 | Household | Primary Contact | One of the values a merge offers a choice about in the simple way of belonging (in the flexible way it follows the primary member), and cleared on a household a split moves that person out of |

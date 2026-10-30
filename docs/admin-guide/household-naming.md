@@ -104,7 +104,8 @@ Maria does steps 1 to 5. David does step 6.
    types the name and greetings the way he wants them. From now on nothing recalculates
    that household: adding a member, a recompute, and a pattern change all leave his wording
    alone. The one exception: a greeting he leaves blank is filled from the members the next
-   time a member is added, changed or moved. Anything he typed is never replaced.
+   time a member is added, changed or moved, or when **Update All Household Names** runs.
+   Anything he typed is never replaced.
 
 ## If Your Org Stores People as Accounts
 
