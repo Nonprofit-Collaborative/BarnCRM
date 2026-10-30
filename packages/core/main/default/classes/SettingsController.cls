@@ -307,6 +307,11 @@ public with sharing class SettingsController {
                     change.oldValue = shownRecordName(record.Old_Value__c, recordNames);
                     change.newValue = shownRecordName(record.New_Value__c, recordNames);
                 }
+                if (String.isNotBlank(change.oldValue) && change.oldValue == change.newValue) {
+                    // Both sides read the same on screen (for example two raw values that both
+                    // show as "No features"), so the row would look like a change that did not happen.
+                    continue;
+                }
                 change.changedBy = record.Changed_By__r == null ? null : record.Changed_By__r.Name;
                 change.changedAt = record.Changed_At__c;
                 changes.add(change);

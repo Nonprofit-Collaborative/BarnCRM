@@ -837,6 +837,42 @@ private class SettingsControllerTest {
     }
 
     @IsTest
+    static void recentChangesHideRowsWhoseShownValuesMatch() {
+        System.runAs(TestUsers.admin()) {
+            String featuresName = SettingsService.CORE_SETTINGS_OBJECT + '.Features_Turned_On__c';
+            insert new List<Setting_Change__c>{
+                // "None" and "NoneChosen" both show as "No features": not a visible change.
+                new Setting_Change__c(
+                    Setting_Name__c = featuresName,
+                    Old_Value__c = FeatureSwitchService.NONE_CHOSEN,
+                    New_Value__c = FeatureSwitchService.NONE_ON,
+                    Changed_By__c = UserInfo.getUserId(),
+                    Changed_At__c = System.now()
+                ),
+                // A real change stays.
+                new Setting_Change__c(
+                    Setting_Name__c = SettingsService.CORE_SETTINGS_OBJECT + '.' + TEXT_KEY,
+                    Old_Value__c = 'The {LastName} Family',
+                    New_Value__c = 'The {LastName} Household',
+                    Changed_By__c = UserInfo.getUserId(),
+                    Changed_At__c = System.now().addMinutes(-1)
+                )
+            };
+
+            Test.startTest();
+            List<SettingsController.ChangeModel> changes = SettingsController.getRecentChanges(5);
+            Test.stopTest();
+
+            Assert.areEqual(1, changes.size(), 'Only the row that reads differently is listed');
+            Assert.areNotEqual(
+                System.Label.Core_Settings_FeaturesTurnedOn,
+                changes[0].settingName,
+                'The row with matching shown values is the one hidden'
+            );
+        }
+    }
+
+    @IsTest
     static void recentChangesShowARecordSettingByTheRecordsName() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{

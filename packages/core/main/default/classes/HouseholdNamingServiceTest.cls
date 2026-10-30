@@ -201,6 +201,25 @@ private class HouseholdNamingServiceTest {
     }
 
     @IsTest
+    static void formalGreetingListsEachPersonWhenATitleIsProfessional() {
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = HouseholdTestDataFactory.smithCouple();
+            members[0].salutation = 'Dr.';
+            Assert.areEqual(
+                'Dr. John Smith and Mrs. Jane Smith',
+                HouseholdNamingService.computeFormalGreeting(members, FORMAL_PATTERN, false),
+                'A professional title is not merged onto one shared first name'
+            );
+            members[1].salutation = 'Dr.';
+            Assert.areEqual(
+                'Dr. John Smith and Dr. Jane Smith',
+                HouseholdNamingService.computeFormalGreeting(members, FORMAL_PATTERN, false),
+                'Two doctors are each named'
+            );
+        }
+    }
+
+    @IsTest
     static void formalGreetingCombinesTitlesForACouple() {
         System.runAs(TestUsers.admin()) {
             Assert.areEqual(
