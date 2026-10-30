@@ -334,6 +334,43 @@ public with sharing class HouseholdNamingService {
 
     // ------------------------------------------------------------------ helpers
 
+    /**
+     * Puts the two greetings the members call for on `target` when `household` holds none of
+     * its own, whether or not it is custom named, and says whether it did. Only the sample
+     * data load calls this: a custom name keeps its Name (R-H8), but a loaded household still
+     * arrives with greetings to merge from. A greeting already there is never replaced.
+     */
+    @NamespaceAccessible
+    public static Boolean fillBlankGreetings(
+        Account household,
+        List<HouseholdService.Person> members,
+        Id primaryId,
+        Account target
+    ) {
+        if (members == null || members.isEmpty()) {
+            return false;
+        }
+        Wording settings = new Wording();
+        markPrimary(members, primaryId);
+        Boolean changed = false;
+        if (String.isBlank(household.Household_Formal_Greeting__c)) {
+            target.Household_Formal_Greeting__c = computeFormalGreeting(
+                members,
+                settings.formalPattern,
+                settings.includeDeceased
+            );
+            changed = true;
+        }
+        if (String.isBlank(household.Household_Informal_Greeting__c)) {
+            target.Household_Informal_Greeting__c = computeInformalGreeting(
+                members,
+                settings.informalPattern
+            );
+            changed = true;
+        }
+        return changed;
+    }
+
     private static void markPrimary(List<HouseholdService.Person> members, Id primaryId) {
         if (primaryId == null) {
             return;

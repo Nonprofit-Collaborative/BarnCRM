@@ -1113,6 +1113,56 @@ public with sharing class HouseholdService {
     }
 
     /**
+     * Gives each custom-named household in `householdIds` that has no greetings the greetings
+     * its members call for. The naming patterns leave a custom name and its greetings alone
+     * from then on (R-H8), so this is not part of upkeep: the sample data load calls it once,
+     * so a sample household named by hand still has greetings to merge from, with Household
+     * Upkeep on or off. A greeting that is already there is kept.
+     */
+    @NamespaceAccessible
+    public static void greetCustomNamedHouseholds(Set<Id> householdIds) {
+        if (upkeepRunning || householdIds == null || householdIds.isEmpty()) {
+            return;
+        }
+        upkeepRunning = true;
+        try {
+            List<Account> custom = new List<Account>();
+            for (Account household : HouseholdSelector.getHouseholdsByIds(householdIds)) {
+                if (household.Custom_Name__c == true) {
+                    custom.add(household);
+                }
+            }
+            if (custom.isEmpty()) {
+                return;
+            }
+            Map<Id, List<Person>> membersByHousehold = getMembers(
+                new Map<Id, Account>(custom).keySet()
+            );
+            Boolean primaryFromField = !isJunctionMode();
+            List<Account> updates = new List<Account>();
+            for (Account household : custom) {
+                Account change = new Account(Id = household.Id);
+                Id primaryId = primaryFromField ? household.Primary_Contact__c : null;
+                if (
+                    HouseholdNamingService.fillBlankGreetings(
+                        household,
+                        membersByHousehold.get(household.Id),
+                        primaryId,
+                        change
+                    )
+                ) {
+                    updates.add(change);
+                }
+            }
+            writeSettledHouseholds(updates);
+        } catch (Exception e) {
+            ErrorLogger.log(e, Label.Core_Households_ErrorContextNaming);
+        } finally {
+            upkeepRunning = false;
+        }
+    }
+
+    /**
      * The day a household was emptied by deleting people (R-H12a): stamped when a person
      * delete leaves a household with no members, kept while it stays empty, and cleared as
      * soon as anyone belongs to it again, so a later move that empties it is not mistaken for

@@ -8,9 +8,11 @@ committed HEAD, so the tree is clean and package changes can be committed freely
 import json
 import os
 import shutil
+import signal
 import subprocess
 import tempfile
 import textwrap
+import time
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -57,6 +59,9 @@ FAKE_SF = textwrap.dedent(
         with open(os.path.join(state, "deploy-log.jsonl"), "a") as log:
             log.write(json.dumps(dirs) + "\n")
         event("deploy", dirs)
+        if os.environ.get("FAKE_HOLD_DEPLOY") and "packages/core/main/default/classes" in dirs:
+            import time
+            time.sleep(60)
         out({"id": new})
     elif args[:3] == ["project", "deploy", "report"]:
         out({"status": "Succeeded", "done": True, "startDate": "now",
@@ -230,6 +235,53 @@ class DeploySkipUnchanged(unittest.TestCase):
             "(Schedulable) Type.forName('TabAccessScheduler').newInstance());",
             after[0],
         )
+
+    def test_an_interrupted_deploy_still_schedules_the_paused_jobs_again(self):
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            events_path = os.path.join(self.fake, "events.jsonl")
+            if os.path.exists(events_path):
+                os.remove(events_path)
+            env = dict(
+                os.environ,
+                PATH=self.fake + os.pathsep + os.environ["PATH"],
+                FAKE_SF_DIR=self.fake,
+                FAKE_ORG_ID=self.org,
+                DEPLOY_STATE_DIR=self.state_dir,
+                DEPLOY_APEX_ALWAYS="1",
+                SOURCE_POST_INSTALL="0",
+                POLL_SECONDS="0",
+                FAKE_SCHEDULED_JOB="1",
+                FAKE_HOLD_DEPLOY="1",
+            )
+            proc = subprocess.Popen(
+                ["bash", "scripts/org/deploy-packages.sh", "fake-org", "--core-only"],
+                cwd=self.repo, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                text=True, start_new_session=True,
+            )
+            try:
+                # Wait until the Apex stage is under way, so the jobs are paused.
+                deadline = time.time() + 60
+                while time.time() < deadline:
+                    if os.path.exists(events_path) and any(
+                        kind == "deploy" and "packages/core/main/default/classes" in detail
+                        for kind, detail in self.events()
+                    ):
+                        break
+                    time.sleep(0.1)
+                else:
+                    self.fail("the Apex stage never started")
+                os.killpg(proc.pid, sig)
+                output, _ = proc.communicate(timeout=60)
+            finally:
+                if proc.poll() is None:
+                    os.killpg(proc.pid, signal.SIGKILL)
+            self.assertEqual(proc.returncode, 130 if sig == signal.SIGINT else 143, output[-2000:])
+            applied = [d for kind, d in self.events() if kind == "apex"]
+            self.assertIn("System.abortJob('08e000000000001AAA');", applied[0])
+            self.assertIn("System.schedule('BarnCRM Tab Access Check'", applied[-1], output[-2000:])
+            self.assertEqual(
+                sum("System.schedule(" in d for d in applied), 1, "restored exactly once"
+            )
 
     def test_no_scheduled_job_means_no_abort(self):
         self.run_script("--core-only")

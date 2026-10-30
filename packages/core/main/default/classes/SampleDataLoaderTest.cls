@@ -488,6 +488,38 @@ private class SampleDataLoaderTest {
     }
 
     @IsTest
+    static void testCustomNamedSampleHouseholdKeepsItsNameAndGetsGreetings() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            // Upkeep off: the case QA v15 found, a custom-named household with no greetings.
+            TestSettings.newInstall();
+
+            Test.startTest();
+            loadEverything(buildJson(2, 2, true));
+            Test.stopTest();
+
+            Account custom = [
+                SELECT
+                    Name,
+                    Member_Count__c,
+                    Household_Formal_Greeting__c,
+                    Household_Informal_Greeting__c
+                FROM Account
+                WHERE Sample_Data_Key__c = 'H0'
+            ];
+            Assert.areEqual('The Test Family', custom.Name, 'a custom name is kept (R-H8)');
+            Assert.areEqual(2, custom.Member_Count__c, 'its people are counted');
+            Assert.isTrue(
+                String.isNotBlank(custom.Household_Formal_Greeting__c),
+                'it has a formal greeting'
+            );
+            Assert.isTrue(
+                String.isNotBlank(custom.Household_Informal_Greeting__c),
+                'it has an informal greeting'
+            );
+        }
+    }
+
+    @IsTest
     static void testRemoveInJunctionModeTakesTheMembershipRowsWithIt() {
         System.runAs(TestUsers.adminWithInstalledModules()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);

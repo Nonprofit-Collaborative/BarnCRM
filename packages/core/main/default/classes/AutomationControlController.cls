@@ -108,7 +108,7 @@ public with sharing class AutomationControlController {
             view.automationName = setting.Automation_Name__c;
             view.label = setting.Name;
             view.description = setting.Description__c;
-            view.objectName = setting.Object_Name__c;
+            view.objectName = objectLabel(setting.Object_Name__c);
             view.alwaysRuns = setting.Always_Runs__c == true;
             // A rule enforcing automation is never running "on" a switch: it is shown off, and
             // disabled, so nobody reads the page as saying it can be turned on (ADR-0024).
@@ -116,6 +116,26 @@ public with sharing class AutomationControlController {
             page.automations.add(view);
         }
         return page;
+    }
+
+    /**
+     * The object's label in this org ("Household Member", not "Household_Member__c"). A name
+     * that is not an object here, or that cannot be described, is shown as stored.
+     */
+    @TestVisible
+    private static String objectLabel(String apiName) {
+        if (String.isBlank(apiName)) {
+            return apiName;
+        }
+        try {
+            Schema.DescribeSObjectResult described = Schema.describeSObjects(
+                new List<String>{ apiName.trim() },
+                SObjectDescribeOptions.DEFERRED
+            )[0];
+            return described.getLabel();
+        } catch (Exception notAnObject) {
+            return apiName;
+        }
     }
 
     private static Boolean canManage() {

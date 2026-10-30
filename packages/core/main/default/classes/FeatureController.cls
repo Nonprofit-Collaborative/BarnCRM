@@ -79,7 +79,7 @@ public with sharing class FeatureController {
     }
 
     @TestVisible
-    private static String nameOf(String key) {
+    public static String nameOf(String key) {
         switch on key {
             when 'DataManager' {
                 return System.Label.Core_Feature_DataManager_Name;
