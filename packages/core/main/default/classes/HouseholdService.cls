@@ -1092,9 +1092,15 @@ public with sharing class HouseholdService {
             }
             Account renamed = worded.get(household.Id);
             if (renamed != null) {
-                change.Name = renamed.Name;
-                change.Household_Formal_Greeting__c = renamed.Household_Formal_Greeting__c;
-                change.Household_Informal_Greeting__c = renamed.Household_Informal_Greeting__c;
+                // Only the wording fields the naming set: a custom-named household gets just
+                // its blank greetings (R-H8), and copying an unset Name or greeting as null
+                // would blank it or have the save refused.
+                Map<String, Object> wording = renamed.getPopulatedFieldsAsMap();
+                for (String field : wording.keySet()) {
+                    if (field != 'Id') {
+                        change.put(field, wording.get(field));
+                    }
+                }
             }
             if (bookkept || renamed != null) {
                 updates.add(change);
