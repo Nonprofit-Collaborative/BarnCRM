@@ -605,6 +605,8 @@ def build_custom_name_household(rng, key, custom_name, surname, address, member_
             member_index[0],
             min_age=spouse_min,
             max_age=spouse_max,
+            # "The Doctors Nguyen": both members are doctors.
+            formal_title="Dr." if formal_title == "Dr." else None,
         )
     )
     member_index[0] += 1

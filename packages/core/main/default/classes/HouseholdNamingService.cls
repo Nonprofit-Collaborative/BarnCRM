@@ -34,6 +34,17 @@ public with sharing class HouseholdNamingService {
     private static final String TOKEN_FIRST_NAME = '{FirstName}';
     private static final String TOKEN_LAST_NAME = '{LastName}';
     private static final String TOKEN_SALUTATION = '{Salutation}';
+    private static final Set<String> COURTESY_TITLES = new Set<String>{
+        'mr.',
+        'mr',
+        'mrs.',
+        'mrs',
+        'ms.',
+        'ms',
+        'miss',
+        'mx.',
+        'mx'
+    };
     private static final String DEFAULT_NAME_PATTERN = 'The {LastName} Family';
     private static final String DEFAULT_FORMAL_PATTERN = '{Salutation} {FirstName} {LastName}';
     private static final String DEFAULT_INFORMAL_PATTERN = '{FirstName}';
@@ -172,6 +183,14 @@ public with sharing class HouseholdNamingService {
             return null;
         }
         if (String.isBlank(first.lastName) || !first.lastName.equals(second.lastName)) {
+            return null;
+        }
+        // One shared first name only reads right for ordinary courtesy titles. "Dr. and Mr.
+        // Priya Nguyen" would put two titles on one person, so other titles are listed one by one.
+        if (
+            !COURTESY_TITLES.contains(first.salutation.trim().toLowerCase()) ||
+            !COURTESY_TITLES.contains(second.salutation.trim().toLowerCase())
+        ) {
             return null;
         }
         String normalized = normalize(pattern);
