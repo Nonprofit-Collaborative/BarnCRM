@@ -347,12 +347,16 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
             return null;
         }
         String pattern = CONTEXT_PREFIX + '%';
+        String moduleSetups = ModuleSetups.CONTEXT;
         String statusNew = ErrorLogger.STATUS_NEW;
         Integer readUpTo = cap + 1;
         return [
             SELECT COUNT()
             FROM Error_Log__c
-            WHERE Context__c LIKE :pattern AND Status__c = :statusNew
+            WHERE
+                (Context__c LIKE :pattern
+                OR Context__c = :moduleSetups)
+                AND Status__c = :statusNew
             WITH USER_MODE
             LIMIT :readUpTo
         ];

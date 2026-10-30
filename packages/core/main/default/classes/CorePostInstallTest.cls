@@ -1045,6 +1045,31 @@ private class CorePostInstallTest {
     }
 
     @IsTest
+    static void aModuleSetupErrorCountsAsAnInstallProblem() {
+        System.runAs(TestUsers.admin()) {
+            List<Error_Log__c> rows = new List<Error_Log__c>();
+            for (String context : new List<String>{ ModuleSetups.CONTEXT, 'Hub test' }) {
+                rows.add(
+                    new Error_Log__c(
+                        Timestamp__c = System.now(),
+                        Context__c = context,
+                        Message__c = 'Something went wrong.',
+                        Severity__c = 'Error',
+                        Status__c = 'New'
+                    )
+                );
+            }
+            insert rows;
+
+            Assert.areEqual(
+                1,
+                CorePostInstall.countInstallProblemsUpTo(999),
+                'A failed module setup step counts; an unrelated error does not'
+            );
+        }
+    }
+
+    @IsTest
     static void theHubCanCountWhatTheInstallLogged() {
         System.runAs(TestUsers.admin()) {
             Id installer = newInstaller();
