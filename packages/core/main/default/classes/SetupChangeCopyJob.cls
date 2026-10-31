@@ -63,16 +63,22 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 
     /** Starts the nightly copy, or does nothing when it is already scheduled. */
     public static Id start() {
-        Id existing = ScheduledJobSelector.triggerIdByName(JOB_NAME);
-        if (existing != null) {
-            return existing;
-        }
-        return ScheduledJobSelector.schedule(JOB_NAME, NIGHTLY_CRON, new SetupChangeCopyJob());
+        return ScheduledJobSelector.ensure(JOB_NAME, NIGHTLY_CRON, new SetupChangeCopyJob());
     }
 
     /** True when the nightly copy is scheduled. */
     public static Boolean isScheduled() {
-        return ScheduledJobSelector.triggerIdByName(JOB_NAME) != null;
+        return ScheduledJobSelector.isScheduled(JOB_NAME);
+    }
+
+    /** The nightly copy as Health Check's nightly jobs list sees it. */
+    public static NightlyJob nightlyJob() {
+        return new NamedNightlyJob(
+            System.Label.Core_HealthCheck_JobSetupChanges,
+            JOB_NAME,
+            NIGHTLY_CRON,
+            new SetupChangeCopyJob()
+        );
     }
 
     /**

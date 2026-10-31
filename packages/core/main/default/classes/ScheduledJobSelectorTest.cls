@@ -2,7 +2,7 @@
  * The one lookup for BarnCRM's scheduled jobs (ADMIN-11), and the deactivated owner finding
  * and fix built on it (ADMIN-12).
  */
-@IsTest(testFor='ApexClass:ScheduledJobSelector, ApexClass:NightlyJobs')
+@IsTest(testFor='ApexClass:ScheduledJobSelector, ApexClass:NightlyJobs, ApexClass:NamedNightlyJob')
 private class ScheduledJobSelectorTest {
     @TestSetup
     static void createTestUser() {
@@ -29,6 +29,34 @@ private class ScheduledJobSelectorTest {
         );
         insert gone;
         return gone.Id;
+    }
+
+    @IsTest
+    static void aNamedJobIsScheduledOnceAndStoppedByName() {
+        System.runAs(TestUsers.admin()) {
+            NightlyJob job = new NamedNightlyJob(
+                'Selector test',
+                OTHER_JOB,
+                DAILY,
+                new ErrorDigestScheduler()
+            );
+
+            Test.startTest();
+            Boolean before = job.isScheduled();
+            job.schedule();
+            Id first = ScheduledJobSelector.ensure(OTHER_JOB, DAILY, new ErrorDigestScheduler());
+            Id again = ScheduledJobSelector.ensure(OTHER_JOB, DAILY, new ErrorDigestScheduler());
+            Boolean during = ScheduledJobSelector.isScheduled(OTHER_JOB);
+            ScheduledJobSelector.stopNamed(OTHER_JOB);
+            ScheduledJobSelector.stopNamed(OTHER_JOB);
+            Test.stopTest();
+
+            Assert.isFalse(before, 'Not scheduled at first');
+            Assert.areEqual(first, again, 'Ensuring twice finds the job already there');
+            Assert.isTrue(during, 'Scheduled once ensured');
+            Assert.isFalse(job.isScheduled(), 'Stopped by name, and stopping twice is harmless');
+            Assert.areEqual('Selector test', job.label(), 'The label it was given');
+        }
     }
 
     @IsTest
@@ -117,7 +145,7 @@ private class ScheduledJobSelectorTest {
             Id gone = inactiveUserId();
             ErrorDigestScheduler.start();
             ScheduledJobSelector.schedule(OTHER_JOB, DAILY, new ErrorDigestScheduler());
-            NightlyJobs.jobsOverride = new List<NightlyJob>{ new NightlyJobs.ErrorDigestJob() };
+            NightlyJobs.jobsOverride = new List<NightlyJob>{ ErrorDigestScheduler.nightlyJob() };
             Id oldDigest = ScheduledJobSelector.triggerIdByName(ErrorDigestScheduler.JOB_NAME);
 
             Test.startTest();

@@ -31,19 +31,22 @@ public with sharing class ErrorDigestScheduler implements Schedulable {
 
     /** Starts the daily run, or returns the one already scheduled. */
     public static Id start() {
-        Id existing = ScheduledJobSelector.triggerIdByName(JOB_NAME);
-        if (existing != null) {
-            return existing;
-        }
-        return ScheduledJobSelector.schedule(JOB_NAME, DAILY_CRON, new ErrorDigestScheduler());
+        return ScheduledJobSelector.ensure(JOB_NAME, DAILY_CRON, new ErrorDigestScheduler());
     }
 
     /** Stops the daily run. Nothing already sent is affected. */
     public static void stop() {
-        Id existing = ScheduledJobSelector.triggerIdByName(JOB_NAME);
-        if (existing != null) {
-            ScheduledJobSelector.abort(existing);
-        }
+        ScheduledJobSelector.stopNamed(JOB_NAME);
+    }
+
+    /** The daily run as Health Check's nightly jobs list sees it. */
+    public static NightlyJob nightlyJob() {
+        return new NamedNightlyJob(
+            System.Label.Core_HealthCheck_JobErrorDigest,
+            JOB_NAME,
+            DAILY_CRON,
+            new ErrorDigestScheduler()
+        );
     }
 
     /** When the digest job runs next, or null when it is not scheduled. */

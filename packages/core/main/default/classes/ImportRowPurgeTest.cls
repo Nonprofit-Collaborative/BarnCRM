@@ -312,7 +312,7 @@ private class ImportRowPurgeTest {
             Assert.isTrue(ImportRowPurgeScheduler.isScheduled());
             Boolean listed = false;
             for (NightlyJob job : NightlyJobs.all()) {
-                if (job instanceof NightlyJobs.ImportRowPurgeJob) {
+                if (job.label() == System.Label.Core_HealthCheck_JobImportRows) {
                     listed = job.isScheduled();
                 }
             }

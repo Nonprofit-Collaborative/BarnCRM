@@ -27,18 +27,25 @@ public with sharing class TabAccessScheduler implements Schedulable {
      * an install or upgrade moves it to the hourly cron and never leaves two.
      */
     public static Id start() {
-        Id existing = ScheduledJobSelector.triggerIdByName(JOB_NAME);
-        if (existing != null) {
-            if (HOURLY_CRON == ScheduledJobSelector.cronExpressionByName(JOB_NAME)) {
-                return existing;
-            }
-            ScheduledJobSelector.abort(existing);
+        String cron = ScheduledJobSelector.cronExpressionByName(JOB_NAME);
+        if (cron != null && cron != HOURLY_CRON) {
+            ScheduledJobSelector.stopNamed(JOB_NAME);
         }
-        return ScheduledJobSelector.schedule(JOB_NAME, HOURLY_CRON, new TabAccessScheduler());
+        return ScheduledJobSelector.ensure(JOB_NAME, HOURLY_CRON, new TabAccessScheduler());
     }
 
     /** True when the hourly check is scheduled. */
     public static Boolean isScheduled() {
-        return ScheduledJobSelector.triggerIdByName(JOB_NAME) != null;
+        return ScheduledJobSelector.isScheduled(JOB_NAME);
+    }
+
+    /** The hourly check as Health Check's nightly jobs list sees it. */
+    public static NightlyJob nightlyJob() {
+        return new NamedNightlyJob(
+            System.Label.Core_HealthCheck_JobTabAccess,
+            JOB_NAME,
+            HOURLY_CRON,
+            new TabAccessScheduler()
+        );
     }
 }

@@ -39,33 +39,21 @@ public with sharing class AcknowledgmentScheduler implements Schedulable {
 
     /** Starts the nightly send, or does nothing when it is already scheduled. */
     public static Id start() {
-        Id existing = scheduledJobId();
-        if (existing != null) {
-            return existing;
-        }
-        return ScheduledJobSelector.schedule(JOB_NAME, NIGHTLY_CRON, new AcknowledgmentScheduler());
+        return ScheduledJobSelector.ensure(JOB_NAME, NIGHTLY_CRON, new AcknowledgmentScheduler());
     }
 
     /** Stops the nightly send. The queue stays exactly as it is. */
     public static void stop() {
-        Id existing = scheduledJobId();
-        if (existing != null) {
-            ScheduledJobSelector.abort(existing);
-        }
+        ScheduledJobSelector.stopNamed(JOB_NAME);
     }
 
     /** True when the nightly send is scheduled. */
     public static Boolean isScheduled() {
-        return scheduledJobId() != null;
+        return ScheduledJobSelector.isScheduled(JOB_NAME);
     }
 
     /** When the nightly send is next due, or null when it is not scheduled. */
     public static Datetime nextRunAt() {
         return ScheduledJobSelector.nextFireTime(JOB_NAME);
-    }
-
-    // Core's one lookup for every BarnCRM scheduled job, read once per transaction (ADMIN-11).
-    private static Id scheduledJobId() {
-        return ScheduledJobSelector.triggerIdByName(JOB_NAME);
     }
 }

@@ -92,11 +92,7 @@ public with sharing class RollupScheduler implements Schedulable {
 
     /** Starts the nightly run, or does nothing when it is already scheduled. */
     public static Id start() {
-        Id existing = scheduledJobId();
-        if (existing != null) {
-            return existing;
-        }
-        return ScheduledJobSelector.schedule(jobNameInUse, nightlyCron(), new RollupScheduler());
+        return ScheduledJobSelector.ensure(jobNameInUse, nightlyCron(), new RollupScheduler());
     }
 
     /**
@@ -105,20 +101,16 @@ public with sharing class RollupScheduler implements Schedulable {
      * settings service calls this through the engine seam when the hour is saved.
      */
     public static void reschedule() {
-        Id existing = scheduledJobId();
-        if (existing == null) {
+        if (!isScheduled()) {
             return;
         }
-        ScheduledJobSelector.abort(existing);
+        ScheduledJobSelector.stopNamed(jobNameInUse);
         ScheduledJobSelector.schedule(jobNameInUse, nightlyCron(), new RollupScheduler());
     }
 
     /** Stops the nightly run. */
     public static void stop() {
-        Id existing = scheduledJobId();
-        if (existing != null) {
-            ScheduledJobSelector.abort(existing);
-        }
+        ScheduledJobSelector.stopNamed(jobNameInUse);
     }
 
     /** Runs the nightly work now, without waiting for tonight; null when nothing started. */
@@ -138,20 +130,16 @@ public with sharing class RollupScheduler implements Schedulable {
             ? Date.today()
             : Date.today().addDays(1);
         String name = jobNameInUse + ' ' + String.valueOf(night);
-        Id existing = ScheduledJobSelector.triggerIdByName(name);
-        if (existing != null) {
-            return existing;
-        }
         String cron = String.join(
             new List<Object>{ '0 0', hour, night.day(), night.month(), '?', night.year() },
             ' '
         );
-        return ScheduledJobSelector.schedule(name, cron, new RollupScheduler(true));
+        return ScheduledJobSelector.ensure(name, cron, new RollupScheduler(true));
     }
 
     /** True when the nightly run is scheduled. */
     public static Boolean isScheduled() {
-        return scheduledJobId() != null;
+        return ScheduledJobSelector.isScheduled(jobNameInUse);
     }
 
     /** When the nightly run is next due, or null when it is not scheduled. */
@@ -159,8 +147,13 @@ public with sharing class RollupScheduler implements Schedulable {
         return ScheduledJobSelector.nextFireTime(jobNameInUse);
     }
 
-    // One lookup for every scheduled job, read once per transaction (ADMIN-11).
-    private static Id scheduledJobId() {
-        return ScheduledJobSelector.triggerIdByName(jobNameInUse);
+    /** The nightly run as Health Check's nightly jobs list sees it (ADR-0075). */
+    public static NightlyJob nightlyJob() {
+        return new NamedNightlyJob(
+            System.Label.Core_HealthCheck_JobRollups,
+            jobNameInUse,
+            nightlyCron(),
+            new RollupScheduler()
+        );
     }
 }
