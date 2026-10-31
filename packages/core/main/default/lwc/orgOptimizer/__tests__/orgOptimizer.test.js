@@ -134,7 +134,7 @@ describe('c-org-optimizer as an administrator', () => {
     expect(getChecks).not.toHaveBeenCalled();
     const groups = one(element, 'c-barn-tool-grid').groups;
     expect(groups.map((group) => group.tiles.map((tile) => tile.name))).toEqual([
-      ['quality', 'fieldUtilization'],
+      ['quality', 'fieldUtilization', 'dataDictionary'],
       ['healthCheck', 'errors', 'storage', 'setup']
     ]);
     tiles(element).forEach((tile) => expect(tile.iconName).toMatch(/^standard:/));
@@ -214,6 +214,15 @@ describe('c-org-optimizer as an administrator', () => {
     await activate(element, 'fieldUtilization');
     expect(one(element, 'c-field-utilization')).not.toBeNull();
     expect(one(element, 'c-data-hygiene-console')).not.toBeNull();
+  });
+
+  it('creates the Data Dictionary only when its tab is first opened', async () => {
+    const element = await render();
+    expect(one(element, 'c-data-dictionary')).toBeNull();
+
+    await activate(element, 'dataDictionary');
+
+    expect(one(element, 'c-data-dictionary')).not.toBeNull();
   });
 
   it('opens a section from its Overview tile', async () => {

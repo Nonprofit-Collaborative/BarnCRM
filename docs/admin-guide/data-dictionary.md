@@ -10,7 +10,7 @@ Choose one or more kinds of record, and it lists every field you can see, with:
 
 | Column | What it shows |
 |---|---|
-| **Object** | The kind of record, by label and API name (in the CSV only the API name) |
+| **Object** | The kind of record's label (the CSV adds an **Object API Name** column) |
 | **Field** and **API Name** | The field's label and its API name |
 | **Type** | The field type, such as text, picklist, currency or reference (a lookup) |
 | **Length** | The most characters a text field holds |
@@ -89,7 +89,7 @@ the number of records and fields, so leave it off when you only want the structu
 **Download CSV** saves what the table shows (every row, not only the page you can see) as a
 UTF-8 file with a byte-order mark, so Excel reads accents correctly. Text that starts with
 `=`, `+`, `-` or `@` is saved with a leading apostrophe, so a spreadsheet shows it as text and
-never runs it as a formula. The file name is `Data-Dictionary-` and the date.
+never runs it as a formula. The file name is `Data_Dictionary-` and the date.
 
 Saving the file to the **Files** tab is not offered: the export-to-Files service writes the
 results of a Find query, not a table the page built.

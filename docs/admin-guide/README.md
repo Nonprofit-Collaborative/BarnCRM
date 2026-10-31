@@ -149,6 +149,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | Core |
 | C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |
 | Field utilization | [field-utilization.md](field-utilization.md) | Core |
+| C-52 Data Dictionary (the Data Dictionary section of Org Optimizer) | [data-dictionary.md](data-dictionary.md) | Core |
 
 ### Automation, Totals and Health
 

@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_DataDictionary_PermissionRequired</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: no permission</shortDescription>
+        <value>You need the Manage BarnCRM Settings permission to build the data dictionary.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_UnknownObject</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: unknown object, {0} is the name asked for</shortDescription>
+        <value>There is no kind of record you can document named "{0}".</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_UnexpectedError</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: unexpected error</shortDescription>
+        <value>The data dictionary could not be built. The problem was written to the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_PageTitle</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: section title</shortDescription>
+        <value>Data Dictionary</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_PageIntro</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: what the section does</shortDescription>
+        <value>Lists every field you can see on the kinds of record you choose, with its type, rules, picklist values, help text and formula. Read only: nothing is changed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ChooseLabel</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: object picker label</shortDescription>
+        <value>Kinds of Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_SourceLabel</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: picker list of available objects</shortDescription>
+        <value>Available</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_SelectedLabel</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: picker list of chosen objects</shortDescription>
+        <value>Selected</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_IncludeFillRates</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: fill rates checkbox</shortDescription>
+        <value>Include Fill Rates</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_IncludeFillRatesHelp</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: fill rates help text</shortDescription>
+        <value>Counts how many records have each field filled in, the same way Field Utilization does, with the same size limit. It takes longer.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_Build</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: build button</shortDescription>
+        <value>Build Dictionary</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_Download</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: download button</shortDescription>
+        <value>Download CSV</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_Downloaded</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: file saved, {0} is the row count</shortDescription>
+        <value>Downloaded {0} fields.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_Progress</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: progress, {0} is done, {1} is the total</shortDescription>
+        <value>Described {0} of {1} kinds of record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_FillProgress</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: counting, {0} is the object label</shortDescription>
+        <value>Counting fill rates for {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_NotCounted</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: fill rates skipped, {0} is a list of labels</shortDescription>
+        <value>Fill rates not counted for: {0}. Each is too large or could not be counted.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_Empty</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: nothing built yet</shortDescription>
+        <value>Choose kinds of record and press Build Dictionary.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_Yes</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: yes</shortDescription>
+        <value>Yes</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_No</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: no</shortDescription>
+        <value>No</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColObject</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, kind of record</shortDescription>
+        <value>Object</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColObjectApiName</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: CSV column, object API name</shortDescription>
+        <value>Object API Name</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColField</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, field label</shortDescription>
+        <value>Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColApiName</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, field API name</shortDescription>
+        <value>API Name</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColType</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, field type</shortDescription>
+        <value>Type</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColLength</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, length</shortDescription>
+        <value>Length</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColPrecision</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, precision and scale</shortDescription>
+        <value>Precision</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColRequired</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, required</shortDescription>
+        <value>Required</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColUnique</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, unique</shortDescription>
+        <value>Unique</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColExternalId</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, external ID</shortDescription>
+        <value>External ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColCustom</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, custom field</shortDescription>
+        <value>Custom</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColPicklistValues</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, picklist values</shortDescription>
+        <value>Picklist Values</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColHelpText</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, help text</shortDescription>
+        <value>Help Text</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColFormula</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, formula</shortDescription>
+        <value>Formula</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColRelatedTo</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, lookup target</shortDescription>
+        <value>Related To</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColFillRate</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data dictionary: column, fill rate</shortDescription>
+        <value>Fill Rate</value>
+    </labels>
+</CustomLabels>
