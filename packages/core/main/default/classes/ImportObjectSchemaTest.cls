@@ -327,6 +327,11 @@ private class ImportObjectSchemaTest {
 
     @IsTest
     static void theObjectIsSuggestedFromHeadingsThenSheetThenFileName() {
+        // Detection chooses among this one object, so its names are unique by construction
+        // whatever else the org has (Nonprofit Cloud adds many objects).
+        ImportObjectSchema.detectionObjectsForTest = new List<Schema.SObjectType>{
+            Affiliation__c.SObjectType
+        };
         System.runAs(TestUsers.admin()) {
             ImportObjectSchema.Detection found;
             ImportObjectSchema.Detection byFile;

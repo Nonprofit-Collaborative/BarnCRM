@@ -89,6 +89,10 @@ private class ImportControllerTest {
 
     @IsTest
     static void suggestsTheObjectAFilePointsAt() {
+        // One candidate object, so the suggestion is unique by construction in any org.
+        ImportObjectSchema.detectionObjectsForTest = new List<Schema.SObjectType>{
+            Affiliation__c.SObjectType
+        };
         System.runAs(TestUsers.admin()) {
             ImportController.permissionOverride = true;
 
