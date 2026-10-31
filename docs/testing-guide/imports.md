@@ -1,6 +1,6 @@
 # Imports
 
-Scripts for the Import wizard: templates, preview, commit, rejected rows, row rules, value changes, the first-step cards, Load one object and undo. Setup detail: [Importing](../admin-guide/importing.md).
+Scripts for the Import wizard: templates, preview, commit, rejected rows, row rules, value changes, the first-step cards, Load one object, several sheets and two-part headings, and undo. Setup detail: [Importing](../admin-guide/importing.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and, in `import-test-1.csv` row 4, use `Harper`, `Zztest`, `harper.zztest1@example.org` so the row matches Harper Zztest (without that match T-IMP-01 would show 4 created, 0 matched). Import only the test files here, never a real list. The **Data Manager** feature must be on (BarnCRM Settings, **General**, see [Data Manager](../admin-guide/data-manager.md)). These scripts assume people are stored as contacts.
 
@@ -294,3 +294,47 @@ Nell,Ashby,nell.ashby@example.org,555-0303,Omar,Ashby,omar.ashby@example.org,555
 | 5 | In an org installed before 2026-10-28 that has **Generic contact list**, open the Import tab after the upgrade and choose **People and Organizations**. | The first template is still named **Generic contact list** (never renamed), and **Organization List** and **Couples and Households** are listed as well. |
 
 **Cleanup:** undo both imports from **Recent Imports** (see T-IMP-03).
+
+## T-IMP-15: Several Sheets and Example Values
+
+**Purpose:** confirm a workbook's sheets are listed with their rows, the chosen ones load as one file with columns joined by field, and each column shows example values (C-49a).
+**Prerequisites:** admin; a spreadsheet program that saves .xlsx; no real data. Make `import-test-sheets.xlsx` with three sheets:
+
+- **Read me**: one cell, `About this file`.
+- **2025**: headings `First Name`, `Last Name`, `Email`, then one row `Sheeta`, `Zztest`, `sheeta.zztest@example.org`.
+- **2026**: headings `Contact.First Name`, `Last Name`, `Phone`, then two rows: `Sheetb`, `Zztest`, `555-0601` and `Sheetc`, `Zztest`, with Phone empty.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the Import tab, choose **One Kind of Record**, choose **Contact**, name the template `Test sheets contact`, select **Create**, then **Next**, and upload `import-test-sheets.xlsx`. | **Sheets to load** lists **Read me (0 rows)**, **2025 (1 rows)** and **2026 (2 rows)**, with **2025** and **2026** chosen and **Read me** not chosen. |
+| 2 | Look at the columns. | One row each for **First Name**, **Last Name**, **Email** and **Phone**: `Contact.First Name` on the 2026 sheet joined **First Name** (both map to First Name). |
+| 3 | Look at the **Examples** column. | **First Name** shows `Sheeta`, `Sheetb`, `Sheetc`, one per line; **Phone** shows `555-0601` and `(blank)`; **Email** shows `sheeta.zztest@example.org` only. |
+| 4 | Clear **2025**. | The columns are read again: **Email** is gone, and the **First Name** examples are `Sheetb` and `Sheetc`. |
+| 5 | Choose **2025** again, select **Next**, choose **Create new records**, then **Preview**. | **would create** 3, **would be rejected** 0. |
+| 6 | Select **Back** to the columns and clear **2025** and **2026**. | "This file has no heading row that BarnCRM can read. Check that the first row of the file holds the column names." No columns show and **Next** is disabled. |
+
+**Cleanup:** none; nothing was imported. Deactivate `Test sheets contact` if you do not keep it.
+
+## T-IMP-16: Headings That Name the Object, and the Suggested Object
+
+**Purpose:** confirm a heading that names the object and the field maps to that field, nothing inexact is mapped, the object is suggested from a file before one is chosen, and sheets for different objects hold the step (C-49a).
+**Prerequisites:** admin; no real data. Save `import-test-two-part.csv` as UTF-8:
+
+```
+Contact.First Name,Last Name (Contact),Contact: Phone,Contact_Email,Account.Name,Contact.Shoe Size
+Twopa,Zztest,555-0701,twopa.zztest@example.org,Nowhere Inc,10
+```
+
+Make `contacts_2026.xlsx` with two sheets: **Contacts** (headings `First Name` and `Last Name`, one row `Sheetd`, `Zztest`) and **Accounts** (heading `Account Name`, one row `Zztest Org`).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the Import tab, choose **One Kind of Record**, and under **Suggest the object from a file** choose `import-test-two-part.csv`. | **Object** is set to **Contact**, with "Suggested from your file: Contact. Change it if it is not right." |
+| 2 | Change **Object** to **Account**, then back to **Contact**. Name the template `Test two-part contact`, select **Create**, then **Next**. | The file is read without a second upload. **Contact.First Name** maps to First Name, **Last Name (Contact)** to Last Name, **Contact: Phone** to the Phone field (labelled Business Phone in most orgs), **Contact_Email** to Email. **Account.Name** and **Contact.Shoe Size** are **Do not load**. |
+| 3 | Change **Account.Name** to any Contact field, then back to **Do not load**. | Each mapping can be changed as before. |
+| 4 | Select **Back** to the first step, choose **One Kind of Record** again, and under **Suggest the object from a file** choose `contacts_2026.xlsx`. | **Object** is set to **Contact**. "The file's sheets point at different objects." with **Contacts: Contact** and **Accounts: Account** listed. |
+| 5 | Name the template `Test sheets suggest`, select **Create**, then **Next**. | Both sheets are chosen. The step says the sheets you chose point at different objects, lists **Contacts: Contact** and **Accounts: Account**, and **Next** is disabled. |
+| 6 | Clear **Accounts**. | The message is gone and **Next** is enabled. |
+| 7 | Choose **One Kind of Record**, and under **Suggest the object from a file** choose a file named `budget.csv` with the heading `Amount`. | "Nothing in the file names an object you can load. Choose one from the list." No object is chosen. |
+
+**Cleanup:** none; nothing was imported. Deactivate the `Test two-part contact` and `Test sheets suggest` templates if you do not keep them.

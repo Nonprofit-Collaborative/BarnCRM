@@ -31,7 +31,10 @@ Manager**. **BarnCRM Console** has the same, plus **Addresses**, **Relationships
 have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching** and
 **Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
 **Import** and **Bulk Update** are not in the navigation: open them from their cards on the
-**Data Manager** tab.
+**Data Manager** tab. If you import files, the **Check Columns** step shows a few example
+values beside each column, so you can see each column lands in the right field before
+anything loads; an Excel workbook can load several of its sheets at once. The Admin Guide's
+Importing page has the detail.
 
 The **Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,
 **Organizations**, **Gifts**, **Commitments**, **Gift Batches**, **Funds**, **Appeals**,

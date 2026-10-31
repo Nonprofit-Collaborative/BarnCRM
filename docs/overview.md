@@ -63,6 +63,7 @@ BarnCRM runs on Platform-only licenses, Sales and Service Cloud, an org with NPS
 This is the plan as recorded in the product plan (Section 6 and 6.0). Dates are not promised.
 
 - **Finishing the Core quality pass.** Existing Core features are being tested, tightened and simplified before new modules start. Related-record duplicate matching (duplicate scan and import matching) is in progress.
+- **Super Importer.** Import grows in slices: the first (built, not yet released) reads several sheets of a workbook at once, maps headings that name the object and the field together, suggests the object from the file, and shows example values beside each column. Loading several objects from one workbook and closer heading matching follow.
 - **BarnCRM Contact Point Sync.** An optional module, approved but not yet scheduled, for orgs that use Salesforce Contact Points: it keeps them in step with a person's email and phone and with their addresses, so Core itself never touches those objects.
 - **BarnCRM Address Verification.** An optional module, approved but not yet scheduled, that verifies addresses with your own provider key (set in BarnCRM Settings) and records each address's verification status and date. No provider is bundled.
 - **Programs and Logic Models.** Track programs, services, enrollments and attendance, and build logic models with indicators and a report you can send to a funder.
