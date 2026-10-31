@@ -1,4 +1,4 @@
-@IsTest
+@IsTest(testFor='ApexClass:ImportNewFieldService, ApexClass:ImportNewFieldController')
 private class ImportNewFieldServiceTest {
     private static final List<String> FIELD_ADMIN = new List<String>{
         'BarnCRM_Admin',
@@ -158,6 +158,15 @@ private class ImportNewFieldServiceTest {
                 Assert.areEqual(Label.Core_ImportNewField_NotConnected, e.getMessage());
             }
             Assert.isTrue(ImportNewFieldController.setUpConnection().canCreate);
+            // Refresh Fields after creating the field in Setup.
+            Assert.areEqual(
+                ImportNewFieldService.CREATED,
+                ImportNewFieldController.findField('Account', alternateEmail() + '__c').state
+            );
+            Assert.areEqual(
+                ImportNewFieldService.RUNNING,
+                ImportNewFieldController.findField('Account', 'Not_Created_Yet').state
+            );
         }
     }
 

@@ -88,6 +88,16 @@ public with sharing class ImportNewFieldController {
         }
     }
 
+    /** Refresh Fields: the field once the admin has created it in Setup. */
+    @AuraEnabled
+    public static ImportNewFieldService.Outcome findField(String objectApiName, String apiName) {
+        try {
+            return ImportNewFieldService.find(objectApiName, apiName);
+        } catch (Exception e) {
+            throw UserErrors.wrap(e, 'ImportNewFieldController.findField', true);
+        }
+    }
+
     private static void requireCreate() {
         if (!ImportNewFieldService.canCreate()) {
             throw new ImportNewFieldService.NewFieldException(

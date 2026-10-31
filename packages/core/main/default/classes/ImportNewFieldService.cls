@@ -38,7 +38,7 @@ public with sharing class ImportNewFieldService {
     private static final Set<String> RESERVED = new Set<String>(
         ('id name owner type select from where and or not null true false like in order group ' +
             'by limit offset having with update delete insert merge undelete upsert object ' +
-            'field system date datetime currency number class trigger new old')
+            'field system date datetime currency number trigger new old class')
             .split(' ')
     );
     /** Read and edit, or read only, through each packaged permission set. */
@@ -488,17 +488,8 @@ public with sharing class ImportNewFieldService {
         if (jobs[0].Status != 'Completed') {
             return result;
         }
-        Schema.SObjectType objectType = NamespaceUtil.objectType(objectApiName);
-        Schema.SObjectField field = objectType == null
-            ? null
-            : objectType.getDescribe(SObjectDescribeOptions.FULL)
-                  .fields.getMap()
-                  .get((apiName + '__c').toLowerCase());
-        if (field != null) {
-            Schema.DescribeFieldResult described = field.getDescribe();
-            result.state = CREATED;
-            result.fieldValue = described.getName();
-            result.fieldLabel = described.getLabel();
+        result = find(objectApiName, apiName);
+        if (result.state == CREATED) {
             return result;
         }
         String logContext = LOG_CONTEXT + jobId;
@@ -513,6 +504,28 @@ public with sharing class ImportNewFieldService {
         if (!logged.isEmpty()) {
             result.state = FAILED;
             result.message = logged[0].Message__c;
+        }
+        return result;
+    }
+
+    /**
+     * The field once it is in describe (Created), else Running. Refresh Fields uses it after the
+     * admin creates the field in Setup; the wizard's own field lists are cached, so it adds this one.
+     */
+    public static Outcome find(String objectApiName, String apiName) {
+        enforce();
+        Outcome result = new Outcome();
+        Schema.SObjectType objectType = NamespaceUtil.objectType(objectApiName);
+        Schema.SObjectField field = objectType == null || String.isBlank(apiName)
+            ? null
+            : objectType.getDescribe(SObjectDescribeOptions.FULL)
+                  .fields.getMap()
+                  .get((apiName.removeEndIgnoreCase('__c') + '__c').toLowerCase());
+        if (field != null) {
+            Schema.DescribeFieldResult described = field.getDescribe();
+            result.state = CREATED;
+            result.fieldValue = described.getName();
+            result.fieldLabel = described.getLabel();
         }
         return result;
     }
