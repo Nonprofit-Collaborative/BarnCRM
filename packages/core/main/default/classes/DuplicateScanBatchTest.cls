@@ -194,7 +194,22 @@ private class DuplicateScanBatchTest {
     @IsTest
     static void aChunkThatCouldNotBeCheckedIsCountedAndTheSummaryWarns() {
         System.runAs(TestUsers.admin()) {
-            List<Contact> people = twins('Lena');
+            // Same name, nothing else shared: only the (failing) rules could pair them, since
+            // similar names (R-DP7) pair only with a shared email, phone or postal code.
+            List<Contact> people = (List<Contact>) insertAllowingDuplicates(
+                new List<Contact>{
+                    new Contact(
+                        FirstName = 'Lena',
+                        LastName = 'Dupscan',
+                        Email = 'lena.one@example.org'
+                    ),
+                    new Contact(
+                        FirstName = 'Lena',
+                        LastName = 'Dupscan',
+                        Email = 'lena.two@example.org'
+                    )
+                }
+            );
             DuplicateService.stubFails = true;
             DuplicateScanBatch batch = new DuplicateScanBatch('Contact', null);
 
