@@ -6,9 +6,16 @@
 @IsTest(testFor='ApexClass:FuzzyMatch')
 private class FuzzyMatchTest {
     private static final Double TOLERANCE = 0.001;
+    // Apex reads a literal like 0.9 as a Decimal, which a Double parameter does not accept.
+    private static final Double HALF = 0.5;
+    private static final Double CLOSE = 0.85;
+    private static final Double VERY_CLOSE = 0.9;
 
-    private static void assertNear(Double expected, Double actual) {
-        Assert.isTrue(Math.abs(expected - actual) < TOLERANCE, expected + ' expected, ' + actual);
+    private static void assertNear(Decimal expected, Double actual) {
+        Assert.isTrue(
+            Math.abs(expected.doubleValue() - actual) < TOLERANCE,
+            expected + ' expected, ' + actual
+        );
     }
 
     @IsTest
@@ -53,21 +60,21 @@ private class FuzzyMatchTest {
     @IsTest
     static void matchesUsesTheThreshold() {
         Assert.isTrue(FuzzyMatch.matches('Robert Jones', 'Robert  Jones', 1));
-        Assert.isTrue(FuzzyMatch.matches('Robert Jones', 'Robret Jones', 0.9));
-        Assert.isFalse(FuzzyMatch.matches('Robert Jones', 'Bob Jones', 0.9));
+        Assert.isTrue(FuzzyMatch.matches('Robert Jones', 'Robret Jones', VERY_CLOSE));
+        Assert.isFalse(FuzzyMatch.matches('Robert Jones', 'Bob Jones', VERY_CLOSE));
     }
 
     @IsTest
     static void bestMatchPicksTheClosestAboveTheThreshold() {
         List<String> headers = new List<String>{ 'Email', 'First Name', 'Last Name', 'Phone' };
-        Assert.areEqual('First Name', FuzzyMatch.bestMatch('first_name', headers, 0.85));
-        Assert.areEqual('Last Name', FuzzyMatch.bestMatch('Lastname', headers, 0.85));
-        Assert.areEqual('Email', FuzzyMatch.bestMatch('E-mail', headers, 0.85));
-        Assert.isNull(FuzzyMatch.bestMatch('Gift Amount', headers, 0.85), 'Nothing close enough.');
-        Assert.isNull(FuzzyMatch.bestMatch('Email', null, 0.5));
+        Assert.areEqual('First Name', FuzzyMatch.bestMatch('first_name', headers, CLOSE));
+        Assert.areEqual('Last Name', FuzzyMatch.bestMatch('Lastname', headers, CLOSE));
+        Assert.areEqual('Email', FuzzyMatch.bestMatch('E-mail', headers, CLOSE));
+        Assert.isNull(FuzzyMatch.bestMatch('Gift Amount', headers, CLOSE), 'Nothing close enough.');
+        Assert.isNull(FuzzyMatch.bestMatch('Email', null, HALF));
         Assert.areEqual(
             'Name',
-            FuzzyMatch.bestMatch('name', new List<String>{ 'Name', 'NAME' }, 0.5),
+            FuzzyMatch.bestMatch('name', new List<String>{ 'Name', 'NAME' }, HALF),
             'A tie goes to the earlier candidate.'
         );
     }
@@ -81,7 +88,7 @@ private class FuzzyMatchTest {
         Integer cpuBefore = Limits.getCpuTime();
         Assert.areEqual(
             'Candidate Header 250',
-            FuzzyMatch.bestMatch('candidate_header_250', candidates, 0.9)
+            FuzzyMatch.bestMatch('candidate_header_250', candidates, VERY_CLOSE)
         );
         Assert.isTrue(Limits.getCpuTime() - cpuBefore < 5000, '300 candidates score quickly.');
     }

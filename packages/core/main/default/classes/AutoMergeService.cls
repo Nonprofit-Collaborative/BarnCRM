@@ -359,7 +359,8 @@ public with sharing class AutoMergeService {
             mergedIds.add(pair.mergedId);
         }
         Map<Id, Moved> moved = movedRecords(mergedIds);
-        Integer merged = 0;
+        // Not named "merged": Apex names are case-insensitive, so it would hide the MERGED status.
+        Integer mergedCount = 0;
         for (Candidate pair : pairs) {
             Savepoint beforePair = Database.setSavepoint();
             try {
@@ -401,14 +402,14 @@ public with sharing class AutoMergeService {
                     AccessLevel.USER_MODE
                 );
                 DuplicateService.closeSet(pair.setId);
-                merged++;
+                mergedCount++;
             } catch (Exception caught) {
                 Database.rollback(beforePair);
                 failureCount++;
                 ErrorLogger.log(caught, CONTEXT);
             }
         }
-        return merged;
+        return mergedCount;
     }
 
     /** The related records of one merged-away person, by "Object.Field", and what was missed. */

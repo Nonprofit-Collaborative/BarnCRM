@@ -12,9 +12,9 @@
     testFor='ApexClass:ImportObjectSchema, ApexClass:ImportTemplateService, ApexClass:ImportController'
 )
 private class ImportSeveralObjectsSchemaTest {
-    private static final String ACCOUNT = String.valueOf(Account.SObjectType);
-    private static final String CONTACT = String.valueOf(Contact.SObjectType);
-    private static final String AFFILIATION = String.valueOf(Affiliation__c.SObjectType);
+    private static final String ACCOUNT_NAME = String.valueOf(Account.SObjectType);
+    private static final String CONTACT_NAME = String.valueOf(Contact.SObjectType);
+    private static final String AFFILIATION_NAME = String.valueOf(Affiliation__c.SObjectType);
 
     @TestSetup
     static void setUp() {
@@ -31,21 +31,25 @@ private class ImportSeveralObjectsSchemaTest {
     private static ImportMapping mapping() {
         ImportMapping mapping = new ImportMapping();
         mapping.objects = new List<ImportMapping.ObjectStep>{
-            new ImportMapping.ObjectStep(AFFILIATION, ImportObjectSchema.OPERATION_INSERT, null),
             new ImportMapping.ObjectStep(
-                ACCOUNT,
+                AFFILIATION_NAME,
+                ImportObjectSchema.OPERATION_INSERT,
+                null
+            ),
+            new ImportMapping.ObjectStep(
+                ACCOUNT_NAME,
                 ImportObjectSchema.OPERATION_UPDATE_BY_FIELD,
                 'Name'
             )
         };
-        mapping.columns.add(new ImportMapping.Column('Org', ACCOUNT + '.Name'));
-        mapping.columns.add(new ImportMapping.Column('Role', AFFILIATION + '.Role__c'));
+        mapping.columns.add(new ImportMapping.Column('Org', ACCOUNT_NAME + '.Name'));
+        mapping.columns.add(new ImportMapping.Column('Role', AFFILIATION_NAME + '.Role__c'));
         return mapping;
     }
 
     private static Import_Template__c template(ImportMapping mapping) {
         Import_Template__c template = ImportTestDataFactory.template(mapping.serialize(), null);
-        template.Target_Object__c = ACCOUNT;
+        template.Target_Object__c = ACCOUNT_NAME;
         update template;
         return ImportTemplateSelector.selectById(template.Id);
     }
@@ -73,8 +77,8 @@ private class ImportSeveralObjectsSchemaTest {
                 );
 
                 Assert.areEqual(2, steps.size(), 'One step an object.');
-                Assert.areEqual(ACCOUNT, steps[0].entity, 'The parent first.');
-                Assert.areEqual(AFFILIATION, steps[1].entity, 'The child after it.');
+                Assert.areEqual(ACCOUNT_NAME, steps[0].entity, 'The parent first.');
+                Assert.areEqual(AFFILIATION_NAME, steps[1].entity, 'The child after it.');
                 Assert.areEqual(
                     new Map<Integer, String>{ 0 => String.valueOf(Affiliation__c.Organization__c) },
                     steps[1].links,
@@ -163,12 +167,16 @@ private class ImportSeveralObjectsSchemaTest {
             System.runAs(admin()) {
                 ImportMapping twice = mapping();
                 twice.objects.add(
-                    new ImportMapping.ObjectStep(ACCOUNT, ImportObjectSchema.OPERATION_UPDATE, null)
+                    new ImportMapping.ObjectStep(
+                        ACCOUNT_NAME,
+                        ImportObjectSchema.OPERATION_UPDATE,
+                        null
+                    )
                 );
                 ImportMapping deletes = mapping();
                 deletes.objects[0].operation = ImportObjectSchema.OPERATION_DELETE;
                 ImportMapping elsewhere = mapping();
-                elsewhere.columns.add(new ImportMapping.Column('Title', CONTACT + '.Title'));
+                elsewhere.columns.add(new ImportMapping.Column('Title', CONTACT_NAME + '.Title'));
                 ImportMapping noKey = mapping();
                 noKey.objects[1].keyField = null;
                 ImportMapping unmapped = mapping();
@@ -190,7 +198,7 @@ private class ImportSeveralObjectsSchemaTest {
                 Assert.areEqual(
                     String.format(
                         Label.Core_Import_ErrorSeveralObjectsColumn,
-                        new List<String>{ 'Title', CONTACT }
+                        new List<String>{ 'Title', CONTACT_NAME }
                     ),
                     ImportObjectSchema.severalObjectsProblem(elsewhere),
                     'A column for an object not listed.'
@@ -232,11 +240,11 @@ private class ImportSeveralObjectsSchemaTest {
             System.runAs(admin()) {
                 ImportController.TemplateView view = ImportController.createSeveralObjectsTemplate(
                     'Members',
-                    new List<String>{ AFFILIATION, ACCOUNT }
+                    new List<String>{ AFFILIATION_NAME, ACCOUNT_NAME }
                 );
 
                 Assert.isTrue(view.severalObjects, 'Several objects.');
-                Assert.areEqual(ACCOUNT, view.targetObject, 'The first listed is the target.');
+                Assert.areEqual(ACCOUNT_NAME, view.targetObject, 'The first listed is the target.');
                 Assert.areEqual(
                     labelOf(Account.SObjectType) + ', ' + labelOf(Affiliation__c.SObjectType),
                     view.targetObjectLabel,
@@ -246,7 +254,7 @@ private class ImportSeveralObjectsSchemaTest {
                     view.id
                 );
                 Assert.areEqual(2, objects.size(), 'Both, before any column is mapped.');
-                Assert.areEqual(ACCOUNT, objects[0].objectName, 'The parent first.');
+                Assert.areEqual(ACCOUNT_NAME, objects[0].objectName, 'The parent first.');
                 Assert.areEqual(
                     ImportObjectSchema.OPERATION_UPDATE,
                     objects[0].operation,
@@ -259,13 +267,13 @@ private class ImportSeveralObjectsSchemaTest {
                 Assert.areEqual(1, objects[1].links.size(), 'The child says how it links.');
                 Assert.isFalse(objects[1].fields.isEmpty(), 'Its fields are offered.');
                 Assert.isTrue(
-                    objects[1].fields[0].value.startsWith(AFFILIATION + '.'),
+                    objects[1].fields[0].value.startsWith(AFFILIATION_NAME + '.'),
                     'As the object and the field: ' + objects[1].fields[0].value
                 );
                 try {
                     ImportController.createSeveralObjectsTemplate(
                         'Twice',
-                        new List<String>{ ACCOUNT, ACCOUNT }
+                        new List<String>{ ACCOUNT_NAME, ACCOUNT_NAME }
                     );
                     Assert.fail('An object listed twice is refused.');
                 } catch (AuraHandledException expected) {
@@ -281,7 +289,7 @@ private class ImportSeveralObjectsSchemaTest {
             System.runAs(admin()) {
                 ImportController.TemplateView view = ImportController.createSeveralObjectsTemplate(
                     'Members',
-                    new List<String>{ ACCOUNT, AFFILIATION }
+                    new List<String>{ ACCOUNT_NAME, AFFILIATION_NAME }
                 );
                 String twoPart =
                     labelOf(Affiliation__c.SObjectType) +
@@ -291,14 +299,18 @@ private class ImportSeveralObjectsSchemaTest {
                 ImportMapping suggested = ImportMapping.parse(
                     ImportController.suggestSheetMapping(
                         view.id,
-                        ACCOUNT,
+                        ACCOUNT_NAME,
                         new List<String>{ 'Name', twoPart, 'Not a field at all' }
                     )
                 );
 
-                Assert.areEqual(ACCOUNT + '.Name', suggested.columns[0].target, 'Its own object.');
                 Assert.areEqual(
-                    AFFILIATION + '.' + String.valueOf(Affiliation__c.Role__c),
+                    ACCOUNT_NAME + '.Name',
+                    suggested.columns[0].target,
+                    'Its own object.'
+                );
+                Assert.areEqual(
+                    AFFILIATION_NAME + '.' + String.valueOf(Affiliation__c.Role__c),
                     suggested.columns[1].target,
                     'The object a two-part heading names.'
                 );
