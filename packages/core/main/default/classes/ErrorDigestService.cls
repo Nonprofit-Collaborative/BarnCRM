@@ -42,16 +42,9 @@ public with sharing class ErrorDigestService {
 
     private static final String LOG_CONTEXT = 'Error digest';
 
-    /**
-     * Test seam, null in every real transaction: when a test sets it, messages are added here
-     * instead of being handed to the platform, so what the digest composed can be read back.
-     */
+    /** The sender in use; a test sets a recording one so what the digest composed can be read. */
     @TestVisible
-    private static List<Messaging.SingleEmailMessage> capturedMessages;
-
-    /** Test seam: when set, sending fails with this reason, as a blocked org's would. */
-    @TestVisible
-    private static String sendFailureForTest;
+    private static EmailSender emailSender = new MessagingEmailSender();
 
     /** What one run did. */
     public class Outcome {
@@ -356,21 +349,13 @@ public with sharing class ErrorDigestService {
      * returns the first reason one was not, for the run summary.
      */
     private static String deliver(List<Messaging.SingleEmailMessage> messages, Outcome outcome) {
-        if (sendFailureForTest != null) {
-            return sendFailureForTest;
-        }
-        if (capturedMessages != null) {
-            capturedMessages.addAll(messages);
-            outcome.recipients = messages.size();
-            return null;
-        }
         String firstFailure;
         try {
-            for (Messaging.SendEmailResult result : Messaging.sendEmail(messages, false)) {
-                if (result.isSuccess()) {
+            for (EmailSendOutcome result : emailSender.send(messages)) {
+                if (result.sent) {
                     outcome.recipients++;
-                } else if (firstFailure == null && !result.getErrors().isEmpty()) {
-                    firstFailure = result.getErrors()[0].getMessage();
+                } else if (firstFailure == null) {
+                    firstFailure = result.error;
                 }
             }
         } catch (Exception refused) {

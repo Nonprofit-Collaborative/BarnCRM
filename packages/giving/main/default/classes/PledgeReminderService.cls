@@ -3,7 +3,7 @@
  * model 25P and 25Q).
  *
  * It reuses the acknowledgment feature's seams rather than building a second send path: the
- * `AcknowledgmentSender` interface (so a test proves what was composed without an org that can
+ * Core `EmailSender` interface (so a test proves what was composed without an org that can
  * send mail), the email template picked by developer name, the organization wide from address,
  * the Send Acknowledgments permission, and the letter merge file and its CSV escaping. What is
  * new is only what a reminder needs: steps measured in days from the due date, and a log keyed
@@ -405,19 +405,14 @@ public with sharing class PledgeReminderService {
      * Sends the chunk in one call. A call the platform refuses as a whole sent nothing, so every
      * message comes back failed with the platform's reason, and `settle` releases every key.
      */
-    private static List<AcknowledgmentSendOutcome> sendAll(
-        List<Messaging.SingleEmailMessage> messages
-    ) {
+    private static List<EmailSendOutcome> sendAll(List<Messaging.SingleEmailMessage> messages) {
         try {
-            return sender().send(messages);
+            return emailSender.send(messages);
         } catch (Exception sendFailure) {
             ErrorLogger.log(sendFailure, CONTEXT_SEND);
-            String reason = String.isBlank(sendFailure.getMessage())
-                ? Label.Giving_PledgeReminders_SendFailedUnknown
-                : sendFailure.getMessage().left(255);
-            List<AcknowledgmentSendOutcome> outcomes = new List<AcknowledgmentSendOutcome>();
+            List<EmailSendOutcome> outcomes = new List<EmailSendOutcome>();
             for (Integer index = 0; index < messages.size(); index++) {
-                outcomes.add(AcknowledgmentSendOutcome.failed(reason));
+                outcomes.add(EmailSendOutcome.failed(sendFailure.getMessage()));
             }
             return outcomes;
         }
@@ -429,23 +424,24 @@ public with sharing class PledgeReminderService {
      */
     private static void settle(
         List<Pledge_Reminder__c> messageRows,
-        List<AcknowledgmentSendOutcome> outcomes,
+        List<EmailSendOutcome> outcomes,
         Counts counts
     ) {
         List<Pledge_Reminder__c> settled = new List<Pledge_Reminder__c>();
         List<String> failures = new List<String>();
         for (Integer index = 0; index < messageRows.size(); index++) {
             Pledge_Reminder__c row = messageRows[index];
-            AcknowledgmentSendOutcome outcome = index < outcomes.size() ? outcomes[index] : null;
+            EmailSendOutcome outcome = index < outcomes.size() ? outcomes[index] : null;
             if (outcome != null && outcome.sent == true) {
                 row.Status__c = STATUS_SENT;
                 row.Sent_On__c = System.now();
                 counts.emails++;
             } else {
                 row.Status__c = STATUS_FAILED;
-                row.Failure_Reason__c = outcome == null
-                    ? Label.Giving_PledgeReminders_SendFailedUnknown
-                    : outcome.failureReason;
+                row.Failure_Reason__c = AcknowledgmentService.failureReasonOf(
+                    outcome,
+                    Label.Giving_PledgeReminders_SendFailedUnknown
+                );
                 // The key goes, so the next run tries this reminder again while it is recent.
                 row.Reminder_Key__c = null;
                 failures.add(row.Failure_Reason__c);
@@ -712,9 +708,5 @@ public with sharing class PledgeReminderService {
 
     /** Overridable by a test, like the acknowledgment feature's sender. */
     @TestVisible
-    private static AcknowledgmentSender senderOverride;
-
-    private static AcknowledgmentSender sender() {
-        return senderOverride == null ? new MessagingAcknowledgmentSender() : senderOverride;
-    }
+    private static EmailSender emailSender = new MessagingEmailSender();
 }

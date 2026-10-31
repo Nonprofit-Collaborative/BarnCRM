@@ -160,8 +160,8 @@ private class AcknowledgmentSendTest {
             Gift__c gift = GivingTestDataFactory.buildGift(donor.Id, 250);
             insert gift;
 
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
-            AcknowledgmentService.senderOverride = sender;
+            RecordingEmailSender sender = new RecordingEmailSender();
+            AcknowledgmentService.emailSender = sender;
 
             Test.startTest();
             AcknowledgmentService.SendCounts counts = AcknowledgmentService.sendEmails(
@@ -228,8 +228,8 @@ private class AcknowledgmentSendTest {
             Gift__c gift = GivingTestDataFactory.buildGift(donor.Id, 250);
             insert gift;
 
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
-            AcknowledgmentService.senderOverride = sender;
+            RecordingEmailSender sender = new RecordingEmailSender();
+            AcknowledgmentService.emailSender = sender;
             List<Gift__c> queue = queuedGiftsInMemory(new List<Id>{ gift.Id });
 
             Test.startTest();
@@ -270,10 +270,10 @@ private class AcknowledgmentSendTest {
             Gift__c bad = GivingTestDataFactory.buildGift(second.Id, 200);
             insert new List<Gift__c>{ good, bad };
 
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
+            RecordingEmailSender sender = new RecordingEmailSender();
             sender.failAt.add(1);
             sender.failureReason = 'The address bounced.';
-            AcknowledgmentService.senderOverride = sender;
+            AcknowledgmentService.emailSender = sender;
 
             Test.startTest();
             AcknowledgmentService.SendCounts counts = AcknowledgmentService.sendEmails(
@@ -329,8 +329,8 @@ private class AcknowledgmentSendTest {
             Gift__c gift = GivingTestDataFactory.buildGift(donor.Id, 250);
             insert gift;
 
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
-            AcknowledgmentService.senderOverride = sender;
+            RecordingEmailSender sender = new RecordingEmailSender();
+            AcknowledgmentService.emailSender = sender;
             AcknowledgmentService.sendEmails(queuedGiftsInMemory(new List<Id>{ gift.Id }), null);
 
             Test.startTest();
@@ -364,8 +364,8 @@ private class AcknowledgmentSendTest {
             Gift__c gift = GivingTestDataFactory.buildAccountGift(organization.Id, 750);
             insert gift;
 
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
-            AcknowledgmentService.senderOverride = sender;
+            RecordingEmailSender sender = new RecordingEmailSender();
+            AcknowledgmentService.emailSender = sender;
 
             Test.startTest();
             AcknowledgmentService.SendCounts counts = AcknowledgmentService.sendEmails(
@@ -419,8 +419,8 @@ private class AcknowledgmentSendTest {
             Gift__c toTrust = GivingTestDataFactory.buildAccountGift(trust.Id, 750);
             insert new List<Gift__c>{ toAda, toGrace, toTrust };
 
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
-            AcknowledgmentService.senderOverride = sender;
+            RecordingEmailSender sender = new RecordingEmailSender();
+            AcknowledgmentService.emailSender = sender;
 
             Test.startTest();
             AcknowledgmentService.SendCounts counts = AcknowledgmentService.sendEmails(

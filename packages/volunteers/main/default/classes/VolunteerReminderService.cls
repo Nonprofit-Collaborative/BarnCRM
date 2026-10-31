@@ -13,30 +13,9 @@ public with sharing class VolunteerReminderService {
     private static final String WHEN_FORMAT = 'EEEE, MMMM d, yyyy h:mm a';
     private static final String TIME_FORMAT = 'h:mm a';
 
-    /** Sends one chunk of messages and says, in order, which went out. */
-    public interface ReminderSender {
-        List<Boolean> send(List<Messaging.SingleEmailMessage> messages);
-    }
-
-    /** The shipped sender: one `Messaging.sendEmail` call for the chunk, partial success on. */
-    public class MessagingSender implements ReminderSender {
-        public List<Boolean> send(List<Messaging.SingleEmailMessage> messages) {
-            List<Boolean> sent = new List<Boolean>();
-            for (Messaging.SendEmailResult result : Messaging.sendEmail(messages, false)) {
-                sent.add(result.isSuccess());
-                if (!result.isSuccess() && !result.getErrors().isEmpty()) {
-                    lastFailure = result.getErrors()[0].getMessage();
-                }
-            }
-            return sent;
-        }
-    }
-
-    /** Set by a test to send nothing for real. */
+    /** One `Messaging.sendEmail` call for the chunk, partial success on; a test sends nothing. */
     @TestVisible
-    private static ReminderSender senderInUse = new MessagingSender();
-
-    private static String lastFailure;
+    private static EmailSender emailSender = new MessagingEmailSender();
 
     /**
      * The window the morning run reminds: shifts that start after now and before the start of
@@ -100,11 +79,14 @@ public with sharing class VolunteerReminderService {
         if (messages.isEmpty()) {
             return 0;
         }
-        lastFailure = null;
-        List<Boolean> sent = senderInUse.send(messages);
+        String lastFailure;
+        List<EmailSendOutcome> sent = emailSender.send(messages);
         List<Volunteer_Signup__c> unstamp = new List<Volunteer_Signup__c>();
         for (Integer i = 0; i < messageSignups.size(); i++) {
-            if (i >= sent.size() || !sent[i]) {
+            if (i < sent.size() && !sent[i].sent && sent[i].error != null) {
+                lastFailure = sent[i].error;
+            }
+            if (i >= sent.size() || !sent[i].sent) {
                 unstamp.add(
                     new Volunteer_Signup__c(Id = messageSignups[i].Id, Reminder_Sent_On__c = null)
                 );

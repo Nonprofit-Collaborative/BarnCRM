@@ -14,10 +14,10 @@ private class AcknowledgmentRunCoverageTest {
     private static final Integer TWO_HUNDRED = 200;
 
     /** A sender whose platform call fails outright, as an exhausted mail limit would. */
-    private class BrokenSender implements AcknowledgmentSender {
-        public List<AcknowledgmentSendOutcome> send(List<Messaging.SingleEmailMessage> messages) {
-            throw new AcknowledgmentService.AcknowledgmentException('The mail service is down.');
-        }
+    private static RecordingEmailSender refusing() {
+        RecordingEmailSender sender = new RecordingEmailSender();
+        sender.refuseWith = 'The mail service is down.';
+        return sender;
     }
 
     @TestSetup
@@ -88,8 +88,8 @@ private class AcknowledgmentRunCoverageTest {
             emailRule();
             Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
             giftsFor(donor, TWO_HUNDRED);
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
-            AcknowledgmentService.senderOverride = sender;
+            RecordingEmailSender sender = new RecordingEmailSender();
+            AcknowledgmentService.emailSender = sender;
             Acknowledgment_Run__c run = newRun();
             AcknowledgmentBatch batch = new AcknowledgmentBatch(run.Id);
             List<Gift__c> queued = AcknowledgmentSelector.queuedGifts(500);
@@ -142,7 +142,7 @@ private class AcknowledgmentRunCoverageTest {
             emailRule();
             Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
             giftsFor(donor, 3);
-            AcknowledgmentService.senderOverride = new BrokenSender();
+            AcknowledgmentService.emailSender = refusing();
             Acknowledgment_Run__c run = newRun();
             AcknowledgmentBatch batch = new AcknowledgmentBatch(run.Id);
 

@@ -152,8 +152,8 @@ private class PledgeReminderServiceTest {
             );
             Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
             Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
-            PledgeReminderService.senderOverride = sender;
+            RecordingEmailSender sender = new RecordingEmailSender();
+            PledgeReminderService.emailSender = sender;
 
             Assert.isFalse(PledgeReminderService.isEnabled(), 'Off by default.');
             PledgeReminderService.Counts counts = PledgeReminderService.process(
@@ -203,8 +203,8 @@ private class PledgeReminderServiceTest {
             insert step;
             Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
             Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
-            PledgeReminderService.senderOverride = sender;
+            RecordingEmailSender sender = new RecordingEmailSender();
+            PledgeReminderService.emailSender = sender;
             List<Installment__c> due = new List<Installment__c>{
                 PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7))
             };
@@ -269,9 +269,9 @@ private class PledgeReminderServiceTest {
             );
             Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
             Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
+            RecordingEmailSender sender = new RecordingEmailSender();
             sender.failAt = new Set<Integer>{ 0 };
-            PledgeReminderService.senderOverride = sender;
+            PledgeReminderService.emailSender = sender;
             List<Installment__c> due = new List<Installment__c>{
                 PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7))
             };
@@ -304,8 +304,8 @@ private class PledgeReminderServiceTest {
             insert PledgeReminderTestData.buildStep('Week late', 7, 'Email', 'No_Such_Template');
             Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
             Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
-            PledgeReminderService.senderOverride = sender;
+            RecordingEmailSender sender = new RecordingEmailSender();
+            PledgeReminderService.emailSender = sender;
 
             PledgeReminderService.Counts counts = PledgeReminderService.process(
                 new List<Installment__c>{
@@ -322,10 +322,10 @@ private class PledgeReminderServiceTest {
     }
 
     /** A sender whose whole call the platform refuses. */
-    private class ThrowingSender implements AcknowledgmentSender {
-        public List<AcknowledgmentSendOutcome> send(List<Messaging.SingleEmailMessage> messages) {
-            throw new PledgeReminderService.PledgeReminderException('The mail server said no.');
-        }
+    private static RecordingEmailSender refusing() {
+        RecordingEmailSender sender = new RecordingEmailSender();
+        sender.refuseWith = 'The mail server said no.';
+        return sender;
     }
 
     @IsTest
@@ -340,7 +340,7 @@ private class PledgeReminderServiceTest {
             );
             Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
             Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
-            PledgeReminderService.senderOverride = new ThrowingSender();
+            PledgeReminderService.emailSender = refusing();
 
             PledgeReminderService.Counts counts = PledgeReminderService.process(
                 new List<Installment__c>{
@@ -371,11 +371,11 @@ private class PledgeReminderServiceTest {
             );
             Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
             Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
+            RecordingEmailSender sender = new RecordingEmailSender();
             sender.failAt = new Set<Integer>{ 0 };
             // Longer than the field holds, so the first, all-or-none settle throws.
             sender.failureReason = 'x'.repeat(300);
-            PledgeReminderService.senderOverride = sender;
+            PledgeReminderService.emailSender = sender;
 
             PledgeReminderService.process(
                 new List<Installment__c>{
@@ -430,8 +430,8 @@ private class PledgeReminderServiceTest {
             );
             Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', null);
             Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
-            PledgeReminderService.senderOverride = sender;
+            RecordingEmailSender sender = new RecordingEmailSender();
+            PledgeReminderService.emailSender = sender;
 
             PledgeReminderService.Counts counts = PledgeReminderService.process(
                 new List<Installment__c>{
@@ -464,8 +464,8 @@ private class PledgeReminderServiceTest {
             donor.HasOptedOutOfEmail = true;
             update donor;
             Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
-            PledgeReminderService.senderOverride = sender;
+            RecordingEmailSender sender = new RecordingEmailSender();
+            PledgeReminderService.emailSender = sender;
 
             PledgeReminderService.Counts counts = PledgeReminderService.process(
                 new List<Installment__c>{
@@ -586,8 +586,8 @@ private class PledgeReminderServiceTest {
             );
             Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
             PledgeReminderTestData.insertPledge(donor.Id, 7);
-            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
-            PledgeReminderService.senderOverride = sender;
+            RecordingEmailSender sender = new RecordingEmailSender();
+            PledgeReminderService.emailSender = sender;
 
             Test.startTest();
             PledgeReminderService.startRun();

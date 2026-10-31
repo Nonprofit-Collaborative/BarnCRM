@@ -292,12 +292,12 @@ public with sharing class AcknowledgmentService {
             return counts;
         }
 
-        List<AcknowledgmentSendOutcome> outcomes = sender().send(messages);
+        List<EmailSendOutcome> outcomes = emailSender.send(messages);
         List<Acknowledgment__c> settled = new List<Acknowledgment__c>();
         List<String> failures = new List<String>();
         for (Integer index = 0; index < messageRows.size(); index++) {
             Acknowledgment__c row = messageRows[index];
-            AcknowledgmentSendOutcome outcome = index < outcomes.size() ? outcomes[index] : null;
+            EmailSendOutcome outcome = index < outcomes.size() ? outcomes[index] : null;
             if (outcome != null && outcome.sent == true) {
                 row.Status__c = STATUS_SENT;
                 row.Sent_On__c = System.now();
@@ -312,9 +312,10 @@ public with sharing class AcknowledgmentService {
                 counts.sent++;
             } else {
                 row.Status__c = STATUS_FAILED;
-                row.Failure_Reason__c = outcome == null
-                    ? Label.Giving_Acknowledgment_SendFailedUnknown
-                    : outcome.failureReason;
+                row.Failure_Reason__c = failureReasonOf(
+                    outcome,
+                    Label.Giving_Acknowledgment_SendFailedUnknown
+                );
                 // The key goes, so the next send tries this gift again (R-AK7).
                 row.Gift_Key__c = null;
                 settled.add(row);
@@ -477,10 +478,15 @@ public with sharing class AcknowledgmentService {
      * an org that cannot send mail should still be able to prove what this class recorded.
      */
     @TestVisible
-    private static AcknowledgmentSender senderOverride;
+    private static EmailSender emailSender = new MessagingEmailSender();
 
-    private static AcknowledgmentSender sender() {
-        return senderOverride == null ? new MessagingAcknowledgmentSender() : senderOverride;
+    /**
+     * The sentence a person reads on a row whose email did not go: the platform's first error,
+     * trimmed to what fits on the record, or `unknown` when it gave none. The rest of the detail
+     * is in the Error Log entry the caller writes.
+     */
+    public static String failureReasonOf(EmailSendOutcome outcome, String unknown) {
+        return outcome == null || String.isBlank(outcome.error) ? unknown : outcome.error.left(255);
     }
 
     private static Boolean needsFirstGiftAnswer(List<Acknowledgment_Rule__c> rules) {

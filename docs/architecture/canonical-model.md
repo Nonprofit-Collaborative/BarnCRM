@@ -5504,8 +5504,8 @@ read in system mode at send time, so the check does not depend on the sender's f
   `GiftAcknowledgmentHandler`, execution order 40, switchable and pausable like every other
   convenience (R-A1, and deliberately not `Always_Runs__c`, ADR-0024).
 - **Service:** `AcknowledgmentRuleService`, `AcknowledgmentService`,
-  `AcknowledgmentSelector`, `AcknowledgmentWriter` (ADR-0021), `AcknowledgmentSender` with
-  `MessagingAcknowledgmentSender`, `AcknowledgmentBatch`, `AcknowledgmentScheduler`,
+  `AcknowledgmentSelector`, `AcknowledgmentWriter` (ADR-0021), Core `EmailSender` with
+  `MessagingEmailSender`, `AcknowledgmentBatch`, `AcknowledgmentScheduler`,
   `AcknowledgmentLetterMerge`, and `AcknowledgmentController` for the page.
 - **Custom permission:** `Send_Acknowledgments`, granted to Giving Admin and Giving Staff.
 - **Page:** LWC `acknowledgments` on the `Acknowledgments` tab and flexipage, reached from
@@ -6249,7 +6249,7 @@ One pledge reminder, recorded (feature G-30): which installment, by which step, 
 letter, to whom, and whether it went. It is the log the organization reads to answer "did we
 remind them", and the claim that stops the same step reminding the same installment twice.
 
-It reuses the acknowledgment feature's seams (Sections 25F to 25H): the `AcknowledgmentSender`
+It reuses the acknowledgment feature's seams (Sections 25F to 25H): the Core `EmailSender`
 interface, the template picked by developer name, the organization wide from address
 (`Acknowledgment_From_Address__c`), the Send Acknowledgments permission, and the letter merge
 file.

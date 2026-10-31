@@ -2,13 +2,13 @@
  * The small Giving classes whose edges no other test reaches: the receipt renderer's refusal of
  * an empty document, the nightly overdue and top up jobs when they find nothing or cannot run,
  * the stewardship starter when it cannot read its templates, the donor delete guard's name, and
- * the mail sender's answers.
+ * a failed email's reason.
  *
  * A nightly job that fails must say so on the Nightly Jobs page and never throw, because a
  * scheduled job's exception goes nowhere anyone looks.
  */
 @IsTest(
-    testFor='ApexClass:BlobToPdfReceiptRenderer, ApexClass:InstallmentSchedulable, ApexClass:InstallmentTopUpSchedulable, ApexClass:StewardshipTriggerHandler, ApexClass:GiftDonorDeleteGuardHandler, ApexClass:MessagingAcknowledgmentSender'
+    testFor='ApexClass:BlobToPdfReceiptRenderer, ApexClass:InstallmentSchedulable, ApexClass:InstallmentTopUpSchedulable, ApexClass:StewardshipTriggerHandler, ApexClass:GiftDonorDeleteGuardHandler'
 )
 private class GivingSmallClassesCoverageTest {
     @TestSetup
@@ -206,33 +206,27 @@ private class GivingSmallClassesCoverageTest {
     // ------------------------------------------------------------------------- mail sender
 
     @IsTest
-    static void theMailSenderAnswersOncePerMessageAndExplainsEachFailure() {
+    static void aFailedSendExplainsItselfInNoMoreThan255Characters() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            MessagingAcknowledgmentSender sender = new MessagingAcknowledgmentSender();
-            Assert.isTrue(sender.send(null).isEmpty(), 'No messages, no answers');
-            Assert.isTrue(
-                sender.send(new List<Messaging.SingleEmailMessage>()).isEmpty(),
-                'An empty list is the same'
+            String unknown = Label.Giving_Acknowledgment_SendFailedUnknown;
+            Assert.areEqual(
+                unknown,
+                AcknowledgmentService.failureReasonOf(null, unknown),
+                'No answer from the platform reads as unknown'
             );
-
-            Messaging.SingleEmailMessage noRecipient = new Messaging.SingleEmailMessage();
-            noRecipient.setSubject('Thank you');
-            noRecipient.setPlainTextBody('Thank you for your gift.');
-            Messaging.SingleEmailMessage reachable = new Messaging.SingleEmailMessage();
-            reachable.setSubject('Thank you');
-            reachable.setPlainTextBody('Thank you for your gift.');
-            reachable.setToAddresses(new List<String>{ 'donor@example.org' });
-
-            List<AcknowledgmentSendOutcome> outcomes = sender.send(
-                new List<Messaging.SingleEmailMessage>{ noRecipient, reachable }
+            Assert.areEqual(
+                unknown,
+                AcknowledgmentService.failureReasonOf(EmailSendOutcome.failed(' '), unknown),
+                'A blank reason too'
             );
-
-            Assert.areEqual(2, outcomes.size(), 'One answer for each message, in order');
-            Assert.isFalse(outcomes[0].sent, 'A message with nobody to send to did not go');
-            Assert.isTrue(
-                String.isNotBlank(outcomes[0].failureReason) &&
-                outcomes[0].failureReason.length() <= 255,
-                'And says why in no more than 255 characters'
+            Assert.areEqual(
+                255,
+                AcknowledgmentService.failureReasonOf(
+                        EmailSendOutcome.failed('x'.repeat(300)),
+                        unknown
+                    )
+                    .length(),
+                'A long reason is trimmed to fit the record'
             );
         }
     }

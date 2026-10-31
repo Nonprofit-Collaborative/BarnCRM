@@ -8,6 +8,9 @@
  */
 @IsTest(testFor='ApexClass:ErrorDigestService')
 private class ErrorDigestServiceTest {
+    /** Stands in for the platform, so what the digest composed can be read back. */
+    private static final RecordingEmailSender MAIL = new RecordingEmailSender();
+
     @TestSetup
     static void createTestUser() {
         TestUsers.admin();
@@ -69,7 +72,7 @@ private class ErrorDigestServiceTest {
             };
             insert logs;
             Test.setCreatedDate(logs[6].Id, System.now().addDays(-3));
-            ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome outcome;
             System.runAs(admin) {
@@ -80,7 +83,7 @@ private class ErrorDigestServiceTest {
 
             Assert.isTrue(outcome.sent, 'Something was new, so a digest went out.');
             Assert.areEqual(5, outcome.entries, 'Five new: not the resolved one, not last week.');
-            List<Messaging.SingleEmailMessage> sent = ErrorDigestService.capturedMessages;
+            List<Messaging.SingleEmailMessage> sent = MAIL.received;
             Assert.areEqual(1, sent.size(), 'One message, to the one listed user.');
             Assert.areEqual(
                 jen.Id,
@@ -122,7 +125,7 @@ private class ErrorDigestServiceTest {
         System.runAs(TestUsers.admin()) {
             TestDataFactory.defaultSettings();
             User admin = maria();
-            ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome outcome;
             System.runAs(admin) {
@@ -132,7 +135,7 @@ private class ErrorDigestServiceTest {
             }
 
             Assert.isFalse(outcome.sent, 'Nothing new, nothing sent.');
-            Assert.isTrue(ErrorDigestService.capturedMessages.isEmpty(), 'Not a single message.');
+            Assert.isTrue(MAIL.received.isEmpty(), 'Not a single message.');
             BarnCRM_Settings__c after = settings();
             Assert.isNotNull(
                 after.Error_Digest_Covered_Until__c,
@@ -154,7 +157,7 @@ private class ErrorDigestServiceTest {
             User admin = maria();
             setDigest(null, null, null);
             insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
-            ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome first;
             ErrorDigestService.Outcome second;
@@ -179,7 +182,7 @@ private class ErrorDigestServiceTest {
             User admin = maria();
             setDigest(null, ErrorDigestService.FREQUENCY_WEEKLY, System.now().addDays(-2));
             insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
-            ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome early;
             ErrorDigestService.Outcome due;
@@ -216,7 +219,7 @@ private class ErrorDigestServiceTest {
                 System.now().addMinutes(-(24 * 60 - 5))
             );
             insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
-            ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome outcome;
             System.runAs(admin) {
@@ -281,7 +284,7 @@ private class ErrorDigestServiceTest {
             }
             insert logs;
             ErrorDigestService.entryCap = 3;
-            ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome outcome;
             System.runAs(admin) {
@@ -293,7 +296,7 @@ private class ErrorDigestServiceTest {
             Assert.isTrue(outcome.sent, 'More than it can count, and the digest still goes out.');
             Assert.areEqual(3, outcome.entries, 'It counted up to its cap.');
             Assert.isTrue(outcome.summary.contains('3+'), 'And says there were more.');
-            String body = ErrorDigestService.capturedMessages[0].getPlainTextBody();
+            String body = MAIL.received[0].getPlainTextBody();
             Assert.isTrue(body.contains('Household naming: 3'), 'The counts cover what it read.');
             Assert.isTrue(
                 body.contains(Label.Core_ErrorDigest_Capped.substringBefore('{0}')),
@@ -309,7 +312,8 @@ private class ErrorDigestServiceTest {
             TestDataFactory.defaultSettings();
             User admin = maria();
             insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
-            ErrorDigestService.sendFailureForTest = 'email is switched off for this org';
+            MAIL.refuseWith = 'email is switched off for this org';
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome first;
             ErrorDigestService.Outcome second;
@@ -357,7 +361,7 @@ private class ErrorDigestServiceTest {
     }
 
     private static ErrorDigestService.Outcome sendAs(User admin) {
-        ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+        ErrorDigestService.emailSender = MAIL;
         ErrorDigestService.Outcome outcome;
         System.runAs(admin) {
             Test.startTest();
@@ -384,7 +388,7 @@ private class ErrorDigestServiceTest {
             ErrorDigestService.Outcome outcome = sendAs(admin);
 
             Assert.isTrue(outcome.sent, 'A failed job and a full limit are worth an email.');
-            Messaging.SingleEmailMessage message = ErrorDigestService.capturedMessages[0];
+            Messaging.SingleEmailMessage message = MAIL.received[0];
             Assert.areEqual(Label.Core_AdminDigest_Subject, message.getSubject());
             String body = message.getPlainTextBody();
             Assert.isTrue(
@@ -414,7 +418,7 @@ private class ErrorDigestServiceTest {
             ErrorDigestService.Outcome outcome = sendAs(admin);
 
             Assert.isFalse(outcome.sent, 'Nothing new and nothing to report.');
-            Assert.isTrue(ErrorDigestService.capturedMessages.isEmpty(), 'No message.');
+            Assert.isTrue(MAIL.received.isEmpty(), 'No message.');
         }
     }
 
@@ -429,7 +433,7 @@ private class ErrorDigestServiceTest {
             limitAt(10, 100);
 
             sendAs(admin);
-            String withSummary = ErrorDigestService.capturedMessages[0].getPlainTextBody();
+            String withSummary = MAIL.received[0].getPlainTextBody();
             Assert.isTrue(withSummary.contains('Household naming: 1'), 'Errors come first.');
             Assert.isTrue(withSummary.contains(Label.Core_AdminDigest_Heading), 'Then summary.');
         }
@@ -446,7 +450,7 @@ private class ErrorDigestServiceTest {
             failedJob();
             limitAt(95, 100);
             sendAs(admin);
-            String without = ErrorDigestService.capturedMessages[0].getPlainTextBody();
+            String without = MAIL.received[0].getPlainTextBody();
             Assert.isFalse(without.contains(Label.Core_AdminDigest_Heading), 'Switched off.');
         }
     }
@@ -463,7 +467,7 @@ private class ErrorDigestServiceTest {
             ErrorDigestService.Outcome outcome = sendAs(admin);
 
             Assert.isTrue(outcome.sent, 'The errors still go out.');
-            String body = ErrorDigestService.capturedMessages[0].getPlainTextBody();
+            String body = MAIL.received[0].getPlainTextBody();
             Assert.isTrue(body.contains('Household naming: 1'), 'With the errors.');
             Assert.isFalse(body.contains(Label.Core_AdminDigest_Heading), 'Without the summary.');
             Assert.areEqual(
@@ -486,7 +490,7 @@ private class ErrorDigestServiceTest {
 
             sendAs(admin);
 
-            String body = ErrorDigestService.capturedMessages[0].getPlainTextBody();
+            String body = MAIL.received[0].getPlainTextBody();
             Assert.isFalse(body.contains(Label.Core_AdminDigest_Heading), 'Weekly only.');
         }
     }
