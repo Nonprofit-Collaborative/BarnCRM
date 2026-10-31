@@ -160,6 +160,26 @@ panel without the button or the stage pickers. The panel lists up to 200 people;
 You can also create and edit enrollments on the **Enrollments** tab and from the **Enrollments**
 related list on the program. The list views are **Open Enrollments** and **All Enrollments**.
 
+### Importing a Roster
+
+To enroll many people at once, use BarnCRM's import (see [Importing](importing.md)) with the
+shipped **Program roster** template, which Programs adds at install. It is an upload of several
+objects: each row finds its program by name and enrolls the person found by email. Columns:
+
+| Column | Loads | Notes |
+|---|---|---|
+| Program | The program | Found by its exact name, any capitals. Required. A program is never created or renamed. |
+| Email | The person | Found by email (contacts) or person email (person accounts). Required. |
+| Stage | Stage | Applied, Enrolled, Completed or Withdrawn. Blank means Enrolled. |
+| Start Date, End Date | Start Date, End Date | Blank dates are filled as for an enrollment made by hand (Enrollment Rules). |
+| Intake Date, Referral Source, Eligibility Status, Eligibility Basis, Eligibility Date | The intake fields | Choices must be ones the picklist holds (see Programs Settings). |
+
+A row is reported and not loaded when its program or email finds nothing, or when the person
+already has an open enrollment in that program. Undo removes the enrollments one import made.
+Create the programs first, on the **Programs** tab. To load old enrollments with their own dates,
+switch off **Enrollment: fill in the stage dates** on the Automation page while the import runs.
+The importing user needs Programs Staff or Programs Admin as well as the import.
+
 ## Attendance and Services: the Service Delivery Log
 
 A **service delivery** records one service given to one person on one day: its **Service**, the

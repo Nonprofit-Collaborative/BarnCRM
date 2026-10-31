@@ -14,6 +14,8 @@
  *    installer's Programs Admin at the same moment; with no installer it is queued alone.
  * 4. Apply the Participant Privacy preset and share every enrollment and service delivery with
  *    its group (P-08, `ProgramsSharing.ApplyJob`), queued for the same reason.
+ * 5. Add the shipped program roster import template (P-06) through Core's
+ *    `materializeDefaultsDuringInstall`, never changing one the org already has.
  *
  * The steps are `runSetup`, which also adds the module to Core's setup marker and is what
  * Finish Setup runs for a module copied into an org by hand (FS1, `ModuleSetups`).
@@ -23,6 +25,7 @@ public with sharing class ProgramsPostInstall implements InstallHandler, ModuleS
     /** The module's key in the module catalog and the setup marker. */
     private static final String MODULE_KEY = 'Programs';
     private static final String SWITCH_CONTEXT = 'ProgramsPostInstall.ensureAutomationSwitches';
+    private static final String IMPORT_CONTEXT = 'ProgramsPostInstall.ensureImportTemplates';
     @TestVisible
     private static final String ACCESS_CONTEXT = 'ProgramsPostInstall.grantInstallerAccess';
 
@@ -53,6 +56,7 @@ public with sharing class ProgramsPostInstall implements InstallHandler, ModuleS
     public void runSetup(Id installerId) {
         // Each entry point records its own failures and returns, so nothing here throws.
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
+        ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);
         ModuleSetups.markRan(MODULE_KEY);
         ProgramsSharing.requestApply();
         if (installerId == null) {

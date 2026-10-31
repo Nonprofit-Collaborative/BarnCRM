@@ -233,3 +233,19 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 8 | On a phone, open the dashboard. | Tiles two to a row; the table stacks each program's figures with their names. |
 
 **Cleanup:** delete the test deliveries if you made them.
+
+## T-PRG-15: Import a Program Roster
+
+**Purpose:** confirm the Program roster template enrolls people by program name and email, and reports rows it cannot load.
+**Prerequisites:** the admin user; an Active program named "Test Pantry"; three test people with emails, none enrolled in it. A CSV with the columns Program, Email, Stage, Start Date, Referral Source and these rows: Test Pantry and the first email, Enrolled, a past date, School; TEST PANTRY and the second email, blank stage; No Such Program and the third email; Test Pantry and nobody@example.org; Test Pantry and the first email again.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open BarnCRM's import and upload the CSV. | **Program roster** is offered as a template. |
+| 2 | Choose it and preview. | Columns map to Program and the enrollment's fields with no manual mapping. |
+| 3 | Load it. | 2 loaded, 3 not loaded: no program "No Such Program", no person with nobody@example.org, and the repeated first email refused as an open enrollment already in Test Pantry. |
+| 4 | Open Test Pantry's **Program Roster** panel. | The first person Enrolled with your start date and Referral Source School; the second Enrolled from today. |
+| 5 | Open the program record. | Its name is still "Test Pantry", not changed to capitals. |
+| 6 | Undo the import. | Both enrollments are removed; the program stays. |
+
+**Cleanup:** none after the undo.

@@ -58,6 +58,18 @@ and the person is listed with today as the Start Date (for Enrolled).
 Enrolling someone who already has an Applied or Enrolled enrollment in the same program is
 refused, with a message naming the program. Change the enrollment that is there instead.
 
+## To Import a Roster
+
+1. Make a spreadsheet with a row per person and the columns **Program** (the program's exact
+   name) and **Email**, plus any of **Stage**, **Start Date**, **End Date**, **Intake Date**,
+   **Referral Source**, **Eligibility Status**, **Eligibility Basis** and **Eligibility Date**.
+2. Open BarnCRM's import, upload the file and choose the **Program roster** template.
+3. Check the preview, then load it.
+
+You should see: one enrollment per row. Rows whose program or email finds nothing, or whose
+person already has an open enrollment in that program, are listed as not loaded with the reason.
+Programs are never created by an import: create them on the **Programs** tab first.
+
 ## To Record Intake and Eligibility
 
 1. Open the program and click the person's name in the **Program Roster** panel (or open the

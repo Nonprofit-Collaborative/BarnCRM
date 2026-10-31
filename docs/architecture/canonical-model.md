@@ -9008,14 +9008,19 @@ Log. A job started by a schedule sends none. The record action shows the same ou
 
 The shipped import template that loads a spreadsheet of volunteer hours with the Core import,
 one row per hours record (feature V-06). It adds no entity: it is an `Import_Template_Default__mdt`
-row shipped by Volunteers that loads one object (R-IT12, R-D3).
+row shipped by Volunteers. Since release 0.14 it is an upload of several objects (R-IT20,
+ADR-0147; it loaded one object, R-IT12, before), as the program roster template is (29Y).
 
 ### Rules
 
 **R-VH1 The shipped rows.** Volunteers ships two rows with the Template Key `volunteer_hours`:
 one with Person Mode Contacts, whose person column fills `Contact__c`, and one with Person Mode
 Person Accounts, whose person column fills `Account__c`. Only the one matching the org's people
-is materialized (R-D3). Target Object `Volunteer_Hours__c`, Load Operation Insert.
+is materialized (R-D3). Target Object `Volunteer_Hours__c`, Load Operation Insert. Its mapping
+lists the objects `Volunteer_Hours__c` (Insert) and `Volunteer_Job__c` (Update by a matching
+field, key Name): the job is found, never created, and its name is not rewritten; each hours
+record links to its row's job (ADR-0147 decision 4). Columns target `Volunteer_Hours__c.<field>`
+and `Volunteer_Job__c.Name`, and the Status default `Volunteer_Hours__c.Status__c`.
 
 **R-VH2 Columns.**
 
@@ -9304,6 +9309,20 @@ program and any other program with activity in the period, at most 200. Read thr
 `ProgramDashboardController` in user mode with aggregate queries, so each user's figures follow
 what they may see (Participant Privacy, R-EN7). No object or field is added; the periods are
 computed in the browser by framework-free JS (plan 9.9).
+
+**Roster import (P-06).** Programs ships two `Import_Template_Default__mdt` rows with the
+Template Key `program_roster`, Person Mode Contacts and Person Accounts, of which only the one
+matching the org's people is materialized (R-D3), at install through Core's
+`materializeDefaultsDuringInstall`. Each is an upload of several objects (R-IT20, ADR-0147):
+objects `Enrollment__c` (Insert, the Target Object) and `Program__c` (Update by a matching
+field, key Name). Columns: Program (`Program__c.Name`), Email (`Enrollment__c.Contact__c` by
+`Email`, or `Enrollment__c.Account__c` by `PersonEmail`), Stage, Start Date, End Date, Intake
+Date, Referral Source, Eligibility Status, Eligibility Basis, Eligibility Date. The program loads
+first and each enrollment links to its row's program (ADR-0147 decision 4); the program is only
+found, never created, and its name is not rewritten, even when a row spells it in other
+capitals. A row whose program or email finds nothing is rejected, and so is one R-EN2 refuses.
+The enrollment rules run as for one made by hand (blank Stage is Enrolled, R-EN3 fills dates).
+No field is added.
 
 **Health Check.** `ProgramsHealthCheckExtension`, registered in
 `HealthCheckExtensions.EXTENSION_CLASSES`, asked only of a viewer who may manage settings and not
@@ -9776,6 +9795,8 @@ mirrors the primary member).
 | 0.14 | 2026-10-31 | Programs P-07. `Enrollment__c` (29Y) gains Intake Date (`Intake_Date__c`, Date), Referral Source (`Referral_Source__c`), Eligibility Status (`Eligibility_Status__c`, default Not Screened) and Eligibility Basis (`Eligibility_Basis__c`), restricted picklists whose values the organization changes in Setup, and Eligibility Date (`Eligibility_Date__c`, Date), filled by new rule R-EN6 in the `Enrollment_Dates` automation. No PMM counterpart: they stay out of the MIG-09 mapping. The Programs section of BarnCRM Settings opens the module's settings page (`Programs_Settings` tab). |
 | 0.14 | 2026-10-31 | Programs P-04. New in the Programs module: Case Note (`Case_Note__c`, 29Y1), a dated, typed note on an enrollment, sharing Private, with rules R-CN1 to R-CN4. Erasing a person now deletes their case notes (`ProgramsErasureExtension` in `PersonErasureExtensions`); enrollments are still kept (R-EN5). |
 | 0.14 | 2026-10-31 | Programs P-08. `Enrollment__c` (29Y) and `Service_Delivery__c` (29Z) change from Public Read/Write to Private, each shared with the new public group `Programs_Participants` through the Apex sharing reason `Programs_Participants__c` (R-EN7, R-SD6). New hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox, default unchecked): the Participant Privacy preset, Shared by default, which puts All Internal Users in the group, or Private, which takes them out. Programs Admin gains View All and Modify All on both objects. |
+| 0.14 | 2026-10-31 | Programs P-05. The Programs Dashboard (29Y, "Program dashboard") and the person card's last service date and services attended. No object or field added. |
+| 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29Y, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
 
 ---
 ## 32. Entity ownership by package
