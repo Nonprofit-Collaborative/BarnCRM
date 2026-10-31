@@ -230,3 +230,34 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 5 | Add another row: **Field Name** `Email`, **Rule** **Oldest record**, and save. | Refused: an active row already names **Email**. |
 
 **Cleanup:** Archive the `Email` merge rule.
+
+## T-DUP-16: Auto-Merge Previews, Confirms and Merges Exact Matches
+
+**Purpose:** Confirm Auto-Merge previews only exact people matches from the review list, merges them in the background after a confirm, and lists the run.
+**Prerequisites:** admin with **BarnCRM Admin** and **BarnCRM Duplicate Review**. Two Zztest pairs: **Zztest Ann Auto** twice with the same email `zztest.ann.auto@example.org` (different phones), and **Zztest Ben Auto** twice with different emails. A duplicate scan has run, so both pairs are in the review list.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **BarnCRM Settings**, open **Duplicate Matching**. | **Exact Match For Auto-Merge** reads **Name and email**, with a description. |
+| 2 | Open the **Duplicate Matching** tab, then **Auto-Merge**. | The intro, **Exact match: Name and email.**, **Preview Exact Matches**, and **Recent Runs** reading **No auto-merge in the last 15 days.** |
+| 3 | Click **Preview Exact Matches**. | **Pairs To Merge (1)**: the Ann pair only, with **Keep:**, **Merge away:** and the values that will change (for example **Phone: (blank) becomes ...**), or **No values change.** The Ben pair is not listed. |
+| 4 | Click **Merge 1 Pairs**, then **Cancel**. | Nothing is merged; the preview stays. |
+| 5 | Click **Merge 1 Pairs** and confirm. | **Auto-merge started.** The bell reports **Auto-Merge Finished** with 1 pair merged. |
+| 6 | Click **Refresh**. | **Recent Runs** lists the run: **1 people merged, 0 undone, 0 not fully undone**, with **Undo**. One Ann record remains; the other is in the Recycle Bin. The Ben pair is still in the review list. |
+
+**Cleanup:** Keep the run for T-DUP-17.
+
+## T-DUP-17: Undoing an Auto-Merge Run, and What It Cannot Restore
+
+**Purpose:** Confirm Undo restores the merged-away person from the Recycle Bin, puts back changed values and moved related records, and lists what it cannot restore.
+**Prerequisites:** T-DUP-16 done. Before undoing, on the kept Ann record change a value the merge changed (for example **Phone**).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **Auto-Merge**, under the run, click **Undo**. | **Undo This Run** asks to confirm, naming the Recycle Bin, values and related records. |
+| 2 | Confirm. | **Undo started.** The bell reports **Auto-Merge Undo Finished**. |
+| 3 | Click **Refresh**. | The run reads **1 people merged, 0 undone, 1 not fully undone**, with a note: **Phone was changed after the merge and was left as it is.** **Undo** is gone. |
+| 4 | Open both Ann records. | The merged-away Ann is back (same record Id as before, not a copy), with her activities and relationships. The kept Ann keeps the phone you typed. |
+| 5 | As a user without **BarnCRM Admin**, open the **Duplicate Matching** tab. | No **Auto-Merge** area. |
+
+**Cleanup:** Delete the Zztest Auto records.

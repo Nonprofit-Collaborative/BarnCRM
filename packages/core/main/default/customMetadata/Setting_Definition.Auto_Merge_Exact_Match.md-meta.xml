@@ -20,9 +20,7 @@
   </values>
   <values>
     <field>Picklist_Values__c</field>
-    <value
-      xsi:type="xsd:string"
-    >Name and email:Same first and last name and the same email;Name and phone:Same first and last name and the same phone number;Name, email and phone:Same first and last name, email and phone number;Name and birthdate:Same first and last name and the same birthdate</value>
+    <value xsi:type="xsd:string">Name and email:Same first and last name and the same email;Name and phone:Same first and last name and the same phone number;Name, email and phone:Same first and last name, email and phone number;Name and birthdate:Same first and last name and the same birthdate</value>
   </values>
   <values>
     <field>Description__c</field>

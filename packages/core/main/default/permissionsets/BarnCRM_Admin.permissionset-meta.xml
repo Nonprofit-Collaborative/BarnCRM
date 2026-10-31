@@ -72,6 +72,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>AutoMergeController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>DuplicateController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -815,6 +819,46 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>true</editable>
+    <field>Merge_Journal__c.Changed_Values__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Merge_Journal__c.Merged_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Merge_Journal__c.Merged_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Merge_Journal__c.Moved_Records__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Merge_Journal__c.Notes__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Merge_Journal__c.Run_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Merge_Journal__c.Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Merge_Journal__c.Survivor_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>false</editable>
     <field>Erasure__c.Contact__c</field>
     <readable>true</readable>
@@ -1485,6 +1529,15 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>true</modifyAllRecords>
     <object>Duplicate_Reason__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>true</modifyAllRecords>
+    <object>Merge_Journal__c</object>
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
