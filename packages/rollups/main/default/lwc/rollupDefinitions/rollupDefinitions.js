@@ -80,6 +80,7 @@ import DELETE_CHOICE from '@salesforce/label/c.Core_RollupEase_DeleteChoice';
 import DELETE_KEEP from '@salesforce/label/c.Core_RollupEase_DeleteKeep';
 import DELETE_CLEAR from '@salesforce/label/c.Core_RollupEase_DeleteClear';
 import DELETED_CLEARED from '@salesforce/label/c.Core_RollupEase_DeletedCleared';
+import { bodyMessage } from 'c/findCsv';
 
 /** How each recalculation state is styled in the Status column (U6). */
 const STATUS_CLASS = {
@@ -208,7 +209,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
       this.page = result.data;
       this.errorMessage = undefined;
     } else if (result.error) {
-      this.errorMessage = this.messageFrom(result.error);
+      this.errorMessage = bodyMessage(result.error, UNEXPECTED_ERROR);
     }
   }
 
@@ -395,7 +396,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         this.estimate = estimate;
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
       })
       .finally(() => {
         this.busy = false;
@@ -415,7 +416,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         this.noticeMessage = notice;
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
       })
       .finally(() => {
         this.busy = false;
@@ -518,7 +519,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         link.click();
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
       })
       .finally(() => {
         this.busy = false;
@@ -573,7 +574,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         }
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
         this.importText = undefined;
       })
       .finally(() => {
@@ -613,7 +614,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         }
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
         if (revert) {
           revert();
         }
@@ -629,12 +630,5 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
       return refreshApex(this.wiredPageResult);
     }
     return Promise.resolve();
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return UNEXPECTED_ERROR;
   }
 }
