@@ -342,14 +342,11 @@ public with sharing class RollupTemplates {
     }
 
     private static AuraHandledException asUserError(Exception caught) {
-        String message = caught instanceof RollupService.RollupServiceException
-            ? caught.getMessage()
-            : Label.Core_Rollups_UnexpectedError;
-        if (!(caught instanceof RollupService.RollupServiceException)) {
-            ErrorLogger.log(caught, 'RollupTemplates');
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof RollupService.RollupServiceException,
+            'RollupTemplates',
+            Label.Core_Rollups_UnexpectedError
+        );
     }
 }

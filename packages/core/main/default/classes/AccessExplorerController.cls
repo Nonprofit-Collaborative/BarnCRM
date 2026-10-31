@@ -1158,13 +1158,11 @@ public with sharing class AccessExplorerController {
     }
 
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof AccessExplorerException)) {
-            ErrorLogger.log(caught, context);
-            message = System.Label.Core_AccessExplorer_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof AccessExplorerException,
+            context,
+            System.Label.Core_AccessExplorer_UnexpectedError
+        );
     }
 }

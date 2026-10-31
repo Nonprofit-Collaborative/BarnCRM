@@ -240,7 +240,7 @@ public with sharing class SetupChangeController {
             result.scheduled = SetupChangeCopyJob.isScheduled();
         } catch (Exception failed) {
             ErrorLogger.log(failed, 'SetupChangeController');
-            throw asAuraError(failed.getMessage());
+            throw UserErrors.message(failed.getMessage());
         }
         return result;
     }
@@ -256,7 +256,7 @@ public with sharing class SetupChangeController {
         try {
             parsed = Date.valueOf(day.trim());
         } catch (Exception badDate) {
-            throw asAuraError(
+            throw UserErrors.message(
                 String.format(Label.Core_SetupChanges_ErrorBadDate, new List<String>{ day })
             );
         }
@@ -318,13 +318,7 @@ public with sharing class SetupChangeController {
             ? permissionOverride
             : FeatureManagement.checkPermission(PERMISSION);
         if (!allowed) {
-            throw asAuraError(Label.Core_OrgOptimizer_ErrorNoPermission);
+            throw UserErrors.message(Label.Core_OrgOptimizer_ErrorNoPermission);
         }
-    }
-
-    private static AuraHandledException asAuraError(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 }

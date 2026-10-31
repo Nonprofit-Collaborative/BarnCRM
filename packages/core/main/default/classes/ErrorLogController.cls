@@ -117,14 +117,12 @@ public with sharing class ErrorLogController {
     }
 
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof ErrorLogControllerException)) {
-            ErrorLogger.log(caught, context);
-            message = Label.Core_ErrorLog_ActionFailed;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof ErrorLogControllerException,
+            context,
+            Label.Core_ErrorLog_ActionFailed
+        );
     }
 
     public class ErrorLogControllerException extends Exception {

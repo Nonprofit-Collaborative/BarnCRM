@@ -40,7 +40,7 @@ public with sharing class CampaignSyncController {
             return status();
         } catch (Exception unexpected) {
             ErrorLogger.log(unexpected, CONTEXT);
-            throw asAuraException(Label.Mirror_CampaignSync_ErrorFailed);
+            throw UserErrors.message(Label.Mirror_CampaignSync_ErrorFailed);
         }
     }
 
@@ -52,17 +52,17 @@ public with sharing class CampaignSyncController {
             current = status();
         } catch (Exception unexpected) {
             ErrorLogger.log(unexpected, CONTEXT);
-            throw asAuraException(Label.Mirror_CampaignSync_ErrorFailed);
+            throw UserErrors.message(Label.Mirror_CampaignSync_ErrorFailed);
         }
         String refusal = refusal(current);
         if (refusal != null) {
-            throw asAuraException(refusal);
+            throw UserErrors.message(refusal);
         }
         try {
             CampaignSyncBatch.start();
         } catch (Exception unexpected) {
             ErrorLogger.log(unexpected, CONTEXT);
-            throw asAuraException(Label.Mirror_CampaignSync_ErrorFailed);
+            throw UserErrors.message(Label.Mirror_CampaignSync_ErrorFailed);
         }
         current.running = true;
         return current;
@@ -106,11 +106,5 @@ public with sharing class CampaignSyncController {
             }
         }
         return current;
-    }
-
-    private static AuraHandledException asAuraException(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 }

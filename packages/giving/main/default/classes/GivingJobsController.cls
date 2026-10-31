@@ -177,13 +177,11 @@ public with sharing class GivingJobsController {
     }
 
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof GivingJobsException)) {
-            ErrorLogger.log(caught, context);
-            message = System.Label.Giving_NightlyJobs_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof GivingJobsException,
+            context,
+            System.Label.Giving_NightlyJobs_UnexpectedError
+        );
     }
 }

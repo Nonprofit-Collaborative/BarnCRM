@@ -71,7 +71,7 @@ public with sharing class ProgramRosterController {
     @AuraEnabled
     public static Roster getRoster(Id programId, Boolean showEnded) {
         if (programId == null) {
-            throw badRequest(Label.Programs_Roster_ActionFailed);
+            throw UserErrors.message(Label.Programs_Roster_ActionFailed);
         }
         try {
             return rosterFor(programId, showEnded == true);
@@ -84,10 +84,10 @@ public with sharing class ProgramRosterController {
     @AuraEnabled
     public static Roster enroll(Id programId, Id personId, String stage, Boolean showEnded) {
         if (programId == null) {
-            throw badRequest(Label.Programs_Roster_ActionFailed);
+            throw UserErrors.message(Label.Programs_Roster_ActionFailed);
         }
         if (personId == null) {
-            throw badRequest(Label.Programs_Roster_PersonRequired);
+            throw UserErrors.message(Label.Programs_Roster_PersonRequired);
         }
         Enrollment__c enrollment = new Enrollment__c(Program__c = programId);
         if (String.isNotBlank(stage)) {
@@ -110,13 +110,13 @@ public with sharing class ProgramRosterController {
     @AuraEnabled
     public static Roster setStage(Id enrollmentId, String stage, Boolean showEnded) {
         if (enrollmentId == null || String.isBlank(stage)) {
-            throw badRequest(Label.Programs_Roster_ActionFailed);
+            throw UserErrors.message(Label.Programs_Roster_ActionFailed);
         }
         String wanted = checkedStage(stage);
         try {
             Id programId = EnrollmentSelector.selectProgramIdOf(enrollmentId);
             if (programId == null) {
-                throw badRequest(Label.Programs_Roster_ActionFailed);
+                throw UserErrors.message(Label.Programs_Roster_ActionFailed);
             }
             Database.update(
                 new List<Enrollment__c>{ new Enrollment__c(Id = enrollmentId, Stage__c = wanted) },
@@ -135,7 +135,7 @@ public with sharing class ProgramRosterController {
         String programName = EnrollmentSelector.selectProgramNames(new Set<Id>{ programId })
             .get(programId);
         if (programName == null) {
-            throw badRequest(Label.Programs_Roster_ActionFailed);
+            throw UserErrors.message(Label.Programs_Roster_ActionFailed);
         }
         Roster roster = new Roster();
         roster.programName = programName;
@@ -209,13 +209,7 @@ public with sharing class ProgramRosterController {
                 return entry.getValue();
             }
         }
-        throw badRequest(Label.Programs_Roster_ActionFailed);
-    }
-
-    private static AuraHandledException badRequest(String message) {
-        AuraHandledException refused = new AuraHandledException(message);
-        refused.setMessage(message);
-        return refused;
+        throw UserErrors.message(Label.Programs_Roster_ActionFailed);
     }
 
     /**
@@ -227,9 +221,9 @@ public with sharing class ProgramRosterController {
             return (AuraHandledException) failure;
         }
         if (failure instanceof DmlException) {
-            return badRequest(((DmlException) failure).getDmlMessage(0));
+            return UserErrors.message(((DmlException) failure).getDmlMessage(0));
         }
         ErrorLogger.log(failure, CONTEXT, recordId);
-        return badRequest(Label.Programs_Roster_ActionFailed);
+        return UserErrors.message(Label.Programs_Roster_ActionFailed);
     }
 }

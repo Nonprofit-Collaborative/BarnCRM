@@ -62,7 +62,7 @@ public with sharing class CustomMetadataManagerController {
         try {
             jobId = Id.valueOf(deploymentId);
         } catch (Exception notAnId) {
-            throw asAuraException(System.Label.Core_CmdtManager_LoadError);
+            throw UserErrors.message(System.Label.Core_CmdtManager_LoadError);
         }
         try {
             if (CustomMetadataManagerSelector.hasSucceeded(jobId)) {
@@ -82,22 +82,17 @@ public with sharing class CustomMetadataManagerController {
 
     /** A refusal the service explains is shown as it is; anything else is logged first. */
     private static AuraHandledException logged(Exception e, String fallback) {
-        if (e instanceof CustomMetadataManagerService.CustomMetadataManagerException) {
-            return asAuraException(e.getMessage());
-        }
-        ErrorLogger.log(e, CustomMetadataDeployCallback.ERROR_CONTEXT);
-        return asAuraException(fallback);
+        return UserErrors.wrap(
+            e,
+            e instanceof CustomMetadataManagerService.CustomMetadataManagerException,
+            CustomMetadataDeployCallback.ERROR_CONTEXT,
+            fallback
+        );
     }
 
     private static void requirePermission() {
         if (!FeatureManagement.checkPermission(PERMISSION)) {
-            throw asAuraException(System.Label.Core_CmdtManager_PermissionRequired);
+            throw UserErrors.message(System.Label.Core_CmdtManager_PermissionRequired);
         }
-    }
-
-    private static AuraHandledException asAuraException(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 }

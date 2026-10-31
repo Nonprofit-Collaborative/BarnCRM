@@ -175,4 +175,20 @@ private class GiftControllerTest {
             System.assert(String.isNotBlank(message), 'The second write-off is refused politely.');
         }
     }
+
+    @IsTest
+    static void aRefundOfAnUnknownGiftNeverShowsRawText() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Id notAGift = FakeIds.of(Account.SObjectType, 1);
+            String message;
+            try {
+                GiftController.refund(notAGift, 5, 'Wrong object');
+            } catch (AuraHandledException refused) {
+                message = refused.getMessage();
+            }
+            Assert.isNotNull(message, 'Refused');
+            Assert.isFalse(message.contains('Exception'), 'No raw exception text');
+            Assert.isFalse(message.contains('Insert failed'), 'No DML text');
+        }
+    }
 }

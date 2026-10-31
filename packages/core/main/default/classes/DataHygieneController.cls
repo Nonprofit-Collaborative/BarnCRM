@@ -88,13 +88,11 @@ public with sharing class DataHygieneController {
 
     /** Anything the person can act on is shown as it is; anything else is logged and summarized. */
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof DataHygieneService.DataHygieneException)) {
-            ErrorLogger.log(caught, context);
-            message = System.Label.Core_DataHygiene_CheckFailed;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof DataHygieneService.DataHygieneException,
+            context,
+            System.Label.Core_DataHygiene_CheckFailed
+        );
     }
 }

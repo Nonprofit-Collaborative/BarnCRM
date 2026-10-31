@@ -180,7 +180,7 @@ public with sharing class AskPipelineController {
             return board;
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.getBoard');
-            throw refuse(Label.Giving_Ask_ErrorLoad);
+            throw UserErrors.message(Label.Giving_Ask_ErrorLoad);
         }
     }
 
@@ -188,15 +188,15 @@ public with sharing class AskPipelineController {
     @AuraEnabled
     public static void moveStage(Id askId, String stage) {
         if (!Schema.SObjectType.Ask__c.isUpdateable()) {
-            throw refuse(Label.Giving_Ask_ErrorNoPermission);
+            throw UserErrors.message(Label.Giving_Ask_ErrorNoPermission);
         }
         try {
             Database.update(new Ask__c(Id = askId, Stage__c = stage), true, AccessLevel.USER_MODE);
         } catch (DmlException e) {
-            throw refuse(e.getDmlMessage(0));
+            throw UserErrors.message(e.getDmlMessage(0));
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.moveStage', askId);
-            throw refuse(Label.Giving_Ask_ErrorUnexpected);
+            throw UserErrors.message(Label.Giving_Ask_ErrorUnexpected);
         }
     }
 
@@ -424,11 +424,5 @@ public with sharing class AskPipelineController {
         } catch (StringException e) {
             return null;
         }
-    }
-
-    private static AuraHandledException refuse(String message) {
-        AuraHandledException refusal = new AuraHandledException(message);
-        refusal.setMessage(message);
-        return refusal;
     }
 }

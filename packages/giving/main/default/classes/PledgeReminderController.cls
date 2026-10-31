@@ -247,13 +247,11 @@ public with sharing class PledgeReminderController {
         Boolean ours =
             failure instanceof PledgeReminderService.PledgeReminderException ||
             failure instanceof AcknowledgmentService.AcknowledgmentException;
-        String message = failure.getMessage();
-        if (!ours) {
-            ErrorLogger.log(failure, context);
-            message = Label.Giving_PledgeReminders_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            failure,
+            ours,
+            context,
+            Label.Giving_PledgeReminders_UnexpectedError
+        );
     }
 }

@@ -47,7 +47,7 @@ public with sharing class SoftCreditController {
     @AuraEnabled(cacheable=true)
     public static SoftCreditPanel getCredits(Id giftId) {
         if (giftId == null) {
-            throw badRequest(Label.Giving_SoftCredit_GiftRequired);
+            throw UserErrors.message(Label.Giving_SoftCredit_GiftRequired);
         }
         try {
             return panelFor(giftId);
@@ -69,10 +69,10 @@ public with sharing class SoftCreditController {
         Decimal amount
     ) {
         if (giftId == null) {
-            throw badRequest(Label.Giving_SoftCredit_GiftRequired);
+            throw UserErrors.message(Label.Giving_SoftCredit_GiftRequired);
         }
         if (personId == null) {
-            throw badRequest(Label.Giving_SoftCredit_OneCreditedParty);
+            throw UserErrors.message(Label.Giving_SoftCredit_OneCreditedParty);
         }
         try {
             Soft_Credit__c credit = new Soft_Credit__c(
@@ -102,18 +102,18 @@ public with sharing class SoftCreditController {
     @AuraEnabled
     public static SoftCreditPanel removeCredit(Id softCreditId) {
         if (softCreditId == null) {
-            throw badRequest(Label.Giving_SoftCredits_ActionFailed);
+            throw UserErrors.message(Label.Giving_SoftCredits_ActionFailed);
         }
         try {
             List<Soft_Credit__c> found = SoftCreditSelector.selectByIds(
                 new Set<Id>{ softCreditId }
             );
             if (found.isEmpty()) {
-                throw badRequest(Label.Giving_SoftCredits_ActionFailed);
+                throw UserErrors.message(Label.Giving_SoftCredits_ActionFailed);
             }
             Soft_Credit__c credit = found[0];
             if (credit.Is_Automatic__c == true) {
-                throw badRequest(Label.Giving_SoftCredits_AutomaticHelp);
+                throw UserErrors.message(Label.Giving_SoftCredits_AutomaticHelp);
             }
             Id giftId = credit.Gift__c;
             Database.delete(new List<Soft_Credit__c>{ credit }, true, AccessLevel.USER_MODE);
@@ -153,14 +153,8 @@ public with sharing class SoftCreditController {
         return panel;
     }
 
-    private static AuraHandledException badRequest(String message) {
-        AuraHandledException refused = new AuraHandledException(message);
-        refused.setMessage(message);
-        return refused;
-    }
-
     private static AuraHandledException report(Exception failure, Id recordId) {
         ErrorLogger.log(failure, CONTEXT, recordId);
-        return badRequest(Label.Giving_SoftCredits_ActionFailed);
+        return UserErrors.message(Label.Giving_SoftCredits_ActionFailed);
     }
 }

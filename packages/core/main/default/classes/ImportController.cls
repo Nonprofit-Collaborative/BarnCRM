@@ -332,7 +332,7 @@ public with sharing class ImportController {
             List<ImportMapping.Target> targets = processor == null ? null : processor.targets();
             return targets == null ? new List<ImportMapping.Target>() : targets;
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getEntityTargets');
+            throw UserErrors.wrap(e, 'ImportController.getEntityTargets', true);
         }
     }
 
@@ -347,7 +347,7 @@ public with sharing class ImportController {
             }
             return result;
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getTemplates');
+            throw UserErrors.wrap(e, 'ImportController.getTemplates', true);
         }
     }
 
@@ -362,7 +362,7 @@ public with sharing class ImportController {
             Import_Template__c copy = ImportTemplateService.copyTemplate(templateId, name);
             return toTemplateView(ImportTemplateSelector.selectById(copy.Id));
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.copyTemplate');
+            throw UserErrors.wrap(e, 'ImportController.copyTemplate', true);
         }
     }
 
@@ -423,7 +423,7 @@ public with sharing class ImportController {
             );
             return view;
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getMatchFields');
+            throw UserErrors.wrap(e, 'ImportController.getMatchFields', true);
         }
     }
 
@@ -445,7 +445,7 @@ public with sharing class ImportController {
             enforcePermission();
             return ImportObjectSchema.loadableObjects();
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getLoadableObjects');
+            throw UserErrors.wrap(e, 'ImportController.getLoadableObjects', true);
         }
     }
 
@@ -524,7 +524,7 @@ public with sharing class ImportController {
             }
             return view;
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.suggestObject');
+            throw UserErrors.wrap(e, 'ImportController.suggestObject', true);
         }
     }
 
@@ -539,7 +539,7 @@ public with sharing class ImportController {
                 )
             );
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.createObjectTemplate');
+            throw UserErrors.wrap(e, 'ImportController.createObjectTemplate', true);
         }
     }
 
@@ -571,7 +571,7 @@ public with sharing class ImportController {
             );
             return objectTemplateView(ImportTemplateSelector.selectById(created.Id));
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.createSeveralObjectsTemplate');
+            throw UserErrors.wrap(e, 'ImportController.createSeveralObjectsTemplate', true);
         }
     }
 
@@ -598,7 +598,7 @@ public with sharing class ImportController {
             }
             return result;
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getSeveralObjects');
+            throw UserErrors.wrap(e, 'ImportController.getSeveralObjects', true);
         }
     }
 
@@ -668,7 +668,7 @@ public with sharing class ImportController {
                 )
                 .serialize();
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.suggestSheetMapping');
+            throw UserErrors.wrap(e, 'ImportController.suggestSheetMapping', true);
         }
     }
 
@@ -686,7 +686,7 @@ public with sharing class ImportController {
             );
             return fieldChoices(type, ImportMapping.ENTITY_RECORD, null, null);
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getObjectFields');
+            throw UserErrors.wrap(e, 'ImportController.getObjectFields', true);
         }
     }
 
@@ -699,7 +699,7 @@ public with sharing class ImportController {
                 ImportObjectSchema.typeOf(ImportTemplateSelector.selectById(templateId))
             );
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getRelatedOptions');
+            throw UserErrors.wrap(e, 'ImportController.getRelatedOptions', true);
         }
     }
 
@@ -728,7 +728,7 @@ public with sharing class ImportController {
                 ? new List<FieldChoice>()
                 : fieldChoices(relatedType, ImportMapping.ENTITY_RELATED, parentField, related);
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getRelatedFields');
+            throw UserErrors.wrap(e, 'ImportController.getRelatedFields', true);
         }
     }
 
@@ -783,7 +783,7 @@ public with sharing class ImportController {
                 ImportObjectSchema.typeOf(ImportTemplateSelector.selectById(templateId))
             );
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getKeyFields');
+            throw UserErrors.wrap(e, 'ImportController.getKeyFields', true);
         }
     }
 
@@ -796,7 +796,7 @@ public with sharing class ImportController {
                 ImportObjectSchema.typeOf(ImportTemplateSelector.selectById(templateId))
             );
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getRowMatchFields');
+            throw UserErrors.wrap(e, 'ImportController.getRowMatchFields', true);
         }
     }
 
@@ -856,7 +856,7 @@ public with sharing class ImportController {
             enforcePermission();
             ImportTemplateService.saveRecurring(templateId, isRecurring, sourceName);
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.saveRecurring');
+            throw UserErrors.wrap(e, 'ImportController.saveRecurring', true);
         }
     }
 
@@ -876,7 +876,7 @@ public with sharing class ImportController {
                 : ImportColumnLibrary.suggestMapping(headers);
             return withSaved(template, suggested).serialize();
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.suggestMapping');
+            throw UserErrors.wrap(e, 'ImportController.suggestMapping', true);
         }
     }
 
@@ -949,7 +949,7 @@ public with sharing class ImportController {
                 )
             );
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.createBatch');
+            throw UserErrors.wrap(e, 'ImportController.createBatch', true);
         }
     }
 
@@ -984,7 +984,7 @@ public with sharing class ImportController {
             ];
             return saved.isEmpty() ? null : String.valueOf(saved[0].ContentDocumentId);
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.saveFile');
+            throw UserErrors.wrap(e, 'ImportController.saveFile', true);
         }
     }
 
@@ -1000,7 +1000,7 @@ public with sharing class ImportController {
             }
             return ImportBatchService.stageRows(batchId, rows, firstRowNumber);
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.stageRows');
+            throw UserErrors.wrap(e, 'ImportController.stageRows', true);
         }
     }
 
@@ -1012,7 +1012,7 @@ public with sharing class ImportController {
             ImportBatchService.startDryRun(batchId);
             return getBatch(batchId);
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.startDryRun');
+            throw UserErrors.wrap(e, 'ImportController.startDryRun', true);
         }
     }
 
@@ -1024,7 +1024,7 @@ public with sharing class ImportController {
             ImportBatchService.startCommit(batchId);
             return getBatch(batchId);
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.startCommit');
+            throw UserErrors.wrap(e, 'ImportController.startCommit', true);
         }
     }
 
@@ -1039,7 +1039,7 @@ public with sharing class ImportController {
             ImportBatchService.startTrial(batchId, rowCount);
             return getBatch(batchId);
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.startTrial');
+            throw UserErrors.wrap(e, 'ImportController.startTrial', true);
         }
     }
 
@@ -1053,7 +1053,7 @@ public with sharing class ImportController {
             enforcePermission();
             return toView(ImportBatchService.openRetry(batchId));
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.openRetry');
+            throw UserErrors.wrap(e, 'ImportController.openRetry', true);
         }
     }
 
@@ -1067,7 +1067,7 @@ public with sharing class ImportController {
             enforcePermission();
             return ImportUndoService.preview(batchId);
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.previewUndo');
+            throw UserErrors.wrap(e, 'ImportController.previewUndo', true);
         }
     }
 
@@ -1082,7 +1082,7 @@ public with sharing class ImportController {
             ImportUndoService.start(batchId, confirmedTotal);
             return getBatch(batchId);
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.startUndo');
+            throw UserErrors.wrap(e, 'ImportController.startUndo', true);
         }
     }
 
@@ -1092,7 +1092,7 @@ public with sharing class ImportController {
         try {
             return toView(ImportBatchSelector.selectById(batchId));
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getBatch');
+            throw UserErrors.wrap(e, 'ImportController.getBatch', true);
         }
     }
 
@@ -1106,7 +1106,7 @@ public with sharing class ImportController {
             }
             return result;
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getRecentBatches');
+            throw UserErrors.wrap(e, 'ImportController.getRecentBatches', true);
         }
     }
 
@@ -1157,7 +1157,7 @@ public with sharing class ImportController {
             page.hasMore = page.nextIndex < page.total;
             return page;
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getRowPage');
+            throw UserErrors.wrap(e, 'ImportController.getRowPage', true);
         }
     }
 
@@ -1223,7 +1223,7 @@ public with sharing class ImportController {
             }
             return preview;
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.previewChanges');
+            throw UserErrors.wrap(e, 'ImportController.previewChanges', true);
         }
     }
 
@@ -1263,7 +1263,7 @@ public with sharing class ImportController {
             }
             return result;
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getChangedValues');
+            throw UserErrors.wrap(e, 'ImportController.getChangedValues', true);
         }
     }
 
@@ -1337,13 +1337,5 @@ public with sharing class ImportController {
             return permissionOverride;
         }
         return FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
-    }
-
-    /**
-     * Logs once and wraps the message for the component. setMessage keeps the readable text
-     * on the exception, which AuraHandledException otherwise replaces with a generic message.
-     */
-    private static AuraHandledException auraError(Exception e, String context) {
-        return UserErrors.wrap(e, context, true);
     }
 }

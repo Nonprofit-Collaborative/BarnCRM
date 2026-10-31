@@ -166,8 +166,6 @@ public with sharing class LogicModelBuilderController {
         } else {
             ErrorLogger.log(e, 'LogicModelBuilderController');
         }
-        AuraHandledException handled = new AuraHandledException(message);
-        handled.setMessage(message);
-        return handled;
+        return UserErrors.message(message);
     }
 }

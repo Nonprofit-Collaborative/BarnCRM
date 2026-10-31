@@ -117,16 +117,9 @@ public with sharing class DonorSegmentController {
 
     /** Anything the person can act on is shown as it is; anything else is logged and summarized. */
     private static AuraHandledException asUserError(Exception caught) {
-        String message = caught.getMessage();
-        if (
-            !(caught instanceof DonorSegmentService.SegmentException) &&
-            !(caught instanceof QueryCompiler.QueryCompilerException)
-        ) {
-            ErrorLogger.log(caught, CONTEXT);
-            message = System.Label.Giving_Segments_Unexpected;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        Boolean shown =
+            caught instanceof DonorSegmentService.SegmentException ||
+            caught instanceof QueryCompiler.QueryCompilerException;
+        return UserErrors.wrap(caught, shown, CONTEXT, System.Label.Giving_Segments_Unexpected);
     }
 }

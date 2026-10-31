@@ -34,7 +34,7 @@ public with sharing class FeatureController {
             return model();
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw asAuraException(System.Label.Core_Feature_LoadError);
+            throw UserErrors.message(System.Label.Core_Feature_LoadError);
         }
     }
 
@@ -42,14 +42,14 @@ public with sharing class FeatureController {
     @AuraEnabled
     public static FeaturesModel turnOn(String key) {
         if (!BarnCRMPermissions.canManageSettings()) {
-            throw asAuraException(System.Label.Core_Settings_PermissionRequiredError);
+            throw UserErrors.message(System.Label.Core_Settings_PermissionRequiredError);
         }
         try {
             FeatureSwitchService.turnOn(key);
             return model();
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw asAuraException(System.Label.Core_Feature_SaveError);
+            throw UserErrors.message(System.Label.Core_Feature_SaveError);
         }
     }
 
@@ -141,11 +141,5 @@ public with sharing class FeatureController {
                 return null;
             }
         }
-    }
-
-    private static AuraHandledException asAuraException(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 }

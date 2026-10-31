@@ -77,10 +77,10 @@ public with sharing class DonorLevelController {
     @AuraEnabled
     public static Id recalculate() {
         if (!BarnCRMPermissions.canManageSettings()) {
-            throw refuse(Label.Giving_DonorLevels_NotPermitted);
+            throw UserErrors.message(Label.Giving_DonorLevels_NotPermitted);
         }
         if (!DonorLevelService.isEnabled()) {
-            throw refuse(Label.Giving_DonorLevels_TurnOnFirst);
+            throw UserErrors.message(Label.Giving_DonorLevels_TurnOnFirst);
         }
         try {
             return Database.executeBatch(new DonorLevelBatch(), DonorLevelSchedulable.CHUNK_SIZE);
@@ -108,14 +108,8 @@ public with sharing class DonorLevelController {
         return source;
     }
 
-    private static AuraHandledException refuse(String message) {
-        AuraHandledException refusal = new AuraHandledException(message);
-        refusal.setMessage(message);
-        return refusal;
-    }
-
     private static AuraHandledException report(Exception failure) {
         ErrorLogger.log(failure, CONTEXT);
-        return refuse(Label.Giving_DonorLevels_ActionFailed);
+        return UserErrors.message(Label.Giving_DonorLevels_ActionFailed);
     }
 }
