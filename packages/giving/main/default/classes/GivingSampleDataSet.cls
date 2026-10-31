@@ -1,6 +1,6 @@
 /**
  * The parsed and validated Giving sample data payload (C-10): funds, appeals, commitments,
- * gifts with their allocations, hand-entered soft credits, and tributes.
+ * gifts with their allocations, hand-entered soft credits, tributes, and asks (G-26).
  *
  * parse() is the only way to build one and it refuses a payload that is missing what the
  * loader needs, rather than letting a null reach an insert and surface as "Attempt to
@@ -28,6 +28,9 @@ public with sharing class GivingSampleDataSet {
     /** Soft credits staff would have entered by hand, each naming its gift. */
     public final List<Map<String, Object>> softCredits;
 
+    /** Asks in the solicitation pipeline (G-26), each naming its donor; optional. */
+    public List<Map<String, Object>> asks { get; private set; }
+
     private GivingSampleDataSet(
         List<Map<String, Object>> funds,
         List<Map<String, Object>> appeals,
@@ -42,6 +45,7 @@ public with sharing class GivingSampleDataSet {
         this.gifts = gifts;
         this.tributes = tributes;
         this.softCredits = softCredits;
+        this.asks = new List<Map<String, Object>>();
     }
 
     /**
@@ -58,6 +62,7 @@ public with sharing class GivingSampleDataSet {
             asMapList(root.get('tributes')),
             asMapList(root.get('softCredits'))
         );
+        data.asks = asMapList(root.get('asks'));
         data.validate();
         return data;
     }
@@ -102,6 +107,12 @@ public with sharing class GivingSampleDataSet {
         }
         for (Map<String, Object> credit : softCredits) {
             if (String.isBlank(asString(credit.get('gift')))) {
+                throw invalidData();
+            }
+        }
+        for (Map<String, Object> ask : asks) {
+            requireKey(ask);
+            if (String.isBlank(asString(ask.get('donor')))) {
                 throw invalidData();
             }
         }

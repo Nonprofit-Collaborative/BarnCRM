@@ -6099,6 +6099,7 @@ it produced.
 | Resulting Commitment | reference(Commitment) | no | The pledge a won ask produced (R-SO5). |
 | Stage Changed Date | date | computed | The day the ask reached its current stage (R-SO4). |
 | Closed Date | date | computed | The day the outcome left Open; empty while the ask is open (R-SO3). |
+| Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
 
 ### Relationships
 
@@ -6180,6 +6181,7 @@ their gifts, still pointing at the anonymized person.
 | Resulting Commitment | `Commitment__c` | Lookup to `Commitment__c`, clears on delete |
 | Stage Changed Date | `Stage_Changed_Date__c` | Date |
 | Closed Date | `Closed_Date__c` | Date |
+| Sample Data | `Sample_Data__c` | Checkbox |
 
 - **Validation rule:** `Exactly_One_Donor` (R-SO1), on create and on a change of either donor
   field.

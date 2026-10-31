@@ -621,6 +621,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Ask__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Ask__c.Stage_Changed_Date__c</field>
     <readable>true</readable>
   </fieldPermissions>

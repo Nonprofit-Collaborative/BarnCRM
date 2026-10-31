@@ -62,7 +62,8 @@ ask cadence (G-29) needs from it.
 - Reports group the text stage alphabetically, not in list order; the board shows the list order.
 - Renaming a stage in the setting does not rename it on existing asks: they appear in the board's
   "not in the stage list" column until moved. The admin guide says so.
-- Sample asks are not in the Giving sample data in this release.
+- The Giving sample data includes a handful of asks across the stages and outcomes, flagged
+  Sample Data and removed with the rest of the set.
 
 ## Alternatives considered
 

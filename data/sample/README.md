@@ -5,7 +5,8 @@
 Tracked as **C-10** in the product plan: 200 realistic households (440 contacts), 25
 organizations, 60 connections between people in different households and 80 affiliations,
 plus, where the Giving package is installed, three years of gifts against 8 funds and 7
-appeals, 24 pledges and recurring commitments with their installments, 30 soft credits and
+appeals, 24 pledges and recurring commitments with their installments, 11 asks across the
+pipeline's stages and outcomes (two won as pledges), 30 soft credits and
 24 tributes. A contributor or reviewer sees the product working immediately, with numbers
 in the reports, without hand-entering data.
 
@@ -130,9 +131,15 @@ The Giving payload:
     }
   ],
   "tributes": [{ "gift": "G0011", "type": "In memory of", "honoreePerson": "H008-2", "recipientPerson": "H008-1", "message": "..." }],
-  "softCredits": [{ "gift": "G0011", "person": "H042-1", "role": "Solicitor", "amount": 2500 }]
+  "softCredits": [{ "gift": "G0011", "person": "H042-1", "role": "Solicitor", "amount": 2500 }],
+  "asks": [{ "key": "A001", "donor": "H004-1", "stage": "Identified", "outcome": "Open", "amount": 1000, "targetDaysAgo": -90, "stageDaysAgo": 12, "closedDaysAgo": null, "nextAskDaysAgo": null, "nextStep": "...", "fund": null, "appeal": null, "commitment": null }]
 }
 ```
+
+Asks use the packaged default stages. A negative offset is a date still to come (a target
+date, a next ask date). A won ask names the sample pledge that closed it in `commitment`, so
+asks load in the reference data stage with the commitments. A stage the org has removed from
+its stage list loads blank and the ask takes the org's first stage.
 
 Giving dates are day offsets (`daysAgo`, `startDaysAgo`, `endDaysAgo`), not calendar dates.
 The loader counts them back from the day the set is loaded, so a set loaded a year from now
