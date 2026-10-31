@@ -62,7 +62,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Setup note, Opportunity mirror: what to change</shortDescription>
-    <value>If each gift should get its Opportunity at once, let fundraising staff create and edit Opportunities through their profile or a permission set. Give yourself Opportunity Mirror on the Access page, under Extra Permissions.</value>
+    <value>To give each gift its Opportunity at once, let fundraising staff create and edit Opportunities through their profile or a permission set. Give yourself Opportunity Mirror on the Access page.</value>
   </labels>
   <labels>
     <fullName>Mirror_SetupNote_Mirror_Why</fullName>

@@ -28,7 +28,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">How many days either side of a scheduled payment's due date an imported gift can fall and still pay it, where the import mapping does not say. Empty means 7.</value>
+        <value xsi:type="xsd:string">How many days either side of a scheduled payment's due date an imported gift can fall and still pay it, where the import mapping does not say. Default: 7.</value>
     </values>
     <values>
         <field>Help_Path__c</field>

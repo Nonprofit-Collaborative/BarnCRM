@@ -2,11 +2,11 @@
 
 A gift is one thing that arrived: money, stock or goods, from one donor, on one date. This page covers entering a gift, reading the gift page, and recording who else deserves credit for it. To change a gift after it is entered, see [Refunds and write-offs](refunds.md); a gift is never edited away.
 
-Before you start: open the **Fundraising** app. You need the **Fundraising Staff** role (it carries the **Giving Staff** permission set). If the **Quick Gift Entry** tab is missing, ask your admin ([Access](../admin-guide/access.md)).
+Before you start: open the **BarnCRM Fundraising** app. You need the **Fundraising Staff** role (it carries the **Giving Staff** permission set). If the **Quick Gift Entry** tab is missing, ask your admin ([Access](../admin-guide/access.md)).
 
 ## To Enter a Gift with Quick Gift Entry
 
-Quick Gift Entry is the first tab of the Fundraising app. On a computer it is also in the utility bar at the bottom of the screen, so you can open it over whatever page you are on.
+Quick Gift Entry is the first tab of the BarnCRM Fundraising app. On a computer it is also in the utility bar at the bottom of the screen, so you can open it over whatever page you are on.
 
 1. Open the **Quick Gift Entry** tab, or click **Quick Gift Entry** in the utility bar.
 2. Under **Who gave this gift**, choose **Person** or **Organization**.
@@ -47,7 +47,7 @@ You should see: the gift page shows an **In-kind Gift** section with **In-kind D
 
 ## To Add a Gift From a Person's or Organization's Page
 
-1. Open the person, household or organization in the Fundraising app.
+1. Open the person, household or organization in the BarnCRM Fundraising app.
 2. Click **New Gift** in the action bar. The donor is already filled in.
 3. Fill in **Amount**, **Payment Method**, **Status** and **Acknowledgment Status**, and choose an **Appeal** if there is one. **Gift Date** defaults to today; change it if the gift arrived on another day.
 4. Click **Save**.
@@ -79,7 +79,7 @@ A gift without a fund goes in full to your organization's default fund, as one l
 A soft credit recognizes someone who influenced a gift but did not give it, such as the board member who asked. It never changes the money.
 
 1. Open the gift.
-2. In the **Soft Credits** panel, click **Add credit**.
+2. In the **Soft Credits** panel, click **Add Credit**.
 3. Choose the **Person to recognize**.
 4. Choose **Why they are recognized**: **Solicitor**, **Honoree**, **Influencer**, **Household Member**, **Matched Donor** or **Other**. With **Other**, type **Your own wording**.
 5. Check the **Amount** and click **Save**.
@@ -97,7 +97,7 @@ The **Tribute** panel on the gift shows the tribute and whether the family has b
 3. Type the **Honoree Name**, or choose **Honoree Contact** if the person is already in BarnCRM.
 4. Fill in who should be told: **Notification Recipient Contact**, or type **Notification Recipient Name** if they are not in BarnCRM.
 5. Type any **Message** from the donor and click **Save**.
-6. When the letter has gone out, open the gift and click **Mark notification sent** in the **Tribute** panel.
+6. When the letter has gone out, open the gift and click **Mark Notification Sent** in the **Tribute** panel.
 
 You should see: the panel reads "In memory of ..., Notify ..." and then **Notification sent** with the date. BarnCRM does not send the letter; the button records that you did. The **Notifications to Send** list view on Tributes shows the ones still waiting.
 

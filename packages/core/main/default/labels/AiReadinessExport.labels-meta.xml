@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>AI-Readiness Export: what the section does</shortDescription>
-        <value>Download your data model, and if you want your records, as files an AI tool of your choice can read. BarnCRM never sends anything to an AI service: you choose the tool and upload the files yourself.</value>
+        <value>Download your data model, and optionally your records, as files an AI tool of your choice can read. BarnCRM never sends anything to an AI service: you choose the tool and upload the files yourself.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_IncludeRecords</fullName>
@@ -278,7 +278,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>AI-Readiness Export README: intro, {0} is the date</shortDescription>
-        <value>This pack describes your organization's Salesforce data so an AI tool can understand it. BarnCRM made it on {0} and did not send it anywhere: you choose which AI tool to use and what to upload.</value>
+        <value>This pack describes your organization's Salesforce data so an AI tool can understand it. BarnCRM made it on {0} and sent it nowhere: you choose the AI tool and what to upload.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ReadmeFiles</fullName>
@@ -294,7 +294,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>AI-Readiness Export README: schema.json line</shortDescription>
-        <value>schema.json: every kind of record and field, with types, picklist values, help text, lookups, fill rates and privacy handling, plus how records connect and data quality notes. Give it to the AI tool first.</value>
+        <value>schema.json: every kind of record and field, with types, picklist values, help text, lookups, fill rates, privacy handling, relationships and data quality notes. Give it to the AI tool first.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ReadmeFileDictionary</fullName>
@@ -310,7 +310,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>AI-Readiness Export README: data folder line</shortDescription>
-        <value>data/: one CSV file of records for each kind of record. The first row holds field API names, which schema.json explains. Id and lookup columns hold record Ids, so the files can be joined.</value>
+        <value>data/: one CSV file of records for each kind of record. The first row holds field API names, explained in schema.json. Id and lookup columns hold record Ids, so files can be joined.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ReadmeObjects</fullName>
@@ -406,7 +406,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>AI-Readiness Export README: privacy advice</shortDescription>
-        <value>Read your AI tool's terms before uploading records about people. Many tools keep what you upload, or train on it, unless you turn that off. Share no more than the question needs.</value>
+        <value>Read your AI tool's terms before uploading records about people. Many tools keep what you upload, or train on it, unless you turn that off. Share only what the question needs.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ReadmeQuality</fullName>

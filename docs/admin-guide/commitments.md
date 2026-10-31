@@ -54,9 +54,9 @@ levels run an hour after the rollups start so that the totals the ladder reads h
 settled.
 
 Nothing else has to be done. If you have just switched the jobs on and do not want to wait
-for tonight, choose **Run the jobs now**: the top up and the overdue pass start
+for tonight, choose **Run the Jobs Now**: the top up and the overdue pass start
 immediately, and the page shows what they did once they finish. (Donor levels have their
-own **Recalculate now** button on the Donor Levels page.)
+own **Recalculate Now** button on the Donor Levels page.)
 
 ### Checking They Are Running
 
@@ -87,7 +87,7 @@ on them (see [Access](access.md)). Somebody who has the Giving Admin permission 
 it can open the page and see whether the jobs are running; the buttons are disabled.
 
 The **payment schedule** card lives on a commitment's record page, and BarnCRM ships a
-page called **Commitment Record Page** with the card already on it. The Fundraising app
+page called **Commitment Record Page** with the card already on it. The BarnCRM Fundraising app
 opens every commitment on it, with nothing to assign. The same page lists the **Gifts**
 received against the commitment, newest first, and its action bar carries **Edit**,
 **Change Owner**, **Sharing** and **Delete**. If your organization has built a commitment record page of
@@ -150,7 +150,7 @@ Active again.
     giving again and the missing payments are filled back in, keeping their original dates
     and their original numbering.
 
-The same card offers **Mark complete** for a commitment that is finished and **Cancel
+The same card offers **Mark Complete** for a commitment that is finished and **Cancel
 commitment** for one the donor has stopped. Cancelling marks the unpaid payments Skipped
 and deletes nothing.
 
@@ -160,7 +160,7 @@ and deletes nothing.
     already marked Overdue is here, with its commitment, its donor, and what was expected.
     A payment is marked Overdue by the overdue pass, so this list fills up the first night
     after you schedule the nightly jobs (see "Switching the nightly jobs on"). If the list
-    is empty and you have just switched the jobs on, choose **Run the jobs now** on the
+    is empty and you have just switched the jobs on, choose **Run the Jobs Now** on the
     Nightly jobs page rather than waiting.
 15. Switch to **Upcoming 30 Days** to see what should arrive next, which is the list Jen
     uses when she reconciles the bank statement.

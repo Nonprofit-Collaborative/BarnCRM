@@ -156,7 +156,7 @@ modules your edition offers (see [Editions](editions.md)), plus any module alrea
   Salesforce's installer, and **What this module does**.
 - An installed module shows **Installed** and a link to its own app, where it has one.
   No module app has a Settings tab: the Rollup Builder's settings are in the **Rollups**
-  section and Volunteers' in the **Volunteers** section of BarnCRM Settings; Giving's Fundraising app has no Settings tab, and Mirror has no app. (Some module
+  section and Volunteers' in the **Volunteers** section of BarnCRM Settings; Giving's BarnCRM Fundraising app has no Settings tab, and Mirror has no app. (Some module
   sections still show in BarnCRM Settings for now; they move to the module's app in a later
   release.)
 
@@ -327,7 +327,7 @@ its next upgrade, so check this row after one.
 BarnCRM's permission sets give no Account record type, so the people who create organizations
 need the chosen one from their profile or a permission set of your own. Without it, import
 rejects the rows that would create an organization, sample data refuses to load, and Health
-Check warns **You cannot use the record type for organizations**, each naming the record type.
+Check warns **You Cannot Use the Record Type for Organizations**, each naming the record type.
 
 **Upgrading from a version that shipped the Organization record type.** The upgrade leaves the
 **Organization** record type and your accounts as they are, and this row keeps it, but
@@ -420,7 +420,7 @@ this page to see the new value.
 
 | Section | Shown | Open in Setup opens |
 |---|---|---|
-| General | **Fiscal year start month**: the month your fiscal year starts. Totals for this year, last year and two years ago, and every report by fiscal year, follow it. After changing it, click **Recalculate all** on the Rollups page | Company Settings, Fiscal Year |
+| General | **Fiscal year start month**: the month your fiscal year starts. Totals for this year, last year and two years ago, and every report by fiscal year, follow it. After changing it, click **Recalculate All** on the Rollups page | Company Settings, Fiscal Year |
 | Organization | **Organization name**, at the top of the section, directly above **Organization legal name** | Company Settings, Company Information |
 
 BarnCRM follows the standard fiscal year: each year starts on the first day of the start month.

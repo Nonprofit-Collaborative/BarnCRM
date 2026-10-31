@@ -30,7 +30,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Asks: the person may read asks but not change them</shortDescription>
-    <value>You can see asks but not change them. Ask your administrator for Giving Staff access.</value>
+    <value>You can see asks but not change them. Ask your BarnCRM admin for Giving Staff access.</value>
   </labels>
   <labels>
     <fullName>Giving_Ask_ErrorOutcome</fullName>

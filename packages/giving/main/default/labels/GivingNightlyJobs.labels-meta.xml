@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: what the page is for</shortDescription>
-    <value>Four jobs keep giving moving overnight: they extend recurring schedules, mark payments overdue, place donors on their giving level, and remind owners when a donor's next ask arrives. Until you schedule them here, none of them runs.</value>
+    <value>Four jobs keep giving moving overnight: they extend recurring schedules, mark payments overdue, place donors on their giving level, and remind owners when a donor's next ask arrives. None runs until you schedule it here.</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_TopUpName</fullName>
@@ -158,7 +158,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: button that runs the jobs now</shortDescription>
-    <value>Run the jobs now</value>
+    <value>Run the Jobs Now</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_RunNowStarted</fullName>

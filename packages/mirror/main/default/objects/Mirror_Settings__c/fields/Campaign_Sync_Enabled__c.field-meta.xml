@@ -6,7 +6,7 @@
   <inlineHelpText>
     Whether saving an appeal creates or updates its matching Campaign. Off until you turn it on.
   </inlineHelpText>
-  <label>Campaign Sync Enabled</label>
+  <label>Copy Appeals to Campaigns</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>
 </CustomField>

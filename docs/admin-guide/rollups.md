@@ -113,7 +113,7 @@ it nothing recalculates overnight and the home page tile stays in warning.
 
 ### If a Rollup Is Missing
 
-**Restore shipped rollups** at the top of the page creates the shipped rollups this org
+**Restore Shipped Rollups** at the top of the page creates the shipped rollups this org
 does not have and leaves every other rollup exactly as it is, including ones you have
 edited or switched off. A shipped rollup whose target field one of your own active rollups
 already writes is not created, so the two never overwrite each other's total. Press it if the page is empty on a fresh install, which means the
@@ -134,7 +134,7 @@ and choose **Rollups**.
 Where "this year", "last year" and "two years ago" begin is not a BarnCRM setting: it is your
 org's fiscal year in Salesforce Setup (**Setup, Company Settings, Fiscal Year**), the same one
 every Salesforce report uses. The **General** section of **BarnCRM Settings** shows it, read
-only, as **Fiscal year start month**. After changing it in Setup, click **Recalculate all** to
+only, as **Fiscal year start month**. After changing it in Setup, click **Recalculate All** to
 correct every year based total in **Every night** or **Both** mode, which is every year based
 total the Builder saves (see [What the Builder will not save](#what-the-builder-will-not-save)).
 BarnCRM follows the standard fiscal year: each year starts on the first day of the start
@@ -201,7 +201,7 @@ hour moves the scheduled run straight away; if the nightly run is not scheduled,
 is used when you schedule it. Pick a quiet hour after the day's data entry and before the
 morning's reports.
 
-The nightly run, **Recalculate** and **Recalculate all** work
+The nightly run, **Recalculate** and **Recalculate All** work
 through every record a rollup writes, one kind of record at a time (all accounts, then all
 contacts, then all funds), and calculate all of a record's totals together:
 
@@ -223,11 +223,11 @@ contacts, then all funds), and calculate all of a record's totals together:
   while it is being recalculated and handed on the same way. Nothing to do.
 - **A record that cannot be saved is tried again.** If someone was editing it, or a
   validation rule refused it, BarnCRM tries again automatically; after five tries it waits
-  in the **Needs attention** list. The next nightly run that saves it takes it off the list.
+  in the **Needs Attention** list. The next nightly run that saves it takes it off the list.
 - **A part of the run the platform stops is tried again.** If Salesforce stops a group of
   records part way (for example because they had more gifts than one step can read), those
   records go to the queue and are recalculated within minutes, not left until the next night.
-- **One full run at a time.** If you click **Recalculate all** or **Recalculate** while a run
+- **One full run at a time.** If you click **Recalculate All** or **Recalculate** while a run
   is still going (for example the nightly run), nothing new starts and the page says "A full
   recalculation is already running. Its totals will be on the records when it finishes, so
   try again after that." The nightly run does the same when a run you started is still going.
@@ -326,8 +326,8 @@ own). Its settings are in the **Rollups** section of **BarnCRM Settings**.
 
 The **Rollup Builder** tab is where you create a new total and edit any existing one, shipped
 or your own, without typing a query. It lists every rollup with its controls (mode, active,
-**Recalculate**, the nightly schedule, **Recalculate all** and **Restore shipped rollups**),
-and adds **New rollup**, and **Edit**, **Copy** and **Delete** on each row. The tab comes with the
+**Recalculate**, the nightly schedule, **Recalculate All** and **Restore Shipped Rollups**),
+and adds **New Rollup**, and **Edit**, **Copy** and **Delete** on each row. The tab comes with the
 **Rollup Builder Admin** permission set (**Rollup Builder User** opens it read only), and
 saving needs the **Manage BarnCRM Settings** permission. The Rollups section in BarnCRM
 Settings opens it.
@@ -423,7 +423,7 @@ was not added, and the list shows the new rollups.
   - "Writes the same field as ... for the same records": two active rollups keep
     overwriting each other's total. Switch one off, or give each **Only for some records**
     conditions that never meet. Saving in the Builder already refuses this; it can still
-    arrive by **Restore shipped rollups** or an edit outside the Builder.
+    arrive by **Restore Shipped Rollups** or an edit outside the Builder.
   - "Cannot be switched on while ... fills the same field for the same records": the rollup
     is off, and switching it on would be refused until the other one is off.
   - "Calculates the same total as ..., into another field": two active rollups do the same
@@ -570,7 +570,7 @@ It says what to change instead of saving:
 
 The Builder warns you on step 3:
 
-- On a total of amounts into a currency field: "This org uses more than one currency. Totals
+- On a total of amounts into a currency field: "This Org Uses More Than One Currency. Totals
   are converted to each record's currency at today's rates, not the rate on the gift date."
 - On a total of amounts into a number field: "This field is a number, not a currency, so the
   total is shown in the corporate currency."
@@ -579,12 +579,12 @@ After changing exchange rates, recalculate your money totals to bring them up to
 
 ### Needs Attention
 
-Under the list, **Needs attention** shows what the engine has not finished:
+Under the list, **Needs Attention** shows what the engine has not finished:
 
 - **Records waiting**, for example "1,204 records waiting, oldest 3 minutes ago". These are
   totals from recent saves and bulk changes, queued and calculated within a minute or a few.
   Nothing to do unless the oldest is more than an hour old, which Health Check also reports.
-  Then click **Start now** to recalculate them now; the nightly run also picks them up.
+  Then click **Start Now** to recalculate them now; the nightly run also picks them up.
   A long queue is worked through in a series of background runs. Salesforce limits how long
   such a series may be (five runs in Developer Edition, trial and scratch orgs), so at that
   point BarnCRM starts a fresh series. Nothing to do.
@@ -601,11 +601,11 @@ Under the list, **Needs attention** shows what the engine has not finished:
   stops partway (often an automation of yours failing on one record), the records it was
   working on are counted as one try and retried in ever smaller groups, then one at a time,
   while the rest of the queue carries on. Only the record that keeps stopping its run appears
-  under **Could not be saved**, after five tries.
-- **Could not be saved**: each record whose totals failed five times, with a link to it,
+  under **Could Not Be Saved**, after five tries.
+- **Could Not Be Saved**: each record whose totals failed five times, with a link to it,
   what went wrong in plain words, when, and how many tries. Fix the cause (often a validation
   rule or a record someone was editing), then click **Retry** for the ones you selected, or
-  **Retry all**. They go back in the queue and are tried within minutes. The next nightly run
+  **Retry All**. They go back in the queue and are tried within minutes. The next nightly run
   that saves a record also takes it off the list.
 - A warning when the nightly run is not scheduled, and how the last full run ended.
 
@@ -614,13 +614,13 @@ Under the list, **Needs attention** shows what the engine has not finished:
 Build and check rollups in a sandbox, then move them to production with a file:
 
 1. In the sandbox, on the **Rollup Builder** tab, tick **Include in the export** on the rollups
-   to move, or tick none to move every rollup you made. Click **Export to a file**. Your
+   to move, or tick none to move every rollup you made. Click **Export to a File**. Your
    browser saves `barncrm-rollups.json`.
 2. In production, on the **Rollup Builder** tab, choose the file under **Import from a file**.
    A table says what would happen to each rollup: **New: will be created**, **Will replace the
    rollup here with the same Definition Key**, or **Not saved** with the reason. Nothing is
    saved yet.
-3. Click **Import these rollups** (or **Cancel**). The table then says what happened to each one.
+3. Click **Import These Rollups** (or **Cancel**). The table then says what happened to each one.
 
 What to know:
 
@@ -643,23 +643,23 @@ What to know:
 
 ### Recalculate All, Now or Tonight
 
-**Recalculate all** rebuilds every active rollup, whatever its mode: **Instantly** totals as
+**Recalculate All** rebuilds every active rollup, whatever its mode: **Instantly** totals as
 well as **Every night** and **Both** ones. The nightly run covers only **Every night** and
-**Both**, because each save already keeps an **Instantly** total right; **Recalculate all** is
+**Both**, because each save already keeps an **Instantly** total right; **Recalculate All** is
 for when you want every total rebuilt from scratch, for example after loading data with
 automation paused.
 
-Before **Recalculate all** starts, the Builder says how many records it will go through and
+Before **Recalculate All** starts, the Builder says how many records it will go through and
 roughly how long that takes, for example "About 41,200 records, roughly 25 minutes." The count
 includes the records of every active rollup, **Instantly** ones too. During working hours
 (8 AM to 6 PM, Monday to Friday, in your time zone) it suggests running it tonight instead,
 because a long run competes with people saving records. When the nightly run is not
-scheduled, **Run tonight** sets up a single run of every active rollup at the next
+scheduled, **Run Tonight** sets up a single run of every active rollup at the next
 **Time of the nightly run** (2:00 AM unless you changed it), and says "One recalculation of
-every total is set for the next 2:00 AM." When it is scheduled, **Run tonight** adds nothing:
+every total is set for the next 2:00 AM." When it is scheduled, **Run Tonight** adds nothing:
 the nightly run already recalculates the **Every night** and **Both** totals at that hour,
 and a second run at the same moment would
-only be turned away. To rebuild the **Instantly** totals as well, choose **Start now**.
+only be turned away. To rebuild the **Instantly** totals as well, choose **Start Now**.
 
 ### Deleting a Rollup
 
@@ -676,8 +676,8 @@ happens to the values the rollup wrote:
   would wipe that rollup's totals too: keep the values, or switch the other rollup off first.
 - **It cannot be undone.** If you might want the rollup back, switch it off instead.
 - **Rollups that came with BarnCRM cannot be deleted.** Delete says so and does nothing, since
-  **Restore shipped rollups** would only bring them back. Switch them off instead.
-- **Not during a full recalculation.** While **Recalculate all** or the nightly run is going,
+  **Restore Shipped Rollups** would only bring them back. Switch them off instead.
+- **Not during a full recalculation.** While **Recalculate All** or the nightly run is going,
   Delete says so; try again when it finishes. Totals already waiting to be recalculated for the
   deleted rollup are skipped, as they are for a rollup that is switched off.
 
@@ -723,16 +723,16 @@ BarnCRM trigger, with what each one does today:
 | Shown | What it means |
 |---|---|
 | **Instant: BarnCRM updates these totals by itself.** | A BarnCRM object, or a person: nothing to do. |
-| **Not set up** | Totals update every night and when you click **Recalculate**. **Turn on instant totals** shows how to add the trigger. |
+| **Not set up** | Totals update every night and when you click **Recalculate**. **Turn On Instant Totals** shows how to add the trigger. |
 | **On** | The trigger is in this org and running. |
-| **Turned off** | The trigger is there but its switch is off: totals update every night until you click **Turn on instant totals**. |
+| **Turned off** | The trigger is there but its switch is off: totals update every night until you click **Turn On Instant Totals**. |
 | **Inactive** | The trigger is there but was deactivated in Setup. Activate it in a sandbox and deploy it again, or remove it. |
 | **Salesforce allows no trigger on this object** | Its totals stay nightly. |
 
 Step 5 of the Builder shows the same line for the object the rollup counts, with the same
 buttons.
 
-**Turn it on.** Click **Turn on instant totals**. The Builder shows a one-line trigger and its
+**Turn it on.** Click **Turn On Instant Totals**. The Builder shows a one-line trigger and its
 test, named from the object (for opportunities, `BarnRollup_Opportunity` and
 `BarnRollup_Opportunity_Test`), with a **Copy** button for each. Then:
 
@@ -768,14 +768,14 @@ What to know:
   Salesforce permissions (an administrator has them). BarnCRM needs no extra permission and
   deploys nothing itself.
 
-**Turn it off.** Click **Turn off instant totals**. Nothing is deployed: the trigger's switch
+**Turn it off.** Click **Turn Off Instant Totals**. Nothing is deployed: the trigger's switch
 goes off at once, in production too, and the object's totals update every night and when you
-click **Recalculate**. **Turn on instant totals** turns it back on. The switch is also on the
+click **Recalculate**. **Turn On Instant Totals** turns it back on. The switch is also on the
 **Automation** page as **Instant rollups on** and the object's name.
 
 **Remove it.** A switched-off trigger costs almost nothing, so you only need to remove it to
 tidy up, and before uninstalling BarnCRM (the trigger refers to BarnCRM, so Salesforce will
-not uninstall BarnCRM while it is there). Click **Remove the trigger**:
+not uninstall BarnCRM while it is there). Click **Remove the Trigger**:
 
 1. In a sandbox, delete the trigger and its test class in Setup (**Apex Triggers**, **Apex
    Classes**).
@@ -829,7 +829,7 @@ What to know:
 - **Saves by people who hold the permission do not update that total**, instantly or in the
   queue. Everyone else's saves update it as usual.
 - **The nightly run still covers it** when the rollup runs **Every night** or **Both
-  (recommended)**, and so do **Recalculate** and **Recalculate all**. A rollup set to
+  (recommended)**, and so do **Recalculate** and **Recalculate All**. A rollup set to
   **Instantly** is put right only when you click **Recalculate**, so prefer **Both** for a
   rollup you skip.
 - **A name that does not exist is refused** when you save, with the name in the message.
@@ -915,7 +915,7 @@ BarnCRM reads DLRS's rollups (never changes them) to stop the two tools filling 
   switch the DLRS rollup off first.
 - **Switching off and saving a rollup switched off** never ask: a rollup that is off fills
   nothing.
-- **Health Check** warns **BarnCRM and DLRS fill the same field** when such a pair appears
+- **Health Check** warns **BarnCRM and DLRS Fill the Same Field** when such a pair appears
   later, for example when a DLRS rollup is switched back on, and names each field and both
   rollups.
 
@@ -1019,7 +1019,7 @@ need the Giving module; without it, do them on a rollup you have added.
    (recommended)** when you have looked at it; it is the setting that keeps the number
    visibly right.
 4. Click **Recalculate** on that row. The page says "Recalculation started" and the row's
-   last calculated time moves to a moment ago when the run finishes. **Recalculate all**
+   last calculated time moves to a moment ago when the run finishes. **Recalculate All**
    at the top does the same for every active rollup at once, **Instantly** ones included.
 5. Open any household record. Its giving totals now match what you just recalculated. If
    any of them changed, the **Rollups last calculated** field on the record shows the time
@@ -1057,7 +1057,7 @@ the save itself, change **When instant totals are calculated** to **During the s
 
 **Expecting an import's totals the moment it finishes.** Totals from a bulk change are
 queued and catch up within minutes, not in the same instant. Give it a few minutes before
-checking. If a number still has not moved, look at **Needs attention** in the Rollup Builder,
+checking. If a number still has not moved, look at **Needs Attention** in the Rollup Builder,
 which shows how many records are still waiting and which could not be saved.
 
 **Switching off a rollup automation and forgetting it (with Giving).** Instantly and Both
@@ -1073,7 +1073,7 @@ afterwards.
 **Turning the module off and forgetting it.** **Turn Off** on the BarnCRM Rollup Builder row
 of **BarnCRM Settings**, **Modules** stops every rollup at once, Giving's included: saves,
 the Flow action, the queue, the nightly run and a recalculation already running all stop,
-and nothing is processed while it is off. **Recalculate**, **Recalculate all** and **Run
+and nothing is processed while it is off. **Recalculate**, **Recalculate All** and **Run
 tonight** say the module is off; a rollup you save in the Builder then is saved and calculated
 once it is on. The values on your records stay. **Turn On** puts every total right: it starts
 the totals that waited and a recalculation of every active rollup, which runs in the
@@ -1088,7 +1088,7 @@ empty, clear it after you make the rollup inactive.
 
 **Deleting a shipped rollup you do not want.** **Delete** refuses a rollup that came with
 BarnCRM, because a shipped rollup that is gone would be created again (an upgrade or
-**Restore shipped rollups** cannot tell it from one never created). Clear its **Active** box
+**Restore Shipped Rollups** cannot tell it from one never created). Clear its **Active** box
 instead. That is remembered, and it leaves the numbers already calculated on the records.
 
 **Never starting the nightly schedule.** If nobody clicks **Schedule nightly
@@ -1097,7 +1097,7 @@ schedules it for you. The tile is the only warning you get, so act on it.
 
 **Changing the fiscal year in Setup and stopping there.** The year based totals are
 recalculated with the new fiscal year at the next run, not the moment you save it in Setup.
-After changing it, click **Recalculate all**, or wait for the nightly run.
+After changing it, click **Recalculate All**, or wait for the nightly run.
 
 ## Field Reference
 

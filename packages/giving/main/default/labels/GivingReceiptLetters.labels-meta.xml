@@ -22,7 +22,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: the org has no receipt letters</shortDescription>
-    <value>This org has no receipt letters. BarnCRM creates the two it ships when the package is installed, so if they are missing that step did not finish. Restore them here, then edit the wording.</value>
+    <value>This org has no receipt letters. BarnCRM creates the two it ships at install, so that step did not finish. Restore them here, then edit the wording.</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_RestoreButton</fullName>
@@ -134,7 +134,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: toast title, preview failed</shortDescription>
-    <value>No preview</value>
+    <value>No Preview</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_TaxNote</fullName>
@@ -222,7 +222,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: toast title, letters restored</shortDescription>
-    <value>Letters restored</value>
+    <value>Letters Restored</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_RestoredMessage</fullName>
@@ -238,7 +238,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: toast title, letters not restored</shortDescription>
-    <value>Letters not restored</value>
+    <value>Letters Not Restored</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_SavedTitle</fullName>
@@ -246,7 +246,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: toast title, letter saved</shortDescription>
-    <value>Letter saved</value>
+    <value>Letter Saved</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_SavedMessage</fullName>
@@ -262,7 +262,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: toast title, letter not saved</shortDescription>
-    <value>Letter not saved</value>
+    <value>Letter Not Saved</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_ActivatedTitle</fullName>
@@ -270,7 +270,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: toast title, letter switched on</shortDescription>
-    <value>Letter switched on</value>
+    <value>Letter Switched On</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_ActivatedMessage</fullName>
@@ -286,7 +286,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: toast title, letter not switched on</shortDescription>
-    <value>Letter not switched on</value>
+    <value>Letter Not Switched On</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_StartedTitle</fullName>
@@ -294,7 +294,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: toast title, statement run started</shortDescription>
-    <value>Statements started</value>
+    <value>Statements Started</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_StartedMessage</fullName>
@@ -310,6 +310,6 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: toast title, statement run not started</shortDescription>
-    <value>Statements not started</value>
+    <value>Statements Not Started</value>
   </labels>
 </CustomLabels>

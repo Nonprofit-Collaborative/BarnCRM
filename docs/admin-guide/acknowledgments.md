@@ -22,14 +22,14 @@ the thank you is yours to write and rewrite, and the receipt is not.
 Everything is in the app, with one exception noted at step 3.
 
 1. Open **BarnCRM Settings**, then **Giving**, then **Acknowledgments**.
-2. Turn on **Acknowledge gifts**. Nothing is queued until you do, because a thank you sent
+2. Turn on **Send Gift Acknowledgments**. Nothing is queued until you do, because a thank you sent
    with the wrong wording cannot be recalled.
 3. Decide what your emailed thank you says. The wording lives in a standard Salesforce email
    template, which means you get the normal editor, the preview, and the test send.
    BarnCRM ships one to start from, called **BarnCRM: thank you for your gift**. Writing or
    changing a template is the one place you may find yourself in Setup, under Email
    Templates, and it is where Salesforce keeps template editing for everybody.
-4. Create your rules with **New rule** on the Acknowledgments page. The rule form opens on the
+4. Create your rules with **New Rule** on the Acknowledgments page. The rule form opens on the
    page itself; to change a rule later, click **Edit** beside it. Each rule has:
    - an **order**, lowest first. The first rule that matches a gift wins, so put your most
      specific rule at the top;
@@ -56,22 +56,22 @@ Everything is in the app, with one exception noted at step 3.
 Start with the sample data loaded (see [sample-data.md](sample-data.md)).
 
 1. Open **BarnCRM Settings**, then **Giving**, then **Acknowledgments**. Turn on
-   **Acknowledge gifts**.
-2. Choose **New rule**. Name it `Everything else`, order `100`, channel `Email`, and choose
+   **Send Gift Acknowledgments**.
+2. Choose **New Rule**. Name it `Everything else`, order `100`, channel `Email`, and choose
    **BarnCRM: thank you for your gift** as the email template. Save.
-3. Choose **New rule** again. Name it `Major gifts`, order `10`, channel `Letter`, minimum
+3. Choose **New Rule** again. Name it `Major gifts`, order `10`, channel `Letter`, minimum
    amount `1000`. Save. You now have two rules: gifts of $1,000 and up get a letter,
    everything else gets an email.
 4. Enter a gift for $50 from one of the sample households, using **Quick Gift Entry**. Enter
    a second gift for $2,500 from another one.
 5. Go back to the Acknowledgments page. The queue now reads **1 email** and **1 letter**,
    plus whatever the sample gifts added.
-6. Press **Send emails now**. The page shows the run finishing and the count sent. Open the
+6. Press **Send Emails Now**. The page shows the run finishing and the count sent. Open the
    $50 gift: its acknowledgment status is now **Acknowledged**, with today's date, and its
    **Acknowledgments** list shows one row saying which template went to which address.
-7. Press **Download letters to merge**. You get a CSV with one row per letter gift: donor
+7. Press **Download Letters to Merge**. You get a CSV with one row per letter gift: donor
    name, greeting, address, amount, gift date, appeal, fund. Merge it with your own letter,
-   print, and then press **Mark as sent** on the run. Until you press it the gifts stay in
+   print, and then press **Mark as Sent** on the run. Until you press it the gifts stay in
    the letter queue, because BarnCRM cannot tell whether you printed anything.
 
 ## List Views

@@ -49,8 +49,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open **BarnCRM Settings** and choose **Health**. | **Health Check**, **What BarnCRM found in your org, and what to do about it.** The card **What We Found in Your Org** shows what was detected (for example **Person Accounts enabled**), **Coexistence mode** and **Recommended**. |
 | 2 | Read the findings. | Grouped under **Your Org**, **Licenses**, **Access** and **Settings**. Each has a severity (**Needs fixing**, **Worth knowing** or **Information**), a title, a sentence on what to do and, for most, a button. |
 | 3 | Find **Your Org at a Glance**. | An **Information** finding that ends by saying Shield Platform Encryption cannot be detected from inside the app. |
-| 4 | Find the automation finding. | **Automation is running normally**, **Information**. |
-| 5 | Look for a fiscal year finding. | With a standard fiscal year in Setup (the default), there is none. An org that uses a custom fiscal year shows **Your org uses a custom fiscal year**, **Information**, naming the start month, with no button. |
+| 4 | Find the automation finding. | **Automation Is Running Normally**, **Information**. |
+| 5 | Look for a fiscal year finding. | With a standard fiscal year in Setup (the default), there is none. An org that uses a custom fiscal year shows **Your Org Uses a Custom Fiscal Year**, **Information**, naming the start month, with no button. |
 | 6 | Click **Re-Run**. | **Reading your org**, then the report again. |
 
 **Cleanup:** None.
@@ -62,12 +62,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **BarnCRM Settings**, **Health**, find **Nightly jobs are not scheduled**. | It names the jobs, for example **Error digest email**, **Empty household tidy-up**, and has **Schedule All Nightly Jobs**. |
+| 1 | On **BarnCRM Settings**, **Health**, find **Nightly Jobs Are Not Scheduled**. | It names the jobs, for example **Error digest email**, **Empty household tidy-up**, and has **Schedule All Nightly Jobs**. |
 | 2 | Click **Schedule All Nightly Jobs**. | A dialog **Before This Fix Runs**: **This is what the fix will do. Nothing changes until you confirm.**, the same list, **Confirm** and **Cancel**. |
 | 3 | Press Escape. | The dialog closes and focus returns to the button. Nothing is scheduled. |
-| 4 | Click **Schedule All Nightly Jobs**, then **Confirm**. | **Done. Scheduled: ...** naming each job, and the report re-runs. **Nightly jobs are not scheduled** is gone. |
+| 4 | Click **Schedule All Nightly Jobs**, then **Confirm**. | **Done. Scheduled: ...** naming each job, and the report re-runs. **Nightly Jobs Are Not Scheduled** is gone. |
 | 5 | In **BarnCRM Settings**, open **General** and scroll to **Recent Changes**. | The top entry starts **Health Check:** with the button's name, your name and the time. |
-| 6 | Open **BarnCRM Settings**, **Error Log**. | The **Error Digest** panel shows as scheduled, so the job can be stopped on its own page. The seasonal address swap is not on the list unless **Seasonal Addresses** is ticked on the **Addresses** page, and then it is scheduled already. |
+| 6 | Open **BarnCRM Settings**, **Error Log**. | The **Error Digest** panel shows as scheduled, so the job can be stopped on its own page. The seasonal address swap is not on the list unless **Turn On Seasonal Addresses** is ticked on the **Addresses** page, and then it is scheduled already. |
 
 **Cleanup:** None. Leave the jobs scheduled.
 
@@ -92,9 +92,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As read-only, open **BarnCRM Settings** and choose **Health**. | The report shows with **You can read this report but not change anything. Ask an administrator for the Manage BarnCRM Settings permission.** |
+| 1 | As read-only, open **BarnCRM Settings** and choose **Health**. | The report shows with **You can read this report but not change anything. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.** |
 | 2 | Look under **Access**. | **Only a BarnCRM Admin can see the access checks**, instead of the admin and user counts. |
-| 3 | Find **Nightly jobs are not scheduled**. | It is not shown (only administrators see it), and no finding has a fix button. |
+| 3 | Find **Nightly Jobs Are Not Scheduled**. | It is not shown (only administrators see it), and no finding has a fix button. |
 | 4 | Check the app's navigation. | No **Org Optimizer** tab. |
 
 **Cleanup:** As admin, run **Schedule All Nightly Jobs** again.
@@ -208,15 +208,15 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Error Log**. Set **Digest frequency** to **Once a week**. | **Weekly admin summary** is shown ticked with a **Default** badge. |
+| 1 | Open **BarnCRM Settings**, **Error Log**. Set **Digest frequency** to **Once a week**. | **Send Weekly Admin Summary** is shown ticked with a **Default** badge. |
 | 2 | In **Error Digest**, click **Send Now** in an org with no new entries, no failed jobs, no duplicates waiting, no limit at 80 percent and no Setup change kept since the last digest. | The panel says there was nothing new and no email goes out. |
 | 3 | Make a Contact Import fail (load a file, then break the job) and, if the org has an active duplicate rule, save a duplicate Contact past the alert. Click **Send Now**. | An email arrives titled **BarnCRM: Weekly Admin Summary**. Under **Admin Summary** it lists **Failed BarnCRM jobs** with a link to each and **Duplicates waiting for review**. No record content is in it. |
 | 4 | Add a New Error Log entry (for example by running a failing action), then **Send Now**. | The email is titled **BarnCRM: 1 new Error Log entries** and carries the error counts first, then the **Admin Summary**. |
-| 5 | Untick **Weekly admin summary**, save, and **Send Now** again after step 3's problems are still present. | No summary section is sent; with no new entries, no email. |
+| 5 | Untick **Send Weekly Admin Summary**, save, and **Send Now** again after step 3's problems are still present. | No summary section is sent; with no new entries, no email. |
 | 6 | Set **Digest frequency** back to **Every day** and **Send Now** with a New entry. | The email has the error counts only, with no **Admin Summary**. |
-| 7 | Set **Digest frequency** to **Once a week** and tick **Weekly admin summary**. In Setup, change the help text of any Contact field. Open **Org Optimizer**, **Setup Changes**, click **Copy New Changes Now**, wait a minute, then **Send Now** in **Error Digest**. | Under **Admin Summary**: **Setup changes since the last digest: {n} (see Org Optimizer, Setup Changes)**, counting your change. |
+| 7 | Set **Digest frequency** to **Once a week** and tick **Send Weekly Admin Summary**. In Setup, change the help text of any Contact field. Open **Org Optimizer**, **Setup Changes**, click **Copy New Changes Now**, wait a minute, then **Send Now** in **Error Digest**. | Under **Admin Summary**: **Setup changes since the last digest: {n} (see Org Optimizer, Setup Changes)**, counting your change. |
 
-**Cleanup:** Restore **Digest frequency** and **Weekly admin summary** to their earlier values, and change the help text from step 7 back.
+**Cleanup:** Restore **Digest frequency** and **Send Weekly Admin Summary** to their earlier values, and change the help text from step 7 back.
 
 ## T-HC-14: Setup Changes Keeps Who Changed What
 

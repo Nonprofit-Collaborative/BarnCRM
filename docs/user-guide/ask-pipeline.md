@@ -2,7 +2,7 @@
 
 An ask is a request you plan to make, or have made, to a donor. The Ask Pipeline shows every open ask by step, so you can see where each one stands and what to do next.
 
-Before you start: open the **Fundraising** app, **Ask Pipeline** tab. You need the **Fundraising Staff** role (the **Giving Staff** permission set) to add or change asks. A Giving Read Only user can look but not change.
+Before you start: open the **BarnCRM Fundraising** app, **Ask Pipeline** tab. You need the **Fundraising Staff** role (the **Giving Staff** permission set) to add or change asks. A Giving Read Only user can look but not change.
 
 ## To Add an Ask
 

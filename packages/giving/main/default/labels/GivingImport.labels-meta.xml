@@ -462,7 +462,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Gift import: two scheduled payments equally close</shortDescription>
-        <value>Gift: two scheduled payments are equally close to this gift, {0} and {1}. Link it to one by hand, or give the row an external ID of a gift you already have.</value>
+        <value>Gift: two scheduled payments are equally close to this gift, {0} and {1}. Link it to one by hand, or give the row an external ID of an existing gift.</value>
     </labels>
     <labels>
         <fullName>Giving_Import_ErrorMatchOnlyNone</fullName>
@@ -502,7 +502,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Gift import refused: the importer cannot delete gifts</shortDescription>
-        <value>A gift import needs permission to delete gifts, because it removes a gift it could not finish. Ask your administrator for the Giving Admin permission set.</value>
+        <value>A gift import needs permission to delete gifts, because it removes a gift it could not finish. Ask your BarnCRM admin for the Giving Admin permission set.</value>
     </labels>
     <labels>
         <fullName>Giving_Import_UndoKeptPosted</fullName>

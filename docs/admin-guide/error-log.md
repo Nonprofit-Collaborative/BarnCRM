@@ -120,7 +120,7 @@ sends the digest).
    3,650, or 0 to keep every entry forever. Click **Save**. The next morning's run deletes
    anything older; nothing is deleted when you save.
 3. Make sure the daily run is scheduled: the **Error Digest** panel says so, and Health
-   Check lists it under **Nightly jobs are not scheduled** when it is not. Old entries are
+   Check lists it under **Nightly Jobs Are Not Scheduled** when it is not. Old entries are
    deleted only while it runs, whether or not anyone receives the digest.
 
 Deleted entries go to the Recycle Bin for 15 days, like any record you delete. If you need

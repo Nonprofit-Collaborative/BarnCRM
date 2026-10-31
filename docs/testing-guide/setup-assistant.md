@@ -53,7 +53,7 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 |---|---|---|
 | 1 | Open the **BarnCRM** app, **Home**. | A **Setup Checklist** card listing all nine steps, each with a progress ring and a **Done**, **Skipped** or **To Do** badge; step 1 has a check mark and **Done**. Only the first step not done (usually step 2) is open. **Setup Checklist** shows once, as the card title, and the only count is "{n} of 9 steps done". Step names are in Title Case. There is no **Back** button. |
 | 2 | Click **1. Choose Your Edition** in the list. | Step 1 opens in place and step 2 closes. "Edition: **Nonprofit Edition**", "The edition is chosen once." and a **How to Change It Later** link. No edition choice and no **Confirm and Continue**. "Giving is installed. Its steps are part of this setup." |
-| 3 | Click **Next**. | Step 2, **Confirm How BarnCRM Fits Your Org**: "Your org uses Person Accounts. Household membership is tracked with one record per person, so a person can be in more than one household and everything you already have keeps working." **Recommended for your org**, and **How BarnCRM fits this org** set to **Standalone**. (On the platform-only shape: "This looks like a fresh org, with no other household model and no Person Accounts. BarnCRM can run on its own.") |
+| 3 | Click **Next**. | Step 2, **Confirm How BarnCRM Fits Your Org**: "Your org uses Person Accounts. Household membership is tracked with one record per person, so a person can be in more than one household and everything you have keeps working." **Recommended for your org**, and **How BarnCRM fits this org** set to **Standalone**. (On the platform-only shape: "This looks like a fresh org, with no other household model and no Person Accounts. BarnCRM can run on its own.") |
 | 4 | Open **How BarnCRM fits this org**. | Only **Standalone** (no NPSP or Nonprofit Cloud is in this org). |
 | 5 | Click **Confirm and Continue**. | Step 3, **Confirm How Households Are Named**, opens with the household naming panel and its preview, and "This step finishes by itself once the setting it fills in has a value." **BarnCRM Settings**, **General**, **Coexistence mode** now reads **Standalone**. |
 | 6 | Click **Next**. | Step 4 (with Giving, the default fund and appeal step; with Core alone, the access step). |
@@ -131,7 +131,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 ## T-SA-08: Load Sample Data From the App
 
 **Purpose:** confirm the load runs in the background, reports its counts and sends one notification.
-**Prerequisites:** admin user. Sample data not loaded (after T-SA-07). **Tell people when their long jobs finish** ticked in **BarnCRM Settings**, **General**.
+**Prerequisites:** admin user. Sample data not loaded (after T-SA-07). **Send Long Job Notifications** ticked in **BarnCRM Settings**, **General**.
 
 | Step | Action | Expected result |
 |---|---|---|

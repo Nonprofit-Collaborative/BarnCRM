@@ -89,14 +89,14 @@ because they have not had the same amount of time.
    the donor fields they rest on both read this one fiscal year, so they always draw the year
    boundary in the same place. BarnCRM follows the standard fiscal year; with a custom fiscal
    year, Health Check explains how the two can differ.
-2. **Run the rollups once.** On the same **Rollups** page, choose **Recalculate all**.
+2. **Run the rollups once.** On the same **Rollups** page, choose **Recalculate All**.
    These reports read First Gift Date, Last Gift Date, Gift Count and Gifts Last Year, and a
    donor whose rollups have never run is invisible to them. After the first run the rollups
    keep themselves current as gifts are entered.
 3. **Give people access.** Assign the Giving module's **Giving Staff** or **Giving Read Only**
    permission set on the Access page (Extra Permissions), as for the dashboard. The report folder ships public read only, so
    the reports themselves need no sharing.
-4. Open the **Fundraising** app, choose **Reports**, then the **BarnCRM Giving** folder.
+4. Open the **BarnCRM Fundraising** app, choose **Reports**, then the **BarnCRM Giving** folder.
 
 Nothing else in Setup is required. There is no new setting to configure: the reports carry
 their own definitions.

@@ -246,7 +246,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: refusal without Manage BarnCRM Settings</shortDescription>
-        <value>This section needs the Manage BarnCRM Settings permission. Ask your administrator.</value>
+        <value>This section needs the Manage BarnCRM Settings permission. Ask your BarnCRM admin.</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_Errors</fullName>

@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Save refused: relationship on file that this user cannot see</shortDescription>
-        <value>This relationship already exists. Ask an administrator to look at the existing one.</value>
+        <value>This relationship already exists. Ask your BarnCRM admin to look at the existing one.</value>
     </labels>
     <labels>
         <fullName>Core_Relationship_DuplicateInSave</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Relationship card: the list of relationships could not be read</shortDescription>
-        <value>BarnCRM could not read this person's relationships. Refresh the page, and if it happens again ask your administrator to check that you can read relationships.</value>
+        <value>BarnCRM could not read this person's relationships. Refresh the page, and if it happens again ask your BarnCRM admin to check that you can read relationships.</value>
     </labels>
     <labels>
         <fullName>Core_Relationship_Loading</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Relationship card: the relationship could not be deleted</shortDescription>
-        <value>BarnCRM could not remove that relationship. Check that you can delete relationships, and if it happens again ask your administrator to check the Error Log.</value>
+        <value>BarnCRM could not remove that relationship. Check that you can delete relationships, and if it happens again ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Core_Relationship_RemoveSuccess</fullName>

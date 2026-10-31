@@ -13,7 +13,7 @@ BarnCRM never sends email. You download a file and import it into your email too
 
 ## To Make a Segment From a Template
 
-1. In the **Fundraising** app, open **Donor Segments**.
+1. In the **BarnCRM Fundraising** app, open **Donor Segments**.
 2. Under **Start From a Template**, choose a **Template**: Lapsed Donors, New Donors,
    Upgraders, Level Movers or Major Gift Prospects. The line below it says who it finds.
 3. Choose **People** or **Organizations**.

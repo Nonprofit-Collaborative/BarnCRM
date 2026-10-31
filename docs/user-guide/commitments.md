@@ -2,7 +2,7 @@
 
 A commitment is a promise to give. A **Pledge** is a fixed total paid over time; a **Recurring** gift is the same amount on a schedule with no end. BarnCRM lays out the expected payments (installments), so you can see what is due, what is overdue and what is left to pay.
 
-Before you start: open the **Fundraising** app, **Commitments** tab. You need the **Fundraising Staff** role (the **Giving Staff** permission set).
+Before you start: open the **BarnCRM Fundraising** app, **Commitments** tab. You need the **Fundraising Staff** role (the **Giving Staff** permission set).
 
 ## To Record a Pledge
 
@@ -27,11 +27,11 @@ You should see: the commitment page with a **Payment Schedule** card listing eve
 
 You should see: about a year of payments on the **Payment Schedule** card. More are added as time goes on.
 
-If the card says "No payments have been generated for this commitment yet.", click **Generate now**.
+If the card says "No payments have been generated for this commitment yet.", click **Generate Now**.
 
 ## To See What Is Overdue or Coming Up
 
-The payments are Installment records. They are not a tab in the Fundraising app.
+The payments are Installment records. They are not a tab in the BarnCRM Fundraising app.
 
 1. Open the App Launcher, search for **Installments**, and open it.
 2. Choose the list view **Overdue**, or **Upcoming 30 Days**.
@@ -63,7 +63,7 @@ You should see: "The commitment was updated." **Status** is **Paused**, no new p
 ## To End a Commitment
 
 1. Open the commitment.
-2. On the **Payment Schedule** card, click **Mark complete** for one that is finished, or **Cancel commitment** for one the donor has stopped.
+2. On the **Payment Schedule** card, click **Mark Complete** for one that is finished, or **Cancel Commitment** for one the donor has stopped.
 
 You should see: **Status** is **Completed** or **Cancelled**. Cancelling marks the unpaid payments **Skipped** and deletes nothing. Gifts already received are not touched.
 
@@ -92,7 +92,7 @@ If your organization has turned on pledge reminders, donors with a payment comin
 - "A pledge needs an expected total or a number of installments, so the schedule can be worked out." Fill in **Expected Total** or **Installments Planned**.
 - "A recurring commitment has no expected total. Choose Pledge if the donor promised a fixed amount." Clear **Expected Total**, or change **Type** to **Pledge**.
 - "Day of month is a day between 1 and 31, or empty to use the day of the start date." A 31 falls on the last day of a shorter month.
-- "This commitment cannot be deleted because a gift has been received against one of its payments. Cancel it instead." Use **Cancel commitment**.
+- "This commitment cannot be deleted because a gift has been received against one of its payments. Cancel it instead." Use **Cancel Commitment**.
 - "This record is the donor of an active or paused pledge or recurring gift, so it cannot be deleted." Cancel the commitment, or change its donor, first. Merging a duplicate still works.
 - "That payment is no longer open, or is not this donor's. Nothing was saved." Choose again in **Pays a scheduled payment**, or None.
 - "A gift of goods cannot pay a scheduled payment. Choose None." In-kind gifts never pay a pledge.

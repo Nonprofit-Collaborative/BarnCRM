@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Automation change not permitted</shortDescription>
-        <value>You do not have permission to change automation. Ask your administrator for the Manage BarnCRM Settings permission.</value>
+        <value>You do not have permission to change automation. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_Automation_NotFound</fullName>
@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Automation unexpected error</shortDescription>
-        <value>Something went wrong while BarnCRM was updating this record, so the record was not saved. The details are in the Error Log. Try again, and if it keeps happening, send the newest Error Log entry to whoever supports your Salesforce.</value>
+        <value>Something went wrong while BarnCRM was updating this record, so it was not saved. The details are in the Error Log. Try again, and if it keeps happening, send the newest Error Log entry to whoever supports your Salesforce.</value>
     </labels>
     <labels>
         <fullName>Core_CoexistenceMode_NonprofitCloud</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error log default message</shortDescription>
-        <value>BarnCRM hit a problem it did not expect. The technical detail on this entry says what failed and where. The admin guide page for the feature you were using says what to check.</value>
+        <value>BarnCRM hit an unexpected problem. The technical detail on this entry says what failed and where. The admin guide page for the feature you were using says what to check.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorLog_UnexpectedFailureIn</fullName>
@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error log default message naming where it happened ({0})</shortDescription>
-        <value>BarnCRM hit a problem it did not expect in {0}. The technical detail on this entry says what failed and where. The admin guide page for that feature says what to check.</value>
+        <value>BarnCRM hit an unexpected problem in {0}. The technical detail on this entry says what failed and where. The admin guide page for that feature says what to check.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorLogTile_Acknowledge</fullName>
@@ -244,7 +244,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Shown when something unexpected went wrong; the details are in the Error Log.</shortDescription>
-        <value>Something went wrong. The details are in the Error Log; try again, or ask your administrator.</value>
+        <value>Something went wrong. The details are in the Error Log; try again, or ask your BarnCRM admin.</value>
     </labels>
     <labels>
         <fullName>Core_SettingsSearch_ResultsHeading</fullName>

@@ -7,7 +7,7 @@
     Whether your logo is printed at the top of receipts and statements. A receipt with no logo is
     still a valid receipt.
   </inlineHelpText>
-  <label>Print Logo On Receipts</label>
+  <label>Print the Logo on Receipts</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>
 </CustomField>

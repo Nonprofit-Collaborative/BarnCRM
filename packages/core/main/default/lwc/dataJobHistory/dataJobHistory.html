@@ -115,7 +115,14 @@
                             <li key={row.key} class="slds-item" data-id="job-row" data-kind={row.kind}>
                                 <div class="slds-grid slds-grid_vertical-align-center">
                                     <div class="slds-col">
-                                        <p class="slds-text-title_bold">{row.title}</p>
+                                        <p class="slds-text-title_bold">
+                                            {row.title}
+                                            <lightning-badge
+                                                class={row.badgeClass}
+                                                data-id="status-badge"
+                                                label={row.status}
+                                            ></lightning-badge>
+                                        </p>
                                         <p class="slds-text-body_small">{row.summary}</p>
                                         <template lwc:if={row.startedAt}>
                                             <p class="slds-text-body_small">
@@ -145,12 +152,21 @@
                                         </template>
                                     </div>
                                     <template lwc:if={row.canUndo}>
-                                        <lightning-button
+                                        <lightning-button-menu
+                                            class="slds-no-flex"
                                             data-id={row.id}
-                                            label={labels.undo}
+                                            alternative-text={labels.rowActions}
+                                            title={labels.rowActions}
+                                            menu-alignment="auto"
+                                            icon-size="small"
                                             disabled={busy}
-                                            onclick={handleUndo}
-                                        ></lightning-button>
+                                            onselect={handleUndo}
+                                        >
+                                            <lightning-menu-item
+                                                value="undo"
+                                                label={labels.undo}
+                                            ></lightning-menu-item>
+                                        </lightning-button-menu>
                                     </template>
                                 </div>
                             </li>

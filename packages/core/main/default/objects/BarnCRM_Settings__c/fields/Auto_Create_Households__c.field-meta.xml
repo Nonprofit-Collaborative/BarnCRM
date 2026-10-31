@@ -4,6 +4,6 @@
   <defaultValue>true</defaultValue>
   <description>Whether saving a new person who belongs to no household creates one automatically, in both membership modes and whichever object stores the person.</description>
   <inlineHelpText>Create a household automatically for a new person.</inlineHelpText>
-  <label>Auto Create Households</label>
+  <label>Create Households Automatically</label>
   <type>Checkbox</type>
 </CustomField>

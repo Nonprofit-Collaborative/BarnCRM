@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that recalculates every rollup for one kind of record.</shortDescription>
-        <value>Recalculate all</value>
+        <value>Recalculate All</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_RecalculateStarted</fullName>
@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Message shown to a user without the settings permission.</shortDescription>
-        <value>You can see these totals but not change them. Ask an administrator for the Manage BarnCRM Settings permission.</value>
+        <value>You can see these totals but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ErrorNoPermission</fullName>
@@ -230,7 +230,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error Log: a value not in the target picklist. {0} is the value, {1} the field.</shortDescription>
-        <value>A rollup could not put "{0}" in {1}, because it is not a value of that picklist. The record keeps the value it had. Add the value to the picklist, or change the rollup.</value>
+        <value>A rollup could not put "{0}" in {1}, because it is not a value of that picklist. The record keeps its value. Add the value to the picklist, or change the rollup.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ErrorTargetType</fullName>
@@ -318,7 +318,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Restore the shipped rollups</shortDescription>
-        <value>Restore shipped rollups</value>
+        <value>Restore Shipped Rollups</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_EmptyList</fullName>
@@ -374,7 +374,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Rollup Queue: an entry held by the large record background job</shortDescription>
-        <value>These records have too many rows behind their totals for one background run, so a separate background job is recalculating them a few thousand rows at a time. If they are still waiting an hour after that job last made progress, it stopped before it finished, and BarnCRM tries again.</value>
+        <value>These records have too many rows behind their totals for one background run, so a separate job recalculates them a few thousand rows at a time. If they are still waiting an hour after that job last made progress, it stopped early, and BarnCRM tries again.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_QueueRunSummary</fullName>
@@ -430,7 +430,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error Log: full run incomplete; {0} records not saved, {1} batches stopped</shortDescription>
-        <value>The rollup recalculation finished, but {0} records' totals could not be saved and {1} batches of records stopped before they finished. The saves are tried again automatically; rollups whose records stopped are not marked calculated and are put right by the next run.</value>
+        <value>The rollup recalculation finished, but totals for {0} records could not be saved and {1} batches stopped early. Saves are retried automatically. Rollups whose records stopped are not marked calculated, and the next run puts them right.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_FullRunAlreadyRunning</fullName>

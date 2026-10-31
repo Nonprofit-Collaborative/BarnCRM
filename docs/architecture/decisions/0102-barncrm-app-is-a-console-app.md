@@ -29,7 +29,7 @@ page.
    a bright blue whose shade (only the shade) follows the Blue Bottle Coffee logo, per the
    owner (2026-10-13). The header color is `#007A9E`, the same hue darkened, which is also
    the roof color: Lightning puts white text on the header, and `#00A8D9` gives white text
-   only 2.76:1, while `#007A9E` gives 4.91:1 (WCAG AA needs 4.5:1). Giving's Fundraising app is unchanged (Core may not reference Giving objects,
+   only 2.76:1, while `#007A9E` gives 4.91:1 (WCAG AA needs 4.5:1). Giving's BarnCRM Fundraising app is unchanged (Core may not reference Giving objects,
    so Giving records keep their own app's behavior).
 
 ## Consequences

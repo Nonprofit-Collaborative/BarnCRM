@@ -94,7 +94,7 @@
   <formFactors>Large</formFactors>
   <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
   <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
-  <label>Fundraising</label>
+  <label>BarnCRM Fundraising</label>
   <navType>Standard</navType>
   <tabs>Quick_Gift_Entry</tabs>
   <tabs>standard-Contact</tabs>

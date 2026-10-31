@@ -88,7 +88,7 @@ Use this when the same family is in BarnCRM twice. You need edit access to both 
 You do not need permission to delete households.
 
 1. Open the household you want to keep and click **Merge or Split** in the action bar.
-2. Stay on the **Merge** tab. In **Find the other household**, type part of its name and pick
+2. Stay on the **Merge** tab. In **Find the Other Household**, type part of its name and pick
    it.
 3. Read the **Household comparison**. Where the two disagree, choose **Keep this one** or **Keep
    the other one**. Check **Members After the Merge**.
@@ -103,7 +103,7 @@ cannot be undone, so check both households first.
 1. On the household, click **Merge or Split**, then the **Split** tab.
 2. Under **Choose Who Moves Out**, tick each person who is moving.
 3. Choose **A new household**, or **An existing household** and search for it.
-4. Click **Split**, then confirm **Split** in "Split this household?".
+4. Click **Split**, then confirm **Split** in "Split This Household?".
 
 You should see: "Moved. Both household names and member counts are up to date."
 

@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: the chosen sheets point at different objects</shortDescription>
-        <value>The sheets you chose point at different objects, and one import loads one object. Clear the sheets for the other objects, or go back and choose the object they point at.</value>
+        <value>The sheets you chose point at different objects, and one import loads one object. Clear the sheets for other objects, or go back and choose the object they point at.</value>
     </labels>
     <labels>
         <fullName>Core_Import_SheetObject</fullName>

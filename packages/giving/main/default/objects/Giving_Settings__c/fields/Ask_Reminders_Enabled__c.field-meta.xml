@@ -6,7 +6,7 @@
   <inlineHelpText>
     Whether a donor's owner gets a task when the donor's Next Ask Date arrives. It does nothing until a Next Ask Date is entered.
   </inlineHelpText>
-  <label>Ask Reminders Enabled</label>
+  <label>Send Ask Reminders</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>
 </CustomField>

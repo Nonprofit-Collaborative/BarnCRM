@@ -61,7 +61,7 @@ offer it anywhere else.
 | Volunteer shift: name from job and start | None | It only names a shift saved without a name. Switch it off to leave unnamed shifts named by their record ID, or type the names yourself. |
 | Shift schedule: keep its shifts | None | It removes a schedule's future shifts that have no sign-ups or hours, even for a coordinator who may not delete shifts, and starts the run that creates shifts in your organization's time zone; a flow can do neither safely. Switch it off and a schedule's shifts appear only with the nightly run, and edits and endings leave existing shifts alone. |
 | Volunteer sign-up: bookings and hours | None | The hours it writes for an attended sign-up go through the same approval as hours typed by hand, which a flow cannot reach. Switch it off to type attendance hours yourself. |
-| Update rollups when hours change | None | Volunteer totals are worked out by the rollup engine, as every other total is. Switched off, they wait for the nightly run, or for **Recalculate all** on the Rollups page. |
+| Update rollups when hours change | None | Volunteer totals are worked out by the rollup engine, as every other total is. Switched off, they wait for the nightly run, or for **Recalculate All** on the Rollups page. |
 | Update rollups when a sign-up changes | None | The same, for Slots Filled on a shift. |
 | Enrollment: fill in the stage dates | None | It only fills an empty Start Date or End Date with today when an enrollment's stage moves, which a record-triggered flow with two assignments can copy if you want a different date. Switch it off while you load past enrollments whose dates you type yourself. |
 

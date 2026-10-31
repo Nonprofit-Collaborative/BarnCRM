@@ -2,7 +2,7 @@
 
 A gift batch is how you type a stack of checks in one sitting. You start with the total from the deposit slip (the control total), type one line per check, and post the batch when the lines add up. Posting turns every line into an ordinary gift in one go.
 
-Before you start: open the **Fundraising** app, **Gift Batches** tab. You need the **Fundraising Staff** role (the **Giving Staff** permission set). For a single gift, [Quick Gift Entry](gifts.md) is quicker.
+Before you start: open the **BarnCRM Fundraising** app, **Gift Batches** tab. You need the **Fundraising Staff** role (the **Giving Staff** permission set). For a single gift, [Quick Gift Entry](gifts.md) is quicker.
 
 ## To Start a Batch
 

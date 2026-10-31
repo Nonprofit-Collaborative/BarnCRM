@@ -59,7 +59,7 @@ Use **Previous** and **Next** to move between pages.
 
 1. On **Approve Hours**, with **Show** on **Submitted**, tick the entries.
 2. Click **Reject**.
-3. Type the **Reason for rejecting** (required) and click **Reject selected**.
+3. Type the **Reason for rejecting** (required) and click **Reject Selected**.
 
 You should see: "Entries rejected: 1." The person who entered the hours sees your reason in
 **Rejection Reason** on the entry.

@@ -52,10 +52,10 @@ time, failed rows and the top errors.
 | Run | How to start it | Pass when |
 | --- | --------------- | --------- |
 | Trigger path during load | The bulk loads above | No failed rows from limits (`Too many SOQL queries`, `CPU time`, `UNABLE_TO_LOCK_ROW`); lock errors under 0.1% and gone on retry |
-| Full rollup recalculation | Rollups page, **Recalculate all** (`RollupFullRecalcBatch`) | Completes with no failed batches; Error Log has no limit errors; spot check 20 households and 20 contacts against a SOQL aggregate |
+| Full rollup recalculation | Rollups page, **Recalculate All** (`RollupFullRecalcBatch`) | Completes with no failed batches; Error Log has no limit errors; spot check 20 households and 20 contacts against a SOQL aggregate |
 | Household naming | **Recompute all households** on the household naming settings (`HouseholdNamingBatch`) | Completes; names match the naming preview for a sample |
 | Duplicate scan | **Scan for duplicates** (`DuplicateScanBatch`) | Completes; no batch reported as not checked; no CPU limit errors on the largest match groups |
-| Donor levels | Turn the feature on and build a ladder first (see "Donor levels and acknowledgments" below), then **Recalculate now** on the Donor levels page (`DonorLevelController.recalculate()`, which starts `DonorLevelBatch`) | Completes with no failed batches; the rungs show donor counts that add up |
+| Donor levels | Turn the feature on and build a ladder first (see "Donor levels and acknowledgments" below), then **Recalculate Now** on the Donor levels page (`DonorLevelController.recalculate()`, which starts `DonorLevelBatch`) | Completes with no failed batches; the rungs show donor counts that add up |
 | Acknowledgments | `AcknowledgmentRunService.startEmailRun()` from anonymous Apex (starts `AcknowledgmentBatch`), after the acknowledgment setup below | Completes with no failed batches; processed items match the "To acknowledge" gifts |
 | Field utilization | Org Optimizer, Field utilization section, choose the gift object and Contact (`FieldUtilizationController`) | Each call returns in under 30 seconds; no limit errors; no Error Log rows |
 | Import | Import wizard with a 250k-row file on tier 2 (a 25k-row file on tier 1), contacts plus gifts | Completes; rows processed per minute recorded; undo of the whole batch (`ImportUndoBatch`) completes |
@@ -67,12 +67,12 @@ and a rule switched on earlier run in the gift triggers and change the load timi
 - **Donor levels.** The feature is off until the organization turns it on, and
   `DonorLevelController.recalculate()` refuses in two cases: the running user lacks the
   `Manage_BarnCRM_Settings` custom permission (in the BarnCRM Admin permission set; a plain
-  System Administrator does not have it), or **Donor levels** is off in the Giving settings
+  System Administrator does not have it), or **Turn On Donor Levels** is off in the Giving settings
   (`Donor_Levels_Enabled__c`). The 2026-10-17 run hit one of these and ran the batch directly,
   which skips the ladder. Supported start: as a user with BarnCRM Admin, open BarnCRM Settings,
   Giving, **Donor Levels**, create three rungs (for example Friend 100 to 1,000, Sustainer 1,000
   to 5,000, Leadership Circle 5,000 and up, as in the donor levels admin guide), turn **Donor
-  levels** on in Giving, then **Recalculate now**.
+  levels** on in Giving, then **Recalculate Now**.
 - **Acknowledgments.** The generator loads every 10th gift (3,000) as "To acknowledge"
   (`--acknowledge-every`, 0 turns it off); the rest are "Not required". Gifts are only queued by a
   rule (the trigger leaves a gift with no matching rule as loaded), so the loaded status is what

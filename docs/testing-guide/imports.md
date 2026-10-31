@@ -72,8 +72,8 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab (Data Manager, **Import a File**, **Open**). | **Recent Imports** lists the import first, with **Started** and **Can be undone until** (30 days after it ran, unless the setting was changed) and an **Undo** button. |
-| 2 | Select **Undo** beside it. | A box headed "Undo" plus the import's name shows counts: **People to remove** 4, **Households to remove** 4, **Organizations to remove** 0, **Changed values to put back** 0, with **Cancel** and **Undo This Import**. Nothing has changed yet. The counts are the records the import created from your file; undo also removes the households and gift allocations BarnCRM created automatically for those rows, so on a large import the total removed can be higher. |
+| 1 | Open the Import tab (Data Manager, **Import a File**, **Open**). | **Recent Imports** lists the import first, with **Started** and **Can be undone until** (30 days after it ran, unless the setting was changed) and a row menu holding **Undo**. |
+| 2 | Open the row menu beside it and select **Undo**. | A box headed "Undo" plus the import's name shows counts: **People to remove** 4, **Households to remove** 4, **Organizations to remove** 0, **Changed values to put back** 0, with **Cancel** and **Undo This Import**. Nothing has changed yet. The counts are the records the import created from your file; undo also removes the households and gift allocations BarnCRM created automatically for those rows, so on a large import the total removed can be higher. |
 | 3 | Select **Cancel**. | The box closes. The import is unchanged and **Undo** is still offered. |
 | 4 | Select **Undo** again, then **Undo This Import**. | "The undo has started. The import shows Undone when it has finished; refresh the page to check." |
 | 5 | Wait a minute and select **Refresh**. | The import row reads **Undone**. **Undo** is no longer offered. |
@@ -410,7 +410,7 @@ Dot,Zzshirt,dot.zzshirt@example.org,M,2026-10-04
 | 2 | Choose **Once Complete** and save. | Saved for the whole org. |
 | 3 | Import `import-test-1.csv` with **Generic contact list** as in T-IMP-01, steps 1 to 8. Open the import's **Data Job** record (from the **Data Jobs** list view). | **Created** 3, **Rejected** 1. Its **Import Rows** related list shows 4 rows. |
 | 4 | The next morning, open the same Data Job record. | **Import Rows** is empty; the counts and **Run Log** are unchanged. |
-| 5 | Open the Import tab and select **Undo** beside the import, then **Undo This Import**. Refresh until it reads **Undone**. | **Undone**. Testa Rivera, Ben Okoro and Cara Lind are gone: undo never needed the rows. |
+| 5 | Open the Import tab and open the row menu beside the import and select **Undo**, then **Undo This Import**. Refresh until it reads **Undone**. | **Undone**. Testa Rivera, Ben Okoro and Cara Lind are gone: undo never needed the rows. |
 | 6 | Set **Delete Import Rows** back to **After 30 Days** and save. | Saved. |
 
 **Cleanup:** none.

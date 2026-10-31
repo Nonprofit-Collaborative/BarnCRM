@@ -23,7 +23,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Stands in for the count at the cap. {0} the cap.</shortDescription>
-        <value>More than {0}</value>
+        <value>These gifts are locked because their date is on or before Books Closed Through, but none is marked posted to accounting. If they belong in an export you already sent, mark them posted on the Accounting Export page (Mirror). If not, move Books Closed Through back (needs the Override Posting Lock permission).</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_UnpostedClosedPeriodFirstListed</fullName>
@@ -47,7 +47,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: someone holds the Override Receipt Lock permission</shortDescription>
-        <value>Someone can override the receipt lock</value>
+        <value>Someone Can Override the Receipt Lock</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_OverrideLockDetail</fullName>
@@ -55,7 +55,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: who holds the Override Receipt Lock permission</shortDescription>
-        <value>The Override Receipt Lock permission lets a person change or delete a gift that already carries a receipt number. BarnCRM grants it to nobody: it is meant to be assigned in Setup for one correction and taken away again. It is held by {0}. If nobody is correcting a receipted gift right now, remove it in Setup, Custom Permissions. Every change made with it is in the Error Log.</value>
+        <value>The Override Receipt Lock permission lets a person change or delete a gift that has a receipt number. BarnCRM grants it to nobody: assign it in Setup for one correction, then remove it. It is held by {0}. If no one is correcting a receipted gift, remove it in Setup, Custom Permissions. Changes made with it are in the Error Log.</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_OverrideLockFix</fullName>
@@ -87,7 +87,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains the single reconciled receipt number, which is ordinary.</shortDescription>
-        <value>One receipt is recorded as Void with the reason Generation failed. That is the record of a number that was handed out to a document which never generated, and a single one is ordinary rather than a problem. The Error Log says what went wrong, and the receipt can be run again once it is fixed.</value>
+        <value>One receipt is Void with the reason Generation failed. That is a number handed to a document that never generated. A single one is ordinary, not a problem. The Error Log says what went wrong, and the receipt can be run again once it is fixed.</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_ReceiptFailedMoreThan</fullName>
@@ -111,7 +111,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains that receipt generation has failed repeatedly.</shortDescription>
-        <value>{0} receipts are recorded as Void with the reason Generation failed, which means receipt generation has failed that many times and those donors are still waiting for their documents. Read the receipt entries in the Error Log, fix what they name, and run the receipts again. Leave the void records alone: they are what accounts for the numbers that were used.</value>
+        <value>{0} receipts are Void with the reason Generation failed, so those donors are still waiting for their documents. Read the receipt entries in the Error Log, fix what they name, and run the receipts again. Leave the void records alone: they account for the numbers that were used.</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_ErrorLogFix</fullName>

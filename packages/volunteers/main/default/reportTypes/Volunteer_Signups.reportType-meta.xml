@@ -6,7 +6,7 @@
   <description>
     Volunteer sign-ups with the person, status and notes, and the shift they signed up for.
   </description>
-  <label>Volunteer Sign-ups</label>
+  <label>Volunteer Sign-Ups</label>
   <sections>
     <columns>
       <checkedByDefault>true</checkedByDefault>
@@ -43,6 +43,6 @@
       <field>CreatedDate</field>
       <table>Volunteer_Signup__c</table>
     </columns>
-    <masterLabel>Volunteer Sign-up</masterLabel>
+    <masterLabel>Volunteer Sign-Up</masterLabel>
   </sections>
 </ReportType>

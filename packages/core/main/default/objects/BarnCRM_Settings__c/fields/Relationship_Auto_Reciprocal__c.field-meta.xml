@@ -4,6 +4,6 @@
   <defaultValue>true</defaultValue>
   <description>Whether BarnCRM creates and maintains the other side of every relationship. On by default.</description>
   <inlineHelpText>Keep both sides of a relationship in step.</inlineHelpText>
-  <label>Relationship Auto Reciprocal</label>
+  <label>Keep Both Sides of Relationships in Step</label>
   <type>Checkbox</type>
 </CustomField>

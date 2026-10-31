@@ -41,7 +41,7 @@ is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**
 | BarnCRM Settings, Access, Module Manager, Features | **BarnCRM Settings** tab in **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Org Optimizer, Duplicate Matching, Error Log | **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Rollup Builder (Rollup Builder module) | **BarnCRM Admin** or **BarnCRM Admin Console** |
-| Gifts and everything around them (Giving module) | The **Fundraising** app, and the BarnCRM apps once added (below) |
+| Gifts and everything around them (Giving module) | The **BarnCRM Fundraising** app, and the BarnCRM apps once added (below) |
 | Volunteer shifts and hours (Volunteers module) | The **BarnCRM Volunteers** app, and the BarnCRM apps once added (below) |
 
 The home page's **Modules** list names each installed module, with an **Open the App** link
@@ -127,7 +127,7 @@ administrator tile to staff, it shows nothing to count.
 
 Every BarnCRM app shows a blue barn logo in the app launcher. The admin apps add a navy gear
 badge to it and have a navy header, so you can tell at a glance which app you are in; a module's
-app adds its own badge (a red heart for **Fundraising**, a green person for **BarnCRM
+app adds its own badge (a red heart for **BarnCRM Fundraising**, a green person for **BarnCRM
 Volunteers**).
 **BarnCRM Console** and
 **BarnCRM Admin Console** are console apps: instead of replacing the page each time you click,

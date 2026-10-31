@@ -6,7 +6,7 @@
   <inlineHelpText>
     Whether volunteer hours wait for a coordinator to approve them. Off means an entry counts as soon as it is saved.
   </inlineHelpText>
-  <label>Hours Require Approval</label>
+  <label>Require Hours Approval</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>
 </CustomField>

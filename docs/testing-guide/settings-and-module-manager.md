@@ -88,7 +88,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 4 | Confirm with **Give Permission**. | "Staff Tester now has the BarnCRM Bulk Delete permission." The name appears on the **BarnCRM Bulk Delete** card. |
 | 5 | Click **Remove** beside the name on that card and confirm. | "Staff Tester no longer has the BarnCRM Bulk Delete permission." The card reads "No one has been given this permission here." Staff Tester's role is unchanged. |
 | 6 | On the **BarnCRM Admin Group** card, click **Remove** beside your own name. | The dialog adds "You are about to remove your own BarnCRM Admin role. You will lose access to BarnCRM Settings." |
-| 7 | Click **Remove**. | A **That did not work** toast: "You cannot remove the last person from the BarnCRM Admin role. Give the role to someone else first." Your name stays on the card. |
+| 7 | Click **Remove**. | A **That Did Not Work** toast: "You cannot remove the last person from the BarnCRM Admin role. Give the role to someone else first." Your name stays on the card. |
 
 **Cleanup:** None.
 
@@ -127,7 +127,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 3 | Choose **1 hour** and click **Pause All Automation**. | A yellow box: "Automation is paused until" a date and time one hour from now, then "Paused by" your name and "It turns itself back on then." Every switch stays where it was. |
 | 4 | Open the **Home** tab. | Under **Welcome to BarnCRM**: "BarnCRM automation is paused. Households and greetings are not being updated until it resumes." in a yellow warning box with a **Resume Automation** link. Click the link: **BarnCRM Settings** opens on **Automation**. |
 | 5 | Back in **Automation**, click **Resume Automation**. | The yellow box disappears. On **Home** the banner is gone after a reload. |
-| 6 | Switch off **Keep both sides of relationships in step**. Reload the page. | The switch is still off. |
+| 6 | Switch off **Keep Both Sides of Relationships in Step**. Reload the page. | The switch is still off. |
 | 7 | Switch it back on, open **General** and scroll to **Recent Changes**. | Rows for **Automation Paused Until** record the pause and the resume, and rows record both switch changes, each with your name. |
 
 **Cleanup:** leave every switch on and automation not paused.
@@ -220,10 +220,10 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As read-only, open **BarnCRM Settings**, **General**. | A notice: "You can read these settings but not change them. Ask your administrator for the Manage BarnCRM Settings permission." Every control is greyed out and no save bar appears. **Edition** shows with no **Change Edition** link. **Features** shows **On** and no **Turn On** buttons. |
+| 1 | As read-only, open **BarnCRM Settings**, **General**. | A notice: "You can read these settings but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." Every control is greyed out and no save bar appears. **Edition** shows with no **Change Edition** link. **Features** shows **On** and no **Turn On** buttons. |
 | 2 | Open **Access**. | "You can see this page but you cannot change roles. Ask someone with the BarnCRM Admin role to make the change, or to give you that role." No **Find a person**, **Role**, **Give Access** or **Remove**. Role cards list holders, or say "You can see this page but you cannot see who holds each role." |
-| 3 | Open **Modules**. | "You can see the modules but not change them. Ask an administrator for the Manage BarnCRM Settings permission." No **Turn Off**, **Turn On** or **What an Uninstall Deletes**. **Show Nonprofit Modules** is greyed out. |
-| 4 | Open **Automation**. | "You can read this page but not change it. Ask your administrator for the Manage BarnCRM Settings permission." **Pause All Automation**, **Resume Automation**, **How long** and every switch are disabled. |
+| 3 | Open **Modules**. | "You can see the modules but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." No **Turn Off**, **Turn On** or **What an Uninstall Deletes**. **Show Nonprofit Modules** is greyed out. |
+| 4 | Open **Automation**. | "You can read this page but not change it. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." **Pause All Automation**, **Resume Automation**, **How long** and every switch are disabled. |
 | 5 | Open **General** and look for **Custom Metadata**. | It is not shown (it needs BarnCRM Metadata Admin). |
 | 6 | Repeat step 1 as staff. | The same read-only notice and greyed-out controls. |
 
@@ -289,20 +289,20 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-17: People and Households, and Boxes on Every Page
 
 **Purpose:** confirm Households and Relationships are one **People and Households** section, every section groups its settings into headed boxes, and links to the old sections land in the right box.
-**Prerequisites:** admin user. The **Household Upkeep** and **Relationships** features on, and **Tell people when their long jobs finish** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update All Household Names** in step 4.
+**Prerequisites:** admin user. The **Household Upkeep** and **Relationships** features on, and **Send Long Job Notifications** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update All Household Names** in step 4.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings** and read the **Sections** list. | **People and Households** is the first item under **People**, right after **Organization**, then **Addresses**. There is no **Households** and no **Relationships** section. |
-| 2 | Click **People and Households**. | Four bordered boxes, in order, each with a Title Case heading: **People** (**How people belong to a household**, **Create a household automatically**), **Households** (**Delete a household once it is empty**, **Keep the households of deleted people**), **Household Names and Greetings** (the **Preview and Recompute** panel, **Include people who have died in names**) and **Relationships** (**Keep both sides of relationships in step**). Every setting shows its value; none is blank. There is no duplicates row and no note about duplicate rules: those are on **Duplicate Matching**. |
-| 3 | Tick **Keep the households of deleted people**, click **Save**, then untick it and save again. | Both saves say the settings were saved. **General**, **Recent Changes** lists both changes. |
+| 2 | Click **People and Households**. | Four bordered boxes, in order, each with a Title Case heading: **People** (**How people belong to a household**, **Create Households Automatically**), **Households** (**Delete Empty Households**, **Keep Households of Deleted People**), **Household Names and Greetings** (the **Preview and Recompute** panel, **Include People Who Have Died in Names**) and **Relationships** (**Keep Both Sides of Relationships in Step**). Every setting shows its value; none is blank. There is no duplicates row and no note about duplicate rules: those are on **Duplicate Matching**. |
+| 3 | Tick **Keep Households of Deleted People**, click **Save**, then untick it and save again. | Both saves say the settings were saved. **General**, **Recent Changes** lists both changes. |
 | 4 | Back on **People and Households**, click **Update All Household Names** and confirm. Wait for the bell, then open its **Household name recompute finished** notification. | The console opens on **People and Households**, scrolled to the **Household Names and Greetings** box, with focus on its heading. |
 | 5 | Open each other section in turn: **General**, **Organization**, **Duplicate Matching**, **Addresses**, **Giving**, **Receipts**, **Rollups**, **Volunteers**, **Error Log**, **Import**, **Modules**, **Automation**, **Access**, **Org Optimizer**, **Integrations**, **Health**. | Every setting is inside a bordered box with a Title Case heading, as listed in the admin guide's "Sections and their boxes". A section with no list, such as **Access**, shows one box headed with its own name. No setting that showed before is missing. |
 | 6 | In the browser address bar, change the end of the console's address to `?c__section=Relationships` and press Enter. | **People and Households** opens, scrolled to the **Relationships** box. |
 | 7 | Do the same with `?c__section=Households`. | **People and Households** opens, scrolled to the **Households** box. |
 | 8 | Open **Setup Assistant** on the Home page, go to **Confirm how households are named** and click **Where This Lives in Settings**. | **People and Households** opens at the **Household Names and Greetings** box. |
 
-**Cleanup:** leave **Keep the households of deleted people** unticked (the default).
+**Cleanup:** leave **Keep Households of Deleted People** unticked (the default).
 
 ## T-SET-18: Keep a Shown Default as a Saved Choice
 

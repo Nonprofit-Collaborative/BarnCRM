@@ -4,7 +4,7 @@
   <defaultValue>1</defaultValue>
   <externalId>false</externalId>
   <inlineHelpText>
-    How many days before a shift its reminder goes out, from 1 to 14. Blank means 1.
+    How many days before a shift its reminder goes out, from 1 to 14. Default: 1.
   </inlineHelpText>
   <label>Days Before a Shift to Remind</label>
   <precision>2</precision>

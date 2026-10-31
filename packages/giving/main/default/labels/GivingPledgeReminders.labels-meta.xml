@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Pledge reminders: the permission a send needs</shortDescription>
-    <value>Sending pledge reminders needs the Send Acknowledgments permission. Ask your administrator for the Fundraising Staff role.</value>
+    <value>Sending pledge reminders needs the Send Acknowledgments permission. Ask your BarnCRM admin for the Fundraising Staff role.</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_UnexpectedError</fullName>
@@ -22,7 +22,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Pledge reminders: an unexpected failure</shortDescription>
-    <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your administrator to check it.</value>
+    <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your BarnCRM admin to check it.</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_NoRecipient</fullName>
@@ -30,7 +30,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Pledge reminders: pledges with nobody to email {0}</shortDescription>
-    <value>{0} pledge installments are due a reminder by email but the pledge has no donor contact with an email address to send it to. Add a donor contact or a primary contact.</value>
+    <value>{0} pledge installments are due an email reminder, but the pledge has no donor contact with an email address. Add a donor contact or a primary contact.</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_TemplateNotFound</fullName>
@@ -94,7 +94,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Pledge reminders page: introduction</shortDescription>
-    <value>Reminders for pledge installments that are coming due or overdue. Each step fires a set number of days before or after an installment's due date, by email or by letter. Only the latest step due for an installment is sent, and every reminder is logged below.</value>
+    <value>Reminders for pledge installments that are coming due or overdue. Each step fires a set number of days before or after an installment's due date, by email or letter. Only the latest step due for an installment is sent, and every reminder is logged below.</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_Off</fullName>
@@ -102,7 +102,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Pledge reminders page: notice that reminders are off</shortDescription>
-    <value>Pledge reminders are off, so nothing will be sent, by hand or by the nightly run. Turn them on in BarnCRM Settings, under Giving, when your steps and templates are ready.</value>
+    <value>Pledge reminders are off, so nothing is sent, by hand or by the nightly run. Turn them on in BarnCRM Settings, under Giving, when your steps and templates are ready.</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_NoSteps</fullName>
@@ -390,7 +390,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Pledge reminders page: fallback error</shortDescription>
-    <value>That did not work. Try again, and if it keeps happening, ask your administrator.</value>
+    <value>The pledge reminders change could not be saved. The details are in the Error Log.</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_ColumnStep</fullName>

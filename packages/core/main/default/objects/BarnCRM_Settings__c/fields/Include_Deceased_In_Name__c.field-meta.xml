@@ -4,6 +4,6 @@
   <defaultValue>false</defaultValue>
   <description>Whether a deceased member remains in the computed household name.</description>
   <inlineHelpText>Keep someone who has died in the household name.</inlineHelpText>
-  <label>Include Deceased In Name</label>
+  <label>Include People Who Have Died in Names</label>
   <type>Checkbox</type>
 </CustomField>

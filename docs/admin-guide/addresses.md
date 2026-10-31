@@ -58,7 +58,7 @@ install and no Setup step. Once it is on, two things are worth setting once.
 
 Then turn on the seasonal address swap, which is off until you turn it on.
 
-5. Stay on the **Addresses** page and tick **Seasonal Addresses**, then choose **Save**.
+5. Stay on the **Addresses** page and tick **Turn On Seasonal Addresses**, then choose **Save**.
    BarnCRM schedules the nightly job for you: there is no separate button to press.
 6. Under **Seasonal Address Swap** the message now reads "The swap runs every night at
    12:30 AM, in your organization's time zone" and the date of the next run appears under it.
@@ -68,7 +68,7 @@ Then turn on the seasonal address swap, which is off until you turn it on.
    works. Refresh the page after a minute: **Seasonal Addresses Last Swapped** shows the time
    it finished and a sentence saying how many addresses moved.
 
-Saving **Seasonal Addresses** on again when the job is already scheduled changes nothing, so
+Saving the **Turn On Seasonal Addresses** box again when the job is already scheduled changes nothing, so
 the job is never scheduled twice. Untick it and choose **Save** to stop the job. **Run the
 swap now** works whether the switch is on or off.
 
@@ -77,7 +77,7 @@ gives you, to save the switch or to use **Run the Swap Now**. Everyone else sees
 last run and cannot change either.
 
 There is nothing to do in Setup. Scheduling Apex is normally a Setup task, and BarnCRM
-does not ask you to do that: the **Seasonal Addresses** switch is the supported way to
+does not ask you to do that: the **Turn On Seasonal Addresses** switch is the supported way to
 schedule the swap. The Module Manager switches whole modules on and off; the seasonal swap
 belongs to Core, which is always on, so it is scheduled here. If your organization already
 ran the nightly swap before this switch existed, the upgrade turns the switch on for you and
@@ -252,7 +252,7 @@ phone. A record with no address yet shows **No Addresses Yet** with an **Add Add
 Still the Garcia household, and still five minutes. This time you are proving to yourself
 that the nightly job really works, before the winter mailing goes out.
 
-1. Open **BarnCRM Settings** and choose **Addresses**. If **Seasonal Addresses** is not
+1. Open **BarnCRM Settings** and choose **Addresses**. If **Turn On Seasonal Addresses** is not
    ticked, tick it and choose **Save**.
 2. Open **The Garcia Family** and look at the **Addresses** card. The Arizona address you
    added is of type **Seasonal** and reads "Used from January 1 to March 31". The **Primary**
@@ -368,7 +368,7 @@ address and marking it primary over deleting the old one: the old address is the
 where a mailing actually went.
 
 **Expecting the swap to happen without turning it on.** Entering seasonal dates is not enough:
-**Seasonal Addresses** has to be ticked and saved once, on the Addresses page of BarnCRM
+**Turn On Seasonal Addresses** has to be ticked and saved once, on the Addresses page of BarnCRM
 Settings, which schedules the nightly job. Until you do that, the page says so in as many
 words and the home page tile says the swap has not run. If
 the tile ever says the swap is scheduled but has not run in more than 36 hours, choose

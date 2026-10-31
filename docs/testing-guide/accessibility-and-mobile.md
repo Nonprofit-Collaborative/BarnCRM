@@ -16,7 +16,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Type `greeting`. | A **Search Results** list appears under the box as you type. |
 | 3 | Press Tab until focus is on the result **Formal greeting pattern**, then press Enter. | The **People and Households** section opens on the right, the page scrolls to the **Preview and Recompute** panel and focus is on its heading. |
 | 4 | Press Shift+Tab until focus is in the **Sections** list, then press Tab or Shift+Tab to reach **General** and press Enter. | The General section shows. Every section in the list can be reached with Tab and opened with Enter. |
-| 5 | Open **Households** again with the keyboard. Tab to the checkbox **Create a household automatically** and press Space. | The checkbox changes state. A screen reader announces "1 unsaved change", and a save bar with **Discard** and **Save** docks to the bottom. |
+| 5 | Open **Households** again with the keyboard. Tab to the checkbox **Create Households Automatically** and press Space. | The checkbox changes state. A screen reader announces "1 unsaved change", and a save bar with **Discard** and **Save** docks to the bottom. |
 | 6 | Tab to **Discard** in the save bar and press Enter. | The checkbox returns to its original state, the bar goes away and nothing is saved. On **General**, **Recent Changes** has no new row. |
 | 7 | Tab to the info icon under the same setting and press Enter, then Tab to **Learn More** beside it and press Enter. | The description opens in a popover. The help page opens in a new browser tab. | The help page opens in a new browser tab. Close it; focus is back on the Settings page. |
 | 8 | Press Tab through the rest of the section. | Focus never lands on something invisible, and the order follows the page from top to bottom. |
@@ -47,7 +47,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In Find, with **A11y check** open, Tab to **Delete** and press Enter. | A dialog opens with the heading **Delete this saved query?**, the text **A11y check will be deleted. This cannot be undone.** and two buttons, **Keep It** and **Delete**. Focus is inside the dialog. |
+| 1 | In Find, with **A11y check** open, Tab to **Delete** and press Enter. | A dialog opens with the heading **Delete This Saved Query?**, the text **A11y check will be deleted. This cannot be undone.** and two buttons, **Keep It** and **Delete**. Focus is inside the dialog. |
 | 2 | Press Tab repeatedly (at least six times). | Focus cycles only through the dialog's close button, **Keep It** and **Delete**. It never reaches the Find page behind the dialog. |
 | 3 | Press Shift+Tab repeatedly. | Focus cycles backwards through the same three controls. |
 | 4 | Press Escape. | The dialog closes. The query is not deleted. Focus is back on the **Delete** button. |
@@ -81,7 +81,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Fundraising** app and the **Quick Gift Entry** tab. Tab into the form. | Card **Quick Gift Entry**. **Who gave this gift** shows **Person** selected; **Gift Date** holds today's date. |
+| 1 | Open the **BarnCRM Fundraising** app and the **Quick Gift Entry** tab. Tab into the form. | Card **Quick Gift Entry**. **Who gave this gift** shows **Person** selected; **Gift Date** holds today's date. |
 | 2 | Leave **Donor** empty. Tab to **Amount**, type `50`. Tab to **Payment Method**, press Enter, choose **Check**, press Enter. | The values show in the fields. |
 | 3 | Tab to **Save** and press Enter. | Nothing is saved. Under **Donor** the message **Choose the person or organization who gave this gift.** shows, and focus is in the **Donor** box. |
 | 4 | Type `Garc`, press Down Arrow to **Harper Garcia**, press Enter. | Harper Garcia stays in the box and the error under **Donor** is cleared on the next save. |
@@ -97,7 +97,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Settings** tab. | A notice at the top reads **You can read these settings but not change them. Ask your administrator for the Manage BarnCRM Settings permission.** A screen reader announces it as a status message. |
+| 1 | Open the **BarnCRM Settings** tab. | A notice at the top reads **You can read these settings but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.** A screen reader announces it as a status message. |
 | 2 | Press Tab through the **People and Households** section. | Every control is greyed out. No save bar appears. Each info icon and **Learn More** link is still reachable. |
 | 3 | Open the **Import** tab from the app launcher. | The warning **You need the Manage BarnCRM Settings permission to import. Ask whoever set up your org for the BarnCRM Admin role.** shows. No wizard controls can be reached with Tab. |
 
@@ -110,8 +110,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **People and Households**, Tab to the info icon under **Create a household automatically**. | Announced as **About Create a household automatically**, a button. Press Enter: the description is read. |
-| 2 | Tab to **Learn More** beside it. | Announced as **Learn More (opens in a new tab)**, inside the group **Create a household automatically**. |
+| 1 | In **BarnCRM Settings**, **People and Households**, Tab to the info icon under **Create Households Automatically**. | Announced as **About Create a household automatically**, a button. Press Enter: the description is read. |
+| 2 | Tab to **Learn More** beside it. | Announced as **Learn More (opens in a new tab)**, inside the group **Create Households Automatically**. |
 | 3 | Open a Garcia household from the **Households** tab (for example **The Garcia Family**). In the **Members** panel, Tab to the first member's actions menu. | Announced as **Actions for** plus the member's own name (for example **Actions for Harper Garcia**), not just "Actions". |
 | 4 | Press Enter on the menu, then the arrow keys. | The menu opens and reads **Make Primary** and **Move to Another Household** where you may use them; Escape closes it and returns focus to the menu button. |
 | 5 | In Find, run any Households query. | The screen reader announces the **N rows found.** line without you moving focus to it. |

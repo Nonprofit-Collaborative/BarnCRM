@@ -16,7 +16,7 @@ calculated.
 
 Nothing to install and no Setup step. Quick Gift Entry arrives with the Giving package.
 
-1. Open the **Fundraising** app from the app launcher (the grid of dots in the top left
+1. Open the **BarnCRM Fundraising** app from the app launcher (the grid of dots in the top left
    corner). The Giving package ships this app, and Quick Gift Entry is its first tab. On a
    computer it is also in the app's utility bar at the bottom of the screen, so the form
    opens over whatever page you are on.
@@ -40,7 +40,7 @@ of gifts from one donor goes in without picking the donor each time.
 
 Do this as David, on a phone, starting from the sample data.
 
-1. Open the app launcher and tap **Fundraising**. Tap **Quick Gift Entry**.
+1. Open the app launcher and tap **BarnCRM Fundraising**. Tap **Quick Gift Entry**.
 2. The form opens with today's date already filled in, and with your default appeal and
    default fund already chosen. Leave the donor toggle on **Person**.
 3. Tap the donor box and type the first few letters of a donor's last name, for example

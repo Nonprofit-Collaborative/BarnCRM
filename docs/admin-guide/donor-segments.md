@@ -51,7 +51,7 @@ templates read the rollup fields **Giving This Year** and **Giving Last Year**.
 
 ## A Five-Minute Walkthrough
 
-1. Open the **Fundraising** app and the **Donor Segments** tab.
+1. Open the **BarnCRM Fundraising** app and the **Donor Segments** tab.
 2. Under **Start From a Template**, choose **Lapsed Donors**, choose **People**, keep or
    change the name, and choose **Save as Segment**.
 3. The segment opens with its count. Choose **Show List** to see who is in it.
