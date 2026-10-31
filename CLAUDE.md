@@ -18,6 +18,7 @@ Read the product plan before any work. Its canonical copy is the BMemory documen
 - Admin-guide page (`docs/admin-guide/`) is written before the LWC.
 - Overview (`docs/overview.md`), Admin Guide (`docs/admin-guide/`), User Guide (`docs/user-guide/`) and Testing Guide (`docs/testing-guide/`) are updated in the same PR as any feature added, changed, or removed; each index carries an "Applies to" line naming the main commit it was checked against.
 - Feature catalog (`docs/barncrm-features.md`) is updated in the same PR as any feature added, changed, or removed.
+- Release plan (plan 6.0a, 9.7, D-155) is kept up to date automatically: every newly approved item goes into a release (about 3 major, 3 to 6 minor enhancements); a move up or back that Brandon asks for is re-slotted and the affected releases rebalanced; statuses update as batches land; each landing batch covers 2 or 3 releases, and the release gate, `barn-npc` and `mwdbdevsb` (approval each time) deploys and QA and UX run once per batch.
 - Definition of done: plan Section 7.4. Review checklist: Section 9.4.
 
 ## Project docs
