@@ -246,6 +246,39 @@ public with sharing class ImportJournalService {
     }
 
     /**
+     * How many entries of one phase each object has, by the object's name as journaled, read
+     * from the pages (at most MAX_PAGES_READ of them, a few at a time).
+     */
+    @NamespaceAccessible
+    public static Map<String, Integer> countsByObject(Id batchId, String phase) {
+        Map<String, Integer> counts = new Map<String, Integer>();
+        if (batchId == null) {
+            return counts;
+        }
+        Import_Journal__c after;
+        Integer read = 0;
+        while (read < MAX_PAGES_READ) {
+            Integer asked = Math.min(pagesPerRead, MAX_PAGES_READ - read);
+            List<Import_Journal__c> window = pagesAfter(batchId, phase, asked, after);
+            for (Import_Journal__c page : window) {
+                after = page;
+                for (Map<String, Object> entry : entries(page)) {
+                    String objectName = (String) entry.get('object');
+                    counts.put(
+                        objectName,
+                        (counts.containsKey(objectName) ? counts.get(objectName) : 0) + 1
+                    );
+                }
+            }
+            read += window.size();
+            if (window.size() < asked) {
+                break;
+            }
+        }
+        return counts;
+    }
+
+    /**
      * How many entries of one action one phase of a batch holds, read from the pages (at most
      * 200 of them): what a job whose finish never counted its rows did, for example the records
      * an aborted bulk update saved, leaving out the ones it journaled as Failed.

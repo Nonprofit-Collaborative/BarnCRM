@@ -977,6 +977,33 @@ private class ImportUndoTest {
     }
 
     @IsTest
+    static void createdRecordsAreCountedPerObject() {
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c batch = committedBatch();
+            Contact ana = importedPerson(batch, 'Ramirez');
+            Account home = new Account(Name = 'Ramirez Home');
+            insert home;
+            ImportJournalService.write(
+                batch.Id,
+                ImportJournalService.PHASE_CREATED,
+                new List<Map<String, Object>>{
+                    ImportJournalService.created('Contact', ana.Id, 1),
+                    ImportJournalService.created('Account', home.Id, 1),
+                    ImportJournalService.created('Account', home.Id, 2)
+                }
+            );
+
+            Map<String, Integer> counts = new Map<String, Integer>();
+            for (ImportUndoService.TaggedCount each : ImportUndoService.preview(batch.Id).others) {
+                counts.put(each.objectName, each.count);
+            }
+
+            Assert.areEqual(1, counts.get('Contact'), 'Each object has its own count.');
+            Assert.areEqual(2, counts.get('Account'), 'Not the first entry\'s object for all.');
+        }
+    }
+
+    @IsTest
     static void aModuleObjectWithoutTheTagIsNeverQueried() {
         System.runAs(TestUsers.admin()) {
             Import_Batch__c batch = committedBatch();

@@ -847,8 +847,17 @@ public with sharing class ImportObjectSchema {
         for (Integer i = 0; i < headers.size(); i++) {
             String field = null;
             if (!named[i] && type != null) {
-                field = ImportHeaderParser.guess(headers[i], guessable);
-                if (field == null && !thisObject.isEmpty()) {
+                // A heading naming this object reads as object plus field, so it never takes
+                // a whole-heading guess; one naming another object is not guessed onto this
+                // one at all (D-150).
+                Boolean namesThis =
+                    !thisObject.isEmpty() && ImportHeaderParser.namesObject(headers[i], thisObject);
+                Boolean namesOther =
+                    !namesThis && ImportHeaderParser.namesObject(headers[i], allObjectKeys());
+                if (!namesThis && !namesOther) {
+                    field = ImportHeaderParser.guess(headers[i], guessable);
+                }
+                if (field == null && !namesOther && !thisObject.isEmpty()) {
                     ImportHeaderParser.Resolved reading = ImportHeaderParser.resolveOrGuess(
                         headers[i],
                         thisObject,
@@ -868,6 +877,20 @@ public with sharing class ImportObjectSchema {
             );
         }
         return mapping;
+    }
+
+    private static Map<String, String> allObjectKeysCache;
+
+    /** Every object's API name by its normalized spelling, to tell a heading that names one. */
+    private static Map<String, String> allObjectKeys() {
+        if (allObjectKeysCache == null) {
+            allObjectKeysCache = new Map<String, String>();
+            for (String name : Schema.getGlobalDescribe().keySet()) {
+                allObjectKeysCache.put(normalized(localName(name).removeEnd('__c')), name);
+                allObjectKeysCache.put(normalized(name), name);
+            }
+        }
+        return allObjectKeysCache;
     }
 
     /**

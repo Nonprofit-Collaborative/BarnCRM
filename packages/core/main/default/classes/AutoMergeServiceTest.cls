@@ -211,6 +211,34 @@ private class AutoMergeServiceTest {
     }
 
     @IsTest
+    static void duplicateRecordItemsAreNotJournaledAsMovedRecords() {
+        System.runAs(TestUsers.admin()) {
+            Id ruleId = DuplicateSelector.activeRuleIdByObject(new Set<String>{ 'Contact' })
+                .get('Contact');
+            if (ruleId == null) {
+                return;
+            }
+            Contact kept = insertPerson(person('Mia', 'mia@example.org'));
+            Contact other = insertPerson(person('Mia', 'MIA@example.org'));
+            DuplicateRecordSet suggestion = new DuplicateRecordSet(DuplicateRuleId = ruleId);
+            insert suggestion;
+            insert new DuplicateRecordItem(
+                DuplicateRecordSetId = suggestion.Id,
+                RecordId = other.Id
+            );
+            AutoMergeService.pairsForTest = new List<List<Id>>{ new List<Id>{ kept.Id, other.Id } };
+
+            AutoMergeService.mergeAll(AutoMergeService.candidates(), 'run-dri');
+
+            Merge_Journal__c journal = journalFor(other.Id);
+            Assert.isFalse(
+                String.valueOf(journal.Moved_Records__c).contains('DuplicateRecordItem'),
+                journal.Moved_Records__c
+            );
+        }
+    }
+
+    @IsTest
     static void undoSaysWhatItCouldNotRestore() {
         System.runAs(TestUsers.admin()) {
             Contact kept = insertPerson(person('Max', 'max@example.org'));

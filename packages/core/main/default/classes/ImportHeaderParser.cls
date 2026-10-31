@@ -319,6 +319,21 @@ public with sharing class ImportHeaderParser {
     // Splits, each an [object part, field part] pair
     // -------------------------------------------------------------------------------------
 
+    /**
+     * Whether the heading, split at a separator or in parentheses ("Contact.Shoe Size",
+     * "Phone (Contact)"), has a part that spells one of the objects exactly. Such a heading
+     * names an object, so it is read as object plus field, never fuzzy-matched whole (D-150).
+     */
+    @NamespaceAccessible
+    public static Boolean namesObject(String header, Map<String, String> objectKeys) {
+        for (List<String> split : explicitSplits(clean(header))) {
+            if (match(split[0], objectKeys) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** "Phone (Contact)", then each separator, either part first. */
     @TestVisible
     private static List<List<String>> explicitSplits(String text) {
