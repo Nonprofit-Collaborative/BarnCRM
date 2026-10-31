@@ -328,7 +328,7 @@ private class HealthCheckFixesTest {
             clearOrgBarnCrmJobs();
             ErrorDigestScheduler.start();
             ScheduledJobSelector.schedule(otherJob, '0 0 3 * * ?', new ErrorDigestScheduler());
-            NightlyJobs.jobsOverride = new List<NightlyJob>{ new NightlyJobs.ErrorDigestJob() };
+            NightlyJobs.jobsOverride = new List<NightlyJob>{ ErrorDigestScheduler.nightlyJob() };
             ScheduledJobSelector.ownerOverride = gone;
             ScheduledJobSelector.forget();
             String fixKey = HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS;
@@ -392,7 +392,7 @@ private class HealthCheckFixesTest {
             // What an install leaves behind: the tab access check, owned by an active user.
             TabAccessScheduler.start();
             ScheduledJobSelector.schedule(otherJob, '0 0 3 * * ?', new ErrorDigestScheduler());
-            NightlyJobs.jobsOverride = new List<NightlyJob>{ new NightlyJobs.TabAccessJob() };
+            NightlyJobs.jobsOverride = new List<NightlyJob>{ TabAccessScheduler.nightlyJob() };
             String fixKey = HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS;
 
             System.runAs(maria) {

@@ -229,7 +229,7 @@ private class SetupChangeCopyJobTest {
 
             Assert.areEqual(first, again, 'Never two jobs under the one name.');
             Assert.isTrue(SetupChangeCopyJob.isScheduled(), 'It is scheduled.');
-            NightlyJobs.SetupChangesJob listed = new NightlyJobs.SetupChangesJob();
+            NightlyJob listed = SetupChangeCopyJob.nightlyJob();
             Assert.isTrue(listed.isScheduled(), 'Health Check sees it as scheduled.');
             Assert.areEqual(
                 Label.Core_HealthCheck_JobSetupChanges,
@@ -260,7 +260,7 @@ private class SetupChangeCopyJobTest {
                 ],
                 'A second scheduled start while one is waiting starts nothing.'
             );
-            new NightlyJobs.SetupChangesJob().schedule();
+            SetupChangeCopyJob.nightlyJob().schedule();
             Test.stopTest();
         }
         Assert.isTrue(SetupChangeCopyJob.isScheduled(), 'Health Check schedules it.');

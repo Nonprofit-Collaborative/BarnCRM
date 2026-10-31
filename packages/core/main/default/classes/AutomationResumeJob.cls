@@ -73,10 +73,7 @@ public with sharing class AutomationResumeJob implements Schedulable {
 
     /** Cancels the scheduled resume, if there is one. */
     public static void cancel() {
-        Id existing = ScheduledJobSelector.triggerIdByName(JOB_NAME);
-        if (existing != null) {
-            ScheduledJobSelector.abort(existing);
-        }
+        ScheduledJobSelector.stopNamed(JOB_NAME);
     }
 
     /** When the resume is scheduled to run, or null when nothing is going to end the pause. */

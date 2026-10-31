@@ -176,7 +176,7 @@ private class GivingSampleDataTest {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             insertSamplePeople();
             GivingSampleData.jsonOverride = buildJson();
-            GivingSampleDataStages stages = new GivingSampleDataStages();
+            GivingSampleData.LoadStages stages = new GivingSampleData.LoadStages();
 
             Test.startTest();
             Integer stageCount = stages.stageCount();
@@ -419,7 +419,7 @@ private class GivingSampleDataTest {
             loadEverything();
 
             Test.startTest();
-            GivingSampleDataRemoveStages stages = new GivingSampleDataRemoveStages();
+            GivingSampleData.RemoveStages stages = new GivingSampleData.RemoveStages();
             Integer stageCount = stages.stageCount();
             for (Integer stage = 0; stage < stageCount; stage++) {
                 stages.runStage(stage);
@@ -625,7 +625,7 @@ private class GivingSampleDataTest {
             );
 
             // Counted once, as SampleDataStageBatch counts it: each stage deletes what it counted.
-            GivingSampleDataRemoveStages stages = new GivingSampleDataRemoveStages();
+            GivingSampleData.RemoveStages stages = new GivingSampleData.RemoveStages();
             Integer stageCount = stages.stageCount();
             for (Integer stage = 0; stage < stageCount; stage++) {
                 stages.runStage(stage);
@@ -706,7 +706,7 @@ private class GivingSampleDataTest {
             insert ownGift;
 
             Test.startTest();
-            GivingSampleDataRemoveStages stages = new GivingSampleDataRemoveStages();
+            GivingSampleData.RemoveStages stages = new GivingSampleData.RemoveStages();
             Integer stageCount = stages.stageCount();
             for (Integer stage = 0; stage < stageCount; stage++) {
                 stages.runStage(stage);
@@ -738,7 +738,7 @@ private class GivingSampleDataTest {
             loadEverything();
             GivingSampleDataLoader.removeChunkSize = 2;
 
-            GivingSampleDataRemoveStages stages = new GivingSampleDataRemoveStages();
+            GivingSampleData.RemoveStages stages = new GivingSampleData.RemoveStages();
             Integer total = stages.stageCount();
             System.assertEquals(
                 6,
@@ -789,7 +789,7 @@ private class GivingSampleDataTest {
             loadEverything();
 
             Test.startTest();
-            new GivingSampleDataRemoveStages().finish();
+            new GivingSampleData.RemoveStages().finish();
             Test.stopTest();
 
             System.assertEquals(

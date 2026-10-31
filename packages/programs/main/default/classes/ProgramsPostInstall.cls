@@ -88,7 +88,7 @@ public with sharing class ProgramsPostInstall implements InstallHandler, ModuleS
             try {
                 // A test cannot chain one queued job from another.
                 if (ProgramsAccessSync.syncOnce() && !Test.isRunningTest()) {
-                    System.enqueueJob(new ProgramsAccessSync.Job());
+                    System.enqueueJob(new ModuleAccessSyncBase.Job(new ProgramsAccessSync()));
                 }
             } catch (Exception e) {
                 ErrorLogger.log(e, ACCESS_CONTEXT);

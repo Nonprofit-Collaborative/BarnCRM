@@ -66,7 +66,7 @@ public with sharing class GivingSampleData implements SampleDataModule {
      * households and people every gift points at already exist.
      */
     public void enqueueLoad() {
-        SampleDataStageBatch.start(new GivingSampleDataStages());
+        SampleDataStageBatch.start(new LoadStages());
     }
 
     /**
@@ -76,7 +76,7 @@ public with sharing class GivingSampleData implements SampleDataModule {
      * master rather than being deleted on their own.
      */
     public void enqueueRemove() {
-        SampleDataRemoveBatch.startRemoval(new GivingSampleDataRemoveStages());
+        SampleDataRemoveBatch.startRemoval(new RemoveStages());
     }
 
     /** The Giving sample data JSON body, from the injected override or the static resource. */
@@ -89,5 +89,76 @@ public with sharing class GivingSampleData implements SampleDataModule {
             throw new SampleDataException(System.Label.Giving_SampleData_ResourceMissing);
         }
         return resource.Body.toString();
+    }
+
+    /**
+     * The Giving sample data load (C-10), as the stages Core's SampleDataStageBatch runs one per
+     * transaction. Stage 0 inserts the funds, appeals and commitments; stages 1 and up insert one
+     * chunk of gifts each. finish() settles the installments already past due and hands back to
+     * Core, so a module that loads after Giving would start there.
+     *
+     * A batch rather than a chain of queueables, because Developer Edition, trial and scratch orgs
+     * stop a chain after five jobs and the gift chunks alone can be more than that.
+     *
+     * Only the reference key to Id map (about forty entries) is kept between stages. The payload
+     * is re-read from the static resource in each stage, so a two hundred kilobyte JSON body is
+     * never serialized into the batch state.
+     */
+    public with sharing class LoadStages implements SampleDataStages {
+        private Map<String, Id> referenceIdsByKey = new Map<String, Id>();
+
+        public String name() {
+            return 'GivingSampleDataStages';
+        }
+
+        /** The reference data stage and one stage per gift chunk. */
+        public Integer stageCount() {
+            return GivingSampleDataSet.parse(GivingSampleData.getSampleDataJson()).chunkCount() + 1;
+        }
+
+        public void runStage(Integer stage) {
+            GivingSampleDataSet data = GivingSampleDataSet.parse(
+                GivingSampleData.getSampleDataJson()
+            );
+            if (stage == 0) {
+                referenceIdsByKey = GivingSampleDataLoader.loadReferenceData(data);
+                return;
+            }
+            GivingSampleDataLoader.loadGiftChunk(data, stage - 1, referenceIdsByKey);
+        }
+
+        public void finish() {
+            GivingSampleDataLoader.finish();
+            SampleDataModules.startAfter(GivingSampleData.MODULE_NAME);
+        }
+    }
+
+    /**
+     * The Giving sample data removal (C-10, ADMIN-3), as the stages Core's SampleDataRemoveBatch
+     * runs one per transaction. Each stage deletes one chunk of Giving sample records through
+     * GivingSampleDataLoader.removeNext: refunds and write-offs, then the other gifts (so the
+     * gifts go before the people and households they point at, which Core removes afterwards),
+     * then commitments, appeals and funds. finish() hands on to the module before this one, or to
+     * Core's own removal, through SampleDataModules.removeAfter.
+     *
+     * Nothing is kept between stages: each one reads what is left.
+     */
+    public with sharing class RemoveStages implements SampleDataStages {
+        public String name() {
+            return 'GivingSampleDataRemoveStages';
+        }
+
+        /** One stage per chunk of each kind of Giving sample record. */
+        public Integer stageCount() {
+            return GivingSampleDataLoader.removeStageCount();
+        }
+
+        public void runStage(Integer stage) {
+            GivingSampleDataLoader.removeNext();
+        }
+
+        public void finish() {
+            SampleDataModules.removeAfter(GivingSampleData.MODULE_NAME);
+        }
     }
 }

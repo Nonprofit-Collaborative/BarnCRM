@@ -27,17 +27,21 @@ public with sharing class OpportunityMirrorSchedulable implements Schedulable {
 
     /** Schedules the nightly run; a second press returns the job already there. */
     public static Id schedule() {
-        CronTrigger existing = job();
-        return existing != null
-            ? existing.Id
-            : ScheduledJobSelector.schedule(JOB_NAME, CRON, new OpportunityMirrorSchedulable());
+        return ScheduledJobSelector.ensure(JOB_NAME, CRON, new OpportunityMirrorSchedulable());
     }
 
     public static void stop() {
-        CronTrigger existing = job();
-        if (existing != null) {
-            ScheduledJobSelector.abort(existing.Id);
-        }
+        ScheduledJobSelector.stopNamed(JOB_NAME);
+    }
+
+    /** The nightly run as Health Check's nightly jobs list sees it (ADR-0075). */
+    public static NightlyJob nightlyJob() {
+        return new NamedNightlyJob(
+            System.Label.Mirror_NightlyJob_MirrorName,
+            JOB_NAME,
+            CRON,
+            new OpportunityMirrorSchedulable()
+        );
     }
 
     /** When the nightly run next starts, or null when it is not scheduled. */

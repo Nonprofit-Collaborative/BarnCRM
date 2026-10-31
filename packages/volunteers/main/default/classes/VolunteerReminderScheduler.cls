@@ -23,20 +23,13 @@ public with sharing class VolunteerReminderScheduler implements Schedulable {
         VolunteerReminderBatch.startMorning();
     }
 
-    /** Schedules the morning job, or returns the one already scheduled. */
-    public static Id start() {
-        Id existing = ScheduledJobSelector.triggerIdByName(jobNameInUse);
-        if (existing != null) {
-            return existing;
-        }
-        return ScheduledJobSelector.schedule(
+    /** The morning job as Health Check's nightly jobs list sees it (ADR-0075). */
+    public static NightlyJob nightlyJob() {
+        return new NamedNightlyJob(
+            System.Label.Volunteers_NightlyJobs_RemindersName,
             jobNameInUse,
             MORNING_CRON,
             new VolunteerReminderScheduler()
         );
-    }
-
-    public static Boolean isScheduled() {
-        return ScheduledJobSelector.triggerIdByName(jobNameInUse) != null;
     }
 }

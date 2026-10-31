@@ -81,7 +81,7 @@ public with sharing class LogicModelsPostInstall implements InstallHandler, Modu
             try {
                 // A test cannot chain one queued job from another.
                 if (LogicModelsAccessSync.syncOnce() && !Test.isRunningTest()) {
-                    System.enqueueJob(new LogicModelsAccessSync.Job());
+                    System.enqueueJob(new ModuleAccessSyncBase.Job(new LogicModelsAccessSync()));
                 }
             } catch (Exception e) {
                 ErrorLogger.log(e, ACCESS_CONTEXT);

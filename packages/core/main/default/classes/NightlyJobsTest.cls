@@ -91,16 +91,28 @@ private class NightlyJobsTest {
             List<NightlyJob> jobs = NightlyJobs.all();
             Test.stopTest();
 
-            Assert.isTrue(jobs[0] instanceof NightlyJobs.SeasonalAddressJob, 'Addresses first.');
-            Assert.isTrue(jobs[1] instanceof NightlyJobs.ErrorDigestJob, 'Then the digest.');
-            Assert.isTrue(jobs[2] instanceof NightlyJobs.ImportRowPurgeJob, 'Then the rows.');
             Assert.isTrue(
-                jobs[3] instanceof NightlyJobs.EmptyHouseholdTidyJob,
+                jobs[0].label() == System.Label.Core_HealthCheck_JobSeasonalAddresses,
+                'Addresses first.'
+            );
+            Assert.isTrue(
+                jobs[1].label() == System.Label.Core_HealthCheck_JobErrorDigest,
+                'Then the digest.'
+            );
+            Assert.isTrue(
+                jobs[2].label() == System.Label.Core_HealthCheck_JobImportRows,
+                'Then the rows.'
+            );
+            Assert.isTrue(
+                jobs[3].label() == System.Label.Core_HealthCheck_JobEmptyHouseholds,
                 'Then the empty households.'
             );
-            Assert.isTrue(jobs[4] instanceof NightlyJobs.TabAccessJob, 'Then the tabs.');
             Assert.isTrue(
-                jobs[5] instanceof NightlyJobs.SetupChangesJob,
+                jobs[4].label() == System.Label.Core_HealthCheck_JobTabAccess,
+                'Then the tabs.'
+            );
+            Assert.isTrue(
+                jobs[5].label() == System.Label.Core_HealthCheck_JobSetupChanges,
                 'Then the Setup changes.'
             );
             Assert.areEqual(7, jobs.size(), 'Core has six of its own.');

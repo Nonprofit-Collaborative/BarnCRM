@@ -34,32 +34,21 @@ public with sharing class PledgeReminderScheduler implements Schedulable {
 
     /** Starts the nightly run, or does nothing when it is already scheduled. */
     public static Id start() {
-        Id existing = scheduledJobId();
-        if (existing != null) {
-            return existing;
-        }
-        return ScheduledJobSelector.schedule(JOB_NAME, NIGHTLY_CRON, new PledgeReminderScheduler());
+        return ScheduledJobSelector.ensure(JOB_NAME, NIGHTLY_CRON, new PledgeReminderScheduler());
     }
 
     /** Stops the nightly run. The log stays exactly as it is. */
     public static void stop() {
-        Id existing = scheduledJobId();
-        if (existing != null) {
-            ScheduledJobSelector.abort(existing);
-        }
+        ScheduledJobSelector.stopNamed(JOB_NAME);
     }
 
     /** True when the nightly run is scheduled. */
     public static Boolean isScheduled() {
-        return scheduledJobId() != null;
+        return ScheduledJobSelector.isScheduled(JOB_NAME);
     }
 
     /** When the nightly run is next due, or null when it is not scheduled. */
     public static Datetime nextRunAt() {
         return ScheduledJobSelector.nextFireTime(JOB_NAME);
-    }
-
-    private static Id scheduledJobId() {
-        return ScheduledJobSelector.triggerIdByName(JOB_NAME);
     }
 }

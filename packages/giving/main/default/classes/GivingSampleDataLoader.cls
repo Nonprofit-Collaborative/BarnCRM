@@ -530,7 +530,7 @@ public with sharing class GivingSampleDataLoader {
 
     /**
      * Deletes the next chunk of Giving sample records and returns how many went, 0 once none
-     * are left. A stage of GivingSampleDataRemoveStages calls it (ADMIN-3), because the whole
+     * are left. A stage of GivingSampleData.RemoveStages calls it (ADMIN-3), because the whole
      * set's gift automation is more than one transaction can run. The order is the dependency
      * order, and each kind is emptied before the next is started: asks first (they point at the
      * gifts and pledges they won, and nothing points at them), then refunds and write-offs,

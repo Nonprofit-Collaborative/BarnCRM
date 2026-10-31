@@ -34,16 +34,13 @@ public with sharing class VolunteersScheduler implements Schedulable {
         ShiftScheduleBatch.startNightly();
     }
 
-    /** Schedules the nightly job, or returns the one already scheduled. */
-    public static Id start() {
-        Id existing = ScheduledJobSelector.triggerIdByName(jobNameInUse);
-        if (existing != null) {
-            return existing;
-        }
-        return ScheduledJobSelector.schedule(jobNameInUse, NIGHTLY_CRON, new VolunteersScheduler());
-    }
-
-    public static Boolean isScheduled() {
-        return ScheduledJobSelector.triggerIdByName(jobNameInUse) != null;
+    /** The nightly job as Health Check's nightly jobs list sees it (ADR-0075). */
+    public static NightlyJob nightlyJob() {
+        return new NamedNightlyJob(
+            System.Label.Volunteers_NightlyJobs_SchedulesName,
+            jobNameInUse,
+            NIGHTLY_CRON,
+            new VolunteersScheduler()
+        );
     }
 }
