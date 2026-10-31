@@ -291,6 +291,18 @@ private class AskReminderTest {
     }
 
     @IsTest
+    static void aFailedStartIsLoggedNotThrown() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            AskReminderSchedulable.failStartForTest = true;
+            Test.startTest();
+            new AskReminderSchedulable().execute(null);
+            Test.stopTest();
+
+            Assert.isFalse(AskReminderService.isRunning(), 'A failed start queues no pass.');
+        }
+    }
+
+    @IsTest
     static void theSchedulableStartsTheBatchWhenOn() {
         User owner = owner();
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
