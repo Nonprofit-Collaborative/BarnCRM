@@ -33,6 +33,10 @@
         <behavior>Edit</behavior>
         <field>Notes__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Readonly</behavior>
+        <field>Reminder_Sent_On__c</field>
+      </layoutItems>
     </layoutColumns>
   </layoutSections>
   <showEmailCheckbox>false</showEmailCheckbox>

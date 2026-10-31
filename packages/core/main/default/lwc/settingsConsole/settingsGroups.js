@@ -214,7 +214,13 @@ const PAGE_GROUPS = {
       id: 'Hours and Shifts',
       label: HOURS_AND_SHIFTS,
       fallback: true,
-      keys: ['Hours_Require_Approval__c', 'Attendance_Creates_Hours__c', 'Shift_Horizon_Weeks__c']
+      keys: [
+        'Hours_Require_Approval__c',
+        'Attendance_Creates_Hours__c',
+        'Shift_Horizon_Weeks__c',
+        'Reminders_Enabled__c',
+        'Reminder_Lead_Days__c'
+      ]
     }
   ],
   'error log': [

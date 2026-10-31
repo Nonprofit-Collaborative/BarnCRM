@@ -785,6 +785,72 @@
         <value>Volunteer Schedules, 3:00 AM</value>
     </labels>
     <labels>
+        <fullName>Volunteers_NightlyJobs_RemindersName</fullName>
+        <categories>Volunteers, Nightly Jobs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nightly jobs: the shift reminder run and when it runs</shortDescription>
+        <value>Volunteer Shift Reminders, 7:00 AM</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_SendFailed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reminders not sent: {0} unsent, {1} due, {2} the reason</shortDescription>
+        <value>{0} of {1} volunteer shift reminders were not sent and will be tried again tomorrow while the shift is still ahead. Salesforce said: {2}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_Subject</fullName>
+        <categories>Volunteers, Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shift reminder email subject; {0} is the job name</shortDescription>
+        <value>Reminder: your volunteer shift, {0}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_Greeting</fullName>
+        <categories>Volunteers, Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shift reminder email greeting; {0} is the first name</shortDescription>
+        <value>Hello {0},</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_GreetingNoName</fullName>
+        <categories>Volunteers, Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shift reminder email greeting when the person has no first name</shortDescription>
+        <value>Hello,</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_Body</fullName>
+        <categories>Volunteers, Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shift reminder email body; {0} is the job name, {1} the day and time</shortDescription>
+        <value>This is a reminder that you are signed up to volunteer: {0}.
+
+When: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_Where</fullName>
+        <categories>Volunteers, Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shift reminder email location line; {0} is the shift location</shortDescription>
+        <value>Where: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_Closing</fullName>
+        <categories>Volunteers, Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shift reminder email closing</shortDescription>
+        <value>If you can no longer come, please tell us as soon as you can so someone else can take your place. Thank you for volunteering.</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_Schedules_SkippedTurnedOff</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>

@@ -146,7 +146,7 @@ private class ShiftScheduleBatchTest {
             jobs[0].schedule();
             Test.stopTest();
 
-            Assert.areEqual(1, jobs.size(), 'One Volunteers nightly job.');
+            Assert.areEqual(2, jobs.size(), 'The schedule run and the reminder run.');
             Assert.areEqual(
                 Label.Volunteers_NightlyJobs_SchedulesName,
                 jobs[0].label(),
