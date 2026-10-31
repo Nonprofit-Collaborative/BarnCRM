@@ -51,7 +51,7 @@ Install Core and run the Setup Assistant, and you can:
 
 - Keep households and the people in them, with household names and greetings built for you, merge and split households, and record relationships, affiliations, addresses (including seasonal ones), several email addresses and a preferred phone.
 - Bring in a spreadsheet (CSV or Excel) with a preview, matching rules and one-click undo, find and export records, change many records at once, and delete many records with a way back.
-- Review duplicates, check what needs attention in Org Optimizer, document your fields in a downloadable Data Dictionary, and run Health Check, with an Error Log that nothing fails silently into.
+- Review duplicates, check what needs attention in Org Optimizer, document your fields in a downloadable Data Dictionary, download an AI-Readiness Export pack for an AI tool you choose (BarnCRM never calls one itself), and run Health Check, with an Error Log that nothing fails silently into.
 - Control who sees what with ready-made roles, load realistic sample data to try things out, and erase a person's personal data when you must.
 
 Add Giving and you can also record and receipt gifts, run appeals and stewardship, import gifts from NPSP or Nonprofit Cloud exports, and watch the Giving dashboard. Add Volunteers and you can schedule shifts and approve hours. Add Mirror to keep Opportunities and Campaigns in step, accept gifts from a giving page, or export gifts for accounting.
