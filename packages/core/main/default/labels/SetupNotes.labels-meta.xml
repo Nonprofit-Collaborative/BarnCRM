@@ -17,14 +17,6 @@
         <value>Show Steps</value>
     </labels>
     <labels>
-        <fullName>Core_SetupNote_Done</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings setup note: the prerequisite is already done</shortDescription>
-        <value>Done</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupNote_Duplicates_Steps</fullName>
         <categories>Core</categories>
         <language>en_US</language>
