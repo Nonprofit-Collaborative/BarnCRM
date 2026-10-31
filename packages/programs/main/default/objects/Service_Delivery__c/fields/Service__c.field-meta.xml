@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Service__c</fullName>
+  <deleteConstraint>Restrict</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The service given. A service with deliveries can't be deleted: clear its Active box instead.</inlineHelpText>
+  <label>Service</label>
+  <referenceTo>Service__c</referenceTo>
+  <relationshipLabel>Service Deliveries</relationshipLabel>
+  <relationshipName>Service_Deliveries</relationshipName>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

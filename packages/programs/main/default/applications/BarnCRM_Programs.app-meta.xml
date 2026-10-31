@@ -64,6 +64,7 @@
   <navType>Console</navType>
   <tabs>Program__c</tabs>
   <tabs>Enrollment__c</tabs>
+  <tabs>Service_Delivery__c</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
     <mappings>
@@ -71,6 +72,9 @@
     </mappings>
     <mappings>
       <tab>Program__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Service_Delivery__c</tab>
     </mappings>
   </workspaceConfig>
 </CustomApplication>

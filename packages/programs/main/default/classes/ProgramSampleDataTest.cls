@@ -71,6 +71,21 @@ private class ProgramSampleDataTest {
             Assert.areEqual(1, countAt('Applied'), 'One applied.');
             Assert.areEqual(1, countAt('Withdrawn'), 'One withdrew.');
             Assert.areEqual(4, countAt('Completed'), 'Four completed summer reading.');
+            Assert.areEqual(
+                40,
+                [SELECT COUNT() FROM Service_Delivery__c WHERE Enrollment__c != NULL],
+                'Four weeks of bags for eight and two sessions for four, each linked.'
+            );
+            Assert.areEqual(
+                0,
+                [
+                    SELECT Quantity__c
+                    FROM Service_Delivery__c
+                    WHERE Attendance__c = 'Unexcused Absence'
+                ]
+                .Quantity__c,
+                'One missed week, which delivered nothing.'
+            );
             Assert.areEqual(18, new ProgramsSampleData().countLoaded(), 'The card counts them.');
             Assert.isTrue(new ProgramsSampleData().hasSampleRecords(), 'Sample programs exist.');
         }
@@ -102,7 +117,7 @@ private class ProgramSampleDataTest {
             Contact person = HouseholdTestDataFactory.newContact('Rita', 'Real');
             insert person;
             insert new Enrollment__c(Program__c = real.Id, Contact__c = person.Id);
-            ProgramSampleDataLoader.removeChunkSize = 5;
+            ProgramSampleDataLoader.removeChunkSize = 20;
 
             Test.startTest();
             removeEverything();
@@ -111,6 +126,7 @@ private class ProgramSampleDataTest {
             Assert.areEqual(0, [SELECT COUNT() FROM Program__c WHERE Sample_Data__c = TRUE]);
             Assert.areEqual(0, [SELECT COUNT() FROM Service__c], 'Services went with them.');
             Assert.areEqual(1, [SELECT COUNT() FROM Enrollment__c], 'Only the real one is left.');
+            Assert.areEqual(0, [SELECT COUNT() FROM Service_Delivery__c], 'Deliveries went first.');
             Assert.isFalse(new ProgramsSampleData().hasSampleRecords(), 'Nothing left.');
             Assert.isNull(ProgramSampleDataLoader.logWhatWasKept(), 'Nothing was kept.');
         }

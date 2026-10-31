@@ -84,7 +84,12 @@ public with sharing class ModuleManagerService {
             'Volunteer_Signup__c',
             'Volunteer_Skill__c'
         },
-        'Programs' => new List<String>{ 'Enrollment__c', 'Program__c', 'Service__c' }
+        'Programs' => new List<String>{
+            'Enrollment__c',
+            'Program__c',
+            'Service__c',
+            'Service_Delivery__c'
+        }
     };
 
     /** The permission set Turn on gives the person who turned the module on. */

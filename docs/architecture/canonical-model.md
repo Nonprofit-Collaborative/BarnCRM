@@ -9245,13 +9245,98 @@ while the module is turned off:
 | `program_enrollments_open_after_end` | Info | Open enrollments (Applied or Enrolled) in a program that is Completed or whose End Date is past: they still count as open (R-EN2) and in the roster. | Links the first five enrollments. |
 
 **Sample data.** `ProgramsSampleData` implements Core's `SampleDataModule` and is registered in
-`SampleDataModules.MODULE_CLASS_NAMES` after Volunteers. Its load, two stages, builds three
+`SampleDataModules.MODULE_CLASS_NAMES` after Volunteers. Its load, three stages, builds three
 programs flagged `Sample_Data__c` (two Active, one Completed) with five services, then 18
-enrollments of up to 12 of Core's sample people (contacts), through the enrollment rules. Its
-removal, before Volunteers', Giving's and Core's, deletes one chunk per stage: the sample
-people's enrollments in sample programs, then the sample programs with no enrollment left (their
-services go with them). A sample program a real person is enrolled in is kept, and one Warning
-in the Error Log names each one kept.
+enrollments of up to 12 of Core's sample people (contacts), through the enrollment rules, then
+(release 0.13, P-02) 40 service deliveries (29Z) to the people Enrolled in the two Active
+programs. Its removal, before Volunteers', Giving's and Core's, deletes one chunk per stage: the
+sample people's service deliveries and enrollments in sample programs, then the sample programs
+with no enrollment or delivery left (their services go with them). A sample program a real person
+is enrolled in, or has a delivery in, is kept, and one Warning in the Error Log names each one
+kept.
+
+---
+
+## 29Z. Service Delivery
+
+### Definition
+
+One service given to one person on one day, or their absence from it (P-02, Programs module):
+a hot meal, two tutoring hours, a missed session. It is both attendance and service delivery, as
+PMM's Service Delivery is: the attendance says whether the person came, the quantity counts what
+they received in the service's unit. Sessions and cohorts are P-11.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number: a delivery is identified by its person, service and date. |
+| Service | reference(Service) | yes | The service given, and through it the program. |
+| Enrollment | reference(Enrollment) | no | The person's enrollment in the service's program. Filled in when left empty (R-SD3). |
+| Contact | reference(Contact) | conditional | The person, where people are Contacts. |
+| Account | reference(Account) | conditional | The person, where people are person Accounts. |
+| Delivery Date | date | yes (defaults today) | The day the service was given, or missed. |
+| Attendance | picklist(Present, Excused Absence, Unexcused Absence) | yes (defaults Present) | Whether the person came. |
+| Quantity | number | yes (defaults 1) | How much was given, in the service's unit of measure. 0 for an absence. |
+
+### Relationships
+
+- **Service Delivery to Service**, many to one, through a required lookup with delete Restrict, not
+  a detail, so participant privacy (P-08) can set deliveries apart from the program as it does
+  enrollments. A service with deliveries cannot be deleted; clear its Active box instead.
+- **Service Delivery to Enrollment**, many to one, optional, delete SetNull.
+- **Service Delivery to a person**, through the Contact and Account pair (Section 4).
+
+### Rules
+
+**R-SD1 Exactly one person.** Contact or Account, never both, never neither (validation rule,
+checked only when the delivery is new or its person changes, as R-EN1).
+
+**R-SD2 An absence delivers nothing.** Quantity is never negative (validation rule). Saving a
+delivery with an absence (Excused or Unexcused) sets its Quantity to 0. Always runs (registry
+row `Service_Delivery_Rules`): totals would otherwise count services nobody received.
+
+**R-SD3 The enrollment is filled in.** A delivery saved with no enrollment is linked to the
+person's enrollment in the service's program: the open one, or else the one that started last.
+A person with no enrollment there is still recorded; the delivery simply has none. Same
+always-run row, as the link is what the roster and the P-05 dashboard count by.
+
+**R-SD4 One row per person, service and day, from the grid.** The Service Delivery Log
+(below) keeps one delivery per person per service per day, changing the row that is there
+instead of adding another. Nothing refuses a second row entered by hand: two separate meals on
+one day are two deliveries.
+
+**R-SD5 Erasing or deleting the person keeps the delivery.** As R-EN5: erasure credits it to the
+anonymous record; deleting the person empties the person (SetNull) and keeps the counts.
+
+### Salesforce implementation
+
+- **Object:** `Service_Delivery__c`, name field AutoNumber `SD-{000000}`, sharing Public
+  Read/Write until P-08.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Service | `Service__c` | Lookup to `Service__c`, required, delete constraint Restrict, relationship name Service_Deliveries |
+| Enrollment | `Enrollment__c` | Lookup to `Enrollment__c`, delete constraint SetNull, relationship name Service_Deliveries |
+| Contact | `Contact__c` | Lookup to Contact, delete constraint SetNull, relationship name Service_Deliveries |
+| Account | `Account__c` | Lookup to Account, delete constraint SetNull, relationship name Service_Deliveries |
+| Delivery Date | `Delivery_Date__c` | Date, required, default `TODAY()` |
+| Attendance | `Attendance__c` | Picklist: Present, Excused Absence, Unexcused Absence; required, default Present |
+| Quantity | `Quantity__c` | Number(10, 2), required, default 1 |
+
+- **Validation rules:** `Exactly_One_Person` (R-SD1), `Quantity_Not_Negative` (R-SD2).
+- **Service:** `ServiceDeliveryRulesHandler` (R-SD2, R-SD3) with `ServiceDeliveryService` and
+  `ServiceDeliverySelector`, trigger `ServiceDeliveryTrigger` through `TriggerDispatcher`.
+- **Service Delivery Log:** the `serviceDeliveryLog` panel on the program page
+  (`ServiceDeliveryLogController`): pick an active service and a day, and every open
+  enrollment (Applied or Enrolled) is listed with its attendance and quantity for that day, saved
+  in one go (R-SD4). It works the same on a phone.
+
+### PMM mapping
+
+| BarnCRM | PMM | Note |
+|---|---|---|
+| Service Delivery: Service, Enrollment, Contact, Delivery Date, Attendance, Quantity | Service Delivery: Service, Program Engagement, Contact, Delivery Date, Attendance Status, Quantity | Attendance values match PMM's Present, Excused Absence and Unexcused Absence. Checked against an org with PMM with MIG-09. |
 
 ---
 
@@ -9266,7 +9351,6 @@ that builds it, before its metadata is created.
 |---|---|---|---|
 | Receipt | Giving | v0.4 (G-13) | Section 4.11, ADR-0010 |
 | Donor Level | Giving | v0.4 (G-14) | Section 5.2 |
-| Attendance, Service Delivery | Programs | release 0.13 (P-02) | Section 5.4 |
 | Funder pipeline entities (grant, reporting deadline, award compliance) | Funders | v0.9 | Section 5.5 |
 | Mirror adapter entities and mirror mappings | Mirror | v0.6 onward | Section 4.12 |
 
@@ -9305,7 +9389,8 @@ the volunteer hours import template in 29V.
 
 Program, Service and Enrollment left this table in release 0.12 (P-01, ADR-NEXT) and are
 specified in Sections 29W to 29Y. Outcome left it when P-03 moved to the Logic Models package as
-L-02 (owner decision, 2026-09-23).
+L-02 (owner decision, 2026-09-23). Attendance and Service Delivery left it in release 0.13
+(P-02) as one entity, Service Delivery, specified in Section 29Z.
 
 Two v0.4 entities have attributes that already exist on `Gift__c` from v0.2, because the
 object is not worth altering later for fields this cheap: Acknowledgment Status,
@@ -9545,6 +9630,7 @@ mirrors the primary member).
 | v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-0149). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a) by any user with the import permission and edit access to the rows; `Import_Batch__c` gains `Retried_By__c` (Rows Retried By) so undo covers their records. R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
 | 0.12 | 2026-10-31 | Programs P-01 (ADR-NEXT `NEXT-programs-module.md`). New in the Programs module: Program (`Program__c`, 29W), Service (`Service__c`, 29X) and Enrollment (`Enrollment__c`, 29Y), with rules R-PG1 to R-PG3, R-SV1 and R-EN1 to R-EN5 and the PMM mapping. Section 30 keeps attendance and service delivery (P-02); Outcome left it for Logic Models (L-02). Specified ahead of the build. |
 | 0.12 | 2026-10-31 | Programs P-01 follow-up. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Program__c` (29W), so the Programs sample load can be removed in one action; services and enrollments are found through their program. 29Y gains the person card, the Programs Health Check finding and the sample data paragraph. No object added. |
+| 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29Z), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |
 
 ---
 ## 32. Entity ownership by package
@@ -9631,7 +9717,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Program | Programs | 0.12 (P-01) | 29W |
 | Service | Programs | 0.12 (P-01) | 29X |
 | Enrollment | Programs | 0.12 (P-01) | 29Y |
-| Attendance and service delivery entities | Programs | 0.13 (P-02) | 30 |
+| Service Delivery | Programs | 0.13 (P-02) | 29Z |
 | Funders entities | Funders | v0.9 | 30 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |

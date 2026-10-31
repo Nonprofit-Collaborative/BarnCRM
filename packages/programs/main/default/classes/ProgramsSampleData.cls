@@ -52,21 +52,26 @@ public with sharing class ProgramsSampleData implements SampleDataModule {
         SampleDataRemoveBatch.startRemoval(new RemoveStages());
     }
 
-    /** The load, one stage per transaction: the programs and services, then the enrollments. */
+    /**
+     * The load, one stage per transaction: the programs and services, the enrollments, then the
+     * service deliveries.
+     */
     public class LoadStages implements SampleDataStages {
         public String name() {
             return 'ProgramsSampleData.LoadStages';
         }
 
         public Integer stageCount() {
-            return 2;
+            return 3;
         }
 
         public void runStage(Integer stage) {
             if (stage == 0) {
                 ProgramSampleDataLoader.loadPrograms();
-            } else {
+            } else if (stage == 1) {
                 ProgramSampleDataLoader.loadEnrollments();
+            } else {
+                ProgramSampleDataLoader.loadDeliveries();
             }
         }
 

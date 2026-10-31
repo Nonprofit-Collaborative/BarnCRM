@@ -123,6 +123,59 @@ public with sharing class ProgramSampleDataLoader {
         Database.insert(dropRepeats(enrollments), AccessLevel.USER_MODE);
     }
 
+    /**
+     * The service deliveries (P-02): a grocery bag a week for the last four weeks to each person
+     * Enrolled in the pantry, one of them missed, and two tutoring sessions of two hours to each
+     * person Enrolled in tutoring. Linked to their enrollments by the delivery rules (R-SD3).
+     */
+    public static void loadDeliveries() {
+        Map<String, Id> serviceIds = new Map<String, Id>();
+        for (Service__c service : [
+            SELECT Id, Name
+            FROM Service__c
+            WHERE Program__r.Sample_Data__c = TRUE
+            WITH USER_MODE
+        ]) {
+            serviceIds.put(service.Name, service.Id);
+        }
+        Date today = Date.today();
+        List<Service_Delivery__c> deliveries = new List<Service_Delivery__c>();
+        Integer pantryPeople = 0;
+        for (Enrollment__c enrollment : [
+            SELECT Contact__c, Program__r.Name
+            FROM Enrollment__c
+            WHERE
+                Program__r.Sample_Data__c = TRUE
+                AND Stage__c = :EnrollmentService.STAGE_ENROLLED
+                AND Contact__r.Sample_Data__c = TRUE
+            WITH USER_MODE
+            ORDER BY Program__r.Name, Name
+        ]) {
+            Boolean pantry = enrollment.Program__r.Name == PANTRY;
+            Id serviceId = serviceIds.get(pantry ? 'Grocery bag' : 'Tutoring hour');
+            if (serviceId == null) {
+                continue;
+            }
+            Integer weeks = pantry ? 4 : 2;
+            for (Integer week = 0; week < weeks; week++) {
+                Service_Delivery__c delivery = new Service_Delivery__c(
+                    Service__c = serviceId,
+                    Contact__c = enrollment.Contact__c,
+                    Delivery_Date__c = today.addDays(-7 * week),
+                    Quantity__c = pantry ? 1 : 2
+                );
+                if (pantry && pantryPeople == 3 && week == 1) {
+                    delivery.Attendance__c = ServiceDeliveryService.UNEXCUSED_ABSENCE;
+                }
+                deliveries.add(delivery);
+            }
+            if (pantry) {
+                pantryPeople++;
+            }
+        }
+        Database.insert(deliveries, AccessLevel.USER_MODE);
+    }
+
     // ------------------------------------------------------------------------- status card
 
     /** The sample people's enrollments in sample programs. */
@@ -148,6 +201,14 @@ public with sharing class ProgramSampleDataLoader {
         Integer stages = 0;
         for (
             Integer recordCount : new List<Integer>{
+                [
+                    SELECT COUNT()
+                    FROM Service_Delivery__c
+                    WHERE
+                        Service__r.Program__r.Sample_Data__c = TRUE
+                        AND Contact__r.Sample_Data__c = TRUE
+                    WITH USER_MODE
+                ],
                 countSampleEnrollments(),
                 [SELECT COUNT() FROM Program__c WHERE Sample_Data__c = TRUE WITH USER_MODE]
             }
@@ -159,9 +220,21 @@ public with sharing class ProgramSampleDataLoader {
 
     /**
      * Deletes the next chunk of Programs sample records and returns how many went, 0 once none
-     * are left: the enrollments first, then the programs no enrollment names.
+     * are left: the service deliveries first, then the enrollments, then the programs no
+     * enrollment or delivery is left on.
      */
     public static Integer removeNext() {
+        List<Service_Delivery__c> deliveries = [
+            SELECT Id
+            FROM Service_Delivery__c
+            WHERE Service__r.Program__r.Sample_Data__c = TRUE AND Contact__r.Sample_Data__c = TRUE
+            WITH USER_MODE
+            LIMIT :removeChunkSize
+        ];
+        if (!deliveries.isEmpty()) {
+            Database.delete(deliveries, AccessLevel.USER_MODE);
+            return deliveries.size();
+        }
         List<Enrollment__c> enrollments = [
             SELECT Id
             FROM Enrollment__c
@@ -173,10 +246,24 @@ public with sharing class ProgramSampleDataLoader {
             Database.delete(enrollments, AccessLevel.USER_MODE);
             return enrollments.size();
         }
+        // A program a real person's delivery is on stays: the delivery's lookup refuses it.
+        Set<Id> inUse = new Set<Id>();
+        for (AggregateResult row : [
+            SELECT Service__r.Program__c program
+            FROM Service_Delivery__c
+            WHERE Service__r.Program__r.Sample_Data__c = TRUE
+            WITH USER_MODE
+            GROUP BY Service__r.Program__c
+        ]) {
+            inUse.add((Id) row.get('program'));
+        }
         List<Program__c> programs = [
             SELECT Id
             FROM Program__c
-            WHERE Sample_Data__c = TRUE AND Id NOT IN (SELECT Program__c FROM Enrollment__c)
+            WHERE
+                Sample_Data__c = TRUE
+                AND Id NOT IN (SELECT Program__c FROM Enrollment__c)
+                AND Id NOT IN :inUse
             WITH USER_MODE
             LIMIT :removeChunkSize
         ];

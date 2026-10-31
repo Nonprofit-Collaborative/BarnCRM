@@ -115,7 +115,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **Sample Data**, select **Load Sample Data** and wait for **Loaded**. | The card lists **Program enrollments** with 18. |
 | 2 | Open **Programs**, list view **All Programs**. | **After-school tutoring** and **Food pantry** (Active) and **Summer reading** (Completed) are listed. |
-| 3 | Open **After-school tutoring**. | The roster shows **Applied** 1, **Enrolled** 4, **Withdrawn** 1, and the services Tutoring hour and Homework club session. |
+| 3 | Open **After-school tutoring**. | The roster shows **Applied** 1, **Enrolled** 4, **Withdrawn** 1, and the services Tutoring hour and Homework club session. Open **Tutoring hour**: its **Service Deliveries** list shows 8 deliveries of 2. |
 | 4 | Create a contact "Rita Real" and enroll her in **Food pantry**. | Accepted. |
 | 5 | Select **Remove Sample Data** and wait. | **Summer reading** and **After-school tutoring** are gone. **Food pantry** stays, with only Rita's enrollment, and the [Error Log](../admin-guide/error-log.md) holds one Warning naming it. The card still offers **Remove Sample Data**. |
 | 6 | Delete Rita's enrollment, then select **Remove Sample Data** again. | **Food pantry** is gone. |

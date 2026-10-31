@@ -31,6 +31,17 @@
       </layoutItems>
     </layoutColumns>
   </layoutSections>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Contact__c</fields>
+    <fields>Account__c</fields>
+    <fields>Delivery_Date__c</fields>
+    <fields>Attendance__c</fields>
+    <fields>Quantity__c</fields>
+    <relatedList>Service_Delivery__c.Service__c</relatedList>
+    <sortField>Delivery_Date__c</sortField>
+    <sortOrder>Desc</sortOrder>
+  </relatedLists>
   <showEmailCheckbox>false</showEmailCheckbox>
   <showHighlightsPanel>false</showHighlightsPanel>
   <showInteractionLogPanel>false</showInteractionLogPanel>

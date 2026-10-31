@@ -254,6 +254,6 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Sample removal kept programs; {0} is their names</shortDescription>
-        <value>Sample data removal kept the sample programs {0}, because people of your own are enrolled in them. Move or delete those enrollments, then select Remove Sample Data again.</value>
+        <value>Sample data removal kept the sample programs {0}, because people of your own are enrolled in them or have services recorded in them. Move or delete those enrollments and service deliveries, then select Remove Sample Data again.</value>
     </labels>
 </CustomLabels>

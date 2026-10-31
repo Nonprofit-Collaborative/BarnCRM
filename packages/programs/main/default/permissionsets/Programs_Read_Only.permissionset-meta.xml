@@ -75,6 +75,21 @@
     <field>Service__c.Unit_Of_Measure__c</field>
     <readable>true</readable>
   </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Service_Delivery__c.Account__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Service_Delivery__c.Contact__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Service_Delivery__c.Enrollment__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <objectPermissions>
     <allowCreate>false</allowCreate>
     <allowDelete>false</allowDelete>
@@ -102,12 +117,25 @@
     <object>Service__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Service_Delivery__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
   <tabSettings>
     <tab>Enrollment__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
     <tab>Program__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Service_Delivery__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

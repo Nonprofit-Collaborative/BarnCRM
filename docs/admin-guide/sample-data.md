@@ -86,11 +86,13 @@ there:
 | Programs | 3 | **After-school tutoring** and **Food pantry**, both Active, and **Summer reading**, Completed, each with a target population and dates |
 | Services | 5 | Tutoring hour and Homework club session; Grocery bag and Hot meal; Reading circle |
 | Enrollments | 18 | Six in tutoring (four Enrolled, one Applied, one Withdrawn), eight Enrolled in the pantry and four Completed in summer reading, among 12 sample people |
+| Service deliveries | 40 | A grocery bag a week for the last four weeks to each person in the pantry (one week missed, as an Unexcused Absence), and two tutoring sessions of two hours to each person Enrolled in tutoring |
 
-Removal takes the sample people's enrollments in the sample programs, then the sample programs
-and their services. A sample program one of your own people is enrolled in stays, with that
-enrollment, and one Warning in the [Error Log](error-log.md) names it: move or delete that
-enrollment, then select **Remove Sample Data** again.
+Removal takes the sample people's service deliveries and enrollments in the sample programs,
+then the sample programs and their services. A sample program one of your own people is enrolled
+in, or has a service delivery in, stays with those records, and one Warning in the
+[Error Log](error-log.md) names it: move or delete them, then select **Remove Sample Data**
+again.
 
 ## 2. How to Turn It On
 

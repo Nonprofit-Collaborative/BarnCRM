@@ -7,12 +7,12 @@ after-school tutoring program, a job readiness course), the **services** each pr
 hot meal, a tutoring hour, a bag of groceries) and who takes part, as **enrollments**. A
 participant is a person you already have in BarnCRM, so there is no separate participant record:
 an enrollment links a person to a program with a **stage** (Applied, Enrolled, Completed or
-Withdrawn) and its start and end dates.
+Withdrawn) and its start and end dates. Each time a service is given, or a person misses it, is a
+**service delivery**: attendance and what was received, in one record.
 
-Recording each time a service is given, attendance, case notes, a program dashboard, a roster
-import and intake fields come in later releases (P-02 and P-04 to P-08). Until the participant
-privacy preset (P-08) arrives, everyone who holds a Programs permission set can see every
-enrollment.
+Case notes, a program dashboard, a roster import and intake fields come in later releases (P-04
+to P-08). Until the participant privacy preset (P-08) arrives, everyone who holds a Programs
+permission set can see every enrollment and service delivery.
 
 ## Before You Install
 
@@ -32,8 +32,8 @@ finishes, BarnCRM does three things on its own:
 2. Gives you, the person who installed it, the **Programs Admin** permission set.
 3. Gives everyone who already has a BarnCRM role their Programs permission set (see below).
 
-Then open the **BarnCRM Programs** app from the App Launcher. Its tabs are **Programs** and
-**Enrollments**. The Programs and Enrollments tabs also join the BarnCRM apps.
+Then open the **BarnCRM Programs** app from the App Launcher. Its tabs are **Programs**,
+**Enrollments** and **Service Deliveries**. These tabs also join the BarnCRM apps.
 
 Programs has no settings yet, so it adds no section to BarnCRM Settings.
 
@@ -71,7 +71,7 @@ is refused.
 Add the program's services from the **Services** related list on the program: a **Service
 Name**, a **Description**, a **Unit of Measure** (what one delivery counts: meals, hours,
 sessions, bags) and **Active**. Clear Active when a service is no longer offered; it keeps its
-history.
+history. A service with deliveries cannot be deleted: clear **Active** instead.
 
 **A program with enrollments cannot be deleted.** Salesforce refuses and lists the enrollments.
 Set its Status to **Completed** instead: a completed program keeps its enrollments and services
@@ -99,6 +99,43 @@ panel without the button or the stage pickers. The panel lists up to 200 people;
 
 You can also create and edit enrollments on the **Enrollments** tab and from the **Enrollments**
 related list on the program. The list views are **Open Enrollments** and **All Enrollments**.
+
+## Attendance and Services: the Service Delivery Log
+
+A **service delivery** records one service given to one person on one day: its **Service**, the
+person, the **Delivery Date**, the **Attendance** (Present, Excused Absence or Unexcused Absence)
+and the **Quantity**, counted in the service's unit of measure (two tutoring hours, one bag).
+The program comes from the service. Each delivery is linked to the person's enrollment in that
+program.
+
+Staff record them for a whole group at once on the program, in the **Service Delivery Log**
+panel under the roster:
+
+1. Pick the **Service** (only Active ones are offered) and the **Date** (today to start with).
+2. Everyone with an open enrollment (Applied or Enrolled) is listed, with what is already
+   recorded for them that day. Set each person's **Attendance** and **Quantity**, or click
+   **Mark All Present**.
+3. Click **Save**. One delivery per person is saved for that service and day; saving again
+   changes those rows rather than adding new ones.
+
+People left at **Not Recorded** get no delivery. The panel works the same in the Salesforce
+mobile app, one person per card, so attendance can be taken in the room. Read Only users see
+what is recorded without the controls. The panel lists up to 200 people.
+
+You can also enter a delivery by hand on the **Service Deliveries** tab, for example for a person
+who is not enrolled. The list views are **All Service Deliveries** and **This Week**.
+
+Rules:
+
+- **One person per delivery**, a contact or an account, as for enrollments.
+- **An absence delivers nothing.** Saving an Excused or Unexcused Absence sets Quantity to 0, so
+  totals count only what people received. A negative quantity is refused.
+- **The enrollment fills itself in.** A delivery saved without one is linked to the person's open
+  enrollment in the program, or else the one that started last. Someone with no enrollment is
+  still recorded.
+
+Both run as the automation **Service Delivery: absences, enrollment** on the Automation
+page. It always runs (it keeps totals right), so it cannot be switched off.
 
 ## A Person's Programs
 
@@ -134,10 +171,12 @@ other BarnCRM apps the person page stays as it was. To show the card there too, 
 - **Merging two people** moves their enrollments to the person kept. If both had an open
   enrollment in the same program, both stay; the next change of stage, person or program on
   either is refused until you set the other to Withdrawn or Completed.
-- **Deleting a person** keeps their enrollments, with no person named, so program counts stand.
-- **Erasing a person** (see [Erase a Person](erase-a-person.md)) keeps their enrollments,
-  credited to the anonymous record. An enrollment holds no typed notes, so there is nothing on it
-  to empty.
+  Their service deliveries move too.
+- **Deleting a person** keeps their enrollments and service deliveries, with no person named, so
+  program counts stand.
+- **Erasing a person** (see [Erase a Person](erase-a-person.md)) keeps their enrollments and
+  service deliveries, credited to the anonymous record. Neither holds typed notes, so there is
+  nothing on them to empty.
 
 ## Health Check
 
@@ -150,8 +189,8 @@ people who can manage BarnCRM Settings and not while Programs is turned off:
 
 ## Sample Data
 
-**Load Sample Data** in BarnCRM Settings also loads three sample programs, five services and 18
-enrollments, and **Remove Sample Data** takes them away again. See
+**Load Sample Data** in BarnCRM Settings also loads three sample programs, five services, 18
+enrollments and 40 service deliveries, and **Remove Sample Data** takes them away again. See
 [Sample data](sample-data.md#with-programs-installed).
 
 ## Turning It Off
