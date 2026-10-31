@@ -1,6 +1,6 @@
 /**
  * Pairs people by similar names, household aware, for the duplicate scan (C-51, canonical model
- * R-DP7, ADR-NEXT advanced duplicate management).
+ * R-DP7, ADR-0145 advanced duplicate management).
  *
  * The org's duplicate rules match names by their own methods and know nothing of households.
  * Here, the people who share a last name or an email with someone in the scan's chunk are

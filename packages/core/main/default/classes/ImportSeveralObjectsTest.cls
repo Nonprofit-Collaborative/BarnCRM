@@ -1,6 +1,6 @@
 /**
- * Several objects in one upload (canonical model R-IT20; ADR-NEXT
- * `NEXT-several-objects-in-one-upload.md`): parents first and each record linked to its row's
+ * Several objects in one upload (canonical model R-IT20; ADR-0147
+ * `0147-several-objects-in-one-upload.md`): parents first and each record linked to its row's
  * parent, at 260 rows over two chunks with repeated parents; a failed parent rejecting the
  * records that point at it; a failed child leaving its parent; rows of two sheets, one object
  * each, linked by a lookup column; the dry run writing nothing; one undo for every object; an

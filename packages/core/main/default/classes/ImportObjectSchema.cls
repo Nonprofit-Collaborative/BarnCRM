@@ -1007,7 +1007,7 @@ public with sharing class ImportObjectSchema {
     }
 
     // -------------------------------------------------------------------------------------
-    // Load steps: one object, related records, several objects (R-IT20; ADR-NEXT)
+    // Load steps: one object, related records, several objects (R-IT20; ADR-0147)
     // -------------------------------------------------------------------------------------
 
     /**

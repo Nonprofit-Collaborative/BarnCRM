@@ -1,4 +1,4 @@
-# ADR-NEXT: Import rows are corrected on screen, deleted by a retention choice, and never needed by undo
+# ADR-0149: Import rows are corrected on screen, deleted by a retention choice, and never needed by undo
 
 **Status:** Accepted (owner decision, Brandon, 2026-10-30)
 **Date:** 2026-10-30

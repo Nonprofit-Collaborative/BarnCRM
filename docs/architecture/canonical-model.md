@@ -1096,7 +1096,7 @@ Section 29E, R-BD2). Shown in the console's Import section.
 | `Find_Export_Row_Limit__c` | integer | 50000 | The most rows one Find export writes (R-SQ3). From 1 to 500,000; empty reads as 50,000. |
 | `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one bulk update may change (R-BU2). From 1 to 48,000; empty or out of range reads as the nearest end. |
 | `Bulk_Delete_Run_Limit__c` | integer | 10000 | The most records one bulk delete may delete (R-BD2). From 1 to 48,000; empty reads as 10,000, out of range as the nearest end. |
-| `Import_Row_Deletion__c` | picklist(Once_Complete, After_30_Days, After_90_Days, Never) | After_30_Days | Delete Import Rows: when the nightly Import row cleanup deletes the staged rows of a complete import (R-IR5, ADR-NEXT). Stored as text (ADR-0019); a blank or unknown value reads as After_30_Days. Replaces `Import_Row_Retention_Days__c` (a number of days, D-40), which is removed. |
+| `Import_Row_Deletion__c` | picklist(Once_Complete, After_30_Days, After_90_Days, Never) | After_30_Days | Delete Import Rows: when the nightly Import row cleanup deletes the staged rows of a complete import (R-IR5, ADR-0149). Stored as text (ADR-0019); a blank or unknown value reads as After_30_Days. Replaces `Import_Row_Retention_Days__c` (a number of days, D-40), which is removed. |
 | `Bulk_Chunk_Size__c` | integer | 200 | Records each chunk of a bulk update or bulk delete handles (R-BU2, R-BD2). From 10 to 200; empty reads as 200, out of range as the nearest end. Stamped on the job when it starts. |
 
 ### v0.8 keys
@@ -1159,7 +1159,7 @@ range reads as the nearest end.
 
 ### Duplicate Matching keys
 
-Added by advanced duplicate management (C-51, ADR-NEXT `NEXT-advanced-duplicate-management.md`).
+Added by advanced duplicate management (C-51, ADR-0145 `0145-advanced-duplicate-management.md`).
 Shown in the console's Duplicate Matching section. A blank or unknown value reads as the
 default; the two choices are stored as text (ADR-0019).
 
@@ -1438,7 +1438,7 @@ read is dynamic SOQL built from describe (ADR-0013, ADR-0110).
 
 ### Merge Rule
 
-`Merge_Rule__mdt` (R-DP8; ADR-NEXT, `NEXT-advanced-duplicate-management.md`): which value wins
+`Merge_Rule__mdt` (R-DP8; ADR-0145, `0145-advanced-duplicate-management.md`): which value wins
 for one person field when auto-merge merges two people. Read directly by the merge. Registered
 with and listed on the custom metadata manager, which saves it; nothing is shipped, so every
 field follows `Merge_Default_Rule__c` until an administrator adds a row.
@@ -2754,7 +2754,7 @@ names it once. The run log counts the values cleared, or that a commit would cle
 run. A people template ignores `blankClears`: a blank never clears a field there.
 
 **R-IT20 Several objects in one upload.** A one-object template (R-IT12) may load several
-objects from one upload (ADR-NEXT, `NEXT-several-objects-in-one-upload.md`; D-154, which
+objects from one upload (ADR-0147, `0147-several-objects-in-one-upload.md`; D-154, which
 replaces the related records of R-IT17 as a separate path). The R-IT1 document then carries
 `"objects"`: a list of `{ "entity", "operation", "keyField" }`, the object's API name, an R-IT12
 operation (Insert when blank, never Delete) and the field an upsert or an update by a matching
@@ -3465,7 +3465,7 @@ according to the template's Person Mode, never to both (Section 4 "Person refere
 
 **R-IR4 Raw values are never rewritten; corrections sit beside them.** Raw Values holds
 what was uploaded and is never changed. A rejected row can be corrected on screen (Brandon,
-2026-10-30, ADR-NEXT, superseding the earlier rule that a correction is made only by fixing
+2026-10-30, ADR-0149, superseding the earlier rule that a correction is made only by fixing
 the file): the corrected values are saved to Corrected Values, only the columns that differ
 from Raw Values, so the row shows each file value next to its correction. A correction is
 saved only on a Rejected row, and only where a retry of its batch is allowed (R-IB17); saving
@@ -3477,7 +3477,7 @@ uploaded. Corrections are written in system mode under ADR-0021, after that chec
 decides when the nightly Import row cleanup (`ImportRowPurgeScheduler`, listed in Health
 Check's nightly jobs) deletes a batch's rows: Once Complete (on the first nightly run after
 the batch is complete), After 30 Days (the default, and what a blank or unknown value reads
-as), After 90 Days, or Never (ADR-NEXT, Brandon 2026-10-30, superseding the number of days
+as), After 90 Days, or Never (ADR-0149, Brandon 2026-10-30, superseding the number of days
 of D-40 and plan Section 4.9's purge on commit). A batch is complete when its last commit
 finished: Status Complete, Failed, Undone or Undo failed, counted from Completed At. Rejected
 rows awaiting correction follow the same setting. A preview never committed (Dry run
@@ -6756,8 +6756,8 @@ org starts with the platform's standard rules for both objects switched on, and 
 administrator's own rules are used exactly as written. No packaged code compares two records
 field by field to decide whether they are duplicates. There are two additions: R-DP6, values on
 related records the rules cannot see, compared only through the configured match sources; and
-R-DP7, people's names scored by the shared fuzzy scorer, household aware (ADR-NEXT,
-`NEXT-advanced-duplicate-management.md`).
+R-DP7, people's names scored by the shared fuzzy scorer, household aware (ADR-0145,
+`0145-advanced-duplicate-management.md`).
 
 **R-DP2 Only pairs BarnCRM can act on are proposed.** A suggestion is two people, or two
 households. A pair of accounts where either side is not a household (an organization, or a
@@ -6817,8 +6817,8 @@ it is deleted with its suggestion when dismissed or closed by a merge. A reason 
 is gone any other way is never read again and is harmless. A source that cannot be read is
 logged and counted as a failure.
 
-**R-DP7 Similar names pair people, household aware** (ADR-NEXT,
-`NEXT-advanced-duplicate-management.md`). In each people chunk of the scan, the people who share
+**R-DP7 Similar names pair people, household aware** (ADR-0145,
+`0145-advanced-duplicate-management.md`). In each people chunk of the scan, the people who share
 a last name or an email with someone in the chunk (at most 2,000, read in user mode) are scored
 on their full names by `FuzzyMatch.score` (normalized case, spacing and punctuation, then
 Jaro-Winkler). A pair scoring at or above `Fuzzy_Match_Threshold__c` percent is proposed when
@@ -9327,8 +9327,8 @@ mirrors the primary member).
 | v0.8 | 2026-10-29 | Organization record type removed (RT5, ADR-0141, D-134). No object or field added. The packaged `Account.Organization` record type and its compact layout are deleted. `Is_Organization__c` also counts an account of the master record type (no developer name) as an organization when the setting is `Master`. R-O5: a stored record type that is no longer a candidate is replaced by the detected one on each install, upgrade or source deploy, so the formula and `AccountKinds` agree. R-O4: `Master` is offered and saved only when the org has no candidate, and a stored `Master` is stale once it has one. |
 | v0.11 | 2026-10-29 | Edition stored values (ADR-0143, `0143-edition-internal-values.md`). No object or field added. `BarnCRM_Settings__c.Suite__c` stores `Standard` and `Nonprofit` instead of `Community` and `Impact`, and `BarnCRM_Module__mdt.Editions__c` names the same values. Core's post-install steps rewrite an old stored value once. |
 | v0.11 | 2026-10-29 | Security review G-L4 and G-L5 (owner decisions). No object or field added. New R-AK13 (ADR-0144, `0144-acknowledgments-honor-email-opt-out.md`): an email gift whose recipient contact has Email Opt Out is not emailed, gets no row and stays queued, and the letter run takes it as a letter. `Giving_Admin` loses View All on `Commitment__c`, matching `Gift__c`; commitment record access comes from ownership, roles and sharing. |
-| v1.0 | 2026-10-30 | Advanced duplicate management (C-51, D-154, ADR-NEXT `NEXT-advanced-duplicate-management.md`). Object `Merge_Journal__c` added (Section 29A); custom metadata type `Merge_Rule__mdt` added (Section 13); settings keys `Fuzzy_Match_Threshold__c`, `Merge_Default_Rule__c` and `Auto_Merge_Exact_Match__c`. R-DP1 and R-DP4 amended; R-DP7 to R-DP10 added. |
-| v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-NEXT). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a) by any user with the import permission and edit access to the rows; `Import_Batch__c` gains `Retried_By__c` (Rows Retried By) so undo covers their records. R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
+| v1.0 | 2026-10-30 | Advanced duplicate management (C-51, D-154, ADR-0145 `0145-advanced-duplicate-management.md`). Object `Merge_Journal__c` added (Section 29A); custom metadata type `Merge_Rule__mdt` added (Section 13); settings keys `Fuzzy_Match_Threshold__c`, `Merge_Default_Rule__c` and `Auto_Merge_Exact_Match__c`. R-DP1 and R-DP4 amended; R-DP7 to R-DP10 added. |
+| v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-0149). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a) by any user with the import permission and edit access to the rows; `Import_Batch__c` gains `Retried_By__c` (Rows Retried By) so undo covers their records. R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
 
 ---
 ## 32. Entity ownership by package

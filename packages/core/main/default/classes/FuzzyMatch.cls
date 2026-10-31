@@ -1,5 +1,5 @@
 /**
- * The one fuzzy string scorer BarnCRM uses (C-51, ADR-NEXT advanced duplicate management):
+ * The one fuzzy string scorer BarnCRM uses (C-51, ADR-0145 advanced duplicate management):
  * the duplicate scan scores people's names with it (R-DP7) and the importer's header matching
  * (C-49e) scores column headers with it, so both agree on what "alike" means.
  *

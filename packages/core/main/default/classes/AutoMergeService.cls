@@ -1,6 +1,6 @@
 /**
  * Auto-merge of exact people matches, journaled and undoable (C-51, canonical model R-DP9 and
- * R-DP10, ADR-NEXT advanced duplicate management).
+ * R-DP10, ADR-0145 advanced duplicate management).
  *
  * Candidates are the open people pairs in the review list that meet the Exact Match For
  * Auto-Merge setting. The kept person is the one whose household has more members, else the

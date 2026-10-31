@@ -1,6 +1,6 @@
 # ADR-0111: Load one object loads related records from the same file, keyed by the record key
 
-**Status:** Superseded by `NEXT-several-objects-in-one-upload.md` (owner decision D-154,
+**Status:** Superseded by `0147-several-objects-in-one-upload.md` (owner decision D-154,
 2026-10-30): the load engine runs in steps, and a template with a Related Object is two of them
 under the rules below; the wizard offers Several Objects in One File for new templates.
 Previously: Proposed (builder decision)

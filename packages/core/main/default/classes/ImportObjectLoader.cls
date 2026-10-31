@@ -19,7 +19,7 @@
  * record is first asked about through the org's active duplicate rules for the object; a record
  * they match is updated instead. A record ID or upsert key match always wins over the rules.
  *
- * A chunk loads in steps (R-IT20; ADR-NEXT `NEXT-several-objects-in-one-upload.md`): one for a
+ * A chunk loads in steps (R-IT20; ADR-0147 `0147-several-objects-in-one-upload.md`): one for a
  * one-object template, two with a Related Object (R-IT17; ADR-0111), one per object for an
  * upload of several objects, parents first. Each step runs the one-object load above over the
  * rows that give its object values. A record links to its row's record of each earlier step

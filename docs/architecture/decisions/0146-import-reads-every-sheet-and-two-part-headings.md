@@ -1,4 +1,4 @@
-# ADR-NEXT: The import reads every sheet of a workbook, and headings that name an object
+# ADR-0146: The import reads every sheet of a workbook, and headings that name an object
 
 **Status:** Accepted (owner decision)
 **Date:** 2026-10-30

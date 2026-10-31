@@ -1,5 +1,5 @@
 /**
- * Which value wins when two people are merged (C-51, canonical model R-DP8, ADR-NEXT advanced
+ * Which value wins when two people are merged (C-51, canonical model R-DP8, ADR-0145 advanced
  * duplicate management).
  *
  * Each person field follows its active Merge Rule row (`Merge_Rule__mdt`), and a field with no

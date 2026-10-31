@@ -55,9 +55,9 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0044](0044-primary-contact-mirrors-the-primary-member.md) | The household's Primary Contact mirrors the primary member, person accounts included | Accepted (provisional) |
 | [0045](0045-gift-batch-entry-keeps-its-own-lines.md) | Gift batch entry keeps its own lines rather than staging through the import framework | Accepted |
 | [0046](0046-suites-and-packaging.md) | Two suites from the same packages, a tentative name, unlocked now and managed at listing | Accepted |
-| [0047](0047-data-management-scope.md) | Data management runs in the org, compiles queries from a document, and is phased | Accepted |
+| [0047](0047-data-management-scope.md) | Data management runs in the org, compiles queries from a document, and is phased | Accepted; amended in part by ADR-0148 |
 | [0048](0048-health-check-fixes-create-or-set-never-delete.md) | Health Check fix buttons create or set, never delete, and ask first | Accepted (builder decision) |
-| [0049](0049-xlsx-read-in-the-browser-without-sheetjs.md) | Excel workbooks are read in the browser without SheetJS | Accepted (builder decision) |
+| [0049](0049-xlsx-read-in-the-browser-without-sheetjs.md) | Excel workbooks are read in the browser without SheetJS | Accepted (builder decision); amended by ADR-0146 |
 | [0050](0050-duplicates-use-the-orgs-own-duplicate-rules.md) | Duplicate detection uses the org's own duplicate rules, and BarnCRM ships none | Accepted (builder decision) |
 | [0051](0051-inbound-gift-api-and-accounting-export.md) | The inbound gift API keeps a small permanent surface, and the accounting export marks nothing | Accepted |
 | [0052](0052-gift-import-and-donation-matching.md) | Gift import through the entity processor seam, and donation matching | Accepted (builder decision) |
@@ -119,7 +119,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0108](0108-a-second-primary-is-refused-on-a-single-save.md) | A second primary member is refused on a single save, and tolerated in a load (builds on ADR-0044) | Accepted (owner default, D-85) |
 | [0109](0109-relationship-mirror-upkeep-in-system-mode.md) | Relationship and affiliation upkeep run in system mode (extends ADR-0021) | Accepted (owner decision D-85) |
 | [0110](0110-erase-a-person-anonymizes-in-place.md) | Erase a person anonymizes the record in place, as the user, with a module seam | Proposed (builder decision) |
-| [0111](0111-load-related-records.md) | Load one object loads related records from the same file, keyed by the record key | Superseded by `NEXT-several-objects-in-one-upload.md` |
+| [0111](0111-load-related-records.md) | Load one object loads related records from the same file, keyed by the record key | Superseded by `0147-several-objects-in-one-upload.md` |
 | [0112](0112-more-transform-steps.md) | Six more transform steps (map values, if then, keep part, first or last characters, shift a date, today), still a closed list with no evaluation | Proposed (builder decision) |
 | [0113](0113-import-row-rules.md) | Import row rules: skip rows and one row per key decided at staging, and empty cells that clear a field only where a column says so | Proposed (builder decision) |
 | [0114](0114-delete-by-file.md) | Delete by file is a one-object import operation that hands its dry run to the bulk delete job | Proposed (builder decision) |
@@ -153,8 +153,11 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0142](0142-admin-view-all-modify-all-on-account-and-contact.md) | BarnCRM Admin keeps View All and Modify All on Account and Contact | Accepted (owner decision) |
 | [0143](0143-edition-internal-values.md) | The edition's stored values are Standard and Nonprofit | Accepted (owner decision) |
 | [0144](0144-acknowledgments-honor-email-opt-out.md) | Acknowledgments honor the donor's email opt-out | Accepted (owner decision) |
-| [NEXT](NEXT-import-reads-every-sheet-and-two-part-headings.md) | The import reads every sheet of a workbook, and headings that name an object | Accepted (owner decision) |
-| [NEXT](NEXT-several-objects-in-one-upload.md) | Several objects in one upload replaces the parent and child load | Accepted (owner decision) |
+| [0145](0145-advanced-duplicate-management.md) | Advanced duplicate management: fuzzy household-aware pairing, merge rules, auto-merge with undo | Accepted (owner decision) |
+| [0146](0146-import-reads-every-sheet-and-two-part-headings.md) | The import reads every sheet of a workbook, and headings that name an object (amends ADR-0049) | Accepted (owner decision) |
+| [0147](0147-several-objects-in-one-upload.md) | Several objects in one upload replaces the parent and child load (supersedes ADR-0111) | Accepted (owner decision) |
+| [0148](0148-import-creates-a-new-field-through-an-org-connection.md) | Import creates a new field through a one-time org connection (amends ADR-0047 for this case) | Accepted (owner decision) |
+| [0149](0149-import-row-correction-retention-and-undo.md) | Import rows are corrected on screen, deleted by a retention choice, and never needed by undo | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

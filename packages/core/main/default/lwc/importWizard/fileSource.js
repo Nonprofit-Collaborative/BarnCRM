@@ -7,7 +7,7 @@ import { isXlsx, readXlsx, readSheetNames } from './xlsx';
  * later one (a shared spreadsheet, a scheduled file, C-38) returns the same shape, and nothing
  * after this point knows which source it was (C-49a).
  *
- * A text file is one sheet with no name. A workbook is every sheet, in tab order (ADR-NEXT,
+ * A text file is one sheet with no name. A workbook is every sheet, in tab order (ADR-0146,
  * amending ADR-0049). Errors are the readers' own, for the wizard to put into words.
  *
  * @param {File} file the uploaded file

@@ -48,7 +48,7 @@ page, even if that puts it out of reading order.
 | [Find](find.md) | FIND | 10 | Query builder, typed queries, export, saved queries, summaries, Show More |
 | [Bulk update and delete](bulk-update-and-delete.md) | BULK | 13 | Bulk update, bulk delete, edit in Find, undo, the bulk path, Super Transform |
 | [Data Manager and job history](data-manager-and-job-history.md) | DM | 11 | Data Manager, data jobs and undo, data quality checks, field utilization and its snapshot history |
-| [Duplicates](duplicates.md) | DUP | 10 | Duplicate scan, review and merge, match sources |
+| [Duplicates](duplicates.md) | DUP | 17 | Duplicate scan, review and merge, match sources, similar names, merge rules, auto-merge and its undo |
 | [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 10 | Health Check findings and fixes, Org Optimizer sections, storage and limits, Data Dictionary |
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
 | [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 15 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import |

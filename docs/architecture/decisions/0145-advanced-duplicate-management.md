@@ -1,4 +1,4 @@
-# ADR-NEXT: Advanced duplicate management: fuzzy household-aware pairing, merge rules, auto-merge with undo
+# ADR-0145: Advanced duplicate management: fuzzy household-aware pairing, merge rules, auto-merge with undo
 
 **Status:** Accepted (owner decision, 2026-10-30)
 **Date:** 2026-10-30

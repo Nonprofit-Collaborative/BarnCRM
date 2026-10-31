@@ -1,4 +1,4 @@
-# ADR-NEXT: Import Creates a New Field Through a One-Time Org Connection
+# ADR-0148: Import Creates a New Field Through a One-Time Org Connection
 
 **Status:** Accepted (owner decision, Brandon, 2026-10-30: "in the import mapping step, a column
 can be mapped to a new field, which the app then creates with permissions")
