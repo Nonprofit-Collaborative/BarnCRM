@@ -158,6 +158,7 @@ in the order listed:
 | **First characters**, **Last characters** | Keeps the first or last number of characters you give. | first 5: `97201-1234` becomes `97201` |
 | **Shift a date** | Adds or takes away days or months. Use it on date fields: a date and time field refuses the result, record by record. | minus 30 days: `2025-12-31` becomes `2025-12-01` |
 | **Today's date** | Writes today's date, or only into empty fields if you tick **Only when empty**. | empty becomes today |
+| **Format digits** | Keeps the digits and writes them into a **Pattern** (one `#` for each digit). **Country code to drop** removes a leading code such as `1`; an extension (`x12`, `ext 12`) is kept as ` x12`. A value whose digits do not fit is left as it is. | `555.123.4567` with `(###) ###-####` becomes `(555) 123-4567` |
 
 The steps work on the value as text, and the result is then saved as the field's type: a
 number field takes `1,250.00` as 1250 (a whole-number field refuses `12.5` rather than drop the

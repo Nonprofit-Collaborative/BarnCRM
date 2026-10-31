@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM main as of 2026-10-29 (landing batch 13). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-31 (commit 1ddb4ed91). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 
@@ -20,7 +20,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 ### People and Households
 
 - [Finding people and records](find.md): search, list views and the Find tab.
-- [Changing many records at once](super-transform.md): Super Transform, with a preview and an undo.
+- [Changing many records at once](super-transform.md): Super Transform, with a preview and an undo, saved lists and a phone format.
 - [People and households](people-and-households.md): adding people, household members, names and greetings, merge and split, interaction notes.
 - [Addresses, email and phone](addresses-email-phone.md): several addresses, seasonal addresses, the preferred email and phone.
 - [Relationships and affiliations](relationships-affiliations.md): how people are connected to each other and to organizations.

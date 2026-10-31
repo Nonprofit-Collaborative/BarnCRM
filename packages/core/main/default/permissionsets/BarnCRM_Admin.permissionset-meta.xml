@@ -1471,6 +1471,16 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Saved_Transform__c.Definition_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Saved_Transform__c.Object_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Setting_Change__c.Changed_At__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -1713,6 +1723,15 @@
     <modifyAllRecords>false</modifyAllRecords>
     <object>Saved_Query__c</object>
     <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>true</modifyAllRecords>
+    <object>Saved_Transform__c</object>
+    <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
