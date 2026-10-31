@@ -180,3 +180,22 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 14 | As an admin without View All Users (no BarnCRM Access Manager permission set), repeat step 5. | Above **People With Access**: **You may not see everyone: without View All Users, this list shows only the people Salesforce lets you see.** With View All Users the line is not shown. |
 
 **Cleanup:** None. Access Explorer changes nothing.
+
+## T-HC-12: Access Explorer Compares Two People and Reports Modify All
+
+**Purpose:** Confirm an admin can compare two people or two permission sets, showing differences only by default, and can list who holds Modify All Data, View All Data and object-level Modify All and View All.
+**Prerequisites:** admin and staff (see [Test users](before-you-test.md#test-users)); staff holds the **Team Member** role; the org has a System Administrator profile user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open **Org Optimizer**, choose **Access Explorer**, then **Compare Two**. | **Compare** set to **People**, two search boxes labeled **First** and **Second**, and **Choose two to compare.** |
+| 2 | Choose the admin under **First** and the staff user under **Second**. | A **Similarity** percentage, **Differences Only** checked, and a **Kinds of Record** table whose **Difference** column reads, for example, **Only {admin name}: Edit, Delete.** Every row differs. A line says how many rows differ. |
+| 3 | Clear **Differences Only**. | Rows both people give identically appear with a blank **Difference**. |
+| 4 | Choose **Relationship** in **Compare Fields For**. | A **Fields** table, differences only, with **Read** and **Edit** for each side and **Difference**. |
+| 5 | Set **Compare** to **Permission Sets**. Both choices clear. Type `Staff` under **First** and choose **BarnCRM Staff**, then type `Admin` under **Second** and choose **BarnCRM Admin**. | The tables show the two sets' differences, with the two set names as column headings. |
+| 6 | Choose the same permission set on both sides. | **Similarity** reads 100% and the table says **No differences.** |
+| 7 | Choose **Modify All Report**. | **Data-Wide Access** lists the System Administrator profile with **Modify All Data** and **View All Data**. **Kinds of Record** lists object-level Modify All and View All, with **Scope**, **Active People** and **In Groups**. |
+| 8 | Click **Download CSV** under each table. | A file named **Access_Explorer-** and today's date ending .csv downloads, and **Downloaded {n} rows.** shows. |
+| 9 | As staff, open **Org Optimizer**. | There is no **Access Explorer** tile, so neither view is reachable. |
+
+**Cleanup:** None. Access Explorer changes nothing.

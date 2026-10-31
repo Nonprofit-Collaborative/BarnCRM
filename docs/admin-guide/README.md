@@ -153,7 +153,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |
 | Field utilization | [field-utilization.md](field-utilization.md) | Core |
 | C-52 Data Dictionary (the Data Dictionary section of Org Optimizer) | [data-dictionary.md](data-dictionary.md) | Core |
-| C-53 Access Explorer (the Access Explorer section of Org Optimizer) | [access-explorer.md](access-explorer.md) | Core |
+| C-53 and C-53b Access Explorer, with Compare Two and the Modify All Report (a section of Org Optimizer) | [access-explorer.md](access-explorer.md) | Core |
 
 ### Automation, Totals and Health
 

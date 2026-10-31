@@ -7,13 +7,15 @@
 
 The **Access Explorer** section of **Org Optimizer** answers "who can see or change what, and
 why". It reads your org's profiles, permission sets and permission set groups and shows the
-answer three ways:
+answer five ways:
 
 | View | What it shows |
 |---|---|
 | **By Person or Permission Set** | Everything one person can read, create, edit or delete, kind of record by kind of record, and the profile, permission sets and permission set groups that give it. Choose **Permission Set** instead to see what one profile, permission set or group gives. Choose a kind of record to see field access too. |
 | **By Kind of Record** | For one kind of record (or one of its fields), every profile, permission set and permission set group that gives access, how many active people hold each, and a list of the people who have access, 50 at a time. |
 | **BarnCRM Permission Sets** | Every permission set and role BarnCRM ships, how many active people hold each, and whether the hourly Tab Access Check is scheduled. |
+| **Compare Two** | Two people, or two profiles, permission sets or groups, side by side: what each can do on every kind of record (and on the fields of one), showing only the differences unless you ask for everything, with a similarity score. |
+| **Modify All Report** | Every profile, permission set and group that holds **Modify All Data** or **View All Data**, and every one that holds **Modify All** or **View All** on a kind of record, with how many active people hold each and the groups it sits inside. |
 
 Each table has **Download CSV**, which saves what it shows.
 
@@ -58,7 +60,45 @@ Start from the sample data (see [Sample data](sample-data.md)).
    `Staff`. Choose **BarnCRM Staff**: the table shows only what that permission set gives.
 7. Choose **BarnCRM Permission Sets**. Each BarnCRM role and permission set shows how many
    active people hold it directly, and the **Tab Access Check** line says when it runs next.
-8. Press **Download CSV** under any table.
+8. Choose **Compare Two**. Leave **Compare** on **People**, type part of one colleague's name
+   under **First** and choose them, then do the same under **Second**. The page shows a
+   **Similarity** percentage and a **Kinds of Record** table with only the rows where the two
+   differ. **Difference** reads, for example, "Only Pat: Edit, Delete. Only Sam: View All".
+   Clear **Differences Only** to see every row. Choose a kind of record in **Compare Fields
+   For** to compare its fields the same way.
+9. Choose **Modify All Report**. **Data-Wide Access** lists everything that holds Modify All Data
+   or View All Data. **Kinds of Record** lists every Modify All and View All on a single kind of
+   record. **In Groups** names the permission set groups a holder sits inside, so you know where
+   to remove it.
+10. Press **Download CSV** under any table.
+
+## Comparing Two
+
+- **People or permission sets, not a mix.** **Compare** is **People** or **Permission Sets**
+  (profiles, permission sets and groups). The two sides use the same choice.
+- **What is compared.** The same totals **By Person or Permission Set** shows: profile,
+  permission sets and groups added together. Read, Create, Edit, Delete, View All and Modify All
+  are compared per kind of record; Read and Edit per field. A kind of record one side cannot
+  read at all counts as no access.
+- **Similarity.** The share of permissions given by both sides out of the permissions given by
+  either side, as a whole percentage (100% when both give nothing). It counts kinds of record, not
+  fields.
+- **Differences Only** is on by default. The counts above each table say how many rows differ.
+
+## The Modify All Report
+
+Modify All Data and View All Data are the broadest permissions in Salesforce: they override
+object, field and sharing settings. The report answers "who holds these, and through what".
+
+- **Data-Wide Access** has one row per profile, permission set or group holding either, with
+  **Active People** (people it is assigned to directly) and **In Groups**.
+- **Kinds of Record** has one row per kind of record and holder with Modify All or View All on
+  it, for standard objects and custom objects alike (**Scope** says which). Modify All always
+  includes View All. Holders of Modify All Data or View All Data are left out of this table,
+  because they hold it on every kind of record; they are in **Data-Wide Access**.
+- **Through what.** A holder that is a permission set inside a group says so under **In Groups**:
+  a person may hold it only through that group.
+- If more than 2,000 rows qualify, the first 2,000 are listed and the page says the list is cut.
 
 ## How Access Is Worked Out
 
@@ -90,7 +130,10 @@ Access Explorer reads only what one view needs, when you ask for it:
   If more than 2,000 profiles and permission sets give access to one kind of record, the first
   2,000 are listed and the page says the list is cut.
 
-Comparing two people or two permission sets side by side is planned as a later addition.
+**Compare Two** reads the two sides' access exactly as **By Person or Permission Set** does, and
+fields only for the kind of record you choose. The **Modify All Report** reads two things only:
+the profiles and permission sets with Modify All Data or View All Data, and the object
+permissions with Modify All or View All, up to 2,000 rows.
 
 ## Download CSV
 

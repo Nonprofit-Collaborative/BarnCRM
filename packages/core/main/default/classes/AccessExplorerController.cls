@@ -119,6 +119,9 @@ public with sharing class AccessExplorerController {
         public Boolean viewAllData = false;
         @AuraEnabled
         public Boolean modifyAllData = false;
+        /** The permission set groups a profile or permission set sits inside, with a comma. */
+        @AuraEnabled
+        public String inGroups;
     }
 
     /** One kind of record, one field, or one person, with its permissions. */
@@ -201,6 +204,39 @@ public with sharing class AccessExplorerController {
         public Boolean tabAccessCheckScheduled = false;
         @AuraEnabled
         public Datetime tabAccessCheckNextRun;
+    }
+
+    /** One profile, permission set or group holding View All or Modify All on one object. */
+    public class HolderRow extends Flags {
+        @AuraEnabled
+        public String objectName;
+        @AuraEnabled
+        public String objectLabel;
+        /** "standard" or "custom". */
+        @AuraEnabled
+        public String scope;
+        @AuraEnabled
+        public String holderId;
+        @AuraEnabled
+        public String holder;
+        @AuraEnabled
+        public String kind;
+        @AuraEnabled
+        public String inGroups;
+        @AuraEnabled
+        public Integer activePeople = 0;
+    }
+
+    /** Who holds View All Data, Modify All Data, and object-level View All and Modify All. */
+    public class ModifyAllReport {
+        /** Holders of View All Data or Modify All Data. */
+        @AuraEnabled
+        public List<Grant> dataGrants = new List<Grant>();
+        /** One row per object and holder. */
+        @AuraEnabled
+        public List<HolderRow> objects = new List<HolderRow>();
+        @AuraEnabled
+        public Boolean truncated = false;
     }
 
     /**
@@ -555,6 +591,73 @@ public with sharing class AccessExplorerController {
     }
 
     /**
+     * Every profile, permission set and group that holds View All Data or Modify All Data, and
+     * every one that holds View All or Modify All on a kind of record, with active holders and
+     * the groups each sits inside. Read only.
+     * @return the data-wide holders and one row per kind of record and holder
+     */
+    @AuraEnabled
+    public static ModifyAllReport getModifyAllReport() {
+        try {
+            requirePermission();
+            ModifyAllReport result = new ModifyAllReport();
+            Integer cap = maxGrants + 1;
+            List<PermissionSet> dataSets = querySets(
+                '(PermissionsViewAllData = TRUE OR PermissionsModifyAllData = TRUE) LIMIT ' + cap,
+                new Map<String, Object>()
+            );
+            // A holder of View All Data or Modify All Data has it on every kind of record, so
+            // its own object rows would only bury the real object-level grants.
+            Set<Id> dataSetIds = new Map<Id, PermissionSet>(dataSets).keySet();
+            List<ObjectPermissions> permissions = [
+                SELECT ParentId, SobjectType, PermissionsViewAllRecords, PermissionsModifyAllRecords
+                FROM ObjectPermissions
+                WHERE
+                    (PermissionsViewAllRecords = TRUE
+                    OR PermissionsModifyAllRecords = TRUE)
+                    AND ParentId NOT IN :dataSetIds
+                WITH USER_MODE
+                ORDER BY SobjectType, ParentId
+                LIMIT :cap
+            ];
+            result.truncated = dataSets.size() > maxGrants || permissions.size() > maxGrants;
+            while (permissions.size() > maxGrants) {
+                permissions.remove(permissions.size() - 1);
+            }
+            Set<Id> parentIds = new Set<Id>();
+            for (ObjectPermissions permission : permissions) {
+                parentIds.add(permission.ParentId);
+            }
+            Map<Id, Grant> holders = new Map<Id, Grant>();
+            for (PermissionSet permissionSet : dataSets) {
+                holders.put(permissionSet.Id, grantOf(permissionSet));
+            }
+            for (
+                PermissionSet permissionSet : querySets(
+                    'Id IN :parentIds',
+                    new Map<String, Object>{ 'parentIds' => parentIds }
+                )
+            ) {
+                holders.put(permissionSet.Id, grantOf(permissionSet));
+            }
+            countHolders(holders);
+            Map<Id, List<String>> groups = groupsHolding(holders.keySet());
+            for (Grant holder : holders.values()) {
+                holder.inGroups = groups.containsKey(holder.id)
+                    ? String.join(groups.get(holder.id), ', ')
+                    : null;
+            }
+            for (PermissionSet permissionSet : dataSets) {
+                result.dataGrants.add(holders.get(permissionSet.Id));
+            }
+            result.objects = holderRows(permissions, holders);
+            return result;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Access explorer modify all report');
+        }
+    }
+
+    /**
      * Where Access Explorer opens, for the Access page's Open Access Explorer button and for Org
      * Optimizer, which opens the section the page state names.
      * @return the tab URL with the section in its state, and the state key
@@ -676,6 +779,64 @@ public with sharing class AccessExplorerController {
         ]) {
             grants.get((Id) counted.get('setId')).activePeople = (Integer) counted.get('people');
         }
+    }
+
+    /** The labels of the groups each permission set sits inside, by the set's Id. */
+    private static Map<Id, List<String>> groupsHolding(Set<Id> setIds) {
+        Map<Id, List<String>> groups = new Map<Id, List<String>>();
+        for (PermissionSetGroupComponent component : [
+            SELECT PermissionSetId, PermissionSetGroup.MasterLabel
+            FROM PermissionSetGroupComponent
+            WHERE PermissionSetId IN :setIds
+            WITH USER_MODE
+        ]) {
+            if (!groups.containsKey(component.PermissionSetId)) {
+                groups.put(component.PermissionSetId, new List<String>());
+            }
+            groups.get(component.PermissionSetId).add(component.PermissionSetGroup.MasterLabel);
+        }
+        for (List<String> labels : groups.values()) {
+            labels.sort();
+        }
+        return groups;
+    }
+
+    /** One row per object and holder, by object label then holder. */
+    private static List<HolderRow> holderRows(
+        List<ObjectPermissions> permissions,
+        Map<Id, Grant> holders
+    ) {
+        Map<String, HolderRow> byKey = new Map<String, HolderRow>();
+        for (ObjectPermissions permission : permissions) {
+            Grant holder = holders.get(permission.ParentId);
+            if (holder == null) {
+                continue;
+            }
+            Schema.SObjectType token = NamespaceUtil.globalDescribe().get(permission.SobjectType);
+            HolderRow row = new HolderRow();
+            row.objectName = permission.SobjectType;
+            row.objectLabel = token == null ? row.objectName : token.getDescribe().getLabel();
+            row.scope = token != null && token.getDescribe().isCustom() ? 'custom' : 'standard';
+            row.holderId = holder.id;
+            row.holder = holder.label;
+            row.kind = holder.kind;
+            row.inGroups = holder.inGroups;
+            row.activePeople = holder.activePeople;
+            row.modifyAll = permission.PermissionsModifyAllRecords;
+            row.viewAll = permission.PermissionsViewAllRecords || row.modifyAll;
+            byKey.put(
+                (row.objectLabel + '\u0000' + row.objectName + '\u0000').toLowerCase() +
+                sortKey(row.kind, row.holder, row.holderId),
+                row
+            );
+        }
+        List<String> keys = new List<String>(byKey.keySet());
+        keys.sort();
+        List<HolderRow> sorted = new List<HolderRow>();
+        for (String key : keys) {
+            sorted.add(byKey.get(key));
+        }
+        return sorted;
     }
 
     /** A person's sets: their profile's own set and every assignment, groups included. */

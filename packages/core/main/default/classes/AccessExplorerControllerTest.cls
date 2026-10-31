@@ -217,6 +217,59 @@ private class AccessExplorerControllerTest {
     }
 
     @IsTest
+    static void theModifyAllReportListsDataWideAndObjectHolders() {
+        System.runAs(TestUsers.admin()) {
+            PermissionSet created = new PermissionSet(
+                Name = 'Access_Explorer_All_Set',
+                Label = 'Access Explorer All Set'
+            );
+            insert as system created;
+            insert as system new ObjectPermissions(
+                ParentId = created.Id,
+                SobjectType = RELATIONSHIP,
+                PermissionsRead = true,
+                PermissionsEdit = true,
+                PermissionsDelete = true,
+                PermissionsViewAllRecords = true,
+                PermissionsModifyAllRecords = true
+            );
+            insert as system new PermissionSetAssignment(
+                AssigneeId = TestUsers.admin().Id,
+                PermissionSetId = created.Id
+            );
+            AccessExplorerController.ModifyAllReport report;
+            System.runAs(maria()) {
+                report = AccessExplorerController.getModifyAllReport();
+            }
+            Boolean profileWithAllData = false;
+            for (AccessExplorerController.Grant grant : report.dataGrants) {
+                profileWithAllData |=
+                    grant.kind == AccessExplorerController.KIND_PROFILE && grant.modifyAllData;
+            }
+            Assert.isTrue(profileWithAllData, 'A profile with Modify All Data is listed.');
+            AccessExplorerController.HolderRow found;
+            for (AccessExplorerController.HolderRow row : report.objects) {
+                if (row.objectName == RELATIONSHIP && row.holderId == created.Id) {
+                    found = row;
+                }
+            }
+            Assert.isNotNull(found, 'The set is listed for Relationship.');
+            Assert.isTrue(found.viewAll && found.modifyAll, 'Both flags.');
+            Assert.areEqual('custom', found.scope, 'Relationship is a custom object.');
+            Assert.areEqual(AccessExplorerController.KIND_SET, found.kind, 'A permission set.');
+            Assert.areEqual(1, found.activePeople, 'One active holder.');
+            Assert.isFalse(report.truncated, 'Not cut.');
+
+            AccessExplorerController.maxGrants = 1;
+            System.runAs(maria()) {
+                report = AccessExplorerController.getModifyAllReport();
+            }
+            Assert.isTrue(report.truncated, 'More than one holder.');
+            Assert.isTrue(report.objects.size() <= 1, 'Cut to the limit.');
+        }
+    }
+
+    @IsTest
     static void searchFindsPeopleAndPermissionSets() {
         System.runAs(TestUsers.admin()) {
             PermissionSet created = testSet();
@@ -304,6 +357,7 @@ private class AccessExplorerControllerTest {
             List<String> messages = new List<String>();
             System.runAs(staff) {
                 messages.add(refusal('overview', null, null));
+                messages.add(refusal('report', null, null));
             }
             System.runAs(maria()) {
                 messages.add(refusal('object', 'No_Such_Object__c', null));
@@ -312,10 +366,11 @@ private class AccessExplorerControllerTest {
                 messages.add(refusal('access', UserInfo.getOrganizationId(), null));
             }
             Assert.areEqual(System.Label.Core_AccessExplorer_PermissionRequired, messages[0], '');
-            Assert.isTrue(messages[1].contains('No_Such_Object__c'), messages[1]);
-            Assert.isTrue(messages[2].contains('No_Such_Field__c'), messages[2]);
-            Assert.areEqual(System.Label.Core_AccessExplorer_UnknownSubject, messages[3], '');
+            Assert.areEqual(System.Label.Core_AccessExplorer_PermissionRequired, messages[1], '');
+            Assert.isTrue(messages[2].contains('No_Such_Object__c'), messages[2]);
+            Assert.isTrue(messages[3].contains('No_Such_Field__c'), messages[3]);
             Assert.areEqual(System.Label.Core_AccessExplorer_UnknownSubject, messages[4], '');
+            Assert.areEqual(System.Label.Core_AccessExplorer_UnknownSubject, messages[5], '');
         }
     }
 
@@ -323,6 +378,8 @@ private class AccessExplorerControllerTest {
         try {
             if (call == 'overview') {
                 AccessExplorerController.getOverview();
+            } else if (call == 'report') {
+                AccessExplorerController.getModifyAllReport();
             } else if (call == 'object') {
                 AccessExplorerController.getObjectAccess(first, second);
             } else {

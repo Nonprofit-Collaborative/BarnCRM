@@ -362,6 +362,27 @@ describe('c-access-explorer', () => {
     expect(getOverview).toHaveBeenCalledTimes(1);
   });
 
+  it('offers Compare Two and the Modify All Report as views', async () => {
+    const element = await render();
+
+    expect(byId(element, 'view').options.map((option) => option.value)).toEqual([
+      'subject',
+      'object',
+      'barncrm',
+      'compare',
+      'modifyAll'
+    ]);
+    expect(byId(element, 'compare')).toBeNull();
+
+    await choose(element, 'view', 'compare');
+    expect(byId(element, 'compare')).not.toBeNull();
+    expect(byId(element, 'subject-view')).toBeNull();
+
+    await choose(element, 'view', 'modifyAll');
+    expect(byId(element, 'modify-all')).not.toBeNull();
+    expect(byId(element, 'compare')).toBeNull();
+  });
+
   it('shows the server message when a read fails', async () => {
     getOverview.mockRejectedValue({ body: { message: 'You need the permission.' } });
     const element = await render();

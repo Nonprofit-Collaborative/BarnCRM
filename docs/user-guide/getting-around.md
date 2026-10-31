@@ -33,7 +33,8 @@ have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matc
 **Import** and **Super Transform** are not in the navigation: open them from their cards on
 the **Data Manager** tab. Administrators also find a **Data Dictionary** section inside **Org
 Optimizer**, which lists every field and downloads it as a CSV, and an **Access Explorer**
-section there that shows who can see or change what, and why. If you import files, the
+section there that shows who can see or change what, and why, compares two people side by side
+and lists who holds Modify All Data. If you import files, the
 **Check Columns** step shows a few example values beside each column, so you can see each
 column lands in the right field before anything loads; a column matched from a near spelling
 (`Frist Name`) shows a **Best Guess, Check It** badge, and you accept it or choose another

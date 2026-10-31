@@ -17,6 +17,8 @@ import SHOW from '@salesforce/label/c.Core_AccessExplorer_Show';
 import VIEW_SUBJECT from '@salesforce/label/c.Core_AccessExplorer_ViewSubject';
 import VIEW_OBJECT from '@salesforce/label/c.Core_AccessExplorer_ViewObject';
 import VIEW_BARNCRM from '@salesforce/label/c.Core_AccessExplorer_ViewBarnCrm';
+import VIEW_COMPARE from '@salesforce/label/c.Core_AccessCompare_ViewCompare';
+import VIEW_MODIFY_ALL from '@salesforce/label/c.Core_AccessCompare_ViewModifyAll';
 import LOOK_UP from '@salesforce/label/c.Core_AccessExplorer_LookUp';
 import LOOK_UP_PERSON from '@salesforce/label/c.Core_AccessExplorer_LookUpPerson';
 import LOOK_UP_SET from '@salesforce/label/c.Core_AccessExplorer_LookUpSet';
@@ -130,7 +132,9 @@ export default class AccessExplorer extends LightningElement {
   viewOptions = [
     { label: VIEW_SUBJECT, value: 'subject' },
     { label: VIEW_OBJECT, value: 'object' },
-    { label: VIEW_BARNCRM, value: 'barncrm' }
+    { label: VIEW_BARNCRM, value: 'barncrm' },
+    { label: VIEW_COMPARE, value: 'compare' },
+    { label: VIEW_MODIFY_ALL, value: 'modifyAll' }
   ];
   lookUpOptions = [
     { label: LOOK_UP_PERSON, value: 'person' },
@@ -180,6 +184,14 @@ export default class AccessExplorer extends LightningElement {
 
   get isBarnCrmView() {
     return this.view === 'barncrm';
+  }
+
+  get isCompareView() {
+    return this.view === 'compare';
+  }
+
+  get isModifyAllView() {
+    return this.view === 'modifyAll';
   }
 
   get noResults() {

@@ -220,6 +220,14 @@
             </div>
         </template>
 
+        <template lwc:if={isCompareView}>
+            <c-access-compare data-id="compare"></c-access-compare>
+        </template>
+
+        <template lwc:if={isModifyAllView}>
+            <c-access-modify-all data-id="modify-all"></c-access-modify-all>
+        </template>
+
         <template lwc:if={isBarnCrmView}>
             <div class="slds-var-m-top_medium" data-id="barncrm-view">
                 <template lwc:if={overview}>

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_AccessCompare_ViewCompare</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: view choice</shortDescription>
+        <value>Compare Two</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_ViewModifyAll</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: view choice</shortDescription>
+        <value>Modify All Report</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_Compare</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: what is compared</shortDescription>
+        <value>Compare</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_People</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: people choice</shortDescription>
+        <value>People</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_Sets</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: permission sets choice</shortDescription>
+        <value>Permission Sets</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_First</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: first side</shortDescription>
+        <value>First</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_Second</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: second side</shortDescription>
+        <value>Second</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_Choose</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: prompt</shortDescription>
+        <value>Choose two to compare.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_Similarity</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: similarity, {0} is the percentage</shortDescription>
+        <value>Similarity: {0}%</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_DifferencesOnly</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: filter</shortDescription>
+        <value>Differences Only</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_KindsHeading</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: object table heading</shortDescription>
+        <value>Kinds of Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_FieldsFor</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: field object picker</shortDescription>
+        <value>Compare Fields For</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_FieldsHeading</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: field table heading</shortDescription>
+        <value>Fields</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_Counts</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: {0} is rows that differ, {1} is rows compared</shortDescription>
+        <value>{0} of {1} rows differ.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_NoDifferences</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: nothing differs</shortDescription>
+        <value>No differences.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_OnlyIn</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: {0} is a name, {1} is permissions only that side has</shortDescription>
+        <value>Only {0}: {1}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_None</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: no access</shortDescription>
+        <value>None</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessCompare_ColDifference</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access compare: difference column</shortDescription>
+        <value>Difference</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessModifyAll_DataHeading</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Modify all report: data-wide table heading</shortDescription>
+        <value>Data-Wide Access</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessModifyAll_ObjectsHeading</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Modify all report: object table heading</shortDescription>
+        <value>Kinds of Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessModifyAll_ColViewAllData</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Modify all report: column</shortDescription>
+        <value>View All Data</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessModifyAll_ColModifyAllData</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Modify all report: column</shortDescription>
+        <value>Modify All Data</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessModifyAll_ColInGroups</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Modify all report: column</shortDescription>
+        <value>In Groups</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessModifyAll_ColScope</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Modify all report: column</shortDescription>
+        <value>Scope</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessModifyAll_ScopeStandard</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Modify all report: standard object</shortDescription>
+        <value>Standard</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessModifyAll_ScopeCustom</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Modify all report: custom object</shortDescription>
+        <value>Custom</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessModifyAll_Truncated</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Modify all report: {0} is the row limit</shortDescription>
+        <value>The list is cut at {0} rows.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessModifyAll_Intro</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Modify all report: intro</shortDescription>
+        <value>Who holds Modify All Data, View All Data, and Modify All or View All on a kind of record, and through what.</value>
+    </labels>
+</CustomLabels>

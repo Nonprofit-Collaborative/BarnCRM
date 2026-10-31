@@ -1,0 +1,134 @@
+<template>
+    <div class="slds-is-relative slds-var-m-top_medium" data-id="compare-view">
+        <lightning-radio-group
+            data-id="kind"
+            name="kind"
+            label={labels.compare}
+            type="button"
+            options={kindOptions}
+            value={kind}
+            onchange={handleKind}
+        ></lightning-radio-group>
+
+        <template lwc:if={errorMessage}>
+            <p class="slds-text-color_error slds-var-m-vertical_small" data-id="error" role="alert">
+                {errorMessage}
+            </p>
+        </template>
+        <template lwc:if={noticeMessage}>
+            <p class="slds-var-m-vertical_small" data-id="notice" role="status" aria-live="polite">
+                {noticeMessage}
+            </p>
+        </template>
+        <template lwc:if={loading}>
+            <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </template>
+
+        <template for:each={sideItems} for:item="side">
+            <div key={side.key} class="slds-var-m-top_small" data-id="side">
+                <lightning-input
+                    data-id="search"
+                    data-side={side.key}
+                    type="search"
+                    label={side.label}
+                    placeholder={labels.searchPlaceholder}
+                    value={side.term}
+                    onchange={handleTerm}
+                ></lightning-input>
+                <template lwc:if={side.noResults}>
+                    <p class="slds-var-m-top_x-small" data-id="no-matches">{labels.noMatches}</p>
+                </template>
+                <ul class="slds-var-m-top_x-small" data-id="results">
+                    <template for:each={side.resultItems} for:item="choice">
+                        <li key={choice.id}>
+                            <lightning-button
+                                variant="base"
+                                label={choice.text}
+                                data-side={side.key}
+                                data-value={choice.id}
+                                onclick={handleChoose}
+                            ></lightning-button>
+                        </li>
+                    </template>
+                </ul>
+                <template lwc:if={side.heading}>
+                    <p class="slds-text-heading_small slds-var-m-top_x-small" data-id="chosen">
+                        {side.heading}
+                    </p>
+                </template>
+            </div>
+        </template>
+
+        <template lwc:if={bothChosen}>
+            <p class="slds-text-heading_small slds-var-m-top_medium" data-id="similarity">
+                {similarityText}
+            </p>
+            <lightning-input
+                class="slds-var-m-top_small"
+                data-id="differences-only"
+                type="checkbox"
+                label={labels.differencesOnly}
+                checked={differencesOnly}
+                onchange={handleDifferencesOnly}
+            ></lightning-input>
+
+            <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.kindsHeading}</h3>
+            <p data-id="object-count">{objectTable.count}</p>
+            <template lwc:if={objectTable.empty}>
+                <p data-id="object-empty">{labels.noDifferences}</p>
+            </template>
+            <template lwc:else>
+                <lightning-datatable
+                    data-id="objects"
+                    key-field="key"
+                    data={objectTable.rows}
+                    columns={objectTable.columns}
+                    hide-checkbox-column
+                    wrap-text-max-lines="3"
+                ></lightning-datatable>
+            </template>
+            <lightning-button
+                class="slds-var-m-top_x-small"
+                label={labels.download}
+                data-table="objects"
+                onclick={handleDownload}
+            ></lightning-button>
+
+            <lightning-combobox
+                class="slds-var-m-top_medium"
+                data-id="field-object"
+                name="fieldObject"
+                label={labels.fieldsFor}
+                options={fieldObjectOptions}
+                value={fieldObject}
+                onchange={handleFieldObject}
+            ></lightning-combobox>
+            <template lwc:if={showFields}>
+                <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.fieldsHeading}</h3>
+                <p data-id="field-count">{fieldTable.count}</p>
+                <template lwc:if={fieldTable.empty}>
+                    <p data-id="field-empty">{labels.noDifferences}</p>
+                </template>
+                <template lwc:else>
+                    <lightning-datatable
+                        data-id="fields"
+                        key-field="key"
+                        data={fieldTable.rows}
+                        columns={fieldTable.columns}
+                        hide-checkbox-column
+                        wrap-text-max-lines="3"
+                    ></lightning-datatable>
+                </template>
+                <lightning-button
+                    class="slds-var-m-top_x-small"
+                    label={labels.download}
+                    data-table="fields"
+                    onclick={handleDownload}
+                ></lightning-button>
+            </template>
+        </template>
+        <template lwc:else>
+            <p class="slds-var-m-top_small" data-id="choose">{labels.choose}</p>
+        </template>
+    </div>
+</template>
