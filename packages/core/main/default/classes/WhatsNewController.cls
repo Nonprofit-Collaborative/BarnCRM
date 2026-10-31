@@ -189,8 +189,6 @@ public with sharing class WhatsNewController {
 
     private static AuraHandledException asUserError(Exception caught, String context) {
         ErrorLogger.log(caught, context);
-        AuraHandledException reported = new AuraHandledException(Label.Core_WhatsNew_Failed);
-        reported.setMessage(Label.Core_WhatsNew_Failed);
-        return reported;
+        return UserErrors.message(Label.Core_WhatsNew_Failed);
     }
 }

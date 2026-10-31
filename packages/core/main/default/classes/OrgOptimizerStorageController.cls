@@ -77,7 +77,7 @@ public with sharing class OrgOptimizerStorageController {
     @AuraEnabled
     public static Storage getStorage() {
         if (!hasPermission()) {
-            throw asAuraError(Label.Core_OrgOptimizer_ErrorNoPermission);
+            throw UserErrors.message(Label.Core_OrgOptimizer_ErrorNoPermission);
         }
         try {
             Storage result = new Storage();
@@ -170,11 +170,5 @@ public with sharing class OrgOptimizerStorageController {
             return permissionOverride;
         }
         return FeatureManagement.checkPermission(PERMISSION);
-    }
-
-    private static AuraHandledException asAuraError(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 }

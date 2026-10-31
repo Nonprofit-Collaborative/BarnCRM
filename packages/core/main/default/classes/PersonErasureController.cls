@@ -29,15 +29,12 @@ public with sharing class PersonErasureController {
     }
 
     private static AuraHandledException asUserError(Exception failed, Id personId) {
-        String message;
-        if (failed instanceof PersonErasure.ErasureException) {
-            message = failed.getMessage();
-        } else {
-            ErrorLogger.log(failed, 'PersonErasureController', personId);
-            message = Label.Core_Households_ErrorUnexpected;
-        }
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
+        return UserErrors.wrap(
+            failed,
+            failed instanceof PersonErasure.ErasureException,
+            'PersonErasureController',
+            personId,
+            Label.Core_Households_ErrorUnexpected
+        );
     }
 }

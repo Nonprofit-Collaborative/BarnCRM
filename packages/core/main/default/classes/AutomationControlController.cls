@@ -157,13 +157,11 @@ public with sharing class AutomationControlController {
      * page cannot explain.
      */
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof AutomationControl.AutomationControlException)) {
-            ErrorLogger.log(caught, context);
-            message = Label.Core_Automation_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof AutomationControl.AutomationControlException,
+            context,
+            Label.Core_Automation_UnexpectedError
+        );
     }
 }

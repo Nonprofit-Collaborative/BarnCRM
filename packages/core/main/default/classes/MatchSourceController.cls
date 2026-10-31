@@ -114,7 +114,7 @@ public with sharing class MatchSourceController {
         requireReader();
         Schema.SObjectType type = NamespaceUtil.objectType(objectName);
         if (type == null) {
-            throw auraError(
+            throw UserErrors.message(
                 String.format(Label.Core_MatchSource_NoSuchObject, new List<Object>{ objectName })
             );
         }
@@ -282,22 +282,17 @@ public with sharing class MatchSourceController {
             !FeatureManagement.checkPermission(SETTINGS_PERMISSION) &&
             !FeatureManagement.checkPermission(METADATA_PERMISSION)
         ) {
-            throw auraError(Label.Core_MatchLogic_PermissionRequired);
+            throw UserErrors.message(Label.Core_MatchLogic_PermissionRequired);
         }
     }
 
     /** A refusal the service explains is shown as it is; anything else is logged first. */
     private static AuraHandledException logged(Exception e) {
-        if (e instanceof CustomMetadataManagerService.CustomMetadataManagerException) {
-            return auraError(e.getMessage());
-        }
-        ErrorLogger.log(e, 'Duplicate Matching: matching logic');
-        return auraError(Label.Core_CmdtManager_LoadError);
-    }
-
-    private static AuraHandledException auraError(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
+        return UserErrors.wrap(
+            e,
+            e instanceof CustomMetadataManagerService.CustomMetadataManagerException,
+            'Duplicate Matching: matching logic',
+            Label.Core_CmdtManager_LoadError
+        );
     }
 }

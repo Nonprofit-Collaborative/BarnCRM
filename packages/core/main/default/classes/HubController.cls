@@ -80,7 +80,7 @@ public with sharing class HubController {
             return buildModel();
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw asAuraException(System.Label.Core_HubHome_LoadErrorMessage);
+            throw UserErrors.message(System.Label.Core_HubHome_LoadErrorMessage);
         }
     }
 
@@ -95,10 +95,10 @@ public with sharing class HubController {
         try {
             return HouseholdService.createEmptyHousehold();
         } catch (HouseholdException e) {
-            throw asAuraException(e.getMessage());
+            throw UserErrors.message(e.getMessage());
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw asAuraException(
+            throw UserErrors.message(
                 String.format(
                     System.Label.Core_HubHomeActions_NewHouseholdFailed,
                     new List<Object>{ e.getMessage() }
@@ -252,11 +252,5 @@ public with sharing class HubController {
     }
 
     private class HubPartException extends Exception {
-    }
-
-    private static AuraHandledException asAuraException(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 }

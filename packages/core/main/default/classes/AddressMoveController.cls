@@ -266,13 +266,11 @@ public with sharing class AddressMoveController {
      * user lacks among them, is logged and shown as one plain sentence.
      */
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof AddressService.AddressMoveException)) {
-            ErrorLogger.log(caught, context);
-            message = System.Label.Core_Address_MoveFailed;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof AddressService.AddressMoveException,
+            context,
+            System.Label.Core_Address_MoveFailed
+        );
     }
 }

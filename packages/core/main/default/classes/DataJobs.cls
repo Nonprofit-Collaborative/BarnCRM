@@ -329,18 +329,16 @@ public with sharing class DataJobs {
      * shown as it is; anything else is logged and summarized.
      */
     public static AuraHandledException userError(Exception caught, String context, Boolean known) {
-        String message = caught.getMessage();
-        if (
-            known != true &&
-            !(caught instanceof QueryCompiler.QueryCompilerException) &&
-            !(caught instanceof QueryFieldCatalog.QueryFieldCatalogException) &&
-            !(caught instanceof ImportException)
-        ) {
-            ErrorLogger.log(caught, context);
-            message = System.Label.Core_BulkUpdate_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        Boolean shown =
+            known == true ||
+            caught instanceof QueryCompiler.QueryCompilerException ||
+            caught instanceof QueryFieldCatalog.QueryFieldCatalogException ||
+            caught instanceof ImportException;
+        return UserErrors.wrap(
+            caught,
+            shown,
+            context,
+            System.Label.Core_BulkUpdate_UnexpectedError
+        );
     }
 }

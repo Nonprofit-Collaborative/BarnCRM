@@ -461,13 +461,11 @@ public with sharing class FieldUtilizationController {
     }
 
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof FieldUtilizationException)) {
-            ErrorLogger.log(caught, context);
-            message = System.Label.Core_FieldUtilization_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof FieldUtilizationException,
+            context,
+            System.Label.Core_FieldUtilization_UnexpectedError
+        );
     }
 }

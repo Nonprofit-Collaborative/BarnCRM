@@ -250,13 +250,11 @@ public with sharing class DataDictionaryController {
     }
 
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof DataDictionaryException)) {
-            ErrorLogger.log(caught, context);
-            message = System.Label.Core_DataDictionary_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof DataDictionaryException,
+            context,
+            System.Label.Core_DataDictionary_UnexpectedError
+        );
     }
 }

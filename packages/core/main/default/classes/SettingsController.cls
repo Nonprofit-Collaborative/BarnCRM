@@ -170,7 +170,7 @@ public with sharing class SettingsController {
             return buildModel();
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw asAuraException(System.Label.Core_Settings_LoadErrorMessage);
+            throw UserErrors.message(System.Label.Core_Settings_LoadErrorMessage);
         }
     }
 
@@ -194,7 +194,7 @@ public with sharing class SettingsController {
             return getConsoleModel();
         }
         if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
-            throw asAuraException(System.Label.Core_Settings_PermissionRequiredError);
+            throw UserErrors.message(System.Label.Core_Settings_PermissionRequiredError);
         }
         try {
             Map<String, Map<String, Object>> byObject = groupByObject(values);
@@ -204,10 +204,10 @@ public with sharing class SettingsController {
             return buildModel();
         } catch (SettingsService.SettingsException e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw asAuraException(e.getMessage());
+            throw UserErrors.message(e.getMessage());
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw asAuraException(System.Label.Core_Settings_SaveErrorMessage);
+            throw UserErrors.message(System.Label.Core_Settings_SaveErrorMessage);
         }
     }
 
@@ -222,7 +222,7 @@ public with sharing class SettingsController {
             return OrganizationAddress.savedParts();
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw asAuraException(System.Label.Core_OrganizationAddress_LoadError);
+            throw UserErrors.message(System.Label.Core_OrganizationAddress_LoadError);
         }
     }
 
@@ -273,7 +273,7 @@ public with sharing class SettingsController {
             }
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw asAuraException(System.Label.Core_Settings_LoadErrorMessage);
+            throw UserErrors.message(System.Label.Core_Settings_LoadErrorMessage);
         }
         return hits;
     }
@@ -321,7 +321,7 @@ public with sharing class SettingsController {
             }
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw asAuraException(System.Label.Core_Settings_LoadErrorMessage);
+            throw UserErrors.message(System.Label.Core_Settings_LoadErrorMessage);
         }
         return changes;
     }
@@ -820,7 +820,7 @@ public with sharing class SettingsController {
             return CompanyInformation.addressParts();
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw asAuraException(System.Label.Core_OrganizationAddress_LoadError);
+            throw UserErrors.message(System.Label.Core_OrganizationAddress_LoadError);
         }
     }
 
@@ -1030,11 +1030,5 @@ public with sharing class SettingsController {
         } catch (Exception unknown) {
             return null;
         }
-    }
-
-    private static AuraHandledException asAuraException(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 }

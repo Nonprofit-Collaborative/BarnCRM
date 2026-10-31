@@ -127,13 +127,13 @@ public with sharing class HealthCheckController {
         requireManageSettings();
         String fixLabel = fixLabel(fixKey);
         if (fixLabel == null) {
-            throw userError(System.Label.Core_HealthCheck_FixUnknown);
+            throw UserErrors.message(System.Label.Core_HealthCheck_FixUnknown);
         }
         Savepoint beforeFix = Database.setSavepoint();
         try {
             List<String> scope = HealthCheckService.fixScope(fixKey);
             if (scope.isEmpty() || !sameScope(scope, expectedScope)) {
-                throw userError(System.Label.Core_HealthCheck_FixStale);
+                throw UserErrors.message(System.Label.Core_HealthCheck_FixStale);
             }
             String outcome = runFix(fixKey, scope);
             SettingsService.logChange(
@@ -153,7 +153,7 @@ public with sharing class HealthCheckController {
         } catch (Exception e) {
             Database.rollback(beforeFix);
             ErrorLogger.log(e, System.Label.Core_HealthCheck_ErrorContext);
-            throw userError(System.Label.Core_HealthCheck_FixFailed);
+            throw UserErrors.message(System.Label.Core_HealthCheck_FixFailed);
         }
     }
 
@@ -246,13 +246,6 @@ public with sharing class HealthCheckController {
         left.sort();
         right.sort();
         return left.equals(right);
-    }
-
-    /** An error the panel shows as it is; the message is set so a test can read it too. */
-    private static AuraHandledException userError(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 
     private class HealthCheckFixException extends Exception {

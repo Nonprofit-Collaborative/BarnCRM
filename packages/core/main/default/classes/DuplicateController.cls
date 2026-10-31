@@ -461,16 +461,9 @@ public with sharing class DuplicateController {
      * with one sentence, because a stack trace in a toast helps nobody (plan Section 7.2).
      */
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
         Boolean expected =
             caught instanceof DuplicateService.DuplicateException ||
             caught instanceof HouseholdException;
-        if (!expected) {
-            ErrorLogger.log(caught, context);
-            message = Label.Core_Duplicates_ErrorUnexpected;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(caught, expected, context, Label.Core_Duplicates_ErrorUnexpected);
     }
 }
