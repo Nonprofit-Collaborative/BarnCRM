@@ -106,7 +106,9 @@ private class ImportSeveralObjectsSchemaTest {
                     ImportObjectSchema.linkField(Contact.SObjectType, Account.SObjectType),
                     'Not the primary affiliation the package keeps.'
                 );
-                Assert.isNull(
+                // An org's own Account lookup to Contact may still link; the package's never does.
+                Assert.areNotEqual(
+                    Account.Primary_Contact__c.getDescribe().getName(),
                     ImportObjectSchema.linkField(Account.SObjectType, Contact.SObjectType),
                     'Not the primary contact the package keeps.'
                 );
