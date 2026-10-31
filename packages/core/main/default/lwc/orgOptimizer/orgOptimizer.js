@@ -1,5 +1,7 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
+import { CurrentPageReference } from 'lightning/navigation';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
+import getOpenLink from '@salesforce/apex/AccessExplorerController.getOpenLink';
 import canFind from '@salesforce/customPermission/Find_And_Export_Records';
 import getErrorTile from '@salesforce/apex/ErrorLogController.getTile';
 import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
@@ -17,6 +19,8 @@ import FIELD_UTILIZATION from '@salesforce/label/c.Core_OrgOptimizer_FieldUtiliz
 import FIELD_UTILIZATION_TEXT from '@salesforce/label/c.Core_OrgOptimizer_FieldUtilizationText';
 import DATA_DICTIONARY from '@salesforce/label/c.Core_OrgOptimizer_DataDictionary';
 import DATA_DICTIONARY_TEXT from '@salesforce/label/c.Core_OrgOptimizer_DataDictionaryText';
+import ACCESS_EXPLORER from '@salesforce/label/c.Core_OrgOptimizer_AccessExplorer';
+import ACCESS_EXPLORER_TEXT from '@salesforce/label/c.Core_OrgOptimizer_AccessExplorerText';
 import HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_HealthCheck';
 import HEALTH_CHECK_TEXT from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckText';
 import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
@@ -64,6 +68,7 @@ export default class OrgOptimizer extends LightningElement {
     quality: QUALITY,
     fieldUtilization: FIELD_UTILIZATION,
     dataDictionary: DATA_DICTIONARY,
+    accessExplorer: ACCESS_EXPLORER,
     healthCheck: HEALTH_CHECK,
     errors: ERRORS,
     storage: STORAGE,
@@ -114,7 +119,8 @@ export default class OrgOptimizer extends LightningElement {
         this.tile('healthCheck', HEALTH_CHECK, HEALTH_CHECK_TEXT, 'standard:approval'),
         this.tile('errors', ERRORS, ERRORS_TEXT, 'standard:incident'),
         this.tile('storage', STORAGE, STORAGE_TEXT, 'standard:data_model'),
-        this.tile('setup', SETUP, SETUP_TEXT, 'standard:settings')
+        this.tile('setup', SETUP, SETUP_TEXT, 'standard:settings'),
+        this.tile('accessExplorer', ACCESS_EXPLORER, ACCESS_EXPLORER_TEXT, 'standard:user_role')
       );
     }
     return [
@@ -202,6 +208,44 @@ export default class OrgOptimizer extends LightningElement {
 
   get setupOpened() {
     return Boolean(this.opened.setup);
+  }
+
+  get accessExplorerOpened() {
+    return Boolean(this.opened.accessExplorer);
+  }
+
+  /** The page state, and the key that names a section to open (the Access page's button). */
+  pageState;
+  sectionLink;
+
+  @wire(CurrentPageReference)
+  wiredPage(pageReference) {
+    this.pageState = pageReference && pageReference.state;
+    this.openRequestedSection();
+  }
+
+  @wire(getOpenLink)
+  wiredOpenLink({ data }) {
+    // Refused without Manage BarnCRM Settings: then there is no section to open, and no error.
+    if (data) {
+      this.sectionLink = data;
+      this.openRequestedSection();
+    }
+  }
+
+  /** Opens Access Explorer when the page was opened for it, for administrators only. */
+  openRequestedSection() {
+    const link = this.sectionLink;
+    if (
+      canManageSettings &&
+      link &&
+      this.pageState &&
+      this.pageState[link.stateKey] === link.section
+    ) {
+      if (this.activeSection !== link.section) {
+        this.openSection(link.section);
+      }
+    }
   }
 
   get showHealthCheck() {

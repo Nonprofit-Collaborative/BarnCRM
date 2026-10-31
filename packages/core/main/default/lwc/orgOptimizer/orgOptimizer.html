@@ -81,6 +81,16 @@
                         <c-optimizer-setup></c-optimizer-setup>
                     </template>
                 </lightning-tab>
+                <lightning-tab
+                    label={labels.accessExplorer}
+                    value="accessExplorer"
+                    onactive={handleActive}
+                    data-id="tab-accessExplorer"
+                >
+                    <template lwc:if={accessExplorerOpened}>
+                        <c-access-explorer></c-access-explorer>
+                    </template>
+                </lightning-tab>
             </template>
         </lightning-tabset>
     </c-barn-page-shell>
