@@ -680,8 +680,7 @@ public with sharing class MatchSourceService {
     }
 
     /** No whitespace, upper case; a US ZIP+4 is cut to its five digits. */
-    @TestVisible
-    private static String postalCode(String value) {
+    public static String postalCode(String value) {
         if (String.isBlank(value)) {
             return null;
         }

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_DuplicateManagement_CandidateCap</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Scan warning: name pairing read its cap; {0} is the cap</shortDescription>
+        <value>Pairing similar names read {0} people for one chunk, the most it reads, so some similar names in that chunk may not have been compared.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_ReasonSameHousehold</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Why a pair is proposed: the same name in one household</shortDescription>
+        <value>Same name in the same household</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_ReasonSimilarNames</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Why a pair is proposed; {0} is a percent, {1} what they share</shortDescription>
+        <value>Similar names ({0}%) and the same {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_SharedEmail</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What two similar names share, inside a sentence</shortDescription>
+        <value>email</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_SharedPhone</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What two similar names share, inside a sentence</shortDescription>
+        <value>phone number</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_SharedPostalCode</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What two similar names share, inside a sentence</shortDescription>
+        <value>postal code</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_MergeRules</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Custom metadata page: name of the merge rules list</shortDescription>
+        <value>Merge Rules</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_MergeRulesHelp</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Custom metadata page: what merge rules are</shortDescription>
+        <value>Which value wins for one person field when auto-merge merges two people. Field Name is the field's API name, or MailingAddress or OtherAddress to move a whole address together. A field with no rule follows Merge Rule For Other Fields in the Duplicate Matching settings.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_RuleUnknown</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Merge rule save refused: the rule is not one of the five</shortDescription>
+        <value>Choose Keep master, Not blank, Most recent, Oldest record or Most complete.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_RuleFieldInvalid</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Merge rule save refused; {0} is the field name entered</shortDescription>
+        <value>{0} is not a person field a merge can change. Use the API name of an editable Contact field, or MailingAddress or OtherAddress. The household, owner and record type always stay the kept person's.</value>
+    </labels>
+</CustomLabels>

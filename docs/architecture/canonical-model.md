@@ -1157,6 +1157,18 @@ range reads as the nearest end.
 | `Unused_Login_Days__c` | integer | 90 | Days without a login before Unused setup lists an active user. From 30 to 365; empty reads as 90. |
 | `Unused_Report_Days__c` | integer | 365 | Days without a run before Unused setup lists a report. From 90 to 1,095; empty reads as 365. |
 
+### Duplicate Matching keys
+
+Added by advanced duplicate management (C-51, ADR-NEXT `NEXT-advanced-duplicate-management.md`).
+Shown in the console's Duplicate Matching section. A blank or unknown value reads as the
+default; the two choices are stored as text (ADR-0019).
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Fuzzy_Match_Threshold__c` | integer | 90 | How alike two names must be, in percent, before the scan pairs two people by name (R-DP7). From 80 to 100; out of range reads as the nearest end. |
+| `Merge_Default_Rule__c` | picklist(Keep master, Not blank, Most recent, Oldest record, Most complete) | Not blank | The merge rule of every person field with no active Merge Rule row (R-DP8). |
+| `Auto_Merge_Exact_Match__c` | picklist(Name and email, Name and phone, Name, email and phone, Name and birthdate) | Name and email | What two people must share exactly before auto-merge takes them (R-DP9). |
+
 ### Health Check keys
 
 Added by ADMIN-7 (ADR-0106 `0106-health-check-on-home-shows-the-last-result.md`). BarnCRM Home
@@ -1423,6 +1435,22 @@ three times (`Address__c`, `Street__c` with `Postal_Code__c`, Address): by `Cont
 people, by `Account__c` for households and by `Person_Account__c` for person accounts. Core
 never names a contact point object in code: every
 read is dynamic SOQL built from describe (ADR-0013, ADR-0110).
+
+### Merge Rule
+
+`Merge_Rule__mdt` (R-DP8; ADR-NEXT, `NEXT-advanced-duplicate-management.md`): which value wins
+for one person field when auto-merge merges two people. Read directly by the merge. Registered
+with and listed on the custom metadata manager, which saves it; nothing is shipped, so every
+field follows `Merge_Default_Rule__c` until an administrator adds a row.
+
+| Field | API name | Type | Definition |
+|---|---|---|---|
+| DeveloperName | `DeveloperName` | text | The stable identifier of the rule. |
+| Label | `MasterLabel` | text | The rule as the page names it. |
+| Field Name | `Field_Name__c` | text (80) | A Contact field the merge may change, or `MailingAddress` or `OtherAddress` for a whole address. One active row per field; a save is refused for a field that does not exist, cannot be edited, or is the household or owner. |
+| Rule | `Rule__c` | picklist(Keep master, Not blank, Most recent, Oldest record, Most complete) | Which value wins (R-DP8). |
+| Active | `Active__c` | boolean, default true | Whether the rule is used. |
+| Is Shipped | `Is_Shipped__c` | boolean, default false | True on a row the package ships; none is shipped. |
 
 ### Release Note
 
@@ -6634,8 +6662,10 @@ same household is decided by the org's own active duplicate rules for Contact an
 and nothing else. BarnCRM ships no matching rule and no duplicate rule (ADR-0050): every
 org starts with the platform's standard rules for both objects switched on, and an
 administrator's own rules are used exactly as written. No packaged code compares two records
-field by field to decide whether they are duplicates. The one addition is R-DP6: values on
-related records the rules cannot see, compared only through the configured match sources.
+field by field to decide whether they are duplicates. There are two additions: R-DP6, values on
+related records the rules cannot see, compared only through the configured match sources; and
+R-DP7, people's names scored by the shared fuzzy scorer, household aware (ADR-NEXT,
+`NEXT-advanced-duplicate-management.md`).
 
 **R-DP2 Only pairs BarnCRM can act on are proposed.** A suggestion is two people, or two
 households. A pair of accounts where either side is not a household (an organization, or a
@@ -6657,7 +6687,9 @@ duplicate rule for Contact or Account is active, because a scan with nothing to 
 report a clean org rather than an org nobody is checking.
 
 **R-DP4 A merge is one pair at a time, previewed, and confirmed by a person.** No packaged
-code merges or deletes records in bulk, and no automation merges anything. Two households are
+code merges or deletes records in bulk, and no automation merges anything, with one exception:
+an administrator's previewed auto-merge of exact people matches, journaled and undoable
+(R-DP9, R-DP10). Two households are
 merged by the household merge (R-H13) and nothing else. Two people are merged with the
 platform's own merge, reached from the Potential Duplicates card on the person's record page,
 because the platform already carries related records across safely.
@@ -6693,6 +6725,47 @@ it is deleted with its suggestion when dismissed or closed by a merge. A reason 
 is gone any other way is never read again and is harmless. A source that cannot be read is
 logged and counted as a failure.
 
+**R-DP7 Similar names pair people, household aware** (ADR-NEXT,
+`NEXT-advanced-duplicate-management.md`). In each people chunk of the scan, the people who share
+a last name or an email with someone in the chunk (at most 2,000, read in user mode) are scored
+on their full names by `FuzzyMatch.score` (normalized case, spacing and punctuation, then
+Jaro-Winkler). A pair scoring at or above `Fuzzy_Match_Threshold__c` percent is proposed when
+they share an email (trimmed, lower case) or a phone number (digits), or are in different
+households and share a mailing postal code. In one household, where an address is shared by
+design and similar names are usually family (Daniel and Danielle), two people with nothing
+else in common are proposed only when their names are the same once normalized. Two people
+whose birthdates are both filled in and differ are never paired. The reason names the score and what they share. A
+pair a rule or a source also found is written once, as theirs; R-DP2 to R-DP5 apply.
+
+**R-DP8 Merge rules decide which value wins.** When two people are merged by auto-merge
+(R-DP9), each field the person merging may edit takes the value its active `Merge_Rule__mdt`
+row names, and a field with no row follows `Merge_Default_Rule__c`: Keep master (the
+survivor's value), Not blank (the survivor's value, or the other's when the survivor's is
+blank), Most recent (the value of the record changed last), Oldest record (the value of the
+record created first) or Most complete (the longer of the two, the survivor's on a tie). A blank
+never wins over a value except under Keep master. A rule on `MailingAddress` or `OtherAddress`
+moves the street, city, state, postal code and country together, from one record. The household
+(`AccountId`) and owner are never changed by a rule.
+
+**R-DP9 Auto-merge takes only exact matches, after a preview.** Candidates are the open
+suggestions in the review list that pair two people (R-DP2) and meet
+`Auto_Merge_Exact_Match__c`: the normalized first and last names are equal and so are the email
+(trimmed, lower case), the phone (digits), both, or the birthdate, each filled in on both. A
+pair whose birthdates both are filled in and differ is never exact. The administrator sees the
+pairs, each survivor and the values that will change before anything runs; the run re-checks
+each pair, merges in user mode with the platform's merge, at most 1,000 pairs a run, in a batch,
+and closes each suggestion. The survivor is the person whose household has more current
+members, else the record created first. Households are never auto-merged.
+
+**R-DP10 Every auto-merge is journaled and undone from the Recycle Bin.** Before each merge a
+Merge Journal row records the run, both identifiers, the survivor's values the rules changed and
+the related records the merge moves (every child whose link to the merged-away person can be
+changed). Undo works on a whole run: it undeletes the merged-away person (never a recreated
+copy), puts back each changed value still as the merge left it and moves each recorded related
+record still on the survivor back. What it cannot restore (no longer in the Recycle Bin, a value
+changed since, a related record deleted or refused) is written on the row as Partly Undone or
+Undo Failed. Undo is offered while the run is no more than 15 days old.
+
 ### Salesforce implementation
 
 - **Object** `Duplicate_Reason__c` (R-DP6), auto number Name, public read/write like the
@@ -6703,6 +6776,21 @@ logged and counted as a failure.
 |---|---|---|---|
 | Set Id | `Set_Id__c` | Text(18), unique, external id | The Duplicate Record Set the reason explains. |
 | Reason | `Reason__c` | Text(255) | What the review list shows, naming the match source. |
+
+- **Object** `Merge_Journal__c` (R-DP10), auto number Name, private: each run's rows belong to
+  the administrator who ran it, and BarnCRM Admin views and modifies all of them. Written and
+  read in user mode.
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Run Id | `Run_Id__c` | Text(36), external id | Groups one auto-merge run; undo works on a run. |
+| Survivor Id | `Survivor_Id__c` | Text(18) | The person the merge kept. |
+| Merged Id | `Merged_Id__c` | Text(18) | The person merged away, undeleted by undo. |
+| Merged Name | `Merged_Name__c` | Text(255) | The merged-away person's name, shown while they are deleted. |
+| Status | `Status__c` | picklist(Merged, Undone, Partly Undone, Undo Failed) | Where the merge stands. |
+| Changed Values | `Changed_Values__c` | Long Text(131072) | JSON: each field the rules changed on the survivor, its value before and after. |
+| Moved Records | `Moved_Records__c` | Long Text(131072) | JSON: each object and link field, with the identifiers the merge moved. |
+| Notes | `Notes__c` | Long Text(32768) | What the merge could not journal and what undo could not restore. |
 
 - **Object** `Duplicate_Dismissal__c`, with an auto number Name. Sharing is public read/write:
   a dismissal is the organization's decision, and a scan run by one administrator must pass
@@ -9147,6 +9235,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-29 | Organization record type removed (RT5, ADR-0141, D-134). No object or field added. The packaged `Account.Organization` record type and its compact layout are deleted. `Is_Organization__c` also counts an account of the master record type (no developer name) as an organization when the setting is `Master`. R-O5: a stored record type that is no longer a candidate is replaced by the detected one on each install, upgrade or source deploy, so the formula and `AccountKinds` agree. R-O4: `Master` is offered and saved only when the org has no candidate, and a stored `Master` is stale once it has one. |
 | v0.11 | 2026-10-29 | Edition stored values (ADR-0143, `0143-edition-internal-values.md`). No object or field added. `BarnCRM_Settings__c.Suite__c` stores `Standard` and `Nonprofit` instead of `Community` and `Impact`, and `BarnCRM_Module__mdt.Editions__c` names the same values. Core's post-install steps rewrite an old stored value once. |
 | v0.11 | 2026-10-29 | Security review G-L4 and G-L5 (owner decisions). No object or field added. New R-AK13 (ADR-0144, `0144-acknowledgments-honor-email-opt-out.md`): an email gift whose recipient contact has Email Opt Out is not emailed, gets no row and stays queued, and the letter run takes it as a letter. `Giving_Admin` loses View All on `Commitment__c`, matching `Gift__c`; commitment record access comes from ownership, roles and sharing. |
+| v1.0 | 2026-10-30 | Advanced duplicate management (C-51, D-154, ADR-NEXT `NEXT-advanced-duplicate-management.md`). Object `Merge_Journal__c` added (Section 29A); custom metadata type `Merge_Rule__mdt` added (Section 13); settings keys `Fuzzy_Match_Threshold__c`, `Merge_Default_Rule__c` and `Auto_Merge_Exact_Match__c`. R-DP1 and R-DP4 amended; R-DP7 to R-DP10 added. |
 
 ---
 ## 32. Entity ownership by package

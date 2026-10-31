@@ -12,6 +12,10 @@ BarnCRM ships eleven types (Spouse, Parent and Child, and so on). If your organi
 records godparents, mentors, or guardians, you add the pairs here and BarnCRM keeps both
 sides in step for them the same way it does for its own.
 
+The second list is **Merge Rules**: which value wins, field by field, when auto-merge merges
+two people (see [Duplicates](duplicates.md#merge-rules)). BarnCRM ships none; a field with no
+rule follows the **Merge Rule For Other Fields** setting.
+
 Match sources, the related records the duplicate scan and imports compare, are custom
 metadata too, but they have their own editor: the **Matching Logic** area of the
 **Duplicate Matching** tab (see [Duplicates](duplicates.md#matching-logic)). It saves the
@@ -111,6 +115,7 @@ and the Setup step above apply there too.
 | List | Here | Why |
 |---|---|---|
 | Relationship types | Add, edit, archive | BarnCRM reads the list directly, so an entry you add is used at once. |
+| Merge rules | Add, edit, archive | BarnCRM reads the list directly at each merge. |
 | Match sources | On the Duplicate Matching tab, Matching Logic: add, edit, deactivate; deactivate and activate a shipped one | BarnCRM reads the list directly when it scans for duplicates and matches an import. |
 | Rollups, import templates | No | BarnCRM copies the shipped entries into the Rollups and Import pages, which is where you add and change your own. |
 | Automations, settings | No | These describe BarnCRM's own code and pages. An entry you added would point at nothing. |

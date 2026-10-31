@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Rule__c</fullName>
+  <description>Which value wins: Keep master (the survivor's), Not blank (the survivor's unless blank), Most recent (the record changed last), Oldest record (the record created first) or Most complete (the longer value).</description>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Rule</label>
+  <required>false</required>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Keep master</fullName>
+        <default>false</default>
+        <label>Keep master</label>
+      </value>
+      <value>
+        <fullName>Not blank</fullName>
+        <default>true</default>
+        <label>Not blank</label>
+      </value>
+      <value>
+        <fullName>Most recent</fullName>
+        <default>false</default>
+        <label>Most recent</label>
+      </value>
+      <value>
+        <fullName>Oldest record</fullName>
+        <default>false</default>
+        <label>Oldest record</label>
+      </value>
+      <value>
+        <fullName>Most complete</fullName>
+        <default>false</default>
+        <label>Most complete</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

@@ -322,9 +322,16 @@ describe('settingsGroups against the shipped registry', () => {
     expect(boxOf('Addresses', 'Address_Card_Fields__c').id).toBe('Address Card');
     expect(boxOf('General', 'App_Navigation_Style__c').id).toBe('Preferences');
     expect(boxOf('Rollups', 'Nightly_Run_Hour__c').id).toBe('Rollup Processing');
-    expect(groupRows('Duplicate Matching', byPage['Duplicate Matching'])).toEqual([
-      { id: 'Duplicate Matching', label: 'Duplicate Matching', rows: [{ key: 'Duplicate_Review' }] }
-    ]);
+    const duplicateBoxes = groupRows('Duplicate Matching', byPage['Duplicate Matching']);
+    expect(duplicateBoxes).toHaveLength(1);
+    expect(duplicateBoxes[0].id).toBe('Duplicate Matching');
+    expect(duplicateBoxes[0].rows.map((one) => one.key)).toEqual(
+      expect.arrayContaining([
+        'Duplicate_Review',
+        'Fuzzy_Match_Threshold__c',
+        'Merge_Default_Rule__c'
+      ])
+    );
   });
 });
 

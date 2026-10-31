@@ -346,10 +346,11 @@ private class CustomMetadataManagerServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                1,
+                2,
                 types.size(),
-                'Relationship types only: match sources have their own page, Matching Logic'
+                'Relationship types and merge rules: match sources have their own page'
             );
+            Assert.isNotNull(viewNamed(types, 'Merge_Rule__mdt'), 'Merge rules are listed here');
             Assert.isNull(viewNamed(types, SOURCE_TYPE), 'Match sources are not listed here');
             CustomMetadataManagerService.TypeView view = viewNamed(types, TYPE_NAME);
             Assert.isNotNull(view, 'Named without a namespace');

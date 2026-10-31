@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>Which value wins for one person field when auto-merge merges two people (C-51, canonical model R-DP8). Administrators add, edit and archive rows on the Custom metadata page in BarnCRM Settings; a field with no active row follows the Merge Rule For Other Fields setting.</description>
+  <label>Merge Rule</label>
+  <pluralLabel>Merge Rules</pluralLabel>
+  <visibility>Public</visibility>
+</CustomObject>

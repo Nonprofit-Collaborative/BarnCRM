@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Field_Name__c</fullName>
+  <description>The API name of the Contact field the rule decides, or MailingAddress or OtherAddress for a whole address. One active row per field.</description>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Field Name</label>
+  <length>80</length>
+  <required>true</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>
