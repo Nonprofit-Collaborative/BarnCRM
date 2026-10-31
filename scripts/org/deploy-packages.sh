@@ -925,6 +925,8 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   else
     echo "== Skipping Volunteers: packages/volunteers holds no metadata yet =="
   fi
+  # Programs depends on Core only (ADR-NEXT, programs module).
+  MODULES+=(programs)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")
@@ -977,7 +979,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # BarnCRM_Module__mdt record (ADR-0137). The app
   # copies are written to a temporary metadata-format package; the repository's app files are
   # never changed. Nothing is deployed when no module names a tab.
-  deployed_modules=(rollups giving mirror)
+  deployed_modules=(rollups giving mirror programs)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
   python3 scripts/org/module-app-tabs.py "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1

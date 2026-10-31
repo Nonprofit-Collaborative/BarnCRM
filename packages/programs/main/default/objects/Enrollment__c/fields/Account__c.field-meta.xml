@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Account__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The person enrolled, where people are person accounts. Fill in a contact or an account, never both.</inlineHelpText>
+  <label>Account</label>
+  <referenceTo>Account</referenceTo>
+  <relationshipLabel>Enrollments</relationshipLabel>
+  <relationshipName>Enrollments</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

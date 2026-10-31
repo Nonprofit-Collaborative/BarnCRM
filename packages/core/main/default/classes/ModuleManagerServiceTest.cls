@@ -207,7 +207,8 @@ private class ModuleManagerServiceTest {
             Integer refused = 0;
 
             Test.startTest();
-            for (String name : new List<String>{ 'Core', 'Programs', null }) {
+            // Funders has a catalog row and no package yet, so it is missing in every org.
+            for (String name : new List<String>{ 'Core', 'Funders', null }) {
                 try {
                     ModuleManagerService.turnOff(name);
                 } catch (ModuleManagerService.ModuleManagerException e) {

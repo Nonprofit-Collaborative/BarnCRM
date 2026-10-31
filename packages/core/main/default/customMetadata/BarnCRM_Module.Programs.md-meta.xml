@@ -18,4 +18,20 @@
     <field>Sort_Order__c</field>
     <value xsi:type="xsd:double">30</value>
   </values>
+  <values>
+    <field>App_Name__c</field>
+    <value xsi:type="xsd:string">BarnCRM_Programs</value>
+  </values>
+  <values>
+    <field>Staff_Tabs__c</field>
+    <value xsi:type="xsd:string">Program__c;Enrollment__c</value>
+  </values>
+  <values>
+    <field>Admin_Tabs__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Probe_Object__c</field>
+    <value xsi:type="xsd:string">Enrollment__c</value>
+  </values>
 </CustomMetadata>

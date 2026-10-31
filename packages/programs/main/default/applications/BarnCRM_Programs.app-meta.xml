@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+  <brand>
+    <headerColor>#0B5CAB</headerColor>
+    <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+  </brand>
+  <description>
+    The BarnCRM Programs module: programs, the services they offer and the people enrolled in them.
+  </description>
+  <formFactors>Large</formFactors>
+  <formFactors>Small</formFactors>
+  <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+  <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+  <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+  <label>BarnCRM Programs</label>
+  <navType>Console</navType>
+  <tabs>Program__c</tabs>
+  <tabs>Enrollment__c</tabs>
+  <uiType>Lightning</uiType>
+  <workspaceConfig>
+    <mappings>
+      <tab>Enrollment__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Program__c</tab>
+    </mappings>
+  </workspaceConfig>
+</CustomApplication>
