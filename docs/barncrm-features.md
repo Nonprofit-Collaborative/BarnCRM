@@ -446,6 +446,8 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Membership tracking | Major | Membership levels with expiry and renewal reminders, likely as its own package. | Planned (1.x) | G-22 |
 | Rule criteria | Minor | Acknowledgment rules match on amount range, gift type, appeal and first gift only. | Shipped | G-12 |
 | Standard email templates | Minor | Thank-you emails use ordinary Salesforce email templates, with a packaged sample template. | Shipped | G-12 |
+| Ask pipeline | Major | Tracks asks and moves toward a gift on an Ask record (no Opportunity needed): a board and list by stage with exact totals, a Close Ask window that can record the gift or pledge a won ask produced, history of stage, outcome, amount and date changes, and an Asks list on donor pages. Stages are one org-wide setting (BarnCRM Settings, Giving, Ask stages). | Shipped | G-26 |
+| Next ask date | Minor | Records when to ask a donor again; a "who is due" list comes with the planned ask cadence feature. | Shipped | G-26 |
 | No double thanks | Minor | A gift cannot be thanked twice, even if a batch is retried. | Shipped | G-12 |
 | Email opt-out honored | Minor | A donor (or an organization's primary contact) with Email Opt Out is never emailed a thank-you; the gift is counted on its own queue line and goes in the letter file instead (2026-10-29 security review, G-L4). | Shipped | G-12, ADR-0144 |
 | Send Acknowledgments permission | Minor | Separate permission for sending thank-yous. | Shipped | G-12 |

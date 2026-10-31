@@ -34,6 +34,7 @@ With the **Giving** package installed, the same action also loads:
 | Gifts | About 700 | Three years of giving: checks, cards, ACH, cash, stock, grants and about twenty in-kind gifts, weighted the way a real list is (most under 500, a few above 10,000). The in-kind gifts carry no amount, as every in-kind gift does, so they are in the In-kind value total on their donor and in none of the cash totals ([In-kind gifts](in-kind-gifts.md)) |
 | Gift allocations | About 750 | One fund for most gifts, two for the gifts a donor designated twice |
 | Commitments | 24 | 14 monthly recurring gifts and 10 pledges, with the installments the schedule implies and the gifts that have paid them |
+| Asks | 11 | Seven open asks across every default stage of the [Ask Pipeline](ask-pipeline.md) (one past its target date, one for an organization), one declined, one withdrawn, and two won as pledges |
 | Soft credits | 30 entered by hand | Solicitors and influencers on the larger gifts, on top of the household member credits the automatic rule writes for every gift |
 | Tributes | 24 | In memory of and in honour of, with a message, notified to somebody other than the person being remembered |
 
@@ -170,7 +171,7 @@ household records, names, greetings, member counts, and Members panel.
    Confirm the dialog. The card shows **Removing** while it deletes the set in steps of
    about a hundred records, the same way it loaded, then returns to **Not loaded**. Every
    record the loader created is gone: households, contacts, organizations, connections, affiliations, and the
-   gifts, allocations, soft credits, tributes, funds, appeals, commitments and installments
+   gifts, allocations, soft credits, tributes, funds, appeals, commitments, installments and asks
    too, along with the household member records that joined people to households if your
    org uses the flexible way. With Volunteers installed, its jobs, skills, schedule, shifts,
   sign-ups, hours, volunteer skills and requirements go first: Approved sample hours are
@@ -248,7 +249,7 @@ household records, names, greetings, member counts, and Members panel.
 |---|---|
 | Sample Data checkbox on households, contacts, and organizations | `Sample_Data__c` on Account and Contact |
 | Sample Data checkbox on connections and affiliations | `Sample_Data__c` on `Relationship__c` and `Affiliation__c` |
-| Sample Data checkbox on gifts, funds, appeals and commitments (with Giving) | `Sample_Data__c` on `Gift__c`, `Fund__c`, `Appeal__c` and `Commitment__c` |
+| Sample Data checkbox on gifts, funds, appeals, commitments and asks (with Giving) | `Sample_Data__c` on `Gift__c`, `Fund__c`, `Appeal__c`, `Commitment__c` and `Ask__c` |
 | Sample Data checkbox on volunteer jobs and skills (with Volunteers) | `Sample_Data__c` on `Volunteer_Job__c` and `Skill__c`; shifts, schedules, sign-ups and hours are found through their job |
 | The key that ties a sample gift to the person who gave it | `Sample_Data_Key__c` on Account and Contact |
 | The join between a sample person and their household, flexible mode only | `Household_Member__c`, removed with the household it belongs to |

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Fund__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <description>
+    The fund the ask is for, carried onto the gift or commitment a win creates (canonical model
+    R-SO5).
+  </description>
+  <inlineHelpText>The fund this ask is for. A gift recorded from the ask goes to this fund.</inlineHelpText>
+  <label>Fund</label>
+  <referenceTo>Fund__c</referenceTo>
+  <relationshipLabel>Asks</relationshipLabel>
+  <relationshipName>Asks</relationshipName>
+  <required>false</required>
+  <trackHistory>false</trackHistory>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

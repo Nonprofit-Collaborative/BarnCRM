@@ -1427,6 +1427,86 @@ def build_soft_credits(rng, builder, adults, giving_households):
     return credits
 
 
+# Asks for the solicitation pipeline (G-26). Built from fixed specs rather than the
+# random stream, so adding them leaves every gift and commitment above unchanged.
+# Stages are the packaged defaults; the loader leaves a stage the org has removed blank,
+# and the ask then takes the org's first stage. Negative offsets are future dates.
+# (household position among giving households, stage, outcome, amount,
+#  targetDaysAgo, stageDaysAgo, closedDaysAgo, nextAskDaysAgo, next step)
+ASK_SPECS = [
+    (3, "Identified", "Open", 1000, -90, 12, None, None, "Invite to the spring program tour."),
+    (7, "Qualified", "Open", 2500, -60, 25, None, None, "Lunch to hear what matters to them."),
+    (11, "Cultivating", "Open", 5000, -45, 40, None, None, "Send the Youth Programs impact report."),
+    (15, "Ask Planned", "Open", 10000, -21, 9, None, None, "Board chair to join the ask meeting."),
+    (19, "Asked", "Open", 7500, -10, 6, None, None, "Follow up on the proposal by phone."),
+    (23, "Asked", "Open", 1500, 5, 30, None, None, "Call: the target date has passed."),
+    (27, "Asked", "Declined", 5000, 60, 75, 50, -120, None),
+    (31, "Cultivating", "Withdrawn", 2000, 30, 100, 40, None, None),
+]
+
+
+def build_asks(adults, giving_households, organizations, commitments):
+    """A handful of asks across every stage and outcome, two of them won as pledges."""
+    asks = []
+    for position, stage, outcome, amount, target, staged, closed, next_ask, step in ASK_SPECS:
+        asks.append(
+            {
+                "key": "A{0:03d}".format(len(asks) + 1),
+                "donor": adults[giving_households[position]][0],
+                "stage": stage,
+                "outcome": outcome,
+                "amount": amount,
+                "targetDaysAgo": target,
+                "stageDaysAgo": staged,
+                "closedDaysAgo": closed,
+                "nextAskDaysAgo": next_ask,
+                "nextStep": step,
+                "fund": None,
+                "appeal": None,
+                "commitment": None,
+            }
+        )
+    # An organization in cultivation, so the board shows both kinds of donor.
+    asks.append(
+        {
+            "key": "A{0:03d}".format(len(asks) + 1),
+            "donor": organizations[0]["key"],
+            "stage": "Cultivating",
+            "outcome": "Open",
+            "amount": 15000,
+            "targetDaysAgo": -75,
+            "stageDaysAgo": 18,
+            "closedDaysAgo": None,
+            "nextAskDaysAgo": None,
+            "nextStep": "Request the foundation's grant guidelines.",
+            "fund": "Youth Programs",
+            "appeal": None,
+            "commitment": None,
+        }
+    )
+    # Two asks won as the pledges that closed them.
+    pledges = [commitment for commitment in commitments if commitment["type"] == "Pledge"]
+    for pledge in pledges[-2:]:
+        asks.append(
+            {
+                "key": "A{0:03d}".format(len(asks) + 1),
+                "donor": pledge["donor"],
+                "stage": "Asked",
+                "outcome": "Won",
+                "amount": pledge["expectedTotal"],
+                "targetDaysAgo": pledge["startDaysAgo"] + 10,
+                "stageDaysAgo": pledge["startDaysAgo"] + 20,
+                "closedDaysAgo": pledge["startDaysAgo"],
+                "nextAskDaysAgo": None,
+                "nextStep": None,
+                "fund": pledge["fund"],
+                "appeal": pledge["appeal"],
+                "commitment": pledge["key"],
+            }
+        )
+    return asks
+
+
 def build_giving(rng, households, organizations):
     """The whole Giving payload, built against the households the Core set creates."""
     funds = [
@@ -1499,6 +1579,7 @@ def build_giving(rng, households, organizations):
     build_pending_and_reversed(rng, builder, adults, giving_households)
     tributes = build_tributes(rng, builder, households)
     soft_credits = build_soft_credits(rng, builder, adults, giving_households)
+    asks = build_asks(adults, giving_households, organizations, commitments)
 
     return {
         "funds": funds,
@@ -1507,6 +1588,7 @@ def build_giving(rng, households, organizations):
         "gifts": builder.gifts,
         "tributes": tributes,
         "softCredits": soft_credits,
+        "asks": asks,
     }
 
 
@@ -1554,6 +1636,7 @@ def main():
     print("Gift allocations: {0}".format(allocations))
     print("Tributes: {0}".format(len(giving["tributes"])))
     print("Soft credits: {0}".format(len(giving["softCredits"])))
+    print("Asks: {0}".format(len(giving["asks"])))
     print("File size: {0} bytes ({1:.1f} KB)".format(giving_size, giving_size / 1024.0))
 
 

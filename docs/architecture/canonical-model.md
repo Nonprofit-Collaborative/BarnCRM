@@ -4276,6 +4276,14 @@ it showed them in before.
 | `Default_Fund__c` | text (18) | empty | The record identifier of the fund a gift is allocated to when nobody says otherwise, chosen in the Setup Assistant's fund and appeal step, which Giving contributes (R-F4, ADR-0014). Moved from Section 12 by C-29. |
 | `Default_Appeal__c` | text (18) | empty | The record identifier of the appeal a gift is credited to when nobody says otherwise, on the same terms as the default fund. Moved from Section 12 by C-29. |
 
+### Release 0.13 keys
+
+Added by the solicitation pipeline (G-26, Section 25O). Shown in the console's Giving section.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Ask_Stages__c` | text (255) | `Identified;Qualified;Cultivating;Ask Planned;Asked` | The stages an ask moves through, in order, separated by semicolons. Empty means the default list (R-SO2). |
+
 ### Rules
 
 **R-GS1 Same contract as Core settings.** Protected, hierarchical, written synchronously
@@ -4328,6 +4336,7 @@ these keys, which is what makes a module that is off leave nothing behind.
 | Receipt Signer Title | `Receipt_Signer_Title__c` | Text(80) (v0.6, from Core) |
 | Default Fund | `Default_Fund__c` | Text(18) (v0.6, from Core) |
 | Default Appeal | `Default_Appeal__c` | Text(18) (v0.6, from Core) |
+| Ask Stages | `Ask_Stages__c` | Text(255) (release 0.13, G-26, R-SO2) |
 
 - **Service:** Core `SettingsService`, reading and writing this object through the
   `Settings_Object__c` field on `Setting_Definition__mdt` (ADR-0017).
@@ -6300,6 +6309,137 @@ Email Opt Out set is reminded by letter instead (R-AK13).
 (pledge, installment, due date, amount still owed, days overdue, step, donor name, greeting,
 address) and leaves the rows Queued until a person marks them sent, because Salesforce cannot
 know whether anything was printed (R-AK11).
+
+---
+
+## 25O. Ask
+
+Added by the solicitation pipeline (G-26, release 0.13, ADR-NEXT).
+
+### Definition
+
+One request for a gift that a fundraiser is working toward: who is being asked, for how much,
+by when, who is responsible, where it stands, and how it ended. It is the Giving module's own
+pipeline record, so a small development team can track its asks and moves without the standard
+Opportunity object, which only the Mirror package may touch (ADR-0013). A gift is money that
+arrived; an ask is the work that comes before it, and a won ask points at the gift or commitment
+it produced.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | The ask's identifier, assigned automatically. |
+| Donor Contact | reference(Contact) | conditional | The person being asked, where people are Contacts. |
+| Donor Account | reference(Organization) | conditional | The organization or household being asked, or the person where people are person Accounts. |
+| Stage | text | yes (defaults to the first stage) | Where the ask stands in the organization's own stage list (R-SO2). |
+| Outcome | picklist(Open, Won, Declined, Withdrawn) | yes (defaults Open) | Whether the ask is still being worked, and how it ended (R-SO3). |
+| Ask Amount | decimal | no | How much the donor is being, or was, asked for. |
+| Target Date | date | no | When the fundraiser expects an answer. |
+| Assigned To | reference(User) | yes | The staff member responsible for the ask: the record owner. |
+| Next Step | text | no | The next thing to do, in a few words. |
+| Next Ask Date | date | no | When to ask this donor again, usually set as the ask closes (R-SO7). |
+| Fund | reference(Fund) | no | The fund the ask is for, carried onto the gift or commitment a win creates. |
+| Appeal | reference(Appeal) | no | The appeal the ask belongs to, carried onto the gift or commitment a win creates. |
+| Resulting Gift | reference(Gift) | no | The gift a won ask produced (R-SO5). |
+| Resulting Commitment | reference(Commitment) | no | The pledge a won ask produced (R-SO5). |
+| Stage Changed Date | date | computed | The day the ask reached its current stage (R-SO4). |
+| Closed Date | date | computed | The day the outcome left Open; empty while the ask is open (R-SO3). |
+| Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
+
+### Relationships
+
+- **Ask to Contact or Organization**, many to one. Exactly one of the two is set, following the
+  person reference convention in Section 4 (R-SO1).
+- **Ask to Gift**, many to one, and **Ask to Commitment**, many to one. Usually one ask to one
+  result; nothing stops two asks (a spouse's and a foundation's, say) pointing at the same gift.
+- **Ask to Fund** and **Ask to Appeal**, many to one.
+
+### Rules
+
+**R-SO1 Exactly one donor.** An ask names a person or an organization, never both and never
+neither. The rule is checked when an ask is created and whenever its donor changes, not on every
+edit: deleting a donor clears the lookup (the ask is kept as a record of the work), and an ask
+left with no donor can still be moved, closed or edited.
+
+**R-SO2 Stages are the organization's own list.** The stages are one org-wide setting, Ask Stages
+(`Ask_Stages__c` on Giving Settings), an ordered list of names separated by semicolons; an empty
+setting means the shipped list: Identified, Qualified, Cultivating, Ask Planned, Asked. An ask
+saved with no stage gets the first one. A stage that is not in the list is refused when an ask is
+created or its stage changes, and accepted on any other edit, so taking a stage out of the list
+never blocks work on the asks still in it; the board shows those asks in a column of their own
+until someone moves them. Stages describe progress only: how an ask ended is its outcome.
+
+**R-SO3 Outcome is separate from stage.** An ask is Open while it is being worked, and Won,
+Declined or Withdrawn once it ends (Withdrawn: the organization decided not to ask after all).
+A closed ask keeps the stage it reached, so "declined at Cultivating" stays reportable. Closed
+Date is filled with today when the outcome leaves Open and has no date, and cleared when the
+outcome goes back to Open.
+
+**R-SO4 Stage history.** Stage Changed Date is today when an ask is created and whenever its stage
+changes, so the board can show how long an ask has sat where it is. The full history of Stage,
+Outcome, Ask Amount and Target Date is kept by the platform's field history on the ask, not by a
+package object.
+
+**R-SO5 A win records what it produced.** Marking an ask Won from the board offers to record the
+gift now, record a pledge, link a gift or commitment already entered for the same donor, or leave
+the result for later. A gift is created through the same save as Quick Gift Entry, so every gift
+rule applies (default allocation, posting lock, payment matching); a pledge is a Commitment of type
+Pledge whose payments are generated as for any other. The donor, fund and appeal are carried from
+the ask. The new record, the link and the outcome are saved together or not at all. A gift or
+commitment linked later by editing the ask is accepted as it is.
+
+**R-SO6 Pipeline totals.** The board totals the open asks of each stage (count and the sum of Ask
+Amount) and, for the current fiscal year by Closed Date, the asks won (count and the sum of Ask
+Amount) and declined (count). Totals are counted by the database, not from the cards on screen, so
+they stay right when the board shows only the first cards of a long column.
+
+**R-SO7 Next Ask Date is a hook, not a reminder.** It records when the organization means to ask
+the donor again. The pipeline itself does nothing with it; ask cadence (G-29) reads it to build the
+"who is due" list. Keeping it on the ask, set as the ask closes, means the cadence work needs no
+change to this object.
+
+**R-SO8 Erasing a person.** Erasing a person (Section 29H) clears Next Step on every ask for them
+and sets each open one to Withdrawn, so no more work is planned about them. The asks are kept, like
+their gifts, still pointing at the anonymized person.
+
+### Salesforce implementation
+
+- **Object:** `Ask__c`, Giving package. Name is an auto number, `ASK-{00000000}`. Sharing is
+  Public Read/Write (`ReadWrite`): a small development team works one shared pipeline, and an
+  organization that wants each fundraiser to see only their own asks sets it to Private in Setup
+  (ADR-NEXT). Field history is on for Stage, Outcome, Ask Amount and Target Date (R-SO4).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Donor Contact | `Donor_Contact__c` | Lookup to Contact, clears on delete |
+| Donor Account | `Donor_Account__c` | Lookup to Account, clears on delete |
+| Stage | `Stage__c` | Text(80) |
+| Outcome | `Outcome__c` | Picklist, restricted: Open, Won, Declined, Withdrawn |
+| Ask Amount | `Amount__c` | Currency(16, 2) |
+| Target Date | `Target_Date__c` | Date |
+| Assigned To | `OwnerId` | Owner (standard) |
+| Next Step | `Next_Step__c` | Text(255) |
+| Next Ask Date | `Next_Ask_Date__c` | Date |
+| Fund | `Fund__c` | Lookup to `Fund__c`, clears on delete |
+| Appeal | `Appeal__c` | Lookup to `Appeal__c`, clears on delete |
+| Resulting Gift | `Gift__c` | Lookup to `Gift__c`, clears on delete |
+| Resulting Commitment | `Commitment__c` | Lookup to `Commitment__c`, clears on delete |
+| Stage Changed Date | `Stage_Changed_Date__c` | Date |
+| Closed Date | `Closed_Date__c` | Date |
+| Sample Data | `Sample_Data__c` | Checkbox |
+
+- **Validation rule:** `Exactly_One_Donor` (R-SO1), on create and on a change of either donor
+  field.
+- **Automation:** one `Automation_Registry__mdt` row, `Ask_Stage_And_Dates`, handler
+  `AskTriggerHandler`, order 10, always running: it fills the first stage, refuses a stage not in
+  the list (R-SO2), and keeps Stage Changed Date and Closed Date in step (R-SO3, R-SO4).
+- **Settings key** (on `Giving_Settings__c`, Section 21A): `Ask_Stages__c`.
+- **Service:** `AskRules` (the stage list and R-SO2 to R-SO4), `AskSelector` (the board's
+  queries, as the person), `AskPipelineController` (the board: totals, moving a stage, closing an
+  ask, R-SO5 and R-SO6), `GivingPersonErasureExtension` (R-SO8), and the framework-free
+  JavaScript module `askPipelineModel` (cards into columns, days in stage), which a WordPress block
+  could reuse (plan Section 9.9).
 
 ---
 
@@ -10029,6 +10169,7 @@ mirrors the primary member).
 | 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29Z), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |
 | v0.13 | 2026-10-31 | Donor segments (G-28, D-156). New Section 25O, rules R-DS1 to R-DS6: a segment is a Saved Query of Contact or Account (no new object), with five starter templates held as documented JSON, a count, a list and Mailchimp, Constant Contact and all-columns CSV exports; no sending, no settings key. Contact and Account gain the formula `Change_From_Last_Year__c` (Giving This Year minus Giving Last Year), so upgraders can be filtered. |
 | v0.13 | 2026-10-31 | Pledge reminders (G-30). Objects `Pledge_Reminder_Step__c` (Section 25O) and `Pledge_Reminder__c` (25P) added; `Giving_Settings__c` gains `Pledge_Reminders_Enabled__c` (off by default), `Pledge_Reminders_Last_Run__c` and `Pledge_Reminders_Last_Run_Summary__c`. Rules R-PR1 to R-PR6. No field is added to `Installment__c` or `Commitment__c`. |
+| 0.13 | 2026-10-31 | Solicitation pipeline (G-26, ADR-NEXT). New entity Ask (Section 25O, `Ask__c`) with rules R-SO1 to R-SO8: an Opportunity-free ask with the organization's own stages, an outcome kept apart from the stage, stage history, and a win that creates or links the gift or commitment. Giving Settings gains `Ask_Stages__c` (Section 21A). `Next_Ask_Date__c` is the hook ask cadence (G-29) reads. |
 
 ---
 ## 32. Entity ownership by package
@@ -10099,6 +10240,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Gift Batch | Giving | v0.5 | 25L |
 | Gift Batch Row | Giving | v0.5 | 25M |
 | Donor segments (Change From Last Year on Account and Contact) | Giving | v0.13 | 25O |
+| Ask | Giving | release 0.13 (G-26) | 25O |
 | Gift Transaction mirror | Mirror | v0.6 | 30 |
 | Opportunity mirror (Opportunity ID on Gift) | Mirror | v0.6 | 29C |
 | Campaign sync (Campaign ID on Appeal) | Mirror | v0.6 | 29B |

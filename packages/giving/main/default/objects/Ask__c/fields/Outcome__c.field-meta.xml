@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Outcome__c</fullName>
+  <description>
+    Whether the ask is still being worked (Open) and how it ended (Won, Declined, Withdrawn).
+    Separate from Stage, so a closed ask keeps the stage it reached (canonical model R-SO3).
+  </description>
+  <inlineHelpText>
+    Open while you are working on it. Won when the donor said yes, Declined when they said no,
+    Withdrawn when you decided not to ask.
+  </inlineHelpText>
+  <label>Outcome</label>
+  <required>true</required>
+  <trackHistory>true</trackHistory>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Open</fullName>
+        <default>true</default>
+        <label>Open</label>
+      </value>
+      <value>
+        <fullName>Won</fullName>
+        <default>false</default>
+        <label>Won</label>
+      </value>
+      <value>
+        <fullName>Declined</fullName>
+        <default>false</default>
+        <label>Declined</label>
+      </value>
+      <value>
+        <fullName>Withdrawn</fullName>
+        <default>false</default>
+        <label>Withdrawn</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

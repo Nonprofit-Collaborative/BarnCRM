@@ -67,6 +67,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>AskPipelineController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>BlobToPdfReceiptRenderer</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -596,6 +600,76 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Appeal__c.Total_Raised__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Amount__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Appeal__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Closed_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Commitment__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Donor_Account__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Donor_Contact__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Fund__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Gift__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Next_Ask_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Next_Step__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Stage_Changed_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Stage__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Ask__c.Target_Date__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1425,6 +1499,15 @@
     <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
+    <object>Ask__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
     <object>Commitment__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
@@ -1612,6 +1695,14 @@
   </tabSettings>
   <tabSettings>
     <tab>Appeal__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Ask_Pipeline</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Ask__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

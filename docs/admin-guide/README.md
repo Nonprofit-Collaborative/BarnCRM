@@ -190,6 +190,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | G-13 Receipts and year-end statements | [receipts.md](receipts.md) | Giving |
 | G-14 Donor levels | [donor-levels.md](donor-levels.md) | Giving |
 | G-15 Stewardship plans | [stewardship-plans.md](stewardship-plans.md) | Giving |
+| G-26 Ask pipeline | [ask-pipeline.md](ask-pipeline.md) | Giving |
 | G-16 Retention reports | [retention-reports.md](retention-reports.md) | Giving |
 | G-28 Donor segments | [donor-segments.md](donor-segments.md) | Giving |
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving |

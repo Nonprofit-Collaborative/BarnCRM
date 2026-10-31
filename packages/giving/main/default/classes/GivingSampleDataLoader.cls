@@ -6,7 +6,8 @@
  *
  * 1. `loadReferenceData` inserts the funds, the appeals (parents before children), and the
  *    commitments. The commitment trigger generates each schedule of installments, exactly as
- *    it would for a pledge entered on screen, so no installment is written here.
+ *    it would for a pledge entered on screen, so no installment is written here. The asks
+ *    (G-26) follow the commitments, because a won ask names the pledge that closed it.
  * 2. `loadGiftChunk` inserts one chunk of gifts with their allocations, the soft credits a
  *    fundraiser would have entered by hand, and the tributes. The automatic household soft
  *    credits are left to the rule that writes them, and the gifts that name a commitment are
@@ -19,7 +20,7 @@
  * rule: that rule puts everything in the organization's one default fund, which would leave
  * eight funds in the set and gifts against only one of them.
  *
- * Removal deletes gifts, commitments, appeals and funds. Allocations, soft credits and
+ * Removal deletes asks, gifts, commitments, appeals and funds. Allocations, soft credits and
  * tributes are details of a gift, and installments are details of a commitment, so the
  * platform deletes them with their master; nothing here has to find them.
  */
@@ -46,6 +47,7 @@ public with sharing class GivingSampleDataLoader {
         idsByKey.putAll(insertFunds(data));
         idsByKey.putAll(insertAppeals(data));
         idsByKey.putAll(insertCommitments(data, idsByKey));
+        insertAsks(data, idsByKey);
         return idsByKey;
     }
 
@@ -162,6 +164,60 @@ public with sharing class GivingSampleDataLoader {
             );
         }
         return insertAndMap(commitments, keys);
+    }
+
+    /**
+     * Asks across the pipeline (G-26). A won ask names the sample pledge that closed it, so
+     * it loads with the commitments rather than waiting for the gift stages. The file uses
+     * the packaged default stages; a stage the org has since removed is left blank, and the
+     * ask rules then give the ask the org's first stage, so the load never fails on settings.
+     */
+    private static void insertAsks(GivingSampleDataSet data, Map<String, Id> referenceIdsByKey) {
+        if (data.asks.isEmpty()) {
+            return;
+        }
+        GivingSampleDataSelector selector = new GivingSampleDataSelector();
+        Map<String, Id> peopleByKey = selector.samplePeopleByKey();
+        Map<String, Id> accountsByKey = selector.sampleAccountsByKey();
+        List<String> stages = AskRules.stages();
+
+        List<Ask__c> asks = new List<Ask__c>();
+        for (Map<String, Object> row : data.asks) {
+            String donorKey = GivingSampleDataSet.asString(row.get('donor'));
+            Id donorContact = peopleByKey.get(donorKey);
+            Id donorAccount = donorContact == null ? accountsByKey.get(donorKey) : null;
+            if (donorContact == null && donorAccount == null) {
+                continue;
+            }
+            asks.add(
+                new Ask__c(
+                    Sample_Data__c = true,
+                    Donor_Contact__c = donorContact,
+                    Donor_Account__c = donorAccount,
+                    Stage__c = AskRules.matchStage(
+                        GivingSampleDataSet.asString(row.get('stage')),
+                        stages
+                    ),
+                    Outcome__c = GivingSampleDataSet.asString(row.get('outcome')),
+                    Amount__c = GivingSampleDataSet.toDecimal(row.get('amount')),
+                    Target_Date__c = GivingSampleDataSet.dateFor(row.get('targetDaysAgo')),
+                    Stage_Changed_Date__c = GivingSampleDataSet.dateFor(row.get('stageDaysAgo')),
+                    Closed_Date__c = GivingSampleDataSet.dateFor(row.get('closedDaysAgo')),
+                    Next_Ask_Date__c = GivingSampleDataSet.dateFor(row.get('nextAskDaysAgo')),
+                    Next_Step__c = GivingSampleDataSet.asString(row.get('nextStep')),
+                    Fund__c = referenceIdsByKey.get(GivingSampleDataSet.asString(row.get('fund'))),
+                    Appeal__c = referenceIdsByKey.get(
+                        GivingSampleDataSet.asString(row.get('appeal'))
+                    ),
+                    Commitment__c = referenceIdsByKey.get(
+                        GivingSampleDataSet.asString(row.get('commitment'))
+                    )
+                )
+            );
+        }
+        if (!asks.isEmpty()) {
+            Database.insert(asks, AccessLevel.USER_MODE);
+        }
     }
 
     /**
@@ -460,7 +516,8 @@ public with sharing class GivingSampleDataLoader {
     public static Integer removeStageCount() {
         GivingSampleDataSelector selector = new GivingSampleDataSelector();
         Integer reversals = selector.sampleReversalIds().size();
-        return chunksFor(reversals) +
+        return chunksFor(selector.sampleAskIds().size()) +
+            chunksFor(reversals) +
             chunksFor(selector.sampleGiftIds().size() - reversals) +
             chunksFor(selector.sampleCommitmentIds().size()) +
             chunksFor(selector.sampleAppealIds().size()) +
@@ -475,7 +532,8 @@ public with sharing class GivingSampleDataLoader {
      * Deletes the next chunk of Giving sample records and returns how many went, 0 once none
      * are left. A stage of GivingSampleDataRemoveStages calls it (ADMIN-3), because the whole
      * set's gift automation is more than one transaction can run. The order is the dependency
-     * order, and each kind is emptied before the next is started: refunds and write-offs first,
+     * order, and each kind is emptied before the next is started: asks first (they point at the
+     * gifts and pledges they won, and nothing points at them), then refunds and write-offs,
      * because a gift that a reversal points at refuses to be deleted (ADR-0010), then the other
      * gifts, because a commitment whose installments have been paid refuses to be deleted while
      * those gifts are still there, then commitments (their installments go with them), then
@@ -493,7 +551,10 @@ public with sharing class GivingSampleDataLoader {
         AutomationControl.bypass(COMMITMENT_AUTOMATION);
         AutomationControl.bypass(INSTALLMENT_AUTOMATION);
         try {
-            Integer removed = deleteChunk(selector.sampleReversalIds());
+            Integer removed = deleteChunk(selector.sampleAskIds());
+            if (removed == 0) {
+                removed = deleteChunk(selector.sampleReversalIds());
+            }
             if (removed == 0) {
                 removed = deleteChunk(selector.sampleGiftIds());
             }

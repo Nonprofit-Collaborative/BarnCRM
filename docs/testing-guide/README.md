@@ -54,6 +54,7 @@ page, even if that puts it out of reading order.
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
 | [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 15 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import |
 | [Giving: commitments](giving-commitments.md) | COM | 11 | Pledges, recurring gifts, payments, nightly jobs, pledge reminders |
+| [Giving: asks](giving-asks.md) | ASK | 7 | Ask stages, the Ask Pipeline board, moving and closing asks, gifts and pledges from won asks, reopening, history, read only access |
 | [Giving: soft credits, tributes and matching](giving-soft-credits-tributes-matching.md) | CRED | 10 | Soft credits, tributes, matching gifts |
 | [Giving: receipts and acknowledgments](giving-receipts-and-acknowledgments.md) | RCPT | 13 | Receipts, year-end statements, void and reissue, receipt lock, acknowledgments |
 | [Giving: refunds and write-offs](giving-refunds.md) | REF | 7 | Refunds and their effect on totals |

@@ -102,6 +102,8 @@
   <tabs>Organizations</tabs>
   <tabs>Gift__c</tabs>
   <tabs>Commitment__c</tabs>
+  <tabs>Ask_Pipeline</tabs>
+  <tabs>Ask__c</tabs>
   <tabs>Gift_Batch__c</tabs>
   <tabs>Fund__c</tabs>
   <tabs>Appeal__c</tabs>

@@ -12,7 +12,8 @@
  * deleted here, as the user, and listed as Deleted rather than left to the queued recompute.
  * What Giving holds as typed text about the person is emptied: tribute names typed for them, the message on a tribute of their
  * own gift, and the email address the acknowledgment ledger sent to. Running stewardship plans
- * for them are cancelled, so no more tasks are made about them. The donor level fields are kept,
+ * for them are cancelled, so no more tasks are made about them, and their asks lose their Next
+ * Step and are withdrawn if open (R-SO8). The donor level fields are kept,
  * like the totals.
  *
  * `@NamespaceAccessible`, public, with a public no-argument constructor, because Core resolves
@@ -97,7 +98,49 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
         changes.addAll(eraseTributes(contacts, accounts));
         changes.addAll(eraseAcknowledgments(contacts, accounts));
         changes.addAll(cancelStewardship(contacts, accounts));
+        changes.addAll(endAsks(contacts, accounts));
         return changes;
+    }
+
+    /**
+     * The person's asks, as the user (R-SO8): Next Step, the one free text an ask holds about the
+     * donor, is emptied on all of them, and open ones are withdrawn so no more work is planned.
+     * The asks are kept, like the gifts, still pointing at the anonymized person.
+     */
+    private static List<PersonErasure.Change> endAsks(Set<Id> contacts, Set<Id> accounts) {
+        List<Ask__c> updates = new List<Ask__c>();
+        for (Ask__c ask : [
+            SELECT Id, Outcome__c
+            FROM Ask__c
+            WHERE
+                (Donor_Contact__c IN :contacts
+                OR Donor_Account__c IN :accounts)
+                AND (Outcome__c = :AskRules.OUTCOME_OPEN
+                OR Next_Step__c != NULL)
+            WITH SYSTEM_MODE
+            LIMIT 10000
+        ]) {
+            Ask__c updated = new Ask__c(Id = ask.Id, Next_Step__c = null);
+            if (ask.Outcome__c == AskRules.OUTCOME_OPEN) {
+                updated.Outcome__c = AskRules.OUTCOME_WITHDRAWN;
+            }
+            updates.add(updated);
+        }
+        if (updates.isEmpty()) {
+            return new List<PersonErasure.Change>();
+        }
+        Database.update(updates, true, AccessLevel.USER_MODE);
+        return new List<PersonErasure.Change>{
+            new PersonErasure.Change(
+                PersonErasure.ENDED,
+                labelOf(Ask__c.SObjectType),
+                new List<Id>(new Map<Id, Ask__c>(updates).keySet()),
+                new List<String>{
+                    Ask__c.Outcome__c.getDescribe().getLabel(),
+                    Ask__c.Next_Step__c.getDescribe().getLabel()
+                }
+            )
+        };
     }
 
     /**
