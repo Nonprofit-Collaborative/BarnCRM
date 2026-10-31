@@ -8,6 +8,10 @@
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
+    <apexClass>PersonEnrollmentsController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>ProgramRosterController</apexClass>
     <enabled>true</enabled>
   </classAccesses>

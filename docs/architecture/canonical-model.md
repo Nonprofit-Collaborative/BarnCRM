@@ -9097,6 +9097,7 @@ Planned or Completed program, so history from a spreadsheet or PMM loads as it h
 | Start Date | `Start_Date__c` | Date |
 | End Date | `End_Date__c` | Date |
 | Coordinator | `Coordinator__c` | Lookup to User, delete constraint SetNull |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (release 0.12) |
 
 - **Validation rules:** `End_After_Start` (R-PG1).
 
@@ -9225,6 +9226,32 @@ repository and are checked against an org with PMM when MIG-09 is built.
 | Program: Name, Status, Description, Target Population, Start Date, End Date | Program: Name, Status, Description, Target Population, Start Date, End Date | Status values match (Planned, Active, Completed) |
 | Service: Name, Program, Description, Unit of Measure, Active | Service: Name, Program, Description, Unit of Measurement, Status | Status Active maps to Active checked |
 | Enrollment: Program, Contact, Stage, Start Date, End Date | Program Engagement: Program, Contact, Stage, Start Date, End Date | Stages: Applied to Applied; Enrolled and Active to Enrolled; Completed to Completed; Withdrawn to Withdrawn |
+
+### On a person, Health Check and sample data
+
+**Programs on a person.** The read only `personEnrollments` card lists a person's enrollments,
+open ones first, each with its program, stage and dates, on the Programs app's own Contact and
+Account record pages (`Programs_Contact_Record_Page`, `Programs_Account_Record_Page`: Core's
+pages plus the card, kept in step under ADR-0064). Read in user mode. On an Account it shows only
+for a person account, and lists enrollments naming the account or its one contact, so it needs no
+person account field. A user who cannot read enrollments gets no card.
+
+**Health Check.** `ProgramsHealthCheckExtension`, registered in
+`HealthCheckExtensions.EXTENSION_CLASSES`, asked only of a viewer who may manage settings and not
+while the module is turned off:
+
+| Key | Severity | Finds | Fix |
+|---|---|---|---|
+| `program_enrollments_open_after_end` | Info | Open enrollments (Applied or Enrolled) in a program that is Completed or whose End Date is past: they still count as open (R-EN2) and in the roster. | Links the first five enrollments. |
+
+**Sample data.** `ProgramsSampleData` implements Core's `SampleDataModule` and is registered in
+`SampleDataModules.MODULE_CLASS_NAMES` after Volunteers. Its load, two stages, builds three
+programs flagged `Sample_Data__c` (two Active, one Completed) with five services, then 18
+enrollments of up to 12 of Core's sample people (contacts), through the enrollment rules. Its
+removal, before Volunteers', Giving's and Core's, deletes one chunk per stage: the sample
+people's enrollments in sample programs, then the sample programs with no enrollment left (their
+services go with them). A sample program a real person is enrolled in is kept, and one Warning
+in the Error Log names each one kept.
 
 ---
 
@@ -9517,6 +9544,7 @@ mirrors the primary member).
 | v1.0 | 2026-10-30 | Advanced duplicate management (C-51, D-154, ADR-0145 `0145-advanced-duplicate-management.md`). Object `Merge_Journal__c` added (Section 29A); custom metadata type `Merge_Rule__mdt` added (Section 13); settings keys `Fuzzy_Match_Threshold__c`, `Merge_Default_Rule__c` and `Auto_Merge_Exact_Match__c`. R-DP1 and R-DP4 amended; R-DP7 to R-DP10 added. |
 | v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-0149). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a) by any user with the import permission and edit access to the rows; `Import_Batch__c` gains `Retried_By__c` (Rows Retried By) so undo covers their records. R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
 | 0.12 | 2026-10-31 | Programs P-01 (ADR-NEXT `NEXT-programs-module.md`). New in the Programs module: Program (`Program__c`, 29W), Service (`Service__c`, 29X) and Enrollment (`Enrollment__c`, 29Y), with rules R-PG1 to R-PG3, R-SV1 and R-EN1 to R-EN5 and the PMM mapping. Section 30 keeps attendance and service delivery (P-02); Outcome left it for Logic Models (L-02). Specified ahead of the build. |
+| 0.12 | 2026-10-31 | Programs P-01 follow-up. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Program__c` (29W), so the Programs sample load can be removed in one action; services and enrollments are found through their program. 29Y gains the person card, the Programs Health Check finding and the sample data paragraph. No object added. |
 
 ---
 ## 32. Entity ownership by package

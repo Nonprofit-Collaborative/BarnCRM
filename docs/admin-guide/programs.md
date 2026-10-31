@@ -100,6 +100,19 @@ panel without the button or the stage pickers. The panel lists up to 200 people;
 You can also create and edit enrollments on the **Enrollments** tab and from the **Enrollments**
 related list on the program. The list views are **Open Enrollments** and **All Enrollments**.
 
+## A Person's Programs
+
+In the **BarnCRM Programs** app, a person's record page carries a **Programs** card listing
+every enrollment they have: the program (a link), the stage and the dates, open ones first. It is
+read only: enroll people and change stages from the program's **Program Roster** panel. On an
+account the card shows only for a person account, never on a household or an organization. A
+user without a Programs permission set sees no card.
+
+The card is on the Programs app's own Contact and Account record pages, **Programs Contact
+Record Page** and **Programs Account Record Page**: BarnCRM's person pages plus the card. In the
+other BarnCRM apps the person page stays as it was. To show the card there too, add the
+**Person Enrollments** component to that app's page in the Lightning App Builder.
+
 ## Enrollment Rules
 
 - **One person per enrollment.** An enrollment names a contact or, where people are person
@@ -125,6 +138,21 @@ related list on the program. The list views are **Open Enrollments** and **All E
 - **Erasing a person** (see [Erase a Person](erase-a-person.md)) keeps their enrollments,
   credited to the anonymous record. An enrollment holds no typed notes, so there is nothing on it
   to empty.
+
+## Health Check
+
+With Programs installed, [Health Check](health-check.md) asks one more question, shown only to
+people who can manage BarnCRM Settings and not while Programs is turned off:
+
+| Finding | Severity | What it means | What to do |
+|---|---|---|---|
+| **Enrollments are still open in programs that have ended** | Information | Enrollments at Applied or Enrolled in a program whose Status is Completed or whose End Date is past. They still count as open, so the person cannot be enrolled again, and they stay on the roster. | Open each linked enrollment and set its Stage to Completed or Withdrawn. If the program is still running, set its Status back to Active or move its End Date. |
+
+## Sample Data
+
+**Load Sample Data** in BarnCRM Settings also loads three sample programs, five services and 18
+enrollments, and **Remove Sample Data** takes them away again. See
+[Sample data](sample-data.md#with-programs-installed).
 
 ## Turning It Off
 

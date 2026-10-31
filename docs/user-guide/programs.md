@@ -64,6 +64,15 @@ someone to **Enrolled** fills an empty Start Date with today; moving them to **C
 To see everyone who has completed or withdrawn, turn on **Show Ended**. To correct a date,
 click the person's name to open the enrollment and edit it there.
 
+## To See Which Programs Someone Is In
+
+1. In the **BarnCRM Programs** app, open the person.
+2. Look at the **Programs** card on the right.
+
+You should see: every program the person has an enrollment in, open ones first, with the stage
+and the dates. Click a program name to open that enrollment. The card is read only: enroll
+people and change stages on the program. On a household or an organization there is no card.
+
 ## To Enroll Someone Again
 
 Once a person's enrollment has ended (Completed or Withdrawn), enroll them again with **Enroll

@@ -16,6 +16,38 @@
     <type>Flexipage</type>
     <pageOrSobjectType>Program__c</pageOrSobjectType>
   </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Households, organizations and person accounts, with a person's programs</comment>
+    <content>Programs_Account_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Account</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Households, organizations and person accounts, with a person's programs</comment>
+    <content>Programs_Account_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Account</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>People, with their programs</comment>
+    <content>Programs_Contact_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Contact</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>People, with their programs</comment>
+    <content>Programs_Contact_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Contact</pageOrSobjectType>
+  </actionOverrides>
   <brand>
     <headerColor>#0B5CAB</headerColor>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>

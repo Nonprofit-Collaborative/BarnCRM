@@ -32,6 +32,33 @@ public with sharing class EnrollmentSelector {
         return found.isEmpty() ? null : found[0].Program__c;
     }
 
+    /**
+     * The enrollments naming these contacts or this account, newest start first, at most
+     * `howMany`, with their program's name.
+     */
+    public static List<Enrollment__c> selectForPerson(
+        Set<Id> contactIds,
+        Id accountId,
+        Integer howMany
+    ) {
+        return [
+            SELECT Id, Program__c, Program__r.Name, Stage__c, Start_Date__c, End_Date__c
+            FROM Enrollment__c
+            WHERE Contact__c IN :contactIds OR (Account__c != NULL AND Account__c = :accountId)
+            WITH USER_MODE
+            ORDER BY Start_Date__c DESC NULLS FIRST, Name DESC
+            LIMIT :howMany
+        ];
+    }
+
+    /** The contacts of this account: for a person account, its one contact. */
+    public static Set<Id> selectContactIdsOf(Id accountId) {
+        return new Map<Id, Contact>(
+                [SELECT Id FROM Contact WHERE AccountId = :accountId WITH USER_MODE LIMIT 2]
+            )
+            .keySet();
+    }
+
     /** How many of the program's enrollments the user can see are at each stage. */
     public static Map<String, Integer> countByStage(Id programId) {
         Map<String, Integer> counts = new Map<String, Integer>();

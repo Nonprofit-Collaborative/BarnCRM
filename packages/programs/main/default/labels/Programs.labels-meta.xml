@@ -152,4 +152,108 @@
         <shortDescription>Spinner text while loading</shortDescription>
         <value>Loading</value>
     </labels>
+    <labels>
+        <fullName>Programs_Person_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title of the Programs card on a person</shortDescription>
+        <value>Programs</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_Empty</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card when the person has no enrollment</shortDescription>
+        <value>Not enrolled in any program.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_Started</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card: before the start date</shortDescription>
+        <value>Started</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_Ended</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card: before the end date</shortDescription>
+        <value>Ended</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_Refresh</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card refresh button</shortDescription>
+        <value>Refresh</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_LoadFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card could not load</shortDescription>
+        <value>The programs could not be loaded. Refresh to try again.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_MoreThanShown</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card lists only the newest 200</shortDescription>
+        <value>Only the newest 200 are listed. The Enrollments tab lists them all.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_HealthCheck_OpenAfterEndTitleOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: one enrollment open in an ended program</shortDescription>
+        <value>1 enrollment is still open in a program that has ended</value>
+    </labels>
+    <labels>
+        <fullName>Programs_HealthCheck_OpenAfterEndTitle</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: enrollments open in ended programs; {0} is how many</shortDescription>
+        <value>{0} enrollments are still open in programs that have ended</value>
+    </labels>
+    <labels>
+        <fullName>Programs_HealthCheck_OpenAfterEndDetail</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: what open enrollments in ended programs mean</shortDescription>
+        <value>These enrollments are Applied or Enrolled in a program whose Status is Completed or whose End Date is past. They still count as open, so the person cannot be enrolled in that program again. Set each one to Completed or Withdrawn, or, if the program is still running, set it back to Active or move its End Date. The first ones are linked below.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_HealthCheck_MoreThan</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check count that stopped at its cap; {0} is the cap</shortDescription>
+        <value>More than {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_SampleData_CountLabel</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sample data card: what the Programs number counts</shortDescription>
+        <value>Program enrollments</value>
+    </labels>
+    <labels>
+        <fullName>Programs_SampleData_Kept</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sample removal kept programs; {0} is their names</shortDescription>
+        <value>Sample data removal kept the sample programs {0}, because people of your own are enrolled in them. Move or delete those enrollments, then select Remove Sample Data again.</value>
+    </labels>
 </CustomLabels>
