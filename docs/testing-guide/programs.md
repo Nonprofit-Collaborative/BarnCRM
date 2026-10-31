@@ -160,3 +160,20 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 7 | Open **Hot meal** and try to delete it. | Refused: the service has deliveries. |
 
 **Cleanup:** delete the deliveries made in steps 1 and 5. Run T-PRG-08 to remove the sample data.
+
+## T-PRG-11: Intake and Eligibility, and the Programs Settings Page
+
+**Purpose:** confirm the intake fields save, the Eligibility Date fills itself in, and an admin reaches the intake picklists from BarnCRM Settings.
+**Prerequisites:** the admin user and the staff user from T-PRG-01; any program and a person not enrolled in it.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, enroll the person as **Applied** and open the enrollment. | An **Intake and Eligibility** section shows **Eligibility Status** **Not Screened** and the other fields empty. |
+| 2 | Edit: set **Intake Date** to last week, **Referral Source** to **School**, **Eligibility Status** to **Awaiting Documents**. Save. | Saved; **Eligibility Date** stays empty. |
+| 3 | Edit: set **Eligibility Status** to **Eligible** and **Eligibility Basis** to **Income**. Save. | **Eligibility Date** shows today. |
+| 4 | As the admin, open **BarnCRM Settings**. | A **Programs** section is listed in the Programs group, above Volunteers if installed. |
+| 5 | Open it and click **Open Programs Settings**. | The **Programs Settings** page lists **Referral Source**, **Eligibility Status** (Default: Not Screened) and **Eligibility Basis** with their choices. |
+| 6 | Click **Change in Setup** beside **Referral Source**. | The enrollment's **Fields and Relationships** open in Setup in a new tab. Open **Referral Source**, add a choice "Library", save, and reload the Programs Settings page: "Library" is listed. |
+| 7 | As the staff user, open the Programs Settings page by its address (copy it from step 5). | The tab is not available to them, or the page says only someone who can manage BarnCRM settings can change the Programs settings. |
+
+**Cleanup:** remove the "Library" choice in Setup; delete the enrollment.

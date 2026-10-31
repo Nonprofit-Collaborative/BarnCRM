@@ -1,0 +1,44 @@
+<template>
+  <div class="slds-var-p-around_medium slds-is-relative">
+    <h1 class="slds-text-heading_medium" data-id="title">{labels.title}</h1>
+    <p class="slds-text-body_regular slds-var-m-bottom_medium" data-id="intro">{labels.intro}</p>
+
+    <template lwc:if={loading}>
+      <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
+    </template>
+
+    <template lwc:if={errorMessage}>
+      <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">{errorMessage}</p>
+    </template>
+
+    <template lwc:if={noAccess}>
+      <p data-id="no-access" class="slds-text-body_regular">{labels.noAccess}</p>
+    </template>
+
+    <template lwc:if={canManage}>
+      <lightning-card title={labels.picklistsTitle} icon-name="utility:picklist_type" data-id="picklists">
+        <div class="slds-var-p-horizontal_medium">
+          <p class="slds-text-body_small slds-var-m-bottom_small">{labels.picklistsIntro}</p>
+          <ul class="slds-has-dividers_bottom-space">
+            <template for:each={picklists} for:item="picklist">
+              <li key={picklist.key} class="slds-item" data-id="picklist">
+                <div class="slds-grid slds-wrap slds-gutters_x-small">
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-4">
+                    <p class="slds-text-heading_small">{picklist.label}</p>
+                    <p class="slds-text-body_regular" data-id="choices">{picklist.choices}</p>
+                    <p class="slds-text-body_small slds-text-color_weak" data-id="default">{picklist.defaultText}</p>
+                  </div>
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4 slds-text-align_right">
+                    <a href={picklist.setupUrl} target="_blank" aria-label={picklist.linkLabel} data-id="setup-link"
+                      >{labels.changeInSetup}</a
+                    >
+                  </div>
+                </div>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </lightning-card>
+    </template>
+  </div>
+</template>

@@ -56,6 +56,9 @@ public with sharing class SettingSections {
     public static final String ROLLUPS = 'Rollups';
     @NamespaceAccessible
     public static final String VOLUNTEERS = 'Volunteers';
+    /** The Programs module's section, which opens its own settings page. */
+    @NamespaceAccessible
+    public static final String PROGRAMS = 'Programs';
     @NamespaceAccessible
     public static final String ADDRESSES = 'Addresses';
     /** A sub-section of People and Households, and a page until P1 (see HOUSEHOLDS). */
@@ -78,6 +81,7 @@ public with sharing class SettingSections {
             GIVING,
             RECEIPTS,
             ROLLUPS,
+            PROGRAMS,
             VOLUNTEERS,
             AUTOMATION,
             ERROR_LOG,

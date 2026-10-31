@@ -217,6 +217,69 @@ private class EnrollmentRulesTest {
     }
 
     @IsTest
+    static void theEligibilityDateIsFilledInWhenEligibilityIsDecided() {
+        System.runAs(TestUsers.adminWith(ADMIN)) {
+            contactMode();
+        }
+        System.runAs(staffer()) {
+            List<Contact> persons = people(3);
+            Program__c pantry = program('Pantry');
+            Date typed = Date.today().addDays(-10);
+            Enrollment__c screened = newEnrollment(pantry.Id, persons[0].Id, 'Applied');
+            screened.Eligibility_Status__c = 'Eligible';
+            screened.Intake_Date__c = typed;
+            screened.Referral_Source__c = 'Another Agency';
+            screened.Eligibility_Basis__c = 'Income';
+            Enrollment__c waiting = newEnrollment(pantry.Id, persons[1].Id, 'Applied');
+            Enrollment__c dated = newEnrollment(pantry.Id, persons[2].Id, 'Applied');
+            dated.Eligibility_Status__c = 'Not Eligible';
+            dated.Eligibility_Date__c = typed;
+            insert new List<Enrollment__c>{ screened, waiting, dated };
+
+            Test.startTest();
+            waiting.Eligibility_Status__c = 'Awaiting Documents';
+            update waiting;
+            Date afterWaiting = [
+                SELECT Eligibility_Date__c
+                FROM Enrollment__c
+                WHERE Id = :waiting.Id
+            ]
+            .Eligibility_Date__c;
+            waiting.Eligibility_Status__c = 'Not Eligible';
+            update waiting;
+            Test.stopTest();
+
+            Map<Id, Enrollment__c> saved = new Map<Id, Enrollment__c>(
+                [SELECT Id, Eligibility_Status__c, Eligibility_Date__c FROM Enrollment__c]
+            );
+            Assert.areEqual(Date.today(), saved.get(screened.Id).Eligibility_Date__c, 'Decided.');
+            Assert.isNull(afterWaiting, 'Awaiting documents decides nothing.');
+            Assert.areEqual(Date.today(), saved.get(waiting.Id).Eligibility_Date__c, 'Later.');
+            Assert.areEqual(
+                typed,
+                saved.get(dated.Id).Eligibility_Date__c,
+                'A typed date is kept.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aNewEnrollmentIsNotScreenedByDefault() {
+        System.runAs(TestUsers.adminWith(ADMIN)) {
+            contactMode();
+            Program__c pantry = program('Pantry');
+            Enrollment__c fresh = newEnrollment(pantry.Id, people(1)[0].Id, 'Applied');
+            insert fresh;
+            Assert.areEqual(
+                'Not Screened',
+                [SELECT Eligibility_Status__c FROM Enrollment__c WHERE Id = :fresh.Id]
+                .Eligibility_Status__c,
+                'The shipped default.'
+            );
+        }
+    }
+
+    @IsTest
     static void anEnrollmentIsOnePersonAndEndsAfterItStarts() {
         System.runAs(TestUsers.adminWith(ADMIN)) {
             contactMode();

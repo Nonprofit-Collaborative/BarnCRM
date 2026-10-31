@@ -9161,6 +9161,11 @@ participant record; P-02 records what they attended and received.
 | Stage | picklist(Applied, Enrolled, Completed, Withdrawn) | yes (defaults Enrolled) | Where the person stands in the program. Applied and Enrolled are open; Completed and Withdrawn have ended. |
 | Start Date | date | no | When the person was enrolled. |
 | End Date | date | no | When the person completed or withdrew. |
+| Intake Date | date | no | When the person was first seen or applied (P-07, release 0.14). |
+| Referral Source | picklist(Self, Family or Friend, Another Agency, School, Health Care Provider, Faith Community, Other) | no | Who sent the person. The values are the organization's to change (P-07). |
+| Eligibility Status | picklist(Not Screened, Awaiting Documents, Eligible, Not Eligible) | no (defaults Not Screened) | Whether the person has been checked against the program's rules (P-07). The values are the organization's to change; Eligible and Not Eligible decide it (R-EN6). |
+| Eligibility Basis | picklist(Income, Age, Residence, Referral, Other) | no | The main reason the person qualifies or not (P-07). The values are the organization's to change. |
+| Eligibility Date | date | no | When eligibility was decided (R-EN6). |
 
 ### Relationships
 
@@ -9194,6 +9199,18 @@ keeps their enrollments, credited to the anonymous record, so program counts sta
 enrollment holds no typed text to empty. Deleting the person empties the person on the
 enrollment (SetNull) and keeps it. A merge moves the enrollments to the record kept.
 
+**R-EN6 The eligibility date is filled in (P-07).** Creating an enrollment with an Eligibility
+Status of Eligible or Not Eligible, or changing it to either, fills an empty Eligibility Date with
+today. A date already typed is kept, and Not Screened or Awaiting Documents leaves it alone. Part
+of the switchable `Enrollment_Dates` automation (R-EN3), so an import of history can turn it off.
+
+**Intake fields hold choices, not typed text (P-07).** The intake and eligibility fields are dates
+and restricted picklists, so R-EN5 still holds: erasing a person leaves nothing on an enrollment
+to empty. Notes about a person belong in case notes (P-04). The picklist values are the
+organization's: an admin adds, renames or deactivates them on the field in Setup (Object Manager,
+Enrollment), which the Programs settings page links to; BarnCRM reads them by value, and only
+R-EN6 names two values.
+
 ### Salesforce implementation
 
 - **Object:** `Enrollment__c`, name field AutoNumber `EN-{000000}`, sharing Public Read/Write
@@ -9207,7 +9224,18 @@ enrollment (SetNull) and keeps it. A merge moves the enrollments to the record k
 | Stage | `Stage__c` | Picklist: Applied, Enrolled, Completed, Withdrawn; required, default Enrolled |
 | Start Date | `Start_Date__c` | Date |
 | End Date | `End_Date__c` | Date |
+| Intake Date | `Intake_Date__c` | Date |
+| Referral Source | `Referral_Source__c` | Picklist, restricted, not required, no default |
+| Eligibility Status | `Eligibility_Status__c` | Picklist, restricted, not required, default Not Screened |
+| Eligibility Basis | `Eligibility_Basis__c` | Picklist, restricted, not required, no default |
+| Eligibility Date | `Eligibility_Date__c` | Date |
 
+- **Settings page:** `ProgramsSettingsController` and the `programsSettings` panel on the
+  `Programs_Settings` app page and tab (Programs Admin only), reached from the Programs section
+  of BarnCRM Settings (`Setting_Definition.Programs_Settings`, a navigation row). It lists the
+  intake picklists' active values and default from describe, with a link to the enrollment's
+  fields in Setup (Object Manager by API name). The section name `Programs` is in Core's
+  `SettingSections`.
 - **Validation rules:** `Exactly_One_Person` (R-EN1), `End_After_Start` (R-EN4).
 - **Service:** `EnrollmentService` (the stage values and the roster panel's reads and writes),
   `EnrollmentRulesHandler` (R-EN2), `EnrollmentDatesHandler` (R-EN3), `EnrollmentSelector`
@@ -9631,6 +9659,7 @@ mirrors the primary member).
 | 0.12 | 2026-10-31 | Programs P-01 (ADR-NEXT `NEXT-programs-module.md`). New in the Programs module: Program (`Program__c`, 29W), Service (`Service__c`, 29X) and Enrollment (`Enrollment__c`, 29Y), with rules R-PG1 to R-PG3, R-SV1 and R-EN1 to R-EN5 and the PMM mapping. Section 30 keeps attendance and service delivery (P-02); Outcome left it for Logic Models (L-02). Specified ahead of the build. |
 | 0.12 | 2026-10-31 | Programs P-01 follow-up. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Program__c` (29W), so the Programs sample load can be removed in one action; services and enrollments are found through their program. 29Y gains the person card, the Programs Health Check finding and the sample data paragraph. No object added. |
 | 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29Z), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |
+| 0.14 | 2026-10-31 | Programs P-07. `Enrollment__c` (29Y) gains Intake Date (`Intake_Date__c`, Date), Referral Source (`Referral_Source__c`), Eligibility Status (`Eligibility_Status__c`, default Not Screened) and Eligibility Basis (`Eligibility_Basis__c`), restricted picklists whose values the organization changes in Setup, and Eligibility Date (`Eligibility_Date__c`, Date), filled by new rule R-EN6 in the `Enrollment_Dates` automation. No PMM counterpart: they stay out of the MIG-09 mapping. The Programs section of BarnCRM Settings opens the module's settings page (`Programs_Settings` tab). |
 
 ---
 ## 32. Entity ownership by package

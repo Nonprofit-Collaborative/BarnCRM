@@ -39,6 +39,37 @@
       </layoutItems>
     </layoutColumns>
   </layoutSections>
+  <layoutSections>
+    <customLabel>true</customLabel>
+    <detailHeading>true</detailHeading>
+    <editHeading>true</editHeading>
+    <label>Intake and Eligibility</label>
+    <style>TwoColumnsTopToBottom</style>
+    <layoutColumns>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Intake_Date__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Referral_Source__c</field>
+      </layoutItems>
+    </layoutColumns>
+    <layoutColumns>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Eligibility_Status__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Eligibility_Basis__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Eligibility_Date__c</field>
+      </layoutItems>
+    </layoutColumns>
+  </layoutSections>
   <relatedLists>
     <fields>NAME</fields>
     <fields>Service__c</fields>

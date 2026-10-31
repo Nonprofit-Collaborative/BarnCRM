@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Referral_Source__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Who sent the person to the program. Your admin can change the choices.</inlineHelpText>
+  <label>Referral Source</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Self</fullName>
+        <default>false</default>
+        <label>Self</label>
+      </value>
+      <value>
+        <fullName>Family or Friend</fullName>
+        <default>false</default>
+        <label>Family or Friend</label>
+      </value>
+      <value>
+        <fullName>Another Agency</fullName>
+        <default>false</default>
+        <label>Another Agency</label>
+      </value>
+      <value>
+        <fullName>School</fullName>
+        <default>false</default>
+        <label>School</label>
+      </value>
+      <value>
+        <fullName>Health Care Provider</fullName>
+        <default>false</default>
+        <label>Health Care Provider</label>
+      </value>
+      <value>
+        <fullName>Faith Community</fullName>
+        <default>false</default>
+        <label>Faith Community</label>
+      </value>
+      <value>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

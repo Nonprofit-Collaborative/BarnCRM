@@ -51,6 +51,20 @@ and the person is listed with today as the Start Date (for Enrolled).
 Enrolling someone who already has an Applied or Enrolled enrollment in the same program is
 refused, with a message naming the program. Change the enrollment that is there instead.
 
+## To Record Intake and Eligibility
+
+1. Open the program and click the person's name in the **Program Roster** panel (or open the
+   enrollment from the **Enrollments** tab).
+2. Click **Edit**. In **Intake and Eligibility**, fill in the **Intake Date** and **Referral
+   Source**, then set the **Eligibility Status** (Not Screened, Awaiting Documents, Eligible or
+   Not Eligible) and the **Eligibility Basis**.
+3. Click **Save**.
+
+You should see the values saved. Choosing **Eligible** or **Not Eligible** fills an empty
+**Eligibility Date** with today. The choices in each list are your organization's; if one you
+need is missing, ask your admin. Write anything longer about the person in a case note, not
+here.
+
 ## To Move Someone to Another Stage
 
 1. Open the program.

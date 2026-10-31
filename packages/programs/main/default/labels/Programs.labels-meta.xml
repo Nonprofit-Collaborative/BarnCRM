@@ -392,4 +392,76 @@
         <shortDescription>Unexpected Service Delivery Log failure, logged</shortDescription>
         <value>Something went wrong with the service delivery log. The details are in the Error Log.</value>
     </labels>
+    <labels>
+        <fullName>Programs_Settings_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings page title</shortDescription>
+        <value>Programs Settings</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_Intro</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings page introduction</shortDescription>
+        <value>The choices your organization makes for the Programs module. Changes apply to everyone.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PicklistsTitle</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Intake picklists card title</shortDescription>
+        <value>Intake and Eligibility Picklists</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PicklistsIntro</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Intake picklists card introduction</shortDescription>
+        <value>The choices staff pick from on an enrollment. Add, rename or deactivate a choice on the field in Setup; a deactivated choice stays on the enrollments that have it.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_Default</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A picklist's default; {0} is the value</shortDescription>
+        <value>Default: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_ChangeInSetup</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link to change a picklist's values in Setup</shortDescription>
+        <value>Change in Setup</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_ChangeFor</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Accessible name of the Setup link; {0} is the field</shortDescription>
+        <value>Change {0} in Setup</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_NoAccess</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Viewer may not manage settings</shortDescription>
+        <value>Only someone who can manage BarnCRM settings can change the Programs settings.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_LoadFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings could not load, logged</shortDescription>
+        <value>The Programs settings could not be loaded. The details are in the Error Log.</value>
+    </labels>
 </CustomLabels>

@@ -10,9 +10,10 @@ an enrollment links a person to a program with a **stage** (Applied, Enrolled, C
 Withdrawn) and its start and end dates. Each time a service is given, or a person misses it, is a
 **service delivery**: attendance and what was received, in one record.
 
-Case notes, a program dashboard, a roster import and intake fields come in later releases (P-04
-to P-08). Until the participant privacy preset (P-08) arrives, everyone who holds a Programs
-permission set can see every enrollment and service delivery.
+Each enrollment also carries the person's **intake and eligibility**: when they were first seen,
+who referred them, and whether they qualify. Case notes, a program dashboard and a roster import
+come in later releases (P-04 to P-06). Until the participant privacy preset (P-08) arrives,
+everyone who holds a Programs permission set can see every enrollment and service delivery.
 
 ## Before You Install
 
@@ -35,7 +36,29 @@ finishes, BarnCRM does three things on its own:
 Then open the **BarnCRM Programs** app from the App Launcher. Its tabs are **Programs**,
 **Enrollments** and **Service Deliveries**. These tabs also join the BarnCRM apps.
 
-Programs has no settings yet, so it adds no section to BarnCRM Settings.
+## Programs Settings
+
+The module adds a **Programs** section to BarnCRM Settings (in the Programs group). Its
+**Programs Settings** row opens the module's own settings page, for anyone who can manage BarnCRM
+settings (BarnCRM Admin). Everything on it applies to the whole organization.
+
+**Intake and Eligibility Picklists.** The page lists the three intake picklists on an enrollment
+(**Referral Source**, **Eligibility Status** and **Eligibility Basis**) with the choices each
+offers now and its default. They ship with:
+
+| Picklist | Choices it ships with | Default |
+|---|---|---|
+| Referral Source | Self, Family or Friend, Another Agency, School, Health Care Provider, Faith Community, Other | None |
+| Eligibility Status | Not Screened, Awaiting Documents, Eligible, Not Eligible | Not Screened |
+| Eligibility Basis | Income, Age, Residence, Referral, Other | None |
+
+To make them your own, click **Change in Setup** beside a picklist: it opens the enrollment's
+fields in Setup (Object Manager, Enrollment) in a new tab. Click the picklist's name; there you add, rename, reorder or deactivate a choice (Salesforce keeps picklist choices on the
+field itself, so this one step happens in Setup). A deactivated choice stays on the enrollments
+that already have it, and a renamed one is renamed on them too. Keep **Eligible** and **Not
+Eligible** in Eligibility Status: choosing either fills in the Eligibility Date (see Enrollment
+Rules). The lists are restricted: an import or another system can only save a choice the list
+holds.
 
 ## Roles and Permission Sets
 
@@ -162,9 +185,20 @@ other BarnCRM apps the person page stays as it was. To show the card there too, 
   so it cannot be switched off on the Automation page.
 - **Dates fill themselves in.** Moving an enrollment to **Enrolled** fills an empty Start Date
   with today; moving it to **Completed** or **Withdrawn** fills an empty End Date with today. A
-  date someone already typed is kept. An End Date before the Start Date is refused. This
-  automation is **Enrollment: fill in the stage dates** on the Automation page; switch it off
-  while you load history whose dates you are typing yourself.
+  date someone already typed is kept. An End Date before the Start Date is refused. Setting
+  **Eligibility Status** to **Eligible** or **Not Eligible** fills an empty **Eligibility Date**
+  with today the same way. This automation is **Enrollment: fill in the stage dates** on the
+  Automation page; switch it off while you load history whose dates you are typing yourself.
+
+## Intake and Eligibility
+
+Each enrollment has an **Intake and Eligibility** section: **Intake Date** (when the person was
+first seen or applied), **Referral Source**, **Eligibility Status** (new enrollments start **Not
+Screened**), **Eligibility Basis** (the main reason they qualify, or do not) and **Eligibility
+Date**. The choices are yours to change (see Programs Settings). They hold choices and dates
+only, never typed notes, so erasing a person leaves nothing on the enrollment to empty; write
+notes about a person in case notes. Add the fields to list views and reports as you need them,
+for example an **Awaiting Documents** list view to chase missing paperwork.
 
 ## People: Merging, Deleting and Erasing
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    The Programs module's settings page: the intake and eligibility picklists, and later the
+    participant privacy preset.
+  </description>
+  <flexiPage>Programs_Settings</flexiPage>
+  <label>Programs Settings</label>
+  <motif>Custom19: Wrench</motif>
+</CustomTab>

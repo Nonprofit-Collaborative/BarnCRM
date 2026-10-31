@@ -34,6 +34,12 @@ public with sharing class EnrollmentService {
         STAGE_WITHDRAWN
     };
 
+    /** The eligibility statuses that decide it, and fill in the Eligibility Date (R-EN6). */
+    private static final Set<String> DECIDED_ELIGIBILITY = new Set<String>{
+        'Eligible',
+        'Not Eligible'
+    };
+
     /** Whether an enrollment at this stage is open (Applied or Enrolled). */
     @NamespaceAccessible
     public static Boolean isOpen(String stage) {
@@ -130,6 +136,32 @@ public with sharing class EnrollmentService {
             }
             if (ends && enrollment.End_Date__c == null) {
                 enrollment.End_Date__c = today;
+            }
+        }
+    }
+
+    /**
+     * R-EN6: an enrollment whose eligibility is decided (Eligible or Not Eligible), when created
+     * so or changed to it, gets today as its Eligibility Date when that is empty.
+     */
+    public static void fillEligibilityDates(
+        List<Enrollment__c> enrollments,
+        Map<Id, Enrollment__c> previousById
+    ) {
+        Date today = Date.today();
+        for (Enrollment__c enrollment : enrollments) {
+            Enrollment__c previous = previousById == null ? null : previousById.get(enrollment.Id);
+            if (
+                previous != null &&
+                previous.Eligibility_Status__c == enrollment.Eligibility_Status__c
+            ) {
+                continue;
+            }
+            if (
+                DECIDED_ELIGIBILITY.contains(enrollment.Eligibility_Status__c) &&
+                enrollment.Eligibility_Date__c == null
+            ) {
+                enrollment.Eligibility_Date__c = today;
             }
         }
     }
