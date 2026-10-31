@@ -177,6 +177,22 @@
         <value>Every field of the kinds of record you choose, with its rules, as a table and a CSV.</value>
     </labels>
     <labels>
+        <fullName>Core_OrgOptimizer_AccessExplorer</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Access Explorer section name</shortDescription>
+        <value>Access Explorer</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_AccessExplorerText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: what the Access Explorer section answers</shortDescription>
+        <value>Who can see or change what, and why. Read only.</value>
+    </labels>
+    <labels>
         <fullName>Core_OrgOptimizer_HealthCheck</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>

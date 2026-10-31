@@ -1,5 +1,8 @@
 import { createElement } from 'lwc';
+import * as navigation from 'lightning/navigation';
+import { createApexTestWireAdapter as mockCreateApexTestWireAdapter } from '@salesforce/sfdx-lwc-jest';
 import OrgOptimizer from 'c/orgOptimizer';
+import getOpenLink from '@salesforce/apex/AccessExplorerController.getOpenLink';
 import getReport from '@salesforce/apex/HealthCheckController.getReport';
 import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
 import getTile from '@salesforce/apex/ErrorLogController.getTile';
@@ -10,6 +13,11 @@ import getFindings from '@salesforce/apex/OrgOptimizerSetupController.getFinding
 jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/AccessExplorerController.getOpenLink',
+  () => ({ default: mockCreateApexTestWireAdapter(jest.fn()) }),
+  { virtual: true }
+);
 jest.mock('@salesforce/customPermission/Find_And_Export_Records', () => ({ default: true }), {
   virtual: true
 });
@@ -135,7 +143,7 @@ describe('c-org-optimizer as an administrator', () => {
     const groups = one(element, 'c-barn-tool-grid').groups;
     expect(groups.map((group) => group.tiles.map((tile) => tile.name))).toEqual([
       ['quality', 'fieldUtilization', 'dataDictionary'],
-      ['healthCheck', 'errors', 'storage', 'setup']
+      ['healthCheck', 'errors', 'storage', 'setup', 'accessExplorer']
     ]);
     tiles(element).forEach((tile) => expect(tile.iconName).toMatch(/^standard:/));
   });
@@ -223,6 +231,37 @@ describe('c-org-optimizer as an administrator', () => {
     await activate(element, 'dataDictionary');
 
     expect(one(element, 'c-data-dictionary')).not.toBeNull();
+  });
+
+  it('creates Access Explorer only when its tab is first opened', async () => {
+    const element = await render();
+    expect(one(element, 'c-access-explorer')).toBeNull();
+
+    await activate(element, 'accessExplorer');
+
+    expect(one(element, 'c-access-explorer')).not.toBeNull();
+  });
+
+  it('opens Access Explorer when the page is opened for it from the Access page', async () => {
+    const element = await render();
+    navigation.CurrentPageReference.emit({ state: { c__section: 'accessExplorer' } });
+    await flush();
+    expect(one(element, 'c-access-explorer')).toBeNull();
+
+    getOpenLink.emit({ url: '/x', stateKey: 'c__section', section: 'accessExplorer' });
+    await flush();
+
+    expect(one(element, 'lightning-tabset').activeTabValue).toBe('accessExplorer');
+    expect(one(element, 'c-access-explorer')).not.toBeNull();
+  });
+
+  it('stays on the Overview when the page names no section', async () => {
+    const element = await render();
+    getOpenLink.emit({ url: '/x', stateKey: 'c__section', section: 'accessExplorer' });
+    navigation.CurrentPageReference.emit({ state: {} });
+    await flush();
+
+    expect(one(element, 'lightning-tabset').activeTabValue).toBe('overview');
   });
 
   it('opens a section from its Overview tile', async () => {

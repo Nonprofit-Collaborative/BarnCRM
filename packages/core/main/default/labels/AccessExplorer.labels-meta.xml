@@ -48,4 +48,428 @@
         <shortDescription>Access explorer: {0} is a group, {1} the permission sets inside it</shortDescription>
         <value>{0} (through {1})</value>
     </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_Title</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: section title</shortDescription>
+        <value>Access Explorer</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_Intro</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: section introduction</shortDescription>
+        <value>Who can see or change what, and why. Access Explorer only reads: it never gives or takes access.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_Show</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: view choice label</shortDescription>
+        <value>Show</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ViewSubject</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: view name</shortDescription>
+        <value>By Person or Permission Set</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ViewObject</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: view name</shortDescription>
+        <value>By Kind of Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ViewBarnCrm</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: view name</shortDescription>
+        <value>BarnCRM Permission Sets</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_LookUp</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: person or permission set choice label</shortDescription>
+        <value>Look Up</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_LookUpPerson</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: look up a person</shortDescription>
+        <value>Person</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_LookUpSet</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: look up a permission set</shortDescription>
+        <value>Permission Set</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_SearchPlaceholder</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: search placeholder</shortDescription>
+        <value>Type at least two letters of a name</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_NoMatches</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: search found nothing</shortDescription>
+        <value>Nothing matches that name.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ChooseSubject</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: empty state before a choice</shortDescription>
+        <value>Choose a person or permission set to see their access.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_Inactive</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: an inactive person</shortDescription>
+        <value>Inactive</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_KindProfile</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: kind of source</shortDescription>
+        <value>Profile</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_KindGroup</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: kind of source</shortDescription>
+        <value>Permission Set Group</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_KindSet</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: kind of source</shortDescription>
+        <value>Permission Set</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_SourcesHeading</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: heading of the sources table</shortDescription>
+        <value>Access Comes From</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ObjectsHeading</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: heading of the object table</shortDescription>
+        <value>Kinds of Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_FieldAccessFor</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: object picker for field access</shortDescription>
+        <value>Field Access For</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_FieldsHeading</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: heading of the field table</shortDescription>
+        <value>Fields</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ViewAllDataNote</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: {0} is the profile or set name</shortDescription>
+        <value>{0} gives View All Data: its holders can see every record of every kind, whatever the table says.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ModifyAllDataNote</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: {0} is the profile or set name</shortDescription>
+        <value>{0} gives Modify All Data: its holders can see and change every record of every kind, whatever the table says.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_KindOfRecord</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: object picker and column label</shortDescription>
+        <value>Kind of Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_Field</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: field picker and column label</shortDescription>
+        <value>Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_FieldNone</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: field picker option for no field</shortDescription>
+        <value>None: the kind of record itself</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ChooseObject</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: empty state before a choice</shortDescription>
+        <value>Choose a kind of record to see who has access.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_GrantsHeading</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: heading of the grants table</shortDescription>
+        <value>Who Gives Access</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_PeopleHeading</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: heading of the people table</shortDescription>
+        <value>People With Access</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ShowMore</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: load the next page of people</shortDescription>
+        <value>Show More</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_AlwaysField</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: field that cannot be restricted</shortDescription>
+        <value>Anyone who can read this kind of record can see this field. Salesforce does not let it be restricted.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_Truncated</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: {0} is the most listed</shortDescription>
+        <value>More than {0} profiles and permission sets give access. The first {0} are listed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_TabCheckScheduled</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: followed by a date and time</shortDescription>
+        <value>The Tab Access Check is scheduled hourly. Next run:</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_TabCheckNotScheduled</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: tab check not scheduled</shortDescription>
+        <value>The Tab Access Check is not scheduled, so people given a BarnCRM role in Setup do not get its tabs. Run Health Check and use Schedule All Nightly Jobs.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_Download</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: download a table</shortDescription>
+        <value>Download CSV</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_Downloaded</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: {0} is the number of rows</shortDescription>
+        <value>Downloaded {0} rows.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_NothingToShow</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: empty table</shortDescription>
+        <value>Nothing to show.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_Yes</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: a permission is given</shortDescription>
+        <value>Yes</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_Always</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: field always visible</shortDescription>
+        <value>Always</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_Loading</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: spinner text</shortDescription>
+        <value>Loading</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ColName</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: column</shortDescription>
+        <value>Name</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ColKind</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: column</shortDescription>
+        <value>Kind</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ColIncludes</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: column, a group's permission sets</shortDescription>
+        <value>Includes</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ColApiName</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: column</shortDescription>
+        <value>API Name</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ColRead</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: column</shortDescription>
+        <value>Read</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ColCreate</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: column</shortDescription>
+        <value>Create</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ColEdit</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: column</shortDescription>
+        <value>Edit</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ColDelete</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: column</shortDescription>
+        <value>Delete</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ColViewAll</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: column</shortDescription>
+        <value>View All</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ColModifyAll</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: column</shortDescription>
+        <value>Modify All</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ColGrantedBy</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: column</shortDescription>
+        <value>Granted By</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ColActivePeople</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: column</shortDescription>
+        <value>Active People</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_ColPerson</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: column</shortDescription>
+        <value>Person</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_MayMissPeople</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: viewer lacks View All Users</shortDescription>
+        <value>You may not see everyone: without View All Users, this list shows only the people Salesforce lets you see.</value>
+    </labels>
 </CustomLabels>

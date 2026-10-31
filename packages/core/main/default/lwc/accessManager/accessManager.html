@@ -2,6 +2,13 @@
     <lightning-card title={labels.pageTitle} icon-name="standard:user_role">
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
             <p class="slds-var-m-bottom_small">{labels.pageDescription}</p>
+            <template lwc:if={accessExplorerUrl}>
+                <p class="slds-var-m-bottom_small">
+                    <a class="slds-button slds-button_neutral" href={accessExplorerUrl} data-id="open-access-explorer">
+                        {labels.openAccessExplorer}
+                    </a>
+                </p>
+            </template>
 
             <template if:true={showSpinner}>
                 <lightning-spinner alternative-text={labels.loadingRoles} size="small"></lightning-spinner>
