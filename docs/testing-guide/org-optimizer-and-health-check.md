@@ -13,8 +13,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In the BarnCRM app, open the **Org Optimizer** tab. | The page name **Org Optimizer** once (no second title card), then **What in your org needs attention, one section at a time.** On your first visit **About This Tool** is open with a **Learn More** link that opens the admin guide in a new tab. **Overview** is selected. |
-| 2 | Read **Overview**. | Tiles with an icon and one line each, under **Check Your Data** (**Data Quality**, **Field Utilization**, **Data Dictionary**) and **Check Your Setup** (**Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**). **Errors** has a badge (**{n} New** or **All Clear**); **Health Check** has **Not Run Yet** on a new org, otherwise the last run's result. No **Duplicates** (they are on the **Duplicate Matching** tab). |
-| 3 | Look at the vertical tabs. | **Overview**, **Data Quality**, **Field Utilization**, **Data Dictionary**, **Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**. Each section has one heading and no card inside the page's card. |
+| 2 | Read **Overview**. | Tiles with an icon and one line each, under **Check Your Data** (**Data Quality**, **Field Utilization**, **Data Dictionary**, **AI-Readiness Export**) and **Check Your Setup** (**Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**). **Errors** has a badge (**{n} New** or **All Clear**); **Health Check** has **Not Run Yet** on a new org, otherwise the last run's result. No **Duplicates** (they are on the **Duplicate Matching** tab). |
+| 3 | Look at the vertical tabs. | **Overview**, **Data Quality**, **Field Utilization**, **Data Dictionary**, **AI-Readiness Export**, **Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**. Each section has one heading and no card inside the page's card. |
 | 4 | Select the **Errors** tile. | The **Errors** section opens with the **Error Log** card: a count of new entries (or **Nothing has gone wrong. There is nothing to read here.**) and **Open the Error Log**. |
 | 5 | Choose **Health Check**. | An illustration, **Health Check Runs When You Ask**, **Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.** and **Run Health Check**. No findings yet. |
 | 6 | Click **Run Health Check**. | **Reading your org**, then the Health Check report with **What We Found in Your Org** and grouped findings. |
@@ -156,3 +156,24 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 8 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **Data Dictionary** tile or tab. |
 
 **Cleanup:** Remove the help text added in step 6.
+
+## T-HC-11: AI-Readiness Export Downloads a Pack With Sensitive Fields Handled
+
+**Purpose:** Confirm an admin can download the AI-Readiness Export pack, that flagged fields are left out, masked or kept as chosen, and that nobody else sees it. Nothing is sent to an AI service.
+**Prerequisites:** admin and staff (see [Test users](before-you-test.md#test-users)); sample data loaded; a zip tool and a text editor.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open **Org Optimizer** and choose **AI-Readiness Export**. | **AI-Readiness Export**, the intro saying BarnCRM never sends anything to an AI service, a **Kinds of Record** picker with **Account**, **Contact** and Core's data objects under **Selected**, **Include Records** and **Include Data Quality Checks** ticked, **Include Fill Rates** unticked, **Review Sensitive Fields** enabled and **Download Pack** disabled, with a line saying to review first. |
+| 2 | Move everything except **Contact** out of **Selected**, tick **Include Fill Rates**, then click **Review Sensitive Fields**. | **Sensitive Fields** lists Contact fields with **Object**, **Field**, **API Name**, **Why It Is Flagged** and **In the Pack**, among them **Email** (Email address), **Mobile Phone** (Phone number), **Birthdate** (Birth date), **Last Name** (Name) and **Mailing Street** (Address). Every **In the Pack** reads **Leave Out**. **Download Pack** is enabled. |
+| 3 | Set **Last Name** to **Mask** and **Email** to **Keep**, then click **Download Pack**. | Progress lines (**Counting fill rates for Contact.**, **Reading records of Contact: {n} so far.**, **Writing the pack.**), then a file named **AI_Readiness_Export-** and today's date ending .zip downloads and **Downloaded the pack: 1 kinds of record and {n} records.** shows. |
+| 4 | Unzip it. | `README.md`, `schema.json`, `data-dictionary.csv` and `data/Contact.csv`. |
+| 5 | Open `data/Contact.csv`. | The header row starts **Id**, uses API names, and has **Email** and **LastName** but no **Birthdate**, **MobilePhone** or **MailingStreet**. **LastName** values read `masked-` and ten letters and digits; two contacts with the same last name have the same code. **Email** holds real addresses. **AccountId** holds Account Ids. |
+| 6 | Open `schema.json`. | `"format": "barncrm-ai-readiness-export"`, one object **Contact** with `"recordFile": "data/Contact.csv"`; the **Email** field has `"sensitive": "email"`, `"handling": "keep"` and a `fillRate` between 0 and 1; **Birthdate** has `"handling": "leaveOut"` and `"inRecordFile": false`; `relationships` includes `AccountId` to **Account**; `dataQuality.checks` lists the Data Quality checks with counts. |
+| 7 | Open `README.md`. | Headings **What Is in This Pack**, **Kinds of Record**, **How Records Connect**, **Privacy**, **Data Quality Notes** and **How to Use It With an AI Tool**. **Privacy** names Contact.Birthdate among the left-out fields, Contact.LastName as masked and Contact.Email as kept. |
+| 8 | Download again with the same choices and compare `LastName` codes. | The codes differ from the first pack (each pack has its own key). |
+| 9 | Untick **Include Records**, click **Download Pack**. | The zip has no `data` folder, and `schema.json` has `"recordFile": null` for Contact. |
+| 10 | Add **Account** to **Selected**. | The sensitive field list goes and **Download Pack** is disabled until **Review Sensitive Fields** is pressed again. |
+| 11 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **AI-Readiness Export** tile or tab. |
+
+**Cleanup:** Delete the downloaded zip files.

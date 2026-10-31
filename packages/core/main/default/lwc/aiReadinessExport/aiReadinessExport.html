@@ -1,0 +1,132 @@
+<template>
+    <div>
+        <h2 class="slds-text-heading_medium slds-var-m-bottom_small">{labels.title}</h2>
+        <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+
+        <template lwc:if={errorMessage}>
+            <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
+                {errorMessage}
+            </p>
+        </template>
+        <template lwc:if={noticeMessage}>
+            <p class="slds-var-m-bottom_small" data-id="notice" role="status" aria-live="polite">
+                {noticeMessage}
+            </p>
+        </template>
+
+        <lightning-dual-listbox
+            data-id="objects"
+            name="objects"
+            label={labels.chooseLabel}
+            source-label={labels.sourceLabel}
+            selected-label={labels.selectedLabel}
+            options={objectOptions}
+            value={selected}
+            disabled={working}
+            onchange={handleSelect}
+        ></lightning-dual-listbox>
+
+        <div class="slds-var-m-vertical_small">
+            <lightning-input
+                data-id="include-records"
+                data-option="includeRecords"
+                type="checkbox"
+                label={labels.includeRecords}
+                checked={includeRecords}
+                disabled={findDisabled}
+                onchange={handleOption}
+            ></lightning-input>
+            <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.includeRecordsHelp}</p>
+            <lightning-input
+                data-id="include-fill-rates"
+                data-option="includeFillRates"
+                type="checkbox"
+                label={labels.includeFillRates}
+                checked={includeFillRates}
+                disabled={working}
+                onchange={handleOption}
+            ></lightning-input>
+            <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.includeFillRatesHelp}</p>
+            <lightning-input
+                data-id="include-checks"
+                data-option="includeChecks"
+                type="checkbox"
+                label={labels.includeChecks}
+                checked={includeChecks}
+                disabled={findDisabled}
+                onchange={handleOption}
+            ></lightning-input>
+            <p class="slds-text-body_small">{labels.includeChecksHelp}</p>
+            <template lwc:if={needsFind}>
+                <p class="slds-text-body_small slds-var-m-top_x-small" data-id="needs-find">{labels.needsFind}</p>
+            </template>
+        </div>
+
+        <lightning-button-group class="slds-var-m-bottom_small">
+            <lightning-button
+                data-id="review"
+                label={labels.review}
+                disabled={reviewDisabled}
+                onclick={handleReview}
+            ></lightning-button>
+            <lightning-button
+                data-id="download"
+                label={labels.download}
+                variant="brand"
+                disabled={downloadDisabled}
+                onclick={handleDownload}
+            ></lightning-button>
+        </lightning-button-group>
+
+        <template lwc:if={progressText}>
+            <p class="slds-text-body_small slds-var-m-bottom_small" data-id="progress" role="status" aria-live="polite">
+                {progressText}
+            </p>
+        </template>
+
+        <template lwc:if={reviewed}>
+            <h3 class="slds-text-heading_small slds-var-m-vertical_small">{labels.sensitiveHeading}</h3>
+            <template lwc:if={hasFlagged}>
+                <p class="slds-var-m-bottom_small" data-id="sensitive-intro">{labels.sensitiveIntro}</p>
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer" data-id="sensitive">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th scope="col">{labels.colObject}</th>
+                            <th scope="col">{labels.colField}</th>
+                            <th scope="col">{labels.colApiName}</th>
+                            <th scope="col">{labels.colWhy}</th>
+                            <th scope="col">{labels.colHandling}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={flagged} for:item="row">
+                            <tr key={row.key} data-key={row.key}>
+                                <td>{row.objectLabel}</td>
+                                <th scope="row">{row.fieldLabel}</th>
+                                <td>{row.fieldName}</td>
+                                <td>{row.reasonLabel}</td>
+                                <td>
+                                    <lightning-combobox
+                                        data-key={row.key}
+                                        label={row.handlingLabel}
+                                        variant="label-hidden"
+                                        options={handlingOptions}
+                                        value={row.handling}
+                                        disabled={working}
+                                        onchange={handleHandling}
+                                    ></lightning-combobox>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+            <template lwc:else>
+                <p data-id="no-sensitive">{labels.noSensitive}</p>
+            </template>
+        </template>
+        <template lwc:else>
+            <p class="slds-text-body_small" data-id="review-first">{labels.reviewFirst}</p>
+        </template>
+    </div>
+</template>
