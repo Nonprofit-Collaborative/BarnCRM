@@ -785,43 +785,43 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| C-53 | Access Explorer: who can see and edit what, and why; extends the Access page and Health Check (Section 6.1.1 item 7) | Major | In progress | D-154 |
-| C-56 | Setup Changes Log: Setup Audit Trail in plain words with filters, kept beyond 180 days in a BarnCRM object, feeds C-54 | Major | Planned | D-156 |
-| P-01 | Programs: Program, Service, Enrollment (Programs package; canonical model first) | Major | Planned | Section 6 v0.9 |
-| C-50f1 | Super Transform saved step lists | Minor | Planned | D-154 |
-| C-50f2 | Phone format preset, with the digit-format transform step it needs | Minor | Planned | D-154 |
-| C-54 | Weekly Admin Digest: one optional weekly email (new errors, failed or stalled jobs, limits at 80%, duplicate pairs waiting, rollups needing attention, Setup changes); nothing sent when nothing is new | Minor | Planned | D-156 |
-| C-55 | Record Inspector: every field the viewer may read on a record, including fields off the layout, with API names, copy value, Open in Find or Setup; respects field security | Minor | Planned | D-156 |
-| C-49f1 | Import redesign R5: Affiliation and Relationship templates, after an org check of reciprocal relationship automation and affiliation primary rules under bulk load | Minor | Planned | D-136 |
-| QA-F1 | Platform-only coverage check: Core and Rollups tests alone on a Platform-only org before the next client deploy | Minor | Planned | Section 11.3 item 10 |
+| C-53 | Access Explorer: who can see and edit what, and why; extends the Access page and Health Check (Section 6.1.1 item 7) | Major | Landed (batch A) | D-154 |
+| C-56 | Setup Changes Log: Setup Audit Trail in plain words with filters, kept beyond 180 days in a BarnCRM object, feeds C-54 | Major | Landed (batch A) | D-156 |
+| P-01 | Programs: Program, Service, Enrollment (Programs package; canonical model first) | Major | Landed (batch A) | Section 6 v0.9 |
+| C-50f1 | Super Transform saved step lists | Minor | Landed (batch A) | D-154 |
+| C-50f2 | Phone format preset, with the digit-format transform step it needs | Minor | Landed (batch A) | D-154 |
+| C-54 | Weekly Admin Digest: one optional weekly email (new errors, failed or stalled jobs, limits at 80%, duplicate pairs waiting, rollups needing attention, Setup changes); nothing sent when nothing is new | Minor | Landed (batch A) | D-156 |
+| C-55 | Record Inspector: every field the viewer may read on a record, including fields off the layout, with API names, copy value, Open in Find or Setup; respects field security | Minor | Landed (batch A) | D-156 |
+| C-49f1 | Import redesign R5: Affiliation and Relationship templates, after an org check of reciprocal relationship automation and affiliation primary rules under bulk load | Minor | Landed (batch A) | D-136 |
+| QA-F1 | Platform-only coverage check: Core and Rollups tests alone on a Platform-only org before the next client deploy | Minor | Landed (batch A) | Section 11.3 item 10 |
 
 #### Release 0.13 (Batch A): Programs attendance, solicitation pipeline, AI readiness
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| P-02 | Attendance and service delivery logging (grid, mobile) | Major | Planned | Section 6 v0.9 |
-| G-26 | Solicitation pipeline: an Opportunity-free ask record (donor, ask amount, stage, expected date, fund or appeal, owner) with a board view and stage history; a win creates the Gift or Commitment | Major | Planned | D-156 |
-| AIR-01 | AI-Readiness Export: documented export schemas and a canonical-model JSON export (Section 6.1 item 7) | Major | Planned | D-154 |
-| UX-F1 | Trim about 200 remaining labels of 20 or more words (Health Check details, logs, toasts) | Minor | Planned | D-140 |
-| UX-F2 | Core UX polish: Cosmos contrast check; "Data Hygiene" comments in non-test classes; Data Jobs section on the UX kit (status badges, Undo in the row menu) | Minor | Planned | D-140 |
-| C-53b | Access Explorer: compare two permission sets or profiles, and list who holds Modify All Data, View All Data or Author Apex | Minor | Planned | D-156 |
-| G-28 | Saved donor segments (lapsed, new, upgraders, level movers, major prospects) with CSV export laid out for Mailchimp or Constant Contact import; no sending | Minor | Planned | D-156 |
-| G-29 | Ask cadence: next ask and last touch per donor, a daily task generator and a "who is due" list | Minor | Planned | D-156 |
-| G-30 | Pledge reminders: templated reminders for upcoming and overdue installments by email or letter, with steps and a log | Minor | Planned | D-156 |
+| P-02 | Attendance and service delivery logging (grid, mobile) | Major | Landed (batch A) | Section 6 v0.9 |
+| G-26 | Solicitation pipeline: an Opportunity-free ask record (donor, ask amount, stage, expected date, fund or appeal, owner) with a board view and stage history; a win creates the Gift or Commitment | Major | Landed (batch A) | D-156 |
+| AIR-01 | AI-Readiness Export: documented export schemas and a canonical-model JSON export (Section 6.1 item 7) | Major | Landed (batch A) | D-154 |
+| UX-F1 | Trim about 200 remaining labels of 20 or more words (Health Check details, logs, toasts) | Minor | Landed (batch A) | D-140 |
+| UX-F2 | Core UX polish: Cosmos contrast check; "Data Hygiene" comments in non-test classes; Data Jobs section on the UX kit (status badges, Undo in the row menu) | Minor | Landed (batch A) | D-140 |
+| C-53b | Access Explorer: compare two permission sets or profiles, and list who holds Modify All Data, View All Data or Author Apex | Minor | Landed (batch A) | D-156 |
+| G-28 | Saved donor segments (lapsed, new, upgraders, level movers, major prospects) with CSV export laid out for Mailchimp or Constant Contact import; no sending | Minor | Landed (batch A) | D-156 |
+| G-29 | Ask cadence: next ask and last touch per donor, a daily task generator and a "who is due" list | Minor | Landed (batch A) | D-156 |
+| G-30 | Pledge reminders: templated reminders for upcoming and overdue installments by email or letter, with steps and a log | Minor | Landed (batch A) | D-156 |
 
 #### Release 0.14 (Batch A): Logic Models start, volunteer reminders, Programs minors
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| L-01 | Logic model builder in the app | Major | Planned | Section 6 v0.9 |
-| L-02 | Indicators on outputs and outcomes (absorbs P-03) | Major | Planned | Section 6 v0.9 |
-| V-10 | Volunteer shift reminders: per-shift email at a chosen lead time and a "still need you" nudge for unfilled shifts; org email limits shown in Settings | Major | Planned | D-156 |
-| P-04 | Case notes (dated, typed, private by default) | Minor | Planned | Section 6 v0.9 |
-| P-05 | Program dashboard | Minor | Planned | Section 6 v0.9 |
-| P-06 | Program roster import template, loading through C-49c; the V-06 volunteer hours template moves to C-49c in the same change | Minor | Planned | Section 6 v0.9, D-154 |
-| P-07 | Intake and eligibility fields with configurable picklists | Minor | Planned | Section 6 v0.9 |
-| P-08 | Participant privacy sharing preset | Minor | Planned | Section 6 v0.9 |
-| V-11 | Suggested volunteers for a shift, ranked by skills, availability and onboarding status, booked in one click | Minor | Planned | D-156 |
+| L-01 | Logic model builder in the app | Major | Landed (batch A) | Section 6 v0.9 |
+| L-02 | Indicators on outputs and outcomes (absorbs P-03) | Major | Landed (batch A) | Section 6 v0.9 |
+| V-10 | Volunteer shift reminders: per-shift email at a chosen lead time; org email limits shown in Settings (the "still need you" nudge for unfilled shifts is V-10b) | Major | Landed (batch A) | D-156, D-165 |
+| P-04 | Case notes (dated, typed, private by default) | Minor | Landed (batch A) | Section 6 v0.9 |
+| P-05 | Program dashboard | Minor | Landed (batch A) | Section 6 v0.9 |
+| P-06 | Program roster import template, loading through C-49c; the V-06 volunteer hours template moves to C-49c in the same change | Minor | Landed (batch A) | Section 6 v0.9, D-154 |
+| P-07 | Intake and eligibility fields with configurable picklists | Minor | Landed (batch A) | Section 6 v0.9 |
+| P-08 | Participant privacy sharing preset | Minor | Landed (batch A) | Section 6 v0.9 |
+| V-11 | Suggested volunteers for a shift, ranked by skills, availability and onboarding status, booked in one click | Minor | Landed (batch A) | D-156 |
 
 #### Release 0.15 (Batch B): Logic Models complete, Programs depth
 
@@ -877,6 +877,8 @@ The Forms engine comes first after v1.0 so V-09, Event Management, Scholarships 
 | C-61 | Duplicate Rules Starter: creates or repairs a recommended matching and duplicate rule for people and households through the C-49d Metadata API connection | Minor | Planned | D-156 |
 | C-63 | Report subscription setup: schedule native report subscriptions (board, retention, rollup freshness) from a BarnCRM page; feasibility check first (needs the Reports REST API through the C-49d connection) | Minor | Planned | D-156 |
 | C-69 | Radius Find: a Find condition "within N miles of a postal code or address" using Salesforce's built-in geocodes, SOQL DISTANCE and a shipped postal-code centroid table; no outside geocoding | Minor | Planned | D-157 |
+| V-10b | Volunteer shift reminders: "still need you" nudge for unfilled shifts (split from V-10) | Minor | Planned | D-165 |
+| UX-F4 | Module UX kit pass: Programs, Giving, Volunteers and Logic Models pages move onto the UX kit | Minor | Planned | D-165 |
 
 #### Release 1.2 (Batch C): Address Verification, Migration Assistant, volunteer self-service
 
@@ -890,6 +892,7 @@ The Forms engine comes first after v1.0 so V-09, Event Management, Scholarships 
 | MIG-08 | Rollup migration: DLRS and NPSP customizable rollups into Rollup Builder (Section 6.1.4 item 8) | Minor | Planned | D-125 |
 | V-12 | Volunteer value rate: one org-wide hourly value (default set, changeable) on dashboards and hour letters | Minor | Planned | D-156 |
 | V-13 | Volunteer recognition: hour milestones and anniversaries with a thank-you task | Minor | Planned | D-156 |
+| G-35 | Giving setup tabs move to Admin_Tabs | Minor | Planned | D-165 |
 
 #### Release 1.3 (Batch C): Online donations, recurring donor health, engagement score
 
@@ -902,6 +905,8 @@ The Forms engine comes first after v1.0 so V-09, Event Management, Scholarships 
 | G-31 | Donor-advised fund and gift-source fields with a DAF and stock report (pairs with G-21) | Minor | Planned | D-156 |
 | G-32 | Wealth data fields (capacity rating, affinity, screening score) and an import template for screening exports; BarnCRM buys and calls nothing | Minor | Planned | D-156 |
 | G-33 | Quick Gift Entry donor panel: household, previous gifts and open pledges inline | Minor | Planned | D-156 |
+| G-36 | One staff-facing word for Pledge versus Commitment (needs Brandon's decision) | Minor | Planned | D-165 |
+| G-37 | Pledge reminders on the GivingScheduler Nightly Jobs path (needs Brandon's decision) | Minor | Planned | D-165 |
 
 #### Release 1.4 (Batch D): Archive, generic merge, field history, Volunteers minors
 
@@ -917,6 +922,7 @@ Archive by Query does not depend on Backup Sets: it uses the shipped Find export
 | V-16 | Group and standing sign-ups: a group books a block of slots with a leader; a person holds a standing weekly shift | Minor | Planned | D-156 |
 | V-17 | Background check details on onboarding (V-05): provider name, reference ID; entered or imported, no provider API | Minor | Planned | D-156 |
 | P-09 | Waitlists and capacity | Minor | Planned | Section 5.4 |
+| C-71 | Fold the remaining inline AuraHandledException blocks into UserErrors | Minor | Planned | D-165 |
 
 #### Release 1.5 (Batch D): Corporate Hub, documents and compliance
 
@@ -1822,6 +1828,9 @@ The pre-batch review (9.8) checks new work against this list; existing code is m
 36. (C-49b) Row correction reverses canonical model R-IR4 (fix the file, never edit the staged row). Raised 2026-10-30. Recommendation: edit a failed row on screen with the original file values kept beside the corrections, then Retry This Row or Retry All Fixed Rows. **Resolved 2026-10-30 (Brandon): approved as recommended; supersedes R-IR4; recorded as Decision D-152.**
 37. (C-49b) Staging retention setting (delete once complete, after 30 days as default, after 90 days, never) must be reconciled with the Section 4.9 purge rule (D-40) and R-IR5. Raised 2026-10-30. Recommendation: check whether undo reads staged rows and, if so, move undo onto its own journal so the four options work as named; undo keeps its own window. **Resolved 2026-10-30 (Brandon):** "Undo should be able to bring the deleted record(s) back from the trash, not create a redundant copy." The four options apply to staging rows; undo never depends on staging rows and never re-inserts a copy: a record an undo restores is undeleted from the Recycle Bin, and one no longer there is reported as not restorable. Recorded as Decision D-153.
 38. (C-50 naming) Names and tabs. Raised 2026-10-30. Recommendation: the Import tab is renamed Super Importer and the Bulk Update tab is renamed Super Transform, each keeping its history on the same tab. **Resolved 2026-10-30:** integrator call (small and reversible), Brandon named both tools; Import tab becomes Super Importer, Bulk Update tab becomes Super Transform, histories stay on the same tab.
+39. (G-26) Ask__c sharing: Public Read/Write as built, or Private plus View All (Gift is Private with no View All in the Giving permission sets). Raised 2026-10-31 at batch A. Pending Brandon.
+40. (Core naming) One name for Super Transform, Update Many Records and Bulk Update. Raised 2026-10-31 in the batch A UX review. Pending Brandon.
+41. (Health Check) Finding titles in sentence case or Title Case. Raised 2026-10-31 in the batch A UX review. Pending Brandon.
 
 ### 11.3 Parking lot (good ideas, deliberately not now)
 
@@ -2092,6 +2101,14 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 | D-155 | Release plan (Brandon, 2026-10-31; Section 6.0a, Section 9.7): every open, approved item is placed in a numbered release of about 3 major and 3 to 6 minor enhancements; each landing batch covers 2 or 3 releases, with the release gate, the `barn-npc` and `mwdbdevsb` deploys (Brandon's approval each time) and QA and UX run once per batch. Releases continue from 0.11 (0.12 to 0.15, then 1.1 onward); 0.15 completes the v1.0 scope (v0.9 and v0.10) and is tagged v1.0 when the v1.0 pilot passes. Iterations v0.12 (Beta) and v0.13 (AppExchange) become milestones M-3 and M-4. C-38 stays held (D-39); unapproved ideas stay out of releases. Upkeep is automatic: new approvals are placed, Brandon's move-up or move-back requests are re-slotted with the affected releases rebalanced, statuses update as batches land | Keeping iterations with "not scheduled" and "TBD" targets; one release per batch; keeping Beta and AppExchange as build iterations | Every approved item has a place and an order Brandon can move; batches stay large enough to amortize the release gate and deploys; milestones that wait on outside events no longer block release numbering |
 | D-156 | Competitive research additions (Brandon, 2026-10-31; Section 6.1.5; amends D-155): Brandon gave standing authorization to add features consistent with the vision to the roadmap and releases without his approval. 48 ideas from the research were added (C-53b to C-63, G-26 to G-33, V-10 to V-17, P-10 to P-14, F-14, CH-15 to CH-20, SG-09, SG-10, EV-12 to EV-15, PB-08, C-40b, MIG-11) and catalog items G-21, P-09 and L-05 were scheduled; prioritized by impact first, then impact per effort, Core before modules. Access Explorer takes ID C-53. Releases were rebalanced: pre-1.0 releases are 0.12 to 0.17 (Batches A and B, three releases each), 0.17 is the v1.0 candidate, post-1.0 releases are 1.1 to 1.12 (Batches C to F). New modules or editions, reversals of settled decisions or non-goals, and not-approved items stay proposals for Brandon (eleven listed in 6.1.5) | Asking Brandon about every idea; adding only to the post-1.0 releases | High-impact Core, Giving, Volunteers and Programs gaps close before the v1.0 pilot, where first customers feel them; anything that changes the product's shape still goes to Brandon |
 | D-157 | Research proposals approved and v1.0 timing (Brandon, 2026-10-31; Sections 6.0a, 6.1.5; amends D-13, D-50, D-155, D-156). Brandon: "Backup and Import should be fairly late additions compared to other functionality but otherwise all eleven research proposals are approved." Placed: Forms module C-42a to C-42c first after v1.0 (1.1), so V-09 (1.2), the G-34 online donation page (1.3), Scholarships applications, Event registrations and portals reuse it; PB-03 volunteer portal moved to 1.9; Memberships module G-22a to G-22d (1.6), PB-09 member directory (1.9), G-22e certifications (1.16); C-64 engagement score (1.3); C-65 Field Access Manager (0.17); C-67 Archive by Query (1.4, by impact; it does not need Backup Sets); C-68 Field History Keeper (1.4); C-69 Radius Find (1.1); C-66 Backup Sets and C-70 files and attachments import last (1.16). Post-1.0 releases become 1.1 to 1.16 in Batches C to H. Reversals: C-65 reverses D-13's "never built: permission tools" and the Section 4.9 permission-management non-goal; C-66 reverses D-13's "never built: backup"; C-70 reverses D-50's "files import not approved"; each needs an ADR before build (amending ADR-0047), as do the Forms and Memberships modules (guest-user security design for C-42b). v1.0 timing, Brandon: "v1.0 will be after my initial QA is complete (still in progress as of now) but will likely be before the AppExchange approval. It will likely be around or after release 0.17." Release 0.17 stays the v1.0 candidate; milestone M-1 is now v1.0 once Brandon's initial QA is complete, before AppExchange approval (M-4) | Keeping the eleven as proposals; Backup and files import earlier; Archive by Query after Backup Sets; a separate pilot milestone for v1.0 | Brandon approved them; one shared Forms engine is built once and reused; Archive uses only shipped tools, so it need not wait for Backup; v1.0 follows Brandon's own QA, not a pilot |
+| D-158 | ADR-0150 to ADR-0154 assigned at landing batch A (2026-10-31): ADR-0150 digit-format step and saved step lists (#771); ADR-0151 Programs module (#774; P-04 to P-08 cite it too); ADR-0152 AI-Readiness Export (#779); ADR-0153 solicitation pipeline Ask object (#783); ADR-0154 Logic Models module (#794) | Branches choosing their own numbers | A placeholder ADR number on branches avoids collisions in parallel work; the integrator assigns numbers at merge (CLAUDE.md working rules) |
+| D-159 | Setup notes whose change is done are hidden, not shown as Done (Brandon, 2026-10-31) | Showing completed notes with a Done badge | Brandon's direction |
+| D-160 | Affiliation primary tie-break (C-49f1, #773): when several rows in one load are flagged primary, the higher Id wins by case-sensitive Id compare, so the last flagged row wins | Leaving the winner undefined | Deterministic result under bulk load; relies on Ids increasing in list order within one insert |
+| D-161 | Donor segments (G-28, #778, #782) are saved Find queries | A separate segment object | Reuses the Find query compiler and its permission gate |
+| D-162 | Reminder defaults: pledge reminders (G-30) and shift reminders (V-10) default off; ask reminders default on | All reminders on by default | Pledge and shift reminders send email to outside people, so an admin turns them on; ask reminders go to staff |
+| D-163 | Pledge reminder with a blank or bounced email address goes to the letter channel | Skipping the reminder | Brandon's recommended call in the pre-batch review; no reminder is silently dropped |
+| D-164 | Logic model stage change is refused when an arrow would point backward (L-01) | Allowing the change and leaving a backward arrow | Keeps the model's flow consistent |
+| D-165 | Batch A pre-batch review (Section 9.8, 2026-10-31): 23 QA fixes, 17 UX fixes and a simplification pass of about -1,650 net lines with no functionality removed; follow-ups placed in releases: V-10b, UX-F4, G-35, G-36, G-37 and C-71 (Sections 6.0a, 9.7) | Testing batch A without the review | Section 9.8 requires the review before each batch test; follow-ups are slotted per Section 9.7 |
 
 ---
 
@@ -2113,3 +2130,4 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 ---
 
 *End of document. Everything above is intended to be enough to begin. When in doubt, return to Section 1.3 and ask which principle the decision serves.*
+
