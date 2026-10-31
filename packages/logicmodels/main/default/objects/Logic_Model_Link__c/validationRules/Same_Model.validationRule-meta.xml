@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Same_Model</fullName>
+  <active>true</active>
+  <description>
+    R-LL1: both ends are set and belong to the link's model.
+  </description>
+  <errorConditionFormula>
+OR(
+  ISBLANK(From_Element__c),
+  ISBLANK(To_Element__c),
+  From_Element__r.Logic_Model__c &lt;&gt; Logic_Model__c,
+  To_Element__r.Logic_Model__c &lt;&gt; Logic_Model__c
+)
+  </errorConditionFormula>
+  <errorMessage>
+    An arrow joins two parts of this logic model.
+  </errorMessage>
+</ValidationRule>

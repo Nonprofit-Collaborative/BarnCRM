@@ -198,7 +198,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Edition change confirmation: what switching to Nonprofit does</shortDescription>
-        <value>BarnCRM will show and offer the nonprofit modules (Giving, Volunteers, Programs, Funders and Mirror) in the Setup Assistant, the Module Manager and the home page, to every admin and user. Nothing is installed: you install each module yourself.</value>
+        <value>BarnCRM will show and offer the nonprofit modules (Giving, Volunteers, Programs, Logic Models, Funders and Mirror) in the Setup Assistant, the Module Manager and the home page, to every admin and user. Nothing is installed: you install each module yourself.</value>
     </labels>
     <labels>
         <fullName>Core_Edition_ConfirmToStandard</fullName>

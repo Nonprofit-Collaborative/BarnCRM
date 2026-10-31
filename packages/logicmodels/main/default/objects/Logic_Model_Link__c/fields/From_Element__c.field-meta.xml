@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>From_Element__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>Where the arrow starts.</inlineHelpText>
+  <label>From Element</label>
+  <referenceTo>Logic_Model_Element__c</referenceTo>
+  <relationshipLabel>Arrows Out</relationshipLabel>
+  <relationshipName>Links_From</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>
