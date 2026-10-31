@@ -5505,7 +5505,8 @@ read in system mode at send time, so the check does not depend on the sender's f
   convenience (R-A1, and deliberately not `Always_Runs__c`, ADR-0024).
 - **Service:** `AcknowledgmentRuleService`, `AcknowledgmentService`,
   `AcknowledgmentSelector`, `AcknowledgmentWriter` (ADR-0021), Core `EmailSender` with
-  `MessagingEmailSender`, `AcknowledgmentBatch`, `AcknowledgmentScheduler`,
+  `MessagingEmailSender`, `GivingEmailTemplates` (template lookup and message, shared with
+  pledge reminders), `AcknowledgmentBatch`, `AcknowledgmentScheduler`,
   `AcknowledgmentLetterMerge`, and `AcknowledgmentController` for the page.
 - **Custom permission:** `Send_Acknowledgments`, granted to Giving Admin and Giving Staff.
 - **Page:** LWC `acknowledgments` on the `Acknowledgments` tab and flexipage, reached from

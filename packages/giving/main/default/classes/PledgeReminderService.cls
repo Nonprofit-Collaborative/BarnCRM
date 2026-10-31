@@ -349,7 +349,7 @@ public with sharing class PledgeReminderService {
                 templateNames.add(item.step.Email_Template__c.trim());
             }
         }
-        Map<String, Id> templateIds = templateIdsByDeveloperName(templateNames);
+        Map<String, Id> templateIds = GivingEmailTemplates.idsByDeveloperName(templateNames);
         Id fromAddressId = AcknowledgmentService.fromAddressId();
 
         List<Pledge_Reminder__c> unsendable = new List<Pledge_Reminder__c>();
@@ -378,8 +378,9 @@ public with sharing class PledgeReminderService {
                 counts.errors++;
                 continue;
             }
+            // The installment is the `WhatId`, so `{!Installment__c.Due_Date__c}` resolves.
             messages.add(
-                messageFor(
+                GivingEmailTemplates.message(
                     planned[index].installment.Id,
                     row.Recipient_Contact__c,
                     templateId,
@@ -491,31 +492,6 @@ public with sharing class PledgeReminderService {
         if (!stillQueued.isEmpty()) {
             ErrorLogger.logMessages(stillQueued, CONTEXT_SEND, ErrorLogger.SEVERITY_ERROR);
         }
-    }
-
-    /**
-     * One message, composed by the platform from the step's template. The contact is the target
-     * so that `{!Contact.FirstName}` resolves, and the installment is the `WhatId` so that
-     * `{!Installment__c.Due_Date__c}` and `{!Installment__c.Expected_Amount__c}` do. The
-     * activity is not saved, because that would depend on a standard object (plan Section 4.2).
-     */
-    @TestVisible
-    private static Messaging.SingleEmailMessage messageFor(
-        Id installmentId,
-        Id recipientContactId,
-        Id templateId,
-        Id fromAddressId
-    ) {
-        Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
-        message.setTemplateId(templateId);
-        message.setTargetObjectId(recipientContactId);
-        message.setWhatId(installmentId);
-        message.setTreatTargetObjectAsRecipient(true);
-        message.setSaveAsActivity(false);
-        if (fromAddressId != null) {
-            message.setOrgWideEmailAddressId(fromAddressId);
-        }
-        return message;
     }
 
     // --------------------------------------------------------------------------- the letters
@@ -688,22 +664,6 @@ public with sharing class PledgeReminderService {
 
     private static Integer daysOf(Pledge_Reminder_Step__c step) {
         return step.Days_From_Due__c == null ? 0 : step.Days_From_Due__c.intValue();
-    }
-
-    private static Map<String, Id> templateIdsByDeveloperName(Set<String> developerNames) {
-        Map<String, Id> byName = new Map<String, Id>();
-        if (developerNames.isEmpty()) {
-            return byName;
-        }
-        for (EmailTemplate template : [
-            SELECT Id, DeveloperName
-            FROM EmailTemplate
-            WHERE DeveloperName IN :developerNames
-            WITH SYSTEM_MODE
-        ]) {
-            byName.put(template.DeveloperName, template.Id);
-        }
-        return byName;
     }
 
     /** Overridable by a test, like the acknowledgment feature's sender. */
