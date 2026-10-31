@@ -132,9 +132,21 @@ tab gathers everything you have written.
 1. In the **BarnCRM Programs** app, open the person.
 2. Look at the **Programs** card on the right.
 
-You should see: every program the person has an enrollment in, open ones first, with the stage
-and the dates. Click a program name to open that enrollment. The card is read only: enroll
-people and change stages on the program. On a household or an organization there is no card.
+You should see: **Last service**, the date the person last attended a service and how many
+services they have attended, then every program the person has an enrollment in, open ones
+first, with the stage and the dates. Click a program name to open that enrollment. The card is
+read only: enroll people and change stages on the program. On a household or an organization
+there is no card.
+
+## To See How Your Programs Are Doing
+
+1. In the **BarnCRM Programs** app, click the **Programs Dashboard** tab.
+2. Pick a period at the top: **This Month** (the default), **Last Month**, **This Year**,
+   **Last Year** or **Last 12 Months**.
+
+You should see: tiles for active programs, open and new enrollments, people served, services
+delivered and the attendance rate, then a table with the same figures for each program. Click a
+program's name to open it. The figures count only the records you can see.
 
 ## To Enroll Someone Again
 

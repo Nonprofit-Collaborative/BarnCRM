@@ -62,6 +62,7 @@
   <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
   <label>BarnCRM Programs</label>
   <navType>Console</navType>
+  <tabs>Programs_Dashboard</tabs>
   <tabs>Program__c</tabs>
   <tabs>Enrollment__c</tabs>
   <tabs>Service_Delivery__c</tabs>
@@ -76,6 +77,9 @@
     </mappings>
     <mappings>
       <tab>Program__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Programs_Dashboard</tab>
     </mappings>
     <mappings>
       <tab>Service_Delivery__c</tab>

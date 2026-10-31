@@ -20,6 +20,12 @@ public with sharing class PersonEnrollmentsController {
         public List<Row> enrollments = new List<Row>();
         @AuraEnabled
         public Boolean moreThanShown = false;
+        /** The latest Delivery Date of a Present delivery to the person (P-05), or null. */
+        @AuraEnabled
+        public Date lastServiceDate;
+        /** How many Present deliveries the person has, of those the user can see (P-05). */
+        @AuraEnabled
+        public Integer servicesAttended = 0;
     }
 
     /** One enrollment of the person. */
@@ -76,7 +82,32 @@ public with sharing class PersonEnrollmentsController {
         }
         result.enrollments.addAll(open);
         result.enrollments.addAll(ended);
+        fillLastService(result, contactIds, accountId);
         return result;
+    }
+
+    /** The person's last service and how many they attended, in user mode (P-05). */
+    private static void fillLastService(
+        PersonEnrollments result,
+        Set<Id> contactIds,
+        Id accountId
+    ) {
+        if (!Schema.SObjectType.Service_Delivery__c.isAccessible()) {
+            return;
+        }
+        for (AggregateResult row : [
+            SELECT MAX(Delivery_Date__c) lastDate, COUNT(Id) total
+            FROM Service_Delivery__c
+            WHERE
+                Attendance__c = 'Present'
+                AND (Contact__c IN :contactIds
+                OR (Account__c != NULL
+                AND Account__c = :accountId))
+            WITH USER_MODE
+        ]) {
+            result.lastServiceDate = (Date) row.get('lastDate');
+            result.servicesAttended = (Integer) row.get('total');
+        }
     }
 
     private static Row toRow(Enrollment__c enrollment, Map<String, String> stageLabels) {

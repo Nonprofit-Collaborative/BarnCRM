@@ -12,7 +12,8 @@ Withdrawn) and its start and end dates. Each time a service is given, or a perso
 
 Each enrollment also carries the person's **intake and eligibility**: when they were first seen,
 who referred them, and whether they qualify, and staff keep private **case notes** on it. A
-program dashboard and a roster import come in later releases (P-05, P-06). Who sees enrollments
+**program dashboard** counts enrollments, people served and attendance for a period. A roster
+import comes in a later release (P-06). Who sees enrollments
 and service deliveries is the **Participant Privacy** preset on the Programs settings page:
 everyone with a Programs permission set (the default), or only the people who need to.
 
@@ -36,8 +37,8 @@ finishes, BarnCRM does four things on its own:
 4. Applies the Participant Privacy preset (Shared until you change it) and shares any
    enrollments and service deliveries already in the org (see Participant Privacy).
 
-Then open the **BarnCRM Programs** app from the App Launcher. Its tabs are **Programs**,
-**Enrollments**, **Service Deliveries** and **Case Notes**. These tabs also join the BarnCRM apps.
+Then open the **BarnCRM Programs** app from the App Launcher. Its tabs are **Programs
+Dashboard**, **Programs**, **Enrollments**, **Service Deliveries** and **Case Notes**. These tabs also join the BarnCRM apps.
 
 ## Programs Settings
 
@@ -222,11 +223,40 @@ Case Notes** (every note you can see) and **My Case Notes**.
 
 Case notes are light notes, not case management: service plans and goals come later (P-10).
 
+## Program Dashboard
+
+The **Programs Dashboard** tab in the BarnCRM Programs app answers how your programs are doing,
+for everyone with a Programs permission set. Pick a period at the top (**This Month**, the
+default, **Last Month**, **This Year**, **Last Year** or **Last 12 Months**). Tiles show:
+
+| Tile | What it counts |
+|---|---|
+| Active Programs | Programs with Status Active. |
+| Open Enrollments | Enrollments at Applied or Enrolled, now. |
+| New Enrollments | Enrollments whose Start Date falls in the period. |
+| People Served | Different people who attended at least one service in the period. |
+| Services Delivered | Service deliveries marked Present in the period. |
+| Attendance Rate | Present deliveries as a share of all deliveries in the period, absences included. |
+
+Below the tiles, a table gives the same figures for each program, plus **Completed** (enrollments
+completed in the period); click a program's name to open it. It lists every Active program and
+any other program with activity in the period.
+
+Each person sees figures for the records they can see. With Participant Privacy set to Private,
+a staff member's dashboard counts only their own enrollments and deliveries, while Programs Admin
+sees the whole organization. Nothing is stored: the figures are counted each time the page opens
+or the period changes. Salesforce counts at most 50,000 records in one go, so an organization with
+more enrollments or deliveries than that in a period sees a message saying the dashboard could not
+load: pick a shorter period. For a report you can schedule or email, build a standard Salesforce
+report on Enrollments or Service Deliveries.
+
 ## A Person's Programs
 
 In the **BarnCRM Programs** app, a person's record page carries a **Programs** card listing
 every enrollment they have: the program (a link), the stage and the dates, open ones first. It is
-read only: enroll people and change stages from the program's **Program Roster** panel. On an
+read only: enroll people and change stages from the program's **Program Roster** panel. Above
+the list, **Last service** gives the date of the person's latest service they attended and how
+many services they have attended in all (absences are not counted). On an
 account the card shows only for a person account, never on a household or an organization. A
 user without a Programs permission set sees no card.
 

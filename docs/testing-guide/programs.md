@@ -215,3 +215,21 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 10 | Choose **Shared** and **Save**, wait a minute, then as the second staff user repeat step 3. | Both records are listed again, and All Internal Users is back in the group. |
 
 **Cleanup:** delete the enrollment and delivery; leave the preset Shared; remove the staff users' roles.
+
+## T-PRG-14: The Programs Dashboard and a Person's Last Service
+
+**Purpose:** confirm the dashboard counts a period correctly and the person card shows the last service.
+**Prerequisites:** the admin user; Programs sample data loaded (T-PRG-08), or any Active program with a service, two enrolled test people and today's deliveries recorded in the Service Delivery Log (one Present, one Unexcused Absence).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open the **BarnCRM Programs** app. | **Programs Dashboard** is the first tab. |
+| 2 | Open **Programs Dashboard**. | Period **This Month**; six tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Services Delivered, Attendance Rate) and a **By Program** table listing every Active program by name. |
+| 3 | Compare the program's row with its **Program Roster** panel and today's log. | Open Enrollments matches the roster's Applied plus Enrolled; Services Delivered counts the Present delivery only; Attendance Rate is 50%; People Served is 1. |
+| 4 | Pick **Last Year**. | The figures reload for last year; a program with no activity then shows 0 and "None yet" for the rate. |
+| 5 | Click a program's name. | The program opens. |
+| 6 | Open the test person who attended, in the BarnCRM Programs app. | The **Programs** card starts with "Last service:" today's date and "(1 attended in all)". |
+| 7 | Open the test person who was absent. | No Last service line (an absence is not a service). |
+| 8 | On a phone, open the dashboard. | Tiles two to a row; the table stacks each program's figures with their names. |
+
+**Cleanup:** delete the test deliveries if you made them.

@@ -1,0 +1,91 @@
+<template>
+  <div class="slds-var-p-around_medium slds-is-relative">
+    <div class="slds-grid slds-wrap slds-grid_vertical-align-end slds-var-m-bottom_medium">
+      <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+        <h1 class="slds-text-heading_medium" data-id="title">{labels.title}</h1>
+        <p class="slds-text-body_regular">{labels.intro}</p>
+      </div>
+      <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+        <lightning-combobox
+          name="period"
+          label={labels.period}
+          options={periodOptions}
+          value={period}
+          onchange={handlePeriodChange}
+          data-id="period"
+        ></lightning-combobox>
+      </div>
+    </div>
+
+    <template lwc:if={loading}>
+      <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+    </template>
+
+    <template lwc:if={errorMessage}>
+      <p class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">{errorMessage}</p>
+    </template>
+
+    <template lwc:if={noAccess}>
+      <p class="slds-text-body_regular" data-id="no-access">{labels.noAccess}</p>
+    </template>
+
+    <template lwc:if={canSee}>
+      <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_medium">
+        <template for:each={tiles} for:item="tile">
+          <div key={tile.key} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-3 slds-large-size_1-of-6 slds-var-p-bottom_x-small">
+            <div class="slds-box slds-theme_default slds-text-align_center" data-id="tile">
+              <p class="slds-text-heading_large" data-id={tile.key}>{tile.value}</p>
+              <p class="slds-text-body_small slds-text-color_weak">{tile.label}</p>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <lightning-card title={labels.byProgram} icon-name="standard:education">
+        <div class="slds-var-p-horizontal_medium">
+          <template lwc:if={noRows}>
+            <p class="slds-text-body_regular" data-id="no-programs">{labels.noPrograms}</p>
+          </template>
+          <template lwc:else>
+            <table
+              class="slds-table slds-table_cell-buffer slds-table_bordered slds-max-medium-table_stacked"
+              aria-label={labels.byProgram}
+            >
+              <thead>
+                <tr class="slds-line-height_reset">
+                  <th scope="col">{labels.program}</th>
+                  <th scope="col">{labels.openEnrollments}</th>
+                  <th scope="col">{labels.newEnrollments}</th>
+                  <th scope="col">{labels.completed}</th>
+                  <th scope="col">{labels.peopleServed}</th>
+                  <th scope="col">{labels.delivered}</th>
+                  <th scope="col">{labels.attendanceRate}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={rows} for:item="row">
+                  <tr key={row.key} data-id="program-row">
+                    <th scope="row" data-label={labels.program}>
+                      <a href={row.href} data-record-id={row.key} onclick={handleOpen} data-id="program">{row.name}</a>
+                    </th>
+                    <td data-label={labels.openEnrollments}>{row.openEnrollments}</td>
+                    <td data-label={labels.newEnrollments}>{row.newEnrollments}</td>
+                    <td data-label={labels.completed}>{row.completedEnrollments}</td>
+                    <td data-label={labels.peopleServed}>{row.peopleServed}</td>
+                    <td data-label={labels.delivered}>{row.delivered}</td>
+                    <td data-label={labels.attendanceRate} data-id="rate">{row.rate}</td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </template>
+          <template lwc:if={moreThanShown}>
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_small" data-id="more">
+              {labels.moreThanShown}
+            </p>
+          </template>
+        </div>
+      </lightning-card>
+    </template>
+  </div>
+</template>

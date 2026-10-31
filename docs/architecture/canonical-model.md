@@ -9287,7 +9287,23 @@ open ones first, each with its program, stage and dates, on the Programs app's o
 Account record pages (`Programs_Contact_Record_Page`, `Programs_Account_Record_Page`: Core's
 pages plus the card, kept in step under ADR-0064). Read in user mode. On an Account it shows only
 for a person account, and lists enrollments naming the account or its one contact, so it needs no
-person account field. A user who cannot read enrollments gets no card.
+person account field. A user who cannot read enrollments gets no card. Since P-05 the card also
+shows the person's last service, the latest Delivery Date of a Present delivery (29Z), and how
+many Present deliveries they have, both counted in user mode over the deliveries naming the
+person, and left out for a user who cannot read deliveries or when there are none.
+
+**Program dashboard (P-05).** The `programDashboard` panel on the `Programs_Dashboard` app page
+and tab (every Programs set) answers, for a period the user picks (This Month, Last Month, This
+Year, Last Year, Last 12 Months; default This Month): active programs (Status Active), open
+enrollments now (Applied or Enrolled), new enrollments (Start Date in the period), completed
+enrollments (Stage Completed, End Date in the period), people served (distinct people with a
+Present delivery in the period, contacts and accounts counted apart, as a delivery names one or
+the other), services delivered (Present deliveries) and the attendance rate (Present over all
+deliveries, absences included, in the period). The same figures per program, for every Active
+program and any other program with activity in the period, at most 200. Read through
+`ProgramDashboardController` in user mode with aggregate queries, so each user's figures follow
+what they may see (Participant Privacy, R-EN7). No object or field is added; the periods are
+computed in the browser by framework-free JS (plan 9.9).
 
 **Health Check.** `ProgramsHealthCheckExtension`, registered in
 `HealthCheckExtensions.EXTENSION_CLASSES`, asked only of a viewer who may manage settings and not

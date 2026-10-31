@@ -1,11 +1,16 @@
 import { createElement } from 'lwc';
 import PersonEnrollments from 'c/personEnrollments';
 import getEnrollments from '@salesforce/apex/PersonEnrollmentsController.getEnrollments';
-import { canShow, enrollmentRows } from '../enrollmentRows';
+import { canShow, enrollmentRows, lastService } from '../enrollmentRows';
 
 jest.mock(
   '@salesforce/apex/PersonEnrollmentsController.getEnrollments',
   () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Programs_Person_ServicesAttended',
+  () => ({ default: '({0} attended in all)' }),
   { virtual: true }
 );
 
@@ -63,6 +68,14 @@ describe('enrollmentRows', () => {
     expect(canShow(undefined)).toBe(false);
     expect(canShow({ canSee: true })).toBe(true);
   });
+
+  it('gives the last service with its count, or nothing when none', () => {
+    expect(
+      lastService({ lastServiceDate: '2026-10-20', servicesAttended: 4 }, '({0} attended)')
+    ).toEqual({ date: '2026-10-20', attendedText: '(4 attended)' });
+    expect(lastService({ servicesAttended: 0 }, '{0}')).toBeNull();
+    expect(lastService(undefined, '{0}')).toBeNull();
+  });
 });
 
 describe('c-person-enrollments', () => {
@@ -83,6 +96,21 @@ describe('c-person-enrollments', () => {
     expect(one(element, 'program').textContent).toBe('After-School Tutoring');
     expect(all(element, 'ended').length).toBe(1);
     expect(one(element, 'empty')).toBeNull();
+    expect(one(element, 'last-service')).toBeNull();
+  });
+
+  it('shows the last service and how many were attended', async () => {
+    getEnrollments.mockResolvedValue({
+      canSee: true,
+      enrollments: [OPEN],
+      lastServiceDate: '2026-10-20',
+      servicesAttended: 3
+    });
+    const element = mount();
+    await flush();
+
+    expect(one(element, 'last-service')).not.toBeNull();
+    expect(one(element, 'attended').textContent).toContain('3');
   });
 
   it('shows no card for a household or a user who cannot see enrollments', async () => {

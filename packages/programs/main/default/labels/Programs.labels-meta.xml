@@ -552,4 +552,196 @@
         <shortDescription>Programs settings: save failed</shortDescription>
         <value>Participant Privacy could not be saved. Try again; if it fails again, the Error Log says why.</value>
     </labels>
+    <labels>
+        <fullName>Programs_Person_LastService</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card: last service, before its date</shortDescription>
+        <value>Last service:</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_ServicesAttended</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card: services attended, {0} is the count</shortDescription>
+        <value>({0} attended in all)</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: page title</shortDescription>
+        <value>Programs Dashboard</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Intro</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: page introduction</shortDescription>
+        <value>How your programs are doing in the period you pick. Figures count only the records you can see.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Period</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: period picker label</shortDescription>
+        <value>Period</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_ThisMonth</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: period choice</shortDescription>
+        <value>This Month</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_LastMonth</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: period choice</shortDescription>
+        <value>Last Month</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_ThisYear</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: period choice</shortDescription>
+        <value>This Year</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_LastYear</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: period choice</shortDescription>
+        <value>Last Year</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Last12Months</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: period choice</shortDescription>
+        <value>Last 12 Months</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_ActivePrograms</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: tile and column</shortDescription>
+        <value>Active Programs</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_OpenEnrollments</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: tile and column</shortDescription>
+        <value>Open Enrollments</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_NewEnrollments</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: tile and column</shortDescription>
+        <value>New Enrollments</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Completed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: column</shortDescription>
+        <value>Completed</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_PeopleServed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: tile and column</shortDescription>
+        <value>People Served</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Delivered</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: tile and column</shortDescription>
+        <value>Services Delivered</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_AttendanceRate</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: tile and column</shortDescription>
+        <value>Attendance Rate</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Program</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: column</shortDescription>
+        <value>Program</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_ByProgram</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: table card title</shortDescription>
+        <value>By Program</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_NoRate</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: attendance rate with no deliveries</shortDescription>
+        <value>None yet</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_NoPrograms</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: empty table</shortDescription>
+        <value>No active programs, and no activity in this period.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_MoreThanShown</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: table cut off</shortDescription>
+        <value>Showing the first 200 programs by name. The tiles count them all.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_LoadFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: load failed</shortDescription>
+        <value>The dashboard could not load. Try a shorter period; if it fails again, the Error Log says why.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_NoAccess</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: no access</shortDescription>
+        <value>You need a Programs permission set to see the dashboard. Ask your admin.</value>
+    </labels>
 </CustomLabels>

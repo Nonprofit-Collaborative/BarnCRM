@@ -19,6 +19,21 @@ export function enrollmentRows(result) {
   }));
 }
 
+/**
+ * The person's last service (P-05): its date and how many services they attended, with the count
+ * put into the label given ({0}). Null when they have attended none.
+ */
+export function lastService(result, attendedLabel) {
+  if (!result || !result.lastServiceDate) {
+    return null;
+  }
+  const count = result.servicesAttended || 0;
+  return {
+    date: result.lastServiceDate,
+    attendedText: (attendedLabel || '').split('{0}').join(String(count))
+  };
+}
+
 /** Whether there is a card to show: only for a person the user may see enrollments of. */
 export function canShow(result) {
   return !!(result && result.canSee === true);
