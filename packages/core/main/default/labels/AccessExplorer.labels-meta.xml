@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_AccessExplorer_PermissionRequired</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: no permission</shortDescription>
+        <value>You need the Manage BarnCRM Settings permission to use Access Explorer.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_UnknownObject</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: unknown object, {0} is the name asked for</shortDescription>
+        <value>There is no kind of record you can explore named "{0}".</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_UnknownField</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: unknown field, {0} is the name asked for</shortDescription>
+        <value>There is no field named "{0}" on this kind of record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_UnknownSubject</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: person or permission set not found</shortDescription>
+        <value>That person or permission set could not be found. Search for it again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_UnexpectedError</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: unexpected error</shortDescription>
+        <value>Access Explorer could not read your org's access. The details are in the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_Through</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: {0} is a group, {1} the permission sets inside it</shortDescription>
+        <value>{0} (through {1})</value>
+    </labels>
+</CustomLabels>

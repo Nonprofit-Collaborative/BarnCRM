@@ -13,8 +13,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In the BarnCRM app, open the **Org Optimizer** tab. | The page name **Org Optimizer** once (no second title card), then **What in your org needs attention, one section at a time.** On your first visit **About This Tool** is open with a **Learn More** link that opens the admin guide in a new tab. **Overview** is selected. |
-| 2 | Read **Overview**. | Tiles with an icon and one line each, under **Check Your Data** (**Data Quality**, **Field Utilization**, **Data Dictionary**) and **Check Your Setup** (**Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**). **Errors** has a badge (**{n} New** or **All Clear**); **Health Check** has **Not Run Yet** on a new org, otherwise the last run's result. No **Duplicates** (they are on the **Duplicate Matching** tab). |
-| 3 | Look at the vertical tabs. | **Overview**, **Data Quality**, **Field Utilization**, **Data Dictionary**, **Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**. Each section has one heading and no card inside the page's card. |
+| 2 | Read **Overview**. | Tiles with an icon and one line each, under **Check Your Data** (**Data Quality**, **Field Utilization**, **Data Dictionary**) and **Check Your Setup** (**Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**, **Access Explorer**). **Errors** has a badge (**{n} New** or **All Clear**); **Health Check** has **Not Run Yet** on a new org, otherwise the last run's result. No **Duplicates** (they are on the **Duplicate Matching** tab). |
+| 3 | Look at the vertical tabs. | **Overview**, **Data Quality**, **Field Utilization**, **Data Dictionary**, **Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**, **Access Explorer**. Each section has one heading and no card inside the page's card. |
 | 4 | Select the **Errors** tile. | The **Errors** section opens with the **Error Log** card: a count of new entries (or **Nothing has gone wrong. There is nothing to read here.**) and **Open the Error Log**. |
 | 5 | Choose **Health Check**. | An illustration, **Health Check Runs When You Ask**, **Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.** and **Run Health Check**. No findings yet. |
 | 6 | Click **Run Health Check**. | **Reading your org**, then the Health Check report with **What We Found in Your Org** and grouped findings. |
@@ -156,3 +156,25 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 8 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **Data Dictionary** tile or tab. |
 
 **Cleanup:** Remove the help text added in step 6.
+
+## T-HC-11: Access Explorer Shows Who Can See What, and Why
+
+**Purpose:** Confirm an admin can see a person's access and its sources, a permission set's access, who has access to a kind of record or field, and BarnCRM's permission sets, that each table downloads, and that nobody else sees it.
+**Prerequisites:** admin and staff (see [Test users](before-you-test.md#test-users)); staff holds the **Team Member** role.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open **Org Optimizer** and choose the **Access Explorer** tile. | **Access Explorer**, **Who can see or change what, and why. Access Explorer only reads: it never gives or takes access.**, a **Show** choice with **By Person or Permission Set** selected, **Look Up** set to **Person**, and **Choose a person or permission set to see their access.** |
+| 2 | Type the first two letters of the staff user's name in **Person** and choose them. | **Access Comes From** lists their profile (**Profile**), then **Team Member** (**Permission Set Group**, **Includes** BarnCRM Staff and the other sets in the role). A **Kinds of Record** table follows, sorted by name, with **Read**, **Create**, **Edit**, **Delete**, **View All**, **Modify All** and **Granted By**. **Relationship** has **Read**, **Create**, **Edit** and **Delete** as **Yes**, and **Granted By** reads **Team Member (through BarnCRM Staff)**. |
+| 3 | Choose **Relationship** in **Field Access For**. | A **Fields** table with **Field**, **API Name**, **Read**, **Edit** and **Granted By**. **Description** shows **Yes** for **Read** and **Edit**; **Relationship Number** (Name) shows **Always**. |
+| 4 | Type one letter in **Person**. | No search runs and nothing is listed until a second letter is typed. |
+| 5 | Choose **By Kind of Record**, then **Relationship** in **Kind of Record**. | **Who Gives Access** lists profiles, then permission set groups, then permission sets, with **Kind**, the six permissions and **Active People**. **Team Member** is there with at least 1 active person, and **System Administrator** shows **View All** and **Modify All** (it gives Modify All Data). **People With Access** lists active people by name with **Granted By**. |
+| 6 | Choose **Description** in **Field**. | **Who Gives Access** now shows **Read** and **Edit** only, and **People With Access** reloads. Choose **Relationship Number**: **Anyone who can read this kind of record can see this field. Salesforce does not let it be restricted.** and no tables. |
+| 7 | In an org with more than 50 active people with access, click **Show More**. | The next 50 people are added below, in name order, with no one listed twice. **Show More** disappears after the last page. |
+| 8 | Choose **By Person or Permission Set**, set **Look Up** to **Permission Set**, type `Staff` and choose **BarnCRM Staff** (**Permission Set**). | **Access Comes From** lists only **BarnCRM Staff**, and the table shows only what it gives: **Relationship** with **Granted By** **BarnCRM Staff**. |
+| 9 | Search `Team` and choose **Team Member** (**Permission Set Group**). | **Access Comes From** shows **Team Member** with **Includes** naming its sets, and **Relationship**'s **Granted By** reads **Team Member (through BarnCRM Staff)**. |
+| 10 | Choose **BarnCRM Permission Sets**. | The BarnCRM roles first (such as **BarnCRM Admin Group** and **Team Member**), then the BarnCRM permission sets, each with **Active People**. Below: **The Tab Access Check is scheduled hourly. Next run:** and a time, or, if it is not scheduled, a message pointing to Health Check. |
+| 11 | Click **Download CSV** under any table. | A file named **Access_Explorer-** and today's date ending .csv downloads with the table's columns and rows, and **Downloaded {n} rows.** shows. |
+| 12 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **Access Explorer** tile or tab. |
+
+**Cleanup:** None. Access Explorer changes nothing.

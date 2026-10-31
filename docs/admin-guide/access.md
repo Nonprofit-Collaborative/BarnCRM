@@ -8,6 +8,10 @@ permission set is, and you never have to open Salesforce Setup to change someone
 page also shows you, at a glance, who currently holds each role, so you can answer "who can
 change our settings?" in a few seconds.
 
+To see why someone can (or cannot) open a kind of record or field, including access that
+comes from outside BarnCRM, use [Access Explorer](access-explorer.md) in Org Optimizer. It
+only reads; changes are made here or in Setup.
+
 Roles ship with BarnCRM and are kept up to date for you.
 
 A module ships its own permission sets, and a Core role cannot include them. They reach
