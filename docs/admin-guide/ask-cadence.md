@@ -38,8 +38,8 @@ Open the **Contacts** or **Accounts** tab and choose the list view **Who Is Due 
 When the [Ask Pipeline](ask-pipeline.md) is in use, a donor's open asks keep their Next Ask Date for you, so the same nightly reminder and the **Who Is Due for an Ask** list cover the pipeline. There is no second job.
 
 - **The earliest open ask wins.** Whenever an ask is created, deleted, or its **Target Date**, **Outcome** or donor changes, the donor's Next Ask Date becomes the earliest **Target Date** among their open asks. Open asks with no Target Date are ignored. While such an ask is open, this overwrites a date entered by hand.
-- **When the last open ask closes or is deleted,** the Next Ask Date is cleared, but only if it still holds the date the asks had set. If somebody changed the donor's Next Ask Date by hand after that (to a later follow-up, say), the date is kept.
-- **The ask's own Next Ask Date** (filled as an ask closes) is not copied onto the donor. Enter the donor's next date by hand when you close the last ask.
+- **When the last open ask closes,** the donor's Next Ask Date takes the closed ask's own **Next Ask Date** (when to ask again), if that date is after today. With no such date, or when the last ask is deleted, the donor's date is cleared.
+- **A date entered by hand is kept.** Both rules above change the donor's Next Ask Date only when it is blank or still holds the date the asks had set. If somebody changed it by hand (to a later follow-up, say), the date is kept.
 - **Turning it off.** The automation is **Ask: donor Next Ask Date** in the automation console. It is on by default. Off, asks and donor dates are independent again.
 
 ## What This Does Not Do Yet

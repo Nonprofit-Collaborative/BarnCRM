@@ -112,7 +112,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-ASK-08: Open Asks Set the Donor's Next Ask Date
 
-**Purpose:** confirm the earliest open ask's Target Date lands on the donor, moves with the asks, and is cleared only when the asks had set it.
+**Purpose:** confirm the earliest open ask's Target Date lands on the donor, moves with the asks, takes a closed last ask's own Next Ask Date, and is cleared only when the asks had set it.
 **Prerequisites:** a user with **Giving Staff**; a person with no Next Ask Date and no asks; **Next Ask Date** on the Contact page layout.
 
 | Step | Action | Expected result |
@@ -122,5 +122,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 3 | Close that ask as **Won** (or **Declined**). Reload the person. | **Next Ask Date** is 30 days out, from the ask still open. |
 | 4 | Close the last ask as **Declined**. Reload the person. | **Next Ask Date** is empty. |
 | 5 | Create an open ask with a Target Date 15 days out. Then edit the person's **Next Ask Date** by hand to 90 days out. Close the ask as **Withdrawn**. | **Next Ask Date** stays 90 days out: a date entered by hand is kept. |
+| 6 | Clear the person's **Next Ask Date**. Create an open ask with a Target Date 20 days out. Close it as **Won** and, in the same save, set the ask's **Next Ask Date** to a year from today. Reload the person. | **Next Ask Date** is a year from today, carried from the closed ask. |
+| 7 | Create an open ask with a Target Date 20 days out, then close it as **Declined** with the ask's **Next Ask Date** set to yesterday. Reload the person. | **Next Ask Date** is empty: a past ask-again date is not carried. |
 
 **Cleanup:** delete the test asks and clear the person's **Next Ask Date**.

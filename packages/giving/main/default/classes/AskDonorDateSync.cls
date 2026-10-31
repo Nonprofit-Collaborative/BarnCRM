@@ -5,8 +5,9 @@
  *
  * For every donor an ask names before or after the change:
  * - with an open ask that has a Target Date, Next Ask Date becomes the earliest such date;
- * - with none left, Next Ask Date is cleared only if it still holds the date the asks had set
- *   (the earliest open Target Date before the change). A date entered by hand is kept.
+ * - with none left, a Next Ask Date that is blank or still holds the date the asks had set (the
+ *   earliest open Target Date before the change) takes the future Next Ask Date of an ask this
+ *   save closed, or is cleared when there is none. A date entered by hand is kept.
  *
  * DOCUMENTED EXCEPTION to the user-mode rule (plan Section 4.13, ADR-0021): the date is computed
  * here from every open ask of the donor, including asks the person saving cannot see when the
@@ -32,6 +33,8 @@ public without sharing class AskDonorDateSync {
         Set<Id> donorIds = new Set<Id>();
         Map<Id, Date> earliestBefore = new Map<Id, Date>();
         Map<Id, Date> earliestAfter = new Map<Id, Date>();
+        // Each donor's earliest future ask-again date from an ask this save closed.
+        Map<Id, Date> askAgain = new Map<Id, Date>();
         if (afterRows != null) {
             for (SObject row : afterRows) {
                 Ask__c ask = (Ask__c) row;
@@ -43,6 +46,7 @@ public without sharing class AskDonorDateSync {
                 note(ask, donorIds, earliestAfter);
                 if (old != null) {
                     note(old, donorIds, earliestBefore);
+                    noteAskAgain(ask, old, askAgain);
                 }
             }
         } else {
@@ -61,7 +65,22 @@ public without sharing class AskDonorDateSync {
             earliestBefore.put(donorId, earlier(earliestBefore.get(donorId), others.get(donorId)));
             earliestAfter.put(donorId, earlier(earliestAfter.get(donorId), others.get(donorId)));
         }
-        save(changedDonors(donorIds, earliestBefore, earliestAfter));
+        save(changedDonors(donorIds, earliestBefore, earliestAfter, askAgain));
+    }
+
+    /** An ask this save closed carries its own Next Ask Date to its donors when it is ahead. */
+    private static void noteAskAgain(Ask__c ask, Ask__c old, Map<Id, Date> askAgain) {
+        Boolean closedNow =
+            old.Outcome__c == AskRules.OUTCOME_OPEN &&
+            ask.Outcome__c != AskRules.OUTCOME_OPEN;
+        if (!closedNow || ask.Next_Ask_Date__c == null || ask.Next_Ask_Date__c <= Date.today()) {
+            return;
+        }
+        for (Id donorId : new List<Id>{ ask.Donor_Contact__c, ask.Donor_Account__c }) {
+            if (donorId != null) {
+                askAgain.put(donorId, earlier(askAgain.get(donorId), ask.Next_Ask_Date__c));
+            }
+        }
     }
 
     /** True when the save changed something R-SO9 reads. */
@@ -132,7 +151,8 @@ public without sharing class AskDonorDateSync {
     private static List<SObject> changedDonors(
         Set<Id> donorIds,
         Map<Id, Date> earliestBefore,
-        Map<Id, Date> earliestAfter
+        Map<Id, Date> earliestAfter,
+        Map<Id, Date> askAgain
     ) {
         // Contacts first, then Accounts: one update takes the two types as two chunks.
         List<SObject> current = new List<SObject>();
@@ -147,9 +167,12 @@ public without sharing class AskDonorDateSync {
             Date held = (Date) donor.get('Next_Ask_Date__c');
             Date target = earliestAfter.get(donor.Id);
             if (target == null) {
-                // No open ask left: clear only the date the asks had set.
+                // No open ask left. A date entered by hand is never touched; a blank date or the
+                // date the asks had set takes the closed ask's ask-again date, or is cleared.
                 Date setByAsks = earliestBefore.get(donor.Id);
-                if (held == null || held != setByAsks) {
+                Boolean askDerived = held == null || held == setByAsks;
+                target = askAgain.get(donor.Id);
+                if (!askDerived || held == target) {
                     continue;
                 }
             } else if (held == target) {

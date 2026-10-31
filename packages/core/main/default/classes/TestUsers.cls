@@ -41,7 +41,8 @@ public class TestUsers {
         'Rollup_Builder_Admin',
         'Giving_Admin',
         'Volunteers_Admin',
-        'Programs_Admin'
+        'Programs_Admin',
+        'Logic_Models_Admin'
     };
 
     /**

@@ -6404,9 +6404,9 @@ Amount) and declined (count). Totals are counted by the database, not from the c
 they stay right when the board shows only the first cards of a long column.
 
 **R-SO7 Next Ask Date is a hook, not a reminder.** It records when the organization means to ask
-the donor again. The pipeline itself does nothing with it; ask cadence (G-29) reads it to build the
-"who is due" list. Keeping it on the ask, set as the ask closes, means the cadence work needs no
-change to this object.
+the donor again. The pipeline itself does nothing with it; when the ask closes, R-SO9 can carry it
+onto the donor's Next Ask Date, which ask cadence (G-29) reads. Keeping it on the ask, set as the
+ask closes, means the cadence work needs no change to this object.
 
 **R-SO8 Erasing a person.** Erasing a person (Section 29H) clears Next Step on every ask for them
 and sets each open one to Withdrawn, so no more work is planned about them. The asks are kept, like
@@ -6418,10 +6418,11 @@ earliest Target Date among their open asks written into the donor's Next Ask Dat
 so the ask cadence reminder and the Who Is Due list follow the pipeline with no second job. Open
 asks without a Target Date are ignored. While a donor has an open ask with a Target Date, the
 donor's Next Ask Date follows the earliest one, overwriting a date entered by hand. When the
-change leaves a donor with no open ask with a Target Date, the donor's Next Ask Date is cleared
-only if it still holds the date the asks had set (the earliest open Target Date before the
-change); a date somebody entered or changed by hand is kept. The ask's own Next Ask Date
-(R-SO7) is not read. Reads and the donor write run in system mode (ADR-0021: a package-owned
+change leaves a donor with no open ask with a Target Date, a donor Next Ask Date that is blank or
+still holds the date the asks had set (the earliest open Target Date before the change) is
+replaced: by the ask's own Next Ask Date (R-SO7) when this change closed the ask (Outcome left
+Open) and that date is after today (the earliest, if several asks closed), otherwise by blank. A
+date somebody entered or changed by hand is kept. Reads and the donor write run in system mode (ADR-0021: a package-owned
 date computed from every open ask, whoever can see them); a donor that cannot be saved is
 logged, and the ask's save is never refused for it.
 

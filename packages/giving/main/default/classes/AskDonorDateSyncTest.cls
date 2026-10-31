@@ -124,6 +124,93 @@ private class AskDonorDateSyncTest {
     }
 
     @IsTest
+    static void closingTheLastAskCarriesItsAskAgainDate() {
+        System.runAs(staff()) {
+            Date today = Date.today();
+            Contact donor = person(null);
+            Ask__c ask = new Ask__c(
+                Donor_Contact__c = donor.Id,
+                Target_Date__c = today.addDays(15)
+            );
+            insert ask;
+
+            update new Ask__c(
+                Id = ask.Id,
+                Outcome__c = 'Won',
+                Next_Ask_Date__c = today.addDays(365)
+            );
+
+            Assert.areEqual(today.addDays(365), nextAskOf(donor.Id), 'Ask again in a year.');
+        }
+    }
+
+    @IsTest
+    static void aBlankDonorDateTakesTheAskAgainDateAndAPastOneIsIgnored() {
+        System.runAs(staff()) {
+            Date today = Date.today();
+            Contact blank = person(null);
+            Contact past = person(null);
+            Ask__c noTarget = new Ask__c(Donor_Contact__c = blank.Id);
+            Ask__c pastAgain = new Ask__c(
+                Donor_Contact__c = past.Id,
+                Target_Date__c = today.addDays(10)
+            );
+            insert new List<Ask__c>{ noTarget, pastAgain };
+
+            update new List<Ask__c>{
+                new Ask__c(
+                    Id = noTarget.Id,
+                    Outcome__c = 'Declined',
+                    Next_Ask_Date__c = today.addDays(180)
+                ),
+                new Ask__c(
+                    Id = pastAgain.Id,
+                    Outcome__c = 'Declined',
+                    Next_Ask_Date__c = today.addDays(-1)
+                )
+            };
+
+            Assert.areEqual(today.addDays(180), nextAskOf(blank.Id), 'A blank date takes it.');
+            Assert.isNull(nextAskOf(past.Id), 'A date already gone is not carried.');
+        }
+    }
+
+    @IsTest
+    static void theAskAgainDateNeverReplacesADateByHandOrAnOpenAsk() {
+        System.runAs(staff()) {
+            Date today = Date.today();
+            Contact byHand = person(today.addDays(90));
+            Contact stillOpen = person(null);
+            Ask__c closing = new Ask__c(Donor_Contact__c = byHand.Id);
+            Ask__c first = new Ask__c(
+                Donor_Contact__c = stillOpen.Id,
+                Target_Date__c = today.addDays(10)
+            );
+            Ask__c second = new Ask__c(
+                Donor_Contact__c = stillOpen.Id,
+                Target_Date__c = today.addDays(40)
+            );
+            insert new List<Ask__c>{ closing, first, second };
+
+            update new List<Ask__c>{
+                new Ask__c(
+                    Id = closing.Id,
+                    Outcome__c = 'Won',
+                    Next_Ask_Date__c = today.addDays(365)
+                ),
+                new Ask__c(Id = first.Id, Outcome__c = 'Won', Next_Ask_Date__c = today.addDays(365))
+            };
+
+            Assert.areEqual(today.addDays(90), nextAskOf(byHand.Id), 'A date by hand is kept.');
+            Assert.areEqual(
+                today.addDays(40),
+                nextAskOf(stillOpen.Id),
+                'The open ask still sets the date.'
+            );
+        }
+    }
+
+    @IsTest
     static void deletingTheLastAskClearsAndAnOrganizationDonorIsKeptToo() {
         System.runAs(staff()) {
             Date today = Date.today();
