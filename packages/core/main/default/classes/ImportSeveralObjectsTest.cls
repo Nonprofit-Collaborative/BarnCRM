@@ -562,14 +562,12 @@ private class ImportSeveralObjectsTest {
                     'And kept on the row: ' + failed.Loaded_Records_JSON__c
                 );
 
-                Test.startTest();
                 // The row fixed and loaded again, as a retry of the same row does.
                 update as system new Import_Row__c(
                     Id = failed.Id,
                     Raw_Values_JSON__c = JSON.serialize(queryRow(0, ana.Id, 'Member'))
                 );
                 ImportRowProcessor.Outcome again = chunk(2, 2, false);
-                Test.stopTest();
 
                 Assert.areEqual(1, again.created, rowErrors());
                 Assert.areEqual(1, savedQueries(), 'One saved query, reused, never a copy.');
@@ -578,7 +576,11 @@ private class ImportSeveralObjectsTest {
                 Saved_Query__c kept = [SELECT Id FROM Saved_Query__c WHERE Name = 'Zzretry 0'];
                 Assert.areEqual(String.valueOf(kept.Id), rows()[0].Gift_Id__c, 'Its record.');
 
+                // The undo is a job of its own, with its own query budget for the checks it
+                // makes before deleting.
+                Test.startTest();
                 undo();
+                Test.stopTest();
                 Assert.areEqual(0, savedQueries(), 'Undo removes the reused record once.');
                 Assert.areEqual(0, [SELECT COUNT() FROM Affiliation__c], 'And the child.');
             }
@@ -609,7 +611,9 @@ private class ImportSeveralObjectsTest {
                 update as system new Import_Batch__c(Id = batch.Id, Retry_After_Row__c = after);
                 List<Import_Row__c> fixedRows = new List<Import_Row__c>();
                 for (Integer i = 0; i < count; i++) {
-                    Map<String, String> fixedRow = queryRow(i, ana.Id, 'Member');
+                    // A role each: the affiliation guard refuses two that overlap for the same
+                    // person, organization and role.
+                    Map<String, String> fixedRow = queryRow(i, ana.Id, 'Member ' + i);
                     fixedRow.put(Label.Core_Import_ResultsRow, String.valueOf(i + 2));
                     fixedRows.add(
                         new Import_Row__c(
@@ -635,8 +639,23 @@ private class ImportSeveralObjectsTest {
                 Test.stopTest();
 
                 Assert.areEqual(MANY, preview.created, 'Each would create its child only.');
-                Assert.areEqual(0, one.rejected + two.rejected, rowErrors());
-                Assert.areEqual(count, one.created + two.created, rowErrors());
+                List<String> fixedErrors = new List<String>();
+                for (Import_Row__c r : [
+                    SELECT Row_Number__c, Status__c, Error_Message__c
+                    FROM Import_Row__c
+                    WHERE Import_Batch__c = :batch.Id AND Row_Number__c > :after
+                    WITH SYSTEM_MODE
+                    ORDER BY Row_Number__c
+                    LIMIT 4
+                ]) {
+                    fixedErrors.add(r.Row_Number__c + ' ' + r.Status__c + ' ' + r.Error_Message__c);
+                }
+                Assert.areEqual(
+                    0,
+                    one.rejected + two.rejected,
+                    one.rejected + '/' + two.rejected + ' ' + String.join(fixedErrors, ' | ')
+                );
+                Assert.areEqual(count, one.created + two.created, String.join(fixedErrors, ' | '));
                 Assert.areEqual(count, savedQueries(), 'Not one saved query copied.');
                 Assert.areEqual(
                     count,
