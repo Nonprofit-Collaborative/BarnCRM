@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <fullName>Giving_PledgeReminders_Disabled</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders: refused while off</shortDescription>
+    <value>Pledge reminders are turned off. An administrator turns them on in BarnCRM Settings, under Giving, once the steps and email templates are ready.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_NoPermission</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders: the permission a send needs</shortDescription>
+    <value>Sending pledge reminders needs the Send Acknowledgments permission. Ask your administrator for the Fundraising Staff role.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_UnexpectedError</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders: an unexpected failure</shortDescription>
+    <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your administrator to check it.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_NoRecipient</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders: pledges with nobody to email {0}</shortDescription>
+    <value>{0} pledge installments are due a reminder by email but the pledge has no donor contact with an email address to send it to. Add a donor contact or a primary contact.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_TemplateNotFound</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders: a step names a template that does not exist {0}</shortDescription>
+    <value>The email template {0} was not found. Edit the step on the Pledge Reminders page and choose one from the list.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_TemplatesMissing</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders: reminders that could not go for a missing template {0}</shortDescription>
+    <value>{0} pledge reminders could not be sent because their step names an email template that does not exist.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_SendFailedUnknown</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders: a send failed with no message</shortDescription>
+    <value>The email could not be sent and Salesforce gave no reason.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_MergeFileTitle</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders: the letter merge file title {0}</shortDescription>
+    <value>Pledge reminder letters {0}</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_RunSummary</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders: last run summary {0} to {2}</shortDescription>
+    <value>{0} reminder emails sent, {1} letters queued, {2} could not be sent.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_JobNotice_PledgeReminders</fullName>
+    <categories>Giving, Job Notifications</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Job notification: name of a pledge reminder run</shortDescription>
+    <value>Pledge reminders</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_Title</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: title</shortDescription>
+    <value>Pledge Reminders</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_Intro</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: introduction</shortDescription>
+    <value>Reminders for pledge installments that are coming due or overdue. Each step fires a set number of days before or after an installment's due date, by email or by letter. Only the latest step due for an installment is sent, and every reminder is logged below.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_Off</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: notice that reminders are off</shortDescription>
+    <value>Pledge reminders are off, so nothing will be sent, by hand or by the nightly run. Turn them on in BarnCRM Settings, under Giving, when your steps and templates are ready.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_NoSteps</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: no steps yet</shortDescription>
+    <value>No steps yet. Add the first step, for example an email 7 days before the due date and another 14 days after.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_QueueHeading</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: heading for what would go next</shortDescription>
+    <value>Due to Go on the Next Run</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_EmailsDue</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: emails due</shortDescription>
+    <value>Emails</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_LettersDue</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: letters due</shortDescription>
+    <value>Letters</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_WithoutRecipient</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: installments with nobody to email</shortDescription>
+    <value>No donor email address</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_LettersWaiting</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: letters waiting for a file</shortDescription>
+    <value>Letters waiting for a file</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_LettersAwaiting</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: letters waiting to be marked sent</shortDescription>
+    <value>Letters waiting to be marked sent</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_SendNow</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: send button</shortDescription>
+    <value>Send Reminders Now</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_SendStarted</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: notice after starting a run</shortDescription>
+    <value>The run has started. The log below fills in as it goes.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_ProduceLetters</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: letter file button</shortDescription>
+    <value>Produce Letter File</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_LettersReady</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: notice after a letter file</shortDescription>
+    <value>The letter file is ready. Download it, print and post the letters, then mark them sent.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_MarkSent</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: mark letters sent button</shortDescription>
+    <value>Mark Letters Sent</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_LettersMarkedSent</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: notice after marking letters sent</shortDescription>
+    <value>Those letters are marked sent.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_Nightly</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: nightly run toggle</shortDescription>
+    <value>Run every night</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_NextRun</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: next run</shortDescription>
+    <value>Next nightly run</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_NotScheduled</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: nightly run not scheduled</shortDescription>
+    <value>Not scheduled</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_LastRun</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: last run</shortDescription>
+    <value>Last run</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_NeverRun</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: never run</shortDescription>
+    <value>Never run</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_StepsHeading</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: steps heading</shortDescription>
+    <value>Steps</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_NewStep</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: new step button</shortDescription>
+    <value>New Step</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_EditStep</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: edit step button</shortDescription>
+    <value>Edit</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_EditStepOf</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: edit step title {0}</shortDescription>
+    <value>Edit the step {0}</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_NewStepHeading</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: new step form heading</shortDescription>
+    <value>New Step</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_EditStepHeading</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: edit step form heading</shortDescription>
+    <value>Edit Step</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_TemplateField</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: template picker label</shortDescription>
+    <value>Email Template</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_TemplateFieldHelp</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: template picker help</shortDescription>
+    <value>The email template this step sends. Use merge fields from the pledge installment, such as the due date and the amount, so each donor sees their own.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_TemplatePlaceholder</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: template picker placeholder</shortDescription>
+    <value>Choose an email template</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_TemplateRequired</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: template required message</shortDescription>
+    <value>Choose the email template this step sends.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_SaveStep</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: save step</shortDescription>
+    <value>Save Step</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_CancelStep</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: cancel step</shortDescription>
+    <value>Cancel</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_StepSaved</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: notice after saving a step</shortDescription>
+    <value>The step is saved.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_LogHeading</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: log heading</shortDescription>
+    <value>Recent Reminders</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_NoLog</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: empty log</shortDescription>
+    <value>No reminders yet.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_TemplateMissing</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: a step's template is missing</shortDescription>
+    <value>Template not found</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_Inactive</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: inactive step marker</shortDescription>
+    <value>Inactive</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_ActionFailed</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: fallback error</shortDescription>
+    <value>That did not work. Try again, and if it keeps happening, ask your administrator.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_ColumnStep</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: column step</shortDescription>
+    <value>Step</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_ColumnTiming</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: column timing</shortDescription>
+    <value>When</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_ColumnChannel</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: column channel</shortDescription>
+    <value>Channel</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_ColumnTemplate</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: column template</shortDescription>
+    <value>Template</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_ColumnPledge</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: column pledge</shortDescription>
+    <value>Pledge</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_ColumnInstallment</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: column installment</shortDescription>
+    <value>Installment</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_ColumnStatus</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: column status</shortDescription>
+    <value>Status</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_ColumnSentOn</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: column sent on</shortDescription>
+    <value>Sent On</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_DownloadFile</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: download link</shortDescription>
+    <value>Download letters</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_DaysBefore</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: timing before the due date {0}</shortDescription>
+    <value>{0} days before the due date</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_OnDueDate</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: timing on the due date</shortDescription>
+    <value>On the due date</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_DaysAfter</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: timing after the due date {0}</shortDescription>
+    <value>{0} days after the due date</value>
+  </labels>
+</CustomLabels>

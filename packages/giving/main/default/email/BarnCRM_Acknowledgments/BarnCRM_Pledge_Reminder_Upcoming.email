@@ -1,0 +1,9 @@
+Dear {!Contact.FirstName, friend},
+
+A friendly reminder that your pledge installment of {!Installment__c.Expected_Amount__c} is due on {!Installment__c.Due_Date__c}.
+
+Thank you for your commitment to our work. If you have already sent it, please disregard this note.
+
+With thanks,
+
+{!Organization.Name}
