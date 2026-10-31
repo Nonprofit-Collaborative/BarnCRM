@@ -153,6 +153,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |
 | Field utilization | [field-utilization.md](field-utilization.md) | Core |
 | C-52 Data Dictionary (the Data Dictionary section of Org Optimizer) | [data-dictionary.md](data-dictionary.md) | Core |
+| AIR-01 AI-Readiness Export (the AI-Readiness Export section of Org Optimizer) | [ai-readiness-export.md](ai-readiness-export.md) | Core |
 
 ### Automation, Totals and Health
 
