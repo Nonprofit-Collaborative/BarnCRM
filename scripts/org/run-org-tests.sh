@@ -169,6 +169,13 @@ if ! SOURCE_POST_INSTALL=0 DEPLOY_FULL="$DEPLOY_FULL" DEPLOY_APEX_ALWAYS="$DEPLO
   exit 1
 fi
 
+# Apex tests cannot see a platform event subscription that stopped delivering (QA v21 D4), so
+# one real Error Log entry goes through the deployed org before the tests run.
+if ! bash scripts/org/probe-error-log.sh "$ALIAS"; then
+  post_status failure "Error Log events are not reaching ${ALIAS} after the deploy, so no test ran"
+  exit 1
+fi
+
 # WHY NO PERMISSION SET IS ASSIGNED. Every test runs inside System.runAs as a user that
 # TestUsers creates with the permission sets it needs (check-tests-run-as.py enforces it), so
 # the user running this script needs none of the BarnCRM, Giving or Mirror permission sets.
