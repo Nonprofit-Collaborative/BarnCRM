@@ -142,6 +142,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | Data Manager (one place to start a data task, and every job's Undo) | [data-manager.md](data-manager.md) | Core |
 | C-14, C-19, C-32, C-33 Importing, import undo, matching rules and Load one object | [importing.md](importing.md) | Core |
+| C-49b Super Importer rows: browse, correct and retry import rows | [import-rows.md](import-rows.md) | Core |
 | C-34, C-36 Find and export | [find.md](find.md) | Core |
 | C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
