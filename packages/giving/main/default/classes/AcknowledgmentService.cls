@@ -460,12 +460,12 @@ public with sharing class AcknowledgmentService {
     private static EmailSender emailSender = new MessagingEmailSender();
 
     /**
-     * The sentence a person reads on a row whose email did not go: the platform's first error,
-     * trimmed to what fits on the record, or `unknown` when it gave none. The rest of the detail
-     * is in the Error Log entry the caller writes.
+     * The sentence a person reads on a row whose email did not go: the platform's first error
+     * (the sender trims it to what fits on the record), or `unknown` when it gave none. The rest
+     * of the detail is in the Error Log entry the caller writes.
      */
     public static String failureReasonOf(EmailSendOutcome outcome, String unknown) {
-        return outcome == null || String.isBlank(outcome.error) ? unknown : outcome.error.left(255);
+        return outcome == null || String.isBlank(outcome.error) ? unknown : outcome.error;
     }
 
     private static Boolean needsFirstGiftAnswer(List<Acknowledgment_Rule__c> rules) {

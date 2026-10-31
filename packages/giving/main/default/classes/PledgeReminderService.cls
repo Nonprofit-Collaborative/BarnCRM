@@ -413,7 +413,7 @@ public with sharing class PledgeReminderService {
             ErrorLogger.log(sendFailure, CONTEXT_SEND);
             List<EmailSendOutcome> outcomes = new List<EmailSendOutcome>();
             for (Integer index = 0; index < messages.size(); index++) {
-                outcomes.add(EmailSendOutcome.failed(sendFailure.getMessage()));
+                outcomes.add(EmailSendOutcome.failed(sendFailure.getMessage()?.left(255)));
             }
             return outcomes;
         }

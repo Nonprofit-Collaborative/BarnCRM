@@ -24,7 +24,10 @@ private class MessagingEmailSenderTest {
 
             Assert.areEqual(2, outcomes.size(), 'One answer for each message, in order');
             Assert.isFalse(outcomes[0].sent, 'A message with nobody to send to did not go');
-            Assert.isTrue(String.isNotBlank(outcomes[0].error), 'And says why');
+            Assert.isTrue(
+                String.isNotBlank(outcomes[0].error) && outcomes[0].error.length() <= 255,
+                'And says why in no more than 255 characters'
+            );
         }
     }
 }

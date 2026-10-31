@@ -21,7 +21,9 @@ public with sharing class MessagingEmailSender implements EmailSender {
                 List<Messaging.SendEmailError> errors = result.getErrors();
                 outcomes.add(
                     EmailSendOutcome.failed(
-                        errors == null || errors.isEmpty() ? null : errors[0].getMessage()
+                        errors == null || errors.isEmpty()
+                            ? null
+                            : errors[0].getMessage()?.left(255)
                     )
                 );
             }

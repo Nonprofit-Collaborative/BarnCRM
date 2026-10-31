@@ -9,7 +9,10 @@ public with sharing class EmailSendOutcome {
     @NamespaceAccessible
     public Boolean sent { get; private set; }
 
-    /** The platform's first error message, untrimmed; null when it gave none or the message went. */
+    /**
+     * The platform's first error message, trimmed to the 255 characters a record's reason field
+     * holds; null when it gave none or the message went.
+     */
     @NamespaceAccessible
     public String error { get; private set; }
 

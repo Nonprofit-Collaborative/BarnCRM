@@ -206,7 +206,7 @@ private class GivingSmallClassesCoverageTest {
     // ------------------------------------------------------------------------- mail sender
 
     @IsTest
-    static void aFailedSendExplainsItselfInNoMoreThan255Characters() {
+    static void aFailedSendWithNoReasonSaysSo() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             String unknown = Label.Giving_Acknowledgment_SendFailedUnknown;
             Assert.areEqual(
@@ -220,13 +220,12 @@ private class GivingSmallClassesCoverageTest {
                 'A blank reason too'
             );
             Assert.areEqual(
-                255,
+                'The address bounced.',
                 AcknowledgmentService.failureReasonOf(
-                        EmailSendOutcome.failed('x'.repeat(300)),
-                        unknown
-                    )
-                    .length(),
-                'A long reason is trimmed to fit the record'
+                    EmailSendOutcome.failed('The address bounced.'),
+                    unknown
+                ),
+                'A reason is shown as the platform gave it'
             );
         }
     }
