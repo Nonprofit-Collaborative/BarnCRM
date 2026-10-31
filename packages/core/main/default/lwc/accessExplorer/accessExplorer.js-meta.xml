@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Access Explorer section of Org Optimizer: who can see or change what, and why, for one
+    person or permission set, one kind of record or field, and BarnCRM's own permission sets.
+    Read only, with CSV downloads.
+  </description>
+  <isExposed>false</isExposed>
+  <masterLabel>Access Explorer</masterLabel>
+</LightningComponentBundle>

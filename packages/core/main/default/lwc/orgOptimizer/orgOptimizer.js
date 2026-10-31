@@ -17,6 +17,8 @@ import FIELD_UTILIZATION from '@salesforce/label/c.Core_OrgOptimizer_FieldUtiliz
 import FIELD_UTILIZATION_TEXT from '@salesforce/label/c.Core_OrgOptimizer_FieldUtilizationText';
 import DATA_DICTIONARY from '@salesforce/label/c.Core_OrgOptimizer_DataDictionary';
 import DATA_DICTIONARY_TEXT from '@salesforce/label/c.Core_OrgOptimizer_DataDictionaryText';
+import ACCESS_EXPLORER from '@salesforce/label/c.Core_OrgOptimizer_AccessExplorer';
+import ACCESS_EXPLORER_TEXT from '@salesforce/label/c.Core_OrgOptimizer_AccessExplorerText';
 import HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_HealthCheck';
 import HEALTH_CHECK_TEXT from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckText';
 import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
@@ -64,6 +66,7 @@ export default class OrgOptimizer extends LightningElement {
     quality: QUALITY,
     fieldUtilization: FIELD_UTILIZATION,
     dataDictionary: DATA_DICTIONARY,
+    accessExplorer: ACCESS_EXPLORER,
     healthCheck: HEALTH_CHECK,
     errors: ERRORS,
     storage: STORAGE,
@@ -114,7 +117,8 @@ export default class OrgOptimizer extends LightningElement {
         this.tile('healthCheck', HEALTH_CHECK, HEALTH_CHECK_TEXT, 'standard:approval'),
         this.tile('errors', ERRORS, ERRORS_TEXT, 'standard:incident'),
         this.tile('storage', STORAGE, STORAGE_TEXT, 'standard:data_model'),
-        this.tile('setup', SETUP, SETUP_TEXT, 'standard:settings')
+        this.tile('setup', SETUP, SETUP_TEXT, 'standard:settings'),
+        this.tile('accessExplorer', ACCESS_EXPLORER, ACCESS_EXPLORER_TEXT, 'standard:user_role')
       );
     }
     return [
@@ -202,6 +206,10 @@ export default class OrgOptimizer extends LightningElement {
 
   get setupOpened() {
     return Boolean(this.opened.setup);
+  }
+
+  get accessExplorerOpened() {
+    return Boolean(this.opened.accessExplorer);
   }
 
   get showHealthCheck() {

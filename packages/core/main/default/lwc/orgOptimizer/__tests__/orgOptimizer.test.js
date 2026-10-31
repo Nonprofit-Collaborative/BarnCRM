@@ -135,7 +135,7 @@ describe('c-org-optimizer as an administrator', () => {
     const groups = one(element, 'c-barn-tool-grid').groups;
     expect(groups.map((group) => group.tiles.map((tile) => tile.name))).toEqual([
       ['quality', 'fieldUtilization', 'dataDictionary'],
-      ['healthCheck', 'errors', 'storage', 'setup']
+      ['healthCheck', 'errors', 'storage', 'setup', 'accessExplorer']
     ]);
     tiles(element).forEach((tile) => expect(tile.iconName).toMatch(/^standard:/));
   });
@@ -223,6 +223,15 @@ describe('c-org-optimizer as an administrator', () => {
     await activate(element, 'dataDictionary');
 
     expect(one(element, 'c-data-dictionary')).not.toBeNull();
+  });
+
+  it('creates Access Explorer only when its tab is first opened', async () => {
+    const element = await render();
+    expect(one(element, 'c-access-explorer')).toBeNull();
+
+    await activate(element, 'accessExplorer');
+
+    expect(one(element, 'c-access-explorer')).not.toBeNull();
   });
 
   it('opens a section from its Overview tile', async () => {
