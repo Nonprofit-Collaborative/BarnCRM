@@ -1,0 +1,126 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom14">
+    <div class="slds-var-p-horizontal_medium slds-is-relative">
+      <template lwc:if={showSpinner}>
+        <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+          {errorMessage}
+        </p>
+      </template>
+
+      <template lwc:if={noServices}>
+        <p data-id="no-services" class="slds-text-body_regular">{labels.noServices}</p>
+      </template>
+
+      <template lwc:if={hasServices}>
+        <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-combobox
+              data-id="service"
+              label={labels.service}
+              value={log.serviceId}
+              options={serviceOptions}
+              disabled={controlsDisabled}
+              onchange={handleServiceChange}
+            ></lightning-combobox>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-input
+              data-id="date"
+              type="date"
+              label={labels.date}
+              value={log.deliveryDate}
+              disabled={controlsDisabled}
+              onchange={handleDateChange}
+            ></lightning-input>
+          </div>
+        </div>
+
+        <template lwc:if={isEmpty}>
+          <p data-id="empty" class="slds-text-body_regular">{labels.empty}</p>
+        </template>
+
+        <template lwc:if={showHeader}>
+          <div class="slds-grid slds-gutters_x-small slds-show_medium slds-text-title_caps" data-id="header">
+            <div class="slds-col slds-size_1-of-2"></div>
+            <div class="slds-col slds-size_1-of-4">{labels.attendance}</div>
+            <div class="slds-col slds-size_1-of-4">{quantityLabel}</div>
+          </div>
+        </template>
+
+        <ul class="slds-has-dividers_bottom-space">
+          <template for:each={rows} for:item="row">
+            <li key={row.key} class="slds-item" data-id="row" data-key={row.key}>
+              <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                  <p class="slds-text-heading_small" data-id="person">{row.personName}</p>
+                </div>
+                <template lwc:if={canEdit}>
+                  <div class="slds-col slds-size_2-of-3 slds-medium-size_1-of-4">
+                    <lightning-combobox
+                      data-id="attendance"
+                      data-key={row.key}
+                      label={row.attendanceFor}
+                      variant="label-hidden"
+                      value={row.attendance}
+                      options={row.options}
+                      disabled={controlsDisabled}
+                      onchange={handleAttendanceChange}
+                    ></lightning-combobox>
+                  </div>
+                  <div class="slds-col slds-size_1-of-3 slds-medium-size_1-of-4">
+                    <lightning-input
+                      data-id="quantity"
+                      data-key={row.key}
+                      type="number"
+                      label={row.quantityFor}
+                      variant="label-hidden"
+                      min="0"
+                      step="0.01"
+                      value={row.quantity}
+                      disabled={row.quantityDisabled}
+                      onchange={handleQuantityChange}
+                    ></lightning-input>
+                  </div>
+                </template>
+                <template lwc:else>
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <p data-id="recorded" class="slds-text-body_regular">{row.attendance} {row.quantity}</p>
+                  </div>
+                </template>
+              </div>
+            </li>
+          </template>
+        </ul>
+
+        <template lwc:if={moreThanShown}>
+          <p data-id="more" class="slds-text-body_small slds-text-color_weak">{labels.moreThanShown}</p>
+        </template>
+
+        <div role="status" data-id="result" class="slds-var-m-vertical_small">{resultMessage}</div>
+
+        <template lwc:if={canEdit}>
+          <div class="slds-grid slds-wrap slds-grid_align-end slds-var-m-bottom_small">
+            <lightning-button
+              data-id="mark-all-present"
+              label={labels.markAllPresent}
+              disabled={controlsDisabled}
+              onclick={handleMarkAllPresent}
+              class="slds-var-m-right_x-small"
+            ></lightning-button>
+            <lightning-button
+              data-id="save"
+              variant="brand"
+              label={labels.save}
+              disabled={controlsDisabled}
+              onclick={handleSave}
+            ></lightning-button>
+          </div>
+        </template>
+      </template>
+    </div>
+  </lightning-card>
+</template>

@@ -64,6 +64,34 @@ someone to **Enrolled** fills an empty Start Date with today; moving them to **C
 To see everyone who has completed or withdrawn, turn on **Show Ended**. To correct a date,
 click the person's name to open the enrollment and edit it there.
 
+## To Take Attendance or Record Services
+
+1. Open the program.
+2. In the **Service Delivery Log** panel under the roster, pick the **Service** and the
+   **Date** (today to start with).
+3. Everyone with an open enrollment is listed. Set each person's **Attendance** (Present,
+   Excused Absence or Unexcused Absence) and **Quantity**, or click **Mark All Present** to set
+   everyone not yet recorded to Present with a quantity of 1.
+4. Click **Save**.
+
+You should see: "(number) service deliveries saved." Anyone left at **Not Recorded** gets
+nothing. An absence always counts a quantity of 0. To correct a day, pick the same service and
+date again: what was saved shows, and saving changes it rather than adding a second delivery.
+The panel works the same in the Salesforce mobile app, one person per card. Read Only users see
+what was recorded without the controls.
+
+## To Record a Service by Hand
+
+For someone who is not enrolled, or a one-off:
+
+1. Open the **Service Deliveries** tab and click **New**.
+2. Pick the **Service**, then a **Contact** or an **Account** (not both), the **Delivery Date**,
+   the **Attendance** and the **Quantity**.
+3. Click **Save**.
+
+You should see the new delivery. If the person has an enrollment in the program, it is filled in
+for you.
+
 ## To See Which Programs Someone Is In
 
 1. In the **BarnCRM Programs** app, open the person.

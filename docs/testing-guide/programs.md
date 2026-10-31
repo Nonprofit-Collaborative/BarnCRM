@@ -1,8 +1,8 @@
 # Programs
 
-Scripts for programs, services, enrollments, the Program Roster panel and Programs access. Setup detail: [Programs](../admin-guide/programs.md).
+Scripts for programs, services, enrollments, the Program Roster panel, the Service Delivery Log and Programs access. Setup detail: [Programs](../admin-guide/programs.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Programs deployed and sample data loaded unless a script says otherwise. Programs has no sample data of its own: T-PRG-02 creates the program later scripts use. Programs is offered in the **Nonprofit Edition** only: run every script here in that edition (see [Edition modes](before-you-test.md#edition-modes)). Leave the automation **Enrollment: fill in the stage dates** on (the default) unless a script says otherwise.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Programs deployed and sample data loaded unless a script says otherwise. T-PRG-02 creates the program T-PRG-03 to T-PRG-07 use; T-PRG-09 and T-PRG-10 use the Programs sample data, so run them before T-PRG-08, which removes it. Programs is offered in the **Nonprofit Edition** only: run every script here in that edition (see [Edition modes](before-you-test.md#edition-modes)). Leave the automation **Enrollment: fill in the stage dates** on (the default) unless a script says otherwise.
 
 ## T-PRG-01: Open the Programs App and Check Access
 
@@ -123,3 +123,40 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 Note: Core's sample set has more than 12 people, so every count above holds; with fewer sample people the set is smaller.
 
 **Cleanup:** delete Rita Real.
+
+## T-PRG-09: Take Attendance With the Service Delivery Log
+
+**Purpose:** confirm the Service Delivery Log lists the open enrollments, records attendance for a whole group, and changes a day rather than adding to it.
+**Prerequisites:** Programs sample data loaded (run before T-PRG-08); the staff user from T-PRG-01 (or any Programs Staff user); the Read Only user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, open **Food pantry**. | A **Service Delivery Log** panel shows under the roster, with **Service** (Grocery bag and Hot meal offered) and **Date** (today). |
+| 2 | Pick **Hot meal**. | The 8 people Enrolled in Food pantry are listed, each at **Not Recorded** with the quantity greyed out. |
+| 3 | Click **Mark All Present**. | Everyone shows **Present** with a quantity of 1. |
+| 4 | Set the first person to **Excused Absence** and the second person's quantity to 2. | The first person's quantity shows 0 and is greyed out. |
+| 5 | Click **Save**. | "8 service deliveries saved." The rows keep their values. |
+| 6 | Click **Save** again without changing anything. | "Nothing to save: no attendance was changed." |
+| 7 | Set the first person to **Present**, click **Save**, then open **Hot meal** and its **Service Deliveries** list. | "1 service delivery saved." The list holds 8 deliveries for today (not 9), each linked to the person's enrollment. |
+| 8 | Back on Food pantry, change the **Date** to yesterday. | Everyone is back at **Not Recorded**. |
+| 9 | In the Salesforce mobile app, open **Food pantry** and the log. | One person per card, with the attendance and quantity under the name; saving works the same. |
+| 10 | As the Read Only user, open **Food pantry**. | The log shows what was recorded for today, with no attendance controls and no **Save**. |
+
+**Cleanup:** keep the deliveries for T-PRG-10.
+
+## T-PRG-10: Record a Service by Hand and the Delivery Rules
+
+**Purpose:** confirm a delivery entered on the tab follows the rules: one person, the enrollment filled in, an absence counting 0, a negative quantity refused.
+**Prerequisites:** T-PRG-09 done; the staff user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Service Deliveries**, click **New**. Pick **Grocery bag**, an Enrolled Food pantry person as the **Contact**, and save. | Saved with today's date, **Present**, quantity 1, and **Enrollment** filled in with the person's Food pantry enrollment. |
+| 2 | Edit it: set **Attendance** to **Unexcused Absence** and **Quantity** to 3, and save. | Saved with quantity 0. |
+| 3 | Edit it: set **Attendance** to **Present** and **Quantity** to -1, and save. | Refused: the quantity cannot be negative. |
+| 4 | Click **New** with both a **Contact** and an **Account** filled in. | Refused: one person per delivery. |
+| 5 | Click **New** for a contact who is not enrolled in Food pantry, with **Hot meal**. | Saved with no enrollment. |
+| 6 | In **BarnCRM Settings**, open **Automation** and find **Service Delivery: absences, enrollment**. | Listed as always on, with no switch. |
+| 7 | Open **Hot meal** and try to delete it. | Refused: the service has deliveries. |
+
+**Cleanup:** delete the deliveries made in steps 1 and 5. Run T-PRG-08 to remove the sample data.

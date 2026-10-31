@@ -31,6 +31,12 @@
     </itemInstances>
     <itemInstances>
       <componentInstance>
+        <componentName>serviceDeliveryLog</componentName>
+        <identifier>serviceDeliveryLogPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>force:detailPanel</componentName>
         <identifier>programDetailPanel</identifier>
       </componentInstance>

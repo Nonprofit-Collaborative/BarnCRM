@@ -2,6 +2,41 @@
  * The reads service delivery makes for the person using it, in user mode (P-02).
  */
 public with sharing class ServiceDeliverySelector {
+    /** The program's active services, by name. */
+    public static List<Service__c> selectActiveServices(Id programId) {
+        return [
+            SELECT Id, Name, Unit_Of_Measure__c
+            FROM Service__c
+            WHERE Program__c = :programId AND Active__c = TRUE
+            WITH USER_MODE
+            ORDER BY Name
+        ];
+    }
+
+    /** The deliveries of this service on this day, oldest first, at most `howMany`. */
+    public static List<Service_Delivery__c> selectDeliveriesOn(
+        Id serviceId,
+        Date deliveryDate,
+        Integer howMany
+    ) {
+        return [
+            SELECT
+                Id,
+                Contact__c,
+                Contact__r.Name,
+                Account__c,
+                Account__r.Name,
+                Enrollment__c,
+                Attendance__c,
+                Quantity__c
+            FROM Service_Delivery__c
+            WHERE Service__c = :serviceId AND Delivery_Date__c = :deliveryDate
+            WITH USER_MODE
+            ORDER BY CreatedDate, Name
+            LIMIT :howMany
+        ];
+    }
+
     /** The program of each of these services the user can see. */
     public static Map<Id, Id> selectProgramIdsOf(Set<Id> serviceIds) {
         Map<Id, Id> programs = new Map<Id, Id>();

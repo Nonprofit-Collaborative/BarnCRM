@@ -256,4 +256,140 @@
         <shortDescription>Sample removal kept programs; {0} is their names</shortDescription>
         <value>Sample data removal kept the sample programs {0}, because people of your own are enrolled in them or have services recorded in them. Move or delete those enrollments and service deliveries, then select Remove Sample Data again.</value>
     </labels>
+    <labels>
+        <fullName>Programs_Log_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title of the Service Delivery Log panel</shortDescription>
+        <value>Service Delivery Log</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Service</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: service picker</shortDescription>
+        <value>Service</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Date</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: date picker</shortDescription>
+        <value>Date</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Attendance</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: attendance column</shortDescription>
+        <value>Attendance</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Quantity</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: quantity column; {0} is the unit</shortDescription>
+        <value>Quantity ({0})</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_NotRecorded</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: no attendance yet</shortDescription>
+        <value>Not Recorded</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_MarkAllPresent</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: mark everyone not recorded as present</shortDescription>
+        <value>Mark All Present</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Save</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: save button</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Saved</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: saved; {0} is how many</shortDescription>
+        <value>{0} service deliveries saved.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_SavedOne</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: one saved</shortDescription>
+        <value>1 service delivery saved.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_NothingToSave</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: no change to save</shortDescription>
+        <value>Nothing to save: no attendance was changed.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_NoServices</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: program has no active service</shortDescription>
+        <value>This program has no active service. Add one in the Services list to record attendance.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Empty</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: nobody enrolled</shortDescription>
+        <value>Nobody has an open enrollment in this program yet.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_AttendanceFor</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hidden label of a person's attendance picker; {0} is the person</shortDescription>
+        <value>Attendance for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_QuantityFor</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hidden label of a person's quantity box; {0} is the person</shortDescription>
+        <value>Quantity for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_MoreThanShown</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log lists only the first 200</shortDescription>
+        <value>Showing the first 200. Record the others on the Service Deliveries tab.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_ActionFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Unexpected Service Delivery Log failure, logged</shortDescription>
+        <value>Something went wrong with the service delivery log. The details are in the Error Log.</value>
+    </labels>
 </CustomLabels>

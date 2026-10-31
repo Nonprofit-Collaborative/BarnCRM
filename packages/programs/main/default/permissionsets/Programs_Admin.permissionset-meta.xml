@@ -18,6 +18,10 @@
     <apexClass>ProgramRosterController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>ServiceDeliveryLogController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Enrollment__c.Account__c</field>
