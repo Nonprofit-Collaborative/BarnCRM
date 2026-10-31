@@ -1,5 +1,5 @@
 /**
- * Gives the Programs permission sets to BarnCRM's roles (ADR-NEXT `NEXT-programs-module.md`,
+ * Gives the Programs permission sets to BarnCRM's roles (ADR-0151 `0151-programs-module.md`,
  * decision 7): Programs Admin to everyone holding BarnCRM Admin, directly or through a role,
  * Programs Staff to the Team Member and Coordinator roles, and Programs Read Only to the Read
  * Only role. The roles are permission set groups, followed through

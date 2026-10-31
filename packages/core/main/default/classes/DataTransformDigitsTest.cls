@@ -1,5 +1,5 @@
 /**
- * The Format digits step (C-50f2, ADR-NEXT): DataTransform.formatDigits against the shared
+ * The Format digits step (C-50f2, ADR-0150): DataTransform.formatDigits against the shared
  * JSON fixture the browser module `transformFormat` is tested against, the step's checks, and
  * the step run through `apply` as a bulk update or an import would run it.
  */

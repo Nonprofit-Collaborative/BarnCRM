@@ -1,6 +1,6 @@
 /**
  * Whose logic model a model is, and the rule that each has one (canonical model R-LM1, R-LM2;
- * ADR-NEXT `NEXT-logic-models-module.md`, decision 5).
+ * ADR-0154 `0154-logic-models-module.md`, decision 5).
  *
  * A model with no program is the organization's; a model may name a program by its record
  * identifier, held as text so Logic Models never depends on Programs. Every save sets the unique

@@ -1,6 +1,6 @@
 /**
- * What the BarnCRM Logic Models module does at install and at every upgrade (ADR-NEXT
- * `NEXT-logic-models-module.md`).
+ * What the BarnCRM Logic Models module does at install and at every upgrade (ADR-0154
+ * `0154-logic-models-module.md`).
  *
  * Each step is safe to run twice and none can abort an install, since every failure is written
  * to the Error Log instead:

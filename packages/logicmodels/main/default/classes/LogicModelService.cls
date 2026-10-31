@@ -164,7 +164,7 @@ public with sharing class LogicModelService {
     // ------------------------------------------------------------------------------ programs
 
     /**
-     * The Programs module's Program object, found by describe only (ADR-NEXT decision 5), or null
+     * The Programs module's Program object, found by describe only (ADR-0154 decision 5), or null
      * where Programs is not installed or the user cannot read programs.
      */
     @TestVisible

@@ -1,4 +1,4 @@
-# ADR-NEXT: AI-Readiness Export: a browser-built pack, no AI calls, sensitive fields left out by default
+# ADR-0152: AI-Readiness Export: a browser-built pack, no AI calls, sensitive fields left out by default
 
 **Status:** Proposed
 **Date:** 2026-10-31

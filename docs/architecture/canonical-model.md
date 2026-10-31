@@ -2669,7 +2669,7 @@ column's value before it is matched or written (ADR-0081, `0081-data-transform-d
 
 The steps from `map` on were added by ADR-0112 (`0112-more-transform-steps.md`); a document
 whose steps may use them carries `"version": 2` (the mapping document of R-IT1 and the bulk
-update definition of R-BU1). `digits` was added by ADR-NEXT (C-50f2, the phone format preset of
+update definition of R-BU1). `digits` was added by ADR-0150 (C-50f2, the phone format preset of
 Super Transform) and a document that may use it carries `"version": 3`. A reader that does not
 know an `op` skips that step, as below. `DataTransform.formatDigits` (Apex) and the framework-free
 module `transformFormat` (the `transformFormat` LWC bundle, plan 9.9) implement `digits` and are
@@ -6323,7 +6323,7 @@ know whether anything was printed (R-AK11).
 
 ## 25O. Ask
 
-Added by the solicitation pipeline (G-26, release 0.13, ADR-NEXT).
+Added by the solicitation pipeline (G-26, release 0.13, ADR-0153).
 
 ### Definition
 
@@ -6417,7 +6417,7 @@ their gifts, still pointing at the anonymized person.
 - **Object:** `Ask__c`, Giving package. Name is an auto number, `ASK-{00000000}`. Sharing is
   Public Read/Write (`ReadWrite`): a small development team works one shared pipeline, and an
   organization that wants each fundraiser to see only their own asks sets it to Private in Setup
-  (ADR-NEXT). Field history is on for Stage, Outcome, Ask Amount and Target Date (R-SO4).
+  (ADR-0153). Field history is on for Stage, Outcome, Ask Amount and Target Date (R-SO4).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -9697,8 +9697,8 @@ mode. Rename changes only the name; a list is saved new, never overwritten.
 ### Definition
 
 Something the organization runs for the people it serves: a food pantry, an after-school
-tutoring program, a job readiness course (P-01, Programs module, ADR-NEXT
-`NEXT-programs-module.md`). It is the durable thing; its services (29X) are what it offers and
+tutoring program, a job readiness course (P-01, Programs module, ADR-0151
+`0151-programs-module.md`). It is the durable thing; its services (29X) are what it offers and
 its enrollments (29Y) are who takes part.
 
 ### Attributes
@@ -9812,7 +9812,7 @@ participant record; P-02 records what they attended and received.
 ### Relationships
 
 - **Enrollment to Program**, many to one, through a required lookup, not a detail, so the
-  enrollment has sharing of its own (participant privacy, P-08; ADR-NEXT decision 3).
+  enrollment has sharing of its own (participant privacy, P-08; ADR-0151 decision 3).
 - **Enrollment to a person**, through the Contact and Account pair (Section 4).
 
 ### Rules
@@ -9992,7 +9992,7 @@ anonymous record; deleting the person empties the person (SetNull) and keeps the
 ### Definition
 
 The organization's theory of change, built by the organization itself (L-01, Logic Models module,
-ADR-NEXT `NEXT-logic-models-module.md`): what it puts in, what it does, what that produces, what
+ADR-0154 `0154-logic-models-module.md`): what it puts in, what it does, what that produces, what
 changes for people as a result, and the long-run impact. Its elements (29ZA) are the parts, its
 links (29ZB) say which part leads to which and on what assumption, and indicators (29ZC) on its
 outputs and outcomes say how the organization knows. One for the organization, and optionally one
@@ -10304,12 +10304,12 @@ Skill, Volunteer Skill, Job Skill, Volunteer Requirement, Shift Schedule and Vol
 Template left this table in v0.8 (V-04 to V-08) and are specified in Sections 29P to 29U, with
 the volunteer hours import template in 29V.
 
-Program, Service and Enrollment left this table in release 0.12 (P-01, ADR-NEXT) and are
+Program, Service and Enrollment left this table in release 0.12 (P-01, ADR-0151) and are
 specified in Sections 29W to 29Y. Outcome left it when P-03 moved to the Logic Models package as
 L-02 (owner decision, 2026-09-23). Attendance and Service Delivery left it in release 0.13
 (P-02) as one entity, Service Delivery, specified in Section 29Z.
 Logic Model, Logic Model Element, Logic Model Link, Indicator and Indicator Period (L-01 and
-L-02, release 0.14, ADR-NEXT `NEXT-logic-models-module.md`) are specified in Sections 29Z to
+L-02, release 0.14, ADR-0154 `0154-logic-models-module.md`) are specified in Sections 29Z to
 29ZD. Indicator takes the place of the Outcome entity listed above for Programs: P-03 moved to the
 Logic Models package as L-02 (owner decision, 2026-09-23).
 
@@ -10551,14 +10551,14 @@ mirrors the primary member).
 | v0.13 | 2026-10-31 | Ask cadence reminders (G-29). New Section 25O. `Contact` and `Account` gain `Next_Ask_Date__c`, `Last_Touch_Date__c` and `Ask_Reminder_For_Date__c` (Giving). `Giving_Settings__c` gains `Ask_Reminders_Enabled__c` (default true), `Ask_Reminders_Last_Run__c` and `Ask_Reminders_Last_Run_Summary__c`. Rules R-AC1 to R-AC6: donor level dates only, one switch, one reminder Task per donor per date, a 30 day catch up window, the Task is the owner's, and a Who Is Due list view on each object. No object added. |
 | v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-0149). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a) by any user with the import permission and edit access to the rows; `Import_Batch__c` gains `Retried_By__c` (Rows Retried By) so undo covers their records. R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
 | 0.12 | 2026-10-31 | Setup Changes Log (C-56, plan D-156). Object `Setup_Change__c` added (Section 29W), rules R-SU1 to R-SU8 (prefix R-SU, since R-SC is soft credits); settings key `Setup_Change_Retention_Days__c` (Org Optimizer keys). A nightly job copies new Setup Audit Trail rows and deletes copies past the retention. |
-| v0.12 | 2026-10-31 | Super Transform follow-ups (C-50f1, C-50f2; ADR-NEXT). New object `Saved_Transform__c` (Section 29W: `Object_Name__c`, `Definition_JSON__c`), org-wide saved step lists, granted to `BarnCRM_Bulk_Update` and `BarnCRM_Admin`. R-IT15 gains the `digits` step (a document that may use it is version 3; Apex `DataTransform.formatDigits` and the JavaScript module `transformFormat` share one test fixture). R-BU7 applies it unchanged. |
-| 0.12 | 2026-10-31 | Programs P-01 (ADR-NEXT `NEXT-programs-module.md`). New in the Programs module: Program (`Program__c`, 29W), Service (`Service__c`, 29X) and Enrollment (`Enrollment__c`, 29Y), with rules R-PG1 to R-PG3, R-SV1 and R-EN1 to R-EN5 and the PMM mapping. Section 30 keeps attendance and service delivery (P-02); Outcome left it for Logic Models (L-02). Specified ahead of the build. |
+| v0.12 | 2026-10-31 | Super Transform follow-ups (C-50f1, C-50f2; ADR-0150). New object `Saved_Transform__c` (Section 29W: `Object_Name__c`, `Definition_JSON__c`), org-wide saved step lists, granted to `BarnCRM_Bulk_Update` and `BarnCRM_Admin`. R-IT15 gains the `digits` step (a document that may use it is version 3; Apex `DataTransform.formatDigits` and the JavaScript module `transformFormat` share one test fixture). R-BU7 applies it unchanged. |
+| 0.12 | 2026-10-31 | Programs P-01 (ADR-0151 `0151-programs-module.md`). New in the Programs module: Program (`Program__c`, 29W), Service (`Service__c`, 29X) and Enrollment (`Enrollment__c`, 29Y), with rules R-PG1 to R-PG3, R-SV1 and R-EN1 to R-EN5 and the PMM mapping. Section 30 keeps attendance and service delivery (P-02); Outcome left it for Logic Models (L-02). Specified ahead of the build. |
 | 0.12 | 2026-10-31 | Programs P-01 follow-up. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Program__c` (29W), so the Programs sample load can be removed in one action; services and enrollments are found through their program. 29Y gains the person card, the Programs Health Check finding and the sample data paragraph. No object added. |
 | 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29Z), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |
 | v0.13 | 2026-10-31 | Donor segments (G-28, D-156). New Section 25O, rules R-DS1 to R-DS6: a segment is a Saved Query of Contact or Account (no new object), with five starter templates held as documented JSON, a count, a list and Mailchimp, Constant Contact and all-columns CSV exports; no sending, no settings key. Contact and Account gain the formula `Change_From_Last_Year__c` (Giving This Year minus Giving Last Year), so upgraders can be filtered. |
 | v0.13 | 2026-10-31 | Pledge reminders (G-30). Objects `Pledge_Reminder_Step__c` (Section 25O) and `Pledge_Reminder__c` (25P) added; `Giving_Settings__c` gains `Pledge_Reminders_Enabled__c` (off by default), `Pledge_Reminders_Last_Run__c` and `Pledge_Reminders_Last_Run_Summary__c`. Rules R-PR1 to R-PR6. No field is added to `Installment__c` or `Commitment__c`. |
-| 0.13 | 2026-10-31 | Solicitation pipeline (G-26, ADR-NEXT). New entity Ask (Section 25O, `Ask__c`) with rules R-SO1 to R-SO8: an Opportunity-free ask with the organization's own stages, an outcome kept apart from the stage, stage history, and a win that creates or links the gift or commitment. Giving Settings gains `Ask_Stages__c` (Section 21A). `Next_Ask_Date__c` is the hook ask cadence (G-29) reads. |
-| 0.14 | 2026-10-31 | Logic Models L-01 and L-02 (ADR-NEXT `NEXT-logic-models-module.md`). New in the Logic Models module: Logic Model (`Logic_Model__c`, 29Z), Logic Model Element (`Logic_Model_Element__c`, 29ZA), Logic Model Link (`Logic_Model_Link__c`, 29ZB), Indicator (`Indicator__c`, 29ZC) and Indicator Period (`Indicator_Period__c`, 29ZD), with rules R-LM1 to R-LM3, R-LE1 to R-LE3, R-LL1 to R-LL3, R-IN1, R-IN2, R-IP1 and R-IP2. Indicator takes the place of P-03's Outcome. Specified ahead of the build. |
+| 0.13 | 2026-10-31 | Solicitation pipeline (G-26, ADR-0153). New entity Ask (Section 25O, `Ask__c`) with rules R-SO1 to R-SO8: an Opportunity-free ask with the organization's own stages, an outcome kept apart from the stage, stage history, and a win that creates or links the gift or commitment. Giving Settings gains `Ask_Stages__c` (Section 21A). `Next_Ask_Date__c` is the hook ask cadence (G-29) reads. |
+| 0.14 | 2026-10-31 | Logic Models L-01 and L-02 (ADR-0154 `0154-logic-models-module.md`). New in the Logic Models module: Logic Model (`Logic_Model__c`, 29Z), Logic Model Element (`Logic_Model_Element__c`, 29ZA), Logic Model Link (`Logic_Model_Link__c`, 29ZB), Indicator (`Indicator__c`, 29ZC) and Indicator Period (`Indicator_Period__c`, 29ZD), with rules R-LM1 to R-LM3, R-LE1 to R-LE3, R-LL1 to R-LL3, R-IN1, R-IN2, R-IP1 and R-IP2. Indicator takes the place of P-03's Outcome. Specified ahead of the build. |
 
 ---
 ## 32. Entity ownership by package
@@ -10679,8 +10679,8 @@ so nothing below that is nonprofit-specific ships in Core.
 | Custom permission Manage BarnCRM Settings | Core | Metadata |
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
 | Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-0127). Dashboard `Volunteers` and four reports in public read only folders `BarnCRM_Volunteers`; report types Volunteer Hours with Job and Shift, Volunteer Shifts with Job, Volunteer Sign-ups, Volunteers (Contact); `standard-Dashboard` and `standard-report` tabs in the app; report and dashboard user permissions in the four permission sets (V-03) |
-| Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-NEXT). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
-| Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-NEXT `NEXT-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
+| Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
+| Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror is v0.6, brought forward from

@@ -1,5 +1,5 @@
 /**
- * The Logic Model Builder panel's server side (L-01, L-02; ADR-NEXT `NEXT-logic-models-module.md`,
+ * The Logic Model Builder panel's server side (L-01, L-02; ADR-0154 `0154-logic-models-module.md`,
  * decision 8). Thin: each method parses the panel's JSON, asks `LogicModelService`, and returns
  * the whole model again as plain JSON, so the panel redraws from one shape. A refused save comes
  * back as its own message.

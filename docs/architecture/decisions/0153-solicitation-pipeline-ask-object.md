@@ -1,4 +1,4 @@
-# ADR-NEXT: The Solicitation Pipeline Is a Giving Ask Object, Not Opportunity
+# ADR-0153: The Solicitation Pipeline Is a Giving Ask Object, Not Opportunity
 
 **Status:** Accepted (D-156 approved G-26 for release 0.13)
 **Date:** 2026-10-31

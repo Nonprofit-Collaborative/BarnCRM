@@ -140,7 +140,7 @@ const README_TEXT = {
 
 /**
  * The AI-Readiness Export section of Org Optimizer (AIR-01, plan Section 6.1 item 7, D-154,
- * ADR-NEXT, admin guide ai-readiness-export.md): choose kinds of record, review the fields flagged as
+ * ADR-0152, admin guide ai-readiness-export.md): choose kinds of record, review the fields flagged as
  * sensitive, and download one zip of README.md, schema.json, data-dictionary.csv and, when
  * asked, one record file per kind of record. It reuses the Data Dictionary's describe, Field
  * Utilization's fill rates, the Data Quality checks and Find's paged export, each with its own

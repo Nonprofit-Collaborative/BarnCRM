@@ -1,4 +1,4 @@
-# ADR-NEXT: The BarnCRM Programs module: Core only, three objects, enrollment kept apart from its program for privacy
+# ADR-0151: The BarnCRM Programs module: Core only, three objects, enrollment kept apart from its program for privacy
 
 **Status:** Proposed (built as recommended for release 0.12, P-01; awaits owner confirmation)
 **Date:** 2026-10-31

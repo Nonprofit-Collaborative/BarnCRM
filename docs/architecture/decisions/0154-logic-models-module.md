@@ -1,4 +1,4 @@
-# ADR-NEXT: The BarnCRM Logic Models module: its own package on Core, five objects, a program named by its record identifier
+# ADR-0154: The BarnCRM Logic Models module: its own package on Core, five objects, a program named by its record identifier
 
 **Status:** Proposed (built as recommended for release 0.14, L-01 and L-02; awaits owner confirmation)
 **Date:** 2026-10-31

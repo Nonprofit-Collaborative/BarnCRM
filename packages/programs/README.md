@@ -8,7 +8,7 @@ service delivery (P-02), case notes (P-04), the program dashboard (P-05), the ro
 
 ## Design
 
-- ADR-NEXT `docs/architecture/decisions/NEXT-programs-module.md`
+- ADR-0151 `docs/architecture/decisions/0151-programs-module.md`
 - Canonical model Sections 29W (Program), 29X (Service) and 29Y (Enrollment)
 - Admin guide `docs/admin-guide/programs.md`
 

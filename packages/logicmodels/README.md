@@ -5,7 +5,7 @@
 Logic models the organization builds itself: inputs, activities, outputs, outcomes (short,
 intermediate and long term) and impact, the assumptions between them, and indicators with a
 baseline and a target and result per period. Separate from Programs on purpose (plan Section
-5.7, ADR-NEXT `NEXT-logic-models-module.md`).
+5.7, ADR-0154 `0154-logic-models-module.md`).
 
 ## First ships in
 

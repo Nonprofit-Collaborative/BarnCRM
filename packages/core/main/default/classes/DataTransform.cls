@@ -66,7 +66,7 @@ public with sharing class DataTransform {
 
     /**
      * The version of a document whose steps may use the operations from `map` on (ADR-0112,
-     * `0112-more-transform-steps.md`), and from 3 on `digits` (ADR-NEXT, C-50f2). A reader that
+     * `0112-more-transform-steps.md`), and from 3 on `digits` (ADR-0150, C-50f2). A reader that
      * does not know an operation skips it.
      */
     @NamespaceAccessible

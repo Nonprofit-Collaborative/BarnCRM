@@ -1,4 +1,4 @@
-# ADR-NEXT: A digit-format transform step, a shared fixture, and saved step lists
+# ADR-0150: A digit-format transform step, a shared fixture, and saved step lists
 
 **Status:** Proposed (builder decision)
 **Date:** 2026-10-31

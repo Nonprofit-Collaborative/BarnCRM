@@ -1,5 +1,5 @@
 /**
- * Gives the Logic Models permission sets to BarnCRM's roles (ADR-NEXT `NEXT-logic-models-module.md`,
+ * Gives the Logic Models permission sets to BarnCRM's roles (ADR-0154 `0154-logic-models-module.md`,
  * decision 7): Logic Models Admin to everyone holding BarnCRM Admin, directly or through a role,
  * Logic Models Staff to the Team Member and Coordinator roles, and Logic Models Read Only to the Read
  * Only role. The roles are permission set groups, followed through

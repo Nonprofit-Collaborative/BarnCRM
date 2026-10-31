@@ -925,9 +925,9 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   else
     echo "== Skipping Volunteers: packages/volunteers holds no metadata yet =="
   fi
-  # Programs depends on Core only (ADR-NEXT, programs module).
+  # Programs depends on Core only (ADR-0151, programs module).
   MODULES+=(programs)
-  # Logic Models depends on Core only (ADR-NEXT, logic models module).
+  # Logic Models depends on Core only (ADR-0154, logic models module).
   MODULES+=(logicmodels)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
@@ -1065,7 +1065,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     fi
   fi
 
-  # The same gap for the Programs permission sets (ADR-NEXT, programs module, decision 7).
+  # The same gap for the Programs permission sets (ADR-0151, programs module, decision 7).
   echo ""
   echo "== Queueing the Programs access sync =="
   if ! printf '%s\n' 'new ProgramsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
@@ -1073,7 +1073,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "check syncs the access."
   fi
 
-  # The same gap for the Logic Models permission sets (ADR-NEXT, logic models module, decision 7).
+  # The same gap for the Logic Models permission sets (ADR-0154, logic models module, decision 7).
   echo ""
   echo "== Queueing the Logic Models access sync =="
   if ! printf '%s\n' 'new LogicModelsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
