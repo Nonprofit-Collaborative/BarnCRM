@@ -44,7 +44,8 @@ const REPORT = {
       modifyAllData: true,
       activePeople: 2
     },
-    { id: '0PS2', label: 'Auditor', kind: 'permissionSet', viewAllData: true, inGroups: 'Finance' }
+    { id: '0PS2', label: 'Auditor', kind: 'permissionSet', viewAllData: true, inGroups: 'Finance' },
+    { id: '0PS4', label: 'Developer', kind: 'permissionSet', authorApex: true }
   ],
   objects: [
     {
@@ -110,7 +111,13 @@ describe('c-access-modify-all', () => {
     expect(data[1]).toMatchObject({
       modifyAllDataText: '',
       viewAllDataText: 'Yes',
+      authorApexText: '',
       inGroups: 'Finance'
+    });
+    expect(data[2]).toMatchObject({
+      authorApexText: 'Yes',
+      modifyAllDataText: '',
+      viewAllDataText: ''
     });
     const objects = byId(element, 'objects').data;
     expect(objects[0]).toMatchObject({

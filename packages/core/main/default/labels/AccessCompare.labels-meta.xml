@@ -177,6 +177,14 @@
         <value>Modify All Data</value>
     </labels>
     <labels>
+        <fullName>Core_AccessModifyAll_ColAuthorApex</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Modify all report: column</shortDescription>
+        <value>Author Apex</value>
+    </labels>
+    <labels>
         <fullName>Core_AccessModifyAll_ColInGroups</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>

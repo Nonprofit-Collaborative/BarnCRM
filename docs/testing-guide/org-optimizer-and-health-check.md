@@ -194,7 +194,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 4 | Choose **Relationship** in **Compare Fields For**. | A **Fields** table, differences only, with **Read** and **Edit** for each side and **Difference**. |
 | 5 | Set **Compare** to **Permission Sets**. Both choices clear. Type `Staff` under **First** and choose **BarnCRM Staff**, then type `Admin` under **Second** and choose **BarnCRM Admin**. | The tables show the two sets' differences, with the two set names as column headings. |
 | 6 | Choose the same permission set on both sides. | **Similarity** reads 100% and the table says **No differences.** |
-| 7 | Choose **Modify All Report**. | **Data-Wide Access** lists the System Administrator profile with **Modify All Data** and **View All Data**. **Kinds of Record** lists object-level Modify All and View All, with **Scope**, **Active People** and **In Groups**. |
+| 7 | Choose **Modify All Report**. | **Data-Wide Access** lists the System Administrator profile with **Modify All Data**, **View All Data** and **Author Apex** all **Yes**. A permission set that gives only Author Apex shows **Yes** under **Author Apex** and blank under the other two. **Kinds of Record** lists object-level Modify All and View All, with **Scope**, **Active People** and **In Groups**. |
 | 8 | Click **Download CSV** under each table. | A file named **Access_Explorer-** and today's date ending .csv downloads, and **Downloaded {n} rows.** shows. |
 | 9 | As staff, open **Org Optimizer**. | There is no **Access Explorer** tile, so neither view is reachable. |
 

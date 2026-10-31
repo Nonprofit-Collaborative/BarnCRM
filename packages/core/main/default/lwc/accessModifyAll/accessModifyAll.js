@@ -7,6 +7,7 @@ import DATA_HEADING from '@salesforce/label/c.Core_AccessModifyAll_DataHeading';
 import OBJECTS_HEADING from '@salesforce/label/c.Core_AccessModifyAll_ObjectsHeading';
 import COL_VIEW_ALL_DATA from '@salesforce/label/c.Core_AccessModifyAll_ColViewAllData';
 import COL_MODIFY_ALL_DATA from '@salesforce/label/c.Core_AccessModifyAll_ColModifyAllData';
+import COL_AUTHOR_APEX from '@salesforce/label/c.Core_AccessModifyAll_ColAuthorApex';
 import COL_IN_GROUPS from '@salesforce/label/c.Core_AccessModifyAll_ColInGroups';
 import COL_SCOPE from '@salesforce/label/c.Core_AccessModifyAll_ColScope';
 import SCOPE_STANDARD from '@salesforce/label/c.Core_AccessModifyAll_ScopeStandard';
@@ -83,6 +84,7 @@ export default class AccessModifyAll extends LightningElement {
           column('kindLabel', COL_KIND),
           column('modifyAllDataText', COL_MODIFY_ALL_DATA),
           column('viewAllDataText', COL_VIEW_ALL_DATA),
+          column('authorApexText', COL_AUTHOR_APEX),
           column('inGroups', COL_IN_GROUPS, { wrapText: true }),
           column('activePeople', COL_ACTIVE_PEOPLE, { type: 'number' })
         ],
@@ -91,7 +93,8 @@ export default class AccessModifyAll extends LightningElement {
           key: grant.id,
           kindLabel: KINDS[grant.kind] || '',
           modifyAllDataText: yes(grant.modifyAllData),
-          viewAllDataText: yes(grant.viewAllData || grant.modifyAllData)
+          viewAllDataText: yes(grant.viewAllData || grant.modifyAllData),
+          authorApexText: yes(grant.authorApex)
         }))
       },
       objects: {

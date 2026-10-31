@@ -40,8 +40,8 @@ public with sharing class AccessExplorerController {
     /** The PermissionSet fields every label, kind and source needs. */
     private static final String SET_FIELDS =
         'SELECT Id, Label, Name, IsOwnedByProfile, Profile.Name, PermissionSetGroupId,' +
-        ' PermissionSetGroup.MasterLabel, PermissionsViewAllData, PermissionsModifyAllData' +
-        ' FROM PermissionSet WHERE ';
+        ' PermissionSetGroup.MasterLabel, PermissionsViewAllData, PermissionsModifyAllData,' +
+        ' PermissionsAuthorApex FROM PermissionSet WHERE ';
 
     /** Raised with a message the page shows as it is. */
     public class AccessExplorerException extends Exception {
@@ -119,6 +119,8 @@ public with sharing class AccessExplorerController {
         public Boolean viewAllData = false;
         @AuraEnabled
         public Boolean modifyAllData = false;
+        @AuraEnabled
+        public Boolean authorApex = false;
         /** The permission set groups a profile or permission set sits inside, with a comma. */
         @AuraEnabled
         public String inGroups;
@@ -603,12 +605,21 @@ public with sharing class AccessExplorerController {
             ModifyAllReport result = new ModifyAllReport();
             Integer cap = maxGrants + 1;
             List<PermissionSet> dataSets = querySets(
-                '(PermissionsViewAllData = TRUE OR PermissionsModifyAllData = TRUE) LIMIT ' + cap,
+                '(PermissionsViewAllData = TRUE OR PermissionsModifyAllData = TRUE' +
+                    ' OR PermissionsAuthorApex = TRUE) LIMIT ' +
+                    cap,
                 new Map<String, Object>()
             );
             // A holder of View All Data or Modify All Data has it on every kind of record, so
             // its own object rows would only bury the real object-level grants.
-            Set<Id> dataSetIds = new Map<Id, PermissionSet>(dataSets).keySet();
+            Set<Id> dataSetIds = new Set<Id>();
+            for (PermissionSet permissionSet : dataSets) {
+                if (
+                    permissionSet.PermissionsViewAllData || permissionSet.PermissionsModifyAllData
+                ) {
+                    dataSetIds.add(permissionSet.Id);
+                }
+            }
             List<ObjectPermissions> permissions = [
                 SELECT ParentId, SobjectType, PermissionsViewAllRecords, PermissionsModifyAllRecords
                 FROM ObjectPermissions
@@ -987,6 +998,7 @@ public with sharing class AccessExplorerController {
         row.kind = kindOf(permissionSet);
         row.viewAllData = permissionSet.PermissionsViewAllData == true;
         row.modifyAllData = permissionSet.PermissionsModifyAllData == true;
+        row.authorApex = permissionSet.PermissionsAuthorApex == true;
         return row;
     }
 

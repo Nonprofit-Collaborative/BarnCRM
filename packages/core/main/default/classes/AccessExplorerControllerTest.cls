@@ -221,7 +221,11 @@ private class AccessExplorerControllerTest {
         System.runAs(TestUsers.admin()) {
             PermissionSet created = new PermissionSet(
                 Name = 'Access_Explorer_All_Set',
-                Label = 'Access Explorer All Set'
+                Label = 'Access Explorer All Set',
+                PermissionsAuthorApex = true,
+                PermissionsModifyMetadata = true,
+                PermissionsViewRoles = true,
+                PermissionsViewSetup = true
             );
             insert as system created;
             insert as system new ObjectPermissions(
@@ -242,10 +246,17 @@ private class AccessExplorerControllerTest {
                 report = AccessExplorerController.getModifyAllReport();
             }
             Boolean profileWithAllData = false;
+            AccessExplorerController.Grant apexSet;
             for (AccessExplorerController.Grant grant : report.dataGrants) {
                 profileWithAllData |=
                     grant.kind == AccessExplorerController.KIND_PROFILE && grant.modifyAllData;
+                if (grant.id == created.Id) {
+                    apexSet = grant;
+                }
             }
+            Assert.isNotNull(apexSet, 'A set with only Author Apex is listed.');
+            Assert.isTrue(apexSet.authorApex, 'Author Apex.');
+            Assert.isFalse(apexSet.modifyAllData || apexSet.viewAllData, 'Nothing else.');
             Assert.isTrue(profileWithAllData, 'A profile with Modify All Data is listed.');
             AccessExplorerController.HolderRow found;
             for (AccessExplorerController.HolderRow row : report.objects) {

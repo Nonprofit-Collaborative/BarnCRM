@@ -15,7 +15,7 @@ answer five ways:
 | **By Kind of Record** | For one kind of record (or one of its fields), every profile, permission set and permission set group that gives access, how many active people hold each, and a list of the people who have access, 50 at a time. |
 | **BarnCRM Permission Sets** | Every permission set and role BarnCRM ships, how many active people hold each, and whether the hourly Tab Access Check is scheduled. |
 | **Compare Two** | Two people, or two profiles, permission sets or groups, side by side: what each can do on every kind of record (and on the fields of one), showing only the differences unless you ask for everything, with a similarity score. |
-| **Modify All Report** | Every profile, permission set and group that holds **Modify All Data** or **View All Data**, and every one that holds **Modify All** or **View All** on a kind of record, with how many active people hold each and the groups it sits inside. |
+| **Modify All Report** | Every profile, permission set and group that holds **Modify All Data**, **View All Data** or **Author Apex**, and every one that holds **Modify All** or **View All** on a kind of record, with how many active people hold each and the groups it sits inside. |
 
 Each table has **Download CSV**, which saves what it shows.
 
@@ -88,10 +88,14 @@ Start from the sample data (see [Sample data](sample-data.md)).
 ## The Modify All Report
 
 Modify All Data and View All Data are the broadest permissions in Salesforce: they override
-object, field and sharing settings. The report answers "who holds these, and through what".
+object, field and sharing settings. Author Apex lets its holders write and change Apex code. The
+report answers "who holds these, and through what".
 
-- **Data-Wide Access** has one row per profile, permission set or group holding either, with
-  **Active People** (people it is assigned to directly) and **In Groups**.
+- **Data-Wide Access** has one row per profile, permission set or group holding any of Modify All
+  Data, View All Data or Author Apex, with a column for each (**Modify All Data**, **View All
+  Data**, **Author Apex**), **Active People** (people it is assigned to directly) and **In
+  Groups**. Modify All Data always includes View All Data. Author Apex does not, so a holder of
+  only Author Apex shows **Yes** in that column alone.
 - **Kinds of Record** has one row per kind of record and holder with Modify All or View All on
   it, for standard objects and custom objects alike (**Scope** says which). Modify All always
   includes View All. Holders of Modify All Data or View All Data are left out of this table,
@@ -132,7 +136,7 @@ Access Explorer reads only what one view needs, when you ask for it:
 
 **Compare Two** reads the two sides' access exactly as **By Person or Permission Set** does, and
 fields only for the kind of record you choose. The **Modify All Report** reads two things only:
-the profiles and permission sets with Modify All Data or View All Data, and the object
+the profiles and permission sets with Modify All Data, View All Data or Author Apex, and the object
 permissions with Modify All or View All, up to 2,000 rows.
 
 ## Download CSV
