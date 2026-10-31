@@ -11,47 +11,7 @@
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
-    <apexClass>AcknowledgmentBatch</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>AcknowledgmentController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>AcknowledgmentLetterMerge</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>AcknowledgmentRuleService</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>AcknowledgmentRunService</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>AcknowledgmentScheduler</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>AcknowledgmentSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>AcknowledgmentService</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>AcknowledgmentWriter</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>AppealSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>AppealTriggerHandler</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -67,43 +27,7 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>DonorLevelSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>DonorLevelService</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>DonorLevelTriggerHandler</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>DonorSegmentController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>FundSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>FundTriggerHandler</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>GiftAcknowledgmentHandler</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>GiftAllocationPostingLockHandler</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>GiftAllocationSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>GiftAllocationTriggerHandler</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -115,43 +39,7 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>GiftDonorDeleteGuardHandler</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>GiftPostingController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>GiftPostingLockHandler</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>GiftReceiptLockHandler</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>GiftSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>GiftService</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>GiftStatusRules</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>GiftTriggerHandler</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>GivingAccountSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>PledgeReminderBatch</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -159,27 +47,7 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>PledgeReminderScheduler</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>PledgeReminderSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>PledgeReminderService</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>PledgeReminderWriter</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>ReceiptController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>ReceiptSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
