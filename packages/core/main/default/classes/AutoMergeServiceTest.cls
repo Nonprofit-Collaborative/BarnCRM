@@ -206,7 +206,7 @@ private class AutoMergeServiceTest {
                 'The restored person has their own memberships back.'
             );
             Merge_Journal__c undone = journalFor(other.Id);
-            Assert.areEqual(AutoMergeService.UNDONE, undone.Status__c, undone.Notes__c);
+            Assert.areEqual(AutoMergeService.UNDONE, undone.Status__c, 'Notes: ' + undone.Notes__c);
         }
     }
 

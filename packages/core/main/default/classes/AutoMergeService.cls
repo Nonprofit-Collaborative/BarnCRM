@@ -754,12 +754,20 @@ public with sharing class AutoMergeService {
                 ) {
                     found.add(row.Id);
                     Merge_Journal__c owner = owners.get(row.Id);
-                    if (String.valueOf(row.get(fieldName)) == owner.Survivor_Id__c) {
+                    String now = String.valueOf(row.get(fieldName));
+                    // On the kept person, or emptied since by automation that keeps the link
+                    // (household upkeep clears the Primary Contact of a household the merge
+                    // emptied): either way it goes back to the restored person.
+                    if (now == owner.Survivor_Id__c || now == null) {
                         SObject move = row.getSObjectType().newSObject(row.Id);
                         move.put(fieldName, owner.Merged_Id__c);
                         moves.add(move);
                         moveOwners.add(owner);
-                    } else {
+                    } else if (now != owner.Merged_Id__c) {
+                        // A link already back on the restored person counts as restored: one
+                        // that automation keeps (a household's Primary Contact, recomputed when
+                        // the memberships come back with the undelete) is back before this runs.
+                        // Anything else was moved since.
                         addOnce(notesById, owner, Label.Core_AutoMerge_NoteRecordMovedSince, key);
                     }
                 }
