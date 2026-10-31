@@ -463,6 +463,116 @@ private class GivingSampleDataTest {
         }
     }
 
+    private static Map<String, Object> ask(
+        String key,
+        String donor,
+        String stage,
+        String outcome,
+        String commitment
+    ) {
+        return new Map<String, Object>{
+            'key' => key,
+            'donor' => donor,
+            'stage' => stage,
+            'outcome' => outcome,
+            'amount' => 5000,
+            'targetDaysAgo' => -30,
+            'stageDaysAgo' => 12,
+            'closedDaysAgo' => outcome == 'Open' ? null : 20,
+            'nextAskDaysAgo' => outcome == 'Declined' ? -120 : null,
+            'nextStep' => outcome == 'Open' ? 'Call next week.' : null,
+            'fund' => 'Building Fund',
+            'appeal' => null,
+            'commitment' => commitment
+        };
+    }
+
+    @IsTest
+    static void testSampleAsksLoadWithTheReferenceDataAndAreRemoved() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
+            Map<String, Object> root = (Map<String, Object>) JSON.deserializeUntyped(buildJson());
+            root.put(
+                'asks',
+                new List<Object>{
+                    ask('A001', PERSON_KEY, 'Cultivating', 'Open', null),
+                    ask('A002', PERSON_KEY, 'Asked', 'Won', 'C001'),
+                    ask('A003', ORGANIZATION_KEY, 'Asked', 'Declined', null),
+                    ask('A004', SECOND_PERSON_KEY, 'A Stage The Org Removed', 'Open', null),
+                    ask('A005', 'H999-9', 'Asked', 'Open', null)
+                }
+            );
+
+            Test.startTest();
+            GivingSampleDataLoader.loadReferenceData(
+                GivingSampleDataSet.parse(JSON.serialize(root))
+            );
+            Test.stopTest();
+
+            System.assertEquals(
+                4,
+                [SELECT COUNT() FROM Ask__c WHERE Sample_Data__c = TRUE],
+                'every ask whose donor is in the set is loaded and flagged; the unknown donor is skipped'
+            );
+            Ask__c open = [
+                SELECT Stage__c, Outcome__c, Target_Date__c, Stage_Changed_Date__c, Fund__c
+                FROM Ask__c
+                WHERE Stage__c = 'Cultivating'
+            ];
+            System.assertEquals('Open', open.Outcome__c, 'an open ask stays open');
+            System.assertEquals(
+                Date.today().addDays(30),
+                open.Target_Date__c,
+                'a negative offset is a target date still to come'
+            );
+            System.assertEquals(
+                Date.today().addDays(-12),
+                open.Stage_Changed_Date__c,
+                'the ask has been in its stage as long as the file says'
+            );
+            System.assertNotEquals(null, open.Fund__c, 'the ask names the sample fund');
+            Ask__c won = [
+                SELECT Commitment__c, Closed_Date__c
+                FROM Ask__c
+                WHERE Outcome__c = 'Won'
+            ];
+            System.assertEquals(
+                [SELECT Id FROM Commitment__c WHERE Sample_Data__c = TRUE LIMIT 1].Id,
+                won.Commitment__c,
+                'a won ask links the sample pledge that closed it'
+            );
+            System.assertEquals(Date.today().addDays(-20), won.Closed_Date__c);
+            Ask__c declined = [
+                SELECT Donor_Account__c, Next_Ask_Date__c
+                FROM Ask__c
+                WHERE Outcome__c = 'Declined'
+            ];
+            System.assertNotEquals(null, declined.Donor_Account__c, 'an organization can be asked');
+            System.assertEquals(Date.today().addDays(120), declined.Next_Ask_Date__c);
+            Ask__c fallback = [
+                SELECT Stage__c
+                FROM Ask__c
+                WHERE Donor_Contact__r.Sample_Data_Key__c = :SECOND_PERSON_KEY
+            ];
+            System.assertEquals(
+                AskRules.stages()[0],
+                fallback.Stage__c,
+                'a stage the org no longer has falls back to its first stage instead of failing the load'
+            );
+
+            Integer calls = 0;
+            while (calls < 10 && GivingSampleDataLoader.removeNext() > 0) {
+                calls++;
+            }
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Ask__c],
+                'removal deletes every sample ask'
+            );
+            System.assertEquals(0, [SELECT COUNT() FROM Commitment__c]);
+        }
+    }
+
     @IsTest
     static void testWithNoDefaultFundTheSampleGeneralFundIsCreatedAndUsed() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

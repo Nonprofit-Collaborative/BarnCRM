@@ -2,7 +2,7 @@
 
 Scripts for the Ask Pipeline: stages, the board, moving and closing asks, and the gift or pledge a won ask can produce. Setup detail: [Ask Pipeline](../admin-guide/ask-pipeline.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded. Work in the **Fundraising** app. A default fund must be set (script T-GIFT-01 in [Giving: gifts, funds and batches](giving-gifts-funds-batches.md)). Sample data has no asks, so the board starts empty.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded. Work in the **Fundraising** app. A default fund must be set (script T-GIFT-01 in [Giving: gifts, funds and batches](giving-gifts-funds-batches.md)). Sample data adds 11 asks: seven open across every default stage (one past its target date, one for an organization), one declined, one withdrawn and two won as pledges.
 
 ## T-ASK-01: Stages in Settings
 

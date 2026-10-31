@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Sample_Data__c</fullName>
+  <label>Sample Data</label>
+  <type>Checkbox</type>
+  <defaultValue>false</defaultValue>
+  <trackTrending>false</trackTrending>
+  <description>
+    True when the record was created by the sample data loader so it can be removed in one action.
+  </description>
+  <inlineHelpText>
+    Checked for asks created by the sample data loader. Remove sample data from BarnCRM Settings to delete every
+    record with this box checked.
+  </inlineHelpText>
+</CustomField>

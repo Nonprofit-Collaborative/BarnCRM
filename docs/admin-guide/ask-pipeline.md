@@ -69,8 +69,6 @@ The **Asks** tab has the list views **Open Asks**, **My Open Asks** and **All As
 - **Linking another donor's gift.** The **Link a Gift or Pledge Already Entered** choice refuses a gift or pledge that belongs to a different donor.
 - **Expecting Next Ask Date to do something.** It records when to ask the donor again. This release does nothing else with it.
 - **Expecting private asks without the Setup step.** Until **Ask** is set to **Private** in Sharing Settings, everyone sees every ask.
-- **Looking for sample asks.** The sample data set does not include any in this release.
-
 ## Other Things Worth Knowing
 
 - **Deleting a donor** keeps the ask, with no donor, and it can still be closed.
