@@ -88,6 +88,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>DonorSegmentController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>FundSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -227,6 +231,11 @@
     <enabled>true</enabled>
     <name>Send_Acknowledgments</name>
   </customPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.Change_From_Last_Year__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
     <field>Account.Donor_Level_Changed_Date__c</field>
@@ -555,6 +564,11 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Commitment__c.Rollups_Last_Calculated__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.Change_From_Last_Year__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
