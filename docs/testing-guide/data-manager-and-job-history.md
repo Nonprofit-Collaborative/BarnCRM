@@ -33,7 +33,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | On **Data Manager**, click **Import a File**. | The **Import** tab opens. |
 | 2 | Go back to **Data Manager**. Press Tab until **Find and Export Records** has the focus ring, and press Enter. | The **Find** tab opens. |
-| 3 | Go back. Click **Update Many Records**. | The **Find** tab opens with the Bulk Update note (bulk update starts from a Find query). |
+| 3 | Go back. Click **Update Many Records**. | The **Super Transform** tab opens, with its five steps above **Data Jobs**. |
 | 4 | Go back. Click **Org Optimizer**. | The **Org Optimizer** tab opens on **Overview**. |
 | 5 | Go back. Click **Delete Many Records**. | A box titled **Delete Many Records** opens, reading "Deleted records go to the Recycle Bin. You can undo a bulk delete from Data Jobs, on this page, for up to 15 days.", with **Cancel** and a red **Continue** button. Nothing else has opened yet. |
 | 6 | Click **Cancel**. | The box closes and **Data Manager** stays open. No tab opens. |

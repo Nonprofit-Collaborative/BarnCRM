@@ -260,9 +260,9 @@ compare it with the page that came with the package.
   **Data Manager** is in the BarnCRM apps too, for anyone with the Find and Export, Bulk Update
   or Bulk Delete permission. Someone without the admin role who has the Duplicate Review
   permission opens Org Optimizer or Duplicate Matching by typing its name in the app launcher.
-- **Looking for Find, Import or Bulk Update in the navigation.** None is in any app's
+- **Looking for Find, Import or Super Transform in the navigation.** None is in any app's
   navigation: open **Data Manager** and choose the **Find and Export Records**, **Import a
-  File** or **Update Many Records** card. Recent bulk updates and their undo are under **Data
+  File** or **Update Many Records** (Super Transform) card. Recent bulk updates and their undo are under **Data
   Jobs** on the same page.
 - **Hiding a style and wondering why a person still has it as their default.** **App
   Navigation Style** takes the other style's apps away; the next time that person opens

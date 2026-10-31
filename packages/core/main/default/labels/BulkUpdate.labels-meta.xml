@@ -238,7 +238,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk Update tab: what the page is for.</shortDescription>
-        <value>A bulk update starts in Find: run a query, then choose Change Records, Bulk Update. Recent bulk updates and their undo are listed here.</value>
+        <value>Start a bulk update with Super Transform above, or from a saved query in Find (Change Records, Bulk Update). Recent bulk updates and their undo are listed here.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_PanelIntro</fullName>

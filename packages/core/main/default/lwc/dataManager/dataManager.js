@@ -52,12 +52,13 @@ import DATA_IMPORT_WIZARD_TEXT from '@salesforce/label/c.Core_DataManager_DataIm
 const TABS = {
   import: 'Import',
   find: 'Find',
-  update: 'Find',
+  // Super Transform (C-50) on the tab that kept the Bulk Update API name.
+  update: 'Bulk_Update',
   optimizer: 'Data_Hygiene',
   delete: 'Find'
 };
 /** The tiles that open Find for a bulk tool, and the tool Find's note names. */
-const BULK_TOOLS = { update: 'update', delete: 'delete' };
+const BULK_TOOLS = { delete: 'delete' };
 
 const LEARN_MORE_URL =
   'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/data-manager.md';
