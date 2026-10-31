@@ -462,3 +462,36 @@ Guessb,Other,Zztest
 | 6 | Select **Back** twice to the columns, then use the template again with `import-test-exact-wins.csv`. | **First Name** is mapped to **First Name** with no badge; **Frist Name** is **Do not load** with no badge, because the exact heading took the field. **Next** is enabled. |
 
 **Cleanup:** none; nothing was imported. Deactivate `Test best guess` if you do not keep it.
+
+## T-IMP-22: Relationships and Affiliations Templates
+
+**Purpose:** confirm the shipped Relationships and Affiliations templates exist and load without duplicates (C-49f1).
+**Prerequisites:** admin; a test org; the contacts `Ana Rowe` (`ana.rowe@example.org`), `Ben Rowe` (`ben.rowe@example.org`), `Cy Lund` (`cy.lund@example.org`) and an organization `Harbor Youth Club`. Save the two files as UTF-8 CSV.
+
+`import-test-relationships.csv`:
+
+```
+Person Email,Related Person Email,Relationship Type,Start Date
+ana.rowe@example.org,ben.rowe@example.org,Parent,2026-01-15
+cy.lund@example.org,ana.rowe@example.org,Friend,2026-02-01
+```
+
+`import-test-affiliations.csv`:
+
+```
+Person Email,Organization Name,Role,Is Primary,Start Date
+ana.rowe@example.org,Harbor Youth Club,Board,true,2026-01-01
+cy.lund@example.org,Harbor Youth Club,Volunteer,true,2026-02-01
+```
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the Import tab and choose **Your Templates**. | **Relationships** and **Affiliations** are listed, each with its description. |
+| 2 | Choose **Relationships**, upload `import-test-relationships.csv`, preview. | **would create** 2, **would be rejected** 0. |
+| 3 | Import. Open Ana Rowe. | Ana shows Ben as Child, Ben shows Ana as Parent: each other side exists once, so 4 relationship records in all. Cy and Ana each show the other as Friend. |
+| 4 | Import `import-test-relationships.csv` again. | **would be rejected** 2 with "already has this relationship"; no new records. |
+| 5 | Choose **Affiliations**, upload `import-test-affiliations.csv`, preview and import. | 2 created. Ana and Cy each show **Harbor Youth Club** as **Primary Affiliation**. |
+| 6 | Import `import-test-affiliations.csv` again. | 2 rejected with "already has an affiliation ... covering those dates"; nothing changes. |
+| 7 | In an org installed before this release, open the Import tab after the upgrade. | **Relationships** and **Affiliations** are added; existing templates are unchanged. |
+
+**Cleanup:** undo both imports from **Recent Imports** (see T-IMP-03); delete the test contacts and organization.
