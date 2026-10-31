@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Super Importer Row: an import row's file values beside its corrections and its reason, with
+    Save Corrections, Retry This Row and Retry All Fixed Rows for a rejected row (C-49b).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Super Importer Row</masterLabel>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage">
+      <objects>
+        <object>Import_Row__c</object>
+      </objects>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

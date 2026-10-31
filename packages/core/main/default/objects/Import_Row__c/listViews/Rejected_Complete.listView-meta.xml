@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Rejected_Complete</fullName>
+  <columns>NAME</columns>
+  <columns>Import_Batch__c</columns>
+  <columns>Row_Number__c</columns>
+  <columns>Status__c</columns>
+  <columns>CREATED_DATE</columns>
+  <filterScope>Everything</filterScope>
+  <filters>
+    <field>Status__c</field>
+    <operation>equals</operation>
+    <value>Rejected</value>
+  </filters>
+  <filters>
+    <field>Batch_Status__c</field>
+    <operation>equals</operation>
+    <value>Complete</value>
+  </filters>
+  <label>Rejected Rows of Complete Imports</label>
+</ListView>

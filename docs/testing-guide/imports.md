@@ -310,3 +310,20 @@ Nell,Ashby,nell.ashby@example.org,555-0303,Omar,Ashby,omar.ashby@example.org,555
 | 6 | Set **Delete Import Rows** back to **After 30 Days** and save. | Saved. |
 
 **Cleanup:** none.
+
+## T-IMP-16: Browse Import Rows, Correct a Rejected Row and Retry It
+
+**Purpose:** confirm a rejected row can be found, corrected on screen beside its file values, and retried into the same import, which one undo still covers.
+**Prerequisites:** admin; **Delete Import Rows** is not **Once Complete**; `import-test-1.csv`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Import `import-test-1.csv` with **Generic contact list** as in T-IMP-01, steps 1 to 8. | **Created** 3, **Rejected** 1 (Dee, no last name). |
+| 2 | In the **BarnCRM Admin** app, open the **Import Rows** tab and choose each list view: **All Import Rows**, **Rejected Import Rows**, **Rejected Rows of Complete Imports**. | Each shows rows with **Import Batch**, **Row Number**, **Status** and **Data Job Status**; the rejected views show Dee's row with **Data Job Status** Complete. |
+| 3 | Open Dee's row. | A **Super Importer Row** card shows **Status** Rejected, a link to the import, **Why It Was Rejected**, and a table of **Column**, **File Value** and **Corrected Value** for every column of the file. |
+| 4 | Type `Nolast` in **Corrected Value** beside **Last Name** and select **Save Corrections**. | "Corrections saved. The file's values are kept beside them." **File Value** for Last Name is still empty; **Raw Values** in the details below is unchanged; "1 corrected rows in this import are ready to retry." |
+| 5 | Select **Retry This Row**, wait a moment, then **Refresh**. | "The retry has started." Then **Status** reads Created and the inputs are gone. Dee Nolast exists, and the import's **Rejected** count is 0; its **Run Log** ends with "Retried 1 rows corrected on screen." |
+| 6 | Open a **Created** row of the same import. | The card shows its values read only, with no buttons. |
+| 7 | Undo the import from the Import tab (see T-IMP-03). | Testa Rivera, Ben Okoro, Cara Lind and Dee Nolast are all removed: one undo covers the retry. |
+
+**Cleanup:** none.
