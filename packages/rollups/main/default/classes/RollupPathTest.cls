@@ -16,28 +16,23 @@ private class RollupPathTest {
             RollupPath.Parsed parsed = RollupPath.parse('Household__c');
 
             System.Assert.areEqual(1, parsed.branches.size(), 'One alternative');
-            System.Assert.areEqual(1, parsed.onlyBranch().segments.size(), 'One segment');
+            System.Assert.areEqual(1, parsed.branches[0].segments.size(), 'One segment');
             System.Assert.isFalse(
                 parsed.needsHouseholdResolution(),
                 'A plain lookup needs no membership lookup'
-            );
-            System.Assert.areEqual(
-                '',
-                RollupPath.toGrandparentFieldPath(parsed.onlyBranch()),
-                'One hop is not a chain'
             );
         }
     }
 
     @IsTest
-    static void twoReferenceAttributesBecomeARelationshipChain() {
+    static void twoReferenceAttributesAreTwoHopsInOrder() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             RollupPath.Parsed parsed = RollupPath.parse('Gift_Allocation__c > Gift__c');
 
             System.Assert.areEqual(
-                'Gift_Allocation__r.Gift__r.Id',
-                RollupPath.toGrandparentFieldPath(parsed.onlyBranch()),
-                'Custom references walk as their relationship names and the chain ends at the parent id'
+                new List<String>{ 'Gift_Allocation__c', 'Gift__c' },
+                parsed.branches[0].segments,
+                'Each reference is one hop, in the order written'
             );
         }
     }
@@ -72,7 +67,7 @@ private class RollupPathTest {
             );
             System.Assert.areEqual(
                 new List<String>{ 'Donor_Contact__c' },
-                parsed.onlyBranch().referencePrefix(),
+                parsed.branches[0].referencePrefix(),
                 'The reference before the token is what reaches the person'
             );
         }

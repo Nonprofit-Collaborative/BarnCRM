@@ -206,7 +206,6 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             chooseSuite('nonprofit');
             String lowerCase = ModuleDetectionService.chosenSuite();
-            Boolean nonprofit = ModuleDetectionService.isNonprofitEdition();
             BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
             settings.Suite__c = ' Community ';
             update settings;
@@ -225,7 +224,6 @@ private class ModuleDetectionServiceTest {
                 lowerCase,
                 'Lower case is forgiven'
             );
-            Assert.isTrue(nonprofit, 'And it is the Nonprofit Edition');
             Assert.areEqual(
                 ModuleDetectionService.SUITE_STANDARD,
                 oldValue,

@@ -175,17 +175,12 @@ public with sharing class SettingsController {
     }
 
     /**
-     * `saveSettings` and `getRecentChanges` for another package (ConsoleSaveAcrossModulesTest):
-     * the platform rejects `@NamespaceAccessible` on an `@AuraEnabled` method.
+     * `saveSettings` for another package (ConsoleSaveAcrossModulesTest): the platform rejects
+     * `@NamespaceAccessible` on an `@AuraEnabled` method.
      */
     @NamespaceAccessible
     public static ConsoleModel save(Map<String, Object> values) {
         return saveSettings(values);
-    }
-
-    @NamespaceAccessible
-    public static List<ChangeModel> recentChanges(Integer limitCount) {
-        return getRecentChanges(limitCount);
     }
 
     @AuraEnabled

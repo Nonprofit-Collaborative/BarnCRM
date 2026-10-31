@@ -691,14 +691,16 @@ private class AddressServiceTest {
     @IsTest
     static void anAddressThatIsNotSeasonalIsNeverSeasonallyActive() {
         System.runAs(TestUsers.admin()) {
-            Assert.isFalse(AddressService.isSeasonalActiveToday(null), 'Nothing is not active.');
+            Date today = Date.today();
+            Assert.isFalse(AddressService.isSeasonalActiveOn(null, today), 'Nothing is not active.');
             Assert.isFalse(
-                AddressService.isSeasonalActiveToday(new Address__c(Type__c = 'Home')),
+                AddressService.isSeasonalActiveOn(new Address__c(Type__c = 'Home'), today),
                 'A home address is not a seasonal one.'
             );
             Assert.isFalse(
-                AddressService.isSeasonalActiveToday(
-                    new Address__c(Type__c = 'Seasonal', Seasonal_Start_Month__c = 1)
+                AddressService.isSeasonalActiveOn(
+                    new Address__c(Type__c = 'Seasonal', Seasonal_Start_Month__c = 1),
+                    today
                 ),
                 'A seasonal address with no full range cannot be judged.'
             );

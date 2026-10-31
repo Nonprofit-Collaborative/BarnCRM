@@ -141,11 +141,6 @@ public with sharing class ModuleDetectionService {
         return SUITE_BY_OLD_VALUE.get(suite.trim().toLowerCase());
     }
 
-    /** True only when the Nonprofit Edition is chosen: the one switch for nonprofit modules. */
-    public static Boolean isNonprofitEdition() {
-        return chosenSuite() == SUITE_NONPROFIT;
-    }
-
     /** The Giving module alone, for the suite step: whether it is here, and where to read and install it. */
     public static ModuleInfo givingModule() {
         BarnCRM_Module__mdt row = catalogRow(MODULE_GIVING);

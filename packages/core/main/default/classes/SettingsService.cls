@@ -1014,15 +1014,6 @@ public with sharing class SettingsService {
     }
 
     @NamespaceAccessible
-    public static String coexistenceMode() {
-        return storedOrDefault(
-            getSettings().Coexistence_Mode__c,
-            COEXISTENCE_MODES,
-            COEXISTENCE_MODE_DEFAULT
-        );
-    }
-
-    @NamespaceAccessible
     public static String householdMembershipMode() {
         return storedOrDefault(
             getSettings().Household_Membership_Mode__c,
