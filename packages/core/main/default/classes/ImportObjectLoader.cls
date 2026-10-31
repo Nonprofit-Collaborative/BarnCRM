@@ -67,6 +67,8 @@ public with sharing class ImportObjectLoader {
         Map<String, Item> parents = new Map<String, Item>();
         /** In a dry run, an existing record would be linked to a parent the commit creates. */
         Boolean linksNew = false;
+        /** The record an earlier pass created for this row, reused as it is (R-IT20). */
+        Boolean reused = false;
 
         Item(Import_Row__c row, Map<String, String> given) {
             this.row = row;
@@ -128,18 +130,21 @@ public with sharing class ImportObjectLoader {
             writeBack(lines, steps, outcome);
             return outcome;
         }
-        Set<Schema.SObjectType> created = mapping.loadsSeveralObjects() && dryRun
-            ? createdHere(steps)
-            : null;
+        Boolean several = mapping.loadsSeveralObjects();
+        Set<Schema.SObjectType> created = several && dryRun ? createdHere(steps) : null;
+        if (several) {
+            // A row loaded again reuses what an earlier pass created for it (R-IT20).
+            reuseLoaded(batch, lines, steps);
+        }
         List<List<Map<String, Object>>> createdPages = new List<List<Map<String, Object>>>();
         for (Integer index = 0; index < steps.size(); index++) {
             List<Map<String, Object>> page = new List<Map<String, Object>>();
             Step step = new Step(steps, index, created);
             attachParents(lines, step.given, index);
-            load(batch, step, itemsOf(lines, index), dryRun, outcome, page);
+            load(batch, step, loadable(itemsOf(lines, index)), dryRun, outcome, page);
             createdPages.add(page);
         }
-        writeBack(lines, steps, outcome);
+        writeBack(lines, steps, outcome, several && !dryRun);
         if (!dryRun && !journal(batch.Id, outcome.journal, createdPages)) {
             outcome.notes.add(Label.Core_Import_LogJournalFailed);
         }
@@ -184,6 +189,8 @@ public with sharing class ImportObjectLoader {
         /** Why the whole row is rejected before any step: unreadable, empty or refused. */
         String error;
         List<Item> items = new List<Item>();
+        /** The records earlier passes created for this row, by object in lower case (R-IT20). */
+        Map<String, Id> loaded = new Map<String, Id>();
 
         Line(Import_Row__c row) {
             this.row = row;
@@ -279,6 +286,148 @@ public with sharing class ImportObjectLoader {
             if (item != null) {
                 result.add(item);
             }
+        }
+        return result;
+    }
+
+    /** The items a step loads: all but the records reused from an earlier pass (R-IT20). */
+    private static List<Item> loadable(List<Item> items) {
+        List<Item> result = new List<Item>();
+        for (Item item : items) {
+            if (!item.reused) {
+                result.add(item);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Reuses, for a row loaded again, each record an earlier pass created for it and the user
+     * can still see (R-IT20): the record is not created, changed or journaled again, and the
+     * row's other records link to it, so a retry never makes a second copy. A record that is
+     * gone is created again.
+     */
+    private static void reuseLoaded(
+        Import_Batch__c batch,
+        List<Line> lines,
+        List<ImportObjectSchema.Step> steps
+    ) {
+        readLoaded(batch, lines);
+        for (Integer index = 0; index < steps.size(); index++) {
+            ImportObjectSchema.Step step = steps[index];
+            String entity = step.entity == null ? '' : step.entity.toLowerCase();
+            Set<Id> ids = new Set<Id>();
+            for (Line line : lines) {
+                Id prior = line.loaded.get(entity);
+                if (line.error == null && line.items[index] != null && prior != null) {
+                    ids.add(prior);
+                }
+            }
+            if (ids.isEmpty() || step.type == null) {
+                continue;
+            }
+            Set<Id> visible = visibleIds(step.type, ids);
+            for (Line line : lines) {
+                Item item = line.items[index];
+                Id prior = line.loaded.get(entity);
+                if (line.error == null && item != null && visible.contains(prior)) {
+                    item.reused = true;
+                    item.recordId = prior;
+                }
+            }
+        }
+    }
+
+    /**
+     * Each row's Loaded Records (R-IT20): its own, from an earlier pass of the same row, over
+     * those of the rejected row a retry's fixed row names in its Row column (R-IB17). Read in
+     * system mode, as the bookkeeping is written (ADR-0021).
+     */
+    private static void readLoaded(Import_Batch__c batch, List<Line> lines) {
+        Set<Id> rowIds = new Set<Id>();
+        Map<Integer, Decimal> originalByLine = new Map<Integer, Decimal>();
+        Decimal after = batch != null && batch.isSet(Import_Batch__c.Retry_After_Row__c)
+            ? batch.Retry_After_Row__c
+            : null;
+        for (Integer i = 0; i < lines.size(); i++) {
+            Import_Row__c row = lines[i].row;
+            if (row.Id != null) {
+                rowIds.add(row.Id);
+            }
+            if (after != null && row.Row_Number__c != null && row.Row_Number__c > after) {
+                Decimal original = originalRowOf(row);
+                if (original != null && original <= after) {
+                    originalByLine.put(i, original);
+                }
+            }
+        }
+        Set<Decimal> numbers = new Set<Decimal>(originalByLine.values());
+        Id batchId = batch == null ? null : batch.Id;
+        Map<Id, Map<String, Id>> byId = new Map<Id, Map<String, Id>>();
+        Map<Decimal, Map<String, Id>> byNumber = new Map<Decimal, Map<String, Id>>();
+        for (Import_Row__c found : [
+            SELECT Id, Row_Number__c, Loaded_Records_JSON__c
+            FROM Import_Row__c
+            WHERE Id IN :rowIds OR (Import_Batch__c = :batchId AND Row_Number__c IN :numbers)
+            WITH SYSTEM_MODE
+        ]) {
+            Map<String, Id> loaded = loadedOf(found.Loaded_Records_JSON__c);
+            if (rowIds.contains(found.Id)) {
+                byId.put(found.Id, loaded);
+            }
+            if (found.Row_Number__c != null && numbers.contains(found.Row_Number__c)) {
+                byNumber.put(found.Row_Number__c, loaded);
+            }
+        }
+        for (Integer i = 0; i < lines.size(); i++) {
+            Line line = lines[i];
+            Map<String, Id> original = byNumber.get(originalByLine.get(i));
+            if (original != null) {
+                line.loaded.putAll(original);
+            }
+            Map<String, Id> own = byId.get(line.row.Id);
+            if (own != null) {
+                line.loaded.putAll(own);
+            }
+        }
+    }
+
+    /** The original row a retry's fixed row names in its Row column, or null. */
+    private static Decimal originalRowOf(Import_Row__c row) {
+        Object parsed;
+        try {
+            parsed = JSON.deserializeUntyped(row.Raw_Values_JSON__c);
+        } catch (Exception e) {
+            return null;
+        }
+        if (!(parsed instanceof Map<String, Object>)) {
+            return null;
+        }
+        Map<String, Object> raw = (Map<String, Object>) parsed;
+        for (String column : raw.keySet()) {
+            if (column == null || !column.trim().equalsIgnoreCase(Label.Core_Import_ResultsRow)) {
+                continue;
+            }
+            String text = raw.get(column) == null ? '' : String.valueOf(raw.get(column)).trim();
+            return text.isNumeric() ? Decimal.valueOf(text) : null;
+        }
+        return null;
+    }
+
+    /** A row's Loaded Records document as object to record ID; empty when blank or unreadable. */
+    private static Map<String, Id> loadedOf(String document) {
+        Map<String, Id> result = new Map<String, Id>();
+        if (String.isBlank(document)) {
+            return result;
+        }
+        try {
+            Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(document);
+            for (String entity : parsed.keySet()) {
+                result.put(entity.toLowerCase(), Id.valueOf(String.valueOf(parsed.get(entity))));
+            }
+        } catch (Exception e) {
+            // An unreadable document reuses nothing: the row loads as if for the first time.
+            result.clear();
         }
         return result;
     }
@@ -1516,6 +1665,16 @@ public with sharing class ImportObjectLoader {
         List<ImportObjectSchema.Step> steps,
         ImportRowProcessor.Outcome outcome
     ) {
+        writeBack(lines, steps, outcome, false);
+    }
+
+    /** As above; `records` also writes each row's Loaded Records after a commit (R-IT20). */
+    private static void writeBack(
+        List<Line> lines,
+        List<ImportObjectSchema.Step> steps,
+        ImportRowProcessor.Outcome outcome,
+        Boolean records
+    ) {
         List<Import_Row__c> rows = new List<Import_Row__c>();
         for (Line line : lines) {
             Import_Row__c row = line.row;
@@ -1561,9 +1720,34 @@ public with sharing class ImportObjectLoader {
                     result.digest.key
                 );
             }
+            if (records && line.error == null) {
+                recordLoaded(line, steps);
+            }
             rows.add(row);
         }
         ImportRowProcessor.saveRows(rows, outcome, 'ImportObjectLoader.writeBack');
+    }
+
+    /**
+     * Keeps on the row each record it created or reused, by object, over what earlier passes
+     * kept, rejected or not: loading it again then creates only what is missing (R-IT20).
+     */
+    private static void recordLoaded(Line line, List<ImportObjectSchema.Step> steps) {
+        Map<String, Id> loaded = new Map<String, Id>(line.loaded);
+        for (Integer index = 0; index < steps.size(); index++) {
+            Item item = line.items[index];
+            if (
+                item != null &&
+                item.error == null &&
+                item.recordId != null &&
+                (item.reused || item.creates)
+            ) {
+                loaded.put(steps[index].entity.toLowerCase(), item.recordId);
+            }
+        }
+        if (!loaded.isEmpty()) {
+            line.row.Loaded_Records_JSON__c = JSON.serialize(loaded);
+        }
     }
 
     /** One row's outcome over its steps (R-IT17, R-IT20). */

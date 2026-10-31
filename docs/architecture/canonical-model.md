@@ -2732,7 +2732,8 @@ replaces the related records of R-IT17 as a separate path). The R-IT1 document t
 operation (Insert when blank, never Delete) and the field an upsert or an update by a matching
 field finds records by. Its columns and values for every row target `<object API name>.<field>`;
 a column of an object the list does not hold refuses the save, as does an object listed twice.
-The Target Object is the first object listed. No field is added.
+The Target Object is the first object listed. Import Row gains Loaded Records
+(`Loaded_Records_JSON__c`), below.
 
 - **Steps.** Each chunk loads the objects in steps, each one the R-IT12 to R-IT19 load of one
   object over the rows that have a value of their own for it (a value for every row alone does
@@ -2758,8 +2759,16 @@ The Target Object is the first object listed. No field is added.
   label; otherwise Created when it created a record, Updated when it changed one, else Matched.
   Resulting Record holds the row's first record in load order. A failed child leaves its saved
   parent.
+- **Loading a row again.** A commit writes each row's Loaded Records: a document of the
+  records it created, `{ "<object API name, lower case>": "<record ID>" }`, kept from earlier
+  passes, written even when the row is rejected. When the row is loaded again (a retry of the
+  same row, or a retry's fixed row whose Row column names it, R-IB17), each object with a
+  recorded record the user can still see reuses that record as it is: it is not created, updated
+  or journaled again, and the row's other records link to it. Only what is missing is created,
+  so a retry never makes a second copy. A recorded record that is gone is created again.
 - **Undo.** Each object's created records are journaled on Created pages in load order, so the
   undo's Created pass deletes children before parents; updates are journaled as for one object.
+  A reused record was journaled by the pass that created it, so one undo removes it once.
 - **Related records.** A template with a Related Object (R-IT17) runs as two steps of this
   engine: the target object, grouped by its key, then the related object, always inserted and
   linked through the Related Parent Field; R-IT17's results are kept.
@@ -3486,9 +3495,10 @@ when the corrected row is loaded again.
 | Several Matches | `Several_Matches__c` | Checkbox |
 | Matched By Duplicate Rule | `Duplicate_Rule_Match__c` | Checkbox |
 | Related Status | `Related_Status__c` | Text (20) |
+| Loaded Records | `Loaded_Records_JSON__c` | Long Text Area (32768) |
 
-The seven keys (Row Key included) and the row's Pass Number are bookkeeping written and read in system mode
-(ADR-0021), in no permission set. The keys are marked External ID only so that they are
+The seven keys (Row Key included), the row's Pass Number and Loaded Records (R-IT20) are
+bookkeeping written and read in system mode (ADR-0021), in no permission set. The keys are marked External ID only so that they are
 indexed; they are not unique, and nothing outside the import reads them.
 
 - **Service:** `ImportRowProcessor`, `ImportMatcher`, `ImportRowSelector`,

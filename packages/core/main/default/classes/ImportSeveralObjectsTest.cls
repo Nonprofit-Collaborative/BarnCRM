@@ -4,7 +4,9 @@
  * parent, at 260 rows over two chunks with repeated parents; a failed parent rejecting the
  * records that point at it; a failed child leaving its parent; rows of two sheets, one object
  * each, linked by a lookup column; the dry run writing nothing; one undo for every object; an
- * existing link kept; and legacy related records running as two steps. The load order, links
+ * existing link kept; legacy related records running as two steps; and a row loaded again
+ * (in place, or as a retry's fixed row at 260 rows) reusing what it created, never a copy, with
+ * one undo removing it once. The load order, links
  * and refusals are in `ImportSeveralObjectsSchemaTest`.
  *
  * Organizations stand for the parent (updated by a matching field, their name), people for a
@@ -445,6 +447,227 @@ private class ImportSeveralObjectsTest {
                     [SELECT COUNT() FROM Account WHERE Id IN :orgs AND Phone = '555-0000'],
                     'And each parent holds its value from before.'
                 );
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------------------------
+    // Loading a row again (R-IT20): what a row created is reused, never copied
+    // -------------------------------------------------------------------------------------
+
+    /**
+     * Saved queries created (the one Core object a row can insert that nothing else needs),
+     * organizations updated by name and affiliations created pointing at them, listed in that
+     * order: a saved query is created before its row's affiliation can fail.
+     */
+    private static ImportMapping queriesAndAffiliations() {
+        ImportMapping mapping = organizationsAndAffiliations();
+        mapping.objects.add(
+            0,
+            new ImportMapping.ObjectStep(
+                'Saved_Query__c',
+                ImportObjectSchema.OPERATION_INSERT,
+                null
+            )
+        );
+        mapping.columns.add(new ImportMapping.Column('Query', 'Saved_Query__c.Name'));
+        mapping.columns.add(new ImportMapping.Column('About', 'Saved_Query__c.Object_Name__c'));
+        mapping.columns.add(new ImportMapping.Column('Json', 'Saved_Query__c.Query_JSON__c'));
+        return mapping;
+    }
+
+    private static Map<String, String> queryRow(Integer index, Id personId, String role) {
+        Map<String, String> result = row('Org 0', null, personId, role);
+        result.put('Query', 'Zzretry ' + index);
+        result.put('About', 'Contact');
+        result.put('Json', '{}');
+        return result;
+    }
+
+    private static final String TOO_LONG = 'R'.repeat(300);
+
+    /** The batch as a commit sees it, so its undo can run. */
+    private static void committing() {
+        update new Import_Batch__c(
+            Id = batch.Id,
+            Is_Dry_Run__c = false,
+            Status__c = ImportBatchService.STATUS_COMMITTING,
+            Started_At__c = Datetime.now().addMinutes(-1),
+            Committed_By__c = UserInfo.getUserId(),
+            Undo_Deadline__c = Datetime.now().addDays(30)
+        );
+        batch = ImportBatchSelector.selectById(batch.Id);
+    }
+
+    private static void undo() {
+        update new Import_Batch__c(
+            Id = batch.Id,
+            Status__c = ImportBatchService.STATUS_COMPLETE,
+            Completed_At__c = Datetime.now()
+        );
+        ImportUndoService.Preview view = ImportUndoService.preview(batch.Id);
+        Datetime undoStartedAt = Datetime.now();
+        for (String pass : ImportUndoBatch.passes()) {
+            ImportUndoBatch job = new ImportUndoBatch(
+                batch.Id,
+                view.total,
+                pass,
+                0,
+                false,
+                undoStartedAt
+            );
+            Database.QueryLocatorIterator records = job.start(null).iterator();
+            List<SObject> scope = new List<SObject>();
+            while (records.hasNext()) {
+                scope.add(records.next());
+            }
+            if (!scope.isEmpty()) {
+                job.execute(null, scope);
+            }
+        }
+    }
+
+    private static Integer savedQueries() {
+        return [SELECT COUNT() FROM Saved_Query__c WHERE Name LIKE 'Zzretry %'];
+    }
+
+    @IsTest
+    static void aRowLoadedAgainReusesWhatItCreatedAndCreatesOnlyWhatIsMissing() {
+        System.runAs(TestUsers.admin()) {
+            System.runAs(admin()) {
+                Account org = organizations(1)[0];
+                Contact ana = person();
+                given(
+                    queriesAndAffiliations(),
+                    new List<Map<String, String>>{ queryRow(0, ana.Id, TOO_LONG) }
+                );
+                committing();
+                chunk(2, 2, false);
+                Import_Row__c failed = [
+                    SELECT Id, Status__c, Loaded_Records_JSON__c
+                    FROM Import_Row__c
+                    WHERE Import_Batch__c = :batch.Id
+                    WITH SYSTEM_MODE
+                ];
+                Assert.areEqual('Rejected', failed.Status__c, 'The affiliation failed.');
+                Assert.areEqual(1, savedQueries(), 'Its saved query was created.');
+                Assert.isTrue(
+                    failed.Loaded_Records_JSON__c.contains('saved_query__c'),
+                    'And kept on the row: ' + failed.Loaded_Records_JSON__c
+                );
+
+                Test.startTest();
+                // The row fixed and loaded again, as a retry of the same row does.
+                update as system new Import_Row__c(
+                    Id = failed.Id,
+                    Raw_Values_JSON__c = JSON.serialize(queryRow(0, ana.Id, 'Member'))
+                );
+                ImportRowProcessor.Outcome again = chunk(2, 2, false);
+                Test.stopTest();
+
+                Assert.areEqual(1, again.created, rowErrors());
+                Assert.areEqual(1, savedQueries(), 'One saved query, reused, never a copy.');
+                Affiliation__c made = [SELECT Organization__c, Contact__c FROM Affiliation__c];
+                Assert.areEqual(org.Id, made.Organization__c, 'The missing child, linked.');
+                Saved_Query__c kept = [SELECT Id FROM Saved_Query__c WHERE Name = 'Zzretry 0'];
+                Assert.areEqual(String.valueOf(kept.Id), rows()[0].Gift_Id__c, 'Its record.');
+
+                undo();
+                Assert.areEqual(0, savedQueries(), 'Undo removes the reused record once.');
+                Assert.areEqual(0, [SELECT COUNT() FROM Affiliation__c], 'And the child.');
+            }
+        }
+    }
+
+    @IsTest
+    static void aRetrysFixedRowsReuseTheRecordsTheirRejectedRowsCreatedAtTwoHundredSixtyRows() {
+        System.runAs(TestUsers.admin()) {
+            System.runAs(admin()) {
+                organizations(1);
+                Contact ana = person();
+                Integer count = MANY + REPEATS;
+                List<Map<String, String>> values = new List<Map<String, String>>();
+                for (Integer i = 0; i < count; i++) {
+                    values.add(queryRow(i, ana.Id, TOO_LONG));
+                }
+                given(queriesAndAffiliations(), values);
+                committing();
+                chunk(2, MANY + 1, false);
+                chunk(MANY + 2, count + 1, false);
+                Assert.areEqual(count, savedQueries(), 'Every saved query was created.');
+                Assert.areEqual(0, [SELECT COUNT() FROM Affiliation__c], 'No child loaded.');
+
+                // A retry's fixed rows, numbered after the import's own, each naming its
+                // rejected row in the exceptions file's Row column (R-IB17).
+                Decimal after = count + 1;
+                update as system new Import_Batch__c(Id = batch.Id, Retry_After_Row__c = after);
+                List<Import_Row__c> fixedRows = new List<Import_Row__c>();
+                for (Integer i = 0; i < count; i++) {
+                    Map<String, String> fixedRow = queryRow(i, ana.Id, 'Member');
+                    fixedRow.put(Label.Core_Import_ResultsRow, String.valueOf(i + 2));
+                    fixedRows.add(
+                        new Import_Row__c(
+                            Import_Batch__c = batch.Id,
+                            Row_Number__c = after + i + 1,
+                            Raw_Values_JSON__c = JSON.serialize(fixedRow),
+                            Status__c = ImportRowProcessor.STATUS_PENDING
+                        )
+                    );
+                }
+                insert as system fixedRows;
+                batch = ImportBatchSelector.selectById(batch.Id);
+                Integer first = after.intValue() + 1;
+
+                Test.startTest();
+                ImportRowProcessor.Outcome preview = chunk(first, first + MANY - 1, true);
+                Assert.areEqual(count, savedQueries(), 'The dry run writes nothing.');
+                // The commit is a pass of its own, as after any dry run.
+                ImportBatchService.beginPass(batch.Id);
+                batch = ImportBatchSelector.selectById(batch.Id);
+                ImportRowProcessor.Outcome one = chunk(first, first + MANY - 1, false);
+                ImportRowProcessor.Outcome two = chunk(first + MANY, first + count - 1, false);
+                Test.stopTest();
+
+                Assert.areEqual(MANY, preview.created, 'Each would create its child only.');
+                Assert.areEqual(0, one.rejected + two.rejected, rowErrors());
+                Assert.areEqual(count, one.created + two.created, rowErrors());
+                Assert.areEqual(count, savedQueries(), 'Not one saved query copied.');
+                Assert.areEqual(
+                    count,
+                    [SELECT COUNT() FROM Affiliation__c WHERE Contact__c = :ana.Id],
+                    'Every missing child created.'
+                );
+            }
+        }
+    }
+
+    @IsTest
+    static void aReusedRecordDeletedSinceIsCreatedAgain() {
+        System.runAs(TestUsers.admin()) {
+            System.runAs(admin()) {
+                organizations(1);
+                Contact ana = person();
+                given(
+                    queriesAndAffiliations(),
+                    new List<Map<String, String>>{ queryRow(0, ana.Id, TOO_LONG) }
+                );
+                chunk(2, 2, false);
+                delete [SELECT Id FROM Saved_Query__c WHERE Name = 'Zzretry 0'];
+                Import_Row__c failed = rows()[0];
+
+                Test.startTest();
+                update as system new Import_Row__c(
+                    Id = [SELECT Id FROM Import_Row__c WHERE Import_Batch__c = :batch.Id]
+                    .Id,
+                    Raw_Values_JSON__c = JSON.serialize(queryRow(0, ana.Id, 'Member'))
+                );
+                ImportRowProcessor.Outcome again = chunk(2, 2, false);
+                Test.stopTest();
+
+                Assert.areEqual('Rejected', failed.Status__c, 'It failed the first time.');
+                Assert.areEqual(1, again.created, rowErrors());
+                Assert.areEqual(1, savedQueries(), 'The gone record is made again, once.');
+                Assert.areEqual(1, [SELECT COUNT() FROM Affiliation__c], 'With its child.');
             }
         }
     }

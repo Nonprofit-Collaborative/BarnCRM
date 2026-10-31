@@ -913,9 +913,12 @@ How it loads:
   before the reason; otherwise it counts as created when it created any record, updated when it
   changed one, and matched when nothing changed. **Download Results** gives each row's first
   record in load order.
-- **Load again with care.** Loading a rejected row again loads all its objects again: an object
-  under **Create new records** that was saved the first time is created again. Upserts and
-  updates find their records instead.
+- **Loading a row again never makes a copy.** BarnCRM remembers the records each row created,
+  even when the row was rejected. Retry the row, or retry a fixed file that keeps the **Row**
+  column of the exceptions file, and each record the row already created is reused as it is:
+  only the missing ones are created, and they are linked to it. A record deleted since is
+  created again. Keep the **Row** column when you fix the file; a row without it is loaded as a
+  new row. One undo removes everything the import created, once.
 
 **Undo** works as in section 5: it deletes the records the import created, children before
 their parents, and puts back the values it changed.

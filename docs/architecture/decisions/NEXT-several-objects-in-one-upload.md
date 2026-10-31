@@ -76,8 +76,12 @@ parent and child load rather than becoming a third load path.
 - Existing related-records templates keep loading through the same rules; the wizard no longer
   offers the related records choice for a new template and offers Several Objects in One File.
 - Account and Contact stay update-only (R-IT14) in an upload of several objects.
-- Retrying a rejected row of several objects loads all its objects again: under Insert, one that
-  was saved the first time is created again. Upsert and the updates find it instead.
+- A row never makes a second copy: Import Row gains Loaded Records, the records each commit
+  created for the row by object, kept even when the row is rejected. Loading the row again (a
+  retry of the row itself, or a retry's fixed row naming it in the Row column) reuses each
+  recorded record the user can still see, as it is, and creates only what is missing, linked to
+  it. A reused record was journaled by the pass that created it, so one undo removes it once.
+  A fixed row without the Row column is a new row and creates its records anew.
 - A second keyed parent's repeats across chunks are not seen through digests: under Upsert the
   later row finds the record by its key in the commit; a dry run may count it as created again.
 - The results file shows one Resulting Record a row.
