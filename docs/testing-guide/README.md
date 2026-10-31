@@ -44,7 +44,7 @@ page, even if that puts it out of reading order.
 | [Apps and Navigation](apps-and-navigation.md) | APP | 3 | The four BarnCRM apps, who sees each, their tabs, App Navigation Style, module pages in them |
 | [Settings and Module Manager](settings-and-module-manager.md) | SET | 19 | BarnCRM Settings console, Access, Module Manager, editions, automation control, home page, organization address, values from Setup, Integrations, People and Households and boxes, keeping a shown default, Finish Setup |
 | [Setup Assistant](setup-assistant.md) | SA | 11 | First-run setup, edition choice, Setup Assistant steps, sample data load and remove |
-| [Imports](imports.md) | IMP | 16 | Import wizard, templates, row rules, matching (including match sources), several sheets, two-part headings, undo |
+| [Imports](imports.md) | IMP | 17 | Import wizard, templates, row rules, matching (including match sources), several sheets, two-part headings, several objects in one file, undo |
 | [Find](find.md) | FIND | 10 | Query builder, typed queries, export, saved queries, summaries, Show More |
 | [Bulk update and delete](bulk-update-and-delete.md) | BULK | 10 | Bulk update, bulk delete, edit in Find, undo, the bulk path |
 | [Data Manager and job history](data-manager-and-job-history.md) | DM | 11 | Data Manager, data jobs and undo, data quality checks, field utilization and its snapshot history |

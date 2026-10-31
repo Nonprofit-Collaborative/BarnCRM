@@ -33,8 +33,9 @@ have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matc
 **Import** and **Bulk Update** are not in the navigation: open them from their cards on the
 **Data Manager** tab. If you import files, the **Check Columns** step shows a few example
 values beside each column, so you can see each column lands in the right field before
-anything loads; an Excel workbook can load several of its sheets at once. The Admin Guide's
-Importing page has the detail.
+anything loads; an Excel workbook can load several of its sheets at once, each into its own
+kind of record if the template loads several. The Admin Guide's Importing page has the
+detail.
 
 The **Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,
 **Organizations**, **Gifts**, **Commitments**, **Gift Batches**, **Funds**, **Appeals**,

@@ -230,14 +230,14 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab. | **What Are You Importing?** with an icon card for **People and Organizations**, **One Kind of Record**, **Records With Their Related Records** and **Your Templates** (and **Gifts** and **Delete the Records a File Lists** where steps 3 and 5 say). Each card says what it creates. None is chosen and **Next** is not shown. |
+| 1 | Open the Import tab. | **What Are You Importing?** with an icon card for **People and Organizations**, **One Kind of Record**, **Several Objects in One File** and **Your Templates** (and **Gifts** and **Delete the Records a File Lists** where steps 3 and 5 say). Each card says what it creates. None is chosen and **Next** is not shown. |
 | 2 | In a Core-only org, look at the cards. | There is no **Gifts** card. |
 | 3 | In an org with Giving installed, look at the cards, then choose **Gifts**. | A **Gifts** card shows. It is marked as chosen and the cards stay on screen. Its **Template** picker lists only gift templates (for example **Generic gift list**), the first is chosen, and **Next** is enabled. |
 | 3a | Tab to the cards and press the arrow keys. | The choice moves from card to card like radio buttons, and what shows below follows the chosen card. |
 | 4 | Choose **People and Organizations**. | The **Template** picker lists only people templates and the first is chosen for you. The line under it says what it creates. **Next** is enabled. |
 | 5 | Log in as an admin without **Bulk Delete Records** and open the Import tab. Then log in as one with it. | The first sees no **Delete the Records a File Lists** card. The second sees it, with a warning icon. |
 | 6 | Choose **One Kind of Record**. | **Object**, **Template name** and **Create** show. **Next** is not shown until a template is created. Choose **Account**, name it `Test cards account`, select **Create**: the template is chosen and the line reads "Loads: Account". |
-| 7 | Choose **Records With Their Related Records**, choose **Account**, name it `Test cards related`, select **Create**, then **Next**, upload any CSV and go to the matching step. | **What each row does** shows **Update by record ID** (an account offers no upsert; an object with an External ID field starts on **Update or create, matched by external ID**), and the **Related records** picker is shown, listing Affiliation. |
+| 7 | Choose **Several Objects in One File**. | **Objects to load** (a list to move objects across), **Template name** and **Create** show, with no **Object** picker. **Create** is disabled until an object is chosen and the template is named. T-IMP-17 covers the rest. |
 | 8 | Select **Back** to the first step, then choose **Delete the Records a File Lists** (as the holder of **Bulk Delete Records**), choose **Contact**, name it `Test cards delete`, select **Create**. | The template is chosen and the line reads "Deletes: Contact". On the matching step **Delete by record ID** is chosen. |
 | 9 | Choose **One Kind of Record**, then **Delete the Records a File Lists** again, and choose an object whose records you may create or edit but not delete (for example a custom object your permission sets give Read, Create and Edit but not Delete). | "This object's records cannot be deleted by file, so the template creates or updates them instead. To pick another object, choose another card, then this one again." |
 | 10 | Choose **Your Templates**. | Every active template shows with its description, what it creates, and **Last loaded** with a date or **Not loaded yet**. Each has a **Use This Template** button. |
@@ -338,3 +338,35 @@ Make `contacts_2026.xlsx` with two sheets: **Contacts** (headings `First Name` a
 | 7 | Choose **One Kind of Record**, and under **Suggest the object from a file** choose a file named `budget.csv` with the heading `Amount`. | "Nothing in the file names an object you can load. Choose one from the list." No object is chosen. |
 
 **Cleanup:** none; nothing was imported. Deactivate the `Test two-part contact` and `Test sheets suggest` templates if you do not keep them.
+
+## T-IMP-17: Several Objects in One File
+
+**Purpose:** confirm one upload loads several objects: each sheet into its own object, several objects from one row through two-part headings, records on a row linked, records on another sheet linked by a lookup column, parents before children, a failed parent rejecting its row, and one undo for all (C-49c, D-154).
+**Prerequisites:** admin; no real data; a test contact whose record ID you have. Accounts are update-only in an import, so first create two accounts by hand: `Zzsev Org A` and `Zzsev Org B`. Make `import-test-several.xlsx` with two sheets, in this order:
+
+- **Affiliations**: headings `Organization`, `Role`; rows `Zzsev Org A`, `Member` and `Zzsev Org B`, `Board`.
+- **Accounts**: headings `Account Name`, `Phone`; rows `Zzsev Org A`, `555-0801` and `Zzsev Org B`, `555-0802`.
+
+Save `import-test-one-row.csv` as UTF-8, with the test contact's record ID in both rows:
+
+```
+Account.Name,Affiliation.Role,Contact.Id,Contact.Title
+Zzsev Org A,Volunteer,<contact record ID>,Zzsev Title
+Zzsev Nowhere,Volunteer,<contact record ID>,Zzsev Title
+```
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the Import tab, choose **Several Objects in One File**, and under **Suggest the object from a file (optional)** choose `import-test-several.xlsx`. | **Objects to load** already holds **Affiliation** and **Account** (from the sheet names). |
+| 2 | Name the template `Test several sheets` and select **Create**. | The template is chosen and the line reads "Loads: Account, Affiliation". |
+| 3 | Select **Next**. | The file is read without a second upload. **Object for Affiliations** is **Affiliation** and **Object for Accounts** is **Account**. The columns list **Account Name** and **Phone** first (the parents' sheet loads first, whatever the file's order), then **Organization** and **Role**. |
+| 4 | Map **Organization** to the affiliation's organization field and set **Find it by** to **Account Name**. Select **Next**. | One box per object, Account first, each with **What each row does**; Account offers only the updates. Below the boxes, one **When a lookup finds no record** choice. |
+| 5 | For **Account** choose **Update by a field you choose**, with **Match rows on** set to **Account Name**; leave **Affiliation** on **Create new records**. Select **Dry Run**. | 4 rows: the 2 Accounts rows would update their accounts, the 2 Affiliations rows would each create an affiliation. Nothing is written. |
+| 6 | Select **Commit**, then open each new affiliation. | Each points at its organization. |
+| 7 | Run the template again and, on the column step, change **Object for Accounts** to **Affiliation**, then back to **Account**. | The sheet's columns are mapped again for the chosen object each time. Leave without loading. |
+| 8 | Create `Test several one row` from **Several Objects in One File** with **Account**, **Affiliation** and **Contact**, upload `import-test-one-row.csv`, and go to the matching step. | Under **Affiliation**, lines say each affiliation is linked to the Account record and to the Contact record on its row. |
+| 9 | Set **Account** to update by **Account Name** and **Contact** to **Update by record ID**, then dry run and commit. | Row 1 updates the account and the contact's Title and creates an affiliation linked to both, with no column for either link. Row 2 is rejected with a reason starting "Account:"; its contact is not updated again and its affiliation is not created, since both point at the account. A contact with an account keeps it; one with none gets `Zzsev Org A`. |
+| 10 | Undo both imports from **Recent Imports**. | The affiliations are deleted and the phones and the contact's Title go back to what they were. |
+| 11 | Open a one-object template saved with **Related records** before this change, if the org has one, and dry run a file. | It still shows **Related records** under a parent key and loads both as before. |
+
+**Cleanup:** deactivate the test templates and delete the test accounts.
