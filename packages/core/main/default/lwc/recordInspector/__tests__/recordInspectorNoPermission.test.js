@@ -5,6 +5,15 @@ jest.mock('@salesforce/apex/RecordInspectorController.inspect', () => ({ default
   virtual: true
 });
 
+jest.mock(
+  '@salesforce/apex/DataManagerController.findToolStateKey',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+
 jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: false }), {
   virtual: true
 });

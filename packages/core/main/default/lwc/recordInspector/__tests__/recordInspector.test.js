@@ -1,11 +1,38 @@
 import { createElement } from 'lwc';
 import RecordInspector from 'c/recordInspector';
 import inspect from '@salesforce/apex/RecordInspectorController.inspect';
+import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 import { filterRows, normalize } from '../inspectorRows';
 
 jest.mock('@salesforce/apex/RecordInspectorController.inspect', () => ({ default: jest.fn() }), {
   virtual: true
 });
+
+jest.mock(
+  '@salesforce/apex/DataManagerController.findToolStateKey',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, __esModule: true };
+  },
+  { virtual: true }
+);
 
 jest.mock('@salesforce/label/c.Core_RecordInspector_Count', () => ({ default: '{0} fields' }), {
   virtual: true
@@ -150,6 +177,33 @@ describe('c-record-inspector', () => {
     await flush();
 
     expect(q(element, '[data-id="error-message"]')).not.toBeNull();
+  });
+
+  it('opens Find on the record object', async () => {
+    inspect.mockResolvedValue({ ...INSPECTION, objectApiName: 'Error_Log__c' });
+    const element = mount();
+    findToolStateKey.emit('c__tool');
+    await open(element);
+
+    q(element, '[data-id="open-find"]').click();
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Find' },
+      state: { c__object: 'Error_Log__c' }
+    });
+  });
+
+  it('links each field to its Object Manager page', async () => {
+    inspect.mockResolvedValue(INSPECTION);
+    const element = mount();
+    await open(element);
+
+    const link = q(element, 'tr[data-row="Notes__c"] a.setup-link');
+    expect(link.getAttribute('href')).toBe(
+      '/lightning/setup/ObjectManager/Contact/FieldsAndRelationships/Notes__c/view'
+    );
+    expect(link.getAttribute('target')).toBe('_blank');
   });
 
   it('shows the refusal Apex gives', async () => {

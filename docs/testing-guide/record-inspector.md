@@ -17,7 +17,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | Click **Inspect This Record**. | A table of fields sorted by **Field**, with **API Name**, **Type** and **Value**, and a count such as "120 fields". It includes a field that is not on the Contact page layout. |
 | 4 | Type `email` in **Search Fields**. | Only fields with email in the label, API name, type or value remain, and the count updates. |
 | 5 | Clear the search, then click **Copy** beside the **Last Name** row. | A short confirmation shows. Pasting elsewhere gives `LastName`. |
-| 6 | Click **Refresh** after changing the Contact's phone number on the page. | The **Phone** value shows the new number. |
+| 6 | Click **Open in Setup** beside **Last Name**. | A new tab opens on the Last Name field of Contact in Object Manager. |
+| 7 | Click **Open in Find**. | The Find tab opens with **Contact** already chosen as the kind of record. |
+| 8 | Click **Refresh** after changing the Contact's phone number on the page. | The **Phone** value shows the new number. |
 
 **Cleanup:** Remove the component from the page if you do not want it kept.
 

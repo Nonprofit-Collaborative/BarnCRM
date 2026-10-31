@@ -89,6 +89,22 @@
         <value>Copy</value>
     </labels>
     <labels>
+        <fullName>Core_RecordInspector_OpenFind</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector link that opens Find on this record's object.</shortDescription>
+        <value>Open in Find</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_OpenSetup</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector link that opens a field's page in Setup.</shortDescription>
+        <value>Open in Setup</value>
+    </labels>
+    <labels>
         <fullName>Core_RecordInspector_Copied</fullName>
         <categories>Core</categories>
         <language>en_US</language>

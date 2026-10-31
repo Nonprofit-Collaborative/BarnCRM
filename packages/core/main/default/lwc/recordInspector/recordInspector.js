@@ -1,4 +1,7 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
+import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+import { fieldSetupPath } from 'c/setupLinks';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
 // namespace prefix.
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
@@ -24,6 +27,8 @@ import NO_MATCH from '@salesforce/label/c.Core_RecordInspector_NoMatch';
 import EMPTY from '@salesforce/label/c.Core_RecordInspector_Empty';
 import SHORTENED from '@salesforce/label/c.Core_RecordInspector_Shortened';
 import FIELDS_CUT from '@salesforce/label/c.Core_RecordInspector_FieldsCut';
+import OPEN_FIND from '@salesforce/label/c.Core_RecordInspector_OpenFind';
+import OPEN_SETUP from '@salesforce/label/c.Core_RecordInspector_OpenSetup';
 import ERROR_UNEXPECTED from '@salesforce/label/c.Core_UnexpectedError';
 
 /**
@@ -36,8 +41,22 @@ import ERROR_UNEXPECTED from '@salesforce/label/c.Core_UnexpectedError';
  * nothing until the person asks, and it shows nothing to someone without Manage BarnCRM
  * Settings.
  */
-export default class RecordInspector extends LightningElement {
+/** The Find tab, and the suffix of the page state key that chooses its object. */
+const FIND_TAB = 'Find';
+const TOOL_STATE_SUFFIX = 'tool';
+
+export default class RecordInspector extends NavigationMixin(LightningElement) {
   @api recordId;
+
+  /** The page state key Find reads its tool from, e.g. `c__tool`; the object key is its sibling. */
+  toolStateKey;
+
+  @wire(findToolStateKey)
+  wiredToolStateKey({ data }) {
+    if (data) {
+      this.toolStateKey = data;
+    }
+  }
 
   labels = {
     title: TITLE,
@@ -51,6 +70,7 @@ export default class RecordInspector extends LightningElement {
     columnType: COLUMN_TYPE,
     columnValue: COLUMN_VALUE,
     copy: COPY,
+    openFind: OPEN_FIND,
     noMatch: NO_MATCH,
     shortened: SHORTENED,
     fieldsCut: FIELDS_CUT
@@ -91,8 +111,25 @@ export default class RecordInspector extends LightningElement {
       hasValue: field.value != null,
       value: field.value,
       empty: EMPTY,
-      copyLabel: `${COPY}: ${field.apiName}`
+      copyLabel: `${COPY}: ${field.apiName}`,
+      setupUrl: fieldSetupPath(this.inspection.objectApiName, field.apiName),
+      setupLabel: `${OPEN_SETUP}: ${field.label}`,
+      openSetup: OPEN_SETUP
     }));
+  }
+
+  /** Opens Find on this record's object, the same for every field. */
+  handleOpenFind() {
+    const state = {};
+    if (this.toolStateKey && this.inspection) {
+      state[this.toolStateKey.replace(new RegExp(`${TOOL_STATE_SUFFIX}$`), 'object')] =
+        this.inspection.objectApiName;
+    }
+    this[NavigationMixin.Navigate]({
+      type: 'standard__navItemPage',
+      attributes: { apiName: FIND_TAB },
+      state
+    });
   }
 
   get noMatch() {

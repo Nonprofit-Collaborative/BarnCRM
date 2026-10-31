@@ -52,7 +52,11 @@ You can add it to the record page of any kind of record, yours or BarnCRM's.
    and the value, and ignores capital letters.
 4. Click **Copy** beside an API name to copy it, ready to paste into an import file, a flow or a
    report filter.
-5. Click **Refresh** to read the record again after an edit.
+5. Click **Open in Setup** beside a field to open that field's page in Object Manager in a new
+   tab, where you can see its definition, help text and field-level security.
+6. Click **Open in Find** above the table to open Find with this kind of record already chosen,
+   ready to build a query on it.
+7. Click **Refresh** to read the record again after an edit.
 
 ## What Can Go Wrong
 
