@@ -67,7 +67,7 @@ private class ProgramSampleDataTest {
             Assert.areEqual(3, [SELECT COUNT() FROM Program__c WHERE Sample_Data__c = TRUE]);
             Assert.areEqual(5, [SELECT COUNT() FROM Service__c], 'Five services.');
             Assert.areEqual(18, [SELECT COUNT() FROM Enrollment__c], 'Eighteen enrollments.');
-            Assert.areEqual(11, countAt('Enrolled'), 'Three in tutoring and eight in the pantry.');
+            Assert.areEqual(12, countAt('Enrolled'), 'Four in tutoring and eight in the pantry.');
             Assert.areEqual(1, countAt('Applied'), 'One applied.');
             Assert.areEqual(1, countAt('Withdrawn'), 'One withdrew.');
             Assert.areEqual(4, countAt('Completed'), 'Four completed summer reading.');

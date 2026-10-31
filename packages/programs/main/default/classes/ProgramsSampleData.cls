@@ -25,12 +25,21 @@ public with sharing class ProgramsSampleData implements SampleDataModule {
 
     /** The number the status card shows for Programs: sample people's enrollments. */
     public Integer countLoaded() {
-        return ProgramSampleDataLoader.countSampleEnrollments();
+        return canRead() ? ProgramSampleDataLoader.countSampleEnrollments() : 0;
     }
 
     /** Whether a sample program is still here, including one removal kept. */
     public Boolean hasSampleRecords() {
-        return ProgramSampleDataLoader.hasSamplePrograms();
+        return canRead() && ProgramSampleDataLoader.hasSamplePrograms();
+    }
+
+    /**
+     * Whether the user may read what the card asks about. An admin without a Programs set (one
+     * the access sync has not reached yet) sees 0 rather than an error on the card.
+     */
+    private static Boolean canRead() {
+        return Schema.SObjectType.Enrollment__c.isAccessible() &&
+            Schema.SObjectType.Program__c.fields.Sample_Data__c.isAccessible();
     }
 
     /** Starts the Programs load, after Core's people and the modules before it. */
