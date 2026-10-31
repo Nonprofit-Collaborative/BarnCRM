@@ -326,7 +326,11 @@ describe('settingsGroups against the shipped registry', () => {
     expect(duplicateBoxes).toHaveLength(1);
     expect(duplicateBoxes[0].id).toBe('Duplicate Matching');
     expect(duplicateBoxes[0].rows.map((one) => one.key)).toEqual(
-      expect.arrayContaining(['Duplicate_Review', 'Fuzzy_Match_Threshold__c', 'Merge_Default_Rule__c'])
+      expect.arrayContaining([
+        'Duplicate_Review',
+        'Fuzzy_Match_Threshold__c',
+        'Merge_Default_Rule__c'
+      ])
     );
   });
 });
