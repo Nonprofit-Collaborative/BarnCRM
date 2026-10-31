@@ -7,15 +7,23 @@
  * runs through Database.queryWithBinds with AccessLevel.USER_MODE, so CRUD, field-level security
  * and sharing apply to every read (R-SQ2, ADR-0047). The display rendering is for showing only;
  * this class never accepts SOQL text.
+ *
+ * Giving's donor segments (G-28, canonical model R-DS3 to R-DS5) count, list and export saved
+ * queries through this class, so it and exactly the members they reach are namespace accessible:
+ * `QueryCompilerException`, `Compiled`, `EXPORT_PAGE_SIZE`, `compile`, `compileExportPage`,
+ * `count(String, Integer)`, `run` and `resolve`.
  */
+@NamespaceAccessible
 public with sharing class QueryCompiler {
     /** Raised when a query document cannot be compiled; the message is for the person. */
+    @NamespaceAccessible
     public class QueryCompilerException extends Exception {
     }
 
     public static final Integer MAX_FIELDS = 20;
     public static final Integer MAX_ROWS = 2000;
     public static final Integer DEFAULT_ROWS = 200;
+    @NamespaceAccessible
     public static final Integer EXPORT_PAGE_SIZE = 2000;
     private static final Integer SUPPORTED_VERSION = 1;
     private static final Pattern FIELD_PATH = Pattern.compile(
@@ -38,6 +46,7 @@ public with sharing class QueryCompiler {
     }
 
     /** A compiled query: SOQL with bind names, its binds, and the rendering to show. */
+    @NamespaceAccessible
     public class Compiled {
         public String soql;
         public String display;
@@ -126,6 +135,7 @@ public with sharing class QueryCompiler {
     }
 
     /** The query the results grid runs: the document's own order and row count. */
+    @NamespaceAccessible
     public static Compiled compile(String queryJson) {
         QueryDocument document = parse(queryJson);
         Compiled compiled = selectAndWhere(document, null, null);
@@ -157,6 +167,7 @@ public with sharing class QueryCompiler {
     }
 
     /** One export page: the document's filter, in Id order, after the last Id already read. */
+    @NamespaceAccessible
     public static Compiled compileExportPage(String queryJson, Id afterId) {
         QueryDocument document = parse(queryJson);
         Compiled compiled = selectAndWhere(document, afterId, null);
@@ -215,6 +226,7 @@ public with sharing class QueryCompiler {
      * How many records the document's filter matches, as the user, counting at most `atMost`
      * (a count reads one query row per record, R-BU2).
      */
+    @NamespaceAccessible
     public static Integer count(String queryJson, Integer atMost) {
         return count(selectAndWhere(parse(queryJson), null, null), atMost);
     }
@@ -231,6 +243,7 @@ public with sharing class QueryCompiler {
     }
 
     /** Runs a compiled query with the running user's access. */
+    @NamespaceAccessible
     public static List<SObject> run(Compiled compiled) {
         return Database.queryWithBinds(compiled.soql, compiled.binds, AccessLevel.USER_MODE);
     }
@@ -308,6 +321,7 @@ public with sharing class QueryCompiler {
      * A field path checked against the running user's describe, or a refusal naming it (cut to
      * 80 characters). One check for the filter, the sort, the summary and the related columns.
      */
+    @NamespaceAccessible
     public static Schema.DescribeFieldResult resolve(String objectName, String path) {
         if (String.isBlank(path) || !FIELD_PATH.matcher(path).matches()) {
             throw new QueryCompilerException(

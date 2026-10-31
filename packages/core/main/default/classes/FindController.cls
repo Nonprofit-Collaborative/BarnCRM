@@ -6,12 +6,17 @@
  * QueryCompiler and run in user mode; no SOQL text is accepted. Saved queries are read and
  * written as the user, and only the owner may change, share or delete one; the one system-mode
  * write, the share row, is SavedQuerySharingWriter's (ADR-0076, saved queries).
+ *
+ * Giving's donor segments (G-28, R-DS5 and R-DS6) read `PERMISSION` and `exportLimit()`, the
+ * only members that are namespace accessible.
  */
+@NamespaceAccessible
 public with sharing class FindController {
     /** Raised for anything the person can fix; the message is shown as it is. */
     public class FindException extends Exception {
     }
 
+    @NamespaceAccessible
     public static final String PERMISSION = 'Find_And_Export_Records';
     public static final Integer DEFAULT_EXPORT_LIMIT = 50000;
     public static final Integer MAX_EXPORT_LIMIT = 500000;
@@ -390,6 +395,7 @@ public with sharing class FindController {
     }
 
     /** The export limit from BarnCRM Settings, held between 1 and MAX_EXPORT_LIMIT. */
+    @NamespaceAccessible
     public static Integer exportLimit() {
         Object configured = SettingsService.hasKey('Find_Export_Row_Limit__c')
             ? SettingsService.getValue('Find_Export_Row_Limit__c')
