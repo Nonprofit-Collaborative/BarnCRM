@@ -397,3 +397,19 @@ Dot,Zzshirt,dot.zzshirt@example.org,M,2026-10-04
 | 8 | As the second user, open the same file's column step. | The field picker has no **Create New Field**, and the Import page of BarnCRM Settings has no **Create Fields From an Import**. |
 
 **Cleanup:** undo the import (see T-IMP-03), delete the Contact field `T_Shirt_Size__c` in Setup, and delete the Named Credential `Barn_Org_Connection` unless the org keeps it.
+
+## T-IMP-19: Delete Import Rows, and Undo After the Rows Are Deleted
+
+**Purpose:** confirm the Delete Import Rows choice decides when the nightly cleanup deletes an import's rows, and that undo still works once they are gone.
+**Prerequisites:** admin; `import-test-1.csv`; Health Check shows **Import row cleanup** scheduled (or run its **Schedule All Nightly Jobs** fix). Step 4 is checked the morning after.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Import**. | **Delete Import Rows** shows **After 30 Days**, never a blank box, with the choices **Once Complete**, **After 30 Days**, **After 90 Days** and **Never**. |
+| 2 | Choose **Once Complete** and save. | Saved for the whole org. |
+| 3 | Import `import-test-1.csv` with **Generic contact list** as in T-IMP-01, steps 1 to 8. Open the import's **Data Job** record (from the **Data Jobs** list view). | **Created** 3, **Rejected** 1. Its **Import Rows** related list shows 4 rows. |
+| 4 | The next morning, open the same Data Job record. | **Import Rows** is empty; the counts and **Run Log** are unchanged. |
+| 5 | Open the Import tab and select **Undo** beside the import, then **Undo This Import**. Refresh until it reads **Undone**. | **Undone**. Testa Rivera, Ben Okoro and Cara Lind are gone: undo never needed the rows. |
+| 6 | Set **Delete Import Rows** back to **After 30 Days** and save. | Saved. |
+
+**Cleanup:** none.

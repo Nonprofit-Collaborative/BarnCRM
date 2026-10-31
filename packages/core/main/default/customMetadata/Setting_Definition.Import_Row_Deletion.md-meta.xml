@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <label>Days the rows of an import are kept</label>
+  <label>Delete Import Rows</label>
   <protected>true</protected>
   <values>
     <field>Setting_Key__c</field>
-    <value xsi:type="xsd:string">Import_Row_Retention_Days__c</value>
+    <value xsi:type="xsd:string">Import_Row_Deletion__c</value>
   </values>
   <values>
     <field>Section__c</field>
@@ -16,15 +16,17 @@
   </values>
   <values>
     <field>Data_Type__c</field>
-    <value xsi:type="xsd:string">Number</value>
+    <value xsi:type="xsd:string">Picklist</value>
   </values>
   <values>
     <field>Picklist_Values__c</field>
-    <value xsi:nil="true" />
+    <value xsi:type="xsd:string">Once_Complete:Once Complete;After_30_Days:After 30 Days;After_90_Days:After 90 Days;Never:Never</value>
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">How many days after an import finished its rows are kept, so you can see what happened to each one. The default is 90, anything from 1 to 3650 is accepted, and 0 keeps them for ever. The nightly Import row cleanup removes older rows; the import keeps its counts and run log, and can still be undone.</value>
+    <value
+      xsi:type="xsd:string"
+    >When the rows of a complete import are deleted, so you can see, correct and retry each row until then. The default is After 30 Days. Rejected rows waiting to be corrected follow the same choice. An import that was only previewed keeps its rows for at least 30 days. The nightly Import row cleanup deletes them; the import keeps its counts and run log, and can still be undone.</value>
   </values>
   <values>
     <field>Help_Path__c</field>
@@ -37,13 +39,5 @@
   <values>
     <field>Settings_Object__c</field>
     <value xsi:type="xsd:string">BarnCRM_Settings__c</value>
-  </values>
-  <values>
-    <field>Min_Value__c</field>
-    <value xsi:type="xsd:double">0</value>
-  </values>
-  <values>
-    <field>Max_Value__c</field>
-    <value xsi:type="xsd:double">3650</value>
   </values>
 </CustomMetadata>

@@ -67,8 +67,8 @@ A few things are worth knowing before your first large file:
    **Rows in a trial import** is how many of a file's first rows **Try the First Rows**
    imports before the rest (section 3, step 8). It is 25 unless you change it, from 1 to
    2,000, and the wizard lets you change it for one file.
-4. **Days the rows of an import are kept** is 90 unless you change it, from 1 to 3650, or 0
-   to keep them for ever. See [How long the rows are kept](#how-long-the-rows-are-kept).
+4. **Delete Import Rows** is **After 30 Days** unless you change it to **Once Complete**,
+   **After 90 Days** or **Never**. See [How long the rows are kept](#how-long-the-rows-are-kept).
 5. **Import** on the same page has an **Open Import** button, which is the same
    place the **Import** tab takes you.
 6. With the Giving module installed, the same page has the two payment matching settings
@@ -313,12 +313,25 @@ affects imports you run afterwards.
 
 ### How Long the Rows Are Kept
 
-Every row of every file is kept as an Import Row so you can see what happened to it, download
-the rejected rows and check what a re-import changed. Rows take storage, so a nightly job
-removes the rows of an import once it finished more than **Days the rows of an import are
-kept** ago (90 days unless you change it in **BarnCRM Settings**, **Import**; 0 keeps them for
-ever). The import itself stays: its counts, run log and file name, and its undo, which never
-reads the rows. A preview whose rows were removed cannot be committed: upload the file again.
+Every row of every file is kept as an Import Row so you can see what happened to it, correct
+and retry a rejected row ([Super Importer rows](import-rows.md)), download the rejected rows
+and check what a re-import changed. Rows take storage, so a nightly job deletes the rows of a
+complete import (Complete, Failed or undone) by **Delete Import Rows** in **BarnCRM
+Settings**, **Import**:
+
+| Choice | The rows of a complete import are deleted |
+|---|---|
+| **Once Complete** | The first night after it is complete. |
+| **After 30 Days** (the default) | 30 days after it is complete. |
+| **After 90 Days** | 90 days after it is complete. |
+| **Never** | Never. |
+
+Rejected rows waiting to be corrected follow the same choice, so with **Once Complete** fix
+them the day you import. An import you only previewed keeps its rows for at least 30 days
+whatever you choose, and an import still open (a trial waiting for the rest, a retry, a run in
+progress) keeps them. The import itself stays: its counts, run log and file name, and its
+undo, which never reads the rows. A preview whose rows were deleted cannot be committed, and a
+row that was deleted cannot be retried: upload the file again.
 
 The job is called **Import row cleanup**. Health Check reports it when it is not scheduled, and
 its **Schedule All Nightly Jobs** fix schedules it. It runs at a quarter past one in the

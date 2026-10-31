@@ -181,8 +181,8 @@ public with sharing class NightlyJobs {
     }
 
     /**
-     * The nightly Import row cleanup (R-IR5, D-40). How long rows are kept is an Import
-     * setting, and 0 keeps them, so the job always belongs on the list.
+     * The nightly Import row cleanup (R-IR5). When rows are deleted is the Import setting
+     * Delete Import Rows, and Never keeps them, so the job always belongs on the list.
      */
     public class ImportRowPurgeJob implements NightlyJob {
         public String label() {

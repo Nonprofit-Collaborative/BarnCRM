@@ -972,32 +972,39 @@ public with sharing class ImportBatchService {
         }
     }
 
-    /** How long a finished import's rows are kept when the org has not said (R-IR5, D-40). */
+    /** The stored values of the Import setting Delete Import Rows (R-IR5). */
     @NamespaceAccessible
-    public static final Integer ROW_RETENTION_DAYS = 90;
+    public static final String ROWS_ONCE_COMPLETE = 'Once_Complete';
+    @NamespaceAccessible
+    public static final String ROWS_AFTER_30_DAYS = 'After_30_Days';
+    @NamespaceAccessible
+    public static final String ROWS_AFTER_90_DAYS = 'After_90_Days';
+    @NamespaceAccessible
+    public static final String ROWS_NEVER = 'Never';
 
-    /** The longest an org may keep rows, so a mistyped number cannot stand. */
-    private static final Integer MAX_ROW_RETENTION_DAYS = 3650;
+    private static final Map<String, Integer> ROW_DAYS = new Map<String, Integer>{
+        ROWS_ONCE_COMPLETE => 0,
+        ROWS_AFTER_30_DAYS => 30,
+        ROWS_AFTER_90_DAYS => 90
+    };
 
     /**
-     * How many days after an import finished its rows are kept, or 0 for for ever (R-IR5).
-     * Nothing, a negative number or an unreadable value falls back to the shipped ninety days,
-     * and anything over ten years is held at ten years.
+     * How many days after an import is complete its rows are kept (R-IR5): 0 once complete,
+     * 30 or 90, or null to keep them for ever. A blank or unknown value reads as the shipped
+     * After 30 Days.
      */
     @NamespaceAccessible
     public static Integer rowRetentionDays() {
-        Object configured = SettingsService.hasKey('Import_Row_Retention_Days__c')
-            ? SettingsService.getValue('Import_Row_Retention_Days__c')
+        Object configured = SettingsService.hasKey('Import_Row_Deletion__c')
+            ? SettingsService.getValue('Import_Row_Deletion__c')
             : null;
-        if (configured == null) {
-            return ROW_RETENTION_DAYS;
+        String choice = configured == null ? null : String.valueOf(configured);
+        if (ROWS_NEVER.equals(choice)) {
+            return null;
         }
-        try {
-            Integer days = Decimal.valueOf(String.valueOf(configured)).intValue();
-            return days < 0 ? ROW_RETENTION_DAYS : Math.min(days, MAX_ROW_RETENTION_DAYS);
-        } catch (Exception ignored) {
-            return ROW_RETENTION_DAYS;
-        }
+        return ROW_DAYS.containsKey(choice)
+            ? ROW_DAYS.get(choice)
+            : ROW_DAYS.get(ROWS_AFTER_30_DAYS);
     }
 
     /**
