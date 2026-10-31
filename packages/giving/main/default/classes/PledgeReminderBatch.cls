@@ -34,8 +34,9 @@ public with sharing class PledgeReminderBatch implements Database.Batchable<SObj
         try {
             totals.add(PledgeReminderService.process(scope));
         } catch (Exception chunkFailure) {
-            // The whole chunk is lost, not the run. Nothing in it was claimed that was not also
-            // settled, so the next run picks the rest up.
+            // The chunk is lost, not the run. `process` rolls its claims back when anything fails
+            // before the send and settles every claimed email row as Sent or Failed after it, so
+            // no row is left Queued holding its key and the next run picks the rest up.
             totals.processed += scope.size();
             totals.errors += scope.size();
             ErrorLogger.log(chunkFailure, LOG_CONTEXT);

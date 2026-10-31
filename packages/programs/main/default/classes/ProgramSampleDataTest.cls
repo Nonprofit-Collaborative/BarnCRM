@@ -164,6 +164,46 @@ private class ProgramSampleDataTest {
     }
 
     @IsTest
+    static void aSampleEnrollmentWithACaseNoteKeepsItsProgram() {
+        System.runAs(admin()) {
+            samplePeople(12);
+            loadEverything();
+            Enrollment__c noted = [
+                SELECT Id
+                FROM Enrollment__c
+                WHERE Program__r.Name = 'Food pantry'
+                LIMIT 1
+            ];
+            insert new Case_Note__c(Enrollment__c = noted.Id, Subject__c = 'Kept', Note__c = 'x');
+
+            Test.startTest();
+            removeEverything();
+            new ProgramsSampleData.RemoveStages().finish();
+            Test.stopTest();
+
+            Assert.areEqual(
+                new List<Id>{ noted.Id },
+                new List<Id>(new Map<Id, Enrollment__c>([SELECT Id FROM Enrollment__c]).keySet()),
+                'Only the enrollment with a case note stays, so removal does not fail on it.'
+            );
+            Assert.areEqual(
+                'Food pantry',
+                [SELECT Name FROM Program__c WHERE Sample_Data__c = TRUE].Name,
+                'Its program stays.'
+            );
+            List<Error_Log__c> logged = [
+                SELECT Message__c
+                FROM Error_Log__c
+                WHERE Context__c = 'ProgramsSampleData.RemoveStages'
+            ];
+            Assert.isTrue(
+                logged[0].Message__c.contains('Food pantry'),
+                'And is named, like a program with real enrollments.'
+            );
+        }
+    }
+
+    @IsTest
     static void coreFindsTheModuleAndHandsOn() {
         System.runAs(admin()) {
             Object built = Type.forName('ProgramsSampleData').newInstance();

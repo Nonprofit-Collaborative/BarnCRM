@@ -125,10 +125,16 @@ public with sharing class DonorSegmentService {
         QueryCompiler.compile(document);
         Id me = UserInfo.getUserId();
         String trimmed = name.trim();
+        // Only a segment is replaced: a Find query of the same name on another object (a gift
+        // or program search) is left alone and the segment is saved beside it.
+        List<String> segmentObjects = new List<String>{
+            DonorSegmentTemplates.PEOPLE,
+            DonorSegmentTemplates.ORGANIZATIONS
+        };
         List<Saved_Query__c> existing = [
             SELECT Id
             FROM Saved_Query__c
-            WHERE OwnerId = :me AND Name = :trimmed
+            WHERE OwnerId = :me AND Name = :trimmed AND Object_Name__c IN :segmentObjects
             WITH USER_MODE
             ORDER BY CreatedDate
             LIMIT 1

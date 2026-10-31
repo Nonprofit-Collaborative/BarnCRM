@@ -53,6 +53,9 @@ Each run looks at the installments still owed (Scheduled, Overdue or Partially p
 - **A step only fires for 14 days after its day.** So a night the run missed is made up the next
   night, and turning reminders on does not send a final notice about an installment that went
   overdue last spring.
+- **A heads-up step stops on the due date.** A step with a negative days from due date applies
+  only while today is before the installment's due date. Once the due date arrives it no longer
+  fires, even within its 14 days.
 - **A step never repeats for the same installment.** If a step's reminder went, the installment
   is not reminded by that step again, even if the run is repeated.
 
@@ -62,11 +65,12 @@ An email goes to the pledge's donor, or to the organization's primary contact wh
 an organization. The template merges the person (`{!Contact.FirstName}`) and the installment
 (`{!Installment__c.Due_Date__c}`, `{!Installment__c.Expected_Amount__c}`).
 
-- A donor whose **Email Opt Out** is ticked is reminded by letter instead, the same as for
+- A donor whose **Email Opt Out** is ticked, who has no email address, or whose email address
+  bounced (Salesforce's **Email Bounced** flag) is reminded by letter instead, the same as for
   thank yous.
-- A pledge with nobody to email (an organization with no primary contact, a donor with no email
-  address) gets no reminder. The page counts these under **No donor email address** and the
-  run names them in one Error Log entry.
+- A pledge with nobody to email (an organization with no primary contact) gets no reminder. The
+  page counts these under **No donor email address** and the run names them in one Error Log
+  entry.
 
 ## Letters
 
@@ -84,7 +88,10 @@ status (Queued, Sent or Failed), when it went, and why it failed. List view **Al
 Reminders** is the full history.
 
 A failed email keeps its row as history and is tried again by the next run while its step is
-still recent.
+still recent. Each reminder row is claimed (Queued) before anything is sent. If Salesforce
+refuses the whole send, every claimed email row is marked Failed with Salesforce's reason and
+the next run retries it. If marking the rows Sent or Failed itself fails, each row is settled
+again on its own with a fixed reason, so no email row is left Queued.
 
 ## A Five-Minute Walkthrough
 

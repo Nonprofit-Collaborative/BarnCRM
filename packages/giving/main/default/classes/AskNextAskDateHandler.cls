@@ -26,6 +26,11 @@ public with sharing class AskNextAskDateHandler extends TriggerHandler {
         sync(null, oldRecords());
     }
 
+    /** An ask restored from the Recycle Bin is open again, so its date counts again. */
+    public override void afterUndelete() {
+        sync(newRecords(), null);
+    }
+
     private void sync(List<SObject> afterRows, List<SObject> beforeRows) {
         try {
             AskDonorDateSync.sync(afterRows, beforeRows);

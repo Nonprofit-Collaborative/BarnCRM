@@ -29,6 +29,8 @@ import OUTCOMES from '@salesforce/label/c.LogicModels_Builder_Outcomes';
 import SAVED from '@salesforce/label/c.LogicModels_Builder_Saved';
 import DELETED from '@salesforce/label/c.LogicModels_Builder_Deleted';
 import ACTION_FAILED from '@salesforce/label/c.LogicModels_Builder_ActionFailed';
+import ARROW_PAIR from '@salesforce/label/c.LogicModels_Builder_ArrowPair';
+import BACKWARD_ARROWS from '@salesforce/label/c.LogicModels_Builder_BackwardArrows';
 import LOADING from '@salesforce/label/c.LogicModels_Builder_Loading';
 import STAGE_INPUT from '@salesforce/label/c.LogicModels_Stage_Input';
 import STAGE_ACTIVITY from '@salesforce/label/c.LogicModels_Stage_Activity';
@@ -105,6 +107,8 @@ export const LABELS = Object.freeze({
   saved: SAVED,
   deleted: DELETED,
   actionFailed: ACTION_FAILED,
+  arrowPair: ARROW_PAIR,
+  backwardArrows: BACKWARD_ARROWS,
   loading: LOADING,
   selectedPart: SELECTED_PART,
   moveUp: MOVE_UP,

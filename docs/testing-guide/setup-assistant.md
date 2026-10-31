@@ -88,7 +88,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Go to step 7, **Choose Which Modules to Turn On**. | Core, BarnCRM Rollup Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Mirror, each **Present** or **Not installed** with **What this module does**. Then "To turn an installed module off or on, or to see what uninstalling one would delete, open the Modules section of BarnCRM Settings." |
+| 1 | Go to step 7, **Choose Which Modules to Turn On**. | Core, BarnCRM Rollup Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM Funders and BarnCRM Mirror, each **Present** or **Not installed** with **What this module does**. Then "To turn an installed module off or on, or to see what uninstalling one would delete, open the Modules section of BarnCRM Settings." |
 | 2 | Click **Next**. | Step 8, **Bring In Your Data**, with **Load the Sample Data** and **Import a Spreadsheet**. Step 7 shows as done. |
 | 3 | Click **Load the Sample Data**. | The **Sample Data** card opens inside the step with status **Loaded** and **Load Sample Data** disabled. |
 | 4 | Click **Import a Spreadsheet**. | The **Import** tab opens. Go back to **Home**. |

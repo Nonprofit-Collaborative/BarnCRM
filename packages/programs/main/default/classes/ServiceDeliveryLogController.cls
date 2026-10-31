@@ -138,14 +138,72 @@ public with sharing class ServiceDeliveryLogController {
                     );
                 }
             }
+            List<Service_Delivery__c> toChangeHidden = new List<Service_Delivery__c>();
+            toInsert = keepOneRow(toInsert, toUpdate, toChangeHidden);
             Database.insert(toInsert, AccessLevel.USER_MODE);
             Database.update(toUpdate, AccessLevel.USER_MODE);
+            ServiceDeliveryIntegrity.changeHidden(toChangeHidden);
             Log log = logFor(programId, serviceId, deliveryDate);
-            log.saved = toInsert.size() + toUpdate.size();
+            log.saved = toInsert.size() + toUpdate.size() + toChangeHidden.size();
             return log;
         } catch (Exception failure) {
             throw report(failure, programId);
         }
+    }
+
+    /**
+     * One row per person, service and day (R-SD4), even when the day's row is one the user
+     * cannot see: under the Private preset a delivery somebody else logged is hidden, so the
+     * log offers the person as unrecorded. Each new row whose person already has a delivery that
+     * day becomes a change to that delivery instead: through `toUpdate` (user mode) when the user
+     * can see it, through `toChangeHidden` (`ServiceDeliveryIntegrity`) when not. Returns the
+     * rows still to insert.
+     */
+    private static List<Service_Delivery__c> keepOneRow(
+        List<Service_Delivery__c> toInsert,
+        List<Service_Delivery__c> toUpdate,
+        List<Service_Delivery__c> toChangeHidden
+    ) {
+        if (toInsert.isEmpty() || !ServiceDeliveryIntegrity.canChange()) {
+            return toInsert;
+        }
+        Set<Id> people = new Set<Id>();
+        for (Service_Delivery__c row : toInsert) {
+            people.add(row.Contact__c != null ? row.Contact__c : row.Account__c);
+        }
+        people.remove(null);
+        Map<Id, Id> existing = ServiceDeliveryIntegrity.existingDeliveryIds(
+            toInsert[0].Service__c,
+            toInsert[0].Delivery_Date__c,
+            people
+        );
+        if (existing.isEmpty()) {
+            return toInsert;
+        }
+        Set<Id> existingIds = new Set<Id>(existing.values());
+        Set<Id> visible = new Map<Id, Service_Delivery__c>(
+                [SELECT Id FROM Service_Delivery__c WHERE Id IN :existingIds WITH USER_MODE]
+            )
+            .keySet();
+        List<Service_Delivery__c> stillNew = new List<Service_Delivery__c>();
+        for (Service_Delivery__c row : toInsert) {
+            Id deliveryId = existing.get(row.Contact__c != null ? row.Contact__c : row.Account__c);
+            if (deliveryId == null) {
+                stillNew.add(row);
+                continue;
+            }
+            Service_Delivery__c change = new Service_Delivery__c(
+                Id = deliveryId,
+                Attendance__c = row.Attendance__c,
+                Quantity__c = row.Quantity__c
+            );
+            if (visible.contains(deliveryId)) {
+                toUpdate.add(change);
+            } else {
+                toChangeHidden.add(change);
+            }
+        }
+        return stillNew;
     }
 
     private static Log logFor(Id programId, Id serviceId, Date deliveryDate) {

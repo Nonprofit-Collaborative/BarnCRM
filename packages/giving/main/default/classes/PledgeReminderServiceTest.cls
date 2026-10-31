@@ -321,6 +321,135 @@ private class PledgeReminderServiceTest {
         }
     }
 
+    /** A sender whose whole call the platform refuses. */
+    private class ThrowingSender implements AcknowledgmentSender {
+        public List<AcknowledgmentSendOutcome> send(List<Messaging.SingleEmailMessage> messages) {
+            throw new PledgeReminderService.PledgeReminderException('The mail server said no.');
+        }
+    }
+
+    @IsTest
+    static void aSendTheWholeCallRefusesFailsEveryRowAndReleasesItsKey() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            PledgeReminderTestData.enable();
+            insert PledgeReminderTestData.buildStep(
+                'Week late',
+                7,
+                'Email',
+                PledgeReminderTestData.TEMPLATE
+            );
+            Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
+            Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
+            PledgeReminderService.senderOverride = new ThrowingSender();
+
+            PledgeReminderService.Counts counts = PledgeReminderService.process(
+                new List<Installment__c>{
+                    PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7))
+                }
+            );
+
+            Assert.areEqual(1, counts.errors);
+            Pledge_Reminder__c row = [
+                SELECT Status__c, Failure_Reason__c, Reminder_Key__c
+                FROM Pledge_Reminder__c
+            ];
+            Assert.areEqual('Failed', row.Status__c, 'Never left Queued.');
+            Assert.areEqual('The mail server said no.', row.Failure_Reason__c);
+            Assert.isNull(row.Reminder_Key__c, 'The key is released so the next run retries.');
+        }
+    }
+
+    @IsTest
+    static void aSettleThatFailsStillLeavesNoRowQueued() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            PledgeReminderTestData.enable();
+            insert PledgeReminderTestData.buildStep(
+                'Week late',
+                7,
+                'Email',
+                PledgeReminderTestData.TEMPLATE
+            );
+            Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
+            Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
+            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
+            sender.failAt = new Set<Integer>{ 0 };
+            // Longer than the field holds, so the first, all-or-none settle throws.
+            sender.failureReason = 'x'.repeat(300);
+            PledgeReminderService.senderOverride = sender;
+
+            PledgeReminderService.process(
+                new List<Installment__c>{
+                    PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7))
+                }
+            );
+
+            Pledge_Reminder__c row = [
+                SELECT Status__c, Failure_Reason__c, Reminder_Key__c
+                FROM Pledge_Reminder__c
+            ];
+            Assert.areEqual('Failed', row.Status__c, 'Settled again on its own, not left Queued.');
+            Assert.areEqual(Label.Giving_PledgeReminders_SendFailedUnknown, row.Failure_Reason__c);
+            Assert.isNull(row.Reminder_Key__c);
+        }
+    }
+
+    @IsTest
+    static void aBeforeDueStepStopsOnTheDueDate() {
+        // runs-as: deploying user (planning logic over in-memory records; its one query is the opt-out read, in system mode)
+        Date today = Date.today();
+        List<Pledge_Reminder_Step__c> steps = new List<Pledge_Reminder_Step__c>{
+            PledgeReminderTestData.buildStep('Week ahead', -7, 'Email', 'X')
+        };
+        PledgeReminderService.Counts counts = new PledgeReminderService.Counts();
+        List<PledgeReminderService.Planned> planned = PledgeReminderService.plan(
+            new List<Installment__c>{
+                // Step day four days ago, still before the due date: fires.
+                PledgeReminderTestData.inMemory(today.addDays(3), FAKE_DONOR),
+                // Due today: a heads-up no longer applies.
+                PledgeReminderTestData.inMemory(today, FAKE_DONOR),
+                // Due three days ago, step day inside the catch up days: still not sent.
+                PledgeReminderTestData.inMemory(today.addDays(-3), FAKE_DONOR)
+            },
+            steps,
+            today,
+            counts
+        );
+        Assert.areEqual(1, planned.size(), 'R-PR2: a before-due step stops on the due date.');
+        Assert.areEqual(today.addDays(3), planned[0].installment.Due_Date__c);
+    }
+
+    @IsTest
+    static void aDonorWithNoEmailAddressGetsALetterInstead() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            PledgeReminderTestData.enable();
+            insert PledgeReminderTestData.buildStep(
+                'Week late',
+                7,
+                'Email',
+                PledgeReminderTestData.TEMPLATE
+            );
+            Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', null);
+            Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
+            AcknowledgmentTestData.RecordingSender sender = new AcknowledgmentTestData.RecordingSender();
+            PledgeReminderService.senderOverride = sender;
+
+            PledgeReminderService.Counts counts = PledgeReminderService.process(
+                new List<Installment__c>{
+                    PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7))
+                }
+            );
+
+            Assert.areEqual(0, counts.emails);
+            Assert.areEqual(
+                1,
+                counts.letters,
+                'R-PR5: no address goes by letter, like an opt-out.'
+            );
+            Assert.isTrue(sender.received.isEmpty());
+            Assert.areEqual('Letter', [SELECT Channel__c FROM Pledge_Reminder__c].Channel__c);
+        }
+    }
+
     @IsTest
     static void aDonorWhoOptedOutOfEmailGetsALetterInstead() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

@@ -3,13 +3,19 @@
  * day, saving new and changed deliveries through the delivery rules, and refusals passed on in
  * their own words.
  */
-@IsTest(testFor='ApexClass:ServiceDeliveryLogController, ApexClass:ServiceDeliverySelector')
+@IsTest(
+    testFor='ApexClass:ServiceDeliveryLogController, ApexClass:ServiceDeliverySelector, ApexClass:ServiceDeliveryIntegrity'
+)
 private class ServiceDeliveryLogControllerTest {
     private static final String ADMIN = 'Programs_Admin';
+
+    private static final List<String> STAFF = new List<String>{ 'BarnCRM_Staff', 'Programs_Staff' };
 
     @TestSetup
     static void createTestUsers() {
         TestUsers.adminWith(ADMIN);
+        TestUsers.standardUserWith('Writer', STAFF);
+        TestUsers.standardUserWith('Colleague', STAFF);
         TestUsers.standardUserWith(
             'Reader',
             new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' }
@@ -162,6 +168,73 @@ private class ServiceDeliveryLogControllerTest {
             Assert.areEqual(day, saved.Delivery_Date__c, 'On the day chosen.');
             Assert.areEqual(rowOf(log, ana.Id).enrollmentId, saved.Enrollment__c, 'Linked.');
         }
+    }
+
+    @IsTest
+    static void aDeliveryTheUserCannotSeeIsChangedNotDoubled() {
+        Program__c pantry = new Program__c(Name = 'Pantry');
+        Service__c meal;
+        Contact ana;
+        Enrollment__c enrolled;
+        System.runAs(TestUsers.adminWith(ADMIN)) {
+            contactMode();
+            insert pantry;
+            meal = serviceIn(pantry, 'Meal');
+        }
+        Date day = Date.today();
+        System.runAs(TestUsers.standardUserWith('Writer', STAFF)) {
+            ana = person('Rivera');
+            enrolled = new Enrollment__c(Program__c = pantry.Id, Contact__c = ana.Id);
+            insert enrolled;
+            insert new Service_Delivery__c(
+                Service__c = meal.Id,
+                Contact__c = ana.Id,
+                Enrollment__c = enrolled.Id,
+                Delivery_Date__c = day,
+                Attendance__c = 'Present',
+                Quantity__c = 1
+            );
+        }
+        // As under the Private preset: the colleague cannot see the writer's delivery.
+        delete [
+            SELECT Id
+            FROM Service_Delivery__Share
+            WHERE RowCause = :Schema.Service_Delivery__Share.RowCause.Programs_Participants__c
+        ];
+        ServiceDeliveryLogController.Entry entry = new ServiceDeliveryLogController.Entry();
+        entry.contactId = ana.Id;
+        entry.enrollmentId = enrolled.Id;
+        entry.attendance = 'Present';
+        entry.quantity = 3;
+
+        Test.startTest();
+        ServiceDeliveryLogController.Log after;
+        Integer seen;
+        System.runAs(TestUsers.standardUserWith('Colleague', STAFF)) {
+            seen = [SELECT COUNT() FROM Service_Delivery__c WITH USER_MODE];
+            after = ServiceDeliveryLogController.save(
+                pantry.Id,
+                meal.Id,
+                day,
+                new List<ServiceDeliveryLogController.Entry>{ entry }
+            );
+        }
+        Test.stopTest();
+
+        Assert.areEqual(0, seen, 'The colleague cannot see the delivery.');
+        List<Service_Delivery__c> rows = [
+            SELECT Quantity__c
+            FROM Service_Delivery__c
+            WHERE Contact__c = :ana.Id
+        ];
+        Assert.areEqual(1, rows.size(), 'R-SD4: one row per person, service and day.');
+        Assert.areEqual(3, rows[0].Quantity__c, 'The existing row was changed.');
+        Assert.areEqual(1, after.saved, 'One saved.');
+        ServiceDeliveryLogController.Row row = rowOf(after, ana.Id);
+        Assert.isTrue(
+            row == null || row.deliveryId == null,
+            'The hidden row is still not shown to the colleague.'
+        );
     }
 
     @IsTest

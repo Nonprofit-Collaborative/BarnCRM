@@ -54,32 +54,70 @@ public with sharing class VolunteerReminderService {
         return !ShiftScheduleService.isTurnedOff() && VolunteerSettings.remindersEnabled();
     }
 
-    /** Emails this chunk of due bookings and stamps the ones that went out. Returns that count. */
+    /**
+     * Stamps this chunk of due bookings, emails only the ones whose stamp saved, and clears the
+     * stamp again on any that did not go out. Returns how many went out.
+     *
+     * Stamp first: a booking whose stamp cannot be saved is never emailed, because an email
+     * without its stamp would be sent again every morning until the shift.
+     */
     public static Integer remind(List<Volunteer_Signup__c> signups) {
         if (signups == null || signups.isEmpty() || !isActive()) {
             return 0;
         }
+        Datetime now = ShiftScheduleService.now();
+        List<Volunteer_Signup__c> stamps = new List<Volunteer_Signup__c>();
+        for (Volunteer_Signup__c signup : signups) {
+            stamps.add(new Volunteer_Signup__c(Id = signup.Id, Reminder_Sent_On__c = now));
+        }
+        List<Database.SaveResult> stamped = Database.update(stamps, false, AccessLevel.SYSTEM_MODE);
         String zone = ShiftScheduleSelector.orgTimeZone();
         List<Messaging.SingleEmailMessage> messages = new List<Messaging.SingleEmailMessage>();
-        for (Volunteer_Signup__c signup : signups) {
-            messages.add(messageFor(signup, zone));
+        List<Volunteer_Signup__c> messageSignups = new List<Volunteer_Signup__c>();
+        String stampFailure;
+        for (Integer i = 0; i < signups.size(); i++) {
+            if (stamped[i].isSuccess()) {
+                messages.add(messageFor(signups[i], zone));
+                messageSignups.add(signups[i]);
+            } else if (stampFailure == null && !stamped[i].getErrors().isEmpty()) {
+                stampFailure = stamped[i].getErrors()[0].getMessage();
+            }
+        }
+        if (messageSignups.size() < signups.size()) {
+            ErrorLogger.logMessage(
+                String.format(
+                    System.Label.Volunteers_Reminders_StampFailed,
+                    new List<Object>{
+                        signups.size() - messageSignups.size(),
+                        signups.size(),
+                        stampFailure == null ? '' : stampFailure
+                    }
+                ),
+                LOG_CONTEXT,
+                ErrorLogger.SEVERITY_WARNING
+            );
+        }
+        if (messages.isEmpty()) {
+            return 0;
         }
         lastFailure = null;
         List<Boolean> sent = senderInUse.send(messages);
-        List<Volunteer_Signup__c> stamps = new List<Volunteer_Signup__c>();
-        Datetime now = ShiftScheduleService.now();
-        for (Integer i = 0; i < signups.size(); i++) {
-            if (sent[i]) {
-                stamps.add(new Volunteer_Signup__c(Id = signups[i].Id, Reminder_Sent_On__c = now));
+        List<Volunteer_Signup__c> unstamp = new List<Volunteer_Signup__c>();
+        for (Integer i = 0; i < messageSignups.size(); i++) {
+            if (i >= sent.size() || !sent[i]) {
+                unstamp.add(
+                    new Volunteer_Signup__c(Id = messageSignups[i].Id, Reminder_Sent_On__c = null)
+                );
             }
         }
-        Database.update(stamps, false, AccessLevel.SYSTEM_MODE);
-        if (stamps.size() < signups.size()) {
+        if (!unstamp.isEmpty()) {
+            // Not sent: the stamp goes so tomorrow's run tries again while the shift is ahead.
+            Database.update(unstamp, false, AccessLevel.SYSTEM_MODE);
             ErrorLogger.logMessage(
                 String.format(
                     System.Label.Volunteers_Reminders_SendFailed,
                     new List<Object>{
-                        signups.size() - stamps.size(),
+                        unstamp.size(),
                         signups.size(),
                         lastFailure == null ? '' : lastFailure
                     }
@@ -88,7 +126,7 @@ public with sharing class VolunteerReminderService {
                 ErrorLogger.SEVERITY_WARNING
             );
         }
-        return stamps.size();
+        return messageSignups.size() - unstamp.size();
     }
 
     /** One reminder, addressed to the booking's Contact. */

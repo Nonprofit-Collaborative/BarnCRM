@@ -250,6 +250,16 @@ private class SetupChangeCopyJobTest {
             Test.startTest();
             new SetupChangeCopyJob().execute((SchedulableContext) null);
             Assert.isTrue(SetupChangeCopyJob.isRunning(), 'The scheduled run starts the copy.');
+            new SetupChangeCopyJob().execute((SchedulableContext) null);
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM AsyncApexJob
+                    WHERE JobType = 'BatchApex' AND ApexClass.Name = 'SetupChangeCopyJob'
+                ],
+                'A second scheduled start while one is waiting starts nothing.'
+            );
             new NightlyJobs.SetupChangesJob().schedule();
             Test.stopTest();
         }

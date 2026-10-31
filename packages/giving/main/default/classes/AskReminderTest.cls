@@ -248,6 +248,49 @@ private class AskReminderTest {
     }
 
     @IsTest
+    static void aSecondStartWhileAPassIsWaitingStartsNothing() {
+        User owner = owner();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Account organization = donorAccount(owner.Id, System.today());
+            Test.startTest();
+            new AskReminderSchedulable().execute(null);
+            Assert.isTrue(AskReminderService.isRunning(), 'The first start queues a pass.');
+            // Run now pressed again while the first pass waits.
+            new AskReminderSchedulable().execute(null);
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM AsyncApexJob
+                    WHERE JobType = 'BatchApex' AND ApexClass.Name = 'AskReminderBatch'
+                ],
+                'Two passes at once could both remind a donor before either stamps it.'
+            );
+            Test.stopTest();
+
+            Assert.areEqual(1, remindersFor(organization.Id).size());
+        }
+    }
+
+    @IsTest
+    static void aRunQueuedBeforeTheSettingWentOffMakesNothing() {
+        User owner = owner();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Account organization = donorAccount(owner.Id, System.today());
+            Test.startTest();
+            Database.executeBatch(new AskReminderBatch(), AskReminderBatch.CHUNK_SIZE);
+            setRemindersEnabled(false);
+            Test.stopTest();
+
+            Assert.areEqual(
+                0,
+                remindersFor(organization.Id).size(),
+                'R-AC2: the switch is read again when the queued run reaches its chunks.'
+            );
+        }
+    }
+
+    @IsTest
     static void theSchedulableStartsTheBatchWhenOn() {
         User owner = owner();
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

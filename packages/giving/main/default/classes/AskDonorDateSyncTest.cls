@@ -226,6 +226,14 @@ private class AskDonorDateSyncTest {
             delete ask;
 
             Assert.isNull(nextAskOf(foundation.Id), 'The deleted ask took its date with it.');
+
+            undelete ask;
+
+            Assert.areEqual(
+                today.addDays(25),
+                nextAskOf(foundation.Id),
+                'An ask restored from the Recycle Bin brings its date back.'
+            );
         }
     }
 

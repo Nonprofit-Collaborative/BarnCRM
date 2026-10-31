@@ -30,6 +30,7 @@ Open the **Contacts** or **Accounts** tab and choose the list view **Who Is Due 
 - **A deleted task stays deleted.** BarnCRM remembers the reminder on the donor, not in the task list, so deleting or completing the task does not bring it back. BarnCRM never edits, closes or deletes a task it created.
 - **Old dates do not flood anyone.** A Next Ask Date more than 30 days in the past gets no task. This protects the first night you turn the job on, when an old import may have left many stale dates. A date inside the last 30 days that the job missed (for example, jobs were stopped for a week) is caught up. Donors with older dates still show in **Who Is Due for an Ask**.
 - **The owner gets the task.** If a donor's owner is an inactive user, no task can be made. The job counts the donor in its summary, writes the reason to the **Error Log**, and tries again the next night. Reassign the donor to an active owner to fix it.
+- **One run at a time.** **Run Now** (Nightly Jobs) and the nightly schedule start nothing while an ask reminder run is already queued or running. The **Ask Reminders** setting is read again as a queued run processes, so turning it off stops a run already queued: it makes no tasks and does not go on to the contacts pass.
 - **No emails.** Reminders are tasks inside Salesforce. Nothing is sent to the donor or to the owner by email.
 - **Health Check.** **Schedule all nightly jobs** in Health Check schedules this job with the other Giving jobs.
 
@@ -37,7 +38,7 @@ Open the **Contacts** or **Accounts** tab and choose the list view **Who Is Due 
 
 When the [Ask Pipeline](ask-pipeline.md) is in use, a donor's open asks keep their Next Ask Date for you, so the same nightly reminder and the **Who Is Due for an Ask** list cover the pipeline. There is no second job.
 
-- **The earliest open ask wins.** Whenever an ask is created, deleted, or its **Target Date**, **Outcome** or donor changes, the donor's Next Ask Date becomes the earliest **Target Date** among their open asks. Open asks with no Target Date are ignored. While such an ask is open, this overwrites a date entered by hand.
+- **The earliest open ask wins.** Whenever an ask is created, deleted, restored from the Recycle Bin (it counts again, as when created), or its **Target Date**, **Outcome** or donor changes, the donor's Next Ask Date becomes the earliest **Target Date** among their open asks. Open asks with no Target Date are ignored. While such an ask is open, this overwrites a date entered by hand.
 - **When the last open ask closes,** the donor's Next Ask Date takes the closed ask's own **Next Ask Date** (when to ask again), if that date is after today. With no such date, or when the last ask is deleted, the donor's date is cleared.
 - **A date entered by hand is kept.** Both rules above change the donor's Next Ask Date only when it is blank or still holds the date the asks had set. If somebody changed it by hand (to a later follow-up, say), the date is kept.
 - **Turning it off.** The automation is **Ask: donor Next Ask Date** in the automation console. It is on by default. Off, asks and donor dates are independent again.

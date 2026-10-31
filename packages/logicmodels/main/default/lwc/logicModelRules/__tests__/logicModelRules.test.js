@@ -1,5 +1,6 @@
 import {
   STAGES,
+  backwardLinks,
   canLink,
   columns,
   findings,
@@ -59,6 +60,22 @@ describe('logicModelRules', () => {
       'oc1',
       'im1'
     ]);
+  });
+
+  it('names the arrows a column change would turn backward', () => {
+    const m = model();
+    // Sessions held (output) sits between Sessions (activity) and Reads at home (short term).
+    expect(backwardLinks(m, 'ou1', 'Output')).toEqual([]);
+    expect(backwardLinks(m, 'ou1', 'Outcome_Short')).toEqual([
+      { id: 'l3', fromName: 'Sessions held', toName: 'Reads at home' }
+    ]);
+    expect(backwardLinks(m, 'ou1', 'Activity')).toEqual([
+      { id: 'l2', fromName: 'Sessions', toName: 'Sessions held' }
+    ]);
+    expect(backwardLinks(m, 'ou1', 'Impact').map((link) => link.id)).toEqual(['l3']);
+    expect(backwardLinks(m, 'ac2', 'Impact')).toEqual([]);
+    expect(backwardLinks(m, 'nope', 'Input')).toEqual([]);
+    expect(backwardLinks(m, 'ou1', 'Nowhere')).toEqual([]);
   });
 
   it('measures outputs and outcomes only', () => {

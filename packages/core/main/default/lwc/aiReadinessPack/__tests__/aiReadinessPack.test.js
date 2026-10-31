@@ -72,6 +72,24 @@ describe('c/aiReadinessPack', () => {
     expect(sensitivityOf('Contact', field('Status__c', 'picklist'))).toBeNull();
   });
 
+  it("flags BarnCRM's own person name fields, with or without a namespace", () => {
+    expect(sensitivityOf('Contact', field('Preferred_Name__c'))).toBe(REASONS.NAME);
+    expect(sensitivityOf('Account', field('Preferred_Name__c'))).toBe(REASONS.NAME);
+    expect(sensitivityOf('Account', field('Emergency_Contact_Name__c'))).toBe(REASONS.NAME);
+    expect(sensitivityOf('Merge_Journal__c', field('Merged_Name__c'))).toBe(REASONS.NAME);
+    expect(sensitivityOf('Import_Row__c', field('Person_1_Name_Key__c'))).toBe(REASONS.NAME);
+    expect(sensitivityOf('Import_Row__c', field('Person_2_Name_Key__c'))).toBe(REASONS.NAME);
+    expect(sensitivityOf('Tribute__c', field('Honoree_Name__c'))).toBe(REASONS.NAME);
+    expect(sensitivityOf('Tribute__c', field('Notification_Recipient_Name__c'))).toBe(REASONS.NAME);
+    // A namespace prefix, built so no literal prefixed name is written in source.
+    const prefix = ['ns', ''].join('__');
+    expect(sensitivityOf(`${prefix}Tribute__c`, field(`${prefix}Honoree_Name__c`))).toBe(
+      REASONS.NAME
+    );
+    expect(sensitivityOf('Account', field('Name'))).toBeNull();
+    expect(sensitivityOf('Program__c', field('Preferred_Name__c'))).toBeNull();
+  });
+
   it('lists flagged fields with their reason, starting at Leave Out', () => {
     const flagged = sensitiveFields([CONTACT]);
     expect(flagged.map((row) => [row.key, row.reason, row.handling])).toEqual([

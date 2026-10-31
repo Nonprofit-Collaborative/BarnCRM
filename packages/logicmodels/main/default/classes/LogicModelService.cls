@@ -277,8 +277,90 @@ public with sharing class LogicModelService {
             return element.Logic_Model__c;
         }
         element.Id = elementId;
+        refuseBackwardArrows(elementId, element.Type__c, element.Outcome_Term__c);
         update as user element;
         return modelOfElement(elementId);
+    }
+
+    /**
+     * The stage rank a type and term give, as the Stage_Rank__c formula computes it: Input 1 to
+     * Impact 7, 0 when unknown.
+     */
+    @TestVisible
+    private static Integer rankFor(String type, String term) {
+        switch on type {
+            when 'Input' {
+                return 1;
+            }
+            when 'Activity' {
+                return 2;
+            }
+            when 'Output' {
+                return 3;
+            }
+            when 'Outcome' {
+                return term == 'Intermediate Term' ? 5 : (term == 'Long Term' ? 6 : 4);
+            }
+            when 'Impact' {
+                return 7;
+            }
+            when else {
+                return 0;
+            }
+        }
+    }
+
+    /**
+     * Refuses a column change that would leave an attached arrow pointing backward (R-LL2). The
+     * arrow's own validation rule checks only when the arrow is saved, so without this a part
+     * could be moved past the parts it leads to. The message names every such arrow.
+     */
+    private static void refuseBackwardArrows(Id elementId, String type, String term) {
+        if (String.isBlank(type)) {
+            return;
+        }
+        Integer rank = rankFor(type, term);
+        List<String> backward = new List<String>();
+        for (Logic_Model_Link__c link : [
+            SELECT
+                From_Element__c,
+                From_Element__r.Name,
+                From_Element__r.Stage_Rank__c,
+                To_Element__c,
+                To_Element__r.Name,
+                To_Element__r.Stage_Rank__c
+            FROM Logic_Model_Link__c
+            WHERE From_Element__c = :elementId OR To_Element__c = :elementId
+            WITH USER_MODE
+            ORDER BY CreatedDate
+        ]) {
+            Boolean outOfStep = link.From_Element__c == elementId
+                ? rank >= rankOf(link.To_Element__r)
+                : rankOf(link.From_Element__r) >= rank;
+            if (outOfStep) {
+                backward.add(
+                    String.format(
+                        Label.LogicModels_Builder_ArrowPair,
+                        new List<String>{ link.From_Element__r.Name, link.To_Element__r.Name }
+                    )
+                );
+            }
+        }
+        if (!backward.isEmpty()) {
+            throw new BuilderException(
+                String.format(
+                    Label.LogicModels_Builder_BackwardArrows,
+                    new List<String>{ String.join(backward, '; ') }
+                )
+            );
+        }
+    }
+
+    private static Integer rankOf(Logic_Model_Element__c element) {
+        if (element == null || element.Stage_Rank__c == null) {
+            return 0;
+        }
+        return element.Stage_Rank__c.intValue();
     }
 
     /**

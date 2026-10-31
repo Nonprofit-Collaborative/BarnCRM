@@ -40,6 +40,10 @@ public with sharing class AskReminderBatch implements Database.Batchable<SObject
     }
 
     public void execute(Database.BatchableContext context, List<SObject> scope) {
+        // Turned off after this run was queued: the rest of the run makes nothing (R-AC2).
+        if (!AskReminderService.isEnabled()) {
+            return;
+        }
         try {
             AskReminderService.Outcome outcome = AskReminderService.remindChunk(scope, today);
             created += outcome.created;
@@ -54,7 +58,7 @@ public with sharing class AskReminderBatch implements Database.Batchable<SObject
     public void finish(Database.BatchableContext context) {
         try {
             if (ACCOUNTS.equals(scopeObject)) {
-                if (!Test.isRunningTest()) {
+                if (!Test.isRunningTest() && AskReminderService.isEnabled()) {
                     Database.executeBatch(
                         new AskReminderBatch(CONTACTS, today, created, failed),
                         CHUNK_SIZE

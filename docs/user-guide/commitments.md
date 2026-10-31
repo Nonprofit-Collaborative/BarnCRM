@@ -76,7 +76,7 @@ You should see: the unpaid payments rebuilt; paid and partly paid ones are left 
 
 ## Pledge Reminders
 
-If your organization has turned on pledge reminders, donors with a payment coming due or overdue are emailed (or, if they opted out of email or the step is a letter, sent a letter) on the schedule your admin set up. You do not send them yourself unless you have the **Send Acknowledgments** permission.
+If your organization has turned on pledge reminders, donors with a payment coming due or overdue are emailed (or, if they opted out of email, have no email address, their address bounced, or the step is a letter, sent a letter) on the schedule your admin set up. You do not send them yourself unless you have the **Send Acknowledgments** permission.
 
 - Open the **Pledge Reminders Log** tab, list view **All Pledge Reminders**, to see what was sent for a payment, to whom, on what date, and whether it failed. A reminder shows its step name, for example `Week late`.
 - If a donor says they never got one, check the log row's **Recipient Email** and **Status** first. **Failed** rows say why.

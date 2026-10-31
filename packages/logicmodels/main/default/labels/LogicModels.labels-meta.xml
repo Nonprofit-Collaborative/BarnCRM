@@ -257,6 +257,22 @@
         <value>That arrow is already there. Change its assumption instead.</value>
     </labels>
     <labels>
+        <fullName>LogicModels_Builder_ArrowPair</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>One arrow named: {0} its start, {1} its end</shortDescription>
+        <value>{0} to {1}</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_BackwardArrows</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Column change refused: {0} the arrows it would turn backward</shortDescription>
+        <value>That column would make these arrows point backward: {0}. Delete those arrows first, or pick a column that keeps every arrow pointing forward.</value>
+    </labels>
+    <labels>
         <fullName>LogicModels_Builder_PeriodExists</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>

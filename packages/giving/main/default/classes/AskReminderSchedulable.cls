@@ -8,7 +8,9 @@
 public with sharing class AskReminderSchedulable implements Schedulable {
     public void execute(SchedulableContext context) {
         try {
-            if (!AskReminderService.isEnabled()) {
+            // Off, or a pass already waiting or running (Run now pressed twice, or pressed while
+            // the nightly pass runs): start nothing.
+            if (!AskReminderService.isEnabled() || AskReminderService.isRunning()) {
                 return;
             }
             Database.executeBatch(new AskReminderBatch(), AskReminderBatch.CHUNK_SIZE);

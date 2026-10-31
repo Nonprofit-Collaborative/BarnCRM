@@ -10,7 +10,7 @@ private class ModuleDetectionServiceTest {
     }
 
     @IsTest
-    static void listsTheSevenPackagesAndSaysWhichAreHere() {
+    static void listsTheEightPackagesAndSaysWhichAreHere() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
@@ -20,7 +20,7 @@ private class ModuleDetectionServiceTest {
             List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
             Test.stopTest();
 
-            Assert.areEqual(7, modules.size(), 'The Nonprofit Edition is offered all seven');
+            Assert.areEqual(8, modules.size(), 'The Nonprofit Edition is offered all eight');
             Assert.areEqual('Core', modules[0].name, 'Core comes first and is always here');
             Assert.isTrue(modules[0].present, 'Core is the package this code is in');
             for (Integer i = 1; i < modules.size(); i++) {
@@ -144,9 +144,9 @@ private class ModuleDetectionServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                7,
+                8,
                 modules.size(),
-                'Any org that chose the Nonprofit Edition is offered all seven, before Giving is here'
+                'Any org that chose the Nonprofit Edition is offered all eight, before Giving is here'
             );
             Assert.areEqual('Giving', modules[2].name, 'Giving follows Rollup Builder');
             Assert.isFalse(modules[2].present, 'And Giving is still shown as not installed');

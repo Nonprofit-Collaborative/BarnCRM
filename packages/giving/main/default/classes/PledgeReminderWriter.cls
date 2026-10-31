@@ -38,4 +38,12 @@ public without sharing class PledgeReminderWriter {
         }
         Database.update(rows, true, AccessLevel.SYSTEM_MODE);
     }
+
+    /** Updates rows one by one, reporting each, for settling after an all-or-none update failed. */
+    public static List<Database.SaveResult> settleEach(List<Pledge_Reminder__c> rows) {
+        if (rows == null || rows.isEmpty()) {
+            return new List<Database.SaveResult>();
+        }
+        return Database.update(rows, false, AccessLevel.SYSTEM_MODE);
+    }
 }

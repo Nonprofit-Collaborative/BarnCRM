@@ -240,11 +240,22 @@ in **BarnCRM Settings**, **Volunteers**. The 7:00 AM job is one of the nightly j
 Check's list: if Health Check shows it as not scheduled, use its **Schedule all nightly jobs**
 fix once. Nothing else needs setting up.
 
-**One reminder per booking.** After a reminder goes out, the sign-up's **Reminder Sent On** field
-holds the time, and that booking is never emailed again, however long the lead time or often
-the job runs. A person who signs up late, inside the lead time, gets theirs the next morning.
-To send a booking's reminder again, clear **Reminder Sent On** on the sign-up (Admin and
+**One reminder per booking.** Each due booking is stamped first: its **Reminder Sent On** field
+holds the time, and only bookings whose stamp saved are emailed. That booking is never emailed
+again, however long the lead time or often the job runs. A booking whose stamp could not be
+saved is not emailed (so it is never emailed twice) and is listed in the **Error Log** as a
+Warning. A booking whose email failed has its stamp cleared, so the next morning's run tries
+again. To send a booking's reminder again, clear **Reminder Sent On** on the sign-up (Admin and
 Coordinator can edit it).
+
+**Late bookings can miss the reminder.** The morning run reminds bookings whose shift starts
+after the run and before the end of the lead time. A booking made after that morning's run, for
+a shift that starts before the next morning's run, gets no reminder: for example someone who
+books at noon for a shift that evening. Tell such volunteers directly.
+
+**From address.** Reminders are sent from the user who scheduled the morning reminder job (the
+person who turned reminders on or saved the schedule), and replies go to that user. BarnCRM has
+no separate from address setting for volunteer reminders.
 
 **Who is never emailed.** A person with **Email Opt Out** checked on their contact, a person
 with no email address, a sign-up that is Cancelled or marked No show or Attended, and any
@@ -254,8 +265,8 @@ a contact are not reminded.
 **Email limits.** Reminders go out through your Salesforce org's own email, so your org's daily
 limit on emails sent by Apex applies, and the same limit is shared with every other BarnCRM email
 (for example donor acknowledgments). Salesforce says what your edition allows under **Setup**,
-**Company Information**. When the limit is reached the rest are not sent: they stay unstamped,
-a Warning in the **Error Log** counts them, and the next morning's run tries them again while
+**Company Information**. When the limit is reached the rest are not sent: their stamps are
+cleared, a Warning in the **Error Log** counts them, and the next morning's run tries them again while
 their shift is still ahead. The emails come from the address of the person who scheduled the
 job and are plain text, not logged on the person's page. There is no mass email tool, no text
 messages and no "still need you" message for unfilled shifts in this version.

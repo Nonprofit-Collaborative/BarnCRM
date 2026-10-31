@@ -161,7 +161,8 @@ modules your edition offers (see [Editions](editions.md)), plus any module alrea
   release.)
 
 The modules are BarnCRM Rollup Builder (both editions), and BarnCRM Giving, BarnCRM
-Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Mirror (Nonprofit Edition). The
+Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM Funders and BarnCRM Mirror
+(Nonprofit Edition). The
 Standard Edition lists no Nonprofit Edition module that is not installed. BarnCRM Rollup
 Builder ships as its own package, installed from this section like the others. See the
 [Module Manager](module-manager.md) for what else you can do with an installed module.

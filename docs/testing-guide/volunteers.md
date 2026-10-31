@@ -222,6 +222,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 5 | Run `VolunteerReminderBatch.startMorning();` again. | No second email. |
 | 6 | Clear **Reminder Sent On** on the first sign-up and run it once more. | The email is sent again and the field is filled. |
 | 7 | Set the sign-up to **Cancelled**, clear **Reminder Sent On**, run it again. | No email. |
+| 8 | Make a new sign-up for a shift that starts later today, after the run in step 6, and run it again with the lead time at 1. | The run stamps and emails only bookings whose shift starts after the run and before the end of the lead time; a booking made after a morning's run for a shift starting before the next morning's run gets no reminder from that run (tell such volunteers directly). |
+| 9 | Check the sender of the email from step 6. | It comes from the user who scheduled the morning reminder job, and replies go to that user. |
 
 **Cleanup:** switch **Send shift reminders** off; cancel the test shift.
 
