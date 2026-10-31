@@ -117,6 +117,51 @@ private class GivingPersonErasureExtensionTest {
         }
     }
 
+    /** R-SO8: next steps emptied, open asks withdrawn, closed asks keep their outcome. */
+    @IsTest
+    static void withdrawsOpenAsksAndEmptiesTheirNextSteps() {
+        System.runAs(eraser()) {
+            Contact jordan = donor();
+            Ask__c open = new Ask__c(
+                Donor_Contact__c = jordan.Id,
+                Amount__c = 5000,
+                Next_Step__c = 'Lunch with Jordan in May'
+            );
+            Ask__c won = new Ask__c(
+                Donor_Contact__c = jordan.Id,
+                Outcome__c = AskRules.OUTCOME_WON,
+                Next_Step__c = 'Thank Jordan at the gala'
+            );
+            insert new List<Ask__c>{ open, won };
+
+            Test.startTest();
+            PersonErasure.Result result = PersonErasure.erase(jordan.Id, 'Jordan Lee', null);
+            Test.stopTest();
+
+            Map<Id, Ask__c> asks = new Map<Id, Ask__c>(
+                [SELECT Outcome__c, Next_Step__c, Donor_Contact__c FROM Ask__c]
+            );
+            Assert.areEqual(
+                AskRules.OUTCOME_WITHDRAWN,
+                asks.get(open.Id).Outcome__c,
+                'Open ask withdrawn'
+            );
+            Assert.areEqual(AskRules.OUTCOME_WON, asks.get(won.Id).Outcome__c, 'Won ask kept');
+            Assert.isNull(asks.get(open.Id).Next_Step__c, 'Next step emptied');
+            Assert.isNull(asks.get(won.Id).Next_Step__c, 'Next step emptied on a closed ask');
+            Assert.areEqual(jordan.Id, asks.get(won.Id).Donor_Contact__c, 'Ask kept');
+            Boolean reported = false;
+            for (PersonErasure.Change change : result.getChanges()) {
+                reported |=
+                    change.getAction() == PersonErasure.ENDED &&
+                    change.getObjectLabel() ==
+                    Ask__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                        .getLabelPlural();
+            }
+            Assert.isTrue(reported, 'The asks are listed');
+        }
+    }
+
     @IsTest
     static void twoHundredTributesAreEmptiedInOneGo() {
         System.runAs(eraser()) {

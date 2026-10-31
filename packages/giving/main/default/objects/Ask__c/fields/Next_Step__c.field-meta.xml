@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Next_Step__c</fullName>
+  <description>
+    The next thing to do on the ask, in a few words. Cleared when the donor is erased (canonical
+    model R-SO8).
+  </description>
+  <externalId>false</externalId>
+  <inlineHelpText>The next thing to do, for example: lunch with the board chair in May.</inlineHelpText>
+  <label>Next Step</label>
+  <length>255</length>
+  <required>false</required>
+  <trackHistory>false</trackHistory>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

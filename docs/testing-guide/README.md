@@ -1,6 +1,6 @@
 # BarnCRM Testing Guide
 
-Applies to: BarnCRM main as of 2026-10-29 (landing batch 13). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-31 (commit 8d62027e3). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 Manual, step-by-step test scripts for checking a build in a scratch org or sandbox, feature by
 feature. Written for a tester: the project owner or a pilot org admin. Start with
@@ -53,6 +53,7 @@ page, even if that puts it out of reading order.
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
 | [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 15 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import |
 | [Giving: commitments](giving-commitments.md) | COM | 10 | Pledges, recurring gifts, payments, nightly jobs |
+| [Giving: asks](giving-asks.md) | ASK | 7 | Ask stages, the Ask Pipeline board, moving and closing asks, gifts and pledges from won asks, reopening, history, read only access |
 | [Giving: soft credits, tributes and matching](giving-soft-credits-tributes-matching.md) | CRED | 10 | Soft credits, tributes, matching gifts |
 | [Giving: receipts and acknowledgments](giving-receipts-and-acknowledgments.md) | RCPT | 13 | Receipts, year-end statements, void and reissue, receipt lock, acknowledgments |
 | [Giving: refunds and write-offs](giving-refunds.md) | REF | 7 | Refunds and their effect on totals |

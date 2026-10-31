@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Exactly_One_Donor</fullName>
+  <active>true</active>
+  <description>
+    An ask names one person or one organization (canonical model R-SO1). Checked on create and when
+    a donor field changes only, so an ask whose donor was deleted can still be closed.
+  </description>
+  <errorConditionFormula>
+    AND( OR( ISNEW(), ISCHANGED(Donor_Contact__c), ISCHANGED(Donor_Account__c) ), OR( AND(
+    ISBLANK(Donor_Contact__c), ISBLANK(Donor_Account__c) ), AND( NOT(ISBLANK(Donor_Contact__c)),
+    NOT(ISBLANK(Donor_Account__c)) ) ) )
+  </errorConditionFormula>
+  <errorMessage>
+    Choose one person or one organization for this ask, not both and not neither.
+  </errorMessage>
+</ValidationRule>
