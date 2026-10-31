@@ -257,18 +257,21 @@ public with sharing class ImportNewFieldService {
         public void execute(QueueableContext queued) {
             String logContext = LOG_CONTEXT + queued.getJobId();
             String failure;
-            String detail;
             try {
                 failure = create(request, UserInfo.getSessionId());
             } catch (Exception e) {
-                failure = String.format(
-                    Label.Core_ImportNewField_ConnectionRefused,
-                    new List<String>{ e.getMessage() }
+                ErrorLogger.logWithMessage(
+                    e,
+                    logContext,
+                    String.format(
+                        Label.Core_ImportNewField_ConnectionRefused,
+                        new List<String>{ e.getMessage() }
+                    )
                 );
-                detail = e.getTypeName() + ': ' + e.getMessage() + '\n' + e.getStackTraceString();
+                return;
             }
             if (failure != null) {
-                recordFailure(failure, detail, logContext);
+                ErrorLogger.logMessage(failure, logContext, ErrorLogger.SEVERITY_ERROR);
                 return;
             }
             grantAccess(
@@ -278,24 +281,6 @@ public with sharing class ImportNewFieldService {
                 logContext
             );
         }
-    }
-
-    /**
-     * The failed job's Error Log entry, which `check` reads to end the poll as Failed. Written
-     * directly, not through ErrorLogger's platform event: this transaction commits (the job
-     * catches everything), and the event's subscriber writes the row later, so the poll (and a
-     * test) could read Running after the job had already failed.
-     */
-    private static void recordFailure(String message, String detail, String logContext) {
-        insert as system new Error_Log__c(
-            Timestamp__c = System.now(),
-            User__c = UserInfo.getUserId(),
-            Context__c = logContext.left(255),
-            Message__c = message.left(32000),
-            Technical_Detail__c = detail == null ? null : detail.left(32000),
-            Severity__c = ErrorLogger.SEVERITY_ERROR,
-            Status__c = ErrorLogger.STATUS_NEW
-        );
     }
 
     /** Calls createMetadata; returns null on success, else the plain reason. */
@@ -507,6 +492,11 @@ public with sharing class ImportNewFieldService {
         if (result.state == CREATED) {
             return result;
         }
+        // createMetadata is synchronous, so a finished job whose field is not in describe failed.
+        // The job's Error Log entry arrives through ErrorLogger's event, possibly after this poll;
+        // until it does, the generic message stands in for it.
+        result.state = FAILED;
+        result.message = Label.Core_ImportNewField_JobFailed;
         String logContext = LOG_CONTEXT + jobId;
         List<Error_Log__c> logged = [
             SELECT Message__c
@@ -517,7 +507,6 @@ public with sharing class ImportNewFieldService {
             LIMIT 1
         ];
         if (!logged.isEmpty()) {
-            result.state = FAILED;
             result.message = logged[0].Message__c;
         }
         return result;
