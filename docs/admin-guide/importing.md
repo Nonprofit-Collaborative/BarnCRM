@@ -981,6 +981,7 @@ file of the same kind is fixed too.
 | **First characters**, **Last characters** | Keeps the first or last number of characters you give. | first 5: `97201-1234` becomes `97201` |
 | **Shift a date** | Adds or takes away days or months (type a minus sign to go back). It reads a date written year first, so put **Read as a date** before it for other orders. Adding a month to the 31st gives the month's last day. | plus 1 month: `2025-01-31` becomes `2025-02-28` |
 | **Today's date** | Writes today's date, or, if you tick **Only when empty**, fills only empty cells with it. | an empty cell becomes `2026-10-13` |
+| **Format digits** | Keeps the digits and writes them into a **Pattern** (one `#` for each digit, other characters as typed). **Country code to drop** removes a leading code such as `1` when that makes the digits fit. An extension (`x12`, `ext 12`) is kept after the number as ` x12`. A value whose digits do not fit is left as it is. | `555.123.4567` with `(###) ###-####` becomes `(555) 123-4567` |
 
 3. The panel shows the first values of the column before and after your changes. Select
    **Done**. The column shows how many changes it has.

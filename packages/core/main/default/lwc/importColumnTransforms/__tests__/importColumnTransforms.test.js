@@ -117,7 +117,8 @@ describe('the changes to one column', () => {
       'first',
       'last',
       'shiftDate',
-      'today'
+      'today',
+      'digits'
     ]);
     const columns = input(element, 'columns');
     expect(columns.options.map((option) => option.value)).toEqual(['Middle', 'Last']);
@@ -210,6 +211,25 @@ describe('the changes to one column', () => {
       { op: 'first', count: 5 },
       { op: 'shiftDate', amount: -30, unit: 'days' },
       { op: 'today', whenBlank: true }
+    ]);
+  });
+
+  it('starts a Format digits step as the US phone pattern and sends what is typed (C-50f2)', async () => {
+    const element = render();
+    listen(element);
+    await flush();
+    element.shadowRoot.querySelector('[data-id="add"]').click();
+    await flush();
+    change(input(element, 'op'), 'digits');
+    await flush();
+    expect(changes[changes.length - 1].transforms).toEqual([
+      { op: 'digits', pattern: '(###) ###-####', country: '1' }
+    ]);
+    change(input(element, 'pattern'), '###-###-####');
+    change(input(element, 'country'), '');
+    await flush();
+    expect(changes[changes.length - 1].transforms).toEqual([
+      { op: 'digits', pattern: '###-###-####', country: '' }
     ]);
   });
 

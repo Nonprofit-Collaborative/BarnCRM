@@ -2663,10 +2663,15 @@ column's value before it is matched or written (ADR-0081, `0081-data-transform-d
 | `first`, `last` | `count` (1 to 255) | The first or last `count` characters; a shorter value is kept whole. |
 | `shiftDate` | `amount` (a whole number, at most 36,600 days or 1,200 months either way), `unit`: `days` or `months` | Reads the first three numbers year first (so `2025-12-31` and a stored date with a time both read), adds the amount and writes `YYYY-MM-DD`; adding months keeps the day where the month has it, otherwise the month's last day. A value that is not a date, or a result outside the years 1700 to 4000, is left unchanged. |
 | `today` | `whenBlank` (default false) | Today's date as `YYYY-MM-DD` in the running user's time zone; under `whenBlank`, only when the value so far is blank. |
+| `digits` | `pattern` (required, at most 30 characters, 1 to 15 `#`), `country` (digits only, at most 3, optional) | Keeps the digits of the value and writes them into `pattern`, one digit for each `#` and every other character as written: `(###) ###-####` turns `555.123.4567` into `(555) 123-4567`. When the digits are exactly `country`'s length too many and start with it, that country code is dropped first (`+1 555 123 4567`, country `1`). An extension at the end (`x12`, `ext 12`, `ext. 12`, `extension 12`, any capitals) is kept and written ` x12` after the number. A value whose digits do not fit the pattern, a blank value and a value longer than 100 characters are left unchanged, so a bad number is never mangled. |
 
 The steps from `map` on were added by ADR-0112 (`0112-more-transform-steps.md`); a document
 whose steps may use them carries `"version": 2` (the mapping document of R-IT1 and the bulk
-update definition of R-BU1). A reader that does not know an `op` skips that step, as below.
+update definition of R-BU1). `digits` was added by ADR-NEXT (C-50f2, the phone format preset of
+Super Transform) and a document that may use it carries `"version": 3`. A reader that does not
+know an `op` skips that step, as below. `DataTransform.formatDigits` (Apex) and the framework-free
+module `transformFormat` (the `transformFormat` LWC bundle, plan 9.9) implement `digits` and are
+both tested against the one fixture `TransformFormatFixture.json`.
 
 Steps run in order, before values for every row (R-IB14): a step's output that is blank is
 filled by a file or template value like any blank cell. A document is checked when it is saved
@@ -9045,6 +9050,69 @@ indexed for an org of more than 100,000 accounts; the V-06 Core work adds it, by
 
 ---
 
+## 29W. Saved Transform
+
+### Definition
+
+A named, reusable Super Transform step list (plan feature C-50f1): the object, the conditions
+(a Find filter document) and up to five field changes, kept as one documented JSON document so
+that a person can load it on the Super Transform page later, rename it or delete it. It is
+org-wide: everyone who may use Super Transform sees and manages every list. It holds no
+records and grants access to none. Neutral: it names no nonprofit concept and is in Core.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The list's name, 1 to 80 characters, unique among lists ignoring capitals. |
+| Object Name | text | yes | The API name of the object the list changes, copied from the definition when it is saved. |
+| Definition | long text | yes | The list as a version 1 JSON document (R-ST1). |
+
+### Rules
+
+**R-ST1 The document.** `{ "version": 1, "object": "Contact", "filter": { ...filter document of R-R2... }, "changes": [ { "field", "action", "value" | "source" | "transforms" } ] }`.
+`object` is the API name of an object a bulk update may write; `filter` is optional (no filter
+means every record, as on the page); `changes` holds at most 5 entries (R-BU1), each with a
+`field` and an `action` of `set`, `clear`, `copy` or `transform`, carrying what that action
+reads in the form R-BU1 and R-BU7 give (`value`, `source`, or `transforms` in the document of
+R-IT15). The page's changes JSON is the same list, so a list is the page's state, nothing more.
+**R-ST2 Checked on save, never on trust.** A save is refused when the document is not
+version 1 JSON, is over 100,000 characters, names an object a bulk update may not write, has a
+`filter` that is not a document, has more than 5 changes or a change with no `field` or an
+unknown `action`, or has a `transform` change whose steps `DataTransform.problems` names a
+problem with. The name must be 1 to 80 characters and no other list may have it (capitals
+ignored). A filter's conditions and a change's fields are not checked against the object at
+save: that happens when the list is loaded and when the page counts, previews and runs.
+**R-ST3 Loading only fills the page in.** Loading reads the document, then the page loads the
+object's fields as the person: a change whose field the person may not change on the object now
+is left out and the page says how many; nothing runs, and a preview, the confirmation and the
+run check everything as the person (R-BU1 to R-BU7). A list is therefore no way past a field
+or record the person cannot reach.
+**R-ST4 Org-wide, one set of permissions.** Every list is visible to, and may be renamed or
+deleted by, everyone who holds Bulk Update Records and Find and Export Records (the permission
+set `BarnCRM_Bulk_Update` grants Read, Create, Edit, Delete, View All and Modify All, the last
+two because a delete otherwise reaches only the list's owner). Reads and writes are in user
+mode. Rename changes only the name; a list is saved new, never overwritten.
+
+### Salesforce implementation
+
+- **Object** `Saved_Transform__c`, Name text (`Saved Transform Name`), public read and write
+  sharing, reports on, no activities, feeds or history. `BarnCRM_Bulk_Update` and
+  `BarnCRM_Admin` are granted Read, Create, Edit, Delete, View All and Modify All.
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Object Name | `Object_Name__c` | Text(255) | |
+| Definition | `Definition_JSON__c` | Long Text Area(131072) | Written only by Super Transform. |
+
+- **Service:** `SavedTransformService` (list, load, save, rename, delete, document checks) and
+  five `@AuraEnabled` methods on `BulkUpdateController` (`getSavedLists`, `loadSavedList`,
+  `saveSavedList`, `renameSavedList`, `deleteSavedList`), each requiring Bulk Update Records and
+  Find and Export Records. The page is the `superTransform` component, whose Saved Step Lists
+  card is the only place a list is made or used.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -9329,6 +9397,7 @@ mirrors the primary member).
 | v0.11 | 2026-10-29 | Security review G-L4 and G-L5 (owner decisions). No object or field added. New R-AK13 (ADR-0144, `0144-acknowledgments-honor-email-opt-out.md`): an email gift whose recipient contact has Email Opt Out is not emailed, gets no row and stays queued, and the letter run takes it as a letter. `Giving_Admin` loses View All on `Commitment__c`, matching `Gift__c`; commitment record access comes from ownership, roles and sharing. |
 | v1.0 | 2026-10-30 | Advanced duplicate management (C-51, D-154, ADR-0145 `0145-advanced-duplicate-management.md`). Object `Merge_Journal__c` added (Section 29A); custom metadata type `Merge_Rule__mdt` added (Section 13); settings keys `Fuzzy_Match_Threshold__c`, `Merge_Default_Rule__c` and `Auto_Merge_Exact_Match__c`. R-DP1 and R-DP4 amended; R-DP7 to R-DP10 added. |
 | v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-0149). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a) by any user with the import permission and edit access to the rows; `Import_Batch__c` gains `Retried_By__c` (Rows Retried By) so undo covers their records. R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
+| v0.12 | 2026-10-31 | Super Transform follow-ups (C-50f1, C-50f2; ADR-NEXT). New object `Saved_Transform__c` (Section 29W: `Object_Name__c`, `Definition_JSON__c`), org-wide saved step lists, granted to `BarnCRM_Bulk_Update` and `BarnCRM_Admin`. R-IT15 gains the `digits` step (a document that may use it is version 3; Apex `DataTransform.formatDigits` and the JavaScript module `transformFormat` share one test fixture). R-BU7 applies it unchanged. |
 
 ---
 ## 32. Entity ownership by package
@@ -9375,6 +9444,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Duplicate Dismissal | Core | v0.5 | 29A |
 | Duplicate Reason | Core | v0.8 | 29A |
 | Saved Query | Core | v0.7 | 29D |
+| Saved Transform | Core | v0.12 | 29W |
 | Field Utilization Snapshot | Core | not scheduled (plan Section 6.1 item 10) | 29F |
 | What's New Seen | Core | v0.6 | 12A |
 | Release Note (shipped, read as shipped) | Core, records from any package | v0.6 | 13 |

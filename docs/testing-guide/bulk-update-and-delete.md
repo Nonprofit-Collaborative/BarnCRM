@@ -215,9 +215,44 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Super Transform**, choose **Contact**, add **Last Name** **equals** `Sttest`, choose **First Name**, and open **Action**. | The actions are **Set To**, **Clear**, **Copy From Another Field**, **Change With Steps** and **Fix Name Capitals**. |
+| 1 | Open **Super Transform**, choose **Contact**, add **Last Name** **equals** `Sttest`, choose **First Name**, and open **Action**. | The actions are **Set To**, **Clear**, **Copy From Another Field**, **Change With Steps**, **Fix Name Capitals** and **Format Phone Number**. |
 | 2 | Choose **Fix Name Capitals**. | **Action** shows **Change With Steps**, with two steps already filled in: remove extra spaces, and capitalize each word. |
 | 3 | Press **Preview**, then **Run Super Transform** and **Run**. | The preview showed `  ana ` changing to `Ana`. After the run the contact's **First Name** is `Ana`. Undo it under **Data Jobs**. |
 | 4 | Log in as the user with **BarnCRM Find and Export** only and open **Super Transform** (App Launcher). | If the tab is shown, it says Super Transform is not turned on for them, with the permissions to ask for, and no error. |
 
 **Cleanup:** delete the Sttest contact.
+
+## T-BULK-14: Super Transform Saved Step Lists
+
+**Purpose:** confirm a Super Transform can be saved by name, loaded, renamed and deleted, org-wide. Setup detail: [Super Transform](../admin-guide/super-transform.md), section 5.
+**Prerequisites:** admin; a second user holding **BarnCRM Find and Export** and **BarnCRM Bulk Update** (see [Test users](before-you-test.md#test-users)); no saved list named `Sttest list` yet.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Super Transform**. | The **Saved Step Lists** card is at the top, saying "No lists are saved yet." (or listing existing lists). **Save as New List**, **Load List**, **Rename List** and **Delete List** are disabled. |
+| 2 | Choose **Contact**, add **Last Name** **equals** `Sttest`, choose **First Name**, choose **Fix Name Capitals**. Type `Sttest list` in **List Name**. | **Save as New List** is enabled. |
+| 3 | Press **Save as New List**. | "Saved the list Sttest list." **Saved List** now offers "Sttest list (Contact)" and has it chosen. |
+| 4 | Type `Sttest list` again and press **Save as New List** a second time. | A red message says a saved list named Sttest list already exists. No second list appears. |
+| 5 | Choose **Account** under **1. Object** (the changes clear). Choose **Sttest list** in **Saved List** and press **Load List**. | "Loaded the list Sttest list." The object is **Contact**, the condition **Last Name** **equals** `Sttest` is back, and **First Name** shows **Change With Steps** with the two name steps. **Matching Records** counts again. Nothing has run. |
+| 6 | Press **Preview** and check the table, but do not run. | The preview works as for any other change; no record has changed. |
+| 7 | Log in as the second user, open **Super Transform**. | **Sttest list (Contact)** is offered. Choose it, type `Sttest names` in **List Name** and press **Rename List**: "Renamed the list to Sttest names." |
+| 8 | Back as admin, reload **Super Transform**. | The list is now **Sttest names (Contact)**. |
+| 9 | Choose it and press **Delete List**, then **Cancel**. | Nothing is deleted. |
+| 10 | Press **Delete List** again and confirm. | "Deleted the list Sttest names." The card says no lists are saved. Contacts are unchanged. |
+
+**Cleanup:** delete the Sttest contact.
+
+## T-BULK-15: Format Phone Number and the Format Digits Step
+
+**Purpose:** confirm the one-click phone format and the Format digits step on phone values with a country code and an extension.
+**Prerequisites:** admin; five contacts with last name `Phtest` and **Phone** values `5551234567`, `1-555-123-4567`, `+1 (555) 123-4567 ext. 12`, `555-1234` and `call the office`. Setup detail: [Super Transform](../admin-guide/super-transform.md), section 6.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Super Transform**, choose **Contact**, add **Last Name** **equals** `Phtest`, choose **Phone**, and open **Action**. | The actions include **Format Phone Number**. |
+| 2 | Choose **Format Phone Number**. | **Action** shows **Change With Steps** with one step, **Format digits**, **Pattern** `(###) ###-####` and **Country code to drop** `1`. |
+| 3 | Press **Preview**. | After values: `(555) 123-4567`, `(555) 123-4567`, `(555) 123-4567 x12`, `555-1234` (unchanged, not highlighted) and `call the office` (unchanged, not highlighted). |
+| 4 | Change **Pattern** to `###-###-####` and clear **Country code to drop**. Press **Preview**. | `5551234567` becomes `555-123-4567`. `1-555-123-4567` is now unchanged (eleven digits and no country code to drop). |
+| 5 | Set **Country code to drop** back to `1`, press **Preview**, then **Run Super Transform** and **Run**. | Three phones are updated to `(555) 123-4567` form (the third with ` x12`); two are unchanged. Undo the run under **Data Jobs**; the original phones return. |
+
+**Cleanup:** delete the Phtest contacts.

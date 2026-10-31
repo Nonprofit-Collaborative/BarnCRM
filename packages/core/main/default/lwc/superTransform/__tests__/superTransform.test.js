@@ -9,6 +9,55 @@ import countMatches from '@salesforce/apex/BulkUpdateController.countMatches';
 import previewSample from '@salesforce/apex/BulkUpdateController.previewSample';
 import startUpdate from '@salesforce/apex/BulkUpdateController.start';
 import getJob from '@salesforce/apex/BulkUpdateController.getJob';
+import getSavedLists from '@salesforce/apex/BulkUpdateController.getSavedLists';
+import loadSavedList from '@salesforce/apex/BulkUpdateController.loadSavedList';
+import saveSavedList from '@salesforce/apex/BulkUpdateController.saveSavedList';
+import renameSavedList from '@salesforce/apex/BulkUpdateController.renameSavedList';
+import deleteSavedList from '@salesforce/apex/BulkUpdateController.deleteSavedList';
+
+jest.mock('@salesforce/apex/BulkUpdateController.getSavedLists', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/BulkUpdateController.loadSavedList', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/BulkUpdateController.saveSavedList', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/BulkUpdateController.renameSavedList', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/BulkUpdateController.deleteSavedList', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/label/c.Core_SuperTransform_SavedSaved',
+  () => ({ default: 'Saved the list {0}.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_SuperTransform_SavedLoaded',
+  () => ({ default: 'Loaded the list {0}.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_SuperTransform_SavedSkipped',
+  () => ({ default: 'Loaded the list {0}. {1} change(s) were left out.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_SuperTransform_SavedRenamed',
+  () => ({ default: 'Renamed the list to {0}.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_SuperTransform_SavedDeleted',
+  () => ({ default: 'Deleted the list {0}.' }),
+  { virtual: true }
+);
+jest.mock('@salesforce/label/c.Core_SuperTransform_SavedOption', () => ({ default: '{0} ({1})' }), {
+  virtual: true
+});
 
 jest.mock('@salesforce/apex/BulkUpdateController.getPage', () => ({ default: jest.fn() }), {
   virtual: true
@@ -155,6 +204,7 @@ describe('c-super-transform', () => {
     previewSample.mockResolvedValue(PREVIEW);
     startUpdate.mockResolvedValue(FINISHED);
     getJob.mockResolvedValue(FINISHED);
+    getSavedLists.mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -241,13 +291,177 @@ describe('c-super-transform', () => {
     q(element, 'field').dispatchEvent(new CustomEvent('change', { detail: { value: 'Title' } }));
     await flush();
     const actions = q(element, 'action').options.map((o) => o.value);
-    expect(actions).toEqual(['set', 'clear', 'copy', 'transform', 'nameCase']);
+    expect(actions).toEqual(['set', 'clear', 'copy', 'transform', 'nameCase', 'phoneFormat']);
     q(element, 'action').dispatchEvent(
       new CustomEvent('change', { detail: { value: 'nameCase' } })
     );
     await flush();
     const steps = element.shadowRoot.querySelector('c-import-column-transforms');
     expect(steps.transforms).toEqual([{ op: 'trim' }, { op: 'proper' }]);
+  });
+
+  it('offers Format Phone Number as one digit-format step (C-50f2)', async () => {
+    const element = mount();
+    await flush();
+    await chooseContact(element);
+    q(element, 'field').dispatchEvent(new CustomEvent('change', { detail: { value: 'Title' } }));
+    await flush();
+    q(element, 'action').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'phoneFormat' } })
+    );
+    await flush();
+    const steps = element.shadowRoot.querySelector('c-import-column-transforms');
+    expect(steps.transforms).toEqual([{ op: 'digits', pattern: '(###) ###-####', country: '1' }]);
+    q(element, 'preview').click();
+    await flush();
+    expect(JSON.parse(previewSample.mock.calls[0][0].changesJson)).toEqual([
+      {
+        field: 'Title',
+        action: 'transform',
+        transforms: [{ op: 'digits', pattern: '(###) ###-####', country: '1' }]
+      }
+    ]);
+  });
+
+  it('offers no phone format on a picklist', async () => {
+    const element = mount();
+    await flush();
+    await chooseContact(element);
+    q(element, 'field').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'Contact_Kind__c' } })
+    );
+    await flush();
+    expect(q(element, 'action').options.map((o) => o.value)).not.toContain('phoneFormat');
+  });
+
+  describe('saved step lists (C-50f1)', () => {
+    const ENTRY = {
+      recordId: 'a0S1',
+      name: 'Tidy titles',
+      objectName: 'Contact',
+      objectLabel: 'Contact'
+    };
+    const DEFINITION = {
+      version: 1,
+      object: 'Contact',
+      filter: { version: 1, conditions: [{ id: 1, field: 'Title' }] },
+      changes: [
+        { field: 'Title', action: 'transform', transforms: [{ op: 'trim' }] },
+        { field: 'Gone__c', action: 'set', value: 'x' }
+      ]
+    };
+
+    it('lists the saved lists with their object', async () => {
+      getSavedLists.mockResolvedValue([ENTRY]);
+      const element = mount();
+      await flush();
+      expect(q(element, 'saved-pick').options).toEqual([
+        { label: 'Tidy titles (Contact)', value: 'a0S1' }
+      ]);
+      expect(q(element, 'saved-load').disabled).toBe(true);
+      expect(q(element, 'saved-delete').disabled).toBe(true);
+    });
+
+    it('says so when none are saved, and saves nothing without an object and a name', async () => {
+      const element = mount();
+      await flush();
+      expect(q(element, 'saved-none')).not.toBeNull();
+      expect(q(element, 'saved-save').disabled).toBe(true);
+    });
+
+    it('saves the page as a version 1 document and selects the new list', async () => {
+      saveSavedList.mockResolvedValue({ ...ENTRY, definitionJson: '{}' });
+      const element = mount();
+      await flush();
+      await chooseContact(element);
+      await setTitle(element, 'Coordinator');
+      q(element, 'saved-name').dispatchEvent(
+        new CustomEvent('change', { detail: { value: 'Tidy titles' } })
+      );
+      await flush();
+      getSavedLists.mockResolvedValue([ENTRY]);
+      q(element, 'saved-save').click();
+      await flush();
+      await flush();
+      const sent = saveSavedList.mock.calls[0][0];
+      expect(sent.name).toBe('Tidy titles');
+      expect(JSON.parse(sent.definitionJson)).toEqual({
+        version: 1,
+        object: 'Contact',
+        changes: [{ field: 'Title', action: 'set', value: 'Coordinator' }]
+      });
+      expect(q(element, 'notice-message').textContent).toBe('Saved the list Tidy titles.');
+      expect(q(element, 'saved-pick').value).toBe('a0S1');
+    });
+
+    it('loads a list, leaving out a change whose field is gone, and counts again', async () => {
+      getSavedLists.mockResolvedValue([ENTRY]);
+      loadSavedList.mockResolvedValue({
+        ...ENTRY,
+        definitionJson: JSON.stringify(DEFINITION)
+      });
+      const element = mount();
+      await flush();
+      q(element, 'saved-pick').dispatchEvent(
+        new CustomEvent('change', { detail: { value: 'a0S1' } })
+      );
+      await flush();
+      q(element, 'saved-load').click();
+      await flush();
+      await rest();
+      await flush();
+      expect(loadSavedList).toHaveBeenCalledWith({ recordId: 'a0S1' });
+      expect(getTargets).toHaveBeenCalledWith({ objectName: 'Contact' });
+      expect(q(element, 'object').value).toBe('Contact');
+      expect(JSON.parse(countMatches.mock.calls[0][0].queryJson).filter.conditions).toHaveLength(1);
+      const steps = element.shadowRoot.querySelector('c-import-column-transforms');
+      expect(steps.transforms).toEqual([{ op: 'trim' }]);
+      expect(q(element, 'notice-message').textContent).toBe(
+        'Loaded the list Tidy titles. 1 change(s) were left out.'
+      );
+      expect(q(element, 'preview').disabled).toBe(false);
+    });
+
+    it('renames the selected list', async () => {
+      getSavedLists.mockResolvedValue([ENTRY]);
+      renameSavedList.mockResolvedValue({ ...ENTRY, name: 'Titles' });
+      const element = mount();
+      await flush();
+      q(element, 'saved-pick').dispatchEvent(
+        new CustomEvent('change', { detail: { value: 'a0S1' } })
+      );
+      await flush();
+      q(element, 'saved-name').dispatchEvent(
+        new CustomEvent('change', { detail: { value: 'Titles' } })
+      );
+      await flush();
+      q(element, 'saved-rename').click();
+      await flush();
+      expect(renameSavedList).toHaveBeenCalledWith({ recordId: 'a0S1', name: 'Titles' });
+      expect(q(element, 'notice-message').textContent).toBe('Renamed the list to Titles.');
+    });
+
+    it('deletes only after the confirmation', async () => {
+      getSavedLists.mockResolvedValue([ENTRY]);
+      const element = mount();
+      await flush();
+      q(element, 'saved-pick').dispatchEvent(
+        new CustomEvent('change', { detail: { value: 'a0S1' } })
+      );
+      await flush();
+      BarnConfirmModal.open = jest.fn().mockResolvedValue(false);
+      q(element, 'saved-delete').click();
+      await flush();
+      expect(deleteSavedList).not.toHaveBeenCalled();
+      BarnConfirmModal.open = jest.fn().mockResolvedValue(true);
+      getSavedLists.mockResolvedValue([]);
+      q(element, 'saved-delete').click();
+      await flush();
+      await flush();
+      expect(deleteSavedList).toHaveBeenCalledWith({ recordId: 'a0S1' });
+      expect(q(element, 'notice-message').textContent).toBe('Deleted the list Tidy titles.');
+      expect(q(element, 'saved-none')).not.toBeNull();
+    });
   });
 
   it('previews old and new values, highlights changes and counts those already held', async () => {

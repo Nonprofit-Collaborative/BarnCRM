@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_SavedTransform_ErrorTooBig</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Saved list: the document is empty or too large</shortDescription>
+        <value>This list is empty or too large to save.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SavedTransform_ErrorUnreadable</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Saved list: the document is not readable</shortDescription>
+        <value>This list could not be read as a Super Transform list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SavedTransform_ErrorObject</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Saved list: object cannot be changed; {0} is the API name</shortDescription>
+        <value>Super Transform cannot change records of {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SavedTransform_ErrorChanges</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Saved list: a change is malformed or there are too many; {0} is the most</shortDescription>
+        <value>Each change needs a field and an action, and a list holds at most {0} changes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SavedTransform_ErrorSteps</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Saved list: steps have a problem; {0} is the field, {1} the problems</shortDescription>
+        <value>The steps for {0} have a problem: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_SavedTransform_ErrorName</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Saved list: name missing or too long; {0} is the longest</shortDescription>
+        <value>Give the list a name of 1 to {0} characters.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SavedTransform_ErrorExists</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Saved list: the name is taken; {0} is the name</shortDescription>
+        <value>A saved list named {0} already exists. Choose another name.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SavedTransform_ErrorNotFound</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Saved list: the list is gone</shortDescription>
+        <value>That saved list is gone. Refresh the page.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedHeading</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: saved lists card heading</shortDescription>
+        <value>Saved Step Lists</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedHelp</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: saved lists card help</shortDescription>
+        <value>Save the object, conditions and changes on this page as a named list that everyone who uses Super Transform can load later. Loading a list fills the page in; nothing runs until you preview and run.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedChoose</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: saved list picker label</shortDescription>
+        <value>Saved List</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedPlaceholder</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: saved list picker placeholder</shortDescription>
+        <value>Choose a saved list</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedNone</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: no lists are saved</shortDescription>
+        <value>No lists are saved yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedOption</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: picker option; {0} list name, {1} object label</shortDescription>
+        <value>{0} ({1})</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedLoad</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: load button</shortDescription>
+        <value>Load List</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedNameLabel</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: list name input label</shortDescription>
+        <value>List Name</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedSave</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: save button</shortDescription>
+        <value>Save as New List</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedRename</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: rename button</shortDescription>
+        <value>Rename List</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedDelete</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: delete button</shortDescription>
+        <value>Delete List</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedDeleteMessage</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: delete confirmation; {0} list name</shortDescription>
+        <value>Delete the saved list {0}?</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedDeleteDetail</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: delete confirmation detail</shortDescription>
+        <value>Only the saved list is deleted. No records change.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedSaved</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: saved notice; {0} list name</shortDescription>
+        <value>Saved the list {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedLoaded</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: loaded notice; {0} list name</shortDescription>
+        <value>Loaded the list {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedRenamed</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: renamed notice; {0} new name</shortDescription>
+        <value>Renamed the list to {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedDeleted</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: deleted notice; {0} list name</shortDescription>
+        <value>Deleted the list {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedSkipped</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: loaded with changes left out; {0} list name, {1} how many</shortDescription>
+        <value>Loaded the list {0}. {1} saved change(s) were left out because you cannot change that field on this object now.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_ActionPhoneFormat</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: action option, shipped steps for phone format</shortDescription>
+        <value>Format Phone Number</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsOpDigits</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: format digits</shortDescription>
+        <value>Format digits</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsPattern</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Format digits: pattern label</shortDescription>
+        <value>Pattern (one # for each digit)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsCountry</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Format digits: country code label</shortDescription>
+        <value>Country code to drop (optional)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Transform_ErrorDigits</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Format digits: pattern or country code unusable</shortDescription>
+        <value>Format digits needs a pattern with 1 to 15 # signs (at most 30 characters) and a country code of up to 3 digits, or none.</value>
+    </labels>
+</CustomLabels>

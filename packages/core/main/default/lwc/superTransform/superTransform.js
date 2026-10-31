@@ -9,6 +9,12 @@ import countMatches from '@salesforce/apex/BulkUpdateController.countMatches';
 import previewSample from '@salesforce/apex/BulkUpdateController.previewSample';
 import startUpdate from '@salesforce/apex/BulkUpdateController.start';
 import getJob from '@salesforce/apex/BulkUpdateController.getJob';
+import getSavedLists from '@salesforce/apex/BulkUpdateController.getSavedLists';
+import loadSavedList from '@salesforce/apex/BulkUpdateController.loadSavedList';
+import saveSavedList from '@salesforce/apex/BulkUpdateController.saveSavedList';
+import renameSavedList from '@salesforce/apex/BulkUpdateController.renameSavedList';
+import deleteSavedList from '@salesforce/apex/BulkUpdateController.deleteSavedList';
+import { PHONE_PRESET_STEPS } from 'c/transformFormat';
 
 import NO_PERMISSION from '@salesforce/label/c.Core_BulkUpdate_ErrorNoPermission';
 import RECORD from '@salesforce/label/c.Core_BulkUpdate_Record';
@@ -73,6 +79,25 @@ import MATCHING from '@salesforce/label/c.Core_SuperTransform_Matching';
 import BADGE_EVERY from '@salesforce/label/c.Core_SuperTransform_BadgeEvery';
 import BADGE_OVER from '@salesforce/label/c.Core_SuperTransform_BadgeOver';
 import ACTION_NAME_CASE from '@salesforce/label/c.Core_SuperTransform_ActionNameCase';
+import ACTION_PHONE_FORMAT from '@salesforce/label/c.Core_SuperTransform_ActionPhoneFormat';
+import SAVED_HEADING from '@salesforce/label/c.Core_SuperTransform_SavedHeading';
+import SAVED_HELP from '@salesforce/label/c.Core_SuperTransform_SavedHelp';
+import SAVED_CHOOSE from '@salesforce/label/c.Core_SuperTransform_SavedChoose';
+import SAVED_PLACEHOLDER from '@salesforce/label/c.Core_SuperTransform_SavedPlaceholder';
+import SAVED_NONE from '@salesforce/label/c.Core_SuperTransform_SavedNone';
+import SAVED_OPTION from '@salesforce/label/c.Core_SuperTransform_SavedOption';
+import SAVED_LOAD from '@salesforce/label/c.Core_SuperTransform_SavedLoad';
+import SAVED_NAME from '@salesforce/label/c.Core_SuperTransform_SavedNameLabel';
+import SAVED_SAVE from '@salesforce/label/c.Core_SuperTransform_SavedSave';
+import SAVED_RENAME from '@salesforce/label/c.Core_SuperTransform_SavedRename';
+import SAVED_DELETE from '@salesforce/label/c.Core_SuperTransform_SavedDelete';
+import SAVED_DELETE_MESSAGE from '@salesforce/label/c.Core_SuperTransform_SavedDeleteMessage';
+import SAVED_DELETE_DETAIL from '@salesforce/label/c.Core_SuperTransform_SavedDeleteDetail';
+import SAVED_SAVED from '@salesforce/label/c.Core_SuperTransform_SavedSaved';
+import SAVED_LOADED from '@salesforce/label/c.Core_SuperTransform_SavedLoaded';
+import SAVED_RENAMED from '@salesforce/label/c.Core_SuperTransform_SavedRenamed';
+import SAVED_DELETED from '@salesforce/label/c.Core_SuperTransform_SavedDeleted';
+import SAVED_SKIPPED from '@salesforce/label/c.Core_SuperTransform_SavedSkipped';
 
 /** A shipped step list: tidy spaces, then capitalize each word (for names). */
 const NAME_CASE_STEPS = [{ op: 'trim' }, { op: 'proper' }];
@@ -84,6 +109,8 @@ const COUNT_DELAY = 500;
 const NUMBER_TYPES = new Set(['integer', 'double', 'currency', 'percent']);
 /** Fields a transform result is written to as text (BulkUpdateFields.canTransform). */
 const TEXT_TYPES = new Set(['string', 'textarea']);
+/** Fields the one-click phone format is offered on: phone fields and short text. */
+const PHONE_TYPES = new Set(['phone', 'string']);
 const INPUT_TYPES = {
   email: 'email',
   phone: 'tel',
@@ -153,7 +180,17 @@ export default class SuperTransform extends LightningElement {
     failures: FAILURES,
     undoHint: UNDO_HINT,
     startAnother: START_ANOTHER,
-    loading: LOADING
+    loading: LOADING,
+    savedHeading: SAVED_HEADING,
+    savedHelp: SAVED_HELP,
+    savedChoose: SAVED_CHOOSE,
+    savedPlaceholder: SAVED_PLACEHOLDER,
+    savedNone: SAVED_NONE,
+    savedLoad: SAVED_LOAD,
+    savedName: SAVED_NAME,
+    savedSave: SAVED_SAVE,
+    savedRename: SAVED_RENAME,
+    savedDelete: SAVED_DELETE
   };
 
   loaded = false;
@@ -177,6 +214,9 @@ export default class SuperTransform extends LightningElement {
   countTimer;
   countRequest = 0;
   stopTimer;
+  savedLists = [];
+  savedListId;
+  savedNameText = '';
 
   connectedCallback() {
     this.load();
@@ -194,6 +234,7 @@ export default class SuperTransform extends LightningElement {
       if (this.allowed) {
         this.maxChanges = page.maxChanges || this.maxChanges;
         this.objects = await getObjects();
+        this.savedLists = await getSavedLists();
       }
     });
     this.loaded = true;
@@ -222,6 +263,31 @@ export default class SuperTransform extends LightningElement {
         option.label.toLowerCase().includes(search) ||
         option.value.toLowerCase().includes(search)
     );
+  }
+
+  /* ---------- saved step lists (C-50f1) ---------- */
+
+  get hasSavedLists() {
+    return this.savedLists.length > 0;
+  }
+
+  get savedOptions() {
+    return this.savedLists.map((entry) => ({
+      label: format(SAVED_OPTION, entry.name, entry.objectLabel || entry.objectName),
+      value: entry.recordId
+    }));
+  }
+
+  get pickDisabled() {
+    return this.busy || !this.savedListId;
+  }
+
+  get saveDisabled() {
+    return this.busy || !this.objectApiName || !this.filterValid || !this.savedNameText.trim();
+  }
+
+  get renameDisabled() {
+    return this.busy || !this.savedListId || !this.savedNameText.trim();
   }
 
   get hasObject() {
@@ -331,6 +397,9 @@ export default class SuperTransform extends LightningElement {
             : []),
           ...(target && TEXT_TYPES.has(type)
             ? [{ label: ACTION_NAME_CASE, value: 'nameCase' }]
+            : []),
+          ...(target && PHONE_TYPES.has(type)
+            ? [{ label: ACTION_PHONE_FORMAT, value: 'phoneFormat' }]
             : [])
         ],
         isBoolean,
@@ -559,6 +628,14 @@ export default class SuperTransform extends LightningElement {
           transforms: NAME_CASE_STEPS.map((s) => ({ ...s }))
         };
       }
+      if (part === 'action' && value === 'phoneFormat') {
+        // A shipped step list with a digit-format step, shown and editable as Change With Steps.
+        return {
+          ...change,
+          action: 'transform',
+          transforms: PHONE_PRESET_STEPS.map((s) => ({ ...s }))
+        };
+      }
       return { ...change, [part === 'record' ? 'value' : part]: value };
     });
     this.invalidate();
@@ -691,6 +768,136 @@ export default class SuperTransform extends LightningElement {
     this.noticeMessage = undefined;
     this.invalidate();
     this.scheduleCount(0);
+  }
+
+  /* ---------- saved step lists (C-50f1, documented JSON, plan 9.9) ---------- */
+
+  /** The page as a version 1 list document: object, filter and changes. */
+  definitionJson() {
+    const definition = {
+      version: 1,
+      object: this.objectApiName,
+      changes: JSON.parse(this.changesJson())
+    };
+    if (this.filterJson) {
+      definition.filter = JSON.parse(this.filterJson);
+    }
+    return JSON.stringify(definition);
+  }
+
+  selectedList() {
+    return this.savedLists.find((entry) => entry.recordId === this.savedListId);
+  }
+
+  async refreshSavedLists(selectId) {
+    this.savedLists = await getSavedLists();
+    this.savedListId = selectId;
+  }
+
+  handleSavedPick(event) {
+    this.savedListId = event.detail.value;
+    const entry = this.selectedList();
+    this.savedNameText = entry ? entry.name : this.savedNameText;
+  }
+
+  handleSavedName(event) {
+    this.savedNameText = event.detail.value || '';
+  }
+
+  async handleSavedSave() {
+    this.noticeMessage = undefined;
+    await this.work(async () => {
+      const saved = await saveSavedList({
+        name: this.savedNameText,
+        definitionJson: this.definitionJson()
+      });
+      await this.refreshSavedLists(saved.recordId);
+      this.noticeMessage = format(SAVED_SAVED, saved.name);
+    });
+  }
+
+  async handleSavedRename() {
+    this.noticeMessage = undefined;
+    await this.work(async () => {
+      const saved = await renameSavedList({
+        recordId: this.savedListId,
+        name: this.savedNameText
+      });
+      await this.refreshSavedLists(saved.recordId);
+      this.noticeMessage = format(SAVED_RENAMED, saved.name);
+    });
+  }
+
+  async handleSavedDelete() {
+    const entry = this.selectedList();
+    if (!entry) {
+      return;
+    }
+    const confirmed = await BarnConfirmModal.open({
+      label: SAVED_DELETE,
+      size: 'small',
+      message: format(SAVED_DELETE_MESSAGE, entry.name),
+      details: [SAVED_DELETE_DETAIL],
+      confirmLabel: SAVED_DELETE,
+      cancelLabel: CANCEL
+    });
+    if (confirmed !== true) {
+      return;
+    }
+    this.noticeMessage = undefined;
+    await this.work(async () => {
+      await deleteSavedList({ recordId: entry.recordId });
+      await this.refreshSavedLists(undefined);
+      this.noticeMessage = format(SAVED_DELETED, entry.name);
+    });
+  }
+
+  /**
+   * Fills the page in from a saved list: object, conditions and changes. A change naming a field
+   * the person may not change now is left out and counted; nothing runs until Preview and Run.
+   */
+  async handleSavedLoad() {
+    this.noticeMessage = undefined;
+    await this.work(async () => {
+      const saved = await loadSavedList({ recordId: this.savedListId });
+      const definition = JSON.parse(saved.definitionJson);
+      const targets = await getTargets({ objectName: definition.object });
+      this.stopPolling();
+      this.job = undefined;
+      this.objectApiName = definition.object;
+      this.targets = targets;
+      this.filterJson = definition.filter ? JSON.stringify(definition.filter) : '';
+      this.filterValid = true;
+      const wanted = definition.changes || [];
+      const kept = wanted.filter((change) => this.targetOf(change.field));
+      const loaded = await Promise.all(
+        kept.map(async (change) => {
+          const entry = {
+            ...this.newChange(),
+            field: change.field,
+            action: change.action,
+            value: change.value === undefined || change.value === null ? '' : change.value,
+            source: change.source,
+            transforms: change.transforms
+          };
+          if (entry.action === 'copy' || entry.action === 'transform') {
+            entry.sources = await getCopySources({
+              objectName: definition.object,
+              fieldName: change.field
+            });
+          }
+          return entry;
+        })
+      );
+      this.changes = loaded.length ? loaded : [this.newChange()];
+      this.invalidate();
+      this.savedNameText = saved.name;
+      const skipped = wanted.length - kept.length;
+      this.noticeMessage = skipped
+        ? format(SAVED_SKIPPED, saved.name, skipped)
+        : format(SAVED_LOADED, saved.name);
+      this.scheduleCount(0);
+    });
   }
 
   /* ---------- plumbing ---------- */
