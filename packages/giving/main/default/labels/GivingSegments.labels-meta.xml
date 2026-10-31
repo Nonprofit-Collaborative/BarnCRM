@@ -144,4 +144,244 @@
     <shortDescription>Segments: what the major gift prospects template finds</shortDescription>
     <value>A largest gift of 1,000 or more or total giving of 5,000 or more, and a gift in the last two years.</value>
   </labels>
+  <labels>
+    <fullName>Giving_Segments_Title</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: page title</shortDescription>
+    <value>Donor Segments</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_Intro</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: what the page is for</shortDescription>
+    <value>Named lists of donors chosen by their giving. Count them, see who is in them, and export a file to import into Mailchimp or Constant Contact. BarnCRM sends nothing.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_TemplatesHeading</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: heading over the starter templates</shortDescription>
+    <value>Start From a Template</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_TemplateField</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: label of the template choice</shortDescription>
+    <value>Template</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_RecordsField</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: label of the people or organizations choice</shortDescription>
+    <value>Records</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_People</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: the people choice</shortDescription>
+    <value>People</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_Organizations</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: the organizations choice</shortDescription>
+    <value>Organizations</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_NameField</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: label of the segment name box</shortDescription>
+    <value>Segment Name</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_SaveAsSegment</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: button that saves a template as a segment</shortDescription>
+    <value>Save as Segment</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_Saved</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: notice after a save; {0} is the segment name</shortDescription>
+    <value>Segment saved: {0}.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_SegmentsHeading</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: heading over the saved segments</shortDescription>
+    <value>Your Segments</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_SegmentField</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: label of the segment choice</shortDescription>
+    <value>Segment</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_Empty</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: shown when there are no segments yet</shortDescription>
+    <value>No segments yet. Save one from a template above, or save a Find query of people or organizations.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_OptionMine</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: a segment name; {0} is the name, {1} People or Organizations</shortDescription>
+    <value>{0} ({1})</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_OptionShared</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: a shared segment; {0} name, {1} kind, {2} owner</shortDescription>
+    <value>{0} ({1}, shared by {2})</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_Count</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: the count; {0} is the number of records</shortDescription>
+    <value>{0} records</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_CountMore</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: the count at the cap; {0} is the cap</shortDescription>
+    <value>More than {0} records</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_ShowList</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: button that lists the records</shortDescription>
+    <value>Show List</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_ListShown</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: above the list; {0} is the number of rows shown</shortDescription>
+    <value>Showing {0} records in the segment's own order and row limit. Change either in Find.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_LayoutField</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: label of the export layout choice</shortDescription>
+    <value>Export Layout</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_LayoutMailchimp</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: the Mailchimp layout</shortDescription>
+    <value>Mailchimp</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_LayoutConstantContact</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: the Constant Contact layout</shortDescription>
+    <value>Constant Contact</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_LayoutAll</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: the all columns layout</shortDescription>
+    <value>All Columns</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_Export</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: button that exports the segment</shortDescription>
+    <value>Export</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_Exporting</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: progress; {0} is the rows read so far</shortDescription>
+    <value>Exporting: {0} rows read.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_Exported</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: export done; {0} is the rows written</shortDescription>
+    <value>Exported {0} rows.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_ExportedDuplicates</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: export done; {0} rows written, {1} repeats left out</shortDescription>
+    <value>Exported {0} rows. {1} repeated email addresses were written only once.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_LimitReached</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: export stopped at the limit; {0} is the limit</shortDescription>
+    <value>Stopped at the export row limit of {0} rows.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_EditInFind</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: button that opens the segment in Find</shortDescription>
+    <value>Edit in Find</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_EmailPeopleOnly</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: why organizations have only All Columns</shortDescription>
+    <value>Mailchimp and Constant Contact layouts are for people. Organizations export with All Columns.</value>
+  </labels>
 </CustomLabels>

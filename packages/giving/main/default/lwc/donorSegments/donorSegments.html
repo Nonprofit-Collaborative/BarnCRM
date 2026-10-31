@@ -1,0 +1,133 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom62">
+    <div class="slds-var-p-horizontal_medium">
+      <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
+
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+          {errorMessage}
+        </p>
+      </template>
+      <template lwc:if={noticeMessage}>
+        <p role="status" data-id="notice-message" class="slds-text-body_small slds-var-m-bottom_small">
+          {noticeMessage}
+        </p>
+      </template>
+      <template lwc:if={busy}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+
+      <h2 class="slds-text-heading_small slds-var-m-top_medium slds-var-m-bottom_x-small">
+        {labels.templatesHeading}
+      </h2>
+      <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+          <lightning-combobox
+            data-id="template"
+            label={labels.templateField}
+            options={templateOptions}
+            value={templateKey}
+            onchange={handleTemplateChange}
+          ></lightning-combobox>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+          <lightning-radio-group
+            data-id="object"
+            label={labels.recordsField}
+            type="button"
+            options={objectOptions}
+            value={objectName}
+            onchange={handleObjectChange}
+          ></lightning-radio-group>
+        </div>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+          <lightning-input
+            data-id="name"
+            label={labels.nameField}
+            max-length="80"
+            value={segmentName}
+            onchange={handleNameChange}
+          ></lightning-input>
+        </div>
+      </div>
+      <p data-id="template-description" class="slds-text-body_small slds-var-m-vertical_x-small">
+        {templateDescription}
+      </p>
+      <lightning-button
+        data-id="save"
+        variant="brand"
+        label={labels.saveAsSegment}
+        disabled={saveDisabled}
+        onclick={handleSave}
+      ></lightning-button>
+
+      <h2 class="slds-text-heading_small slds-var-m-top_large slds-var-m-bottom_x-small">
+        {labels.segmentsHeading}
+      </h2>
+      <template lwc:if={showEmpty}>
+        <p data-id="empty-state" class="slds-text-body_regular">{labels.empty}</p>
+      </template>
+      <template lwc:if={hasSegments}>
+        <lightning-combobox
+          data-id="segment"
+          label={labels.segmentField}
+          options={segmentOptions}
+          value={segmentId}
+          onchange={handleSegmentChange}
+        ></lightning-combobox>
+      </template>
+
+      <template lwc:if={hasSelection}>
+        <p data-id="count" class="slds-text-heading_small slds-var-m-vertical_small">{countText}</p>
+        <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <lightning-combobox
+              data-id="layout"
+              label={labels.layoutField}
+              options={layoutOptions}
+              value={layout}
+              onchange={handleLayoutChange}
+            ></lightning-combobox>
+          </div>
+          <div class="slds-col">
+            <lightning-button-group>
+              <lightning-button
+                data-id="export"
+                variant="brand"
+                label={labels.export}
+                disabled={exportDisabled}
+                onclick={handleExport}
+              ></lightning-button>
+              <lightning-button
+                data-id="show-list"
+                label={labels.showList}
+                disabled={exportDisabled}
+                onclick={handleShowList}
+              ></lightning-button>
+              <lightning-button
+                data-id="edit-in-find"
+                label={labels.editInFind}
+                onclick={handleEditInFind}
+              ></lightning-button>
+            </lightning-button-group>
+          </div>
+        </div>
+        <template lwc:if={showPeopleOnlyNote}>
+          <p data-id="people-only" class="slds-text-body_small slds-var-m-top_x-small">
+            {labels.emailPeopleOnly}
+          </p>
+        </template>
+        <template lwc:if={hasList}>
+          <p data-id="list-text" class="slds-text-body_small slds-var-m-vertical_x-small">{listText}</p>
+          <lightning-datatable
+            data-id="list"
+            key-field="Id"
+            data={listRows}
+            columns={listColumns}
+            hide-checkbox-column
+          ></lightning-datatable>
+        </template>
+      </template>
+    </div>
+  </lightning-card>
+</template>
