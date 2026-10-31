@@ -441,7 +441,7 @@ public with sharing class AcknowledgmentService {
      * the thank you goes out from the user instead, and the setting is visibly wrong on the page.
      */
     @TestVisible
-    private static Id fromAddressId() {
+    public static Id fromAddressId() {
         String configured = Giving_Settings__c.getOrgDefaults().Acknowledgment_From_Address__c;
         if (String.isBlank(configured)) {
             return null;

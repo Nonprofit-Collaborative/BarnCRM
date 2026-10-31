@@ -1,0 +1,9 @@
+Dear {!Contact.FirstName, friend},
+
+Our records show that your pledge installment of {!Installment__c.Expected_Amount__c}, due on {!Installment__c.Due_Date__c}, has not yet reached us.
+
+If you have already sent it, thank you, and please disregard this note. If your plans have changed, we would be glad to talk about adjusting your pledge.
+
+With thanks,
+
+{!Organization.Name}

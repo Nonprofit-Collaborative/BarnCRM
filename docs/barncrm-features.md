@@ -440,6 +440,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | No double thanks | Minor | A gift cannot be thanked twice, even if a batch is retried. | Shipped | G-12 |
 | Email opt-out honored | Minor | A donor (or an organization's primary contact) with Email Opt Out is never emailed a thank-you; the gift is counted on its own queue line and goes in the letter file instead (2026-10-29 security review, G-L4). | Shipped | G-12, ADR-0144 |
 | Send Acknowledgments permission | Minor | Separate permission for sending thank-yous. | Shipped | G-12 |
+| Pledge reminders | Minor | Steps measured in days before or after an installment's due date send a templated email or add the installment to a letter merge file; only the latest recent step is sent per installment, every reminder is logged, a donor with Email Opt Out gets a letter, and nothing is ever sent until an administrator turns the off-by-default Send pledge reminders setting on (manual or nightly run). | Shipped | G-30 |
 | Thank-you greets "friend" | Minor | The thank-you email greets "friend" when the person has no first name. | Shipped | G-12 (UX pass) |
 | Acknowledgment rules edited in the app | Minor | Rules are created and edited on the Acknowledgments page with the email template chosen by name; a new stewardship plan's key is made from its name. | Shipped | G-12, G-15 (UX pass) |
 | Which total a ladder measures | Minor | Setting chooses total giving, this fiscal year, last fiscal year or largest gift. | Shipped | G-14 |
