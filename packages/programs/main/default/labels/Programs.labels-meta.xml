@@ -254,7 +254,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Sample removal kept programs; {0} is their names</shortDescription>
-        <value>Sample data removal kept the sample programs {0}, because people of your own are enrolled in them or have services recorded in them. Move or delete those enrollments and service deliveries, then select Remove Sample Data again.</value>
+        <value>Sample data removal kept the sample programs {0}, because people of your own are enrolled in them or have services recorded in them, or a sample enrollment in them has case notes. Move or delete those enrollments, service deliveries and case notes, then select Remove Sample Data again.</value>
     </labels>
     <labels>
         <fullName>Programs_Log_Title</fullName>
@@ -735,6 +735,14 @@
         <protected>true</protected>
         <shortDescription>Programs dashboard: load failed</shortDescription>
         <value>The dashboard could not load. Try a shorter period; if it fails again, the Error Log says why.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_PersonEnrollments_LoadFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card on a person: load failed</shortDescription>
+        <value>The Programs card could not load. Refresh the page; if it fails again, the Error Log says why.</value>
     </labels>
     <labels>
         <fullName>Programs_Dashboard_NoAccess</fullName>

@@ -86,18 +86,34 @@ describe('c-logic-model-part', () => {
     q(element, 'edit').click();
     await flush();
     change(q(element, 'edit-name'), 'Weekly sessions');
-    change(q(element, 'edit-stage'), 'Output');
+    change(q(element, 'edit-stage'), 'Input');
     await flush();
     q(element, 'edit-save').click();
     await flush();
     expect(JSON.parse(saveElement.mock.calls[0][0].elementJson)).toMatchObject({
       id: 'a1',
       name: 'Weekly sessions',
-      type: 'Output',
+      type: 'Input',
       term: null
     });
     expect(changes).toHaveBeenCalledTimes(1);
     expect(q(element, 'edit-form')).toBeNull();
+  });
+
+  it('refuses a column that would turn an arrow backward and names it', async () => {
+    const { element, changes, failures } = await render();
+    q(element, 'edit').click();
+    await flush();
+    // Sessions leads to Sessions held, an output: moving Sessions to Output turns that arrow.
+    change(q(element, 'edit-stage'), 'Output');
+    await flush();
+    q(element, 'edit-save').click();
+    await flush();
+    expect(saveElement).not.toHaveBeenCalled();
+    expect(changes).not.toHaveBeenCalled();
+    expect(failures).toHaveBeenCalledTimes(1);
+    expect(failures.mock.calls[0][0].detail.message).toBe('c.LogicModels_Builder_BackwardArrows');
+    expect(q(element, 'edit-form')).not.toBeNull();
   });
 
   it('moves the part down its column', async () => {

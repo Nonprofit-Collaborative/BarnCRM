@@ -28,13 +28,13 @@ Settings** permission to install, turn on, turn off, or check what an uninstall 
 
 Which modules are listed depends on the edition chosen in first-run setup (see
 [BarnCRM Settings, First-run setup](barncrm-settings.md#first-run-setup)). The Standard Edition (or no edition chosen yet) lists
-Core and BarnCRM Rollup Builder. The Nonprofit Edition lists all seven: Core, BarnCRM Rollup
-Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM
-Mirror. A module that is installed is always listed, whatever the edition. See
+Core and BarnCRM Rollup Builder. The Nonprofit Edition lists all eight: Core, BarnCRM Rollup
+Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM
+Funders and BarnCRM Mirror. A module that is installed is always listed, whatever the edition. See
 [Editions](editions.md).
 
-The modules that only the Nonprofit Edition offers (Giving, Volunteers, Programs, Funders and
-Mirror; the module catalog decides, not a fixed list) are grouped in their own section at the
+The modules that only the Nonprofit Edition offers (Giving, Volunteers, Programs, Logic Models,
+Funders and Mirror; the module catalog decides, not a fixed list) are grouped in their own section at the
 bottom of the list, titled **Nonprofit Modules**. Core and the modules both editions offer come
 first. The section has a **Show Nonprofit Modules** checkbox, ticked by default. Clear it and
 the nonprofit modules are hidden from the list; the checkbox stays so you can tick it again.

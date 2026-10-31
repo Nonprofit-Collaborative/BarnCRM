@@ -196,7 +196,10 @@ panel under the roster:
    recorded for them that day. Set each person's **Attendance** and **Quantity**, or click
    **Mark All Present**.
 3. Click **Save**. One delivery per person is saved for that service and day; saving again
-   changes those rows rather than adding new ones.
+   changes those rows rather than adding new ones. If a delivery for that person, service and
+   day already exists but you cannot see it (under Private, one another staff member logged),
+   saving changes its Attendance and Quantity instead of adding a second row, and it is still
+   not shown to you. This needs update access to Service Delivery Attendance and Quantity.
 
 People left at **Not Recorded** get no delivery. The panel works the same in the Salesforce
 mobile app, one person per card, so attendance can be taken in the room. Read Only users see
@@ -254,7 +257,7 @@ default, **Last Month**, **This Year**, **Last Year** or **Last 12 Months**). Ti
 | Active Programs | Programs with Status Active. |
 | Open Enrollments | Enrollments at Applied or Enrolled, now. |
 | New Enrollments | Enrollments whose Start Date falls in the period. |
-| People Served | Different people who attended at least one service in the period. |
+| People Served | Different people (contacts plus accounts) with a Present delivery in the period, counted as people rather than by scanning every delivery. |
 | Services Delivered | Service deliveries marked Present in the period. |
 | Attendance Rate | Present deliveries as a share of all deliveries in the period, absences included. |
 
@@ -324,7 +327,8 @@ for example an **Awaiting Documents** list view to chase missing paperwork.
   service deliveries, credited to the anonymous record. Neither holds typed notes, so there is
   nothing on them to empty. Their **case notes are deleted**, whoever wrote them. Only someone
   with Programs Admin can delete every note, so anyone else erasing a person who has case notes
-  is refused, with that reason, and nothing is erased.
+  is refused, with that reason, and nothing is erased. Erasing a person account also finds the
+  case notes, and counts the enrollments, recorded on that person account's own contact.
 - **Deleting a person** keeps their case notes on the enrollment, which no longer names anyone.
   To remove what was written about someone, erase them rather than delete them.
 
@@ -340,7 +344,9 @@ people who can manage BarnCRM Settings and not while Programs is turned off:
 ## Sample Data
 
 **Load Sample Data** in BarnCRM Settings also loads three sample programs, five services, 18
-enrollments and 40 service deliveries, and **Remove Sample Data** takes them away again. See
+enrollments and 40 service deliveries, and **Remove Sample Data** takes them away again, keeping
+a sample program that has real enrollments or service deliveries, or a sample enrollment with a
+case note. See
 [Sample data](sample-data.md#with-programs-installed).
 
 ## Turning It Off

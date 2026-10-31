@@ -1081,7 +1081,7 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 |---|---|---|---|
 | `Error_Digest_Recipients__c` | text (255) | empty | The email addresses of the users who receive the error digest, separated by commas. Each has to belong to an active user of this org. Empty sends it to every active user holding Manage BarnCRM Settings. |
 | `Error_Digest_Frequency__c` | picklist(Daily, Weekly) | Daily | How often the error digest may be sent. Stored as text (ADR-0019); empty reads as Daily. |
-| `Error_Digest_Include_Admin_Summary__c` | checkbox | true | Whether a weekly digest also carries the admin summary (C-54): org limits at 80 percent or more, BarnCRM data jobs (`Import_Batch__c`, Status Failed) that failed in the window, and duplicate suggestions waiting. No effect on a daily digest. |
+| `Error_Digest_Include_Admin_Summary__c` | checkbox | true | Whether a weekly digest also carries the admin summary (C-54): BarnCRM jobs that failed this week, how many Setup changes were kept this week, and two standing counts as they are when sent: org limits at 80 percent or more and duplicates waiting for review. No effect on a daily digest. |
 | `Error_Digest_Covered_Until__c` | datetime | empty | The end of the window the last digest run covered; the next digest counts entries created after it. Written by the job. |
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
 | `Error_Digest_Last_Run_Summary__c` | text (255) | empty | What the last digest run did, in one sentence. Written by the job. |
@@ -6109,7 +6109,9 @@ query cannot compare two fields):
 read (their own and those shared with them, as Find lists them) is shown as a segment. A
 segment made from a template is saved as the person's own unshared Saved Query under the name
 they give, replacing the query of their own saved query of that name if there is one (as R-SQ6
-does) and keeping that one's sharing. Its criteria, columns and sharing are changed in Find; no
+does) and keeping that one's sharing. Only the person's own saved query of that name whose
+object is Contact or Account (a segment) is replaced: a Find saved query of the same name on
+another object (for example a gift search) is left alone and the segment is saved beside it. Its criteria, columns and sharing are changed in Find; no
 other copy exists.
 
 **R-DS2 Starter templates are documented JSON.** The templates are one JSON document held in
@@ -6230,7 +6232,9 @@ day is made. An installment 20 days overdue with steps at 7 and 14 days gets the
 
 **R-PR2 Only recent steps fire.** A step whose day passed more than 14 days ago is never made,
 so a run that missed a night still sends, and turning the feature on does not send a final
-notice about an installment that went overdue months ago.
+notice about an installment that went overdue months ago. A step with Days From Due below zero
+(a before-due heads-up) applies only while today is before the installment's Due Date: once the
+due date arrives it no longer fires, even within its catch-up days.
 
 **R-PR3 Nothing sends unless an administrator turned it on.** `Pledge_Reminders_Enabled__c` is
 off by default (Section 25Q). With it off no reminder is made by hand or by the nightly run.
@@ -6306,13 +6310,17 @@ file.
 
 **R-PR4 A reminder is claimed before it is sent.** The row, with its unique Reminder Key, is
 written before anything goes, so a retried chunk or two people pressing Send produce one
-reminder per installment and step. A failed send clears the key and marks the row Failed with
-the reason, and the next run tries again while the step is still recent (R-PR2).
+reminder per installment and step. A failure before the send rolls the claims back. If the
+platform refuses the whole send call, every claimed email row is marked Failed with the
+platform's reason and its key cleared, and the next run tries again while the step is still
+recent (R-PR2). If marking the rows Sent or Failed itself fails, each row is settled again on
+its own with a fixed reason; no email row is left Queued holding its key.
 
-**R-PR5 An email reaches only a person with an address who has not opted out.** The recipient
-is the pledge's donor contact, or the organization's primary contact. A pledge with nobody to
-email gets no row and is counted and named in one Error Log entry per chunk. A recipient with
-Email Opt Out set is reminded by letter instead (R-AK13).
+**R-PR5 An email reaches only a person with an address who has not opted out or bounced.** The
+recipient is the pledge's donor contact, or the organization's primary contact. A pledge with
+nobody to email gets no row and is counted and named in one Error Log entry per chunk. A
+recipient with Email Opt Out set, no email address, or an email address that bounced
+(Salesforce's Email Bounced flag) is reminded by letter instead (R-AK13).
 
 **R-PR6 A letter waits for a person.** The package writes a merge file of the queued letters
 (pledge, installment, due date, amount still owed, days overdue, step, donor name, greeting,
@@ -6412,8 +6420,8 @@ ask closes, means the cadence work needs no change to this object.
 and sets each open one to Withdrawn, so no more work is planned about them. The asks are kept, like
 their gifts, still pointing at the anonymized person.
 
-**R-SO9 Open asks set the donor's Next Ask Date.** After an ask is created, deleted, or changes
-its Target Date, Outcome or donor, each donor it names (before and after the change) gets the
+**R-SO9 Open asks set the donor's Next Ask Date.** After an ask is created, deleted, restored from the Recycle Bin (it counts again, its Target
+Date setting the donor's Next Ask Date as an insert does), or changes its Target Date, Outcome or donor, each donor it names (before and after the change) gets the
 earliest Target Date among their open asks written into the donor's Next Ask Date (Section 25S),
 so the ask cadence reminder and the Who Is Due list follow the pipeline with no second job. Open
 asks without a Target Date are ignored. While a donor has an open ask with a Target Date, the
@@ -6496,7 +6504,11 @@ pass, with no second job.
 
 **R-AC2 One switch, on by default.** `Ask_Reminders_Enabled__c` switches the daily pass on and
 off for the whole organization. Off means the pass creates nothing; the Next Ask Date and Last
-Touch Date fields and the Who Is Due list keep working.
+Touch Date fields and the Who Is Due list keep working. Only one ask reminder run goes at a
+time: Run Now (Giving nightly jobs) and the nightly schedule start nothing while a run is
+already queued or running. The setting is read again as a queued run processes, so turning Ask
+Reminders off stops a run already queued (it makes no tasks and does not go on to the contacts
+pass).
 
 **R-AC3 One reminder per donor per date.** The pass creates a Task for a donor whose Next Ask
 Date is today or earlier (within the catch up window of R-AC4) and whose Ask Reminder For Date
@@ -8737,8 +8749,12 @@ expects the person. Done by `VolunteersErasureExtension`, as the user (R-ER5).
 7:00 AM (`VolunteerReminderScheduler`, one of the two Volunteers nightly jobs Health Check
 schedules) emails each booking that is Signed up or Confirmed, on an open shift that starts
 after now and before the start of the day Days Before a Shift to Remind after today (org time
-zone), once: the booking is stamped Reminder Sent On when the platform accepts the message, and
-a stamped booking is never emailed again. Nobody is emailed whose Contact has Email Opt Out
+zone), once: each due booking is stamped Reminder Sent On first, and only bookings whose stamp saved
+are emailed; a booking whose stamp could not be saved is not emailed (so it is never emailed
+twice) and is listed in the Error Log as a Warning, and a booking whose email failed has its
+stamp cleared so the next morning's run tries again. A stamped booking is never emailed again.
+A booking made after that morning's run for a shift starting before the next morning's run gets
+no reminder. Nobody is emailed whose Contact has Email Opt Out
 checked or no email address; a booking named by a person account (no Contact) is not reminded
 in this version. The email goes through the platform's single email call to the Contact's own
 address, so the org's daily email limit applies: a message the platform refuses is not stamped,
@@ -9618,8 +9634,12 @@ nobody edits them.
 It shows the newest 200 matches; **Download CSV** writes up to 5,000 with the same filters
 (R-SQ3 format). One search looks at no more than 40,000 kept rows and says so when it stops.
 
-**R-SU7 Feeds the digest.** The Weekly Admin Digest (C-54) counts rows by Changed At since its
-last send; no other data is needed.
+**R-SU7 Feeds the digest.** The Weekly Admin Digest (C-54) counts the changes kept (copied into
+the Setup Changes Log) within the digest window, by when each was kept, not by its Changed At.
+A change copied late (after a missed night, or on the first copy) is counted once, in the next
+digest. If reading the admin summary fails, the failure is logged to the Error Log and the
+digest still goes, without the summary. The nightly copy does not start while a copy started by
+hand is still waiting or running.
 
 **R-SU8 Off with Org Optimizer.** While the Org Optimizer feature is off, a run (nightly or
 Copy New Changes Now) copies nothing, deletes nothing and logs nothing; kept rows stay as they
@@ -9968,7 +9988,8 @@ Year, Last Year, Last 12 Months; default This Month): active programs (Status Ac
 enrollments now (Applied or Enrolled), new enrollments (Start Date in the period), completed
 enrollments (Stage Completed, End Date in the period), people served (distinct people with a
 Present delivery in the period, contacts and accounts counted apart, as a delivery names one or
-the other), services delivered (Present deliveries) and the attendance rate (Present over all
+the other, counted as people rather than by scanning every delivery, so large orgs stay within
+platform query limits), services delivered (Present deliveries) and the attendance rate (Present over all
 deliveries, absences included, in the period). The same figures per program, for every Active
 program and any other program with activity in the period, at most 200. Read through
 `ProgramDashboardController` in user mode with aggregate queries, so each user's figures follow
@@ -10005,8 +10026,9 @@ enrollments of up to 12 of Core's sample people (contacts), through the enrollme
 programs. Its removal, before Volunteers', Giving's and Core's, deletes one chunk per stage: the
 sample people's service deliveries and enrollments in sample programs, then the sample programs
 with no enrollment or delivery left (their services go with them). A sample program a real person
-is enrolled in, or has a delivery in, is kept, and one Warning in the Error Log names each one
-kept.
+is enrolled in, or has a delivery in, is kept, and so is a sample program with a sample
+enrollment that has a case note (whoever wrote it, even a note the remover cannot see: that
+enrollment is skipped and kept); one Warning in the Error Log names each one kept.
 
 ---
 
@@ -10053,7 +10075,8 @@ sees neither the tab nor the related list.
 **R-CN4 Erasing the person deletes their notes.** A case note is typed text about the person and
 nothing else, so erasing the person (Section 29H, R-ER8) deletes every note on any of their
 enrollments, read in system mode and deleted as the user; someone who may not delete them all is
-refused with that reason (only Programs Admin may). The enrollments are kept (R-EN5). Deleting a
+refused with that reason (only Programs Admin may). Erasing a person account also finds notes
+and counts enrollments recorded on that person account's own contact. The enrollments are kept (R-EN5). Deleting a
 person, not erasing them, keeps the notes on the enrollment, which no longer names the person;
 erase a person to remove what was written about them.
 
@@ -10125,7 +10148,11 @@ always-run row, as the link is what the roster and the P-05 dashboard count by.
 **R-SD4 One row per person, service and day, from the grid.** The Service Delivery Log
 (below) keeps one delivery per person per service per day, changing the row that is there
 instead of adding another. Nothing refuses a second row entered by hand: two separate meals on
-one day are two deliveries.
+one day are two deliveries. When the log saves a new delivery for a person, service and day
+that already has one the saving user cannot see (under the Private Participant Privacy preset, a
+delivery another staff member logged is hidden), that delivery's Attendance and Quantity are
+changed instead of a second row being added; the hidden delivery is still not shown to the user.
+This needs update access to Service Delivery Attendance and Quantity.
 
 **R-SD6 Participant privacy (P-08).** As R-EN7: sharing Private, every delivery shared with
 `Programs_Participants` through the reason `Programs_Participants__c` (registry row
@@ -10312,6 +10339,10 @@ organization believes it does ("if students attend twice a week, their reading i
 **R-LL2 Forward only.** The To Element's Stage Rank is higher than the From Element's: an input
 leads to an activity or further, a short term outcome to an intermediate or long term one or the
 impact, never back and never to the same stage (validation rule). The builder offers only these.
+Changing a part's column is refused when any arrow attached to it would then point backward (to
+the same or an earlier stage). The message names each such arrow as "From to To" and says to
+delete those arrows first or pick a column that keeps every arrow forward. The builder checks
+before saving and the server refuses the same move.
 
 **R-LL3 One link per pair.** The builder refuses a second link between the same two elements, in
 the same direction.

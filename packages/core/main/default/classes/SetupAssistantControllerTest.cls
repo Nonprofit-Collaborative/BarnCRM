@@ -210,7 +210,7 @@ private class SetupAssistantControllerTest {
                 state.suite.giving.docsUrl.endsWith('/giving/README.md'),
                 'The step can say where to read about Giving'
             );
-            Assert.areEqual(7, state.modules.size(), 'The modules step now offers all seven');
+            Assert.areEqual(8, state.modules.size(), 'The modules step now offers all eight');
             Assert.areEqual(
                 8,
                 state.stepsTotal,

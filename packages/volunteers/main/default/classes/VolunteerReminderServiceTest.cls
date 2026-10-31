@@ -252,6 +252,43 @@ private class VolunteerReminderServiceTest {
     }
 
     @IsTest
+    static void aBookingWhoseStampCannotBeSavedIsNotEmailed() {
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            StubSender stub = new StubSender(true);
+            VolunteerReminderService.senderInUse = stub;
+            settings(true, 1);
+            Volunteer_Shift__c shift = shiftIn(3, null);
+            book(shift.Id, person('Rivera', 'ana@example.org', false), 'Signed up');
+            Volunteer_Signup__c gone = book(
+                shift.Id,
+                person('Okafor', 'obi@example.org', false),
+                'Signed up'
+            );
+            List<Volunteer_Signup__c> chunk = due();
+            // Deleted after the run read it: its stamp cannot be saved.
+            delete gone;
+
+            Test.startTest();
+            Integer sent = VolunteerReminderService.remind(chunk);
+            Test.stopTest();
+
+            Assert.areEqual(1, sent, 'Only the booking whose stamp saved is reminded.');
+            Assert.areEqual(1, stub.got.size(), 'No email goes out without its stamp.');
+            Assert.areEqual('ana@example.org', stub.got[0].getToAddresses()[0]);
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'VolunteerReminderService'
+                    WITH SYSTEM_MODE
+                ],
+                'The stamp failure is in the Error Log.'
+            );
+        }
+    }
+
+    @IsTest
     static void clearingTheStampSendsTheReminderAgain() {
         System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
             StubSender stub = new StubSender(true);

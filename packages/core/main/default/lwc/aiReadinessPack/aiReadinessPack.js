@@ -49,6 +49,31 @@ const PERSON_NAMES = new Set([
 /** Objects whose Name field is a person's name. */
 const PERSON_OBJECTS = new Set(['contact', 'lead']);
 
+/**
+ * BarnCRM's own fields that hold a person's name, by object, in lower case and without a
+ * namespace prefix. A household account's Name is left unflagged: it names a family, and the
+ * export needs it to group people.
+ */
+const NAMED_FIELDS = Object.freeze({
+  contact: new Set(['preferred_name__c', 'emergency_contact_name__c']),
+  account: new Set(['preferred_name__c', 'emergency_contact_name__c']),
+  merge_journal__c: new Set(['merged_name__c']),
+  import_row__c: new Set(['person_1_name_key__c', 'person_2_name_key__c']),
+  tribute__c: new Set(['honoree_name__c', 'notification_recipient_name__c'])
+});
+
+/** An API name without its namespace prefix, when the package carries one. */
+function withoutNamespace(apiName) {
+  const parts = apiName.split('__');
+  return parts.length > 2 ? parts.slice(1).join('__') : apiName;
+}
+
+/** True when the field is one of BarnCRM's own person name fields (NAMED_FIELDS). */
+function isNamedField(objectName, fieldName) {
+  const names = NAMED_FIELDS[withoutNamespace(String(objectName || '').toLowerCase())];
+  return Boolean(names && names.has(withoutNamespace(fieldName)));
+}
+
 /** API name fragments, checked in order; the first that matches gives the reason. */
 const NAME_PATTERNS = [
   [REASONS.BIRTH_DATE, /birth|(^|_)dob(_|$)/],
@@ -88,7 +113,8 @@ export function sensitivityOf(objectName, field) {
   }
   if (
     PERSON_NAMES.has(name) ||
-    (name === 'name' && PERSON_OBJECTS.has(String(objectName).toLowerCase()))
+    (name === 'name' && PERSON_OBJECTS.has(String(objectName).toLowerCase())) ||
+    isNamedField(objectName, name)
   ) {
     return REASONS.NAME;
   }

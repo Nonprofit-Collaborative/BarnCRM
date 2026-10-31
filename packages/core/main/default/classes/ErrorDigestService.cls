@@ -115,7 +115,7 @@ public with sharing class ErrorDigestService {
         outcome.entries = window.total;
         // The weekly admin summary (C-54): only in a weekly digest, and only when switched on.
         AdminDigestSummary.Summary summary = includeSummary(settings, periodDays)
-            ? AdminDigestSummary.build(windowStart, runAt)
+            ? summaryOrNone(windowStart, runAt)
             : null;
         if (window.total == 0 && (summary == null || !summary.hasContent())) {
             outcome.summary = String.format(
@@ -146,6 +146,19 @@ public with sharing class ErrorDigestService {
             }
         );
         return finish(outcome, runAt, runAt);
+    }
+
+    /**
+     * The admin summary, or null when reading it failed: the failure is logged and the digest
+     * goes without it, since the errors it carries matter more than the summary.
+     */
+    private static AdminDigestSummary.Summary summaryOrNone(Datetime windowStart, Datetime runAt) {
+        try {
+            return AdminDigestSummary.build(windowStart, runAt);
+        } catch (Exception summaryFailure) {
+            ErrorLogger.log(summaryFailure, 'AdminDigestSummary.build');
+            return null;
+        }
     }
 
     /**

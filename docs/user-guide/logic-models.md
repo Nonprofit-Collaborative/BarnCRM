@@ -45,7 +45,9 @@ You should see: the part at the bottom of its column.
 
 1. Click the part. Its details open below the columns.
 2. Click **Edit** to change its **Name**, **Description** or **Column**, then **Save**. A part with
-   indicators can only move to another output or outcome column.
+   indicators can only move to another output or outcome column. A part cannot move to a column
+   that would make one of its arrows point backward; the message names those arrows ("From to
+   To"), so delete them first or pick a column that keeps every arrow forward.
 3. Click **Move Up** or **Move Down** to change its place in its column.
 4. Click **Delete**, then **Delete** again to confirm. Its arrows, and its indicators with their
    periods, are deleted too.

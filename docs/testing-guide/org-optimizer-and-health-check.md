@@ -214,7 +214,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 4 | Add a New Error Log entry (for example by running a failing action), then **Send Now**. | The email is titled **BarnCRM: 1 new Error Log entries** and carries the error counts first, then the **Admin Summary**. |
 | 5 | Untick **Weekly admin summary**, save, and **Send Now** again after step 3's problems are still present. | No summary section is sent; with no new entries, no email. |
 | 6 | Set **Digest frequency** back to **Every day** and **Send Now** with a New entry. | The email has the error counts only, with no **Admin Summary**. |
-| 7 | Set **Digest frequency** to **Once a week** and tick **Weekly admin summary**. In Setup, change the help text of any Contact field. Open **Org Optimizer**, **Setup Changes**, click **Copy New Changes Now**, wait a minute, then **Send Now** in **Error Digest**. | Under **Admin Summary**: **Setup changes since the last digest: {n} (see Org Optimizer, Setup Changes)**, counting your change. |
+| 7 | Set **Digest frequency** to **Once a week** and tick **Weekly admin summary**. In Setup, change the help text of any Contact field. Open **Org Optimizer**, **Setup Changes**, click **Copy New Changes Now**, wait a minute, then **Send Now** in **Error Digest**. | Under **Admin Summary**: **Setup changes since the last digest: {n} (see Org Optimizer, Setup Changes)**, counting your change (counted once, by when it was kept: a second **Send Now** after the next digest does not count it again). |
 
 **Cleanup:** Restore **Digest frequency** and **Weekly admin summary** to their earlier values, and change the help text from step 7 back.
 

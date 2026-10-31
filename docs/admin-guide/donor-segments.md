@@ -94,7 +94,9 @@ count, list and export them but only their owner can change them.
   no email, who opted out, or who share an email already written. The count is everyone in
   the segment.
 - **Saving a template under a name you already used** replaces that segment's criteria.
-  Choose a new name to keep both.
+  Choose a new name to keep both. Only your own saved query of that name on Contact or Account
+  (a segment) is replaced; a Find saved query of the same name on another object (for example a
+  gift search) is left alone and the segment is saved beside it.
 - **Expecting a segment to be a snapshot.** A segment is criteria, not a stored list. It
   finds whoever matches today.
 - **A count that says "More than 10,000".** The page stops counting there. The export still

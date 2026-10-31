@@ -179,12 +179,16 @@ public with sharing class AffiliationService {
      * Whether the first affiliation was created after the second. Records created in one save
      * share a created time, so the higher Id, the later one in save order (the last row of an
      * import file), wins the tie instead of whichever the query listed first.
+     *
+     * The Ids are compared with `compareTo`, which is case sensitive and orders 0-9, A-Z, a-z as
+     * Salesforce numbers Ids. The `>` operator on strings ignores case, so it ranks `...a0`
+     * below `...Az` and picked the earlier row whenever two Ids differed only past a case change.
      */
     private static Boolean isNewer(Affiliation__c candidate, Affiliation__c other) {
         if (candidate.CreatedDate != other.CreatedDate) {
             return candidate.CreatedDate > other.CreatedDate;
         }
-        return String.valueOf(candidate.Id) > String.valueOf(other.Id);
+        return String.valueOf(candidate.Id).compareTo(String.valueOf(other.Id)) > 0;
     }
 
     /** Takes the flag off the affiliations that lost it, without re-entering this handler. */

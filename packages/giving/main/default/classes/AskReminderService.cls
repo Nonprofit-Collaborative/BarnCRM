@@ -44,6 +44,31 @@ public with sharing class AskReminderService {
         return String.isBlank(text) ? true : Boolean.valueOf(text);
     }
 
+    private static final List<String> UNFINISHED = new List<String>{
+        'Holding',
+        'Queued',
+        'Preparing',
+        'Processing'
+    };
+
+    /**
+     * Whether an ask reminder pass is waiting or running, whoever started it. Two passes at once
+     * could both read a donor before either stamps it and make two tasks, so a second start is
+     * skipped. Read in system mode, as `SetupChangeCopyJob.isRunning` is: without View Setup a
+     * person sees only their own jobs, and the answer is a yes or no about job status only.
+     */
+    public static Boolean isRunning() {
+        return [
+                SELECT COUNT()
+                FROM AsyncApexJob
+                WHERE
+                    JobType = 'BatchApex'
+                    AND ApexClass.Name = 'AskReminderBatch'
+                    AND Status IN :UNFINISHED
+                WITH SYSTEM_MODE
+            ] > 0;
+    }
+
     /** The oldest Next Ask Date that still gets a reminder today. */
     public static Date earliestDate(Date today) {
         return today.addDays(-CATCH_UP_DAYS);

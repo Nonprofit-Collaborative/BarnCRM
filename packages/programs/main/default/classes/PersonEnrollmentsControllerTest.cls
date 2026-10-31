@@ -124,6 +124,36 @@ private class PersonEnrollmentsControllerTest {
     }
 
     @IsTest
+    static void aFailureIsLoggedAndReportedInTheCardsWords() {
+        System.runAs(TestUsers.adminWith(ADMIN)) {
+            Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Rivera');
+            Database.insert(ana, AccessLevel.SYSTEM_MODE);
+            PersonEnrollmentsController.failForTest = true;
+            String refusal;
+
+            Test.startTest();
+            try {
+                PersonEnrollmentsController.getEnrollments(ana.Id);
+            } catch (AuraHandledException refused) {
+                refusal = refused.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(Label.Programs_PersonEnrollments_LoadFailed, refusal);
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'PersonEnrollmentsController'
+                    WITH SYSTEM_MODE
+                ],
+                'The failure is in the Error Log first.'
+            );
+        }
+    }
+
+    @IsTest
     static void aUserWithoutProgramsGetsNoCard() {
         Contact ana;
         System.runAs(TestUsers.adminWith(ADMIN)) {

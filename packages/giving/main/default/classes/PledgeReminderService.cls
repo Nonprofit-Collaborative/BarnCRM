@@ -20,7 +20,9 @@
  *   an installment that went overdue last spring.
  * - **A reminder is claimed before it is sent.** `Reminder_Key__c` is unique, so the row is the
  *   claim and the same step cannot remind the same installment twice. A failed send releases the
- *   key so the next run tries again while the step is still recent.
+ *   key so the next run tries again while the step is still recent. A failure before the send
+ *   rolls the claims back; a send the platform refuses, or a settle that fails, still leaves
+ *   every claimed email row Sent or Failed, never Queued with its key held.
  */
 public with sharing class PledgeReminderService {
     public static final String CHANNEL_EMAIL = 'Email';
@@ -146,15 +148,16 @@ public with sharing class PledgeReminderService {
             planned.add(item);
         }
 
-        // An email goes only to somebody with an address who has not opted out. A donor who opted
-        // out is reminded by letter, the same rule the acknowledgment send follows (R-AK13).
+        // An email goes only to somebody with a working address who has not opted out. A donor
+        // who opted out, has no address, or whose address bounced is reminded by letter, the
+        // opt-out rule the acknowledgment send follows (R-AK13, R-PR5).
         Set<Id> emailRecipients = new Set<Id>();
         for (Planned item : planned) {
             if (CHANNEL_EMAIL.equals(item.channel) && item.recipientId != null) {
                 emailRecipients.add(item.recipientId);
             }
         }
-        Set<Id> optedOut = PledgeReminderSelector.optedOutOfEmail(emailRecipients);
+        Set<Id> notEmailable = PledgeReminderSelector.cannotBeEmailed(emailRecipients);
         List<Planned> kept = new List<Planned>();
         for (Planned item : planned) {
             if (CHANNEL_EMAIL.equals(item.channel)) {
@@ -162,7 +165,7 @@ public with sharing class PledgeReminderService {
                     counts.withoutRecipient++;
                     continue;
                 }
-                if (optedOut.contains(item.recipientId)) {
+                if (notEmailable.contains(item.recipientId)) {
                     item.channel = CHANNEL_LETTER;
                 }
             }
@@ -189,6 +192,11 @@ public with sharing class PledgeReminderService {
             }
             Date day = installment.Due_Date__c.addDays(daysOf(step));
             if (day > today || day < today.addDays(-CATCH_UP_DAYS)) {
+                continue;
+            }
+            // A before-due step is a heads-up: once the due date arrives it no longer applies,
+            // even inside its catch up days (R-PR2).
+            if (daysOf(step) < 0 && today >= installment.Due_Date__c) {
                 continue;
             }
             if (chosenDay == null || day > chosenDay) {
@@ -302,6 +310,35 @@ public with sharing class PledgeReminderService {
                 )
             );
         }
+        // Everything from the claim to the send runs under a savepoint: if any of it throws, the
+        // claims are rolled back with it, so no row is left Queued holding its key.
+        Savepoint beforeClaim = Database.setSavepoint();
+        List<Messaging.SingleEmailMessage> messages = new List<Messaging.SingleEmailMessage>();
+        List<Pledge_Reminder__c> messageRows = new List<Pledge_Reminder__c>();
+        try {
+            claimAndCompose(planned, rows, messages, messageRows, counts);
+        } catch (Exception beforeSend) {
+            Database.rollback(beforeClaim);
+            throw beforeSend;
+        }
+        if (messages.isEmpty()) {
+            return counts;
+        }
+        settle(messageRows, sendAll(messages), counts);
+        return counts;
+    }
+
+    /**
+     * Claims the rows, then composes a message for each email claim that has a template. Rows
+     * whose template is gone are settled as Failed here; letters stay Queued for the merge file.
+     */
+    private static void claimAndCompose(
+        List<Planned> planned,
+        List<Pledge_Reminder__c> rows,
+        List<Messaging.SingleEmailMessage> messages,
+        List<Pledge_Reminder__c> messageRows,
+        Counts counts
+    ) {
         List<Database.SaveResult> claimed = PledgeReminderWriter.claim(rows);
 
         Set<String> templateNames = new Set<String>();
@@ -315,8 +352,6 @@ public with sharing class PledgeReminderService {
         Map<String, Id> templateIds = templateIdsByDeveloperName(templateNames);
         Id fromAddressId = AcknowledgmentService.fromAddressId();
 
-        List<Messaging.SingleEmailMessage> messages = new List<Messaging.SingleEmailMessage>();
-        List<Pledge_Reminder__c> messageRows = new List<Pledge_Reminder__c>();
         List<Pledge_Reminder__c> unsendable = new List<Pledge_Reminder__c>();
         for (Integer index = 0; index < claimed.size(); index++) {
             if (!claimed[index].isSuccess()) {
@@ -364,11 +399,39 @@ public with sharing class PledgeReminderService {
                 ErrorLogger.SEVERITY_ERROR
             );
         }
-        if (messages.isEmpty()) {
-            return counts;
-        }
+    }
 
-        List<AcknowledgmentSendOutcome> outcomes = sender().send(messages);
+    /**
+     * Sends the chunk in one call. A call the platform refuses as a whole sent nothing, so every
+     * message comes back failed with the platform's reason, and `settle` releases every key.
+     */
+    private static List<AcknowledgmentSendOutcome> sendAll(
+        List<Messaging.SingleEmailMessage> messages
+    ) {
+        try {
+            return sender().send(messages);
+        } catch (Exception sendFailure) {
+            ErrorLogger.log(sendFailure, CONTEXT_SEND);
+            String reason = String.isBlank(sendFailure.getMessage())
+                ? Label.Giving_PledgeReminders_SendFailedUnknown
+                : sendFailure.getMessage().left(255);
+            List<AcknowledgmentSendOutcome> outcomes = new List<AcknowledgmentSendOutcome>();
+            for (Integer index = 0; index < messages.size(); index++) {
+                outcomes.add(AcknowledgmentSendOutcome.failed(reason));
+            }
+            return outcomes;
+        }
+    }
+
+    /**
+     * Marks each sent row Sent and each failed row Failed with its reason and its key released,
+     * so the next run tries it again while the step is still recent.
+     */
+    private static void settle(
+        List<Pledge_Reminder__c> messageRows,
+        List<AcknowledgmentSendOutcome> outcomes,
+        Counts counts
+    ) {
         List<Pledge_Reminder__c> settled = new List<Pledge_Reminder__c>();
         List<String> failures = new List<String>();
         for (Integer index = 0; index < messageRows.size(); index++) {
@@ -390,11 +453,48 @@ public with sharing class PledgeReminderService {
             }
             settled.add(row);
         }
-        PledgeReminderWriter.updateReminders(settled);
+        try {
+            PledgeReminderWriter.updateReminders(settled);
+        } catch (Exception settleFailure) {
+            // The mail has gone (or failed), so the rows are not rolled back. Each is settled
+            // again on its own with only the fields its outcome needs and a fixed reason, so
+            // none stays Queued holding its key; a row that still refuses is logged.
+            ErrorLogger.log(settleFailure, CONTEXT_SEND);
+            settleEachPlainly(settled);
+        }
         if (!failures.isEmpty()) {
             ErrorLogger.logMessages(failures, CONTEXT_SEND, ErrorLogger.SEVERITY_ERROR);
         }
-        return counts;
+    }
+
+    private static void settleEachPlainly(List<Pledge_Reminder__c> settled) {
+        List<Pledge_Reminder__c> plain = new List<Pledge_Reminder__c>();
+        for (Pledge_Reminder__c row : settled) {
+            Boolean sent = STATUS_SENT.equals(row.Status__c);
+            plain.add(
+                new Pledge_Reminder__c(
+                    Id = row.Id,
+                    Status__c = row.Status__c,
+                    Sent_On__c = row.Sent_On__c,
+                    Reminder_Key__c = row.Reminder_Key__c,
+                    Failure_Reason__c = sent ? null : Label.Giving_PledgeReminders_SendFailedUnknown
+                )
+            );
+        }
+        List<String> stillQueued = new List<String>();
+        List<Database.SaveResult> results = PledgeReminderWriter.settleEach(plain);
+        for (Integer index = 0; index < results.size(); index++) {
+            if (!results[index].isSuccess()) {
+                stillQueued.add(
+                    String.valueOf(plain[index].Id) +
+                        ': ' +
+                        results[index].getErrors()[0].getMessage()
+                );
+            }
+        }
+        if (!stillQueued.isEmpty()) {
+            ErrorLogger.logMessages(stillQueued, CONTEXT_SEND, ErrorLogger.SEVERITY_ERROR);
+        }
     }
 
     /**

@@ -81,7 +81,10 @@ columns are stacked.
   sessions"), and press **Save**. Add a longer **Description** if it helps.
 - Click a part to select it. Its details open below the columns: change its name, description or
   column, or **Delete** it. Deleting a part removes its arrows and its indicators with their
-  periods; the builder asks first.
+  periods; the builder asks first. Changing a part's column is refused when any arrow attached
+  to it would then point backward (to the same or an earlier column). The message names each
+  such arrow as "From to To" and says to delete those arrows first or pick a column that keeps
+  every arrow forward. The builder checks before saving, and the server refuses the same move.
 - Parts keep the order you add them in. Use **Move Up** and **Move Down** in a part's details to
   change it.
 

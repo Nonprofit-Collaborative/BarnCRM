@@ -131,6 +131,33 @@ private class DonorSegmentControllerTest {
     }
 
     @IsTest
+    static void aFindQueryOfTheSameNameOnAnotherObjectIsNotReplaced() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Saved_Query__c giftSearch = new Saved_Query__c(
+                Name = 'Lapsed',
+                Object_Name__c = 'Gift__c',
+                Query_JSON__c = '{"object":"Gift__c"}',
+                Shared__c = false
+            );
+            insert giftSearch;
+
+            DonorSegmentController.PageModel page = DonorSegmentController.saveFromTemplate(
+                'lapsed',
+                'Contact',
+                'Lapsed'
+            );
+
+            Assert.areNotEqual(giftSearch.Id, page.savedId, 'A new segment, not the gift search.');
+            Assert.areEqual(
+                'Gift__c',
+                [SELECT Object_Name__c FROM Saved_Query__c WHERE Id = :giftSearch.Id]
+                .Object_Name__c,
+                'The gift search is untouched.'
+            );
+        }
+    }
+
+    @IsTest
     static void emailExportsLeaveOutWhoCannotBeEmailedAndAllColumnsKeepsTheSegment() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             Contact reachable = donor('Reachable', 100, 0);

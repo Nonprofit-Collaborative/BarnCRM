@@ -153,6 +153,10 @@ reminder email before it, early in the morning, so you do not have to chase them
 2. Look at **Reminder Sent On**. A date and time means the reminder went out; empty means it has
    not yet, or the person is not emailed (no email address, or Email Opt Out is checked).
 
+A sign-up made after that morning's run for a shift that starts before the next morning's run
+gets no reminder (for example someone who signs up at noon for a shift that evening). Tell those
+volunteers directly.
+
 To send a reminder again, a Coordinator clears **Reminder Sent On**; it goes out the next
 morning if the shift is still within the reminder window. To stop a person being reminded,
 change their sign-up to **Cancelled**.

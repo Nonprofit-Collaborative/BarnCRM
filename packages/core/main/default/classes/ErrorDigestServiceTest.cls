@@ -452,6 +452,29 @@ private class ErrorDigestServiceTest {
     }
 
     @IsTest
+    static void aSummaryThatFailsIsLoggedAndTheDigestStillGoes() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            User admin = maria();
+            setDigest(null, ErrorDigestService.FREQUENCY_WEEKLY, null);
+            insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
+            AdminDigestSummary.failForTest = true;
+
+            ErrorDigestService.Outcome outcome = sendAs(admin);
+
+            Assert.isTrue(outcome.sent, 'The errors still go out.');
+            String body = ErrorDigestService.capturedMessages[0].getPlainTextBody();
+            Assert.isTrue(body.contains('Household naming: 1'), 'With the errors.');
+            Assert.isFalse(body.contains(Label.Core_AdminDigest_Heading), 'Without the summary.');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'AdminDigestSummary.build'],
+                'The summary failure is in the Error Log.'
+            );
+        }
+    }
+
+    @IsTest
     static void aDailyDigestNeverCarriesTheSummary() {
         System.runAs(TestUsers.admin()) {
             TestDataFactory.defaultSettings();
@@ -506,19 +529,26 @@ private class ErrorDigestServiceTest {
         System.runAs(TestUsers.admin()) {
             TestDataFactory.defaultSettings();
             Datetime now = System.now();
+            Setup_Change__c keptEarlier = setupChange('0Ym000000000003AAA', now.addDays(-9));
             insert new List<Setup_Change__c>{
                 setupChange('0Ym000000000001AAA', now.addDays(-1)),
-                setupChange('0Ym000000000002AAA', now.addDays(-3)),
-                // Before the window: sent in an earlier digest.
-                setupChange('0Ym000000000003AAA', now.addDays(-9))
+                // Changed a month ago but kept only now (a late copy): counted once, now.
+                setupChange('0Ym000000000002AAA', now.addDays(-30)),
+                // Kept before the window: sent in an earlier digest.
+                keptEarlier
             };
+            Test.setCreatedDate(keptEarlier.Id, now.addDays(-9));
             User admin = maria();
             AdminDigestSummary.Summary summary;
             System.runAs(admin) {
                 limitAt(10, 100);
                 summary = AdminDigestSummary.build(now.addDays(-7), now);
             }
-            Assert.areEqual(2, summary.setupChanges, 'Only changes inside the window count.');
+            Assert.areEqual(
+                2,
+                summary.setupChanges,
+                'R-SU7: changes kept inside the window count.'
+            );
             Assert.isTrue(summary.hasContent(), 'Setup changes alone are worth an email.');
             String joined = String.join(AdminDigestSummary.lines(summary, 'https://x'), '\n');
             Assert.isTrue(

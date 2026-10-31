@@ -54,6 +54,29 @@ public with sharing class PersonEnrollmentsController {
         if (personId == null || !Schema.SObjectType.Enrollment__c.isAccessible()) {
             return result;
         }
+        try {
+            if (failForTest) {
+                throw new QueryException('Simulated failure.');
+            }
+            return read(result, personId);
+        } catch (Exception failure) {
+            // Anything unexpected is in the Error Log before the card says it could not load.
+            ErrorLogger.log(failure, CONTEXT, personId);
+            AuraHandledException refused = new AuraHandledException(
+                Label.Programs_PersonEnrollments_LoadFailed
+            );
+            refused.setMessage(Label.Programs_PersonEnrollments_LoadFailed);
+            throw refused;
+        }
+    }
+
+    private static final String CONTEXT = 'PersonEnrollmentsController';
+
+    /** Set by a test to prove a failure is logged and reported in the card's own words. */
+    @TestVisible
+    private static Boolean failForTest = false;
+
+    private static PersonEnrollments read(PersonEnrollments result, Id personId) {
         Set<Id> contactIds = new Set<Id>();
         Id accountId;
         Schema.SObjectType type = personId.getSObjectType();

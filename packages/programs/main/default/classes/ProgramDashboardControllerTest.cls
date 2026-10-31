@@ -115,8 +115,19 @@ private class ProgramDashboardControllerTest {
             Assert.areEqual(2, food.delivered, 'Pantry: two Present.');
             Assert.areEqual(3, food.deliveries, 'Pantry: three in all.');
             Assert.areEqual(1, food.peopleServed, 'Pantry: one person served.');
+            Assert.areEqual(1, result.programs[0].peopleServed, 'Old Camp: one person served.');
             Assert.areEqual(0, result.programs[2].deliveries, 'Tutoring: nothing yet.');
             Assert.isFalse(result.moreThanShown, 'Nothing left out.');
+
+            // Past the query budget, per program people fall back to one grouped count.
+            ProgramDashboardController.queryReserve = 1000;
+            ProgramDashboardController.Dashboard fallback = ProgramDashboardController.getDashboard(
+                monthStart,
+                monthStart.addMonths(1).addDays(-1)
+            );
+            Assert.areEqual(1, fallback.totals.peopleServed, 'The total is the same.');
+            Assert.areEqual(1, fallback.programs[0].peopleServed, 'Old Camp: the same.');
+            Assert.areEqual(1, fallback.programs[1].peopleServed, 'Pantry: the same.');
         }
     }
 

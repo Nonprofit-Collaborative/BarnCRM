@@ -117,9 +117,30 @@ public with sharing class PledgeReminderSelector {
         return AcknowledgmentSelector.contactsById(contactIds);
     }
 
-    /** Which of these contacts have Email Opt Out set. Ids only, read in system mode. */
-    public static Set<Id> optedOutOfEmail(Set<Id> contactIds) {
-        return AcknowledgmentSelector.optedOutOfEmail(contactIds);
+    /**
+     * Which of these contacts cannot be emailed: Email Opt Out set, no email address, or an
+     * address that bounced. Ids only, read in system mode for the reason
+     * `AcknowledgmentSelector.optedOutOfEmail` gives: the answer only moves a reminder to the
+     * letter channel and never reaches the person running the job.
+     */
+    public static Set<Id> cannotBeEmailed(Set<Id> contactIds) {
+        Set<Id> blocked = new Set<Id>();
+        if (contactIds == null || contactIds.isEmpty()) {
+            return blocked;
+        }
+        for (Contact person : [
+            SELECT Id
+            FROM Contact
+            WHERE
+                Id IN :contactIds
+                AND (HasOptedOutOfEmail = TRUE
+                OR Email = NULL
+                OR IsEmailBounced = TRUE)
+            WITH SYSTEM_MODE
+        ]) {
+            blocked.add(person.Id);
+        }
+        return blocked;
     }
 
     /** Letters waiting for a file: queued, with no file yet, oldest first. */

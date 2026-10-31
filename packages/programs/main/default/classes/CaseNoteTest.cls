@@ -142,6 +142,29 @@ private class CaseNoteTest {
     }
 
     @IsTest
+    static void erasingAPersonAccountFindsTheNotesOnItsOwnContact() {
+        System.runAs(TestUsers.adminWith(ADMIN)) {
+            Enrollment__c enrolled = enrollment();
+            insert note(enrolled.Id, 'On the contact');
+            // Stands in for a person account and its own contact: erasure reaches an account
+            // only when it is a person record, so its contacts are that person.
+            Account personRecord = new Account(Name = 'Pat Rivera');
+            insert personRecord;
+            update new Contact(Id = enrolled.Contact__c, AccountId = personRecord.Id);
+
+            Test.startTest();
+            List<PersonErasure.Change> changes = new ProgramsErasureExtension()
+                .erase(personRecord.Id);
+            Test.stopTest();
+
+            Assert.areEqual(0, [SELECT COUNT() FROM Case_Note__c], 'The note is found and gone.');
+            Assert.areEqual(2, changes.size(), 'Deleted notes, kept enrollments.');
+            Assert.areEqual(PersonErasure.KEPT, changes[1].action);
+            Assert.areEqual(1, changes[1].count, 'The enrollment on its contact is counted.');
+        }
+    }
+
+    @IsTest
     static void staffCannotEraseSomeoneWithNotes() {
         Enrollment__c enrolled;
         System.runAs(TestUsers.adminWith(ADMIN)) {

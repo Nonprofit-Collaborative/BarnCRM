@@ -8,7 +8,8 @@
  * Removal deletes, one chunk per call: the sample people's enrollments in the sample programs,
  * then the sample programs no enrollment names any more (their services go with them). A sample
  * program one of the org's own people is enrolled in is kept, since its enrollment's lookup
- * refuses the delete, and `logWhatWasKept`, at the end, names each one in one Warning.
+ * refuses the delete, and so is a sample enrollment with a case note, with its program;
+ * `logWhatWasKept`, at the end, names each kept program in one Warning.
  */
 public with sharing class ProgramSampleDataLoader {
     /** How many of Core's sample people take part. */
@@ -188,6 +189,20 @@ public with sharing class ProgramSampleDataLoader {
         ];
     }
 
+    /** The sample enrollments removal deletes: those without a case note. */
+    private static Integer countRemovableEnrollments() {
+        Set<Id> withNotes = CaseNoteSelector.sampleEnrollmentsWithNotes();
+        return [
+            SELECT COUNT()
+            FROM Enrollment__c
+            WHERE
+                Program__r.Sample_Data__c = TRUE
+                AND Contact__r.Sample_Data__c = TRUE
+                AND Id NOT IN :withNotes
+            WITH USER_MODE
+        ];
+    }
+
     /** True while any sample program is in the org. */
     public static Boolean hasSamplePrograms() {
         return [SELECT COUNT() FROM Program__c WHERE Sample_Data__c = TRUE WITH USER_MODE LIMIT 1] >
@@ -209,7 +224,7 @@ public with sharing class ProgramSampleDataLoader {
                         AND Contact__r.Sample_Data__c = TRUE
                     WITH USER_MODE
                 ],
-                countSampleEnrollments(),
+                countRemovableEnrollments(),
                 [SELECT COUNT() FROM Program__c WHERE Sample_Data__c = TRUE WITH USER_MODE]
             }
         ) {
@@ -235,10 +250,17 @@ public with sharing class ProgramSampleDataLoader {
             Database.delete(deliveries, AccessLevel.USER_MODE);
             return deliveries.size();
         }
+        // A sample enrollment somebody wrote a case note on stays, with its program: the note's
+        // lookup refuses the delete, and notes are private to their authors, so the user may
+        // not see why.
+        Set<Id> withNotes = CaseNoteSelector.sampleEnrollmentsWithNotes();
         List<Enrollment__c> enrollments = [
             SELECT Id
             FROM Enrollment__c
-            WHERE Program__r.Sample_Data__c = TRUE AND Contact__r.Sample_Data__c = TRUE
+            WHERE
+                Program__r.Sample_Data__c = TRUE
+                AND Contact__r.Sample_Data__c = TRUE
+                AND Id NOT IN :withNotes
             WITH USER_MODE
             LIMIT :removeChunkSize
         ];

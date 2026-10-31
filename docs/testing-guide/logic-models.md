@@ -38,6 +38,7 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 | 4 | Click **Add Arrow** again on `Two tutors`. | `Weekly sessions` is no longer offered. |
 | 5 | Click **Edit** beside the arrow, change the assumption, **Save**. | The new assumption shows. |
 | 6 | Link `Weekly sessions` to `Sessions held`, `Sessions held` to `Reads at home`, `Reads at home` to `Reads at grade level`. | Those parts drop out of the no-arrow findings. |
+| 6a | Click `Weekly sessions`, **Edit**, change **Column** to **Inputs**, **Save**. | Refused before saving: the message names the arrow `Two tutors to Weekly sessions` and says to delete those arrows first or pick a column that keeps every arrow forward. The part stays in **Activities**. |
 | 7 | Click `Books`, **Delete**, then confirm. | `Books` is gone; the status says `Deleted.` |
 
 **Cleanup:** None.

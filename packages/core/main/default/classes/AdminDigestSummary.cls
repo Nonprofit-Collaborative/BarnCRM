@@ -2,8 +2,8 @@
  * The admin summary half of the weekly digest (C-54, extends the error digest of C-23): what an
  * administrator would otherwise have to go and look for. Org limits at or above 80 percent,
  * BarnCRM data jobs that failed in the window, duplicate suggestions waiting for review, and how
- * many Setup changes the Setup Changes Log (C-56) kept in the window, counted by Changed At
- * (canonical model R-SU7).
+ * many Setup changes the Setup Changes Log (C-56) kept in the window, counted by when each was
+ * kept (canonical model R-SU7).
  *
  * Like the error digest it counts and names, and never copies a record's content: a failed job
  * is named by its record name and operation, and a duplicate suggestion is only counted. Every
@@ -40,8 +40,15 @@ public with sharing class AdminDigestSummary {
         }
     }
 
+    /** Set by a test to prove the digest goes on without a summary that failed. */
+    @TestVisible
+    private static Boolean failForTest = false;
+
     /** Reads the summary for the window the digest covers. */
     public static Summary build(Datetime after, Datetime upTo) {
+        if (failForTest) {
+            throw new QueryException('Simulated failure.');
+        }
         Summary summary = new Summary();
         for (
             OrgOptimizerStorageController.LimitUse use : OrgOptimizerStorageController.limitsAtOrAbove(
@@ -135,8 +142,11 @@ public with sharing class AdminDigestSummary {
     }
 
     /**
-     * Setup changes kept with Changed At in the window, up to one past the cap. Zero when the
-     * administrator cannot read the Setup Changes Log (only BarnCRM Admin is granted it).
+     * Setup changes kept in the window, by when the kept row was made (its CreatedDate), up to
+     * one past the cap. Counted by when they were kept rather than by Changed At, so a change the
+     * nightly copy picks up late (a missed night, or the first copy) is counted once, in the
+     * digest after it was kept, instead of falling before the window. Zero when the administrator
+     * cannot read the Setup Changes Log (only BarnCRM Admin is granted it).
      */
     @TestVisible
     private static Integer setupChangeCount(Datetime after, Datetime upTo) {
@@ -147,13 +157,17 @@ public with sharing class AdminDigestSummary {
         return [
             SELECT COUNT()
             FROM Setup_Change__c
-            WHERE Changed_At__c > :after AND Changed_At__c <= :upTo
+            WHERE CreatedDate > :after AND CreatedDate <= :upTo
             WITH USER_MODE
             LIMIT :countLimit
         ];
     }
 
     private static Integer failedJobCount(Datetime after, Datetime upTo) {
+        // Zero, not an error, for an administrator who cannot read data jobs.
+        if (!Schema.SObjectType.Import_Batch__c.isAccessible()) {
+            return 0;
+        }
         String failed = ImportBatchService.STATUS_FAILED;
         return [
             SELECT COUNT()

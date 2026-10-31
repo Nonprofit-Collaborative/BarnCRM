@@ -91,9 +91,12 @@ there:
 
 Removal takes the sample people's service deliveries and enrollments in the sample programs,
 then the sample programs and their services. A sample program one of your own people is enrolled
-in, or has a service delivery in, stays with those records, and one Warning in the
-[Error Log](error-log.md) names it: move or delete them, then select **Remove Sample Data**
-again.
+in, or has a service delivery in, stays with those records, and so does a sample program with
+a sample enrollment that has a case note (whoever wrote it, even a note you cannot see). One
+Warning in the [Error Log](error-log.md) names it: "Sample data removal kept the sample
+programs {names}, because people of your own are enrolled in them or have services recorded in
+them, or a sample enrollment in them has case notes. Move or delete those enrollments, service
+deliveries and case notes, then select Remove Sample Data again."
 
 ## 2. How to Turn It On
 

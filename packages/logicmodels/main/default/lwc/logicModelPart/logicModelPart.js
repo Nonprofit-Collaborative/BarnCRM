@@ -6,6 +6,7 @@ import remove from '@salesforce/apex/LogicModelBuilderController.remove';
 
 import {
   STAGES,
+  backwardLinks,
   liveLinks,
   linkTargets,
   moveOrders,
@@ -13,7 +14,7 @@ import {
   stageOf,
   takesIndicators
 } from 'c/logicModelRules';
-import { LABELS, messageFrom, stageLabel } from 'c/logicModelText';
+import { LABELS, format, messageFrom, stageLabel } from 'c/logicModelText';
 
 /**
  * The selected part of a logic model (L-01): its name, description and column, its place in the
@@ -105,6 +106,19 @@ export default class LogicModelPart extends LightningElement {
   }
 
   handleEditSave() {
+    // An arrow may never point backward (R-LL2): say which ones the new column would turn.
+    const backward = backwardLinks(this.model, this.elementId, this.draftStage);
+    if (backward.length) {
+      const arrows = backward
+        .map((link) => format(LABELS.arrowPair, link.fromName, link.toName))
+        .join('; ');
+      this.dispatchEvent(
+        new CustomEvent('failure', {
+          detail: { message: format(LABELS.backwardArrows, arrows) }
+        })
+      );
+      return undefined;
+    }
     const stage = stageByKey(this.draftStage);
     const element = {
       id: this.elementId,

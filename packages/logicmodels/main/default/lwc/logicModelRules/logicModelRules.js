@@ -57,6 +57,32 @@ export function canLink(from, to) {
   return Boolean(from && to) && from.id !== to.id && rankOf(to) > rankOf(from);
 }
 
+/**
+ * The arrows that would point backward if this element moved to the column `stageKey` (R-LL2):
+ * each { id, fromName, toName }, in the model's order. Empty when the move keeps every arrow
+ * forward. LogicModelService.saveElement refuses the same move.
+ */
+export function backwardLinks(model, elementId, stageKey) {
+  const stage = stageByKey(stageKey);
+  const elements = (model && model.elements) || [];
+  const byId = new Map(elements.map((element) => [element.id, element]));
+  if (!stage || !byId.has(elementId)) {
+    return [];
+  }
+  return liveLinks(model)
+    .filter((link) => {
+      if (link.fromId === elementId) {
+        return stage.rank >= rankOf(byId.get(link.toId));
+      }
+      return link.toId === elementId && rankOf(byId.get(link.fromId)) >= stage.rank;
+    })
+    .map((link) => ({
+      id: link.id,
+      fromName: byId.get(link.fromId).name,
+      toName: byId.get(link.toId).name
+    }));
+}
+
 /** True when the element takes indicators: outputs and outcomes (R-IN1). */
 export function takesIndicators(element) {
   const stage = stageOf(element);

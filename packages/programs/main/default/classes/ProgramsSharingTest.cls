@@ -124,6 +124,65 @@ private class ProgramsSharingTest {
     }
 
     @IsTest
+    static void aLoadOfTwoHundredIsSharedInOneGo() {
+        // runs-as: deploying user (each write runs as staff; this only reads share rows)
+        Service__c meal = service();
+        Integer howMany = 200;
+
+        Test.startTest();
+        System.runAs(writer()) {
+            List<Contact> people = new List<Contact>();
+            for (Integer i = 0; i < howMany; i++) {
+                people.add(HouseholdTestDataFactory.newContact('Pat', 'Rivera' + i));
+            }
+            insert people;
+            List<Enrollment__c> enrollments = new List<Enrollment__c>();
+            for (Contact person : people) {
+                enrollments.add(
+                    new Enrollment__c(Program__c = meal.Program__c, Contact__c = person.Id)
+                );
+            }
+            insert enrollments;
+            List<Service_Delivery__c> deliveries = new List<Service_Delivery__c>();
+            for (Enrollment__c enrolled : enrollments) {
+                deliveries.add(
+                    new Service_Delivery__c(
+                        Service__c = meal.Id,
+                        Contact__c = enrolled.Contact__c,
+                        Enrollment__c = enrolled.Id
+                    )
+                );
+            }
+            insert deliveries;
+        }
+        Test.stopTest();
+
+        Id participants = groupId();
+        Assert.areEqual(
+            howMany,
+            [
+                SELECT COUNT()
+                FROM Enrollment__Share
+                WHERE
+                    UserOrGroupId = :participants
+                    AND RowCause = :Schema.Enrollment__Share.RowCause.Programs_Participants__c
+            ],
+            'Every enrollment of a 200 record load is shared with the group.'
+        );
+        Assert.areEqual(
+            howMany,
+            [
+                SELECT COUNT()
+                FROM Service_Delivery__Share
+                WHERE
+                    UserOrGroupId = :participants
+                    AND RowCause = :Schema.Service_Delivery__Share.RowCause.Programs_Participants__c
+            ],
+            'And every delivery.'
+        );
+    }
+
+    @IsTest
     static void thePresetDecidesWhoSeesAndTheHourlyCheckRepairsTheGroup() {
         ProgramsSharing.writeGroupInTests = true;
         User author = writer();

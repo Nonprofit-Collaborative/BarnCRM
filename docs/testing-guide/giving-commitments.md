@@ -178,6 +178,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 9 | Press **Produce Letter File**. | A **Download letters** link appears. The CSV has one row with the opted-out donor, amount, 7 days overdue and the step name. The row is still **Queued**. |
 | 10 | Press **Mark Letters Sent**. | The row's status is **Sent**. |
 | 11 | Open the **Pledge Reminders Log** tab, list view **All Pledge Reminders**. | Both rows are listed with their pledge, payment, step, channel and status. |
+| 11a | Repeat steps 7 to 10 for a donor whose email address is blank, and for one whose Email Bounced flag is set (one pledge each, Start Date seven days ago). | Each is reminded by a Queued letter, not an email. |
+| 11b | Add a step with **Days From Due Date** `-3`, **Channel** `Email`, and run reminders for a payment due today. | No reminder is made by that step: a heads-up step stops once the due date arrives. |
 | 12 | In **BarnCRM Settings**, turn **Send pledge reminders** off. Return to the page and press **Send Reminders Now**. | The button is disabled; if the page was open before the change, the error says reminders are turned off. |
 
 **Cleanup:** turn **Send pledge reminders** off, and clear **Active** on both steps.

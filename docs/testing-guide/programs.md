@@ -119,6 +119,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | Create a contact "Rita Real" and enroll her in **Food pantry**. | Accepted. |
 | 5 | Select **Remove Sample Data** and wait. | **Summer reading** and **After-school tutoring** are gone. **Food pantry** stays, with only Rita's enrollment, and the [Error Log](../admin-guide/error-log.md) holds one Warning naming it. The card still offers **Remove Sample Data**. |
 | 6 | Delete Rita's enrollment, then select **Remove Sample Data** again. | **Food pantry** is gone. |
+| 7 | Load the sample data again, add a case note to one sample enrollment in **Summer reading**, then select **Remove Sample Data**. | **Summer reading** stays with that enrollment, and the Error Log Warning names it: "Sample data removal kept the sample programs Summer reading, because people of your own are enrolled in them or have services recorded in them, or a sample enrollment in them has case notes. Move or delete those enrollments, service deliveries and case notes, then select Remove Sample Data again." |
+| 8 | Delete that case note, then select **Remove Sample Data** again. | **Summer reading** is gone. |
 
 Note: Core's sample set has more than 12 people, so every count above holds; with fewer sample people the set is smaller.
 
@@ -138,6 +140,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 5 | Click **Save**. | "8 service deliveries saved." The rows keep their values. |
 | 6 | Click **Save** again without changing anything. | "Nothing to save: no attendance was changed." |
 | 7 | Set the first person to **Present**, click **Save**, then open **Hot meal** and its **Service Deliveries** list. | "1 service delivery saved." The list holds 8 deliveries for today (not 9), each linked to the person's enrollment. |
+| 7a | With Participant Privacy at **Private**, as a second staff user who cannot see the first user's deliveries, save the same service and date for the same person. | Saved; the first user's delivery has the new Attendance and Quantity and there is still one delivery (not two). The second user still does not see it. |
 | 8 | Back on Food pantry, change the **Date** to yesterday. | Everyone is back at **Not Recorded**. |
 | 9 | In the Salesforce mobile app, open **Food pantry** and the log. | One person per card, with the attendance and quantity under the name; saving works the same. |
 | 10 | As the Read Only user, open **Food pantry**. | The log shows what was recorded for today, with no attendance controls and no **Save**. |
@@ -192,7 +195,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 5 | As the first staff user, try to delete the note. | No Delete action. |
 | 6 | As the admin, try to delete the enrollment. | Refused: it has case notes. |
 | 7 | As the second staff user (if they may erase people), erase Test Person. | Refused: the person has case notes only Programs Admin can delete; nothing is erased. |
-| 8 | As the admin, erase Test Person. | Done; the summary lists the Case Notes as deleted and the Enrollments as kept. The note is gone; the enrollment stays, naming the anonymous record. |
+| 8 | As the admin, erase Test Person. | Done; the summary lists the Case Notes as deleted and the Enrollments as kept. The note is gone; the enrollment stays, naming the anonymous record. For a person account, notes and enrollments on the account's own contact are found and counted too. |
 
 **Cleanup:** delete the enrollment; remove the staff users' roles.
 

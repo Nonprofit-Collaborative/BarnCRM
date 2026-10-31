@@ -8,7 +8,9 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">When the digest is weekly, also report org limits at 80 percent or more, BarnCRM jobs that failed this week and duplicates waiting for review. Nothing is sent when there is nothing new and nothing to report. Turn this off to keep the digest to Error Log entries only. It has no effect on a daily digest.</value>
+    <value
+      xsi:type="xsd:string"
+    >When the digest is weekly, also report BarnCRM jobs that failed this week, how many Setup changes were kept this week, and two standing counts as they are when it is sent: org limits at 80 percent or more and duplicates waiting for review. Nothing is sent when there is nothing new and nothing to report. Turn this off to keep the digest to Error Log entries only. It has no effect on a daily digest.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

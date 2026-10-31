@@ -9,7 +9,7 @@ duplicate review, Org Optimizer, Health Check, settings and the rest of BarnCRM 
 | Edition | For | What BarnCRM shows |
 |---|---|---|
 | **Standard Edition** | Any Salesforce org: businesses, clubs, associations, any organization | The core suite and the modules every edition offers: BarnCRM Rollup Builder. No nonprofit modules are listed or offered anywhere. |
-| **Nonprofit Edition** | Nonprofits, or any organization that wants the nonprofit tools | The core suite, BarnCRM Rollup Builder, and the nonprofit modules: BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Mirror. |
+| **Nonprofit Edition** | Nonprofits, or any organization that wants the nonprofit tools | The core suite, BarnCRM Rollup Builder, and the nonprofit modules: BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM Funders and BarnCRM Mirror. |
 
 The edition decides what BarnCRM shows and offers. It never installs, removes or changes
 anything: every module is a separate package that you install yourself through Salesforce's

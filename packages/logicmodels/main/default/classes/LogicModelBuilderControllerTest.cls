@@ -141,6 +141,71 @@ private class LogicModelBuilderControllerTest {
     }
 
     @IsTest
+    static void aColumnChangeThatWouldTurnAnArrowBackwardIsRefusedByName() {
+        System.runAs(TestUsers.adminWith(ADMIN)) {
+            Id modelId = newModel();
+            addPart(modelId, 'Two tutors', 'Input', null);
+            Map<String, Object> model = addPart(modelId, 'Weekly sessions', 'Activity', null);
+            Id tutors = idOf(model, 'elements', 'Two tutors');
+            Id sessions = idOf(model, 'elements', 'Weekly sessions');
+            LogicModelBuilderController.saveLink(
+                JSON.serialize(
+                    new Map<String, Object>{
+                        'modelId' => modelId,
+                        'fromId' => tutors,
+                        'toId' => sessions
+                    }
+                )
+            );
+
+            String refused = refusal(
+                new Save(
+                    'element',
+                    new Map<String, Object>{
+                        'id' => sessions,
+                        'name' => 'Weekly sessions',
+                        'type' => 'Input'
+                    }
+                )
+            );
+            String allowed = refusal(
+                new Save(
+                    'element',
+                    new Map<String, Object>{
+                        'id' => sessions,
+                        'name' => 'Weekly sessions',
+                        'type' => 'Outcome',
+                        'term' => 'Long Term'
+                    }
+                )
+            );
+
+            Assert.areEqual(
+                String.format(
+                    Label.LogicModels_Builder_BackwardArrows,
+                    new List<String>{
+                        String.format(
+                            Label.LogicModels_Builder_ArrowPair,
+                            new List<String>{ 'Two tutors', 'Weekly sessions' }
+                        )
+                    }
+                ),
+                refused,
+                'R-LL2: the move is refused and the arrow named.'
+            );
+            Assert.isNull(allowed, 'A move that keeps every arrow forward saves.');
+            Assert.areEqual(
+                6,
+                [SELECT Stage_Rank__c FROM Logic_Model_Element__c WHERE Id = :sessions]
+                .Stage_Rank__c,
+                'The Apex rank matches the formula.'
+            );
+            Assert.areEqual(4, LogicModelService.rankFor('Outcome', null));
+            Assert.areEqual(0, LogicModelService.rankFor('Nothing', null));
+        }
+    }
+
+    @IsTest
     static void indicatorsHoldATargetAndResultPerPeriod() {
         System.runAs(TestUsers.adminWith(ADMIN)) {
             Id modelId = newModel();

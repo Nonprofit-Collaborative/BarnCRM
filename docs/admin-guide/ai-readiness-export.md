@@ -67,7 +67,7 @@ flag is worked out from the field's type and API name, so it also catches custom
 | Email address | Every email field |
 | Phone number | Every phone field |
 | Encrypted | Every encrypted text field |
-| Name | A person's first, middle and last name and suffix, and the Name of Contact and Lead |
+| Name | A person's first, middle and last name and suffix, and the Name of Contact and Lead. BarnCRM fields flagged as a person's name: Preferred Name and Emergency Contact Name (Contact and Account), Merge Journal Merged Name, Import Row Person 1 Name Key and Person 2 Name Key, Tribute Honoree Name and Notification Recipient Name. A household account's Account Name stays unflagged (it names a family and is needed to group people) |
 | Birth date | Names containing birth or dob |
 | Address | Street, postal code, latitude and longitude parts |
 | Identity or financial number | Names containing ssn, social security, tax id, passport, driver, bank, routing, iban or account number |

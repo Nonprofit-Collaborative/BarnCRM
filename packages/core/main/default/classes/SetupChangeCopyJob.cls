@@ -56,8 +56,9 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
     // Schedule
     // -------------------------------------------------------------------------------------
 
+    /** The nightly start: skipped when a copy started by hand is still waiting or running. */
     public void execute(SchedulableContext context) {
-        Database.executeBatch(new SetupChangeCopyJob(), CHUNK_SIZE);
+        runNow();
     }
 
     /** Starts the nightly copy, or does nothing when it is already scheduled. */

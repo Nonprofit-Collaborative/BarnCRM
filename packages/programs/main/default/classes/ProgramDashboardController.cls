@@ -144,45 +144,130 @@ public with sharing class ProgramDashboardController {
         }
     }
 
+    /** Queries kept back for the rest of the page load when counting people per program. */
+    @TestVisible
+    private static Integer queryReserve = 10;
+
     /**
      * Different people with a Present delivery in the period. A delivery names a contact or an
-     * account, never both (R-SD1), so the two distinct counts add up. Returns the total across
-     * programs, where one person served by two programs counts once.
+     * account, never both (R-SD1), so the two counts add up. Returns the total across programs,
+     * where one person served by two programs counts once.
+     *
+     * Counted with semi-join COUNT() queries on Contact and Account rather than COUNT_DISTINCT
+     * over the deliveries: an aggregate counts every delivery it reads toward the 50,000 query
+     * row limit, and a busy year has more deliveries than that, where the people are far fewer.
+     * Per program the same pair runs once per program with a Present delivery, while the query
+     * budget allows; any programs past it fall back to one grouped distinct count.
      */
     private static Integer countPeople(
         Map<Id, ProgramFigures> byProgram,
         Date fromDate,
         Date toDate
     ) {
-        for (AggregateResult row : [
-            SELECT
-                Service__r.Program__c program,
-                COUNT_DISTINCT(Contact__c) contacts,
-                COUNT_DISTINCT(Account__c) accounts
-            FROM Service_Delivery__c
-            WHERE
-                Delivery_Date__c >= :fromDate
-                AND Delivery_Date__c <= :toDate
-                AND Attendance__c = :PRESENT
-            WITH USER_MODE
-            GROUP BY Service__r.Program__c
-        ]) {
-            figuresOf(byProgram, row).peopleServed =
-                (Integer) row.get('contacts') + (Integer) row.get('accounts');
+        Set<Id> served = new Set<Id>();
+        Boolean anyPresent = false;
+        for (Id programId : byProgram.keySet()) {
+            if (byProgram.get(programId).delivered > 0) {
+                anyPresent = true;
+                if (programId != null) {
+                    served.add(programId);
+                }
+            }
         }
-        Integer people = 0;
-        for (AggregateResult row : [
-            SELECT COUNT_DISTINCT(Contact__c) contacts, COUNT_DISTINCT(Account__c) accounts
-            FROM Service_Delivery__c
-            WHERE
-                Delivery_Date__c >= :fromDate
-                AND Delivery_Date__c <= :toDate
-                AND Attendance__c = :PRESENT
-            WITH USER_MODE
-        ]) {
-            people += (Integer) row.get('contacts') + (Integer) row.get('accounts');
+        Set<Id> remaining = new Set<Id>(served);
+        for (Id programId : served) {
+            if (Limits.getQueries() + 2 > Limits.getLimitQueries() - queryReserve) {
+                break;
+            }
+            byProgram.get(programId).peopleServed = peopleIn(programId, fromDate, toDate);
+            remaining.remove(programId);
         }
-        return people;
+        if (!remaining.isEmpty()) {
+            for (AggregateResult row : [
+                SELECT
+                    Service__r.Program__c program,
+                    COUNT_DISTINCT(Contact__c) contacts,
+                    COUNT_DISTINCT(Account__c) accounts
+                FROM Service_Delivery__c
+                WHERE
+                    Service__r.Program__c IN :remaining
+                    AND Delivery_Date__c >= :fromDate
+                    AND Delivery_Date__c <= :toDate
+                    AND Attendance__c = :PRESENT
+                WITH USER_MODE
+                GROUP BY Service__r.Program__c
+            ]) {
+                figuresOf(byProgram, row).peopleServed =
+                    (Integer) row.get('contacts') + (Integer) row.get('accounts');
+            }
+        }
+        return anyPresent ? peopleInPeriod(fromDate, toDate) : 0;
+    }
+
+    /** People with a Present delivery in the period, in any program. */
+    private static Integer peopleInPeriod(Date fromDate, Date toDate) {
+        return [
+                SELECT COUNT()
+                FROM Contact
+                WHERE
+                    Id IN (
+                        SELECT Contact__c
+                        FROM Service_Delivery__c
+                        WHERE
+                            Delivery_Date__c >= :fromDate
+                            AND Delivery_Date__c <= :toDate
+                            AND Attendance__c = :PRESENT
+                    )
+                WITH USER_MODE
+            ] +
+            [
+                SELECT COUNT()
+                FROM Account
+                WHERE
+                    Id IN (
+                        SELECT Account__c
+                        FROM Service_Delivery__c
+                        WHERE
+                            Delivery_Date__c >= :fromDate
+                            AND Delivery_Date__c <= :toDate
+                            AND Attendance__c = :PRESENT
+                    )
+                WITH USER_MODE
+            ];
+    }
+
+    /** People with a Present delivery in the period in one program. */
+    private static Integer peopleIn(Id programId, Date fromDate, Date toDate) {
+        return [
+                SELECT COUNT()
+                FROM Contact
+                WHERE
+                    Id IN (
+                        SELECT Contact__c
+                        FROM Service_Delivery__c
+                        WHERE
+                            Service__r.Program__c = :programId
+                            AND Delivery_Date__c >= :fromDate
+                            AND Delivery_Date__c <= :toDate
+                            AND Attendance__c = :PRESENT
+                    )
+                WITH USER_MODE
+            ] +
+            [
+                SELECT COUNT()
+                FROM Account
+                WHERE
+                    Id IN (
+                        SELECT Account__c
+                        FROM Service_Delivery__c
+                        WHERE
+                            Service__r.Program__c = :programId
+                            AND Delivery_Date__c >= :fromDate
+                            AND Delivery_Date__c <= :toDate
+                            AND Attendance__c = :PRESENT
+                    )
+                WITH USER_MODE
+            ];
     }
 
     /** Every Active program and any other with activity, by name, with its counts and the totals. */

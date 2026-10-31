@@ -801,6 +801,14 @@
         <value>{0} of {1} volunteer shift reminders were not sent and will be tried again tomorrow while the shift is still ahead. Salesforce said: {2}</value>
     </labels>
     <labels>
+        <fullName>Volunteers_Reminders_StampFailed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reminders held back: {0} unmarked, {1} due, {2} the reason</shortDescription>
+        <value>{0} of {1} volunteer shift reminders were held back because their booking could not be marked as reminded, so they are not sent twice. They will be tried again tomorrow while the shift is still ahead. Salesforce said: {2}</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_Reminders_Subject</fullName>
         <categories>Volunteers, Reminders</categories>
         <language>en_US</language>
