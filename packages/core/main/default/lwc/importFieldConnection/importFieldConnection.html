@@ -1,0 +1,26 @@
+<template>
+  <p class="slds-var-m-bottom_x-small" data-id="intro">{labels.intro}</p>
+  <template lwc:if={errorMessage}>
+    <p class="slds-text-color_error slds-var-m-bottom_x-small" data-id="error" role="alert">
+      {errorMessage}
+    </p>
+  </template>
+  <template lwc:if={connection}>
+    <p class="slds-var-m-bottom_x-small" data-id="status" role="status">
+      {labels.status}: {statusText}
+    </p>
+    <template lwc:if={canSetUp}>
+      <lightning-button
+        data-id="set-up"
+        label={labels.setUp}
+        disabled={busy}
+        onclick={handleSetUp}
+      ></lightning-button>
+    </template>
+    <template lwc:if={needsPermission}>
+      <p class="slds-text-body_small slds-text-color_weak" data-id="needs-permission">
+        {labels.needsPermission}
+      </p>
+    </template>
+  </template>
+</template>

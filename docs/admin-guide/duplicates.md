@@ -9,7 +9,9 @@ in most editions is look through the records you already have, so a spreadsheet 
 year is never checked against itself. BarnCRM adds that scan, lists every pair on one page,
 and puts the household merge one click away.
 
-Nothing is ever merged or deleted for you. Every merge is a pair you looked at and confirmed.
+Nothing is merged or deleted without you. Every merge is a pair you looked at and confirmed,
+or, with **Auto-Merge**, a list of exact matches you previewed and confirmed together, which
+you can undo for 15 days; see [Auto-Merge](#auto-merge).
 
 Salesforce's rules only compare fields on the person or household itself. The scan also looks
 at **match sources**: related records such as contact point emails, phones and addresses, and
@@ -17,6 +19,10 @@ BarnCRM addresses. Two people who share an email held only on a contact point em
 listed too, with a line saying why, for example "Same email on Contact Point Email". Match
 sources are listed, added, deactivated and tried out in the tool's **Matching Logic** area;
 see [Matching Logic](#matching-logic).
+
+The scan also compares **people's names**, ignoring case, spacing and punctuation, so "Jonathan
+Smith" and "Jonathon Smith" are noticed. A similar name is never enough on its own, and the
+scan knows about households; see [Similar Names](#similar-names).
 
 ## How to Turn It On
 
@@ -85,9 +91,87 @@ Duplicates** with a reminder to scan after a large import.
 
 In **BarnCRM Settings**, the **Duplicate Matching** section holds the tool's settings: a note
 on the one Setup step (keep the duplicate rules active, give reviewers Duplicate Review) and
-the **Duplicate Matching** row, whose **Open This Page** button opens the tab. The scan has
-no options to set: it always checks every person and household with your active duplicate
-rules and your active match sources.
+the **Duplicate Matching** row, whose **Open This Page** button opens the tab. The scan always
+checks every person and household with your active duplicate rules, your active match sources
+and similar names. Two settings sit beside the row, each with a default you can change:
+
+- **Fuzzy Name Match** (default 90): how alike two names must be, in percent, before the scan
+  pairs two people by name. From 80 to 100; 100 pairs only names that are the same once case,
+  spacing and punctuation are ignored.
+- **Merge Rule For Other Fields** (default **Not blank**): which value a field keeps when two
+  people are merged and the field has no [merge rule](#merge-rules) of its own.
+- **Exact Match For Auto-Merge** (default **Name and email**): what two people must share
+  exactly before [auto-merge](#auto-merge) takes them: **Name and email**, **Name and phone**,
+  **Name, email and phone** or **Name and birthdate**.
+
+### Similar Names
+
+In each pass over people, the scan scores the names of people who share a last name or an email,
+from 0 to 100 percent alike (case, spacing and punctuation do not count). Two people at or above
+**Fuzzy Name Match** are listed when they also:
+
+- share an email or a phone number (digits only, so "(555) 010-2000" and "555.010.2000" are
+  the same), or
+- are in different households and share a mailing postal code.
+
+Within one household an address is shared by design and similar names are usually family
+(Daniel and Danielle), so there two people with nothing else in common are listed only when
+their names are exactly the same. Two people whose birthdates are both filled in and differ are
+never listed. The line under the pair says why, for example **Similar names (97%) and the same
+email** or **Same name in the same household**.
+
+### Merge Rules
+
+Merge rules decide which value wins, field by field, when two people are merged by auto-merge.
+Each rule names one person field and one of five choices:
+
+| Rule | The kept person ends with |
+|---|---|
+| **Keep master** | Its own value, even a blank. |
+| **Not blank** | Its own value, or the other person's when its own is blank. |
+| **Most recent** | The value of whichever person was changed last. |
+| **Oldest record** | The value of whichever person was created first. |
+| **Most complete** | The longer of the two values (its own on a tie). |
+
+Except under **Keep master**, a blank never replaces a value. Add rules in **BarnCRM Settings**,
+**Custom Metadata**, **Merge Rules**: **Field Name** is the field's API name (for example
+`Email` or `Title`), or `MailingAddress` or `OtherAddress` to take a whole address from one
+person, so a street never lands with the other person's city. A field with no rule follows
+**Merge Rule For Other Fields**. The household and the record owner always stay the kept
+person's. Saving a rule needs BarnCRM Metadata Admin.
+
+### Auto-Merge
+
+The **Auto-Merge** area of the **Duplicate Matching** tab merges the obvious duplicates in one
+go, so you stop merging them one pair at a time. It needs Manage BarnCRM Settings (BarnCRM
+Admin) and BarnCRM Duplicate Review, like the review list it works from.
+
+1. Click **Preview Exact Matches**. BarnCRM reads the people pairs waiting in the review list
+   and keeps only those that meet **Exact Match For Auto-Merge**: the same first and last name
+   (ignoring case, spacing and punctuation) and the same email, phone (digits) or birthdate,
+   filled in on both. Households are never auto-merged.
+2. Read the list. Each row shows the person kept, the person merged away, and the values the
+   [merge rules](#merge-rules) will change on the kept person. The kept person is the one whose
+   household has more members, so nobody is pulled out of their family; with equal households,
+   the record created first is kept.
+3. Click **Merge Pairs** and confirm. The merge runs in the background, as you, with your
+   access: a pair you cannot edit is skipped. Each pair is checked again just before it is
+   merged; one that has changed or been dismissed is skipped. At most 1,000 pairs a run. The
+   bell tells you when it finishes.
+
+Every merge is written down. Under **Recent Runs**, each run shows how many people it merged;
+**Undo** puts the whole run back:
+
+- each merged-away person is restored from the Recycle Bin (the real record, never a copy);
+- each value the rules changed on the kept person goes back, unless somebody changed it since;
+- each related record the merge moved (activities, memberships, relationships and anything else
+  whose link can be changed) moves back to the restored person, unless it was moved or deleted
+  since.
+
+What undo cannot put back is listed under the run: for example a person no longer in the
+Recycle Bin (it keeps people for 15 days, or until someone empties it), a value changed after
+the merge, or a related record deleted since. Undo is offered for 15 days. After an undo the
+two people are separate again; the next scan suggests them again.
 
 ### Matching Logic
 

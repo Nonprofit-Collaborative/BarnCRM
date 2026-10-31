@@ -20,7 +20,7 @@ BarnCRM is in development. No package version exists yet and nothing is installa
 
 ## Two Editions
 
-Both editions include the full core suite of tools: people, households, relationships, addresses, importing with undo, Find, bulk update and bulk delete, duplicate review, Org Optimizer, Health Check, settings and the Setup Assistant.
+Both editions include the full core suite of tools: people, households, relationships, addresses, importing with undo (an admin can create a new field for a column), Find, bulk update and bulk delete, duplicate review, Org Optimizer, Health Check, settings and the Setup Assistant.
 
 | Edition | For | What you get |
 |---|---|---|
@@ -33,7 +33,7 @@ You choose the edition once, in the first-run setup window; the Setup Assistant 
 
 | Package | What it holds | State on main |
 |---|---|---|
-| **Core** | Households and people, relationships, affiliations, addresses, the BarnCRM apps (everyday and admin, each with standard or console navigation), Settings console, Setup Assistant, Module Manager, access roles, Import, Data Manager, Find, bulk update and delete, Org Optimizer, Duplicates, Health Check, Error Log, erase a person | Built |
+| **Core** | Households and people, relationships, affiliations, addresses, the BarnCRM apps (everyday and admin, each with standard or console navigation), Settings console, Setup Assistant, Module Manager, access roles, Import, Data Manager, Find, bulk update and delete, Super Transform (bulk changes without a file), Org Optimizer, Duplicates, Health Check, Error Log, erase a person | Built |
 | **Rollup Builder** | The rollup engine and the Rollup Builder page where you manage totals | Built (offered in both editions; Giving depends on it) |
 | **Giving** | Gifts, funds, Quick Gift Entry, gift batches, refunds, in-kind gifts, commitments, soft credits, tributes, matching gifts, appeals, acknowledgments, receipts and year-end statements, donor levels, stewardship plans, retention reports, posting and closed periods, gift import, the Giving dashboard, the Fundraising app | Built |
 | **Mirror** | Opportunity mirror, Campaign sync, inbound gift API, accounting export | Built (the Gift Transaction mirror for Nonprofit Cloud is planned) |
@@ -51,7 +51,7 @@ Install Core and run the Setup Assistant, and you can:
 
 - Keep households and the people in them, with household names and greetings built for you, merge and split households, and record relationships, affiliations, addresses (including seasonal ones), several email addresses and a preferred phone.
 - Bring in a spreadsheet (CSV or Excel) with a preview, matching rules and one-click undo, find and export records, change many records at once, and delete many records with a way back.
-- Review duplicates, check what needs attention in Org Optimizer, and run Health Check, with an Error Log that nothing fails silently into.
+- Review duplicates, check what needs attention in Org Optimizer, document your fields in a downloadable Data Dictionary, and run Health Check, with an Error Log that nothing fails silently into.
 - Control who sees what with ready-made roles, load realistic sample data to try things out, and erase a person's personal data when you must.
 
 Add Giving and you can also record and receipt gifts, run appeals and stewardship, import gifts from NPSP or Nonprofit Cloud exports, and watch the Giving dashboard. Add Volunteers and you can schedule shifts and approve hours. Add Mirror to keep Opportunities and Campaigns in step, accept gifts from a giving page, or export gifts for accounting.
@@ -63,6 +63,7 @@ BarnCRM runs on Platform-only licenses, Sales and Service Cloud, an org with NPS
 This is the plan as recorded in the product plan (Section 6 and 6.0). Dates are not promised.
 
 - **Finishing the Core quality pass.** Existing Core features are being tested, tightened and simplified before new modules start. Related-record duplicate matching (duplicate scan and import matching) is in progress.
+- **Super Importer.** Import grows in slices: the first (built, not yet released) reads several sheets of a workbook at once, maps headings that name the object and the field together, suggests the object from the file, and shows example values beside each column. The second (built, not yet released) loads several objects from one upload, a sheet for each or several on one row, linked and loaded parents first; it replaces the older related-records load. Closer heading matching follows.
 - **BarnCRM Contact Point Sync.** An optional module, approved but not yet scheduled, for orgs that use Salesforce Contact Points: it keeps them in step with a person's email and phone and with their addresses, so Core itself never touches those objects.
 - **BarnCRM Address Verification.** An optional module, approved but not yet scheduled, that verifies addresses with your own provider key (set in BarnCRM Settings) and records each address's verification status and date. No provider is bundled.
 - **Programs and Logic Models.** Track programs, services, enrollments and attendance, and build logic models with indicators and a report you can send to a funder.

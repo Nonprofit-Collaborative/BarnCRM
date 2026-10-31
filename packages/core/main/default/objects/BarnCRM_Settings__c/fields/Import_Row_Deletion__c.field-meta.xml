@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Import_Row_Deletion__c</fullName>
+  <defaultValue>&quot;After_30_Days&quot;</defaultValue>
+  <description>When the nightly Import row cleanup deletes the staged rows of a complete import: Once_Complete, After_30_Days, After_90_Days or Never (R-IR5). Text rather than a picklist because custom settings do not support picklists (ADR-0019); blank reads as After_30_Days.</description>
+  <inlineHelpText>When the rows of a complete import are deleted: once complete, after 30 days, after 90 days, or never.</inlineHelpText>
+  <label>Delete Import Rows</label>
+  <length>40</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>

@@ -60,19 +60,19 @@ const SESSIONS = {
 describe('the first step of the import wizard (D-136)', () => {
   it('offers Gifts only when a template maps the Gift entity', () => {
     const keys = (templates, canDelete) => kindCards(templates, canDelete).map((c) => c.key);
-    expect(keys([PEOPLE, SESSIONS], false)).toEqual(['people', 'object', 'related', 'templates']);
+    expect(keys([PEOPLE, SESSIONS], false)).toEqual(['people', 'object', 'several', 'templates']);
     expect(keys([PEOPLE, GIFTS], false)).toEqual([
       'people',
       'gifts',
       'object',
-      'related',
+      'several',
       'templates'
     ]);
   });
 
   it('offers the Delete card only to holders of Bulk Delete Records, with a warning', () => {
     const cards = kindCards([PEOPLE], true);
-    expect(cards.map((c) => c.key)).toEqual(['people', 'object', 'related', 'delete', 'templates']);
+    expect(cards.map((c) => c.key)).toEqual(['people', 'object', 'several', 'delete', 'templates']);
     expect(cards.find((c) => c.key === 'delete').warning).toBe(true);
     expect(kindCards([PEOPLE], false).some((c) => c.key === 'delete')).toBe(false);
   });

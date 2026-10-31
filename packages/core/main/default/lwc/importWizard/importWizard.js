@@ -1,9 +1,36 @@
 import { LightningElement, wire } from 'lwc';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
-import { parseCsv, toRecords, detectDelimiter } from './csv';
+import { toRecords } from './csv';
 import { toCsv } from 'c/findCsv';
-import { isXlsx, readXlsx, readSheetNames, XLSX_ERRORS } from './xlsx';
+import { isXlsx, XLSX_ERRORS } from './xlsx';
+import { readFileSheets } from './fileSource';
+import {
+  defaultSheets,
+  combineSheets,
+  combineObjectSheets,
+  sheetConflicts,
+  sheetsInLoadOrder
+} from './importSheets';
+import createSeveralObjectsTemplate from '@salesforce/apex/ImportController.createSeveralObjectsTemplate';
+import getSeveralObjects from '@salesforce/apex/ImportController.getSeveralObjects';
+import suggestSheetMapping from '@salesforce/apex/ImportController.suggestSheetMapping';
+import severalObjectsLabel from '@salesforce/label/c.Core_Import_SeveralObjectsLabel';
+import severalObjectsAvailable from '@salesforce/label/c.Core_Import_SeveralObjectsAvailable';
+import severalObjectsHelp from '@salesforce/label/c.Core_Import_SeveralObjectsHelp';
+import sheetObjectLabel from '@salesforce/label/c.Core_Import_SheetObjectLabel';
+import fileObjectLabel from '@salesforce/label/c.Core_Import_FileObjectLabel';
+import sheetObjectHelp from '@salesforce/label/c.Core_Import_SheetObjectHelp';
+import severalMatchingHelp from '@salesforce/label/c.Core_Import_SeveralMatchingHelp';
+import sheetOption from '@salesforce/label/c.Core_Import_SheetOption';
+import sheetConflict from '@salesforce/label/c.Core_Import_SheetConflict';
+import sheetObject from '@salesforce/label/c.Core_Import_SheetObject';
+import exampleBlank from '@salesforce/label/c.Core_Import_ExampleBlank';
+import detectFileLabel from '@salesforce/label/c.Core_Import_DetectFileLabel';
+import detectSuggested from '@salesforce/label/c.Core_Import_DetectSuggested';
+import detectNone from '@salesforce/label/c.Core_Import_DetectNone';
+import detectSheetsDiffer from '@salesforce/label/c.Core_Import_DetectSheetsDiffer';
+import suggestObject from '@salesforce/apex/ImportController.suggestObject';
 import delimiterLabel from '@salesforce/label/c.Core_Import_DelimiterLabel';
 import delimiterHelp from '@salesforce/label/c.Core_Import_DelimiterHelp';
 import delimiterComma from '@salesforce/label/c.Core_Import_DelimiterComma';
@@ -12,6 +39,12 @@ import delimiterTab from '@salesforce/label/c.Core_Import_DelimiterTab';
 import delimiterPipe from '@salesforce/label/c.Core_Import_DelimiterPipe';
 import sheetLabel from '@salesforce/label/c.Core_Import_SheetLabel';
 import sheetHelp from '@salesforce/label/c.Core_Import_SheetHelp';
+// C-49d: Create New Field in the column picker.
+import ImportNewFieldModal from 'c/importNewFieldModal';
+import getFieldConnection from '@salesforce/apex/ImportNewFieldController.getConnection';
+import createNewField from '@salesforce/label/c.Core_ImportNewField_ModalTitle';
+import newFieldPerson from '@salesforce/label/c.Core_ImportNewField_ObjectPerson';
+import newFieldOrganization from '@salesforce/label/c.Core_ImportNewField_ObjectOrganization';
 
 import canImport from '@salesforce/apex/ImportController.canImport';
 import getTemplates from '@salesforce/apex/ImportController.getTemplates';
@@ -142,7 +175,7 @@ import canBulkDelete from '@salesforce/customPermission/Bulk_Delete_Records';
 import {
   KIND_PEOPLE,
   KIND_GIFTS,
-  KIND_RELATED,
+  KIND_SEVERAL,
   KIND_DELETE,
   KIND_TEMPLATES,
   OBJECT_KINDS,
@@ -172,13 +205,22 @@ import retryHeading from '@salesforce/label/c.Core_Import_RetryHeading';
 import retryHelp from '@salesforce/label/c.Core_Import_RetryHelp';
 import retryFileLabel from '@salesforce/label/c.Core_Import_RetryFileLabel';
 import retryColumnsMissing from '@salesforce/label/c.Core_Import_RetryColumnsMissing';
+import guessBadge from '@salesforce/label/c.Core_Import_GuessBadge';
+import guessBadgeHelp from '@salesforce/label/c.Core_Import_GuessBadgeHelp';
+import guessAccept from '@salesforce/label/c.Core_Import_GuessAccept';
+import guessAcceptColumn from '@salesforce/label/c.Core_Import_GuessAcceptColumn';
+import guessAcceptAll from '@salesforce/label/c.Core_Import_GuessAcceptAll';
+import guessPending from '@salesforce/label/c.Core_Import_GuessPending';
 import {
   INSERT,
   UPDATE,
   UPDATE_BY_FIELD,
   UPSERT,
   DELETE,
-  LOOKUP_REJECT
+  LOOKUP_REJECT,
+  NOT_FOUND_LABEL,
+  notFoundChoices,
+  notFoundHelpOf
 } from 'c/importLoadOptions';
 
 /** How many of the file's rows the column changes are previewed on (R-IT15). */
@@ -190,9 +232,9 @@ const TABLE_PAGE_ROWS = 200;
 /** Rows per server call while the exceptions file is read (a cursor page holds up to 2,000). */
 const DOWNLOAD_PAGE_ROWS = 500;
 
-/** Fills a label's {0} with a value. */
-function format(label, value) {
-  return label.replace('{0}', value);
+/** Fills a label's {0}, {1} and so on with values. */
+function format(label, ...values) {
+  return values.reduce((text, value, index) => text.replace(`{${index}}`, value), label);
 }
 
 /** A number as an input shows it, or empty. */
@@ -213,8 +255,6 @@ const STAGE_PAGE_SIZE = 500;
  * base64, a third larger, and is decoded on the server, against a 6 MB heap.
  */
 const MAX_STORED_FILE_BYTES = 2500000;
-/** How many values of each column the picker shows, so the choice can be checked by eye. */
-const SAMPLE_VALUES = 3;
 /** The separators a text file's columns may use, as the separator picker offers them. */
 const DELIMITER_OPTIONS = [
   { value: ',', label: delimiterComma },
@@ -224,6 +264,8 @@ const DELIMITER_OPTIONS = [
 ];
 
 const IGNORE = 'Ignore';
+/** The picker's Create New Field choice (C-49d); never stored as a target. */
+const NEW_FIELD = '__new_field__';
 
 /**
  * The row entities a module outside Core loads (R-IR6). Their columns are offered only from
@@ -305,9 +347,13 @@ export default class ImportWizard extends LightningElement {
   fileName;
   /** How a text file's columns are separated, detected and then as chosen. */
   delimiter;
-  /** A workbook's sheets, and the one being read. */
-  sheetNames = [];
-  sheetName;
+  /** The file's sheets as `{ name, headers, records }`, the names chosen, and their objects. */
+  sheets = [];
+  chosenSheets = [];
+  sheetObjects = [];
+  /** The object suggested from a file on the first step, and that file (C-49a). */
+  detection;
+  detectionFile;
   pollTimer;
   storeFileError;
   enclosingTabId;
@@ -379,6 +425,16 @@ export default class ImportWizard extends LightningElement {
   loadRelated = '';
   relatedOptions = [];
   relatedFields = [];
+  /**
+   * An upload of several objects (R-IT20): each object in load order as the server describes
+   * it, how each finds its records (`{ operation, matchField }` by object), and the object
+   * each sheet loads, by sheet name, as chosen.
+   */
+  severalObjects = [];
+  severalChoices = {};
+  sheetObjectChoice = {};
+  /** The objects chosen for a new upload of several objects. */
+  newObjectNames = [];
   /** The new one-object mapping being made on the first step. */
   choosingObject = false;
   loadableObjects = [];
@@ -389,6 +445,10 @@ export default class ImportWizard extends LightningElement {
 
   labels = {
     blankClearsLabel,
+    guessBadge,
+    guessBadgeHelp,
+    guessAccept,
+    guessAcceptAll,
     cardTitle,
     stepTemplate,
     stepFileType,
@@ -457,6 +517,9 @@ export default class ImportWizard extends LightningElement {
     delimiterHelp,
     sheetLabel,
     sheetHelp,
+    sheetConflict,
+    detectFileLabel,
+    detectSheetsDiffer,
     trialHeading,
     trialHelp,
     trialRowsLabel,
@@ -464,13 +527,20 @@ export default class ImportWizard extends LightningElement {
     remainingButton,
     retryHeading,
     retryHelp,
-    retryFileLabel
+    retryFileLabel,
+    severalObjectsLabel,
+    severalObjectsAvailable,
+    severalObjectsHelp,
+    sheetObjectHelp,
+    severalMatchingHelp,
+    notFoundLabel: NOT_FOUND_LABEL
   };
 
   async connectedCallback() {
     try {
       this.permitted = await canImport();
       if (this.permitted) {
+        this.loadFieldCreation();
         // Independent reads: one round trip of waiting, not three.
         const [templates, entityTargets, fields] = await Promise.all([
           getTemplates(),
@@ -663,6 +733,9 @@ export default class ImportWizard extends LightningElement {
     this.objectFields = [];
     this.keyFields = [];
     this.rowMatchFields = [];
+    this.severalObjects = [];
+    this.severalChoices = {};
+    this.sheetObjectChoice = {};
     // A mapping saved before a field could be chosen starts with the first one offered.
     if (this.isPersonExternalId && !this.personMatchField && this.personFields.length > 0) {
       this.personMatchField = this.personFields[0].value;
@@ -672,6 +745,16 @@ export default class ImportWizard extends LightningElement {
   /** Whether the chosen mapping loads one object rather than people (R-IT12). */
   get loadsOneObject() {
     return Boolean(this.selectedTemplate && this.selectedTemplate.targetObject);
+  }
+
+  /** Whether the chosen mapping loads several objects from one upload (R-IT20). */
+  get loadsSeveral() {
+    return Boolean(this.selectedTemplate && this.selectedTemplate.severalObjects);
+  }
+
+  /** A mapping of one object only, with its one set of load choices. */
+  get loadsSingleObject() {
+    return this.loadsOneObject && !this.loadsSeveral;
   }
 
   /** Whether the mapping deletes the records the file names, as a bulk delete (R-BD7). */
@@ -723,6 +806,122 @@ export default class ImportWizard extends LightningElement {
     this.newTemplateName = event.target.value;
   }
 
+  /**
+   * Reads a file before any object is chosen and suggests the object it points at, from its
+   * two-part headings, its sheet names, then its name (C-49a). The suggestion is chosen in the
+   * list and can be changed; the file is read for the columns after Next.
+   */
+  async handleDetectFile(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) {
+      return;
+    }
+    this.message = undefined;
+    this.detection = undefined;
+    try {
+      this.resetFileState();
+      await this.readIntoSheets(file);
+      const view = await suggestObject({ fileName: file.name, sheetsJson: this.sheetsJson });
+      this.detection = view || {};
+      this.sheetObjects = this.detection.sheets || [];
+      this.detectionFile = file;
+      if (this.detection.objectName) {
+        this.newObjectName = this.detection.objectName;
+      }
+      this.newObjectNames = this.detectedObjects;
+    } catch (error) {
+      this.message = this.errorText(error);
+    }
+  }
+
+  /**
+   * Every object the file read on the first step points at, for an upload of several (R-IT20):
+   * the suggestion, each sheet's object and the objects its two-part headings name, each once
+   * and only where the user may load it.
+   */
+  get detectedObjects() {
+    const detection = this.detection || {};
+    const named = [detection.objectName].concat(
+      (detection.sheets || []).flatMap((sheet) =>
+        [sheet.objectName].concat(sheet.namedObjects || [])
+      )
+    );
+    const loadable = new Map(
+      this.loadableObjects.map((object) => [object.value.toLowerCase(), object.value])
+    );
+    const found = [];
+    named.forEach((name) => {
+      const value = name && loadable.get(String(name).toLowerCase());
+      if (value && !found.includes(value)) {
+        found.push(value);
+      }
+    });
+    return found;
+  }
+
+  /** Whether the first step makes an upload of several objects rather than one. */
+  get choosingSeveral() {
+    return this.choosingObject && this.importKind === KIND_SEVERAL;
+  }
+
+  get choosingOneObject() {
+    return this.choosingObject && this.importKind !== KIND_SEVERAL;
+  }
+
+  handleNewObjectsChange(event) {
+    this.newObjectNames = event.detail.value || [];
+  }
+
+  /** Creates the mapping of several objects and chooses it (R-IT20). */
+  async handleCreateSeveralTemplate() {
+    this.message = undefined;
+    try {
+      const created = await createSeveralObjectsTemplate({
+        name: this.newTemplateName,
+        objectNames: this.newObjectNames
+      });
+      this.templates = this.templates.concat([created]);
+      this.selectTemplate(created.id);
+      this.choosingObject = false;
+      this.newObjectNames = [];
+      this.newTemplateName = '';
+    } catch (error) {
+      this.message = this.errorText(error);
+    }
+  }
+
+  get hasDetection() {
+    return Boolean(this.detection);
+  }
+
+  get detectionText() {
+    return this.detection && this.detection.objectName
+      ? format(detectSuggested, this.detection.objectLabel || this.detection.objectName)
+      : detectNone;
+  }
+
+  /** Whether the suggested object is a best guess from a near spelling of a name (C-49e). */
+  get detectionGuessed() {
+    return Boolean(this.detection && this.detection.objectName && this.detection.objectGuessed);
+  }
+
+  /** The sheets of the file read on the first step, when they point at different objects. */
+  get detectionSheets() {
+    const all = this.sheetObjects.map((sheet) => sheet.sheetName);
+    return this.sheetLines(sheetConflicts(all, this.sheetObjects));
+  }
+
+  get hasDetectionSheets() {
+    return this.detectionSheets.length > 0;
+  }
+
+  sheetLines(sheets) {
+    return sheets.map((sheet) => ({
+      key: sheet.sheetName,
+      text: format(sheetObject, sheet.sheetName, sheet.objectLabel || sheet.objectName)
+    }));
+  }
+
   get cannotCreateObjectTemplate() {
     return !this.newObjectName || !String(this.newTemplateName || '').trim();
   }
@@ -746,16 +945,17 @@ export default class ImportWizard extends LightningElement {
     }
   }
 
+  get cannotCreateSeveralTemplate() {
+    return this.newObjectNames.length === 0 || !String(this.newTemplateName || '').trim();
+  }
+
   /**
-   * A new template made from the Related Records card starts on an operation that offers
-   * related records, and one made from the Delete card on Delete by record ID (D-136). The
-   * matching step still lets either be changed.
+   * A new template made from the Delete card starts on Delete by record ID (D-136); the
+   * matching step still lets it be changed.
    */
   startWithKindOperation() {
     const offered = this.loadOperations;
-    if (this.importKind === KIND_RELATED) {
-      this.loadOperation = offered.includes(UPSERT) ? UPSERT : UPDATE;
-    } else if (this.importKind === KIND_DELETE) {
+    if (this.importKind === KIND_DELETE) {
       if (offered.includes(DELETE)) {
         this.loadOperation = DELETE;
       } else {
@@ -798,6 +998,12 @@ export default class ImportWizard extends LightningElement {
       }
     }
     this.handleNext();
+    // A file read on this step to suggest the object is read for its columns too (C-49a).
+    const detected = this.detectionFile;
+    this.detectionFile = undefined;
+    if (detected && this.loadsOneObject) {
+      await this.loadFile(detected);
+    }
   }
 
   // ---------------------------------------------------------------------------------------
@@ -809,22 +1015,28 @@ export default class ImportWizard extends LightningElement {
     if (!file) {
       return;
     }
-    // A new file is read with its own separator or first sheet, not the last file's.
-    this.delimiter = undefined;
-    this.sheetNames = [];
-    this.sheetName = undefined;
+    // A new file is read with its own separator and sheets, not the last file's.
+    this.resetFileState();
     await this.loadFile(file);
+  }
+
+  resetFileState() {
+    this.delimiter = undefined;
+    this.sheets = [];
+    this.chosenSheets = [];
+    this.sheetObjects = [];
   }
 
   /** Reads the text file again with the separator the administrator chose. */
   async handleDelimiterChange(event) {
     this.delimiter = event.detail.value;
+    this.sheets = [];
     await this.loadFile(this.pendingFile);
   }
 
-  /** Reads another sheet of the workbook. */
+  /** Loads another choice of the workbook's sheets, already read. */
   async handleSheetChange(event) {
-    this.sheetName = event.detail.value;
+    this.chosenSheets = event.detail.value || [];
     await this.loadFile(this.pendingFile);
   }
 
@@ -833,7 +1045,7 @@ export default class ImportWizard extends LightningElement {
   }
 
   get hasSeveralSheets() {
-    return this.sheetNames.length > 1;
+    return this.sheets.length > 1;
   }
 
   get delimiterOptions() {
@@ -841,15 +1053,41 @@ export default class ImportWizard extends LightningElement {
   }
 
   get sheetOptions() {
-    return this.sheetNames.map((name) => ({ label: name, value: name }));
+    return this.sheets.map((sheet) => ({
+      label: format(sheetOption, sheet.name, sheet.records.length),
+      value: sheet.name
+    }));
   }
 
-  /** A separator or sheet that read nothing leaves no columns to go on with. */
+  /** The chosen sheets that point at another object than the rest, for a one-object load. */
+  get sheetConflictLines() {
+    if (!this.loadsSingleObject) {
+      return [];
+    }
+    const loaded = this.selectedTemplate && this.selectedTemplate.targetObject;
+    return this.sheetLines(sheetConflicts(this.chosenSheets, this.sheetObjects, loaded));
+  }
+
+  get hasSheetConflict() {
+    return this.sheetConflictLines.length > 0;
+  }
+
+  /** A separator or sheets that read nothing, or sheets for two objects, cannot go on. */
   get hasNoColumns() {
-    return this.parsing || this.columns.length === 0;
+    return this.parsing || this.columns.length === 0 || this.hasSheetConflict;
   }
 
-  /** Reads the file into headers and rows, then suggests a mapping for its columns. */
+  /** The sheets' headings, as `suggestObject` reads them. */
+  get sheetsJson() {
+    return JSON.stringify(
+      this.sheets.map((sheet) => ({ name: sheet.name, headers: sheet.headers }))
+    );
+  }
+
+  /**
+   * Reads the file into sheets (once; a new sheet choice reuses them), combines the chosen ones
+   * into headers and rows, then suggests a mapping for its columns.
+   */
   async loadFile(file) {
     if (!file) {
       return;
@@ -857,25 +1095,54 @@ export default class ImportWizard extends LightningElement {
     this.message = undefined;
     this.parsing = true;
     this.fileName = file.name;
+    this.pendingFile = file;
     try {
-      const rows = isXlsx(file.name)
-        ? await this.readWorkbook(file)
-        : this.readDelimited(await this.readText(file));
-      const { headers, records } = toRecords(rows);
-      if (headers.length === 0 || records.length === 0) {
+      if (this.sheets.length === 0) {
+        await this.readIntoSheets(file);
+      }
+      const chosen = this.sheets.filter((sheet) => this.chosenSheets.includes(sheet.name));
+      if (!chosen.some((sheet) => sheet.headers.length > 0 && sheet.records.length > 0)) {
         this.message = noHeaderRow;
         this.clearColumns();
         return;
       }
-      this.headers = headers;
-      this.records = records;
-      await this.buildColumns(file);
+      await this.loadSheetObjects();
+      await this.buildColumns(chosen);
       this.step = 3;
     } catch (error) {
       this.message = this.errorText(error);
       this.clearColumns();
     } finally {
       this.parsing = false;
+    }
+  }
+
+  /**
+   * The file's sheets as headers and records, from its source (`fileSource.js`), with every
+   * sheet that has rows chosen (or the one sheet there is).
+   */
+  async readIntoSheets(file) {
+    const { sheets, delimiter } = await this.readSheets(file, this.delimiter);
+    this.delimiter = delimiter;
+    this.sheets = sheets.map((sheet) => ({ name: sheet.name, ...toRecords(sheet.rows) }));
+    this.chosenSheets = defaultSheets(this.sheets);
+  }
+
+  /**
+   * The objects a workbook's sheets point at, asked once per file for a one-object load; for an
+   * upload of several, a text file's object too, to start each sheet on its object (R-IT20).
+   */
+  async loadSheetObjects() {
+    const minimum = this.loadsSeveral ? 1 : 2;
+    if (!this.loadsOneObject || this.sheets.length < minimum || this.sheetObjects.length > 0) {
+      return;
+    }
+    try {
+      const view = await suggestObject({ fileName: this.fileName, sheetsJson: this.sheetsJson });
+      this.sheetObjects = (view && view.sheets) || [];
+    } catch {
+      // Without the sheets' objects the load goes on; the columns still map exactly.
+      this.sheetObjects = [];
     }
   }
 
@@ -889,39 +1156,17 @@ export default class ImportWizard extends LightningElement {
     this.columns = [];
   }
 
-  readText(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(reader.error);
-      reader.readAsText(file);
-    });
-  }
-
-  /** A text file's rows, split on the separator detected from it unless one was chosen. */
-  readDelimited(text) {
-    if (!this.delimiter) {
-      this.delimiter = detectDelimiter(text);
-    }
-    return parseCsv(text, this.delimiter);
-  }
-
   /**
-   * The chosen sheet of an Excel workbook (the first until another is chosen), as rows; a file
-   * it cannot read says what to do.
+   * A file's sheets of rows, a text file split on `delimiter` (detected when not given); a
+   * workbook it cannot read says what to do.
    */
-  async readWorkbook(file) {
-    const buffer = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(reader.error);
-      reader.readAsArrayBuffer(file);
-    });
+  async readSheets(file, delimiter) {
     try {
-      this.sheetNames = await readSheetNames(buffer);
-      this.sheetName = this.sheetName || this.sheetNames[0];
-      return await readXlsx(buffer, { sheet: this.sheetName });
+      return await readFileSheets(file, { delimiter });
     } catch (error) {
+      if (!isXlsx(file.name)) {
+        throw error;
+      }
       const sentences = {
         [XLSX_ERRORS.unsupportedBrowser]: xlsxUnsupportedBrowser,
         [XLSX_ERRORS.tooLarge]: xlsxTooLarge
@@ -940,7 +1185,16 @@ export default class ImportWizard extends LightningElement {
     });
   }
 
-  async buildColumns(file) {
+  /**
+   * The chosen sheets as one set of columns: with several, each sheet's headings are suggested
+   * on their own first, so a heading on one sheet joins another sheet's heading for the same
+   * field (C-49a); then the joined headings are suggested as one file.
+   */
+  async buildColumns(chosen) {
+    if (this.loadsSeveral) {
+      await this.buildSeveralColumns(chosen);
+      return;
+    }
     if (this.loadsOneObject && this.objectFields.length === 0) {
       // The object's fields and keys, from the running user's describe (R-IT12).
       const [fields, keys, matchable, related] = await Promise.all([
@@ -955,20 +1209,42 @@ export default class ImportWizard extends LightningElement {
       this.relatedOptions = related || [];
       await this.loadRelatedFields();
     }
+    const targetsBySheet = [];
+    if (chosen.length > 1) {
+      for (const sheet of chosen) {
+        // One sheet at a time, so a failure says which call failed and the order holds.
+        // eslint-disable-next-line no-await-in-loop
+        const each = await suggestMapping({ templateId: this.templateId, headers: sheet.headers });
+        // A best guess joins no other sheet's column (C-49e): it stays its own column, to be
+        // guessed again below and checked by the administrator.
+        targetsBySheet.push(
+          Object.fromEntries(
+            (JSON.parse(each || '{}').columns || []).map((column) => [
+              column.source,
+              column.guessed === true ? IGNORE : column.target
+            ])
+          )
+        );
+      }
+    }
+    const combined = combineSheets(chosen, targetsBySheet, IGNORE, exampleBlank);
+    this.headers = combined.headers;
+    this.records = combined.records;
     const suggested = await suggestMapping({ templateId: this.templateId, headers: this.headers });
     const targets = {};
     const lookups = {};
     const changes = {};
     const clears = {};
+    const guesses = {};
     const parsed = JSON.parse(suggested || '{}');
-    const offered = new Set(this.targetOptions.map((option) => option.value));
+    const offered = new Set(this.mappableTargets.map((option) => option.value));
     (parsed.columns || []).forEach((column) => {
-      targets[column.source] = this.isOfferedTarget(column.target, offered)
-        ? column.target
-        : IGNORE;
+      const kept = this.isOfferedTarget(column.target, offered);
+      targets[column.source] = kept ? column.target : IGNORE;
       lookups[column.source] = column.lookupField;
       changes[column.source] = column.transforms || [];
       clears[column.source] = column.blankClears === true;
+      guesses[column.source] = kept && column.guessed === true && column.target !== IGNORE;
     });
     this.skipRows = parsed.skipRows || [];
     this.uniqueBy = parsed.uniqueBy || [];
@@ -979,13 +1255,176 @@ export default class ImportWizard extends LightningElement {
       lookupField: lookups[heading] || LOOKUP_BY_ID,
       transforms: changes[heading] || [],
       blankClears: clears[heading] || false,
-      samples: this.records
-        .slice(0, SAMPLE_VALUES)
-        .map((record) => record[heading])
-        .filter((value) => value && value.length > 0)
-        .join(', ')
+      guessed: guesses[heading] === true,
+      examples: combined.examples[heading].map((text, index) => ({ key: `${index}`, text }))
     }));
-    this.pendingFile = file;
+  }
+
+  /**
+   * An upload of several objects (R-IT20): each chosen sheet loads its object, parents' sheets
+   * first so their rows stage, and load, first. Each sheet's headings are suggested for its
+   * object, a two-part heading for the object it names; then the template's saved columns are
+   * put over the suggestion by column name, so a saved template keeps its choices.
+   */
+  async buildSeveralColumns(chosen) {
+    if (this.severalObjects.length === 0) {
+      const objects = (await getSeveralObjects({ templateId: this.templateId })) || [];
+      this.severalObjects = objects;
+      const choices = {};
+      objects.forEach((object) => {
+        choices[object.objectName] = {
+          operation: object.operation || INSERT,
+          matchField: object.keyField || ''
+        };
+      });
+      this.severalChoices = choices;
+    }
+    const order = this.severalObjects.map((object) => object.objectName);
+    const objectOfSheet = {};
+    chosen.forEach((sheet) => {
+      objectOfSheet[sheet.name] = this.objectOfSheet(sheet.name);
+    });
+    const ordered = sheetsInLoadOrder(chosen, objectOfSheet, order);
+    const targetsBySheet = [];
+    const guessesBySheet = [];
+    for (const sheet of ordered) {
+      // One sheet at a time, so a failure says which call failed and the order holds.
+      // eslint-disable-next-line no-await-in-loop
+      const each = await suggestSheetMapping({
+        templateId: this.templateId,
+        objectName: objectOfSheet[sheet.name],
+        headers: sheet.headers
+      });
+      const columns = JSON.parse(each || '{}').columns || [];
+      // A best guess joins no other column (C-49e); it is put back on its own column below.
+      targetsBySheet.push(
+        Object.fromEntries(
+          columns.map((column) => [column.source, column.guessed === true ? IGNORE : column.target])
+        )
+      );
+      guessesBySheet.push(
+        columns.filter((column) => column.guessed === true && column.target !== IGNORE)
+      );
+    }
+    const combined = combineObjectSheets(
+      ordered,
+      targetsBySheet,
+      ordered.map((sheet) => objectOfSheet[sheet.name]),
+      IGNORE,
+      exampleBlank
+    );
+    this.headers = combined.headers;
+    this.records = combined.records;
+    const saved = this.savedMapping;
+    const savedBySource = new Map(
+      (saved.columns || []).map((column) => [String(column.source || '').toLowerCase(), column])
+    );
+    const offered = new Set(this.targetOptions.map((option) => option.value));
+    const guessed = this.guessedColumns(ordered, guessesBySheet, combined);
+    this.skipRows = saved.skipRows || [];
+    this.uniqueBy = saved.uniqueBy || [];
+    this.columns = this.headers.map((heading) => {
+      const kept = savedBySource.get(heading.toLowerCase());
+      const guess = kept ? undefined : guessed[heading];
+      const suggested = guess || combined.targets[heading];
+      const target = kept && offered.has(kept.target) ? kept.target : suggested;
+      return {
+        key: heading,
+        source: heading,
+        target: offered.has(target) ? target : IGNORE,
+        lookupField: (kept && kept.lookupField) || LOOKUP_BY_ID,
+        transforms: (kept && kept.transforms) || [],
+        blankClears: Boolean(kept && kept.blankClears),
+        guessed: Boolean(guess) && offered.has(guess),
+        examples: combined.examples[heading].map((text, index) => ({ key: `${index}`, text }))
+      };
+    });
+  }
+
+  /**
+   * Each joined column a sheet's best guess (C-49e) belongs to, with the guessed target: only
+   * where the column has no target of its own and no other column took that target.
+   */
+  guessedColumns(sheets, guessesBySheet, combined) {
+    const taken = new Set(Object.values(combined.targets).filter((target) => target !== IGNORE));
+    const result = {};
+    sheets.forEach((sheet, index) => {
+      (guessesBySheet[index] || []).forEach((column) => {
+        const own = `${column.source} (${sheet.name})`;
+        const heading = combined.headers.includes(own) ? own : column.source;
+        const free = combined.targets[heading] === IGNORE && !taken.has(column.target);
+        if (combined.headers.includes(heading) && free && !result[heading]) {
+          result[heading] = column.target;
+          taken.add(column.target);
+        }
+      });
+    });
+    return result;
+  }
+
+  /** The chosen template's saved mapping, or an empty one. */
+  get savedMapping() {
+    try {
+      return JSON.parse((this.selectedTemplate && this.selectedTemplate.mapping) || '{}') || {};
+    } catch {
+      return {};
+    }
+  }
+
+  /**
+   * The object a sheet loads (R-IT20): as chosen, else the object its name or headings point
+   * at when the upload loads it, else the first object.
+   */
+  objectOfSheet(sheetName) {
+    const listed = this.severalObjects.map((object) => object.objectName);
+    const lower = (name) => String(name || '').toLowerCase();
+    const listedNamed = (name) => listed.find((each) => lower(each) === lower(name));
+    const chosen = listedNamed(this.sheetObjectChoice[sheetName]);
+    if (chosen) {
+      return chosen;
+    }
+    const detected = this.sheetObjects.find((sheet) => sheet.sheetName === sheetName);
+    const fromSheet = detected && listedNamed(detected.objectName);
+    const fromFile = this.sheets.length === 1 ? listedNamed(this.detectionObjectName) : undefined;
+    return fromSheet || fromFile || listed[0];
+  }
+
+  /** The object the file read on the first step pointed at, kept for its one sheet. */
+  get detectionObjectName() {
+    return this.detection && this.detection.objectName;
+  }
+
+  /** Each chosen sheet's object, as a picker of the upload's objects (R-IT20). */
+  get sheetObjectRows() {
+    if (!this.loadsSeveral) {
+      return [];
+    }
+    const options = this.severalObjects.map((object) => ({
+      label: object.objectLabel,
+      value: object.objectName
+    }));
+    return this.sheets
+      .filter((sheet) => this.chosenSheets.includes(sheet.name))
+      .map((sheet) => ({
+        key: sheet.name || '-',
+        sheetName: sheet.name,
+        label: sheet.name ? format(sheetObjectLabel, sheet.name) : fileObjectLabel,
+        value: this.objectOfSheet(sheet.name),
+        options
+      }));
+  }
+
+  get hasSheetObjectRows() {
+    return this.sheetObjectRows.length > 0;
+  }
+
+  /** Another object for a sheet maps its columns again (R-IT20). */
+  async handleSheetObjectChange(event) {
+    this.sheetObjectChoice = {
+      ...this.sheetObjectChoice,
+      [event.target.dataset.sheet]: event.detail.value
+    };
+    await this.loadFile(this.pendingFile);
   }
 
   // ---------------------------------------------------------------------------------------
@@ -993,6 +1432,14 @@ export default class ImportWizard extends LightningElement {
   // ---------------------------------------------------------------------------------------
 
   get targetOptions() {
+    const options = this.mappableTargets;
+    // C-49d: an admin who may create fields gets Create New Field last.
+    return this.newFieldObjects.length > 0
+      ? options.concat([{ label: createNewField, value: NEW_FIELD }])
+      : options;
+  }
+
+  get mappableTargets() {
     if (this.loadsOneObject) {
       // The object's own fields, from describe (R-IT12).
       return [{ label: doNotLoad, value: IGNORE }].concat(
@@ -1135,7 +1582,18 @@ export default class ImportWizard extends LightningElement {
     if (this.matchOnly) {
       options.matchOnly = true;
     }
-    if (this.loadsOneObject) {
+    if (this.loadsSeveral) {
+      // Each object's operation and key travel in the mapping; the template keeps the first
+      // object's, what a missing lookup does and what several matches do (R-IT20).
+      const first = this.severalObjects[0];
+      const choice = (first && this.severalChoices[first.objectName]) || {};
+      options.load = {
+        operation: choice.operation || INSERT,
+        matchField: this.findsByField(choice.operation) ? choice.matchField : null,
+        lookupNotFound: this.lookupNotFound,
+        severalMatches: this.severalMatches
+      };
+    } else if (this.loadsOneObject) {
       // A one-object mapping's load choices, saved on the template (R-IT12, R-IT13).
       options.load = {
         operation: this.loadOperation,
@@ -1164,8 +1622,124 @@ export default class ImportWizard extends LightningElement {
   handleTargetChange(event) {
     const source = event.target.dataset.source;
     const target = event.detail.value;
+    if (target === NEW_FIELD) {
+      this.openNewField(source);
+      return;
+    }
     this.columns = this.columns.map((column) => {
-      return column.source === source ? { ...column, target, lookupField: LOOKUP_BY_ID } : column;
+      return column.source === source
+        ? { ...column, target, lookupField: LOOKUP_BY_ID, guessed: false }
+        : column;
+    });
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // C-49e: best guesses. A column mapped from a near spelling is flagged until the
+  // administrator accepts it or chooses another field; Next waits for every one.
+  // ---------------------------------------------------------------------------------------
+
+  handleAcceptGuess(event) {
+    const source = event.currentTarget.dataset.source;
+    this.columns = this.columns.map((column) => {
+      return column.source === source ? { ...column, guessed: false } : column;
+    });
+  }
+
+  handleAcceptAllGuesses() {
+    this.columns = this.columns.map((column) => ({ ...column, guessed: false }));
+  }
+
+  get guessCount() {
+    return this.columns.filter((column) => column.guessed).length;
+  }
+
+  get hasGuesses() {
+    return this.guessCount > 0;
+  }
+
+  get guessPendingText() {
+    return format(guessPending, this.guessCount);
+  }
+
+  /** Next on the column step: columns to load, and no best guess left unchecked (C-49e). */
+  get cannotLeaveColumns() {
+    return this.hasNoColumns || this.hasGuesses;
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // C-49d: Create New Field. The dialog (c-import-new-field-modal) creates the field; this
+  // only offers it, adds the field to the cached lists and maps the column to it.
+  // ---------------------------------------------------------------------------------------
+
+  canCreateFields = false;
+
+  async loadFieldCreation() {
+    try {
+      const connection = await getFieldConnection();
+      this.canCreateFields = Boolean(connection && connection.canCreate);
+    } catch {
+      // Without BarnCRM Metadata Admin the class is out of reach: no option, no message.
+      this.canCreateFields = false;
+    }
+  }
+
+  /** The objects a new field can go on, with the prefix the column's target takes. */
+  get newFieldObjects() {
+    const template = this.selectedTemplate;
+    if (!this.canCreateFields || !template) {
+      return [];
+    }
+    if (this.loadsOneObject) {
+      return [
+        {
+          label: template.targetObjectLabel || template.targetObject,
+          value: template.targetObject,
+          prefix: 'Record'
+        }
+      ];
+    }
+    return [
+      { label: newFieldPerson, value: 'Contact', prefix: 'Contact1' },
+      { label: newFieldOrganization, value: 'Account', prefix: 'Organization' }
+    ];
+  }
+
+  async openNewField(source) {
+    // Re-render the picker so it does not keep showing Create New Field.
+    this.columns = this.columns.map((column) => ({ ...column }));
+    const created = await ImportNewFieldModal.open({
+      size: 'small',
+      label: createNewField,
+      objects: this.newFieldObjects,
+      heading: source,
+      values: this.records.map((record) => record[source])
+    });
+    if (!created) {
+      return;
+    }
+    const field = { value: created.fieldValue, label: created.fieldLabel };
+    if (created.prefix === 'Record') {
+      field.value = `Record.${created.fieldValue}`;
+      this.objectFields = this.objectFields.concat([
+        { ...field, isLookup: false, lookupFields: [] }
+      ]);
+    } else if (created.prefix === 'Contact1') {
+      this.matchFields = {
+        ...this.matchFields,
+        personFields: this.matchFields.personFields.concat([field])
+      };
+    } else {
+      this.matchFields = {
+        ...this.matchFields,
+        organizationFields: this.matchFields.organizationFields.concat([field])
+      };
+    }
+    const target =
+      created.prefix === 'Record' ? field.value : `${created.prefix}.${created.fieldValue}`;
+    this.columns = this.columns.map((column) => {
+      return column.source === source
+        ? { ...column, target, lookupField: LOOKUP_BY_ID, guessed: false }
+        : column;
     });
   }
 
@@ -1188,6 +1762,7 @@ export default class ImportWizard extends LightningElement {
       const changeCount = (column.transforms || []).length;
       return {
         ...column,
+        acceptGuessLabel: format(guessAcceptColumn, column.source),
         changesLabel: changeCount > 0 ? format(changesButtonCount, changeCount) : changesButton,
         isLookup,
         lookupOptions: isLookup
@@ -1215,8 +1790,30 @@ export default class ImportWizard extends LightningElement {
         return mapped;
       }),
       defaults: [],
-      ...this.rowRules
+      ...this.rowRules,
+      ...this.objectsRule
     });
+  }
+
+  /** The objects of an upload of several, each with how it finds its records (R-IT20). */
+  get objectsRule() {
+    if (!this.loadsSeveral) {
+      return {};
+    }
+    return {
+      objects: this.severalObjects.map((object) => {
+        const choice = this.severalChoices[object.objectName] || {};
+        const listed = { entity: object.objectName, operation: choice.operation || INSERT };
+        if (this.findsByField(choice.operation) && choice.matchField) {
+          listed.keyField = choice.matchField;
+        }
+        return listed;
+      })
+    };
+  }
+
+  findsByField(operation) {
+    return operation === UPSERT || operation === UPDATE_BY_FIELD;
   }
 
   /** The rows to load, only when set, so a mapping without them reads as before. */
@@ -1283,6 +1880,12 @@ export default class ImportWizard extends LightningElement {
    * switched on, the run log says so.
    */
   get showDuplicateRules() {
+    if (this.loadsSeveral) {
+      return this.severalObjects.some((object) => {
+        const operation = (this.severalChoices[object.objectName] || {}).operation;
+        return operation === INSERT || operation === UPSERT;
+      });
+    }
     return !this.loadsOneObject || this.loadOperation === INSERT || this.loadOperation === UPSERT;
   }
 
@@ -1316,6 +1919,9 @@ export default class ImportWizard extends LightningElement {
    * field that a column feeds.
    */
   get mapsTheObject() {
+    if (this.loadsSeveral) {
+      return this.mapsSeveral;
+    }
     const targets = this.columns.map((column) => column.target || '');
     if (!targets.some((target) => target.startsWith(RECORD_PREFIX))) {
       return false;
@@ -1328,6 +1934,77 @@ export default class ImportWizard extends LightningElement {
       return Boolean(this.loadMatchField) && targets.some((target) => target.toLowerCase() === key);
     }
     return true;
+  }
+
+  /**
+   * Whether an upload of several objects can load (R-IT20): a column on some object, and each
+   * object with columns that finds its records has its key, the record ID or a chosen field, as
+   * a column. The server checks the rest when the dry run starts.
+   */
+  get mapsSeveral() {
+    const targets = this.columns
+      .map((column) => String(column.target || '').toLowerCase())
+      .filter((target) => target && target !== IGNORE.toLowerCase());
+    if (targets.length === 0) {
+      return false;
+    }
+    return this.severalObjects.every((object) => {
+      const prefix = `${object.objectName.toLowerCase()}.`;
+      if (!targets.some((target) => target.startsWith(prefix))) {
+        return true;
+      }
+      const choice = this.severalChoices[object.objectName] || {};
+      if (choice.operation === UPDATE) {
+        return targets.includes(`${prefix}id`);
+      }
+      if (this.findsByField(choice.operation)) {
+        return (
+          Boolean(choice.matchField) && targets.includes(prefix + choice.matchField.toLowerCase())
+        );
+      }
+      return true;
+    });
+  }
+
+  /** Each object of an upload of several with its choices, for the matching step (R-IT20). */
+  get severalObjectRows() {
+    return this.severalObjects.map((object) => {
+      const choice = this.severalChoices[object.objectName] || {};
+      return {
+        key: object.objectName,
+        objectName: object.objectName,
+        objectLabel: object.objectLabel,
+        operation: choice.operation || INSERT,
+        matchField: choice.matchField || '',
+        operations: object.operations || [],
+        keyFields: object.keyFields || [],
+        matchFields: object.matchFields || [],
+        links: (object.links || []).map((text, index) => ({ key: `${index}`, text }))
+      };
+    });
+  }
+
+  handleSeveralLoadChange(event) {
+    const objectName = event.target.dataset.object;
+    this.severalChoices = {
+      ...this.severalChoices,
+      [objectName]: {
+        operation: event.detail.operation,
+        matchField: event.detail.matchField || ''
+      }
+    };
+  }
+
+  get notFoundOptions() {
+    return notFoundChoices();
+  }
+
+  get notFoundHelp() {
+    return notFoundHelpOf(this.lookupNotFound);
+  }
+
+  handleNotFoundChange(event) {
+    this.lookupNotFound = event.detail.value;
   }
 
   /** Whether a one-object load finds records by a chosen field: an upsert, or an update. */
@@ -1348,11 +2025,15 @@ export default class ImportWizard extends LightningElement {
 
   /** Whether each row also creates a related record: one chosen, under a parent key (R-IT17). */
   get loadsRelated() {
-    return Boolean(this.loadRelated) && this.loadOperation !== INSERT;
+    return !this.loadsSeveral && Boolean(this.loadRelated) && this.loadOperation !== INSERT;
   }
 
   /** The fields a one-object column can fill: the object's, then the related record's. */
   get loadFields() {
+    if (this.loadsSeveral) {
+      // Every object's fields, `Object.Field`, labelled with the object (R-IT20).
+      return this.severalObjects.flatMap((object) => object.fields || []);
+    }
     return this.objectFields.concat(this.loadsRelated ? this.relatedFields : []);
   }
 
@@ -1503,10 +2184,16 @@ export default class ImportWizard extends LightningElement {
    * person, since every row would then be one person.
    */
   get fileValueTargetOptions() {
+    if (this.loadsSeveral) {
+      // Every row would name the same record, so no record ID (R-IT20).
+      return this.targetOptions.filter(
+        (option) => option.value !== IGNORE && !option.value.toLowerCase().endsWith('.id')
+      );
+    }
     if (this.loadsOneObject) {
       // Every row would name the same record (R-IT12).
       const key = this.loadFindsByField ? RECORD_PREFIX + this.loadMatchField : null;
-      return this.targetOptions.filter(
+      return this.mappableTargets.filter(
         (option) =>
           option.value !== IGNORE &&
           option.value !== RECORD_ID &&
@@ -1514,7 +2201,7 @@ export default class ImportWizard extends LightningElement {
       );
     }
     const personField = this.isPersonExternalId ? this.personMatchField : null;
-    return this.targetOptions.filter((option) => {
+    return this.mappableTargets.filter((option) => {
       if (option.value === IGNORE) {
         return false;
       }
@@ -1707,10 +2394,10 @@ export default class ImportWizard extends LightningElement {
     this.message = undefined;
     this.loading = true;
     try {
-      const rows = isXlsx(file.name)
-        ? await this.readWorkbook(file)
-        : this.readRetryText(await this.readText(file));
-      const { headers, records } = toRecords(rows);
+      // The fixed rows' own separator, which may differ from the original's; a workbook's
+      // first sheet.
+      const { sheets } = await this.readSheets(file, undefined);
+      const { headers, records } = toRecords(sheets.length > 0 ? sheets[0].rows : []);
       if (headers.length === 0 || records.length === 0) {
         this.message = noHeaderRow;
         return;
@@ -1733,11 +2420,6 @@ export default class ImportWizard extends LightningElement {
     } finally {
       this.loading = false;
     }
-  }
-
-  /** A fixed-rows file's rows, split on its own separator, which may differ from the original's. */
-  readRetryText(text) {
-    return parseCsv(text, detectDelimiter(text));
   }
 
   startPolling() {
@@ -1951,9 +2633,9 @@ export default class ImportWizard extends LightningElement {
     this.columns = [];
     this.fileName = undefined;
     this.pendingFile = undefined;
-    this.delimiter = undefined;
-    this.sheetNames = [];
-    this.sheetName = undefined;
+    this.resetFileState();
+    this.detection = undefined;
+    this.detectionFile = undefined;
     this.message = undefined;
     this.expectedCount = '';
     this.expectedAmount = '';

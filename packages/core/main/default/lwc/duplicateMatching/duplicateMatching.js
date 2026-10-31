@@ -9,9 +9,11 @@ import REVIEW from '@salesforce/label/c.Core_DuplicateMatching_Review';
 import REVIEW_COUNT from '@salesforce/label/c.Core_DuplicateMatching_ReviewCount';
 import MATCHING_LOGIC from '@salesforce/label/c.Core_DuplicateMatching_MatchingLogic';
 import NO_ACCESS from '@salesforce/label/c.Core_DuplicateMatching_NoAccess';
+import AUTO_MERGE from '@salesforce/label/c.Core_AutoMerge_Tab';
 
 const REVIEW_AREA = 'review';
 const MATCHING_LOGIC_AREA = 'matchingLogic';
+const AUTO_MERGE_AREA = 'autoMerge';
 
 /**
  * The Duplicate Matching tab (ADR-0139, admin guide duplicates.md): one tab per area, each
@@ -26,6 +28,7 @@ export default class DuplicateMatching extends LightningElement {
     intro: INTRO,
     review: REVIEW,
     matchingLogic: MATCHING_LOGIC,
+    autoMerge: AUTO_MERGE,
     noAccess: NO_ACCESS
   };
 
@@ -60,6 +63,11 @@ export default class DuplicateMatching extends LightningElement {
     return Boolean(canManageSettings || canManageMetadata);
   }
 
+  /** Auto-Merge (C-51) needs Manage BarnCRM Settings, as merging from the review list does. */
+  get canSeeAutoMerge() {
+    return Boolean(canManageSettings);
+  }
+
   /** The areas this person may open, in the order the tabs show them. */
   get areas() {
     const areas = [];
@@ -69,7 +77,14 @@ export default class DuplicateMatching extends LightningElement {
     if (this.canSeeMatchingLogic) {
       areas.push(MATCHING_LOGIC_AREA);
     }
+    if (this.canSeeAutoMerge) {
+      areas.push(AUTO_MERGE_AREA);
+    }
     return areas;
+  }
+
+  get autoMergeOpened() {
+    return Boolean(this.opened[AUTO_MERGE_AREA]);
   }
 
   get hasAnyArea() {

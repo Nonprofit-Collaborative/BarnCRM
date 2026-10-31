@@ -13,8 +13,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In the BarnCRM app, open the **Org Optimizer** tab. | The page name **Org Optimizer** once (no second title card), then **What in your org needs attention, one section at a time.** On your first visit **About This Tool** is open with a **Learn More** link that opens the admin guide in a new tab. **Overview** is selected. |
-| 2 | Read **Overview**. | Tiles with an icon and one line each, under **Check Your Data** (**Data Quality**, **Field Utilization**) and **Check Your Setup** (**Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**). **Errors** has a badge (**{n} New** or **All Clear**); **Health Check** has **Not Run Yet** on a new org, otherwise the last run's result. No **Duplicates** (they are on the **Duplicate Matching** tab). |
-| 3 | Look at the vertical tabs. | **Overview**, **Data Quality**, **Field Utilization**, **Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**. Each section has one heading and no card inside the page's card. |
+| 2 | Read **Overview**. | Tiles with an icon and one line each, under **Check Your Data** (**Data Quality**, **Field Utilization**, **Data Dictionary**) and **Check Your Setup** (**Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**). **Errors** has a badge (**{n} New** or **All Clear**); **Health Check** has **Not Run Yet** on a new org, otherwise the last run's result. No **Duplicates** (they are on the **Duplicate Matching** tab). |
+| 3 | Look at the vertical tabs. | **Overview**, **Data Quality**, **Field Utilization**, **Data Dictionary**, **Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**. Each section has one heading and no card inside the page's card. |
 | 4 | Select the **Errors** tile. | The **Errors** section opens with the **Error Log** card: a count of new entries (or **Nothing has gone wrong. There is nothing to read here.**) and **Open the Error Log**. |
 | 5 | Choose **Health Check**. | An illustration, **Health Check Runs When You Ask**, **Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.** and **Run Health Check**. No findings yet. |
 | 6 | Click **Run Health Check**. | **Reading your org**, then the Health Check report with **What We Found in Your Org** and grouped findings. |
@@ -138,3 +138,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Set it to `60`, **Save**, then **Refresh** on **Unused Setup**. | **Your settings are saved.** The first check reads **Active Users Who Have Not Logged In for 60 Days**. |
 
 **Cleanup:** Set **Days before a user is unused** back to `90`.
+
+## T-HC-10: Data Dictionary Lists Fields, Fill Rates and a CSV
+
+**Purpose:** Confirm an admin can document fields, add fill rates and download the table, and that nobody else sees it.
+**Prerequisites:** admin and staff (see [Test users](before-you-test.md#test-users)); sample data loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open **Org Optimizer** and choose **Data Dictionary**. | **Data Dictionary**, a **Kinds of Record** picker with **Account**, **Contact** and Core's data objects (such as **Address** and **Relationship**) already under **Selected**, **Include Fill Rates** unticked, **Build Dictionary** enabled and **Download CSV** disabled. **Choose kinds of record and press Build Dictionary.** shows. |
+| 2 | Move everything except **Account** out of **Selected**, then click **Build Dictionary**. | A progress bar, then **Described 1 of 1 kinds of record.** and a table of Account's fields sorted by **Field**, with **Object**, **API Name**, **Type**, **Length**, **Precision**, **Required**, **Unique**, **External ID**, **Custom**, **Picklist Values**, **Help Text**, **Formula** and **Related To**. No **Fill Rate** column. |
+| 3 | Find **Name**, **Website** and **Is Organization**. | **Name** is **Required**: Yes. **Website** has type url and **Custom**: No. **Is Organization** has **Custom**: Yes and its formula in **Formula**. **Parent Account** has **Related To**: Account. |
+| 4 | Tick **Include Fill Rates** and click **Build Dictionary**. | The progress line reads **Counting fill rates for Account.** while it counts, then a **Fill Rate** column appears. **Phone** shows a percentage; **Is Organization** (a formula) and checkboxes are blank. |
+| 5 | Click **Download CSV**. | A file named **Data_Dictionary-** and today's date ending .csv downloads, and **Downloaded {n} fields.** shows. Open it in a spreadsheet: a header row starting **Object**, **Object API Name**, **Field**, then one row per field with the same values, and **Fill Rate** as a percentage such as 33.3%. |
+| 6 | In Setup, give a field help text containing a comma and a quotation mark, such as `Used for "Gifts", mostly`. Build again. | The help text shows whole in the table, and in the CSV it sits in one cell. |
+| 7 | Choose all objects, tick **Include Fill Rates** and build, with an object of more than 1,000,000 records if the org has one. | Each object is described. An object over the limit has blank fill rates and **Fill rates not counted for: {object}.** appears under the table. |
+| 8 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **Data Dictionary** tile or tab. |
+
+**Cleanup:** Remove the help text added in step 6.

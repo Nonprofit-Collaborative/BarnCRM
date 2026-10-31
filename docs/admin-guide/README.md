@@ -142,13 +142,17 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | Data Manager (one place to start a data task, and every job's Undo) | [data-manager.md](data-manager.md) | Core |
 | C-14, C-19, C-32, C-33 Importing, import undo, matching rules and Load one object | [importing.md](importing.md) | Core |
+| C-49d Creating a new field from an import | [import-new-fields.md](import-new-fields.md) | Core |
+| C-49b Super Importer rows: browse, correct and retry import rows | [import-rows.md](import-rows.md) | Core |
 | C-34, C-36 Find and export | [find.md](find.md) | Core |
 | C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core |
+| C-50 Super Transform (bulk change without a file or a Find query) | [super-transform.md](super-transform.md) | Core |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
 | Org Optimizer (Data Quality, Field Utilization, Health Check, Errors, Storage and Limits, Unused Setup) | [org-optimizer.md](org-optimizer.md) | Core |
 | C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | Core |
 | C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |
 | Field utilization | [field-utilization.md](field-utilization.md) | Core |
+| C-52 Data Dictionary (the Data Dictionary section of Org Optimizer) | [data-dictionary.md](data-dictionary.md) | Core |
 
 ### Automation, Totals and Health
 

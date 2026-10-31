@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_ErrorOnObject</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: one object's reason; {0} is the object, {1} the reason</shortDescription>
+        <value>{0}: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorParentNotSaved</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: a record is not saved because its parent on the row was not</shortDescription>
+        <value>Not saved, because a record it points at on this row was not saved. Fix that record, then load this row again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorKeyFirstRowFailed</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: a later row of a key loads nothing because the key's first row failed</shortDescription>
+        <value>The first row with this key was not saved, so this row was not loaded. Fix that row, then load these rows again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogLookupLoadedHere</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log: a lookup to a record the file creates; {0} is the field</shortDescription>
+        <value>{0}: a value naming a record this file creates is found when the file loads, not in the dry run.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorSeveralObjectsNone</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: a several-object mapping lists no object</shortDescription>
+        <value>Choose at least one object to load.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorSeveralObjectsRepeated</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: an object is listed twice; {0} is the object</shortDescription>
+        <value>{0} is listed twice. List each object once.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorSeveralObjectsDelete</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: a several-object upload cannot delete</shortDescription>
+        <value>A file of several objects cannot delete records. Delete records of one object at a time.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorSeveralObjectsColumn</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: a column maps to an object not loaded; {0} column, {1} object</shortDescription>
+        <value>The column {0} is mapped to {1}, which this file does not load. Map the column again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SeveralLinkLine</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: a same-row link; {0} child, {1} parent, {2} field</shortDescription>
+        <value>Each {0} record is linked to the {1} record on its row through {2}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindSeveralTitle</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: title of the several objects card</shortDescription>
+        <value>Several Objects in One File</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_KindSeveralText</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what the several objects card loads</shortDescription>
+        <value>Load several kinds of record from one file, a sheet for each or several on one row, each linked to the records it points at.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SeveralObjectsLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: label of the objects a several-object mapping loads</shortDescription>
+        <value>Objects to load</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SeveralObjectsAvailable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the objects not chosen yet</shortDescription>
+        <value>Available objects</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SeveralObjectsHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: help for choosing several objects</shortDescription>
+        <value>Choose every object the file loads. A file read above suggests them. Records load parents first, whatever the order here.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SheetObjectLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the object one sheet loads; {0} is the sheet</shortDescription>
+        <value>Object for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_FileObjectLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the object a text file loads</shortDescription>
+        <value>Object for this file</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SheetObjectHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: help for the object of each sheet</shortDescription>
+        <value>A heading of the sheet's object maps to its field. A two-part heading, such as Contact.LastName, maps to that object's field on any sheet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SeveralMatchingHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: help for the several objects matching step</shortDescription>
+        <value>Choose how each object's rows find their records. Records on one row are linked where one points at another. A record on another sheet is linked by a column that names its parent by ID or by a field you choose.</value>
+    </labels>
+</CustomLabels>

@@ -1,0 +1,104 @@
+<template>
+  <div class="slds-is-relative">
+    <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+    <template lwc:if={error}>
+      <p class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">{error}</p>
+    </template>
+    <template lwc:if={message}>
+      <p class="slds-var-m-bottom_small" role="status" data-id="status">{message}</p>
+    </template>
+    <template lwc:if={showNoAccess}>
+      <p class="slds-var-m-bottom_small" role="status" data-id="no-access">{labels.noAccess}</p>
+    </template>
+    <p class="slds-var-m-bottom_small" data-id="rule">{ruleText}</p>
+    <template lwc:if={running}>
+      <p class="slds-var-m-bottom_small" role="status" data-id="running">{labels.running}</p>
+    </template>
+    <div class="slds-var-m-bottom_medium">
+      <lightning-button
+        label={labels.preview}
+        onclick={handlePreview}
+        disabled={previewDisabled}
+        data-id="preview"
+      ></lightning-button>
+      <lightning-button
+        class="slds-var-m-left_x-small"
+        label={labels.refresh}
+        onclick={handleRefresh}
+        data-id="refresh"
+      ></lightning-button>
+    </div>
+    <template lwc:if={loading}>
+      <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+    </template>
+    <template lwc:if={previewed}>
+      <h3 class="slds-text-heading_small slds-var-m-bottom_small" data-id="preview-heading">{previewHeading}</h3>
+      <template lwc:if={hasPairs}>
+        <ul class="slds-has-dividers_bottom-space slds-var-m-bottom_small" data-id="pairs">
+          <template for:each={pairRows} for:item="pair">
+            <li key={pair.ref} class="slds-item">
+              <p>
+                <strong>{labels.keep}</strong> {pair.survivorName}
+                <span class="slds-var-m-left_small"><strong>{labels.mergeAway}</strong> {pair.mergedName}</span>
+              </p>
+              <template lwc:if={pair.hasChanges}>
+                <p class="slds-text-color_weak">{pair.changeText}</p>
+              </template>
+              <template lwc:else>
+                <p class="slds-text-color_weak">{labels.noChanges}</p>
+              </template>
+            </li>
+          </template>
+        </ul>
+        <template lwc:if={moreNotShown}>
+          <p class="slds-var-m-bottom_small" data-id="more">{moreText}</p>
+        </template>
+        <lightning-button
+          variant="brand"
+          label={mergeLabel}
+          onclick={handleMerge}
+          disabled={running}
+          data-id="merge"
+        ></lightning-button>
+      </template>
+      <template lwc:else>
+        <p data-id="none">{labels.none}</p>
+      </template>
+    </template>
+    <h3 class="slds-text-heading_small slds-var-m-top_medium slds-var-m-bottom_small">{labels.recentRuns}</h3>
+    <template lwc:if={hasRuns}>
+      <ul data-id="runs">
+        <template for:each={runRows} for:item="run">
+          <li key={run.runId} class="slds-var-m-bottom_small">
+            <p>
+              <lightning-formatted-date-time
+                value={run.startedAt}
+                year="numeric"
+                month="short"
+                day="numeric"
+                hour="numeric"
+                minute="2-digit"
+              ></lightning-formatted-date-time>
+              <span class="slds-var-m-left_small">{run.summary}</span>
+            </p>
+            <template for:each={run.noteLines} for:item="note">
+              <p key={note.key} class="slds-text-color_weak">{note.text}</p>
+            </template>
+            <template lwc:if={run.canUndo}>
+              <lightning-button
+                label={labels.undo}
+                data-run={run.runId}
+                data-id="undo"
+                onclick={handleUndo}
+                disabled={running}
+              ></lightning-button>
+            </template>
+          </li>
+        </template>
+      </ul>
+    </template>
+    <template lwc:else>
+      <p data-id="no-runs">{labels.noRuns}</p>
+    </template>
+  </div>
+</template>

@@ -1,0 +1,356 @@
+<template>
+    <c-barn-page-shell
+        title={labels.title}
+        purpose={labels.intro}
+        title-hidden
+        help-storage-key="superTransform"
+        status-message={statusMessage}
+        data-id="shell"
+    >
+        <div slot="help" class="slds-var-p-bottom_small" data-id="help">
+            <p>{labels.help}</p>
+        </div>
+
+        <template lwc:if={errorMessage}>
+            <div class="slds-notify slds-notify_alert slds-alert_error slds-var-m-bottom_small" role="alert">
+                <span data-id="error-message">{errorMessage}</span>
+            </div>
+        </template>
+        <template lwc:if={noticeMessage}>
+            <div class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small">
+                <span data-id="notice-message">{noticeMessage}</span>
+            </div>
+        </template>
+        <template lwc:if={busy}>
+            <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </template>
+
+        <template lwc:if={showNoPermission}>
+            <c-barn-empty-state
+                data-id="no-permission"
+                illustration="setup"
+                heading={labels.noPermissionHeading}
+                message={labels.noPermission}
+            ></c-barn-empty-state>
+        </template>
+
+        <template lwc:if={showCards}>
+            <!-- 1. Object -->
+            <section class="step" data-id="step-object" aria-labelledby="step-object-heading">
+                <h2 id="step-object-heading" class="slds-text-heading_small step__heading">{labels.stepObject}</h2>
+                <template lwc:if={hasObjects}>
+                    <div class="slds-grid slds-wrap slds-gutters_x-small">
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                            <lightning-input
+                                data-id="object-search"
+                                type="search"
+                                label={labels.searchObjects}
+                                value={objectSearch}
+                                onchange={handleObjectSearch}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                            <lightning-combobox
+                                data-id="object"
+                                label={labels.object}
+                                placeholder={labels.chooseObject}
+                                options={objectOptions}
+                                value={objectApiName}
+                                disabled={busy}
+                                onchange={handleObjectChange}
+                            ></lightning-combobox>
+                        </div>
+                    </div>
+                </template>
+                <template lwc:else>
+                    <c-barn-empty-state
+                        data-id="no-objects"
+                        heading={labels.noObjectsHeading}
+                        message={labels.noObjects}
+                    ></c-barn-empty-state>
+                </template>
+            </section>
+
+            <!-- 2. Which Records -->
+            <section class="step" data-id="step-records" aria-labelledby="step-records-heading">
+                <h2 id="step-records-heading" class="slds-text-heading_small step__heading">{labels.stepRecords}</h2>
+                <template lwc:if={hasObject}>
+                    <c-filter-builder
+                        object-api-name={objectApiName}
+                        value={filterJson}
+                        onchange={handleFilterChange}
+                    ></c-filter-builder>
+                    <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-gutters_x-small slds-var-m-top_small">
+                        <div class="slds-col slds-no-flex">
+                            <c-barn-stat-tile
+                                data-id="count-tile"
+                                label={labels.matching}
+                                value={countValue}
+                                badge-label={countBadge}
+                                badge-variant={countBadgeVariant}
+                            ></c-barn-stat-tile>
+                        </div>
+                        <p class="slds-col" data-id="count">{countMessage}</p>
+                    </div>
+                    <template for:each={warnings} for:item="warning">
+                        <div
+                            key={warning.key}
+                            class="slds-notify slds-notify_alert slds-alert_warning slds-var-m-top_x-small"
+                            data-id="warning"
+                        >
+                            {warning.text}
+                        </div>
+                    </template>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-color_weak">{labels.objectFirst}</p>
+                </template>
+            </section>
+
+            <!-- 3. What to Change -->
+            <section class="step" data-id="step-changes" aria-labelledby="step-changes-heading">
+                <h2 id="step-changes-heading" class="slds-text-heading_small step__heading">{labels.stepChanges}</h2>
+                <template lwc:if={hasObject}>
+                    <template for:each={changeRows} for:item="change">
+                        <div key={change.key} class="change slds-var-m-bottom_small" data-id="change">
+                            <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                    <lightning-combobox
+                                        data-id="field"
+                                        label={labels.field}
+                                        placeholder={labels.chooseField}
+                                        options={fieldOptions}
+                                        value={change.field}
+                                        data-key={change.key}
+                                        data-part="field"
+                                        onchange={handleChangeEdit}
+                                    ></lightning-combobox>
+                                </div>
+                                <template lwc:if={change.hasField}>
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                                        <lightning-combobox
+                                            data-id="action"
+                                            label={labels.action}
+                                            options={change.actionOptions}
+                                            value={change.action}
+                                            data-key={change.key}
+                                            data-part="action"
+                                            onchange={handleChangeEdit}
+                                        ></lightning-combobox>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                        <template lwc:if={change.isBoolean}>
+                                            <lightning-combobox
+                                                label={labels.newValue}
+                                                options={change.booleanOptions}
+                                                value={change.value}
+                                                data-key={change.key}
+                                                data-part="value"
+                                                onchange={handleChangeEdit}
+                                            ></lightning-combobox>
+                                        </template>
+                                        <template lwc:if={change.isPicklist}>
+                                            <lightning-combobox
+                                                data-id="picklist"
+                                                label={labels.newValue}
+                                                options={change.picklistOptions}
+                                                value={change.value}
+                                                data-key={change.key}
+                                                data-part="value"
+                                                onchange={handleChangeEdit}
+                                            ></lightning-combobox>
+                                        </template>
+                                        <template lwc:if={change.isMulti}>
+                                            <lightning-checkbox-group
+                                                label={labels.newValue}
+                                                options={change.picklistOptions}
+                                                value={change.multiValue}
+                                                data-key={change.key}
+                                                data-part="value"
+                                                onchange={handleChangeEdit}
+                                            ></lightning-checkbox-group>
+                                        </template>
+                                        <template lwc:if={change.isRecord}>
+                                            <lightning-record-picker
+                                                label={labels.newValue}
+                                                object-api-name={change.referenceTo}
+                                                value={change.value}
+                                                data-key={change.key}
+                                                data-part="record"
+                                                onchange={handleChangeEdit}
+                                            ></lightning-record-picker>
+                                        </template>
+                                        <template lwc:if={change.isInput}>
+                                            <lightning-input
+                                                data-id="value"
+                                                type={change.inputType}
+                                                step="any"
+                                                label={labels.newValue}
+                                                value={change.value}
+                                                data-key={change.key}
+                                                data-part="value"
+                                                onchange={handleChangeEdit}
+                                            ></lightning-input>
+                                        </template>
+                                        <template lwc:if={change.isCopy}>
+                                            <lightning-combobox
+                                                data-id="source"
+                                                label={labels.copyFrom}
+                                                placeholder={labels.chooseField}
+                                                options={change.sourceOptions}
+                                                value={change.source}
+                                                data-key={change.key}
+                                                data-part="source"
+                                                onchange={handleChangeEdit}
+                                            ></lightning-combobox>
+                                        </template>
+                                    </div>
+                                </template>
+                                <div class="slds-col slds-no-flex">
+                                    <lightning-button-icon
+                                        icon-name="utility:delete"
+                                        alternative-text={labels.remove}
+                                        title={labels.remove}
+                                        data-key={change.key}
+                                        onclick={handleRemoveChange}
+                                    ></lightning-button-icon>
+                                </div>
+                            </div>
+                            <template lwc:if={change.isTransform}>
+                                <div class="slds-var-m-top_x-small" data-id="steps">
+                                    <c-import-column-transforms
+                                        embedded
+                                        source={change.field}
+                                        column-options={change.sourceOptions}
+                                        transforms={change.stepList}
+                                        data-key={change.key}
+                                        onchange={handleStepsChange}
+                                    ></c-import-column-transforms>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                    <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-gutters_x-small">
+                        <div class="slds-col slds-no-flex">
+                            <lightning-button
+                                data-id="add-field"
+                                label={labels.addField}
+                                icon-name="utility:add"
+                                disabled={addDisabled}
+                                onclick={handleAddChange}
+                            ></lightning-button>
+                        </div>
+                        <p class="slds-col slds-text-color_weak">{fieldLimitLine}</p>
+                    </div>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-color_weak">{labels.objectFirst}</p>
+                </template>
+            </section>
+
+            <!-- 4. Preview -->
+            <section class="step" data-id="step-preview" aria-labelledby="step-preview-heading">
+                <div class="slds-grid slds-wrap slds-grid_vertical-align-center step__heading">
+                    <h2 id="step-preview-heading" class="slds-text-heading_small slds-col">{labels.stepPreview}</h2>
+                    <lightning-button
+                        data-id="preview"
+                        class="slds-col slds-no-flex"
+                        label={labels.preview}
+                        icon-name="utility:preview"
+                        disabled={previewDisabled}
+                        onclick={handlePreview}
+                    ></lightning-button>
+                </div>
+                <template lwc:if={preview}>
+                    <p class="slds-var-m-bottom_x-small" data-id="preview-count">{previewLine}</p>
+                    <div class="slds-scrollable_x">
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer" data-id="preview-table">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th scope="col">{labels.record}</th>
+                                    <template for:each={previewColumns} for:item="column">
+                                        <th key={column.key} scope="col">{column.label}</th>
+                                    </template>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={previewRows} for:item="row">
+                                    <tr key={row.key}>
+                                        <th scope="row" class="slds-cell-wrap">{row.name}</th>
+                                        <template for:each={row.cells} for:item="cell">
+                                            <td key={cell.key} class={cell.cellClass} data-id="cell">
+                                                <template lwc:if={cell.unchanged}>
+                                                    <span>{cell.before}</span>
+                                                    <span class="slds-assistive-text">{labels.noChange}</span>
+                                                </template>
+                                                <template lwc:else>
+                                                    <span class="before">{cell.before}</span>
+                                                    <lightning-icon
+                                                        class="slds-var-m-horizontal_xx-small"
+                                                        icon-name="utility:forward"
+                                                        size="xx-small"
+                                                        alternative-text={labels.changesTo}
+                                                    ></lightning-icon>
+                                                    <span class="after">{cell.after}</span>
+                                                </template>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="slds-var-m-top_x-small slds-text-color_weak" data-id="already-held">{alreadyHeldLine}</p>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-color_weak">{labels.previewHint}</p>
+                </template>
+            </section>
+
+            <!-- 5. Run -->
+            <section class="step" data-id="step-run" aria-labelledby="step-run-heading">
+                <div class="slds-grid slds-wrap slds-grid_vertical-align-center step__heading">
+                    <h2 id="step-run-heading" class="slds-text-heading_small slds-col">{labels.stepRun}</h2>
+                    <lightning-button
+                        data-id="run"
+                        class="slds-col slds-no-flex"
+                        variant="brand"
+                        label={labels.run}
+                        icon-name="utility:play"
+                        disabled={runDisabled}
+                        onclick={handleRun}
+                    ></lightning-button>
+                </div>
+                <template lwc:if={jobView}>
+                    <template lwc:if={jobView.running}>
+                        <p data-id="progress">{jobView.progressLine}</p>
+                        <lightning-progress-bar value={jobView.progressValue} size="large"></lightning-progress-bar>
+                    </template>
+                    <template lwc:else>
+                        <p data-id="summary">{jobView.summary}</p>
+                        <template lwc:if={jobView.hasFailures}>
+                            <h3 class="slds-text-heading_small slds-var-m-top_small">{labels.failures}</h3>
+                            <ul class="slds-list_dotted">
+                                <template for:each={jobView.failures} for:item="failure">
+                                    <li key={failure.recordId}>{failure.recordId}: {failure.reason}</li>
+                                </template>
+                            </ul>
+                        </template>
+                        <template lwc:if={jobView.showUndo}>
+                            <p class="slds-var-m-top_small" data-id="undo-hint">{labels.undoHint}</p>
+                        </template>
+                        <lightning-button
+                            data-id="start-another"
+                            class="slds-var-m-top_small"
+                            label={labels.startAnother}
+                            onclick={handleStartAnother}
+                        ></lightning-button>
+                    </template>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-color_weak">{labels.runHint}</p>
+                </template>
+            </section>
+        </template>
+    </c-barn-page-shell>
+</template>

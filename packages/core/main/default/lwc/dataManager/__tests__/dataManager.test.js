@@ -187,7 +187,7 @@ describe('c-data-manager', () => {
     });
   });
 
-  it('opens Find with the Bulk Update note from the Update Many Records tile', async () => {
+  it('opens Super Transform, with no Find note, from the Update Many Records tile', async () => {
     const element = await render();
     findToolStateKey.emit('ns__tool');
 
@@ -197,8 +197,7 @@ describe('c-data-manager', () => {
     expect(BarnConfirmModal.open).not.toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenLastCalledWith({
       type: 'standard__navItemPage',
-      attributes: { apiName: 'Find' },
-      state: { ns__tool: 'update' }
+      attributes: { apiName: 'Bulk_Update' }
     });
   });
 

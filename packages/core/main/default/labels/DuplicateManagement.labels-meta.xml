@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_DuplicateManagement_CandidateCap</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Scan warning: name pairing read its cap; {0} is the cap</shortDescription>
+        <value>Pairing similar names read {0} people for one chunk, the most it reads, so some similar names in that chunk may not have been compared.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_ReasonSameHousehold</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Why a pair is proposed: the same name in one household</shortDescription>
+        <value>Same name in the same household</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_ReasonSimilarNames</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Why a pair is proposed; {0} is a percent, {1} what they share</shortDescription>
+        <value>Similar names ({0}%) and the same {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_SharedEmail</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What two similar names share, inside a sentence</shortDescription>
+        <value>email</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_SharedPhone</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What two similar names share, inside a sentence</shortDescription>
+        <value>phone number</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_SharedPostalCode</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What two similar names share, inside a sentence</shortDescription>
+        <value>postal code</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_MergeRules</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Custom metadata page: name of the merge rules list</shortDescription>
+        <value>Merge Rules</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_MergeRulesHelp</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Custom metadata page: what merge rules are</shortDescription>
+        <value>Which value wins for one person field when auto-merge merges two people. Field Name is the field's API name, or MailingAddress or OtherAddress to move a whole address together. A field with no rule follows Merge Rule For Other Fields in the Duplicate Matching settings.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_RuleUnknown</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Merge rule save refused: the rule is not one of the five</shortDescription>
+        <value>Choose Keep master, Not blank, Most recent, Oldest record or Most complete.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateManagement_RuleFieldInvalid</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Merge rule save refused; {0} is the field name entered</shortDescription>
+        <value>{0} is not a person field a merge can change. Use the API name of an editable Contact field, or MailingAddress or OtherAddress. The household, owner and record type always stay the kept person's.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_NoteNotRecorded</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Merge journal note; {0} is an object and field</shortDescription>
+        <value>Related records on {0} were not recorded, so undo cannot move them back.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_NoteNotUndeleted</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo note; {0} is a person, {1} the platform's reason</shortDescription>
+        <value>{0} could not be restored from the Recycle Bin: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_NoteSurvivorGone</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo note: the kept person no longer exists</shortDescription>
+        <value>The kept person no longer exists, so changed values were not put back.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_NoteValueChanged</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo note; {0} is a field API name</shortDescription>
+        <value>{0} was changed after the merge and was left as it is.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_NoteValuesRefused</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo note; {0} is the platform's reason</shortDescription>
+        <value>Changed values could not be put back: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_NoteRecordMovedSince</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo note; {0} is an object and field</shortDescription>
+        <value>Some related records on {0} were moved after the merge and were left where they are.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_NoteRecordRefused</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo note; {0} is an object and field</shortDescription>
+        <value>Some related records on {0} could not be moved back.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_NoteRecordGone</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo note; {0} is an object and field</shortDescription>
+        <value>Some related records on {0} were deleted after the merge.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_RunFinished</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-merge summary; {0} merged, {1} skipped, {2} failed counts</shortDescription>
+        <value>Auto-merge finished: {0} pairs merged, {1} skipped because they changed or were dismissed, {2} could not be merged.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_UndoFinished</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo summary; {0} undone, {1} skipped, {2} failed counts</shortDescription>
+        <value>Auto-merge undo finished: {0} merges undone, {1} skipped, {2} could not be undone.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_RunNotice</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bell notification title: an auto-merge finished</shortDescription>
+        <value>Auto-Merge Finished</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_UndoNotice</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bell notification title: an undo finished</shortDescription>
+        <value>Auto-Merge Undo Finished</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_ErrorNothing</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Start refused: no pair meets the exact-match rule</shortDescription>
+        <value>No pair in the review list meets the exact-match rule, so there is nothing to merge.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_ErrorNoUndo</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo refused: nothing left to undo in the run</shortDescription>
+        <value>Nothing in this run can be undone: it is undone already or older than 15 days.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_ErrorRunning</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Start refused: another run or a scan is running</shortDescription>
+        <value>An auto-merge, an undo or a duplicate scan is running. Try again when it finishes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_Tab</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicate Matching: name of the auto-merge tab</shortDescription>
+        <value>Auto-Merge</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_Intro</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge: one line under the tab</shortDescription>
+        <value>Merge the exact matches waiting in the review list in one go. You see every pair first, and you can undo a run for 15 days.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_Rule</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge: the exact-match rule; {0} is the rule</shortDescription>
+        <value>Exact match: {0}. Change it in BarnCRM Settings, Duplicate Matching.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_Preview</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge button: list the pairs</shortDescription>
+        <value>Preview Exact Matches</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_Refresh</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge button: reload</shortDescription>
+        <value>Refresh</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_Loading</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge: spinner text</shortDescription>
+        <value>Loading</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_Running</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge: a run is in progress</shortDescription>
+        <value>A run is in progress. Refresh in a minute to see it under Recent Runs.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_PreviewHeading</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge heading; {0} is the number of pairs</shortDescription>
+        <value>Pairs To Merge ({0})</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_None</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge: no pair meets the rule</shortDescription>
+        <value>No pair in the review list meets the exact-match rule. Scan for duplicates first, or choose another exact match in settings.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_Keep</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge: before the kept person's name</shortDescription>
+        <value>Keep:</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_MergeAway</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge: before the merged-away person's name</shortDescription>
+        <value>Merge away:</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_NoChanges</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge: the merge rules change nothing</shortDescription>
+        <value>No values change.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_Change</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>One value that changes; {0} field label, {1} before, {2} after</shortDescription>
+        <value>{0}: {1} becomes {2}</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_Blank</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge: shown for an empty value</shortDescription>
+        <value>(blank)</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_More</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge; {0} pairs shown, {1} pairs in all</shortDescription>
+        <value>The first {0} of {1} pairs are shown. All {1} are merged.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_MergeButton</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge button; {0} is the number of pairs</shortDescription>
+        <value>Merge {0} Pairs</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_ConfirmHeading</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge confirm window heading</shortDescription>
+        <value>Merge Exact Matches</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_ConfirmBody</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge confirm text; {0} is the number of pairs</shortDescription>
+        <value>Merge {0} pairs now? Each pair is checked again first. The run happens in the background, and you can undo it for 15 days.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_Cancel</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge confirm: cancel button</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_Started</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge: the run has started</shortDescription>
+        <value>Auto-merge started. It runs in the background; the bell tells you when it finishes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_RecentRuns</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge heading: runs of the last 15 days</shortDescription>
+        <value>Recent Runs</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_NoRuns</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge: no run in the last 15 days</shortDescription>
+        <value>No auto-merge in the last 15 days.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_RunSummary</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run line; {0} merged, {1} undone, {2} not fully undone counts</shortDescription>
+        <value>{0} people merged, {1} undone, {2} not fully undone</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_Undo</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge button: undo a run</shortDescription>
+        <value>Undo</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_UndoHeading</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo confirm window heading</shortDescription>
+        <value>Undo This Run</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_UndoBody</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo confirm text</shortDescription>
+        <value>Restore every person this run merged away from the Recycle Bin, put back the values it changed, and move their related records back? What cannot be restored is listed under the run.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_UndoStarted</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge: the undo has started</shortDescription>
+        <value>Undo started. It runs in the background; the bell tells you when it finishes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutoMerge_NoAccess</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-Merge: missing Duplicate Review</shortDescription>
+        <value>Auto-merge works from the review list, which needs the BarnCRM Duplicate Review permission set. You can still undo a recent run.</value>
+    </labels>
+</CustomLabels>

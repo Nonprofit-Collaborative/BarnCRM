@@ -141,8 +141,27 @@ describe('what each row of a one-object mapping does', () => {
     ]);
   });
 
-  it('offers related records under a key, and says why not under Insert', async () => {
+  it('offers no related records to a template without them, and one of several asks less', async () => {
     const element = render({
+      operation: 'Upsert by external ID',
+      relatedOptions: [{ value: 'Session__c.Program__c', label: 'Session (Program)' }]
+    });
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="related"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="related-insert-help"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="not-found"]')).not.toBeNull();
+
+    element.hideLookups = true;
+    element.related = 'Session__c.Program__c';
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="not-found"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="related"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="operation"]')).not.toBeNull();
+  });
+
+  it('keeps related records of a template that has them under a key, and says why not under Insert', async () => {
+    const element = render({
+      related: 'Session__c.Program__c',
       relatedOptions: [{ value: 'Session__c.Program__c', label: 'Session (Program)' }]
     });
     const changes = [];

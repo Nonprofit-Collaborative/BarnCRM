@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Prompt xmlns="http://soap.sforce.com/2006/04/metadata">
-  <masterLabel>BarnCRM tips: Bulk Update</masterLabel>
+  <masterLabel>BarnCRM tips: Super Transform</masterLabel>
   <promptVersions>
-    <body>This tab lists recent bulk updates and bulk deletes, with their progress and an undo. To start a new one, run a query on the Find tab and choose Bulk update or Bulk delete.</body>
+    <body>Change many records here without a file: choose the object, the records and the changes, preview, then run. To start from a saved query, run it on the Find tab and choose Bulk update. Recent bulk updates and deletes, with their undo, are listed below.</body>
     <customApplication>BarnCRM</customApplication>
     <delayDays>1</delayDays>
-    <description>First visit to the Bulk Update tab: what the lists show, and that new bulk changes start in Find.</description>
+    <description>First visit to the Super Transform tab: bulk changes start here; Find for a saved query; the lists below and their undo.</description>
     <dismissButtonLabel>Got it</dismissButtonLabel>
     <displayPosition>BottomRight</displayPosition>
     <displayType>FloatingPanel</displayType>
     <isPublished>true</isPublished>
-    <masterLabel>BarnCRM tips: Bulk Update</masterLabel>
+    <masterLabel>BarnCRM tips: Super Transform</masterLabel>
     <publishedDate>2026-10-13</publishedDate>
     <shouldDisplayActionButton>false</shouldDisplayActionButton>
     <shouldIgnoreGlobalDelay>false</shouldIgnoreGlobalDelay>
@@ -18,7 +18,7 @@
     <targetPageKey1>Bulk_Update</targetPageKey1>
     <targetPageType>standard__navItemPage</targetPageType>
     <timesToDisplay>1</timesToDisplay>
-    <title>Bulk Changes Start in Find</title>
+    <title>Bulk Changes Start Here</title>
     <userAccess>Everyone</userAccess>
     <userProfileAccess>Everyone</userProfileAccess>
     <versionNumber>1</versionNumber>

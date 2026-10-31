@@ -54,6 +54,15 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
         this.afterRow = afterRow;
     }
 
+    /** A retry of corrected rows (R-IB17a): only these rejected rows, or null for a full pass. */
+    private Set<Id> rowIds;
+
+    /** Commits only the named rejected rows, read with their corrections (R-IB17a). */
+    public ImportProcessorBatch(Id batchId, Set<Id> rowIds) {
+        this(batchId, false, null, null);
+        this.rowIds = rowIds;
+    }
+
     @NamespaceAccessible
     public Database.QueryLocator start(Database.BatchableContext context) {
         Id owner = batchId;
@@ -67,6 +76,9 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             LIMIT 1
         ];
         retryAfter = batches.isEmpty() ? null : batches[0].Retry_After_Row__c;
+        if (rowIds != null) {
+            return correctedRows();
+        }
         if (retryAfter != null) {
             return retryRows();
         }
@@ -152,11 +164,46 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
     }
 
     /**
+     * A retry of corrected rows (R-IB17a): the named rows still rejected, with their
+     * corrections, processed in place. System mode for the reason `start` gives.
+     */
+    private Database.QueryLocator correctedRows() {
+        Id owner = batchId;
+        Set<Id> named = rowIds;
+        String rejected = ImportRowProcessor.STATUS_REJECTED;
+        return Database.getQueryLocator(
+            [
+                SELECT
+                    Id,
+                    Import_Batch__c,
+                    Row_Number__c,
+                    Raw_Values_JSON__c,
+                    Corrected_Values_JSON__c,
+                    Status__c,
+                    Error_Message__c,
+                    Household__c,
+                    Contact_1__c,
+                    Person_1_Account__c,
+                    Contact_2__c,
+                    Person_2_Account__c,
+                    Organization__c,
+                    Gift_Id__c,
+                    Soft_Credit_Id__c
+                FROM Import_Row__c
+                WHERE Import_Batch__c = :owner AND Id IN :named AND Status__c = :rejected
+                WITH SYSTEM_MODE
+                ORDER BY Row_Number__c ASC
+            ]
+        );
+    }
+
+    /**
      * Marks the earlier rejected rows a retry's commit met as Retried, and hands back the rest
-     * to process (R-IB17). Written in system mode for the reason `rejectChunk` gives.
+     * to process (R-IB17). Written in system mode for the reason `rejectChunk` gives. A retry of
+     * corrected rows processes its rows in place and replaces nothing (R-IB17a).
      */
     private List<Import_Row__c> retireReplaced(List<Import_Row__c> scope) {
-        if (retryAfter == null || dryRun) {
+        if (retryAfter == null || dryRun || rowIds != null) {
             return scope;
         }
         List<Import_Row__c> rest = new List<Import_Row__c>();
@@ -246,6 +293,14 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                 dryRun ? Label.Core_Import_LogDryRunHeader : Label.Core_Import_LogCommitHeader
             );
             // Chunk failures first: the run log is cut at its field's length, and they matter most.
+            if (rowIds != null) {
+                lines.add(
+                    String.format(
+                        Label.Core_Import_LogCorrectedRetry,
+                        new List<String>{ String.valueOf(rowIds.size()) }
+                    )
+                );
+            }
             lines.addAll(log);
             if (cleared > 0) {
                 lines.add(
@@ -266,7 +321,8 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                 lines,
                 fileAmount,
                 processorSettings,
-                trialRows != null
+                trialRows != null,
+                rowIds != null
             );
         } catch (Exception e) {
             ErrorLogger.log(e, 'ImportProcessorBatch.finish');

@@ -35,19 +35,19 @@
             onchange={handleNotFoundChange}
         ></lightning-radio-group>
         <p class="slds-text-body_small slds-var-m-top_x-small" data-id="not-found-help">{notFoundHelp}</p>
-        <template lwc:if={offersRelated}>
-            <lightning-combobox
-                class="slds-var-m-top_small"
-                data-id="related"
-                label={labels.relatedLabel}
-                value={related}
-                options={relatedChoices}
-                onchange={handleRelatedChange}
-            ></lightning-combobox>
-            <p class="slds-text-body_small slds-var-m-top_x-small" data-id="related-help">{labels.relatedHelp}</p>
-        </template>
-        <template lwc:else>
-            <p class="slds-text-body_small slds-var-m-top_small" data-id="related-insert-help">{labels.relatedInsertHelp}</p>
-        </template>
+    </template>
+    <template lwc:if={offersRelated}>
+        <lightning-combobox
+            class="slds-var-m-top_small"
+            data-id="related"
+            label={labels.relatedLabel}
+            value={related}
+            options={relatedChoices}
+            onchange={handleRelatedChange}
+        ></lightning-combobox>
+        <p class="slds-text-body_small slds-var-m-top_x-small" data-id="related-help">{labels.relatedHelp}</p>
+    </template>
+    <template lwc:if={explainsRelatedInsert}>
+        <p class="slds-text-body_small slds-var-m-top_small" data-id="related-insert-help">{labels.relatedInsertHelp}</p>
     </template>
 </template>

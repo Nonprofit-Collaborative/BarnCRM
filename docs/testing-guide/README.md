@@ -44,12 +44,12 @@ page, even if that puts it out of reading order.
 | [Apps and Navigation](apps-and-navigation.md) | APP | 3 | The four BarnCRM apps, who sees each, their tabs, App Navigation Style, module pages in them |
 | [Settings and Module Manager](settings-and-module-manager.md) | SET | 19 | BarnCRM Settings console, Access, Module Manager, editions, automation control, home page, organization address, values from Setup, Integrations, People and Households and boxes, keeping a shown default, Finish Setup |
 | [Setup Assistant](setup-assistant.md) | SA | 11 | First-run setup, edition choice, Setup Assistant steps, sample data load and remove |
-| [Imports](imports.md) | IMP | 14 | Import wizard, templates, row rules, matching (including match sources), undo |
+| [Imports](imports.md) | IMP | 21 | Import wizard, templates, row rules, matching (including match sources), several sheets, two-part headings, best guesses for near spellings, several objects in one file, new fields from a column, undo, row retention, correcting and retrying rows |
 | [Find](find.md) | FIND | 10 | Query builder, typed queries, export, saved queries, summaries, Show More |
-| [Bulk update and delete](bulk-update-and-delete.md) | BULK | 10 | Bulk update, bulk delete, edit in Find, undo, the bulk path |
+| [Bulk update and delete](bulk-update-and-delete.md) | BULK | 13 | Bulk update, bulk delete, edit in Find, undo, the bulk path, Super Transform |
 | [Data Manager and job history](data-manager-and-job-history.md) | DM | 11 | Data Manager, data jobs and undo, data quality checks, field utilization and its snapshot history |
-| [Duplicates](duplicates.md) | DUP | 10 | Duplicate scan, review and merge, match sources |
-| [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 9 | Health Check findings and fixes, Org Optimizer sections, storage and limits |
+| [Duplicates](duplicates.md) | DUP | 17 | Duplicate scan, review and merge, match sources, similar names, merge rules, auto-merge and its undo |
+| [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 10 | Health Check findings and fixes, Org Optimizer sections, storage and limits, Data Dictionary |
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
 | [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 15 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import |
 | [Giving: commitments](giving-commitments.md) | COM | 10 | Pledges, recurring gifts, payments, nightly jobs |

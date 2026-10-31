@@ -15,6 +15,8 @@ import QUALITY from '@salesforce/label/c.Core_OrgOptimizer_Quality';
 import QUALITY_TEXT from '@salesforce/label/c.Core_OrgOptimizer_QualityText';
 import FIELD_UTILIZATION from '@salesforce/label/c.Core_OrgOptimizer_FieldUtilization';
 import FIELD_UTILIZATION_TEXT from '@salesforce/label/c.Core_OrgOptimizer_FieldUtilizationText';
+import DATA_DICTIONARY from '@salesforce/label/c.Core_OrgOptimizer_DataDictionary';
+import DATA_DICTIONARY_TEXT from '@salesforce/label/c.Core_OrgOptimizer_DataDictionaryText';
 import HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_HealthCheck';
 import HEALTH_CHECK_TEXT from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckText';
 import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
@@ -61,6 +63,7 @@ export default class OrgOptimizer extends LightningElement {
     overview: OVERVIEW,
     quality: QUALITY,
     fieldUtilization: FIELD_UTILIZATION,
+    dataDictionary: DATA_DICTIONARY,
     healthCheck: HEALTH_CHECK,
     errors: ERRORS,
     storage: STORAGE,
@@ -103,6 +106,9 @@ export default class OrgOptimizer extends LightningElement {
     if (canManageSettings) {
       dataTiles.push(
         this.tile('fieldUtilization', FIELD_UTILIZATION, FIELD_UTILIZATION_TEXT, 'standard:metrics')
+      );
+      dataTiles.push(
+        this.tile('dataDictionary', DATA_DICTIONARY, DATA_DICTIONARY_TEXT, 'standard:article')
       );
       setupTiles.push(
         this.tile('healthCheck', HEALTH_CHECK, HEALTH_CHECK_TEXT, 'standard:approval'),
@@ -180,6 +186,10 @@ export default class OrgOptimizer extends LightningElement {
 
   get fieldUtilizationOpened() {
     return Boolean(this.opened.fieldUtilization);
+  }
+
+  get dataDictionaryOpened() {
+    return Boolean(this.opened.dataDictionary);
   }
 
   get errorsOpened() {

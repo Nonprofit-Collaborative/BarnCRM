@@ -134,6 +134,8 @@ function importCoreComponent(name) {
       return import('c/organizationAddressSettings');
     case 'integrationsPanel':
       return import('c/integrationsPanel');
+    case 'importFieldConnection':
+      return import('c/importFieldConnection');
     default:
       return null;
   }

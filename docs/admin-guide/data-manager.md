@@ -33,7 +33,7 @@ section and kind of job is shown only to people who may use it:
 |---|---|---|---|---|
 | **Bring Data In** | **Import a File** | Yes | The **Import** tab: people and organizations, gifts with Giving, any one object, records with their related records, or deleting the records a file lists, with a dry run first | Administrators |
 | **Find and Change** | **Find and Export Records** | No | The **Find** tab: find records, save the query, export them to a file | Anyone with **Find and Export Records** |
-| **Find and Change** | **Update Many Records** | No | The **Find** tab: run a query, then **Bulk Update** changes up to five fields on every record it returns | Anyone with **Bulk Update Records** |
+| **Find and Change** | **Update Many Records** | No | The **Super Transform** tab: choose the object and the records, then change up to five fields on every record that matches ([Super Transform](super-transform.md)). To start from a saved query, use Find's **Bulk Update** instead | Anyone with **Bulk Update Records** |
 | **Check and Tidy** | **Org Optimizer** | No | The **Org Optimizer** tab | Anyone with **Find and Export Records**, and administrators |
 | **Careful** | **Delete Many Records** | No | The **Find** tab, after a confirmation: run a query, then **Bulk Delete** | Anyone with **Bulk Delete Records** |
 | | **Import Templates** section | | The templates you import with, and when each recurring file was last loaded | Administrators |
@@ -46,7 +46,7 @@ A group with no tile you may use is left out.
 **BarnCRM Admin** role carries.
 
 **Which tool changes many records?** To change the same fields on many records without a file,
-use **Update Many Records** (a Find query, then **Bulk Update**). To change records from a
+use **Update Many Records** (Super Transform; or a saved Find query, then **Bulk Update**). To change records from a
 spreadsheet, each row with its own values, use **Import a File**. To delete records, use
 **Delete Many Records** (a Find query, then **Bulk Delete**); to delete the records a
 spreadsheet lists by record ID, an administrator who also has **Bulk Delete Records** uses
@@ -77,9 +77,10 @@ On the page the section shows one line and a **Learn More** link to this guide;
 with no template yet it shows **No Import Templates Yet** and a **Create a Template** button,
 which opens **Import a File**.
 
-The **Import**, **Find** and **Bulk Update** tabs are not in the apps' navigation: open them
-from here (the **Bulk Update** tab lists recent bulk updates, which **Data Jobs** below shows
-too). Bookmarks to them still work, and so do the links that open Find from elsewhere
+The **Import**, **Find** and **Super Transform** (formerly **Bulk Update**) tabs are not in
+the apps' navigation: open them from here or the App Launcher (the **Super Transform** tab
+changes many records without a file, see [Super Transform](super-transform.md), and lists
+recent bulk updates, which **Data Jobs** below shows too). Bookmarks to them still work, and so do the links that open Find from elsewhere
 (**Open in Find** on the Org Optimizer page, for example).
 
 ## 3. A Five-Minute Walkthrough (as Maria)

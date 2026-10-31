@@ -161,6 +161,22 @@
         <value>How often each field of a kind of record is filled in.</value>
     </labels>
     <labels>
+        <fullName>Core_OrgOptimizer_DataDictionary</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Data dictionary section name</shortDescription>
+        <value>Data Dictionary</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_DataDictionaryText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: what the Data dictionary section answers</shortDescription>
+        <value>Every field of the kinds of record you choose, with its rules, as a table and a CSV.</value>
+    </labels>
+    <labels>
         <fullName>Core_OrgOptimizer_HealthCheck</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>

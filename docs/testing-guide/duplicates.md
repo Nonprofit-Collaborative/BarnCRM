@@ -201,3 +201,63 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 4 | Read the counts. | The tab and **Possible Duplicates** count suggestions, and the dismissed count reads **Dismissed suggestions**. |
 
 **Cleanup:** None.
+
+## T-DUP-14: Similar Names, Household Aware
+
+**Purpose:** Confirm the scan pairs similar names only with something else in common, and treats one household as family.
+**Prerequisites:** admin. In **BarnCRM Settings**, **Duplicate Matching**, **Fuzzy Name Match** reads **90**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create a contact: First Name `Jonathan`, Last Name `Zzfuzz`, Email `jz.fuzz@example.org`. Create another: First Name `Jonathon`, Last Name `Zzfuzz`, Email `JZ.Fuzz@example.org`; save past any warning. | Both save, each in a household of its own. |
+| 2 | Create a contact `Jonathen Zzfuzz` with Email `other.fuzz@example.org`. | It saves. |
+| 3 | Create a household `Zzfuzz Family Household`, and in it four contacts with no email or phone: `Daniel Zzfuzz`, `Danielle Zzfuzz`, `Sam Zzfuzz` and `Sam Zzfuzz` (save past any warning). | All save in that household. |
+| 4 | On **Duplicate Matching**, **Review**, scan and refresh. | A pair of **Jonathan Zzfuzz** and **Jonathon Zzfuzz**, with the line **Similar names (97%) and the same email**. A pair of the two **Sam Zzfuzz**, with **Same name in the same household** (or a rule's name, if your rules found it first). No pair names **Jonathen Zzfuzz** (nothing else in common), and no pair of **Daniel** and **Danielle**. |
+
+**Cleanup:** Delete the `Zzfuzz` contacts and `Zzfuzz Family Household`; their pairs go with them.
+
+## T-DUP-15: Merge Rules and the Setting for Other Fields
+
+**Purpose:** Confirm merge rules are listed on the Custom Metadata page, a bad one is refused, and the setting for other fields shows its default.
+**Prerequisites:** admin with **BarnCRM Metadata Admin**. In an org where BarnCRM is installed as a package, **Deploy Metadata from Non-Certified Package Versions via Apex** is on in Setup, **Apex Settings**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **BarnCRM Settings**, open **Duplicate Matching**. | **Fuzzy Name Match** reads **90** and **Merge Rule For Other Fields** reads **Not blank**, each with a description. Change **Merge Rule For Other Fields** to **Most recent** and save: **Saved.** Change it back to **Not blank** and save. |
+| 2 | Open **Custom Metadata**. | Two lists: **Relationship types** and **Merge Rules**, the second empty with a line explaining it. |
+| 3 | Under **Merge Rules**, add a row: **Field Name** `AccountId`, **Rule** **Most recent**, and save. | Refused: **AccountId is not a person field a merge can change.** and the rest of the sentence. |
+| 4 | Change **Field Name** to `Email` and save. | **Saved** once Salesforce applies it. The row lists **Email**, **Most recent**. |
+| 5 | Add another row: **Field Name** `Email`, **Rule** **Oldest record**, and save. | Refused: an active row already names **Email**. |
+
+**Cleanup:** Archive the `Email` merge rule.
+
+## T-DUP-16: Auto-Merge Previews, Confirms and Merges Exact Matches
+
+**Purpose:** Confirm Auto-Merge previews only exact people matches from the review list, merges them in the background after a confirm, and lists the run.
+**Prerequisites:** admin with **BarnCRM Admin** and **BarnCRM Duplicate Review**. Two Zztest pairs: **Zztest Ann Auto** twice with the same email `zztest.ann.auto@example.org` (different phones), and **Zztest Ben Auto** twice with different emails. A duplicate scan has run, so both pairs are in the review list.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **BarnCRM Settings**, open **Duplicate Matching**. | **Exact Match For Auto-Merge** reads **Name and email**, with a description. |
+| 2 | Open the **Duplicate Matching** tab, then **Auto-Merge**. | The intro, **Exact match: Name and email.**, **Preview Exact Matches**, and **Recent Runs** reading **No auto-merge in the last 15 days.** |
+| 3 | Click **Preview Exact Matches**. | **Pairs To Merge (1)**: the Ann pair only, with **Keep:**, **Merge away:** and the values that will change (for example **Phone: (blank) becomes ...**), or **No values change.** The Ben pair is not listed. |
+| 4 | Click **Merge 1 Pairs**, then **Cancel**. | Nothing is merged; the preview stays. |
+| 5 | Click **Merge 1 Pairs** and confirm. | **Auto-merge started.** The bell reports **Auto-Merge Finished** with 1 pair merged. |
+| 6 | Click **Refresh**. | **Recent Runs** lists the run: **1 people merged, 0 undone, 0 not fully undone**, with **Undo**. One Ann record remains; the other is in the Recycle Bin. The Ben pair is still in the review list. |
+
+**Cleanup:** Keep the run for T-DUP-17.
+
+## T-DUP-17: Undoing an Auto-Merge Run, and What It Cannot Restore
+
+**Purpose:** Confirm Undo restores the merged-away person from the Recycle Bin, puts back changed values and moved related records, and lists what it cannot restore.
+**Prerequisites:** T-DUP-16 done. Before undoing, on the kept Ann record change a value the merge changed (for example **Phone**).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **Auto-Merge**, under the run, click **Undo**. | **Undo This Run** asks to confirm, naming the Recycle Bin, values and related records. |
+| 2 | Confirm. | **Undo started.** The bell reports **Auto-Merge Undo Finished**. |
+| 3 | Click **Refresh**. | The run reads **1 people merged, 0 undone, 1 not fully undone**, with a note: **Phone was changed after the merge and was left as it is.** **Undo** is gone. |
+| 4 | Open both Ann records. | The merged-away Ann is back (same record Id as before, not a copy), with her activities and relationships. The kept Ann keeps the phone you typed. |
+| 5 | As a user without **BarnCRM Admin**, open the **Duplicate Matching** tab. | No **Auto-Merge** area. |
+
+**Cleanup:** Delete the Zztest Auto records.

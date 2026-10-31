@@ -12,6 +12,8 @@
 public with sharing class BulkUpdateController {
     public static final String PERMISSION = 'Bulk_Update_Records';
     private static final Integer RECENT_JOBS = 10;
+    /** Query rows left free for the reads around Super Transform's count. */
+    private static final Integer COUNT_MARGIN = 100;
     private static final String JOB_FIELDS =
         'Id, Name, Status__c, Is_Dry_Run__c, Operation__c, Operation_JSON__c, Row_Count__c, ' +
         'Rows_Updated__c, Rows_Matched__c, Rows_Rejected__c, Run_Log__c, Started_At__c, ' +
@@ -125,6 +127,80 @@ public with sharing class BulkUpdateController {
             return BulkUpdateFields.copySources(objectName, fieldName);
         } catch (Exception caught) {
             throw asUserError(caught, 'Bulk update copy sources');
+        }
+    }
+
+    /** How many records Super Transform's conditions match, against the run limit (C-50). */
+    public class MatchCount {
+        /** The records that match; null when there are too many to count in one request. */
+        @AuraEnabled
+        public Integer count;
+        @AuraEnabled
+        public Integer runLimit;
+        /** True when more records match than one run may change (R-BU2). */
+        @AuraEnabled
+        public Boolean overLimit;
+        @AuraEnabled
+        public String objectLabel;
+    }
+
+    /**
+     * Super Transform's object picker (C-50): every object Find offers that a bulk update may
+     * write, by label. Cached per user in the browser.
+     */
+    @AuraEnabled(cacheable=true)
+    public static List<FindController.Option> getObjects() {
+        try {
+            requirePermission();
+            List<FindController.Option> writable = new List<FindController.Option>();
+            for (FindController.Option option : FindController.listObjects()) {
+                if (BulkUpdateFields.isWritable(option.value)) {
+                    writable.add(option);
+                }
+            }
+            return writable;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Super Transform objects');
+        }
+    }
+
+    /**
+     * Super Transform's live count (C-50): how many records the query document matches now,
+     * counted as the person, at most one past the run limit. Zero is an answer, not a refusal.
+     */
+    @AuraEnabled
+    public static MatchCount countMatches(String queryJson) {
+        try {
+            requirePermission();
+            Schema.SObjectType type = BulkUpdateFields.writableObject(
+                QueryCompiler.parse(queryJson).objectName
+            );
+            MatchCount result = new MatchCount();
+            result.runLimit = BulkUpdateService.runLimit();
+            result.count = DataJobs.countWithin(queryJson, result.runLimit, COUNT_MARGIN);
+            result.overLimit = result.count == null || result.count > result.runLimit;
+            result.objectLabel = type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
+            return result;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Super Transform count');
+        }
+    }
+
+    /**
+     * Super Transform's preview (C-50): the count and the first 25 records before and after,
+     * worked out by the code the run uses, each value it would leave alone marked unchanged.
+     */
+    @AuraEnabled
+    public static BulkUpdateService.Preview previewSample(String queryJson, String changesJson) {
+        try {
+            requirePermission();
+            return BulkUpdateService.preview(
+                queryJson,
+                changesJson,
+                BulkUpdateService.MAX_SAMPLE_SIZE
+            );
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Super Transform preview');
         }
     }
 

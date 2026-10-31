@@ -304,6 +304,14 @@ public with sharing class ImportBatchService {
      */
     @NamespaceAccessible
     public static String retryRefusal(Import_Batch__c batch) {
+        return retryRefusal(batch, false);
+    }
+
+    /**
+     * The same, where anyImporter lets any user with the import permission retry rather than
+     * only the committer: corrected rows retried on screen (R-IB17a).
+     */
+    private static String retryRefusal(Import_Batch__c batch, Boolean anyImporter) {
         if (batch == null) {
             return Label.Core_Import_ErrorBatchGone;
         }
@@ -318,7 +326,7 @@ public with sharing class ImportBatchService {
         if (dataJob || !(complete || open) || isRunning(batch)) {
             return Label.Core_Import_ErrorRetryNotOpen;
         }
-        if (batch.Committed_By__c != UserInfo.getUserId()) {
+        if (!anyImporter && batch.Committed_By__c != UserInfo.getUserId()) {
             return Label.Core_Import_ErrorRetryOtherUser;
         }
         String undo = ImportUndoService.refusal(batch);
@@ -532,11 +540,84 @@ public with sharing class ImportBatchService {
         return start(batchId, dryRun, null, null);
     }
 
+    private static Id start(Id batchId, Boolean dryRun, Integer trialRows, Decimal afterRow) {
+        return start(batchId, dryRun, trialRows, afterRow, null);
+    }
+
+    /**
+     * Commits the batch's rejected rows corrected on screen, in place, through the same path
+     * as the import's commit (R-IB17a): the named rows, or every fixed row when none are named.
+     * Refused where a retry is not allowed (R-IB17), while a retry by file is open, or when no
+     * named row is still rejected with corrections.
+     */
+    @NamespaceAccessible
+    public static Id startRowRetry(Id batchId, Set<Id> rowIds) {
+        String refused = rowRetryRefusal(ImportBatchSelector.selectById(batchId));
+        if (refused != null) {
+            throw new ImportException(refused);
+        }
+        Set<Id> fixed = fixedRowIds(batchId, rowIds);
+        if (fixed.isEmpty()) {
+            throw new ImportException(Label.Core_Import_ErrorNoFixedRows);
+        }
+        return start(batchId, false, null, null, fixed);
+    }
+
+    /** Why rows of this batch cannot be corrected or retried on screen now, or null (R-IR4). */
+    @NamespaceAccessible
+    public static String rowRetryRefusal(Import_Batch__c batch) {
+        String refused = retryRefusal(batch, true);
+        if (refused == null && isRetrying(batch)) {
+            refused = Label.Core_Import_ErrorRetryByFileOpen;
+        }
+        return refused;
+    }
+
+    /**
+     * The batch's rejected rows that carry corrections, among those named or, when none are
+     * named, all of them, up to the retry cap. Corrections are long text, which a query cannot
+     * filter on, so they are checked here. System mode: the rows are the package's staging.
+     */
+    @NamespaceAccessible
+    public static Set<Id> fixedRowIds(Id batchId, Set<Id> rowIds) {
+        String rejected = ImportRowProcessor.STATUS_REJECTED;
+        Set<Id> named = rowIds == null ? new Set<Id>() : rowIds;
+        List<Import_Row__c> rows = named.isEmpty()
+            ? [
+                  SELECT Id, Corrected_Values_JSON__c
+                  FROM Import_Row__c
+                  WHERE Import_Batch__c = :batchId AND Status__c = :rejected
+                  WITH SYSTEM_MODE
+                  LIMIT :MAX_RETRY_ROWS
+              ]
+            : [
+                  SELECT Id, Corrected_Values_JSON__c
+                  FROM Import_Row__c
+                  WHERE Import_Batch__c = :batchId AND Status__c = :rejected AND Id IN :named
+                  WITH SYSTEM_MODE
+                  LIMIT :MAX_RETRY_ROWS
+              ];
+        Set<Id> fixed = new Set<Id>();
+        for (Import_Row__c row : rows) {
+            if (String.isNotBlank(row.Corrected_Values_JSON__c)) {
+                fixed.add(row.Id);
+            }
+        }
+        return fixed;
+    }
+
     /**
      * @param trialRows commit only this many first rows (R-IB16), or null
      * @param afterRow commit only rows after this row number, the rest of a trial, or null
+     * @param rowIds commit only these corrected rows (R-IB17a), or null
      */
-    private static Id start(Id batchId, Boolean dryRun, Integer trialRows, Decimal afterRow) {
+    private static Id start(
+        Id batchId,
+        Boolean dryRun,
+        Integer trialRows,
+        Decimal afterRow,
+        Set<Id> rowIds
+    ) {
         // Locked, so two starts at once cannot both find no job running (R-IB13).
         List<Import_Batch__c> locked = [
             SELECT Id
@@ -553,8 +634,11 @@ public with sharing class ImportBatchService {
             // Two passes of one batch at once would each overwrite the other's rows (R-IB13).
             throw new ImportException(Label.Core_Import_ErrorRunInProgress);
         }
-        Boolean retrying = isRetrying(batch);
-        if (retrying && batch.Committed_By__c != UserInfo.getUserId()) {
+        // A retry of corrected rows runs as a retry's commit does (R-IB17a).
+        Boolean retrying = isRetrying(batch) || rowIds != null;
+        Id me = UserInfo.getUserId();
+        // Corrected rows may be retried by anyone who runs imports, not only the committer.
+        if (retrying && rowIds == null && batch.Committed_By__c != me) {
             throw new ImportException(Label.Core_Import_ErrorRetryOtherUser);
         }
         if (dryRun && hasCommitted(batch) && !retrying) {
@@ -621,14 +705,19 @@ public with sharing class ImportBatchService {
         batch.Rows_Rejected__c = 0;
         if (!dryRun) {
             // Stamped now as well as at the finish, so a commit the platform aborts part way
-            // can still be undone (R-IB7, R-IB13).
-            batch.Committed_By__c = UserInfo.getUserId();
+            // can still be undone (R-IB7, R-IB13). A corrected-row retry keeps the committer;
+            // its user is added to Rows Retried By instead (R-IB17a).
+            if (rowIds == null) {
+                batch.Committed_By__c = me;
+            }
             batch.Undo_Deadline__c = Datetime.now().addDays(undoWindowDays());
         }
         // Enqueued before the write, so the job is recorded with the pass; both roll back
         // together if the write fails.
         batch.Job_Id__c = Database.executeBatch(
-            new ImportProcessorBatch(batch.Id, dryRun, trialRows, afterRow),
+            rowIds == null
+                ? new ImportProcessorBatch(batch.Id, dryRun, trialRows, afterRow)
+                : new ImportProcessorBatch(batch.Id, rowIds),
             scopeSize(batch.Chunk_Size__c)
         );
         Database.update(passStamp(batch), AccessLevel.USER_MODE);
@@ -645,8 +734,47 @@ public with sharing class ImportBatchService {
         if (trialRows != null) {
             bookkeeping.Trial_Rows__c = trialRows;
         }
+        Set<Id> retriers = retriedBy(batch.Id);
+        if (rowIds != null && batch.Committed_By__c != me && retriers.add(me)) {
+            // Undo counts what this user creates during the import as the import's (R-IB17a).
+            bookkeeping.Retried_By__c = String.join(new List<Id>(retriers), ',');
+        }
         Database.update(bookkeeping, AccessLevel.SYSTEM_MODE);
         return batch.Job_Id__c;
+    }
+
+    /**
+     * The users other than the committer who retried corrected rows of a batch (R-IB17a). The
+     * package's bookkeeping, read in system mode.
+     */
+    @NamespaceAccessible
+    public static Set<Id> retriedBy(Id batchId) {
+        List<Import_Batch__c> found = [
+            SELECT Retried_By__c
+            FROM Import_Batch__c
+            WHERE Id = :batchId
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        return found.isEmpty() ? new Set<Id>() : retriersIn(found[0].Retried_By__c);
+    }
+
+    /**
+     * The users a batch's Rows Retried By names, for a caller that already read the field, so
+     * no query is spent on it (undo's passes each read the batch once).
+     */
+    @NamespaceAccessible
+    public static Set<Id> retriersIn(String retriedBy) {
+        Set<Id> users = new Set<Id>();
+        if (String.isBlank(retriedBy)) {
+            return users;
+        }
+        for (String userId : retriedBy.split(',')) {
+            if (String.isNotBlank(userId)) {
+                users.add(Id.valueOf(userId.trim()));
+            }
+        }
+        return users;
     }
 
     /**
@@ -812,6 +940,7 @@ public with sharing class ImportBatchService {
         if (batch == null) {
             throw new ImportException(Label.Core_Import_ErrorBatchGone);
         }
+        // Package bookkeeping (ADR-0021).
         Database.update(
             new Import_Batch__c(Id = batch.Id, Pass_Number__c = nextPass(batch)),
             AccessLevel.SYSTEM_MODE
@@ -858,6 +987,33 @@ public with sharing class ImportBatchService {
         String processorSettings,
         Boolean trial
     ) {
+        return finish(
+            batchId,
+            dryRun,
+            failed,
+            logLines,
+            fileAmount,
+            processorSettings,
+            trial,
+            false
+        );
+    }
+
+    /**
+     * Closes a run as above. A retry of corrected rows (R-IB17a) closes as a retry's commit
+     * does: the log follows the import's, the file total is kept and every row is counted.
+     */
+    @NamespaceAccessible
+    public static Import_Batch__c finish(
+        Id batchId,
+        Boolean dryRun,
+        Boolean failed,
+        List<String> logLines,
+        Decimal fileAmount,
+        String processorSettings,
+        Boolean trial,
+        Boolean correctedRetry
+    ) {
         Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
         if (batch == null) {
             return null;
@@ -865,7 +1021,7 @@ public with sharing class ImportBatchService {
         Boolean partOfTrial = dryRun != true && (trial == true || batch.Trial_Rows__c != null);
         // A retry's preview counts its own rows; its commit counts every row, the replaced
         // rejects now Retried and counted as nothing (R-IB17).
-        Boolean retrying = isRetrying(batch);
+        Boolean retrying = isRetrying(batch) || correctedRetry == true;
         Boolean retryPreview = retrying && dryRun == true;
         Map<String, Integer> counts = trial == true
             ? ImportBatchSelector.countRowsByStatus(batchId, batch.Pass_Number__c)
@@ -925,8 +1081,11 @@ public with sharing class ImportBatchService {
         if (dryRun != true) {
             // A commit that failed part way still wrote the chunks that ran, so it is as
             // undoable as one that finished. The deadline is stamped here rather than
-            // computed at undo, so changing the setting never moves it (R-IB7).
-            batch.Committed_By__c = UserInfo.getUserId();
+            // computed at undo, so changing the setting never moves it (R-IB7). A corrected-row
+            // retry keeps the committer (R-IB17a).
+            if (correctedRetry != true) {
+                batch.Committed_By__c = UserInfo.getUserId();
+            }
             batch.Undo_Deadline__c = Datetime.now().addDays(undoWindowDays());
         }
         Database.update(batch, AccessLevel.SYSTEM_MODE);
@@ -972,32 +1131,39 @@ public with sharing class ImportBatchService {
         }
     }
 
-    /** How long a finished import's rows are kept when the org has not said (R-IR5, D-40). */
+    /** The stored values of the Import setting Delete Import Rows (R-IR5). */
     @NamespaceAccessible
-    public static final Integer ROW_RETENTION_DAYS = 90;
+    public static final String ROWS_ONCE_COMPLETE = 'Once_Complete';
+    @NamespaceAccessible
+    public static final String ROWS_AFTER_30_DAYS = 'After_30_Days';
+    @NamespaceAccessible
+    public static final String ROWS_AFTER_90_DAYS = 'After_90_Days';
+    @NamespaceAccessible
+    public static final String ROWS_NEVER = 'Never';
 
-    /** The longest an org may keep rows, so a mistyped number cannot stand. */
-    private static final Integer MAX_ROW_RETENTION_DAYS = 3650;
+    private static final Map<String, Integer> ROW_DAYS = new Map<String, Integer>{
+        ROWS_ONCE_COMPLETE => 0,
+        ROWS_AFTER_30_DAYS => 30,
+        ROWS_AFTER_90_DAYS => 90
+    };
 
     /**
-     * How many days after an import finished its rows are kept, or 0 for for ever (R-IR5).
-     * Nothing, a negative number or an unreadable value falls back to the shipped ninety days,
-     * and anything over ten years is held at ten years.
+     * How many days after an import is complete its rows are kept (R-IR5): 0 once complete,
+     * 30 or 90, or null to keep them for ever. A blank or unknown value reads as the shipped
+     * After 30 Days.
      */
     @NamespaceAccessible
     public static Integer rowRetentionDays() {
-        Object configured = SettingsService.hasKey('Import_Row_Retention_Days__c')
-            ? SettingsService.getValue('Import_Row_Retention_Days__c')
+        Object configured = SettingsService.hasKey('Import_Row_Deletion__c')
+            ? SettingsService.getValue('Import_Row_Deletion__c')
             : null;
-        if (configured == null) {
-            return ROW_RETENTION_DAYS;
+        String choice = configured == null ? null : String.valueOf(configured);
+        if (ROWS_NEVER.equals(choice)) {
+            return null;
         }
-        try {
-            Integer days = Decimal.valueOf(String.valueOf(configured)).intValue();
-            return days < 0 ? ROW_RETENTION_DAYS : Math.min(days, MAX_ROW_RETENTION_DAYS);
-        } catch (Exception ignored) {
-            return ROW_RETENTION_DAYS;
-        }
+        return ROW_DAYS.containsKey(choice)
+            ? ROW_DAYS.get(choice)
+            : ROW_DAYS.get(ROWS_AFTER_30_DAYS);
     }
 
     /**

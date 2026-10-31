@@ -100,6 +100,53 @@ public with sharing class ImportTemplateService {
         if (String.isBlank(name)) {
             throw new ImportException(Label.Core_Import_ErrorObjectTemplateName);
         }
+        Import_Template__c template = newObjectTemplate(name, loadableObject(objectName));
+        Database.insert(template, AccessLevel.USER_MODE);
+        return template;
+    }
+
+    /**
+     * Creates a template that loads several objects from one upload (R-IT20), empty until its
+     * first file is mapped: each object one `createObjectTemplate` admits, listed once, starting
+     * on the operation that template would. The first object is the Target Object, so the
+     * template loads as one-object templates do.
+     */
+    @NamespaceAccessible
+    public static Import_Template__c createSeveralObjectsTemplate(
+        String name,
+        List<String> objectNames
+    ) {
+        if (String.isBlank(name)) {
+            throw new ImportException(Label.Core_Import_ErrorObjectTemplateName);
+        }
+        if (objectNames == null || objectNames.isEmpty()) {
+            throw new ImportException(Label.Core_Import_ErrorSeveralObjectsNone);
+        }
+        ImportMapping mapping = new ImportMapping();
+        mapping.objects = new List<ImportMapping.ObjectStep>();
+        Import_Template__c template;
+        for (String objectName : objectNames) {
+            Schema.DescribeSObjectResult described = loadableObject(objectName);
+            Import_Template__c each = newObjectTemplate(name, described);
+            template = template == null ? each : template;
+            mapping.objects.add(
+                new ImportMapping.ObjectStep(described.getName(), each.Load_Operation__c, null)
+            );
+        }
+        String problem = ImportObjectSchema.severalObjectsProblem(mapping);
+        if (problem != null) {
+            throw new ImportException(problem);
+        }
+        template.Column_Mapping_JSON__c = mapping.serialize();
+        Database.insert(template, AccessLevel.USER_MODE);
+        return template;
+    }
+
+    /**
+     * The object of this name, as describe gives it, when a template may load it: admitted by
+     * the allow-list rule (R-IT14) and one the user can read and create or edit records of.
+     */
+    private static Schema.DescribeSObjectResult loadableObject(String objectName) {
         Schema.SObjectType type = ImportObjectSchema.typeNamed(objectName);
         String refused = DataProtectedFields.objectRefusal(type);
         if (refused != null) {
@@ -115,7 +162,17 @@ public with sharing class ImportTemplateService {
                 )
             );
         }
-        Import_Template__c template = new Import_Template__c(
+        return described;
+    }
+
+    /** A new, unsaved template that loads this object, on Insert when the user may create. */
+    private static Import_Template__c newObjectTemplate(
+        String name,
+        Schema.DescribeSObjectResult described
+    ) {
+        Boolean creates =
+            described.isCreateable() && !ImportObjectSchema.updatesOnly(described.getSObjectType());
+        return new Import_Template__c(
             Name = name.trim().abbreviate(80),
             Template_Key__c = 'object_' +
                 described.getName().toLowerCase().left(40) +
@@ -135,8 +192,6 @@ public with sharing class ImportTemplateService {
             Lookup_Not_Found__c = ImportObjectSchema.LOOKUP_REJECT,
             Several_Matches__c = SEVERAL_REJECT
         );
-        Database.insert(template, AccessLevel.USER_MODE);
-        return template;
     }
 
     /**
@@ -626,6 +681,11 @@ public with sharing class ImportTemplateService {
         // starts, once its load choices are saved too (R-IT12).
         if (!ImportObjectSchema.loadsOneObject(template) && !mapping.identifiesSomebody()) {
             throw new ImportException(Label.Core_Import_ErrorMappingIdentifiesNobody);
+        }
+        // The objects of an upload of several objects are checked when the mapping is saved.
+        String severalProblem = ImportObjectSchema.severalObjectsProblem(mapping);
+        if (severalProblem != null) {
+            throw new ImportException(severalProblem);
         }
         // A broken step is skipped on read, so it is refused here, where the admin can fix it.
         List<String> changeProblems = mapping.transformProblems();

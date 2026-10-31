@@ -10,8 +10,8 @@ In-App Guidance (prompts), so they look and behave like any other Salesforce tip
 |---|---|---|
 | BarnCRM Settings | Docked, bottom right | How the sections and search work, that changing a setting needs the BarnCRM Admin role, and where the Setup Assistant and the What's new card are |
 | Import | Floating | Check the preview before you import; an import can be undone from Recent imports |
-| Find | Floating | Run, save and export a query; bulk update and bulk delete start here |
-| Bulk Update | Floating | The tab lists recent bulk updates and deletes with their undo; new ones start in Find |
+| Find | Floating | Run, save and export a query; bulk delete, and a bulk update from a saved query, start here |
+| Super Transform | Floating | Bulk changes start here, without a file; Find is for starting from a saved query; recent bulk updates and deletes are listed below with their undo |
 
 Each tip appears once for each person, in the **BarnCRM Console** app only (a Salesforce tip
 names exactly one app, and this is the app the tips were first made for). The tips do not repeat the

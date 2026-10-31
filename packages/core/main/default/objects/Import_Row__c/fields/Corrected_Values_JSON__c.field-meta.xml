@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Corrected_Values_JSON__c</fullName>
+  <description>The values corrected on screen for a rejected row, only the corrected columns, keyed by column name as Raw Values is. Read in place of the raw values when the row is retried; Raw Values is never changed (canonical model R-IR4, R-IB17a).</description>
+  <label>Corrected Values</label>
+  <length>32768</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>5</visibleLines>
+</CustomField>

@@ -1,0 +1,31 @@
+/* One card (the page shell); each numbered step is a section divided by a rule, not a card. */
+.step {
+  padding: var(--slds-g-spacing-4, 1rem) 0;
+  border-top: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #e5e5e5);
+}
+
+.step:first-of-type {
+  border-top: none;
+}
+
+.step__heading {
+  margin-bottom: var(--slds-g-spacing-3, 0.75rem);
+}
+
+.change {
+  padding-left: var(--slds-g-spacing-2, 0.5rem);
+  border-left: var(--slds-g-sizing-border-3, 3px) solid var(--slds-g-color-accent-container-1, #0176d3);
+}
+
+/* A value the run would change: shaded, the old value struck, the new value in bold. */
+td.changed {
+  background-color: var(--slds-g-color-success-container-1, #ebf7e6);
+}
+
+td.changed .after {
+  font-weight: var(--slds-g-font-weight-7, 700);
+}
+
+td.changed .before {
+  text-decoration: line-through;
+}

@@ -27,7 +27,7 @@ The cards work like radio buttons: Tab reaches them and the arrow keys move betw
 | **People and Organizations** | People, a second person on the same row, households, organizations and the links between people and organizations, with their mailing addresses. A file of organizations only works too. You choose the template; the first one is chosen for you. | Sections 3, 4 and 8 |
 | **Gifts** | Gifts with the people and organizations who gave them. Shown only when one of your active templates loads gifts, which means the Giving module is installed. | [Importing gifts](gift-import.md) |
 | **One Kind of Record** | Creates, updates or upserts the records of any one object you may load, such as program sessions or one of your own objects. You choose the object and name a new template. | Section 9 |
-| **Records With Their Related Records** | One kind of record and its related records from the same rows, such as sessions and their attendees. As **One Kind of Record**, with **Update or create, matched by external ID** chosen for you (or **Update by record ID** where that is not offered), so the related records choice is open on the matching step. | Section 9, "Related Records in the Same File" |
+| **Several Objects in One File** | Records of several objects from one file: a sheet for each object, or several objects on one row (`Account.Name` and `Contact.LastName`), each record linked to the records it points at, such as programs, their sessions and the attendees. You choose the objects and name a new template. | Section 9, "Several Objects in One File" |
 | **Delete the Records a File Lists** | Sends the records whose IDs the file lists to the Recycle Bin, after a preview and a confirmed count. Shown only to people with **Bulk Delete Records**. As **One Kind of Record**, with **Delete by record ID** chosen for you. | Section 9, "Deleting the records a file lists" |
 | **Your Templates** | Every active template in your org: the ones BarnCRM and your modules ship and the ones you made, each with its description, what it creates and when it last loaded a file. | Sections 2 and 6 |
 
@@ -67,8 +67,8 @@ A few things are worth knowing before your first large file:
    **Rows in a trial import** is how many of a file's first rows **Try the First Rows**
    imports before the rest (section 3, step 8). It is 25 unless you change it, from 1 to
    2,000, and the wizard lets you change it for one file.
-4. **Days the rows of an import are kept** is 90 unless you change it, from 1 to 3650, or 0
-   to keep them for ever. See [How long the rows are kept](#how-long-the-rows-are-kept).
+4. **Delete Import Rows** is **After 30 Days** unless you change it to **Once Complete**,
+   **After 90 Days** or **Never**. See [How long the rows are kept](#how-long-the-rows-are-kept).
 5. **Import** on the same page has an **Open Import** button, which is the same
    place the **Import** tab takes you.
 6. With the Giving module installed, the same page has the two payment matching settings
@@ -98,12 +98,19 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    Organizations**. **People and Organizations List** (or **Generic contact list** in an older
    org) is chosen for you; select **Next**.
 2. Select **Upload file** and choose your file. BarnCRM reads the header row and shows
-   you every column it found, with the first few values from the file underneath each one.
+   you every column it found. The **Examples** column shows up to three values from the
+   column's first rows, one per line, so you can see the column holds what its mapping says
+   (a long value is cut short, and an empty cell shows as "(blank)").
    For a text file, **Columns are separated by** shows the separator BarnCRM found (commas,
    semicolons, tabs or pipes); change it if the columns look wrong, for example every heading
-   in one column. For a workbook with more than one sheet, **Sheet** chooses which one to load
-   (the first, until you choose another). Changing either reads the file again and suggests
-   the columns afresh.
+   in one column. Changing it reads the file again and suggests the columns afresh.
+   For a workbook with more than one sheet, **Sheets to load** lists every sheet with its
+   number of rows. Every sheet with rows is chosen to start; clear any you do not want (a
+   "Read me" sheet, for example). The chosen sheets load as one file: a column is joined with
+   a column on another sheet when both map to the same field (`First Name` on one sheet,
+   `Contact.First Name` on the next), and any other column stays its own, empty in rows from
+   sheets that do not have it. Rows load in sheet order, and row numbers in the results count
+   across the chosen sheets.
 3. Check the columns. Each column shows what BarnCRM thinks it is, for example
    "Email" for a column headed `Email Address`. Change anything that is wrong from the
    picker beside it. A column you do not want loaded is set to **Do not load**, and its
@@ -306,12 +313,25 @@ affects imports you run afterwards.
 
 ### How Long the Rows Are Kept
 
-Every row of every file is kept as an Import Row so you can see what happened to it, download
-the rejected rows and check what a re-import changed. Rows take storage, so a nightly job
-removes the rows of an import once it finished more than **Days the rows of an import are
-kept** ago (90 days unless you change it in **BarnCRM Settings**, **Import**; 0 keeps them for
-ever). The import itself stays: its counts, run log and file name, and its undo, which never
-reads the rows. A preview whose rows were removed cannot be committed: upload the file again.
+Every row of every file is kept as an Import Row so you can see what happened to it, correct
+and retry a rejected row ([Super Importer rows](import-rows.md)), download the rejected rows
+and check what a re-import changed. Rows take storage, so a nightly job deletes the rows of a
+complete import (Complete, Failed or undone) by **Delete Import Rows** in **BarnCRM
+Settings**, **Import**:
+
+| Choice | The rows of a complete import are deleted |
+|---|---|
+| **Once Complete** | The first night after it is complete. |
+| **After 30 Days** (the default) | 30 days after it is complete. |
+| **After 90 Days** | 90 days after it is complete. |
+| **Never** | Never. |
+
+Rejected rows waiting to be corrected follow the same choice, so with **Once Complete** fix
+them the day you import. An import you only previewed keeps its rows for at least 30 days
+whatever you choose, and an import still open (a trial waiting for the rest, a retry, a run in
+progress) keeps them. The import itself stays: its counts, run log and file name, and its
+undo, which never reads the rows. A preview whose rows were deleted cannot be committed, and a
+row that was deleted cannot be retried: upload the file again.
 
 The job is called **Import row cleanup**. Health Check reports it when it is not scheduled, and
 its **Schedule All Nightly Jobs** fix schedules it. It runs at a quarter past one in the
@@ -360,10 +380,11 @@ than what BarnCRM chose (European exports often use semicolons). Choose the righ
 **Columns are separated by** above the column list. A file of only one column reads as comma
 separated.
 
-**An Excel file shows the wrong columns, or none.** The **first sheet** of a workbook is read
-until you choose another in **Sheet** above the column list, and the sheet's first row must be
-the column headings. A sheet with no rows under its headings shows no columns and you cannot go
-on until you choose another. A formula is read as the value Excel last saved for it,
+**An Excel file shows the wrong columns, or none.** Every sheet with rows is chosen until you
+clear it in **Sheets to load** above the column list, and each sheet's first row must be the
+column headings. A note or summary sheet adds its own columns and rows: clear it. When the chosen
+sheets have no rows under their headings, no columns show and you cannot go on until you choose
+another sheet. A formula is read as the value Excel last saved for it,
 and a date as the date, whatever format the cell shows. An older .xls file, or a
 password-protected workbook, cannot be read: save it as .xlsx or CSV and upload that. A
 browser too old to open a workbook says so; save the sheet as CSV instead. So does a workbook
@@ -510,7 +531,7 @@ so a row whose person or organization is not already in Salesforce is rejected i
 creating them. If those rows are new people, untick **Match only** and load them again.
 
 **Load one object: "No record ... was found for" a lookup.** The value in a lookup column did
-not find a record by the field that column names its parent by (section 9, step 4). Check the
+not find a record by the field that column names its parent by (section 9, step 5). Check the
 value, or choose a different field in the column's second picker, or choose **Leave it empty**
 to load the row without the lookup.
 
@@ -689,16 +710,46 @@ that has the object and every field it uses, and where the template's people (Co
 person Accounts) match yours; otherwise it is left out, and the reason is on the Error Log
 (Health Check). You can edit it or switch it off like any other template.
 
-1. Open the **Import** tab and choose **One Kind of Record** (or **Records With Their Related
-   Records**, or **Delete the Records a File Lists**). A template you made before is under
-   **Your Templates**.
-2. Choose the object from the list, give the template a name (for example "Program sessions"),
+1. Open the **Import** tab and choose **One Kind of Record** (or **Delete the Records a File
+   Lists**). A template you made before is under **Your Templates**. For a file of several
+   objects, see "Several Objects in One File" below.
+2. Not sure which object? Under **Suggest the object from a file**, choose the file first.
+   BarnCRM suggests the object its headings, sheet names or file name point at, in that order
+   (for example `Contact.First Name`, a **Contacts** sheet, or `contacts_2026.xlsx`; dates,
+   digits and the words export and import in a name are ignored), and chooses it in the list.
+   It is only a suggestion: change it if it is wrong. When nothing names an object exactly, a
+   near spelling of a sheet or file name (`Contcts.csv`) is suggested with an amber **Best
+   Guess, Check It** badge. When a workbook's sheets point at different objects, each sheet is
+   listed with its object. The same file is read for you after **Next**, so you do not upload
+   it twice.
+3. Choose the object from the list, give the template a name (for example "Program sessions"),
    and select **Create**. The new template is chosen for you, with what it loads shown under
    it. Select **Next**.
-3. Upload the file. Each column is matched to the field whose label or API name is its heading;
-   anything else is **Do not load**. Change any column from the picker, which lists the fields
-   of that object you may create or edit.
-4. For a column that fills a lookup (a field that points at another record), a second picker
+4. Upload the file (unless you chose it in step 2). Each column is matched to the field whose
+   label or API name is its heading. A heading may also name the object and the field
+   together, in any of these forms: `Contact.First Name`, `Contact: Phone`, `Contact / Phone`,
+   `Contact | Phone`, `Contact - Phone`, `Phone: Contact`, `Phone (Contact)` or
+   `Contact_Phone`. The object can be its label, plural label or API name, and case, spaces
+   and line breaks do not matter. A heading that names another object, or that could be read
+   two ways, is not mapped. Change any column from the picker, which lists the fields of that
+   object you may create or edit.
+
+   **Best guesses.** A heading that matches no field exactly is mapped to the field with the
+   nearest spelling, when one is close enough: `Frist Name` to First Name, `Emial` to Email,
+   `Contcts.Phone` to the contact's phone. Each such column shows an amber **Best Guess, Check
+   It** badge with **Accept** beside it, and **Next** waits until every guess is checked: select
+   **Accept** (or **Accept All Guesses** above the columns), or choose another field, **Do not
+   load** included. An exact heading always wins over a guess for the same field, two fields
+   equally near are not guessed, a different word (`Shoe Size`) is not guessed, and a column
+   is never guessed to be the record ID. The guess is not saved: the template keeps what you
+   accepted or chose. Anything else is **Do not load**.
+
+   A workbook with several sheets loads them all into the template's one object. When the
+   chosen sheets point at different objects, the step lists each sheet with its object and
+   **Next** waits: clear the sheets for the other objects, or go back and choose the object
+   they point at. To load each sheet into its own object, use **Several Objects in One File**
+   (below).
+5. For a column that fills a lookup (a field that points at another record), a second picker
    says how the file names that record: **Salesforce record ID** (the default), the record's
    name, or any of its text, email or phone fields you may read (for example a program code or
    an organization's phone number). Matching is exact, ignoring case and the spaces around the
@@ -710,13 +761,13 @@ person Accounts) match yours; otherwise it is left out, and the reason is on the
    on an object holding more than 100,000 records you can see, the dry run is refused and names
    the field. Choose one of those fields instead, or ask your Salesforce administrator to mark
    the field External ID.
-5. On the next step choose what each row does:
+6. On the next step choose what each row does:
 
 | Choice | What it does | What it risks |
 |---|---|---|
 | **Create new records** | Creates a new record for every row. | Loading the same file twice creates every record twice. |
 | **Update by record ID** | Changes the record whose Salesforce record ID is in the row's ID column. Map that column to **Salesforce record ID**. | A row whose ID is wrong, of another object, or not one you can see is rejected; nothing is created for it. |
-| **Update by a field you choose** | Finds the record whose text, email or phone field you choose holds the row's value (for example Email), and changes it. Map a column to that field. | A row that finds no record is rejected; nothing is created for it. The field follows the matching and large object rules in step 4. |
+| **Update by a field you choose** | Finds the record whose text, email or phone field you choose holds the row's value (for example Email), and changes it. Map a column to that field. | A row that finds no record is rejected; nothing is created for it. The field follows the matching and large object rules in step 5. |
 | **Update or create, matched by external ID** | Finds the record by the ID field you choose (one marked External ID) and changes it, or creates a record when none has that value. | A value typed into the wrong row changes the wrong record. |
 | **Delete by record ID** | Deletes the record whose Salesforce record ID is in the row's ID column, as a bulk delete does. Listed only for people with **Bulk Delete Records**, and only for objects a bulk delete may delete. | Every record the file names goes, with the related records Salesforce deletes with it. See "Deleting the records a file lists" below. |
 
@@ -724,7 +775,7 @@ person Accounts) match yours; otherwise it is left out, and the reason is on the
    **Leave it empty** and load the rest of the row. When a lookup, an update by a field you
    choose, or an upsert finds more than one record, the **When more than one record matches**
    choice applies, as in section 8.
-6. Select **Preview**, read the results, and commit. After the import, **Download Results**
+7. Select **Preview**, read the results, and commit. After the import, **Download Results**
    gives every row with its outcome, the record ID it created, updated or matched, and the
    reason for a rejected row (section 3, step 9).
 
@@ -827,49 +878,81 @@ ID**; every other column is ignored, and it loads no related records.
 A file naming more records than the **Bulk delete run limit** (default 10,000) is refused at
 the confirm step: split the file.
 
-### Related Records in the Same File
+### Several Objects in One File
 
-One file often holds two kinds of record: programs and their sessions, events and their
-attendees, or a legacy system's accounts and their notes. Each row names its parent by a key,
-and the rows that share a key belong to one parent. **Related records** loads both in one
-import, with one dry run and one undo.
+One file often holds several kinds of record: programs, their sessions and the attendees, a
+legacy system's accounts and their notes, or an export with `Account.Name` and
+`Contact.LastName` on the same row. **Several Objects in One File** loads them all in one
+import, with one dry run, one set of results and one undo.
 
-1. On the step where you choose what each row does, choose **Update or create, matched by
-   external ID**, **Update by a field you choose** or **Update by record ID**. The field rows are matched by is the
-   **parent key**: rows with the same value in it share one parent. **Create new records** cannot load
-   related records, because a key that no field holds cannot find its parent again in a later
-   part of the file or on a second run. To create new parents, give the object an External ID
-   field (a program code, a legacy ID) and upsert by it.
-2. Under **Related records**, choose the related object and the field on it that points at
-   your object (for example **Session (Program)**). Only objects you may create records of
-   are listed.
-3. Back on the columns step, the picker lists the related object's fields after your object's,
-   each starting with the related object's name. Map the related columns to them. The field
-   that points at the parent is filled in by the load, so a column mapped to it is skipped.
+1. Open the **Import** tab and choose **Several Objects in One File**.
+2. Not sure which objects? Under **Suggest the object from a file**, choose the file first.
+   BarnCRM reads each sheet's name and headings, as for one object, and chooses every object
+   they point at under **Objects to load**. Add or remove objects there; the order you list
+   them in does not matter.
+3. Give the template a name and select **Create**, then **Next**.
+4. Upload the file (unless you chose it in step 2) and choose the sheets to load. Each sheet
+   loads one object, chosen for you from its name or headings under **Object for** the sheet;
+   change it if it is wrong. A text file is one sheet. On any sheet, a heading of the sheet's
+   object maps to its field, and a two-part heading (`Contact.LastName`, `Phone (Contact)`) maps
+   to the field of the object it names, so one row can load several objects. The same heading on
+   sheets of different objects becomes two columns, the second with its sheet's name after it.
+   A near spelling of a field or an object is a best guess with the amber badge, to accept or
+   change before **Next**, as for one object (step 4 above).
+5. Check the columns. The picker lists every field of every object you chose, each starting with
+   its object's name. Every object needs at least one column; one without any is not loaded.
+6. On the matching step, choose what each object's rows do, as for one object: **Create new
+   records**, **Update by record ID**, **Update by a field you choose** or **Update or create,
+   matched by external ID**, with the field it finds records by. Deleting is not offered here.
+   Accounts and contacts load by update only, as for one object. The step lists how each object
+   links to the others. **Reject the row** or **Leave it empty**, for a lookup that finds
+   nothing, applies to every object.
+7. Select **Preview**, read the results, and commit.
 
 How it loads:
 
-- **Parents first.** The first row with a key is that parent's row: its parent columns create
-  or update the parent. Later rows with the same key add related records to it, and their
-  parent columns are not loaded, so put the parent's values on its first row.
-- **A row with only a key and related columns** adds a related record to the parent that key
-  finds, in the file or already in Salesforce. Under **Update or create, matched by external ID**, a key no record holds creates a
-  parent with only that value.
-- **A parent that fails takes its related records with it.** When a parent row is rejected,
-  each later row with the same key is rejected with "The parent record of this row was not
-  saved", and nothing is created for it. Fix the parent row and load the rejected rows again:
-  the key finds the parents that were saved, so none is made twice.
-- **A related record that fails** rejects its own row with the reason. Its parent is still
-  saved, and loading the row again finds it by its key.
-- **Related records are always created.** A second run of the same file adds them again, so
-  load only the rows you fixed, not the whole file.
+- **Parents first.** An object that points at another listed object (through a lookup or
+  master-detail field you may fill in) loads after it, whatever the order of the sheets or the
+  list. The wizard stages the sheets parents first too.
+- **Records on one row are linked.** A record is linked to the record of each object it points
+  at on the same row, through the field named after that object (for example **Account ID** on
+  a contact, **Organization** on an affiliation), or the first such field by API name. A new
+  record always takes the link. A record that already exists takes it only when that field is
+  empty: an import never moves a record to another parent. A column mapped to that field is
+  not read for a row that has the parent on it, and the run log says so.
+- **Records on other sheets are linked by a column you pick.** On a sheet of attendees, map a
+  column to the field that points at the session and, in its second picker, say how the column
+  names the session: its record ID, or a field such as a session code (section 9, step 5). The
+  dry run cannot find a session the same file creates yet, so it leaves that lookup for the
+  commit and the run log says so.
+- **A row loads an object only when it has a value for it.** A sheet of sessions does not create
+  attendees, even with a value for every row set for attendees.
+- **Repeated parents.** When an object other objects point at finds records by a key (an update,
+  or an upsert by an external ID), the first row with a key loads that record, and later rows
+  with the same key only link their own records to it: put the parent's values on its first
+  row. Under **Create new records** each row creates its own parent, so give a parent an
+  External ID field (a program code, a legacy ID) and upsert by it when several rows share one.
+- **A parent that fails takes its children with it.** A record whose parent on its row was not
+  saved is rejected and not saved; later rows of a failed key are rejected too. A child that
+  fails rejects its row with the reason, and its parent stays saved.
+- **One row, one result.** A row is rejected when any of its records is, with the object's name
+  before the reason; otherwise it counts as created when it created any record, updated when it
+  changed one, and matched when nothing changed. **Download Results** gives each row's first
+  record in load order.
+- **Loading a row again never makes a copy.** BarnCRM remembers the records each row created,
+  even when the row was rejected. Retry the row, or retry a fixed file that keeps the **Row**
+  column of the exceptions file, and each record the row already created is reused as it is:
+  only the missing ones are created, and they are linked to it. A record deleted since is
+  created again. Keep the **Row** column when you fix the file; a row without it is loaded as a
+  new row. One undo removes everything the import created, once.
 
-The dry run decides both, and writes neither. The counts are of your object's rows (a row that
-adds a related record to a parent an earlier row named counts as matched), and the run log says
-how many related records would be created and how many rows were rejected for theirs. Each row
-keeps its related record as its second resulting record. **Undo** deletes the related records
-first, then the parents the import created, and puts back the values it changed on parents
-that already existed.
+**Undo** works as in section 5: it deletes the records the import created, children before
+their parents, and puts back the values it changed.
+
+**Templates made before this update** that load related records with one object still load the
+same way: the first row of a key loads the parent, later rows add a related record, each row's
+related record is its second resulting record, and the run log counts them. To change one, start
+a **Several Objects in One File** template with both objects.
 
 ## 10. Changing Values as They Load
 

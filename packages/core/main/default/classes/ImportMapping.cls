@@ -84,6 +84,12 @@ public with sharing class ImportMapping {
          */
         @AuraEnabled
         public Boolean blankClears;
+        /**
+         * In a suggested mapping only: the target is a best guess from a near spelling, for the
+         * administrator to accept or change (C-49e). Never part of a saved template.
+         */
+        @AuraEnabled
+        public Boolean guessed;
 
         // JSON.deserialize requires a no-arg constructor to build this class from the stored
         // mapping document (see parse below); the fields it fills in are set afterward by the
@@ -188,6 +194,81 @@ public with sharing class ImportMapping {
     /** Only the first row of each combination of these columns' values loads (R-IT18). */
     @AuraEnabled
     public List<String> uniqueBy;
+    /**
+     * For an upload of several objects (C-49c, R-IT20): each object the file loads, its
+     * targets written `<object API name>.<field>`. Empty for every other template.
+     */
+    @AuraEnabled
+    public List<ObjectStep> objects;
+
+    /** One object of a several-object upload and how its rows load (C-49c, R-IT20). */
+    @NamespaceAccessible
+    public class ObjectStep {
+        /** The object's API name, which is also the entity of its columns' targets. */
+        @AuraEnabled
+        public String entity;
+        /** An `ImportObjectSchema` operation; Insert when blank. */
+        @AuraEnabled
+        public String operation;
+        /** The field an upsert or an update by a matching field finds records by. */
+        @AuraEnabled
+        public String keyField;
+
+        @NamespaceAccessible
+        public ObjectStep() {
+            this.entity = null;
+        }
+
+        @NamespaceAccessible
+        public ObjectStep(String entity, String operation, String keyField) {
+            this.entity = entity;
+            this.operation = operation;
+            this.keyField = keyField;
+        }
+    }
+
+    /** True for an upload of several objects (C-49c). */
+    @NamespaceAccessible
+    public Boolean loadsSeveralObjects() {
+        return objects != null && !objects.isEmpty();
+    }
+
+    /**
+     * This mapping as one object's: the columns and values for every row of `entity`, written
+     * as `Record` targets, and the rules for the rows to load, so the one-object loader reads
+     * them as its own (C-49c).
+     */
+    @NamespaceAccessible
+    public ImportMapping forEntity(String entity) {
+        ImportMapping result = new ImportMapping();
+        result.version = version;
+        for (Column column : columns) {
+            if (column == null || !isOf(column.target, entity)) {
+                continue;
+            }
+            Column copy = new Column(column.source, asRecord(column.target));
+            copy.lookupField = column.lookupField;
+            copy.transforms = column.transforms;
+            copy.blankClears = column.blankClears;
+            result.columns.add(copy);
+        }
+        for (Assignment assignment : defaults) {
+            if (assignment != null && isOf(assignment.target, entity)) {
+                result.defaults.add(new Assignment(asRecord(assignment.target), assignment.value));
+            }
+        }
+        result.skipRows = skipRows;
+        result.uniqueBy = uniqueBy;
+        return result;
+    }
+
+    private static Boolean isOf(String target, String entity) {
+        return !isIgnored(target) && entity.equalsIgnoreCase(entityOf(target));
+    }
+
+    private static String asRecord(String target) {
+        return ENTITY_RECORD + '.' + attributeOf(target);
+    }
 
     @NamespaceAccessible
     public ImportMapping() {
@@ -229,6 +310,7 @@ public with sharing class ImportMapping {
             result.defaults = parsed.defaults == null ? new List<Assignment>() : parsed.defaults;
             result.skipRows = parsed.skipRows;
             result.uniqueBy = parsed.uniqueBy;
+            result.objects = parsed.objects;
         } catch (Exception ignored) {
             // An unreadable document is an empty mapping. The caller reports the emptiness.
             return new ImportMapping();

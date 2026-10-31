@@ -68,6 +68,10 @@ households this way, never with Salesforce's own account merge. The full steps a
 
 You should see: "The two households are now one." Merged pairs leave the list.
 
+To merge the obvious duplicates in one go, an admin opens **Auto-Merge** on the same tab, clicks
+**Preview Exact Matches**, reads the pairs and confirms. A run can be undone for 15 days from
+**Recent Runs**. See [Auto-Merge](../admin-guide/duplicates.md#auto-merge).
+
 ## Why a Pair Is Suggested
 
 Each pair shows a short reason:
@@ -78,6 +82,10 @@ Each pair shows a short reason:
   on Contact Point Phone" or "Same address on Address (person)". BarnCRM also checks these
   related records (contact point emails, phones and addresses, and BarnCRM addresses). Your
   admin chooses which on the **Duplicate Matching** tab, **Matching Logic**.
+- Similar names with something else in common, such as "Similar names (97%) and the same
+  email", or "Same name in the same household". Case, spacing and punctuation do not count, and
+  a similar name alone never pairs two people: in one household similar names are usually
+  family, so there only an identical name is listed.
 
 A pair found both ways is listed once, under the rule. Some shared values are ignored on
 purpose: a value shared by more than ten people or households (such as an office's main

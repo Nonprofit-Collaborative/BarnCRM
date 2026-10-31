@@ -25,6 +25,10 @@ import getChangedValues from '@salesforce/apex/ImportController.getChangedValues
 import previewChanges from '@salesforce/apex/ImportController.previewChanges';
 import openRetry from '@salesforce/apex/ImportController.openRetry';
 import copyTemplate from '@salesforce/apex/ImportController.copyTemplate';
+import suggestObject from '@salesforce/apex/ImportController.suggestObject';
+import createSeveralObjectsTemplate from '@salesforce/apex/ImportController.createSeveralObjectsTemplate';
+import getSeveralObjects from '@salesforce/apex/ImportController.getSeveralObjects';
+import suggestSheetMapping from '@salesforce/apex/ImportController.suggestSheetMapping';
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
 import { readSheetNames, readXlsx } from '../xlsx';
 
@@ -134,6 +138,38 @@ jest.mock('@salesforce/apex/ImportController.previewChanges', () => ({ default: 
 jest.mock('@salesforce/apex/ImportController.openRetry', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock('@salesforce/apex/ImportController.suggestObject', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/apex/ImportController.createSeveralObjectsTemplate',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock('@salesforce/apex/ImportController.getSeveralObjects', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.suggestSheetMapping', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/label/c.Core_Import_SheetObjectLabel',
+  () => ({ default: 'Object for {0}' }),
+  {
+    virtual: true
+  }
+);
+jest.mock('@salesforce/label/c.Core_Import_SheetOption', () => ({ default: '{0} ({1} rows)' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_Import_SheetObject', () => ({ default: '{0}: {1}' }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/label/c.Core_Import_DetectSuggested',
+  () => ({ default: 'Suggested: {0}' }),
+  { virtual: true }
+);
 jest.mock('@salesforce/apex/ImportController.copyTemplate', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -330,7 +366,7 @@ describe('the import wizard', () => {
     expect(kindPicker.options.map((option) => option.value)).toEqual([
       'people',
       'object',
-      'related',
+      'several',
       'delete',
       'templates'
     ]);
@@ -589,13 +625,17 @@ describe('the import wizard', () => {
     expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Import_TabLabel: donors.csv');
   });
 
-  it('shows the first values of each column beside the choice', async () => {
+  it('shows example values of each column beside the choice, a blank one as such', async () => {
     const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element);
+    const examples = (row) =>
+      Array.from(row.querySelectorAll('[data-id="examples"] div')).map((each) => each.textContent);
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
-    expect(rows[0].textContent).toContain('Ramirez, Okafor');
+    expect(examples(rows[0])).toEqual(['Ramirez', 'Okafor']);
+    expect(examples(rows[2])).toEqual(['vip', 'c.Core_Import_ExampleBlank']);
+    expect(suggestObject).not.toHaveBeenCalled();
   });
 
   it('refuses a file with no rows under its heading', async () => {
@@ -657,39 +697,94 @@ describe('the import wizard', () => {
     expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(3);
   });
 
-  it('offers the sheets of a workbook that has several, and reads the one chosen', async () => {
-    readSheetNames
-      .mockResolvedValueOnce(['Read me', 'Donors'])
-      .mockResolvedValueOnce(['Read me', 'Donors']);
+  it('lists every sheet with its rows, chooses those with rows, and loads the choice', async () => {
+    readSheetNames.mockResolvedValueOnce(['Read me', 'Donors', 'Empty']);
     readXlsx
       .mockResolvedValueOnce([['About this export'], ['Exported 1 October']])
       .mockResolvedValueOnce([
         ['Last Name', 'Email'],
-        ['Ramirez', 'ana@example.org']
-      ]);
+        ['Ramirez', 'ana@example.org'],
+        ['Okafor', 'ben@example.org']
+      ])
+      .mockResolvedValueOnce([['Last Name']]);
     const element = await open();
     click(element, 'next');
     await flush();
     await chooseFile(element, 'zip bytes', 'donors.xlsx');
-    const picker = element.shadowRoot.querySelector('[data-id="sheet"]');
-    expect(picker.value).toBe('Read me');
+    const picker = element.shadowRoot.querySelector('[data-id="sheets"]');
+    expect(picker.value).toEqual(['Read me', 'Donors']);
     expect(picker.options).toEqual([
-      { label: 'Read me', value: 'Read me' },
-      { label: 'Donors', value: 'Donors' }
+      { label: 'Read me (1 rows)', value: 'Read me' },
+      { label: 'Donors (2 rows)', value: 'Donors' },
+      { label: 'Empty (0 rows)', value: 'Empty' }
     ]);
     expect(element.shadowRoot.querySelector('[data-id="delimiter"]')).toBeNull();
-    picker.dispatchEvent(new CustomEvent('change', { detail: { value: 'Donors' } }));
+    expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(3);
+    // Each sheet is suggested on its own, then the joined columns once.
+    expect(suggestMapping).toHaveBeenCalledWith({
+      templateId: 'a01',
+      headers: ['About this export']
+    });
+    picker.dispatchEvent(new CustomEvent('change', { detail: { value: ['Donors'] } }));
     await flush();
-    expect(readXlsx).toHaveBeenLastCalledWith(expect.anything(), { sheet: 'Donors' });
+    expect(readXlsx).toHaveBeenCalledTimes(3);
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
     expect(rows).toHaveLength(2);
     expect(rows[0].textContent).toContain('Last Name');
+    expect(suggestObject).not.toHaveBeenCalled();
+  });
+
+  it('joins columns of two sheets that map to the same field, and stages every row', async () => {
+    readSheetNames.mockResolvedValueOnce(['2025', '2026']);
+    readXlsx
+      .mockResolvedValueOnce([
+        ['Last Name', 'Email'],
+        ['Ramirez', 'ana@example.org']
+      ])
+      .mockResolvedValueOnce([
+        ['Surname', 'Notes'],
+        ['Okafor', 'vip']
+      ]);
+    const targetOf = (source) => {
+      if (['Last Name', 'Surname'].includes(source)) {
+        return 'Contact1.LastName';
+      }
+      return source === 'Email' ? 'Contact1.Email' : 'Ignore';
+    };
+    suggestMapping.mockImplementation(({ headers }) =>
+      Promise.resolve(
+        JSON.stringify({
+          version: 1,
+          columns: headers.map((source) => ({ source, target: targetOf(source) }))
+        })
+      )
+    );
+    const element = await open();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element, 'zip bytes', 'people.xlsx');
+    const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    expect(Array.from(rows).map((row) => row.querySelector('td').textContent)).toEqual([
+      'Last Name',
+      'Email',
+      'Notes'
+    ]);
+    expect(suggestMapping).toHaveBeenLastCalledWith({
+      templateId: 'a01',
+      headers: ['Last Name', 'Email', 'Notes']
+    });
+    click(element, 'next');
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    expect(JSON.parse(stageRows.mock.calls[0][0].rowsJson)).toEqual([
+      { 'Last Name': 'Ramirez', Email: 'ana@example.org', Notes: '' },
+      { 'Last Name': 'Okafor', Email: '', Notes: 'vip' }
+    ]);
   });
 
   it('shows no columns and will not go on when the chosen sheet has no rows', async () => {
-    readSheetNames
-      .mockResolvedValueOnce(['Donors', 'Empty'])
-      .mockResolvedValueOnce(['Donors', 'Empty']);
+    readSheetNames.mockResolvedValueOnce(['Donors', 'Empty']);
     readXlsx
       .mockResolvedValueOnce([
         ['Last Name', 'Email'],
@@ -702,8 +797,8 @@ describe('the import wizard', () => {
     await chooseFile(element, 'zip bytes', 'donors.xlsx');
     expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(false);
     element.shadowRoot
-      .querySelector('[data-id="sheet"]')
-      .dispatchEvent(new CustomEvent('change', { detail: { value: 'Empty' } }));
+      .querySelector('[data-id="sheets"]')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: ['Empty'] } }));
     await flush();
     expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
       'c.Core_Import_NoHeaderRow'
@@ -1718,6 +1813,88 @@ describe('the import wizard', () => {
       expect(element.shadowRoot.querySelector('[data-id="remaining"]')).toBeNull();
     });
   });
+
+  describe('best guesses (C-49e)', () => {
+    const GUESSED = JSON.stringify({
+      version: 1,
+      columns: [
+        { source: 'Last Name', target: 'Contact1.LastName' },
+        { source: 'Email', target: 'Contact1.Email', guessed: true },
+        { source: 'Notes', target: 'Ignore' }
+      ]
+    });
+
+    async function toColumns() {
+      suggestMapping.mockResolvedValue(GUESSED);
+      const element = await open();
+      click(element, 'next');
+      await flush();
+      await chooseFile(element);
+      return element;
+    }
+
+    const rows = (element) => element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    const nextDisabled = (element) => element.shadowRoot.querySelector('[data-id="next"]').disabled;
+
+    it('flags a guessed column with a badge and holds Next until it is accepted', async () => {
+      const element = await toColumns();
+      expect(rows(element)[0].querySelector('[data-id="guess"]')).toBeNull();
+      const guess = rows(element)[1].querySelector('[data-id="guess"]');
+      expect(guess).not.toBeNull();
+      const badge = guess.querySelector('.slds-badge');
+      expect(badge.classList.contains('slds-theme_warning')).toBe(true);
+      expect(badge.textContent).toContain('c.Core_Import_GuessBadge');
+      expect(badge.querySelector('.slds-assistive-text').textContent).toBe(
+        'c.Core_Import_GuessBadgeHelp'
+      );
+      expect(element.shadowRoot.querySelector('[data-id="guess-pending"]')).not.toBeNull();
+      expect(nextDisabled(element)).toBe(true);
+
+      guess.querySelector('[data-id="accept-guess"]').click();
+      await flush();
+      expect(rows(element)[1].querySelector('[data-id="guess"]')).toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="guess-pending"]')).toBeNull();
+      expect(nextDisabled(element)).toBe(false);
+      expect(rows(element)[1].querySelector('lightning-combobox').value).toBe('Contact1.Email');
+    });
+
+    it('accepts every guess at once, and never sends the flag with the mapping', async () => {
+      const element = await toColumns();
+      click(element, 'accept-all-guesses');
+      await flush();
+      expect(element.shadowRoot.querySelectorAll('[data-id="guess"]')).toHaveLength(0);
+      expect(nextDisabled(element)).toBe(false);
+      click(element, 'next');
+      await flush();
+      click(element, 'dry-run');
+      await flush();
+      const sent = JSON.parse(createBatch.mock.calls[0][0].mappingDocument);
+      expect(sent.columns[1]).toEqual({ source: 'Email', target: 'Contact1.Email' });
+    });
+
+    it('treats choosing another field as checking the guess', async () => {
+      const element = await toColumns();
+      const picker = rows(element)[1].querySelector('lightning-combobox');
+      picker.dispatchEvent(new CustomEvent('change', { detail: { value: 'Ignore' } }));
+      await flush();
+      expect(rows(element)[1].querySelector('[data-id="guess"]')).toBeNull();
+      expect(nextDisabled(element)).toBe(false);
+    });
+
+    it('does not flag a guess at a field the picker does not offer', async () => {
+      suggestMapping.mockResolvedValue(
+        JSON.stringify({
+          version: 1,
+          columns: [{ source: 'Email', target: 'Gift.Amount__c', guessed: true }]
+        })
+      );
+      const element = await open();
+      click(element, 'next');
+      await flush();
+      await chooseFile(element);
+      expect(element.shadowRoot.querySelectorAll('[data-id="guess"]')).toHaveLength(0);
+    });
+  });
 });
 
 describe('the import wizard loading one object', () => {
@@ -1878,29 +2055,139 @@ describe('the import wizard loading one object', () => {
     expect(element.shadowRoot.querySelector('[data-id="start-copy"]')).toBeNull();
   });
 
-  it('starts a template made from the related records card on upsert', async () => {
+  it('suggests the object from a file, lists sheets that differ, and reads the file after Next', async () => {
+    getTemplates.mockResolvedValue([TEMPLATE]);
     getLoadableObjects.mockResolvedValue([
-      { value: 'Program_Session__c', label: 'Program Session' }
+      { value: 'Program_Session__c', label: 'Program Session' },
+      { value: 'Account', label: 'Account' }
     ]);
     createObjectTemplate.mockResolvedValue(OBJECT_TEMPLATE);
-    getRelatedOptions.mockResolvedValue([]);
+    readSheetNames.mockResolvedValueOnce(['Sessions', 'Accounts']);
+    readXlsx
+      .mockResolvedValueOnce([
+        ['Session Key', 'Program'],
+        ['S-1', 'Reading']
+      ])
+      .mockResolvedValueOnce([['Account Name'], ['Riverbend']]);
+    suggestObject.mockResolvedValue({
+      objectName: 'Program_Session__c',
+      objectLabel: 'Program Session',
+      sheets: [
+        { sheetName: 'Sessions', objectName: 'Program_Session__c', objectLabel: 'Program Session' },
+        { sheetName: 'Accounts', objectName: 'Account', objectLabel: 'Account' }
+      ]
+    });
     const element = render();
     await flush();
-    await chooseKind(element, 'related');
-    const object = element.shadowRoot.querySelector('[data-id="new-object"]');
-    object.dispatchEvent(new CustomEvent('change', { detail: { value: 'Program_Session__c' } }));
+    await chooseKind(element, 'object');
+    const input = element.shadowRoot.querySelector('[data-id="detect-file"]');
+    const file = new File(['zip bytes'], 'Program Sessions 2026.xlsx');
+    Object.defineProperty(input, 'files', { value: [file], configurable: true });
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+
+    expect(suggestObject).toHaveBeenCalledWith({
+      fileName: 'Program Sessions 2026.xlsx',
+      sheetsJson: JSON.stringify([
+        { name: 'Sessions', headers: ['Session Key', 'Program'] },
+        { name: 'Accounts', headers: ['Account Name'] }
+      ])
+    });
+    expect(element.shadowRoot.querySelector('[data-id="new-object"]').value).toBe(
+      'Program_Session__c'
+    );
+    expect(element.shadowRoot.querySelector('[data-id="detection"]').textContent).toContain(
+      'Suggested: Program Session'
+    );
+    const listed = element.shadowRoot.querySelectorAll('[data-id="detection-sheets"] li');
+    expect(Array.from(listed).map((each) => each.textContent)).toEqual([
+      'Sessions: Program Session',
+      'Accounts: Account'
+    ]);
+
     const name = element.shadowRoot.querySelector('[data-id="new-template-name"]');
-    name.value = 'Sessions and attendees';
+    name.value = 'Program sessions';
     name.dispatchEvent(new CustomEvent('change'));
     await flush();
     click(element, 'create-object-template');
     await flush();
     click(element, 'next');
     await flush();
-    await chooseFile(element, SESSIONS, 'sessions.csv');
-    click(element, 'next');
+
+    // The file is read once and its columns shown; the sheet for another object holds Next.
+    expect(readXlsx).toHaveBeenCalledTimes(2);
+    expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(3);
+    const conflict = element.shadowRoot.querySelector('[data-id="sheet-conflict"]');
+    expect(conflict.textContent).toContain('Accounts: Account');
+    expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(true);
+    expect(suggestObject).toHaveBeenCalledTimes(1);
+
+    element.shadowRoot
+      .querySelector('[data-id="sheets"]')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: ['Sessions'] } }));
     await flush();
-    expect(loadOptions(element).operation).toBe('Upsert by external ID');
+    expect(element.shadowRoot.querySelector('[data-id="sheet-conflict"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(false);
+  });
+
+  it('says so when nothing in the file names an object, and chooses none', async () => {
+    getTemplates.mockResolvedValue([TEMPLATE]);
+    getLoadableObjects.mockResolvedValue([{ value: 'Account', label: 'Account' }]);
+    suggestObject.mockResolvedValue({ objectName: null, sheets: [{ sheetName: '' }] });
+    const element = render();
+    await flush();
+    await chooseKind(element, 'object');
+    const input = element.shadowRoot.querySelector('[data-id="detect-file"]');
+    Object.defineProperty(input, 'files', {
+      value: [new File(['Name\nAna'], 'budget.csv')],
+      configurable: true
+    });
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="detection"]').textContent).toContain(
+      'c.Core_Import_DetectNone'
+    );
+    expect(element.shadowRoot.querySelector('[data-id="new-object"]').value).toBeUndefined();
+    expect(element.shadowRoot.querySelector('[data-id="detection-sheets"]')).toBeNull();
+  });
+
+  it('flags an object guessed from a near spelling of the file name (C-49e)', async () => {
+    getTemplates.mockResolvedValue([TEMPLATE]);
+    getLoadableObjects.mockResolvedValue([{ value: 'Account', label: 'Account' }]);
+    suggestObject.mockResolvedValue({
+      objectName: 'Account',
+      objectLabel: 'Account',
+      objectGuessed: true,
+      sheets: [{ sheetName: '' }]
+    });
+    const element = render();
+    await flush();
+    await chooseKind(element, 'object');
+    const input = element.shadowRoot.querySelector('[data-id="detect-file"]');
+    Object.defineProperty(input, 'files', {
+      value: [new File(['Name\nAna'], 'Acounts.csv')],
+      configurable: true
+    });
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="new-object"]').value).toBe('Account');
+    const badge = element.shadowRoot.querySelector('[data-id="detection-guess"]');
+    expect(badge).not.toBeNull();
+    expect(badge.classList.contains('slds-theme_warning')).toBe(true);
+
+    suggestObject.mockResolvedValue({
+      objectName: 'Account',
+      objectLabel: 'Account',
+      objectGuessed: false,
+      sheets: [{ sheetName: '' }]
+    });
+    Object.defineProperty(input, 'files', {
+      value: [new File(['Name\nAna'], 'Accounts.csv')],
+      configurable: true
+    });
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="detection-guess"]')).toBeNull();
   });
 
   it('starts a template made from the delete card on delete by record ID', async () => {
@@ -2360,5 +2647,283 @@ describe('the import wizard loading one object', () => {
     await flush();
     expect(element.shadowRoot.querySelector('[data-id="start-over"]')).not.toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="retry-file"]')).toBeNull();
+  });
+});
+
+describe('the import wizard loading several objects from one upload (R-IT20)', () => {
+  const SEVERAL_TEMPLATE = {
+    id: 'a09',
+    name: 'Programs and sessions',
+    matchingRule: 'Email exact',
+    mapping: JSON.stringify({
+      version: 2,
+      columns: [{ source: 'Room', target: 'Session__c.Room__c' }],
+      objects: [
+        { entity: 'Program__c', operation: 'Insert' },
+        { entity: 'Session__c', operation: 'Insert' }
+      ]
+    }),
+    targetObject: 'Program__c',
+    targetObjectLabel: 'Program, Session',
+    severalObjects: true,
+    loadOperation: 'Insert',
+    loadOperations: ['Insert', 'Update by record Id', 'Upsert by external ID'],
+    lookupNotFound: 'Reject the row'
+  };
+  const field = (value, label, lookupFields) => ({
+    value,
+    label,
+    isLookup: Boolean(lookupFields),
+    lookupFields: lookupFields || []
+  });
+  const OBJECTS = [
+    {
+      objectName: 'Program__c',
+      objectLabel: 'Program',
+      operation: 'Insert',
+      operations: ['Insert', 'Update by record Id', 'Upsert by external ID'],
+      keyFields: [{ value: 'Code__c', label: 'Code' }],
+      matchFields: [{ value: 'Name', label: 'Program Name' }],
+      fields: [
+        field('Program__c.Id', 'Program: Salesforce record ID'),
+        field('Program__c.Name', 'Program: Program Name'),
+        field('Program__c.Code__c', 'Program: Code')
+      ],
+      links: []
+    },
+    {
+      objectName: 'Session__c',
+      objectLabel: 'Session',
+      operation: 'Insert',
+      operations: ['Insert', 'Update by record Id', 'Upsert by external ID'],
+      keyFields: [{ value: 'Name', label: 'Session Name' }],
+      matchFields: [],
+      fields: [
+        field('Session__c.Name', 'Session: Session Name'),
+        field('Session__c.Program__c', 'Session: Program', [
+          { value: 'Id', label: 'Salesforce record ID' },
+          { value: 'Code__c', label: 'Code' }
+        ]),
+        field('Session__c.Room__c', 'Session: Room')
+      ],
+      links: ['Each Session record is linked to the Program record on its row through Program.']
+    }
+  ];
+  const TARGETS = {
+    Program__c: { Name: 'Program__c.Name', Code: 'Program__c.Code__c' },
+    Session__c: { Name: 'Session__c.Name', Program: 'Session__c.Program__c' }
+  };
+
+  beforeEach(() => {
+    canImport.mockResolvedValue(true);
+    getTemplates.mockResolvedValue([]);
+    getEntityTargets.mockResolvedValue([]);
+    getMatchFields.mockResolvedValue({ fixedTargets: FIXED_TARGETS, contact: [], account: [] });
+    getLoadableObjects.mockResolvedValue([
+      { value: 'Program__c', label: 'Program' },
+      { value: 'Session__c', label: 'Session' },
+      { value: 'Venue__c', label: 'Venue' }
+    ]);
+    suggestObject.mockResolvedValue({
+      objectName: 'Session__c',
+      objectLabel: 'Session',
+      sheets: [
+        { sheetName: 'Sessions', objectName: 'Session__c', namedObjects: [] },
+        { sheetName: 'Programs', objectName: 'Program__c', namedObjects: [] }
+      ]
+    });
+    createSeveralObjectsTemplate.mockResolvedValue(SEVERAL_TEMPLATE);
+    getSeveralObjects.mockResolvedValue(OBJECTS);
+    suggestSheetMapping.mockImplementation(({ objectName, headers }) =>
+      Promise.resolve(
+        JSON.stringify({
+          columns: headers.map((source) => ({
+            source,
+            target: (TARGETS[objectName] || {})[source] || 'Ignore'
+          }))
+        })
+      )
+    );
+    saveFile.mockResolvedValue('069000000000001');
+    createBatch.mockResolvedValue(DRY_RUN_BATCH);
+    stageRows.mockResolvedValue(3);
+    startDryRun.mockResolvedValue(DRY_RUN_BATCH);
+    getBatch.mockResolvedValue(DRY_RUN_BATCH);
+    getRowPage.mockResolvedValue(EMPTY_PAGE);
+  });
+
+  afterEach(() => {
+    while (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild);
+    }
+    jest.clearAllMocks();
+  });
+
+  /** A workbook whose child sheet comes first, so the parents' sheet is moved ahead. */
+  function giveWorkbook() {
+    readSheetNames.mockResolvedValueOnce(['Sessions', 'Programs']);
+    readXlsx
+      .mockResolvedValueOnce([
+        ['Name', 'Program', 'Room'],
+        ['Intro', 'P-1', '101'],
+        ['Advanced', 'P-1', '102']
+      ])
+      .mockResolvedValueOnce([
+        ['Name', 'Code'],
+        ['Reading', 'P-1']
+      ]);
+  }
+
+  /** Chooses the card, reads the workbook, names the template and makes it. */
+  async function createFromWorkbook() {
+    giveWorkbook();
+    const element = render();
+    await flush();
+    await chooseKind(element, 'several');
+    expect(element.shadowRoot.querySelector('[data-id="new-object"]')).toBeNull();
+    const input = element.shadowRoot.querySelector('[data-id="detect-file"]');
+    Object.defineProperty(input, 'files', {
+      value: [new File(['zip bytes'], 'programs.xlsx')],
+      configurable: true
+    });
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    const name = element.shadowRoot.querySelector('[data-id="new-template-name"]');
+    name.value = 'Programs and sessions';
+    name.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    return element;
+  }
+
+  async function toColumnsStep() {
+    const element = await createFromWorkbook();
+    click(element, 'create-several-template');
+    await flush();
+    click(element, 'next');
+    await flush();
+    return element;
+  }
+
+  it('suggests every object the file points at, and makes the template of them', async () => {
+    const element = await createFromWorkbook();
+    const objects = element.shadowRoot.querySelector('[data-id="new-objects"]');
+    expect(objects.options.map((option) => option.value)).toEqual([
+      'Program__c',
+      'Session__c',
+      'Venue__c'
+    ]);
+    expect(objects.value).toEqual(['Session__c', 'Program__c']);
+    objects.dispatchEvent(
+      new CustomEvent('change', { detail: { value: ['Program__c', 'Session__c', 'Venue__c'] } })
+    );
+    await flush();
+    click(element, 'create-several-template');
+    await flush();
+    expect(createSeveralObjectsTemplate).toHaveBeenCalledWith({
+      name: 'Programs and sessions',
+      objectNames: ['Program__c', 'Session__c', 'Venue__c']
+    });
+    expect(element.shadowRoot.querySelector('[data-id="template-creates"]').textContent).toContain(
+      'Program, Session'
+    );
+  });
+
+  it('maps each sheet for its object, parents first, keeping the saved columns', async () => {
+    const element = await toColumnsStep();
+    const sheetObjects = element.shadowRoot.querySelectorAll('[data-id="sheet-object"]');
+    expect(Array.from(sheetObjects).map((each) => [each.dataset.sheet, each.value])).toEqual([
+      ['Sessions', 'Session__c'],
+      ['Programs', 'Program__c']
+    ]);
+    expect(suggestSheetMapping.mock.calls.map(([call]) => call.objectName)).toEqual([
+      'Program__c',
+      'Session__c'
+    ]);
+    const rows = Array.from(element.shadowRoot.querySelectorAll('[data-id="column-row"]'));
+    expect(rows.map((row) => row.querySelector('td').textContent)).toEqual([
+      'Name',
+      'Code',
+      'Name (Sessions)',
+      'Program',
+      'Room'
+    ]);
+    const targets = rows.map((row) => row.querySelector('lightning-combobox').value);
+    expect(targets).toEqual([
+      'Program__c.Name',
+      'Program__c.Code__c',
+      'Session__c.Name',
+      'Session__c.Program__c',
+      'Session__c.Room__c'
+    ]);
+    // A lookup on one object names its parent by a field, as for one object.
+    expect(element.shadowRoot.querySelectorAll('[data-id="lookup-field"]')).toHaveLength(1);
+    expect(element.shadowRoot.querySelector('[data-id="sheet-conflict"]')).toBeNull();
+  });
+
+  it('maps a sheet again for another object', async () => {
+    const element = await toColumnsStep();
+    suggestSheetMapping.mockClear();
+    const sessions = element.shadowRoot.querySelectorAll('[data-id="sheet-object"]')[0];
+    sessions.dispatchEvent(new CustomEvent('change', { detail: { value: 'Program__c' } }));
+    await flush();
+    expect(suggestSheetMapping.mock.calls.map(([call]) => call.objectName)).toEqual([
+      'Program__c',
+      'Program__c'
+    ]);
+  });
+
+  it('asks each object how it finds its records, then sends the objects with the mapping', async () => {
+    const element = await toColumnsStep();
+    click(element, 'next');
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="load-options"]')).toBeNull();
+    const options = element.shadowRoot.querySelectorAll('[data-id="several-load-options"]');
+    expect(options).toHaveLength(2);
+    expect(options[0].hideLookups).toBe(true);
+    expect(element.shadowRoot.querySelector('[data-id="several-link"]').textContent).toContain(
+      'linked to the Program record'
+    );
+    options[1].dispatchEvent(
+      new CustomEvent('change', {
+        detail: { operation: 'Upsert by external ID', matchField: 'Name' }
+      })
+    );
+    element.shadowRoot
+      .querySelector('[data-id="several-not-found"]')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: 'Leave it empty' } }));
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+
+    const call = createBatch.mock.calls[0][0];
+    expect(JSON.parse(call.mappingDocument).objects).toEqual([
+      { entity: 'Program__c', operation: 'Insert' },
+      { entity: 'Session__c', operation: 'Upsert by external ID', keyField: 'Name' }
+    ]);
+    const load = JSON.parse(call.optionsJson).load;
+    expect(load.operation).toBe('Insert');
+    expect(load.lookupNotFound).toBe('Leave it empty');
+    expect(load.related).toBeUndefined();
+    // The parents' rows stage first.
+    expect(JSON.parse(stageRows.mock.calls[0][0].rowsJson)[0]).toEqual({
+      Name: 'Reading',
+      Code: 'P-1',
+      'Name (Sessions)': '',
+      Program: '',
+      Room: ''
+    });
+  });
+
+  it('cannot dry run while an object that finds its records has no key column', async () => {
+    const element = await toColumnsStep();
+    click(element, 'next');
+    await flush();
+    element.shadowRoot
+      .querySelectorAll('[data-id="several-load-options"]')[0]
+      .dispatchEvent(
+        new CustomEvent('change', { detail: { operation: 'Update by record Id', matchField: '' } })
+      );
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="dry-run"]').disabled).toBe(true);
   });
 });

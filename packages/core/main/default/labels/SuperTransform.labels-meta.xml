@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_SuperTransform_Title</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Page heading</shortDescription>
+        <value>Super Transform</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_Intro</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Line under the heading</shortDescription>
+        <value>Change many records at once, without a file, and undo it if needed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_StepObject</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Card heading, step 1</shortDescription>
+        <value>1. Object</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_StepRecords</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Card heading, step 2</shortDescription>
+        <value>2. Which Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_StepChanges</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Card heading, step 3</shortDescription>
+        <value>3. What to Change</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_StepPreview</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Card heading, step 4</shortDescription>
+        <value>4. Preview</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_StepRun</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Card heading, step 5</shortDescription>
+        <value>5. Run</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SearchObjects</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Search box label over the object list</shortDescription>
+        <value>Search Objects</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_Object</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Object picker label</shortDescription>
+        <value>Object</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_ChooseObject</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Object picker placeholder</shortDescription>
+        <value>Choose an object</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_NoObjects</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Empty state: no object the person may change</shortDescription>
+        <value>There is no object you may change. Ask your administrator for edit access to the records you need to change.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_ObjectFirst</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Empty state of steps 2 and 3 before an object is chosen</shortDescription>
+        <value>Choose an object first.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_Counting</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Live count while it is being worked out</shortDescription>
+        <value>Counting the matching records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_MatchCount</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Live count; {0} count, {1} plural object label</shortDescription>
+        <value>{0} {1} match.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_NoneMatch</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Live count of zero; {0} plural object label</shortDescription>
+        <value>No {0} match these conditions.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_NoFilter</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Warning: no condition set; {0} object label, {1} count</shortDescription>
+        <value>No condition is set. This changes every {0}: {1} records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_OverLimit</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Warning: over the run limit; {0} count, {1} run limit</shortDescription>
+        <value>{0} records match, more than the {1} one run may change. Narrow the conditions, or run it in parts.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_TooManyToCount</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Warning: too many records to count; {0} run limit</shortDescription>
+        <value>More records match than the {0} one run may change. Narrow the conditions.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_FixConditions</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Live count while a condition is unfinished</shortDescription>
+        <value>Finish the conditions above to count the records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_Field</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Field picker label in a change row</shortDescription>
+        <value>Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_ChooseField</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Field picker placeholder</shortDescription>
+        <value>Choose a field</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_Action</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Action picker label in a change row</shortDescription>
+        <value>Action</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_ActionSet</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Action option: set a value</shortDescription>
+        <value>Set To</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_ActionClear</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Action option: empty the field</shortDescription>
+        <value>Clear</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_ActionCopy</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Action option: copy another field</shortDescription>
+        <value>Copy From Another Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_ActionTransform</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Action option: transform steps</shortDescription>
+        <value>Change With Steps</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_NewValue</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Value input label in a change row</shortDescription>
+        <value>New Value</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_CopyFrom</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Source field picker label</shortDescription>
+        <value>Copy From</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_AddField</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Button: add a change row</shortDescription>
+        <value>Add a Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_FieldLimit</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Line by Add a Field; {0} most changes</shortDescription>
+        <value>Up to {0} fields in one run.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_Preview</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Button: work out the preview</shortDescription>
+        <value>Preview</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_PreviewHint</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Empty state of step 4</shortDescription>
+        <value>Press Preview to see the first 25 records before and after. Nothing changes yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_PreviewCount</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Line over the preview table; {0} count, {1} records shown</shortDescription>
+        <value>{0} records match. The first {1}, before and after:</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_AlreadyHeld</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Under the preview; {0} unchanged, {1} records shown</shortDescription>
+        <value>{0} of the {1} records shown already have these values and will not be saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_ChangesTo</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Screen reader text of the arrow between old and new values</shortDescription>
+        <value>changes to</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_NoChange</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Screen reader text of a cell that keeps its value</shortDescription>
+        <value>no change</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_Blank</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Shown for an empty value in the preview</shortDescription>
+        <value>(blank)</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_Run</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Button and confirmation heading: start the run</shortDescription>
+        <value>Run Super Transform</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_RunHint</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Empty state of step 5</shortDescription>
+        <value>Preview first, then run. You confirm before anything changes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_ConfirmMessage</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Confirmation; {0} fields, {1} count, {2} plural object</shortDescription>
+        <value>Change {0} on {1} {2}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_ConfirmDetail</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Confirmation detail line</shortDescription>
+        <value>It runs in the background with your own access. You can undo it from Data Jobs for as long as an import can be undone.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_ConfirmButton</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Confirmation button: start</shortDescription>
+        <value>Run</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_Cancel</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Confirmation button: do nothing</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_TypeToConfirm</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Typed confirmation field label; {0} count</shortDescription>
+        <value>Type {0} to confirm</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_UndoHint</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Line after a finished run</shortDescription>
+        <value>To undo this run, press Undo on it under Data Jobs below. Reload the page if it is not listed yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_StartAnother</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: Button after a run: keep the object and start again</shortDescription>
+        <value>Start Another</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_Help</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: About This Tool text</shortDescription>
+        <value
+    >Work down the five steps: choose the object, add conditions for the records to change (the count updates as you type), choose up to five fields and what each becomes, preview the first 25 records before and after, then run. It runs as a bulk update with your own access, so your validation rules and automation apply, and every run is listed under Data Jobs below with its Undo.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_NoPermissionHeading</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: empty state heading without the permissions</shortDescription>
+        <value>Super Transform Is Not Turned On for You</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_NoObjectsHeading</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: empty state heading, no object to change</shortDescription>
+        <value>No Objects to Change</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_Matching</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: label under the live match count</shortDescription>
+        <value>Matching Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_BadgeEvery</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: count badge when no condition is set</shortDescription>
+        <value>Every Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_BadgeOver</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: count badge when over the run limit</shortDescription>
+        <value>Over the Limit</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_ActionNameCase</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: action option, shipped steps for name capitals</shortDescription>
+        <value>Fix Name Capitals</value>
+    </labels>
+</CustomLabels>

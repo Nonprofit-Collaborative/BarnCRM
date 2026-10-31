@@ -1,0 +1,115 @@
+<template>
+    <lightning-card title={labels.TITLE} icon-name="standard:data_streams">
+        <lightning-button
+            slot="actions"
+            label={labels.REFRESH}
+            onclick={handleRefresh}
+            disabled={busy}
+            data-id="refresh"
+        ></lightning-button>
+        <div class="slds-var-p-horizontal_medium">
+            <template lwc:if={loading}>
+                <lightning-spinner alternative-text={labels.LOADING} size="small"></lightning-spinner>
+            </template>
+            <template lwc:if={errorMessage}>
+                <div class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">
+                    {errorMessage}
+                </div>
+            </template>
+            <template lwc:if={message}>
+                <div class="slds-text-color_success slds-var-m-bottom_small" role="status" data-id="message">
+                    {message}
+                </div>
+            </template>
+            <template lwc:if={hasRow}>
+                <dl class="slds-list_horizontal slds-wrap slds-var-m-bottom_small">
+                    <dt class="slds-item_label slds-text-color_weak">{labels.STATUS_LABEL}</dt>
+                    <dd class="slds-item_detail" data-id="status">{row.status}</dd>
+                    <dt class="slds-item_label slds-text-color_weak">{labels.IMPORT_LABEL}</dt>
+                    <dd class="slds-item_detail">
+                        <a href={importUrl} data-id="import-link">{row.batchName}</a>
+                    </dd>
+                </dl>
+                <template lwc:if={isRejected}>
+                    <h3 class="slds-text-heading_small">{labels.REASON_HEADING}</h3>
+                    <p class="slds-var-m-bottom_small" data-id="reason">{row.errorMessage}</p>
+                    <template lwc:if={refusal}>
+                        <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="refusal">{refusal}</p>
+                    </template>
+                    <template lwc:if={canCorrect}>
+                        <p class="slds-text-body_small slds-var-m-bottom_small">{labels.HELP}</p>
+                    </template>
+                </template>
+                <template lwc:if={hasColumns}>
+                    <table
+                        class="slds-table slds-table_bordered slds-table_cell-buffer"
+                        aria-label={labels.TITLE}
+                        data-id="values"
+                    >
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th scope="col">{labels.COLUMN_HEADER}</th>
+                                <th scope="col">{labels.FILE_VALUE_HEADER}</th>
+                                <th scope="col">{labels.CORRECTED_HEADER}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={columns} for:item="column">
+                                <tr key={column.column} class={column.rowClass} data-id="column">
+                                    <th scope="row" class="slds-cell-wrap">{column.column}</th>
+                                    <td class="slds-cell-wrap" data-id="file-value">{column.fileValue}</td>
+                                    <td class="slds-cell-wrap">
+                                        <template lwc:if={canCorrect}>
+                                            <lightning-input
+                                                label={column.column}
+                                                variant="label-hidden"
+                                                value={column.value}
+                                                data-column={column.column}
+                                                onchange={handleInput}
+                                                disabled={busy}
+                                            ></lightning-input>
+                                        </template>
+                                        <template lwc:else>
+                                            <span data-id="corrected-value">{column.correctedValue}</span>
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-color_weak" data-id="no-values">{labels.NO_VALUES}</p>
+                </template>
+                <template lwc:if={canCorrect}>
+                    <template lwc:if={fixedCountText}>
+                        <p class="slds-text-body_small slds-var-m-top_small" data-id="fixed-count">{fixedCountText}</p>
+                    </template>
+                    <div class="slds-var-m-top_small slds-var-m-bottom_small">
+                        <lightning-button
+                            label={labels.SAVE}
+                            onclick={handleSave}
+                            disabled={controlsDisabled}
+                            data-id="save"
+                        ></lightning-button>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            variant="brand"
+                            label={labels.RETRY_ROW}
+                            onclick={handleRetryRow}
+                            disabled={controlsDisabled}
+                            data-id="retry-row"
+                        ></lightning-button>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            label={labels.RETRY_ALL}
+                            onclick={handleRetryAll}
+                            disabled={retryAllDisabled}
+                            data-id="retry-all"
+                        ></lightning-button>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

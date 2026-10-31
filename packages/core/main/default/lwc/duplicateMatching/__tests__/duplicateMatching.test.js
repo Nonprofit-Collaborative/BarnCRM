@@ -19,6 +19,13 @@ jest.mock(
   { virtual: true }
 );
 jest.mock(
+  '@salesforce/apex/AutoMergeController.getView',
+  () => ({
+    default: jest.fn(() => Promise.resolve({ canRun: true, running: false, runs: [] }))
+  }),
+  { virtual: true }
+);
+jest.mock(
   '@salesforce/label/c.Core_DuplicateMatching_ReviewCount',
   () => ({ default: 'Review ({0})' }),
   {
@@ -52,13 +59,14 @@ describe('c-duplicate-matching for an administrator', () => {
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
   });
 
-  it('opens on the review list, and offers Matching Logic', async () => {
+  it('opens on the review list, and offers Matching Logic and Auto-Merge', async () => {
     const element = await render();
 
     const tabs = Array.from(element.shadowRoot.querySelectorAll('lightning-tab')).map(
       (tab) => tab.value
     );
-    expect(tabs).toEqual(['review', 'matchingLogic']);
+    expect(tabs).toEqual(['review', 'matchingLogic', 'autoMerge']);
+    expect(element.shadowRoot.querySelector('c-auto-merge-panel')).toBeNull();
     expect(element.shadowRoot.querySelector('lightning-tabset').activeTabValue).toBe('review');
     expect(element.shadowRoot.querySelector('c-duplicate-review')).not.toBeNull();
     expect(element.shadowRoot.querySelector('c-match-source-manager')).toBeNull();
@@ -97,5 +105,16 @@ describe('c-duplicate-matching for an administrator', () => {
 
     expect(element.shadowRoot.querySelector('c-match-source-manager')).not.toBeNull();
     expect(element.shadowRoot.querySelector('c-duplicate-review')).not.toBeNull();
+  });
+
+  it('creates Auto-Merge when it is first opened', async () => {
+    const element = await render();
+
+    const autoMerge = element.shadowRoot.querySelector('lightning-tab[data-id="tab-autoMerge"]');
+    expect(autoMerge.label).toBe('c.Core_AutoMerge_Tab');
+    autoMerge.dispatchEvent(new CustomEvent('active'));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('c-auto-merge-panel')).not.toBeNull();
   });
 });

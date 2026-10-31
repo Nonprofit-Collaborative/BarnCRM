@@ -131,13 +131,59 @@
                         </template>
                     </template>
                     <template lwc:if={choosingObject}>
-                        <lightning-combobox
-                            data-id="new-object"
-                            label={labels.loadObjectLabel}
-                            value={newObjectName}
-                            options={objectOptions}
-                            onchange={handleNewObjectChange}
-                        ></lightning-combobox>
+                        <lightning-input
+                            type="file"
+                            data-id="detect-file"
+                            label={labels.detectFileLabel}
+                            accept=".csv,text/csv,.tsv,.txt,text/tab-separated-values,text/plain,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            onchange={handleDetectFile}
+                        ></lightning-input>
+                        <template lwc:if={hasDetection}>
+                            <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="detection">
+                                {detectionText}
+                                <template lwc:if={detectionGuessed}>
+                                    <span
+                                        class="slds-badge slds-theme_warning slds-var-m-left_x-small"
+                                        title={labels.guessBadgeHelp}
+                                        data-id="detection-guess"
+                                    >
+                                        {labels.guessBadge}
+                                        <span class="slds-assistive-text">{labels.guessBadgeHelp}</span>
+                                    </span>
+                                </template>
+                            </p>
+                            <template lwc:if={hasDetectionSheets}>
+                                <p class="slds-text-body_small" data-id="detection-sheets-help">
+                                    {labels.detectSheetsDiffer}
+                                </p>
+                                <ul class="slds-list_dotted slds-text-body_small" data-id="detection-sheets">
+                                    <template for:each={detectionSheets} for:item="line">
+                                        <li key={line.key}>{line.text}</li>
+                                    </template>
+                                </ul>
+                            </template>
+                        </template>
+                        <template lwc:if={choosingOneObject}>
+                            <lightning-combobox
+                                data-id="new-object"
+                                label={labels.loadObjectLabel}
+                                value={newObjectName}
+                                options={objectOptions}
+                                onchange={handleNewObjectChange}
+                            ></lightning-combobox>
+                        </template>
+                        <template lwc:if={choosingSeveral}>
+                            <lightning-dual-listbox
+                                data-id="new-objects"
+                                label={labels.severalObjectsLabel}
+                                source-label={labels.severalObjectsAvailable}
+                                selected-label={labels.severalObjectsLabel}
+                                field-level-help={labels.severalObjectsHelp}
+                                options={objectOptions}
+                                value={newObjectNames}
+                                onchange={handleNewObjectsChange}
+                            ></lightning-dual-listbox>
+                        </template>
                         <lightning-input
                             data-id="new-template-name"
                             label={labels.loadObjectNameLabel}
@@ -145,13 +191,24 @@
                             max-length="80"
                             onchange={handleNewTemplateNameChange}
                         ></lightning-input>
-                        <lightning-button
-                            class="slds-var-m-top_x-small"
-                            label={labels.loadObjectCreateButton}
-                            data-id="create-object-template"
-                            disabled={cannotCreateObjectTemplate}
-                            onclick={handleCreateObjectTemplate}
-                        ></lightning-button>
+                        <template lwc:if={choosingSeveral}>
+                            <lightning-button
+                                class="slds-var-m-top_x-small"
+                                label={labels.loadObjectCreateButton}
+                                data-id="create-several-template"
+                                disabled={cannotCreateSeveralTemplate}
+                                onclick={handleCreateSeveralTemplate}
+                            ></lightning-button>
+                        </template>
+                        <template lwc:else>
+                            <lightning-button
+                                class="slds-var-m-top_x-small"
+                                label={labels.loadObjectCreateButton}
+                                data-id="create-object-template"
+                                disabled={cannotCreateObjectTemplate}
+                                onclick={handleCreateObjectTemplate}
+                            ></lightning-button>
+                        </template>
                     </template>
                 </template>
 
@@ -185,16 +242,57 @@
                         ></lightning-combobox>
                     </template>
                     <template lwc:if={hasSeveralSheets}>
-                        <lightning-combobox
-                            data-id="sheet"
+                        <lightning-checkbox-group
+                            data-id="sheets"
                             class="slds-var-m-bottom_small"
                             label={labels.sheetLabel}
-                            field-level-help={labels.sheetHelp}
                             options={sheetOptions}
-                            value={sheetName}
+                            value={chosenSheets}
                             disabled={parsing}
                             onchange={handleSheetChange}
-                        ></lightning-combobox>
+                        ></lightning-checkbox-group>
+                        <p class="slds-text-body_small slds-var-m-bottom_small">{labels.sheetHelp}</p>
+                    </template>
+                    <template lwc:if={hasSheetObjectRows}>
+                        <div class="slds-var-m-bottom_small" data-id="sheet-objects">
+                            <template for:each={sheetObjectRows} for:item="sheetRow">
+                                <lightning-combobox
+                                    key={sheetRow.key}
+                                    data-id="sheet-object"
+                                    data-sheet={sheetRow.sheetName}
+                                    label={sheetRow.label}
+                                    value={sheetRow.value}
+                                    options={sheetRow.options}
+                                    disabled={parsing}
+                                    onchange={handleSheetObjectChange}
+                                ></lightning-combobox>
+                            </template>
+                            <p class="slds-text-body_small slds-var-m-top_x-small">{labels.sheetObjectHelp}</p>
+                        </div>
+                    </template>
+                    <template lwc:if={hasSheetConflict}>
+                        <div class="slds-var-m-bottom_small" role="alert" data-id="sheet-conflict">
+                            <p class="slds-text-color_error">{labels.sheetConflict}</p>
+                            <ul class="slds-list_dotted">
+                                <template for:each={sheetConflictLines} for:item="line">
+                                    <li key={line.key}>{line.text}</li>
+                                </template>
+                            </ul>
+                        </div>
+                    </template>
+                    <template lwc:if={hasGuesses}>
+                        <div
+                            class="slds-var-m-bottom_small slds-grid slds-grid_vertical-align-center slds-wrap"
+                            role="status"
+                            data-id="guess-pending"
+                        >
+                            <p class="slds-var-m-right_small">{guessPendingText}</p>
+                            <lightning-button
+                                label={labels.guessAcceptAll}
+                                data-id="accept-all-guesses"
+                                onclick={handleAcceptAllGuesses}
+                            ></lightning-button>
+                        </div>
                     </template>
                     <div class="slds-scrollable_x">
                         <table
@@ -222,6 +320,25 @@
                                                 options={targetOptions}
                                                 onchange={handleTargetChange}
                                             ></lightning-combobox>
+                                            <template lwc:if={column.guessed}>
+                                                <div class="slds-var-m-top_xx-small" data-id="guess">
+                                                    <span
+                                                        class="slds-badge slds-theme_warning slds-var-m-right_x-small"
+                                                        title={labels.guessBadgeHelp}
+                                                    >
+                                                        {labels.guessBadge}
+                                                        <span class="slds-assistive-text">{labels.guessBadgeHelp}</span>
+                                                    </span>
+                                                    <lightning-button
+                                                        variant="base"
+                                                        label={labels.guessAccept}
+                                                        aria-label={column.acceptGuessLabel}
+                                                        data-id="accept-guess"
+                                                        data-source={column.source}
+                                                        onclick={handleAcceptGuess}
+                                                    ></lightning-button>
+                                                </div>
+                                            </template>
                                             <template lwc:if={column.isLookup}>
                                                 <lightning-combobox
                                                     class="slds-var-m-top_xx-small"
@@ -251,7 +368,11 @@
                                                 ></lightning-input>
                                             </template>
                                         </td>
-                                        <td class="slds-text-body_small">{column.samples}</td>
+                                        <td class="slds-text-body_small" data-id="examples">
+                                            <template for:each={column.examples} for:item="example">
+                                                <div key={example.key} class="slds-truncate">{example.text}</div>
+                                            </template>
+                                        </td>
                                     </tr>
                                 </template>
                             </tbody>
@@ -278,7 +399,42 @@
                 </template>
 
                 <template lwc:if={isStepMatching}>
-                    <template lwc:if={loadsOneObject}>
+                    <template lwc:if={loadsSeveral}>
+                        <p class="slds-text-body_small slds-var-m-bottom_small" data-id="several-matching-help">
+                            {labels.severalMatchingHelp}
+                        </p>
+                        <template for:each={severalObjectRows} for:item="objectRow">
+                            <div key={objectRow.key} class="slds-box slds-var-m-bottom_small" data-id="several-object">
+                                <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{objectRow.objectLabel}</h3>
+                                <c-import-load-options
+                                    data-id="several-load-options"
+                                    data-object={objectRow.objectName}
+                                    operation={objectRow.operation}
+                                    operations={objectRow.operations}
+                                    match-field={objectRow.matchField}
+                                    key-fields={objectRow.keyFields}
+                                    row-match-fields={objectRow.matchFields}
+                                    hide-lookups
+                                    onchange={handleSeveralLoadChange}
+                                ></c-import-load-options>
+                                <template for:each={objectRow.links} for:item="link">
+                                    <p key={link.key} class="slds-text-body_small slds-var-m-top_x-small" data-id="several-link">
+                                        {link.text}
+                                    </p>
+                                </template>
+                            </div>
+                        </template>
+                        <lightning-radio-group
+                            data-id="several-not-found"
+                            name="several-lookup-not-found"
+                            label={labels.notFoundLabel}
+                            value={lookupNotFound}
+                            options={notFoundOptions}
+                            onchange={handleNotFoundChange}
+                        ></lightning-radio-group>
+                        <p class="slds-text-body_small slds-var-m-top_x-small">{notFoundHelp}</p>
+                    </template>
+                    <template lwc:if={loadsSingleObject}>
                         <c-import-load-options
                             data-id="load-options"
                             operation={loadOperation}
@@ -597,7 +753,7 @@
                             variant="brand"
                             label={labels.nextButton}
                             data-id="next"
-                            disabled={hasNoColumns}
+                            disabled={cannotLeaveColumns}
                             onclick={handleNext}
                         ></lightning-button>
                     </template>

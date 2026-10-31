@@ -133,6 +133,8 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     private Datetime completedAt;
     private Datetime startedAt;
     private Id committedBy;
+    /** The committer and anyone who retried corrected rows (R-IB17a): the import's own users. */
+    private Set<Id> committers = new Set<Id>();
     /** The job's operation: an import, or a bulk update, whose undo is the restore pass only. */
     private String operation;
     /**
@@ -263,6 +265,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                 Completed_At__c,
                 Started_At__c,
                 Committed_By__c,
+                Retried_By__c,
                 Status__c,
                 Job_Id__c,
                 Operation__c
@@ -282,6 +285,12 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
         }
         startedAt = batch.Started_At__c;
         committedBy = batch.Committed_By__c;
+        // Read with the batch: a query more in every pass's start would take from the budget
+        // the judging passes keep records by when they cannot afford to ask.
+        committers = ImportBatchService.retriersIn(batch.Retried_By__c);
+        if (committedBy != null) {
+            committers.add(committedBy);
+        }
         operation = batch.Operation__c;
         // Every query below is in system mode, so a tagged record the person cannot see is
         // still met, refused by the user-mode delete, and journaled as kept (R-IB9), instead
@@ -875,12 +884,15 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
         }
     }
 
-    /** Whether the committer created this record between the commit's start and its end. */
+    /**
+     * Whether the committer, or someone who retried corrected rows (R-IB17a), created this
+     * record between the commit's start and its end.
+     */
     private Boolean createdByTheCommit(SObject record) {
         Datetime created = (Datetime) record.get('CreatedDate');
         return committedBy != null &&
             startedAt != null &&
-            record.get('CreatedById') == committedBy &&
+            committers.contains((Id) record.get('CreatedById')) &&
             created >= toTheSecond(startedAt) &&
             (completedAt == null ||
             created <= completedAt);
@@ -1057,7 +1069,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                     ((startedAt != null &&
                     committedBy != null &&
                     modified >= startedAt &&
-                    modifiedBy != committedBy) ||
+                    !committers.contains(modifiedBy)) ||
                     (completedAt != null &&
                     modified > completedAt.addMinutes(SETTLE_MINUTES)));
             }
@@ -1115,7 +1127,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             'ids' => ids,
             'completedAt' => completedAt,
             'startedAt' => startedAt,
-            'committedBy' => committedBy,
+            'committers' => committers,
             'undoer' => UserInfo.getUserId(),
             'undoStartedAt' => undoStartedAt,
             'checkedAt' => Datetime.now(),
@@ -1187,7 +1199,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     ) {
         String since = completedAt == null ? 'CreatedDate != NULL' : 'CreatedDate > :completedAt';
         if (startedAt != null && committedBy != null) {
-            since += ' OR (CreatedDate >= :startedAt AND CreatedById != :committedBy)';
+            since += ' OR (CreatedDate >= :startedAt AND CreatedById NOT IN :committers)';
         }
         String filter =
             '(' +

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Super Transform: change many records at once without a file, in five numbered steps
+    (object, which records, what to change, preview, run), on the bulk update engine.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Super Transform</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>
