@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Moved_Records__c</fullName>
+  <description>JSON: each object and link field, with the identifiers of the related records the merge moved from the merged-away person to the kept one.</description>
+  <externalId>false</externalId>
+  <label>Moved Records</label>
+  <length>131072</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>5</visibleLines>
+</CustomField>
