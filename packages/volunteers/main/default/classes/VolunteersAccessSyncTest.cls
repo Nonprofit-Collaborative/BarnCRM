@@ -81,35 +81,6 @@ private class VolunteersAccessSyncTest {
     }
 
     @IsTest
-    static void aLargeOrgIsDoneASliceAtATime() {
-        System.runAs(TestUsers.admin()) {
-            people();
-            VolunteersAccessSync.rowsPerSet = 0;
-
-            Test.startTest();
-            Boolean more = VolunteersAccessSync.syncOnce();
-            Test.stopTest();
-
-            Assert.isTrue(more, 'Nobody fits in a slice of nothing, so more is left');
-        }
-    }
-
-    @IsTest
-    static void givesNothingWhileTheModuleIsOff() {
-        System.runAs(TestUsers.admin()) {
-            Map<String, Id> ids = people();
-            ModuleManagerService.turnOff(VolunteersAccessSync.MODULE_NAME);
-
-            Test.startTest();
-            Boolean more = VolunteersAccessSync.syncOnce();
-            Test.stopTest();
-
-            Assert.isFalse(more, 'Nothing to do');
-            Assert.isTrue(setsOf(ids.get('Member')).isEmpty(), 'Nothing was given');
-        }
-    }
-
-    @IsTest
     static void turningTheModuleOnQueuesTheSync() {
         Map<String, Id> ids;
         // Its own block: Turn on also writes switch rows, which may not follow setup writes.

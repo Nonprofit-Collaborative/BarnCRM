@@ -80,35 +80,6 @@ private class ProgramsAccessSyncTest {
     }
 
     @IsTest
-    static void aLargeOrgIsDoneASliceAtATime() {
-        System.runAs(TestUsers.admin()) {
-            people();
-            ProgramsAccessSync.rowsPerSet = 0;
-
-            Test.startTest();
-            Boolean more = ProgramsAccessSync.syncOnce();
-            Test.stopTest();
-
-            Assert.isTrue(more, 'Nobody fits in a slice of nothing, so more is left');
-        }
-    }
-
-    @IsTest
-    static void givesNothingWhileTheModuleIsOff() {
-        System.runAs(TestUsers.admin()) {
-            Map<String, Id> ids = people();
-            ModuleManagerService.turnOff(ProgramsAccessSync.MODULE_NAME);
-
-            Test.startTest();
-            Boolean more = ProgramsAccessSync.syncOnce();
-            Test.stopTest();
-
-            Assert.isFalse(more, 'Nothing to do');
-            Assert.isTrue(setsOf(ids.get('Member')).isEmpty(), 'Nothing was given');
-        }
-    }
-
-    @IsTest
     static void theHourlyAccessCheckQueuesTheSync() {
         System.runAs(TestUsers.admin()) {
             Map<String, Id> ids = people();

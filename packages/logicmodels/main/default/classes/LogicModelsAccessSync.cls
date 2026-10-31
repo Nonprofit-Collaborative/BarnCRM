@@ -12,12 +12,11 @@
  * keeps this name. It does nothing while the module is turned off.
  */
 @NamespaceAccessible
-public with sharing class LogicModelsAccessSync implements ModuleAccessSync {
+public with sharing class LogicModelsAccessSync extends ModuleAccessSyncBase {
     /** The module key in the Module Manager. */
     public static final String MODULE_NAME = 'LogicModels';
     /** The set the installer and BarnCRM Admin holders get. */
     public static final String ADMIN_SET = 'Logic_Models_Admin';
-    private static final String CONTEXT = 'LogicModelsAccessSync';
 
     /** The Admin set, and the Core permission set whose holders get it. */
     @TestVisible
@@ -33,68 +32,35 @@ public with sharing class LogicModelsAccessSync implements ModuleAccessSync {
     };
 
     /** Assignments one run gives per set: all three together stay inside the 10,000 DML rows. */
-    @TestVisible
-    private static Integer rowsPerSet = 3000;
+    private static final Integer ROWS_PER_SET = 3000;
 
     @NamespaceAccessible
     public LogicModelsAccessSync() {
         // Built by name from Core (ModuleAccessSyncs), so it needs a public constructor.
     }
 
-    /** Queues one sync. Never throws: a failure is logged, and the hourly check tries again. */
-    public void requestSync() {
-        try {
-            System.enqueueJob(new Job());
-        } catch (Exception e) {
-            ErrorLogger.log(e, CONTEXT);
-        }
-    }
-
-    /**
-     * One slice of each set now. Returns true when more is left. Nothing while the module is
-     * turned off.
-     */
+    /** One slice of each set now. Returns true when more is left. */
     public static Boolean syncOnce() {
-        if (ModuleManagerService.turnedOff().contains(MODULE_NAME.toLowerCase())) {
-            return false;
-        }
-        Boolean more = false;
-        for (String setName : BY_SET.keySet()) {
-            Boolean left = TabAccessService.giveToHolders(
-                setName,
-                BY_SET.get(setName),
-                rowsPerSet,
-                CONTEXT
-            );
-            more = more || left;
-        }
-        for (String setName : BY_ROLE.keySet()) {
-            Boolean left = TabAccessService.giveToGroupHolders(
-                setName,
-                BY_ROLE.get(setName),
-                rowsPerSet,
-                CONTEXT
-            );
-            more = more || left;
-        }
-        return more;
+        return new LogicModelsAccessSync().sync();
     }
 
-    /**
-     * The queued sync: a permission set assignment is a setup object write, so it never shares
-     * a transaction with the install's or Turn on's record writes (mixed DML). It queues itself
-     * again while more is left.
-     */
-    public with sharing class Job implements Queueable {
-        public void execute(QueueableContext jobContext) {
-            try {
-                // A test cannot chain one queued job from another.
-                if (syncOnce() && !Test.isRunningTest()) {
-                    System.enqueueJob(new Job());
-                }
-            } catch (Exception e) {
-                ErrorLogger.log(e, CONTEXT);
-            }
-        }
+    public override String moduleName() {
+        return MODULE_NAME;
+    }
+
+    public override String logContext() {
+        return 'LogicModelsAccessSync';
+    }
+
+    public override Map<String, List<String>> setsByPermissionSet() {
+        return BY_SET;
+    }
+
+    public override Map<String, List<String>> setsByRole() {
+        return BY_ROLE;
+    }
+
+    public override Integer sliceSize() {
+        return ROWS_PER_SET;
     }
 }
