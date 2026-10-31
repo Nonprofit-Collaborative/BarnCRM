@@ -6064,6 +6064,115 @@ installment: each counts toward it.
 
 ---
 
+## 25O. Donor Segments
+
+### Definition
+
+A donor segment is a named, reusable list of people or organizations chosen by their giving
+(feature G-28): lapsed donors, new donors, upgraders and the like, kept so they can be counted,
+listed and exported for an email tool again next month. A segment is a Saved Query (Section 29D)
+whose object is Contact (people) or Account (organizations). Giving adds no object for it: the
+query document (R-SQ1) is the segment's criteria, Find edits and shares it, and Giving adds
+starter templates, a count, a list and an export laid out for Mailchimp or Constant Contact.
+Nothing is sent: BarnCRM writes a file and the person imports it.
+
+### Attributes
+
+One attribute is added to Contact and Account, so an upgrader can be found by a filter (a
+query cannot compare two fields):
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Change From Last Year | currency, formula | no | Giving This Year minus Giving Last Year, a blank read as zero. Positive when the donor has already given more this year than all of last year. |
+
+### Rules
+
+**R-DS1 A segment is a saved query.** Every Saved Query of Contact or Account the person can
+read (their own and those shared with them, as Find lists them) is shown as a segment. A
+segment made from a template is saved as the person's own unshared Saved Query under the name
+they give, replacing the query of their own saved query of that name if there is one (as R-SQ6
+does) and keeping that one's sharing. Its criteria, columns and sharing are changed in Find; no
+other copy exists.
+
+**R-DS2 Starter templates are documented JSON.** The templates are one JSON document held in
+`DonorSegmentTemplates`, in this format:
+
+```
+{
+  "version": 1,
+  "templates": [
+    { "key": "lapsed", "objects": ["Contact", "Account"],
+      "fields": ["Name", "Last_Gift_Date__c", "Giving_Last_Year__c", "Total_Giving__c"],
+      "orderBy": { "field": "Giving_Last_Year__c", "direction": "DESC" },
+      "filter": { "version": 1, "logic": "1 AND (2 OR 3)", "conditions": [ ... ] } }
+  ]
+}
+```
+
+`objects` says which of people and organizations a template applies to, `fields`, `orderBy`
+and `filter` are the R-SQ1 and R-R2 parts, and names carry no namespace prefix: building a
+segment qualifies each custom name for the org. The built document adds `Email` after `Name`
+for people, a limit of 200 rows, and one more condition joined by AND to the template's logic:
+`Deceased__c` equals false for people, `Is_Organization__c` equals true for organizations
+(households are accounts too). A template's name and description are custom labels. The five
+templates:
+
+| Key | Name | Filter |
+|---|---|---|
+| `lapsed` | Lapsed Donors | Gave last year, nothing yet this year: `Giving_Last_Year__c` greater than 0 and `Giving_This_Year__c` equals 0 or is blank. |
+| `new` | New Donors | First gift in the last 365 days (`First_Gift_Date__c`). |
+| `upgraders` | Upgraders | Gave last year and has already given more this year: `Giving_Last_Year__c` greater than 0 and `Change_From_Last_Year__c` greater than 0. |
+| `levelMovers` | Level Movers | Donor level changed in the last 90 days (`Donor_Level_Changed_Date__c`) from an earlier level (`Previous_Donor_Level__c` is not blank). |
+| `majorProspects` | Major Gift Prospects | A largest gift of 1,000 or more or total giving of 5,000 or more (`Largest_Gift__c`, `Total_Giving__c`), and a gift in the last 730 days. |
+
+The amounts and days are starting points, changed in Find once saved.
+
+**R-DS3 Count.** `SELECT COUNT()` over the segment's filter as the person, through Find's
+compiler (R-SQ2), counting at most 10,000; more is shown as "more than 10,000".
+
+**R-DS4 List.** The segment's own columns, order and row count (at most 2,000), compiled and
+run as Find's results grid runs them.
+
+**R-DS5 Export.** Three layouts, each a CSV file built in the browser by Find's CSV writer
+(R-SQ3 cell rules, UTF-8 with a byte-order mark), read in pages of 2,000 in Id order and
+stopped at Export Row Limit (`Find_Export_Row_Limit__c`):
+
+- **Mailchimp** (people only): Email Address, First Name, Last Name, Tags (the segment's
+  name, so the import can tag the contacts).
+- **Constant Contact** (people only): Email address, First name, Last name, Street address
+  line 1, City, State/Province, Zip/Postal code, Country, from the mailing address.
+- **All Columns**: the segment's own columns with their labels, for people or organizations.
+
+The two email layouts read the segment's filter with three more conditions: `Email` is not
+blank, `HasOptedOutOfEmail` equals false and `Deceased__c` equals false, so nobody who opted out
+or has died is exported. A row whose email (compared without case or surrounding spaces)
+already appeared is left out, since both tools refuse a repeated address in one import, and the
+page says how many were. The header names follow each tool's own field names; both tools still
+ask the person to confirm the columns when they import.
+
+**R-DS6 Access.** Every action requires the `Find_And_Export_Records` custom permission
+(R-SQ5): a segment is a Find query and an export is the sensitive act. Every read runs in user
+mode, so a segment shows only the records, and the columns, the person can see. No settings
+key: there is nothing to configure beyond the saved queries themselves.
+
+### Salesforce implementation
+
+- **Fields on Contact and Account** (shipped by Giving, read only):
+
+| Attribute | API name | Type |
+|---|---|---|
+| Change From Last Year | `Change_From_Last_Year__c` | Currency formula |
+
+- **Apex:** `DonorSegmentTemplates` (the R-DS2 document and the build of a template into an
+  R-SQ1 document), `DonorSegmentService` (count, list and export pages over Find's
+  `QueryCompiler`), `DonorSegmentController` (the Donor Segments page).
+- **Page:** the Donor Segments tab in the Fundraising app (`donorSegments`), with the
+  browser-side layouts and duplicate check in the framework-free module `donorSegmentExport`.
+- **Permission:** the page's controller is granted by Giving Admin, Giving Staff and Giving
+  Read Only; the Find permission above is what opens it.
+
+---
+
 ## 26. Packaged default rollups
 
 ### Definition
@@ -9788,6 +9897,7 @@ mirrors the primary member).
 | 0.12 | 2026-10-31 | Programs P-01 (ADR-NEXT `NEXT-programs-module.md`). New in the Programs module: Program (`Program__c`, 29W), Service (`Service__c`, 29X) and Enrollment (`Enrollment__c`, 29Y), with rules R-PG1 to R-PG3, R-SV1 and R-EN1 to R-EN5 and the PMM mapping. Section 30 keeps attendance and service delivery (P-02); Outcome left it for Logic Models (L-02). Specified ahead of the build. |
 | 0.12 | 2026-10-31 | Programs P-01 follow-up. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Program__c` (29W), so the Programs sample load can be removed in one action; services and enrollments are found through their program. 29Y gains the person card, the Programs Health Check finding and the sample data paragraph. No object added. |
 | 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29Z), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |
+| v0.13 | 2026-10-31 | Donor segments (G-28, D-156). New Section 25O, rules R-DS1 to R-DS6: a segment is a Saved Query of Contact or Account (no new object), with five starter templates held as documented JSON, a count, a list and Mailchimp, Constant Contact and all-columns CSV exports; no sending, no settings key. Contact and Account gain the formula `Change_From_Last_Year__c` (Giving This Year minus Giving Last Year), so upgraders can be filtered. |
 
 ---
 ## 32. Entity ownership by package
@@ -9855,6 +9965,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Stewardship Plan | Giving | v0.4 | 25K |
 | Gift Batch | Giving | v0.5 | 25L |
 | Gift Batch Row | Giving | v0.5 | 25M |
+| Donor segments (Change From Last Year on Account and Contact) | Giving | v0.13 | 25O |
 | Gift Transaction mirror | Mirror | v0.6 | 30 |
 | Opportunity mirror (Opportunity ID on Gift) | Mirror | v0.6 | 29C |
 | Campaign sync (Campaign ID on Appeal) | Mirror | v0.6 | 29B |

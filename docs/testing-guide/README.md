@@ -57,7 +57,7 @@ page, even if that puts it out of reading order.
 | [Giving: soft credits, tributes and matching](giving-soft-credits-tributes-matching.md) | CRED | 10 | Soft credits, tributes, matching gifts |
 | [Giving: receipts and acknowledgments](giving-receipts-and-acknowledgments.md) | RCPT | 13 | Receipts, year-end statements, void and reissue, receipt lock, acknowledgments |
 | [Giving: refunds and write-offs](giving-refunds.md) | REF | 7 | Refunds and their effect on totals |
-| [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 7 | Giving totals, recalculation, dashboards and reports |
+| [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 8 | Giving totals, recalculation, dashboards and reports, donor segments |
 | [Mirror](mirror.md) | MIR | 13 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API |
 | [Volunteers](volunteers.md) | VOL | 13 | Jobs, shifts, sign-ups, hours and approval, skills |
 | [Programs](programs.md) | PRG | 10 | Programs, services, enrollments, the Program Roster panel, a person's Programs card, Programs access, Health Check, sample data, the Service Delivery Log and the delivery rules |

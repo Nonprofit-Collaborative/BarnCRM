@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Framework-free layouts for donor segment exports: Mailchimp and Constant Contact columns, one
+    row per email address, the segment name as a tag (G-28, canonical model R-DS5).
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

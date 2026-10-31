@@ -34,6 +34,7 @@ CONSOLE_CASE = re.compile(r"case '([A-Za-z0-9_]+)'")
 COMPONENT_NAME = re.compile(r"<componentName>([A-Za-z0-9_]+)</componentName>")
 QUICK_ACTION_LWC = re.compile(r"<lightningWebComponent>([A-Za-z0-9_]+)</lightningWebComponent>")
 MARKUP_TAG = re.compile(r"<c-([a-z0-9-]+)")
+JS_IMPORT = re.compile(r"from\s+'c/([A-Za-z0-9_]+)'")
 EXPOSED = "<isExposed>true</isExposed>"
 
 
@@ -59,6 +60,12 @@ def reachable_names():
     for path in glob.glob("packages/*/main/default/lwc/*/*.html"):
         with open(path, encoding="utf-8") as handle:
             names.update(camel(tag) for tag in MARKUP_TAG.findall(handle.read()))
+
+    # A JavaScript library (no markup) exposed so another package can import it, such as
+    # findCsv for Giving's donorSegments, is reached through the component that imports it.
+    for path in glob.glob("packages/*/main/default/lwc/*/*.js"):
+        with open(path, encoding="utf-8") as handle:
+            names.update(JS_IMPORT.findall(handle.read()))
 
     if os.path.isfile(CONSOLE):
         with open(CONSOLE, encoding="utf-8") as handle:
