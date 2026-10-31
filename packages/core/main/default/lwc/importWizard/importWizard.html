@@ -141,6 +141,16 @@
                         <template lwc:if={hasDetection}>
                             <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="detection">
                                 {detectionText}
+                                <template lwc:if={detectionGuessed}>
+                                    <span
+                                        class="slds-badge slds-theme_warning slds-var-m-left_x-small"
+                                        title={labels.guessBadgeHelp}
+                                        data-id="detection-guess"
+                                    >
+                                        {labels.guessBadge}
+                                        <span class="slds-assistive-text">{labels.guessBadgeHelp}</span>
+                                    </span>
+                                </template>
                             </p>
                             <template lwc:if={hasDetectionSheets}>
                                 <p class="slds-text-body_small" data-id="detection-sheets-help">
@@ -270,6 +280,20 @@
                             </ul>
                         </div>
                     </template>
+                    <template lwc:if={hasGuesses}>
+                        <div
+                            class="slds-var-m-bottom_small slds-grid slds-grid_vertical-align-center slds-wrap"
+                            role="status"
+                            data-id="guess-pending"
+                        >
+                            <p class="slds-var-m-right_small">{guessPendingText}</p>
+                            <lightning-button
+                                label={labels.guessAcceptAll}
+                                data-id="accept-all-guesses"
+                                onclick={handleAcceptAllGuesses}
+                            ></lightning-button>
+                        </div>
+                    </template>
                     <div class="slds-scrollable_x">
                         <table
                             class="slds-table slds-table_bordered slds-table_cell-buffer"
@@ -296,6 +320,25 @@
                                                 options={targetOptions}
                                                 onchange={handleTargetChange}
                                             ></lightning-combobox>
+                                            <template lwc:if={column.guessed}>
+                                                <div class="slds-var-m-top_xx-small" data-id="guess">
+                                                    <span
+                                                        class="slds-badge slds-theme_warning slds-var-m-right_x-small"
+                                                        title={labels.guessBadgeHelp}
+                                                    >
+                                                        {labels.guessBadge}
+                                                        <span class="slds-assistive-text">{labels.guessBadgeHelp}</span>
+                                                    </span>
+                                                    <lightning-button
+                                                        variant="base"
+                                                        label={labels.guessAccept}
+                                                        aria-label={column.acceptGuessLabel}
+                                                        data-id="accept-guess"
+                                                        data-source={column.source}
+                                                        onclick={handleAcceptGuess}
+                                                    ></lightning-button>
+                                                </div>
+                                            </template>
                                             <template lwc:if={column.isLookup}>
                                                 <lightning-combobox
                                                     class="slds-var-m-top_xx-small"
@@ -710,7 +753,7 @@
                             variant="brand"
                             label={labels.nextButton}
                             data-id="next"
-                            disabled={hasNoColumns}
+                            disabled={cannotLeaveColumns}
                             onclick={handleNext}
                         ></lightning-button>
                     </template>

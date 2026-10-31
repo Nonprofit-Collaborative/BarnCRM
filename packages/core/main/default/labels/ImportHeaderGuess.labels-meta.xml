@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_GuessBadge</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: badge on a column mapped by a best guess (C-49e)</shortDescription>
+        <value>Best Guess, Check It</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_GuessBadgeHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what a best-guess badge means, for screen readers</shortDescription>
+        <value>BarnCRM guessed this field from a similar name. Accept it or choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_GuessAccept</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: button that accepts one column's best guess</shortDescription>
+        <value>Accept</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_GuessAcceptColumn</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: accept button's full name; {0} is the column</shortDescription>
+        <value>Accept the best guess for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_GuessAcceptAll</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: button that accepts every best guess at once</shortDescription>
+        <value>Accept All Guesses</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_GuessPending</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: why Next waits; {0} is the number of guesses</shortDescription>
+        <value>Columns with a best guess: {0}. Accept each guess, or choose another field, before you go on.</value>
+    </labels>
+</CustomLabels>

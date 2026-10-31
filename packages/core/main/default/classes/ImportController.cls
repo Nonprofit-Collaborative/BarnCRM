@@ -455,6 +455,9 @@ public with sharing class ImportController {
         public String objectName;
         @AuraEnabled
         public String objectLabel;
+        /** True when the object is a best guess from a near spelling of a name (C-49e). */
+        @AuraEnabled
+        public Boolean objectGuessed = false;
         /** Each sheet and the object it points at; objectName is null where it names none. */
         @AuraEnabled
         public List<SheetObjectView> sheets = new List<SheetObjectView>();
@@ -467,6 +470,9 @@ public with sharing class ImportController {
         public String objectName;
         @AuraEnabled
         public String objectLabel;
+        /** True when the sheet's object is a best guess (C-49e). */
+        @AuraEnabled
+        public Boolean objectGuessed = false;
         /** Every object the sheet's two-part headings name, API names (R-IT20). */
         @AuraEnabled
         public List<String> namedObjects = new List<String>();
@@ -479,7 +485,8 @@ public with sharing class ImportController {
 
     /**
      * Suggests the object a file loads (C-49a), from its two-part headings, its sheet names,
-     * then its file name, exact matches only.
+     * then its file name; exact matches first, then a best guess from a near spelling of a
+     * sheet or file name, flagged (C-49e).
      *
      * @param fileName the file's name
      * @param sheetsJson a JSON list of `{name, headers}`, one per sheet (one for a text file)
@@ -505,11 +512,13 @@ public with sharing class ImportController {
             ObjectSuggestionView view = new ObjectSuggestionView();
             view.objectName = found.suggested;
             view.objectLabel = found.labels.get(found.suggested);
+            view.objectGuessed = found.suggested != null && found.suggestedGuessed;
             for (Integer i = 0; i < names.size(); i++) {
                 SheetObjectView sheet = new SheetObjectView();
                 sheet.sheetName = names[i];
                 sheet.objectName = found.bySheet[i];
                 sheet.objectLabel = found.labels.get(found.bySheet[i]);
+                sheet.objectGuessed = found.bySheet[i] != null && found.guessedBySheet[i];
                 sheet.namedObjects = found.namedBySheet[i];
                 view.sheets.add(sheet);
             }

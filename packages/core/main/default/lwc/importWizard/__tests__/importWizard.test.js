@@ -1813,6 +1813,88 @@ describe('the import wizard', () => {
       expect(element.shadowRoot.querySelector('[data-id="remaining"]')).toBeNull();
     });
   });
+
+  describe('best guesses (C-49e)', () => {
+    const GUESSED = JSON.stringify({
+      version: 1,
+      columns: [
+        { source: 'Last Name', target: 'Contact1.LastName' },
+        { source: 'Email', target: 'Contact1.Email', guessed: true },
+        { source: 'Notes', target: 'Ignore' }
+      ]
+    });
+
+    async function toColumns() {
+      suggestMapping.mockResolvedValue(GUESSED);
+      const element = await open();
+      click(element, 'next');
+      await flush();
+      await chooseFile(element);
+      return element;
+    }
+
+    const rows = (element) => element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    const nextDisabled = (element) => element.shadowRoot.querySelector('[data-id="next"]').disabled;
+
+    it('flags a guessed column with a badge and holds Next until it is accepted', async () => {
+      const element = await toColumns();
+      expect(rows(element)[0].querySelector('[data-id="guess"]')).toBeNull();
+      const guess = rows(element)[1].querySelector('[data-id="guess"]');
+      expect(guess).not.toBeNull();
+      const badge = guess.querySelector('.slds-badge');
+      expect(badge.classList.contains('slds-theme_warning')).toBe(true);
+      expect(badge.textContent).toContain('c.Core_Import_GuessBadge');
+      expect(badge.querySelector('.slds-assistive-text').textContent).toBe(
+        'c.Core_Import_GuessBadgeHelp'
+      );
+      expect(element.shadowRoot.querySelector('[data-id="guess-pending"]')).not.toBeNull();
+      expect(nextDisabled(element)).toBe(true);
+
+      guess.querySelector('[data-id="accept-guess"]').click();
+      await flush();
+      expect(rows(element)[1].querySelector('[data-id="guess"]')).toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="guess-pending"]')).toBeNull();
+      expect(nextDisabled(element)).toBe(false);
+      expect(rows(element)[1].querySelector('lightning-combobox').value).toBe('Contact1.Email');
+    });
+
+    it('accepts every guess at once, and never sends the flag with the mapping', async () => {
+      const element = await toColumns();
+      click(element, 'accept-all-guesses');
+      await flush();
+      expect(element.shadowRoot.querySelectorAll('[data-id="guess"]')).toHaveLength(0);
+      expect(nextDisabled(element)).toBe(false);
+      click(element, 'next');
+      await flush();
+      click(element, 'dry-run');
+      await flush();
+      const sent = JSON.parse(createBatch.mock.calls[0][0].mappingDocument);
+      expect(sent.columns[1]).toEqual({ source: 'Email', target: 'Contact1.Email' });
+    });
+
+    it('treats choosing another field as checking the guess', async () => {
+      const element = await toColumns();
+      const picker = rows(element)[1].querySelector('lightning-combobox');
+      picker.dispatchEvent(new CustomEvent('change', { detail: { value: 'Ignore' } }));
+      await flush();
+      expect(rows(element)[1].querySelector('[data-id="guess"]')).toBeNull();
+      expect(nextDisabled(element)).toBe(false);
+    });
+
+    it('does not flag a guess at a field the picker does not offer', async () => {
+      suggestMapping.mockResolvedValue(
+        JSON.stringify({
+          version: 1,
+          columns: [{ source: 'Email', target: 'Gift.Amount__c', guessed: true }]
+        })
+      );
+      const element = await open();
+      click(element, 'next');
+      await flush();
+      await chooseFile(element);
+      expect(element.shadowRoot.querySelectorAll('[data-id="guess"]')).toHaveLength(0);
+    });
+  });
 });
 
 describe('the import wizard loading one object', () => {
@@ -2067,6 +2149,45 @@ describe('the import wizard loading one object', () => {
     );
     expect(element.shadowRoot.querySelector('[data-id="new-object"]').value).toBeUndefined();
     expect(element.shadowRoot.querySelector('[data-id="detection-sheets"]')).toBeNull();
+  });
+
+  it('flags an object guessed from a near spelling of the file name (C-49e)', async () => {
+    getTemplates.mockResolvedValue([TEMPLATE]);
+    getLoadableObjects.mockResolvedValue([{ value: 'Account', label: 'Account' }]);
+    suggestObject.mockResolvedValue({
+      objectName: 'Account',
+      objectLabel: 'Account',
+      objectGuessed: true,
+      sheets: [{ sheetName: '' }]
+    });
+    const element = render();
+    await flush();
+    await chooseKind(element, 'object');
+    const input = element.shadowRoot.querySelector('[data-id="detect-file"]');
+    Object.defineProperty(input, 'files', {
+      value: [new File(['Name\nAna'], 'Acounts.csv')],
+      configurable: true
+    });
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="new-object"]').value).toBe('Account');
+    const badge = element.shadowRoot.querySelector('[data-id="detection-guess"]');
+    expect(badge).not.toBeNull();
+    expect(badge.classList.contains('slds-theme_warning')).toBe(true);
+
+    suggestObject.mockResolvedValue({
+      objectName: 'Account',
+      objectLabel: 'Account',
+      objectGuessed: false,
+      sheets: [{ sheetName: '' }]
+    });
+    Object.defineProperty(input, 'files', {
+      value: [new File(['Name\nAna'], 'Accounts.csv')],
+      configurable: true
+    });
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="detection-guess"]')).toBeNull();
   });
 
   it('starts a template made from the delete card on delete by record ID', async () => {

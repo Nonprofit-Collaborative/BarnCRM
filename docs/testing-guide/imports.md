@@ -431,3 +431,33 @@ Dot,Zzshirt,dot.zzshirt@example.org,M,2026-10-04
 | 8 | Log back in as the admin who committed the import and undo it from the Import tab (see T-IMP-03). | Testa Rivera, Ben Okoro, Cara Lind and Dee Nolast are all removed: one undo covers the other user's retry. |
 
 **Cleanup:** none.
+
+## T-IMP-21: Best Guesses for Near Spellings
+
+**Purpose:** confirm a heading with a typo is mapped as a flagged best guess, Next waits until each guess is accepted or changed, an exact heading always wins, a different word is not guessed, and a near spelling of a file name suggests the object with the same badge (C-49e, D-150).
+**Prerequisites:** admin; no real data. Save these as UTF-8:
+
+`Contcts.csv`:
+
+```
+Frist Name,Last Name,Emial,Mobil Phone,Shoe Size
+Guessa,Zztest,guessa.zztest@example.org,555-0901,10
+```
+
+`import-test-exact-wins.csv`:
+
+```
+First Name,Frist Name,Last Name
+Guessb,Other,Zztest
+```
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the Import tab, choose **One Kind of Record**, and under **Suggest the object from a file** choose `Contcts.csv`. | **Object** is set to **Contact**, and the suggestion line shows an amber **Best Guess, Check It** badge. |
+| 2 | Name the template `Test best guess`, select **Create**, then **Next**. | **Frist Name** is mapped to **First Name**, **Emial** to **Email** and **Mobil Phone** to **Mobile Phone**, each with the amber **Best Guess, Check It** badge and **Accept**. **Last Name** is mapped with no badge. **Shoe Size** is **Do not load**, with no badge. Above the columns: "Columns with a best guess: 3. Accept each guess, or choose another field, before you go on." with **Accept All Guesses**. **Next** is disabled. |
+| 3 | Select **Accept** beside **Frist Name**. Change **Mobil Phone** to **Do not load**. | Both badges are gone; the line now counts 1 and **Next** is still disabled. |
+| 4 | Select **Accept All Guesses**. | No badge is left, the line is gone and **Next** is enabled. |
+| 5 | Select **Next**, keep **Create new records**, then **Dry Run**. | **would create** 1, **would be rejected** 0. Nothing is written. |
+| 6 | Select **Back** twice to the columns, then use the template again with `import-test-exact-wins.csv`. | **First Name** is mapped to **First Name** with no badge; **Frist Name** is **Do not load** with no badge, because the exact heading took the field. **Next** is enabled. |
+
+**Cleanup:** none; nothing was imported. Deactivate `Test best guess` if you do not keep it.

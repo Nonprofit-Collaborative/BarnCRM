@@ -326,6 +326,104 @@ private class ImportObjectSchemaTest {
     }
 
     @IsTest
+    static void aNearSpellingIsSuggestedAsABestGuessAfterEveryExactHeading() {
+        System.runAs(TestUsers.admin()) {
+            ImportMapping suggested;
+            ImportMapping several;
+            Test.startTest();
+            System.runAs(admin()) {
+                suggested = ImportObjectSchema.suggestMapping(
+                    Affiliation__c.SObjectType,
+                    new List<String>{
+                        'Rloe',
+                        'Strat Date',
+                        'Start Date',
+                        'Orgnization',
+                        'Mystery',
+                        'Record Num',
+                        'Contact.Status'
+                    }
+                );
+                several = ImportObjectSchema.suggestSeveralMapping(
+                    new List<Schema.SObjectType>{ Affiliation__c.SObjectType },
+                    Affiliation__c.SObjectType,
+                    new List<String>{ 'Rloe', 'Affiliatons.Start Date', 'Start Date' }
+                );
+            }
+            Test.stopTest();
+
+            List<ImportMapping.Column> columns = suggested.columns;
+            Assert.isTrue(columns[0].target.endsWithIgnoreCase('Role__c'), 'Rloe is Role.');
+            Assert.isTrue(columns[0].guessed, 'Flagged as a best guess (C-49e).');
+            Assert.areEqual(
+                ImportMapping.TARGET_IGNORE,
+                columns[1].target,
+                'An exact heading for the same field wins, wherever it is.'
+            );
+            Assert.isTrue(columns[2].target.endsWithIgnoreCase('Start_Date__c'), 'Exact.');
+            Assert.isNull(columns[2].guessed, 'An exact heading is not flagged.');
+            Assert.isTrue(
+                columns[3].target.endsWithIgnoreCase('Organization__c'),
+                'Orgnization is Organization.'
+            );
+            Assert.isTrue(columns[3].guessed, 'Flagged.');
+            for (Integer i = 4; i < columns.size(); i++) {
+                Assert.areEqual(
+                    ImportMapping.TARGET_IGNORE,
+                    columns[i].target,
+                    '"' + columns[i].source + '" is not guessed (never the record ID).'
+                );
+                Assert.isNull(columns[i].guessed, 'Nothing to flag.');
+            }
+
+            Assert.isTrue(several.columns[0].target.endsWithIgnoreCase('.Role__c'), 'Several.');
+            Assert.isTrue(several.columns[0].guessed, 'Flagged.');
+            Assert.areEqual(
+                ImportMapping.TARGET_IGNORE,
+                several.columns[1].target,
+                'The near two-part heading loses to the exact heading for its field.'
+            );
+            Assert.isTrue(several.columns[2].target.endsWithIgnoreCase('.Start_Date__c'), 'Exact.');
+            Assert.isNull(several.columns[2].guessed, 'Not flagged.');
+        }
+    }
+
+    @IsTest
+    static void aNearSpellingOfASheetNameIsAFlaggedGuess() {
+        ImportObjectSchema.detectionObjectsForTest = new List<Schema.SObjectType>{
+            Affiliation__c.SObjectType
+        };
+        System.runAs(TestUsers.admin()) {
+            ImportObjectSchema.Detection guessed;
+            ImportObjectSchema.Detection exact;
+            Test.startTest();
+            System.runAs(admin()) {
+                guessed = ImportObjectSchema.detectObject(
+                    'budget.xlsx',
+                    new List<String>{ 'Sheet1', 'Afiliations' },
+                    new List<List<String>>{ new List<String>{ 'Name' }, new List<String>() }
+                );
+                exact = ImportObjectSchema.detectObject(
+                    'Afiliations.csv',
+                    new List<String>{ 'Affiliations' },
+                    new List<List<String>>{ new List<String>{ 'Role' } }
+                );
+            }
+            Test.stopTest();
+
+            String affiliation = String.valueOf(Affiliation__c.SObjectType);
+            Assert.isNull(guessed.bySheet[0], 'Sheet1 is no guess.');
+            Assert.areEqual(affiliation, guessed.bySheet[1], 'A typo of the sheet name.');
+            Assert.isTrue(guessed.guessedBySheet[1], 'Flagged on the sheet.');
+            Assert.areEqual(affiliation, guessed.suggested, 'Suggested.');
+            Assert.isTrue(guessed.suggestedGuessed, 'Flagged as a best guess (C-49e).');
+            Assert.areEqual('Affiliation', guessed.labels.get(affiliation), 'With its label.');
+            Assert.areEqual(affiliation, exact.suggested, 'An exact sheet name.');
+            Assert.isFalse(exact.suggestedGuessed, 'An exact name wins over a near file name.');
+        }
+    }
+
+    @IsTest
     static void theObjectIsSuggestedFromHeadingsThenSheetThenFileName() {
         // Detection chooses among this one object, so its names are unique by construction
         // whatever else the org has (Nonprofit Cloud adds many objects).

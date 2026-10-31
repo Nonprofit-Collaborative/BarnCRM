@@ -717,9 +717,11 @@ person Accounts) match yours; otherwise it is left out, and the reason is on the
    BarnCRM suggests the object its headings, sheet names or file name point at, in that order
    (for example `Contact.First Name`, a **Contacts** sheet, or `contacts_2026.xlsx`; dates,
    digits and the words export and import in a name are ignored), and chooses it in the list.
-   It is only a suggestion: change it if it is wrong. When a workbook's sheets point at
-   different objects, each sheet is listed with its object. The same file is read for you
-   after **Next**, so you do not upload it twice.
+   It is only a suggestion: change it if it is wrong. When nothing names an object exactly, a
+   near spelling of a sheet or file name (`Contcts.csv`) is suggested with an amber **Best
+   Guess, Check It** badge. When a workbook's sheets point at different objects, each sheet is
+   listed with its object. The same file is read for you after **Next**, so you do not upload
+   it twice.
 3. Choose the object from the list, give the template a name (for example "Program sessions"),
    and select **Create**. The new template is chosen for you, with what it loads shown under
    it. Select **Next**.
@@ -729,9 +731,18 @@ person Accounts) match yours; otherwise it is left out, and the reason is on the
    `Contact | Phone`, `Contact - Phone`, `Phone: Contact`, `Phone (Contact)` or
    `Contact_Phone`. The object can be its label, plural label or API name, and case, spaces
    and line breaks do not matter. A heading that names another object, or that could be read
-   two ways, is not mapped. Matching is exact: anything else is **Do not load**, never a
-   guess. Change any column from the picker, which lists the fields of that object you may
-   create or edit.
+   two ways, is not mapped. Change any column from the picker, which lists the fields of that
+   object you may create or edit.
+
+   **Best guesses.** A heading that matches no field exactly is mapped to the field with the
+   nearest spelling, when one is close enough: `Frist Name` to First Name, `Emial` to Email,
+   `Contcts.Phone` to the contact's phone. Each such column shows an amber **Best Guess, Check
+   It** badge with **Accept** beside it, and **Next** waits until every guess is checked: select
+   **Accept** (or **Accept All Guesses** above the columns), or choose another field, **Do not
+   load** included. An exact heading always wins over a guess for the same field, two fields
+   equally near are not guessed, a different word (`Shoe Size`) is not guessed, and a column
+   is never guessed to be the record ID. The guess is not saved: the template keeps what you
+   accepted or chose. Anything else is **Do not load**.
 
    A workbook with several sheets loads them all into the template's one object. When the
    chosen sheets point at different objects, the step lists each sheet with its object and
@@ -886,6 +897,8 @@ import, with one dry run, one set of results and one undo.
    object maps to its field, and a two-part heading (`Contact.LastName`, `Phone (Contact)`) maps
    to the field of the object it names, so one row can load several objects. The same heading on
    sheets of different objects becomes two columns, the second with its sheet's name after it.
+   A near spelling of a field or an object is a best guess with the amber badge, to accept or
+   change before **Next**, as for one object (step 4 above).
 5. Check the columns. The picker lists every field of every object you chose, each starting with
    its object's name. Every object needs at least one column; one without any is not loaded.
 6. On the matching step, choose what each object's rows do, as for one object: **Create new

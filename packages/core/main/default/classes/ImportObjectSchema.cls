@@ -254,6 +254,12 @@ public with sharing class ImportObjectSchema {
         /** The label of every object named above, by API name. */
         @NamespaceAccessible
         public Map<String, String> labels = new Map<String, String>();
+        /** True when the suggested object is a best guess from a near spelling (C-49e). */
+        @NamespaceAccessible
+        public Boolean suggestedGuessed = false;
+        /** For each sheet, whether its object is a best guess (C-49e). */
+        @NamespaceAccessible
+        public List<Boolean> guessedBySheet = new List<Boolean>();
     }
 
     /**
@@ -290,6 +296,7 @@ public with sharing class ImportObjectSchema {
                 found = ImportHeaderParser.objectOfName(sheetNames[i], keys);
             }
             result.bySheet.add(found);
+            result.guessedBySheet.add(false);
             if (result.suggested == null) {
                 result.suggested = found;
             }
@@ -297,6 +304,9 @@ public with sharing class ImportObjectSchema {
         }
         if (result.suggested == null) {
             result.suggested = ImportHeaderParser.objectOfFileName(fileName, keys);
+        }
+        if (result.suggested == null) {
+            guessObject(result, fileName, sheetNames, keys);
         }
         Set<String> anyNamed = new Set<String>();
         for (List<String> named : result.namedBySheet) {
@@ -312,6 +322,42 @@ public with sharing class ImportObjectSchema {
             }
         }
         return result;
+    }
+
+    /**
+     * When nothing in the file names an object exactly, a near spelling of a sheet's name, then
+     * of the file's name ("Contcts.csv"), as a best guess the wizard flags (C-49e).
+     */
+    private static void guessObject(
+        Detection result,
+        String fileName,
+        List<String> sheetNames,
+        Map<String, String> keys
+    ) {
+        for (Integer i = 0; i < sheetNames.size(); i++) {
+            ImportHeaderParser.Found named = ImportHeaderParser.objectOfNameOrGuess(
+                sheetNames[i],
+                keys
+            );
+            if (named != null) {
+                result.bySheet[i] = named.name;
+                result.guessedBySheet[i] = named.guessed;
+                if (result.suggested == null) {
+                    result.suggested = named.name;
+                    result.suggestedGuessed = named.guessed;
+                }
+            }
+        }
+        if (result.suggested == null) {
+            ImportHeaderParser.Found named = ImportHeaderParser.objectOfFileNameOrGuess(
+                fileName,
+                keys
+            );
+            if (named != null) {
+                result.suggested = named.name;
+                result.suggestedGuessed = named.guessed;
+            }
+        }
     }
 
     /** Every object these headings name as two-part headings, in the order first named. */
@@ -361,24 +407,82 @@ public with sharing class ImportObjectSchema {
         String sheetName = sheetType == null
             ? null
             : sheetType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+        List<String> given = headers == null ? new List<String>() : headers;
+        List<String> targets = new List<String>();
+        List<Boolean> named = new List<Boolean>();
         Set<String> used = new Set<String>();
-        for (String header : headers == null ? new List<String>() : headers) {
+        // Exact readings first, across every heading, so a guess never takes their field.
+        for (String header : given) {
             String field = known.get(normalized(header));
             String target = field == null ? null : sheetName + '.' + field;
             if (target == null) {
-                ImportHeaderParser.Resolved named = ImportHeaderParser.resolve(
+                ImportHeaderParser.Resolved reading = ImportHeaderParser.resolve(
                     header,
                     keys,
                     fields
                 );
-                target = named == null ? null : named.objectName + '.' + named.fieldName;
+                target = reading == null ? null : reading.objectName + '.' + reading.fieldName;
             }
-            Boolean maps = target != null && used.add(target.toLowerCase());
-            mapping.columns.add(
-                new ImportMapping.Column(header, maps ? target : ImportMapping.TARGET_IGNORE)
-            );
+            named.add(target != null);
+            targets.add(target != null && used.add(target.toLowerCase()) ? target : null);
+        }
+        // Then a best guess for each heading nothing names exactly (C-49e).
+        Map<String, String> guessable = guessableKeys(known);
+        List<Boolean> guessed = new List<Boolean>();
+        for (Integer i = 0; i < given.size(); i++) {
+            String target = null;
+            if (!named[i]) {
+                String field = sheetName == null
+                    ? null
+                    : ImportHeaderParser.guess(given[i], guessable);
+                target = field == null ? null : sheetName + '.' + field;
+                if (target == null) {
+                    ImportHeaderParser.Resolved reading = ImportHeaderParser.resolveOrGuess(
+                        given[i],
+                        keys,
+                        fields
+                    );
+                    target = reading == null || !reading.guessed
+                        ? null
+                        : reading.objectName + '.' + reading.fieldName;
+                }
+            }
+            Boolean guessMaps = target != null && used.add(target.toLowerCase());
+            if (guessMaps) {
+                targets[i] = target;
+            }
+            guessed.add(guessMaps);
+        }
+        for (Integer i = 0; i < given.size(); i++) {
+            mapping.columns.add(column(given[i], targets[i], guessed[i]));
         }
         return mapping;
+    }
+
+    /** A suggested column: Do not load without a target, and flagged when a guess (C-49e). */
+    private static ImportMapping.Column column(String header, String target, Boolean guessed) {
+        ImportMapping.Column result = new ImportMapping.Column(
+            header,
+            target == null ? ImportMapping.TARGET_IGNORE : target
+        );
+        if (target != null && guessed) {
+            result.guessed = true;
+        }
+        return result;
+    }
+
+    /**
+     * A field map without the record ID's spellings: a column is never guessed to be the
+     * record ID, which decides which records an update changes (C-49e).
+     */
+    private static Map<String, String> guessableKeys(Map<String, String> known) {
+        Map<String, String> result = new Map<String, String>();
+        for (String key : known.keySet()) {
+            if (known.get(key) != ID_ATTRIBUTE) {
+                result.put(key, known.get(key));
+            }
+        }
+        return result;
     }
 
     /**
@@ -697,12 +801,16 @@ public with sharing class ImportObjectSchema {
     /**
      * A mapping suggested from a file's header row (R-IT12): a heading that is a writable
      * field's label or API name, ignoring case, spaces and punctuation, is mapped to it, and Id
-     * or Record Id to the record ID; anything else is Do not load, never a guess. A second
-     * heading for one field is left for the administrator.
+     * or Record Id to the record ID. A second heading for one field is left for the
+     * administrator.
      *
      * A heading that names this object and a field together ("Contact.First Name", "Phone
      * (Contact)", C-49a) maps to that field; the whole heading is tried as a field first, and a
      * heading naming another object is Do not load.
+     *
+     * Once every exact heading is mapped, a heading nothing names exactly gets a best guess
+     * from a near spelling of a field ("Frist Name", "Contcts.Emial"), flagged as guessed for
+     * the administrator to accept (C-49e). Never the record ID, and never a field already taken.
      */
     @NamespaceAccessible
     public static ImportMapping suggestMapping(Schema.SObjectType type, List<String> headers) {
@@ -720,24 +828,42 @@ public with sharing class ImportObjectSchema {
               );
         DescribedFieldKeys fields = new DescribedFieldKeys();
         Set<String> used = new Set<String>();
+        List<String> targets = new List<String>();
+        List<Boolean> named = new List<Boolean>();
         for (String header : headers) {
             String field = known.get(normalized(header));
             if (field == null && !thisObject.isEmpty()) {
-                ImportHeaderParser.Resolved named = ImportHeaderParser.resolve(
+                ImportHeaderParser.Resolved reading = ImportHeaderParser.resolve(
                     header,
                     thisObject,
                     fields
                 );
-                field = named == null ? null : named.fieldName;
+                field = reading == null ? null : reading.fieldName;
             }
-            Boolean maps = field != null && !used.contains(field);
-            if (maps) {
-                used.add(field);
+            named.add(field != null);
+            targets.add(field != null && used.add(field) ? field : null);
+        }
+        Map<String, String> guessable = guessableKeys(known);
+        for (Integer i = 0; i < headers.size(); i++) {
+            String field = null;
+            if (!named[i] && type != null) {
+                field = ImportHeaderParser.guess(headers[i], guessable);
+                if (field == null && !thisObject.isEmpty()) {
+                    ImportHeaderParser.Resolved reading = ImportHeaderParser.resolveOrGuess(
+                        headers[i],
+                        thisObject,
+                        fields
+                    );
+                    field = reading == null || !reading.guessed ? null : reading.fieldName;
+                }
             }
+            Boolean guessMaps = field != null && used.add(field);
+            String target = guessMaps ? field : targets[i];
             mapping.columns.add(
-                new ImportMapping.Column(
-                    header,
-                    maps ? ImportMapping.ENTITY_RECORD + '.' + field : ImportMapping.TARGET_IGNORE
+                column(
+                    headers[i],
+                    target == null ? null : ImportMapping.ENTITY_RECORD + '.' + target,
+                    guessMaps
                 )
             );
         }

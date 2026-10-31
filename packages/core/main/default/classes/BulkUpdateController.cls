@@ -179,8 +179,7 @@ public with sharing class BulkUpdateController {
             result.runLimit = BulkUpdateService.runLimit();
             result.count = DataJobs.countWithin(queryJson, result.runLimit, COUNT_MARGIN);
             result.overLimit = result.count == null || result.count > result.runLimit;
-            result.objectLabel = type.getDescribe(SObjectDescribeOptions.DEFERRED)
-                .getLabelPlural();
+            result.objectLabel = type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
             return result;
         } catch (Exception caught) {
             throw asUserError(caught, 'Super Transform count');

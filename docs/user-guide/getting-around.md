@@ -30,12 +30,14 @@ Manager**. **BarnCRM Console** has the same, plus **Addresses**, **Relationships
 **Affiliations** and **Household Members** just before **Data Manager**. The admin apps
 have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching** and
 **Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
-**Import** and **Bulk Update** are not in the navigation: open them from their cards on the
-**Data Manager** tab. Administrators also find a **Data Dictionary** section inside **Org
+**Import** and **Super Transform** are not in the navigation: open them from their cards on
+the **Data Manager** tab. Administrators also find a **Data Dictionary** section inside **Org
 Optimizer**, which lists every field and downloads it as a CSV. If you import files, the
 **Check Columns** step shows a few example values beside each column, so you can see each
-column lands in the right field before anything loads; an Excel workbook can load several of
-its sheets at once, each into its own kind of record if the template loads several. The
+column lands in the right field before anything loads; a column matched from a near spelling
+(`Frist Name`) shows a **Best Guess, Check It** badge, and you accept it or choose another
+field before you go on. An Excel workbook can load several of its sheets at once, each into
+its own kind of record if the template loads several. The
 Admin Guide's Importing page has the detail.
 
 The **Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,

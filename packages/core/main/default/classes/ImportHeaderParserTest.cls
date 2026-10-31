@@ -1,7 +1,8 @@
 /**
  * Headings that name an object and a field together, and sheet and file names that name an
  * object (C-49a): every spelling the owner listed, and the readings that must not match.
- * Exact matches only; nothing is guessed.
+ * `match`, `resolve` and `objectOfName` are exact; the best guesses of C-49e (`find`, `guess`,
+ * `resolveOrGuess`, `objectOfNameOrGuess`) are tested at the end, typos and near words alike.
  */
 // runs-as: deploying user (pure logic: reads names against maps built in the test, no DML or SOQL)
 @IsTest(testFor='ApexClass:ImportHeaderParser')
@@ -227,5 +228,171 @@ private class ImportHeaderParserTest {
         Assert.areEqual('Contact', ImportHeaderParser.objectOfName('Contacts', objects()), 'Tab.');
         Assert.isNull(ImportHeaderParser.objectOfName('Sheet1', objects()), 'A default tab name.');
         Assert.isNull(ImportHeaderParser.objectOfName(null, objects()), 'No name.');
+    }
+
+    // -------------------------------------------------------------------------------------
+    // C-49e: best guesses (plan D-150)
+    // -------------------------------------------------------------------------------------
+
+    /** Contact's fields as describe spells them: API name and label. */
+    private static Map<String, String> contactFields() {
+        Map<String, String> keys = new Map<String, String>();
+        for (
+            String each : new List<String>{
+                'FirstName|First Name',
+                'LastName|Last Name',
+                'Email|Email',
+                'Phone|Business Phone',
+                'MobilePhone|Mobile Phone',
+                'Birthdate|Birthdate',
+                'Phone_Number__c|Phone Number'
+            }
+        ) {
+            ImportHeaderParser.putKey(keys, each.substringBefore('|'), each.substringBefore('|'));
+            ImportHeaderParser.putKey(keys, each.substringAfter('|'), each.substringBefore('|'));
+        }
+        return keys;
+    }
+
+    @IsTest
+    static void guessesTyposOfAFieldAndSaysSo() {
+        Map<String, String> expected = new Map<String, String>{
+            'Frist Name' => 'FirstName',
+            'Emial' => 'Email',
+            'Phone Nmber' => 'Phone_Number__c',
+            'Last Nme' => 'LastName',
+            'Mobile Phon' => 'MobilePhone'
+        };
+        for (String header : expected.keySet()) {
+            ImportHeaderParser.Found found = ImportHeaderParser.find(header, contactFields());
+            Assert.isNotNull(found, 'A guess for "' + header + '".');
+            Assert.areEqual(expected.get(header), found.name, 'Guesses "' + header + '".');
+            Assert.isTrue(found.guessed, '"' + header + '" is flagged as a guess.');
+        }
+    }
+
+    @IsTest
+    static void anExactMatchIsNeverAGuess() {
+        ImportHeaderParser.Found found = ImportHeaderParser.find('First Name', contactFields());
+        Assert.areEqual('FirstName', found.name, 'Exact by label.');
+        Assert.isFalse(found.guessed, 'An exact match is not flagged.');
+        found = ImportHeaderParser.find('EMAIL', contactFields());
+        Assert.areEqual('Email', found.name, 'Exact ignoring case.');
+        Assert.isFalse(found.guessed, 'Still exact.');
+        Assert.isNull(
+            ImportHeaderParser.match('Frist Name', contactFields()),
+            'match stays exact.'
+        );
+    }
+
+    @IsTest
+    static void guessesNothingForADifferentWord() {
+        for (
+            String header : new List<String>{
+                'Shoe Size',
+                'Favorite Color',
+                'Gender',
+                'Notes',
+                'Amount',
+                'Zip',
+                'Fax',
+                'Nme',
+                '',
+                null
+            }
+        ) {
+            Assert.isNull(
+                ImportHeaderParser.find(header, contactFields()),
+                '"' + header + '" must not be guessed.'
+            );
+        }
+        Assert.isNull(ImportHeaderParser.guess('Frist Name', null), 'No keys, no guess.');
+        Map<String, String> person = new Map<String, String>();
+        ImportHeaderParser.putKey(person, 'Contact', 'Contact__c');
+        Assert.isNull(
+            ImportHeaderParser.guess('Contact.Status', person),
+            'A longer heading that starts with a field name is not that field.'
+        );
+    }
+
+    @IsTest
+    static void aTieBetweenTwoNamesIsNoGuess() {
+        Map<String, String> keys = new Map<String, String>();
+        ImportHeaderParser.putKey(keys, 'Phone1', 'Phone_1__c');
+        ImportHeaderParser.putKey(keys, 'Phone2', 'Phone_2__c');
+        Assert.isNull(ImportHeaderParser.guess('Phone3', keys), 'Equally near two fields.');
+
+        Map<String, String> shared = new Map<String, String>();
+        ImportHeaderParser.putKey(shared, 'Shift', 'Shift__c');
+        ImportHeaderParser.putKey(shared, 'Shift', 'Other_Shift__c');
+        Assert.isNull(
+            ImportHeaderParser.guess('Shifts', shared),
+            'A spelling two names share is never offered.'
+        );
+    }
+
+    @IsTest
+    static void guessesTheObjectOrFieldOfATwoPartHeading() {
+        Map<String, String> expected = new Map<String, String>{
+            'Contcts.Frist Name' => 'Contact.FirstName',
+            'Contact.Frist Name' => 'Contact.FirstName',
+            'Contcts: Phone' => 'Contact.Phone',
+            'Mobile Phon (Contact)' => 'Contact.MobilePhone'
+        };
+        for (String header : expected.keySet()) {
+            ImportHeaderParser.Resolved found = ImportHeaderParser.resolveOrGuess(
+                header,
+                objects(),
+                new TestFields()
+            );
+            Assert.isNotNull(found, 'A guess for "' + header + '".');
+            Assert.areEqual(
+                expected.get(header),
+                found.objectName + '.' + found.fieldName,
+                'Guesses "' + header + '".'
+            );
+            Assert.isTrue(found.guessed, '"' + header + '" is flagged as a guess.');
+            Assert.isNull(read(header), 'resolve stays exact for "' + header + '".');
+        }
+        ImportHeaderParser.Resolved exact = ImportHeaderParser.resolveOrGuess(
+            'Contact.First Name',
+            objects(),
+            new TestFields()
+        );
+        Assert.isFalse(exact.guessed, 'An exact two-part heading is not flagged.');
+        for (
+            String header : new List<String>{
+                'Contcts.Shoe Size',
+                'Donor.Phone',
+                'Contact.Account',
+                'Frist Name'
+            }
+        ) {
+            Assert.isNull(
+                ImportHeaderParser.resolveOrGuess(header, objects(), new TestFields()),
+                '"' + header + '" must not be guessed.'
+            );
+        }
+    }
+
+    @IsTest
+    static void guessesTheObjectASheetOrFileIsNamedFor() {
+        ImportHeaderParser.Found found = ImportHeaderParser.objectOfNameOrGuess(
+            'Contcts',
+            objects()
+        );
+        Assert.areEqual('Contact', found.name, 'A typo of a tab name.');
+        Assert.isTrue(found.guessed, 'Flagged.');
+        found = ImportHeaderParser.objectOfFileNameOrGuess('Contcts export 2026.csv', objects());
+        Assert.areEqual('Contact', found.name, 'A typo of a file name.');
+        Assert.isTrue(found.guessed, 'Flagged.');
+        found = ImportHeaderParser.objectOfNameOrGuess('Contacts', objects());
+        Assert.isFalse(found.guessed, 'An exact name is not flagged.');
+        for (String name : new List<String>{ 'Sheet1', 'Budget 2026', 'Amount', 'Donors', '' }) {
+            Assert.isNull(
+                ImportHeaderParser.objectOfNameOrGuess(name, objects()),
+                '"' + name + '" must not be guessed.'
+            );
+        }
     }
 }

@@ -205,6 +205,12 @@ import retryHeading from '@salesforce/label/c.Core_Import_RetryHeading';
 import retryHelp from '@salesforce/label/c.Core_Import_RetryHelp';
 import retryFileLabel from '@salesforce/label/c.Core_Import_RetryFileLabel';
 import retryColumnsMissing from '@salesforce/label/c.Core_Import_RetryColumnsMissing';
+import guessBadge from '@salesforce/label/c.Core_Import_GuessBadge';
+import guessBadgeHelp from '@salesforce/label/c.Core_Import_GuessBadgeHelp';
+import guessAccept from '@salesforce/label/c.Core_Import_GuessAccept';
+import guessAcceptColumn from '@salesforce/label/c.Core_Import_GuessAcceptColumn';
+import guessAcceptAll from '@salesforce/label/c.Core_Import_GuessAcceptAll';
+import guessPending from '@salesforce/label/c.Core_Import_GuessPending';
 import {
   INSERT,
   UPDATE,
@@ -439,6 +445,10 @@ export default class ImportWizard extends LightningElement {
 
   labels = {
     blankClearsLabel,
+    guessBadge,
+    guessBadgeHelp,
+    guessAccept,
+    guessAcceptAll,
     cardTitle,
     stepTemplate,
     stepFileType,
@@ -890,6 +900,11 @@ export default class ImportWizard extends LightningElement {
       : detectNone;
   }
 
+  /** Whether the suggested object is a best guess from a near spelling of a name (C-49e). */
+  get detectionGuessed() {
+    return Boolean(this.detection && this.detection.objectName && this.detection.objectGuessed);
+  }
+
   /** The sheets of the file read on the first step, when they point at different objects. */
   get detectionSheets() {
     const all = this.sheetObjects.map((sheet) => sheet.sheetName);
@@ -1200,9 +1215,14 @@ export default class ImportWizard extends LightningElement {
         // One sheet at a time, so a failure says which call failed and the order holds.
         // eslint-disable-next-line no-await-in-loop
         const each = await suggestMapping({ templateId: this.templateId, headers: sheet.headers });
+        // A best guess joins no other sheet's column (C-49e): it stays its own column, to be
+        // guessed again below and checked by the administrator.
         targetsBySheet.push(
           Object.fromEntries(
-            (JSON.parse(each || '{}').columns || []).map((column) => [column.source, column.target])
+            (JSON.parse(each || '{}').columns || []).map((column) => [
+              column.source,
+              column.guessed === true ? IGNORE : column.target
+            ])
           )
         );
       }
@@ -1215,15 +1235,16 @@ export default class ImportWizard extends LightningElement {
     const lookups = {};
     const changes = {};
     const clears = {};
+    const guesses = {};
     const parsed = JSON.parse(suggested || '{}');
     const offered = new Set(this.mappableTargets.map((option) => option.value));
     (parsed.columns || []).forEach((column) => {
-      targets[column.source] = this.isOfferedTarget(column.target, offered)
-        ? column.target
-        : IGNORE;
+      const kept = this.isOfferedTarget(column.target, offered);
+      targets[column.source] = kept ? column.target : IGNORE;
       lookups[column.source] = column.lookupField;
       changes[column.source] = column.transforms || [];
       clears[column.source] = column.blankClears === true;
+      guesses[column.source] = kept && column.guessed === true && column.target !== IGNORE;
     });
     this.skipRows = parsed.skipRows || [];
     this.uniqueBy = parsed.uniqueBy || [];
@@ -1234,6 +1255,7 @@ export default class ImportWizard extends LightningElement {
       lookupField: lookups[heading] || LOOKUP_BY_ID,
       transforms: changes[heading] || [],
       blankClears: clears[heading] || false,
+      guessed: guesses[heading] === true,
       examples: combined.examples[heading].map((text, index) => ({ key: `${index}`, text }))
     }));
   }
@@ -1264,6 +1286,7 @@ export default class ImportWizard extends LightningElement {
     });
     const ordered = sheetsInLoadOrder(chosen, objectOfSheet, order);
     const targetsBySheet = [];
+    const guessesBySheet = [];
     for (const sheet of ordered) {
       // One sheet at a time, so a failure says which call failed and the order holds.
       // eslint-disable-next-line no-await-in-loop
@@ -1272,10 +1295,15 @@ export default class ImportWizard extends LightningElement {
         objectName: objectOfSheet[sheet.name],
         headers: sheet.headers
       });
+      const columns = JSON.parse(each || '{}').columns || [];
+      // A best guess joins no other column (C-49e); it is put back on its own column below.
       targetsBySheet.push(
         Object.fromEntries(
-          (JSON.parse(each || '{}').columns || []).map((column) => [column.source, column.target])
+          columns.map((column) => [column.source, column.guessed === true ? IGNORE : column.target])
         )
+      );
+      guessesBySheet.push(
+        columns.filter((column) => column.guessed === true && column.target !== IGNORE)
       );
     }
     const combined = combineObjectSheets(
@@ -1292,11 +1320,13 @@ export default class ImportWizard extends LightningElement {
       (saved.columns || []).map((column) => [String(column.source || '').toLowerCase(), column])
     );
     const offered = new Set(this.targetOptions.map((option) => option.value));
+    const guessed = this.guessedColumns(ordered, guessesBySheet, combined);
     this.skipRows = saved.skipRows || [];
     this.uniqueBy = saved.uniqueBy || [];
     this.columns = this.headers.map((heading) => {
       const kept = savedBySource.get(heading.toLowerCase());
-      const suggested = combined.targets[heading];
+      const guess = kept ? undefined : guessed[heading];
+      const suggested = guess || combined.targets[heading];
       const target = kept && offered.has(kept.target) ? kept.target : suggested;
       return {
         key: heading,
@@ -1305,9 +1335,31 @@ export default class ImportWizard extends LightningElement {
         lookupField: (kept && kept.lookupField) || LOOKUP_BY_ID,
         transforms: (kept && kept.transforms) || [],
         blankClears: Boolean(kept && kept.blankClears),
+        guessed: Boolean(guess) && offered.has(guess),
         examples: combined.examples[heading].map((text, index) => ({ key: `${index}`, text }))
       };
     });
+  }
+
+  /**
+   * Each joined column a sheet's best guess (C-49e) belongs to, with the guessed target: only
+   * where the column has no target of its own and no other column took that target.
+   */
+  guessedColumns(sheets, guessesBySheet, combined) {
+    const taken = new Set(Object.values(combined.targets).filter((target) => target !== IGNORE));
+    const result = {};
+    sheets.forEach((sheet, index) => {
+      (guessesBySheet[index] || []).forEach((column) => {
+        const own = `${column.source} (${sheet.name})`;
+        const heading = combined.headers.includes(own) ? own : column.source;
+        const free = combined.targets[heading] === IGNORE && !taken.has(column.target);
+        if (combined.headers.includes(heading) && free && !result[heading]) {
+          result[heading] = column.target;
+          taken.add(column.target);
+        }
+      });
+    });
+    return result;
   }
 
   /** The chosen template's saved mapping, or an empty one. */
@@ -1575,8 +1627,43 @@ export default class ImportWizard extends LightningElement {
       return;
     }
     this.columns = this.columns.map((column) => {
-      return column.source === source ? { ...column, target, lookupField: LOOKUP_BY_ID } : column;
+      return column.source === source
+        ? { ...column, target, lookupField: LOOKUP_BY_ID, guessed: false }
+        : column;
     });
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // C-49e: best guesses. A column mapped from a near spelling is flagged until the
+  // administrator accepts it or chooses another field; Next waits for every one.
+  // ---------------------------------------------------------------------------------------
+
+  handleAcceptGuess(event) {
+    const source = event.currentTarget.dataset.source;
+    this.columns = this.columns.map((column) => {
+      return column.source === source ? { ...column, guessed: false } : column;
+    });
+  }
+
+  handleAcceptAllGuesses() {
+    this.columns = this.columns.map((column) => ({ ...column, guessed: false }));
+  }
+
+  get guessCount() {
+    return this.columns.filter((column) => column.guessed).length;
+  }
+
+  get hasGuesses() {
+    return this.guessCount > 0;
+  }
+
+  get guessPendingText() {
+    return format(guessPending, this.guessCount);
+  }
+
+  /** Next on the column step: columns to load, and no best guess left unchecked (C-49e). */
+  get cannotLeaveColumns() {
+    return this.hasNoColumns || this.hasGuesses;
   }
 
   // ---------------------------------------------------------------------------------------
@@ -1650,7 +1737,9 @@ export default class ImportWizard extends LightningElement {
     const target =
       created.prefix === 'Record' ? field.value : `${created.prefix}.${created.fieldValue}`;
     this.columns = this.columns.map((column) => {
-      return column.source === source ? { ...column, target, lookupField: LOOKUP_BY_ID } : column;
+      return column.source === source
+        ? { ...column, target, lookupField: LOOKUP_BY_ID, guessed: false }
+        : column;
     });
   }
 
@@ -1673,6 +1762,7 @@ export default class ImportWizard extends LightningElement {
       const changeCount = (column.transforms || []).length;
       return {
         ...column,
+        acceptGuessLabel: format(guessAcceptColumn, column.source),
         changesLabel: changeCount > 0 ? format(changesButtonCount, changeCount) : changesButton,
         isLookup,
         lookupOptions: isLookup

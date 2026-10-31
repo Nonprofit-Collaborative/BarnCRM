@@ -84,6 +84,12 @@ public with sharing class ImportMapping {
          */
         @AuraEnabled
         public Boolean blankClears;
+        /**
+         * In a suggested mapping only: the target is a best guess from a near spelling, for the
+         * administrator to accept or change (C-49e). Never part of a saved template.
+         */
+        @AuraEnabled
+        public Boolean guessed;
 
         // JSON.deserialize requires a no-arg constructor to build this class from the stored
         // mapping document (see parse below); the fields it fills in are set afterward by the

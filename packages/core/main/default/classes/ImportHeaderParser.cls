@@ -4,14 +4,49 @@
  * sheet or file name that names an object ("Contacts", "contacts_2026.xlsx").
  *
  * Pure logic over maps the caller builds from describe (`ImportObjectSchema`), so it holds no
- * org shape. Every match is exact after `ImportColumnLibrary.normalize` (lower case, letters and
- * digits only); `match` is the one place a fuzzy fallback would plug in.
+ * org shape. `match` is exact after `ImportColumnLibrary.normalize` (lower case, letters and
+ * digits only). When nothing matches exactly, `find` falls back to a best guess (C-49e, plan
+ * D-150): the spelling `FuzzyMatch` scores closest, at or above GUESS_THRESHOLD, flagged as a
+ * guess so the wizard asks the administrator to accept it. An exact match always wins, and a
+ * tie between two names is no guess.
  */
 @NamespaceAccessible
 public with sharing class ImportHeaderParser {
     /** The value of a normalized key two objects share, which therefore names neither. */
     @NamespaceAccessible
     public static final String AMBIGUOUS = '';
+
+    /**
+     * The lowest FuzzyMatch score a guess may have (C-49e): a typo of one or two letters
+     * ("Frist Name", "Emial", "Contcts") reaches it, a different word does not.
+     */
+    @NamespaceAccessible
+    public static final Double GUESS_THRESHOLD = 0.88;
+
+    /** A normalized spelling shorter than this is never guessed: a few letters match too much. */
+    private static final Integer GUESS_MIN_LENGTH = 4;
+
+    /**
+     * The shorter of a part and a spelling must be at least this share of the longer. A typo
+     * changes a letter or two; without this, Jaro-Winkler's weight on a shared start would
+     * read "Contact.Status" as the field "Contact".
+     */
+    private static final Double GUESS_MIN_LENGTH_RATIO = 0.75;
+
+    /** A name found for a part of a heading or a file name, and whether it is a guess. */
+    @NamespaceAccessible
+    public class Found {
+        @NamespaceAccessible
+        public String name;
+        @NamespaceAccessible
+        public Boolean guessed;
+
+        @NamespaceAccessible
+        public Found(String name, Boolean guessed) {
+            this.name = name;
+            this.guessed = guessed;
+        }
+    }
 
     /** What separates an object from a field in a heading, besides parentheses and "_". */
     private static final String SEPARATORS = ':./|-';
@@ -36,6 +71,9 @@ public with sharing class ImportHeaderParser {
         public String objectName;
         @NamespaceAccessible
         public String fieldName;
+        /** True when the object or the field is a best guess, not an exact match (C-49e). */
+        @NamespaceAccessible
+        public Boolean guessed = false;
 
         @NamespaceAccessible
         public Resolved(String objectName, String fieldName) {
@@ -80,11 +118,7 @@ public with sharing class ImportHeaderParser {
         }
     }
 
-    /**
-     * The name a part of a heading or a file name spells, or null. Exact only in C-49a: a fuzzy
-     * fallback (awaiting the owner's decision) would plug in here, after the exact lookup
-     * misses, and nowhere else.
-     */
+    /** The name a part of a heading or a file name spells exactly, or null. */
     @NamespaceAccessible
     public static String match(String part, Map<String, String> keys) {
         if (keys == null || String.isBlank(part)) {
@@ -92,6 +126,56 @@ public with sharing class ImportHeaderParser {
         }
         String found = keys.get(ImportColumnLibrary.normalize(part));
         return String.isBlank(found) ? null : found;
+    }
+
+    /**
+     * The name a part spells: exact when one is (never a guess), else the best guess (C-49e),
+     * else null. The seam every fuzzy reading goes through.
+     */
+    @NamespaceAccessible
+    public static Found find(String part, Map<String, String> keys) {
+        String exact = match(part, keys);
+        if (exact != null) {
+            return new Found(exact, false);
+        }
+        String guessed = guess(part, keys);
+        return guessed == null ? null : new Found(guessed, true);
+    }
+
+    /**
+     * The name whose spelling `FuzzyMatch.bestMatch` scores closest to the part, at or above
+     * GUESS_THRESHOLD, or null: also null for a short part, and when two names tie for the best
+     * score (an ambiguous guess is no guess). Only spellings of a near length are offered, and
+     * never one two names share (AMBIGUOUS).
+     */
+    @NamespaceAccessible
+    public static String guess(String part, Map<String, String> keys) {
+        String key = ImportColumnLibrary.normalize(part);
+        if (keys == null || key.length() < GUESS_MIN_LENGTH) {
+            return null;
+        }
+        List<String> spellings = new List<String>();
+        for (String spelling : keys.keySet()) {
+            Double shorter = Math.min(spelling.length(), key.length());
+            Double longer = Math.max(spelling.length(), key.length());
+            if (
+                String.isNotBlank(keys.get(spelling)) && shorter / longer >= GUESS_MIN_LENGTH_RATIO
+            ) {
+                spellings.add(spelling);
+            }
+        }
+        String best = FuzzyMatch.bestMatch(key, spellings, GUESS_THRESHOLD);
+        if (best == null) {
+            return null;
+        }
+        String name = keys.get(best);
+        Double bestScore = FuzzyMatch.score(key, best);
+        for (String spelling : spellings) {
+            if (!keys.get(spelling).equals(name) && FuzzyMatch.score(key, spelling) >= bestScore) {
+                return null;
+            }
+        }
+        return name;
     }
 
     /**
@@ -108,9 +192,37 @@ public with sharing class ImportHeaderParser {
         FieldKeys fields
     ) {
         String text = clean(header);
-        Map<String, Resolved> found = readings(explicitSplits(text), objectKeys, fields);
+        Map<String, Resolved> found = readings(explicitSplits(text), objectKeys, fields, false);
         if (found.isEmpty()) {
-            found = readings(underscoreSplits(text), objectKeys, fields);
+            found = readings(underscoreSplits(text), objectKeys, fields, false);
+        }
+        return found.size() == 1 ? found.values()[0] : null;
+    }
+
+    /**
+     * As `resolve`, and when no reading is exact, the one reading whose object or field is a
+     * best guess (C-49e), flagged as guessed; null when none reads, or several do. The caller
+     * passes only the objects a template loads, so the guesses stay few.
+     */
+    @NamespaceAccessible
+    public static Resolved resolveOrGuess(
+        String header,
+        Map<String, String> objectKeys,
+        FieldKeys fields
+    ) {
+        String text = clean(header);
+        List<List<String>> explicit = explicitSplits(text);
+        List<List<String>> underscores = underscoreSplits(text);
+        Boolean anyExact =
+            !readings(explicit, objectKeys, fields, false).isEmpty() ||
+            !readings(underscores, objectKeys, fields, false).isEmpty();
+        if (anyExact) {
+            // Exact readings win; two of them that disagree name nothing, and are not guessed.
+            return resolve(header, objectKeys, fields);
+        }
+        Map<String, Resolved> found = readings(explicit, objectKeys, fields, true);
+        if (found.isEmpty()) {
+            found = readings(underscores, objectKeys, fields, true);
         }
         return found.size() == 1 ? found.values()[0] : null;
     }
@@ -170,6 +282,39 @@ public with sharing class ImportHeaderParser {
         return match(String.join(kept, ' '), objectKeys);
     }
 
+    /**
+     * The object a sheet or file name names exactly (as `objectOfName`), else the best guess at
+     * it (C-49e): "Contcts" for Contact. Null when neither reads.
+     */
+    @NamespaceAccessible
+    public static Found objectOfNameOrGuess(String name, Map<String, String> objectKeys) {
+        String exact = objectOfName(name, objectKeys);
+        if (exact != null) {
+            return new Found(exact, false);
+        }
+        String withoutDigits = clean(name).replaceAll('[0-9]', ' ');
+        String guessed = guess(withoutDigits, objectKeys);
+        if (guessed == null) {
+            List<String> kept = new List<String>();
+            for (String word : withoutDigits.toLowerCase().split('[^a-z]+')) {
+                if (!IGNORED_WORDS.contains(word)) {
+                    kept.add(word);
+                }
+            }
+            guessed = guess(String.join(kept, ' '), objectKeys);
+        }
+        return guessed == null ? null : new Found(guessed, true);
+    }
+
+    /** As `objectOfNameOrGuess`, for a file name with its extension. */
+    @NamespaceAccessible
+    public static Found objectOfFileNameOrGuess(String fileName, Map<String, String> objectKeys) {
+        return objectOfNameOrGuess(
+            clean(fileName).replaceAll('\\.[A-Za-z0-9]{1,5}$', ''),
+            objectKeys
+        );
+    }
+
     // -------------------------------------------------------------------------------------
     // Splits, each an [object part, field part] pair
     // -------------------------------------------------------------------------------------
@@ -215,25 +360,41 @@ public with sharing class ImportHeaderParser {
         }
     }
 
-    /** The distinct object and field pairs the splits read as, keyed by object and field. */
+    /**
+     * The distinct object and field pairs the splits read as, keyed by object and field. With
+     * guesses, only readings with a guessed object or field, each flagged (C-49e).
+     */
     private static Map<String, Resolved> readings(
         List<List<String>> splits,
         Map<String, String> objectKeys,
-        FieldKeys fields
+        FieldKeys fields,
+        Boolean withGuesses
     ) {
         Map<String, Resolved> found = new Map<String, Resolved>();
         for (List<String> split : splits) {
-            String objectName = match(split[0], objectKeys);
-            String fieldName = objectName == null
+            Found objectFound = withGuesses
+                ? find(split[0], objectKeys)
+                : asFound(match(split[0], objectKeys));
+            Found fieldFound = objectFound == null
                 ? null
-                : match(split[1], fields.keysOf(objectName));
-            if (fieldName != null) {
-                found.put(
-                    (objectName + '.' + fieldName).toLowerCase(),
-                    new Resolved(objectName, fieldName)
-                );
+                : withGuesses
+                      ? find(split[1], fields.keysOf(objectFound.name))
+                      : asFound(match(split[1], fields.keysOf(objectFound.name)));
+            if (fieldFound == null) {
+                continue;
             }
+            Boolean guessed = objectFound.guessed || fieldFound.guessed;
+            if (withGuesses && !guessed) {
+                continue;
+            }
+            Resolved reading = new Resolved(objectFound.name, fieldFound.name);
+            reading.guessed = guessed;
+            found.put((objectFound.name + '.' + fieldFound.name).toLowerCase(), reading);
         }
         return found;
+    }
+
+    private static Found asFound(String exact) {
+        return exact == null ? null : new Found(exact, false);
     }
 }
