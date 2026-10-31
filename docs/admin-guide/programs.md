@@ -12,9 +12,9 @@ Withdrawn) and its start and end dates. Each time a service is given, or a perso
 
 Each enrollment also carries the person's **intake and eligibility**: when they were first seen,
 who referred them, and whether they qualify, and staff keep private **case notes** on it. A
-program dashboard and a roster import come in later releases (P-05, P-06). Until the participant
-privacy preset (P-08) arrives,
-everyone who holds a Programs permission set can see every enrollment and service delivery.
+program dashboard and a roster import come in later releases (P-05, P-06). Who sees enrollments
+and service deliveries is the **Participant Privacy** preset on the Programs settings page:
+everyone with a Programs permission set (the default), or only the people who need to.
 
 ## Before You Install
 
@@ -28,11 +28,13 @@ everyone who holds a Programs permission set can see every enrollment and servic
 ## Installing
 
 Install it from **Module Manager** (see [Module Manager](module-manager.md)). When the install
-finishes, BarnCRM does three things on its own:
+finishes, BarnCRM does four things on its own:
 
 1. Creates the switch rows for the module's automations on the **Automation** page.
 2. Gives you, the person who installed it, the **Programs Admin** permission set.
 3. Gives everyone who already has a BarnCRM role their Programs permission set (see below).
+4. Applies the Participant Privacy preset (Shared until you change it) and shares any
+   enrollments and service deliveries already in the org (see Participant Privacy).
 
 Then open the **BarnCRM Programs** app from the App Launcher. Its tabs are **Programs**,
 **Enrollments**, **Service Deliveries** and **Case Notes**. These tabs also join the BarnCRM apps.
@@ -41,7 +43,8 @@ Then open the **BarnCRM Programs** app from the App Launcher. Its tabs are **Pro
 
 The module adds a **Programs** section to BarnCRM Settings (in the Programs group). Its
 **Programs Settings** row opens the module's own settings page, for anyone who can manage BarnCRM
-settings (BarnCRM Admin). Everything on it applies to the whole organization.
+settings (BarnCRM Admin). Everything on it applies to the whole organization: the intake
+picklists and Participant Privacy.
 
 **Intake and Eligibility Picklists.** The page lists the three intake picklists on an enrollment
 (**Referral Source**, **Eligibility Status** and **Eligibility Basis**) with the choices each
@@ -60,6 +63,38 @@ that already have it, and a renamed one is renamed on them too. Keep **Eligible*
 Eligible** in Eligibility Status: choosing either fills in the Eligibility Date (see Enrollment
 Rules). The lists are restricted: an import or another system can only save a choice the list
 holds.
+
+### Participant Privacy
+
+Who can see enrollments and service deliveries. Program membership can be sensitive (a recovery
+group, a housing program), so you choose:
+
+| Preset | Who sees enrollments and service deliveries |
+|---|---|
+| **Shared** (the default) | Everyone with a Programs permission set, as before this setting existed. |
+| **Private** | The person who created the record (its owner), the people above them in the role hierarchy, and Programs Admin. |
+
+Choose one under **Participant Privacy** and click **Save**. The change applies within a minute,
+to every enrollment and delivery, old and new, and is listed under **Recent Changes** in BarnCRM
+Settings. Case notes are private whichever you choose (see Case Notes).
+
+**How it works, for admins who know Salesforce sharing.** Enrollments and service deliveries
+have a Private organization-wide default. Each one is shared, Read/Write, with the public group
+**Programs Participant Records**. Shared puts **All Internal Users** in that group; Private
+takes them out. To let a few people see every record while the preset is Private (for example a
+program manager outside the role hierarchy), add them, their role or another group to
+**Programs Participant Records** in Setup under **Public Groups**. BarnCRM only ever adds or
+removes All Internal Users there, so your own members stay. With the hourly access check it puts
+All Internal Users back, or takes them out, if the group was changed by hand against the preset.
+
+What Private means day to day:
+
+- A staff member sees on the **Program Roster** panel and in the **Service Delivery Log** only the
+  enrollments they can see. Decide who owns enrollments: the person who enrolls someone owns that
+  enrollment, and a Programs Admin can change the owner.
+- Reports and list views show each person only the records they can see.
+- Program counts that BarnCRM keeps (the rules that stop a second open enrollment, for example)
+  still count every record, whoever can see it.
 
 ## Roles and Permission Sets
 
@@ -176,7 +211,7 @@ list on the enrollment (or the **Case Notes** tab): a **Note Date** (today to st
 - Programs Admins, who see, edit and delete every note.
 
 Colleagues with Programs Staff do not see each other's notes, and Read Only users have no access
-to case notes at all. This holds whatever you choose for participant privacy (P-08). To let a
+to case notes at all. This holds whatever you choose for Participant Privacy. To let a
 colleague see a note, its owner clicks **Sharing** on the note, or you add a sharing rule in Setup
 (**Sharing Settings**, Case Note) for a team that works together. To hand a caseload to someone
 else, change the notes' owner.
@@ -286,10 +321,11 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
 
 ## Common Mistakes
 
-- **Looking for a Programs section in BarnCRM Settings.** There is none yet: Programs has no
-  settings until intake fields and the privacy preset arrive.
-- **Expecting enrollments to be private.** Until the participant privacy preset (P-08), anyone
-  with a Programs set sees every enrollment. Do not record sensitive program membership for
-  people outside your program staff until then.
+- **Expecting enrollments to be private straight after install.** The Participant Privacy
+  preset starts as Shared: anyone with a Programs set sees every enrollment. Choose Private on the
+  Programs settings page before you record sensitive program membership.
+- **Choosing Private without deciding who owns enrollments.** A staff member then sees only the
+  enrollments they own or that people below them own. Decide owners first, or add the program's
+  staff to the Programs Participant Records group in Setup.
 - **Deleting a finished program.** Set Status to Completed; the platform will not delete a
   program people were enrolled in.

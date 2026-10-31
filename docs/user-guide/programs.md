@@ -11,6 +11,13 @@ Read Only). If the app is missing, ask your admin (see the
 [Programs admin guide](../admin-guide/programs.md#roles-and-permission-sets)). Read Only users
 can look at programs and enrollments but change nothing.
 
+**Which enrollments you see** depends on your organization's Participant Privacy choice. With
+**Shared** (the usual) you see every enrollment and service delivery. With **Private** you see
+the ones you created, the ones created by people who report to you, and any your admin opened to
+you; a roster or list may then show fewer people than are enrolled. If you are missing someone
+you work with, ask your admin (see
+[Participant Privacy](../admin-guide/programs.md#participant-privacy)).
+
 ## To Find a Program or an Enrollment
 
 1. Click the **Programs** tab, or the **Enrollments** tab.

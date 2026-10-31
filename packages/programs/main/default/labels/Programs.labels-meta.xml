@@ -480,4 +480,76 @@
         <shortDescription>Erasure keeps enrollments, credited to the anonymous record</shortDescription>
         <value>Kept, credited to the anonymous record, so program counts stand.</value>
     </labels>
+    <labels>
+        <fullName>Programs_Settings_PrivacyTitle</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: privacy card title</shortDescription>
+        <value>Participant Privacy</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PrivacyIntro</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: privacy card introduction</shortDescription>
+        <value>Who can see enrollments and service deliveries. Every case note stays private whichever you choose.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PrivacyLegend</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: privacy choice legend</shortDescription>
+        <value>Who sees enrollments and service deliveries</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PrivacyShared</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: Shared preset</shortDescription>
+        <value>Shared: everyone with a Programs permission set</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PrivacyPrivate</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: Private preset</shortDescription>
+        <value>Private: the record's owner, their managers and Programs Admin</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PrivacyDefault</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: the preset's default</shortDescription>
+        <value>Default: Shared</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_Save</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: save button</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_Saved</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: saved message</shortDescription>
+        <value>Saved. It applies to every enrollment and delivery within a minute.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_SaveFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: save failed</shortDescription>
+        <value>Participant Privacy could not be saved. Try again; if it fails again, the Error Log says why.</value>
+    </labels>
 </CustomLabels>

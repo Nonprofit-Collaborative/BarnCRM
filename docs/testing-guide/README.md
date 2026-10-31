@@ -59,7 +59,7 @@ page, even if that puts it out of reading order.
 | [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 7 | Giving totals, recalculation, dashboards and reports |
 | [Mirror](mirror.md) | MIR | 13 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API |
 | [Volunteers](volunteers.md) | VOL | 13 | Jobs, shifts, sign-ups, hours and approval, skills |
-| [Programs](programs.md) | PRG | 12 | Programs, services, enrollments, the Program Roster panel, a person's Programs card, Programs access, Health Check, sample data, the Service Delivery Log and the delivery rules, intake and eligibility, the Programs Settings page, case notes |
+| [Programs](programs.md) | PRG | 13 | Programs, services, enrollments, the Program Roster panel, a person's Programs card, Programs access, Health Check, sample data, the Service Delivery Log and the delivery rules, intake and eligibility, the Programs Settings page, case notes, participant privacy |
 | [Rollup Builder](rollup-builder.md) | RB | 26 | Building, recalculating and switching rollups, standard objects, parity options, export and import, instant totals on other objects |
 | [Accessibility and mobile](accessibility-and-mobile.md) | A11Y | 9 | Keyboard, focus, screen reader labels, zoom, Salesforce mobile app |
 

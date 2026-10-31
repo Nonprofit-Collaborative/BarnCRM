@@ -11,6 +11,23 @@ export function format(template, ...values) {
   );
 }
 
+/** The Participant Privacy presets (P-08), as the server names them. */
+export const SHARED = 'Shared';
+export const PRIVATE = 'Private';
+
+/** The two presets as radio options, Shared first because it is the default. */
+export function privacyOptions(labels) {
+  return [
+    { label: labels.shared, value: SHARED },
+    { label: labels.private, value: PRIVATE }
+  ];
+}
+
+/** The preset the server holds now, Shared when it says nothing. */
+export function storedPrivacy(settings) {
+  return settings && settings.participantPrivacy === PRIVATE ? PRIVATE : SHARED;
+}
+
 /** One row per intake picklist: its name, its choices as one line, its default and its link. */
 export function picklistRows(settings, labels) {
   const picklists = settings && settings.intakePicklists ? settings.intakePicklists : [];

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Delivery: share by the privacy preset</label>
+    <protected>true</protected>
+    <values>
+        <field>Object_Name__c</field>
+        <value xsi:type="xsd:string">Service_Delivery__c</value>
+    </values>
+    <values>
+        <field>Handler_Class__c</field>
+        <value xsi:type="xsd:string">ProgramsSharingHandler</value>
+    </values>
+    <values>
+        <field>Execution_Order__c</field>
+        <value xsi:type="xsd:double">90</value>
+    </values>
+    <values>
+        <field>Enabled_By_Default__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Always_Runs__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Shares each new service delivery with the Programs Participant Records group, so the Participant Privacy preset on the Programs settings page decides who sees it. Without it a new delivery would be seen only by its owner, so it cannot be switched off here and pausing automation does not suspend it.</value>
+    </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Programs</value>
+    </values>
+</CustomMetadata>

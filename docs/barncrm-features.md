@@ -602,7 +602,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Program dashboard | Minor | A packaged program dashboard. | Planned (v0.9) | P-05 |
 | Roster import template | Minor | Loads a program roster with the Core import. | Planned (v0.9) | P-06 |
 | Intake and eligibility fields | Minor | Each enrollment records Intake Date, Referral Source, Eligibility Status (Not Screened, Awaiting Documents, Eligible, Not Eligible), Eligibility Basis and Eligibility Date, which fills itself in when eligibility is decided. The three picklists' choices are the organization's to change: a Programs Settings page (from the Programs section of BarnCRM Settings) lists them with a link to each in Setup. Choices and dates only, so erasing a person leaves nothing to empty. | In progress (release 0.14) | P-07 |
-| Participant privacy sharing preset | Minor | A sharing preset that protects participant privacy. | Planned (v0.9) | P-08 |
+| Participant privacy sharing preset | Minor | Participant Privacy on the Programs settings page: Shared (the default, everyone with a Programs permission set sees every enrollment and service delivery) or Private (the owner, people above them in the role hierarchy and Programs Admin). Enrollments and deliveries are Private org-wide and shared with the Programs Participant Records group, which holds All Internal Users only while the preset is Shared; an admin may add chosen people to the group. Applied within a minute, audited, repaired hourly. Case notes stay private either way. | In progress (release 0.14) | P-08 |
 | Waitlists and capacity | Minor | Waitlists and capacity limits for programs. | Planned (1.x) | P-09 |
 
 ### 5.2 Logic Models (separate package)

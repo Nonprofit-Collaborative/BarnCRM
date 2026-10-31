@@ -374,7 +374,16 @@ private class EnrollmentRulesTest {
             contactMode();
             person = people(1)[0];
             tutoring = program('Tutoring');
-            insert newEnrollment(tutoring.Id, person.Id, 'Enrolled');
+            Enrollment__c enrolled = newEnrollment(tutoring.Id, person.Id, 'Enrolled');
+            insert enrolled;
+            // Seen by everyone, as with Participant Privacy Shared (P-08), whatever the org's group.
+            insert new Enrollment__Share(
+                ParentId = enrolled.Id,
+                UserOrGroupId = [SELECT Id FROM Group WHERE Type = 'Organization' LIMIT 1]
+                .Id,
+                AccessLevel = 'Read',
+                RowCause = Schema.Enrollment__Share.RowCause.Manual
+            );
         }
         System.runAs(TestUsers.standardUserWith(
             'Reader',

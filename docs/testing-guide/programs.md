@@ -195,3 +195,23 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 8 | As the admin, erase Test Person. | Done; the summary lists the Case Notes as deleted and the Enrollments as kept. The note is gone; the enrollment stays, naming the anonymous record. |
 
 **Cleanup:** delete the enrollment; remove the staff users' roles.
+
+## T-PRG-13: Participant Privacy, Shared and Private
+
+**Purpose:** confirm the Participant Privacy preset decides who sees enrollments and service deliveries, starts as Shared, and is audited.
+**Prerequisites:** the admin user; two staff users with a BarnCRM role of Team Member (Programs Staff), with no role above the other; any active program with a service.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open **BarnCRM Settings**, the **Programs** section, then **Programs Settings**. | A **Participant Privacy** card with **Shared** chosen, "Default: Shared" under it, and **Save** greyed out. |
+| 2 | As the first staff user, enroll a test person in the program on its **Program Roster** panel, then record one delivery for them in the **Service Delivery Log**. | Both saved. |
+| 3 | As the second staff user, open the program and the **Enrollments** and **Service Deliveries** tabs, **All** lists. | The enrollment and the delivery are listed. |
+| 4 | As the admin, choose **Private** on the Participant Privacy card and click **Save**. | "Saved. It applies to every enrollment and delivery within a minute." **Save** is greyed out again. |
+| 5 | Wait a minute. As the second staff user, repeat step 3. | Neither record is listed, on the roster or the tabs. |
+| 6 | As the first staff user, repeat step 3. | Both are listed: they own them. |
+| 7 | As the admin, repeat step 3. | Both are listed. |
+| 8 | As the admin, open **BarnCRM Settings**, **Recent Changes**. | A row for Programs_Settings__c.Private_Participants__c from Shared to Private. |
+| 9 | As the admin, in Setup open **Public Groups**, **Programs Participant Records**. | All Internal Users is not a member. |
+| 10 | Choose **Shared** and **Save**, wait a minute, then as the second staff user repeat step 3. | Both records are listed again, and All Internal Users is back in the group. |
+
+**Cleanup:** delete the enrollment and delivery; leave the preset Shared; remove the staff users' roles.

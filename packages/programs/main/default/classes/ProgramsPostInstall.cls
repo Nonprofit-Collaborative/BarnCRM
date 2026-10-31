@@ -12,6 +12,8 @@
  * 3. Give the Programs sets to BarnCRM's roles (`ProgramsAccessSync`), queued for the same
  *    reason. The installer's job runs it after its own grant, so the two never insert the
  *    installer's Programs Admin at the same moment; with no installer it is queued alone.
+ * 4. Apply the Participant Privacy preset and share every enrollment and service delivery with
+ *    its group (P-08, `ProgramsSharing.ApplyJob`), queued for the same reason.
  *
  * The steps are `runSetup`, which also adds the module to Core's setup marker and is what
  * Finish Setup runs for a module copied into an org by hand (FS1, `ModuleSetups`).
@@ -52,6 +54,7 @@ public with sharing class ProgramsPostInstall implements InstallHandler, ModuleS
         // Each entry point records its own failures and returns, so nothing here throws.
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         ModuleSetups.markRan(MODULE_KEY);
+        ProgramsSharing.requestApply();
         if (installerId == null) {
             new ProgramsAccessSync().requestSync();
             return;

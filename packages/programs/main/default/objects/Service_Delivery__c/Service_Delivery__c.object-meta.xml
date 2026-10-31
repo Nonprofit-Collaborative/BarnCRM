@@ -15,6 +15,7 @@
   <enableSearch>true</enableSearch>
   <enableSharing>true</enableSharing>
   <enableStreamingApi>true</enableStreamingApi>
+  <externalSharingModel>Private</externalSharingModel>
   <label>Service Delivery</label>
   <nameField>
     <displayFormat>SD-{000000}</displayFormat>
@@ -23,6 +24,6 @@
     <type>AutoNumber</type>
   </nameField>
   <pluralLabel>Service Deliveries</pluralLabel>
-  <sharingModel>ReadWrite</sharingModel>
+  <sharingModel>Private</sharingModel>
   <visibility>Public</visibility>
 </CustomObject>

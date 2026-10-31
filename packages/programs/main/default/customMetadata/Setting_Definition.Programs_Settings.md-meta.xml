@@ -40,7 +40,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">The choices staff pick from for an enrollment's intake and eligibility, and where to change them.</value>
+        <value xsi:type="xsd:string">Participant Privacy (who sees enrollments and service deliveries, Shared by default), and the choices staff pick from for an enrollment's intake and eligibility.</value>
     </values>
     <values>
         <field>Help_Path__c</field>

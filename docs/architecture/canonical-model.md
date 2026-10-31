@@ -9205,6 +9205,23 @@ Status of Eligible or Not Eligible, or changing it to either, fills an empty Eli
 today. A date already typed is kept, and Not Screened or Awaiting Documents leaves it alone. Part
 of the switchable `Enrollment_Dates` automation (R-EN3), so an import of history can turn it off.
 
+**R-EN7 Participant privacy is a preset (P-08).** Organization-wide sharing is Private. Every
+enrollment is shared, Read/Write, with the public group Programs Participant Records
+(`Programs_Participants`), through the Apex sharing reason `Programs_Participants__c`, written by
+an automation that always runs (registry row `Enrollment_Sharing`). The Participant Privacy preset
+on the Programs settings page decides who is in that group:
+
+- **Shared (the default):** the group holds All Internal Users, so everyone with a Programs
+  permission set sees every enrollment, as before P-08.
+- **Private:** the group holds no one BarnCRM put there, so an enrollment is seen by its owner,
+  people above the owner in the role hierarchy, and Programs Admin (View All and Modify All). An
+  admin may add chosen users, roles or groups to the group in Setup; BarnCRM adds and removes
+  only All Internal Users.
+
+The preset is stored in `Programs_Settings__c`, written only by the settings page and audited as
+a settings change. The group follows the preset at once when it is saved, and again at install,
+at Turn on and in the hourly access check, which repairs a group changed by hand.
+
 **Intake fields hold choices, not typed text (P-07).** The intake and eligibility fields are dates
 and restricted picklists, so R-EN5 still holds: erasing a person leaves nothing on an enrollment
 to empty. Notes about a person belong in case notes (P-04). The picklist values are the
@@ -9214,8 +9231,8 @@ R-EN6 names two values.
 
 ### Salesforce implementation
 
-- **Object:** `Enrollment__c`, name field AutoNumber `EN-{000000}`, sharing Public Read/Write
-  until P-08.
+- **Object:** `Enrollment__c`, name field AutoNumber `EN-{000000}`, sharing Private (Public
+  Read/Write before P-08), Apex sharing reason `Programs_Participants__c` (R-EN7).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -9236,7 +9253,14 @@ R-EN6 names two values.
   of BarnCRM Settings (`Setting_Definition.Programs_Settings`, a navigation row). It lists the
   intake picklists' active values and default from describe, with a link to the enrollment's
   fields in Setup (Object Manager by API name). The section name `Programs` is in Core's
-  `SettingSections`.
+  `SettingSections`. It also holds the Participant Privacy preset (R-EN7).
+- **Participant privacy (R-EN7, R-SD6):** the public group `Programs_Participants` (no bosses);
+  the hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox,
+  default unchecked, which is Shared); `ProgramsSharing` writes the shares (handler
+  `ProgramsSharingHandler`, registry rows `Enrollment_Sharing` and `Service_Delivery_Sharing`,
+  always run), sets the group's All Internal Users member (queued, as a group member is a setup
+  object), and shares records that have no share yet (`ProgramsSharingBatch`, run at install
+  and when the preset is saved). `ProgramsAccessSync` sets the member hourly.
 - **Validation rules:** `Exactly_One_Person` (R-EN1), `End_After_Start` (R-EN4).
 - **Service:** `EnrollmentService` (the stage values and the roster panel's reads and writes),
   `EnrollmentRulesHandler` (R-EN2), `EnrollmentDatesHandler` (R-EN3), `EnrollmentSelector`
@@ -9403,13 +9427,18 @@ always-run row, as the link is what the roster and the P-05 dashboard count by.
 instead of adding another. Nothing refuses a second row entered by hand: two separate meals on
 one day are two deliveries.
 
+**R-SD6 Participant privacy (P-08).** As R-EN7: sharing Private, every delivery shared with
+`Programs_Participants` through the reason `Programs_Participants__c` (registry row
+`Service_Delivery_Sharing`, always runs), so the Participant Privacy preset decides who sees
+deliveries as it does enrollments.
+
 **R-SD5 Erasing or deleting the person keeps the delivery.** As R-EN5: erasure credits it to the
 anonymous record; deleting the person empties the person (SetNull) and keeps the counts.
 
 ### Salesforce implementation
 
-- **Object:** `Service_Delivery__c`, name field AutoNumber `SD-{000000}`, sharing Public
-  Read/Write until P-08.
+- **Object:** `Service_Delivery__c`, name field AutoNumber `SD-{000000}`, sharing Private
+  (Public Read/Write before P-08), Apex sharing reason `Programs_Participants__c` (R-SD6).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -9730,6 +9759,7 @@ mirrors the primary member).
 | 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29Z), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |
 | 0.14 | 2026-10-31 | Programs P-07. `Enrollment__c` (29Y) gains Intake Date (`Intake_Date__c`, Date), Referral Source (`Referral_Source__c`), Eligibility Status (`Eligibility_Status__c`, default Not Screened) and Eligibility Basis (`Eligibility_Basis__c`), restricted picklists whose values the organization changes in Setup, and Eligibility Date (`Eligibility_Date__c`, Date), filled by new rule R-EN6 in the `Enrollment_Dates` automation. No PMM counterpart: they stay out of the MIG-09 mapping. The Programs section of BarnCRM Settings opens the module's settings page (`Programs_Settings` tab). |
 | 0.14 | 2026-10-31 | Programs P-04. New in the Programs module: Case Note (`Case_Note__c`, 29Y1), a dated, typed note on an enrollment, sharing Private, with rules R-CN1 to R-CN4. Erasing a person now deletes their case notes (`ProgramsErasureExtension` in `PersonErasureExtensions`); enrollments are still kept (R-EN5). |
+| 0.14 | 2026-10-31 | Programs P-08. `Enrollment__c` (29Y) and `Service_Delivery__c` (29Z) change from Public Read/Write to Private, each shared with the new public group `Programs_Participants` through the Apex sharing reason `Programs_Participants__c` (R-EN7, R-SD6). New hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox, default unchecked): the Participant Privacy preset, Shared by default, which puts All Internal Users in the group, or Private, which takes them out. Programs Admin gains View All and Modify All on both objects. |
 
 ---
 ## 32. Entity ownership by package
@@ -9817,6 +9847,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Service | Programs | 0.12 (P-01) | 29X |
 | Enrollment | Programs | 0.12 (P-01) | 29Y |
 | Case Note | Programs | 0.14 (P-04) | 29Y1 |
+| Programs Settings (custom setting, Participant Privacy preset) | Programs | 0.14 (P-08) | 29Y |
 | Service Delivery | Programs | 0.13 (P-02) | 29Z |
 | Funders entities | Funders | v0.9 | 30 |
 | NPSP household adoption | Mirror | v0.9 | 30 |

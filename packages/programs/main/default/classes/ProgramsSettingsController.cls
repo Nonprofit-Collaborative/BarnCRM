@@ -1,7 +1,8 @@
 /**
  * The Programs settings page (reached from the Programs section of BarnCRM Settings): the intake
  * and eligibility picklists (P-07, canonical model 29Y) with their current values and a link to
- * change them in Setup. Returns plain wrappers (plan 9.9).
+ * change them in Setup, and the Participant Privacy preset (P-08, R-EN7). Returns plain wrappers
+ * (plan 9.9).
  */
 public with sharing class ProgramsSettingsController {
     private static final String CONTEXT = 'ProgramsSettingsController';
@@ -32,6 +33,35 @@ public with sharing class ProgramsSettingsController {
         public Boolean canManage = false;
         @AuraEnabled
         public List<Picklist> intakePicklists = new List<Picklist>();
+        /** The Participant Privacy preset (P-08): Shared, the default, or Private. */
+        @AuraEnabled
+        public String participantPrivacy = ProgramsSharing.SHARED;
+    }
+
+    /**
+     * Saves the Participant Privacy preset org-wide (P-08, R-EN7): Private when true, Shared when
+     * false. Audited, and applied within a minute by a queued job. Returns the page's settings.
+     */
+    @AuraEnabled
+    public static Settings savePrivacy(Boolean privateParticipants) {
+        if (!HealthCheckService.canManageSettings()) {
+            AuraHandledException refused = new AuraHandledException(
+                Label.Programs_Settings_NoAccess
+            );
+            refused.setMessage(Label.Programs_Settings_NoAccess);
+            throw refused;
+        }
+        try {
+            ProgramsSharing.savePreset(privateParticipants);
+        } catch (Exception failure) {
+            ErrorLogger.log(failure, CONTEXT, null);
+            AuraHandledException refused = new AuraHandledException(
+                Label.Programs_Settings_SaveFailed
+            );
+            refused.setMessage(Label.Programs_Settings_SaveFailed);
+            throw refused;
+        }
+        return getSettings();
     }
 
     @AuraEnabled
@@ -42,6 +72,7 @@ public with sharing class ProgramsSettingsController {
             if (!settings.canManage) {
                 return settings;
             }
+            settings.participantPrivacy = ProgramsSharing.presetName(ProgramsSharing.isPrivate());
             for (Schema.SObjectField token : INTAKE_PICKLISTS) {
                 Schema.DescribeFieldResult described = token.getDescribe();
                 Picklist picklist = new Picklist();

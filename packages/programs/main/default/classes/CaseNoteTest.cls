@@ -41,6 +41,14 @@ private class CaseNoteTest {
         insert pantry;
         Enrollment__c enrolled = new Enrollment__c(Program__c = pantry.Id, Contact__c = person.Id);
         insert enrolled;
+        // Seen by all staff, as with Participant Privacy Shared (P-08), whatever the org's group.
+        insert new Enrollment__Share(
+            ParentId = enrolled.Id,
+            UserOrGroupId = [SELECT Id FROM Group WHERE Type = 'Organization' LIMIT 1]
+            .Id,
+            AccessLevel = 'Edit',
+            RowCause = Schema.Enrollment__Share.RowCause.Manual
+        );
         return enrolled;
     }
 

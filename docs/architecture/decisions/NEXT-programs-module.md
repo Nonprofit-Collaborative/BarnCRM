@@ -33,7 +33,11 @@ before each new module.
    make participants private without hiding programs. The lookup is required with delete
    Restrict: a program with enrollments cannot be deleted, enforced by the platform with no code.
    Enrollment ships Public Read/Write until P-08, which lands in the same batch (A) before any
-   client deploy.
+   client deploy. P-08 makes Enrollment and Service Delivery Private and shares every record
+   with one public group through an Apex sharing reason; the Participant Privacy preset only
+   adds or removes All Internal Users in that group, so changing it rewrites no record
+   (canonical model R-EN7). Apex managed sharing, not a sharing rule, because a sharing reason
+   ships with the object in a package and a group member can be set from Apex.
 4. **The person is the Contact and Account pair** (Section 4), exactly one set, as Volunteers.
 5. **One open enrollment per person per program.** Applied or Enrolled is open; a second open one
    is refused, in Apex, by an automation that always runs (ADR-0024). A person may enroll again

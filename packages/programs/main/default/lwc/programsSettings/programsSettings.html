@@ -15,7 +15,36 @@
       <p data-id="no-access" class="slds-text-body_regular">{labels.noAccess}</p>
     </template>
 
+    <template lwc:if={savedMessage}>
+      <p class="slds-text-color_success slds-var-m-bottom_small" data-id="saved" role="status">{savedMessage}</p>
+    </template>
+
     <template lwc:if={canManage}>
+      <lightning-card title={labels.privacyTitle} icon-name="utility:lock" class="slds-show slds-var-m-bottom_medium" data-id="privacy">
+        <div class="slds-var-p-horizontal_medium">
+          <p class="slds-text-body_small slds-var-m-bottom_small">{labels.privacyIntro}</p>
+          <lightning-radio-group
+            name="participantPrivacy"
+            label={labels.privacyLegend}
+            options={privacyOptions}
+            value={chosenPrivacy}
+            onchange={handlePrivacyChange}
+            data-id="privacy-choice"
+          ></lightning-radio-group>
+          <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small" data-id="privacy-default">
+            {labels.privacyDefault}
+          </p>
+          <lightning-button
+            class="slds-var-m-top_small slds-show"
+            variant="brand"
+            label={labels.save}
+            disabled={saveDisabled}
+            onclick={handleSavePrivacy}
+            data-id="privacy-save"
+          ></lightning-button>
+        </div>
+      </lightning-card>
+
       <lightning-card title={labels.picklistsTitle} icon-name="utility:picklist_type" data-id="picklists">
         <div class="slds-var-p-horizontal_medium">
           <p class="slds-text-body_small slds-var-m-bottom_small">{labels.picklistsIntro}</p>

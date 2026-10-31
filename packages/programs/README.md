@@ -3,9 +3,9 @@
 ## Purpose
 
 Programs, the services they offer, and the people enrolled in them (P-01), attendance and
-service delivery (P-02), private case notes (P-04), and intake and eligibility fields with the
-Programs Settings page (P-07). The program dashboard (P-05), the roster import (P-06) and the
-participant privacy preset (P-08) follow.
+service delivery (P-02), private case notes (P-04), intake and eligibility fields with the
+Programs Settings page (P-07), and the participant privacy preset (P-08). The program dashboard
+(P-05) and the roster import (P-06) follow.
 
 ## Design
 

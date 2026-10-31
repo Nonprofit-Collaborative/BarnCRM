@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Group xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Sees every Programs enrollment and service delivery. BarnCRM adds All Internal Users when
+    Participant Privacy is Shared and removes them when it is Private; members you add yourself
+    stay.
+  </description>
+  <doesIncludeBosses>false</doesIncludeBosses>
+  <name>Programs Participant Records</name>
+</Group>

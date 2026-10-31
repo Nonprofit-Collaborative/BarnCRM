@@ -1,10 +1,16 @@
 import { createElement } from 'lwc';
 import ProgramsSettings from 'c/programsSettings';
 import getSettings from '@salesforce/apex/ProgramsSettingsController.getSettings';
-import { format, picklistRows } from '../settingsRows';
+import savePrivacy from '@salesforce/apex/ProgramsSettingsController.savePrivacy';
+import { format, picklistRows, privacyOptions, storedPrivacy } from '../settingsRows';
 
 jest.mock(
   '@salesforce/apex/ProgramsSettingsController.getSettings',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/ProgramsSettingsController.savePrivacy',
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -64,6 +70,16 @@ describe('settingsRows (framework free)', () => {
     expect(picklistRows(undefined, {})).toEqual([]);
     expect(format(undefined)).toBe('');
   });
+
+  it('offers Shared first and reads the stored preset, Shared when unknown', () => {
+    expect(privacyOptions({ shared: 'S', private: 'P' })).toEqual([
+      { label: 'S', value: 'Shared' },
+      { label: 'P', value: 'Private' }
+    ]);
+    expect(storedPrivacy({ participantPrivacy: 'Private' })).toBe('Private');
+    expect(storedPrivacy({ participantPrivacy: 'Odd' })).toBe('Shared');
+    expect(storedPrivacy(undefined)).toBe('Shared');
+  });
 });
 
 describe('c-programs-settings', () => {
@@ -82,6 +98,41 @@ describe('c-programs-settings', () => {
     expect(link.getAttribute('href')).toContain('FieldsAndRelationships/00N1/view');
     expect(link.getAttribute('aria-label')).toBe('Change Referral Source in Setup');
     expect(find(element, 'no-access')).toBeNull();
+  });
+
+  it('shows the stored preset and saves a new one', async () => {
+    getSettings.mockResolvedValue({ ...SETTINGS, participantPrivacy: 'Shared' });
+    savePrivacy.mockResolvedValue({ ...SETTINGS, participantPrivacy: 'Private' });
+    const element = await render();
+    const choice = find(element, 'privacy-choice');
+    const save = find(element, 'privacy-save');
+    expect(choice.value).toBe('Shared');
+    expect(save.disabled).toBe(true);
+    expect(find(element, 'privacy-default')).not.toBeNull();
+
+    choice.dispatchEvent(new CustomEvent('change', { detail: { value: 'Private' } }));
+    await flush();
+    expect(save.disabled).toBe(false);
+
+    save.click();
+    await flush();
+    expect(savePrivacy).toHaveBeenCalledWith({ privateParticipants: true });
+    expect(find(element, 'saved')).not.toBeNull();
+    expect(save.disabled).toBe(true);
+  });
+
+  it('keeps the choice and says why when the save fails', async () => {
+    getSettings.mockResolvedValue({ ...SETTINGS, participantPrivacy: 'Private' });
+    savePrivacy.mockRejectedValue({});
+    const element = await render();
+    const choice = find(element, 'privacy-choice');
+    choice.dispatchEvent(new CustomEvent('change', { detail: { value: 'Shared' } }));
+    await flush();
+    find(element, 'privacy-save').click();
+    await flush();
+    expect(savePrivacy).toHaveBeenCalledWith({ privateParticipants: false });
+    expect(find(element, 'error').textContent).toContain('Programs_Settings_SaveFailed');
+    expect(choice.value).toBe('Shared');
   });
 
   it('says so when the viewer cannot manage settings', async () => {
