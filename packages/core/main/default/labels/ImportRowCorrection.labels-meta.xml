@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_LogCorrectedRetry</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row correction: run log line for a retry; {0} is how many rows</shortDescription>
+        <value>Retried {0} rows corrected on screen.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorNoFixedRows</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row correction: nothing corrected to retry</shortDescription>
+        <value>There are no corrected rejected rows to retry. Correct a rejected row and select Save Corrections first.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRetryByFileOpen</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row correction: a retry by file is open</shortDescription>
+        <value>A retry by file is open on this import. Finish it on the import&apos;s results step before retrying rows here.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorCorrectOnlyRejected</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row correction: the row is not rejected</shortDescription>
+        <value>Only a rejected row can be corrected.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorCorrectionsTooLong</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row correction: corrections too long to save</shortDescription>
+        <value>These corrections are too long to save. Shorten them, or retry the row with a fixed file.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_Title</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: title</shortDescription>
+        <value>Super Importer Row</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_Help</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: help text</shortDescription>
+        <value>Correct the values that caused the rejection, save, then retry. The file&apos;s own values are never changed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_StatusLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: status label</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_ImportLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: import label</shortDescription>
+        <value>Import</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_ReasonHeading</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: rejection reason heading</shortDescription>
+        <value>Why It Was Rejected</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_ColumnHeader</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: column header</shortDescription>
+        <value>Column</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_FileValueHeader</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: file value header</shortDescription>
+        <value>File Value</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_CorrectedHeader</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: corrected value header</shortDescription>
+        <value>Corrected Value</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_Save</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: save button</shortDescription>
+        <value>Save Corrections</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_RetryRow</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: retry one row button</shortDescription>
+        <value>Retry This Row</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_RetryAll</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: retry all fixed rows button</shortDescription>
+        <value>Retry All Fixed Rows</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_FixedCount</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: corrected rows waiting; {0} is how many rows</shortDescription>
+        <value>{0} corrected rows in this import are ready to retry.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_Refresh</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: refresh button</shortDescription>
+        <value>Refresh</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_Saved</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: corrections saved</shortDescription>
+        <value>Corrections saved. The file&apos;s values are kept beside them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_RetryStarted</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: retry started</shortDescription>
+        <value>The retry has started. Select Refresh in a moment to see the row&apos;s new status.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_NoValues</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: the row has no values</shortDescription>
+        <value>This row has no values to show.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportRow_Loading</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row card: loading alternative text</shortDescription>
+        <value>Loading</value>
+    </labels>
+</CustomLabels>

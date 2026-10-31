@@ -532,11 +532,84 @@ public with sharing class ImportBatchService {
         return start(batchId, dryRun, null, null);
     }
 
+    private static Id start(Id batchId, Boolean dryRun, Integer trialRows, Decimal afterRow) {
+        return start(batchId, dryRun, trialRows, afterRow, null);
+    }
+
+    /**
+     * Commits the batch's rejected rows corrected on screen, in place, through the same path
+     * as the import's commit (R-IB17a): the named rows, or every fixed row when none are named.
+     * Refused where a retry is not allowed (R-IB17), while a retry by file is open, or when no
+     * named row is still rejected with corrections.
+     */
+    @NamespaceAccessible
+    public static Id startRowRetry(Id batchId, Set<Id> rowIds) {
+        String refused = rowRetryRefusal(ImportBatchSelector.selectById(batchId));
+        if (refused != null) {
+            throw new ImportException(refused);
+        }
+        Set<Id> fixed = fixedRowIds(batchId, rowIds);
+        if (fixed.isEmpty()) {
+            throw new ImportException(Label.Core_Import_ErrorNoFixedRows);
+        }
+        return start(batchId, false, null, null, fixed);
+    }
+
+    /** Why rows of this batch cannot be corrected or retried on screen now, or null (R-IR4). */
+    @NamespaceAccessible
+    public static String rowRetryRefusal(Import_Batch__c batch) {
+        String refused = retryRefusal(batch);
+        if (refused == null && isRetrying(batch)) {
+            refused = Label.Core_Import_ErrorRetryByFileOpen;
+        }
+        return refused;
+    }
+
+    /**
+     * The batch's rejected rows that carry corrections, among those named or, when none are
+     * named, all of them, up to the retry cap. Corrections are long text, which a query cannot
+     * filter on, so they are checked here. System mode: the rows are the package's staging.
+     */
+    @NamespaceAccessible
+    public static Set<Id> fixedRowIds(Id batchId, Set<Id> rowIds) {
+        String rejected = ImportRowProcessor.STATUS_REJECTED;
+        Set<Id> named = rowIds == null ? new Set<Id>() : rowIds;
+        List<Import_Row__c> rows = named.isEmpty()
+            ? [
+                  SELECT Id, Corrected_Values_JSON__c
+                  FROM Import_Row__c
+                  WHERE Import_Batch__c = :batchId AND Status__c = :rejected
+                  WITH SYSTEM_MODE
+                  LIMIT :MAX_RETRY_ROWS
+              ]
+            : [
+                  SELECT Id, Corrected_Values_JSON__c
+                  FROM Import_Row__c
+                  WHERE Import_Batch__c = :batchId AND Status__c = :rejected AND Id IN :named
+                  WITH SYSTEM_MODE
+                  LIMIT :MAX_RETRY_ROWS
+              ];
+        Set<Id> fixed = new Set<Id>();
+        for (Import_Row__c row : rows) {
+            if (String.isNotBlank(row.Corrected_Values_JSON__c)) {
+                fixed.add(row.Id);
+            }
+        }
+        return fixed;
+    }
+
     /**
      * @param trialRows commit only this many first rows (R-IB16), or null
      * @param afterRow commit only rows after this row number, the rest of a trial, or null
+     * @param rowIds commit only these corrected rows (R-IB17a), or null
      */
-    private static Id start(Id batchId, Boolean dryRun, Integer trialRows, Decimal afterRow) {
+    private static Id start(
+        Id batchId,
+        Boolean dryRun,
+        Integer trialRows,
+        Decimal afterRow,
+        Set<Id> rowIds
+    ) {
         // Locked, so two starts at once cannot both find no job running (R-IB13).
         List<Import_Batch__c> locked = [
             SELECT Id
@@ -553,7 +626,8 @@ public with sharing class ImportBatchService {
             // Two passes of one batch at once would each overwrite the other's rows (R-IB13).
             throw new ImportException(Label.Core_Import_ErrorRunInProgress);
         }
-        Boolean retrying = isRetrying(batch);
+        // A retry of corrected rows runs as a retry's commit does (R-IB17a).
+        Boolean retrying = isRetrying(batch) || rowIds != null;
         if (retrying && batch.Committed_By__c != UserInfo.getUserId()) {
             throw new ImportException(Label.Core_Import_ErrorRetryOtherUser);
         }
@@ -628,7 +702,9 @@ public with sharing class ImportBatchService {
         // Enqueued before the write, so the job is recorded with the pass; both roll back
         // together if the write fails.
         batch.Job_Id__c = Database.executeBatch(
-            new ImportProcessorBatch(batch.Id, dryRun, trialRows, afterRow),
+            rowIds == null
+                ? new ImportProcessorBatch(batch.Id, dryRun, trialRows, afterRow)
+                : new ImportProcessorBatch(batch.Id, rowIds),
             scopeSize(batch.Chunk_Size__c)
         );
         Database.update(passStamp(batch), AccessLevel.USER_MODE);
@@ -858,6 +934,33 @@ public with sharing class ImportBatchService {
         String processorSettings,
         Boolean trial
     ) {
+        return finish(
+            batchId,
+            dryRun,
+            failed,
+            logLines,
+            fileAmount,
+            processorSettings,
+            trial,
+            false
+        );
+    }
+
+    /**
+     * Closes a run as above. A retry of corrected rows (R-IB17a) closes as a retry's commit
+     * does: the log follows the import's, the file total is kept and every row is counted.
+     */
+    @NamespaceAccessible
+    public static Import_Batch__c finish(
+        Id batchId,
+        Boolean dryRun,
+        Boolean failed,
+        List<String> logLines,
+        Decimal fileAmount,
+        String processorSettings,
+        Boolean trial,
+        Boolean correctedRetry
+    ) {
         Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
         if (batch == null) {
             return null;
@@ -865,7 +968,7 @@ public with sharing class ImportBatchService {
         Boolean partOfTrial = dryRun != true && (trial == true || batch.Trial_Rows__c != null);
         // A retry's preview counts its own rows; its commit counts every row, the replaced
         // rejects now Retried and counted as nothing (R-IB17).
-        Boolean retrying = isRetrying(batch);
+        Boolean retrying = isRetrying(batch) || correctedRetry == true;
         Boolean retryPreview = retrying && dryRun == true;
         Map<String, Integer> counts = trial == true
             ? ImportBatchSelector.countRowsByStatus(batchId, batch.Pass_Number__c)

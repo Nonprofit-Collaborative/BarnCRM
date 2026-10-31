@@ -208,6 +208,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>ImportRowCorrectionController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>ImportRowProcessor</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -1125,6 +1129,11 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Row__c.Batch_Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Import_Row__c.Contact_1__c</field>
     <readable>true</readable>
@@ -1132,6 +1141,11 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Import_Row__c.Contact_2__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Row__c.Corrected_Values_JSON__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

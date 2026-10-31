@@ -3461,7 +3461,7 @@ when the corrected row is loaded again.
 | Import Batch | `Import_Batch__c` | Master-Detail to `Import_Batch__c` |
 | Row Number | `Row_Number__c` | Number |
 | Raw Values | `Raw_Values_JSON__c` | Long Text Area |
-| Corrected Values | `Corrected_Values_JSON__c` | Long Text Area (131072) |
+| Corrected Values | `Corrected_Values_JSON__c` | Long Text Area (32768) |
 | Data Job Status | `Batch_Status__c` | Formula (Text): `TEXT(Import_Batch__r.Status__c)` |
 | Status | `Status__c` | Picklist: Pending, Matched, Created, Updated, Rejected, Skipped, Retried |
 | Error Message | `Error_Message__c` | Long Text Area |

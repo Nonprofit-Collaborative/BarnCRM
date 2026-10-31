@@ -390,16 +390,26 @@ public with sharing class ImportRowProcessor {
         return result;
     }
 
-    /** The row's uploaded values, keyed the way a mapping's source columns are keyed. */
+    /**
+     * The row's uploaded values, keyed the way a mapping's source columns are keyed, with each
+     * column corrected on screen read in place of the file's value (R-IR4). The raw values
+     * themselves are never changed.
+     */
     private static Map<String, String> rawValues(Import_Row__c row) {
+        Map<String, String> result = valuesOf(row.Raw_Values_JSON__c);
+        if (!result.isEmpty() && row.isSet(Import_Row__c.Corrected_Values_JSON__c)) {
+            result.putAll(valuesOf(row.Corrected_Values_JSON__c));
+        }
+        return result;
+    }
+
+    private static Map<String, String> valuesOf(String document) {
         Map<String, String> result = new Map<String, String>();
-        if (String.isBlank(row.Raw_Values_JSON__c)) {
+        if (String.isBlank(document)) {
             return result;
         }
         try {
-            Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
-                row.Raw_Values_JSON__c
-            );
+            Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(document);
             for (String column : parsed.keySet()) {
                 Object value = parsed.get(column);
                 result.put(
