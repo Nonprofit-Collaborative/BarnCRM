@@ -77,9 +77,10 @@ On the page the section shows one line and a **Learn More** link to this guide;
 with no template yet it shows **No Import Templates Yet** and a **Create a Template** button,
 which opens **Import a File**.
 
-The **Import**, **Find** and **Bulk Update** tabs are not in the apps' navigation: open them
-from here (the **Bulk Update** tab lists recent bulk updates, which **Data Jobs** below shows
-too). Bookmarks to them still work, and so do the links that open Find from elsewhere
+The **Import**, **Find** and **Super Transform** (formerly **Bulk Update**) tabs are not in
+the apps' navigation: open them from here or the App Launcher (the **Super Transform** tab
+changes many records without a file, see [Super Transform](super-transform.md), and lists
+recent bulk updates, which **Data Jobs** below shows too). Bookmarks to them still work, and so do the links that open Find from elsewhere
 (**Open in Find** on the Org Optimizer page, for example).
 
 ## 3. A Five-Minute Walkthrough (as Maria)

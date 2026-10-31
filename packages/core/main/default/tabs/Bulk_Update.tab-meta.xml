@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    Recent bulk updates, what each changed, and their undo. A bulk update starts from Find.
+    Super Transform: change many records without a file, then recent bulk updates and their
+    undo. A bulk update can also start from Find.
   </description>
   <flexiPage>Bulk_Update</flexiPage>
-  <label>Bulk Update</label>
+  <label>Super Transform</label>
   <motif>Custom19: Wrench</motif>
 </CustomTab>

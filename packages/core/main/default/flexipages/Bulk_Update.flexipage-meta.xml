@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    The Bulk Update page: recent bulk updates and bulk deletes, and their undo.
+    The Super Transform page (C-50): change many records without a file, then recent bulk
+    updates and bulk deletes, and their undo.
   </description>
   <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>superTransform</componentName>
+        <identifier>superTransform1</identifier>
+      </componentInstance>
+    </itemInstances>
     <itemInstances>
       <componentInstance>
         <componentInstanceProperties>
@@ -17,7 +24,7 @@
     <name>main</name>
     <type>Region</type>
   </flexiPageRegions>
-  <masterLabel>Bulk Update</masterLabel>
+  <masterLabel>Super Transform</masterLabel>
   <template>
     <name>flexipage:defaultAppHomeTemplate</name>
   </template>

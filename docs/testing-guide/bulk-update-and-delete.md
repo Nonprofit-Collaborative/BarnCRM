@@ -147,10 +147,10 @@ Test contacts for the delete scripts: create three contacts with first names `De
 |---|---|---|
 | 1 | As admin (without **BarnCRM Bulk Delete**), run any Find query. | **Bulk Update** is offered; **Bulk Delete** is not. |
 | 2 | Log in as read-only. Search the App Launcher for "Find", "Bulk Update" and "Data Manager". | None of these BarnCRM tabs is found. |
-| 3 | As admin, on **Access**, give staff **BarnCRM Find and Export** only. Log in as staff and run a Find query. | Neither **Bulk Update** nor **Bulk Delete** is offered. No **Bulk Update** tab in the App Launcher. |
-| 4 | As admin, give staff **BarnCRM Bulk Update** as well. Log in as staff and run a Find query. | **Bulk Update** is offered, and the **Bulk Update** tab is available. |
-| 5 | As staff, open the **Bulk Update** tab. | **Data Jobs** with "A bulk update starts in Find: run a query, then choose Change Records, Bulk Update. Recent bulk updates and their undo are listed here." and **Open Find**. Only staff's own jobs are listed; **Show everyone's jobs** is not offered. |
-| 6 | As admin, open the **Bulk Update** tab. | **Show everyone's jobs** is offered; ticking it lists other people's jobs too. |
+| 3 | As admin, on **Access**, give staff **BarnCRM Find and Export** only. Log in as staff and run a Find query. | Neither **Bulk Update** nor **Bulk Delete** is offered. No **Super Transform** tab in the App Launcher. |
+| 4 | As admin, give staff **BarnCRM Bulk Update** as well. Log in as staff and run a Find query. | **Bulk Update** is offered, and the **Super Transform** tab is available. |
+| 5 | As staff, open the **Super Transform** tab. | The five Super Transform steps, then **Data Jobs** with "A bulk update starts in Find: run a query, then choose Change Records, Bulk Update. Recent bulk updates and their undo are listed here." and **Open Find**. Only staff's own jobs are listed; **Show everyone's jobs** is not offered. |
+| 6 | As admin, open the **Super Transform** tab. | **Show everyone's jobs** is offered; ticking it lists other people's jobs too. |
 | 7 | As admin, give staff **BarnCRM Bulk Delete**. Log in as staff and run a Find query. | **Bulk Delete** is offered. On **Access**, the Bulk Delete give step showed the warning "This permission lets the person remove data. Give it only to someone you trust to do that." |
 | 8 | As admin, in Setup, open staff's user and check **Permission Set Assignments**. | **BarnCRM Tab: Bulk Update**, **BarnCRM Tab: Find** and **BarnCRM Tab: Data Manager** are assigned (given by BarnCRM, not by hand). |
 | 9 | As admin, remove **BarnCRM Bulk Update**, **BarnCRM Bulk Delete** and **BarnCRM Find and Export** from staff on **Access**. Log in as staff. | The **Find**, **Bulk Update** and **Data Manager** tabs are gone. |
@@ -172,3 +172,52 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 6 | On **Data Manager**, under **Data Jobs**, select **Open Find**. | **Find** opens with the Bulk Update note from step 1. |
 
 **Cleanup:** none (nothing was changed or deleted).
+
+## T-BULK-11: Super Transform from Start to Undo
+
+**Purpose:** confirm the five Super Transform steps: live count, typed value inputs, preview with highlighted changes, confirmation, run and undo. Setup detail: [Super Transform](../admin-guide/super-transform.md).
+**Prerequisites:** admin; the Garcia contacts have an empty **Title**.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Super Transform** tab. | The tab reads **Super Transform**. Five numbered steps show above **Data Jobs**: **1. Object**, **2. Which Records**, **3. What to Change**, **4. Preview**, **5. Run**. Steps 2 and 3 say "Choose an object first." **Preview** and **Run Super Transform** are disabled. |
+| 2 | Type `cont` in **Search Objects**, then open **Object**. | Only objects whose name contains "cont" are listed. No BarnCRM bookkeeping object (Data Job, Error Log) is offered anywhere in the list. Choose **Contact**. |
+| 3 | Wait a moment without adding a condition. | **Matching Records** shows the number of contacts with an **Every Record** badge, and a warning: "No condition is set. This changes every Contact: N records." |
+| 4 | Add the condition **Last Name** **equals** `Garcia`. | After about half a second the count changes to the number of Garcia contacts (note it as N) and the warning goes away. |
+| 5 | Under **3. What to Change**, choose **Title**, keep **Set To**, and type `st test`. Then press **Add a Field**, choose a picklist field (for example **Salutation**). | The second row's **New Value** is a dropdown of the picklist's values. Remove the second row with its delete icon. |
+| 6 | Press **Preview**. | "N records match. The first N, before and after:" and a table with **Record** and **Title**. Every **Title** cell is shaded and reads "(blank)", an arrow, then `st test` in bold. "0 of the N records shown already have these values and will not be saved." |
+| 7 | Change **New Value** to `st test2`. | The preview table disappears and **Run Super Transform** is disabled until you press **Preview** again. Press **Preview**. |
+| 8 | Press **Run Super Transform**, then **Cancel**. | The confirmation read "Change Title on N Contacts." Nothing changed. |
+| 9 | Press **Run Super Transform**, then **Run**. | "The bulk update started." then a progress bar, then "N matched: N updated, 0 already held the new values, 0 failed." and "To undo this run, press Undo on it under Data Jobs below." |
+| 10 | Reload the page. Under **Data Jobs**, press **Undo** on the newest bulk update, type the number and confirm. | When the undo finishes, every Garcia contact's **Title** is empty again. |
+
+**Cleanup:** none (the undo put the titles back).
+
+## T-BULK-12: Super Transform Warnings and Typed Confirmation
+
+**Purpose:** confirm the run limit warning, the typed confirmation over 200 records, and that values already held are shown as unchanged.
+**Prerequisites:** admin; sample data loaded (more than 200 contacts).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In BarnCRM Settings, **Import**, set **Bulk update run limit** to `10`. Open **Super Transform**, choose **Contact**, with no condition. | **Matching Records** shows 11 with an **Over the Limit** badge and a warning that more records match than the 10 one run may change. **Preview** is disabled. |
+| 2 | Set **Bulk update run limit** back to `48000` and reload **Super Transform**. Choose **Contact**, choose **Title**, **Set To**, type `x`, and press **Preview**. | The table lists 25 contacts. |
+| 3 | Press **Run Super Transform**. | The confirmation has a field "Type N to confirm" (N is the count), and **Run** stays disabled until N is typed. Press **Cancel**. |
+| 4 | Add the condition **Last Name** **equals** `Garcia`, choose **Title** **Clear**, and press **Preview**. | Every **Title** cell that is already empty is not shaded and shows only "(blank)"; the line under the table counts them. |
+
+**Cleanup:** check **Bulk update run limit** reads 48,000.
+
+## T-BULK-13: Super Transform Steps and Permissions
+
+**Purpose:** confirm Change With Steps, Fix Name Capitals and the message for a person without the permissions.
+**Prerequisites:** admin; a contact with **First Name** `  ana ` and **Last Name** `Sttest`; a user with **BarnCRM Find and Export** only (see [Test users](before-you-test.md#test-users)).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Super Transform**, choose **Contact**, add **Last Name** **equals** `Sttest`, choose **First Name**, and open **Action**. | The actions are **Set To**, **Clear**, **Copy From Another Field**, **Change With Steps** and **Fix Name Capitals**. |
+| 2 | Choose **Fix Name Capitals**. | **Action** shows **Change With Steps**, with two steps already filled in: remove extra spaces, and capitalize each word. |
+| 3 | Press **Preview**, then **Run Super Transform** and **Run**. | The preview showed `  ana ` changing to `Ana`. After the run the contact's **First Name** is `Ana`. Undo it under **Data Jobs**. |
+| 4 | Log in as the user with **BarnCRM Find and Export** only and open **Super Transform** (App Launcher). | If the tab is shown, it says Super Transform is not turned on for them, with the permissions to ask for, and no error. |
+
+**Cleanup:** delete the Sttest contact.

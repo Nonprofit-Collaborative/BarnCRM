@@ -3,9 +3,11 @@
 ## 1. What It Does
 
 **Bulk Update** changes up to five fields on every record a [Find](find.md) query returns, in
-one go. It always starts in Find: the **Update Many Records** tile on the Data Manager tab
-opens Find with a note, and the **Bulk Update** page (recent bulk updates and their undo) has
-an **Open Find** button. For each field you choose one of:
+one go. It starts in Find: the **Update Many Records** tile on the Data Manager tab
+opens Find with a note, and the **Super Transform** page (formerly **Bulk Update**: recent
+bulk updates and their undo) has an **Open Find** button. To make the same change without a
+Find query, use [Super Transform](super-transform.md), which runs the same bulk update. For
+each field you choose one of:
 
 - **Set to a value**: every record gets the same value, for example Mailing City "Portland".
 - **Clear**: the field is emptied.
