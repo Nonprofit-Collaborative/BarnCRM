@@ -3,7 +3,7 @@ import searchPeople from '@salesforce/apex/AccessExplorerController.searchPeople
 import searchPermissionSets from '@salesforce/apex/AccessExplorerController.searchPermissionSets';
 import getAccess from '@salesforce/apex/AccessExplorerController.getAccess';
 import getFieldAccess from '@salesforce/apex/AccessExplorerController.getFieldAccess';
-import { toCsv, fileName, format, messageFrom } from 'c/findCsv';
+import { format, messageFrom, downloadCsv } from 'c/findCsv';
 import { withDetails } from 'c/accessExplorerRows';
 import {
   OBJECT_FLAGS,
@@ -314,13 +314,7 @@ export default class AccessCompare extends LightningElement {
       label: column.label,
       path: column.fieldName
     }));
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(
-      new Blob([toCsv(columns, table.rows)], { type: 'text/csv;charset=utf-8' })
-    );
-    link.download = fileName(FILE_BASE);
-    link.click();
-    URL.revokeObjectURL(link.href);
+    downloadCsv(FILE_BASE, columns, table.rows);
     this.noticeMessage = format(DOWNLOADED, String(table.rows.length));
   }
 }

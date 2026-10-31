@@ -4,7 +4,7 @@ import TIME_ZONE from '@salesforce/i18n/timeZone';
 import getSummary from '@salesforce/apex/SetupChangeController.getSummary';
 import getChanges from '@salesforce/apex/SetupChangeController.getChanges';
 import copyNow from '@salesforce/apex/SetupChangeController.copyNow';
-import { toCsv, fileName, messageFrom, zonedDateTime } from 'c/findCsv';
+import { messageFrom, zonedDateTime, downloadCsv } from 'c/findCsv';
 import {
   tableColumns,
   csvColumns,
@@ -228,13 +228,7 @@ export default class SetupChangeLog extends LightningElement {
       const exportRows = (this.summary && this.summary.exportRows) || 5000;
       const result = await getChanges(filterArgs(this.filters, exportRows));
       const rows = csvRows(result && result.rows, (value) => zonedDateTime(value, TIME_ZONE));
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(
-        new Blob([toCsv(csvColumns(COLUMN_LABELS), rows)], { type: 'text/csv;charset=utf-8' })
-      );
-      link.download = fileName(FILE_BASE);
-      link.click();
-      URL.revokeObjectURL(link.href);
+      downloadCsv(FILE_BASE, csvColumns(COLUMN_LABELS), rows);
       this.noticeMessage = fill(DOWNLOADED, countText(rows.length, LOCALE));
     } catch (error) {
       this.errorMessage = messageFrom(error);

@@ -27,8 +27,8 @@ import markPostedLabel from '@salesforce/label/c.Mirror_AccountingExport_MarkPos
 import markPostedHelp from '@salesforce/label/c.Mirror_AccountingExport_MarkPostedHelp';
 import marked from '@salesforce/label/c.Mirror_AccountingExport_Marked';
 import markNeedsAllFunds from '@salesforce/label/c.Mirror_AccountingExport_MarkNeedsAllFunds';
+import { BYTE_ORDER_MARK, bodyMessage, saveBlob } from 'c/findCsv';
 
-const BYTE_ORDER_MARK = '\uFEFF';
 const REVOKE_DELAY_MS = 1000;
 
 /**
@@ -156,7 +156,7 @@ export default class AccountingExport extends LightningElement {
         .replace('{1}', view.giftCount)
         .replace('{2}', this.money(view.total));
     } catch (failure) {
-      this.error = (failure && failure.body && failure.body.message) || errorFailed;
+      this.error = bodyMessage(failure, errorFailed);
     } finally {
       this.working = false;
     }
@@ -174,7 +174,7 @@ export default class AccountingExport extends LightningElement {
       this.downloaded = undefined;
       this.message = marked.replace('{0}', count);
     } catch (failure) {
-      this.error = (failure && failure.body && failure.body.message) || errorFailed;
+      this.error = bodyMessage(failure, errorFailed);
     } finally {
       this.working = false;
     }
@@ -193,14 +193,10 @@ export default class AccountingExport extends LightningElement {
    * download only after the click handler returns.
    */
   save(fileName, csv) {
-    const url = URL.createObjectURL(
-      new Blob([BYTE_ORDER_MARK, csv], { type: 'text/csv;charset=utf-8' })
+    saveBlob(
+      new Blob([BYTE_ORDER_MARK, csv], { type: 'text/csv;charset=utf-8' }),
+      fileName,
+      REVOKE_DELAY_MS
     );
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    link.click();
-    // eslint-disable-next-line @lwc/lwc/no-async-operation
-    setTimeout(() => URL.revokeObjectURL(url), REVOKE_DELAY_MS);
   }
 }

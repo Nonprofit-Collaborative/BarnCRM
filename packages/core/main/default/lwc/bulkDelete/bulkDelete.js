@@ -6,7 +6,7 @@ import previewFile from '@salesforce/apex/BulkDeleteController.previewFile';
 import startFile from '@salesforce/apex/BulkDeleteController.startFile';
 import FILE_INTRO from '@salesforce/label/c.Core_BulkDelete_FileIntro';
 import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
-import { toCsv, fileName, messageFrom, format } from 'c/findCsv';
+import { messageFrom, format, downloadCsv } from 'c/findCsv';
 import { startPolling } from 'c/jobPoller';
 import BACKUP from '@salesforce/label/c.Core_BulkDelete_Backup';
 import BACKUP_HELP from '@salesforce/label/c.Core_BulkDelete_BackupHelp';
@@ -182,13 +182,7 @@ export default class BulkDelete extends LightningElement {
         label: column.label,
         path: column.fieldName
       }));
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(
-        new Blob([toCsv(columns, rows)], { type: 'text/csv;charset=utf-8' })
-      );
-      link.download = fileName(page.objectName);
-      link.click();
-      URL.revokeObjectURL(link.href);
+      downloadCsv(page.objectName, columns, rows);
       this.noticeMessage = format(BACKUP_DONE, String(rows.length));
     });
   }

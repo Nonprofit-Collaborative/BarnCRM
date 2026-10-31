@@ -8,7 +8,7 @@ import {
   TABLE_COLUMNS,
   FILL_RATE_COLUMN
 } from 'c/dictionaryKit';
-import { fileName, format, messageFrom } from 'c/findCsv';
+import { fileName, format, messageFrom, saveBlob } from 'c/findCsv';
 
 import TITLE from '@salesforce/label/c.Core_DataDictionary_PageTitle';
 import INTRO from '@salesforce/label/c.Core_DataDictionary_PageIntro';
@@ -188,15 +188,12 @@ export default class DataDictionary extends LightningElement {
   }
 
   handleDownload() {
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(
+    saveBlob(
       new Blob([dictionaryCsv(this.rows, this.builtWithFillRates)], {
         type: 'text/csv;charset=utf-8'
-      })
+      }),
+      fileName(FILE_BASE)
     );
-    link.download = fileName(FILE_BASE);
-    link.click();
-    URL.revokeObjectURL(link.href);
     this.noticeMessage = format(DOWNLOADED, String(this.rows.length));
   }
 }

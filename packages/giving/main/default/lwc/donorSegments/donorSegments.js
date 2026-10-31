@@ -15,7 +15,7 @@ import saveFromTemplate from '@salesforce/apex/DonorSegmentController.saveFromTe
 import countSegment from '@salesforce/apex/DonorSegmentController.countSegment';
 import listSegment from '@salesforce/apex/DonorSegmentController.listSegment';
 import exportPage from '@salesforce/apex/DonorSegmentController.exportPage';
-import { toCsv, fileName, format, messageFrom } from 'c/findCsv';
+import { format, messageFrom, downloadCsv } from 'c/findCsv';
 import {
   MAILCHIMP,
   CONSTANT_CONTACT,
@@ -358,11 +358,7 @@ export default class DonorSegments extends NavigationMixin(LightningElement) {
           break;
         }
       }
-      const csv = toCsv(columns, rows);
-      this.download(
-        new Blob([csv], { type: 'text/csv;charset=utf-8' }),
-        fileName(`${segment.name}-${layout}`)
-      );
+      downloadCsv(`${segment.name}-${layout}`, columns, rows);
       const done = collector.duplicates
         ? format(EXPORTED_DUPLICATES, rows.length.toLocaleString(), collector.duplicates)
         : format(EXPORTED, rows.length.toLocaleString());
@@ -375,14 +371,6 @@ export default class DonorSegments extends NavigationMixin(LightningElement) {
     } finally {
       this.busy = false;
     }
-  }
-
-  download(blob, name) {
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = name;
-    link.click();
-    URL.revokeObjectURL(link.href);
   }
 
   handleEditInFind() {

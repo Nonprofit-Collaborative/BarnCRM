@@ -6,7 +6,7 @@ import getFindPage from '@salesforce/apex/FindController.getPage';
 import exportPage from '@salesforce/apex/FindController.exportPage';
 import getChecks from '@salesforce/apex/DataHygieneController.getChecks';
 import { readFillRates, toRow, dictionaryCsv } from 'c/dictionaryKit';
-import { toCsv, fileName, format, messageFrom } from 'c/findCsv';
+import { toCsv, fileName, format, messageFrom, saveBlob } from 'c/findCsv';
 import { writeZip } from 'c/xlsxWriter';
 import {
   HANDLING,
@@ -330,7 +330,10 @@ export default class AiReadinessExport extends LightningElement {
         ['data-dictionary.csv', dictionaryCsv(dictionaryRows, this.includeFillRates)],
         ...files
       ]);
-      this.save(new Blob([bytes], { type: 'application/zip' }));
+      saveBlob(
+        new Blob([bytes], { type: 'application/zip' }),
+        fileName(FILE_BASE, new Date(), 'zip')
+      );
       const total = Object.values(records).reduce((sum, info) => sum + info.count, 0);
       this.noticeMessage = [format(DONE, String(objects.length), String(total)), ...notes].join(
         ' '
@@ -464,13 +467,5 @@ export default class AiReadinessExport extends LightningElement {
       }
     }
     return { rows: [...byId.values()], stopped };
-  }
-
-  save(blob) {
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName(FILE_BASE, new Date(), 'zip');
-    link.click();
-    URL.revokeObjectURL(link.href);
   }
 }

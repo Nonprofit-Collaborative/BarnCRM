@@ -8,7 +8,7 @@ import getPeopleWithAccess from '@salesforce/apex/AccessExplorerController.getPe
 import getOverview from '@salesforce/apex/AccessExplorerController.getOverview';
 import listObjects from '@salesforce/apex/DataDictionaryController.listObjects';
 import describeObject from '@salesforce/apex/DataDictionaryController.describeObject';
-import { toCsv, fileName, format, messageFrom } from 'c/findCsv';
+import { format, messageFrom, downloadCsv } from 'c/findCsv';
 import { withFlags as toFlagRow, withDetails } from 'c/accessExplorerRows';
 
 import TITLE from '@salesforce/label/c.Core_AccessExplorer_Title';
@@ -470,13 +470,7 @@ export default class AccessExplorer extends LightningElement {
       label: column.label,
       path: column.fieldName
     }));
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(
-      new Blob([toCsv(columns, table.rows)], { type: 'text/csv;charset=utf-8' })
-    );
-    link.download = fileName(FILE_BASE);
-    link.click();
-    URL.revokeObjectURL(link.href);
+    downloadCsv(FILE_BASE, columns, table.rows);
     this.noticeMessage = format(DOWNLOADED, String(table.rows.length));
   }
 }
