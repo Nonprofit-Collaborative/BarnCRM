@@ -24,7 +24,7 @@
   </values>
   <values>
     <field>Staff_Tabs__c</field>
-    <value xsi:type="xsd:string">Quick_Gift_Entry;Gift__c;Commitment__c;Gift_Batch__c</value>
+    <value xsi:type="xsd:string">Quick_Gift_Entry;Gift__c;Commitment__c;Gift_Batch__c;Donor_Segments</value>
   </values>
   <values>
     <field>Admin_Tabs__c</field>

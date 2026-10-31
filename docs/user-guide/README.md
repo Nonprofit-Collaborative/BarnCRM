@@ -42,6 +42,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.
+- [Donor segments](donor-segments.md): lists of donors by their giving, exported for Mailchimp or Constant Contact.
 
 ## Report a Bug or Give Feedback
 

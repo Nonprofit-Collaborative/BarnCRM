@@ -121,3 +121,23 @@ For every script on this page:
 | 6 | Open **Margaret Young**'s household (sample: 65 about two years ago, then 1,475 refunded in full about three months before load). | If the 1,475 gift is dated in this fiscal year: **Giving This Year** 0, and the household is on neither LYBUNT nor SYBUNT, because the refunded gift still counts as a gift this year. |
 
 **Cleanup:** None.
+
+## T-GRD-08: Donor Segments
+
+**Purpose:** Confirm a starter template saves a segment that counts, lists and exports for Mailchimp, Constant Contact and All Columns, leaving out who cannot be emailed. Setup detail: [Donor segments](../admin-guide/donor-segments.md).
+**Prerequisites:** admin (holds BarnCRM Find and Export through BarnCRM Admin). T-GRD-01 done. Sample data loaded. A spreadsheet app to open CSV files.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the **Fundraising** app, open **Donor Segments**. | The page shows **Start From a Template** with five templates and **Your Segments**. |
+| 2 | Choose **Lapsed Donors**, **People**, keep the name **Lapsed Donors (People)**, select **Save as Segment**. | "Segment saved" shows; the segment is chosen and its count shows (sample data gives at least one). |
+| 3 | Select **Show List**. | A table of people with Email, Last Gift Date and giving columns; each has **Giving Last Year** above 0 and **Giving This Year** 0 or empty. |
+| 4 | Open one listed person, tick **Email Opt Out**, save, and return to **Donor Segments**. Choose the segment again. | The count is unchanged: opting out does not leave the segment. |
+| 5 | With **Export Layout** **Mailchimp**, select **Export**. Open the file. | Header row: Email Address, First Name, Last Name, Tags. The opted-out person is not in it, nobody without an email is, and every row's Tags is **Lapsed Donors (People)**. |
+| 6 | Choose **Constant Contact** and export. | Header row starts Email address, First name, Last name, Street address line 1, City. |
+| 7 | Choose **All Columns** and export. | The segment's own columns; the opted-out person is in it. |
+| 8 | Save **Major Gift Prospects** for **Organizations**. Open the **Export Layout** choice. | Only **All Columns** is offered, with a note that the email layouts are for people. |
+| 9 | Choose **Lapsed Donors (People)** and select **Edit in Find**. | Find opens with the segment's query loaded. |
+| 10 | As staff without **BarnCRM Find and Export**, open **Donor Segments**. | The page says the BarnCRM Find and Export permission set is needed and shows no segments. |
+
+**Cleanup:** Untick **Email Opt Out** on the person from step 4. In Find, delete the two saved queries.

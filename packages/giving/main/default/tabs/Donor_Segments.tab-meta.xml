@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Donor segments: named lists of people or organizations chosen by their giving, counted,
+    listed and exported for an email tool (G-28).
+  </description>
+  <flexiPage>Donor_Segments</flexiPage>
+  <label>Donor Segments</label>
+  <motif>Custom62: Chalkboard</motif>
+</CustomTab>

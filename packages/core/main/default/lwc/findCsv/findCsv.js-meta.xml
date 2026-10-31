@@ -3,7 +3,7 @@
   <apiVersion>67.0</apiVersion>
   <description>
     Writes Find results as CSV: UTF-8 with a byte-order mark, a header row of labels, quoted
-    values (canonical model R-SQ3). Imported by findRecords.
+    values (R-SQ3). Imported by findRecords and by Giving's donorSegments, so it is exposed.
   </description>
-  <isExposed>false</isExposed>
+  <isExposed>true</isExposed>
 </LightningComponentBundle>

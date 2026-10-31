@@ -1429,6 +1429,10 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Donor_Segments</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Fund__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
