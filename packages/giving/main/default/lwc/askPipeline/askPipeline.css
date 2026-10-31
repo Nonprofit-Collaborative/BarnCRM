@@ -1,0 +1,21 @@
+.ask-board {
+  display: flex;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  overflow-x: auto;
+  padding-bottom: var(--slds-g-spacing-3, 0.75rem);
+  align-items: flex-start;
+}
+
+.ask-column {
+  flex: 0 0 16rem;
+  min-width: 16rem;
+}
+
+.ask-card {
+  cursor: grab;
+  background: var(--slds-g-color-surface-container-1, #ffffff);
+}
+
+.ask-tile {
+  height: 100%;
+}

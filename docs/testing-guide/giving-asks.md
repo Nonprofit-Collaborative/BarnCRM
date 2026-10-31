@@ -107,5 +107,5 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Log in as that user. Open **Ask Pipeline**. | The board and totals show. |
-| 2 | Try to drag a card, and look at **New Ask** and a card's menu. | The ask is not moved (or the move is refused). New and changes are refused or not offered. |
+| 2 | Look at the top of the page, then try to drag a card and open a card's menu. | A line says you can see asks but not change them. **New Ask** is not shown. Cards do not drag, and the menu offers only **Open**. |
 | 3 | Open an ask and try to edit it. | Refused: no edit access. |
