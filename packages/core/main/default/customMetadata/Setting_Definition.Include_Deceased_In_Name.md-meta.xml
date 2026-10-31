@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <label>Include people who have died in names</label>
+  <label>Include People Who Have Died in Names</label>
   <protected>true</protected>
   <values>
     <field>Data_Type__c</field>

@@ -38,6 +38,7 @@ import SEVERITY_INFO from '@salesforce/label/c.Core_HealthCheck_SeverityInfo';
 import SEVERITY_WARNING from '@salesforce/label/c.Core_HealthCheck_SeverityWarning';
 import TITLE from '@salesforce/label/c.Core_HealthCheck_Title';
 import USE_RECOMMENDED from '@salesforce/label/c.Core_HealthCheck_UseRecommendedButton';
+import { messageFrom } from 'c/findCsv';
 
 const ACTION_PREFIX = 'action:';
 const ACTION_RECOMMENDED_MODE = 'action:applyRecommendedMode';
@@ -123,7 +124,7 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
       this.lastRun = await getLastRun();
     } catch (error) {
       this.lastRun = undefined;
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = messageFrom(error, LOAD_FAILED);
     } finally {
       this.loading = false;
     }
@@ -170,7 +171,7 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
       this.report = await getReport();
     } catch (error) {
       this.report = undefined;
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = messageFrom(error, LOAD_FAILED);
     } finally {
       this.loading = false;
     }
@@ -431,7 +432,7 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
       this.report = await action();
       this.fixOutcome = this.report ? this.report.fixOutcome : undefined;
     } catch (error) {
-      const message = this.messageFrom(error);
+      const message = messageFrom(error, LOAD_FAILED);
       // If the re-run fails too, the fix's own message is the one worth reading, so the
       // report already shown stays.
       const shown = this.report;
@@ -440,15 +441,5 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
     } finally {
       this.loading = false;
     }
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    if (error && error.message) {
-      return error.message;
-    }
-    return LOAD_FAILED;
   }
 }

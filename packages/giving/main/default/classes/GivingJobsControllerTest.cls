@@ -39,7 +39,7 @@ private class GivingJobsControllerTest {
                 view.nextRunAt,
                 'There is no next run to show when nothing is scheduled.'
             );
-            Assert.areEqual(3, view.jobs.size(), 'The page lists all three nightly jobs.');
+            Assert.areEqual(4, view.jobs.size(), 'The page lists all four nightly jobs.');
             for (GivingJobsController.JobView job : view.jobs) {
                 Assert.isFalse(
                     job.stale,
@@ -70,7 +70,7 @@ private class GivingJobsControllerTest {
                 'The page shows when the first of the three jobs is next due.'
             );
             Assert.areEqual(
-                3,
+                4,
                 [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
                 'Choosing Schedule from the console schedules all three jobs, which is the whole fix.'
             );
@@ -93,7 +93,7 @@ private class GivingJobsControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                3,
+                4,
                 [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
                 'Pressing Schedule twice does not schedule a second copy of each job.'
             );
@@ -259,9 +259,9 @@ private class GivingJobsControllerTest {
                 'The page tells the component to disable its buttons for a reader.'
             );
             Assert.areEqual(
-                3,
+                4,
                 view.jobs.size(),
-                'A reader still sees all three jobs, because seeing whether they run is not a change.'
+                'A reader still sees all four jobs, because seeing whether they run is not a change.'
             );
         }
     }

@@ -54,7 +54,7 @@ public with sharing class HouseholdOfPersonController {
                 : householdIdFromContact(personId);
             return toViews(householdsAsUser(householdIds));
         } catch (Exception e) {
-            throw asUserError(Label.Core_HouseholdPanel_OfPersonLoadFailed);
+            throw UserErrors.message(Label.Core_HouseholdPanel_OfPersonLoadFailed);
         }
     }
 
@@ -90,10 +90,10 @@ public with sharing class HouseholdOfPersonController {
                 Database.update(changed, AccessLevel.USER_MODE);
             }
         } catch (HouseholdException e) {
-            throw asUserError(e.getMessage());
+            throw UserErrors.message(e.getMessage());
         } catch (Exception e) {
             ErrorLogger.log(e, Label.Core_Households_ErrorContextMembership, householdId);
-            throw asUserError(Label.Core_HouseholdPanel_MakePrimaryFailed);
+            throw UserErrors.message(Label.Core_HouseholdPanel_MakePrimaryFailed);
         }
     }
 
@@ -122,7 +122,7 @@ public with sharing class HouseholdOfPersonController {
             }
             return result;
         } catch (Exception e) {
-            throw asUserError(Label.Core_HouseholdPanel_AddSearchFailed);
+            throw UserErrors.message(Label.Core_HouseholdPanel_AddSearchFailed);
         }
     }
 
@@ -142,10 +142,10 @@ public with sharing class HouseholdOfPersonController {
                 new Map<Id, Set<Id>>{ householdId => new Set<Id>{ personId } }
             );
         } catch (HouseholdException e) {
-            throw asUserError(e.getMessage());
+            throw UserErrors.message(e.getMessage());
         } catch (Exception e) {
             ErrorLogger.log(e, Label.Core_Households_ErrorContextMembership, householdId);
-            throw asUserError(Label.Core_HouseholdPanel_AddMemberFailed);
+            throw UserErrors.message(Label.Core_HouseholdPanel_AddMemberFailed);
         }
     }
 
@@ -186,10 +186,10 @@ public with sharing class HouseholdOfPersonController {
                 new Map<Id, Set<Id>>{ householdId => new Set<Id>{ person.Id } }
             );
         } catch (HouseholdException e) {
-            throw asUserError(e.getMessage());
+            throw UserErrors.message(e.getMessage());
         } catch (Exception e) {
             ErrorLogger.log(e, Label.Core_Households_ErrorContextMembership, householdId);
-            throw asUserError(Label.Core_HouseholdPanel_AddMemberFailed);
+            throw UserErrors.message(Label.Core_HouseholdPanel_AddMemberFailed);
         }
     }
 
@@ -345,11 +345,5 @@ public with sharing class HouseholdOfPersonController {
             result.add(view);
         }
         return result;
-    }
-
-    private static AuraHandledException asUserError(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 }

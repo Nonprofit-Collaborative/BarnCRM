@@ -1,0 +1,267 @@
+<template>
+    <div class="slds-is-relative">
+        <h2 class="slds-text-heading_medium slds-var-m-bottom_small">{labels.title}</h2>
+        <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+
+        <lightning-radio-group
+            data-id="view"
+            name="view"
+            label={labels.show}
+            type="button"
+            options={viewOptions}
+            value={view}
+            onchange={handleView}
+        ></lightning-radio-group>
+
+        <template lwc:if={errorMessage}>
+            <p class="slds-text-color_error slds-var-m-vertical_small" data-id="error" role="alert">
+                {errorMessage}
+            </p>
+        </template>
+        <template lwc:if={noticeMessage}>
+            <p class="slds-var-m-vertical_small" data-id="notice" role="status" aria-live="polite">
+                {noticeMessage}
+            </p>
+        </template>
+        <template lwc:if={loading}>
+            <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </template>
+
+        <template lwc:if={isSubjectView}>
+            <div class="slds-var-m-top_medium" data-id="subject-view">
+                <lightning-radio-group
+                    data-id="look-up"
+                    name="lookUp"
+                    label={labels.lookUp}
+                    type="button"
+                    options={lookUpOptions}
+                    value={lookUp}
+                    onchange={handleLookUp}
+                ></lightning-radio-group>
+                <lightning-input
+                    class="slds-var-m-top_small"
+                    data-id="search"
+                    type="search"
+                    label={labels.lookUp}
+                    variant="label-hidden"
+                    placeholder={labels.searchPlaceholder}
+                    value={term}
+                    onchange={handleTerm}
+                ></lightning-input>
+                <template lwc:if={noResults}>
+                    <p class="slds-var-m-top_x-small" data-id="no-matches">{labels.noMatches}</p>
+                </template>
+                <ul class="slds-var-m-top_x-small" data-id="results">
+                    <template for:each={resultItems} for:item="choice">
+                        <li key={choice.id}>
+                            <lightning-button
+                                variant="base"
+                                label={choice.text}
+                                data-value={choice.id}
+                                onclick={handleChoose}
+                            ></lightning-button>
+                        </li>
+                    </template>
+                </ul>
+
+                <template lwc:if={subject}>
+                    <h3 class="slds-text-heading_small slds-var-m-top_medium" data-id="subject">
+                        {subjectHeading}
+                    </h3>
+                    <template for:each={allDataNotes} for:item="note">
+                        <p key={note.key} class="slds-var-m-top_x-small" data-id="all-data">{note.text}</p>
+                    </template>
+
+                    <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.sourcesHeading}</h3>
+                    <lightning-datatable
+                        data-id="sources"
+                        key-field="key"
+                        data={sourceTable.rows}
+                        columns={sourceTable.columns}
+                        hide-checkbox-column
+                    ></lightning-datatable>
+                    <lightning-button
+                        class="slds-var-m-top_x-small"
+                        label={labels.download}
+                        data-table="sources"
+                        onclick={handleDownload}
+                    ></lightning-button>
+
+                    <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.objectsHeading}</h3>
+                    <template lwc:if={objectTable.rows.length}>
+                        <lightning-datatable
+                            data-id="objects"
+                            key-field="key"
+                            data={objectTable.rows}
+                            columns={objectTable.columns}
+                            hide-checkbox-column
+                            wrap-text-max-lines="3"
+                        ></lightning-datatable>
+                        <lightning-button
+                            class="slds-var-m-top_x-small"
+                            label={labels.download}
+                            data-table="objects"
+                            onclick={handleDownload}
+                        ></lightning-button>
+
+                        <lightning-combobox
+                            class="slds-var-m-top_medium"
+                            data-id="field-object"
+                            name="fieldObject"
+                            label={labels.fieldAccessFor}
+                            options={fieldObjectOptions}
+                            value={fieldObject}
+                            onchange={handleFieldObject}
+                        ></lightning-combobox>
+                        <template lwc:if={fieldRows.length}>
+                            <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.fieldsHeading}</h3>
+                            <lightning-datatable
+                                data-id="fields"
+                                key-field="key"
+                                data={fieldTable.rows}
+                                columns={fieldTable.columns}
+                                hide-checkbox-column
+                                wrap-text-max-lines="3"
+                            ></lightning-datatable>
+                            <lightning-button
+                                class="slds-var-m-top_x-small"
+                                label={labels.download}
+                                data-table="fields"
+                                onclick={handleDownload}
+                            ></lightning-button>
+                        </template>
+                    </template>
+                    <template lwc:else>
+                        <p data-id="no-objects">{labels.nothingToShow}</p>
+                    </template>
+                </template>
+                <template lwc:else>
+                    <p class="slds-var-m-top_small" data-id="choose-subject">{labels.chooseSubject}</p>
+                </template>
+            </div>
+        </template>
+
+        <template lwc:if={isObjectView}>
+            <div class="slds-var-m-top_medium" data-id="object-view">
+                <lightning-combobox
+                    data-id="object"
+                    name="object"
+                    label={labels.kindOfRecord}
+                    options={objectOptions}
+                    value={objectName}
+                    onchange={handleObject}
+                ></lightning-combobox>
+                <template lwc:if={objectName}>
+                    <lightning-combobox
+                        class="slds-var-m-top_small"
+                        data-id="field"
+                        name="field"
+                        label={labels.field}
+                        options={fieldOptions}
+                        value={fieldName}
+                        onchange={handleField}
+                    ></lightning-combobox>
+                </template>
+                <template lwc:else>
+                    <p class="slds-var-m-top_small" data-id="choose-object">{labels.chooseObject}</p>
+                </template>
+
+                <template lwc:if={objectAccess}>
+                    <template lwc:if={objectAccess.always}>
+                        <p class="slds-var-m-top_small" data-id="always">{labels.alwaysField}</p>
+                    </template>
+                </template>
+                <template lwc:if={showGrants}>
+                    <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.grantsHeading}</h3>
+                    <template lwc:if={truncatedMessage}>
+                        <p data-id="truncated">{truncatedMessage}</p>
+                    </template>
+                    <lightning-datatable
+                        data-id="grants"
+                        key-field="key"
+                        data={grantTable.rows}
+                        columns={grantTable.columns}
+                        hide-checkbox-column
+                    ></lightning-datatable>
+                    <lightning-button
+                        class="slds-var-m-top_x-small"
+                        label={labels.download}
+                        data-table="grants"
+                        onclick={handleDownload}
+                    ></lightning-button>
+
+                    <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.peopleHeading}</h3>
+                    <template lwc:if={objectAccess.mayMissPeople}>
+                        <p data-id="may-miss-people">{labels.mayMissPeople}</p>
+                    </template>
+                    <lightning-datatable
+                        data-id="people"
+                        key-field="key"
+                        data={peopleTable.rows}
+                        columns={peopleTable.columns}
+                        hide-checkbox-column
+                        wrap-text-max-lines="3"
+                    ></lightning-datatable>
+                    <lightning-button-group class="slds-var-m-top_x-small">
+                        <template lwc:if={hasMorePeople}>
+                            <lightning-button
+                                data-id="show-more"
+                                label={labels.showMore}
+                                onclick={handleShowMore}
+                            ></lightning-button>
+                        </template>
+                        <lightning-button
+                            label={labels.download}
+                            data-table="people"
+                            onclick={handleDownload}
+                        ></lightning-button>
+                    </lightning-button-group>
+                </template>
+            </div>
+        </template>
+
+        <template lwc:if={isCompareView}>
+            <c-access-compare data-id="compare"></c-access-compare>
+        </template>
+
+        <template lwc:if={isModifyAllView}>
+            <c-access-modify-all data-id="modify-all"></c-access-modify-all>
+        </template>
+
+        <template lwc:if={isBarnCrmView}>
+            <div class="slds-var-m-top_medium" data-id="barncrm-view">
+                <template lwc:if={overview}>
+                    <lightning-datatable
+                        data-id="barncrm"
+                        key-field="key"
+                        data={barnCrmTable.rows}
+                        columns={barnCrmTable.columns}
+                        hide-checkbox-column
+                    ></lightning-datatable>
+                    <lightning-button
+                        class="slds-var-m-top_x-small"
+                        label={labels.download}
+                        data-table="barncrm"
+                        onclick={handleDownload}
+                    ></lightning-button>
+                    <template lwc:if={overview.tabAccessCheckScheduled}>
+                        <p class="slds-var-m-top_small" data-id="tab-check">
+                            {labels.tabCheckScheduled}
+                            <lightning-formatted-date-time
+                                value={tabCheckNextRun}
+                                year="numeric"
+                                month="short"
+                                day="numeric"
+                                hour="numeric"
+                                minute="2-digit"
+                            ></lightning-formatted-date-time>
+                        </p>
+                    </template>
+                    <template lwc:else>
+                        <p class="slds-var-m-top_small" data-id="tab-check">{labels.tabCheckNotScheduled}</p>
+                    </template>
+                </template>
+            </div>
+        </template>
+    </div>
+</template>

@@ -1,8 +1,8 @@
 /**
  * The helpers the relationship and affiliation code share: the status rule, the person name,
- * the trigger-failure report and the Aura message.
+ * and the trigger-failure report.
  */
-@IsTest(testFor='ApexClass:ConnectionStatus, ApexClass:PersonReference, ApexClass:ControllerErrors')
+@IsTest(testFor='ApexClass:ConnectionStatus, ApexClass:PersonReference')
 private class ConnectionHelpersTest {
     @TestSetup
     static void createTestUser() {
@@ -75,13 +75,6 @@ private class ConnectionHelpersTest {
             Assert.areEqual('Already refused', refused.getErrors()[0].getMessage());
             Assert.areEqual('Sync failed', other.getErrors()[0].getMessage());
             new ReportingHandler().fail(null, 'Sync failed');
-        }
-    }
-
-    @IsTest
-    static void theAuraMessageCarriesTheText() {
-        System.runAs(TestUsers.admin()) {
-            Assert.areEqual('Nope', ControllerErrors.messageFor('Nope').getMessage());
         }
     }
 }

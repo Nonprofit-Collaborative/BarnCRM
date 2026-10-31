@@ -2,7 +2,7 @@
 
 ## What It Does
 
-When David opens a person, a household or an organization in the **Fundraising** app, the
+When David opens a person, a household or an organization in the **BarnCRM Fundraising** app, the
 record shows what they gave: a **Giving** section with their totals, their donor level and
 when those numbers were last calculated, and lists of their gifts, commitments, soft
 credits, receipts and stewardship plans. A person also shows their **Employer**, which
@@ -15,7 +15,7 @@ Nothing here is calculated on the page. The totals are the rollups BarnCRM keeps
 ## How to Turn It On
 
 Nothing to do: it arrives with the Giving module. BarnCRM Giving ships two record pages,
-**Giving Contact Record Page** and **Giving Account Record Page**, and the Fundraising app
+**Giving Contact Record Page** and **Giving Account Record Page**, and the BarnCRM Fundraising app
 opens people, households and organizations on them.
 
 Two things to know:
@@ -36,7 +36,7 @@ Two things to know:
 
 Start with the sample data loaded (BarnCRM Settings, then Sample Data).
 
-1. Open the **Fundraising** app and its **Contacts** tab, and open a person who has given.
+1. Open the **BarnCRM Fundraising** app and its **Contacts** tab, and open a person who has given.
 2. Find the **Giving** section. **Total Giving**, **Last Gift Date** and the rest are filled,
    and **Rollups Last Calculated** shows a date and time.
 3. Scroll to **Gifts**. Each gift the person gave is listed, newest first.
@@ -51,8 +51,8 @@ Start with the sample data loaded (BarnCRM Settings, then Sample Data).
 
 ## Common Mistakes
 
-- **"I see no Giving section."** The record was opened outside the Fundraising app, or your
-  organization assigned its own record page. Switch to the Fundraising app, or follow the
+- **"I see no Giving section."** The record was opened outside the BarnCRM Fundraising app, or your
+  organization assigned its own record page. Switch to the BarnCRM Fundraising app, or follow the
   first item under "How to turn it on".
 - **Totals that look out of date.** Look at **Rollups Last Calculated**. If it is days old,
   the nightly rollup is not scheduled: see [Rollups](rollups.md).

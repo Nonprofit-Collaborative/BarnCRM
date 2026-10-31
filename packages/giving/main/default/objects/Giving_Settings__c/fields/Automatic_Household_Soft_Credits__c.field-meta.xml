@@ -7,7 +7,7 @@
     Whether a gift from one household member automatically soft credits the household's other
     current members.
   </inlineHelpText>
-  <label>Automatic Household Soft Credits</label>
+  <label>Auto-Create Household Soft Credits</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>
 </CustomField>

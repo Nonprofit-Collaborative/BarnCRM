@@ -96,13 +96,11 @@ public with sharing class ErrorDigestController {
     }
 
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof ErrorDigestException)) {
-            ErrorLogger.log(caught, context);
-            message = System.Label.Core_ErrorDigest_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof ErrorDigestException,
+            context,
+            System.Label.Core_ErrorDigest_UnexpectedError
+        );
     }
 }

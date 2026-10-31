@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Amount__c</fullName>
+  <description>How much the donor is being, or was, asked for (canonical model Section 25R).</description>
+  <inlineHelpText>How much you are asking for. Leave it empty if you do not know yet.</inlineHelpText>
+  <label>Ask Amount</label>
+  <precision>16</precision>
+  <required>false</required>
+  <scale>2</scale>
+  <trackHistory>true</trackHistory>
+  <trackTrending>false</trackTrending>
+  <type>Currency</type>
+</CustomField>

@@ -1,9 +1,12 @@
 import {
   BYTE_ORDER_MARK,
+  bodyMessage,
   cell,
+  downloadCsv,
   fileName,
   format,
   messageFrom,
+  saveBlob,
   toCsv,
   valueAt,
   zonedDateTime
@@ -87,5 +90,74 @@ describe('c/findCsv', () => {
     expect(messageFrom({ body: { message: 'From the server' } })).toBe('From the server');
     expect(messageFrom(new Error('Thrown'))).toBe('Thrown');
     expect(messageFrom('plain')).toBe('c.Core_UnexpectedError');
+  });
+
+  it('fills every copy of a placeholder and reads a missing label as empty', () => {
+    expect(format('{0} and {0} of {1}', 'a', 2)).toBe('a and a of 2');
+    expect(format(undefined, 'a')).toBe('');
+    expect(format('No placeholders')).toBe('No placeholders');
+  });
+
+  it('falls back to the given message', () => {
+    expect(messageFrom(undefined, 'Fallback')).toBe('Fallback');
+    expect(messageFrom(new Error('Thrown'), 'Fallback')).toBe('Thrown');
+    expect(bodyMessage({ body: { message: 'From the server' } }, 'Fallback')).toBe(
+      'From the server'
+    );
+    expect(bodyMessage(new Error('Thrown'), 'Fallback')).toBe('Fallback');
+    expect(bodyMessage({ body: { message: '' } }, 'Fallback')).toBe('Fallback');
+    expect(bodyMessage(null)).toBe('c.Core_UnexpectedError');
+  });
+
+  describe('saving files', () => {
+    let click;
+    let saved;
+    beforeEach(() => {
+      saved = [];
+      URL.createObjectURL = jest.fn((blob) => {
+        saved.push(blob);
+        return 'blob:saved';
+      });
+      URL.revokeObjectURL = jest.fn();
+      click = jest
+        .spyOn(HTMLAnchorElement.prototype, 'click')
+        .mockImplementation(function record() {
+          saved.push(this.download);
+        });
+    });
+    afterEach(() => {
+      click.mockRestore();
+      jest.useRealTimers();
+    });
+
+    it('saves a blob under a name and releases the address at once', () => {
+      const blob = new Blob(['x']);
+      saveBlob(blob, 'out.zip');
+      expect(saved).toEqual([blob, 'out.zip']);
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:saved');
+    });
+
+    it('releases the address after a delay when given one', () => {
+      jest.useFakeTimers();
+      saveBlob(new Blob(['x']), 'out.csv', 1000);
+      expect(URL.revokeObjectURL).not.toHaveBeenCalled();
+      jest.advanceTimersByTime(1000);
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:saved');
+    });
+
+    it('downloads rows as a dated CSV with a byte-order mark', async () => {
+      downloadCsv('Gift__c', [{ label: 'Name', path: 'Name' }], [{ Name: 'Gift 1' }]);
+      const [blob, name] = saved;
+      expect(blob.type).toBe('text/csv;charset=utf-8');
+      expect(name).toBe(fileName('Gift__c'));
+      const bytes = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(new Uint8Array(reader.result));
+        reader.readAsArrayBuffer(blob);
+      });
+      // UTF-8 byte-order mark, then the rows.
+      expect(Array.from(bytes.slice(0, 3))).toEqual([0xef, 0xbb, 0xbf]);
+      expect(String.fromCharCode(...bytes.slice(3))).toBe('Name\r\nGift 1\r\n');
+    });
   });
 });

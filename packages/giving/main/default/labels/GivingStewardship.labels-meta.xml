@@ -38,7 +38,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: the plans and their templates did not line up</shortDescription>
-    <value>BarnCRM could not start one or more stewardship plans because the plans and the templates they came from did not line up. No tasks were created. This is a fault in BarnCRM rather than something to correct in your data.</value>
+    <value>BarnCRM could not start one or more stewardship plans because the plans and their templates did not line up. No tasks were created. This is a fault in BarnCRM, not something to correct in your data.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_Title</fullName>
@@ -62,7 +62,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: editing a plan does not reach into running plans</shortDescription>
-    <value>Editing a plan changes what starts next. Plans already running keep the tasks they laid out, because those tasks are in people's lists and they have planned their week around them.</value>
+    <value>Editing a plan changes what starts next. Plans already running keep the tasks they laid out, because those tasks are already in people's lists and weekly plans.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_ReadOnlyNotice</fullName>
@@ -86,7 +86,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: button, create a template</shortDescription>
-    <value>New plan</value>
+    <value>New Plan</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_EditPlan</fullName>
@@ -238,7 +238,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: button, add a step</shortDescription>
-    <value>Add step</value>
+    <value>Add Step</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_MoveUp</fullName>
@@ -254,7 +254,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: button, move a step later</shortDescription>
-    <value>Move down</value>
+    <value>Move Down</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_RemoveStep</fullName>
@@ -374,7 +374,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: the page could not do what was asked</shortDescription>
-    <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your administrator to check it.</value>
+    <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your BarnCRM admin to check it.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_Selected</fullName>
@@ -446,7 +446,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Start plan action: the person may not start a plan</shortDescription>
-    <value>You can see stewardship plans but not start one. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set.</value>
+    <value>You can see stewardship plans but not start one. Ask your BarnCRM admin for the Fundraising Staff role, together with the Giving Staff permission set.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_StartLoadFailed</fullName>

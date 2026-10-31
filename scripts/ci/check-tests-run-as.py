@@ -10,7 +10,7 @@ inaccessible", "No such column" or "You need the Manage BarnCRM Settings
 permission". A check-only deploy to a real sandbox failed 565 of 1008 Core tests
 this way.
 
-So in packages/core, packages/rollups, packages/giving, packages/volunteers and packages/mirror every @IsTest method
+So in packages/core, packages/rollups, packages/giving, packages/volunteers, packages/programs, packages/logicmodels and packages/mirror every @IsTest method
 and every @TestSetup method calls System.runAs, normally as TestUsers.admin() or TestUsers.adminWith(...), which
 creates a user holding the packaged permission sets inside the test
 (docs/contributor-guide/ci.md, "Tests run as a user they create").
@@ -44,6 +44,8 @@ SOURCES = [
     "packages/rollups/main/**/*.cls",
     "packages/giving/main/**/*.cls",
     "packages/volunteers/main/**/*.cls",
+    "packages/programs/main/**/*.cls",
+    "packages/logicmodels/main/**/*.cls",
     "packages/mirror/main/**/*.cls",
 ]
 OPT_OUT = re.compile(r"//\s*runs-as:\s*deploying user\s*\(\s*\S[^\n]*\)", re.I)

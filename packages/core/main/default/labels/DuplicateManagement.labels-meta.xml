@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Custom metadata page: what merge rules are</shortDescription>
-        <value>Which value wins for one person field when auto-merge merges two people. Field Name is the field's API name, or MailingAddress or OtherAddress to move a whole address together. A field with no rule follows Merge Rule For Other Fields in the Duplicate Matching settings.</value>
+        <value>Which value wins for one person field when auto-merge merges two people. Field Name is the field's API name, or MailingAddress or OtherAddress to move a whole address. A field with no rule follows Merge Rule For Other Fields in the Duplicate Matching settings.</value>
     </labels>
     <labels>
         <fullName>Core_DuplicateManagement_RuleUnknown</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Merge rule save refused; {0} is the field name entered</shortDescription>
-        <value>{0} is not a person field a merge can change. Use the API name of an editable Contact field, or MailingAddress or OtherAddress. The household, owner and record type always stay the kept person's.</value>
+        <value>{0} is not a person field a merge can change. Use the API name of an editable Contact field, or MailingAddress or OtherAddress. Household, owner and record type stay the kept person's.</value>
     </labels>
     <labels>
         <fullName>Core_AutoMerge_NoteNotRecorded</fullName>

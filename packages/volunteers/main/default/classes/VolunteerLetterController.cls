@@ -102,15 +102,12 @@ public with sharing class VolunteerLetterController {
 
     /** A refusal the service names is passed on as it is; anything else is logged first. */
     private static AuraHandledException report(Exception failure, Id recordId) {
-        String message;
-        if (failure instanceof VolunteerLetterService.VolunteerLetterException) {
-            message = failure.getMessage();
-        } else {
-            ErrorLogger.log(failure, CONTEXT, recordId);
-            message = Label.Volunteers_Letter_ActionFailed;
-        }
-        AuraHandledException handled = new AuraHandledException(message);
-        handled.setMessage(message);
-        return handled;
+        return UserErrors.wrap(
+            failure,
+            failure instanceof VolunteerLetterService.VolunteerLetterException,
+            CONTEXT,
+            recordId,
+            Label.Volunteers_Letter_ActionFailed
+        );
     }
 }

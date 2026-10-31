@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM main as of 2026-10-29 (landing batch 13). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-31 (landing batch A head a8489572d, pending the squash commit on main). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 
@@ -20,7 +20,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 ### People and Households
 
 - [Finding people and records](find.md): search, list views and the Find tab.
-- [Changing many records at once](super-transform.md): Super Transform, with a preview and an undo.
+- [Changing many records at once](super-transform.md): Super Transform, with a preview and an undo, saved lists and a phone format.
 - [People and households](people-and-households.md): adding people, household members, names and greetings, merge and split, interaction notes.
 - [Addresses, email and phone](addresses-email-phone.md): several addresses, seasonal addresses, the preferred email and phone.
 - [Relationships and affiliations](relationships-affiliations.md): how people are connected to each other and to organizations.
@@ -31,17 +31,28 @@ What you can do depends on the role your admin gave you on the Access page (for 
 - [Entering gifts](gifts.md): Quick Gift Entry, the New Gift action, funds, soft credits, tributes, in-kind and matching gifts.
 - [Gift batches](gift-batches.md): typing a stack of checks against a deposit total.
 - [Pledges and recurring gifts](commitments.md): commitments, installments and paying them.
+- [The Ask Pipeline](ask-pipeline.md): tracking asks by step on a board, and closing them as won, declined or withdrawn.
 - [Refunds and write-offs](refunds.md): recording money that went back, and cancelling a pending gift.
 - [Receipts and acknowledgments](receipts-and-acknowledgments.md): receipts, thank-yous and stewardship plans.
+- [Ask reminders](ask-reminders.md): a next ask date on a donor, the task that reminds you, and the Who Is Due list.
 
 ### Volunteers (Nonprofit Edition)
 
 - [Volunteer jobs, shifts and sign-ups](volunteer-shifts.md): finding and creating shifts, recurring shifts, signing people up and marking attendance.
 - [Volunteer hours, profiles and letters](volunteer-hours.md): logging and approving hours, a volunteer's profile and readiness, hour letters.
 
+### Programs (Nonprofit Edition)
+
+- [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages.
+
+### Logic Models (Nonprofit Edition)
+
+- [Logic models](logic-models.md): building a logic model with arrows and assumptions, and measuring outputs and outcomes with indicators, targets and results.
+
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.
+- [Donor segments](donor-segments.md): lists of donors by their giving, exported for Mailchimp or Constant Contact.
 
 ## Report a Bug or Give Feedback
 

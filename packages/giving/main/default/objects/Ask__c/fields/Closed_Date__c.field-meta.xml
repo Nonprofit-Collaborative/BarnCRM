@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Closed_Date__c</fullName>
+  <description>
+    The day the outcome left Open, filled when it does and cleared when it goes back to Open
+    (canonical model R-SO3).
+  </description>
+  <inlineHelpText>The day this ask was won, declined or withdrawn. Filled in for you.</inlineHelpText>
+  <label>Closed Date</label>
+  <required>false</required>
+  <trackHistory>false</trackHistory>
+  <trackTrending>false</trackTrending>
+  <type>Date</type>
+</CustomField>

@@ -550,20 +550,17 @@ public with sharing class RollupInstantTotals {
     }
 
     private static AuraHandledException asUserError(Exception caught) {
-        String message;
-        if (
+        Boolean shown =
             caught instanceof RollupService.RollupServiceException ||
-            caught instanceof AutomationControl.AutomationControlException
-        ) {
-            message = caught.getMessage();
-        } else if (caught instanceof DmlException) {
-            message = ((DmlException) caught).getDmlMessage(0);
-        } else {
-            ErrorLogger.log(caught, 'RollupInstantTotals');
-            message = Label.Core_Rollups_UnexpectedError;
+            caught instanceof AutomationControl.AutomationControlException;
+        if (!shown && caught instanceof DmlException) {
+            return UserErrors.message(((DmlException) caught).getDmlMessage(0));
         }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            shown,
+            'RollupInstantTotals',
+            Label.Core_Rollups_UnexpectedError
+        );
     }
 }

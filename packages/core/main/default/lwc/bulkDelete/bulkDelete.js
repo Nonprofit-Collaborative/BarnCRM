@@ -6,7 +6,7 @@ import previewFile from '@salesforce/apex/BulkDeleteController.previewFile';
 import startFile from '@salesforce/apex/BulkDeleteController.startFile';
 import FILE_INTRO from '@salesforce/label/c.Core_BulkDelete_FileIntro';
 import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
-import { toCsv, fileName } from 'c/findCsv';
+import { messageFrom, format, downloadCsv } from 'c/findCsv';
 import { startPolling } from 'c/jobPoller';
 import BACKUP from '@salesforce/label/c.Core_BulkDelete_Backup';
 import BACKUP_HELP from '@salesforce/label/c.Core_BulkDelete_BackupHelp';
@@ -37,10 +37,6 @@ const STEPS = [
   { value: 'confirm', label: PATH_CONFIRM },
   { value: 'run', label: PATH_RUN }
 ];
-
-function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
-}
 
 /**
  * Bulk delete (C-37, admin guide bulk-delete.md): every record a Find query returns, counted
@@ -186,13 +182,7 @@ export default class BulkDelete extends LightningElement {
         label: column.label,
         path: column.fieldName
       }));
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(
-        new Blob([toCsv(columns, rows)], { type: 'text/csv;charset=utf-8' })
-      );
-      link.download = fileName(page.objectName);
-      link.click();
-      URL.revokeObjectURL(link.href);
+      downloadCsv(page.objectName, columns, rows);
       this.noticeMessage = format(BACKUP_DONE, String(rows.length));
     });
   }
@@ -216,7 +206,7 @@ export default class BulkDelete extends LightningElement {
     this.stopTimer = startPolling(
       () => this.poll(),
       (error) => {
-        this.errorMessage = messageFrom(error);
+        this.errorMessage = messageFrom(error, String(error));
       }
     );
   }
@@ -250,16 +240,9 @@ export default class BulkDelete extends LightningElement {
     try {
       await action();
     } catch (error) {
-      this.errorMessage = messageFrom(error);
+      this.errorMessage = messageFrom(error, String(error));
     } finally {
       this.busy = false;
     }
   }
-}
-
-function messageFrom(error) {
-  if (error && error.body && error.body.message) {
-    return error.body.message;
-  }
-  return error && error.message ? error.message : String(error);
 }

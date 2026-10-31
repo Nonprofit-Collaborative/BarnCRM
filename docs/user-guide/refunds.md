@@ -11,7 +11,7 @@ Before you start: you need the **Fundraising Staff** role (the **Giving Staff** 
 3. Leave **Refund part or all of this gift** selected.
 4. Check **Left on this gift**. **How much is going back** starts at that figure; change it for a partial refund.
 5. Type **Why is it going back**. A reason is required.
-6. Click **Record it**.
+6. Click **Record It**.
 
 You should see: "Recorded. The gift it reverses now shows what happened." The refund appears in the original's **Refunds and Write-Offs** list. Open it: a negative gift dated today, with **Original Gift** and **Refund Reason** filled in, the same donor and appeal, and allocations that mirror the original's funds.
 
@@ -23,7 +23,7 @@ Use a write-off when money recorded as received will not be kept, for example a 
 
 1. Open the gift and click **Refund or Write Off**.
 2. Choose **Write off what is left of this gift**. There is no amount to type: a write-off is always what is left.
-3. Type **Why is it going back** and click **Record it**.
+3. Type **Why is it going back** and click **Record It**.
 
 You should see: a linked negative gift for the remaining amount, and the original's **Status** is `Written off`.
 

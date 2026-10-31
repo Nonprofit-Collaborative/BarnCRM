@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load refused: user lacks the organization record type; {0} is its label</shortDescription>
-        <value>Sample data was not loaded, because you cannot use the {0} record type, which BarnCRM Settings uses for organizations (Record type for organizations, on General). Give yourself that record type on your profile or a permission set, or choose another one in that setting, then load again.</value>
+        <value>Sample data was not loaded, because you cannot use the {0} record type that BarnCRM Settings uses for organizations (Record type for organizations, on General). Give yourself that record type on your profile or a permission set, or choose another in that setting, then load again.</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_CancelButton</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>How sample data arrives in the flexible membership mode</shortDescription>
-        <value>This org uses the flexible way of belonging to a household, so each sample person is joined to their household by a household member record, exactly as your own people are. The sample people themselves are loaded as contacts: BarnCRM never creates person accounts, so if your org stores people as accounts the sample set shows you households of contacts.</value>
+        <value>This org uses the flexible way of belonging to a household, so each sample person is joined to a household by a household member record, like your own people. Sample people are loaded as contacts: BarnCRM never creates person accounts, so an org that stores people as accounts sees households of contacts.</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_HouseholdsLabel</fullName>
@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load confirmation dialog body</shortDescription>
-        <value>This adds 200 households, 440 contacts, 25 organizations, and the relationships and affiliations between them to this org, plus sample records for each installed module. Only load sample data into a scratch org, sandbox, or demo org, never into production.</value>
+        <value>This adds 200 households, 440 contacts, 25 organizations, their relationships and affiliations, and sample records for each installed module. Only load sample data into a scratch org, sandbox, or demo org, never production.</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_LoadConfirmTitle</fullName>
@@ -286,6 +286,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error Log message: a sample data load or removal stopped part way</shortDescription>
-        <value>The sample data load or removal stopped part way, at the step this entry names. The technical detail on this entry says what failed. The Sample data page of the admin guide, under Common mistakes, says what to check and how to finish.</value>
+        <value>The sample data load or removal stopped part way, at the step this entry names. Its technical detail says what failed. The Sample data admin guide page, under Common mistakes, says what to check and how to finish.</value>
     </labels>
 </CustomLabels>

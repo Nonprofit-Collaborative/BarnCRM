@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Module Manager: the reader cannot switch modules</shortDescription>
-        <value>You can see the modules but not change them. Ask an administrator for the Manage BarnCRM Settings permission.</value>
+        <value>You can see the modules but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_ModuleManager_NonprofitTitle</fullName>

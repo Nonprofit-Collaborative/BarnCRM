@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Builder error: another active rollup fills the same field. {0} is its name.</shortDescription>
-        <value>{0} already fills this field for some of the same records, so the two would overwrite each other. Choose another field, or add conditions under Only for some records so they never pick the same record.</value>
+        <value>{0} already fills this field for some of the same records, so the two would overwrite each other. Choose another field, or add conditions under Only for some records so they never overlap.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ErrorOneLookup</fullName>
@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Step 4 note shown when a filter reads a field of another record.</shortDescription>
-        <value>This filter reads a field of another record. When that record changes, the totals update at once only if its object has rollup triggers; otherwise the nightly run, or Recalculate on the Rollups page, puts them right.</value>
+        <value>This filter reads a field of another record. When that record changes, totals update at once only if its object has rollup triggers. Otherwise the nightly run, or Recalculate on the Rollups page, puts them right.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_SourceBy</fullName>
@@ -190,7 +190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Filter builder button that adds a condition row.</shortDescription>
-        <value>Add condition</value>
+        <value>Add Condition</value>
     </labels>
     <labels>
         <fullName>Core_RollupFilter_Field</fullName>
@@ -510,7 +510,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Step 5 notice: counted records have no rollup trigger. {0} plural name.</shortDescription>
-        <value>Instant totals are not available yet for {0}. This total is updated by the nightly run and when you click Recalculate. To make it instant, turn on instant totals for it below, or use the Recalculate rollups Flow template and choose Both (recommended).</value>
+        <value>Instant totals are not available yet for {0}. This total updates in the nightly run and when you click Recalculate. For instant updates, turn on instant totals for it below, or use the Recalculate rollups Flow template and choose Both (recommended).</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ErrorNoInstant</fullName>
@@ -774,7 +774,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Rollup Builder button: save and start the recalculation.</shortDescription>
-        <value>Save and calculate now</value>
+        <value>Save and Calculate Now</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Title</fullName>
@@ -790,7 +790,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Rollup Builder button: create a rollup.</shortDescription>
-        <value>New rollup</value>
+        <value>New Rollup</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Edit</fullName>
@@ -894,7 +894,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Recalculate all: button that starts the run now</shortDescription>
-        <value>Start now</value>
+        <value>Start Now</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_RunTonight</fullName>
@@ -902,7 +902,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Recalculate all: button that runs it tonight</shortDescription>
-        <value>Run tonight</value>
+        <value>Run Tonight</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_TonightAlreadyScheduled</fullName>
@@ -926,7 +926,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Needs attention: section title</shortDescription>
-        <value>Needs attention</value>
+        <value>Needs Attention</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Waiting</fullName>
@@ -950,7 +950,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Needs attention: list of records that could not be saved</shortDescription>
-        <value>Could not be saved</value>
+        <value>Could Not Be Saved</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_NothingFailed</fullName>
@@ -1006,7 +1006,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Needs attention: retry every failed record</shortDescription>
-        <value>Retry all</value>
+        <value>Retry All</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Retried</fullName>
@@ -1047,14 +1047,6 @@
         <protected>false</protected>
         <shortDescription>Needs attention: no full run yet</shortDescription>
         <value>No full run yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_StartNow</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: button that starts the waiting records now</shortDescription>
-        <value>Start now</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Started</fullName>
@@ -1110,7 +1102,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button: download the ticked rollups, or all admin-made ones, as a file</shortDescription>
-        <value>Export to a file</value>
+        <value>Export to a File</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ExportSelect</fullName>
@@ -1150,7 +1142,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button: save the rollups the file holds</shortDescription>
-        <value>Import these rollups</value>
+        <value>Import These Rollups</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ImportDone</fullName>

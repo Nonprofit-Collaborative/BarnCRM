@@ -11,6 +11,9 @@ public with sharing class VolunteerSettings {
     public static final Integer DEFAULT_SHIFT_HORIZON_WEEKS = 8;
     public static final Integer MIN_SHIFT_HORIZON_WEEKS = 1;
     public static final Integer MAX_SHIFT_HORIZON_WEEKS = 26;
+    public static final Integer DEFAULT_REMINDER_LEAD_DAYS = 1;
+    public static final Integer MIN_REMINDER_LEAD_DAYS = 1;
+    public static final Integer MAX_REMINDER_LEAD_DAYS = 14;
 
     /**
      * R-VG6: whether a new hours entry waits for a coordinator. On unless an administrator
@@ -41,6 +44,29 @@ public with sharing class VolunteerSettings {
             return DEFAULT_SHIFT_HORIZON_WEEKS;
         }
         return weeks;
+    }
+
+    /** V-10: whether signed-up volunteers get a reminder email before a shift. Off until turned on. */
+    public static Boolean remindersEnabled() {
+        return flag('Reminders_Enabled__c', false);
+    }
+
+    /** V-10: how many days before a shift its reminder goes out, 1 to 14. */
+    public static Integer reminderLeadDays() {
+        Object stored = read('Reminder_Lead_Days__c');
+        if (stored == null) {
+            return DEFAULT_REMINDER_LEAD_DAYS;
+        }
+        Integer days;
+        try {
+            days = Decimal.valueOf(String.valueOf(stored)).intValue();
+        } catch (TypeException unreadable) {
+            return DEFAULT_REMINDER_LEAD_DAYS;
+        }
+        if (days < MIN_REMINDER_LEAD_DAYS || days > MAX_REMINDER_LEAD_DAYS) {
+            return DEFAULT_REMINDER_LEAD_DAYS;
+        }
+        return days;
     }
 
     private static Boolean flag(String key, Boolean shipped) {

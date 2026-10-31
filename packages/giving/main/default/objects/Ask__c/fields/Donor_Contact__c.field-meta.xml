@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Donor_Contact__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <description>
+    The person being asked, where people are Contacts. Exactly one of Donor Contact and Donor
+    Account is set (canonical model R-SO1).
+  </description>
+  <inlineHelpText>The person you are asking.</inlineHelpText>
+  <label>Donor Contact</label>
+  <referenceTo>Contact</referenceTo>
+  <relationshipLabel>Asks</relationshipLabel>
+  <relationshipName>Asks</relationshipName>
+  <required>false</required>
+  <trackHistory>false</trackHistory>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

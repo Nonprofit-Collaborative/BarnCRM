@@ -169,10 +169,11 @@ private class SettingsControllerTest {
                 new Set<String>{
                     'Stale_Record_Years__c',
                     'Unused_Login_Days__c',
-                    'Unused_Report_Days__c'
+                    'Unused_Report_Days__c',
+                    'Setup_Change_Retention_Days__c'
                 },
                 after.get(SettingSections.ORG_OPTIMIZER),
-                'The three thresholds are under Org Optimizer once the feature is on'
+                'The thresholds and the Setup Changes retention are under Org Optimizer once the feature is on'
             );
             Assert.isFalse(
                 after.get(SettingSections.GENERAL).contains('Unused_Login_Days__c'),
@@ -1327,6 +1328,44 @@ private class SettingsControllerTest {
             }
         }
         return null;
+    }
+
+    // Owner QA 2026-10-31: the Custom Metadata note stayed after the Apex setting was turned on.
+    @IsTest
+    static void theMetadataCheckNeedsThePermissionAndConfirmsTheSettingByAWorkingSave() {
+        Map<String, Boolean> withoutPermission;
+        System.runAs(TestUsers.admin()) {
+            withoutPermission = SettingsController.getSetupChecks();
+        }
+        User metadataAdmin = TestUsers.withPermissionSets(
+            new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Metadata_Admin' }
+        );
+        Map<String, Boolean> beforeAnySave;
+        Map<String, Boolean> afterASave;
+        System.runAs(metadataAdmin) {
+            beforeAnySave = SettingsController.getSetupChecks();
+            // What CustomMetadataDeployCallback writes when a deployment succeeds.
+            insert as system new Setting_Change__c(
+                Setting_Name__c = 'Relationship_Type.Org_Close_friend',
+                Changed_By__c = UserInfo.getUserId(),
+                Changed_At__c = System.now(),
+                Deployment_Id__c = '0Af000000000001AAA'
+            );
+            afterASave = SettingsController.getSetupChecks();
+        }
+
+        Assert.isFalse(
+            withoutPermission.get(SettingsController.CHECK_METADATA),
+            'Without Manage BarnCRM Metadata the note is not done'
+        );
+        Assert.isFalse(
+            beforeAnySave.containsKey(SettingsController.CHECK_METADATA),
+            'Apex cannot read the Apex setting, so before a save works the answer is unknown'
+        );
+        Assert.isTrue(
+            afterASave.get(SettingsController.CHECK_METADATA),
+            'A finished Custom Metadata save shows the setting lets saves through'
+        );
     }
 
     @IsTest

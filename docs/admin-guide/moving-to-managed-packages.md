@@ -102,7 +102,7 @@ had none).
 13. **Put your settings back.** Re-enter every value from step 4 in BarnCRM Settings (the kit's
     list is `pilot-export/settings.csv`), then schedule again each job you stopped in step 5.
 14. **Finish.** Remove the two override permissions from yourself. Resume automation. In the
-    **Rollup Builder**, click **Recalculate all**; on the household naming settings, click **Recompute
+    **Rollup Builder**, click **Recalculate All**; on the household naming settings, click **Recompute
     all households**. Then run Health Check: it should find nothing new.
 15. **Put back your own customizations** from step 8: reports, flows and fields that used
     BarnCRM. If the namespace changed, their references to BarnCRM fields need the new names.

@@ -209,13 +209,11 @@ public with sharing class AutoMergeController {
     }
 
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof DuplicateService.DuplicateException)) {
-            ErrorLogger.log(caught, context);
-            message = Label.Core_Duplicates_ErrorUnexpected;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof DuplicateService.DuplicateException,
+            context,
+            Label.Core_Duplicates_ErrorUnexpected
+        );
     }
 }

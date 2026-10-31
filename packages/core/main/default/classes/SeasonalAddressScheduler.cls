@@ -64,23 +64,12 @@ public with sharing class SeasonalAddressScheduler implements Schedulable {
 
     /** Starts the nightly swap, or does nothing when it is already scheduled. */
     public static Id start() {
-        Id existing = scheduledJobId();
-        if (existing != null) {
-            return existing;
-        }
-        return ScheduledJobSelector.schedule(
-            JOB_NAME,
-            NIGHTLY_CRON,
-            new SeasonalAddressScheduler()
-        );
+        return ScheduledJobSelector.ensure(JOB_NAME, NIGHTLY_CRON, new SeasonalAddressScheduler());
     }
 
     /** Stops the nightly swap. The addresses stay exactly as the last run left them. */
     public static void stop() {
-        Id existing = scheduledJobId();
-        if (existing != null) {
-            ScheduledJobSelector.abort(existing);
-        }
+        ScheduledJobSelector.stopNamed(JOB_NAME);
     }
 
     /** Runs the swap now, without waiting for tonight. */
@@ -90,7 +79,7 @@ public with sharing class SeasonalAddressScheduler implements Schedulable {
 
     /** True when the nightly swap is scheduled. */
     public static Boolean isScheduled() {
-        return scheduledJobId() != null;
+        return ScheduledJobSelector.isScheduled(JOB_NAME);
     }
 
     /** When the nightly swap is next due, or null when it is not scheduled. */
@@ -98,8 +87,13 @@ public with sharing class SeasonalAddressScheduler implements Schedulable {
         return ScheduledJobSelector.nextFireTime(JOB_NAME);
     }
 
-    // One lookup for every scheduled job, read once per transaction (ADMIN-11).
-    private static Id scheduledJobId() {
-        return ScheduledJobSelector.triggerIdByName(JOB_NAME);
+    /** The nightly swap as Health Check's nightly jobs list sees it. */
+    public static NightlyJob nightlyJob() {
+        return new NamedNightlyJob(
+            System.Label.Core_HealthCheck_JobSeasonalAddresses,
+            JOB_NAME,
+            NIGHTLY_CRON,
+            new SeasonalAddressScheduler()
+        );
     }
 }

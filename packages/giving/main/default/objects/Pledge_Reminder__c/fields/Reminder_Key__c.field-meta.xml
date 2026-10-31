@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Reminder_Key__c</fullName>
+  <inlineHelpText>The installment and step, held while this reminder stands, so the same step cannot remind the same installment twice.</inlineHelpText>
+  <label>Reminder Key</label>
+  <length>40</length>
+  <required>false</required>
+  <type>Text</type>
+  <unique>true</unique>
+  <trackTrending>false</trackTrending>
+  <externalId>true</externalId>
+</CustomField>

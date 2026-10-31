@@ -25,23 +25,6 @@ public with sharing class MirrorNightlyJobProvider implements NightlyJobProvider
         ) {
             return new List<NightlyJob>();
         }
-        return new List<NightlyJob>{ new MirrorJob() };
-    }
-
-    /** The Opportunity mirror's nightly run, started and stopped on the Opportunity mirror page. */
-    @TestVisible
-    private class MirrorJob implements NightlyJob {
-        public String label() {
-            return System.Label.Mirror_NightlyJob_MirrorName;
-        }
-
-        public Boolean isScheduled() {
-            return OpportunityMirrorSchedulable.scheduledAt() != null;
-        }
-
-        public void schedule() {
-            // A second call returns the job already there, so this is safe to repeat.
-            OpportunityMirrorSchedulable.schedule();
-        }
+        return new List<NightlyJob>{ OpportunityMirrorSchedulable.nightlyJob() };
     }
 }

@@ -52,6 +52,7 @@ public with sharing class ModuleManagerService {
             'Acknowledgment_Rule__c',
             'Acknowledgment_Run__c',
             'Appeal__c',
+            'Ask__c',
             'Commitment__c',
             'Donor_Level__c',
             'Fund__c',
@@ -60,6 +61,8 @@ public with sharing class ModuleManagerService {
             'Gift_Batch__c',
             'Gift_Batch_Row__c',
             'Installment__c',
+            'Pledge_Reminder__c',
+            'Pledge_Reminder_Step__c',
             'Receipt__c',
             'Receipt_Number_Sequence__c',
             'Receipt_Run__c',
@@ -83,6 +86,20 @@ public with sharing class ModuleManagerService {
             'Volunteer_Shift__c',
             'Volunteer_Signup__c',
             'Volunteer_Skill__c'
+        },
+        'Programs' => new List<String>{
+            'Case_Note__c',
+            'Enrollment__c',
+            'Program__c',
+            'Service__c',
+            'Service_Delivery__c'
+        },
+        'LogicModels' => new List<String>{
+            'Indicator__c',
+            'Indicator_Period__c',
+            'Logic_Model__c',
+            'Logic_Model_Element__c',
+            'Logic_Model_Link__c'
         }
     };
 
@@ -91,7 +108,9 @@ public with sharing class ModuleManagerService {
     private static Map<String, String> adminPermissionSets = new Map<String, String>{
         'Giving' => 'Giving_Admin',
         'Rollups' => 'Rollup_Builder_Admin',
-        'Volunteers' => 'Volunteers_Admin'
+        'Volunteers' => 'Volunteers_Admin',
+        'Programs' => 'Programs_Admin',
+        'LogicModels' => 'Logic_Models_Admin'
     };
 
     /** Raised for a module the org does not have, or one that cannot be switched. */

@@ -11,15 +11,12 @@ public with sharing class HouseholdException extends Exception {
      * generic message.
      */
     public static AuraHandledException forScreen(Exception e, String context, Id recordId) {
-        String message;
-        if (e instanceof HouseholdException) {
-            message = e.getMessage();
-        } else {
-            ErrorLogger.log(e, context, recordId);
-            message = Label.Core_Households_ErrorUnexpected;
-        }
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
+        return UserErrors.wrap(
+            e,
+            e instanceof HouseholdException,
+            context,
+            recordId,
+            Label.Core_Households_ErrorUnexpected
+        );
     }
 }

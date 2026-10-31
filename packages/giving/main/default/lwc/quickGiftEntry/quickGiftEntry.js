@@ -45,6 +45,7 @@ import paysNone from '@salesforce/label/c.Giving_GiftEntryPays_None';
 import paysOneSuggested from '@salesforce/label/c.Giving_GiftEntryPays_OneSuggested';
 import paysSeveralSuggested from '@salesforce/label/c.Giving_GiftEntryPays_SeveralSuggested';
 import paysErrorLoad from '@salesforce/label/c.Giving_GiftEntryPays_ErrorLoad';
+import { messageFrom } from 'c/findCsv';
 
 const IN_KIND = 'In-kind';
 /** How long typing has to pause before the donor's payments are looked up again. */
@@ -418,7 +419,7 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
       }));
       this.applyDefaults();
     } catch (error) {
-      this.formError = this.messageFrom(error, errorLoadDefaults);
+      this.formError = messageFrom(error, errorLoadDefaults);
     }
   }
 
@@ -489,7 +490,7 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
         this.startAnotherGift();
       }
     } catch (error) {
-      this.formError = this.messageFrom(error, errorUnexpected);
+      this.formError = messageFrom(error, errorUnexpected);
     } finally {
       this.saving = false;
     }
@@ -615,15 +616,5 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     if (donor && typeof donor.focus === 'function') {
       donor.focus();
     }
-  }
-
-  messageFrom(error, fallback) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    if (error && error.message) {
-      return error.message;
-    }
-    return fallback;
   }
 }

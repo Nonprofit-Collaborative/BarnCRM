@@ -12,11 +12,13 @@
     </values>
     <values>
         <field>Column_Mapping_JSON__c</field>
-        <value xsi:type="xsd:string">{"version": 1, "columns": [{"source": "Email", "target": "Record.Account__c", "lookupField": "PersonEmail"}, {"source": "Job", "target": "Record.Volunteer_Job__c", "lookupField": "Name"}, {"source": "Date", "target": "Record.Date_Worked__c"}, {"source": "Hours", "target": "Record.Hours__c"}, {"source": "Notes", "target": "Record.Notes__c"}]}</value>
+        <value
+      xsi:type="xsd:string"
+    >{"version": 1, "objects": [{"entity": "Volunteer_Hours__c", "operation": "Insert"}, {"entity": "Volunteer_Job__c", "operation": "Update by a matching field", "keyField": "Name"}], "columns": [{"source": "Email", "target": "Volunteer_Hours__c.Account__c", "lookupField": "PersonEmail"}, {"source": "Job", "target": "Volunteer_Job__c.Name"}, {"source": "Date", "target": "Volunteer_Hours__c.Date_Worked__c"}, {"source": "Hours", "target": "Volunteer_Hours__c.Hours__c"}, {"source": "Notes", "target": "Volunteer_Hours__c.Notes__c"}]}</value>
     </values>
     <values>
         <field>Default_Values_JSON__c</field>
-        <value xsi:type="xsd:string">{"version": 1, "defaults": [{"target": "Record.Status__c", "value": "Submitted"}]}</value>
+        <value xsi:type="xsd:string">{"version": 1, "defaults": [{"target": "Volunteer_Hours__c.Status__c", "value": "Submitted"}]}</value>
     </values>
     <values>
         <field>Matching_Rule__c</field>

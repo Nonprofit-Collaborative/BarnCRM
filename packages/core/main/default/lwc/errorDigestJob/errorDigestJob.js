@@ -21,6 +21,7 @@ import TO_ADMINISTRATORS from '@salesforce/label/c.Core_ErrorDigest_ToAdministra
 import NO_RECIPIENTS from '@salesforce/label/c.Core_ErrorDigest_NoRecipients';
 import READ_ONLY from '@salesforce/label/c.Core_ErrorDigest_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_ErrorDigest_UnexpectedError';
+import { bodyMessage } from 'c/findCsv';
 
 /**
  * The error digest panel on the Error Log page of the BarnCRM Settings console (C-23).
@@ -53,7 +54,7 @@ export default class ErrorDigestJob extends LightningElement {
       this.digest = result.data;
       this.errorMessage = undefined;
     } else if (result.error) {
-      this.errorMessage = this.messageFrom(result.error);
+      this.errorMessage = bodyMessage(result.error, UNEXPECTED_ERROR);
     }
   }
 
@@ -124,14 +125,9 @@ export default class ErrorDigestJob extends LightningElement {
         await refreshApex(this.wiredDigestResult);
       }
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
     } finally {
       this.busy = false;
     }
-  }
-
-  messageFrom(error) {
-    const body = error && error.body;
-    return (body && body.message) || UNEXPECTED_ERROR;
   }
 }

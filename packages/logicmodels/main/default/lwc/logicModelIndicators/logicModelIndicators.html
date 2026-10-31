@@ -1,0 +1,316 @@
+<template>
+  <div data-id="indicators" class="slds-var-m-top_medium">
+    <h4 class="slds-text-title_caps slds-var-m-bottom_x-small">{labels.indicators}</h4>
+
+    <template lwc:if={showAddIndicator}>
+      <lightning-button
+        data-id="add-indicator"
+        label={labels.addIndicator}
+        icon-name="utility:add"
+        variant="base"
+        disabled={busy}
+        onclick={handleAddIndicator}
+      ></lightning-button>
+    </template>
+
+    <template lwc:if={indicatorFormOpen}>
+      <div class="slds-box slds-var-m-vertical_x-small" data-id="indicator-form">
+        <lightning-input
+          data-id="indicator-name"
+          data-field="name"
+          label={labels.indicatorName}
+          value={indicatorDraft.name}
+          max-length="80"
+          required
+          onchange={handleIndicatorField}
+        ></lightning-input>
+        <div class="slds-grid slds-wrap slds-gutters_x-small">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-input
+              data-id="indicator-unit"
+              data-field="unit"
+              label={labels.unit}
+              value={indicatorDraft.unit}
+              max-length="40"
+              onchange={handleIndicatorField}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-combobox
+              data-id="indicator-better-when"
+              data-field="betterWhen"
+              label={labels.betterWhen}
+              value={indicatorDraft.betterWhen}
+              options={betterWhenOptions}
+              onchange={handleIndicatorField}
+            ></lightning-combobox>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-input
+              data-id="indicator-baseline"
+              data-field="baselineValue"
+              type="number"
+              step="0.01"
+              label={labels.baseline}
+              value={indicatorDraft.baselineValue}
+              onchange={handleIndicatorField}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-input
+              data-id="indicator-baseline-date"
+              data-field="baselineDate"
+              type="date"
+              label={labels.baselineDate}
+              value={indicatorDraft.baselineDate}
+              onchange={handleIndicatorField}
+            ></lightning-input>
+          </div>
+        </div>
+        <lightning-textarea
+          data-id="indicator-description"
+          data-field="description"
+          label={labels.description}
+          value={indicatorDraft.description}
+          onchange={handleIndicatorField}
+        ></lightning-textarea>
+        <div class="slds-var-m-top_small">
+          <lightning-button
+            data-id="indicator-save"
+            variant="brand"
+            label={labels.save}
+            disabled={indicatorSaveDisabled}
+            onclick={handleIndicatorSave}
+            class="slds-var-m-right_x-small"
+          ></lightning-button>
+          <lightning-button
+            data-id="indicator-cancel"
+            label={labels.cancel}
+            onclick={handleIndicatorCancel}
+          ></lightning-button>
+        </div>
+      </div>
+    </template>
+
+    <template lwc:if={hasIndicators}>
+      <template for:each={indicators} for:item="indicator">
+        <div
+          key={indicator.id}
+          class="slds-var-m-vertical_small"
+          data-id="indicator"
+          data-record-id={indicator.id}
+        >
+          <p class="slds-text-title_bold">{indicator.name}</p>
+          <p class="slds-text-body_small">{indicator.summary}</p>
+          <template lwc:if={indicator.description}>
+            <p class="slds-text-body_small slds-text-color_weak">{indicator.description}</p>
+          </template>
+          <template lwc:if={canEdit}>
+            <lightning-button
+              data-id="indicator-edit"
+              data-record-id={indicator.id}
+              variant="base"
+              label={labels.edit}
+              disabled={busy}
+              onclick={handleEditIndicator}
+              class="slds-var-m-right_small"
+            ></lightning-button>
+            <lightning-button
+              data-id="add-period"
+              data-record-id={indicator.id}
+              variant="base"
+              label={labels.addPeriod}
+              disabled={busy}
+              onclick={handleAddPeriod}
+              class="slds-var-m-right_small"
+            ></lightning-button>
+          </template>
+          <template lwc:if={canDelete}>
+            <lightning-button
+              data-id="indicator-delete"
+              data-record-id={indicator.id}
+              variant="base"
+              label={labels.delete}
+              disabled={busy}
+              onclick={handleDeleteIndicator}
+            ></lightning-button>
+          </template>
+          <template lwc:if={indicator.confirming}>
+            <div class="slds-var-m-vertical_x-small" data-id="indicator-delete-confirm">
+              <p class="slds-var-m-bottom_x-small">{labels.deleteIndicatorConfirm}</p>
+              <lightning-button
+                data-id="indicator-delete-confirm-button"
+                variant="destructive"
+                label={labels.delete}
+                disabled={busy}
+                onclick={handleDeleteConfirm}
+                class="slds-var-m-right_x-small"
+              ></lightning-button>
+              <lightning-button
+                data-id="indicator-delete-cancel"
+                label={labels.cancel}
+                onclick={handleDeleteCancel}
+              ></lightning-button>
+            </div>
+          </template>
+
+          <template lwc:if={indicator.hasPeriods}>
+            <div class="slds-scrollable_x">
+              <table
+                class="slds-table slds-table_bordered slds-table_cell-buffer slds-var-m-top_x-small"
+                data-id="periods"
+              >
+                <thead>
+                  <tr class="slds-line-height_reset">
+                    <th scope="col">{labels.period}</th>
+                    <th scope="col">{labels.startDate}</th>
+                    <th scope="col">{labels.endDate}</th>
+                    <th scope="col">{labels.target}</th>
+                    <th scope="col">{labels.result}</th>
+                    <th scope="col">{labels.progress}</th>
+                    <th scope="col">{labels.actions}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={indicator.periods} for:item="period">
+                    <tr key={period.id} data-id="period">
+                      <th scope="row">{period.name}</th>
+                      <td>
+                        <lightning-formatted-date-time
+                          value={period.startDate}
+                          time-zone="UTC"
+                        ></lightning-formatted-date-time>
+                      </td>
+                      <td>
+                        <lightning-formatted-date-time
+                          value={period.endDate}
+                          time-zone="UTC"
+                        ></lightning-formatted-date-time>
+                      </td>
+                      <td>{period.targetValue}</td>
+                      <td>{period.resultValue}</td>
+                      <td data-id="progress">{period.progressText}</td>
+                      <td>
+                        <template lwc:if={canEdit}>
+                          <lightning-button
+                            data-id="period-edit"
+                            data-record-id={period.id}
+                            variant="base"
+                            label={labels.edit}
+                            disabled={busy}
+                            onclick={handleEditPeriod}
+                            class="slds-var-m-right_x-small"
+                          ></lightning-button>
+                        </template>
+                        <template lwc:if={canDelete}>
+                          <lightning-button
+                            data-id="period-delete"
+                            data-record-id={period.id}
+                            variant="base"
+                            label={labels.delete}
+                            disabled={busy}
+                            onclick={handleDeletePeriod}
+                          ></lightning-button>
+                        </template>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </template>
+          <template lwc:else>
+            <p class="slds-text-color_weak slds-text-body_small">{labels.noPeriods}</p>
+          </template>
+
+          <template lwc:if={indicator.periodFormOpen}>
+            <div class="slds-box slds-var-m-vertical_x-small" data-id="period-form">
+              <div class="slds-grid slds-wrap slds-gutters_x-small">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                  <lightning-input
+                    data-id="period-name"
+                    data-field="name"
+                    label={labels.period}
+                    value={periodDraft.name}
+                    max-length="80"
+                    required
+                    onchange={handlePeriodField}
+                  ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                  <lightning-input
+                    data-id="period-start"
+                    data-field="startDate"
+                    type="date"
+                    label={labels.startDate}
+                    value={periodDraft.startDate}
+                    required
+                    onchange={handlePeriodField}
+                  ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                  <lightning-input
+                    data-id="period-end"
+                    data-field="endDate"
+                    type="date"
+                    label={labels.endDate}
+                    value={periodDraft.endDate}
+                    required
+                    onchange={handlePeriodField}
+                  ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                  <lightning-input
+                    data-id="period-target"
+                    data-field="targetValue"
+                    type="number"
+                    step="0.01"
+                    label={labels.target}
+                    value={periodDraft.targetValue}
+                    onchange={handlePeriodField}
+                  ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                  <lightning-input
+                    data-id="period-result"
+                    data-field="resultValue"
+                    type="number"
+                    step="0.01"
+                    label={labels.result}
+                    value={periodDraft.resultValue}
+                    onchange={handlePeriodField}
+                  ></lightning-input>
+                </div>
+              </div>
+              <lightning-textarea
+                data-id="period-notes"
+                data-field="notes"
+                label={labels.notes}
+                value={periodDraft.notes}
+                onchange={handlePeriodField}
+              ></lightning-textarea>
+              <div class="slds-var-m-top_small">
+                <lightning-button
+                  data-id="period-save"
+                  variant="brand"
+                  label={labels.save}
+                  disabled={periodSaveDisabled}
+                  onclick={handlePeriodSave}
+                  class="slds-var-m-right_x-small"
+                ></lightning-button>
+                <lightning-button
+                  data-id="period-cancel"
+                  label={labels.cancel}
+                  onclick={handlePeriodCancel}
+                ></lightning-button>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+    </template>
+    <template lwc:else>
+      <p class="slds-text-color_weak" data-id="no-indicators">{labels.noIndicators}</p>
+    </template>
+  </div>
+</template>

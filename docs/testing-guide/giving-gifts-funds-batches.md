@@ -2,7 +2,7 @@
 
 Scripts for entering gifts (Gifts tab, Quick Gift Entry, gift batches, import), funds, appeals, in-kind gifts and closed accounting periods. Setup detail: [Gifts](../admin-guide/gifts.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **Fundraising** app (app launcher). Sample data makes no fund the default, so run T-GIFT-01 first (a new org's own starting **General Fund** is already the default: see T-GIFT-14). Related admin-guide pages: [Quick Gift Entry](../admin-guide/quick-gift-entry.md), [Funds](../admin-guide/funds.md), [Appeals](../admin-guide/appeals.md), [Gift batches](../admin-guide/gift-batches.md), [In-kind gifts](../admin-guide/in-kind-gifts.md), [Posting and closed periods](../admin-guide/posting-and-closed-periods.md), [Importing gifts](../admin-guide/gift-import.md), [A donor's giving on their record](../admin-guide/donor-records.md). Refunds, receipts and the receipt lock have their own pages.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app (app launcher). Sample data makes no fund the default, so run T-GIFT-01 first (a new org's own starting **General Fund** is already the default: see T-GIFT-14). Related admin-guide pages: [Quick Gift Entry](../admin-guide/quick-gift-entry.md), [Funds](../admin-guide/funds.md), [Appeals](../admin-guide/appeals.md), [Gift batches](../admin-guide/gift-batches.md), [In-kind gifts](../admin-guide/in-kind-gifts.md), [Posting and closed periods](../admin-guide/posting-and-closed-periods.md), [Importing gifts](../admin-guide/gift-import.md), [A donor's giving on their record](../admin-guide/donor-records.md). Refunds, receipts and the receipt lock have their own pages.
 
 ## T-GIFT-01: Funds and the Default Fund
 
@@ -73,7 +73,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | Switch to **Organization**, pick **Founders Consulting Group**, **Amount** `25`, **Payment Method** `Cash`. Click **Save**. | Saved message with link. **Save** and **Save and New** are now greyed out. |
 | 5 | Change the amount to `30`. | **Save** and **Save and New** are enabled again. Do not save. |
 | 6 | Click **Open This Gift**. | The gift shows **Donor Account** Founders Consulting Group, 25.00, Cash, appeal Annual Fund, one allocation to General Fund. |
-| 7 | Open the utility bar at the bottom of any Fundraising page. | **Quick Gift Entry** opens there over the page. |
+| 7 | Open the utility bar at the bottom of any BarnCRM Fundraising page. | **Quick Gift Entry** opens there over the page. |
 
 **Cleanup:** set **Default appeal** back to empty if later scripts expect none.
 
@@ -155,7 +155,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 3 | Pick **Harper Garcia** on line 1 and set its **Amount** to `100`. **Add line** for **Luis Garcia** with **Amount** `-40`. | Status: Balanced (100 less 40 is 60). |
 | 4 | Click **Post batch**. | "Some lines are not finished..." Line 2 shows "This line needs an amount greater than zero. Money that went back is recorded as a refund on the gift, not here." No gift is created. |
 | 5 | Set line 2's **Amount** to `40` and line 1's to `20`, then click **Save**. Do not post. | "Lines saved." Status: Balanced. |
-| 6 | As read-only, open **Gift Batches**, list view **Open Batches**, open `Bad lines`. | "You can see this batch but not change or post it. Ask your administrator for the Giving Staff permission set, or for edit access to this batch." No **Add line**, **Save** or **Post batch**. |
+| 6 | As read-only, open **Gift Batches**, list view **Open Batches**, open `Bad lines`. | "You can see this batch but not change or post it. Ask your BarnCRM admin for the Giving Staff permission set, or for edit access to this batch." No **Add line**, **Save** or **Post batch**. |
 | 7 | As read-only, look at the **Gift Batches** tab header. | No **New** button. |
 
 **Cleanup:** as admin, delete batch `Bad lines` (staff cannot delete a batch).
@@ -210,11 +210,11 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff, open the **Fundraising** app. | Tabs include **Quick Gift Entry**, **Gifts**, **Commitments**, **Gift Batches**, **Funds** and **Appeals**. |
+| 1 | As staff, open the **BarnCRM Fundraising** app. | Tabs include **Quick Gift Entry**, **Gifts**, **Commitments**, **Gift Batches**, **Funds** and **Appeals**. |
 | 2 | As staff, open a gift. | **Edit** and **Refund or Write Off** show; **Delete** does not. |
-| 3 | As read-only, open the **Fundraising** app. | No **Quick Gift Entry** tab. **Gifts**, **Funds** and **Appeals** show no **New** button. |
-| 4 | As read-only, open a gift. | No **Edit** or **Delete**. The **Soft Credits** panel's **Add credit** is disabled. |
-| 5 | As read-only, open a person with gifts in the Fundraising app. | The **Giving** section and **Gifts** list show; there is no **New Gift** button. |
+| 3 | As read-only, open the **BarnCRM Fundraising** app. | No **Quick Gift Entry** tab. **Gifts**, **Funds** and **Appeals** show no **New** button. |
+| 4 | As read-only, open a gift. | No **Edit** or **Delete**. The **Soft Credits** panel's **Add Credit** is disabled. |
+| 5 | As read-only, open a person with gifts in the BarnCRM Fundraising app. | The **Giving** section and **Gifts** list show; there is no **New Gift** button. |
 
 **Cleanup:** none.
 

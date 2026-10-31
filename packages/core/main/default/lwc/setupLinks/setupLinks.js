@@ -36,4 +36,17 @@ function setupValuePath(settingKey) {
   return SETUP_VALUE_PATHS[String(settingKey || '').toLowerCase()];
 }
 
-export { SETUP_PATHS, setupPath, setupValuePath };
+/**
+ * The Object Manager page of one field, from the object's and the field's API names (a custom
+ * object or field keeps its __c suffix). Undefined when either is missing.
+ */
+function fieldSetupPath(objectApiName, fieldApiName) {
+  if (!objectApiName || !fieldApiName) {
+    return undefined;
+  }
+  return `${SETUP_PATHS.objectManager.replace(/\/home$/, '')}/${encodeURIComponent(
+    objectApiName
+  )}/FieldsAndRelationships/${encodeURIComponent(fieldApiName)}/view`;
+}
+
+export { SETUP_PATHS, setupPath, setupValuePath, fieldSetupPath };

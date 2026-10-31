@@ -1,0 +1,239 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom25">
+    <div class="slds-var-p-horizontal_medium">
+      <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
+
+      <template lwc:if={hasError}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+          {errorMessage}
+        </p>
+      </template>
+
+      <template lwc:if={hasNotice}>
+        <p role="status" data-id="notice-message" class="slds-text-body_small slds-var-m-bottom_small">
+          {noticeMessage}
+        </p>
+      </template>
+
+      <template lwc:if={showOffNotice}>
+        <p data-id="off-notice" class="slds-text-body_small slds-var-m-bottom_small">
+          {labels.off}
+        </p>
+      </template>
+
+      <template lwc:if={hasPage}>
+        <h3 class="slds-text-heading_small slds-var-m-top_small">{labels.queueHeading}</h3>
+        <dl class="slds-dl_horizontal slds-var-m-bottom_small">
+          <dt class="slds-dl_horizontal__label">{labels.emailsDue}</dt>
+          <dd data-id="emails-due" class="slds-dl_horizontal__detail">{page.emailsDue}</dd>
+          <dt class="slds-dl_horizontal__label">{labels.lettersDue}</dt>
+          <dd data-id="letters-due" class="slds-dl_horizontal__detail">{page.lettersDue}</dd>
+          <dt class="slds-dl_horizontal__label">{labels.withoutRecipient}</dt>
+          <dd data-id="without-recipient" class="slds-dl_horizontal__detail">
+            {page.withoutRecipient}
+          </dd>
+          <dt class="slds-dl_horizontal__label">{labels.lettersWaiting}</dt>
+          <dd data-id="letters-waiting" class="slds-dl_horizontal__detail">
+            {page.lettersWaiting}
+          </dd>
+          <dt class="slds-dl_horizontal__label">{labels.lettersAwaiting}</dt>
+          <dd data-id="letters-awaiting" class="slds-dl_horizontal__detail">
+            {page.lettersAwaitingConfirmation}
+            <template lwc:if={hasLettersFile}>
+              <a data-id="letters-file" href={lettersFileUrl}>{labels.downloadFile}</a>
+            </template>
+          </dd>
+          <dt class="slds-dl_horizontal__label">{labels.lastRun}</dt>
+          <dd data-id="last-run" class="slds-dl_horizontal__detail">{lastRunText}</dd>
+          <dt class="slds-dl_horizontal__label">{labels.nextRun}</dt>
+          <dd data-id="next-run" class="slds-dl_horizontal__detail">{nextRunText}</dd>
+        </dl>
+
+        <div class="slds-var-m-bottom_medium">
+          <lightning-button
+            data-id="send-now"
+            variant="brand"
+            label={labels.sendNow}
+            disabled={sendDisabled}
+            onclick={handleSendNow}
+          ></lightning-button>
+          <lightning-button
+            data-id="produce-letters"
+            class="slds-var-m-left_x-small"
+            label={labels.produceLetters}
+            disabled={lettersDisabled}
+            onclick={handleProduceLetters}
+          ></lightning-button>
+          <lightning-button
+            data-id="mark-sent"
+            class="slds-var-m-left_x-small"
+            label={labels.markSent}
+            disabled={markSentDisabled}
+            onclick={handleMarkSent}
+          ></lightning-button>
+          <lightning-input
+            data-id="nightly"
+            class="slds-var-m-top_x-small"
+            type="toggle"
+            label={labels.nightly}
+            checked={scheduled}
+            disabled={scheduleDisabled}
+            onchange={handleScheduleChange}
+          ></lightning-input>
+        </div>
+      </template>
+
+      <h3 class="slds-text-heading_small">{labels.stepsHeading}</h3>
+      <template lwc:if={showNoSteps}>
+        <p data-id="no-steps" class="slds-text-body_regular">{labels.noSteps}</p>
+      </template>
+      <template lwc:if={hasSteps}>
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th scope="col">{labels.columnStep}</th>
+              <th scope="col">{labels.columnTiming}</th>
+              <th scope="col">{labels.columnChannel}</th>
+              <th scope="col">{labels.columnTemplate}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={steps} for:item="step">
+              <tr key={step.id} data-id="step">
+                <td data-label={labels.columnStep}>
+                  <lightning-button
+                    data-id="step-link"
+                    data-record-id={step.id}
+                    variant="base"
+                    label={step.name}
+                    onclick={handleOpenStep}
+                  ></lightning-button>
+                  <span data-id="step-active" class="slds-text-body_small">{step.activeText}</span>
+                  <template lwc:if={canManage}>
+                    <lightning-button
+                      data-id="step-edit"
+                      data-record-id={step.id}
+                      class="slds-var-m-left_x-small"
+                      variant="base"
+                      label={labels.editStep}
+                      title={step.editTitle}
+                      onclick={handleEditStep}
+                    ></lightning-button>
+                  </template>
+                </td>
+                <td data-id="step-timing" data-label={labels.columnTiming}>{step.timingText}</td>
+                <td data-label={labels.columnChannel}>{step.channel}</td>
+                <td data-label={labels.columnTemplate}>
+                  <template lwc:if={step.templateMissing}>
+                    <span data-id="template-missing" class="slds-text-color_error">
+                      {step.templateText}
+                    </span>
+                  </template>
+                  <template lwc:else>
+                    <span data-id="template-name">{step.templateText}</span>
+                  </template>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </template>
+
+      <template lwc:if={showStepForm}>
+        <div data-id="step-form" class="slds-box slds-var-m-top_small slds-var-m-bottom_medium">
+          <h3 class="slds-text-heading_small slds-var-m-bottom_small">{stepFormHeading}</h3>
+          <lightning-record-edit-form
+            object-api-name="Pledge_Reminder_Step__c"
+            record-id={editingStepId}
+            onsubmit={handleStepSubmit}
+            onsuccess={handleStepSaved}
+          >
+            <lightning-messages></lightning-messages>
+            <lightning-input-field field-name="Name"></lightning-input-field>
+            <lightning-input-field field-name="Days_From_Due__c"></lightning-input-field>
+            <lightning-input-field field-name="Active__c"></lightning-input-field>
+            <lightning-input-field
+              data-id="step-channel"
+              field-name="Channel__c"
+              onchange={handleChannelChange}
+            ></lightning-input-field>
+            <template lwc:if={stepIsEmail}>
+              <lightning-combobox
+                data-id="step-template"
+                label={labels.templateField}
+                field-level-help={labels.templateFieldHelp}
+                placeholder={labels.templatePlaceholder}
+                options={templateOptions}
+                value={stepTemplate}
+                message-when-value-missing={labels.templateRequired}
+                required
+                onchange={handleStepTemplateChange}
+              ></lightning-combobox>
+            </template>
+            <div class="slds-var-m-top_small">
+              <lightning-button
+                data-id="step-cancel"
+                label={labels.cancelStep}
+                onclick={handleCancelStep}
+              ></lightning-button>
+              <lightning-button
+                data-id="step-save"
+                class="slds-var-m-left_x-small"
+                variant="brand"
+                type="submit"
+                label={labels.saveStep}
+              ></lightning-button>
+            </div>
+          </lightning-record-edit-form>
+        </div>
+      </template>
+      <template lwc:elseif={canManage}>
+        <div class="slds-var-m-top_small slds-var-m-bottom_medium">
+          <lightning-button
+            data-id="new-step"
+            label={labels.newStep}
+            onclick={handleNewStep}
+          ></lightning-button>
+        </div>
+      </template>
+
+      <h3 class="slds-text-heading_small">{labels.logHeading}</h3>
+      <template lwc:if={showNoReminders}>
+        <p data-id="no-log" class="slds-text-body_regular">{labels.noLog}</p>
+      </template>
+      <template lwc:if={hasReminders}>
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th scope="col">{labels.columnPledge}</th>
+              <th scope="col">{labels.columnInstallment}</th>
+              <th scope="col">{labels.columnStep}</th>
+              <th scope="col">{labels.columnChannel}</th>
+              <th scope="col">{labels.columnStatus}</th>
+              <th scope="col">{labels.columnSentOn}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={reminders} for:item="reminder">
+              <tr key={reminder.id} data-id="reminder">
+                <td data-label={labels.columnPledge}>{reminder.pledgeName}</td>
+                <td data-label={labels.columnInstallment}>{reminder.installmentName}</td>
+                <td data-label={labels.columnStep}>{reminder.stepName}</td>
+                <td data-label={labels.columnChannel}>{reminder.channel}</td>
+                <td data-id="reminder-status" data-label={labels.columnStatus}>
+                  {reminder.status}
+                  <template lwc:if={reminder.failureReason}>
+                    <span data-id="reminder-failure" class="slds-text-color_error">
+                      {reminder.failureReason}
+                    </span>
+                  </template>
+                </td>
+                <td data-label={labels.columnSentOn}>{reminder.sentOnText}</td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </template>
+    </div>
+  </lightning-card>
+</template>

@@ -4,6 +4,6 @@
   <defaultValue>false</defaultValue>
   <description>Whether seasonal addresses move on their own. Turning it on schedules the nightly seasonal address swap and turning it off stops it (C-18).</description>
   <inlineHelpText>Swap seasonal addresses in and out every night.</inlineHelpText>
-  <label>Seasonal Addresses Enabled</label>
+  <label>Turn On Seasonal Addresses</label>
   <type>Checkbox</type>
 </CustomField>

@@ -8,7 +8,7 @@ import listChildRelationships from '@salesforce/apex/FindController.listChildRel
 import saveEdits from '@salesforce/apex/FindController.saveEdits';
 import getTargets from '@salesforce/apex/BulkUpdateController.getTargets';
 import { CELL_TYPES, writeXlsx } from 'c/xlsxWriter';
-import { fileName, format, messageFrom, toCsv, valueAt, zonedDateTime } from 'c/findCsv';
+import { fileName, format, messageFrom, toCsv, valueAt, zonedDateTime, saveBlob } from 'c/findCsv';
 import TIME_ZONE from '@salesforce/i18n/timeZone';
 import getPage from '@salesforce/apex/FindController.getPage';
 import previewQuery from '@salesforce/apex/FindController.previewQuery';
@@ -115,6 +115,8 @@ const TABLE_EDIT_TYPES = { email: 'email', phone: 'phone', url: 'url' };
 const SAVED_QUERY_STATE = '__savedQueryId';
 /** The state key the Data Manager's bulk cards use, matched by suffix: "update" or "delete" (D-135). */
 const TOOL_STATE = '__tool';
+/** The state key the Record Inspector (C-55) uses to open Find on one object: `c__object`. */
+const OBJECT_STATE = '__object';
 const START_NOTES = { update: START_UPDATE, delete: START_DELETE };
 
 const DEFAULT_ROWS = 200;
@@ -268,7 +270,7 @@ export default class FindRecords extends LightningElement {
     labelTab(this, label, 'utility:search');
   }
 
-  /** Another page (Data Hygiene, C-28) can link to Find with a saved query to open and run. */
+  /** Another page (Data Quality in Org Optimizer, C-28) can link to Find with a saved query to open and run. */
   @wire(CurrentPageReference)
   handlePageReference(pageReference) {
     const state = (pageReference && pageReference.state) || {};
@@ -279,12 +281,30 @@ export default class FindRecords extends LightningElement {
       this.requestedSavedQueryId = state[key];
       this.openRequested();
     }
+    const objectKey = Object.keys(state).find((name) => name.endsWith(OBJECT_STATE));
+    if (objectKey && state[objectKey]) {
+      this.requestedObject = state[objectKey];
+      this.openRequestedObject();
+    }
+  }
+
+  /** Chooses the object a link asked for, once the object list is loaded and it is in it. */
+  async openRequestedObject() {
+    const requested = this.requestedObject;
+    if (!requested || !this.objectOptions.some((option) => option.value === requested)) {
+      return;
+    }
+    this.requestedObject = undefined;
+    if (requested !== this.objectApiName) {
+      await this.handleObjectChange({ detail: { value: requested } });
+    }
   }
 
   @wire(listObjects)
   wiredObjects({ data, error }) {
     if (data) {
       this.objectOptions = data.map((option) => ({ label: option.label, value: option.value }));
+      this.openRequestedObject();
     } else if (error) {
       this.errorMessage = messageFrom(error);
     }
@@ -901,14 +921,14 @@ export default class FindRecords extends LightningElement {
           rows,
           { sheetName: this.objectApiName, timeZone: TIME_ZONE }
         );
-        this.download(
+        saveBlob(
           new Blob([bytes], {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
           }),
           fileName(this.objectApiName, new Date(), 'xlsx')
         );
       } else {
-        this.download(
+        saveBlob(
           new Blob(
             [
               // Each row is an array, so a column's path is its position.
@@ -1193,13 +1213,5 @@ export default class FindRecords extends LightningElement {
     return path.includes('.')
       ? `${this.pathLabel(path.split('.').slice(0, -1).join('.'))} > ${leaf}`
       : leaf;
-  }
-
-  download(blob, name) {
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = name;
-    link.click();
-    URL.revokeObjectURL(link.href);
   }
 }

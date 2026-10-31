@@ -45,8 +45,8 @@ queries over everything you can read. You still cannot change records.
 | Giving reports and dashboards | Run them and view dashboards | Create or change reports and dashboards |
 
 The gift panels on a record still load, so you can read them; their actions are not for you.
-A commitment's **Payment Schedule** card shows no **Pause**, **Resume**, **Mark complete** or
-**Cancel commitment**, and **Refund or Write Off** and **Start Stewardship Plan** open a window
+A commitment's **Payment Schedule** card shows no **Pause**, **Resume**, **Mark Complete** or
+**Cancel Commitment**, and **Refund or Write Off** and **Start Stewardship Plan** open a window
 that says you cannot record a refund or start a plan.
 
 ### Volunteers (with Volunteers Read Only)
@@ -60,7 +60,7 @@ that says you cannot record a refund or start a plan.
 
 ## To Check What You Can See
 
-1. Open the App Launcher and choose **BarnCRM** (or **Fundraising**, or **BarnCRM
+1. Open the App Launcher and choose **BarnCRM** (or **BarnCRM Fundraising**, or **BarnCRM
    Volunteers**).
 2. Open a tab, then a record.
 

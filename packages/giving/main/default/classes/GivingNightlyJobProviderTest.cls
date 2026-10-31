@@ -21,9 +21,9 @@ private class GivingNightlyJobProviderTest {
             List<NightlyJob> jobs = new GivingNightlyJobProvider().nightlyJobs();
 
             Assert.areEqual(
-                3,
+                4,
                 jobs.size(),
-                'The top up, the overdue pass and the donor levels pass.'
+                'The top up, the overdue pass, the donor levels pass and the ask reminders.'
             );
             Set<String> labels = new Set<String>();
             for (NightlyJob job : jobs) {
@@ -33,8 +33,9 @@ private class GivingNightlyJobProviderTest {
             Assert.isTrue(labels.contains(System.Label.Giving_NightlyJobs_TopUpName));
             Assert.isTrue(labels.contains(System.Label.Giving_NightlyJobs_OverdueName));
             Assert.isTrue(labels.contains(System.Label.Giving_NightlyJobs_LevelsName));
+            Assert.isTrue(labels.contains(System.Label.Giving_NightlyJobs_AskRemindersName));
             Assert.areEqual(
-                3,
+                4,
                 labels.size(),
                 'Each job has its own name, so the finding can list them apart.'
             );
@@ -54,7 +55,7 @@ private class GivingNightlyJobProviderTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(3, givingTriggerCount(), 'A second press adds no second job.');
+            Assert.areEqual(4, givingTriggerCount(), 'A second press adds no second job.');
             for (NightlyJob job : jobs) {
                 Assert.isTrue(job.isScheduled(), job.label() + ' is scheduled.');
             }
@@ -111,7 +112,7 @@ private class GivingNightlyJobProviderTest {
             GivingScheduler.scheduleAll();
             Test.stopTest();
 
-            Assert.areEqual(3, givingTriggerCount());
+            Assert.areEqual(4, givingTriggerCount());
             Assert.isFalse(
                 NightlyJobs.unscheduledLabels()
                     .contains(System.Label.Giving_NightlyJobs_LevelsName),

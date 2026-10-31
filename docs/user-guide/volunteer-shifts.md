@@ -21,7 +21,7 @@ users can look at jobs, shifts and sign-ups but change nothing.
    - Shifts: **All Shifts**, **Shifts Needing Volunteers** (open shifts from today that still
      have places left) or **Past Shifts Still Open** (shifts that ended more than 7 days ago
      and were never closed).
-3. Click a name to open the record. Every sign-up, across all shifts, is also listed on the **Volunteer Sign-ups** tab, list view **All Sign-Ups**.
+3. Click a name to open the record. Every sign-up, across all shifts, is also listed on the **Volunteer Sign-Ups** tab, list view **All Sign-Ups**.
 
 You should see: a job page with its details and the **Shifts**, **Shift Schedules** and
 **Job Skills** lists, or a shift page with the **Sign-Ups** panel at the top.
@@ -88,7 +88,7 @@ cancelled one does not.
 
 1. Open the shift. The **Sign-Ups** panel at the top shows **Volunteers needed**, **Slots
    filled** and **Slots remaining**, and lists who is signed up.
-2. Click **Add sign-up**.
+2. Click **Add Sign-Up**.
 3. Choose the **Person**. Leave **Status** as **Signed up**, or pick another status.
 4. Click **Save**.
 
@@ -97,6 +97,22 @@ filled** up by one.
 
 More people than **Volunteers needed** can be signed up: **Slots remaining** then goes below
 zero.
+
+## To Sign Up Someone From the Suggestions
+
+Under the Sign-Ups panel, **Suggested Volunteers** lists up to ten active volunteers who are not
+yet on the shift, best match first, with why each is suggested (skills the job needs, available
+that weekday, hours already given on this job, onboarding up to date).
+
+1. Open the shift and find **Suggested Volunteers**.
+2. Read the **Why** column for the person you would like.
+3. Click **Sign Up** on their row.
+
+They are added as **Signed up**, the **Sign-Ups** panel updates and the person leaves the list.
+Someone who does not list the shift's weekday, or whose onboarding is not current, is listed
+lower with that said, but you can still sign them up. If the card says nobody is left, every
+active volunteer is already on the shift. Use **Add Sign-Up** for anyone who is not an active
+volunteer.
 
 ## To Change a Sign-Up's Status
 
@@ -110,7 +126,7 @@ A **Cancelled** sign-up frees its slot.
 ## To Mark Attendance After a Shift
 
 1. Open the shift.
-2. In each person's row, under **Attendance**, click **Attended** or **No show**.
+2. In each person's row, under **Attendance**, click **Attended** or **No Show**.
 3. When everyone is marked, click **Edit** on the shift, set **Status** to **Completed**, and
    click **Save**.
 
@@ -127,6 +143,23 @@ a second time records nothing more, and changing the status back deletes nothing
 
 To free the place but keep a record that the person had signed up, set the status to
 **Cancelled** instead of deleting.
+
+## To Know Whether a Volunteer Was Reminded
+
+When your admin has turned on **Send Shift Reminders**, each person signed up for a shift gets one
+reminder email before it, early in the morning, so you do not have to chase them.
+
+1. Open the sign-up (click the person's name in the **Sign-Ups** panel).
+2. Look at **Reminder Sent On**. A date and time means the reminder went out; empty means it has
+   not yet, or the person is not emailed (no email address, or Email Opt Out is checked).
+
+A sign-up made after that morning's run for a shift that starts before the next morning's run
+gets no reminder (for example someone who signs up at noon for a shift that evening). Tell those
+volunteers directly.
+
+To send a reminder again, a Coordinator clears **Reminder Sent On**; it goes out the next
+morning if the shift is still within the reminder window. To stop a person being reminded,
+change their sign-up to **Cancelled**.
 
 ## Common Problems
 
@@ -147,7 +180,7 @@ To free the place but keep a record that the person had signed up, set the statu
   admin: the nightly job that creates shifts may not be running.
 - Problem: "This job has shifts or volunteer hours, so it cannot be deleted ..." Why and what to
   do: clear **Active** on the job instead.
-- Problem: the **Sign-Ups** panel has no **Add sign-up** button or attendance buttons. Why and
+- Problem: the **Sign-Ups** panel has no **Add Sign-Up** button or attendance buttons. Why and
   what to do: you have read only access. Ask your admin if you need to sign people up.
 - Problem: "Showing the first ... sign-ups." Why and what to do: the panel shows a limited
   number of rows. Use the **Sign-Ups** related list below the details to see them all.

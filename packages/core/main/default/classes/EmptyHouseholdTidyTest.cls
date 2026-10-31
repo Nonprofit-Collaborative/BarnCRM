@@ -447,7 +447,7 @@ private class EmptyHouseholdTidyTest {
             Assert.areEqual(first, second, 'Starting again finds the job already there.');
             Boolean listed = false;
             for (NightlyJob job : NightlyJobs.all()) {
-                if (job instanceof NightlyJobs.EmptyHouseholdTidyJob) {
+                if (job.label() == System.Label.Core_HealthCheck_JobEmptyHouseholds) {
                     listed = job.isScheduled();
                 }
             }

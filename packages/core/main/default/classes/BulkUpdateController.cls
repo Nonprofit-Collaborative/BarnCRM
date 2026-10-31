@@ -186,6 +186,64 @@ public with sharing class BulkUpdateController {
         }
     }
 
+    /** The saved step lists, by name (C-50f1). Org-wide, so everyone's lists appear. */
+    @AuraEnabled
+    public static List<SavedTransformService.ListEntry> getSavedLists() {
+        try {
+            requirePermission();
+            return SavedTransformService.listAll();
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Super Transform saved lists');
+        }
+    }
+
+    /** One saved step list with its document (C-50f1). */
+    @AuraEnabled
+    public static SavedTransformService.SavedList loadSavedList(Id recordId) {
+        try {
+            requirePermission();
+            return SavedTransformService.load(recordId);
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Super Transform load list');
+        }
+    }
+
+    /** Saves the page's object, filter and changes as a new named list (C-50f1). */
+    @AuraEnabled
+    public static SavedTransformService.SavedList saveSavedList(
+        String name,
+        String definitionJson
+    ) {
+        try {
+            requirePermission();
+            return SavedTransformService.save(name, definitionJson);
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Super Transform save list');
+        }
+    }
+
+    /** Renames a saved list (C-50f1). */
+    @AuraEnabled
+    public static SavedTransformService.SavedList renameSavedList(Id recordId, String name) {
+        try {
+            requirePermission();
+            return SavedTransformService.rename(recordId, name);
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Super Transform rename list');
+        }
+    }
+
+    /** Deletes a saved list (C-50f1). */
+    @AuraEnabled
+    public static void deleteSavedList(Id recordId) {
+        try {
+            requirePermission();
+            SavedTransformService.remove(recordId);
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Super Transform delete list');
+        }
+    }
+
     /**
      * Super Transform's preview (C-50): the count and the first 25 records before and after,
      * worked out by the code the run uses, each value it would leave alone marked unchanged.

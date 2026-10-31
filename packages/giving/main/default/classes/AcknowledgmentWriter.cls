@@ -24,13 +24,6 @@
  * one sent on behalf of somebody who cannot open the gift.
  */
 public without sharing class AcknowledgmentWriter {
-    public static void insertAcknowledgments(List<Acknowledgment__c> rows) {
-        if (rows == null || rows.isEmpty()) {
-            return;
-        }
-        Database.insert(rows, true, AccessLevel.SYSTEM_MODE);
-    }
-
     /**
      * Inserts rows one at a time, keeping the ones that went in and reporting the ones that did
      * not. This is how the claim key does its work (R-AK7): a row whose gift already has a

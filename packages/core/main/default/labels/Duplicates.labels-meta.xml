@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Error Log warning: {0} is the match source, {1} the row cap</shortDescription>
-        <value>Match source {0} reached its limit of {1} rows in one lookup, so some duplicates it would find may be missed. If its values are very common, consider deactivating it on the Duplicate Matching tab, Matching Logic.</value>
+        <value>Match source {0} reached its limit of {1} rows in one lookup, so some duplicates may be missed. If its values are very common, consider deactivating it on the Duplicate Matching tab, Matching Logic.</value>
     </labels>
     <labels>
         <fullName>Core_MatchSource_BudgetSpent</fullName>
@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Error Log warning: {0} is the match source not read</shortDescription>
-        <value>Match source {0} was skipped because this run had used most of its database queries or rows, so some duplicates it would find may be missed. Run the duplicate scan or import again with fewer records at a time.</value>
+        <value>Match source {0} was skipped because this run had used most of its database queries or rows, so some duplicates may be missed. Run the duplicate scan or import again with fewer records at a time.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_Cancel</fullName>
@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates: action needs Manage BarnCRM Settings</shortDescription>
-        <value>Scanning, dismissing and merging from this panel need the Manage BarnCRM Settings permission. Ask your BarnCRM administrator.</value>
+        <value>Scanning, dismissing and merging from this panel need the Manage BarnCRM Settings permission. Ask your BarnCRM admin.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_ErrorScanRunning</fullName>
@@ -334,7 +334,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates: scan finished with failures. {0} objects, {1} pairs, {2} failed.</shortDescription>
-        <value>Duplicate scan of {0} finished: {1} new possible duplicates recorded, but {2} batches of up to 50 records could not be checked. The Error Log has the details. Run the scan again once they are fixed.</value>
+        <value>Duplicate scan of {0} finished: {1} new possible duplicates recorded, but {2} batches of up to 50 records could not be checked. See the Error Log, fix the cause, and scan again.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_ScanRunning</fullName>

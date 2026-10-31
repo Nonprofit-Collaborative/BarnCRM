@@ -131,20 +131,14 @@ public with sharing class ModuleManagerController {
 
     private static AuraHandledException logged(Exception e, String fallback) {
         ErrorLogger.log(e, ERROR_CONTEXT);
-        return asAuraException(
+        return UserErrors.message(
             e instanceof ModuleManagerService.ModuleManagerException ? e.getMessage() : fallback
         );
     }
 
     private static void requireEdit() {
         if (!BarnCRMPermissions.canManageSettings()) {
-            throw asAuraException(System.Label.Core_Settings_PermissionRequiredError);
+            throw UserErrors.message(System.Label.Core_Settings_PermissionRequiredError);
         }
-    }
-
-    private static AuraHandledException asAuraException(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 }

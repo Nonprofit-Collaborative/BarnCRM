@@ -83,6 +83,31 @@ public with sharing class ScheduledJobSelector {
         return System.schedule(jobName, cron, job);
     }
 
+    /**
+     * Schedules a named job unless a job by that name is already scheduled. Returns the trigger
+     * Id of the job that is there, or of the one just scheduled.
+     */
+    @NamespaceAccessible
+    public static Id ensure(String jobName, String cron, Schedulable job) {
+        Id existing = triggerIdByName(jobName);
+        return existing != null ? existing : schedule(jobName, cron, job);
+    }
+
+    /** Aborts the named job when it is scheduled; does nothing when it is not. */
+    @NamespaceAccessible
+    public static void stopNamed(String jobName) {
+        Id existing = triggerIdByName(jobName);
+        if (existing != null) {
+            abort(existing);
+        }
+    }
+
+    /** True when a job by that name is scheduled. */
+    @NamespaceAccessible
+    public static Boolean isScheduled(String jobName) {
+        return triggerIdByName(jobName) != null;
+    }
+
     /** Aborts a scheduled job and forgets what was read. */
     @NamespaceAccessible
     public static void abort(Id triggerId) {

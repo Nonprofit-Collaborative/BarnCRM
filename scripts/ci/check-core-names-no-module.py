@@ -15,8 +15,8 @@ did. So:
 - Core's metadata XML names no module class, object, field, label, tab, app or permission set.
 - Core's Apex string literals name no module object, app or permission set, except in the
   files listed in ALLOWED_LITERALS, each of which holds such names as data on purpose.
-- The module catalog records (ALLOWED_METADATA_PREFIX) may name a module object as a value:
-  the probe object detection reads by describe, never a static reference.
+- The module catalog records and the Integrations page rows (ALLOWED_METADATA_PREFIXES) may
+  name a module object as a value: detection reads by describe, never a static reference.
 """
 
 import glob
@@ -42,7 +42,9 @@ ALLOWED_LITERALS = {
 
 # Module catalog records (BarnCRM_Module__mdt): their Probe_Object__c values name a module
 # object as data, which ModuleDetectionService resolves by describe at run time (ADR-0124).
-ALLOWED_METADATA_PREFIX = "BarnCRM_Module."
+# Integrations page rows (Integration_App__mdt): their Detection_Objects__c values name another
+# vendor's namespaced object (pmdm.Program__c), which can share a bare name with a module's.
+ALLOWED_METADATA_PREFIXES = ("BarnCRM_Module.", "Integration_App.")
 
 KINDS = ("class", "component", "object", "field", "label", "tab", "app", "permission set")
 
@@ -192,7 +194,7 @@ def check_metadata(names, problems):
     }
     for path in sorted(files(CORE, "*.xml")):
         text = open(path, encoding="utf-8").read()
-        catalog = os.path.basename(path).startswith(ALLOWED_METADATA_PREFIX)
+        catalog = os.path.basename(path).startswith(ALLOWED_METADATA_PREFIXES)
         for number, line in enumerate(text.split("\n"), 1):
             if words and not catalog:
                 for name in sorted(set(words.findall(line))):

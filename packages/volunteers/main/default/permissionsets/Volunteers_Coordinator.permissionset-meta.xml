@@ -26,6 +26,10 @@
     <apexClass>VolunteerShiftSignupsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>VolunteerSuggestionController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <customPermissions>
     <enabled>true</enabled>
     <name>Manage_Volunteers</name>
@@ -318,6 +322,11 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Volunteer_Signup__c.Notes__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Volunteer_Signup__c.Reminder_Sent_On__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

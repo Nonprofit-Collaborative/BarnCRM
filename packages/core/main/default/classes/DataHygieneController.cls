@@ -1,5 +1,5 @@
 /**
- * What the Data Hygiene tab reads and does (C-28, admin guide data-hygiene.md, canonical model
+ * What the Data Quality section of Org Optimizer reads and does (C-28, admin guide data-hygiene.md, canonical model
  * R-SQ6, ADR-0079 `0079-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
  *
  * Both methods require the Find and Export Records custom permission (R-SQ5): the console is a
@@ -88,13 +88,11 @@ public with sharing class DataHygieneController {
 
     /** Anything the person can act on is shown as it is; anything else is logged and summarized. */
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof DataHygieneService.DataHygieneException)) {
-            ErrorLogger.log(caught, context);
-            message = System.Label.Core_DataHygiene_CheckFailed;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof DataHygieneService.DataHygieneException,
+            context,
+            System.Label.Core_DataHygiene_CheckFailed
+        );
     }
 }

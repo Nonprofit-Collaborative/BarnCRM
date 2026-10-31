@@ -244,9 +244,16 @@ private class VolunteerHoursImportTest {
             Assert.areEqual(2, outcome.rejected, 'The two that find nobody are reported.');
             String reasons = rejections();
             Assert.isTrue(reasons.contains('nobody@example.org'), 'Names the email: ' + reasons);
-            Assert.isTrue(reasons.contains('No such job'), 'Names the job: ' + reasons);
+            Assert.isTrue(
+                reasons.contains(Schema.SObjectType.Volunteer_Job__c.getLabel()),
+                'Names the job, found by name in the same upload (C-49c): ' + reasons
+            );
         }
         Assert.areEqual(2, hours().size(), 'Nothing was created for the rejected rows.');
+        Assert.isTrue(
+            [SELECT Name FROM Volunteer_Job__c WHERE Name = :JOB_NAME].Name.equals(JOB_NAME),
+            'The job keeps its name, not renamed to the row\'s capitals.'
+        );
     }
 
     @IsTest
@@ -283,7 +290,7 @@ private class VolunteerHoursImportTest {
             shipped = template();
             emails = people(shipped, 2);
             // An administrator edits the shipped template to name Approved instead of Submitted.
-            shipped.Default_Values_JSON__c = '{"version": 1, "defaults": [{"target": "Record.Status__c", "value": "Approved"}]}';
+            shipped.Default_Values_JSON__c = '{"version": 1, "defaults": [{"target": "Volunteer_Hours__c.Status__c", "value": "Approved"}]}';
             update shipped;
         }
 

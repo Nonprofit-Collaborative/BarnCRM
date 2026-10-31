@@ -22,7 +22,7 @@ Everything is in the app. You never open Setup.
 
 1. Open **BarnCRM Settings**, then **Giving**.
 2. Open **Donor Levels**. This is the page that shows your ladder.
-3. Choose **New level** and create your first rung. Each rung has:
+3. Choose **New Level** and create your first rung. Each rung has:
    - a **name**, the one you use with donors and on your donor wall;
    - a **minimum amount**, the amount at which a donor reaches this rung. A donor whose
      total is exactly the minimum is on it;
@@ -44,8 +44,8 @@ Everything is in the app. You never open Setup.
    - **Giving last fiscal year**, the fiscal year before this one.
    - **Largest single gift**, the single biggest gift the donor has given, for a ladder
      built on one gift rather than on a total.
-6. Turn **Donor levels** on in the same section.
-7. Back on the **Donor Levels** page, choose **Recalculate now**. Levels are assigned to
+6. Turn **Turn On Donor Levels** on in the same section.
+7. Back on the **Donor Levels** page, choose **Recalculate Now**. Levels are assigned to
    everyone who already has giving. The page then shows how many donors are on each rung
    and the time the recalculation finished.
 
@@ -59,13 +59,13 @@ Start with the sample data loaded (BarnCRM Settings, then Sample Data).
 
 1. Open **BarnCRM Settings**, then **Giving**, then **Donor Levels**. The ladder is
    empty.
-2. Choose **New level**. Name it `Friend`, minimum `100`, maximum `1000`. Save.
-3. Choose **New level** again. Name it `Sustainer`, minimum `1000`, maximum `5000`. Save.
-4. Choose **New level** once more. Name it `Leadership Circle`, minimum `5000`, leave
+2. Choose **New Level**. Name it `Friend`, minimum `100`, maximum `1000`. Save.
+3. Choose **New Level** again. Name it `Sustainer`, minimum `1000`, maximum `5000`. Save.
+4. Choose **New Level** once more. Name it `Leadership Circle`, minimum `5000`, leave
    maximum empty. Save. You now have three rungs and the page lists them lowest first.
-5. Go back to **Giving** and turn **Donor levels** on. Leave the source as **Total
+5. Go back to **Giving** and turn **Turn On Donor Levels** on. Leave the source as **Total
    giving, everything ever given**.
-6. Open **Donor Levels** again and choose **Recalculate now**. Each rung now shows a donor
+6. Open **Donor Levels** again and choose **Recalculate Now**. Each rung now shows a donor
    count, and the page says when the recalculation finished.
 7. Use **Quick Gift Entry** to enter a gift of 1200 from one of the sample households.
    Open that household. **Total giving** reads 1200, **Donor level** reads `Sustainer`,
@@ -93,8 +93,8 @@ recognizes goods, there is no setting for it: **Donor level source** offers the 
 totals and not in-kind value, so the honest way to do it is to recognize those donors
 alongside the ladder rather than on it. See [In-kind gifts](in-kind-gifts.md).
 
-**Nobody has a level after you build the ladder.** Two causes. Either **Donor levels** is
-still off in BarnCRM Settings, or you have not pressed **Recalculate now**. Editing the
+**Nobody has a level after you build the ladder.** Two causes. Either **Turn On Donor Levels** is
+still off in BarnCRM Settings, or you have not pressed **Recalculate Now**. Editing the
 ladder does not reassign anybody by itself: a donor moves when their giving changes, or
 when the nightly pass runs, or when you recalculate. Press the button after every change
 to the ladder.

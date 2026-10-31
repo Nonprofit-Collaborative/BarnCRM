@@ -60,17 +60,62 @@ export function fileName(objectApiName, today = new Date(), extension = 'csv') {
 // What the Find components share
 // -----------------------------------------------------------------------------------------
 
-/** A label with `{0}`, `{1}` and so on replaced by the values, in order. */
+/**
+ * A label with every `{0}`, `{1}` and so on replaced by the values, in order. A missing label
+ * reads as empty text.
+ */
 export function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
+  return values.reduce(
+    (text, value, index) => text.split(`{${index}}`).join(value),
+    template || ''
+  );
 }
 
-/** The message to show for a failed server call or a thrown error. */
-export function messageFrom(error) {
+/**
+ * The message to show for a failed server call or a thrown error: the server's message, else the
+ * error's own message, else the fallback.
+ */
+export function messageFrom(error, fallback = UNEXPECTED_ERROR) {
   if (error && error.body && error.body.message) {
     return error.body.message;
   }
-  return error && error.message ? error.message : UNEXPECTED_ERROR;
+  return error && error.message ? error.message : fallback;
+}
+
+/**
+ * The message to show for a failed server call: the server's message, else the fallback (an error
+ * thrown in the browser shows the fallback, never its own wording).
+ */
+export function bodyMessage(error, fallback = UNEXPECTED_ERROR) {
+  const body = error && error.body;
+  return (body && body.message) || fallback;
+}
+
+/**
+ * Saves a Blob as a file through a temporary link. With a delay, the address is released that
+ * many milliseconds after the click (some browsers start the download only after the click
+ * handler returns); without one, at once.
+ */
+export function saveBlob(blob, name, revokeDelayMs) {
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = name;
+  link.click();
+  if (revokeDelayMs) {
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    setTimeout(() => URL.revokeObjectURL(url), revokeDelayMs);
+  } else {
+    URL.revokeObjectURL(link.href);
+  }
+}
+
+/** Saves rows as CSV (toCsv) in a file named after `fileBase` and today (fileName). */
+export function downloadCsv(fileBase, columns, rows) {
+  saveBlob(
+    new Blob([toCsv(columns, rows)], { type: 'text/csv;charset=utf-8' }),
+    fileName(fileBase)
+  );
 }
 
 const zonedFormats = new Map();

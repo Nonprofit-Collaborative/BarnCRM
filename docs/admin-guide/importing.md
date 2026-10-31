@@ -82,6 +82,20 @@ BarnCRM Core ships three ready-made people templates, added at install and on up
 | **Organization List** | Organizations only: businesses, foundations, partner groups. Organizations are matched by name. | Organization Name, Street, City, State, Postal Code, Country (the billing address), Phone, Website |
 | **Couples and Households** | Two people on each row who share a household (section 4). | Contact 1 First Name, Last Name, Email and Phone; Contact 2 First Name, Last Name, Email and Phone; Household Name; Street, City, State, Postal Code, Country |
 
+Core also ships two templates that each load one kind of record, listed under **Your
+Templates** and added the same way:
+
+| Template | For a file of | Columns it reads |
+|---|---|---|
+| **Relationships** | One row per relationship between two people already in BarnCRM. Each person is found by email address. The other side of the relationship (Child for a Parent) is created for you once, so list each relationship once. A row that repeats an existing relationship is rejected. | Person Email, Related Person Email, Relationship Type (for example Parent, Spouse, Sibling), Start Date, End Date, Description |
+| **Affiliations** | One row per link between a person (found by email address) and an organization (found by name), both already in BarnCRM. A person keeps one primary affiliation: when several rows in one file say primary for the same person, the last of them in file order stays primary, and an ended affiliation is never primary. A row that repeats an affiliation covering the same dates is rejected. | Person Email, Organization Name, Role, Is Primary, Start Date, End Date, Description |
+
+Both insert only, and a row is rejected (never guessed) when an email or name matches no
+record or more than one. Load people and organizations first, then these. The rows are
+journaled, so **Undo** works as for any one-object load. A file that lists both directions of a
+relationship (A is Parent of B, and B is Child of A) loads without duplicates, but one row is
+enough.
+
 In an org installed before 2026-10-28 the first is called **Generic contact list**: an upgrade
 adds the two new templates but never renames or changes one you already have. You can edit
 any of them, and your edits are never overwritten by an upgrade. With the Giving module installed (and
@@ -981,6 +995,7 @@ file of the same kind is fixed too.
 | **First characters**, **Last characters** | Keeps the first or last number of characters you give. | first 5: `97201-1234` becomes `97201` |
 | **Shift a date** | Adds or takes away days or months (type a minus sign to go back). It reads a date written year first, so put **Read as a date** before it for other orders. Adding a month to the 31st gives the month's last day. | plus 1 month: `2025-01-31` becomes `2025-02-28` |
 | **Today's date** | Writes today's date, or, if you tick **Only when empty**, fills only empty cells with it. | an empty cell becomes `2026-10-13` |
+| **Format digits** | Keeps the digits and writes them into a **Pattern** (one `#` for each digit, other characters as typed). **Country code to drop** removes a leading code such as `1` when that makes the digits fit. An extension (`x12`, `ext 12`) is kept after the number as ` x12`. A value whose digits do not fit is left as it is. | `555.123.4567` with `(###) ###-####` becomes `(555) 123-4567` |
 
 3. The panel shows the first values of the column before and after your changes. Select
    **Done**. The column shows how many changes it has.

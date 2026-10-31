@@ -1,5 +1,5 @@
 /**
- * The Giving module's three nightly jobs, and the schedule an administrator starts and stops
+ * The Giving module's four nightly jobs, and the schedule an administrator starts and stops
  * from the Nightly Jobs page of the BarnCRM Settings console (ADR-0038).
  *
  * The schedule is an administrator's, not Setup's. Until this page existed nothing called
@@ -15,6 +15,7 @@ public with sharing class GivingScheduler {
     public static final String TOP_UP_JOB_NAME = 'BarnCRM Giving: installment top up';
     public static final String OVERDUE_JOB_NAME = 'BarnCRM Giving: installments overdue';
     public static final String LEVELS_JOB_NAME = 'BarnCRM Giving: donor levels';
+    public static final String ASK_JOB_NAME = 'BarnCRM Giving: ask reminders';
 
     /**
      * The times, and why they are these times. The top up runs first so the overdue pass sees
@@ -26,6 +27,8 @@ public with sharing class GivingScheduler {
     private static final String TOP_UP_CRON = '0 15 1 * * ?';
     private static final String OVERDUE_CRON = '0 45 1 * * ?';
     private static final String LEVELS_CRON = '0 0 3 * * ?';
+    /** Half an hour after the donor level pass, so reminders go out on settled data (G-29). */
+    private static final String ASK_CRON = '0 30 3 * * ?';
 
     /** The scheduled Apex job type, which is what CronJobDetail calls a scheduled class. */
     private static final String SCHEDULED_APEX = '7';
@@ -65,6 +68,10 @@ public with sharing class GivingScheduler {
             jobIds,
             scheduleJob(current, LEVELS_JOB_NAME, LEVELS_CRON, new DonorLevelSchedulable())
         );
+        addIfNotNull(
+            jobIds,
+            scheduleJob(current, ASK_JOB_NAME, ASK_CRON, new AskReminderSchedulable())
+        );
         return jobIds;
     }
 
@@ -87,6 +94,8 @@ public with sharing class GivingScheduler {
             scheduleJob(current, jobName, OVERDUE_CRON, new InstallmentSchedulable());
         } else if (jobName == LEVELS_JOB_NAME) {
             scheduleJob(current, jobName, LEVELS_CRON, new DonorLevelSchedulable());
+        } else if (jobName == ASK_JOB_NAME) {
+            scheduleJob(current, jobName, ASK_CRON, new AskReminderSchedulable());
         }
     }
 
@@ -142,6 +151,9 @@ public with sharing class GivingScheduler {
     public static void runNow() {
         new InstallmentTopUpSchedulable().execute(null);
         new InstallmentSchedulable().execute(null);
+        // Safe to repeat: a donor already reminded for its date is skipped, and it does nothing
+        // while the setting is off (G-29).
+        new AskReminderSchedulable().execute(null);
     }
 
     /** What is scheduled right now, by job name, with an entry for every job whether or not it is. */
@@ -165,7 +177,7 @@ public with sharing class GivingScheduler {
     }
 
     private static List<String> jobNames() {
-        return new List<String>{ TOP_UP_JOB_NAME, OVERDUE_JOB_NAME, LEVELS_JOB_NAME };
+        return new List<String>{ TOP_UP_JOB_NAME, OVERDUE_JOB_NAME, LEVELS_JOB_NAME, ASK_JOB_NAME };
     }
 
     private static List<CronTrigger> jobTriggers() {

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Indicators_Need_Output_Or_Outcome</fullName>
+  <active>true</active>
+  <description>
+    R-LE2: an element with indicators stays an output or an outcome.
+  </description>
+  <errorConditionFormula>
+AND(
+  Indicator_Count__c &gt; 0,
+  NOT(ISPICKVAL(Type__c, &quot;Output&quot;)),
+  NOT(ISPICKVAL(Type__c, &quot;Outcome&quot;))
+)
+  </errorConditionFormula>
+  <errorMessage>
+    This part has indicators, so it must stay an output or an outcome. Delete or move its indicators first.
+  </errorMessage>
+</ValidationRule>

@@ -32,6 +32,11 @@
                 <template lwc:if={note.hasStatus}>
                     <p class="slds-text-title_bold" data-id="status">{note.statusText}</p>
                 </template>
+                <template lwc:if={note.showUnconfirmed}>
+                    <p class="slds-text-color_weak slds-var-m-top_xx-small" data-id="unconfirmed">
+                        {note.unconfirmed}
+                    </p>
+                </template>
                 <div class="slds-var-m-top_x-small">
                     <template lwc:if={note.url}>
                         <a

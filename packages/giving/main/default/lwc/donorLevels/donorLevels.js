@@ -22,6 +22,7 @@ import COLUMN_ACTIVE from '@salesforce/label/c.Giving_DonorLevels_ColumnActive';
 import TOP_OF_LADDER from '@salesforce/label/c.Giving_DonorLevels_TopOfLadder';
 import INACTIVE from '@salesforce/label/c.Giving_DonorLevels_Inactive';
 import ACTION_FAILED from '@salesforce/label/c.Giving_DonorLevels_ActionFailed';
+import { bodyMessage } from 'c/findCsv';
 
 /**
  * The ladder, as Maria reads it: every rung lowest first, how many donors are on each, what the
@@ -64,7 +65,7 @@ export default class DonorLevels extends NavigationMixin(LightningElement) {
       this.errorMessage = undefined;
     }
     if (result.error) {
-      this.errorMessage = this.messageFrom(result.error);
+      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
     }
   }
 
@@ -146,17 +147,10 @@ export default class DonorLevels extends NavigationMixin(LightningElement) {
         return refreshApex(this.wiredLadder);
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
       })
       .finally(() => {
         this.busy = false;
       });
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return ACTION_FAILED;
   }
 }

@@ -22,7 +22,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Health Check: mirror has not run, detail</shortDescription>
-    <value>The Opportunity mirror's nightly run is scheduled, but no run has completed since {0}. It runs as the person who scheduled it: if they were deactivated or lost access, every run fails before it starts. Open Opportunity mirror in BarnCRM Settings, then stop the nightly run and schedule it again as someone who can run it. The Error Log says why the runs failed.</value>
+    <value>The Opportunity mirror's nightly run is scheduled, but none has completed since {0}. It runs as the person who scheduled it, so if they were deactivated or lost access every run fails. In BarnCRM Settings, open Opportunity mirror, stop the nightly run, and schedule it again as someone who can run it. The Error Log says why runs failed.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_DifferenceCountAll</fullName>
@@ -62,7 +62,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Compare refused: no Opportunity read access</shortDescription>
-    <value>Comparing needs read access to Opportunities and to their Name, Amount and Close Date. Ask your administrator for it.</value>
+    <value>Comparing needs read access to Opportunities and to their Name, Amount and Close Date. Ask your BarnCRM admin for it.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_NoUsePermission</fullName>
@@ -70,7 +70,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Page refused: no Opportunity Mirror permission set</shortDescription>
-    <value>The Opportunity mirror page needs the Opportunity Mirror permission set. Ask your administrator for it.</value>
+    <value>The Opportunity mirror page needs the Opportunity Mirror permission set. Ask your BarnCRM admin for it.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_RunPaused</fullName>
@@ -94,7 +94,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Run: record type list names ones the org does not have</shortDescription>
-    <value>The Opportunity mirror's record type list names record types this org does not have: {0}. They match no Opportunity, so no gift is made from them. Correct the list in the Opportunity mirror settings.</value>
+    <value>The Opportunity mirror's record type list names types this org does not have: {0}. They match no Opportunity, so no gift is made from them. Correct the list in the Opportunity mirror settings.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_MasterRecordType</fullName>
@@ -102,7 +102,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Run: record type list names Master</shortDescription>
-    <value>The Opportunity mirror's record type list includes Master. An Opportunity without a record type stores none, so Master matches no Opportunity and the run left it out. Remove Master from the list in the Opportunity mirror settings, or leave the list empty to include every Opportunity.</value>
+    <value>The Opportunity mirror's record type list includes Master. An Opportunity without a record type stores none, so Master matches nothing and the run skipped it. Remove Master from the list in the Opportunity mirror settings, or leave the list empty to include every Opportunity.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_DeletedKept</fullName>
@@ -118,7 +118,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Deleted gift: its Opportunity will become a gift again</shortDescription>
-    <value>Its Opportunity is left in place, and while it is won the next run makes a new gift from it. Close it as lost, or delete it, if the gift should stay gone.</value>
+    <value>Its Opportunity is left in place, and while it is won the next run makes a new gift from it. Close it as lost, or delete it, to keep the gift gone.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_LogDeletedOne</fullName>
@@ -142,7 +142,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Opportunity mirror log: saver cannot write opportunities</shortDescription>
-    <value>The Opportunity mirror skipped {0} gift(s): the person who saved them cannot create and edit Opportunities. The next run of the Opportunity mirror copies them, and any change to a gift that already has one.</value>
+    <value>The Opportunity mirror skipped {0} gift(s) because the person who saved them cannot create and edit Opportunities. The next run copies them, and any later change to a gift that has one.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_LogNoHeadroom</fullName>
@@ -150,7 +150,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Opportunity mirror log: save too large to copy</shortDescription>
-    <value>The Opportunity mirror did not copy the gifts in a very large save, because copying them in the same transaction would have gone past Salesforce limits. The gifts are saved without their Opportunities, and the next run of the Opportunity mirror copies them.</value>
+    <value>The Opportunity mirror did not copy the gifts in a very large save, because copying them in the same transaction would pass Salesforce limits. The gifts are saved without Opportunities, and the next mirror run copies them.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_LogOne</fullName>
@@ -174,7 +174,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Opportunity mirror log: linked opportunity not found</shortDescription>
-    <value>The Opportunity linked to the gift was deleted or is not visible to you. If it was deleted, clear the gift's Opportunity ID to have a new Opportunity made; if it still exists, give the person saving the gift access to it.</value>
+    <value>The Opportunity linked to the gift was deleted or is not visible to you. If deleted, clear the gift's Opportunity ID to make a new Opportunity. If it still exists, give the person saving the gift access to it.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_NoStage</fullName>
@@ -182,7 +182,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Opportunity mirror log: org has no closed stage to use</shortDescription>
-    <value>Salesforce has no active closed stage of the kind this gift needs (won for a gift in the totals, lost for a Cancelled one), so its Opportunity could not be written. Activate a Closed Won and a Closed Lost stage in Setup.</value>
+    <value>Salesforce has no active closed stage of the kind this gift needs (won for a gift in the totals, lost for a Cancelled one), so its Opportunity could not be written. In Setup, activate a Closed Won and a Closed Lost stage.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_InvalidOpportunityId</fullName>
@@ -206,7 +206,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Opportunity mirror log: new opportunity left unlinked</shortDescription>
-    <value>The Opportunity mirror created the Opportunity {0} for this gift, could not store its Opportunity ID on the gift, and could not delete the Opportunity again: {1} Delete that Opportunity, or paste its ID onto the gift once the gift can be saved.</value>
+    <value>The Opportunity mirror created the Opportunity {0} for this gift, but could not store its Opportunity ID on the gift or delete the Opportunity again: {1} Delete that Opportunity, or paste its ID onto the gift once it can be saved.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_NewGift</fullName>
@@ -246,7 +246,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Opportunity mirror log: opportunity names no donor</shortDescription>
-    <value>The Opportunity has no primary contact and no account, so no gift was made from it. Give it a primary contact or an account, and the next run makes the gift.</value>
+    <value>The Opportunity has no primary contact or account, so no gift was made from it. Give it a primary contact or an account, and the next run makes the gift.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_LogOneOpportunity</fullName>
@@ -270,7 +270,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Opportunity mirror log: what a gifts to opportunities run did</shortDescription>
-    <value>Opportunity mirror run, Gifts to Opportunities: {0} Opportunities created, {1} updated, {2} already up to date, {3} could not be copied (see the Warnings), {4} left for the next run.</value>
+    <value>Opportunity mirror run, Gifts to Opportunities: {0} Opportunities created, {1} updated, {2} already up to date, {3} could not be copied (see Warnings), {4} left for the next run.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_LogRunGifts</fullName>
@@ -358,7 +358,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Page: org has no Opportunities</shortDescription>
-    <value>This org has no Opportunities, so there is nothing to mirror. The Opportunity mirror needs a Salesforce edition with Opportunities, such as Sales Cloud, Service Cloud, NPSP or Nonprofit Cloud.</value>
+    <value>This org has no Opportunities, so there is nothing to mirror. The Opportunity mirror needs an edition with Opportunities, such as Sales Cloud, Service Cloud, NPSP or Nonprofit Cloud.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_SwitchedOff</fullName>
@@ -430,7 +430,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Page introduction</shortDescription>
-    <value>Keeps gifts and Salesforce Opportunities in step, in the direction chosen in BarnCRM Settings. Run now copies what is waiting; the nightly run catches up every night at 1:30 AM, in your organization's time zone.</value>
+    <value>Keeps gifts and Salesforce Opportunities in step, in the direction set in BarnCRM Settings. Run now copies what is waiting. The nightly run catches up at 1:30 AM, your organization's time zone.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_DirectionGifts</fullName>

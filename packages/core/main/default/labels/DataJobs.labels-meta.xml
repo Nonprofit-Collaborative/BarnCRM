@@ -112,4 +112,12 @@
         <shortDescription>Data job history: before the time a job started</shortDescription>
         <value>Started</value>
     </labels>
+    <labels>
+        <fullName>Core_DataJobs_RowActions</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: screen reader name of the menu on each job row</shortDescription>
+        <value>Job Actions</value>
+    </labels>
 </CustomLabels>

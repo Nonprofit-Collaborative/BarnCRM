@@ -61,6 +61,32 @@ to see the rest.
 
 If nothing new has arrived, no email is sent at all.
 
+### The Weekly Admin Summary
+
+When the digest is set to **Once a week**, it also carries a short **Admin Summary** of what an
+administrator would otherwise have to go looking for:
+
+- any org limit at 80 percent or more (data and file storage, daily API requests, daily
+  asynchronous Apex runs and single emails), each with its percentage;
+- BarnCRM data jobs (imports, bulk updates, bulk deletes and their undos) that failed since the
+  last digest, up to ten, each with a link that opens it;
+- how many duplicate suggestions are waiting for review (counted only when the person who
+  scheduled the digest holds the BarnCRM Duplicate Review permission set);
+- how many Setup changes were kept (copied into the Setup Changes Log) this week, counted by
+  when each was kept, not when it was made, so a change copied late is counted once, in the
+  next digest (see [Setup Changes](setup-changes.md); counted only when the person who
+  scheduled the digest holds BarnCRM Admin, the only set that can read the log).
+
+An email is sent when there are new Error Log entries or something to report; when there is
+neither, nothing is sent. With no new entries the subject reads **BarnCRM: Weekly Admin
+Summary**. Like the rest of the digest, it counts and names; it never copies record content.
+The summary is on by default for a weekly digest. To turn it off, clear **Weekly admin
+summary** on the same page. A daily digest never carries it. The setting reads: the weekly
+summary reports BarnCRM jobs that failed this week, how many Setup changes were kept this week,
+and two standing counts as they are when sent: org limits at 80 percent or more and duplicates
+waiting for review. If reading the admin summary fails, the failure is logged to the Error Log
+and the digest still goes, without the summary.
+
 ### Switch It On
 
 1. Open **BarnCRM Settings** and click **Error Log** in the left navigation.

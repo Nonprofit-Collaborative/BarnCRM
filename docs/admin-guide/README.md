@@ -1,6 +1,6 @@
 # Admin Guide
 
-Applies to: BarnCRM main as of 2026-10-29 (landing batch 13). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
+Applies to: BarnCRM main as of 2026-10-31 (landing batch A head a8489572d, pending the squash commit on main). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
 
 > **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
 
@@ -94,7 +94,7 @@ these pages, so that everyone is talking about the same person.
 
 ## Index
 
-Applies to: BarnCRM main as of 2026-10-29 (landing batch 13). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-31 (landing batch A head a8489572d, pending the squash commit on main). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 Every page in this folder is listed once, below, grouped by what you are trying to do. A feature that adds a page adds its row here in the same pull request, and the version line is refreshed with it. For a short description of what BarnCRM is and which modules exist, read the [Overview](../overview.md). Staff who use BarnCRM daily (and are not administrators) have the [User Guide](../user-guide/README.md); someone checking a build step by step has the [Testing Guide](../testing-guide/README.md).
 
@@ -148,11 +148,15 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core |
 | C-50 Super Transform (bulk change without a file or a Find query) | [super-transform.md](super-transform.md) | Core |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
-| Org Optimizer (Data Quality, Field Utilization, Health Check, Errors, Storage and Limits, Unused Setup) | [org-optimizer.md](org-optimizer.md) | Core |
+| Org Optimizer (Data Quality, Field Utilization, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | Core |
 | C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | Core |
 | C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |
 | Field utilization | [field-utilization.md](field-utilization.md) | Core |
 | C-52 Data Dictionary (the Data Dictionary section of Org Optimizer) | [data-dictionary.md](data-dictionary.md) | Core |
+| C-53 and C-53b Access Explorer, with Compare Two and the Modify All Report (a section of Org Optimizer) | [access-explorer.md](access-explorer.md) | Core |
+| C-56 Setup Changes (who changed what in Setup, kept beyond 180 days; the Setup Changes section of Org Optimizer) | [setup-changes.md](setup-changes.md) | Core |
+| C-55 Record Inspector (every readable field of one record, on record pages) | [record-inspector.md](record-inspector.md) | Core |
+| AIR-01 AI-Readiness Export (the AI-Readiness Export section of Org Optimizer) | [ai-readiness-export.md](ai-readiness-export.md) | Core |
 
 ### Automation, Totals and Health
 
@@ -182,10 +186,14 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | G-10 Matching gifts | [matching-gifts.md](matching-gifts.md) | Giving |
 | G-05 Appeals | [appeals.md](appeals.md) | Giving |
 | G-12 Acknowledgments | [acknowledgments.md](acknowledgments.md) | Giving |
+| G-30 Pledge reminders | [pledge-reminders.md](pledge-reminders.md) | Giving |
 | G-13 Receipts and year-end statements | [receipts.md](receipts.md) | Giving |
 | G-14 Donor levels | [donor-levels.md](donor-levels.md) | Giving |
 | G-15 Stewardship plans | [stewardship-plans.md](stewardship-plans.md) | Giving |
+| G-26 Ask pipeline | [ask-pipeline.md](ask-pipeline.md) | Giving |
+| G-29 Ask cadence reminders | [ask-cadence.md](ask-cadence.md) | Giving |
 | G-16 Retention reports | [retention-reports.md](retention-reports.md) | Giving |
+| G-28 Donor segments | [donor-segments.md](donor-segments.md) | Giving |
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving |
 | G-02, ADR-0064 A donor's giving on their record | [donor-records.md](donor-records.md) | Giving |
 | G-06 Giving dashboard | [giving-dashboard.md](giving-dashboard.md) | Giving |
@@ -205,6 +213,18 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | Feature | Page | Package |
 |---|---|---|
 | V-01 to V-08 Volunteers: install, roles, settings, jobs, shifts, sign-ups, hours, skills, requirements, recurring shifts, letters, dashboard | [volunteers.md](volunteers.md) | BarnCRM Volunteers |
+
+### Programs
+
+| Feature | Page | Package |
+|---|---|---|
+| P-01 Programs: install, roles, programs, services, enrollments, the Program Roster panel | [programs.md](programs.md) | BarnCRM Programs |
+
+### Logic Models
+
+| Feature | Page | Package |
+|---|---|---|
+| L-01 and L-02 Logic Models: install, roles, the Logic Model Builder, arrows and assumptions, indicators with baselines, targets and results by period | [logic-models.md](logic-models.md) | BarnCRM Logic Models |
 
 ### Moving From Another System
 

@@ -576,15 +576,10 @@ public with sharing class AddressService {
     // ---------------------------------------------------------------- seasonal helper
 
     /**
-     * Whether a seasonal address covers today. A range may wrap the end of the year, so
-     * November 1 to March 31 is one range and not two (R-AD4). The v0.4 seasonal swap job
-     * (C-18) is the only planned caller; it needs no change to this object.
+     * Whether a seasonal address covers a day. A range may wrap the end of the year, so
+     * November 1 to March 31 is one range and not two (R-AD4). The seasonal swap job (C-18)
+     * passes today; its tests name a date.
      */
-    public static Boolean isSeasonalActiveToday(Address__c address) {
-        return isSeasonalActiveOn(address, Date.today());
-    }
-
-    /** The same test against any day, so the swap job and its tests can name a date. */
     public static Boolean isSeasonalActiveOn(Address__c address, Date day) {
         if (address == null || day == null || address.Type__c != TYPE_SEASONAL) {
             return false;

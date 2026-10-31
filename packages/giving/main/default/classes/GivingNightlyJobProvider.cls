@@ -3,8 +3,8 @@
  * counted and scheduled by Health Check's "Schedule all nightly jobs" fix (ADR-0075,
  * health-check-schedules-every-nightly-job).
  *
- * It lists the installment top up, the installments overdue pass and the donor levels pass, the
- * three jobs `GivingScheduler` runs, each scheduled under the name the Nightly Jobs page already
+ * It lists the installment top up, the installments overdue pass, the donor levels pass and the
+ * ask reminders pass, the four jobs `GivingScheduler` runs, each scheduled under the name the Nightly Jobs page already
  * looks for (ADR-0038). The acknowledgment send is not listed: it emails donors, so whether it
  * runs is the organization's choice, made on its own page.
  *
@@ -31,11 +31,15 @@ public with sharing class GivingNightlyJobProvider implements NightlyJobProvider
             new GivingJob(
                 GivingScheduler.LEVELS_JOB_NAME,
                 System.Label.Giving_NightlyJobs_LevelsName
+            ),
+            new GivingJob(
+                GivingScheduler.ASK_JOB_NAME,
+                System.Label.Giving_NightlyJobs_AskRemindersName
             )
         };
     }
 
-    /** One of the three jobs, scheduled and counted by its job name. */
+    /** One of the four jobs, scheduled and counted by its job name. */
     @TestVisible
     private class GivingJob implements NightlyJob {
         private final String jobName;

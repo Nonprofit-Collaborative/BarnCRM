@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Ask_Reminders_Enabled__c</fullName>
+  <defaultValue>true</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>
+    Whether a donor's owner gets a task when the donor's Next Ask Date arrives. It does nothing until a Next Ask Date is entered.
+  </inlineHelpText>
+  <label>Send Ask Reminders</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

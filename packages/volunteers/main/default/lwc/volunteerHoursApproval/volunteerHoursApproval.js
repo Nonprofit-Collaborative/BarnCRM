@@ -41,6 +41,7 @@ import REASON_REQUIRED from '@salesforce/label/c.Volunteers_Hours_RejectionReaso
 import ACTION_FAILED from '@salesforce/label/c.Volunteers_Approve_ActionFailed';
 import DATE_RANGE from '@salesforce/label/c.Volunteers_Approve_DateRange';
 import LOADING from '@salesforce/label/c.Volunteers_Loading';
+import { bodyMessage, format } from 'c/findCsv';
 
 const STATUS_SUBMITTED = 'Submitted';
 const STATUS_APPROVED = 'Approved';
@@ -50,10 +51,6 @@ const STATUS_LABELS = {
   [STATUS_APPROVED]: APPROVED,
   [STATUS_REJECTED]: REJECTED
 };
-
-function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
-}
 
 /** A yyyy-mm-dd date as people read dates, for a screen reader; the raw value if it is not one. */
 function readableDate(value) {
@@ -173,7 +170,7 @@ export default class VolunteerHoursApproval extends LightningElement {
         this.errorMessage = undefined;
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
       })
       .finally(() => {
         this.busy = false;
@@ -437,16 +434,9 @@ export default class VolunteerHoursApproval extends LightningElement {
         return this.load();
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
         this.busy = false;
         return false;
       });
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return ACTION_FAILED;
   }
 }

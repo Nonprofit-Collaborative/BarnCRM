@@ -5,5 +5,5 @@
   <fields>Volunteer_Shift__c</fields>
   <fields>Contact__c</fields>
   <fields>Status__c</fields>
-  <label>Volunteer Sign-up Compact Layout</label>
+  <label>Volunteer Sign-Up Compact Layout</label>
 </CompactLayout>

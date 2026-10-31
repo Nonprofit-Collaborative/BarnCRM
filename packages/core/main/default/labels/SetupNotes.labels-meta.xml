@@ -17,14 +17,6 @@
         <value>Show Steps</value>
     </labels>
     <labels>
-        <fullName>Core_SetupNote_Done</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings setup note: the prerequisite is already done</shortDescription>
-        <value>Done</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupNote_Duplicates_Steps</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -103,6 +95,14 @@
         <protected>true</protected>
         <shortDescription>Setup note, General: why Custom Metadata needs Setup</shortDescription>
         <value>Salesforce lets an installed package change the org's metadata only with this switch on, and only Setup can turn it on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Metadata_Unconfirmed</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, General: BarnCRM cannot read the Apex setting itself</shortDescription>
+        <value>BarnCRM can't read this Setup switch, so this note stays until a Custom Metadata save works. Already turned it on? Save an entry on the Custom Metadata page, then select Check Again.</value>
     </labels>
     <labels>
         <fullName>Core_SetupNote_NewTab</fullName>

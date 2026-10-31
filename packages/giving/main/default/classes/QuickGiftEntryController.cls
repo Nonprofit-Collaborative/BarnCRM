@@ -33,7 +33,7 @@ public with sharing class QuickGiftEntryController {
             return defaults;
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.getDefaults');
-            throw asAuraException(Label.Giving_QuickGiftEntry_ErrorLoadDefaults);
+            throw UserErrors.message(Label.Giving_QuickGiftEntry_ErrorLoadDefaults);
         }
     }
 
@@ -61,7 +61,7 @@ public with sharing class QuickGiftEntryController {
                 .get('gift');
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.getPaymentChoices');
-            throw asAuraException(Label.Giving_GiftEntryPays_ErrorLoad);
+            throw UserErrors.message(Label.Giving_GiftEntryPays_ErrorLoad);
         }
     }
 
@@ -237,12 +237,6 @@ public with sharing class QuickGiftEntryController {
             values.add(option.value);
         }
         return values;
-    }
-
-    private static AuraHandledException asAuraException(String message) {
-        AuraHandledException e = new AuraHandledException(message);
-        e.setMessage(message);
-        return e;
     }
 
     /** One choice in the "How it arrived" list. */

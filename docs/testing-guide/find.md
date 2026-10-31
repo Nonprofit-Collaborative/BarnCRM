@@ -98,7 +98,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 4 | Open **Test Garcias**, tick **Show to everyone who uses Find**, and select **Save**. | Saved. |
 | 5 | Log in as staff, open **Find**, and open **Saved queries**. | **Test Garcias** is listed as "Test Garcias (shared by" plus the admin's name. **Test Garcias copy** is not listed. |
 | 6 | As staff, open the shared query and select **Run**. | The same Garcia rows. **Save** and, in the menu next to it, **Delete** are disabled for it; **Save As** is enabled. |
-| 7 | As admin, open **Test Garcias** and choose **Delete** in the menu next to **Save**. | A dialog "Delete this saved query?" says "Test Garcias will be deleted. This cannot be undone." and "This query is shared with everyone who uses Find. Deleting it removes it for all of them." |
+| 7 | As admin, open **Test Garcias** and choose **Delete** in the menu next to **Save**. | A dialog "Delete This Saved Query?" says "Test Garcias will be deleted. This cannot be undone." and "This query is shared with everyone who uses Find. Deleting it removes it for all of them." |
 | 8 | Select **Keep It**. | The dialog closes; the query is still listed. |
 | 9 | Choose **Delete** again, then **Delete** in the dialog. | "Deleted Test Garcias." It is gone from **Saved queries** for admin and staff. |
 

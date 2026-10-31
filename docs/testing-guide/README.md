@@ -1,6 +1,6 @@
 # BarnCRM Testing Guide
 
-Applies to: BarnCRM main as of 2026-10-29 (landing batch 13). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-31 (landing batch A head a8489572d, pending the squash commit on main). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 Manual, step-by-step test scripts for checking a build in a scratch org or sandbox, feature by
 feature. Written for a tester: the project owner or a pilot org admin. Start with
@@ -46,19 +46,24 @@ page, even if that puts it out of reading order.
 | [Setup Assistant](setup-assistant.md) | SA | 11 | First-run setup, edition choice, Setup Assistant steps, sample data load and remove |
 | [Imports](imports.md) | IMP | 21 | Import wizard, templates, row rules, matching (including match sources), several sheets, two-part headings, best guesses for near spellings, several objects in one file, new fields from a column, undo, row retention, correcting and retrying rows |
 | [Find](find.md) | FIND | 10 | Query builder, typed queries, export, saved queries, summaries, Show More |
-| [Bulk update and delete](bulk-update-and-delete.md) | BULK | 13 | Bulk update, bulk delete, edit in Find, undo, the bulk path, Super Transform |
+| [Bulk update and delete](bulk-update-and-delete.md) | BULK | 15 | Bulk update, bulk delete, edit in Find, undo, the bulk path, Super Transform, saved step lists, phone format |
 | [Data Manager and job history](data-manager-and-job-history.md) | DM | 11 | Data Manager, data jobs and undo, data quality checks, field utilization and its snapshot history |
 | [Duplicates](duplicates.md) | DUP | 17 | Duplicate scan, review and merge, match sources, similar names, merge rules, auto-merge and its undo |
-| [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 10 | Health Check findings and fixes, Org Optimizer sections, storage and limits, Data Dictionary |
+| [Record Inspector](record-inspector.md) | RI | 2 | Inspect a record, search fields, copy an API name, field security and permission |
+| [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 15 | Health Check findings and fixes, Org Optimizer sections, storage and limits, Data Dictionary, Access Explorer, Access compare and Modify All report, weekly admin summary, Setup Changes, AI-Readiness Export |
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
 | [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 15 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import |
-| [Giving: commitments](giving-commitments.md) | COM | 10 | Pledges, recurring gifts, payments, nightly jobs |
+| [Giving: commitments](giving-commitments.md) | COM | 11 | Pledges, recurring gifts, payments, nightly jobs, pledge reminders |
+| [Giving: asks](giving-asks.md) | ASK | 8 | Ask stages, the Ask Pipeline board, moving and closing asks, gifts and pledges from won asks, reopening, history, read only access, the donor's Next Ask Date from open asks |
 | [Giving: soft credits, tributes and matching](giving-soft-credits-tributes-matching.md) | CRED | 10 | Soft credits, tributes, matching gifts |
 | [Giving: receipts and acknowledgments](giving-receipts-and-acknowledgments.md) | RCPT | 13 | Receipts, year-end statements, void and reissue, receipt lock, acknowledgments |
+| [Giving: ask cadence](giving-ask-cadence.md) | ASK | 2 | Next Ask Date, nightly reminder task, Who Is Due list |
 | [Giving: refunds and write-offs](giving-refunds.md) | REF | 7 | Refunds and their effect on totals |
-| [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 7 | Giving totals, recalculation, dashboards and reports |
+| [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 8 | Giving totals, recalculation, dashboards and reports, donor segments |
 | [Mirror](mirror.md) | MIR | 13 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API |
-| [Volunteers](volunteers.md) | VOL | 13 | Jobs, shifts, sign-ups, hours and approval, skills |
+| [Volunteers](volunteers.md) | VOL | 15 | Jobs, shifts, sign-ups, hours and approval, skills, shift reminders, suggested volunteers |
+| [Programs](programs.md) | PRG | 15 | Programs, services, enrollments, roster import, the Program Roster panel, a person's Programs card and last service, Programs access, Health Check, sample data, the Service Delivery Log and the delivery rules, intake and eligibility, the Programs Settings page, case notes, participant privacy, the Programs Dashboard |
+| [Logic Models](logic-models.md) | LM | 6 | The Logic Model Builder: parts, arrows and assumptions, whose model it is, indicators and periods with progress, staff and read-only access |
 | [Rollup Builder](rollup-builder.md) | RB | 26 | Building, recalculating and switching rollups, standard objects, parity options, export and import, instant totals on other objects |
 | [Accessibility and mobile](accessibility-and-mobile.md) | A11Y | 9 | Keyboard, focus, screen reader labels, zoom, Salesforce mobile app |
 
@@ -112,7 +117,7 @@ list in the same org, run them last or refresh the org first.
 
 Every script on every page above, before a release or after a change that touches many areas.
 Run Core pages first (People and households through Erase a person), then Giving, then Mirror,
-Volunteers and Rollup Builder, then Accessibility and mobile. Within a page, run in ID order.
+Volunteers, Programs, Logic Models and Rollup Builder, then Accessibility and mobile. Within a page, run in ID order.
 
 Run it on the Person Accounts shape, then repeat the Core pages and the Giving pages on the
 platform-only shape (Mirror needs Opportunity and Campaign, so skip it there). Scripts that need

@@ -289,8 +289,9 @@ GitHub). A module that is not installed and has a published version also has an
 - With the Standard Edition chosen in step one (or no edition chosen), the list shows Core
   and BarnCRM Rollup Builder, plus any module that is already installed. It offers no
   nonprofit modules.
-- With the Nonprofit Edition chosen, it shows all seven: Core, BarnCRM Rollup Builder, BarnCRM
-  Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders, and BarnCRM Mirror.
+- With the Nonprofit Edition chosen, it shows all eight: Core, BarnCRM Rollup Builder, BarnCRM
+  Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM Funders, and
+  BarnCRM Mirror.
 
 Core is always present. The rest are separate packages, and a module that is not installed
 leaves nothing behind in your org: no objects, no tabs, no automation. Installing one means
@@ -309,7 +310,7 @@ To turn an installed module on or off, or to see what uninstalling one would del
 
 Click **Next** when you have read it. The step marks itself done.
 
-**What Maria sees:** all seven packages, Core and Giving present, the other four not
+**What Maria sees:** all eight packages, Core and Giving present, the other six not
 installed. She makes a note to read about Volunteers this afternoon.
 
 ### Step 8: Bring in Your Data

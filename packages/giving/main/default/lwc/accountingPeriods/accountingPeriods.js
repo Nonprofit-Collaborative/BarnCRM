@@ -11,6 +11,7 @@ import SAVED from '@salesforce/label/c.Giving_Periods_Saved';
 import REOPEN_NOTE from '@salesforce/label/c.Giving_Periods_ReopenNote';
 import READ_ONLY from '@salesforce/label/c.Giving_Periods_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Periods_UnexpectedError';
+import { bodyMessage } from 'c/findCsv';
 
 /**
  * The Accounting Periods page (G-20, ADR-0053), reached from the Giving section of the Nonprofit
@@ -46,7 +47,7 @@ export default class AccountingPeriods extends LightningElement {
     try {
       this.show(await getPeriod());
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
     }
   }
 
@@ -96,14 +97,9 @@ export default class AccountingPeriods extends LightningElement {
       this.show(await closeThrough({ closeDate: this.draftDate }));
       this.noticeMessage = SAVED;
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
     } finally {
       this.busy = false;
     }
-  }
-
-  messageFrom(error) {
-    const body = error && error.body;
-    return (body && body.message) || UNEXPECTED_ERROR;
   }
 }

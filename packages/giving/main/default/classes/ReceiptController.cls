@@ -295,6 +295,6 @@ public with sharing class ReceiptController {
         Id recordId
     ) {
         ErrorLogger.log(failure, context, recordId);
-        return GivingErrors.userError(failure, Label.Giving_Receipt_UnexpectedError);
+        return UserErrors.wrapShowingDml(failure, Label.Giving_Receipt_UnexpectedError);
     }
 }

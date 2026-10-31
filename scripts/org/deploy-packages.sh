@@ -925,6 +925,10 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   else
     echo "== Skipping Volunteers: packages/volunteers holds no metadata yet =="
   fi
+  # Programs depends on Core only (ADR-0151, programs module).
+  MODULES+=(programs)
+  # Logic Models depends on Core only (ADR-0154, logic models module).
+  MODULES+=(logicmodels)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")
@@ -977,7 +981,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # BarnCRM_Module__mdt record (ADR-0137). The app
   # copies are written to a temporary metadata-format package; the repository's app files are
   # never changed. Nothing is deployed when no module names a tab.
-  deployed_modules=(rollups giving mirror)
+  deployed_modules=(rollups giving mirror programs logicmodels)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
   python3 scripts/org/module-app-tabs.py "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1
@@ -1013,7 +1017,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     if volunteers_has_metadata; then
       SETUP_MODULES+=(Volunteers)
     fi
-    SETUP_MODULES+=(Mirror)
+    SETUP_MODULES+=(Programs LogicModels Mirror)
     for module in "${SETUP_MODULES[@]}"; do
       echo ""
       echo "== Running the ${module} module's setup steps =="
@@ -1059,6 +1063,22 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
       echo "The Volunteers access sync was not queued. Nothing else is affected: the nightly access"
       echo "check syncs the access."
     fi
+  fi
+
+  # The same gap for the Programs permission sets (ADR-0151, programs module, decision 7).
+  echo ""
+  echo "== Queueing the Programs access sync =="
+  if ! printf '%s\n' 'new ProgramsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Programs access sync was not queued. Nothing else is affected: the hourly access"
+    echo "check syncs the access."
+  fi
+
+  # The same gap for the Logic Models permission sets (ADR-0154, logic models module, decision 7).
+  echo ""
+  echo "== Queueing the Logic Models access sync =="
+  if ! printf '%s\n' 'new LogicModelsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Logic Models access sync was not queued. Nothing else is affected: the hourly access"
+    echo "check syncs the access."
   fi
 fi
 

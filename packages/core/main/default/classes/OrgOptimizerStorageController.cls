@@ -28,7 +28,8 @@ public with sharing class OrgOptimizerStorageController {
         Import_Row__c.SObjectType,
         Import_Journal__c.SObjectType,
         Error_Log__c.SObjectType,
-        Field_Utilization_Snapshot__c.SObjectType
+        Field_Utilization_Snapshot__c.SObjectType,
+        Setup_Change__c.SObjectType
     };
 
     @TestVisible
@@ -76,7 +77,7 @@ public with sharing class OrgOptimizerStorageController {
     @AuraEnabled
     public static Storage getStorage() {
         if (!hasPermission()) {
-            throw asAuraError(Label.Core_OrgOptimizer_ErrorNoPermission);
+            throw UserErrors.message(Label.Core_OrgOptimizer_ErrorNoPermission);
         }
         try {
             Storage result = new Storage();
@@ -86,15 +87,7 @@ public with sharing class OrgOptimizerStorageController {
                 if (reading == null) {
                     continue;
                 }
-                LimitUse use = new LimitUse();
-                use.name = name;
-                use.used = reading[0];
-                use.max = reading[1];
-                use.percent = use.max == null ||
-                    use.max <= 0
-                    ? 0
-                    : (Integer) Math.min(100, Math.round(100.0 * use.used / use.max));
-                result.limits.add(use);
+                result.limits.add(limitUse(name, reading));
             }
             for (SObjectType type : OWN_OBJECTS) {
                 DescribeSObjectResult describe = type.getDescribe(SObjectDescribeOptions.DEFERRED);
@@ -114,6 +107,37 @@ public with sharing class OrgOptimizerStorageController {
         } catch (Exception caught) {
             throw UserErrors.wrap(caught, 'OrgOptimizerStorageController.getStorage', true);
         }
+    }
+
+    /**
+     * The limits at or above `threshold` percent, for the weekly admin digest (C-54). No
+     * permission check: the caller is the digest, which runs as an administrator.
+     */
+    public static List<LimitUse> limitsAtOrAbove(Integer threshold) {
+        List<LimitUse> found = new List<LimitUse>();
+        Map<String, List<Integer>> readings = readLimits();
+        for (String name : LIMIT_NAMES) {
+            if (readings.get(name) == null) {
+                continue;
+            }
+            LimitUse use = limitUse(name, readings.get(name));
+            if (use.percent >= threshold) {
+                found.add(use);
+            }
+        }
+        return found;
+    }
+
+    private static LimitUse limitUse(String name, List<Integer> reading) {
+        LimitUse use = new LimitUse();
+        use.name = name;
+        use.used = reading[0];
+        use.max = reading[1];
+        use.percent = use.max == null ||
+            use.max <= 0
+            ? 0
+            : (Integer) Math.min(100, Math.round(100.0 * use.used / use.max));
+        return use;
     }
 
     private static Map<String, List<Integer>> readLimits() {
@@ -146,11 +170,5 @@ public with sharing class OrgOptimizerStorageController {
             return permissionOverride;
         }
         return FeatureManagement.checkPermission(PERMISSION);
-    }
-
-    private static AuraHandledException asAuraError(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 }

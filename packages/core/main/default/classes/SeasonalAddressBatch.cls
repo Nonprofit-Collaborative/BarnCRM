@@ -93,9 +93,4 @@ public with sharing class SeasonalAddressBatch implements Database.Batchable<SOb
             JobNotifier.SECTION_ADDRESSES
         );
     }
-
-    /** What this run came to, for a caller or a test that wants the counts rather than the text. */
-    public SeasonalAddressService.RunSummary runSummary() {
-        return this.summary;
-    }
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Ask_Compact</fullName>
+  <fields>NAME</fields>
+  <fields>Stage__c</fields>
+  <fields>Outcome__c</fields>
+  <fields>Amount__c</fields>
+  <fields>Target_Date__c</fields>
+  <fields>OWNERID</fields>
+  <label>Ask Compact Layout</label>
+</CompactLayout>

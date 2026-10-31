@@ -68,7 +68,7 @@ export default class SetupStepFields extends NavigationMixin(LightningElement) {
       // The address parts are shown as one grouped block, where the first part sits.
       isAddress: field === firstAddress,
       columnClass:
-        field.fullWidth || field === firstAddress
+        field === firstAddress
           ? 'slds-col slds-size_1-of-1'
           : 'slds-col slds-size_1-of-1 slds-medium-size_1-of-2',
       previewUrl: this.draft[field.key] ? `${FILE_URL}${this.draft[field.key]}` : undefined

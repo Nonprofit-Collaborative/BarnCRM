@@ -6,7 +6,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 For every script on this page:
 
-- Open gifts from the **Fundraising** app, so they open on the packaged **Gift Record Page**, which carries the **Refund or Write Off** action and the **Refunds and Write-Offs** list.
+- Open gifts from the **BarnCRM Fundraising** app, so they open on the packaged **Gift Record Page**, which carries the **Refund or Write Off** action and the **Refunds and Write-Offs** list.
 - In **BarnCRM Settings**, **Giving**, set **Default fund** to **General Fund** and save.
 - "Enter a gift" means: in **Quick Gift Entry**, choose **Person**, pick the **Donor**, type the **Amount**, set **Payment Method** to **Check** and **Fund** to **General Fund**, then select **Save**.
 - Totals are recalculated a few seconds after a save. Refresh the record page before reading a total.
@@ -22,11 +22,11 @@ For every script on this page:
 |---|---|---|
 | 1 | Enter a gift from **Rosa Hall** for 250. Open it. | **Status** Received, **Amount** 250.00. |
 | 2 | Select **Refund or Write Off**. | The **Record Money Going Back** dialog. **Refund part or all of this gift** is chosen, **Left on this gift** reads 250.00, **How much is going back** starts at 250. |
-| 3 | Change the amount to 100, type `Donor asked for part back` in **Why is it going back**, select **Record it**. | Toast "Recorded. The gift it reverses now shows what happened." The dialog closes. |
+| 3 | Change the amount to 100, type `Donor asked for part back` in **Why is it going back**, select **Record It**. | Toast "Recorded. The gift it reverses now shows what happened." The dialog closes. |
 | 4 | Read the original gift. | **Amount** still 250.00, **Status** still Received. **Refunds and Write-Offs** lists one gift for -100.00 with the reason. |
 | 5 | Open that refund gift. | **Amount** -100.00, **Original Gift** is the 250 gift, **Donor Contact** Rosa Hall, **Gift Date** today, **Status** Received, **Refund Reason** "Donor asked for part back". Its **Gift Allocations** show -100.00 to General Fund. |
 | 6 | Back on the original, select **Refund or Write Off** again. | **Left on this gift** reads 150.00 and the amount starts at 150. |
-| 7 | Type a reason and select **Record it**. | The original's **Status** changes to Refunded. The **Refund or Write Off** button is no longer on the page. The list shows two refunds. |
+| 7 | Type a reason and select **Record It**. | The original's **Status** changes to Refunded. The **Refund or Write Off** button is no longer on the page. The list shows two refunds. |
 
 **Cleanup:** None. T-REF-04 reads these totals.
 
@@ -39,7 +39,7 @@ For every script on this page:
 |---|---|---|
 | 1 | Enter a gift from **Rosa Hall** for 500. Open it and select **Refund or Write Off**. | The dialog opens with **Left on this gift** 500.00. |
 | 2 | Choose **Write off what is left of this gift**. | The **How much is going back** box disappears. |
-| 3 | Type `Check returned unpaid by the bank` and select **Record it**. | The recorded toast. The original's **Status** is Written off and **Refunds and Write-Offs** lists one gift for -500.00. |
+| 3 | Type `Check returned unpaid by the bank` and select **Record It**. | The recorded toast. The original's **Status** is Written off and **Refunds and Write-Offs** lists one gift for -500.00. |
 
 **Cleanup:** None.
 
@@ -51,12 +51,12 @@ For every script on this page:
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Enter a gift from **Rosa Hall** for 80. Open it and select **Refund or Write Off**. | The dialog opens. |
-| 2 | Leave **Why is it going back** empty and select **Record it**. | Error toast: "Say why the money is going back, so the next person reading this gift knows what happened." No gift is created. |
-| 3 | Type a reason, set the amount to 200, select **Record it**. | Error toast: "This refund is larger than the amount left on the gift. Check the gift's refunds: part of it may have gone back already." |
-| 4 | Set the amount to 0, select **Record it**. | Error toast: "Enter how much is going back to the donor. A refund amount is always more than zero: BarnCRM records it as a negative gift for you." |
+| 2 | Leave **Why is it going back** empty and select **Record It**. | Error toast: "Say why the money is going back, so the next person reading this gift knows what happened." No gift is created. |
+| 3 | Type a reason, set the amount to 200, select **Record It**. | Error toast: "This refund is larger than the amount left on the gift. Check the gift's refunds: part of it may have gone back already." |
+| 4 | Set the amount to 0, select **Record It**. | Error toast: "Enter how much is going back to the donor. A refund amount is always more than zero: BarnCRM records it as a negative gift for you." |
 | 5 | Select **Cancel**. On the **Gifts** tab, select **New**, enter Rosa Hall as donor and **Amount** -50, select **Save**. | Refused: "A negative gift is a refund or a write-off, so it must name the original gift it reverses. Use the Refund or Write Off action on the original gift instead of entering this by hand." |
 | 6 | Cancel. Open any sample gift with **Status** Pending (filter **All Gifts** by Status). | No **Refund or Write Off** button: only a received gift can go back. |
-| 7 | As admin, open the original 250 gift from T-REF-01 and select **Delete**, then confirm. | Refused: "This gift has a refund or a write-off linked to it, so it cannot be deleted: deleting it would leave the negative gift explaining nothing. Delete the refund first if it was recorded in error." |
+| 7 | As admin, open the original 250 gift from T-REF-01 and select **Delete**, then confirm. | Refused: "This gift has a refund or write-off linked to it, so it cannot be deleted. Delete the refund first if it was recorded in error." |
 
 **Cleanup:** None.
 
@@ -83,7 +83,7 @@ For every script on this page:
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As read-only, open **Rosa Hall**'s 80 gift. | The gift opens. **Refunds and Write-Offs** and the refund fields are readable. |
-| 2 | Select **Refund or Write Off**. | The dialog says "You can see this gift but not record money going back. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set." It offers no reason box and no **Record it**, only **Cancel**. Select **Cancel**; no negative gift is added to **Refunds and Write-Offs**. |
+| 2 | Select **Refund or Write Off**. | The dialog says "You can see this gift but not record money going back. Ask your BarnCRM admin for the Fundraising Staff role, together with the Giving Staff permission set." It offers no reason box and no **Record It**, only **Cancel**. Select **Cancel**; no negative gift is added to **Refunds and Write-Offs**. |
 | 3 | Open the **Refunds and Write-Offs** list view on the **Gifts** tab. | The refunds from T-REF-01 and T-REF-02 are listed. |
 
 **Cleanup:** None.

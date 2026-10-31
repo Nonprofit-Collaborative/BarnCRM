@@ -6,9 +6,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 For every script on this page:
 
-- Open gifts from the **Fundraising** app, so they open on the packaged **Gift Record Page** with its **Receipts** panel. Outside that app, assign the page as the org default for Gift first ([Receipts](../admin-guide/receipts.md), step 2).
+- Open gifts from the **BarnCRM Fundraising** app, so they open on the packaged **Gift Record Page** with its **Receipts** panel. Outside that app, assign the page as the org default for Gift first ([Receipts](../admin-guide/receipts.md), step 2).
 - In **BarnCRM Settings**, **Giving**, set **Default fund** to **General Fund** and save.
-- "Enter a gift" means: in the **Fundraising** app, open **Quick Gift Entry**, choose **Person**, pick the **Donor**, type the **Amount**, set **Payment Method** to **Check** and **Fund** to **General Fund**, then select **Save**. A **Gift saved** toast names the new gift number.
+- "Enter a gift" means: in the **BarnCRM Fundraising** app, open **Quick Gift Entry**, choose **Person**, pick the **Donor**, type the **Amount**, set **Payment Method** to **Check** and **Fund** to **General Fund**, then select **Save**. A **Gift Saved** toast names the new gift number.
 - **Rosa Hall** and **Susan Ortiz** have no gifts in the sample data, so their totals start empty.
 
 ## T-RCPT-01: Set Receipt Numbering and Check the Shipped Letters
@@ -35,7 +35,7 @@ For every script on this page:
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Enter a gift from **Rosa Hall** for 125. Open the gift. | The **Receipts** panel reads "No receipt has been issued for this gift yet." and shows **Issue Receipt**. |
-| 2 | Select **Issue Receipt**. | Toast **Receipt issued**: "Receipt TEST-<this year>-000001 has been issued. Click View PDF beside it to open the file." |
+| 2 | Select **Issue Receipt**. | Toast **Receipt Issued**: "Receipt TEST-<this year>-000001 has been issued. Click View PDF beside it to open the file." |
 | 3 | Read the panel row. | **Number** TEST-<this year>-000001, **Status** Issued, **Amount** 125.00, **Issued** today, and a **View PDF** link. **Issue Receipt** is gone; a **Why is this receipt being voided?** box and **Void and Reissue** button show instead. |
 | 4 | Refresh the page and read **Receipt Number** on the gift. | It holds the same number. |
 | 5 | Select **View PDF**. | The file preview opens. The PDF shows the organization's name and address at the top, the amount 125.00, the gift date, the tax ID, and the sentence "No goods or services were provided in exchange for this contribution." |
@@ -66,11 +66,11 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the gift, leave **Why is this receipt being voided?** empty and select **Void and Reissue**. | Toast **Reason needed**: "Say why this receipt is being voided. A void needs a reason and a date." Nothing changes in the panel. |
-| 2 | Type `Amount was entered wrongly` and select **Void and Reissue**. | Toast **Receipt reissued**: "Receipt TEST-<this year>-000001 has been voided and reissued as TEST-<this year>-000002. The original file is unchanged." |
+| 1 | On the gift, leave **Why is this receipt being voided?** empty and select **Void and Reissue**. | Toast **Reason Needed**: "Say why this receipt is being voided. A void needs a reason and a date." Nothing changes in the panel. |
+| 2 | Type `Amount was entered wrongly` and select **Void and Reissue**. | Toast **Receipt Reissued**: "Receipt TEST-<this year>-000001 has been voided and reissued as TEST-<this year>-000002. The original file is unchanged." |
 | 3 | Read the panel. | Two rows: 000001 with **Status** Void and **Void Reason** "Amount was entered wrongly"; 000002 with **Status** Issued. Each row has **View PDF**. |
 | 4 | Open **View PDF** on each row. | Both files open; the first is the original PDF, unchanged. |
-| 5 | As admin, open the **Receipts** tab in the Fundraising app and choose the list view **Voided Receipts**. Open 000001. | **Replaced By** points at 000002, **Voided On** is today. Opening 000002 shows **Replaces** pointing back at 000001. |
+| 5 | As admin, open the **Receipts** tab in the BarnCRM Fundraising app and choose the list view **Voided Receipts**. Open 000001. | **Replaced By** points at 000002, **Voided On** is today. Opening 000002 shows **Replaces** pointing back at 000001. |
 | 6 | On 000002 select **Edit**, change **Issue Date** to yesterday, select **Save**. | The save is refused: "A receipt cannot be changed once it exists. Void it and issue a new one instead." |
 | 7 | Open the gift's donor from its **Donor Contact** link. | The **Receipts** list shows 000001 (Void) and 000002 (Issued). |
 
@@ -84,9 +84,9 @@ For every script on this page:
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **Receipts**, on **Receipt Letters and Year End Statements** select **Open Receipt Letters**, then the **Year End Statements** tab. | **Statement year** shows last year. The runs table, or "No statement run has been started yet." |
-| 2 | Select **Generate**. | Toast **Statements started**: "Year end statements are being generated. Click Refresh to see the run's progress below." |
+| 2 | Select **Generate**. | Toast **Statements Started**: "Year end statements are being generated. Click Refresh to see the run's progress below." |
 | 3 | Select **Refresh** until the run's **Status** stops changing. | One row for last year with **Donors** and **Issued** above zero and **Errors** 0. |
-| 4 | Open the **Receipts** tab in the Fundraising app, list view **Year End Statements**. Open one record. | **Type** Consolidated statement, **Statement Year** last year, **Status** Issued, a **Total Amount**, and no **Gift**. |
+| 4 | Open the **Receipts** tab in the BarnCRM Fundraising app, list view **Year End Statements**. Open one record. | **Type** Consolidated statement, **Statement Year** last year, **Status** Issued, a **Total Amount**, and no **Gift**. |
 | 5 | Open the record's file. | One line per gift in that year; the total at the bottom equals the sum of the lines. |
 | 6 | Back on **Year End Statements**, select **Generate** again, then **Refresh** until it finishes. | A second row with **Issued** 0: donors who already hold a statement for the year are skipped. |
 
@@ -99,11 +99,11 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Receipt Letters** tab in the Fundraising app, **Receipt Templates** tab. Choose the per gift letter in **Letter**. | The editor **The letter donors read** shows the wording, with tokens such as `{{DonorName}}`. |
+| 1 | Open the **Receipt Letters** tab in the BarnCRM Fundraising app, **Receipt Templates** tab. Choose the per gift letter in **Letter**. | The editor **The letter donors read** shows the wording, with tokens such as `{{DonorName}}`. |
 | 2 | Add the sentence `Testing the letter editor.` at the end. Select **Preview**. | A **Preview for a Sample Gift** section shows the letter filled in for a sample donor, with your sentence and the tax sentences BarnCRM adds. |
-| 3 | Select **Save**. | Toast **Letter saved**: "Your receipt letter has been saved." |
-| 4 | Remove the test sentence and select **Save**. | **Letter saved** again. |
-| 5 | Log in as staff, then as read-only, and open the same tab. | Each sees "You do not have permission to change the receipt letters. Ask your administrator for the BarnCRM Admin role, which carries Manage BarnCRM Settings." The editor and **Save** are disabled. |
+| 3 | Select **Save**. | Toast **Letter Saved**: "Your receipt letter has been saved." |
+| 4 | Remove the test sentence and select **Save**. | **Letter Saved** again. |
+| 5 | Log in as staff, then as read-only, and open the same tab. | Each sees "You do not have permission to change the receipt letters. Ask your BarnCRM admin for the BarnCRM Admin role, which carries Manage BarnCRM Settings." The editor and **Save** are disabled. |
 
 **Cleanup:** Step 4 restores the wording.
 
@@ -131,13 +131,13 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, turn on **Acknowledge gifts** and select **Save**. On the **Acknowledgments** row select **Open Acknowledgment Queue**. | The **Acknowledgments** page opens, with **Waiting to Go** and **Your Rules, in the Order They Are Considered**. |
-| 2 | Select **New rule**. **Rule Name**: `Test email`, **Order** 10, **Active** on, **Channel** Email, **Email template** **BarnCRM: thank you for your gift**, **Minimum Amount** 7777, **Maximum Amount** 7777. Select **Save**. | Toast "The rule has been saved." The rule is listed with **Matches** "7777 and up, up to 7777". |
-| 3 | Select **New rule**, **Channel** Email, leave **Email template** at **Choose a template**, select **Save**. | Refused: "An email rule needs an email template. Choose one from the list." Select **Cancel**. |
+| 1 | In **BarnCRM Settings**, **Giving**, turn on **Send Gift Acknowledgments** and select **Save**. On the **Acknowledgments** row select **Open Acknowledgment Queue**. | The **Acknowledgments** page opens, with **Waiting to Go** and **Your Rules, in the Order They Are Considered**. |
+| 2 | Select **New Rule**. **Rule Name**: `Test email`, **Order** 10, **Active** on, **Channel** Email, **Email template** **BarnCRM: thank you for your gift**, **Minimum Amount** 7777, **Maximum Amount** 7777. Select **Save**. | Toast "The rule has been saved." The rule is listed with **Matches** "7777 and up, up to 7777". |
+| 3 | Select **New Rule**, **Channel** Email, leave **Email template** at **Choose a template**, select **Save**. | Refused: "An email rule needs an email template. Choose one from the list." Select **Cancel**. |
 | 4 | Open **Susan Ortiz**. Set **Work Email** to `susan.work@example.org`, **Preferred Email** to **Work**, select **Save**. | The ordinary **Email** now reads `susan.work@example.org` ([Email addresses](../admin-guide/emails.md)). |
 | 5 | As staff, enter a gift from **Susan Ortiz** for 7777. Open the gift. | **Acknowledgment Status** is **To acknowledge**. |
-| 6 | Open the **Acknowledgments** page (**Acknowledgment Queue** tab in the Fundraising app). | **Emails ready to send** is at least 1. |
-| 7 | Select **Send emails now**. | "The email send has started. The run below shows how it goes." After a refresh, a run under **Recent Runs** with **Sent** 1 and **Did Not Go** 0. |
+| 6 | Open the **Acknowledgments** page (**Acknowledgment Queue** tab in the BarnCRM Fundraising app). | **Emails ready to send** is at least 1. |
+| 7 | Select **Send Emails Now**. | "The email send has started. The run below shows how it goes." After a refresh, a run under **Recent Runs** with **Sent** 1 and **Did Not Go** 0. |
 | 8 | Open the gift again, then the newest row in its **Acknowledgments** list. | The gift's **Acknowledgment Status** is **Acknowledged** with today's **Acknowledgment Date**. The acknowledgment has **Status** Sent, **Recipient Email** `susan.work@example.org`. |
 
 **Cleanup:** On the rules list, **Edit** `Test email` and clear **Active**. Leave the gift (T-RCPT-10 uses Susan Ortiz).
@@ -149,14 +149,14 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the Acknowledgments page select **New rule**: `Test letter`, **Order** 5, **Channel** Letter, **Minimum Amount** 8888, **Maximum Amount** 8888. **Save**. | The rule is listed first (lowest order). |
-| 2 | As staff, enter a gift from **Rosa Hall** for 8888. Open the Acknowledgments page. | **Letters ready to merge** is at least 1. No **New rule** and no **Edit** buttons show for staff. |
-| 3 | Select **Download letters to merge**. | "The letter file is ready on the run below. Merge it, print it, and then choose Mark as sent." The run shows **Download the file** and **Mark as sent**. |
+| 1 | On the Acknowledgments page select **New Rule**: `Test letter`, **Order** 5, **Channel** Letter, **Minimum Amount** 8888, **Maximum Amount** 8888. **Save**. | The rule is listed first (lowest order). |
+| 2 | As staff, enter a gift from **Rosa Hall** for 8888. Open the Acknowledgments page. | **Letters ready to merge** is at least 1. No **New Rule** and no **Edit** buttons show for staff. |
+| 3 | Select **Download Letters to Merge**. | "The letter file is ready on the run below. Merge it, print it, and then choose Mark as sent." The run shows **Download the file** and **Mark as Sent**. |
 | 4 | Select **Download the file**. | A CSV with a row for the 8888 gift: donor name, greeting, address, amount, gift date, appeal, fund. |
-| 5 | Select **Mark as sent**. | "Those letters are recorded as sent." The 8888 gift's **Acknowledgment Status** is **Acknowledged**. |
-| 6 | Select **Download letters to merge** again (or note it is disabled). | The 8888 gift is not in a new file: a thanked gift never returns to the queue by itself. |
-| 7 | As read-only, open the Acknowledgments page. | The queue counts show. **Send emails now**, **Download letters to merge** and **Send emails nightly** are disabled; no **New rule** or **Edit**. |
-| 8 | As staff, set Rosa Hall's mailing street to `=1+1`, enter another 8888 gift from her, select **Download letters to merge** and open the file in a spreadsheet. | The street cell reads `'=1+1` as text, not `2`. On the run, **Files** shows the CSV; in Setup, the file's sharing lists the run with **Internal users** where the org has a site or portal (otherwise **All users**). |
+| 5 | Select **Mark as Sent**. | "Those letters are recorded as sent." The 8888 gift's **Acknowledgment Status** is **Acknowledged**. |
+| 6 | Select **Download Letters to Merge** again (or note it is disabled). | The 8888 gift is not in a new file: a thanked gift never returns to the queue by itself. |
+| 7 | As read-only, open the Acknowledgments page. | The queue counts show. **Send Emails Now**, **Download Letters to Merge** and **Send emails nightly** are disabled; no **New Rule** or **Edit**. |
+| 8 | As staff, set Rosa Hall's mailing street to `=1+1`, enter another 8888 gift from her, select **Download Letters to Merge** and open the file in a spreadsheet. | The street cell reads `'=1+1` as text, not `2`. On the run, **Files** shows the CSV; in Setup, the file's sharing lists the run with **Internal users** where the org has a site or portal (otherwise **All users**). |
 
 **Cleanup:** As admin, **Edit** `Test letter` and clear **Active**. Put Rosa Hall's street back and mark the second letter sent.
 
@@ -168,15 +168,15 @@ For every script on this page:
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **Giving**, on the **Donor Levels** row select **Open Donor Level Ladder**. | The **Donor Levels** page. With no rungs: "You have not created any levels yet. Choose New level to add the first rung of your ladder." |
-| 2 | Select **New level**: **Level Name** `Friend`, **Minimum Amount** 100, **Maximum Amount** 1000, **Active** on. Save. Repeat for `Sustainer` 1000 to 5000 and `Leadership Circle` 5000 with no maximum. | The page lists three rungs, lowest first; the top one reads "and above". |
+| 2 | Select **New Level**: **Level Name** `Friend`, **Minimum Amount** 100, **Maximum Amount** 1000, **Active** on. Save. Repeat for `Sustainer` 1000 to 5000 and `Leadership Circle` 5000 with no maximum. | The page lists three rungs, lowest first; the top one reads "and above". |
 | 3 | Try a fourth level with **Minimum Amount** 500 and **Maximum Amount** 200. | Refused: "The maximum amount has to be greater than the minimum amount. Leave the maximum empty for the top level of your ladder." Cancel. |
-| 4 | In **BarnCRM Settings**, **Giving**, turn on **Donor levels**, leave **Donor level source** at total giving, **Save**. Back on the page select **Recalculate now**. | "Placing every donor on the ladder. This runs in the background and the counts below update when it finishes." After a refresh, **Donors** counts appear and **Donors last placed** shows a time. |
+| 4 | In **BarnCRM Settings**, **Giving**, turn on **Turn On Donor Levels**, leave **Donor level source** at total giving, **Save**. Back on the page select **Recalculate Now**. | "Placing every donor on the ladder. This runs in the background and the counts below update when it finishes." After a refresh, **Donors** counts appear and **Donors last placed** shows a time. |
 | 5 | Open Susan Ortiz's household. | **Donor Level** reads `Leadership Circle` (total giving 7777). |
 | 6 | Open the 7777 gift and select **Refund or Write Off**. Refund 5000 with reason `Level test`. Open the household again after a few seconds. | **Total Giving** 2777, **Donor Level** `Sustainer`. |
 | 7 | On the **Households** tab choose the list view **Donor Level Changed This Month** and find the household. | **Donor Level** `Sustainer`, **Previous Donor Level** `Leadership Circle`, **Donor Level Changed** today. The **Contacts** tab has a list view of the same name for people. |
-| 8 | As read-only, open the Donor Levels page. | The ladder shows; **Recalculate now** is disabled. |
+| 8 | As read-only, open the Donor Levels page. | The ladder shows; **Recalculate Now** is disabled. |
 
-**Cleanup:** In **BarnCRM Settings**, **Giving**, turn **Donor levels** off. Clear **Active** on the three test levels.
+**Cleanup:** In **BarnCRM Settings**, **Giving**, turn **Turn On Donor Levels** off. Clear **Active** on the three test levels.
 
 ## T-RCPT-11: A Stewardship Plan Lays Out Tasks on a First Gift
 
@@ -185,16 +185,16 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship Plans** select **Open Stewardship Plan Setup**. Select **New plan**: **Plan name** `First gift welcome`, **What Starts It** Manual, **Smallest gift that starts it** 100. **Save**. | Refused: "A minimum amount applies only to the First gift and Gift received events. Clear it, or choose one of those events." |
+| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship Plans** select **Open Stewardship Plan Setup**. Select **New Plan**: **Plan name** `First gift welcome`, **What Starts It** Manual, **Smallest gift that starts it** 100. **Save**. | Refused: "A minimum amount applies only to the First gift and Gift received events. Clear it, or choose one of those events." |
 | 2 | Change **What Starts It** to **First gift**, clear the minimum, leave **On** off. **Save**. | "Saved." The plan is listed with **On** Off, **Steps** 0, **Running Now** 0. |
-| 3 | Select the plan, then **Add step**: **Subject** `Call to say thank you`, **Days after start** 1, **Assign to** Specific user, no **Assigned user**. **Save**. | Refused: "Choose the person this task goes to, or change Assign To." |
-| 4 | Change **Assign to** to **Record owner**, **Save**. Add `Send the welcome packet`, 7 days, Record owner. | Two steps listed in order; **Move up** and **Move down** reorder them. |
+| 3 | Select the plan, then **Add Step**: **Subject** `Call to say thank you`, **Days after start** 1, **Assign to** Specific user, no **Assigned user**. **Save**. | Refused: "Choose the person this task goes to, or change Assign To." |
+| 4 | Change **Assign to** to **Record owner**, **Save**. Add `Send the welcome packet`, 7 days, Record owner. | Two steps listed in order; **Move up** and **Move Down** reorder them. |
 | 5 | Select **Turn On** in the plan's row. | **On** reads On. |
-| 6 | Enter a gift from **Valentina Singh** for 50. | **Gift saved**. |
-| 7 | Open **Stewardship Plans** in the Fundraising app, list view **Running Plans**. Open the new plan. | **Plan Template** `First gift welcome`, **Status** Running, **Started Date** today, **Contact** Valentina Singh. Its activity shows two open tasks due tomorrow and in 7 days, assigned to the contact's owner. |
+| 6 | Enter a gift from **Valentina Singh** for 50. | **Gift Saved**. |
+| 7 | Open **Stewardship Plans** in the BarnCRM Fundraising app, list view **Running Plans**. Open the new plan. | **Plan Template** `First gift welcome`, **Status** Running, **Started Date** today, **Contact** Valentina Singh. Its activity shows two open tasks due tomorrow and in 7 days, assigned to the contact's owner. |
 | 8 | Enter a second gift from Valentina Singh for 50. Reopen **Running Plans**. | Still one plan for her: the same plan does not start twice while running. |
-| 9 | Open Valentina Singh in the Fundraising app. | Her **Stewardship Plans** list shows the one running plan. |
-| 10 | As read-only, open the Stewardship Plans page. | "You can read the plans here. Changing them needs the Manage BarnCRM Settings permission." **New plan** is disabled. |
+| 9 | Open Valentina Singh in the BarnCRM Fundraising app. | Her **Stewardship Plans** list shows the one running plan. |
+| 10 | As read-only, open the Stewardship Plans page. | "You can read the plans here. Changing them needs the Manage BarnCRM Settings permission." **New Plan** is disabled. |
 | 11 | As the admin, open the running plan, select **Edit**, set **Status** to **Complete** and leave **Completed Date** empty. **Save**. | Saved, with no error. **Completed Date** is today. |
 | 12 | Edit the plan again and set **Status** back to **Running**. **Save**. | Saved. **Completed Date** is empty. |
 
@@ -207,13 +207,13 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship Plans** select **Open Stewardship Plan Setup**. **New plan**: `After a meeting`, **What Starts It** Manual, a **description** `Use after a donor meeting`. **Save**, add one step `Send a note`, 2 days, Record owner, then **Turn On**. | The plan is listed with **On** On. |
-| 2 | As staff, open **Harper Garcia** in the Fundraising app and select **Start Stewardship Plan**. | The **Start a Stewardship Plan** window lists the plans that are on, including `After a meeting`. |
+| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship Plans** select **Open Stewardship Plan Setup**. **New Plan**: `After a meeting`, **What Starts It** Manual, a **description** `Use after a donor meeting`. **Save**, add one step `Send a note`, 2 days, Record owner, then **Turn On**. | The plan is listed with **On** On. |
+| 2 | As staff, open **Harper Garcia** in the BarnCRM Fundraising app and select **Start Stewardship Plan**. | The **Start a Stewardship Plan** window lists the plans that are on, including `After a meeting`. |
 | 3 | Select **Start Plan** without choosing. | Toast "Choose the plan to start." Nothing starts. |
 | 4 | Choose `After a meeting`. | "Use after a donor meeting" shows under the list. Select **Start Plan**. Toast "The plan has started. Its tasks are in the task lists of the people they are assigned to." |
 | 5 | Refresh Harper Garcia. | Her **Stewardship Plans** list shows the plan, **Status** Running. Start the same plan again: toast says it is already running for her. |
 | 6 | Open **The Summit Foundation** and start `After a meeting` there. | Started; the organization's **Stewardship Plans** list shows it. |
-| 7 | As read-only, open Harper Garcia and select **Start Stewardship Plan**. | "You can see stewardship plans but not start one. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set." No **Start Plan** button. |
+| 7 | As read-only, open Harper Garcia and select **Start Stewardship Plan**. | "You can see stewardship plans but not start one. Ask your BarnCRM admin for the Fundraising Staff role, together with the Giving Staff permission set." No **Start Plan** button. |
 | 8 | Covered by `StewardshipStartControllerTest` rather than on screen: starting a plan on a donor the person cannot see (for example a deleted person) is refused with "You cannot see this donor, so no plan was started." | Nothing starts. |
 
 **Cleanup:** As admin, set both plans' **Status** to Cancelled and select **Turn Off** on `After a meeting`.
@@ -243,9 +243,9 @@ For every script on this page:
 | 1 | On the Acknowledgments page, **Edit** `Test email` and tick **Active**. Select **Save**. | The rule is listed as active (Email, 7777 to 7777). |
 | 2 | Open **Rosa Hall**, tick **Email Opt Out**, select **Save**. | Saved. |
 | 3 | As staff, enter a gift from **Rosa Hall** for 7777. Open the Acknowledgments page. | **Opted out of email, sent by letter** is at least 1, and **Letters ready to merge** counts it too. **Emails ready to send** does not. |
-| 4 | If **Send emails now** is enabled, select it and refresh after the run finishes (it is greyed out when Rosa's gift is the only email gift waiting). | Any new run shows **Did Not Go** 0. The 7777 gift has no row in its **Acknowledgments** list and its **Acknowledgment Status** is still **To acknowledge**. Rosa receives no email. |
-| 5 | Select **Download letters to merge**, then **Download the file**. | The CSV has a row for Rosa's 7777 gift, with **Rule** `Test email`. |
-| 6 | Select **Mark as sent** on that run. | The 7777 gift's **Acknowledgment Status** is **Acknowledged**; its acknowledgment row has **Channel** Letter. |
+| 4 | If **Send Emails Now** is enabled, select it and refresh after the run finishes (it is greyed out when Rosa's gift is the only email gift waiting). | Any new run shows **Did Not Go** 0. The 7777 gift has no row in its **Acknowledgments** list and its **Acknowledgment Status** is still **To acknowledge**. Rosa receives no email. |
+| 5 | Select **Download Letters to Merge**, then **Download the file**. | The CSV has a row for Rosa's 7777 gift, with **Rule** `Test email`. |
+| 6 | Select **Mark as Sent** on that run. | The 7777 gift's **Acknowledgment Status** is **Acknowledged**; its acknowledgment row has **Channel** Letter. |
 | 7 | Open an organization with a primary contact, tick **Email Opt Out** on that contact, and enter a 7777 gift from the organization. Open the Acknowledgments page. | The gift is counted under **Opted out of email, sent by letter**: an organization's thank-you follows its primary contact's opt-out. |
 
 **Cleanup:** As admin, **Edit** `Test email` and clear **Active**. Clear **Email Opt Out** on Rosa Hall and the primary contact, and mark the step 7 gift **Do not acknowledge**.

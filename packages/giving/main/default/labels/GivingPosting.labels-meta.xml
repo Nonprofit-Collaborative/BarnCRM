@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Posted gift is locked</shortDescription>
-        <value>This gift has been posted to accounting, so its date, amount, donor, payment method, reference and funds cannot change and it cannot be deleted. Record a refund instead, or ask your bookkeeper to unpost it first.</value>
+        <value>This gift has been posted to accounting, so its date, amount, donor, payment method, reference and funds cannot change and it cannot be deleted. Record a refund, or ask your bookkeeper to unpost it.</value>
     </labels>
     <labels>
         <fullName>Giving_Posting_ClosedGiftLocked</fullName>
@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Gift in a closed period is locked</shortDescription>
-        <value>This gift is dated in a closed accounting period (the books are closed through {0}), so its date, amount, donor, payment method, reference and funds cannot change and it cannot be deleted. Record a refund instead: it is dated today.</value>
+        <value>This gift is dated in a closed accounting period (books closed through {0}), so its date, amount, donor, payment method, reference and funds cannot change and it cannot be deleted. Record a refund instead: it is dated today.</value>
     </labels>
     <labels>
         <fullName>Giving_Posting_ClosedPeriodNewGift</fullName>
@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>No new gift in a closed period</shortDescription>
-        <value>The books are closed through {0}, so a gift dated on or before that day cannot be added to them. Date the gift after {0}, or ask your administrator.</value>
+        <value>The books are closed through {0}, so a gift dated on or before that day cannot be added to them. Date the gift after {0}, or ask your BarnCRM admin.</value>
     </labels>
     <labels>
         <fullName>Giving_Posting_FieldsWrittenByPosting</fullName>
@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Funds of a gift in the books are locked</shortDescription>
-        <value>This gift is in the books (posted to accounting, or dated in a closed accounting period), so its funds and the amount to each cannot change. Record a refund instead.</value>
+        <value>This gift is in the books (posted to accounting, or dated in a closed period), so its funds and amounts to each cannot change. Record a refund instead.</value>
     </labels>
     <labels>
         <fullName>Giving_Posting_OverrideLogged</fullName>
@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Donor of a locked gift not deleted</shortDescription>
-        <value>Gifts from this record are posted to accounting or dated in a closed period, and the books name it as their donor, so it cannot be deleted. Merge it into the right record instead.</value>
+        <value>Gifts from this record are posted to accounting or dated in a closed period, and the books name it as donor, so it cannot be deleted. Merge it into the right record instead.</value>
     </labels>
     <labels>
         <fullName>Giving_Posting_OriginalLocked</fullName>

@@ -177,6 +177,38 @@
         <value>Every field of the kinds of record you choose, with its rules, as a table and a CSV.</value>
     </labels>
     <labels>
+        <fullName>Core_OrgOptimizer_AccessExplorer</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Access Explorer section name</shortDescription>
+        <value>Access Explorer</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_AccessExplorerText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: what the Access Explorer section answers</shortDescription>
+        <value>Who can see or change what, and why. Read only.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_AiExport</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: AI-Readiness Export section name</shortDescription>
+        <value>AI-Readiness Export</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_AiExportText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: what the AI-Readiness Export section does</shortDescription>
+        <value>Your data model and records as files ready for an AI tool you choose, with sensitive fields left out or masked.</value>
+    </labels>
+    <labels>
         <fullName>Core_OrgOptimizer_HealthCheck</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
@@ -214,7 +246,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: refusal without Manage BarnCRM Settings</shortDescription>
-        <value>This section needs the Manage BarnCRM Settings permission. Ask your administrator.</value>
+        <value>This section needs the Manage BarnCRM Settings permission. Ask your BarnCRM admin.</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_Errors</fullName>
@@ -375,6 +407,22 @@
         <protected>false</protected>
         <shortDescription>Org Optimizer: Overview line for Unused setup</shortDescription>
         <value>Users, permission sets, reports, flows and jobs nobody seems to use.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_SetupChanges</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Setup Changes section name</shortDescription>
+        <value>Setup Changes</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_SetupChangesText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Overview line for Setup Changes</shortDescription>
+        <value>Who changed what in Setup, and when, kept beyond Salesforce's 180 days.</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_SetupIntro</fullName>

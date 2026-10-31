@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: success toast title</shortDescription>
-        <value>Gift saved</value>
+        <value>Gift Saved</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_SuccessMessage</fullName>
@@ -206,7 +206,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: error region heading</shortDescription>
-        <value>The gift was not saved</value>
+        <value>The Gift Was Not Saved</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_ErrorDonorRequired</fullName>
@@ -302,7 +302,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: defaults could not be read</shortDescription>
-        <value>The form could not load its settings. Ask your administrator to check the default fund and default appeal in BarnCRM Settings.</value>
+        <value>The form could not load its settings. Ask your BarnCRM admin to check the default fund and default appeal in BarnCRM Settings.</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_ErrorUnexpected</fullName>

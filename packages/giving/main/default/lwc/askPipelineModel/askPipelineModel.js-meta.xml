@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Ask Pipeline board's arithmetic in plain JavaScript: stages into columns with their totals,
+    cards into columns, and days in stage (canonical model Section 25R). Imported by askPipeline.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

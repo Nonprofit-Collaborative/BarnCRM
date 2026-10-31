@@ -52,11 +52,11 @@ The thank-you page shows what is waiting, sorted into queues by your organizatio
 
 1. Open the **Acknowledgment Queue** tab.
 2. Read **Waiting to Go**: **Emails ready to send**, **Letters ready to merge**, **Opted out of email, sent by letter**, **Waiting, matched by no rule** and **Could not be sent, nobody to email**. A donor who has ticked **Email Opt Out** (for an organization, its primary contact) is never emailed a thank-you; their gift goes in the letter file instead.
-3. Click **Send emails now** to send the email queue.
-4. Click **Download letters to merge** to get the letter queue as a spreadsheet. Under **Recent Runs**, click **Download the file**, merge it with your letter, and print.
-5. When the letters are posted, click **Mark as sent** on that run.
+3. Click **Send Emails Now** to send the email queue.
+4. Click **Download Letters to Merge** to get the letter queue as a spreadsheet. Under **Recent Runs**, click **Download the file**, merge it with your letter, and print.
+5. When the letters are posted, click **Mark as Sent** on that run.
 
-You should see: each run under **Recent Runs** with **Status**, **Sent** and **Errors**. A thanked gift's **Acknowledgment Status** is **Acknowledged**, with an **Acknowledgment Date**. Letters stay in the queue until you click **Mark as sent**.
+You should see: each run under **Recent Runs** with **Status**, **Sent** and **Errors**. A thanked gift's **Acknowledgment Status** is **Acknowledged**, with an **Acknowledgment Date**. Letters stay in the queue until you click **Mark as Sent**.
 
 Only your admin can add or change rules, or turn on **Send emails nightly**. The **Gifts to Acknowledge** list view on **Gifts** shows every gift still waiting.
 
@@ -83,7 +83,7 @@ You should see: the plan leave **Running Plans**. BarnCRM does not close a plan 
 
 Use this for a donor who should get a plan that no gift started, for example after a meeting. Any plan your admin has turned on can be started by hand ([Stewardship plans](../admin-guide/stewardship-plans.md)).
 
-1. In the Fundraising app, open the person, household or organization.
+1. In the BarnCRM Fundraising app, open the person, household or organization.
 2. Click **Start Stewardship Plan** and choose the plan in **Plan**. Its description shows under the list.
 3. Click **Start Plan**.
 
@@ -103,7 +103,7 @@ Marking gifts posted, and unposting, need the **Post Gifts** permission, which o
 ## Common Problems
 
 - **Issue Receipt** is missing. The gift already has a receipt (use **Void and Reissue**), or you lack **Issue Receipts**.
-- "You do not have permission to issue receipts. Ask your administrator for the Fundraising Staff role."
+- "You do not have permission to issue receipts. Ask your BarnCRM admin for the Fundraising Staff role."
 - "This gift has already been receipted. To correct the receipt, void it and reissue it."
 - "A pending or cancelled gift cannot be receipted, because no money has arrived. Mark the gift Received first."
 - "Say why this receipt is being voided. A void needs a reason and a date." Fill in the reason first.
@@ -111,10 +111,10 @@ Marking gifts posted, and unposting, need the **Post Gifts** permission, which o
 - "A year end statement is reissued by voiding it and running statements again for that donor, not from this button."
 - "This gift has a receipt number, so its amount, date, donor and in-kind description cannot change." Void and reissue, or record a refund.
 - "Sending thank yous needs the Send Acknowledgments permission." Ask your admin for the Fundraising Staff role.
-- **Send emails now** is greyed out. The email queue is empty, or you lack **Send Acknowledgments**.
+- **Send Emails Now** is greyed out. The email queue is empty, or you lack **Send Acknowledgments**.
 - "Acknowledging gifts is switched off, so nothing is joining the queue." Your admin turns it on.
 - Gifts sit under **Waiting, matched by no rule**. No rule covers them; tell your admin.
-- Gifts under **Opted out of email, sent by letter** are not emailed. Click **Download letters to merge** to thank those donors by post.
+- Gifts under **Opted out of email, sent by letter** are not emailed. Click **Download Letters to Merge** to thank those donors by post.
 - **Template not found** beside a rule. Its email template is gone; your admin picks another. The **Failed Acknowledgments** list view on Acknowledgments shows what did not send.
 - "You need the Post Gifts permission to mark gifts posted to accounting or to unpost them."
 

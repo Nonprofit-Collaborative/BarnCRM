@@ -54,6 +54,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import: the rest of a trial refused to someone other than its runner</shortDescription>
-        <value>Only the person who imported the first rows can import the remaining rows, so one undo can tell this import's records from anyone else's. Ask them, or undo the import and import the file again.</value>
+        <value>Only the person who imported the first rows can import the rest, so one undo can tell this import's records from others. Ask them, or undo the import and import the file again.</value>
     </labels>
 </CustomLabels>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    One copied row of the Salesforce Setup Audit Trail: who changed what in Setup, and when
+    (C-56, canonical model Section 29W). Written and deleted only by the nightly Setup Changes
+    copy, kept for the days the Org Optimizer setting Days to Keep Setup Changes gives. Never
+    edited. Report on it for history beyond what the Org Optimizer section shows.
+  </description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>false</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Setup Change</label>
+  <nameField>
+    <displayFormat>SC-{000000}</displayFormat>
+    <label>Setup Change Number</label>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Setup Changes</pluralLabel>
+  <sharingModel>Read</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>
