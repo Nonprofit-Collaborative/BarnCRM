@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    The logic model record page: the model's details and its Elements and Links lists.
+    The logic model record page: the Logic Model Builder panel, where the model is built, above
+    the model's details and its Elements and Links lists.
   </description>
   <flexiPageRegions>
     <itemInstances>
@@ -22,6 +23,12 @@
     <type>Region</type>
   </flexiPageRegions>
   <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>logicModelBuilder</componentName>
+        <identifier>logicModelBuilderPanel</identifier>
+      </componentInstance>
+    </itemInstances>
     <itemInstances>
       <componentInstance>
         <componentName>force:detailPanel</componentName>

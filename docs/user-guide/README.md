@@ -39,6 +39,10 @@ What you can do depends on the role your admin gave you on the Access page (for 
 - [Volunteer jobs, shifts and sign-ups](volunteer-shifts.md): finding and creating shifts, recurring shifts, signing people up and marking attendance.
 - [Volunteer hours, profiles and letters](volunteer-hours.md): logging and approving hours, a volunteer's profile and readiness, hour letters.
 
+### Logic Models (Nonprofit Edition)
+
+- [Logic models](logic-models.md): building a logic model with arrows and assumptions, and measuring outputs and outcomes with indicators, targets and results.
+
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.

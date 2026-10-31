@@ -77,7 +77,7 @@ The builder shows seven columns, in order: **Inputs**, **Activities**, **Outputs
 Outcomes**, **Intermediate Term Outcomes**, **Long Term Outcomes** and **Impact**. On a phone the
 columns are stacked.
 
-- Click **Add** under a column, type a short name (for example "Two tutors" or "Weekly reading
+- Click **Add to** under a column (for example **Add to Inputs**), type a short name (for example "Two tutors" or "Weekly reading
   sessions"), and press **Save**. Add a longer **Description** if it helps.
 - Click a part to select it. Its details open below the columns: change its name, description or
   column, or **Delete** it. Deleting a part removes its arrows and its indicators with their

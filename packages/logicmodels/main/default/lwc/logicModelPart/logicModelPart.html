@@ -1,0 +1,228 @@
+<template>
+  <section class="slds-box slds-var-m-bottom_small" data-id="part">
+    <p class="slds-text-title">{labels.selectedPart}: {columnName}</p>
+    <template lwc:if={editing}>
+      <div data-id="edit-form" class="slds-var-m-vertical_small">
+        <lightning-input
+          data-id="edit-name"
+          label={labels.name}
+          value={draftName}
+          max-length="80"
+          required
+          onchange={handleDraftName}
+        ></lightning-input>
+        <lightning-textarea
+          data-id="edit-description"
+          label={labels.description}
+          value={draftDescription}
+          onchange={handleDraftDescription}
+        ></lightning-textarea>
+        <lightning-combobox
+          data-id="edit-stage"
+          label={labels.column}
+          value={draftStage}
+          options={stageOptions}
+          onchange={handleDraftStage}
+        ></lightning-combobox>
+        <div class="slds-var-m-top_small">
+          <lightning-button
+            data-id="edit-save"
+            variant="brand"
+            label={labels.save}
+            disabled={editSaveDisabled}
+            onclick={handleEditSave}
+            class="slds-var-m-right_x-small"
+          ></lightning-button>
+          <lightning-button
+            data-id="edit-cancel"
+            label={labels.cancel}
+            onclick={handleEditCancel}
+          ></lightning-button>
+        </div>
+      </div>
+    </template>
+    <template lwc:else>
+      <h3 class="slds-text-heading_small" data-id="part-name">{name}</h3>
+      <template lwc:if={description}>
+        <p class="slds-var-m-top_x-small" data-id="part-description">{description}</p>
+      </template>
+    </template>
+
+    <template lwc:if={showActions}>
+      <div class="slds-var-m-top_small" data-id="part-actions">
+        <lightning-button
+          data-id="edit"
+          label={labels.edit}
+          disabled={busy}
+          onclick={handleEdit}
+          class="slds-var-m-right_x-small"
+        ></lightning-button>
+        <lightning-button
+          data-id="move-up"
+          label={labels.moveUp}
+          disabled={moveUpDisabled}
+          onclick={handleMoveUp}
+          class="slds-var-m-right_x-small"
+        ></lightning-button>
+        <lightning-button
+          data-id="move-down"
+          label={labels.moveDown}
+          disabled={moveDownDisabled}
+          onclick={handleMoveDown}
+          class="slds-var-m-right_x-small"
+        ></lightning-button>
+        <template lwc:if={canDelete}>
+          <lightning-button
+            data-id="delete"
+            variant="destructive-text"
+            label={labels.delete}
+            disabled={busy}
+            onclick={handleDelete}
+          ></lightning-button>
+        </template>
+      </div>
+    </template>
+    <template lwc:if={confirmingDelete}>
+      <div class="slds-var-m-top_small" data-id="delete-confirm">
+        <p class="slds-var-m-bottom_x-small">{labels.deletePartConfirm}</p>
+        <lightning-button
+          data-id="delete-confirm-button"
+          variant="destructive"
+          label={labels.delete}
+          disabled={busy}
+          onclick={handleDeleteConfirm}
+          class="slds-var-m-right_x-small"
+        ></lightning-button>
+        <lightning-button
+          data-id="delete-cancel"
+          label={labels.cancel}
+          onclick={handleDeleteCancel}
+        ></lightning-button>
+      </div>
+    </template>
+
+    <template for:each={arrowGroups} for:item="group">
+      <div key={group.key} data-id={group.key}>
+        <h4 class="slds-text-title_caps slds-var-m-top_medium slds-var-m-bottom_x-small">
+          {group.heading}
+        </h4>
+        <template lwc:if={group.empty}>
+          <p class="slds-text-color_weak">{labels.noArrows}</p>
+        </template>
+        <ul>
+          <template for:each={group.arrows} for:item="arrow">
+            <li key={arrow.id} class="slds-var-m-bottom_x-small" data-id="arrow">
+              <span class="slds-text-title_bold">{arrow.other}</span>
+              <template lwc:if={arrow.editing}>
+                <lightning-textarea
+                  data-id="link-assumption"
+                  label={labels.assumption}
+                  value={draftLinkAssumption}
+                  onchange={handleDraftLinkAssumption}
+                ></lightning-textarea>
+                <lightning-button
+                  data-id="link-save"
+                  variant="brand"
+                  label={labels.save}
+                  disabled={busy}
+                  onclick={handleLinkSave}
+                  class="slds-var-m-right_x-small"
+                ></lightning-button>
+                <lightning-button
+                  data-id="link-cancel"
+                  label={labels.cancel}
+                  onclick={handleLinkCancel}
+                ></lightning-button>
+              </template>
+              <template lwc:else>
+                <span>: {arrow.assumption}</span>
+                <template lwc:if={canEdit}>
+                  <lightning-button
+                    data-id="link-edit"
+                    data-record-id={arrow.id}
+                    variant="base"
+                    label={labels.edit}
+                    disabled={busy}
+                    onclick={handleEditAssumption}
+                    class="slds-var-m-left_x-small"
+                  ></lightning-button>
+                </template>
+                <template lwc:if={canDelete}>
+                  <lightning-button
+                    data-id="link-remove"
+                    data-record-id={arrow.id}
+                    variant="base"
+                    label={labels.remove}
+                    disabled={busy}
+                    onclick={handleRemoveArrow}
+                    class="slds-var-m-left_x-small"
+                  ></lightning-button>
+                </template>
+              </template>
+            </li>
+          </template>
+        </ul>
+        <template lwc:if={group.out}>
+          <template lwc:if={canAddArrow}>
+            <lightning-button
+              data-id="add-arrow"
+              label={labels.addArrow}
+              icon-name="utility:add"
+              variant="base"
+              disabled={busy}
+              onclick={handleAddArrow}
+            ></lightning-button>
+          </template>
+          <template lwc:if={showNoTargets}>
+            <p class="slds-text-color_weak slds-text-body_small" data-id="no-targets">
+              {labels.noTargets}
+            </p>
+          </template>
+          <template lwc:if={addingArrow}>
+            <div class="slds-var-m-top_x-small" data-id="arrow-form">
+              <lightning-combobox
+                data-id="arrow-target"
+                label={labels.arrowTarget}
+                value={draftTargetId}
+                options={targetOptions}
+                required
+                onchange={handleDraftTarget}
+              ></lightning-combobox>
+              <lightning-textarea
+                data-id="arrow-assumption"
+                label={labels.assumption}
+                value={draftAssumption}
+                onchange={handleDraftAssumption}
+              ></lightning-textarea>
+              <lightning-button
+                data-id="arrow-save"
+                variant="brand"
+                label={labels.save}
+                disabled={arrowSaveDisabled}
+                onclick={handleArrowSave}
+                class="slds-var-m-right_x-small"
+              ></lightning-button>
+              <lightning-button
+                data-id="arrow-cancel"
+                label={labels.cancel}
+                onclick={handleArrowCancel}
+              ></lightning-button>
+            </div>
+          </template>
+        </template>
+      </div>
+    </template>
+
+    <template lwc:if={measured}>
+      <c-logic-model-indicators
+        data-id="indicators"
+        model={model}
+        element-id={elementId}
+        can-edit={canEdit}
+        can-delete={canDelete}
+        onmodelchange={handleChildChange}
+        onfailure={handleChildFailure}
+      ></c-logic-model-indicators>
+    </template>
+  </section>
+</template>
