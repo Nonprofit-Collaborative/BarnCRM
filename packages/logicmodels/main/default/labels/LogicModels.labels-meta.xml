@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>LogicModels_Scope_OrganizationTaken</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Second organization logic model refused</shortDescription>
+        <value>The organization already has a logic model. Open that one instead of adding another.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Scope_ProgramTaken</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Second logic model for one program refused</shortDescription>
+        <value>This program already has a logic model. Open that one instead of adding another.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Scope_BadProgram</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Program field holds something that is not a record identifier</shortDescription>
+        <value>Choose the program with Change in the Logic Model Builder. This is not a program.</value>
+    </labels>
+</CustomLabels>
