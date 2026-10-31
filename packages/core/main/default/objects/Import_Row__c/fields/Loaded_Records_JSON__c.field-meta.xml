@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Loaded_Records_JSON__c</fullName>
+  <description>The records an upload of several objects created for this row, by object, so loading the row again reuses them instead of making a second copy (canonical model R-IT20). Bookkeeping written in system mode, in no permission set.</description>
+  <label>Loaded Records</label>
+  <length>32768</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

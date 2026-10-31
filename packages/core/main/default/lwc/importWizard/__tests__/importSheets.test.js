@@ -2,8 +2,10 @@ import {
   defaultSheets,
   distinctHeaders,
   combineSheets,
+  combineObjectSheets,
   exampleText,
   sheetConflicts,
+  sheetsInLoadOrder,
   EXAMPLE_LENGTH
 } from '../importSheets';
 
@@ -111,5 +113,82 @@ describe('importSheets', () => {
     expect(sheetConflicts(['Shifts', 'Notes'], objects)).toEqual([]);
     expect(sheetConflicts(['Shifts'], objects, 'Contact')).toEqual([]);
     expect(sheetConflicts(['People', 'More'], undefined, 'Contact')).toEqual([]);
+  });
+});
+
+describe('the sheets of an upload of several objects (R-IT20)', () => {
+  const programs = {
+    name: 'Programs',
+    headers: ['Name', 'Code'],
+    records: [{ Name: 'Reading', Code: 'P-1' }]
+  };
+  const sessions = {
+    name: 'Sessions',
+    headers: ['Name', 'Program Code', 'Notes'],
+    records: [
+      { Name: 'Intro', 'Program Code': 'P-1', Notes: '' },
+      { Name: 'Advanced', 'Program Code': 'P-1', Notes: 'x' }
+    ]
+  };
+
+  it('keeps the same heading of two objects as two columns, the later named with its sheet', () => {
+    const combined = combineObjectSheets(
+      [programs, sessions],
+      [
+        { Name: 'Program__c.Name', Code: 'Program__c.Code__c' },
+        { Name: 'Session__c.Name', 'Program Code': 'Session__c.Program__c', Notes: IGNORE }
+      ],
+      ['Program__c', 'Session__c'],
+      IGNORE,
+      BLANK
+    );
+    expect(combined.headers).toEqual(['Name', 'Code', 'Name (Sessions)', 'Program Code', 'Notes']);
+    expect(combined.targets).toEqual({
+      Name: 'Program__c.Name',
+      Code: 'Program__c.Code__c',
+      'Name (Sessions)': 'Session__c.Name',
+      'Program Code': 'Session__c.Program__c',
+      Notes: IGNORE
+    });
+    expect(combined.records).toEqual([
+      { Name: 'Reading', Code: 'P-1', 'Name (Sessions)': '', 'Program Code': '', Notes: '' },
+      { Name: '', Code: '', 'Name (Sessions)': 'Intro', 'Program Code': 'P-1', Notes: '' },
+      { Name: '', Code: '', 'Name (Sessions)': 'Advanced', 'Program Code': 'P-1', Notes: 'x' }
+    ]);
+    expect(combined.examples['Name (Sessions)']).toEqual(['Intro', 'Advanced']);
+    expect(combined.examples.Notes).toEqual([BLANK, 'x']);
+  });
+
+  it('joins headings of one object, or mapped to one field, as one column', () => {
+    const others = {
+      name: 'More',
+      headers: ['Name', 'Title'],
+      records: [{ Name: 'Art', Title: 'A' }]
+    };
+    const combined = combineObjectSheets(
+      [programs, others],
+      [{ Name: 'Program__c.Name' }, { Name: 'Program__c.Name', Title: 'Program__c.Name' }],
+      ['Program__c', 'Program__c'],
+      IGNORE
+    );
+    expect(combined.headers).toEqual(['Name', 'Code']);
+    expect(combined.records[1]).toEqual({ Name: 'Art', Code: '' });
+  });
+
+  it('orders the sheets parents first, keeping the file order within an object', () => {
+    const moreSessions = { name: 'More sessions', headers: [], records: [] };
+    const loose = { name: 'Notes', headers: [], records: [] };
+    const objectOf = {
+      Sessions: 'Session__c',
+      Programs: 'Program__c',
+      'More sessions': 'Session__c',
+      Notes: 'Venue__c'
+    };
+    expect(
+      sheetsInLoadOrder([loose, sessions, programs, moreSessions], objectOf, [
+        'Program__c',
+        'Session__c'
+      ]).map((sheet) => sheet.name)
+    ).toEqual(['Programs', 'Sessions', 'More sessions', 'Notes']);
   });
 });

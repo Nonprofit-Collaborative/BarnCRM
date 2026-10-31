@@ -58,9 +58,18 @@ export function combineSheets(sheets, targetsBySheet = [], ignore = '', blank = 
     });
   });
 
+  return { headers, ...rowsOf(sheets, headers, () => columnOf, blank) };
+}
+
+/**
+ * The rows of the sheets under the joined columns, with each column's first values as examples.
+ * `columnsOf(index)` gives a sheet's column for each of its headings.
+ */
+function rowsOf(sheets, headers, columnsOf, blank) {
   const examples = Object.fromEntries(headers.map((heading) => [heading, []]));
   const records = [];
-  sheets.forEach((sheet) => {
+  sheets.forEach((sheet, index) => {
+    const columnOf = columnsOf(index);
     sheet.records.forEach((source) => {
       const record = Object.fromEntries(headers.map((heading) => [heading, '']));
       const seen = new Set();
@@ -80,7 +89,87 @@ export function combineSheets(sheets, targetsBySheet = [], ignore = '', blank = 
       records.push(record);
     });
   });
-  return { headers, records, examples };
+  return { records, examples };
+}
+
+/**
+ * The chosen sheets of an upload of several objects (R-IT20) as one set of columns and rows,
+ * each sheet loading its own object. A heading mapped to the same target as an earlier sheet's
+ * heading joins that column, as in `combineSheets`; the same heading on sheets of different
+ * objects is two columns, the later one named with its sheet, `Name (Contacts)`, so each keeps
+ * its own field.
+ *
+ * @param {object[]} sheets the chosen sheets, in the order they load
+ * @param {object[]} targetsBySheet for each sheet, its headings' suggested targets by heading
+ * @param {string[]} objectBySheet for each sheet, the API name of the object it loads
+ * @param {string} [ignore] the target that means Do not load
+ * @param {string} [blank] the text for a blank example
+ * @returns {object} `{ headers, records, examples, targets }`, targets being each column's
+ *   suggested target
+ */
+export function combineObjectSheets(
+  sheets,
+  targetsBySheet = [],
+  objectBySheet = [],
+  ignore = '',
+  blank = ''
+) {
+  const headers = [];
+  const targets = {};
+  const objectOfColumn = new Map();
+  const columnByTarget = new Map();
+  const columnsBySheet = sheets.map((sheet, index) => {
+    const own = targetsBySheet[index] || {};
+    const object = objectBySheet[index] || '';
+    const columnOf = new Map();
+    sheet.headers.forEach((heading) => {
+      if (columnOf.has(heading)) {
+        return;
+      }
+      const target = own[heading];
+      const mapped = Boolean(target) && target !== ignore;
+      if (mapped && columnByTarget.has(target)) {
+        columnOf.set(heading, columnByTarget.get(target));
+        return;
+      }
+      const taken = objectOfColumn.has(heading) && objectOfColumn.get(heading) !== object;
+      const column = taken ? `${heading} (${sheet.name})` : heading;
+      if (!objectOfColumn.has(column)) {
+        objectOfColumn.set(column, object);
+        headers.push(column);
+        targets[column] = mapped ? target : ignore;
+      }
+      columnOf.set(heading, column);
+      if (mapped && !columnByTarget.has(target)) {
+        columnByTarget.set(target, column);
+      }
+    });
+    return columnOf;
+  });
+  return {
+    headers,
+    targets,
+    ...rowsOf(sheets, headers, (index) => columnsBySheet[index], blank)
+  };
+}
+
+/**
+ * The chosen sheets in the order their objects load (R-IT20), parents first, keeping the
+ * file's order among sheets of one object. A sheet whose object is not listed goes last.
+ *
+ * @param {object[]} sheets the chosen sheets
+ * @param {object} objectOfSheet each sheet's object API name, by sheet name
+ * @param {string[]} loadOrder the objects' API names in load order
+ */
+export function sheetsInLoadOrder(sheets, objectOfSheet, loadOrder) {
+  const rank = (sheet) => {
+    const found = loadOrder.indexOf(objectOfSheet[sheet.name]);
+    return found < 0 ? loadOrder.length : found;
+  };
+  return sheets
+    .map((sheet, index) => ({ sheet, index }))
+    .sort((a, b) => rank(a.sheet) - rank(b.sheet) || a.index - b.index)
+    .map((each) => each.sheet);
 }
 
 /** A value as an example: `blank` for an empty one, cut to EXAMPLE_LENGTH characters. */

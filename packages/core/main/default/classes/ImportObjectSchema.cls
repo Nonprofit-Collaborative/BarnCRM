@@ -245,6 +245,12 @@ public with sharing class ImportObjectSchema {
         /** Each sheet's object API name (null where it names none), in the order given. */
         @NamespaceAccessible
         public List<String> bySheet = new List<String>();
+        /**
+         * Every object each sheet's two-part headings name, in the order they first appear, for
+         * an upload of several objects (R-IT20).
+         */
+        @NamespaceAccessible
+        public List<List<String>> namedBySheet = new List<List<String>>();
         /** The label of every object named above, by API name. */
         @NamespaceAccessible
         public Map<String, String> labels = new Map<String, String>();
@@ -287,19 +293,92 @@ public with sharing class ImportObjectSchema {
             if (result.suggested == null) {
                 result.suggested = found;
             }
+            result.namedBySheet.add(namedObjects(headers, keys, fields));
         }
         if (result.suggested == null) {
             result.suggested = ImportHeaderParser.objectOfFileName(fileName, keys);
         }
+        Set<String> anyNamed = new Set<String>();
+        for (List<String> named : result.namedBySheet) {
+            anyNamed.addAll(named);
+        }
         for (Schema.DescribeSObjectResult described : loadable) {
             Boolean named =
                 described.getName() == result.suggested ||
-                result.bySheet.contains(described.getName());
+                result.bySheet.contains(described.getName()) ||
+                anyNamed.contains(described.getName());
             if (named) {
                 result.labels.put(described.getName(), described.getLabel());
             }
         }
         return result;
+    }
+
+    /** Every object these headings name as two-part headings, in the order first named. */
+    private static List<String> namedObjects(
+        List<String> headers,
+        Map<String, String> keys,
+        DescribedFieldKeys fields
+    ) {
+        List<String> result = new List<String>();
+        for (String header : headers == null ? new List<String>() : headers) {
+            ImportHeaderParser.Resolved named = ImportHeaderParser.resolve(header, keys, fields);
+            if (named != null && !result.contains(named.objectName)) {
+                result.add(named.objectName);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * The mapping suggested for one sheet of an upload of several objects (R-IT20): a heading
+     * that is a field of the sheet's object maps to it; a two-part heading to the field of the
+     * listed object it names (`Contact.LastName` on a sheet of accounts); any other is Do not
+     * load. Targets are `<object API name>.<field>`, each field once.
+     *
+     * @param types the objects the upload loads
+     * @param sheetType the sheet's object, or null for none
+     * @param headers the sheet's headings
+     */
+    @NamespaceAccessible
+    public static ImportMapping suggestSeveralMapping(
+        List<Schema.SObjectType> types,
+        Schema.SObjectType sheetType,
+        List<String> headers
+    ) {
+        ImportMapping mapping = new ImportMapping();
+        List<Schema.DescribeSObjectResult> listed = new List<Schema.DescribeSObjectResult>();
+        for (Schema.SObjectType type : types) {
+            if (type != null) {
+                listed.add(type.getDescribe(SObjectDescribeOptions.DEFERRED));
+            }
+        }
+        Map<String, String> keys = objectKeys(listed);
+        DescribedFieldKeys fields = new DescribedFieldKeys();
+        Map<String, String> known = sheetType == null
+            ? new Map<String, String>()
+            : fieldKeys(sheetType);
+        String sheetName = sheetType == null
+            ? null
+            : sheetType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+        Set<String> used = new Set<String>();
+        for (String header : headers == null ? new List<String>() : headers) {
+            String field = known.get(normalized(header));
+            String target = field == null ? null : sheetName + '.' + field;
+            if (target == null) {
+                ImportHeaderParser.Resolved named = ImportHeaderParser.resolve(
+                    header,
+                    keys,
+                    fields
+                );
+                target = named == null ? null : named.objectName + '.' + named.fieldName;
+            }
+            Boolean maps = target != null && used.add(target.toLowerCase());
+            mapping.columns.add(
+                new ImportMapping.Column(header, maps ? target : ImportMapping.TARGET_IGNORE)
+            );
+        }
+        return mapping;
     }
 
     /**
@@ -712,6 +791,9 @@ public with sharing class ImportObjectSchema {
      */
     @NamespaceAccessible
     public static String refusal(Import_Template__c template, ImportMapping mapping) {
+        if (mapping != null && mapping.loadsSeveralObjects()) {
+            return severalRefusal(template, mapping);
+        }
         Schema.SObjectType type = typeOf(template);
         String refused = DataProtectedFields.objectRefusal(type);
         if (refused != null) {
@@ -922,6 +1004,314 @@ public with sharing class ImportObjectSchema {
             );
         }
         return slowLookups(related, mapping.lookupFieldsByAttribute(ImportMapping.ENTITY_RELATED));
+    }
+
+    // -------------------------------------------------------------------------------------
+    // Load steps: one object, related records, several objects (R-IT20; ADR-NEXT)
+    // -------------------------------------------------------------------------------------
+
+    /**
+     * One object a chunk loads, in load order (R-IT20). A one-object template is one step;
+     * with related records (R-IT17) two, the related record linked to its row's record; an
+     * upload of several objects one per object, parents first.
+     */
+    public class Step {
+        /** The step as a one-object template: its object, operation and key field. */
+        public Import_Template__c template;
+        /** The step's columns and values for every row, as `Record` targets. */
+        public ImportMapping mapping;
+        /** The entity the step's columns have in the template's mapping. */
+        public String entity;
+        public Schema.SObjectType type;
+        /** For each earlier step this object points at, that step's index to the field. */
+        public Map<Integer, String> links = new Map<Integer, String>();
+        /** Later rows of a key load nothing new and link to the first row's record. */
+        public Boolean groupsRepeats = false;
+        /** Writes the record key's digest on the row, so later chunks see repeats. */
+        public Boolean keepsDigest = false;
+        /** Every row loads the step, even one without a value for it. */
+        public Boolean everyRow = false;
+        /** A row loads the step only with a value of its own, not one for every row. */
+        public Boolean needsOwnValue = false;
+        /** The related records of R-IT17, which keep their own row results. */
+        public Boolean related = false;
+
+        /** The object's label, or the name the mapping gives when the org has no such object. */
+        public String label() {
+            return type == null
+                ? entity
+                : type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
+        }
+    }
+
+    /** The link field of each child and parent object, worked out once a transaction. */
+    private static Map<String, String> linkFields = new Map<String, String>();
+
+    /**
+     * Every object an upload of several objects lists, mapped or not, in load order, for the
+     * wizard to offer (R-IT20). Empty for any other template.
+     */
+    public static List<Step> listedSteps(Import_Template__c template, ImportMapping mapping) {
+        return mapping != null && mapping.loadsSeveralObjects()
+            ? severalSteps(template, mapping, false)
+            : new List<Step>();
+    }
+
+    /** The steps a chunk of this template loads, in load order (R-IT17, R-IT20). */
+    public static List<Step> steps(Import_Template__c template, ImportMapping mapping) {
+        ImportMapping given = mapping == null ? new ImportMapping() : mapping;
+        if (given.loadsSeveralObjects()) {
+            return severalSteps(template, given, true);
+        }
+        Step record = new Step();
+        record.template = template;
+        record.mapping = given;
+        record.entity = ImportMapping.ENTITY_RECORD;
+        record.type = typeOf(template);
+        record.everyRow = true;
+        record.keepsDigest = true;
+        List<Step> result = new List<Step>{ record };
+        if (!loadsRelated(template)) {
+            return result;
+        }
+        // Related records (R-IT17) are a second step: always created, linked to the row's record.
+        record.groupsRepeats = true;
+        Step related = new Step();
+        related.template = stepTemplate(
+            template,
+            template.Related_Object__c,
+            OPERATION_INSERT,
+            null
+        );
+        related.template.Use_Duplicate_Rules__c = false;
+        related.mapping = given.forEntity(ImportMapping.ENTITY_RELATED);
+        related.entity = ImportMapping.ENTITY_RELATED;
+        related.type = relatedTypeOf(template);
+        related.related = true;
+        related.links.put(
+            0,
+            relatedParentField(record.type, related.type, template.Related_Parent_Field__c)
+        );
+        result.add(related);
+        return result;
+    }
+
+    /**
+     * An upload of several objects (R-IT20): a step per object, parents before the objects that
+     * point at them, in the mapping's order otherwise and where two point at each other. Each
+     * step links to every earlier step its object points at; a parent that finds records by a
+     * key groups its repeated keys, and the first such step keeps the row's digest.
+     */
+    private static List<Step> severalSteps(
+        Import_Template__c template,
+        ImportMapping mapping,
+        Boolean mappedOnly
+    ) {
+        List<Step> listed = new List<Step>();
+        for (ImportMapping.ObjectStep each : mapping.objects) {
+            if (each == null || String.isBlank(each.entity)) {
+                continue;
+            }
+            Step step = new Step();
+            step.entity = each.entity.trim();
+            step.type = typeNamed(step.entity);
+            step.template = stepTemplate(template, step.entity, each.operation, each.keyField);
+            step.mapping = mapping.forEntity(step.entity);
+            step.needsOwnValue = true;
+            // An object no column or value fills loads nothing, so it is left out of a load.
+            if (!mappedOnly || !step.mapping.recordAttributes().isEmpty()) {
+                listed.add(step);
+            }
+        }
+        List<Step> ordered = loadOrder(listed);
+        Boolean digestTaken = false;
+        for (Integer i = 0; i < ordered.size(); i++) {
+            Step step = ordered[i];
+            for (Integer parent = 0; parent < i; parent++) {
+                String field = linkField(step.type, ordered[parent].type);
+                if (field != null) {
+                    step.links.put(parent, field);
+                    ordered[parent].groupsRepeats =
+                        operationOf(ordered[parent].template) != OPERATION_INSERT;
+                }
+            }
+        }
+        for (Step step : ordered) {
+            if (!digestTaken && operationOf(step.template) != OPERATION_INSERT) {
+                step.keepsDigest = true;
+                digestTaken = true;
+            }
+        }
+        return ordered;
+    }
+
+    /** The template as one step's: its object, operation and key field, no related records. */
+    private static Import_Template__c stepTemplate(
+        Import_Template__c template,
+        String objectName,
+        String operation,
+        String keyField
+    ) {
+        Import_Template__c result = template.clone(true, true);
+        result.Target_Object__c = objectName;
+        result.Load_Operation__c = String.isBlank(operation) ? OPERATION_INSERT : operation;
+        result.Load_Match_Field__c = keyField;
+        result.Related_Object__c = null;
+        result.Related_Parent_Field__c = null;
+        return result;
+    }
+
+    /**
+     * The steps in load order: each step after every listed object it points at, the mapping's
+     * order breaking ties. Where objects point at each other, the one waiting for the fewest
+     * goes first, the mapping's order breaking ties.
+     */
+    private static List<Step> loadOrder(List<Step> listed) {
+        List<Step> result = new List<Step>();
+        Set<Integer> placed = new Set<Integer>();
+        while (placed.size() < listed.size()) {
+            Integer next = null;
+            Integer fewest = null;
+            for (Integer i = 0; i < listed.size(); i++) {
+                Integer waits = placed.contains(i) ? null : waitingFor(listed, placed, i);
+                if (waits != null && (fewest == null || waits < fewest)) {
+                    next = i;
+                    fewest = waits;
+                }
+            }
+            placed.add(next);
+            result.add(listed[next]);
+        }
+        return result;
+    }
+
+    /** How many unplaced listed objects this step's object points at. */
+    private static Integer waitingFor(List<Step> listed, Set<Integer> placed, Integer index) {
+        Integer result = 0;
+        for (Integer other = 0; other < listed.size(); other++) {
+            if (
+                other != index &&
+                !placed.contains(other) &&
+                linkField(listed[index].type, listed[other].type) != null
+            ) {
+                result++;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * The field of the child object that links a record to its row's parent (R-IT20): a lookup
+     * or master-detail to the parent alone that the user may fill in. With several, the one
+     * named after the parent (`AccountId`, `Account__c`), else the first by API name. Null for
+     * none, and for an object and itself.
+     */
+    @NamespaceAccessible
+    public static String linkField(Schema.SObjectType child, Schema.SObjectType parent) {
+        if (child == null || parent == null || child == parent) {
+            return null;
+        }
+        String pair = String.valueOf(child) + '>' + String.valueOf(parent);
+        if (linkFields.containsKey(pair)) {
+            return linkFields.get(pair);
+        }
+        List<String> names = new List<String>();
+        String preferred = null;
+        String parentName = localName(
+                parent.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase()
+            )
+            .removeEnd('__c');
+        for (Schema.SObjectField token : fieldsOf(child).values()) {
+            Schema.DescribeFieldResult field = token.getDescribe();
+            if (
+                field.getType() != Schema.DisplayType.REFERENCE ||
+                pointsAt(field, parent) == null ||
+                DataProtectedFields.isProtected(child, field.getName())
+            ) {
+                continue;
+            }
+            names.add(field.getName());
+            String bare = localName(field.getName().toLowerCase());
+            if (bare == parentName + 'id' || bare == parentName + '__c') {
+                preferred = field.getName();
+            }
+        }
+        names.sort();
+        String found = preferred != null ? preferred : names.isEmpty() ? null : names[0];
+        linkFields.put(pair, found);
+        return found;
+    }
+
+    /**
+     * Why the objects of an upload of several objects cannot be saved (R-IT20), or null: none,
+     * one the org does not have or listed twice, a delete, or a column mapped to an object the
+     * upload does not load.
+     */
+    @NamespaceAccessible
+    public static String severalObjectsProblem(ImportMapping mapping) {
+        if (mapping == null || !mapping.loadsSeveralObjects()) {
+            return null;
+        }
+        Set<String> listed = new Set<String>();
+        for (ImportMapping.ObjectStep each : mapping.objects) {
+            Schema.SObjectType type = each == null ? null : typeNamed(each.entity);
+            if (type == null) {
+                return Label.Core_Data_ObjectUnknown;
+            }
+            Schema.DescribeSObjectResult described = type.getDescribe(
+                SObjectDescribeOptions.DEFERRED
+            );
+            if (!listed.add(described.getName().toLowerCase())) {
+                return String.format(
+                    Label.Core_Import_ErrorSeveralObjectsRepeated,
+                    new List<String>{ described.getLabel() }
+                );
+            }
+            if (OPERATION_DELETE.equalsIgnoreCase(each.operation)) {
+                return Label.Core_Import_ErrorSeveralObjectsDelete;
+            }
+        }
+        for (ImportMapping.Column column : mapping.columns) {
+            if (column == null || ImportMapping.isIgnored(column.target)) {
+                continue;
+            }
+            Schema.SObjectType type = typeNamed(ImportMapping.entityOf(column.target));
+            String name = type == null
+                ? ''
+                : type.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase();
+            if (!listed.contains(name)) {
+                return String.format(
+                    Label.Core_Import_ErrorSeveralObjectsColumn,
+                    new List<String>{
+                        column.source,
+                        ImportMapping.entityOf(column.target).abbreviate(80)
+                    }
+                );
+            }
+        }
+        return null;
+    }
+
+    /** The first refusal of an upload of several objects, naming its object (R-IT20). */
+    private static String severalRefusal(Import_Template__c template, ImportMapping mapping) {
+        String problem = severalObjectsProblem(mapping);
+        if (problem != null) {
+            return problem;
+        }
+        List<Step> steps = steps(template, mapping);
+        if (steps.isEmpty()) {
+            return Label.Core_Import_ErrorNothingMapped;
+        }
+        for (Step step : steps) {
+            String refused = refusal(step.template, step.mapping);
+            if (refused != null) {
+                return String.format(
+                    Label.Core_Import_ErrorOnObject,
+                    new List<String>{ step.label(), refused }
+                );
+            }
+        }
+        return null;
     }
 
     /** Whether the user's object access allows the operation. */

@@ -35,7 +35,8 @@ have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matc
 Optimizer**, which lists every field and downloads it as a CSV. If you import files, the
 **Check Columns** step shows a few example values beside each column, so you can see each
 column lands in the right field before anything loads; an Excel workbook can load several of
-its sheets at once. The Admin Guide's Importing page has the detail.
+its sheets at once, each into its own kind of record if the template loads several. The
+Admin Guide's Importing page has the detail.
 
 The **Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,
 **Organizations**, **Gifts**, **Commitments**, **Gift Batches**, **Funds**, **Appeals**,

@@ -1,6 +1,9 @@
 # ADR-0111: Load one object loads related records from the same file, keyed by the record key
 
-**Status:** Proposed (builder decision)
+**Status:** Superseded by `NEXT-several-objects-in-one-upload.md` (owner decision D-154,
+2026-10-30): the load engine runs in steps, and a template with a Related Object is two of them
+under the rules below; the wizard offers Several Objects in One File for new templates.
+Previously: Proposed (builder decision)
 **Date:** 2026-10-13
 **Source:** data tools parity item 17 ("Generic parent and child in one file", owner approved
 2026-10-13). Extends ADR-0080 (`0080-import-load-one-object.md`) and canonical model R-IT12 to

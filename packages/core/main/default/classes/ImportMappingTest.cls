@@ -159,4 +159,41 @@ private class ImportMappingTest {
             'Columns and values for every row, folded to lower case.'
         );
     }
+
+    @IsTest
+    static void aSeveralObjectMappingReadsAsEachObjectsOwnRecordColumns() {
+        ImportMapping mapping = ImportMapping.parse(
+            '{"objects":[{"entity":"Program__c","operation":"Insert"},' +
+                '{"entity":"Session__c","operation":"Upsert by external ID","keyField":"Code__c"}],' +
+                '"columns":[' +
+                '{"source":"Program","target":"Program__c.Name","transforms":[{"op":"trim"}]},' +
+                '{"source":"Code","target":"Session__c.Code__c","blankClears":true},' +
+                '{"source":"Leader","target":"session__c.Leader__c","lookupField":"Email"},' +
+                '{"source":"Skip","target":"Ignore"}],' +
+                '"defaults":[{"target":"Session__c.Status__c","value":"Planned"}]}'
+        );
+
+        ImportMapping sessions = mapping.forEntity('Session__c');
+
+        Assert.isTrue(mapping.loadsSeveralObjects(), 'The objects are read.');
+        Assert.areEqual('Code__c', mapping.objects[1].keyField, 'With their keys.');
+        Assert.isFalse(sessions.loadsSeveralObjects(), 'One object is a one-object mapping.');
+        Assert.areEqual(
+            new Set<String>{ 'code__c', 'leader__c', 'status__c' },
+            sessions.recordAttributes(),
+            'Its own columns and values, any capitals, as Record attributes.'
+        );
+        Assert.areEqual(
+            new Map<String, String>{ 'leader__c' => 'Email' },
+            sessions.lookupFieldsByAttribute(),
+            'With their lookups.'
+        );
+        Assert.areEqual(new Set<String>{ 'code__c' }, sessions.clearingAttributes(), 'Clears.');
+        Assert.areEqual(
+            1,
+            mapping.forEntity('Program__c').transformsBySourceKey().get('program').size(),
+            'And changes.'
+        );
+        Assert.isFalse(new ImportMapping().loadsSeveralObjects(), 'None by default.');
+    }
 }
