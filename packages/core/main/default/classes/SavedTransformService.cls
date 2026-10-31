@@ -50,9 +50,12 @@ public with sharing class SavedTransformService {
         public String objectName;
         @AuraEnabled
         public String definitionJson;
-        /** On load: conditions left out because their field is gone or not readable now. */
+        /**
+         * On load: the filter fields (API names) that are gone or not readable by the person
+         * now. When not empty the page must not load the list (R-ST3).
+         */
         @AuraEnabled
-        public Integer droppedConditions = 0;
+        public List<String> missingFields = new List<String>();
     }
 
     /** Every saved list, by name. */
@@ -76,10 +79,10 @@ public with sharing class SavedTransformService {
     }
 
     /**
-     * One list with its document. The filter's conditions are checked against the object's
-     * fields as the person sees them now: a condition whose field is gone or not readable is
-     * removed and counted in `droppedConditions`. When any is removed the `logic` key is dropped
-     * too (its numbers no longer match), so the rest are joined by AND; Preview shows the count.
+     * One list with its document, unchanged. The filter's conditions are checked against the
+     * object's fields as the person sees them now; the API names of fields that are gone or not
+     * readable are returned in `missingFields`. Dropping a condition would match more records,
+     * so the document is never trimmed: the page refuses to load a list with missing fields.
      */
     public static SavedList load(Id recordId) {
         SavedList view = toView(find(recordId));
@@ -91,43 +94,34 @@ public with sharing class SavedTransformService {
             if (!(rawFilter instanceof Map<String, Object>)) {
                 return view;
             }
-            Map<String, Object> filter = (Map<String, Object>) rawFilter;
-            if (!(filter.get('conditions') instanceof List<Object>)) {
+            Object conditions = ((Map<String, Object>) rawFilter).get('conditions');
+            if (!(conditions instanceof List<Object>)) {
                 return view;
             }
-            List<Object> kept = new List<Object>();
-            for (Object each : (List<Object>) filter.get('conditions')) {
-                if (conditionUsable(view.objectName, each)) {
-                    kept.add(each);
-                } else {
-                    view.droppedConditions++;
+            for (Object each : (List<Object>) conditions) {
+                String field = fieldOf(each);
+                if (!fieldUsable(view.objectName, field) && !view.missingFields.contains(field)) {
+                    view.missingFields.add(field);
                 }
-            }
-            if (view.droppedConditions > 0) {
-                filter.put('conditions', kept);
-                filter.remove('logic');
-                if (kept.isEmpty()) {
-                    document.remove('filter');
-                }
-                view.definitionJson = JSON.serialize(document);
             }
         } catch (Exception unreadable) {
             // A document checkDefinition would refuse is returned as stored; the page reports it.
-            view.droppedConditions = 0;
+            view.missingFields = new List<String>();
         }
         return view;
     }
 
-    private static Boolean conditionUsable(String objectName, Object condition) {
-        if (!(condition instanceof Map<String, Object>)) {
-            return false;
-        }
-        Object field = ((Map<String, Object>) condition).get('field');
-        if (!(field instanceof String)) {
-            return false;
-        }
+    /** A condition's field, or a placeholder when it names none. */
+    private static String fieldOf(Object condition) {
+        Object field = condition instanceof Map<String, Object>
+            ? ((Map<String, Object>) condition).get('field')
+            : null;
+        return field instanceof String ? (String) field : '?';
+    }
+
+    private static Boolean fieldUsable(String objectName, String field) {
         try {
-            QueryFieldCatalog.resolvePath(objectName, (String) field);
+            QueryFieldCatalog.resolvePath(objectName, field);
             return true;
         } catch (Exception gone) {
             return false;

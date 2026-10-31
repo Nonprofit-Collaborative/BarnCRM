@@ -146,7 +146,7 @@ private class SavedTransformServiceTest {
     }
 
     @IsTest
-    static void loadingDropsConditionsWhoseFieldIsGoneAndCountsThem() {
+    static void loadingNamesFilterFieldsThatAreGoneAndNeverTrimsTheFilter() {
         System.runAs(named('Maria')) {
             SavedTransformService.SavedList saved = SavedTransformService.save(
                 'Stale',
@@ -160,32 +160,35 @@ private class SavedTransformServiceTest {
                 )
             );
             SavedTransformService.SavedList loaded = SavedTransformService.load(saved.recordId);
-            System.assertEquals(2, loaded.droppedConditions);
-            Map<String, Object> filter = (Map<String, Object>) ((Map<String, Object>) JSON.deserializeUntyped(
-                    loaded.definitionJson
-                ))
-                .get('filter');
-            System.assertEquals(1, ((List<Object>) filter.get('conditions')).size());
-            System.assertEquals(false, filter.containsKey('logic'), 'Logic no longer fits.');
-
-            SavedTransformService.SavedList everything = SavedTransformService.save(
-                'All stale',
-                withFilter(new List<Object>{ condition(1, 'Gone__c') }, null)
-            );
-            SavedTransformService.SavedList none = SavedTransformService.load(everything.recordId);
-            System.assertEquals(1, none.droppedConditions);
             System.assertEquals(
-                false,
-                ((Map<String, Object>) JSON.deserializeUntyped(none.definitionJson))
-                    .containsKey('filter'),
-                'No condition left means no filter.'
+                new List<String>{ 'Gone__c', 'Account.Nothing__c' },
+                loaded.missingFields,
+                'Every missing filter field is named.'
+            );
+            System.assertEquals(
+                saved.definitionJson,
+                loaded.definitionJson,
+                'The document is never trimmed: dropping a condition would match more records.'
+            );
+
+            SavedTransformService.SavedList twice = SavedTransformService.save(
+                'Twice',
+                withFilter(
+                    new List<Object>{ condition(1, 'Gone__c'), condition(2, 'Gone__c') },
+                    null
+                )
+            );
+            System.assertEquals(
+                new List<String>{ 'Gone__c' },
+                SavedTransformService.load(twice.recordId).missingFields,
+                'A field is named once.'
             );
 
             SavedTransformService.SavedList fine = SavedTransformService.save(
                 'Fine',
                 withFilter(new List<Object>{ condition(1, 'Title') }, null)
             );
-            System.assertEquals(0, SavedTransformService.load(fine.recordId).droppedConditions);
+            System.assertEquals(0, SavedTransformService.load(fine.recordId).missingFields.size());
         }
     }
 

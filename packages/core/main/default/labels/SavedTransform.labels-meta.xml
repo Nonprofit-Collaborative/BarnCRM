@@ -206,7 +206,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Super Transform: loaded with changes left out; {0} list name, {1} how many</shortDescription>
-        <value>Loaded the list {0}. {1} saved change(s) or condition(s) were left out because the field is gone or you cannot use it on this object now. Check the conditions and the count before you preview.</value>
+        <value>Loaded the list {0}. {1} saved change(s) were left out because you cannot change that field on this object now.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuperTransform_SavedMissingFields</fullName>
+        <categories>SuperTransform</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Super Transform: list not loaded, {0} name, {1} missing filter fields</shortDescription>
+        <value>The list {0} was not loaded because its conditions use fields that are gone or that you cannot read: {1}. Edit or delete the saved list.</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_ActionPhoneFormat</fullName>

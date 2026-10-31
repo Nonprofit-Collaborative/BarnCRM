@@ -82,11 +82,12 @@ changes (with their steps) exactly as they stand on the page.
 - **Load List**: choose a list in **Saved List** (shown as name and object) and press **Load
   List**. The page fills in the object, the conditions and the changes, and counts the matching
   records again. Nothing runs: press **Preview** and **Run Super Transform** as usual. If a
-  saved change names a field you cannot change on that object now, or a saved condition names a
-  field that is gone or that you cannot read, that change or condition is left out and the page
-  says how many in total. When a condition is left out, any "1 AND (2 OR 3)" style logic is
-  dropped too and the remaining conditions are joined by AND, which can match more records, so
-  check the conditions and the count before you preview.
+  saved change names a field you cannot change on that object now, that change is left out and
+  the page says how many (this can only narrow what the run does). If a saved **condition**
+  names a field that is gone or that you cannot read, the list is **not loaded at all**: the page
+  stays as it was and a message names the missing fields, because leaving a condition out would
+  match more records than the list was saved to change. Delete the saved list and set the
+  page up again.
 - **Rename List**: choose a list, type the new name in **List Name**, and press **Rename
   List**. The list's content is untouched.
 - **Delete List**: choose a list, press **Delete List** and confirm. Only the saved list is

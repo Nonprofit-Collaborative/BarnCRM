@@ -97,6 +97,7 @@ import SAVED_SAVED from '@salesforce/label/c.Core_SuperTransform_SavedSaved';
 import SAVED_LOADED from '@salesforce/label/c.Core_SuperTransform_SavedLoaded';
 import SAVED_RENAMED from '@salesforce/label/c.Core_SuperTransform_SavedRenamed';
 import SAVED_DELETED from '@salesforce/label/c.Core_SuperTransform_SavedDeleted';
+import SAVED_MISSING from '@salesforce/label/c.Core_SuperTransform_SavedMissingFields';
 import SAVED_SKIPPED from '@salesforce/label/c.Core_SuperTransform_SavedSkipped';
 
 /** A shipped step list: tidy spaces, then capitalize each word (for names). */
@@ -853,13 +854,18 @@ export default class SuperTransform extends LightningElement {
   }
 
   /**
-   * Fills the page in from a saved list: object, conditions and changes. A change naming a field
-   * the person may not change now is left out and counted; nothing runs until Preview and Run.
+   * Fills the page in from a saved list: object, conditions and changes. A list whose filter
+   * names a field that is gone or unreadable is not loaded at all. A change naming a field the
+   * person may not change now is left out and counted; nothing runs until Preview and Run.
    */
   async handleSavedLoad() {
     this.noticeMessage = undefined;
     await this.work(async () => {
       const saved = await loadSavedList({ recordId: this.savedListId });
+      if (saved.missingFields && saved.missingFields.length) {
+        // Leaving a condition out would match more records, so the page is left as it was.
+        throw new Error(format(SAVED_MISSING, saved.name, saved.missingFields.join(', ')));
+      }
       const definition = JSON.parse(saved.definitionJson);
       const targets = await getTargets({ objectName: definition.object });
       this.stopPolling();
@@ -892,8 +898,8 @@ export default class SuperTransform extends LightningElement {
       this.changes = loaded.length ? loaded : [this.newChange()];
       this.invalidate();
       this.savedNameText = saved.name;
-      // Changes the person cannot change now, and conditions the server dropped (field gone).
-      const skipped = wanted.length - kept.length + (saved.droppedConditions || 0);
+      // A change the person cannot change now is left out: that narrows what the run does.
+      const skipped = wanted.length - kept.length;
       this.noticeMessage = skipped
         ? format(SAVED_SKIPPED, saved.name, skipped)
         : format(SAVED_LOADED, saved.name);

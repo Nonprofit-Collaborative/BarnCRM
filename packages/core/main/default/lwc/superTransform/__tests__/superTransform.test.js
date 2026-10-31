@@ -46,6 +46,11 @@ jest.mock(
   { virtual: true }
 );
 jest.mock(
+  '@salesforce/label/c.Core_SuperTransform_SavedMissingFields',
+  () => ({ default: 'The list {0} was not loaded: {1}.' }),
+  { virtual: true }
+);
+jest.mock(
   '@salesforce/label/c.Core_SuperTransform_SavedRenamed',
   () => ({ default: 'Renamed the list to {0}.' }),
   { virtual: true }
@@ -398,7 +403,7 @@ describe('c-super-transform', () => {
       getSavedLists.mockResolvedValue([ENTRY]);
       loadSavedList.mockResolvedValue({
         ...ENTRY,
-        droppedConditions: 2,
+        missingFields: [],
         definitionJson: JSON.stringify(DEFINITION)
       });
       const element = mount();
@@ -418,9 +423,32 @@ describe('c-super-transform', () => {
       const steps = element.shadowRoot.querySelector('c-import-column-transforms');
       expect(steps.transforms).toEqual([{ op: 'trim' }]);
       expect(q(element, 'notice-message').textContent).toBe(
-        'Loaded the list Tidy titles. 3 change(s) were left out.'
+        'Loaded the list Tidy titles. 1 change(s) were left out.'
       );
       expect(q(element, 'preview').disabled).toBe(false);
+    });
+
+    it('does not load a list whose filter uses a missing field, and names the fields', async () => {
+      getSavedLists.mockResolvedValue([ENTRY]);
+      loadSavedList.mockResolvedValue({
+        ...ENTRY,
+        missingFields: ['Gone__c', 'Account.Nothing__c'],
+        definitionJson: JSON.stringify(DEFINITION)
+      });
+      const element = mount();
+      await flush();
+      q(element, 'saved-pick').dispatchEvent(
+        new CustomEvent('change', { detail: { value: 'a0S1' } })
+      );
+      await flush();
+      q(element, 'saved-load').click();
+      await flush();
+      expect(q(element, 'error-message').textContent).toContain('Gone__c, Account.Nothing__c');
+      expect(q(element, 'error-message').textContent).toContain('Tidy titles');
+      expect(getTargets).not.toHaveBeenCalled();
+      expect(q(element, 'step-changes')).not.toBeNull();
+      expect(q(element, 'object').value).toBeUndefined();
+      expect(q(element, 'notice-message')).toBeNull();
     });
 
     it('renames the selected list', async () => {
