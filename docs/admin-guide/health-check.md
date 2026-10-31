@@ -130,6 +130,7 @@ Nothing is broken today.
 | Settings | With Mirror: whether the Opportunity mirror's nightly run is scheduled but has not completed a run for more than two days. |
 | Settings | With Volunteers: hours waiting more than 14 days for approval, past shifts nobody closed, shift schedules that have not created shifts far enough ahead, and shipped volunteer totals turned off. See [Volunteers, Health Check findings](volunteers.md#health-check-findings). |
 | Access | With Volunteers: whether anyone holding the Coordinator role is missing the Volunteers Coordinator permission set. |
+| Settings | With Programs: enrollments still open in a program that has ended. See [Programs, Health Check](programs.md#health-check). |
 
 Four of those need a module: the Override Receipt Lock permission, the failed receipts, the
 unposted gifts in a closed period (all with Giving), and the stalled Opportunity mirror (with

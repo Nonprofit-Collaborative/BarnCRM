@@ -83,6 +83,12 @@ public with sharing class ModuleManagerService {
             'Volunteer_Shift__c',
             'Volunteer_Signup__c',
             'Volunteer_Skill__c'
+        },
+        'Programs' => new List<String>{
+            'Enrollment__c',
+            'Program__c',
+            'Service__c',
+            'Service_Delivery__c'
         }
     };
 
@@ -91,7 +97,8 @@ public with sharing class ModuleManagerService {
     private static Map<String, String> adminPermissionSets = new Map<String, String>{
         'Giving' => 'Giving_Admin',
         'Rollups' => 'Rollup_Builder_Admin',
-        'Volunteers' => 'Volunteers_Admin'
+        'Volunteers' => 'Volunteers_Admin',
+        'Programs' => 'Programs_Admin'
     };
 
     /** Raised for a module the org does not have, or one that cannot be switched. */

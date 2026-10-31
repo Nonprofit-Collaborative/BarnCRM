@@ -209,6 +209,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | V-01 to V-08 Volunteers: install, roles, settings, jobs, shifts, sign-ups, hours, skills, requirements, recurring shifts, letters, dashboard | [volunteers.md](volunteers.md) | BarnCRM Volunteers |
 
+### Programs
+
+| Feature | Page | Package |
+|---|---|---|
+| P-01 Programs: install, roles, programs, services, enrollments, the Program Roster panel | [programs.md](programs.md) | BarnCRM Programs |
+
 ### Moving From Another System
 
 | Feature | Page | Package |

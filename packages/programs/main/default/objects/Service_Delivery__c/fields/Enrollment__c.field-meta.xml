@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Enrollment__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The person's enrollment in the service's program. Filled in when left empty.</inlineHelpText>
+  <label>Enrollment</label>
+  <referenceTo>Enrollment__c</referenceTo>
+  <relationshipLabel>Service Deliveries</relationshipLabel>
+  <relationshipName>Service_Deliveries</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

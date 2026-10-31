@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Programs_Enrollment_AlreadyOpen</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Second open enrollment refused; {0} is the program name</shortDescription>
+        <value>This person already has an open enrollment in {0}. Change that enrollment instead of adding another, or end it first.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Program Roster panel title</shortDescription>
+        <value>Program Roster</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_Enroll</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that opens the enroll form</shortDescription>
+        <value>Enroll Someone</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_Person</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Person picker and column heading</shortDescription>
+        <value>Person</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_Stage</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Stage picker and column heading</shortDescription>
+        <value>Stage</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_StartDate</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Start date column heading</shortDescription>
+        <value>Start Date</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_EndDate</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>End date column heading</shortDescription>
+        <value>End Date</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_Save</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save button of the enroll form</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_Cancel</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cancel button of the enroll form</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_ShowEnded</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Toggle that also lists completed and withdrawn enrollments</shortDescription>
+        <value>Show Ended</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_Caption</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Roster table caption; {0} is the program name</shortDescription>
+        <value>Enrollments in {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_StageFor</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hidden label of a row stage picker; {0} is the person name</shortDescription>
+        <value>Stage for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_Empty</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Roster has no enrollments to list</shortDescription>
+        <value>No one to list. Click Enroll Someone to add a person, or turn on Show Ended to see past enrollments.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_Added</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A person was enrolled from the panel</shortDescription>
+        <value>Enrollment added.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_Changed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Stage changed; {0} is the person name, {1} the new stage</shortDescription>
+        <value>{0} is now {1}.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_MoreThanShown</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Roster capped; {0} is how many are shown</shortDescription>
+        <value>Showing the first {0}. The Enrollments tab lists them all.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_PersonRequired</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Enroll form saved with no person</shortDescription>
+        <value>Choose the person to enroll.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Roster_ActionFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Unexpected roster failure, logged</shortDescription>
+        <value>Something went wrong with the roster. The details are in the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Loading</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Spinner text while loading</shortDescription>
+        <value>Loading</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title of the Programs card on a person</shortDescription>
+        <value>Programs</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_Empty</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card when the person has no enrollment</shortDescription>
+        <value>Not enrolled in any program.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_Started</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card: before the start date</shortDescription>
+        <value>Started</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_Ended</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card: before the end date</shortDescription>
+        <value>Ended</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_Refresh</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card refresh button</shortDescription>
+        <value>Refresh</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_LoadFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card could not load</shortDescription>
+        <value>The programs could not be loaded. Refresh to try again.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_MoreThanShown</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card lists only the newest 200</shortDescription>
+        <value>Only the newest 200 are listed. The Enrollments tab lists them all.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_HealthCheck_OpenAfterEndTitleOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: one enrollment open in an ended program</shortDescription>
+        <value>1 enrollment is still open in a program that has ended</value>
+    </labels>
+    <labels>
+        <fullName>Programs_HealthCheck_OpenAfterEndTitle</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: enrollments open in ended programs; {0} is how many</shortDescription>
+        <value>{0} enrollments are still open in programs that have ended</value>
+    </labels>
+    <labels>
+        <fullName>Programs_HealthCheck_OpenAfterEndDetail</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: what open enrollments in ended programs mean</shortDescription>
+        <value>These enrollments are Applied or Enrolled in a program whose Status is Completed or whose End Date is past. They still count as open, so the person cannot be enrolled in that program again. Set each one to Completed or Withdrawn, or, if the program is still running, set it back to Active or move its End Date. The first ones are linked below.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_HealthCheck_MoreThan</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check count that stopped at its cap; {0} is the cap</shortDescription>
+        <value>More than {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_SampleData_CountLabel</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sample data card: what the Programs number counts</shortDescription>
+        <value>Program enrollments</value>
+    </labels>
+    <labels>
+        <fullName>Programs_SampleData_Kept</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sample removal kept programs; {0} is their names</shortDescription>
+        <value>Sample data removal kept the sample programs {0}, because people of your own are enrolled in them or have services recorded in them. Move or delete those enrollments and service deliveries, then select Remove Sample Data again.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title of the Service Delivery Log panel</shortDescription>
+        <value>Service Delivery Log</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Service</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: service picker</shortDescription>
+        <value>Service</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Date</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: date picker</shortDescription>
+        <value>Date</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Attendance</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: attendance column</shortDescription>
+        <value>Attendance</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Quantity</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: quantity column; {0} is the unit</shortDescription>
+        <value>Quantity ({0})</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_NotRecorded</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: no attendance yet</shortDescription>
+        <value>Not Recorded</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_MarkAllPresent</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: mark everyone not recorded as present</shortDescription>
+        <value>Mark All Present</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Save</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: save button</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Saved</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: saved; {0} is how many</shortDescription>
+        <value>{0} service deliveries saved.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_SavedOne</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: one saved</shortDescription>
+        <value>1 service delivery saved.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_NothingToSave</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: no change to save</shortDescription>
+        <value>Nothing to save: no attendance was changed.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_NoServices</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: program has no active service</shortDescription>
+        <value>This program has no active service. Add one in the Services list to record attendance.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_Empty</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: nobody enrolled</shortDescription>
+        <value>Nobody has an open enrollment in this program yet.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_AttendanceFor</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hidden label of a person's attendance picker; {0} is the person</shortDescription>
+        <value>Attendance for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_QuantityFor</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hidden label of a person's quantity box; {0} is the person</shortDescription>
+        <value>Quantity for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_MoreThanShown</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log lists only the first 200</shortDescription>
+        <value>Showing the first 200. Record the others on the Service Deliveries tab.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_ActionFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Unexpected Service Delivery Log failure, logged</shortDescription>
+        <value>Something went wrong with the service delivery log. The details are in the Error Log.</value>
+    </labels>
+</CustomLabels>

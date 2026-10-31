@@ -9200,6 +9200,301 @@ mode. Rename changes only the name; a list is saved new, never overwritten.
 
 ---
 
+## 29W. Program
+
+### Definition
+
+Something the organization runs for the people it serves: a food pantry, an after-school
+tutoring program, a job readiness course (P-01, Programs module, ADR-NEXT
+`NEXT-programs-module.md`). It is the durable thing; its services (29X) are what it offers and
+its enrollments (29Y) are who takes part.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the program is called, in the words staff use for it. |
+| Status | picklist(Planned, Active, Completed) | yes (defaults Active) | Where the program stands. Completed programs keep their enrollments and services. |
+| Description | long text | no | What the program does and for whom. |
+| Target Population | text | no | Who the program is meant for, in a sentence a funder report can quote. |
+| Start Date | date | no | When the program began, or will begin. |
+| End Date | date | no | When the program ended, or will end. |
+| Coordinator | reference(User) | no | The staff member who runs this program. |
+
+### Relationships
+
+- **Program to Service**, one to many; the service is a detail of the program.
+- **Program to Enrollment**, one to many, through a required lookup (R-PG2).
+- Coordinator is a User, not a person pair: a coordinator is staff who logs in.
+
+### Rules
+
+**R-PG1 End after start.** A program's End Date, when set, is not before its Start Date
+(validation rule).
+
+**R-PG2 A program with enrollments is kept.** It cannot be deleted while an enrollment names
+it: the enrollment's lookup is required with delete Restrict, so the platform refuses, naming the
+enrollments. Set Status to Completed instead. Deleting a program with no enrollments deletes its
+services with it.
+
+**R-PG3 A completed program still takes enrollments.** Nothing refuses an enrollment into a
+Planned or Completed program, so history from a spreadsheet or PMM loads as it happened.
+
+### Salesforce implementation
+
+- **Object:** `Program__c`, name field Text, label Program Name, sharing Public Read/Write.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Status | `Status__c` | Picklist: Planned, Active, Completed; required, default Active |
+| Description | `Description__c` | Long Text Area(32768) |
+| Target Population | `Target_Population__c` | Text(255) |
+| Start Date | `Start_Date__c` | Date |
+| End Date | `End_Date__c` | Date |
+| Coordinator | `Coordinator__c` | Lookup to User, delete constraint SetNull |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (release 0.12) |
+
+- **Validation rules:** `End_After_Start` (R-PG1).
+
+---
+
+## 29X. Service
+
+### Definition
+
+One thing a program offers its participants: a hot meal, a tutoring hour, a bag of groceries
+(P-01). Attendance and service delivery (P-02) record each time a service is given, counted in
+the service's unit.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the service is called. |
+| Program | reference(Program) | yes | The program offering it. A service is a detail of its program. |
+| Description | long text | no | What the service is. |
+| Unit of Measure | text | no | What one delivery counts: meals, hours, sessions, bags. |
+| Active | boolean | yes (defaults true) | Whether the service is still offered. An inactive service keeps its history. |
+
+### Relationships
+
+- **Service to Program**, many to one, as a detail of the program.
+
+### Rules
+
+**R-SV1 A service follows its program.** It is seen and edited by whoever may see and edit its
+program, and deleted with it.
+
+### Salesforce implementation
+
+- **Object:** `Service__c`, name field Text, label Service Name, sharing Controlled By Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Program | `Program__c` | Master-Detail to `Program__c`, relationship name Services |
+| Description | `Description__c` | Long Text Area(32768) |
+| Unit of Measure | `Unit_Of_Measure__c` | Text(80) |
+| Active | `Active__c` | Checkbox, default true |
+
+---
+
+## 29Y. Enrollment
+
+### Definition
+
+A person taking part in a program (P-01): applied, enrolled, completed or withdrawn. It is the
+participant record; P-02 records what they attended and received.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number: an enrollment is identified by its person and program. |
+| Program | reference(Program) | yes | The program the person takes part in. |
+| Contact | reference(Contact) | conditional | The person, where people are Contacts. |
+| Account | reference(Account) | conditional | The person, where people are person Accounts. |
+| Stage | picklist(Applied, Enrolled, Completed, Withdrawn) | yes (defaults Enrolled) | Where the person stands in the program. Applied and Enrolled are open; Completed and Withdrawn have ended. |
+| Start Date | date | no | When the person was enrolled. |
+| End Date | date | no | When the person completed or withdrew. |
+
+### Relationships
+
+- **Enrollment to Program**, many to one, through a required lookup, not a detail, so the
+  enrollment has sharing of its own (participant privacy, P-08; ADR-NEXT decision 3).
+- **Enrollment to a person**, through the Contact and Account pair (Section 4).
+
+### Rules
+
+**R-EN1 Exactly one person.** Contact or Account, never both, never neither (validation rule,
+checked only when the enrollment is new or its person changes, as R-VU1).
+
+**R-EN2 One open enrollment per person per program.** A second open enrollment (Applied or
+Enrolled) for the same person in the same program is refused, naming the program: change the one
+that is there instead. A person may enroll again once an earlier enrollment has ended. Every
+enrollment in the org counts, one the user cannot see included. The check runs on insert, on
+undelete and when the program, person or stage changes. A merge of two people, which moves
+enrollments without running their automation, can leave two open ones; the next such change to
+either is refused until one is ended. Enforced in Apex by an automation that always runs
+(registry row `Enrollment_Rules`, ADR-0024).
+
+**R-EN3 Stage dates are filled in.** Moving an enrollment to Enrolled, or creating it as
+Enrolled, fills an empty Start Date with today; moving it to Completed or Withdrawn, or creating
+it so, fills an empty End Date with today. A date already typed is kept. A switchable automation
+(registry row `Enrollment_Dates`), so an import of history can turn it off.
+
+**R-EN4 End after start.** End Date, when set, is not before Start Date (validation rule).
+
+**R-EN5 Erasing or deleting the person keeps the enrollment.** Erasing a person (Section 29H)
+keeps their enrollments, credited to the anonymous record, so program counts stand; an
+enrollment holds no typed text to empty. Deleting the person empties the person on the
+enrollment (SetNull) and keeps it. A merge moves the enrollments to the record kept.
+
+### Salesforce implementation
+
+- **Object:** `Enrollment__c`, name field AutoNumber `EN-{000000}`, sharing Public Read/Write
+  until P-08.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Program | `Program__c` | Lookup to `Program__c`, required, delete constraint Restrict, relationship name Enrollments |
+| Contact | `Contact__c` | Lookup to Contact, delete constraint SetNull, relationship name Enrollments |
+| Account | `Account__c` | Lookup to Account, delete constraint SetNull, relationship name Enrollments |
+| Stage | `Stage__c` | Picklist: Applied, Enrolled, Completed, Withdrawn; required, default Enrolled |
+| Start Date | `Start_Date__c` | Date |
+| End Date | `End_Date__c` | Date |
+
+- **Validation rules:** `Exactly_One_Person` (R-EN1), `End_After_Start` (R-EN4).
+- **Service:** `EnrollmentService` (the stage values and the roster panel's reads and writes),
+  `EnrollmentRulesHandler` (R-EN2), `EnrollmentDatesHandler` (R-EN3), `EnrollmentSelector`
+  (the R-EN2 check reads every enrollment in the org, without sharing, so one the user cannot see
+  still counts).
+
+### PMM mapping
+
+The three Programs objects map onto the Program Management Module's (namespace `pmdm`) without a
+new field, so the PMM migration (MIG-09, plan Section 6.1.4 item 9) is a template, not a schema
+change. Nothing in BarnCRM references a PMM object. The PMM names below are from its public
+repository and are checked against an org with PMM when MIG-09 is built.
+
+| BarnCRM | PMM | Note |
+|---|---|---|
+| Program: Name, Status, Description, Target Population, Start Date, End Date | Program: Name, Status, Description, Target Population, Start Date, End Date | Status values match (Planned, Active, Completed) |
+| Service: Name, Program, Description, Unit of Measure, Active | Service: Name, Program, Description, Unit of Measurement, Status | Status Active maps to Active checked |
+| Enrollment: Program, Contact, Stage, Start Date, End Date | Program Engagement: Program, Contact, Stage, Start Date, End Date | Stages: Applied to Applied; Enrolled and Active to Enrolled; Completed to Completed; Withdrawn to Withdrawn |
+
+### On a person, Health Check and sample data
+
+**Programs on a person.** The read only `personEnrollments` card lists a person's enrollments,
+open ones first, each with its program, stage and dates, on the Programs app's own Contact and
+Account record pages (`Programs_Contact_Record_Page`, `Programs_Account_Record_Page`: Core's
+pages plus the card, kept in step under ADR-0064). Read in user mode. On an Account it shows only
+for a person account, and lists enrollments naming the account or its one contact, so it needs no
+person account field. A user who cannot read enrollments gets no card.
+
+**Health Check.** `ProgramsHealthCheckExtension`, registered in
+`HealthCheckExtensions.EXTENSION_CLASSES`, asked only of a viewer who may manage settings and not
+while the module is turned off:
+
+| Key | Severity | Finds | Fix |
+|---|---|---|---|
+| `program_enrollments_open_after_end` | Info | Open enrollments (Applied or Enrolled) in a program that is Completed or whose End Date is past: they still count as open (R-EN2) and in the roster. | Links the first five enrollments. |
+
+**Sample data.** `ProgramsSampleData` implements Core's `SampleDataModule` and is registered in
+`SampleDataModules.MODULE_CLASS_NAMES` after Volunteers. Its load, three stages, builds three
+programs flagged `Sample_Data__c` (two Active, one Completed) with five services, then 18
+enrollments of up to 12 of Core's sample people (contacts), through the enrollment rules, then
+(release 0.13, P-02) 40 service deliveries (29Z) to the people Enrolled in the two Active
+programs. Its removal, before Volunteers', Giving's and Core's, deletes one chunk per stage: the
+sample people's service deliveries and enrollments in sample programs, then the sample programs
+with no enrollment or delivery left (their services go with them). A sample program a real person
+is enrolled in, or has a delivery in, is kept, and one Warning in the Error Log names each one
+kept.
+
+---
+
+## 29Z. Service Delivery
+
+### Definition
+
+One service given to one person on one day, or their absence from it (P-02, Programs module):
+a hot meal, two tutoring hours, a missed session. It is both attendance and service delivery, as
+PMM's Service Delivery is: the attendance says whether the person came, the quantity counts what
+they received in the service's unit. Sessions and cohorts are P-11.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number: a delivery is identified by its person, service and date. |
+| Service | reference(Service) | yes | The service given, and through it the program. |
+| Enrollment | reference(Enrollment) | no | The person's enrollment in the service's program. Filled in when left empty (R-SD3). |
+| Contact | reference(Contact) | conditional | The person, where people are Contacts. |
+| Account | reference(Account) | conditional | The person, where people are person Accounts. |
+| Delivery Date | date | yes (defaults today) | The day the service was given, or missed. |
+| Attendance | picklist(Present, Excused Absence, Unexcused Absence) | yes (defaults Present) | Whether the person came. |
+| Quantity | number | yes (defaults 1) | How much was given, in the service's unit of measure. 0 for an absence. |
+
+### Relationships
+
+- **Service Delivery to Service**, many to one, through a required lookup with delete Restrict, not
+  a detail, so participant privacy (P-08) can set deliveries apart from the program as it does
+  enrollments. A service with deliveries cannot be deleted; clear its Active box instead.
+- **Service Delivery to Enrollment**, many to one, optional, delete SetNull.
+- **Service Delivery to a person**, through the Contact and Account pair (Section 4).
+
+### Rules
+
+**R-SD1 Exactly one person.** Contact or Account, never both, never neither (validation rule,
+checked only when the delivery is new or its person changes, as R-EN1).
+
+**R-SD2 An absence delivers nothing.** Quantity is never negative (validation rule). Saving a
+delivery with an absence (Excused or Unexcused) sets its Quantity to 0. Always runs (registry
+row `Service_Delivery_Rules`): totals would otherwise count services nobody received.
+
+**R-SD3 The enrollment is filled in.** A delivery saved with no enrollment is linked to the
+person's enrollment in the service's program: the open one, or else the one that started last.
+A person with no enrollment there is still recorded; the delivery simply has none. Same
+always-run row, as the link is what the roster and the P-05 dashboard count by.
+
+**R-SD4 One row per person, service and day, from the grid.** The Service Delivery Log
+(below) keeps one delivery per person per service per day, changing the row that is there
+instead of adding another. Nothing refuses a second row entered by hand: two separate meals on
+one day are two deliveries.
+
+**R-SD5 Erasing or deleting the person keeps the delivery.** As R-EN5: erasure credits it to the
+anonymous record; deleting the person empties the person (SetNull) and keeps the counts.
+
+### Salesforce implementation
+
+- **Object:** `Service_Delivery__c`, name field AutoNumber `SD-{000000}`, sharing Public
+  Read/Write until P-08.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Service | `Service__c` | Lookup to `Service__c`, required, delete constraint Restrict, relationship name Service_Deliveries |
+| Enrollment | `Enrollment__c` | Lookup to `Enrollment__c`, delete constraint SetNull, relationship name Service_Deliveries |
+| Contact | `Contact__c` | Lookup to Contact, delete constraint SetNull, relationship name Service_Deliveries |
+| Account | `Account__c` | Lookup to Account, delete constraint SetNull, relationship name Service_Deliveries |
+| Delivery Date | `Delivery_Date__c` | Date, required, default `TODAY()` |
+| Attendance | `Attendance__c` | Picklist: Present, Excused Absence, Unexcused Absence; required, default Present |
+| Quantity | `Quantity__c` | Number(10, 2), required, default 1 |
+
+- **Validation rules:** `Exactly_One_Person` (R-SD1), `Quantity_Not_Negative` (R-SD2).
+- **Service:** `ServiceDeliveryRulesHandler` (R-SD2, R-SD3) with `ServiceDeliveryService` and
+  `ServiceDeliverySelector`, trigger `ServiceDeliveryTrigger` through `TriggerDispatcher`.
+- **Service Delivery Log:** the `serviceDeliveryLog` panel on the program page
+  (`ServiceDeliveryLogController`): pick an active service and a day, and every open
+  enrollment (Applied or Enrolled) is listed with its attendance and quantity for that day, saved
+  in one go (R-SD4). It works the same on a phone.
+
+### PMM mapping
+
+| BarnCRM | PMM | Note |
+|---|---|---|
+| Service Delivery: Service, Enrollment, Contact, Delivery Date, Attendance, Quantity | Service Delivery: Service, Program Engagement, Contact, Delivery Date, Attendance Status, Quantity | Attendance values match PMM's Present, Excused Absence and Unexcused Absence. Checked against an org with PMM with MIG-09. |
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -9211,7 +9506,6 @@ that builds it, before its metadata is created.
 |---|---|---|---|
 | Receipt | Giving | v0.4 (G-13) | Section 4.11, ADR-0010 |
 | Donor Level | Giving | v0.4 (G-14) | Section 5.2 |
-| Program, Service, Enrollment, Attendance, Service Delivery, Outcome | Programs | v0.9 | Section 5.4 |
 | Funder pipeline entities (grant, reporting deadline, award compliance) | Funders | v0.9 | Section 5.5 |
 | Mirror adapter entities and mirror mappings | Mirror | v0.6 onward | Section 4.12 |
 
@@ -9247,6 +9541,11 @@ rollups (V-01 to V-03, ADR-0127). There is no Volunteer entity.
 Skill, Volunteer Skill, Job Skill, Volunteer Requirement, Shift Schedule and Volunteer Letter
 Template left this table in v0.8 (V-04 to V-08) and are specified in Sections 29P to 29U, with
 the volunteer hours import template in 29V.
+
+Program, Service and Enrollment left this table in release 0.12 (P-01, ADR-NEXT) and are
+specified in Sections 29W to 29Y. Outcome left it when P-03 moved to the Logic Models package as
+L-02 (owner decision, 2026-09-23). Attendance and Service Delivery left it in release 0.13
+(P-02) as one entity, Service Delivery, specified in Section 29Z.
 
 Two v0.4 entities have attributes that already exist on `Gift__c` from v0.2, because the
 object is not worth altering later for fields this cheap: Acknowledgment Status,
@@ -9486,6 +9785,9 @@ mirrors the primary member).
 | v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-0149). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a) by any user with the import permission and edit access to the rows; `Import_Batch__c` gains `Retried_By__c` (Rows Retried By) so undo covers their records. R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
 | 0.12 | 2026-10-31 | Setup Changes Log (C-56, plan D-156). Object `Setup_Change__c` added (Section 29W), rules R-SU1 to R-SU8 (prefix R-SU, since R-SC is soft credits); settings key `Setup_Change_Retention_Days__c` (Org Optimizer keys). A nightly job copies new Setup Audit Trail rows and deletes copies past the retention. |
 | v0.12 | 2026-10-31 | Super Transform follow-ups (C-50f1, C-50f2; ADR-NEXT). New object `Saved_Transform__c` (Section 29W: `Object_Name__c`, `Definition_JSON__c`), org-wide saved step lists, granted to `BarnCRM_Bulk_Update` and `BarnCRM_Admin`. R-IT15 gains the `digits` step (a document that may use it is version 3; Apex `DataTransform.formatDigits` and the JavaScript module `transformFormat` share one test fixture). R-BU7 applies it unchanged. |
+| 0.12 | 2026-10-31 | Programs P-01 (ADR-NEXT `NEXT-programs-module.md`). New in the Programs module: Program (`Program__c`, 29W), Service (`Service__c`, 29X) and Enrollment (`Enrollment__c`, 29Y), with rules R-PG1 to R-PG3, R-SV1 and R-EN1 to R-EN5 and the PMM mapping. Section 30 keeps attendance and service delivery (P-02); Outcome left it for Logic Models (L-02). Specified ahead of the build. |
+| 0.12 | 2026-10-31 | Programs P-01 follow-up. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Program__c` (29W), so the Programs sample load can be removed in one action; services and enrollments are found through their program. 29Y gains the person card, the Programs Health Check finding and the sample data paragraph. No object added. |
+| 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29Z), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |
 
 ---
 ## 32. Entity ownership by package
@@ -9571,7 +9873,10 @@ included; standard objects the packages extend are named by the entity that gove
 | Volunteer Letter Template | Volunteers | v0.8 | 29U |
 | Volunteer Letter Template Default (shipped default) | Volunteers | v0.8 | 29U |
 | Volunteer hours import template (Import Template Default rows) | Volunteers | v0.8 | 29V |
-| Programs entities | Programs | v0.9 | 30 |
+| Program | Programs | 0.12 (P-01) | 29W |
+| Service | Programs | 0.12 (P-01) | 29X |
+| Enrollment | Programs | 0.12 (P-01) | 29Y |
+| Service Delivery | Programs | 0.13 (P-02) | 29Z |
 | Funders entities | Funders | v0.9 | 30 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
@@ -9593,6 +9898,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Custom permission Manage BarnCRM Settings | Core | Metadata |
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
 | Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-0127). Dashboard `Volunteers` and four reports in public read only folders `BarnCRM_Volunteers`; report types Volunteer Hours with Job and Shift, Volunteer Shifts with Job, Volunteer Sign-ups, Volunteers (Contact); `standard-Dashboard` and `standard-report` tabs in the app; report and dashboard user permissions in the four permission sets (V-03) |
+| Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-NEXT). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror is v0.6, brought forward from

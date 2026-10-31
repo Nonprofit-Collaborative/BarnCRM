@@ -63,6 +63,7 @@ offer it anywhere else.
 | Volunteer sign-up: bookings and hours | None | The hours it writes for an attended sign-up go through the same approval as hours typed by hand, which a flow cannot reach. Switch it off to type attendance hours yourself. |
 | Update rollups when hours change | None | Volunteer totals are worked out by the rollup engine, as every other total is. Switched off, they wait for the nightly run, or for **Recalculate all** on the Rollups page. |
 | Update rollups when a sign-up changes | None | The same, for Slots Filled on a shift. |
+| Enrollment: fill in the stage dates | None | It only fills an empty Start Date or End Date with today when an enrollment's stage moves, which a record-triggered flow with two assignments can copy if you want a different date. Switch it off while you load past enrollments whose dates you type yourself. |
 
 With Giving, Giving's automations are listed on the same page. Their templates are not built
 yet, and this page lists them when they are.

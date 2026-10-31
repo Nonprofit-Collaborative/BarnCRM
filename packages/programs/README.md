@@ -2,16 +2,22 @@
 
 ## Purpose
 
-Programs, services, enrollments, attendance, service deliveries, light case notes, and outcomes.
+Programs, the services they offer, and the people enrolled in them (P-01). Attendance and
+service delivery (P-02), case notes (P-04), the program dashboard (P-05), the roster import
+(P-06), intake fields (P-07) and the participant privacy preset (P-08) follow.
+
+## Design
+
+- ADR-NEXT `docs/architecture/decisions/NEXT-programs-module.md`
+- Canonical model Sections 29W (Program), 29X (Service) and 29Y (Enrollment)
+- Admin guide `docs/admin-guide/programs.md`
 
 ## First ships in
 
-Iteration **0.8**.
+Release **0.12**.
 
 ## Depends on
 
 - BarnCRM Core
 
-## Status
-
-This directory is intentionally empty until iteration 0.8.
+Nonprofit Edition only (ADR-0124).
