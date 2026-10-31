@@ -108,15 +108,15 @@ private class DataDictionaryControllerTest {
 
             Assert.isTrue(account.fields.size() > 40, 'Account has dozens of fields.');
             Set<String> names = new Set<String>();
-            String previous = '';
+            // The controller's rule: lower-case label, then API name, as List.sort orders them.
+            List<String> keys = new List<String>();
             for (DataDictionaryController.FieldRow row : account.fields) {
                 Assert.isTrue(names.add(row.fieldName), 'Each field once: ' + row.fieldName);
-                Assert.isTrue(
-                    previous <= row.fieldLabel.toLowerCase(),
-                    'Sorted by label at ' + row.fieldLabel
-                );
-                previous = row.fieldLabel.toLowerCase();
+                keys.add(row.fieldLabel.toLowerCase() + '\u0000' + row.fieldName);
             }
+            List<String> sorted = new List<String>(keys);
+            sorted.sort();
+            Assert.areEqual(sorted, keys, 'Sorted by label, then API name.');
         }
     }
 
