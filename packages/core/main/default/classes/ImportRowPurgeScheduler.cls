@@ -1,8 +1,8 @@
 /**
- * The nightly Import row cleanup's schedule (R-IR5, D-40). Health Check lists it among the
- * nightly jobs and its Schedule all nightly jobs fix starts it (`NightlyJobs`, ADR-0075). How
- * long rows are kept is the Import setting Days the rows of an import are kept; 0 keeps them,
- * so the job needs no stop button of its own.
+ * The nightly Import row cleanup's schedule (R-IR5). Health Check lists it among the
+ * nightly jobs and its Schedule all nightly jobs fix starts it (`NightlyJobs`, ADR-0075). When
+ * rows are deleted is the Import setting Delete Import Rows; Never keeps them, so the job
+ * needs no stop button of its own.
  */
 public with sharing class ImportRowPurgeScheduler implements Schedulable {
     /** The name the scheduled job carries, so it is found again rather than doubled. */

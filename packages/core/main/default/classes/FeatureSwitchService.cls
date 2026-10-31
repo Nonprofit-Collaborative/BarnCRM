@@ -103,7 +103,7 @@ public with sharing class FeatureSwitchService {
                         'Import_Wizard',
                         'Import_Chunk_Size',
                         'Import_Trial_Rows',
-                        'Import_Row_Retention_Days',
+                        'Import_Row_Deletion',
                         'Import_Undo_Retention_Days',
                         'Bulk_Chunk_Size',
                         'Bulk_Update_Run_Limit',

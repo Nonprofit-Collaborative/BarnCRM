@@ -240,7 +240,7 @@ const PAGE_GROUPS = {
         'Import_Chunk_Size__c',
         'Import_Trial_Rows__c',
         'Import_Undo_Retention_Days__c',
-        'Import_Row_Retention_Days__c'
+        'Import_Row_Deletion__c'
       ]
     },
     {

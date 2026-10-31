@@ -95,6 +95,14 @@
     </layoutColumns>
     <style>OneColumn</style>
   </layoutSections>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Row_Number__c</fields>
+    <fields>Status__c</fields>
+    <relatedList>Import_Row__c.Import_Batch__c</relatedList>
+    <sortField>Row_Number__c</sortField>
+    <sortOrder>Asc</sortOrder>
+  </relatedLists>
   <showEmailCheckbox>false</showEmailCheckbox>
   <showHighlightsPanel>false</showHighlightsPanel>
   <showInteractionLogPanel>false</showInteractionLogPanel>
