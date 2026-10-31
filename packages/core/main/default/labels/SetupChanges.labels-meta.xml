@@ -1,12 +1,244 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Core_SetupChanges_Title</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: section heading</shortDescription>
+        <value>Setup Changes</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_Intro</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: line under the heading</shortDescription>
+        <value>Who changed what in Setup, and when, from the Salesforce Setup Audit Trail. Salesforce keeps it for 180 days; BarnCRM copies it every night and keeps it longer. Nothing in Setup is changed here.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_Kept</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: {0} is the count kept, {1} oldest day, {2} newest day</shortDescription>
+        <value>Kept: {0} changes, from {1} to {2}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_NothingKept</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: shown when no change has been copied yet</shortDescription>
+        <value>Nothing is kept yet. Press Copy New Changes Now to copy the last 180 days of Setup changes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_Scheduled</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: copy status; {0} is the days each change is kept</shortDescription>
+        <value>New changes are copied every night at 1:30 and kept for {0} days.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_NotScheduled</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: copy status when the nightly job is not scheduled</shortDescription>
+        <value>The nightly copy is not scheduled. Copy New Changes Now schedules it, and so does Health Check.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_CopyRunning</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: shown while a copy is waiting or running</shortDescription>
+        <value>A copy is running. Press Refresh in a minute or two to see the new changes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_CopyNow</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: button that copies new changes now</shortDescription>
+        <value>Copy New Changes Now</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_CopyStarted</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: shown after Copy New Changes Now starts a copy</shortDescription>
+        <value>The copy has started and runs in the background. Press Refresh in a minute or two to see the new changes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_Refresh</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: button that reads the kept changes again</shortDescription>
+        <value>Refresh</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_From</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: first day filter</shortDescription>
+        <value>From</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_To</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: last day filter</shortDescription>
+        <value>To</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_Section</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: Setup area filter</shortDescription>
+        <value>Section</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_AllSections</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: Section filter choice for every section</shortDescription>
+        <value>All Sections</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_Search</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: search box label</shortDescription>
+        <value>Search</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_SearchHelp</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: help text of the search box</shortDescription>
+        <value>Words that must all appear in What Changed, Section, Changed By, Logged In As or Action, ignoring capitals. Try a field or object name, a user, or a permission set.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_RunSearch</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: button that applies the filters</shortDescription>
+        <value>Search</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_Download</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: button that saves the matches as CSV</shortDescription>
+        <value>Download CSV</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_Downloaded</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: after a download; {0} is the number of rows saved</shortDescription>
+        <value>Saved {0} changes as CSV.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_More</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: {0} rows shown, {1} the most a download holds</shortDescription>
+        <value>Showing the newest {0} matches. Narrow the filters, or use Download CSV for up to {1}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_ScanStopped</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: search stopped early; {0} is the rows looked at</shortDescription>
+        <value>This search looked at the newest {0} kept changes and stopped. Narrow the dates or the section to search older ones.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_Empty</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: no kept change matches the filters</shortDescription>
+        <value>No kept change matches these filters.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_DatesReversed</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: From is after To</shortDescription>
+        <value>From is after To. Choose a From day on or before the To day.</value>
+    </labels>
+    <labels>
         <fullName>Core_SetupChanges_ErrorBadDate</fullName>
         <categories>SetupChanges</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Setup Changes: a date filter is not a day; {0} is what was given</shortDescription>
         <value>{0} is not a day. Choose the day from the calendar.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_ColChangedAt</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: column for when the change was made</shortDescription>
+        <value>Changed At</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_ColChangedBy</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: column for the user who made the change</shortDescription>
+        <value>Changed By</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_ColLoggedInAs</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: column for the person logged in as that user</shortDescription>
+        <value>Logged In As</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_ColSection</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: column for the Setup area</shortDescription>
+        <value>Section</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_ColAction</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: CSV column for Salesforce's code for the change</shortDescription>
+        <value>Action</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupChanges_ColWhatChanged</fullName>
+        <categories>SetupChanges</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Setup Changes: column for Salesforce's sentence for the change</shortDescription>
+        <value>What Changed</value>
     </labels>
     <labels>
         <fullName>Core_SetupChanges_LogCannotRead</fullName>

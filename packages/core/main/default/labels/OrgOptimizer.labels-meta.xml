@@ -377,6 +377,22 @@
         <value>Users, permission sets, reports, flows and jobs nobody seems to use.</value>
     </labels>
     <labels>
+        <fullName>Core_OrgOptimizer_SetupChanges</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Setup Changes section name</shortDescription>
+        <value>Setup Changes</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_SetupChangesText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Overview line for Setup Changes</shortDescription>
+        <value>Who changed what in Setup, and when, kept beyond Salesforce's 180 days.</value>
+    </labels>
+    <labels>
         <fullName>Core_OrgOptimizer_SetupIntro</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
