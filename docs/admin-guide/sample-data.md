@@ -76,6 +76,22 @@ volunteer with Approved hours and use the **Volunteer Letter** action with the s
 letter template ([Hour letters and certificates](volunteers.md#hour-letters-and-certificates)). Remove the file yourself afterwards: it is yours, not the
 loader's.
 
+### With Programs Installed
+
+With the **Programs** package installed, the same action also loads, after Volunteers if it is
+there:
+
+| Records | How many | What is in them |
+|---|---|---|
+| Programs | 3 | **After-school tutoring** and **Food pantry**, both Active, and **Summer reading**, Completed, each with a target population and dates |
+| Services | 5 | Tutoring hour and Homework club session; Grocery bag and Hot meal; Reading circle |
+| Enrollments | 18 | Six in tutoring (four Enrolled, one Applied, one Withdrawn), eight Enrolled in the pantry and four Completed in summer reading, among 12 sample people |
+
+Removal takes the sample people's enrollments in the sample programs, then the sample programs
+and their services. A sample program one of your own people is enrolled in stays, with that
+enrollment, and one Warning in the [Error Log](error-log.md) names it: move or delete that
+enrollment, then select **Remove Sample Data** again.
+
 ## 2. How to Turn It On
 
 1. Open **BarnCRM Settings**.

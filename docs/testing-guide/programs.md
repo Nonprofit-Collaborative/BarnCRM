@@ -78,4 +78,48 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | As the admin, delete "Test tutoring" from its record page. | Salesforce refuses and lists the enrollments. |
 | 3 | Set the program's **Status** to **Completed** and save. | The program saves. It is no longer in **Active Programs**, and its enrollments stay. |
 
+**Cleanup:** keep the data for T-PRG-06 and T-PRG-07.
+
+## T-PRG-06: A Person's Programs Card
+
+**Purpose:** confirm a person's record page in the Programs app lists their enrollments, and that a household shows no card.
+**Prerequisites:** T-PRG-05 done; the first person from T-PRG-03.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **BarnCRM Programs**, open the first person from T-PRG-03. | A **Programs** card on the right lists "Test tutoring" twice: the open enrollment (Enrolled, green badge) first, then the completed one, with Started and Ended dates. |
+| 2 | Click the first "Test tutoring". | The enrollment record opens. |
+| 3 | Open the person's household (or, on a person account org, an organization account). | No **Programs** card shows. |
+| 4 | As the Read Only user, open the same person in **BarnCRM Programs**. | The card shows the same list. |
+
+**Cleanup:** none.
+
+## T-PRG-07: Health Check Finds Enrollments Open After a Program Ended
+
+**Purpose:** confirm Health Check reports open enrollments in a Completed program, and stops once they are ended.
+**Prerequisites:** T-PRG-05 done ("Test tutoring" is Completed with open enrollments); the admin user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, run **Health Check**. | An Information finding says enrollments are still open in programs that have ended, with each open "Test tutoring" enrollment linked. |
+| 2 | Open each linked enrollment and set its **Stage** to **Completed**. Run Health Check again. | The finding is gone. |
+
 **Cleanup:** as the admin, delete the enrollments of "Test tutoring" on the **Enrollments** tab, then delete the program (its service goes with it). Remove the roles given in T-PRG-01, and the Programs sets in Setup.
+
+## T-PRG-08: Programs Sample Data
+
+**Purpose:** confirm the sample load adds the Programs set and the removal takes it away, keeping a sample program a real person is enrolled in.
+**Prerequisites:** an org with Core and Programs deployed and no sample data loaded; the admin user. Run it last: it removes the sample data other pages use.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **BarnCRM Settings**, **Sample Data**, select **Load Sample Data** and wait for **Loaded**. | The card lists **Program enrollments** with 18. |
+| 2 | Open **Programs**, list view **All Programs**. | **After-school tutoring** and **Food pantry** (Active) and **Summer reading** (Completed) are listed. |
+| 3 | Open **After-school tutoring**. | The roster shows **Applied** 1, **Enrolled** 4, **Withdrawn** 1, and the services Tutoring hour and Homework club session. |
+| 4 | Create a contact "Rita Real" and enroll her in **Food pantry**. | Accepted. |
+| 5 | Select **Remove Sample Data** and wait. | **Summer reading** and **After-school tutoring** are gone. **Food pantry** stays, with only Rita's enrollment, and the [Error Log](../admin-guide/error-log.md) holds one Warning naming it. The card still offers **Remove Sample Data**. |
+| 6 | Delete Rita's enrollment, then select **Remove Sample Data** again. | **Food pantry** is gone. |
+
+Note: Core's sample set has more than 12 people, so every count above holds; with fewer sample people the set is smaller.
+
+**Cleanup:** delete Rita Real.

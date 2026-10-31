@@ -1,0 +1,70 @@
+<template>
+  <template lwc:if={showCard}>
+    <lightning-card title={label.title} icon-name="standard:education">
+      <lightning-button-icon
+        slot="actions"
+        icon-name="utility:refresh"
+        alternative-text={label.refresh}
+        title={label.refresh}
+        size="small"
+        onclick={handleRefresh}
+        data-id="refresh"
+      ></lightning-button-icon>
+      <div class="slds-var-p-horizontal_medium slds-is-relative">
+        <template lwc:if={loading}>
+          <lightning-spinner alternative-text={label.loading} size="small"></lightning-spinner>
+        </template>
+        <template lwc:if={errorMessage}>
+          <p class="slds-text-color_error" role="alert" data-id="error">{errorMessage}</p>
+        </template>
+        <template lwc:if={showEmpty}>
+          <p class="slds-text-body_regular" data-id="empty">{label.empty}</p>
+        </template>
+        <ul class="slds-has-dividers_bottom-space">
+          <template for:each={rows} for:item="row">
+            <li key={row.key} class="slds-item" data-id="enrollment">
+              <div
+                class="slds-grid slds-wrap slds-grid_align-spread slds-grid_vertical-align-center"
+              >
+                <a
+                  href={row.enrollmentHref}
+                  class="slds-text-heading_small"
+                  data-record-id={row.recordId}
+                  data-id="program"
+                  onclick={handleOpen}
+                  >{row.programLabel}</a
+                >
+                <span class={row.badgeClass} data-id="stage">{row.stageLabel}</span>
+              </div>
+              <template lwc:if={row.startDate}>
+                <p class="slds-text-body_small slds-text-color_weak" data-id="started">
+                  {label.started}
+                  <lightning-formatted-date-time
+                    value={row.startDate}
+                    time-zone="UTC"
+                    class="slds-var-m-left_xx-small"
+                  ></lightning-formatted-date-time>
+                </p>
+              </template>
+              <template lwc:if={row.endDate}>
+                <p class="slds-text-body_small slds-text-color_weak" data-id="ended">
+                  {label.ended}
+                  <lightning-formatted-date-time
+                    value={row.endDate}
+                    time-zone="UTC"
+                    class="slds-var-m-left_xx-small"
+                  ></lightning-formatted-date-time>
+                </p>
+              </template>
+            </li>
+          </template>
+        </ul>
+        <template lwc:if={moreThanShown}>
+          <p class="slds-text-body_small slds-text-color_weak" data-id="more">
+            {label.moreThanShown}
+          </p>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>
