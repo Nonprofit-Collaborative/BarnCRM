@@ -21,6 +21,14 @@ Record, or a person (Contact) or an organization (Account) for People and Organi
 2. Open **BarnCRM Settings**, **Import** page, **Create Fields From an Import**, and select
    **Set Up Connection**. This creates a Named Credential called `Barn_Org_Connection` that lets
    BarnCRM call your org's own Metadata API. It is done once for the org and stores no password.
+3. Salesforce creates the Named Credential with callouts turned off, and only an administrator
+   can turn them on. The status reads **Set up, one step left**, with these steps:
+   1. In Setup, enter **Named Credentials** in Quick Find and open **Named Credentials**.
+   2. Select **BarnCRM: this org**, then **Edit**.
+   3. Turn on **Enabled for Callouts** and select **Save**.
+   4. Back on the Import page, select **Check Again**. The status reads **Connected**.
+
+Until the status reads **Connected**, **Create New Field** shows the Setup fallback below.
 
 Without the connection, **Create New Field** still opens. It shows the field's details as text
 to copy, with the steps to create the field in Setup, and **Refresh Fields** to pick it up.
@@ -55,6 +63,8 @@ record page.
   the existing field.
 - **"The connection is not set up."** Set it up on BarnCRM Settings, or follow the Setup steps
   the dialog shows.
+- **"The connection is set up but not turned on."** Turn on **Enabled for Callouts** on the Named
+  Credential **BarnCRM: this org** (section 2, step 3), then select **Check Again**.
 - **"You need the Customize Application and Modify Metadata permissions."** BarnCRM creates the
   field as you, so you need the same permissions Setup needs.
 - **"Your org did not accept BarnCRM's connection."** The Metadata API refused the call. Create

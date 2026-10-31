@@ -49,6 +49,24 @@ describe('c-import-field-connection', () => {
     expect(one(element, 'set-up')).toBeNull();
   });
 
+  it('shows the Setup step while callouts are off, and checks again', async () => {
+    setUpConnection.mockResolvedValue({ canCreate: true, connected: false, calloutsOff: true });
+    const element = await render({ canCreate: true, connected: false, calloutsOff: false });
+    one(element, 'set-up').click();
+    await flush();
+    expect(one(element, 'status').textContent).toContain('PanelCalloutsOff');
+    expect(one(element, 'enable-steps').textContent).toContain('PanelEnableSteps');
+    expect(one(element, 'set-up')).toBeNull();
+
+    getConnection.mockResolvedValue({ canCreate: true, connected: true, calloutsOff: false });
+    one(element, 'check-again').click();
+    await flush();
+    expect(getConnection).toHaveBeenCalledTimes(2);
+    expect(one(element, 'status').textContent).toContain('PanelConnected');
+    expect(one(element, 'enable-steps')).toBeNull();
+    expect(one(element, 'check-again')).toBeNull();
+  });
+
   it('says what is missing to someone who may not set it up', async () => {
     const element = await render({ canCreate: false, connected: false });
     expect(one(element, 'set-up')).toBeNull();

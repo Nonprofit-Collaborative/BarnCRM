@@ -95,9 +95,11 @@ public with sharing class DataJobs {
             job,
             ImportBatchService.isRunning(job, asyncJob)
         );
-        state.running = ImportBatchService.STATUS_COMMITTING.equals(state.status);
+        Boolean committing = ImportBatchService.STATUS_COMMITTING.equals(state.status);
+        // An undo still running is as much a running job: the list polls until it ends.
+        state.running = committing || ImportBatchService.STATUS_UNDOING.equals(state.status);
         state.refusal = ImportUndoService.refusal(job, state.status);
-        if (withProgress == true && state.running && asyncJob != null) {
+        if (withProgress == true && committing && asyncJob != null) {
             state.chunksDone = asyncJob.JobItemsProcessed;
             state.chunksTotal = asyncJob.TotalJobItems;
         }

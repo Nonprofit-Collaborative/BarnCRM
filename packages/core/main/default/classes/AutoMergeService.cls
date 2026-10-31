@@ -491,9 +491,11 @@ public with sharing class AutoMergeService {
             Schema.DescribeFieldResult field = link.getField().getDescribe();
             Schema.DescribeSObjectResult child = link.getChildSObject()
                 .getDescribe(SObjectDescribeOptions.DEFERRED);
-            // Memberships are not moved by the merge: see ADDED_MEMBERSHIPS.
+            // Memberships are not moved by the merge: see ADDED_MEMBERSHIPS. Duplicate record
+            // items are removed by it, so there is nothing to move back.
             if (
                 link.getChildSObject() == Household_Member__c.SObjectType ||
+                link.getChildSObject() == DuplicateRecordItem.SObjectType ||
                 !field.isUpdateable() ||
                 !field.isFilterable() ||
                 !child.isQueryable() ||

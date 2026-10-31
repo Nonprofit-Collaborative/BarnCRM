@@ -212,7 +212,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 1 | Create a contact: First Name `Jonathan`, Last Name `Zzfuzz`, Email `jz.fuzz@example.org`. Create another: First Name `Jonathon`, Last Name `Zzfuzz`, Email `JZ.Fuzz@example.org`; save past any warning. | Both save, each in a household of its own. |
 | 2 | Create a contact `Jonathen Zzfuzz` with Email `other.fuzz@example.org`. | It saves. |
 | 3 | Create a household `Zzfuzz Family Household`, and in it four contacts with no email or phone: `Daniel Zzfuzz`, `Danielle Zzfuzz`, `Sam Zzfuzz` and `Sam Zzfuzz` (save past any warning). | All save in that household. |
-| 4 | On **Duplicate Matching**, **Review**, scan and refresh. | A pair of **Jonathan Zzfuzz** and **Jonathon Zzfuzz**, with the line **Similar names (97%) and the same email**. A pair of the two **Sam Zzfuzz**, with **Same name in the same household** (or a rule's name, if your rules found it first). No pair names **Jonathen Zzfuzz** (nothing else in common), and no pair of **Daniel** and **Danielle**. |
+| 4 | On **Duplicate Matching**, **Review**, scan and refresh. | A pair of **Jonathan Zzfuzz** and **Jonathon Zzfuzz**, with the line **Similar names (95%) and the same email** (the percentage varies a little with the last name), or the name of a duplicate rule when an active rule found the pair first. A pair of the two **Sam Zzfuzz**, with **Same name in the same household** (or a rule's name, if your rules found it first). No pair names **Jonathen Zzfuzz** (nothing else in common), and no pair of **Daniel** and **Danielle**. |
 
 **Cleanup:** Delete the `Zzfuzz` contacts and `Zzfuzz Family Household`; their pairs go with them.
 
@@ -234,7 +234,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 ## T-DUP-16: Auto-Merge Previews, Confirms and Merges Exact Matches
 
 **Purpose:** Confirm Auto-Merge previews only exact people matches from the review list, merges them in the background after a confirm, and lists the run.
-**Prerequisites:** admin with **BarnCRM Admin** and **BarnCRM Duplicate Review**. Two Zztest pairs: **Zztest Ann Auto** twice with the same email `zztest.ann.auto@example.org` (different phones), and **Zztest Ben Auto** twice with different emails. A duplicate scan has run, so both pairs are in the review list.
+**Prerequisites:** admin with **BarnCRM Admin** and **BarnCRM Duplicate Review**. Two Zztest pairs: **Zztest Ann Auto** twice with the same email `zztest.ann.auto@example.org` (different phones), and **Zztest Ben Auto** twice with different emails. A duplicate scan has run, so the Ann pair is in the review list; the Ben pair is not, because two people with different emails and no phone in common are no match.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -243,7 +243,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 3 | Click **Preview Exact Matches**. | **Pairs To Merge (1)**: the Ann pair only, with **Keep:**, **Merge away:** and the values that will change (for example **Phone: (blank) becomes ...**), or **No values change.** The Ben pair is not listed. |
 | 4 | Click **Merge 1 Pairs**, then **Cancel**. | Nothing is merged; the preview stays. |
 | 5 | Click **Merge 1 Pairs** and confirm. | **Auto-merge started.** The bell reports **Auto-Merge Finished** with 1 pair merged. |
-| 6 | Click **Refresh**. | **Recent Runs** lists the run: **1 people merged, 0 undone, 0 not fully undone**, with **Undo**. One Ann record remains; the other is in the Recycle Bin. The Ben pair is still in the review list. |
+| 6 | Click **Refresh**. | **Recent Runs** lists the run: **1 people merged, 0 undone, 0 not fully undone**, with **Undo**. One Ann record remains; the other is in the Recycle Bin. The Ben records are both still there, untouched. |
 
 **Cleanup:** Keep the run for T-DUP-17.
 
