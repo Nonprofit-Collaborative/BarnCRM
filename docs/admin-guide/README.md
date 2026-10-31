@@ -1,6 +1,6 @@
 # Admin Guide
 
-Applies to: BarnCRM main as of 2026-10-29 (landing batch 13). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
+Applies to: BarnCRM main as of 2026-10-31 (commit 8d62027e3). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
 
 > **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
 
@@ -94,7 +94,7 @@ these pages, so that everyone is talking about the same person.
 
 ## Index
 
-Applies to: BarnCRM main as of 2026-10-29 (landing batch 13). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-31 (commit 8d62027e3). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 Every page in this folder is listed once, below, grouped by what you are trying to do. A feature that adds a page adds its row here in the same pull request, and the version line is refreshed with it. For a short description of what BarnCRM is and which modules exist, read the [Overview](../overview.md). Staff who use BarnCRM daily (and are not administrators) have the [User Guide](../user-guide/README.md); someone checking a build step by step has the [Testing Guide](../testing-guide/README.md).
 
@@ -185,6 +185,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | G-13 Receipts and year-end statements | [receipts.md](receipts.md) | Giving |
 | G-14 Donor levels | [donor-levels.md](donor-levels.md) | Giving |
 | G-15 Stewardship plans | [stewardship-plans.md](stewardship-plans.md) | Giving |
+| G-26 Ask pipeline | [ask-pipeline.md](ask-pipeline.md) | Giving |
 | G-16 Retention reports | [retention-reports.md](retention-reports.md) | Giving |
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving |
 | G-02, ADR-0064 A donor's giving on their record | [donor-records.md](donor-records.md) | Giving |

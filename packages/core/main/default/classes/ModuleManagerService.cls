@@ -52,6 +52,7 @@ public with sharing class ModuleManagerService {
             'Acknowledgment_Rule__c',
             'Acknowledgment_Run__c',
             'Appeal__c',
+            'Ask__c',
             'Commitment__c',
             'Donor_Level__c',
             'Fund__c',

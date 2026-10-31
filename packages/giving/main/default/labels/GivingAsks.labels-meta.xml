@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <fullName>Giving_Ask_ErrorStageNotInList</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: a stage not in the Ask Stages list ({0} stage, {1} list)</shortDescription>
+    <value>"{0}" is not one of your ask stages. Choose one of: {1}.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorLoad</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: the pipeline board could not load</shortDescription>
+    <value>The ask pipeline could not be loaded. Try again. If it keeps happening, the Error Log has the details.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorNotFound</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: the ask is missing or not visible</shortDescription>
+    <value>That ask is not available. It may have been deleted, or you may not have access to it.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorNoPermission</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: the person may read asks but not change them</shortDescription>
+    <value>You can see asks but not change them. Ask your administrator for Giving Staff access.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorOutcome</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: closing needs a closed outcome</shortDescription>
+    <value>Choose how the ask ended: Won, Declined or Withdrawn.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorNoDonor</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: no gift or pledge can be recorded for an ask with no donor</shortDescription>
+    <value>This ask has no donor, so no gift or pledge can be recorded from it. Add a donor to the ask first, or record the result later.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorAmount</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: a pledge needs an amount above zero</shortDescription>
+    <value>Enter the pledge total, above zero.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorPledgeSchedule</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: a pledge needs its payment schedule</shortDescription>
+    <value>Enter how often the donor pays, how many payments, and the date of the first one.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorChooseLink</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: linking needs a gift or pledge chosen</shortDescription>
+    <value>Choose the gift or pledge this ask produced.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorWrongDonor</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: the linked gift or pledge is another donor's</shortDescription>
+    <value>That gift or pledge is from a different donor, or you cannot see it. Choose one from this ask's donor.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorUnexpected</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: an unexpected failure saving an ask</shortDescription>
+    <value>The ask could not be saved, and nothing was changed. The Error Log has the details.</value>
+  </labels>
+</CustomLabels>

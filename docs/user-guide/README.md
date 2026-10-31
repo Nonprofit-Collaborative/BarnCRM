@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM main as of 2026-10-29 (landing batch 13). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-31 (commit 8d62027e3). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 
@@ -31,6 +31,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 - [Entering gifts](gifts.md): Quick Gift Entry, the New Gift action, funds, soft credits, tributes, in-kind and matching gifts.
 - [Gift batches](gift-batches.md): typing a stack of checks against a deposit total.
 - [Pledges and recurring gifts](commitments.md): commitments, installments and paying them.
+- [The Ask Pipeline](ask-pipeline.md): tracking asks by step on a board, and closing them as won, declined or withdrawn.
 - [Refunds and write-offs](refunds.md): recording money that went back, and cancelling a pending gift.
 - [Receipts and acknowledgments](receipts-and-acknowledgments.md): receipts, thank-yous and stewardship plans.
 
