@@ -25,7 +25,7 @@ employee's gift. BarnCRM fills in the other side of the link for you, so the emp
 gift shows the match too, and it refuses a link that cannot be right.
 
 One piece of setup makes it safer and faster: fill in **Employer** on the people who work
-for companies that match. Open the person in the **Fundraising** app and set **Employer**
+for companies that match. Open the person in the **BarnCRM Fundraising** app and set **Employer**
 (in the **Person** section) to the organization. When
 the employer's check arrives, BarnCRM checks the link you are making against it and
 warns you if the two do not agree.
@@ -35,7 +35,7 @@ warns you if the two do not agree.
 You are David. Start from the sample data, which includes Harper Garcia and the
 organization Founders Consulting Group.
 
-1. In the **Fundraising** app, open **Harper Garcia** and set **Employer** to **Founders
+1. In the **BarnCRM Fundraising** app, open **Harper Garcia** and set **Employer** to **Founders
    Consulting Group**. Save.
 2. Click the **Gifts** tab and press **New**. Enter a gift from **Harper Garcia** for
    **500**, dated last month, status **Received**. Save. This is the employee's gift.

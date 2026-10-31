@@ -41,6 +41,7 @@ import OPEN_SECTION from '@salesforce/label/c.Core_SetupAssistant_OpenSectionBut
 import PROGRESS_FORMAT from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupPath } from 'c/setupLinks';
+import { bodyMessage } from 'c/findCsv';
 
 const CREATE_USER_URL = setupPath('users');
 // User access policies are created in Setup, not by a package (ADR-0095), so the step links to the guide.
@@ -128,7 +129,7 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
       this.applyState(await getState(), true);
       this.errorMessage = undefined;
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, LOAD_ERROR);
     }
   }
 
@@ -346,7 +347,7 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
         state: { [link.sectionKey]: section }
       });
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, LOAD_ERROR);
     }
   }
 
@@ -503,11 +504,7 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
         afterwards();
       }
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, LOAD_ERROR);
     }
-  }
-
-  messageFrom(error) {
-    return error && error.body && error.body.message ? error.body.message : LOAD_ERROR;
   }
 }

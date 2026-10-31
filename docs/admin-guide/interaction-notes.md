@@ -22,7 +22,7 @@ Interaction notes work as soon as Core is installed. There is nothing to switch 
 
 **Where the button is.** **Log an Interaction** sits in the action bar at the top of the
 packaged person page and the packaged household and organization page, in the **BarnCRM**
-app and, with Giving installed, the **Fundraising** app, on the desktop and on the phone. If
+app and, with Giving installed, the **BarnCRM Fundraising** app, on the desktop and on the phone. If
 you do not see it, you are probably looking at the record outside those apps, or somebody
 has assigned a different record page in the Lightning App Builder.
 

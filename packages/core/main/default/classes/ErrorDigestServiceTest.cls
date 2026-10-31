@@ -8,6 +8,9 @@
  */
 @IsTest(testFor='ApexClass:ErrorDigestService')
 private class ErrorDigestServiceTest {
+    /** Stands in for the platform, so what the digest composed can be read back. */
+    private static final RecordingEmailSender MAIL = new RecordingEmailSender();
+
     @TestSetup
     static void createTestUser() {
         TestUsers.admin();
@@ -38,6 +41,8 @@ private class ErrorDigestServiceTest {
         record.Error_Digest_Recipients__c = recipients;
         record.Error_Digest_Frequency__c = frequency;
         record.Error_Digest_Covered_Until__c = coveredUntil;
+        // The factory saves the materialized false; the shipped default is on.
+        record.Error_Digest_Include_Admin_Summary__c = true;
         TestDataFactory.saveSettings(record);
     }
 
@@ -67,7 +72,7 @@ private class ErrorDigestServiceTest {
             };
             insert logs;
             Test.setCreatedDate(logs[6].Id, System.now().addDays(-3));
-            ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome outcome;
             System.runAs(admin) {
@@ -78,7 +83,7 @@ private class ErrorDigestServiceTest {
 
             Assert.isTrue(outcome.sent, 'Something was new, so a digest went out.');
             Assert.areEqual(5, outcome.entries, 'Five new: not the resolved one, not last week.');
-            List<Messaging.SingleEmailMessage> sent = ErrorDigestService.capturedMessages;
+            List<Messaging.SingleEmailMessage> sent = MAIL.received;
             Assert.areEqual(1, sent.size(), 'One message, to the one listed user.');
             Assert.areEqual(
                 jen.Id,
@@ -120,7 +125,7 @@ private class ErrorDigestServiceTest {
         System.runAs(TestUsers.admin()) {
             TestDataFactory.defaultSettings();
             User admin = maria();
-            ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome outcome;
             System.runAs(admin) {
@@ -130,7 +135,7 @@ private class ErrorDigestServiceTest {
             }
 
             Assert.isFalse(outcome.sent, 'Nothing new, nothing sent.');
-            Assert.isTrue(ErrorDigestService.capturedMessages.isEmpty(), 'Not a single message.');
+            Assert.isTrue(MAIL.received.isEmpty(), 'Not a single message.');
             BarnCRM_Settings__c after = settings();
             Assert.isNotNull(
                 after.Error_Digest_Covered_Until__c,
@@ -152,7 +157,7 @@ private class ErrorDigestServiceTest {
             User admin = maria();
             setDigest(null, null, null);
             insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
-            ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome first;
             ErrorDigestService.Outcome second;
@@ -177,7 +182,7 @@ private class ErrorDigestServiceTest {
             User admin = maria();
             setDigest(null, ErrorDigestService.FREQUENCY_WEEKLY, System.now().addDays(-2));
             insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
-            ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome early;
             ErrorDigestService.Outcome due;
@@ -214,7 +219,7 @@ private class ErrorDigestServiceTest {
                 System.now().addMinutes(-(24 * 60 - 5))
             );
             insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
-            ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome outcome;
             System.runAs(admin) {
@@ -279,7 +284,7 @@ private class ErrorDigestServiceTest {
             }
             insert logs;
             ErrorDigestService.entryCap = 3;
-            ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome outcome;
             System.runAs(admin) {
@@ -291,7 +296,7 @@ private class ErrorDigestServiceTest {
             Assert.isTrue(outcome.sent, 'More than it can count, and the digest still goes out.');
             Assert.areEqual(3, outcome.entries, 'It counted up to its cap.');
             Assert.isTrue(outcome.summary.contains('3+'), 'And says there were more.');
-            String body = ErrorDigestService.capturedMessages[0].getPlainTextBody();
+            String body = MAIL.received[0].getPlainTextBody();
             Assert.isTrue(body.contains('Household naming: 3'), 'The counts cover what it read.');
             Assert.isTrue(
                 body.contains(Label.Core_ErrorDigest_Capped.substringBefore('{0}')),
@@ -307,7 +312,8 @@ private class ErrorDigestServiceTest {
             TestDataFactory.defaultSettings();
             User admin = maria();
             insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
-            ErrorDigestService.sendFailureForTest = 'email is switched off for this org';
+            MAIL.refuseWith = 'email is switched off for this org';
+            ErrorDigestService.emailSender = MAIL;
 
             ErrorDigestService.Outcome first;
             ErrorDigestService.Outcome second;
@@ -329,6 +335,247 @@ private class ErrorDigestServiceTest {
                 [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'Error digest'],
                 'The same reason twice is one Error Log entry, not one a day.'
             );
+        }
+    }
+
+    // ------------------------------------------------------------ weekly admin summary (C-54)
+
+    private static void failedJob() {
+        insert new Import_Batch__c(
+            Operation__c = BulkUpdateService.OPERATION_UPDATE,
+            Status__c = ImportBatchService.STATUS_FAILED,
+            Is_Dry_Run__c = false
+        );
+    }
+
+    private static void limitAt(Integer used, Integer max) {
+        OrgOptimizerStorageController.limitsOverride = new Map<String, List<Integer>>{
+            'DataStorageMB' => new List<Integer>{ used, max }
+        };
+    }
+
+    private static void setSummary(Boolean include) {
+        BarnCRM_Settings__c record = settings();
+        record.Error_Digest_Include_Admin_Summary__c = include;
+        TestDataFactory.saveSettings(record);
+    }
+
+    private static ErrorDigestService.Outcome sendAs(User admin) {
+        ErrorDigestService.emailSender = MAIL;
+        ErrorDigestService.Outcome outcome;
+        System.runAs(admin) {
+            Test.startTest();
+            outcome = ErrorDigestService.sendNow();
+            Test.stopTest();
+        }
+        return outcome;
+    }
+
+    @IsTest
+    static void aWeeklyDigestWithNoNewErrorsStillSendsWhatNeedsALook() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            User admin = maria();
+            setDigest(null, ErrorDigestService.FREQUENCY_WEEKLY, null);
+            failedJob();
+            limitAt(85, 100);
+            // Under the threshold: not reported.
+            OrgOptimizerStorageController.limitsOverride.put(
+                'FileStorageMB',
+                new List<Integer>{ 79, 100 }
+            );
+
+            ErrorDigestService.Outcome outcome = sendAs(admin);
+
+            Assert.isTrue(outcome.sent, 'A failed job and a full limit are worth an email.');
+            Messaging.SingleEmailMessage message = MAIL.received[0];
+            Assert.areEqual(Label.Core_AdminDigest_Subject, message.getSubject());
+            String body = message.getPlainTextBody();
+            Assert.isTrue(
+                body.contains(Label.Core_AdminDigest_Heading),
+                'The summary has a heading.'
+            );
+            Assert.isTrue(body.contains('Data Storage MB: 85% (85 of 100)'), 'Limit is named.');
+            Assert.isFalse(body.contains('File Storage'), 'A limit under 80% is left out.');
+            Assert.isTrue(
+                body.contains(
+                    String.format(Label.Core_AdminDigest_FailedJobs, new List<Object>{ '1' })
+                ),
+                'The failed job is counted.'
+            );
+            Assert.isTrue(body.contains(Label.Core_ErrorDigest_Footer), 'The footer closes it.');
+        }
+    }
+
+    @IsTest
+    static void aWeeklyDigestWithNothingToReportSendsNothing() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            User admin = maria();
+            setDigest(null, ErrorDigestService.FREQUENCY_WEEKLY, null);
+            limitAt(10, 100);
+
+            ErrorDigestService.Outcome outcome = sendAs(admin);
+
+            Assert.isFalse(outcome.sent, 'Nothing new and nothing to report.');
+            Assert.isTrue(MAIL.received.isEmpty(), 'No message.');
+        }
+    }
+
+    @IsTest
+    static void theSummaryRidesAlongWithErrors() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            User admin = maria();
+            setDigest(null, ErrorDigestService.FREQUENCY_WEEKLY, null);
+            insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
+            failedJob();
+            limitAt(10, 100);
+
+            sendAs(admin);
+            String withSummary = MAIL.received[0].getPlainTextBody();
+            Assert.isTrue(withSummary.contains('Household naming: 1'), 'Errors come first.');
+            Assert.isTrue(withSummary.contains(Label.Core_AdminDigest_Heading), 'Then summary.');
+        }
+    }
+
+    @IsTest
+    static void theSummaryCanBeSwitchedOff() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            User admin = maria();
+            setDigest(null, ErrorDigestService.FREQUENCY_WEEKLY, null);
+            setSummary(false);
+            insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
+            failedJob();
+            limitAt(95, 100);
+            sendAs(admin);
+            String without = MAIL.received[0].getPlainTextBody();
+            Assert.isFalse(without.contains(Label.Core_AdminDigest_Heading), 'Switched off.');
+        }
+    }
+
+    @IsTest
+    static void aSummaryThatFailsIsLoggedAndTheDigestStillGoes() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            User admin = maria();
+            setDigest(null, ErrorDigestService.FREQUENCY_WEEKLY, null);
+            insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
+            AdminDigestSummary.failForTest = true;
+
+            ErrorDigestService.Outcome outcome = sendAs(admin);
+
+            Assert.isTrue(outcome.sent, 'The errors still go out.');
+            String body = MAIL.received[0].getPlainTextBody();
+            Assert.isTrue(body.contains('Household naming: 1'), 'With the errors.');
+            Assert.isFalse(body.contains(Label.Core_AdminDigest_Heading), 'Without the summary.');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'AdminDigestSummary.build'],
+                'The summary failure is in the Error Log.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aDailyDigestNeverCarriesTheSummary() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            User admin = maria();
+            setDigest(null, ErrorDigestService.FREQUENCY_DAILY, null);
+            insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
+            failedJob();
+            limitAt(95, 100);
+
+            sendAs(admin);
+
+            String body = MAIL.received[0].getPlainTextBody();
+            Assert.isFalse(body.contains(Label.Core_AdminDigest_Heading), 'Weekly only.');
+        }
+    }
+
+    @IsTest
+    static void aQuietOrgHasNothingToReportAndACappedCountSaysSo() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            Datetime now = System.now();
+            AdminDigestSummary.Summary summary;
+            User reviewer = TestDataFactory.createUser(
+                'Dana',
+                new List<String>{ 'BarnCRM_Admin', 'BarnCRM_Duplicate_Review' }
+            );
+            System.runAs(reviewer) {
+                limitAt(10, 100);
+                summary = AdminDigestSummary.build(now.addDays(-7), now);
+            }
+            Assert.isFalse(summary.hasContent(), 'A quiet org has nothing to report.');
+            Assert.areEqual(0, AdminDigestSummary.lines(summary, 'https://x').size());
+            summary.duplicatesWaiting = 2;
+            summary.duplicatesCapped = true;
+            String joined = String.join(AdminDigestSummary.lines(summary, 'https://x'), '\n');
+            Assert.isTrue(joined.contains('2+'), 'A capped count says "2+".');
+        }
+    }
+
+    private static Setup_Change__c setupChange(String auditId, Datetime changedAt) {
+        return new Setup_Change__c(
+            Audit_Trail_Id__c = auditId,
+            Changed_At__c = changedAt,
+            Section__c = 'Customize Contacts',
+            Action__c = 'changedFieldLabel',
+            Display__c = 'Changed Phone field label'
+        );
+    }
+
+    @IsTest
+    static void setupChangesSinceTheLastSendAreCounted() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            Datetime now = System.now();
+            Setup_Change__c keptEarlier = setupChange('0Ym000000000003AAA', now.addDays(-9));
+            insert new List<Setup_Change__c>{
+                setupChange('0Ym000000000001AAA', now.addDays(-1)),
+                // Changed a month ago but kept only now (a late copy): counted once, now.
+                setupChange('0Ym000000000002AAA', now.addDays(-30)),
+                // Kept before the window: sent in an earlier digest.
+                keptEarlier
+            };
+            Test.setCreatedDate(keptEarlier.Id, now.addDays(-9));
+            User admin = maria();
+            AdminDigestSummary.Summary summary;
+            System.runAs(admin) {
+                limitAt(10, 100);
+                summary = AdminDigestSummary.build(now.addDays(-7), now);
+            }
+            Assert.areEqual(
+                2,
+                summary.setupChanges,
+                'R-SU7: changes kept inside the window count.'
+            );
+            Assert.isTrue(summary.hasContent(), 'Setup changes alone are worth an email.');
+            String joined = String.join(AdminDigestSummary.lines(summary, 'https://x'), '\n');
+            Assert.isTrue(
+                joined.contains(
+                    String.format(Label.Core_AdminDigest_SetupChanges, new List<Object>{ '2' })
+                ),
+                'The count is in the summary.'
+            );
+        }
+    }
+
+    @IsTest
+    static void setupChangesAreNotCountedForSomeoneWhoCannotReadThem() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            Datetime now = System.now();
+            insert setupChange('0Ym000000000004AAA', now.addDays(-1));
+            User staff = TestDataFactory.createUser('Sam', new List<String>{ 'BarnCRM_Staff' });
+            Integer counted;
+            System.runAs(staff) {
+                counted = AdminDigestSummary.setupChangeCount(now.addDays(-7), now);
+            }
+            Assert.areEqual(0, counted, 'No access, no count, and no error.');
         }
     }
 

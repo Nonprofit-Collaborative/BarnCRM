@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail; {0} lists each field and its two rollups</shortDescription>
-        <value>An active BarnCRM rollup and an active DLRS rollup both fill these fields, so each overwrites the other: {0}. Switch one of each pair off: the DLRS rollup in DLRS, or the BarnCRM rollup in the Rollup Builder.</value>
+        <value>An active BarnCRM rollup and an active DLRS rollup both fill these fields, so each overwrites the other: {0}. Switch one of each pair off, either the DLRS rollup in DLRS or the BarnCRM rollup in Rollup Builder.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_TwoToolsPair</fullName>

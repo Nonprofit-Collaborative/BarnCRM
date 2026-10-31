@@ -22,6 +22,10 @@
     <apexClass>VolunteerShiftSignupsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>VolunteerSuggestionController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Account.Availability_Days__c</field>
@@ -295,6 +299,11 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Volunteer_Signup__c.Notes__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Volunteer_Signup__c.Reminder_Sent_On__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

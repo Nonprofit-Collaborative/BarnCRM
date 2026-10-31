@@ -1,0 +1,67 @@
+<template>
+    <div class="slds-is-relative slds-var-m-top_medium" data-id="modify-all-view">
+        <p data-id="intro">{labels.intro}</p>
+
+        <template lwc:if={errorMessage}>
+            <p class="slds-text-color_error slds-var-m-vertical_small" data-id="error" role="alert">
+                {errorMessage}
+            </p>
+        </template>
+        <template lwc:if={noticeMessage}>
+            <p class="slds-var-m-vertical_small" data-id="notice" role="status" aria-live="polite">
+                {noticeMessage}
+            </p>
+        </template>
+        <template lwc:if={loading}>
+            <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </template>
+
+        <template lwc:if={report}>
+            <template lwc:if={truncatedMessage}>
+                <p class="slds-var-m-top_small" data-id="truncated">{truncatedMessage}</p>
+            </template>
+
+            <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.dataHeading}</h3>
+            <template lwc:if={hasData}>
+                <lightning-datatable
+                    data-id="data"
+                    key-field="key"
+                    data={dataTable.rows}
+                    columns={dataTable.columns}
+                    hide-checkbox-column
+                    wrap-text-max-lines="3"
+                ></lightning-datatable>
+                <lightning-button
+                    class="slds-var-m-top_x-small"
+                    label={labels.download}
+                    data-table="data"
+                    onclick={handleDownload}
+                ></lightning-button>
+            </template>
+            <template lwc:else>
+                <p data-id="data-empty">{labels.nothingToShow}</p>
+            </template>
+
+            <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.objectsHeading}</h3>
+            <template lwc:if={hasObjects}>
+                <lightning-datatable
+                    data-id="objects"
+                    key-field="key"
+                    data={objectTable.rows}
+                    columns={objectTable.columns}
+                    hide-checkbox-column
+                    wrap-text-max-lines="3"
+                ></lightning-datatable>
+                <lightning-button
+                    class="slds-var-m-top_x-small"
+                    label={labels.download}
+                    data-table="objects"
+                    onclick={handleDownload}
+                ></lightning-button>
+            </template>
+            <template lwc:else>
+                <p data-id="objects-empty">{labels.nothingToShow}</p>
+            </template>
+        </template>
+    </div>
+</template>

@@ -15,6 +15,7 @@ import VIEW_ALL from '@salesforce/label/c.Core_ErrorLogTile_ViewAll';
 import OPEN_ENTRY from '@salesforce/label/c.Core_ErrorLogTile_OpenEntry';
 import READ_ONLY from '@salesforce/label/c.Core_ErrorLogTile_ReadOnly';
 import ACTION_FAILED from '@salesforce/label/c.Core_ErrorLog_ActionFailed';
+import { bodyMessage } from 'c/findCsv';
 
 const ROW_COUNT = 5;
 
@@ -43,7 +44,7 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
       this.tile = result.data;
       this.errorMessage = undefined;
     } else if (result.error) {
-      this.errorMessage = this.messageFrom(result.error);
+      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
     }
   }
 
@@ -93,7 +94,7 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
         this.tile = tile;
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
       })
       .finally(() => {
         this.busy = false;
@@ -129,12 +130,5 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
         filterName: 'New_Errors'
       }
     });
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return ACTION_FAILED;
   }
 }

@@ -124,10 +124,10 @@ public with sharing class GiftBatchController {
         try {
             return view(batchId);
         } catch (GiftBatchException e) {
-            throw asAuraException(e.getMessage());
+            throw UserErrors.message(e.getMessage());
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.getBatch', batchId);
-            throw asAuraException(Label.Giving_GiftBatch_ErrorLoadBatch);
+            throw UserErrors.message(Label.Giving_GiftBatch_ErrorLoadBatch);
         }
     }
 
@@ -154,13 +154,13 @@ public with sharing class GiftBatchController {
             deleteLines(removedLineIds, existing);
             return view(batchId);
         } catch (GiftBatchException e) {
-            throw asAuraException(e.getMessage());
+            throw UserErrors.message(e.getMessage());
         } catch (DmlException e) {
             ErrorLogger.log(e, CONTEXT + '.saveLines', batchId);
-            throw asAuraException(e.getDmlMessage(0));
+            throw UserErrors.message(e.getDmlMessage(0));
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.saveLines', batchId);
-            throw asAuraException(Label.Giving_GiftBatch_ErrorSaveRows);
+            throw UserErrors.message(Label.Giving_GiftBatch_ErrorSaveRows);
         }
     }
 
@@ -190,10 +190,10 @@ public with sharing class GiftBatchController {
             }
             return GiftEntryPayments.forRequests(requests).values();
         } catch (GiftBatchException e) {
-            throw asAuraException(e.getMessage());
+            throw UserErrors.message(e.getMessage());
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.getPaymentChoices', batchId);
-            throw asAuraException(Label.Giving_GiftEntryPays_ErrorLoad);
+            throw UserErrors.message(Label.Giving_GiftEntryPays_ErrorLoad);
         }
     }
 
@@ -321,12 +321,6 @@ public with sharing class GiftBatchController {
         } catch (System.StringException e) {
             return null;
         }
-    }
-
-    private static AuraHandledException asAuraException(String message) {
-        AuraHandledException e = new AuraHandledException(message);
-        e.setMessage(message);
-        return e;
     }
 
     /** A refusal the person can act on, shown as it is rather than logged. */

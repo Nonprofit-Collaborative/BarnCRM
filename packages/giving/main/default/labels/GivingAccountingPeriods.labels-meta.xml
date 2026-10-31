@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Accounting periods page intro</shortDescription>
-        <value>Close the books through a date when a month is finished. No gift in the books dated on or before it can be added, changed in its date, amount, donor, payment method, reference or funds, or deleted. Refunds and write-offs are dated today, so they still work.</value>
+        <value>Close the books through a date when a month is finished. No gift dated on or before it can be added, or have its date, amount, donor, payment method, reference or funds changed, or be deleted. Refunds and write-offs are dated today, so they still work.</value>
     </labels>
     <labels>
         <fullName>Giving_Periods_ClosedThroughHeading</fullName>

@@ -75,6 +75,10 @@
                     <template lwc:if={step.isToday}>
                         <lightning-input type="checkbox" label={labels.whenBlankLabel} data-key={step.key} data-name="whenBlank" checked={step.whenBlank} onchange={handleInput}></lightning-input>
                     </template>
+                    <template lwc:if={step.isDigits}>
+                        <lightning-input type="text" label={labels.patternLabel} data-key={step.key} data-name="pattern" data-id="pattern" value={step.pattern} maxlength="30" onchange={handleInput}></lightning-input>
+                        <lightning-input type="text" label={labels.countryLabel} data-key={step.key} data-name="country" data-id="country" value={step.country} maxlength="3" onchange={handleInput}></lightning-input>
+                    </template>
                 </div>
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-12 slds-align-bottom">
                     <lightning-button-icon
@@ -97,7 +101,7 @@
         <template lwc:if={hasSamples}>
             <h4 class="slds-text-title slds-var-m-top_small">{labels.previewHeading}</h4>
             <table
-                class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_cell-buffer slds-var-m-top_xx-small"
+                class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_cell-buffer slds-max-medium-table_stacked slds-var-m-top_xx-small"
                 aria-label={labels.previewHeading}
             >
                 <thead>
@@ -110,9 +114,9 @@
                 <tbody>
                     <template for:each={samples} for:item="sample">
                         <tr key={sample.key} data-id="sample">
-                            <td class="slds-cell-wrap">{sample.rowNumber}</td>
-                            <td class="slds-cell-wrap">{sample.before}</td>
-                            <td class="slds-cell-wrap">{sample.after}</td>
+                            <td class="slds-cell-wrap" data-label={labels.rowNumberHeader}>{sample.rowNumber}</td>
+                            <td class="slds-cell-wrap" data-label={labels.beforeHeader}>{sample.before}</td>
+                            <td class="slds-cell-wrap" data-label={labels.afterHeader}>{sample.after}</td>
                         </tr>
                     </template>
                 </tbody>

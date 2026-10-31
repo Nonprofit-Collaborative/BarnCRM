@@ -1,5 +1,7 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
+import { CurrentPageReference } from 'lightning/navigation';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
+import getOpenLink from '@salesforce/apex/AccessExplorerController.getOpenLink';
 import canFind from '@salesforce/customPermission/Find_And_Export_Records';
 import getErrorTile from '@salesforce/apex/ErrorLogController.getTile';
 import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
@@ -17,6 +19,10 @@ import FIELD_UTILIZATION from '@salesforce/label/c.Core_OrgOptimizer_FieldUtiliz
 import FIELD_UTILIZATION_TEXT from '@salesforce/label/c.Core_OrgOptimizer_FieldUtilizationText';
 import DATA_DICTIONARY from '@salesforce/label/c.Core_OrgOptimizer_DataDictionary';
 import DATA_DICTIONARY_TEXT from '@salesforce/label/c.Core_OrgOptimizer_DataDictionaryText';
+import ACCESS_EXPLORER from '@salesforce/label/c.Core_OrgOptimizer_AccessExplorer';
+import ACCESS_EXPLORER_TEXT from '@salesforce/label/c.Core_OrgOptimizer_AccessExplorerText';
+import AI_EXPORT from '@salesforce/label/c.Core_OrgOptimizer_AiExport';
+import AI_EXPORT_TEXT from '@salesforce/label/c.Core_OrgOptimizer_AiExportText';
 import HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_HealthCheck';
 import HEALTH_CHECK_TEXT from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckText';
 import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
@@ -25,6 +31,8 @@ import STORAGE from '@salesforce/label/c.Core_OrgOptimizer_Storage';
 import STORAGE_TEXT from '@salesforce/label/c.Core_OrgOptimizer_StorageText';
 import SETUP from '@salesforce/label/c.Core_OrgOptimizer_Setup';
 import SETUP_TEXT from '@salesforce/label/c.Core_OrgOptimizer_SetupText';
+import SETUP_CHANGES from '@salesforce/label/c.Core_OrgOptimizer_SetupChanges';
+import SETUP_CHANGES_TEXT from '@salesforce/label/c.Core_OrgOptimizer_SetupChangesText';
 import RUN_HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_RunHealthCheck';
 import HEALTH_CHECK_INTRO from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckIntro';
 import HEALTH_CHECK_NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckNotRunHeading';
@@ -48,8 +56,10 @@ function badge(label, variant) {
  * The Org Optimizer page (ADR-0103 org-optimizer-and-data-manager-pages, admin guide
  * org-optimizer.md), on the UX kit (D-140): a page shell, an Overview of tool tiles, and one
  * vertical tab per section. A section's component is created only when its tab is first opened,
- * and Health Check only on Run Health Check, so opening the page runs no check (core review
- * ADMIN-7). Tile badges show only what is already known: the unread error count and the last
+ * and Health Check never runs on open, so opening the page runs no check (core review ADMIN-7).
+ * The Health Check section shows the same stored last run the tile badges (date, counts and
+ * Run now), or Not Run Yet with Run Health Check when there is none, so the tile and the
+ * section always agree (owner QA, 2026-10-31). Tile badges show only what is already known: the unread error count and the last
  * Health Check run (two small reads, administrators only), and the Data Quality and Storage
  * results once those sections have reported them. Data Quality needs Find and Export Records;
  * the other sections need Manage BarnCRM Settings. Each embedded component keeps its own server
@@ -64,10 +74,13 @@ export default class OrgOptimizer extends LightningElement {
     quality: QUALITY,
     fieldUtilization: FIELD_UTILIZATION,
     dataDictionary: DATA_DICTIONARY,
+    accessExplorer: ACCESS_EXPLORER,
+    aiExport: AI_EXPORT,
     healthCheck: HEALTH_CHECK,
     errors: ERRORS,
     storage: STORAGE,
     setup: SETUP,
+    setupChanges: SETUP_CHANGES,
     runHealthCheck: RUN_HEALTH_CHECK,
     healthCheckIntro: HEALTH_CHECK_INTRO,
     healthCheckNotRun: HEALTH_CHECK_NOT_RUN
@@ -78,6 +91,8 @@ export default class OrgOptimizer extends LightningElement {
   /** The sections opened so far; a section stays loaded once opened. */
   opened = {};
   healthCheckRequested = false;
+  /** The stored last Health Check run (getLastRun), once read. */
+  lastRun;
   /** Tile badges by section name, each { badgeLabel, badgeVariant }. */
   badges = {};
 
@@ -110,11 +125,14 @@ export default class OrgOptimizer extends LightningElement {
       dataTiles.push(
         this.tile('dataDictionary', DATA_DICTIONARY, DATA_DICTIONARY_TEXT, 'standard:article')
       );
+      dataTiles.push(this.tile('aiExport', AI_EXPORT, AI_EXPORT_TEXT, 'standard:data_mapping'));
       setupTiles.push(
         this.tile('healthCheck', HEALTH_CHECK, HEALTH_CHECK_TEXT, 'standard:approval'),
         this.tile('errors', ERRORS, ERRORS_TEXT, 'standard:incident'),
         this.tile('storage', STORAGE, STORAGE_TEXT, 'standard:data_model'),
-        this.tile('setup', SETUP, SETUP_TEXT, 'standard:settings')
+        this.tile('setup', SETUP, SETUP_TEXT, 'standard:settings'),
+        this.tile('setupChanges', SETUP_CHANGES, SETUP_CHANGES_TEXT, 'standard:timeslot'),
+        this.tile('accessExplorer', ACCESS_EXPLORER, ACCESS_EXPLORER_TEXT, 'standard:user_role')
       );
     }
     return [
@@ -150,7 +168,8 @@ export default class OrgOptimizer extends LightningElement {
   async readHealthCheckBadge() {
     try {
       // One badge rule, shared with the Health Check summary on BarnCRM Home.
-      this.setBadge('healthCheck', healthCheckBadge(await getLastRun()));
+      this.lastRun = await getLastRun();
+      this.setBadge('healthCheck', healthCheckBadge(this.lastRun));
     } catch {
       // As above: the Health Check section itself reports a failure to read.
     }
@@ -192,6 +211,10 @@ export default class OrgOptimizer extends LightningElement {
     return Boolean(this.opened.dataDictionary);
   }
 
+  get aiExportOpened() {
+    return Boolean(this.opened.aiExport);
+  }
+
   get errorsOpened() {
     return Boolean(this.opened.errors);
   }
@@ -204,8 +227,60 @@ export default class OrgOptimizer extends LightningElement {
     return Boolean(this.opened.setup);
   }
 
+  get setupChangesOpened() {
+    return Boolean(this.opened.setupChanges);
+  }
+
+  get accessExplorerOpened() {
+    return Boolean(this.opened.accessExplorer);
+  }
+
+  /** The page state, and the key that names a section to open (the Access page's button). */
+  pageState;
+  sectionLink;
+
+  @wire(CurrentPageReference)
+  wiredPage(pageReference) {
+    this.pageState = pageReference && pageReference.state;
+    this.openRequestedSection();
+  }
+
+  @wire(getOpenLink)
+  wiredOpenLink({ data }) {
+    // Refused without Manage BarnCRM Settings: then there is no section to open, and no error.
+    if (data) {
+      this.sectionLink = data;
+      this.openRequestedSection();
+    }
+  }
+
+  /** Opens Access Explorer when the page was opened for it, for administrators only. */
+  openRequestedSection() {
+    const link = this.sectionLink;
+    if (
+      canManageSettings &&
+      link &&
+      this.pageState &&
+      this.pageState[link.stateKey] === link.section
+    ) {
+      if (this.activeSection !== link.section) {
+        this.openSection(link.section);
+      }
+    }
+  }
+
+  get hasLastRun() {
+    return Boolean(this.lastRun && this.lastRun.ranAt);
+  }
+
+  /** The panel shows once asked to run, or straight away when a stored run is there to show. */
   get showHealthCheck() {
-    return Boolean(this.opened.healthCheck) && this.healthCheckRequested;
+    return Boolean(this.opened.healthCheck) && (this.healthCheckRequested || this.hasLastRun);
+  }
+
+  /** Until Run Health Check is pressed here, the panel shows the stored run, not a new one. */
+  get healthCheckLastResultFirst() {
+    return !this.healthCheckRequested;
   }
 
   handleActive(event) {
@@ -221,8 +296,9 @@ export default class OrgOptimizer extends LightningElement {
     if (!this.opened[name]) {
       this.opened = { ...this.opened, [name]: true };
     }
-    // Back on the Overview after a run, the Health Check tile shows that run.
-    if (name === OVERVIEW_TAB && canManageSettings && this.healthCheckRequested) {
+    // Back on the Overview after a run (Run Health Check, or Run now in the panel), the Health
+    // Check tile shows that run.
+    if (name === OVERVIEW_TAB && canManageSettings && this.opened.healthCheck) {
       this.readHealthCheckBadge();
     }
   }

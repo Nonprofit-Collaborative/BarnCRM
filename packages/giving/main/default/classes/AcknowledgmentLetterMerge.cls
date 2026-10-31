@@ -89,7 +89,7 @@ public with sharing class AcknowledgmentLetterMerge {
      * starting with = runs when the merge file is opened (2026-10-28 security review, G-L1).
      */
     @TestVisible
-    private static String escape(String value) {
+    public static String escape(String value) {
         if (String.isBlank(value)) {
             return '';
         }

@@ -40,6 +40,7 @@ import TEST_HEADING from '@salesforce/label/c.Core_RollupBuilder_InstantTestHead
 import TURNED_OFF from '@salesforce/label/c.Core_RollupBuilder_InstantTurnedOff';
 import TURNED_ON from '@salesforce/label/c.Core_RollupBuilder_InstantTurnedOn';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
+import { bodyMessage, format } from 'c/findCsv';
 
 /** The states `RollupInstantTotals` reports (ADR-0138). */
 const STATUS_TEXT = {
@@ -53,10 +54,6 @@ const STATUS_TEXT = {
 
 const SETUP = 'setup';
 const REMOVAL = 'removal';
-
-function format(label, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), label);
-}
 
 /**
  * Instant totals on objects BarnCRM ships no trigger for (canonical model R-R12, ADR-0138).
@@ -136,7 +133,7 @@ export default class RollupInstantTotals extends LightningElement {
         this.states = (states || []).filter((state) => Boolean(state));
       })
       .catch((error) => {
-        this.error = this.messageFrom(error);
+        this.error = bodyMessage(error, UNEXPECTED_ERROR);
       });
   }
 
@@ -215,7 +212,7 @@ export default class RollupInstantTotals extends LightningElement {
         this.panel = panel;
       })
       .catch((error) => {
-        this.error = this.messageFrom(error);
+        this.error = bodyMessage(error, UNEXPECTED_ERROR);
       })
       .finally(() => {
         this.busy = false;
@@ -240,7 +237,7 @@ export default class RollupInstantTotals extends LightningElement {
         this.notice = format(turnedOn ? TURNED_ON : TURNED_OFF, state.objectLabel);
       })
       .catch((error) => {
-        this.error = this.messageFrom(error);
+        this.error = bodyMessage(error, UNEXPECTED_ERROR);
       })
       .finally(() => {
         this.busy = false;
@@ -331,9 +328,5 @@ export default class RollupInstantTotals extends LightningElement {
       `sf project deploy start --metadata-dir ${this.removalFileName} --single-package ` +
       '--test-level RunLocalTests --target-org your-org'
     );
-  }
-
-  messageFrom(error) {
-    return error && error.body && error.body.message ? error.body.message : UNEXPECTED_ERROR;
   }
 }

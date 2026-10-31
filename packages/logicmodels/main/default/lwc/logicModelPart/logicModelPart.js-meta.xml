@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>The selected part of a logic model in the Logic Model Builder: its details, its place in its column, and its arrows and assumptions.</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

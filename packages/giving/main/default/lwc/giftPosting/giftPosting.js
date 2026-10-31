@@ -12,6 +12,7 @@ import UNPOST_BUTTON from '@salesforce/label/c.Giving_PostingCard_UnpostButton';
 import UNPOSTED from '@salesforce/label/c.Giving_PostingCard_Unposted';
 import REASON_REQUIRED from '@salesforce/label/c.Giving_Posting_ReasonRequired';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Periods_UnexpectedError';
+import { bodyMessage } from 'c/findCsv';
 
 /**
  * The Posting card on a gift's page (G-20, ADR-0053).
@@ -47,7 +48,7 @@ export default class GiftPosting extends LightningElement {
     try {
       this.state = await getState({ giftId: this.recordId });
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
     }
   }
 
@@ -96,14 +97,9 @@ export default class GiftPosting extends LightningElement {
       this.reason = '';
       this.noticeMessage = UNPOSTED;
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
     } finally {
       this.busy = false;
     }
-  }
-
-  messageFrom(error) {
-    const body = error && error.body;
-    return (body && body.message) || UNEXPECTED_ERROR;
   }
 }

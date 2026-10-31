@@ -1663,5 +1663,27 @@ describe('c-settings-console', () => {
       ]);
       expect(items.every((item) => item.iconName)).toBe(true);
     });
+
+    // Owner QA 2026-10-31: Standard Edition uses the Rollup Builder without Giving.
+    it('lists Rollups under Data, not Fundraising, with or without Giving', async () => {
+      getConsoleModel.mockResolvedValue({
+        canEdit: true,
+        sections: ['Rollups', 'Import', 'Error Log'].map((name) => ({ name, settings: [] }))
+      });
+      const element = build();
+      await settle();
+
+      const groups = Array.from(
+        element.shadowRoot.querySelectorAll('lightning-vertical-navigation-section')
+      );
+      expect(groups.map((section) => section.label)).toEqual([
+        'c.Core_Settings_NavGroup_Data',
+        'c.Core_Settings_NavGroup_System'
+      ]);
+      const dataItems = Array.from(
+        groups[0].querySelectorAll('lightning-vertical-navigation-item-icon')
+      ).map((item) => item.name);
+      expect(dataItems).toEqual(['Import', 'Rollups']);
+    });
   });
 });

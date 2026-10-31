@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Stage__c</fullName>
+  <description>
+    Where the ask stands, one of the stages in the Ask Stages setting. Text rather than a picklist
+    so the list is an org-wide setting in BarnCRM Settings (canonical model R-SO2).
+  </description>
+  <externalId>false</externalId>
+  <inlineHelpText>
+    Where this ask stands. Your stages are set in BarnCRM Settings, Giving, Ask Stages. Leave it
+    empty to start at the first stage.
+  </inlineHelpText>
+  <label>Stage</label>
+  <length>80</length>
+  <required>false</required>
+  <trackHistory>true</trackHistory>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

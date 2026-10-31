@@ -15,8 +15,8 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | From the App Launcher, open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab. | The page name **BarnCRM Settings** shows once, in the page header, with the line "Choose how BarnCRM works for your whole organization." under it. A **Search settings** box and the section list are on the left; the first section shows on the right. No read-only notice is shown. |
-| 2 | Read the section list. | Sections sit under group headings, each with an icon: **Organization** (**General**, **Organization**), **People** (**People and Households**, **Addresses**), **Data** (**Import**, **Duplicate Matching**, **Org Optimizer**), **Fundraising** (**Giving** and **Receipts** with Giving installed, **Rollups** with Rollup Builder installed), **Programs** (**Volunteers** with Volunteers installed) and **System** (**Modules**, **Access**, **Automation**, **Integrations**, **Health**, **Error Log**). **Error Log** is the last item. A Core-only org has no Fundraising or Programs group. |
-| 3 | Click **General**. | **Edition**, **Features**, **Sample Data**, **Custom Metadata** and the setting rows show. No description is printed under a row: each row has an info icon, and clicking it shows the plain description. A **Needs a Change in Setup** note at the top shows one line, an **Open in Setup** button and **Show Steps** (T-SET-20). No note asks you to match a fiscal year: **Fiscal year start month** is a read-only row (T-SET-15). In **Features**, no description says "tab" or "Data Hygiene". |
+| 2 | Read the section list. | Sections sit under group headings, each with an icon: **Organization** (**General**, **Organization**), **People** (**People and Households**, **Addresses**), **Data** (**Import**, **Duplicate Matching**, **Rollups** with Rollup Builder installed, **Org Optimizer**), **Fundraising** (**Giving** and **Receipts** with Giving installed), **Programs** (**Volunteers** with Volunteers installed) and **System** (**Modules**, **Access**, **Automation**, **Integrations**, **Health**, **Error Log**). **Error Log** is the last item. A Core-only org has no Fundraising or Programs group. |
+| 3 | Click **General**. | **Edition**, **Features**, **Sample Data**, **Custom Metadata** and the setting rows show. No description is printed under a row: each row has an info icon, and clicking it shows the plain description. Unless a Custom Metadata save has already worked here, a **Needs a Change in Setup** note at the top shows one line, an **Open in Setup** button and **Show Steps** (T-SET-20). No note asks you to match a fiscal year: **Fiscal year start month** is a read-only row (T-SET-15). In **Features**, no description says "tab" or "Data Hygiene". |
 | 4 | Click **Learn More** beside the info icon of any setting. | **Learn More** stands apart from any text, with a new-window icon. A new browser tab opens the matching admin-guide page on GitHub. The console tab is unchanged. |
 | 5 | Scroll to the bottom of the page. | A **Recent Changes** heading with a table (columns **Setting**, **Old Value**, **New Value**, **Changed By**, **Changed At**), or "No settings have been changed yet. Every change you make is listed here." |
 | 6 | In a console app, look at the workspace tab label. | The tab reads **BarnCRM Settings: General** (the open section). |
@@ -88,7 +88,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 4 | Confirm with **Give Permission**. | "Staff Tester now has the BarnCRM Bulk Delete permission." The name appears on the **BarnCRM Bulk Delete** card. |
 | 5 | Click **Remove** beside the name on that card and confirm. | "Staff Tester no longer has the BarnCRM Bulk Delete permission." The card reads "No one has been given this permission here." Staff Tester's role is unchanged. |
 | 6 | On the **BarnCRM Admin Group** card, click **Remove** beside your own name. | The dialog adds "You are about to remove your own BarnCRM Admin role. You will lose access to BarnCRM Settings." |
-| 7 | Click **Remove**. | A **That did not work** toast: "You cannot remove the last person from the BarnCRM Admin role. Give the role to someone else first." Your name stays on the card. |
+| 7 | Click **Remove**. | A **That Did Not Work** toast: "You cannot remove the last person from the BarnCRM Admin role. Give the role to someone else first." Your name stays on the card. |
 
 **Cleanup:** None.
 
@@ -127,7 +127,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 3 | Choose **1 hour** and click **Pause All Automation**. | A yellow box: "Automation is paused until" a date and time one hour from now, then "Paused by" your name and "It turns itself back on then." Every switch stays where it was. |
 | 4 | Open the **Home** tab. | Under **Welcome to BarnCRM**: "BarnCRM automation is paused. Households and greetings are not being updated until it resumes." in a yellow warning box with a **Resume Automation** link. Click the link: **BarnCRM Settings** opens on **Automation**. |
 | 5 | Back in **Automation**, click **Resume Automation**. | The yellow box disappears. On **Home** the banner is gone after a reload. |
-| 6 | Switch off **Keep both sides of relationships in step**. Reload the page. | The switch is still off. |
+| 6 | Switch off **Keep Both Sides of Relationships in Step**. Reload the page. | The switch is still off. |
 | 7 | Switch it back on, open **General** and scroll to **Recent Changes**. | Rows for **Automation Paused Until** record the pause and the resume, and rows record both switch changes, each with your name. |
 
 **Cleanup:** leave every switch on and automation not paused.
@@ -220,10 +220,10 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As read-only, open **BarnCRM Settings**, **General**. | A notice: "You can read these settings but not change them. Ask your administrator for the Manage BarnCRM Settings permission." Every control is greyed out and no save bar appears. **Edition** shows with no **Change Edition** link. **Features** shows **On** and no **Turn On** buttons. |
+| 1 | As read-only, open **BarnCRM Settings**, **General**. | A notice: "You can read these settings but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." Every control is greyed out and no save bar appears. **Edition** shows with no **Change Edition** link. **Features** shows **On** and no **Turn On** buttons. |
 | 2 | Open **Access**. | "You can see this page but you cannot change roles. Ask someone with the BarnCRM Admin role to make the change, or to give you that role." No **Find a person**, **Role**, **Give Access** or **Remove**. Role cards list holders, or say "You can see this page but you cannot see who holds each role." |
-| 3 | Open **Modules**. | "You can see the modules but not change them. Ask an administrator for the Manage BarnCRM Settings permission." No **Turn Off**, **Turn On** or **What an Uninstall Deletes**. **Show Nonprofit Modules** is greyed out. |
-| 4 | Open **Automation**. | "You can read this page but not change it. Ask your administrator for the Manage BarnCRM Settings permission." **Pause All Automation**, **Resume Automation**, **How long** and every switch are disabled. |
+| 3 | Open **Modules**. | "You can see the modules but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." No **Turn Off**, **Turn On** or **What an Uninstall Deletes**. **Show Nonprofit Modules** is greyed out. |
+| 4 | Open **Automation**. | "You can read this page but not change it. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." **Pause All Automation**, **Resume Automation**, **How long** and every switch are disabled. |
 | 5 | Open **General** and look for **Custom Metadata**. | It is not shown (it needs BarnCRM Metadata Admin). |
 | 6 | Repeat step 1 as staff. | The same read-only notice and greyed-out controls. |
 
@@ -289,20 +289,20 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-17: People and Households, and Boxes on Every Page
 
 **Purpose:** confirm Households and Relationships are one **People and Households** section, every section groups its settings into headed boxes, and links to the old sections land in the right box.
-**Prerequisites:** admin user. The **Household Upkeep** and **Relationships** features on, and **Tell people when their long jobs finish** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update All Household Names** in step 4.
+**Prerequisites:** admin user. The **Household Upkeep** and **Relationships** features on, and **Send Long Job Notifications** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update All Household Names** in step 4.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings** and read the **Sections** list. | **People and Households** is the first item under **People**, right after **Organization**, then **Addresses**. There is no **Households** and no **Relationships** section. |
-| 2 | Click **People and Households**. | Four bordered boxes, in order, each with a Title Case heading: **People** (**How people belong to a household**, **Create a household automatically**), **Households** (**Delete a household once it is empty**, **Keep the households of deleted people**), **Household Names and Greetings** (the **Preview and Recompute** panel, **Include people who have died in names**) and **Relationships** (**Keep both sides of relationships in step**). Every setting shows its value; none is blank. There is no duplicates row and no note about duplicate rules: those are on **Duplicate Matching**. |
-| 3 | Tick **Keep the households of deleted people**, click **Save**, then untick it and save again. | Both saves say the settings were saved. **General**, **Recent Changes** lists both changes. |
+| 2 | Click **People and Households**. | Four bordered boxes, in order, each with a Title Case heading: **People** (**How people belong to a household**, **Create Households Automatically**), **Households** (**Delete Empty Households**, **Keep Households of Deleted People**), **Household Names and Greetings** (the **Preview and Recompute** panel, **Include People Who Have Died in Names**) and **Relationships** (**Keep Both Sides of Relationships in Step**). Every setting shows its value; none is blank. There is no duplicates row and no note about duplicate rules: those are on **Duplicate Matching**. |
+| 3 | Tick **Keep Households of Deleted People**, click **Save**, then untick it and save again. | Both saves say the settings were saved. **General**, **Recent Changes** lists both changes. |
 | 4 | Back on **People and Households**, click **Update All Household Names** and confirm. Wait for the bell, then open its **Household name recompute finished** notification. | The console opens on **People and Households**, scrolled to the **Household Names and Greetings** box, with focus on its heading. |
 | 5 | Open each other section in turn: **General**, **Organization**, **Duplicate Matching**, **Addresses**, **Giving**, **Receipts**, **Rollups**, **Volunteers**, **Error Log**, **Import**, **Modules**, **Automation**, **Access**, **Org Optimizer**, **Integrations**, **Health**. | Every setting is inside a bordered box with a Title Case heading, as listed in the admin guide's "Sections and their boxes". A section with no list, such as **Access**, shows one box headed with its own name. No setting that showed before is missing. |
 | 6 | In the browser address bar, change the end of the console's address to `?c__section=Relationships` and press Enter. | **People and Households** opens, scrolled to the **Relationships** box. |
 | 7 | Do the same with `?c__section=Households`. | **People and Households** opens, scrolled to the **Households** box. |
 | 8 | Open **Setup Assistant** on the Home page, go to **Confirm how households are named** and click **Where This Lives in Settings**. | **People and Households** opens at the **Household Names and Greetings** box. |
 
-**Cleanup:** leave **Keep the households of deleted people** unticked (the default).
+**Cleanup:** leave **Keep Households of Deleted People** unticked (the default).
 
 ## T-SET-18: Keep a Shown Default as a Saved Choice
 
@@ -359,17 +359,19 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-20: Needs a Change in Setup Opens the Right Setup Page
 
 **Purpose:** confirm every **Needs a Change in Setup** note gives one sentence on why, numbered steps, and an **Open in Setup** button that opens the right Setup page in a new tab, and that **Check Again** re-reads a check.
-**Prerequisites:** admin user. Giving and Mirror installed for steps 7 to 10 (skip them on a Core-only org).
+**Prerequisites:** admin user without **BarnCRM Metadata Admin** at the start, in an org where no Custom Metadata entry has been saved yet. Deliverability **Access level** is **All email**. Giving and Mirror installed for steps 7 to 10 (skip them on a Core-only org). A note whose change is already made is not shown at all.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **General**, and click **Open in Setup** on the note. | A new browser tab opens **Apex Settings**. The BarnCRM tab is unchanged. Every note in this test shows one line under **Needs a Change in Setup**, the button, and **Show Steps**, closed; opening **Show Steps** shows one sentence on why and 2 to 4 numbered steps. |
+| 1 | Open **BarnCRM Settings**, **General**, and click **Open in Setup** on the note. | The note shows **Not done yet** with a warning icon and **Check Again**. A new browser tab opens **Apex Settings**. The BarnCRM tab is unchanged. Every note in this test shows one line under **Needs a Change in Setup**, the button, and **Show Steps**, closed; opening **Show Steps** shows one sentence on why and 2 to 4 numbered steps. |
+| 1a | On **Access**, **Extra Permissions**, give yourself **BarnCRM Metadata Admin**. Back on **General**, click **Check Again**. | **Not done yet** is gone; the note says "BarnCRM can't read this Setup switch, so this note stays until a Custom Metadata save works. Already turned it on? Save an entry on the Custom Metadata page, then select Check Again." |
+| 1b | Where BarnCRM is an installed package, turn on **Deploy Metadata from Non-Certified Package Versions via Apex** in the Apex Settings tab and save. Open **Custom Metadata**, add a relationship type and wait until it is saved. Back on **General**, click **Check Again**, then reload the page. | The note is gone, and stays gone after the reload (owner QA, 2026-10-31). |
 | 2 | Click **Duplicate Matching**, then **Open in Setup**. | A new tab opens **Duplicate Rules**. |
 | 3 | Click **Rollups** (Rollup Builder installed), then **Open in Setup**. | A new tab opens **Object Manager**; the first step says to click the object the rollup totals onto. |
-| 4 | Click **Error Log**, then **Open in Setup**. | A new tab opens **Deliverability**. The note shows **Done** or **Not done yet** and a **Check Again** button. |
-| 5 | In the Deliverability tab, set **Access level** to **System email only** and save. Back in BarnCRM, click **Check Again**. | The note changes to **Not done yet** without reloading. Set **Access level** back to **All email**, save, click **Check Again**: **Done**. |
+| 4 | Click **Error Log**. | No email note: the org already sends all email. |
+| 5 | In Setup, **Deliverability**, set **Access level** to **System email only** and save. Back in BarnCRM, reload and click **Error Log**, then **Open in Setup** on the note. | The note shows **Not done yet** and **Check Again**; a new tab opens **Deliverability**. Set **Access level** back to **All email**, save, click **Check Again**: the note goes without reloading. |
 | 6 | Click **Access**, then **Open in Setup** on the note. | A new tab opens **Permission Sets**. |
-| 7 | Open **Giving**, **Acknowledgments**. Click **Open in Setup** on each of the three notes in turn. | The From address note opens **Organization-Wide Addresses**, the email note opens **Deliverability** (with **Check Again**), and the template note opens **Classic Email Templates**. |
+| 7 | Open **Giving**, **Acknowledgments**. Click **Open in Setup** on each note in turn. | The From address note opens **Organization-Wide Addresses** and the template note opens **Classic Email Templates**. There is no email note while the org sends all email; with **System email only** it shows, opens **Deliverability** and has **Check Again**. |
 | 8 | Open **Receipts**, then **Open in Setup** on the note. | A new tab opens **Lightning App Builder** (the Lightning Pages list). There is no note about Giving permission sets. |
 | 9 | Open **Giving**, **Campaign Sync**. Click **Open in Setup** on each of the two notes. | The Campaign access note opens **Permission Sets**; the Marketing User note opens **Users**. |
 | 10 | Open **Giving**, **Opportunity Mirror**, then **Open in Setup**; then open **Accounting Export**. | **Permission Sets** opens. **Accounting Export** shows no **Needs a Change in Setup** note. |

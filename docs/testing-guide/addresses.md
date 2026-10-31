@@ -83,21 +83,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-ADDR-06: Turn on Seasonal Addresses and Run the Seasonal Swap
 
 **Purpose:** turning on Seasonal Addresses schedules the nightly swap with no other step, and the swap runs and swaps a seasonal address in.
-**Prerequisites:** admin, T-ADDR-01 done, **Seasonal Addresses** not ticked and the swap not scheduled.
+**Prerequisites:** admin, T-ADDR-01 done, **Turn On Seasonal Addresses** not ticked and the swap not scheduled.
 **Smoke:** yes
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Addresses**. | **Seasonal Addresses** is not ticked. The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** It has **Run the Swap Now** and no **Schedule Nightly Run** or **Stop Nightly Run** button. |
-| 2 | Tick **Seasonal Addresses** and choose **Save**. Do not refresh the page. | **Your settings are saved.** The section now reads **The swap runs every night at 12:30 AM, in your organization's time zone.** with the next run date below. |
-| 2a | Untick **Seasonal Addresses** and choose **Save**, then tick it and **Save** again. | After the untick the section reads **Seasonal Addresses is off...** with no next run date. After the second save it reads **The swap runs every night...** again, and **Health Check** does not list the swap as unscheduled. |
+| 1 | Open **BarnCRM Settings**, **Addresses**. | **Turn On Seasonal Addresses** is not ticked. The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** It has **Run the Swap Now** and no **Schedule Nightly Run** or **Stop Nightly Run** button. |
+| 2 | Tick **Turn On Seasonal Addresses** and choose **Save**. Do not refresh the page. | **Your settings are saved.** The section now reads **The swap runs every night at 12:30 AM, in your organization's time zone.** with the next run date below. |
+| 2a | Untick **Turn On Seasonal Addresses** and choose **Save**, then tick it and **Save** again. | After the untick the section reads **Seasonal Addresses is off...** with no next run date. After the second save it reads **The swap runs every night...** again, and **Health Check** does not list the swap as unscheduled. |
 | 3 | Edit the Phoenix address so its season runs from yesterday to a date next month. | Saved. |
 | 4 | Select **Run the Swap Now**. | **The swap has started. Refresh this page in a minute to see what it did.** |
 | 5 | Wait a minute and refresh. | **Seasonal Addresses Last Swapped** shows a time a minute ago and **1 moved to a seasonal address, 0 moved back, 0 could not be changed.** |
 | 6 | Open The Garcia Family. | **Primary** is on Phoenix; Billing Address reads Phoenix; the Home address record has **Replaced By Seasonal** ticked. |
 | 7 | Open **Home**. | The **Seasonal Addresses Last Swapped** tile shows the same time and sentence. |
 
-**Cleanup:** keep **Seasonal Addresses** on for T-ADDR-07.
+**Cleanup:** keep **Turn On Seasonal Addresses** on for T-ADDR-07.
 
 ## T-ADDR-07: The Season Ends and the Address Moves Back
 
@@ -109,7 +109,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Set the Phoenix address's end month and day to yesterday and save. | Saved. |
 | 2 | **BarnCRM Settings**, **Addresses**, **Run the Swap Now**, wait a minute, refresh. | **0 moved to a seasonal address, 1 moved back, 0 could not be changed.** |
 | 3 | Open The Garcia Family. | **Primary** is back on the Home address; Billing Address reads Springfield. |
-| 4 | Untick **Seasonal Addresses** and choose **Save**. | The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** |
+| 4 | Untick **Turn On Seasonal Addresses** and choose **Save**. | The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** |
 
 **Cleanup:** delete the Phoenix address.
 
@@ -137,7 +137,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open The Garcia Family. | The **Addresses** card lists the addresses. |
 | 2 | Look at a non-primary address. | It shows no **Set as Primary** button. The **Primary** badge still shows on the primary one. |
 | 3 | Look at the card header. | There is no **Add Address** button. |
-| 4 | Open **BarnCRM Settings**, **Addresses**. | The last run shows; **Seasonal Addresses** and **Run the Swap Now** are disabled, with **You can see when the swap last ran. Running it needs the Manage BarnCRM Settings permission.** |
+| 4 | Open **BarnCRM Settings**, **Addresses**. | The last run shows; **Turn On Seasonal Addresses** and **Run the Swap Now** are disabled, with **You can see when the swap last ran. Running it needs the Manage BarnCRM Settings permission.** |
 
 **Cleanup:** None.
 
@@ -275,7 +275,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-ADDR-18: The Seasonal Swap Is Not a Move
 
 **Purpose:** the seasonal swap moves the primary without ending or starting anything, and a Former seasonal address is not swapped in.
-**Prerequisites:** admin, T-ADDR-01 done, **Seasonal Addresses** on.
+**Prerequisites:** admin, T-ADDR-01 done, **Turn On Seasonal Addresses** on.
 
 | Step | Action | Expected result |
 |---|---|---|

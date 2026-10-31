@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Indicator_Count__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>How many indicators measure this part.</inlineHelpText>
+  <label>Indicator Count</label>
+  <summaryForeignKey>Indicator__c.Element__c</summaryForeignKey>
+  <summaryOperation>count</summaryOperation>
+  <trackTrending>false</trackTrending>
+  <type>Summary</type>
+</CustomField>

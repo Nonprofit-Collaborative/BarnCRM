@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal when the user lacks the Find and Export Records permission.</shortDescription>
-        <value>Find needs the Find and Export Records permission. Ask your administrator to assign you the BarnCRM Find and Export permission set.</value>
+        <value>Find needs the Find and Export Records permission. Ask your BarnCRM admin to assign you the BarnCRM Find and Export permission set.</value>
     </labels>
     <labels>
         <fullName>Core_Find_ErrorNotYours</fullName>
@@ -262,7 +262,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Notice when an export stopped at the limit. {0}: the limit.</shortDescription>
-        <value>Exported {0} rows, the export row limit. Narrow the conditions, or ask an administrator to raise the limit.</value>
+        <value>Exported {0} rows, the export row limit. Narrow the conditions, or ask your BarnCRM admin to raise the limit.</value>
     </labels>
     <labels>
         <fullName>Core_Find_ResultCount</fullName>
@@ -374,7 +374,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading of the dialog that confirms deleting a saved query.</shortDescription>
-        <value>Delete this saved query?</value>
+        <value>Delete This Saved Query?</value>
     </labels>
     <labels>
         <fullName>Core_Find_DeleteConfirmBody</fullName>

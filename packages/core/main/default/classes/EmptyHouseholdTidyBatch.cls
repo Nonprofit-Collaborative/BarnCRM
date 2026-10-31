@@ -9,7 +9,7 @@
  * records a delete of the household would purge (D-88), so while one is there the people could
  * still be restored. Both are read in every membership mode.
  *
- * It is kept for good, and stays on Health Check's and Data Hygiene's lists of households
+ * It is kept for good, and stays on Health Check's and Data Quality's lists of households
  * without members, while a record of any object points at it through a child relationship of
  * Account (read by describe, so Core names no module object), a membership row names a person
  * who still exists, an installed module credits records to it (ADR-0070), or something outside

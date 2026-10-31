@@ -28,6 +28,7 @@ import PAUSED_BY from '@salesforce/label/c.Core_AutomationControl_PausedBy';
 import RESUMES_ITSELF from '@salesforce/label/c.Core_AutomationControl_ResumesItself';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Automation_UnexpectedError';
 import ALWAYS_RUNS from '@salesforce/label/c.Core_Automation_AlwaysRuns';
+import { bodyMessage } from 'c/findCsv';
 
 const HOUR_OPTIONS = [
   { label: ONE_HOUR, value: '1' },
@@ -71,7 +72,7 @@ export default class AutomationControl extends LightningElement {
       this.page = result.data;
       this.errorMessage = undefined;
     } else if (result.error) {
-      this.errorMessage = this.messageFrom(result.error);
+      this.errorMessage = bodyMessage(result.error, UNEXPECTED_ERROR);
     }
   }
 
@@ -202,7 +203,7 @@ export default class AutomationControl extends LightningElement {
         this.page = page;
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
         // A refused switch must not leave a toggle showing a change the server did not make.
         if (revert) {
           revert();
@@ -219,12 +220,5 @@ export default class AutomationControl extends LightningElement {
       return refreshApex(this.wiredPageResult);
     }
     return Promise.resolve();
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return UNEXPECTED_ERROR;
   }
 }

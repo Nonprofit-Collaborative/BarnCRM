@@ -155,7 +155,7 @@ public with sharing class SetupAssistantController {
             ModuleDetectionService.SUITE_NONPROFIT
         };
         if (!suites.contains(chosen)) {
-            throw asAuraException(System.Label.Core_SuiteChoice_UnknownSuiteError);
+            throw UserErrors.message(System.Label.Core_SuiteChoice_UnknownSuiteError);
         }
         return chosen;
     }
@@ -166,7 +166,7 @@ public with sharing class SetupAssistantController {
         requireEdit();
         String chosen = mode == null ? '' : mode.trim();
         if (!new Set<String>(SetupAssistantService.modes()).contains(chosen)) {
-            throw asAuraException(System.Label.Core_SetupAssistant_UnknownModeError);
+            throw UserErrors.message(System.Label.Core_SetupAssistant_UnknownModeError);
         }
         try {
             SetupAssistantService.ensureStarted();
@@ -189,11 +189,11 @@ public with sharing class SetupAssistantController {
         requireEdit();
         SetupAssistantService.Step step = SetupAssistantService.findStep(stepKey);
         if (step == null) {
-            throw asAuraException(System.Label.Core_SetupAssistant_UnknownStepError);
+            throw UserErrors.message(System.Label.Core_SetupAssistant_UnknownStepError);
         }
         Map<String, Map<String, Object>> byObject = acceptedValues(step, values);
         if (byObject.isEmpty()) {
-            throw asAuraException(System.Label.Core_SetupAssistant_NothingToSaveError);
+            throw UserErrors.message(System.Label.Core_SetupAssistant_NothingToSaveError);
         }
         // A step can span two settings objects (Core's and a module's): all of it or none.
         Savepoint beforeSave = Database.setSavepoint();
@@ -251,7 +251,7 @@ public with sharing class SetupAssistantController {
     public static SetupState assignAccess(Id userId, String roleDeveloperName) {
         requireEdit();
         if (userId == null || String.isBlank(roleDeveloperName)) {
-            throw asAuraException(System.Label.Core_SetupAssistant_NothingToSaveError);
+            throw UserErrors.message(System.Label.Core_SetupAssistant_NothingToSaveError);
         }
         try {
             AccessService.assignRole(userId, roleDeveloperName);
@@ -326,7 +326,7 @@ public with sharing class SetupAssistantController {
             return;
         }
         if (field.maxLength != null && text.length() > field.maxLength) {
-            throw asAuraException(
+            throw UserErrors.message(
                 String.format(
                     System.Label.Core_SetupAssistant_TooLongError,
                     new List<Object>{ field.label, String.valueOf(field.maxLength) }
@@ -334,7 +334,7 @@ public with sharing class SetupAssistantController {
             );
         }
         if (String.isNotBlank(field.pattern) && !Pattern.matches(field.pattern, text)) {
-            throw asAuraException(
+            throw UserErrors.message(
                 String.isBlank(field.patternMessage)
                     ? System.Label.Core_SetupAssistant_InvalidValueError
                     : field.patternMessage
@@ -357,13 +357,13 @@ public with sharing class SetupAssistantController {
         try {
             recordId = Id.valueOf(text);
         } catch (Exception notAnId) {
-            throw asAuraException(System.Label.Core_SetupAssistant_WrongRecordTypeError);
+            throw UserErrors.message(System.Label.Core_SetupAssistant_WrongRecordTypeError);
         }
         String actual = recordId.getSObjectType()
             .getDescribe(SObjectDescribeOptions.DEFERRED)
             .getName();
         if (String.isBlank(expectedObject) || !expectedObject.equalsIgnoreCase(actual)) {
-            throw asAuraException(System.Label.Core_SetupAssistant_WrongRecordTypeError);
+            throw UserErrors.message(System.Label.Core_SetupAssistant_WrongRecordTypeError);
         }
         return String.valueOf(recordId);
     }
@@ -374,18 +374,12 @@ public with sharing class SetupAssistantController {
         Boolean speaksForItself =
             e instanceof SetupAssistantService.SetupStepException ||
             e instanceof SettingsService.SettingsException;
-        return asAuraException(speaksForItself ? e.getMessage() : fallback);
+        return UserErrors.message(speaksForItself ? e.getMessage() : fallback);
     }
 
     private static void requireEdit() {
         if (!BarnCRMPermissions.canManageSettings()) {
-            throw asAuraException(System.Label.Core_Settings_PermissionRequiredError);
+            throw UserErrors.message(System.Label.Core_Settings_PermissionRequiredError);
         }
-    }
-
-    private static AuraHandledException asAuraException(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 }

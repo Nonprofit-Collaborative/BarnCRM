@@ -7,12 +7,18 @@ import getAccessOverview from '@salesforce/apex/AccessController.getAccessOvervi
 import searchUsers from '@salesforce/apex/AccessController.searchUsers';
 import assignRole from '@salesforce/apex/AccessController.assignRole';
 import removeRole from '@salesforce/apex/AccessController.removeRole';
+import getOpenLink from '@salesforce/apex/AccessExplorerController.getOpenLink';
 
 jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
   virtual: true
 });
 jest.mock(
   '@salesforce/apex/AccessController.getAccessOverview',
+  () => ({ default: mockCreateApexTestWireAdapter(jest.fn()) }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/AccessExplorerController.getOpenLink',
   () => ({ default: mockCreateApexTestWireAdapter(jest.fn()) }),
   { virtual: true }
 );
@@ -285,5 +291,29 @@ describe('c-access-manager', () => {
     expect(link.target).toBe('_blank');
     expect(link.textContent).toContain('c.Core_Access_AutomaticAccessLink');
     expect(link.textContent).toContain('c.Core_Kit_NewTab');
+  });
+
+  it('offers Open Access Explorer once the link is known', async () => {
+    const element = createComponent();
+    getAccessOverview.emit(OVERVIEW);
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="open-access-explorer"]')).toBeNull();
+
+    const url = '/lightning/n/Data_Hygiene?c__section=accessExplorer';
+    getOpenLink.emit({ url, stateKey: 'c__section', section: 'accessExplorer' });
+    await flush();
+
+    const link = element.shadowRoot.querySelector('[data-id="open-access-explorer"]');
+    expect(link.getAttribute('href')).toBe(url);
+    expect(link.textContent).toContain('c.Core_Access_OpenAccessExplorer');
+  });
+
+  it('offers no Access Explorer link when the link is refused', async () => {
+    const element = createComponent();
+    getAccessOverview.emit(OVERVIEW);
+    getOpenLink.error();
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="open-access-explorer"]')).toBeNull();
   });
 });

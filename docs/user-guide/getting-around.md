@@ -16,12 +16,12 @@ Only or Admin). If you cannot find the apps, ask your admin. See
 | **BarnCRM Console** | The same work as **BarnCRM** | Console navigation: records open in tabs across the top |
 | **BarnCRM Admin** | BarnCRM Settings and the data tools (admins only) | Standard navigation |
 | **BarnCRM Admin Console** | The same as **BarnCRM Admin** (admins only) | Console navigation |
-| **Fundraising** | Gifts and everything around them (with the Giving module) | A standard app: each record replaces the page |
+| **BarnCRM Fundraising** | Gifts and everything around them (with the Giving module) | A standard app: each record replaces the page |
 | **BarnCRM Volunteers** | Jobs, shifts and volunteer hours (with the Volunteers module) | A console, like BarnCRM Console |
 
 **Which one should I open?** For everyday work, open **BarnCRM** or **BarnCRM Console**: they
 hold the same things and differ only in how records open, so pick the one you like and star it.
-Your admin may have hidden one of them for everyone. Open **Fundraising** for gifts and **BarnCRM
+Your admin may have hidden one of them for everyone. Open **BarnCRM Fundraising** for gifts and **BarnCRM
 Volunteers** for volunteers. **BarnCRM Admin** and **BarnCRM Admin Console** are for
 administrators only.
 
@@ -32,7 +32,11 @@ have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matc
 **Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
 **Import** and **Super Transform** are not in the navigation: open them from their cards on
 the **Data Manager** tab. Administrators also find a **Data Dictionary** section inside **Org
-Optimizer**, which lists every field and downloads it as a CSV. If you import files, the
+Optimizer**, which lists every field and downloads it as a CSV, an **AI-Readiness Export**
+section, which downloads a zip that explains your data to an AI tool of their choice, a
+**Setup Changes** section that shows who changed what in Setup, and when, and an **Access
+Explorer** section that shows who can see or change what, and why, compares two people side by
+side and lists who holds Modify All Data. If you import files, the
 **Check Columns** step shows a few example values beside each column, so you can see each
 column lands in the right field before anything loads; a column matched from a near spelling
 (`Frist Name`) shows a **Best Guess, Check It** badge, and you accept it or choose another
@@ -40,7 +44,7 @@ field before you go on. An Excel workbook can load several of its sheets at once
 its own kind of record if the template loads several. The
 Admin Guide's Importing page has the detail.
 
-The **Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,
+The **BarnCRM Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,
 **Organizations**, **Gifts**, **Commitments**, **Gift Batches**, **Funds**, **Appeals**,
 **Tributes**, **Receipts**, **Stewardship Plans**, **Acknowledgment Queue**, **Receipt
 Letters**, **Dashboards** and **Reports** (an admin also sees **Donor Level Ladder** and
@@ -60,7 +64,7 @@ apps; anyone else who may view it opens it by typing its name in the App Launche
 ## To Open an App
 
 1. Click the App Launcher (the grid of dots at the top left).
-2. Type `BarnCRM` (or `Fundraising`) and choose the app.
+2. Type `BarnCRM` (or `BarnCRM Fundraising`) and choose the app.
 3. Optional: click the star next to the app name to open it by default.
 
 You should see: the app's first tab. In **BarnCRM** and **BarnCRM Console** that is **Home**.
@@ -177,7 +181,7 @@ it can still be undone. **Bring Data In** (**Import a File**), **Import Template
 - Problem: a tab such as **Find** or **Data Manager** is missing. Those tabs appear only once
   the feature is turned on and you have the matching add-on. Ask your admin.
 - Problem: a record replaced the page instead of opening in a tab. You are in the
-  **Fundraising** app, which is a standard app, or another app. Switch to **BarnCRM**.
+  **BarnCRM Fundraising** app, which is a standard app, or another app. Switch to **BarnCRM**.
 - Problem: "What's new could not be updated. Refresh the page and try again. The problem is
   recorded in the Error Log." Refresh the page. If it keeps happening, tell your admin.
 - Problem: "The home page could not load everything. The error is recorded in the Error

@@ -42,16 +42,9 @@ public with sharing class ErrorDigestService {
 
     private static final String LOG_CONTEXT = 'Error digest';
 
-    /**
-     * Test seam, null in every real transaction: when a test sets it, messages are added here
-     * instead of being handed to the platform, so what the digest composed can be read back.
-     */
+    /** The sender in use; a test sets a recording one so what the digest composed can be read. */
     @TestVisible
-    private static List<Messaging.SingleEmailMessage> capturedMessages;
-
-    /** Test seam: when set, sending fails with this reason, as a blocked org's would. */
-    @TestVisible
-    private static String sendFailureForTest;
+    private static EmailSender emailSender = new MessagingEmailSender();
 
     /** What one run did. */
     public class Outcome {
@@ -113,7 +106,11 @@ public with sharing class ErrorDigestService {
             cap
         );
         outcome.entries = window.total;
-        if (window.total == 0) {
+        // The weekly admin summary (C-54): only in a weekly digest, and only when switched on.
+        AdminDigestSummary.Summary summary = includeSummary(settings, periodDays)
+            ? summaryOrNone(windowStart, runAt)
+            : null;
+        if (window.total == 0 && (summary == null || !summary.hasContent())) {
             outcome.summary = String.format(
                 System.Label.Core_ErrorDigest_SummaryNothingNew,
                 new List<Object>{ windowStart.format() }
@@ -129,7 +126,7 @@ public with sharing class ErrorDigestService {
             return finish(outcome, runAt, coveredUntil);
         }
 
-        String failure = deliver(compose(window, windowStart, recipients, cap), outcome);
+        String failure = deliver(compose(window, windowStart, recipients, cap, summary), outcome);
         if (outcome.recipients == 0) {
             return notSent(outcome, failure, lastSummary, runAt, coveredUntil);
         }
@@ -142,6 +139,27 @@ public with sharing class ErrorDigestService {
             }
         );
         return finish(outcome, runAt, runAt);
+    }
+
+    /**
+     * The admin summary, or null when reading it failed: the failure is logged and the digest
+     * goes without it, since the errors it carries matter more than the summary.
+     */
+    private static AdminDigestSummary.Summary summaryOrNone(Datetime windowStart, Datetime runAt) {
+        try {
+            return AdminDigestSummary.build(windowStart, runAt);
+        } catch (Exception summaryFailure) {
+            ErrorLogger.log(summaryFailure, 'AdminDigestSummary.build');
+            return null;
+        }
+    }
+
+    /**
+     * Whether the digest carries the admin summary: a weekly digest does, unless the setting is
+     * switched off. An empty setting reads as on (its default).
+     */
+    private static Boolean includeSummary(BarnCRM_Settings__c settings, Integer periodDays) {
+        return periodDays == 7 && settings.Error_Digest_Include_Admin_Summary__c != false;
     }
 
     /**
@@ -195,13 +213,18 @@ public with sharing class ErrorDigestService {
         ErrorDigestSelector.Window window,
         Datetime windowStart,
         List<User> recipients,
-        Integer cap
+        Integer cap,
+        AdminDigestSummary.Summary summary
     ) {
-        String subject = String.format(
-            System.Label.Core_ErrorDigest_Subject,
-            new List<Object>{ counted(window.total, window.capped) }
-        );
-        String body = body(window, windowStart, cap);
+        // Nothing new in the Error Log but something to report: the subject says it is the
+        // admin summary rather than claiming zero new entries.
+        String subject = window.total == 0
+            ? System.Label.Core_AdminDigest_Subject
+            : String.format(
+                  System.Label.Core_ErrorDigest_Subject,
+                  new List<Object>{ counted(window.total, window.capped) }
+              );
+        String body = body(window, windowStart, cap, summary);
         List<Messaging.SingleEmailMessage> messages = new List<Messaging.SingleEmailMessage>();
         for (User recipient : recipients) {
             Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
@@ -220,9 +243,22 @@ public with sharing class ErrorDigestService {
     private static String body(
         ErrorDigestSelector.Window window,
         Datetime windowStart,
-        Integer cap
+        Integer cap,
+        AdminDigestSummary.Summary summary
     ) {
         String base = URL.getOrgDomainUrl().toExternalForm();
+        if (window.total == 0) {
+            List<String> only = new List<String>{
+                String.format(
+                    System.Label.Core_AdminDigest_NoNewErrors,
+                    new List<Object>{ windowStart.format() }
+                ),
+                ''
+            };
+            only.addAll(AdminDigestSummary.lines(summary, base));
+            only.add(System.Label.Core_ErrorDigest_Footer);
+            return String.join(only, '\n');
+        }
         List<String> lines = new List<String>{
             String.format(
                 System.Label.Core_ErrorDigest_Intro,
@@ -283,6 +319,7 @@ public with sharing class ErrorDigestService {
             String.format(System.Label.Core_ErrorDigest_StillNew, new List<Object>{ stillNew(cap) })
         );
         lines.add('');
+        lines.addAll(AdminDigestSummary.lines(summary, base));
         lines.add(System.Label.Core_ErrorDigest_Footer);
         return String.join(lines, '\n');
     }
@@ -312,21 +349,13 @@ public with sharing class ErrorDigestService {
      * returns the first reason one was not, for the run summary.
      */
     private static String deliver(List<Messaging.SingleEmailMessage> messages, Outcome outcome) {
-        if (sendFailureForTest != null) {
-            return sendFailureForTest;
-        }
-        if (capturedMessages != null) {
-            capturedMessages.addAll(messages);
-            outcome.recipients = messages.size();
-            return null;
-        }
         String firstFailure;
         try {
-            for (Messaging.SendEmailResult result : Messaging.sendEmail(messages, false)) {
-                if (result.isSuccess()) {
+            for (EmailSendOutcome result : emailSender.send(messages)) {
+                if (result.sent) {
                     outcome.recipients++;
-                } else if (firstFailure == null && !result.getErrors().isEmpty()) {
-                    firstFailure = result.getErrors()[0].getMessage();
+                } else if (firstFailure == null) {
+                    firstFailure = result.error;
                 }
             }
         } catch (Exception refused) {

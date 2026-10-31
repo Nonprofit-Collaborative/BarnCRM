@@ -17,11 +17,7 @@ public with sharing class EmptyHouseholdTidyScheduler implements Schedulable {
 
     /** Starts the nightly tidy-up, or does nothing when it is already scheduled. */
     public static Id start() {
-        Id existing = ScheduledJobSelector.triggerIdByName(JOB_NAME);
-        if (existing != null) {
-            return existing;
-        }
-        return ScheduledJobSelector.schedule(
+        return ScheduledJobSelector.ensure(
             JOB_NAME,
             NIGHTLY_CRON,
             new EmptyHouseholdTidyScheduler()
@@ -30,6 +26,16 @@ public with sharing class EmptyHouseholdTidyScheduler implements Schedulable {
 
     /** True when the nightly tidy-up is scheduled. */
     public static Boolean isScheduled() {
-        return ScheduledJobSelector.triggerIdByName(JOB_NAME) != null;
+        return ScheduledJobSelector.isScheduled(JOB_NAME);
+    }
+
+    /** The tidy-up as Health Check's nightly jobs list sees it. */
+    public static NightlyJob nightlyJob() {
+        return new NamedNightlyJob(
+            System.Label.Core_HealthCheck_JobEmptyHouseholds,
+            JOB_NAME,
+            NIGHTLY_CRON,
+            new EmptyHouseholdTidyScheduler()
+        );
     }
 }

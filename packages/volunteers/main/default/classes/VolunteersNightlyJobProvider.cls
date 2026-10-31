@@ -11,22 +11,9 @@ public with sharing class VolunteersNightlyJobProvider implements NightlyJobProv
     }
 
     public List<NightlyJob> nightlyJobs() {
-        return new List<NightlyJob>{ new ScheduleJob() };
-    }
-
-    /** The nightly shift schedule run (`VolunteersScheduler`). */
-    @NamespaceAccessible
-    public class ScheduleJob implements NightlyJob {
-        public String label() {
-            return System.Label.Volunteers_NightlyJobs_SchedulesName;
-        }
-
-        public Boolean isScheduled() {
-            return VolunteersScheduler.isScheduled();
-        }
-
-        public void schedule() {
-            VolunteersScheduler.start();
-        }
+        return new List<NightlyJob>{
+            VolunteersScheduler.nightlyJob(),
+            VolunteerReminderScheduler.nightlyJob()
+        };
     }
 }

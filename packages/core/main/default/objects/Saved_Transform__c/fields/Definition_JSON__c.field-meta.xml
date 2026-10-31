@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Definition_JSON__c</fullName>
+  <description>The saved step list as a version 1 JSON document: object, filter (the Find filter document) and changes (field, action, value, source or transform steps). Written only by Super Transform, which checks it on every save.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The saved list, as Super Transform stores it. Change it in Super Transform, not here.</inlineHelpText>
+  <label>Definition</label>
+  <length>131072</length>
+  <required>false</required>
+  <trackHistory>false</trackHistory>
+  <type>LongTextArea</type>
+  <visibleLines>6</visibleLines>
+</CustomField>

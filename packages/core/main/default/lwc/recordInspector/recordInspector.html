@@ -1,0 +1,134 @@
+<template>
+    <template lwc:if={canUse}>
+        <lightning-card title={labels.title} icon-name="utility:search">
+            <span slot="actions">
+                <lightning-button
+                    data-id="inspect-button"
+                    label={inspectLabel}
+                    variant="neutral"
+                    disabled={loading}
+                    onclick={handleInspect}
+                ></lightning-button>
+            </span>
+
+            <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
+                <template lwc:if={hasError}>
+                    <div
+                        class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small"
+                        role="alert"
+                    >
+                        <span data-id="error-message">{errorMessage}</span>
+                    </div>
+                </template>
+
+                <template lwc:if={showIntro}>
+                    <p data-id="intro">{labels.intro}</p>
+                </template>
+
+                <template lwc:if={loading}>
+                    <div class="slds-is-relative slds-var-p-around_large">
+                        <lightning-spinner
+                            alternative-text={labels.loading}
+                            size="small"
+                        ></lightning-spinner>
+                    </div>
+                </template>
+
+                <template lwc:if={hasInspection}>
+                    <lightning-input
+                        data-id="search"
+                        type="search"
+                        label={labels.search}
+                        value={searchTerm}
+                        onchange={handleSearch}
+                    ></lightning-input>
+                    <lightning-button
+                        class="slds-float_right"
+                        data-id="open-find"
+                        label={labels.openFind}
+                        variant="base"
+                        onclick={handleOpenFind}
+                    ></lightning-button>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small" aria-live="polite">
+                        <span data-id="count">{countLabel}</span>
+                        <template lwc:if={hasCopied}>
+                            <span class="slds-var-m-left_small" data-id="copied">
+                                {copiedMessage}
+                            </span>
+                        </template>
+                    </p>
+                    <template lwc:if={fieldsCut}>
+                        <p class="slds-text-body_small" data-id="fields-cut">{labels.fieldsCut}</p>
+                    </template>
+                    <template lwc:if={noMatch}>
+                        <p data-id="no-match">{labels.noMatch}</p>
+                    </template>
+                    <template lwc:else>
+                        <div class="slds-scrollable" style="max-height: 30rem">
+                            <table
+                                class="slds-table slds-table_bordered slds-table_header-fixed"
+                                data-id="field-table"
+                            >
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col">{labels.columnField}</th>
+                                        <th scope="col">{labels.columnApiName}</th>
+                                        <th scope="col">{labels.columnType}</th>
+                                        <th scope="col">{labels.columnValue}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={rows} for:item="row">
+                                        <tr key={row.key} data-row={row.apiName}>
+                                            <th scope="row" class="slds-cell-wrap">{row.label}</th>
+                                            <td class="slds-cell-wrap">
+                                                <code>{row.apiName}</code>
+                                                <lightning-button-icon
+                                                    class="copy-button slds-var-m-left_xx-small"
+                                                    icon-name="utility:copy"
+                                                    variant="bare"
+                                                    size="small"
+                                                    alternative-text={row.copyLabel}
+                                                    title={row.copyLabel}
+                                                    data-api-name={row.apiName}
+                                                    onclick={handleCopy}
+                                                ></lightning-button-icon>
+                                                <template lwc:if={row.setupUrl}>
+                                                    <a
+                                                        class="setup-link slds-var-m-left_xx-small slds-text-body_small"
+                                                        href={row.setupUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        title={row.setupLabel}
+                                                        >{row.openSetup}</a
+                                                    >
+                                                </template>
+                                            </td>
+                                            <td class="slds-cell-wrap">{row.type}</td>
+                                            <td class="slds-cell-wrap">
+                                                <template lwc:if={row.hasValue}>
+                                                    <span data-id="value">{row.value}</span>
+                                                    <template lwc:if={row.truncated}>
+                                                        <lightning-badge
+                                                            class="slds-var-m-left_xx-small"
+                                                            label={labels.shortened}
+                                                        ></lightning-badge>
+                                                    </template>
+                                                </template>
+                                                <template lwc:else>
+                                                    <span class="slds-text-color_weak">
+                                                        {row.empty}
+                                                    </span>
+                                                </template>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </template>
+                </template>
+            </div>
+        </lightning-card>
+    </template>
+</template>

@@ -226,7 +226,7 @@ private class SeasonalAddressSwitchTest {
 
     private static Boolean hasSeasonalJob(List<NightlyJob> jobs) {
         for (NightlyJob job : jobs) {
-            if (job instanceof NightlyJobs.SeasonalAddressJob) {
+            if (job.label() == System.Label.Core_HealthCheck_JobSeasonalAddresses) {
                 return true;
             }
         }

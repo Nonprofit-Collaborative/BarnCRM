@@ -76,11 +76,6 @@ public with sharing class RollupPath {
             }
             return false;
         }
-
-        /** The single branch a path has when it has exactly one. */
-        public Branch onlyBranch() {
-            return this.branches.size() == 1 ? this.branches[0] : null;
-        }
     }
 
     public static Boolean isToken(String segment) {
@@ -124,26 +119,9 @@ public with sharing class RollupPath {
     }
 
     /**
-     * The engine's dot-separated relationship chain for a branch the engine can walk itself,
-     * ending in the Id of the ultimate parent. A single lookup has no chain: the engine takes it
-     * as a plain lookup attribute instead, so this returns an empty string for that case.
-     *
-     * A custom reference attribute is walked as its relationship name, which is the attribute name
-     * with `__c` replaced by `__r`. A standard reference such as `AccountId` walks as the name
-     * without its `Id` suffix.
+     * The relationship name of a reference attribute: a custom one with `__c` replaced by `__r`,
+     * a standard one such as `AccountId` without its `Id` suffix.
      */
-    public static String toGrandparentFieldPath(Branch branch) {
-        if (branch == null || branch.segments.size() < 2) {
-            return '';
-        }
-        List<String> relationships = new List<String>();
-        for (Integer i = 0; i < branch.segments.size(); i++) {
-            relationships.add(relationshipNameFor(branch.segments[i]));
-        }
-        return String.join(relationships, '.') + '.Id';
-    }
-
-    /** The relationship name of a reference attribute. */
     public static String relationshipNameFor(String referenceField) {
         if (String.isBlank(referenceField)) {
             return referenceField;

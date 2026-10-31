@@ -6,7 +6,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Campaign sync log: saver cannot write campaigns</shortDescription>
-    <value>Campaign sync skipped {0} appeal(s): the person who saved them cannot create and edit Campaigns, or does not have the Campaign Sync permission set. Click Sync all appeals on the Campaign sync page to catch them up.</value>
+    <value>Campaign sync skipped {0} appeal(s): the person who saved them cannot create and edit Campaigns, or lacks the Campaign Sync permission set. Click Sync all appeals on the Campaign sync page to catch them up.</value>
   </labels>
   <labels>
     <fullName>Mirror_CampaignSync_LogNoHeadroom</fullName>
@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Campaign sync log: save too large to copy</shortDescription>
-    <value>Campaign sync did not copy the appeals in a very large save, because copying them in the same transaction would have gone past Salesforce limits. The appeals are saved without their Campaigns. Click Sync all appeals on the Campaign sync page to give them their Campaigns.</value>
+    <value>Campaign sync did not copy the appeals in a very large save, because copying them in the same transaction would pass Salesforce limits. The appeals are saved without their Campaigns. Click Sync all appeals on the Campaign sync page to give them their Campaigns.</value>
   </labels>
   <labels>
     <fullName>Mirror_CampaignSync_LogFailed</fullName>
@@ -30,7 +30,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Campaign sync log: linked campaign not found</shortDescription>
-    <value>The Campaign linked to the appeal "{0}" was deleted or is not visible to you. If it was deleted, clear Campaign ID on the appeal to have a new Campaign made; if it still exists, give the person saving the appeal access to it.</value>
+    <value>The Campaign linked to the appeal "{0}" was deleted or is not visible to you. If deleted, clear Campaign ID on the appeal to make a new Campaign. If it still exists, give the person saving the appeal access to it.</value>
   </labels>
   <labels>
     <fullName>Mirror_CampaignSync_InvalidCampaignId</fullName>
@@ -46,7 +46,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Campaign sync log: new campaign left unlinked</shortDescription>
-    <value>Sync all appeals created the Campaign {0} for the appeal "{1}", could not store its Campaign ID on the appeal, and could not delete the Campaign again: {2} Delete that Campaign, or paste its ID onto the appeal once the appeal can be saved.</value>
+    <value>Sync all appeals created the Campaign {0} for the appeal "{1}", but could not store its Campaign ID on the appeal or delete the Campaign again: {2} Delete that Campaign, or paste its ID onto the appeal once it can be saved.</value>
   </labels>
   <labels>
     <fullName>Mirror_CampaignSync_LogRunSummary</fullName>
@@ -70,7 +70,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Campaign sync page: what it does</shortDescription>
-    <value>Each appeal gets a matching Salesforce Campaign, kept up to date when the appeal changes, so Campaign Members and marketing tools work. Nothing on a Campaign is copied back, and no Campaign is ever deleted.</value>
+    <value>Each appeal gets a matching Salesforce Campaign, kept current as the appeal changes, so Campaign Members and marketing tools work. Nothing is copied back, and no Campaign is ever deleted.</value>
   </labels>
   <labels>
     <fullName>Mirror_CampaignSync_Unavailable</fullName>
@@ -134,7 +134,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Campaign sync page: a sync is running</shortDescription>
-    <value>Sync all appeals is running in the background. Reload this page in a minute to see the new counts. Anything that could not be copied is in the Error Log.</value>
+    <value>Sync all appeals is running in the background. Reload this page in a minute to see new counts. Anything that could not be copied is in the Error Log.</value>
   </labels>
   <labels>
     <fullName>Mirror_CampaignSync_ErrorFailed</fullName>

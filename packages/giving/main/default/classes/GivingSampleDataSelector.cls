@@ -107,6 +107,14 @@ public with sharing class GivingSampleDataSelector {
         return ids;
     }
 
+    public List<Id> sampleAskIds() {
+        List<Id> ids = new List<Id>();
+        for (Ask__c ask : [SELECT Id FROM Ask__c WHERE Sample_Data__c = TRUE WITH USER_MODE]) {
+            ids.add(ask.Id);
+        }
+        return ids;
+    }
+
     public List<Id> sampleCommitmentIds() {
         List<Id> ids = new List<Id>();
         for (Commitment__c commitment : [

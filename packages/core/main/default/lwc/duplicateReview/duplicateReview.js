@@ -58,6 +58,7 @@ import COMPARED_WITH_FIRST from '@salesforce/label/c.Core_Duplicates_ComparedWit
 import BLANK from '@salesforce/label/c.Core_Duplicates_Blank';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupPath } from 'c/setupLinks';
+import { bodyMessage } from 'c/findCsv';
 
 const SETUP_DUPLICATE_RULES = setupPath('duplicateRules');
 const PAGE_SIZE = 10;
@@ -173,7 +174,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
       this.errorMessage = undefined;
       this.announceCount();
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
     } finally {
       this.busy = false;
     }
@@ -476,7 +477,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
       }
     } catch (error) {
       if (request === this.previewRequest) {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
         this.merging = undefined;
       }
     } finally {
@@ -560,14 +561,9 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
       this.noticeMessage = notice;
       this.announceCount();
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
     } finally {
       this.busy = false;
     }
-  }
-
-  messageFrom(error) {
-    const body = error && error.body;
-    return (body && body.message) || UNEXPECTED_ERROR;
   }
 }

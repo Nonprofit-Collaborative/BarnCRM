@@ -47,4 +47,10 @@ Notes:
 - The confirm modal resolves `true` when confirmed. With `choices` or `checks` it resolves `{ choice, checked }` instead (the chosen value and the ticked values), so a caller that passes neither keeps its plain `true`. Each `choices` and `checks` entry is `{ label, value }`.
 - Use `typeToConfirm` (for example the record count) only for deletes and other changes that are hard to undo; the confirm button stays disabled until the text matches.
 
+## Part 3 Screens that follow the kit
+
+| Screen | How it follows the kit |
+|---|---|
+| Data Jobs (`dataJobHistory`) | Each job row shows its status as a `lightning-badge` (green when done, amber while it runs, red when it failed) and keeps the job's actions, Undo for now, in a small row menu (`lightning-button-menu`) instead of a button on every row. The undo confirmations still open in place above the list. |
+
 Each component has Jest tests written as stories (one case per variant a screen uses). Add a story when you add a variant.

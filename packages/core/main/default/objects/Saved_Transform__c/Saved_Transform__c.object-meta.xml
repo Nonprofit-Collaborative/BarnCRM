@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    A named Super Transform step list: which object, which records and what to change, saved as
+    one documented JSON document (canonical model Section 29P, C-50f1). Org-wide: everyone who
+    may use Super Transform sees, loads, renames and deletes every list. Holds no records and
+    grants access to none; loading a list fills the page in, and the run still checks everything
+    as the person.
+  </description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>false</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Saved Transform</label>
+  <nameField>
+    <label>Saved Transform Name</label>
+    <type>Text</type>
+  </nameField>
+  <pluralLabel>Saved Transforms</pluralLabel>
+  <sharingModel>ReadWrite</sharingModel>
+  <externalSharingModel>ReadWrite</externalSharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

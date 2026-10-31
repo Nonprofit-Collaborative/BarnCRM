@@ -60,7 +60,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-DM-03: A Bulk Update Appears in Data Jobs, with a Notification
 
 **Purpose:** Confirm a bulk update is listed newest first with its counts, the filter works, and the starter gets one bell notification.
-**Prerequisites:** admin. In **BarnCRM Settings**, **General**, **Tell people when their long jobs finish** is ticked.
+**Prerequisites:** admin. In **BarnCRM Settings**, **General**, **Send Long Job Notifications** is ticked.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -68,7 +68,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 2 | Press **Bulk Update** and set **Title** to `Test title` on all 6, confirming with the count (steps in [Bulk update](../admin-guide/bulk-update.md)). | The bulk update starts. |
 | 3 | When it finishes, check the bell at the top of the page. | One new notification titled **Bulk update finished**, reading **6 updated, 0 already right, 0 no longer matched, 0 could not be saved. Open the bulk update for the run log.** |
 | 4 | Click the notification. | The bulk update's **Data Job** record opens, with its run log. |
-| 5 | Open **Data Manager** and press **Refresh** on **Data Jobs**. | The bulk update is first. Its title names the job, **Bulk Update**, **Contact** and its status; the line under it reads **6 matched: 6 updated, 0 already held the new values, 0 failed.**, followed by **Started** and **Can be undone until** with dates, and an **Undo** button. |
+| 5 | Open **Data Manager** and press **Refresh** on **Data Jobs**. | The bulk update is first. Its title names the job, **Bulk Update** and **Contact**, with its status as a badge beside it; the line under it reads **6 matched: 6 updated, 0 already held the new values, 0 failed.**, followed by **Started** and **Can be undone until** with dates, and a row menu holding **Undo**. |
 | 6 | In **Show**, choose **Imports**. | The bulk update is no longer listed. |
 | 7 | In **Show**, choose **Bulk updates**, then **All**. | The bulk update is listed again each time. |
 
@@ -177,12 +177,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **General**, clear **Tell people when their long jobs finish** and click **Save**. | **Your settings are saved.** |
+| 1 | In **BarnCRM Settings**, **General**, clear **Send Long Job Notifications** and click **Save**. | **Your settings are saved.** |
 | 2 | Run a bulk update as in T-DM-03, steps 1 and 2, setting **Title** to `Quiet`. | The job completes and is listed in **Data Jobs**. |
 | 3 | Check the bell. | No new notification. |
 | 4 | Undo the job as in T-DM-04 (type `6`). | The job reaches undone; no notification. |
 
-**Cleanup:** Tick **Tell people when their long jobs finish** again and save.
+**Cleanup:** Tick **Send Long Job Notifications** again and save.
 
 ## T-DM-11: Snapshot History Compares, Shows and Deletes Saved Counts
 

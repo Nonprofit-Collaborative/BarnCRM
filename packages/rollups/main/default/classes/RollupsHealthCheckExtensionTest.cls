@@ -288,9 +288,7 @@ private class RollupsHealthCheckExtensionTest {
             User maria = HealthCheckTestHelper.mariaWithManageSettings();
             shipOneRollup(RollupService.MODE_SCHEDULED);
             RollupScheduler.jobNameInUse = TEST_JOB_NAME;
-            NightlyJobs.overrideJobsForTest(
-                new List<NightlyJob>{ new RollupsNightlyJobProvider.RollupJob() }
-            );
+            NightlyJobs.overrideJobsForTest(new List<NightlyJob>{ RollupScheduler.nightlyJob() });
 
             System.runAs(maria) {
                 RollupService.ensureDefaults();

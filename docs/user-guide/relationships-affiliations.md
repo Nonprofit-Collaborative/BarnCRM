@@ -107,6 +107,14 @@ An affiliation never moves a person between households.
 - Problem: **Primary Affiliation** went empty. The primary affiliation was ended. Make another
   one primary.
 
+## To Load Many at Once
+
+An admin can load a list of relationships or affiliations from a file with the **Relationships**
+and **Affiliations** import templates (Admin Guide, Importing). Each person is found by email
+address and each organization by name, so they must already be in BarnCRM. List each
+relationship once: the other side is added for you. A row for something that already exists is
+rejected and named in the results.
+
 ## Related
 
 - [People and households](people-and-households.md)

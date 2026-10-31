@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Instant totals: button that shows the steps or switches back on</shortDescription>
-        <value>Turn on instant totals</value>
+        <value>Turn On Instant Totals</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_InstantTurnOff</fullName>
@@ -102,7 +102,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Instant totals: button that switches the trigger off</shortDescription>
-        <value>Turn off instant totals</value>
+        <value>Turn Off Instant Totals</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_InstantRemove</fullName>
@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Instant totals: button that shows the removal steps</shortDescription>
-        <value>Remove the trigger</value>
+        <value>Remove the Trigger</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_InstantClose</fullName>
@@ -198,7 +198,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Setup step 4. {0} is the test class name.</shortDescription>
-        <value>In production's Setup, open Inbound Change Sets, click Deploy, choose Run specified tests and enter {0}. Only that test runs, so tests elsewhere in your org do not block it.</value>
+        <value>In production's Setup, open Inbound Change Sets, click Deploy, choose Run specified tests and enter {0}. Only that test runs, so other tests in your org do not block it.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_InstantSetupStep5</fullName>

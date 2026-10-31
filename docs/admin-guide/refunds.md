@@ -67,7 +67,7 @@ was meant for another organization, and the donor has asked for it back.
 2. Click **Refund or Write Off**.
 3. Leave the choice at the top on **Refund part or all of this gift**. The amount starts at
    what is left of the gift, which is 250. Change it to 100, type "Donor asked for the
-   misdirected portion back" as the reason, and click **Record it**.
+   misdirected portion back" as the reason, and click **Record It**.
 4. BarnCRM creates a second gift for minus 100. Open it. Its **Original Gift** points at
    `G-000001`, its **Donor** and **Appeal** are the same as the original, its **Gift Date**
    is today, its **Status** is `Received` (because the refund itself is a transaction that
@@ -77,7 +77,7 @@ was meant for another organization, and the donor has asked for it back.
 6. Go back to `G-000001`. It still shows 250 and its **Status** is still `Received`, because
    only part of it came back. The refund is visible in its **Refunds and Write-Offs** list.
 7. Now refund the rest: click **Refund or Write Off** on `G-000001` again. The amount starts
-   at 150, which is what is left. Give a reason and click **Record it**. This time the
+   at 150, which is what is left. Give a reason and click **Record It**. This time the
    original's **Status** changes to `Refunded`, because the whole gift has now gone back,
    and the **Refund or Write Off** button leaves the page: nothing is left to refund.
 8. To see a write-off instead, enter a new gift for 500, open it, click **Refund or Write

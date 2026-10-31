@@ -135,7 +135,9 @@ const PAGE_GROUPS = {
       keys: [
         'Installment_Generation_Horizon_Months__c',
         'Installment_Overdue_Grace_Days__c',
-        'Auto_Apply_Gifts_To_Installments__c'
+        'Auto_Apply_Gifts_To_Installments__c',
+        'Pledge_Reminders_Enabled__c',
+        'Giving_Pledge_Reminders_Page'
       ]
     },
     {
@@ -150,7 +152,8 @@ const PAGE_GROUPS = {
         'Acknowledgments_Enabled__c',
         'Acknowledgment_From_Address__c',
         'Giving_Acknowledgments_Page',
-        'Stewardship_Plans_Page'
+        'Stewardship_Plans_Page',
+        'Ask_Reminders_Enabled__c'
       ]
     },
     {
@@ -214,7 +217,13 @@ const PAGE_GROUPS = {
       id: 'Hours and Shifts',
       label: HOURS_AND_SHIFTS,
       fallback: true,
-      keys: ['Hours_Require_Approval__c', 'Attendance_Creates_Hours__c', 'Shift_Horizon_Weeks__c']
+      keys: [
+        'Hours_Require_Approval__c',
+        'Attendance_Creates_Hours__c',
+        'Shift_Horizon_Weeks__c',
+        'Reminders_Enabled__c',
+        'Reminder_Lead_Days__c'
+      ]
     }
   ],
   'error log': [
@@ -222,7 +231,12 @@ const PAGE_GROUPS = {
       id: 'Error Digest',
       label: ERROR_DIGEST,
       fallback: true,
-      keys: ['Error_Digest_Job', 'Error_Digest_Recipients__c', 'Error_Digest_Frequency__c']
+      keys: [
+        'Error_Digest_Job',
+        'Error_Digest_Recipients__c',
+        'Error_Digest_Frequency__c',
+        'Error_Digest_Include_Admin_Summary__c'
+      ]
     },
     {
       id: 'Error Log Retention',

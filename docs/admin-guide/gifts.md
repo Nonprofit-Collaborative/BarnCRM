@@ -24,7 +24,7 @@ once:
 1. Create at least one fund and mark it as the default (see the Funds page). A gift saved
    without a designation goes there.
 2. Open **BarnCRM Settings**, choose **Giving**, and check the settings on that page:
-   **Default fund**, **Default appeal** (optional), and **Automatic household soft credits**.
+   **Default fund**, **Default appeal** (optional), and **Auto-Create Household Soft Credits**.
 
 Then give your fundraising staff the **Fundraising Staff** role on the Access page: it
 includes the **Giving Staff** permission set. Give yourself **Giving Admin**. People who only
@@ -68,7 +68,7 @@ You are David, and a check from Maria's neighbour arrived this morning.
 
 ## What the Gift Page Shows
 
-In the Fundraising app a gift opens on the packaged **Gift Record Page**. Its action bar
+In the BarnCRM Fundraising app a gift opens on the packaged **Gift Record Page**. Its action bar
 carries **Edit**, **Refund or Write Off** and **Delete**. **Refund or Write Off** shows only
 while the gift's **Status** is `Received`, because only a received gift can be refunded. The
 **Gift Allocations** list (largest first), the **Refunds and Write-Offs** list (newest
@@ -81,7 +81,7 @@ can also set on the new gift form. The
 To add another list, such as one your organization built, open the page in the Lightning
 App Builder and drag in the **Dynamic Related List - Single** component. Adding it to the
 Gift page layout alone does not put it on this page: the layout is what Salesforce shows
-when a gift is opened outside the Fundraising app, or on a record page your organization
+when a gift is opened outside the BarnCRM Fundraising app, or on a record page your organization
 built that still uses the related list component.
 
 ## Lifting the Receipt Lock

@@ -45,9 +45,16 @@
                         <c-data-dictionary></c-data-dictionary>
                     </template>
                 </lightning-tab>
+                <lightning-tab label={labels.aiExport} value="aiExport" onactive={handleActive} data-id="tab-aiExport">
+                    <template lwc:if={aiExportOpened}>
+                        <c-ai-readiness-export></c-ai-readiness-export>
+                    </template>
+                </lightning-tab>
                 <lightning-tab label={labels.healthCheck} value="healthCheck" onactive={handleActive} data-id="tab-healthCheck">
                     <template lwc:if={showHealthCheck}>
-                        <c-health-check-panel></c-health-check-panel>
+                        <c-health-check-panel
+                            last-result-first={healthCheckLastResultFirst}
+                        ></c-health-check-panel>
                     </template>
                     <template lwc:else>
                         <c-barn-empty-state
@@ -79,6 +86,26 @@
                 <lightning-tab label={labels.setup} value="setup" onactive={handleActive} data-id="tab-setup">
                     <template lwc:if={setupOpened}>
                         <c-optimizer-setup></c-optimizer-setup>
+                    </template>
+                </lightning-tab>
+                <lightning-tab
+                    label={labels.setupChanges}
+                    value="setupChanges"
+                    onactive={handleActive}
+                    data-id="tab-setupChanges"
+                >
+                    <template lwc:if={setupChangesOpened}>
+                        <c-setup-change-log></c-setup-change-log>
+                    </template>
+                </lightning-tab>
+                <lightning-tab
+                    label={labels.accessExplorer}
+                    value="accessExplorer"
+                    onactive={handleActive}
+                    data-id="tab-accessExplorer"
+                >
+                    <template lwc:if={accessExplorerOpened}>
+                        <c-access-explorer></c-access-explorer>
                     </template>
                 </lightning-tab>
             </template>

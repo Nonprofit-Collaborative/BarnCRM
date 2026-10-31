@@ -1,0 +1,392 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom48">
+    <div slot="actions" class="slds-grid slds-grid_vertical-align-center slds-wrap">
+      <lightning-radio-group
+        data-id="view"
+        class="slds-var-m-right_small"
+        name="view"
+        label={labels.viewBoard}
+        variant="label-hidden"
+        type="button"
+        options={viewOptions}
+        value={view}
+        onchange={handleView}
+      ></lightning-radio-group>
+      <lightning-radio-group
+        data-id="scope"
+        class="slds-var-m-right_small"
+        name="scope"
+        label={labels.scopeEveryone}
+        variant="label-hidden"
+        type="button"
+        options={scopeOptions}
+        value={scope}
+        onchange={handleScope}
+      ></lightning-radio-group>
+      <template lwc:if={canCreate}>
+        <lightning-button
+          data-id="new-ask"
+          label={labels.newAsk}
+          onclick={handleNewAsk}
+        ></lightning-button>
+      </template>
+    </div>
+
+    <div class="slds-var-p-horizontal_medium">
+      <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
+
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={hasError}>
+        <p
+          role="alert"
+          data-id="error-message"
+          class="slds-text-color_error slds-var-m-bottom_small"
+        >
+          {errorMessage}
+        </p>
+      </template>
+
+      <template lwc:if={showReadOnly}>
+        <p data-id="read-only" class="slds-text-body_small slds-var-m-bottom_small">
+          {labels.readOnly}
+        </p>
+      </template>
+
+      <template lwc:if={hasBoard}>
+        <div
+          class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_medium"
+          data-id="totals"
+        >
+          <div class="slds-col slds-grid slds-size_1-of-2 slds-medium-size_1-of-4">
+            <div class="slds-box slds-box_x-small slds-size_1-of-1">
+              <p class="slds-text-title">{labels.tileOpen}</p>
+              <p class="slds-text-heading_medium" data-id="open-count">
+                <lightning-formatted-number value={board.openCount}></lightning-formatted-number>
+              </p>
+            </div>
+          </div>
+          <div class="slds-col slds-grid slds-size_1-of-2 slds-medium-size_1-of-4">
+            <div class="slds-box slds-box_x-small slds-size_1-of-1">
+              <p class="slds-text-title">{labels.tileOpenAmount}</p>
+              <p class="slds-text-heading_medium" data-id="open-amount">
+                <lightning-formatted-number
+                  value={board.openAmount}
+                  format-style="currency"
+                ></lightning-formatted-number>
+              </p>
+            </div>
+          </div>
+          <div class="slds-col slds-grid slds-size_1-of-2 slds-medium-size_1-of-4">
+            <div class="slds-box slds-box_x-small slds-size_1-of-1">
+              <p class="slds-text-title">{labels.tileWon}</p>
+              <p class="slds-text-heading_medium" data-id="won-amount">
+                <lightning-formatted-number
+                  value={board.wonAmount}
+                  format-style="currency"
+                ></lightning-formatted-number>
+              </p>
+              <p class="slds-text-body_small" data-id="won-count">{wonDetail}</p>
+            </div>
+          </div>
+          <div class="slds-col slds-grid slds-size_1-of-2 slds-medium-size_1-of-4">
+            <div class="slds-box slds-box_x-small slds-size_1-of-1">
+              <p class="slds-text-title">{labels.tileDeclined}</p>
+              <p class="slds-text-heading_medium" data-id="declined-count">
+                <lightning-formatted-number
+                  value={board.declinedCount}
+                ></lightning-formatted-number>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <template lwc:if={truncatedMessage}>
+          <p role="status" data-id="truncated" class="slds-text-body_small slds-var-m-bottom_small">
+            {truncatedMessage}
+          </p>
+        </template>
+      </template>
+
+      <template lwc:if={isEmpty}>
+        <p data-id="empty-state" class="slds-text-body_regular">{labels.empty}</p>
+      </template>
+
+      <template lwc:if={showBoard}>
+        <div class="ask-board" data-id="board">
+          <template for:each={columns} for:item="column">
+            <section
+              key={column.key}
+              class={column.dropClass}
+              data-id="column"
+              data-stage={column.stage}
+              aria-label={column.title}
+              ondragover={handleDragOver}
+              ondrop={handleDrop}
+            >
+              <header class="slds-var-m-bottom_x-small">
+                <h2 class="slds-text-heading_small slds-truncate" title={column.title}>
+                  {column.title}
+                </h2>
+                <p class="slds-text-body_small" data-id="column-total">
+                  <lightning-formatted-number value={column.count}></lightning-formatted-number>
+                  <span class="slds-var-m-horizontal_xx-small" aria-hidden="true">|</span>
+                  <lightning-formatted-number
+                    value={column.amount}
+                    format-style="currency"
+                  ></lightning-formatted-number>
+                </p>
+              </header>
+              <template lwc:if={column.isEmpty}>
+                <p class="slds-text-body_small slds-text-color_weak">{labels.columnEmpty}</p>
+              </template>
+              <ul class="slds-has-dividers_around-space">
+                <template for:each={column.cards} for:item="card">
+                  <li
+                    key={card.id}
+                    class="slds-item ask-card slds-var-m-bottom_x-small"
+                    data-id={card.id}
+                    data-card
+                    draggable={card.draggable}
+                    ondragstart={handleDragStart}
+                  >
+                    <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-start">
+                      <h3 class="slds-text-title_bold slds-truncate" title={card.donorLabel}>
+                        {card.donorLabel}
+                      </h3>
+                      <lightning-button-menu
+                        data-id={card.id}
+                        alternative-text={card.menuLabel}
+                        icon-size="x-small"
+                        menu-alignment="right"
+                        onselect={handleCardMenu}
+                      >
+                        <template for:each={card.menuItems} for:item="item">
+                          <lightning-menu-item
+                            key={item.key}
+                            label={item.label}
+                            value={item.value}
+                          ></lightning-menu-item>
+                        </template>
+                      </lightning-button-menu>
+                    </div>
+                    <p class="slds-text-body_regular">
+                      <lightning-formatted-number
+                        value={card.amount}
+                        format-style="currency"
+                      ></lightning-formatted-number>
+                    </p>
+                    <template lwc:if={card.targetDate}>
+                      <p class="slds-text-body_small">
+                        <lightning-formatted-date-time
+                          value={card.targetDate}
+                          time-zone="UTC"
+                        ></lightning-formatted-date-time>
+                      </p>
+                    </template>
+                    <template lwc:if={card.nextStep}>
+                      <p class="slds-text-body_small">{card.nextStep}</p>
+                    </template>
+                    <p class="slds-text-body_small slds-text-color_weak">{card.ownerName}</p>
+                    <template lwc:if={card.daysText}>
+                      <p class="slds-text-body_small slds-text-color_weak" data-id="days">
+                        {card.daysText}
+                      </p>
+                    </template>
+                  </li>
+                </template>
+              </ul>
+            </section>
+          </template>
+        </div>
+      </template>
+
+      <template lwc:if={showList}>
+        <div data-id="list">
+          <lightning-datatable
+            key-field="id"
+            data={rows}
+            columns={listColumns}
+            hide-checkbox-column
+            onrowaction={handleRowAction}
+          ></lightning-datatable>
+        </div>
+      </template>
+    </div>
+  </lightning-card>
+
+  <template lwc:if={isClosing}>
+    <section
+      role="dialog"
+      tabindex="-1"
+      aria-modal="true"
+      aria-labelledby="close-ask-title"
+      class="slds-modal slds-fade-in-open"
+    >
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <h2 id="close-ask-title" class="slds-modal__title slds-hyphenate">{closeTitle}</h2>
+        </header>
+        <div class="slds-modal__content slds-var-p-around_medium" data-id="close-dialog">
+          <template lwc:if={hasCloseError}>
+            <p
+              role="alert"
+              data-id="close-error"
+              class="slds-text-color_error slds-var-m-bottom_small"
+            >
+              {closeError}
+            </p>
+          </template>
+          <lightning-radio-group
+            data-field="outcome"
+            data-close-input
+            name="outcome"
+            label={labels.outcomeLabel}
+            options={outcomeOptions}
+            value={form.outcome}
+            required
+            onchange={handleFormChange}
+          ></lightning-radio-group>
+
+          <template lwc:if={isWon}>
+            <lightning-radio-group
+              class="slds-var-m-top_small"
+              data-field="result"
+              data-close-input
+              name="result"
+              label={labels.resultLabel}
+              options={resultOptions}
+              value={form.result}
+              required
+              onchange={handleFormChange}
+            ></lightning-radio-group>
+          </template>
+
+          <template lwc:if={isGift}>
+            <lightning-input
+              data-field="amount"
+              data-close-input
+              type="number"
+              formatter="currency"
+              step="0.01"
+              min="0.01"
+              label={labels.fieldAmount}
+              value={form.amount}
+              required
+              onchange={handleFormChange}
+            ></lightning-input>
+            <lightning-input
+              data-field="giftDate"
+              data-close-input
+              type="date"
+              label={labels.fieldGiftDate}
+              value={form.giftDate}
+              required
+              onchange={handleFormChange}
+            ></lightning-input>
+            <lightning-combobox
+              data-field="giftType"
+              data-close-input
+              label={labels.fieldGiftType}
+              options={giftTypes}
+              value={form.giftType}
+              required
+              onchange={handleFormChange}
+            ></lightning-combobox>
+          </template>
+
+          <template lwc:if={isPledge}>
+            <lightning-input
+              data-field="amount"
+              data-close-input
+              type="number"
+              formatter="currency"
+              step="0.01"
+              min="0.01"
+              label={labels.fieldPledgeTotal}
+              value={form.amount}
+              required
+              onchange={handleFormChange}
+            ></lightning-input>
+            <lightning-input
+              data-field="giftDate"
+              data-close-input
+              type="date"
+              label={labels.fieldFirstPayment}
+              value={form.giftDate}
+              required
+              onchange={handleFormChange}
+            ></lightning-input>
+            <lightning-combobox
+              data-field="frequency"
+              data-close-input
+              label={labels.fieldFrequency}
+              options={frequencies}
+              value={form.frequency}
+              required
+              onchange={handleFormChange}
+            ></lightning-combobox>
+            <lightning-input
+              data-field="payments"
+              data-close-input
+              type="number"
+              step="1"
+              min="1"
+              label={labels.fieldPayments}
+              value={form.payments}
+              required
+              onchange={handleFormChange}
+            ></lightning-input>
+          </template>
+
+          <template lwc:if={isLink}>
+            <p class="slds-text-body_small slds-var-m-top_small">{labels.linkHelp}</p>
+            <lightning-record-picker
+              data-field="linkedId"
+              label={labels.fieldLinkGift}
+              object-api-name="Gift__c"
+              filter={donorFilter}
+              onchange={handleFormChange}
+            ></lightning-record-picker>
+            <lightning-record-picker
+              data-field="linkedId"
+              label={labels.fieldLinkPledge}
+              object-api-name="Commitment__c"
+              filter={donorFilter}
+              onchange={handleFormChange}
+            ></lightning-record-picker>
+          </template>
+
+          <lightning-input
+            class="slds-var-m-top_small"
+            data-field="nextAskDate"
+            data-close-input
+            type="date"
+            label={labels.fieldNextAsk}
+            field-level-help={labels.nextAskHelp}
+            value={form.nextAskDate}
+            onchange={handleFormChange}
+          ></lightning-input>
+        </div>
+        <footer class="slds-modal__footer">
+          <lightning-button
+            data-id="close-cancel"
+            label={labels.cancel}
+            onclick={handleCancelClose}
+          ></lightning-button>
+          <lightning-button
+            data-id="close-save"
+            class="slds-var-m-left_x-small"
+            variant="brand"
+            label={labels.save}
+            disabled={isSaving}
+            onclick={handleSaveClose}
+          ></lightning-button>
+        </footer>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+  </template>
+</template>

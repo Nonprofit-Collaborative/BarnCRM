@@ -2,26 +2,15 @@ import { LightningElement, api } from 'lwc';
 import startServerExport from '@salesforce/apex/FindController.startServerExport';
 import serverExportStatus from '@salesforce/apex/FindController.serverExportStatus';
 
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import STARTED from '@salesforce/label/c.Core_Find_ExportFilesStarted';
 import PROGRESS from '@salesforce/label/c.Core_Find_ExportFilesProgress';
 import DONE from '@salesforce/label/c.Core_Find_ExportFilesDone';
 import FAILED from '@salesforce/label/c.Core_Find_ExportFilesFailed';
 import FILES from '@salesforce/label/c.Core_Find_ExportFilesList';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
+import { messageFrom, format } from 'c/findCsv';
 
 const POLL_MILLISECONDS = 5000;
-
-function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
-}
-
-function messageFrom(error) {
-  if (error && error.body && error.body.message) {
-    return error.body.message;
-  }
-  return error && error.message ? error.message : UNEXPECTED_ERROR;
-}
 
 /**
  * Find's export to Files (C-36, canonical model R-SQ12, admin guide find.md section 7.5a): starts

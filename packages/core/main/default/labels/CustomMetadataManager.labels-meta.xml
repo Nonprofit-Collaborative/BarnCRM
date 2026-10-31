@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Save refused by Salesforce before it started</shortDescription>
-        <value>Salesforce did not accept the change, so nothing was saved. If BarnCRM was installed as a package, turn on Deploy Metadata from Non-Certified Package Versions via Apex in Setup (Apex Settings), then save again. The Error Log has the details.</value>
+        <value>Salesforce did not accept the change, so nothing was saved. If BarnCRM was installed as a package, turn on Deploy Metadata from Non-Certified Package Versions via Apex in Setup (Apex Settings), then save again. The Error Log has details.</value>
     </labels>
     <labels>
         <fullName>Core_CmdtManager_DeployFailed</fullName>
@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Custom metadata page: the user lacks Manage BarnCRM Metadata</shortDescription>
-        <value>You need the BarnCRM Metadata Admin permission set to change custom metadata. Ask your administrator to add it.</value>
+        <value>You need the BarnCRM Metadata Admin permission set to change custom metadata. Ask your BarnCRM admin to add it.</value>
     </labels>
     <labels>
         <fullName>Core_CmdtManager_AddButton</fullName>

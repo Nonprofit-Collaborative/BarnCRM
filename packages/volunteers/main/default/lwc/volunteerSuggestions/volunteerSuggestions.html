@@ -1,0 +1,67 @@
+<template>
+  <template lwc:if={visible}>
+    <lightning-card title={labels.title} icon-name="custom:custom15">
+      <div class="slds-var-p-horizontal_medium slds-is-relative">
+        <template lwc:if={showSpinner}>
+          <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
+        </template>
+
+        <template lwc:if={hasError}>
+          <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">{errorMessage}</p>
+        </template>
+
+        <div role="status" class="slds-var-m-bottom_small">
+          <template lwc:if={resultMessage}>
+            <p data-id="result-text" class="slds-text-body_regular">{resultMessage}</p>
+          </template>
+        </div>
+
+        <p data-id="subtitle" class="slds-text-body_small slds-var-m-bottom_small">{labels.subtitle}</p>
+
+        <template lwc:if={isEmpty}>
+          <p data-id="empty-state" class="slds-text-body_regular">{labels.empty}</p>
+        </template>
+
+        <template lwc:if={hasRows}>
+          <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+            <thead>
+              <tr class="slds-line-height_reset">
+                <th scope="col">{labels.person}</th>
+                <th scope="col">{labels.why}</th>
+                <th scope="col">{labels.actions}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={rows} for:item="row">
+                <tr key={row.personId} data-id="suggestion">
+                  <th scope="row" data-label={labels.person}>{row.name}</th>
+                  <td data-label={labels.why}>
+                    <ul class="slds-list_dotted">
+                      <template for:each={row.reasons} for:item="reason">
+                        <li key={reason.key} data-id="reason">{reason.text}</li>
+                      </template>
+                    </ul>
+                  </td>
+                  <td data-label={labels.actions}>
+                    <lightning-button
+                      class="sign-up"
+                      data-person-id={row.personId}
+                      label={row.signUp}
+                      aria-label={row.signUpFor}
+                      disabled={busy}
+                      onclick={handleSignUp}
+                    ></lightning-button>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </template>
+
+        <template lwc:if={moreNote}>
+          <p data-id="more-note" class="slds-text-body_small slds-var-m-top_small">{moreNote}</p>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

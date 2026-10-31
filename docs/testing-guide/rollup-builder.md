@@ -17,10 +17,10 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | From the App Launcher, open the **BarnCRM Admin** app and click **Rollup Builder**. | The **Rollup Builder** tab opens. |
-| 2 | Look at the page. | A **Rollup Builder** card holds a **Rollups** card that starts "Every total BarnCRM keeps up to date for you, and when each one was last calculated." Under it is a **Needs attention** section. No read only notice is shown. |
-| 3 | Look at the buttons above the list. | **Schedule nightly recalculation** (or **Stop the nightly recalculation**), **Recalculate all**, **Restore shipped rollups** and **New rollup** are all enabled. |
-| 4 | If the button reads **Stop the nightly recalculation**, click it. | The text above the buttons reads "Nightly recalculation is not scheduled yet." **Needs attention** shows "The nightly run is not scheduled, so totals a bulk change missed are not put right overnight." |
-| 5 | Click **Schedule nightly recalculation**. | The text reads "Nightly recalculation is scheduled for 2:00 AM." The button now reads **Stop the nightly recalculation**, and the not scheduled warning under **Needs attention** is gone. |
+| 2 | Look at the page. | A **Rollup Builder** card holds a **Rollups** card that starts "Every total BarnCRM keeps up to date for you, and when each one was last calculated." Under it is a **Needs Attention** section. No read only notice is shown. |
+| 3 | Look at the buttons above the list. | **Schedule nightly recalculation** (or **Stop the nightly recalculation**), **Recalculate All**, **Restore Shipped Rollups** and **New Rollup** are all enabled. |
+| 4 | If the button reads **Stop the nightly recalculation**, click it. | The text above the buttons reads "Nightly recalculation is not scheduled yet." **Needs Attention** shows "The nightly run is not scheduled, so totals a bulk change missed are not put right overnight." |
+| 5 | Click **Schedule nightly recalculation**. | The text reads "Nightly recalculation is scheduled for 2:00 AM." The button now reads **Stop the nightly recalculation**, and the not scheduled warning under **Needs Attention** is gone. |
 | 6 | Open the **BarnCRM Admin** app, then **BarnCRM Settings**, then the **Rollups** section. | The section opens the same Rollup Builder list, with the same schedule message. |
 
 **Cleanup:** leave the nightly run scheduled.
@@ -33,7 +33,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the **Rollup Builder** tab, click **New rollup**. | The Builder opens above the list with a five step path: **Where should the number appear?**, **What should be counted?**, **How should it be calculated?**, **Which records count?**, **Check and save**. The heading reads **Where should the number appear?** |
+| 1 | On the **Rollup Builder** tab, click **New Rollup**. | The Builder opens above the list with a five step path: **Where should the number appear?**, **What should be counted?**, **How should it be calculated?**, **Which records count?**, **Check and save**. The heading reads **Where should the number appear?** |
 | 2 | In **Record that shows the total**, choose **Account**. In **Field that shows the total**, choose **Test Children Count**. Click **Next**. | The heading reads **What should be counted?** |
 | 3 | In **Records to count**, choose **Contact, by Account ID**. Click **Next**. | The heading reads **How should it be calculated?** |
 | 4 | In **Calculation**, choose **Count**. Leave **Time window** on **All time**. | No **Field to calculate** box appears (Count reads no field). No **Date that decides the year** box appears. |
@@ -42,7 +42,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 7 | Click **Next**. | The heading reads **Check and save**. A sentence of the form "Count of Contact, by Account ID, shown in ..., Test Children Count." is shown, and "This rollup will maintain about N records." where N is the number of accounts in the org. |
 | 8 | In **See it on a record**, pick **The Garcia Family**. | "Calculated: 1. On the record now: (empty)." |
 | 9 | In **Name**, type `Test children per household`. In **What this number means**, type `Children in the household`. Leave **Mode** on its default and **Active** on. | The fields hold what you typed. **Mode** shows the org's default rollup mode (**Both (recommended)** unless it was changed). |
-| 10 | Click **Save and calculate now**. | The Builder closes. A green notice reads "Rollup saved, and its recalculation has started." |
+| 10 | Click **Save and Calculate Now**. | The Builder closes. A green notice reads "Rollup saved, and its recalculation has started." |
 | 11 | Find **Test children per household** in the list. | The row is under the **Account** heading and shows **Children in the household** under the name, a **What It Counts** sentence of the form "Number of Contacts by Account, shown in Test Children Count on each Account. Only records that meet its conditions count.", the mode you saved, and **Active** on. |
 | 12 | Wait a minute and refresh the page. | The row's **Last Calculated** shows a time from a moment ago, not **Not calculated yet**. |
 | 13 | Open **The Garcia Family** household. | **Test Children Count** shows 1. |
@@ -75,10 +75,10 @@ The **Records to count** option in step 2 is named from your org's object and fi
 |---|---|---|
 | 1 | On the **Rollup Builder** tab, note the **Last Calculated** time of **Test children per household**. Click **Recalculate** on its row. | A green notice reads "Recalculation started. This page updates as it finishes." |
 | 2 | Wait a minute and refresh. | The row's **Last Calculated** time has moved on. |
-| 3 | Click **Recalculate all**. | Nothing starts yet. A box shows "About N records, roughly M minutes." with **Cancel**, **Start now** and **Run tonight**. Between 8 AM and 6 PM on a weekday it also says "People are working now. A long run competes with them saving records, so consider running it tonight." |
+| 3 | Click **Recalculate All**. | Nothing starts yet. A box shows "About N records, roughly M minutes." with **Cancel**, **Start Now** and **Run Tonight**. Between 8 AM and 6 PM on a weekday it also says "People are working now. A long run competes with them saving records, so consider running it tonight." |
 | 4 | Click **Cancel**. | The box closes and no notice appears. |
-| 5 | Click **Recalculate all**, then **Run tonight**. | The notice reads "The nightly run already recalculates every Every night and Both total at 2:00 AM. Instantly totals are kept by each save; to rebuild them too, choose Start now." |
-| 6 | Click **Recalculate all**, then **Start now**. | The notice reads "Recalculation started. This page updates as it finishes." **Needs attention** shows a line starting "A full run is going:" or, once done, "Last full run:". |
+| 5 | Click **Recalculate All**, then **Run Tonight**. | The notice reads "The nightly run already recalculates every Every night and Both total at 2:00 AM. Instantly totals are kept by each save; to rebuild them too, choose Start now." |
+| 6 | Click **Recalculate All**, then **Start Now**. | The notice reads "Recalculation started. This page updates as it finishes." **Needs Attention** shows a line starting "A full run is going:" or, once done, "Last full run:". |
 | 7 | Straight away, click **Recalculate** on any row. | If the full run is still going, the red message reads "A full recalculation is already running. Its totals will be on the records when it finishes, so try again after that." |
 | 8 | When the full run has finished, refresh. | Every active row's **Last Calculated** time is recent. **The Garcia Family** still shows **Test Children Count** 1. |
 
@@ -110,7 +110,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Click **New rollup**. Click **Next** without choosing anything. | The Builder stays on step 1. A red message reads "Choose the kind of record and the field that show the total, in step 1." |
+| 1 | Click **New Rollup**. Click **Next** without choosing anything. | The Builder stays on step 1. A red message reads "Choose the kind of record and the field that show the total, in step 1." |
 | 2 | Choose **Account** and a writable number field you created (for example a second test field, or **Test Children Count**). Click **Next**, then click **Next** again with no **Records to count**. | Stays on step 2: "Choose the records to count and how they link to the record that shows the total, in step 2." |
 | 3 | Choose **Contact, by Account ID**, click **Next**, then **Next** again with no **Calculation**. | Stays on step 3: "This calculation reads a field on each record. Fill in Source Field with the field to read." |
 | 4 | Choose **Calculation** = **Last**, and a **Field to calculate**. Leave **Which record comes first, by** empty. Click **Next**. | "First and Last need the field that decides which record comes first, usually a date. Choose one in step 3." |
@@ -133,7 +133,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 1 | On the **Rollup Builder** tab, turn off the **Active** toggle on **Test children per household**. | No error; after the refresh the toggle stays off. |
 | 2 | Open **The Garcia Family**. | **Test Children Count** still shows 1. Switching off never clears values already calculated. |
 | 3 | Open Diego Garcia, change **Household Role** to **Other** and save. Wait a minute, then refresh **The Garcia Family**. | **Test Children Count** still shows 1: the inactive rollup did not recalculate. |
-| 4 | Back on the **Rollup Builder** tab, click **New rollup**, choose **Account**, and open **Field that shows the total**. | **Test Children Count** is listed with no "(filled by ...)" note, because no active rollup fills it. Click **Cancel**. |
+| 4 | Back on the **Rollup Builder** tab, click **New Rollup**, choose **Account**, and open **Field that shows the total**. | **Test Children Count** is listed with no "(filled by ...)" note, because no active rollup fills it. Click **Cancel**. |
 | 5 | Turn the **Active** toggle on **Test children per household** back on. | The toggle stays on after the refresh. |
 | 6 | Click **Recalculate** on its row and wait a minute. Refresh **The Garcia Family**. | **Test Children Count** shows 0, matching Diego's new role. |
 | 7 | Open Diego Garcia, set **Household Role** back to **Child** and save. Wait a minute and refresh **The Garcia Family**. | **Test Children Count** shows 1. |
@@ -148,10 +148,10 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Log in as the staff user. In the App Launcher, search for "Rollup" and open the **Rollup Builder** tab. | The **Rollup Builder** tab opens. |
-| 2 | Look at the top of the list. | A grey notice reads "You can see these totals but not change them. Ask an administrator for the Manage BarnCRM Settings permission." |
-| 3 | Look at the buttons and rows. | **Schedule nightly recalculation** (or **Stop the nightly recalculation**), **Recalculate all**, **Restore shipped rollups** and **New rollup** are disabled. On every row the **Mode** list, **Active** toggle, **Recalculate**, **Edit** and **Copy** are disabled. |
+| 2 | Look at the top of the list. | A grey notice reads "You can see these totals but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." |
+| 3 | Look at the buttons and rows. | **Schedule nightly recalculation** (or **Stop the nightly recalculation**), **Recalculate All**, **Restore Shipped Rollups** and **New Rollup** are disabled. On every row the **Mode** list, **Active** toggle, **Recalculate**, **Edit** and **Copy** are disabled. |
 | 4 | Find **Test children per household**. | The row shows its name, description, what it counts, where it shows and its **Last Calculated** time. |
-| 5 | Look below the list. | No **Needs attention** section is shown. |
+| 5 | Look below the list. | No **Needs Attention** section is shown. |
 | 6 | Log in as the read-only user and repeat steps 1 to 5. | Same results as the staff user. |
 | 7 | As admin, in Setup remove **Rollup Builder User** from the read-only user. Log in as the read-only user and search the App Launcher for "Rollup". | The **Rollup Builder** tab is not offered. |
 | 8 | As admin, in Setup open the **Rollup Builder Admin** and **Rollup Builder User** permission sets. | **Rollup Builder Admin** gives create, edit and delete on rollup definitions; **Rollup Builder User** gives read only. Both open the **Rollup Builder** tab; neither names an app. |
@@ -168,7 +168,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 1 | Open **BarnCRM Settings** and choose the **Rollups** section. | **Default rollup mode**, **When instant totals are calculated** and a **Rollups** row with an **Open Rollup Builder** button are shown. **Fiscal year start month** is not here (it is the org's, shown read only in **General**). The **BarnCRM Rollup Builder** app has no Settings tab. On a fresh org **Default rollup mode** shows **Both (recommended)** and **When instant totals are calculated** shows **After the save (recommended)** (neither is empty). |
 | 2 | Change **Default rollup mode** to **Every night** and save. | The setting saves and shows **Every night**. |
 | 3 | Reload the page and open the **Rollups** section again. | **Default rollup mode** still shows **Every night**. |
-| 4 | On the **Rollup Builder** tab, click **New rollup**, complete steps 1 to 4 (any valid choices) and go to **Check and save**. | **Mode** is preselected as **Every night**. |
+| 4 | On the **Rollup Builder** tab, click **New Rollup**, complete steps 1 to 4 (any valid choices) and go to **Check and save**. | **Mode** is preselected as **Every night**. |
 | 5 | Click **Cancel**. | Nothing is saved. |
 
 **Cleanup:** set **Default rollup mode** back to **Both (recommended)**.
@@ -180,12 +180,12 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the **Rollup Builder** tab, click **New rollup** and open **Record that shows the total**. | The list starts with Account, Contact, BarnCRM's objects and the common standard objects this org has, for example Task, Event and Asset, and in an org with Sales Cloud also Opportunity, Case and Campaign. No sharing or history objects (such as Account Share) are listed. |
+| 1 | On the **Rollup Builder** tab, click **New Rollup** and open **Record that shows the total**. | The list starts with Account, Contact, BarnCRM's objects and the common standard objects this org has, for example Task, Event and Asset, and in an org with Sales Cloud also Opportunity, Case and Campaign. No sharing or history objects (such as Account Share) are listed. |
 | 2 | In **Find another object**, type `work`. Open **Record that shows the total** again. | Only objects whose name contains "work" are listed (for example Work Order, if the org has it). Clearing the box shows the common list again. |
 | 3 | Clear **Find another object**. Choose **Account** and **Test Task Count**. Click **Next**. | Step 2 lists, among the others, **Task, by Related To ID** (and in an org with Sales Cloud, **Opportunity, by Account ID**). |
-| 4 | Choose **Task, by Related To ID**. Click **Next**. Choose **Calculation** = **Count**. Click **Next**. Add the condition **Status** **is not** **Completed**. Click **Next**. | Step 5 shows the sentence, and the notice "Instant totals are not available yet for Tasks. This total is updated by the nightly run and when you click Recalculate. To make it instant, turn on instant totals for it below, or use the Recalculate rollups Flow template and choose Both (recommended)." Below the mode, the Task line reads **Not set up: these totals update every night and when you click Recalculate.** with **Turn on instant totals**. |
+| 4 | Choose **Task, by Related To ID**. Click **Next**. Choose **Calculation** = **Count**. Click **Next**. Add the condition **Status** **is not** **Completed**. Click **Next**. | Step 5 shows the sentence, and the notice "Instant totals are not available yet for Tasks. This total is updated by the nightly run and when you click Recalculate. To make it instant, turn on instant totals for it below, or use the Recalculate rollups Flow template and choose Both (recommended)." Below the mode, the Task line reads **Not set up: these totals update every night and when you click Recalculate.** with **Turn On Instant Totals**. |
 | 5 | In **See it on a record**, choose **The Garcia Family**. | The preview shows 2 as the calculated total. |
-| 6 | Name it **Test open tasks**, leave the mode, click **Save and calculate now**. | Saved. After the recalculation finishes, **The Garcia Family** shows **Test Task Count** 2. |
+| 6 | Name it **Test open tasks**, leave the mode, click **Save and Calculate Now**. | Saved. After the recalculation finishes, **The Garcia Family** shows **Test Task Count** 2. |
 
 **Cleanup:** delete **Test open tasks** (or set it inactive) and the two test tasks.
 
@@ -209,7 +209,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the **Rollup Builder** tab, click **New rollup**. Choose **Account** and **Test Names**, click **Next**, choose **Contact, by Account ID** and click **Next**. | The heading reads **How should it be calculated?** |
+| 1 | On the **Rollup Builder** tab, click **New Rollup**. Choose **Account** and **Test Names**, click **Next**, choose **Contact, by Account ID** and click **Next**. | The heading reads **How should it be calculated?** |
 | 2 | In **Calculation**, choose **Text list**. In **Field to calculate**, choose **First Name**. | **Only the first N records**, **Which record comes first, by**, **Order** (showing **Ascending**) and **Separate the values with** appear. |
 | 3 | In **Only the first N records**, enter `2`. Leave **Which record comes first, by** empty and click **Next**. | The step does not move on and says "Only the first N records needs a field to order by, so BarnCRM knows which records come first. Choose one, or clear the limit." |
 | 4 | In **Which record comes first, by**, choose **First Name**. In **Order**, choose **Descending**. Click **Next** twice. | The heading reads **Check and save**. |
@@ -265,9 +265,9 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Click **New rollup**. Choose **Account** and **Test Children Count**, then **Contact, by Account ID**, then **Calculation** = **Count**, and click **Next** until **Which records count?** | Step 4 shows the **Conditions** builder. No note about another record is shown. |
+| 1 | Click **New Rollup**. Choose **Account** and **Test Children Count**, then **Contact, by Account ID**, then **Calculation** = **Count**, and click **Next** until **Which records count?** | Step 4 shows the **Conditions** builder. No note about another record is shown. |
 | 2 | Under **Conditions**, click **Add Condition** and open **Field**. | After the contact's own fields, the list offers fields of the records a contact points to, written as the lookup and the field, for example **Account > Account Name** and **Reports To > Last Name**. No **Created By > ...** or **Last Modified By > ...** fields are offered, and nothing two lookups away (such as **Account > Parent Account > ...**). |
-| 3 | Choose **Account > Account Name**, **Comparison** = **is**, **Value** = `The Garcia Family`. | The sentence reads about contacts whose Account > Account Name is The Garcia Family. Below the conditions a grey note reads "This filter reads a field of another record. When that record changes, the totals update at once only if its object has rollup triggers; otherwise the nightly run, or Recalculate on the Rollups page, puts them right." |
+| 3 | Choose **Account > Account Name**, **Comparison** = **is**, **Value** = `The Garcia Family`. | The sentence reads about contacts whose Account > Account Name is The Garcia Family. Below the conditions a grey note reads "This filter reads a field of another record. When that record changes, totals update at once only if its object has rollup triggers. Otherwise the nightly run, or Recalculate on the Rollups page, puts them right." |
 | 4 | Click **Next**. In **See it on a record**, pick **The Garcia Family**. | The preview starts "Calculated: 3." (Harper, Luis and Diego). No error. |
 | 5 | Pick any other household. | The preview starts "Calculated: 0." |
 | 6 | Click **Back**, remove the condition. | The note about another record disappears. Click **Cancel**; nothing is saved. |
@@ -281,10 +281,10 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Click **New rollup**. Choose **Account** and, in **Field that shows the total**, **Test Last Role**. Choose **Contact, by Account ID** and click **Next**. | **Test Last Role** was offered in step 1. **Calculation** offers only **First** and **Last**. |
+| 1 | Click **New Rollup**. Choose **Account** and, in **Field that shows the total**, **Test Last Role**. Choose **Contact, by Account ID** and click **Next**. | **Test Last Role** was offered in step 1. **Calculation** offers only **First** and **Last**. |
 | 2 | Choose **Last**. Open **Field to calculate**. | Only picklist and text fields are offered (for example **Household Role**, **Last Name**), no number or date fields. |
 | 3 | Choose **Household Role** and **Which record comes first, by** = **Created Date**. Click **Next** twice, name it `Test last role`, and click **Save**. | Nothing is saved. A red message reads "The picklist you fill does not have these values of the field you copy: Spouse or Partner. Add them to that picklist, or choose another field." |
-| 4 | Keep the Builder open. In Setup, add the value **Spouse or Partner** to **Test Last Role**. Back in the Builder, click **Save and calculate now**. | "Rollup saved, and its recalculation has started." |
+| 4 | Keep the Builder open. In Setup, add the value **Spouse or Partner** to **Test Last Role**. Back in the Builder, click **Save and Calculate Now**. | "Rollup saved, and its recalculation has started." |
 | 5 | Wait a minute and open **The Garcia Family**. | **Test Last Role** shows the Household Role of the Garcia person created last (Head, Spouse or Partner, or Child). |
 | 6 | Click **Edit** on **Test last role**. On step 3 change **Field to calculate** to **Last Name**. Save and calculate now, wait a minute, and refresh **The Garcia Family**. | **Test Last Role** still shows the role from step 5: a last name is not a value of the picklist. |
 | 7 | Open the **Error Log**. | A Warning from `RollupWriter` reads "A rollup could not put "Garcia" in Test Last Role, because it is not a value of that picklist. The record keeps the value it had. Add the value to the picklist, or change the rollup." (with that person's last name). |
@@ -344,7 +344,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 2 | Choose **11:00 PM** and save. | The setting saves and shows **11:00 PM**. |
 | 3 | Open the **Rollup Builder** tab. | The text above the buttons reads "Nightly recalculation is scheduled for 11:00 PM." |
 | 4 | In Setup, open **Scheduled Jobs**. | One job named **BarnCRM Rollups**, next run today or tomorrow at 11:00 PM. |
-| 5 | On the **Rollup Builder** tab, click **Stop the nightly recalculation**, then **Recalculate all**, then **Run tonight**. | The notice reads "One recalculation of every total is set for the next 11:00 PM." |
+| 5 | On the **Rollup Builder** tab, click **Stop the nightly recalculation**, then **Recalculate All**, then **Run Tonight**. | The notice reads "One recalculation of every total is set for the next 11:00 PM." |
 | 6 | Click **Schedule nightly recalculation**. | The text reads "Nightly recalculation is scheduled for 11:00 PM." |
 
 **Cleanup:** set **Time of the nightly run** back to **2:00 AM** and check the Rollup Builder tab says 2:00 AM; in Setup, **Scheduled Jobs**, delete the one-off **BarnCRM Rollups** job with a date in its name.
@@ -373,13 +373,13 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the **Rollup Builder** tab, tick **Include in the export** on **Test children per household** and click **Export to a file**. | The browser saves `barncrm-rollups.json`. Rows of rollups that came with BarnCRM have no tick box. |
+| 1 | On the **Rollup Builder** tab, tick **Include in the export** on **Test children per household** and click **Export to a File**. | The browser saves `barncrm-rollups.json`. Rows of rollups that came with BarnCRM have no tick box. |
 | 2 | Open the file in a text editor. | It starts with `"format" : "BarnCRM rollups"` and `"version" : 1`, and holds one rollup with `"name" : "Test children per household"` and a `"definitionKey"` starting `Custom_`. It has no `recordId` and no last calculated date. |
 | 3 | Back on the tab, under **Import from a file**, choose the file. | A table lists **Test children per household** with "Will replace the rollup here with the same Definition Key". Nothing is saved yet. |
 | 4 | Click **Cancel**. | The table closes. |
-| 5 | Choose the file again and click **Import these rollups**. | The table reads **Updated** for the rollup, and the notice reads "Import finished: see each rollup below. Imported rollups are calculated in their next run, or click Recalculate." The list still has one **Test children per household**, still active. |
-| 6 | Untick the box and click **Export to a file** again. | The file holds every rollup you made and none that came with BarnCRM. |
-| 7 | In the second org, on the **Rollup Builder** tab, import the file from step 1 and click **Import these rollups**. | The table reads "Not saved: BarnCRM cannot write to the field this rollup fills. Choose a field that exists and is not a formula or read only." Nothing is saved. |
+| 5 | Choose the file again and click **Import These Rollups**. | The table reads **Updated** for the rollup, and the notice reads "Import finished: see each rollup below. Imported rollups are calculated in their next run, or click Recalculate." The list still has one **Test children per household**, still active. |
+| 6 | Untick the box and click **Export to a File** again. | The file holds every rollup you made and none that came with BarnCRM. |
+| 7 | In the second org, on the **Rollup Builder** tab, import the file from step 1 and click **Import These Rollups**. | The table reads "Not saved: BarnCRM cannot write to the field this rollup fills. Choose a field that exists and is not a formula or read only." Nothing is saved. |
 
 **Cleanup:** None.
 
@@ -391,7 +391,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Save a text file named `not-rollups.json` holding `{}`. On the **Rollup Builder** tab, choose it under **Import from a file**. | A red message reads "This is not a BarnCRM rollups file. Choose a file made by Export to a file." No table opens. |
-| 2 | Log in as the staff user and open the **Rollup Builder** tab. | **Export to a file**, **Import from a file** and the tick boxes are disabled or not shown. |
+| 2 | Log in as the staff user and open the **Rollup Builder** tab. | **Export to a File**, **Import from a file** and the tick boxes are disabled or not shown. |
 
 **Cleanup:** delete `not-rollups.json`.
 
@@ -402,12 +402,12 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the **Rollup Builder** tab, build a rollup on **Contact**, field **Test shift hours**, counting **Shift, by Volunteer**, **Sum** of **Hours**, mode **Both (recommended)**. Stay on **Check and save**. | The notice "Instant totals are not available yet for Shifts..." is shown and **Mode** offers **Every night** and **Both (recommended)** only. Under **Mode**: **Not set up: these totals update every night and when you click Recalculate.** with **Turn on instant totals**. |
-| 2 | Save. Scroll to **Instant Totals** below the rollups. | **Shift** is listed: **Not set up**, **1 instant rollup counts this object.**, and **Turn on instant totals**. |
-| 3 | Click **Turn on instant totals**. | **Turn On Instant Totals for Shift** opens with five steps, the **Trigger** (`trigger BarnRollup_Shift_c on Shift__c (...)` with one line, `RollupInstantTrigger.run();`), the **Test Class** (`BarnRollup_Shift_c_Test`), a CLI command naming `--tests BarnRollup_Shift_c_Test`, and **Download deploy package**. |
+| 1 | On the **Rollup Builder** tab, build a rollup on **Contact**, field **Test shift hours**, counting **Shift, by Volunteer**, **Sum** of **Hours**, mode **Both (recommended)**. Stay on **Check and save**. | The notice "Instant totals are not available yet for Shifts..." is shown and **Mode** offers **Every night** and **Both (recommended)** only. Under **Mode**: **Not set up: these totals update every night and when you click Recalculate.** with **Turn On Instant Totals**. |
+| 2 | Save. Scroll to **Instant Totals** below the rollups. | **Shift** is listed: **Not set up**, **1 instant rollup counts this object.**, and **Turn On Instant Totals**. |
+| 3 | Click **Turn On Instant Totals**. | **Turn On Instant Totals for Shift** opens with five steps, the **Trigger** (`trigger BarnRollup_Shift_c on Shift__c (...)` with one line, `RollupInstantTrigger.run();`), the **Test Class** (`BarnRollup_Shift_c_Test`), a CLI command naming `--tests BarnRollup_Shift_c_Test`, and **Download deploy package**. |
 | 4 | Click **Download deploy package**. | `BarnRollup_Shift_c.zip` downloads, holding `package.xml`, `triggers/BarnRollup_Shift_c.trigger` and `classes/BarnRollup_Shift_c_Test.cls` with their `-meta.xml` files. |
 | 5 | Follow steps 1 and 2 of the panel in this org's Developer Console (use **Copy** for each piece of code), and run the test. | The test passes. |
-| 6 | Reload the **Rollup Builder** tab. | **Shift** shows **On: the trigger BarnRollup_Shift_c updates these totals at once.** with **Turn off instant totals** and **Remove the trigger**. |
+| 6 | Reload the **Rollup Builder** tab. | **Shift** shows **On: the trigger BarnRollup_Shift_c updates these totals at once.** with **Turn Off Instant Totals** and **Remove the Trigger**. |
 | 7 | Open a contact, add a **Shift** with **Hours** 3, wait a few seconds and reload the contact. | **Test shift hours** is 3 without clicking **Recalculate**. |
 | 8 | On the **Rollup Builder** tab, click **Edit** on the rollup and go to **Check and save**. | No "Instant totals are not available yet" notice. **Mode** offers **Instantly** too, and the Shift line reads **On**. Click **Cancel**. |
 
@@ -420,12 +420,12 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Instant Totals**, click **Turn off instant totals** for **Shift**. | **Instant totals on Shift are turned off.** The line reads **Turned off: these totals update every night and when you click Recalculate.** |
+| 1 | On **Instant Totals**, click **Turn Off Instant Totals** for **Shift**. | **Instant totals on Shift are turned off.** The line reads **Turned off: these totals update every night and when you click Recalculate.** |
 | 2 | Add another **Shift** with **Hours** 2 to the same contact, wait a few seconds and reload. | **Test shift hours** is still 3. |
 | 3 | In BarnCRM Settings, open the **Automation** page. | **Instant rollups on Shift** is listed and off. |
-| 4 | Back on **Instant Totals**, click **Turn on instant totals**, then click **Recalculate** on the rollup. | **Instant totals on Shift are turned back on.**, and after the recalculation **Test shift hours** is 5. |
-| 5 | Click **Remove the trigger**. | **Remove the Trigger for Shift** opens with three steps, a CLI command with `--test-level RunLocalTests`, and **Download removal package** (`BarnRollup_Shift_c_Removal.zip`, holding `package.xml` and `destructiveChanges.xml`). |
-| 6 | Sign in as a user with BarnCRM Staff and Rollup Builder User only and open the **Rollup Builder** tab. | **Shift** is listed with **Remove the trigger** but no **Turn off instant totals** button. |
+| 4 | Back on **Instant Totals**, click **Turn On Instant Totals**, then click **Recalculate** on the rollup. | **Instant totals on Shift are turned back on.**, and after the recalculation **Test shift hours** is 5. |
+| 5 | Click **Remove the Trigger**. | **Remove the Trigger for Shift** opens with three steps, a CLI command with `--test-level RunLocalTests`, and **Download removal package** (`BarnRollup_Shift_c_Removal.zip`, holding `package.xml` and `destructiveChanges.xml`). |
+| 6 | Sign in as a user with BarnCRM Staff and Rollup Builder User only and open the **Rollup Builder** tab. | **Shift** is listed with **Remove the Trigger** but no **Turn Off Instant Totals** button. |
 
 **Cleanup:** delete `BarnRollup_Shift_c` and `BarnRollup_Shift_c_Test` in Setup (sandbox), then the rollup.
 
@@ -452,14 +452,14 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the **Rollup Builder** tab, click **New rollup** and build a rollup on **Account**, field **Test child count**, counting **Account, by Parent Account**, **Count**, **Active** ticked. Click **Save**. | **Switch Off the DLRS Rollup** opens: "The DLRS rollup Test child count also fills Account.Test_child_count__c. Two tools filling one field overwrite each other..." |
+| 1 | On the **Rollup Builder** tab, click **New Rollup** and build a rollup on **Account**, field **Test child count**, counting **Account, by Parent Account**, **Count**, **Active** ticked. Click **Save**. | **Switch Off the DLRS Rollup** opens: "The DLRS rollup Test child count also fills Account.Test_child_count__c. Two tools filling one field overwrite each other..." |
 | 2 | Click **Cancel**. | The dialog closes, you are still on **Check and save**, and nothing is saved (the list has no new rollup). |
 | 3 | Click **Save** again, then **OK**. | The rollup is saved and switched on. |
 | 4 | In BarnCRM Settings, open **Recent Changes**. | A row **Rollup Builder:** and the rollup's name, old value "DLRS rollup Test child count fills Account.Test_child_count__c", new value "Turned on; the admin confirmed the DLRS rollup will be switched off". |
 | 5 | In DLRS, open **Test child count**. | It is still active: BarnCRM changed nothing. |
 | 6 | Back in the list, switch **Active** off for the rollup, then on again. Click **Cancel** in the dialog. | Switching off asks nothing. Switching on opens **Switch Off the DLRS Rollup**; after **Cancel** the switch is back off. |
 | 7 | Switch **Active** on again and click **OK**. | The rollup is on, and a second **Recent Changes** row is written. |
-| 8 | Tick the rollup, click **Export to a file**, delete the rollup, and import the file under **Import from a file**. | The table reads **Not saved** with the DLRS sentence; nothing is saved. |
+| 8 | Tick the rollup, click **Export to a File**, delete the rollup, and import the file under **Import from a file**. | The table reads **Not saved** with the DLRS sentence; nothing is saved. |
 
 **Cleanup:** delete the BarnCRM rollup; keep the DLRS rollup and field for T-RB-34.
 
@@ -533,7 +533,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Click **New rollup**. | Above the steps, a sentence starting "Show (not chosen yet) from (not chosen yet)". Only the part for step 1 can be clicked. |
+| 1 | Click **New Rollup**. | Above the steps, a sentence starting "Show (not chosen yet) from (not chosen yet)". Only the part for step 1 can be clicked. |
 | 2 | Choose **Account** and **Test Children Count**, click **Next**, choose **Contact, by Account ID** and click **Next**. | The sentence now names **Contact, by Account ID** and **Account: Test Children Count**. Under **Calculation**: "Not available for Test Children Count: Any, None, Text list, Text list, each value once. To use one of them, choose another field in step 1." |
 | 3 | Choose **Sum**. | **Field to calculate** lists only number, currency and percent fields of Contact, and the line under it reads "Only number, currency and percent fields are listed, because Sum works on numbers." |
 | 4 | Choose **Count**, click **Next** twice. On step 5 read **What Each Choice Means**. | Three lines: "Instantly, after the save: Test Children Count changes within about a minute after one of the Contacts is saved.", "Every night: Test Children Count is recalculated at 2:00 AM each night, so a change made today shows tomorrow." (or the time you set), and "Both (recommended): instantly, and the nightly run at 2:00 AM puts right anything a save missed." |
@@ -581,7 +581,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Click **New rollup**, choose **Account**, then click **Create a Field**. | A **Create a Field** panel opens, saying BarnCRM cannot add a field itself because that takes a Metadata API deploy. **Field type** shows **Number**; **Write the Field** is disabled. |
+| 1 | Click **New Rollup**, choose **Account**, then click **Create a Field**. | A **Create a Field** panel opens, saying BarnCRM cannot add a field itself because that takes a Metadata API deploy. **Field type** shows **Number**; **Write the Field** is disabled. |
 | 2 | Type `Test Gift Count` in **Field label** and click **Write the Field**. | Four numbered steps: open Object Manager, then Account, then Fields & Relationships, and click New; choose Number, enter the label Test Gift Count and the field name Test_Gift_Count; make it visible and save; come back and click Refresh Fields. Below, `objects/Account/fields/Test_Gift_Count__c.field-meta.xml` and its XML, **Copy**, **Download Field Package**, and the CLI command. |
 | 3 | Click **Copy**. | "Copied." The clipboard holds the XML. |
 | 4 | Click **Download Field Package**. | `BarnRollupField_Account_Test_Gift_Count__c.zip` downloads, holding `package.xml` and `objects/Account.object`. |
@@ -634,10 +634,10 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As the admin, open the **Rollup Builder** tab, click **New rollup** and search step 1's object list for **User** and **Permission Set**. | Neither is offered. |
+| 1 | As the admin, open the **Rollup Builder** tab, click **New Rollup** and search step 1's object list for **User** and **Permission Set**. | Neither is offered. |
 | 2 | Log in as the test user. Open **Test children per household** by its record URL (`/lightning/r/Rollup_Definition__c/<Id>/view`), click **Edit**, change **Target Field** to `AnnualRevenue` and save. | Refused: "You do not have permission to change rollups." The field is unchanged. |
 | 3 | As the test user, in the Developer Console run `insert new Rollup_Definition__c(Name='Test guard', Definition_Key__c='Test_Guard', Source_Object__c='Contact', Relationship_Path__c='AccountId', Aggregate__c='COUNT', Target_Object__c='Account', Target_Field__c='NumberOfEmployees', Mode__c='Both');` | Fails with the same message. Nothing is saved. |
 | 4 | As the admin, run the same statement with `Target_Object__c='User'`, `Target_Field__c='Title'`, `Relationship_Path__c='OwnerId'`, `Aggregate__c='LAST'`, `Source_Field__c='Title'`, `Order_By_Field__c='CreatedDate'`. | Fails: "A rollup cannot fill fields on this kind of record. Choose another object for the total." |
-| 5 | As the admin, click **Recalculate all** on the **Rollup Builder** tab. | The run finishes as before; shipped rollups and their last calculated times are unaffected. |
+| 5 | As the admin, click **Recalculate All** on the **Rollup Builder** tab. | The run finishes as before; shipped rollups and their last calculated times are unaffected. |
 
 **Cleanup:** None.

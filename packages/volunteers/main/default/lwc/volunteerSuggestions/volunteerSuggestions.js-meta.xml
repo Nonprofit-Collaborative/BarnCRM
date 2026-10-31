@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Active volunteers not yet signed up for a shift, best match first by skills, availability,
+    hours on the job and onboarding, each with the reasons and a button to sign them up.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Suggested Volunteers</masterLabel>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage">
+      <objects>
+        <object>Volunteer_Shift__c</object>
+      </objects>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

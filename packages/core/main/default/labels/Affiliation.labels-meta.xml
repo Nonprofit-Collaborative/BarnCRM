@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Affiliation card: the list of affiliations could not be read</shortDescription>
-        <value>BarnCRM could not read these affiliations. Refresh the page, and if it happens again ask your administrator to check that you can read affiliations.</value>
+        <value>BarnCRM could not read these affiliations. Refresh the page, and if it happens again ask your BarnCRM admin to check that you can read affiliations.</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_Loading</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Affiliation card: the primary organization could not be changed</shortDescription>
-        <value>BarnCRM could not make that the primary affiliation. Check that you can edit affiliations, and if it happens again ask your administrator to check the Error Log.</value>
+        <value>BarnCRM could not make that the primary affiliation. Check that you can edit affiliations, and if it happens again ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_MakePrimarySuccess</fullName>
@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Save refused, dates overlap a record this user cannot see</shortDescription>
-        <value>This person already has an affiliation with this organization and role covering those dates. Change the dates, or ask an administrator to look at the existing one.</value>
+        <value>This person already has an affiliation with this organization and role covering those dates. Change the dates, or ask your BarnCRM admin to look at the existing one.</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_OverlapInSave</fullName>

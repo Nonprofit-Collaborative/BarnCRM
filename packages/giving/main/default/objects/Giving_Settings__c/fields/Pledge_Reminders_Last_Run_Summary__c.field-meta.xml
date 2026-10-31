@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Pledge_Reminders_Last_Run_Summary__c</fullName>
+  <inlineHelpText>What that run did, in one sentence.</inlineHelpText>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+  <label>Pledge Reminders Last Run Summary</label>
+  <trackTrending>false</trackTrending>
+  <externalId>false</externalId>
+</CustomField>

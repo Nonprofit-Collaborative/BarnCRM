@@ -43,6 +43,7 @@ import SAVED from '@salesforce/label/c.Core_CmdtManager_Saved';
 import STILL_SAVING from '@salesforce/label/c.Core_CmdtManager_StillSaving';
 import CHECK_AGAIN from '@salesforce/label/c.Core_CmdtManager_CheckAgain';
 import LOAD_ERROR from '@salesforce/label/c.Core_CmdtManager_LoadError';
+import { bodyMessage } from 'c/findCsv';
 
 const TYPE_NAME = 'Match_Source__mdt';
 const ADDRESS = 'Address';
@@ -108,7 +109,7 @@ export default class MatchSourceManager extends LightningElement {
       this.view = await getView();
       this.errorMessage = undefined;
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, LOAD_ERROR);
     }
   }
 
@@ -279,7 +280,7 @@ export default class MatchSourceManager extends LightningElement {
       this.errorMessage = undefined;
     } catch (error) {
       this.tryResult = undefined;
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, LOAD_ERROR);
     }
   }
 
@@ -304,7 +305,7 @@ export default class MatchSourceManager extends LightningElement {
       this.track(await request, label);
     } catch (error) {
       this.busy = false;
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, LOAD_ERROR);
     }
   }
 
@@ -325,7 +326,7 @@ export default class MatchSourceManager extends LightningElement {
       try {
         outcome = await getOutcome({ deploymentId: jobId });
       } catch (error) {
-        this.finish(undefined, this.messageFrom(error));
+        this.finish(undefined, bodyMessage(error, LOAD_ERROR));
         return;
       }
       if (outcome.status === 'Succeeded') {
@@ -367,9 +368,5 @@ export default class MatchSourceManager extends LightningElement {
 
   findSource(developerName) {
     return this.view.sources.find((source) => source.developerName === developerName);
-  }
-
-  messageFrom(error) {
-    return error && error.body && error.body.message ? error.body.message : LOAD_ERROR;
   }
 }

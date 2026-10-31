@@ -238,7 +238,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: notice when the household naming panel is not in this org</shortDescription>
-        <value>The household naming screen is not in this org yet, so there is nothing to confirm here. Skip this step, and BarnCRM will name households with the pattern it ships until you change it.</value>
+        <value>The household naming screen is not in this org yet, so there is nothing to confirm. Skip this step: BarnCRM names households with its shipped pattern until you change it.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_NextButton</fullName>
@@ -366,7 +366,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: what detection found in an org with Person Accounts</shortDescription>
-        <value>Your org uses Person Accounts. Household membership is tracked with one record per person, so a person can be in more than one household and everything you already have keeps working.</value>
+        <value>Your org uses Person Accounts. Household membership is tracked with one record per person, so a person can be in more than one household and everything you have keeps working.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_SkipButton</fullName>

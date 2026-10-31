@@ -12,22 +12,6 @@ public with sharing class RollupsNightlyJobProvider implements NightlyJobProvide
     }
 
     public List<NightlyJob> nightlyJobs() {
-        return new List<NightlyJob>{ new RollupJob() };
-    }
-
-    /** The nightly rollup recalculation, started and stopped on the Rollup Builder page. */
-    @NamespaceAccessible
-    public class RollupJob implements NightlyJob {
-        public String label() {
-            return System.Label.Core_HealthCheck_JobRollups;
-        }
-
-        public Boolean isScheduled() {
-            return RollupScheduler.isScheduled();
-        }
-
-        public void schedule() {
-            RollupScheduler.start();
-        }
+        return new List<NightlyJob>{ RollupScheduler.nightlyJob() };
     }
 }

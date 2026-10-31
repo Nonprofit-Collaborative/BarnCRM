@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: packages whose setup never ran. {1} names them.</shortDescription>
-        <value>{1}: installed, but the setup steps a package install runs never ran. This happens when source is copied into an org by hand. Finish Setup runs those same steps now, and is safe to run more than once.</value>
+        <value>{1}: installed, but the setup steps a package install runs never ran. This happens when source is copied into an org by hand. Finish Setup runs those steps now, and is safe to run more than once.</value>
     </labels>
     <labels>
         <fullName>Core_ModuleSetup_FindingTitle</fullName>

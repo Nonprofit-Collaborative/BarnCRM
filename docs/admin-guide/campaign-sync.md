@@ -60,12 +60,12 @@ appeals**. Choose one:
 Clicking **Sync all appeals** needs the Manage BarnCRM Settings permission (the BarnCRM
 Admin permission set has it) as well as Campaign access.
 
-**Two switches, one of them in charge.** **Copy appeals to Campaigns** in BarnCRM Settings
+**Two switches, one of them in charge.** **Copy Appeals to Campaigns** in BarnCRM Settings
 is the switch that decides whether Campaign sync is on. The **Campaign sync** row on the
 Automation page is the pause every BarnCRM automation has. It stops only the copy made
-when an appeal is saved, and it does nothing while **Copy appeals to Campaigns** is off. Leave
-it on, and use **Copy appeals to Campaigns** to turn the feature on or off. **Sync all
-appeals** follows **Copy appeals to Campaigns** alone.
+when an appeal is saved, and it does nothing while **Copy Appeals to Campaigns** is off. Leave
+it on, and use **Copy Appeals to Campaigns** to turn the feature on or off. **Sync all
+appeals** follows **Copy Appeals to Campaigns** alone.
 
 **Very large saves.** When one save holds so many appeals that copying them would push it
 past Salesforce's limits, for example a data load of thousands of appeals from Apex or a

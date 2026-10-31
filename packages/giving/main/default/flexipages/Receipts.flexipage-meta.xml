@@ -14,7 +14,7 @@
     <name>main</name>
     <type>Region</type>
   </flexiPageRegions>
-  <masterLabel>Receipts</masterLabel>
+  <masterLabel>Receipt Letters</masterLabel>
   <template>
     <name>flexipage:defaultAppHomeTemplate</name>
   </template>

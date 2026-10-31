@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Pledge_Reminders_Enabled__c</fullName>
+  <inlineHelpText>Whether pledge reminders go out at all. Off until your reminder steps and templates are ready: nothing is ever sent while this is off, by hand or by the nightly schedule.</inlineHelpText>
+  <defaultValue>false</defaultValue>
+  <type>Checkbox</type>
+  <label>Send Pledge Reminders</label>
+  <trackTrending>false</trackTrending>
+  <externalId>false</externalId>
+</CustomField>

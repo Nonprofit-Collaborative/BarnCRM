@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Donor segments: saved Find queries of people or organizations, made from starter templates,
+    counted, listed and exported as CSV for Mailchimp or Constant Contact (G-28).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Donor Segments</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

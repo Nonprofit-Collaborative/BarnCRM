@@ -100,7 +100,7 @@ public with sharing class VolunteersPostInstall implements InstallHandler, Modul
             try {
                 // A test cannot chain one queued job from another.
                 if (VolunteersAccessSync.syncOnce() && !Test.isRunningTest()) {
-                    System.enqueueJob(new VolunteersAccessSync.Job());
+                    System.enqueueJob(new ModuleAccessSyncBase.Job(new VolunteersAccessSync()));
                 }
             } catch (Exception e) {
                 ErrorLogger.log(e, ACCESS_CONTEXT);

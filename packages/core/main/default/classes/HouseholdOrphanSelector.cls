@@ -51,7 +51,7 @@ public with sharing class HouseholdOrphanSelector {
 
     /**
      * Junction mode: the people in no household, contacts and person accounts together, as
-     * Health Check and the data hygiene console both count them. Stops at `cap`: the person
+     * Health Check and Data Quality both count them. Stops at `cap`: the person
      * accounts are not counted once the contacts alone reach it.
      */
     public static Integer countPeopleWithoutMembership(Id householdRecordTypeId, Integer cap) {

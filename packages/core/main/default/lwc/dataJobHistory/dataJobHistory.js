@@ -26,6 +26,7 @@ import KIND_DELETE from '@salesforce/label/c.Core_DataJobs_KindDelete';
 import IMPORT_SUMMARY from '@salesforce/label/c.Core_DataJobs_ImportSummary';
 import IMPORT_SUMMARY_ONE from '@salesforce/label/c.Core_DataJobs_ImportSummaryOne';
 import STARTED from '@salesforce/label/c.Core_DataJobs_Started';
+import ROW_ACTIONS from '@salesforce/label/c.Core_DataJobs_RowActions';
 import IMPORT_HEADING from '@salesforce/label/c.Core_Import_HistoryHeading';
 import IMPORT_CONFIRM_HEADING from '@salesforce/label/c.Core_Import_UndoConfirmHeading';
 import IMPORT_CONFIRM_PEOPLE from '@salesforce/label/c.Core_Import_UndoConfirmPeople';
@@ -52,6 +53,7 @@ import EVERYONE from '@salesforce/label/c.Core_BulkUpdate_EveryonesJobs';
 import OPEN_FIND from '@salesforce/label/c.Core_BulkUpdate_OpenFind';
 import { NavigationMixin } from 'lightning/navigation';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+import { format } from 'c/findCsv';
 
 const FIND_TAB = 'Find';
 
@@ -60,10 +62,6 @@ const UPDATE = 'Update';
 const DELETE = 'Delete';
 const ALL_KINDS = [IMPORT, UPDATE, DELETE];
 const IMPORTS_SHOWN = 10;
-
-function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
-}
 
 function errorText(error) {
   if (error && error.body && error.body.message) {
@@ -74,6 +72,21 @@ function errorText(error) {
 
 // ImportBatchService.STATUS_UNDOING
 const IMPORT_UNDOING = 'Undoing';
+
+/** The SLDS badge theme for a job status: green when done, red when it failed, amber while it runs. */
+function badgeTheme(status) {
+  const text = String(status || '').toLowerCase();
+  if (text.includes('fail') || text.includes('error')) {
+    return 'slds-theme_error';
+  }
+  if (text.includes('ing') || text.startsWith('queued') || text.startsWith('pending')) {
+    return 'slds-theme_warning';
+  }
+  if (text.startsWith('complete') || text.startsWith('done') || text === 'undone') {
+    return 'slds-theme_success';
+  }
+  return '';
+}
 
 /** One import, in the shape every row of the list shares. */
 function fromImport(batch) {
@@ -156,6 +169,7 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
     undo: UNDO,
     undoUntil: UNDO_UNTIL,
     started: STARTED,
+    rowActions: ROW_ACTIONS,
     typeToConfirm: TYPE_TO_CONFIRM,
     cancel: CANCEL,
     loading: LOADING,
@@ -333,7 +347,8 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
       .filter((job) => this.filter === 'all' || job.kind === this.filter)
       .map((job) => ({
         ...job,
-        title: `${job.name}: ${[job.kindLabel, job.detail, job.status].filter(Boolean).join(', ')}`,
+        title: `${job.name}: ${[job.kindLabel, job.detail].filter(Boolean).join(', ')}`,
+        badgeClass: `slds-var-m-left_x-small ${badgeTheme(job.status)}`,
         showDeadline: job.canUndo && Boolean(job.undoDeadline)
       }));
   }

@@ -6,7 +6,7 @@
   <inlineHelpText>
     Whether donors are assigned to giving levels. Turn it on once your ladder is built.
   </inlineHelpText>
-  <label>Donor Levels Enabled</label>
+  <label>Turn On Donor Levels</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>
 </CustomField>

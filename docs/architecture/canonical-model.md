@@ -1081,6 +1081,7 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 |---|---|---|---|
 | `Error_Digest_Recipients__c` | text (255) | empty | The email addresses of the users who receive the error digest, separated by commas. Each has to belong to an active user of this org. Empty sends it to every active user holding Manage BarnCRM Settings. |
 | `Error_Digest_Frequency__c` | picklist(Daily, Weekly) | Daily | How often the error digest may be sent. Stored as text (ADR-0019); empty reads as Daily. |
+| `Error_Digest_Include_Admin_Summary__c` | checkbox | true | Whether a weekly digest also carries the admin summary (C-54): BarnCRM jobs that failed this week, how many Setup changes were kept this week, and two standing counts as they are when sent: org limits at 80 percent or more and duplicates waiting for review. No effect on a daily digest. |
 | `Error_Digest_Covered_Until__c` | datetime | empty | The end of the window the last digest run covered; the next digest counts entries created after it. Written by the job. |
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
 | `Error_Digest_Last_Run_Summary__c` | text (255) | empty | What the last digest run did, in one sentence. Written by the job. |
@@ -1156,6 +1157,7 @@ range reads as the nearest end.
 | `Stale_Record_Years__c` | integer | 5 | Years without a change before the Data quality check People not changed lists a person (R-SQ6). From 1 to 20; empty reads as 5. |
 | `Unused_Login_Days__c` | integer | 90 | Days without a login before Unused setup lists an active user. From 30 to 365; empty reads as 90. |
 | `Unused_Report_Days__c` | integer | 365 | Days without a run before Unused setup lists a report. From 90 to 1,095; empty reads as 365. |
+| `Setup_Change_Retention_Days__c` | integer | 730 | Days a copied Setup Audit Trail row is kept before the nightly Setup Changes copy deletes it (R-SU4, C-56). From 180 to 3,650; empty reads as 730, out of range as the nearest end. |
 
 ### Duplicate Matching keys
 
@@ -2663,10 +2665,15 @@ column's value before it is matched or written (ADR-0081, `0081-data-transform-d
 | `first`, `last` | `count` (1 to 255) | The first or last `count` characters; a shorter value is kept whole. |
 | `shiftDate` | `amount` (a whole number, at most 36,600 days or 1,200 months either way), `unit`: `days` or `months` | Reads the first three numbers year first (so `2025-12-31` and a stored date with a time both read), adds the amount and writes `YYYY-MM-DD`; adding months keeps the day where the month has it, otherwise the month's last day. A value that is not a date, or a result outside the years 1700 to 4000, is left unchanged. |
 | `today` | `whenBlank` (default false) | Today's date as `YYYY-MM-DD` in the running user's time zone; under `whenBlank`, only when the value so far is blank. |
+| `digits` | `pattern` (required, at most 30 characters, 1 to 15 `#`), `country` (digits only, at most 3, optional) | Keeps the digits of the value and writes them into `pattern`, one digit for each `#` and every other character as written: `(###) ###-####` turns `555.123.4567` into `(555) 123-4567`. When the digits are exactly `country`'s length too many and start with it, that country code is dropped first (`+1 555 123 4567`, country `1`). An extension at the end (`x12`, `ext 12`, `ext. 12`, `extension 12`, any capitals) is kept and written ` x12` after the number. A value whose digits do not fit the pattern, a blank value and a value longer than 100 characters are left unchanged, so a bad number is never mangled. |
 
 The steps from `map` on were added by ADR-0112 (`0112-more-transform-steps.md`); a document
 whose steps may use them carries `"version": 2` (the mapping document of R-IT1 and the bulk
-update definition of R-BU1). A reader that does not know an `op` skips that step, as below.
+update definition of R-BU1). `digits` was added by ADR-0150 (C-50f2, the phone format preset of
+Super Transform) and a document that may use it carries `"version": 3`. A reader that does not
+know an `op` skips that step, as below. `DataTransform.formatDigits` (Apex) and the framework-free
+module `transformFormat` (the `transformFormat` LWC bundle, plan 9.9) implement `digits` and are
+both tested against the one fixture `TransformFormatFixture.json`.
 
 Steps run in order, before values for every row (R-IB14): a step's output that is blank is
 filled by a file or template value like any blank cell. A document is checked when it is saved
@@ -3954,7 +3961,7 @@ receipt.
 | Posted to Accounting | `Accounting_Posted_At__c` | Date/Time, package written (v0.6, R-G13) |
 | Posted to Accounting By | `Accounting_Posted_By__c` | Lookup to User, package written (v0.6, R-G13) |
 
-- **Service:** `GiftService`, `GiftDomain`, `GiftSelector`, LWC `quickGiftEntry` (G-03).
+- **Service:** `GiftService`, `GiftTriggerHandler`, `GiftSelector`, LWC `quickGiftEntry` (G-03).
 - **Receipt lock:** handler `GiftReceiptLockHandler`, registry record
   `Automation_Registry.Gift_Receipt_Lock` (execution order 5, Always Runs), custom
   permission `Override_Receipt_Lock` (granted to nobody by the package).
@@ -4031,7 +4038,7 @@ R-G14 apply.
 | Amount | `Amount__c` | Currency |
 | Percent | `Percent__c` | Percent |
 
-- **Service:** `AllocationService`, `AllocationDomain`.
+- **Service:** `GiftAllocationTriggerHandler`, `GiftAllocationSelector`.
 - **Lock (R-GA5):** `GiftAllocationPostingLockHandler`, registry record
   `Automation_Registry.Gift_Allocation_Posting_Lock` (execution order 20, after
   `Gift_Allocation_Totals` works out the amount, Always Runs).
@@ -4099,7 +4106,7 @@ identifier.
 
 Rollup target attributes on `Fund__c` are listed in Section 26.
 
-- **Service:** `FundService`.
+- **Service:** `FundTriggerHandler`, `FundSelector`, `FundDefaultsService`.
 
 ---
 
@@ -4173,7 +4180,7 @@ both shipped by the Mirror package, so Giving itself never names Campaign.
 
 Rollup target attributes on `Appeal__c` are listed in Section 26.
 
-- **Service:** `AppealService`.
+- **Service:** `AppealTriggerHandler`, `AppealSelector`.
 
 ---
 
@@ -4219,6 +4226,15 @@ Added by acknowledgments (G-12, ADR-0032).
 | `Acknowledgment_From_Address__c` | text | empty | The organization wide email address acknowledgments are sent from, named by its address. Empty means they are sent from the user who ran the send, which is what a small organization usually wants. |
 | `Acknowledgments_Last_Run__c` | datetime | empty | When the last acknowledgment send finished, shown read only on the Acknowledgments page (R-AK12). |
 | `Acknowledgments_Last_Run_Summary__c` | text | empty | What that run did, in one sentence, because a bare timestamp says the job woke up and not that it sent anything (R-AK12). |
+Added by ask cadence reminders (G-29). Shown in the console's Giving section beside
+acknowledgments and stewardship, because the reminders are tasks of the same kind.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Ask_Reminders_Enabled__c` | boolean | true | Whether the daily pass creates a Task for a donor's owner when the donor's Next Ask Date arrives (R-AC2). On by default: it does nothing until somebody enters a Next Ask Date, and it only creates tasks inside the organization. |
+| `Ask_Reminders_Last_Run__c` | datetime | empty | When the last ask reminder pass finished, whether or not it created anything. |
+| `Ask_Reminders_Last_Run_Summary__c` | text | empty | What that pass did, in one sentence: how many reminders it created and how many donors it could not create one for (R-AC5). |
+
 Added by receipting (G-13). The organization's legal name and address, which a receipt
 prints, are Core keys on `BarnCRM_Settings__c` (Section 12): any organization has them. The
 tax identification number, the logo, the signature and the signer's name and title were Core
@@ -4268,6 +4284,14 @@ it showed them in before.
 | `Receipt_Signer_Title__c` | text (80) | empty | The job title of the person who signs receipt letters. Moved from Section 12 by C-29. |
 | `Default_Fund__c` | text (18) | empty | The record identifier of the fund a gift is allocated to when nobody says otherwise, chosen in the Setup Assistant's fund and appeal step, which Giving contributes (R-F4, ADR-0014). Moved from Section 12 by C-29. |
 | `Default_Appeal__c` | text (18) | empty | The record identifier of the appeal a gift is credited to when nobody says otherwise, on the same terms as the default fund. Moved from Section 12 by C-29. |
+
+### Release 0.13 keys
+
+Added by the solicitation pipeline (G-26, Section 25R). Shown in the console's Giving section.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Ask_Stages__c` | text (255) | `Identified;Qualified;Cultivating;Ask Planned;Asked` | The stages an ask moves through, in order, separated by semicolons. Empty means the default list (R-SO2). |
 
 ### Rules
 
@@ -4321,6 +4345,7 @@ these keys, which is what makes a module that is off leave nothing behind.
 | Receipt Signer Title | `Receipt_Signer_Title__c` | Text(80) (v0.6, from Core) |
 | Default Fund | `Default_Fund__c` | Text(18) (v0.6, from Core) |
 | Default Appeal | `Default_Appeal__c` | Text(18) (v0.6, from Core) |
+| Ask Stages | `Ask_Stages__c` | Text(255) (release 0.13, G-26, R-SO2) |
 
 - **Service:** Core `SettingsService`, reading and writing this object through the
   `Settings_Object__c` field on `Setting_Definition__mdt` (ADR-0017).
@@ -4634,7 +4659,7 @@ automatic one, because a spouse can also be the solicitor.
 | Is Automatic | `Is_Automatic__c` | Checkbox |
 
 - **Settings keys:** `Automatic_Household_Soft_Credits__c` (Section 12).
-- **Service:** `SoftCreditService`, `SoftCreditDomain`.
+- **Service:** `SoftCreditService`, `SoftCreditTriggerHandler`, `SoftCreditSelector`.
 
 ---
 
@@ -5033,7 +5058,7 @@ produced without it.
 
 - **Service:** `ReceiptService`, `ReceiptSelector`, `ReceiptNumberSequence`,
   `ReceiptContentBuilder`, `ReceiptRenderer` and `BlobToPdfReceiptRenderer`,
-  `ReceiptLogoSource` (R-RC13), `ReceiptFileWriter` (ADR-0021), batch
+  `ReceiptLogoSource` (R-RC13), `ReceiptWriter` (ADR-0021), batch
   `ReceiptStatementBatch`, LWC `receiptTemplates` and `receiptRunConsole`.
 
 ---
@@ -5479,8 +5504,9 @@ read in system mode at send time, so the check does not depend on the sender's f
   `GiftAcknowledgmentHandler`, execution order 40, switchable and pausable like every other
   convenience (R-A1, and deliberately not `Always_Runs__c`, ADR-0024).
 - **Service:** `AcknowledgmentRuleService`, `AcknowledgmentService`,
-  `AcknowledgmentSelector`, `AcknowledgmentWriter` (ADR-0021), `AcknowledgmentSender` with
-  `MessagingAcknowledgmentSender`, `AcknowledgmentBatch`, `AcknowledgmentScheduler`,
+  `AcknowledgmentSelector`, `AcknowledgmentWriter` (ADR-0021), Core `EmailSender` with
+  `MessagingEmailSender`, `GivingEmailTemplates` (template lookup and message, shared with
+  pledge reminders), `AcknowledgmentBatch`, `AcknowledgmentScheduler`,
   `AcknowledgmentLetterMerge`, and `AcknowledgmentController` for the page.
 - **Custom permission:** `Send_Acknowledgments`, granted to Giving Admin and Giving Staff.
 - **Page:** LWC `acknowledgments` on the `Acknowledgments` tab and flexipage, reached from
@@ -6054,6 +6080,473 @@ installment: each counts toward it.
   `Donation_Match_Date_Window_Days__c`, `Donation_Match_Amount_Tolerance__c`.
 - **Template attributes** (on `Import_Template__c`, Section 15): `Payment_Matching__c`,
   `Match_Date_Window_Days__c`, `Match_Amount_Tolerance__c`.
+
+---
+
+## 25O. Donor Segments
+
+### Definition
+
+A donor segment is a named, reusable list of people or organizations chosen by their giving
+(feature G-28): lapsed donors, new donors, upgraders and the like, kept so they can be counted,
+listed and exported for an email tool again next month. A segment is a Saved Query (Section 29D)
+whose object is Contact (people) or Account (organizations). Giving adds no object for it: the
+query document (R-SQ1) is the segment's criteria, Find edits and shares it, and Giving adds
+starter templates, a count, a list and an export laid out for Mailchimp or Constant Contact.
+Nothing is sent: BarnCRM writes a file and the person imports it.
+
+### Attributes
+
+One attribute is added to Contact and Account, so an upgrader can be found by a filter (a
+query cannot compare two fields):
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Change From Last Year | currency, formula | no | Giving This Year minus Giving Last Year, a blank read as zero. Positive when the donor has already given more this year than all of last year. |
+
+### Rules
+
+**R-DS1 A segment is a saved query.** Every Saved Query of Contact or Account the person can
+read (their own and those shared with them, as Find lists them) is shown as a segment. A
+segment made from a template is saved as the person's own unshared Saved Query under the name
+they give, replacing the query of their own saved query of that name if there is one (as R-SQ6
+does) and keeping that one's sharing. Only the person's own saved query of that name whose
+object is Contact or Account (a segment) is replaced: a Find saved query of the same name on
+another object (for example a gift search) is left alone and the segment is saved beside it. Its criteria, columns and sharing are changed in Find; no
+other copy exists.
+
+**R-DS2 Starter templates are documented JSON.** The templates are one JSON document held in
+`DonorSegmentTemplates`, in this format:
+
+```
+{
+  "version": 1,
+  "templates": [
+    { "key": "lapsed", "objects": ["Contact", "Account"],
+      "fields": ["Name", "Last_Gift_Date__c", "Giving_Last_Year__c", "Total_Giving__c"],
+      "orderBy": { "field": "Giving_Last_Year__c", "direction": "DESC" },
+      "filter": { "version": 1, "logic": "1 AND (2 OR 3)", "conditions": [ ... ] } }
+  ]
+}
+```
+
+`objects` says which of people and organizations a template applies to, `fields`, `orderBy`
+and `filter` are the R-SQ1 and R-R2 parts, and names carry no namespace prefix: building a
+segment qualifies each custom name for the org. The built document adds `Email` after `Name`
+for people, a limit of 200 rows, and one more condition joined by AND to the template's logic:
+`Deceased__c` equals false for people, `Is_Organization__c` equals true for organizations
+(households are accounts too). A template's name and description are custom labels. The five
+templates:
+
+| Key | Name | Filter |
+|---|---|---|
+| `lapsed` | Lapsed Donors | Gave last year, nothing yet this year: `Giving_Last_Year__c` greater than 0 and `Giving_This_Year__c` equals 0 or is blank. |
+| `new` | New Donors | First gift in the last 365 days (`First_Gift_Date__c`). |
+| `upgraders` | Upgraders | Gave last year and has already given more this year: `Giving_Last_Year__c` greater than 0 and `Change_From_Last_Year__c` greater than 0. |
+| `levelMovers` | Level Movers | Donor level changed in the last 90 days (`Donor_Level_Changed_Date__c`) from an earlier level (`Previous_Donor_Level__c` is not blank). |
+| `majorProspects` | Major Gift Prospects | A largest gift of 1,000 or more or total giving of 5,000 or more (`Largest_Gift__c`, `Total_Giving__c`), and a gift in the last 730 days. |
+
+The amounts and days are starting points, changed in Find once saved.
+
+**R-DS3 Count.** `SELECT COUNT()` over the segment's filter as the person, through Find's
+compiler (R-SQ2), counting at most 10,000; more is shown as "more than 10,000".
+
+**R-DS4 List.** The segment's own columns, order and row count (at most 2,000), compiled and
+run as Find's results grid runs them.
+
+**R-DS5 Export.** Three layouts, each a CSV file built in the browser by Find's CSV writer
+(R-SQ3 cell rules, UTF-8 with a byte-order mark), read in pages of 2,000 in Id order and
+stopped at Export Row Limit (`Find_Export_Row_Limit__c`):
+
+- **Mailchimp** (people only): Email Address, First Name, Last Name, Tags (the segment's
+  name, so the import can tag the contacts).
+- **Constant Contact** (people only): Email address, First name, Last name, Street address
+  line 1, City, State/Province, Zip/Postal code, Country, from the mailing address.
+- **All Columns**: the segment's own columns with their labels, for people or organizations.
+
+The two email layouts read the segment's filter with three more conditions: `Email` is not
+blank, `HasOptedOutOfEmail` equals false and `Deceased__c` equals false, so nobody who opted out
+or has died is exported. A row whose email (compared without case or surrounding spaces)
+already appeared is left out, since both tools refuse a repeated address in one import, and the
+page says how many were. The header names follow each tool's own field names; both tools still
+ask the person to confirm the columns when they import.
+
+**R-DS6 Access.** Every action requires the `Find_And_Export_Records` custom permission
+(R-SQ5): a segment is a Find query and an export is the sensitive act. Every read runs in user
+mode, so a segment shows only the records, and the columns, the person can see. No settings
+key: there is nothing to configure beyond the saved queries themselves.
+
+### Salesforce implementation
+
+- **Fields on Contact and Account** (shipped by Giving, read only):
+
+| Attribute | API name | Type |
+|---|---|---|
+| Change From Last Year | `Change_From_Last_Year__c` | Currency formula |
+
+- **Apex:** `DonorSegmentTemplates` (the R-DS2 document and the build of a template into an
+  R-SQ1 document), `DonorSegmentService` (count, list and export pages over Find's
+  `QueryCompiler`), `DonorSegmentController` (the Donor Segments page).
+- **Page:** the Donor Segments tab in the BarnCRM Fundraising app (`donorSegments`), with the
+  browser-side layouts and duplicate check in the framework-free module `donorSegmentExport`.
+- **Permission:** the page's controller is granted by Giving Admin, Giving Staff and Giving
+  Read Only; the Find permission above is what opens it.
+
+---
+
+## 25P. Pledge Reminder Step
+
+### Definition
+
+One rung of the pledge reminder ladder (feature G-30): how many days before or after an
+installment's due date it fires, and the email template or letter it sends. An organization
+writes a few of them, for example an email a week ahead, a second email two weeks after, and a
+letter a month after, and every open installment on an Active pledge walks the ladder.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The step's name, shown on the page and kept on each reminder it makes. |
+| Days From Due Date | integer | yes | Negative fires before the due date, zero on it, positive after it. |
+| Channel | picklist(Email, Letter) | yes (defaults Email) | Email sends a templated email. Letter adds the installment to a merge file. |
+| Email Template | text | conditional | The developer name of a standard `EmailTemplate`, required for an email step (the same by-name reference an Acknowledgment Rule uses, ADR-0032). The template merges the installment (`WhatId`) and the contact. |
+| Active | boolean | yes (defaults true) | Whether the step fires. |
+
+### Salesforce implementation
+
+- **Object:** `Pledge_Reminder_Step__c`, Giving package. Name is text. Sharing ReadWrite.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Days From Due Date | `Days_From_Due__c` | Number(4, 0) |
+| Channel | `Channel__c` | Picklist (Email, Letter) |
+| Email Template | `Email_Template__c` | Text(80) |
+| Active | `Active__c` | Checkbox |
+
+### Rules
+
+**R-PR1 One step per installment per run.** For each open installment (Scheduled, Overdue or
+Partially paid, on an Active pledge) the run considers the active steps whose day, the due date
+plus Days From Due Date, is today or within the previous 14 days. Only the one with the latest
+day is made. An installment 20 days overdue with steps at 7 and 14 days gets the 14 day step.
+
+**R-PR2 Only recent steps fire.** A step whose day passed more than 14 days ago is never made,
+so a run that missed a night still sends, and turning the feature on does not send a final
+notice about an installment that went overdue months ago. A step with Days From Due below zero
+(a before-due heads-up) applies only while today is before the installment's Due Date: once the
+due date arrives it no longer fires, even within its catch-up days.
+
+**R-PR3 Nothing sends unless an administrator turned it on.** `Pledge_Reminders_Enabled__c` is
+off by default (Section 25Q). With it off no reminder is made by hand or by the nightly run.
+
+---
+
+## 25Q. Pledge Reminder
+
+### Definition
+
+One pledge reminder, recorded (feature G-30): which installment, by which step, by email or
+letter, to whom, and whether it went. It is the log the organization reads to answer "did we
+remind them", and the claim that stops the same step reminding the same installment twice.
+
+It reuses the acknowledgment feature's seams (Sections 25F to 25H): the Core `EmailSender`
+interface, the template picked by developer name, the organization wide from address
+(`Acknowledgment_From_Address__c`), the Send Acknowledgments permission, and the letter merge
+file.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | The record's identifier, assigned automatically. |
+| Installment | reference(Installment) | yes | The installment being reminded about. Deleting it deletes its reminders. |
+| Pledge | reference(Commitment) | no | The pledge the installment belongs to. |
+| Step | reference(Pledge Reminder Step) | no | The step that fired; empty if the step was deleted since. |
+| Step Name | text | no | The step's name when it fired. |
+| Channel | picklist(Email, Letter) | yes | How it goes. An email step becomes a letter for a recipient with Email Opt Out set. |
+| Status | picklist(Queued, Sent, Failed) | yes (defaults Queued) | A letter stays Queued until a person says the letters went. |
+| Template | text | no | The email template used, by developer name. |
+| Recipient Contact | reference(Contact) | no | The person it was addressed to: the pledge's donor, or the organization's primary contact. |
+| Recipient Email | email | no | The address it went to. |
+| Failure Reason | text | conditional | Why it did not go. |
+| Sent On | datetime | conditional | When it went. |
+| Days Overdue | integer | no | The installment's age past due when the reminder was made; negative before the due date. |
+| Reminder Key | text | no | Installment and step identifiers, unique, held while the reminder stands and cleared when a send fails so the next run retries it. |
+| Letter File Document Id | text | no | The merge file the letter is in. |
+
+### Relationships
+
+- **Pledge Reminder to Installment**, many to one (cascade).
+- **Pledge Reminder to Pledge Reminder Step**, many to one (set null).
+- **Pledge Reminder to Pledge** and **to Contact**, many to one (set null).
+
+### Salesforce implementation
+
+- **Object:** `Pledge_Reminder__c`, Giving package. Name is an auto number, `PR-{000000}`.
+  Sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Installment | `Installment__c` | Lookup to `Installment__c` |
+| Pledge | `Commitment__c` | Lookup to `Commitment__c` |
+| Step | `Step__c` | Lookup to `Pledge_Reminder_Step__c` |
+| Step Name | `Step_Name__c` | Text(80) |
+| Channel | `Channel__c` | Picklist (Email, Letter) |
+| Status | `Status__c` | Picklist (Queued, Sent, Failed) |
+| Template | `Template__c` | Text(80) |
+| Recipient Contact | `Recipient_Contact__c` | Lookup to Contact |
+| Recipient Email | `Recipient_Email__c` | Email |
+| Failure Reason | `Failure_Reason__c` | Text(255) |
+| Sent On | `Sent_On__c` | Date/Time |
+| Days Overdue | `Days_Overdue__c` | Number(4, 0) |
+| Reminder Key | `Reminder_Key__c` | Text(40), unique, external id |
+| Letter File Document Id | `Letter_File_Document_Id__c` | Text(18) |
+
+- **Settings keys** (on `Giving_Settings__c`, Section 21A): `Pledge_Reminders_Enabled__c`
+  (boolean, false, whether reminders go out at all), `Pledge_Reminders_Last_Run__c` (datetime)
+  and `Pledge_Reminders_Last_Run_Summary__c` (text, one sentence).
+
+### Rules
+
+**R-PR4 A reminder is claimed before it is sent.** The row, with its unique Reminder Key, is
+written before anything goes, so a retried chunk or two people pressing Send produce one
+reminder per installment and step. A failure before the send rolls the claims back. If the
+platform refuses the whole send call, every claimed email row is marked Failed with the
+platform's reason and its key cleared, and the next run tries again while the step is still
+recent (R-PR2). If marking the rows Sent or Failed itself fails, each row is settled again on
+its own with a fixed reason; no email row is left Queued holding its key.
+
+**R-PR5 An email reaches only a person with an address who has not opted out or bounced.** The
+recipient is the pledge's donor contact, or the organization's primary contact. A pledge with
+nobody to email gets no row and is counted and named in one Error Log entry per chunk. A
+recipient with Email Opt Out set, no email address, or an email address that bounced
+(Salesforce's Email Bounced flag) is reminded by letter instead (R-AK13).
+
+**R-PR6 A letter waits for a person.** The package writes a merge file of the queued letters
+(pledge, installment, due date, amount still owed, days overdue, step, donor name, greeting,
+address) and leaves the rows Queued until a person marks them sent, because Salesforce cannot
+know whether anything was printed (R-AK11).
+
+---
+
+## 25R. Ask
+
+Added by the solicitation pipeline (G-26, release 0.13, ADR-0153).
+
+### Definition
+
+One request for a gift that a fundraiser is working toward: who is being asked, for how much,
+by when, who is responsible, where it stands, and how it ended. It is the Giving module's own
+pipeline record, so a small development team can track its asks and moves without the standard
+Opportunity object, which only the Mirror package may touch (ADR-0013). A gift is money that
+arrived; an ask is the work that comes before it, and a won ask points at the gift or commitment
+it produced.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | The ask's identifier, assigned automatically. |
+| Donor Contact | reference(Contact) | conditional | The person being asked, where people are Contacts. |
+| Donor Account | reference(Organization) | conditional | The organization or household being asked, or the person where people are person Accounts. |
+| Stage | text | yes (defaults to the first stage) | Where the ask stands in the organization's own stage list (R-SO2). |
+| Outcome | picklist(Open, Won, Declined, Withdrawn) | yes (defaults Open) | Whether the ask is still being worked, and how it ended (R-SO3). |
+| Ask Amount | decimal | no | How much the donor is being, or was, asked for. |
+| Target Date | date | no | When the fundraiser expects an answer. |
+| Assigned To | reference(User) | yes | The staff member responsible for the ask: the record owner. |
+| Next Step | text | no | The next thing to do, in a few words. |
+| Next Ask Date | date | no | When to ask this donor again, usually set as the ask closes (R-SO7). |
+| Fund | reference(Fund) | no | The fund the ask is for, carried onto the gift or commitment a win creates. |
+| Appeal | reference(Appeal) | no | The appeal the ask belongs to, carried onto the gift or commitment a win creates. |
+| Resulting Gift | reference(Gift) | no | The gift a won ask produced (R-SO5). |
+| Resulting Commitment | reference(Commitment) | no | The pledge a won ask produced (R-SO5). |
+| Stage Changed Date | date | computed | The day the ask reached its current stage (R-SO4). |
+| Closed Date | date | computed | The day the outcome left Open; empty while the ask is open (R-SO3). |
+| Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
+
+### Relationships
+
+- **Ask to Contact or Organization**, many to one. Exactly one of the two is set, following the
+  person reference convention in Section 4 (R-SO1).
+- **Ask to Gift**, many to one, and **Ask to Commitment**, many to one. Usually one ask to one
+  result; nothing stops two asks (a spouse's and a foundation's, say) pointing at the same gift.
+- **Ask to Fund** and **Ask to Appeal**, many to one.
+
+### Rules
+
+**R-SO1 Exactly one donor.** An ask names a person or an organization, never both and never
+neither. The rule is checked when an ask is created and whenever its donor changes, not on every
+edit: deleting a donor clears the lookup (the ask is kept as a record of the work), and an ask
+left with no donor can still be moved, closed or edited.
+
+**R-SO2 Stages are the organization's own list.** The stages are one org-wide setting, Ask Stages
+(`Ask_Stages__c` on Giving Settings), an ordered list of names separated by semicolons; an empty
+setting means the shipped list: Identified, Qualified, Cultivating, Ask Planned, Asked. An ask
+saved with no stage gets the first one. A stage that is not in the list is refused when an ask is
+created or its stage changes, and accepted on any other edit, so taking a stage out of the list
+never blocks work on the asks still in it; the board shows those asks in a column of their own
+until someone moves them. Stages describe progress only: how an ask ended is its outcome.
+
+**R-SO3 Outcome is separate from stage.** An ask is Open while it is being worked, and Won,
+Declined or Withdrawn once it ends (Withdrawn: the organization decided not to ask after all).
+A closed ask keeps the stage it reached, so "declined at Cultivating" stays reportable. Closed
+Date is filled with today when the outcome leaves Open and has no date, and cleared when the
+outcome goes back to Open.
+
+**R-SO4 Stage history.** Stage Changed Date is today when an ask is created and whenever its stage
+changes, so the board can show how long an ask has sat where it is. The full history of Stage,
+Outcome, Ask Amount and Target Date is kept by the platform's field history on the ask, not by a
+package object.
+
+**R-SO5 A win records what it produced.** Marking an ask Won from the board offers to record the
+gift now, record a pledge, link a gift or commitment already entered for the same donor, or leave
+the result for later. A gift is created through the same save as Quick Gift Entry, so every gift
+rule applies (default allocation, posting lock, payment matching); a pledge is a Commitment of type
+Pledge whose payments are generated as for any other. The donor, fund and appeal are carried from
+the ask. The new record, the link and the outcome are saved together or not at all. A gift or
+commitment linked later by editing the ask is accepted as it is.
+
+**R-SO6 Pipeline totals.** The board totals the open asks of each stage (count and the sum of Ask
+Amount) and, for the current fiscal year by Closed Date, the asks won (count and the sum of Ask
+Amount) and declined (count). Totals are counted by the database, not from the cards on screen, so
+they stay right when the board shows only the first cards of a long column.
+
+**R-SO7 Next Ask Date is a hook, not a reminder.** It records when the organization means to ask
+the donor again. The pipeline itself does nothing with it; when the ask closes, R-SO9 can carry it
+onto the donor's Next Ask Date, which ask cadence (G-29) reads. Keeping it on the ask, set as the
+ask closes, means the cadence work needs no change to this object.
+
+**R-SO8 Erasing a person.** Erasing a person (Section 29H) clears Next Step on every ask for them
+and sets each open one to Withdrawn, so no more work is planned about them. The asks are kept, like
+their gifts, still pointing at the anonymized person.
+
+**R-SO9 Open asks set the donor's Next Ask Date.** After an ask is created, deleted, restored from the Recycle Bin (it counts again, its Target
+Date setting the donor's Next Ask Date as an insert does), or changes its Target Date, Outcome or donor, each donor it names (before and after the change) gets the
+earliest Target Date among their open asks written into the donor's Next Ask Date (Section 25S),
+so the ask cadence reminder and the Who Is Due list follow the pipeline with no second job. Open
+asks without a Target Date are ignored. While a donor has an open ask with a Target Date, the
+donor's Next Ask Date follows the earliest one, overwriting a date entered by hand. When the
+change leaves a donor with no open ask with a Target Date, a donor Next Ask Date that is blank or
+still holds the date the asks had set (the earliest open Target Date before the change) is
+replaced: by the ask's own Next Ask Date (R-SO7) when this change closed the ask (Outcome left
+Open) and that date is after today (the earliest, if several asks closed), otherwise by blank. A
+date somebody entered or changed by hand is kept. Reads and the donor write run in system mode (ADR-0021: a package-owned
+date computed from every open ask, whoever can see them); a donor that cannot be saved is
+logged, and the ask's save is never refused for it.
+
+### Salesforce implementation
+
+- **Object:** `Ask__c`, Giving package. Name is an auto number, `ASK-{00000000}`. Sharing is
+  Public Read/Write (`ReadWrite`): a small development team works one shared pipeline, and an
+  organization that wants each fundraiser to see only their own asks sets it to Private in Setup
+  (ADR-0153). Field history is on for Stage, Outcome, Ask Amount and Target Date (R-SO4).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Donor Contact | `Donor_Contact__c` | Lookup to Contact, clears on delete |
+| Donor Account | `Donor_Account__c` | Lookup to Account, clears on delete |
+| Stage | `Stage__c` | Text(80) |
+| Outcome | `Outcome__c` | Picklist, restricted: Open, Won, Declined, Withdrawn |
+| Ask Amount | `Amount__c` | Currency(16, 2) |
+| Target Date | `Target_Date__c` | Date |
+| Assigned To | `OwnerId` | Owner (standard) |
+| Next Step | `Next_Step__c` | Text(255) |
+| Next Ask Date | `Next_Ask_Date__c` | Date |
+| Fund | `Fund__c` | Lookup to `Fund__c`, clears on delete |
+| Appeal | `Appeal__c` | Lookup to `Appeal__c`, clears on delete |
+| Resulting Gift | `Gift__c` | Lookup to `Gift__c`, clears on delete |
+| Resulting Commitment | `Commitment__c` | Lookup to `Commitment__c`, clears on delete |
+| Stage Changed Date | `Stage_Changed_Date__c` | Date |
+| Closed Date | `Closed_Date__c` | Date |
+| Sample Data | `Sample_Data__c` | Checkbox |
+
+- **Validation rule:** `Exactly_One_Donor` (R-SO1), on create and on a change of either donor
+  field.
+- **Automation:** one `Automation_Registry__mdt` row, `Ask_Stage_And_Dates`, handler
+  `AskTriggerHandler`, order 10, always running: it fills the first stage, refuses a stage not in
+  the list (R-SO2), and keeps Stage Changed Date and Closed Date in step (R-SO3, R-SO4). A
+  second row, `Ask_Donor_Next_Ask_Date`, handler `AskNextAskDateHandler`, order 20, on by
+  default and switchable in the automation console, runs after insert, update and delete and
+  calls `AskDonorDateSync` (R-SO9).
+- **Settings key** (on `Giving_Settings__c`, Section 21A): `Ask_Stages__c`.
+- **Service:** `AskRules` (the stage list and R-SO2 to R-SO4), `AskSelector` (the board's
+  queries, as the person), `AskPipelineController` (the board: totals, moving a stage, closing an
+  ask, R-SO5 and R-SO6), `GivingPersonErasureExtension` (R-SO8), and the framework-free
+  JavaScript module `askPipelineModel` (cards into columns, days in stage), which a WordPress block
+  could reuse (plan Section 9.9).
+
+---
+
+## 25S. Ask cadence
+
+### Definition
+
+Two dates a fundraiser keeps on a donor, and the reminder the package makes from one of them.
+Next Ask Date is when the donor should next be asked; Last Touch Date is when somebody last
+spoke to them. Both are plain fields the staff edit, on Contact where people are Contacts and
+on Account where the donor is an organization or a household. No new object: the reminder is
+a Salesforce Task, so it appears in the owner's own task list.
+
+### Attributes (on Contact and Account)
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Next Ask Date | date | no | The day the donor should next be asked. Entered by staff, or set from the donor's earliest open ask (R-SO9). |
+| Last Touch Date | date | no | The day somebody last contacted the donor. Entered by staff; the package does not infer it. |
+| Ask Reminder For Date | date | no | The Next Ask Date a reminder Task was last created for. Written only by the daily pass; it is how the pass knows not to create the same reminder twice (R-AC3). Read only to staff. |
+
+### Rules
+
+**R-AC1 Donor level dates only.** The reminder reads the two dates on the donor, never a date on
+an ask. The solicitation pipeline (G-26) reaches it by writing the earliest open ask's Target
+Date into the donor's Next Ask Date (R-SO9), so an open ask gets its reminder from this same
+pass, with no second job.
+
+**R-AC2 One switch, on by default.** `Ask_Reminders_Enabled__c` switches the daily pass on and
+off for the whole organization. Off means the pass creates nothing; the Next Ask Date and Last
+Touch Date fields and the Who Is Due list keep working. Only one ask reminder run goes at a
+time: Run Now (Giving nightly jobs) and the nightly schedule start nothing while a run is
+already queued or running. The setting is read again as a queued run processes, so turning Ask
+Reminders off stops a run already queued (it makes no tasks and does not go on to the contacts
+pass).
+
+**R-AC3 One reminder per donor per date.** The pass creates a Task for a donor whose Next Ask
+Date is today or earlier (within the catch up window of R-AC4) and whose Ask Reminder For Date
+is not already that date, then stamps Ask Reminder For Date. Running the pass twice in a day,
+or on every day after the date, creates nothing more. Changing the Next Ask Date to a new date
+is a new ask and gets a new reminder.
+
+**R-AC4 Catch up window.** A date more than 30 days in the past gets no Task: the first night
+the setting is on must not bury staff under every stale date an old import left. Those donors
+still appear in the Who Is Due list. A date inside the window that the pass missed (a job that
+was stopped for a week) is caught up.
+
+**R-AC5 The Task belongs to the donor's owner.** The Task is assigned to the owner of the
+Contact or Account, related to the donor (Contact on Who and its Account on What, or the
+Account on What for an account donor), dated the Next Ask Date, subject from a custom label. A donor whose
+owner cannot take a Task is logged to Error Log, counted in the run summary, and left
+unstamped so the next night tries again. The pass never deletes, closes or edits a Task.
+
+**R-AC6 Who Is Due.** A list view named Who Is Due on Contact and one on Account list donors
+whose Next Ask Date is today or earlier, whatever the setting says. A list view cannot carry a
+sort in package metadata, so the list opens unsorted and a click on the Next Ask Date column sorts it.
+
+### Salesforce implementation
+
+| Attribute | API name | Type |
+|---|---|---|
+| Next Ask Date | `Next_Ask_Date__c` | Date |
+| Last Touch Date | `Last_Touch_Date__c` | Date |
+| Ask Reminder For Date | `Ask_Reminder_For_Date__c` | Date |
+
+- **Objects:** the three fields ship on both `Contact` and `Account`, Giving package.
+- **Settings keys** (on `Giving_Settings__c`, Section 12): `Ask_Reminders_Enabled__c`,
+  `Ask_Reminders_Last_Run__c`, `Ask_Reminders_Last_Run_Summary__c`.
+- **Nightly job:** `AskReminderSchedulable` and `AskReminderBatch`, scheduled by
+  `GivingScheduler` as the module's fourth job (`BarnCRM Giving: ask reminders`, 03:30) and
+  listed by `GivingNightlyJobProvider` for Health Check.
+- **Service:** `AskReminderService`, `AskReminderSelector`, `AskReminderWriter`.
 
 ---
 
@@ -7981,7 +8474,7 @@ person's hours, a sample skill a real person's volunteer skill or a real job's j
 which R-VJ1 or the Restrict lookup would refuse, and leaves those out; every delete runs with
 partial success, and a record refused for any other reason is logged as a Warning and left, so
 one record never stops the removal. `finish()` logs one Warning (context
-`VolunteerSampleDataRemoveStages`) naming each kept shift, job and skill and why, then hands on,
+`VolunteersSampleData.RemoveStages`) naming each kept shift, job and skill and why, then hands on,
 so Core's and Giving's sample data are still removed. Each read of what real records point at
 takes up to 200 rows of a kind, so the Warning may not name every kept record when more do;
 nothing real is deleted either way. `hasSampleRecords()` answers true while a sample job or
@@ -8207,6 +8700,7 @@ of what happened. Staff enter sign-ups; there is no portal (V-09 is out of scope
 | Account | reference(Account) | conditional | The person, where people are person Accounts. |
 | Status | picklist(Signed up, Confirmed, Attended, No show, Cancelled) | yes (defaults Signed up) | Where this booking stands, up to whether the person turned up. |
 | Notes | text | no | Anything the coordinator needs to remember about this booking. |
+| Reminder Sent On | datetime | no | When the shift reminder email for this booking went out (V-10, R-VU6). Empty means none was sent. BarnCRM writes it; a coordinator clears it to send the reminder again. |
 
 ### Relationships
 
@@ -8252,6 +8746,38 @@ sign-up naming them, so shift counts stand, and empties its Notes. A sign-up Sig
 Confirmed on a shift that has not started is set to Cancelled, so the place is freed and nobody
 expects the person. Done by `VolunteersErasureExtension`, as the user (R-ER5).
 
+**R-VU6 One reminder per booking.** When Send Shift Reminders is on (29N), a morning job at
+7:00 AM (`VolunteerReminderScheduler`, one of the two Volunteers nightly jobs Health Check
+schedules) emails each booking that is Signed up or Confirmed, on an open shift that starts
+after now and before the start of the day Days Before a Shift to Remind after today (org time
+zone), once: each due booking is stamped Reminder Sent On first, and only bookings whose stamp saved
+are emailed; a booking whose stamp could not be saved is not emailed (so it is never emailed
+twice) and is listed in the Error Log as a Warning, and a booking whose email failed has its
+stamp cleared so the next morning's run tries again. A stamped booking is never emailed again.
+A booking made after that morning's run for a shift starting before the next morning's run gets
+no reminder. Nobody is emailed whose Contact has Email Opt Out
+checked or no email address; a booking named by a person account (no Contact) is not reminded
+in this version. The email goes through the platform's single email call to the Contact's own
+address, so the org's daily email limit applies: a message the platform refuses is not stamped,
+a Warning in the Error Log counts them, and the next morning's run tries them again while the
+shift is still ahead. Reminders ship off.
+
+**R-VU7 Suggestions are read only and rank on data already held.** The Suggested Volunteers
+card on an Open shift (V-11) offers Contacts whose Volunteer Status is Active and who have no
+sign-up of any status on the shift (R-VU2 would refuse a second), up to the 500 with the most
+total hours. Per person it gathers the available days, the skills and interests that match the
+job's required skills (Job Skill), approved hours on the job and in total, and onboarding
+(`cleared` when the latest step of each Type is current, `open` when one is not, `none` when
+the user sees no steps). It ranks them with the documented weights (admin guide, Suggested
+Volunteers): skills up to 30 (share of required skills held), interests up to 10 (required
+skills held only as interests), an available day +25 or minus 25 when days are listed and the
+shift's is not one, hours on the job up to 20 (capped at 40), total hours up to 5 (capped at
+200), onboarding cleared +10 or open minus 15. The ranking is the framework-free module
+`rankSuggestions`; Apex only gathers facts, in user mode, so a user sees suggestions only from
+what they may read. Nothing is written: booking uses `VolunteerShiftSignupsController.addSignup`,
+so R-VU1 to R-VU4 apply. The card shows nothing to a user who cannot create sign-ups or for a
+shift that is not Open. A person held only as a person account is not suggested.
+
 ### Salesforce implementation
 
 - **Object:** `Volunteer_Signup__c`, name field AutoNumber `VS-{000000}`, sharing Controlled
@@ -8264,7 +8790,11 @@ expects the person. Done by `VolunteersErasureExtension`, as the user (R-ER5).
 | Account | `Account__c` | Lookup to Account, delete constraint SetNull |
 | Status | `Status__c` | Picklist: Signed up, Confirmed, Attended, No show, Cancelled; required, default Signed up |
 | Notes | `Notes__c` | Text Area(255) |
+| Reminder Sent On | `Reminder_Sent_On__c` | DateTime, read-only on the layout; editable (to clear) for Admin and Coordinator |
 
+- **Reminders:** `VolunteerReminderScheduler` (7:00 AM) starts `VolunteerReminderBatch` (100
+  bookings per transaction), which reads through `VolunteerReminderSelector` (system mode) and
+  sends through `VolunteerReminderService`.
 - **Validation rules:** `Exactly_One_Person` (R-VU1), checked only when the sign-up is new or
   its Contact or Account changes, so a sign-up whose person was deleted (the lookup cleared by
   SetNull) can still be edited.
@@ -8424,6 +8954,8 @@ module has no settings page of its own), never in Setup. Defaults are applied in
 | `Hours_Require_Approval__c` | boolean | true | Whether hours are entered as Submitted and wait for a coordinator. Off means an entry is Approved as it is saved and counts at once (R-VG6). |
 | `Attendance_Creates_Hours__c` | boolean | true | Whether marking a sign-up Attended writes the hours for that shift (R-VU3). |
 | `Shift_Horizon_Weeks__c` | integer, 1 to 26 | 8 | How many weeks ahead recurring schedules keep their shifts created (V-07). |
+| `Reminders_Enabled__c` | boolean | false | Whether bookings get one reminder email before their shift (V-10, R-VU6). Ships off, because turning it on emails real people. |
+| `Reminder_Lead_Days__c` | integer, 1 to 14 | 1 | How many days before a shift its reminder goes out (V-10). |
 
 ### Salesforce implementation
 
@@ -8434,6 +8966,8 @@ module has no settings page of its own), never in Setup. Defaults are applied in
 | Hours Require Approval | `Hours_Require_Approval__c` | Checkbox, default true |
 | Attendance Creates Hours | `Attendance_Creates_Hours__c` | Checkbox, default true |
 | Weeks Ahead to Create Shifts | `Shift_Horizon_Weeks__c` | Number(2, 0) |
+| Send Shift Reminders | `Reminders_Enabled__c` | Checkbox, default false |
+| Days Before a Shift to Remind | `Reminder_Lead_Days__c` | Number(2, 0), default 1 |
 
 - **Setting Definition rows:** `Settings_Object__c` `Volunteer_Settings__c`, `Module__c`
   Volunteers, `Section__c` Volunteers, one per key.
@@ -9008,14 +9542,19 @@ Log. A job started by a schedule sends none. The record action shows the same ou
 
 The shipped import template that loads a spreadsheet of volunteer hours with the Core import,
 one row per hours record (feature V-06). It adds no entity: it is an `Import_Template_Default__mdt`
-row shipped by Volunteers that loads one object (R-IT12, R-D3).
+row shipped by Volunteers. Since release 0.14 it is an upload of several objects (R-IT20,
+ADR-0147; it loaded one object, R-IT12, before), as the program roster template is (29ZA).
 
 ### Rules
 
 **R-VH1 The shipped rows.** Volunteers ships two rows with the Template Key `volunteer_hours`:
 one with Person Mode Contacts, whose person column fills `Contact__c`, and one with Person Mode
 Person Accounts, whose person column fills `Account__c`. Only the one matching the org's people
-is materialized (R-D3). Target Object `Volunteer_Hours__c`, Load Operation Insert.
+is materialized (R-D3). Target Object `Volunteer_Hours__c`, Load Operation Insert. Its mapping
+lists the objects `Volunteer_Hours__c` (Insert) and `Volunteer_Job__c` (Update by a matching
+field, key Name): the job is found, never created, and its name is not rewritten; each hours
+record links to its row's job (ADR-0147 decision 4). Columns target `Volunteer_Hours__c.<field>`
+and `Volunteer_Job__c.Name`, and the Status default `Volunteer_Hours__c.Status__c`.
 
 **R-VH2 Columns.**
 
@@ -9045,6 +9584,890 @@ indexed for an org of more than 100,000 accounts; the V-06 Core work adds it, by
 
 ---
 
+## 29W. Setup Change
+
+### Definition
+
+A copy of one row of the Salesforce Setup Audit Trail: who changed what in Setup, and when
+(feature C-56, plan D-156). Salesforce keeps the trail for 180 days; BarnCRM keeps its copy for
+as long as the org chooses, so a part-time administrator can answer "who changed this, and
+when?" long after Setup has forgotten. The copy is read only: BarnCRM never changes Setup.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Audit trail ID | text(18) | yes | The Setup Audit Trail row's ID. Unique: a row is never stored twice. |
+| Changed at | datetime | yes | When the change was made. |
+| Changed by | text(121) | no | The name of the user who made it, as it was when copied. Blank when Salesforce gives no name (an automated process). |
+| Delegate user | text(80) | no | The username of the person who was logged in as that user, when someone was. |
+| Section | text(40) | no | The Setup area, such as Customize Accounts or Manage Users. |
+| Action | text(120) | no | Salesforce's code for the kind of change, such as `changedFieldLabel`. |
+| What changed | long text(1000) | no | Salesforce's own sentence for the change, such as "Changed Phone field label". |
+
+### Rules
+
+**R-SU1 Source.** Rows come only from `SetupAuditTrail`, read with SOQL. BarnCRM reads the
+trail and writes only its own copy; it never changes Setup.
+
+**R-SU2 Copy.** The nightly job "BarnCRM Setup Changes Copy" (1:30, listed among Health
+Check's nightly jobs) copies every trail row made at or after the newest kept row's Changed At,
+or every row the trail holds when nothing is kept yet. A row already kept is found by its Audit
+Trail ID and not stored again. An administrator can also run the same copy from the page
+(**Copy New Changes Now**), which schedules the nightly job when it is not scheduled.
+
+**R-SU3 Who can read the trail.** Salesforce lets a user read the trail only with View Setup
+and Configuration. The copy runs as the user who scheduled it, or who pressed Copy New Changes
+Now; when the trail cannot be read, the run writes one Error Log entry and copies nothing.
+
+**R-SU4 Retention.** After copying, the same run deletes the kept rows whose Changed At is
+older than the Org Optimizer setting Days to Keep Setup Changes
+(`Setup_Change_Retention_Days__c`): 730 days unless changed, from 180 to 3,650.
+
+**R-SU5 Administrators only.** The page and every controller method require Manage BarnCRM
+Settings. Only `BarnCRM_Admin` is granted the object, Read and View All only. Rows are written
+and deleted only by the copy, in system mode (the package's own copy, as ADR-0021 allows), and
+nobody edits them.
+
+**R-SU6 Filters and export.** The page lists kept rows newest first, filtered by From and To
+(dates in the person's time zone, both ends included), Section (the sections kept) and Search
+(case-insensitive words found in What Changed, Section, Action, Changed By or Delegate User).
+It shows the newest 200 matches; **Download CSV** writes up to 5,000 with the same filters
+(R-SQ3 format). One search looks at no more than 40,000 kept rows and says so when it stops.
+
+**R-SU7 Feeds the digest.** The Weekly Admin Digest (C-54) counts the changes kept (copied into
+the Setup Changes Log) within the digest window, by when each was kept, not by its Changed At.
+A change copied late (after a missed night, or on the first copy) is counted once, in the next
+digest. If reading the admin summary fails, the failure is logged to the Error Log and the
+digest still goes, without the summary. The nightly copy does not start while a copy started by
+hand is still waiting or running.
+
+**R-SU8 Off with Org Optimizer.** While the Org Optimizer feature is off, a run (nightly or
+Copy New Changes Now) copies nothing, deletes nothing and logs nothing; kept rows stay as they
+are until it is turned on.
+
+### Salesforce implementation
+
+- **Object** `Setup_Change__c`, auto number Name `SC-{000000}`, public read only sharing,
+  reports on, no activities, feeds, history or search.
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Audit trail ID | `Audit_Trail_Id__c` | Text(18) | External ID, unique, case sensitive. |
+| Changed at | `Changed_At__c` | DateTime | |
+| Changed by | `Changed_By__c` | Text(121) | |
+| Delegate user | `Delegate_User__c` | Text(80) | |
+| Section | `Section__c` | Text(40) | |
+| Action | `Action__c` | Text(120) | |
+| What changed | `Display__c` | LongTextArea(1000) | |
+
+- **Classes:** `SetupChangeCopyJob` (schedulable and batchable: copy, then delete past
+  retention), `SetupChangeController` (summary, search, copy now; every method requires
+  `Manage_BarnCRM_Settings`). The page is the `setupChangeLog` component, the Setup Changes
+  section of Org Optimizer, its only host.
+
+---
+
+## 29X. Saved Transform
+
+### Definition
+
+A named, reusable Super Transform step list (plan feature C-50f1): the object, the conditions
+(a Find filter document) and up to five field changes, kept as one documented JSON document so
+that a person can load it on the Super Transform page later, rename it or delete it. It is
+org-wide: everyone who may use Super Transform sees and manages every list. It holds no
+records and grants access to none. Neutral: it names no nonprofit concept and is in Core.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The list's name, 1 to 80 characters, unique among lists ignoring capitals. |
+| Object Name | text | yes | The API name of the object the list changes, copied from the definition when it is saved. |
+| Definition | long text | yes | The list as a version 1 JSON document (R-ST1). |
+
+### Rules
+
+**R-ST1 The document.** `{ "version": 1, "object": "Contact", "filter": { ...filter document of R-R2... }, "changes": [ { "field", "action", "value" | "source" | "transforms" } ] }`.
+`object` is the API name of an object a bulk update may write; `filter` is optional (no filter
+means every record, as on the page); `changes` holds at most 5 entries (R-BU1), each with a
+`field` and an `action` of `set`, `clear`, `copy` or `transform`, carrying what that action
+reads in the form R-BU1 and R-BU7 give (`value`, `source`, or `transforms` in the document of
+R-IT15). The page's changes JSON is the same list, so a list is the page's state, nothing more.
+**R-ST2 Checked on save, never on trust.** A save is refused when the document is not
+version 1 JSON, is over 100,000 characters, names an object a bulk update may not write, has a
+`filter` that is not a document, has more than 5 changes or a change with no `field` or an
+unknown `action`, or has a `transform` change whose steps `DataTransform.problems` names a
+problem with. The name must be 1 to 80 characters and no other list may have it (capitals
+ignored). A filter's conditions and a change's fields are not checked against the object at
+save: that happens when the list is loaded and when the page counts, previews and runs.
+**R-ST3 Loading only fills the page in.** Loading reads the document, then the page loads the
+object's fields as the person: a change whose field the person may not change on the object now
+is left out and the page says how many (that only narrows what a run does). A filter condition
+whose field is gone or not readable by the person (checked server-side with
+`QueryFieldCatalog.resolvePath`, in user mode, returned as `missingFields`) stops the load
+altogether: the page is left unchanged and a message names the fields and says to edit or delete
+the list, because dropping a condition, with or without `logic`, would match more records. Nothing
+runs on a load, and a preview, the confirmation and the
+run check everything as the person (R-BU1 to R-BU7). A list is therefore no way past a field
+or record the person cannot reach.
+**R-ST4 Org-wide, one set of permissions.** Every list is visible to, and may be renamed or
+deleted by, everyone who holds Bulk Update Records and Find and Export Records (the permission
+set `BarnCRM_Bulk_Update` grants Read, Create, Edit, Delete, View All and Modify All, the last
+two because a delete otherwise reaches only the list's owner). Reads and writes are in user
+mode. Rename changes only the name; a list is saved new, never overwritten.
+
+### Salesforce implementation
+
+- **Object** `Saved_Transform__c`, Name text (`Saved Transform Name`), public read and write
+  sharing, reports on, no activities, feeds or history. `BarnCRM_Bulk_Update` and
+  `BarnCRM_Admin` are granted Read, Create, Edit, Delete, View All and Modify All.
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Object Name | `Object_Name__c` | Text(255) | |
+| Definition | `Definition_JSON__c` | Long Text Area(131072) | Written only by Super Transform. |
+
+- **Service:** `SavedTransformService` (list, load, save, rename, delete, document checks) and
+  five `@AuraEnabled` methods on `BulkUpdateController` (`getSavedLists`, `loadSavedList`,
+  `saveSavedList`, `renameSavedList`, `deleteSavedList`), each requiring Bulk Update Records and
+  Find and Export Records. The page is the `superTransform` component, whose Saved Step Lists
+  card is the only place a list is made or used.
+
+---
+
+## 29Y. Program
+
+### Definition
+
+Something the organization runs for the people it serves: a food pantry, an after-school
+tutoring program, a job readiness course (P-01, Programs module, ADR-0151
+`0151-programs-module.md`). It is the durable thing; its services (29Z) are what it offers and
+its enrollments (29ZA) are who takes part.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the program is called, in the words staff use for it. |
+| Status | picklist(Planned, Active, Completed) | yes (defaults Active) | Where the program stands. Completed programs keep their enrollments and services. |
+| Description | long text | no | What the program does and for whom. |
+| Target Population | text | no | Who the program is meant for, in a sentence a funder report can quote. |
+| Start Date | date | no | When the program began, or will begin. |
+| End Date | date | no | When the program ended, or will end. |
+| Coordinator | reference(User) | no | The staff member who runs this program. |
+
+### Relationships
+
+- **Program to Service**, one to many; the service is a detail of the program.
+- **Program to Enrollment**, one to many, through a required lookup (R-PG2).
+- Coordinator is a User, not a person pair: a coordinator is staff who logs in.
+
+### Rules
+
+**R-PG1 End after start.** A program's End Date, when set, is not before its Start Date
+(validation rule).
+
+**R-PG2 A program with enrollments is kept.** It cannot be deleted while an enrollment names
+it: the enrollment's lookup is required with delete Restrict, so the platform refuses, naming the
+enrollments. Set Status to Completed instead. Deleting a program with no enrollments deletes its
+services with it.
+
+**R-PG3 A completed program still takes enrollments.** Nothing refuses an enrollment into a
+Planned or Completed program, so history from a spreadsheet or PMM loads as it happened.
+
+### Salesforce implementation
+
+- **Object:** `Program__c`, name field Text, label Program Name, sharing Public Read/Write.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Status | `Status__c` | Picklist: Planned, Active, Completed; required, default Active |
+| Description | `Description__c` | Long Text Area(32768) |
+| Target Population | `Target_Population__c` | Text(255) |
+| Start Date | `Start_Date__c` | Date |
+| End Date | `End_Date__c` | Date |
+| Coordinator | `Coordinator__c` | Lookup to User, delete constraint SetNull |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (release 0.12) |
+
+- **Validation rules:** `End_After_Start` (R-PG1).
+
+---
+
+## 29Z. Service
+
+### Definition
+
+One thing a program offers its participants: a hot meal, a tutoring hour, a bag of groceries
+(P-01). Attendance and service delivery (P-02) record each time a service is given, counted in
+the service's unit.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the service is called. |
+| Program | reference(Program) | yes | The program offering it. A service is a detail of its program. |
+| Description | long text | no | What the service is. |
+| Unit of Measure | text | no | What one delivery counts: meals, hours, sessions, bags. |
+| Active | boolean | yes (defaults true) | Whether the service is still offered. An inactive service keeps its history. |
+
+### Relationships
+
+- **Service to Program**, many to one, as a detail of the program.
+
+### Rules
+
+**R-SV1 A service follows its program.** It is seen and edited by whoever may see and edit its
+program, and deleted with it.
+
+### Salesforce implementation
+
+- **Object:** `Service__c`, name field Text, label Service Name, sharing Controlled By Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Program | `Program__c` | Master-Detail to `Program__c`, relationship name Services |
+| Description | `Description__c` | Long Text Area(32768) |
+| Unit of Measure | `Unit_Of_Measure__c` | Text(80) |
+| Active | `Active__c` | Checkbox, default true |
+
+---
+
+## 29ZA. Enrollment
+
+### Definition
+
+A person taking part in a program (P-01): applied, enrolled, completed or withdrawn. It is the
+participant record; P-02 records what they attended and received.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number: an enrollment is identified by its person and program. |
+| Program | reference(Program) | yes | The program the person takes part in. |
+| Contact | reference(Contact) | conditional | The person, where people are Contacts. |
+| Account | reference(Account) | conditional | The person, where people are person Accounts. |
+| Stage | picklist(Applied, Enrolled, Completed, Withdrawn) | yes (defaults Enrolled) | Where the person stands in the program. Applied and Enrolled are open; Completed and Withdrawn have ended. |
+| Start Date | date | no | When the person was enrolled. |
+| End Date | date | no | When the person completed or withdrew. |
+| Intake Date | date | no | When the person was first seen or applied (P-07, release 0.14). |
+| Referral Source | picklist(Self, Family or Friend, Another Agency, School, Health Care Provider, Faith Community, Other) | no | Who sent the person. The values are the organization's to change (P-07). |
+| Eligibility Status | picklist(Not Screened, Awaiting Documents, Eligible, Not Eligible) | no (defaults Not Screened) | Whether the person has been checked against the program's rules (P-07). The values are the organization's to change; Eligible and Not Eligible decide it (R-EN6). |
+| Eligibility Basis | picklist(Income, Age, Residence, Referral, Other) | no | The main reason the person qualifies or not (P-07). The values are the organization's to change. |
+| Eligibility Date | date | no | When eligibility was decided (R-EN6). |
+
+### Relationships
+
+- **Enrollment to Program**, many to one, through a required lookup, not a detail, so the
+  enrollment has sharing of its own (participant privacy, P-08; ADR-0151 decision 3).
+- **Enrollment to a person**, through the Contact and Account pair (Section 4).
+
+### Rules
+
+**R-EN1 Exactly one person.** Contact or Account, never both, never neither (validation rule,
+checked only when the enrollment is new or its person changes, as R-VU1).
+
+**R-EN2 One open enrollment per person per program.** A second open enrollment (Applied or
+Enrolled) for the same person in the same program is refused, naming the program: change the one
+that is there instead. A person may enroll again once an earlier enrollment has ended. Every
+enrollment in the org counts, one the user cannot see included. The check runs on insert, on
+undelete and when the program, person or stage changes. A merge of two people, which moves
+enrollments without running their automation, can leave two open ones; the next such change to
+either is refused until one is ended. Enforced in Apex by an automation that always runs
+(registry row `Enrollment_Rules`, ADR-0024).
+
+**R-EN3 Stage dates are filled in.** Moving an enrollment to Enrolled, or creating it as
+Enrolled, fills an empty Start Date with today; moving it to Completed or Withdrawn, or creating
+it so, fills an empty End Date with today. A date already typed is kept. A switchable automation
+(registry row `Enrollment_Dates`), so an import of history can turn it off.
+
+**R-EN4 End after start.** End Date, when set, is not before Start Date (validation rule).
+
+**R-EN5 Erasing or deleting the person keeps the enrollment.** Erasing a person (Section 29H)
+keeps their enrollments, credited to the anonymous record, so program counts stand; an
+enrollment holds no typed text to empty. Their case notes, which are typed text, are deleted
+(R-CN4). Deleting the person empties the person on the enrollment (SetNull) and keeps it. A merge
+moves the enrollments to the record kept.
+
+**R-EN6 The eligibility date is filled in (P-07).** Creating an enrollment with an Eligibility
+Status of Eligible or Not Eligible, or changing it to either, fills an empty Eligibility Date with
+today. A date already typed is kept, and Not Screened or Awaiting Documents leaves it alone. Part
+of the switchable `Enrollment_Dates` automation (R-EN3), so an import of history can turn it off.
+
+**R-EN7 Participant privacy is a preset (P-08).** Organization-wide sharing is Private. Every
+enrollment is shared, Read/Write, with the public group Programs Participant Records
+(`Programs_Participants`), through the Apex sharing reason `Programs_Participants__c`, written by
+an automation that always runs (registry row `Enrollment_Sharing`). The Participant Privacy preset
+on the Programs settings page decides who is in that group:
+
+- **Shared (the default):** the group holds All Internal Users, so everyone with a Programs
+  permission set sees every enrollment, as before P-08.
+- **Private:** the group holds no one BarnCRM put there, so an enrollment is seen by its owner,
+  people above the owner in the role hierarchy, and Programs Admin (View All and Modify All). An
+  admin may add chosen users, roles or groups to the group in Setup; BarnCRM adds and removes
+  only All Internal Users.
+
+The preset is stored in `Programs_Settings__c`, written only by the settings page and audited as
+a settings change. The group follows the preset at once when it is saved, and again at install,
+at Turn on and in the hourly access check, which repairs a group changed by hand.
+
+**Intake fields hold choices, not typed text (P-07).** The intake and eligibility fields are dates
+and restricted picklists, so R-EN5 still holds: erasing a person leaves nothing on an enrollment
+to empty. Notes about a person belong in case notes (P-04). The picklist values are the
+organization's: an admin adds, renames or deactivates them on the field in Setup (Object Manager,
+Enrollment), which the Programs settings page links to; BarnCRM reads them by value, and only
+R-EN6 names two values.
+
+### Salesforce implementation
+
+- **Object:** `Enrollment__c`, name field AutoNumber `EN-{000000}`, sharing Private (Public
+  Read/Write before P-08), Apex sharing reason `Programs_Participants__c` (R-EN7).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Program | `Program__c` | Lookup to `Program__c`, required, delete constraint Restrict, relationship name Enrollments |
+| Contact | `Contact__c` | Lookup to Contact, delete constraint SetNull, relationship name Enrollments |
+| Account | `Account__c` | Lookup to Account, delete constraint SetNull, relationship name Enrollments |
+| Stage | `Stage__c` | Picklist: Applied, Enrolled, Completed, Withdrawn; required, default Enrolled |
+| Start Date | `Start_Date__c` | Date |
+| End Date | `End_Date__c` | Date |
+| Intake Date | `Intake_Date__c` | Date |
+| Referral Source | `Referral_Source__c` | Picklist, restricted, not required, no default |
+| Eligibility Status | `Eligibility_Status__c` | Picklist, restricted, not required, default Not Screened |
+| Eligibility Basis | `Eligibility_Basis__c` | Picklist, restricted, not required, no default |
+| Eligibility Date | `Eligibility_Date__c` | Date |
+
+- **Settings page:** `ProgramsSettingsController` and the `programsSettings` panel on the
+  `Programs_Settings` app page and tab (Programs Admin only), reached from the Programs section
+  of BarnCRM Settings (`Setting_Definition.Programs_Settings`, a navigation row). It lists the
+  intake picklists' active values and default from describe, with a link to the enrollment's
+  fields in Setup (Object Manager by API name). The section name `Programs` is in Core's
+  `SettingSections`. It also holds the Participant Privacy preset (R-EN7).
+- **Participant privacy (R-EN7, R-SD6):** the public group `Programs_Participants` (no bosses);
+  the hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox,
+  default unchecked, which is Shared); `ProgramsSharing` writes the shares (handler
+  `ProgramsSharingHandler`, registry rows `Enrollment_Sharing` and `Service_Delivery_Sharing`,
+  always run), sets the group's All Internal Users member (queued, as a group member is a setup
+  object), and shares records that have no share yet (`ProgramsSharingBatch`, run at install
+  and when the preset is saved). `ProgramsAccessSync` sets the member hourly.
+- **Validation rules:** `Exactly_One_Person` (R-EN1), `End_After_Start` (R-EN4).
+- **Service:** `EnrollmentService` (the stage values and the roster panel's reads and writes),
+  `EnrollmentRulesHandler` (R-EN2), `EnrollmentDatesHandler` (R-EN3), `EnrollmentSelector`
+  (the R-EN2 check reads every enrollment in the org, without sharing, so one the user cannot see
+  still counts).
+
+### PMM mapping
+
+The three Programs objects map onto the Program Management Module's (namespace `pmdm`) without a
+new field, so the PMM migration (MIG-09, plan Section 6.1.4 item 9) is a template, not a schema
+change. Nothing in BarnCRM references a PMM object. The PMM names below are from its public
+repository and are checked against an org with PMM when MIG-09 is built.
+
+| BarnCRM | PMM | Note |
+|---|---|---|
+| Program: Name, Status, Description, Target Population, Start Date, End Date | Program: Name, Status, Description, Target Population, Start Date, End Date | Status values match (Planned, Active, Completed) |
+| Service: Name, Program, Description, Unit of Measure, Active | Service: Name, Program, Description, Unit of Measurement, Status | Status Active maps to Active checked |
+| Enrollment: Program, Contact, Stage, Start Date, End Date | Program Engagement: Program, Contact, Stage, Start Date, End Date | Stages: Applied to Applied; Enrolled and Active to Enrolled; Completed to Completed; Withdrawn to Withdrawn |
+
+### On a person, Health Check and sample data
+
+**Programs on a person.** The read only `personEnrollments` card lists a person's enrollments,
+open ones first, each with its program, stage and dates, on the Programs app's own Contact and
+Account record pages (`Programs_Contact_Record_Page`, `Programs_Account_Record_Page`: Core's
+pages plus the card, kept in step under ADR-0064). Read in user mode. On an Account it shows only
+for a person account, and lists enrollments naming the account or its one contact, so it needs no
+person account field. A user who cannot read enrollments gets no card. Since P-05 the card also
+shows the person's last service, the latest Delivery Date of a Present delivery (29ZB), and how
+many Present deliveries they have, both counted in user mode over the deliveries naming the
+person, and left out for a user who cannot read deliveries or when there are none.
+
+**Program dashboard (P-05).** The `programDashboard` panel on the `Programs_Dashboard` app page
+and tab (every Programs set) answers, for a period the user picks (This Month, Last Month, This
+Year, Last Year, Last 12 Months; default This Month): active programs (Status Active), open
+enrollments now (Applied or Enrolled), new enrollments (Start Date in the period), completed
+enrollments (Stage Completed, End Date in the period), people served (distinct people with a
+Present delivery in the period, contacts and accounts counted apart, as a delivery names one or
+the other, counted as people rather than by scanning every delivery, so large orgs stay within
+platform query limits), services delivered (Present deliveries) and the attendance rate (Present over all
+deliveries, absences included, in the period). The same figures per program, for every Active
+program and any other program with activity in the period, at most 200. Read through
+`ProgramDashboardController` in user mode with aggregate queries, so each user's figures follow
+what they may see (Participant Privacy, R-EN7). No object or field is added; the periods are
+computed in the browser by framework-free JS (plan 9.9).
+
+**Roster import (P-06).** Programs ships two `Import_Template_Default__mdt` rows with the
+Template Key `program_roster`, Person Mode Contacts and Person Accounts, of which only the one
+matching the org's people is materialized (R-D3), at install through Core's
+`materializeDefaultsDuringInstall`. Each is an upload of several objects (R-IT20, ADR-0147):
+objects `Enrollment__c` (Insert, the Target Object) and `Program__c` (Update by a matching
+field, key Name). Columns: Program (`Program__c.Name`), Email (`Enrollment__c.Contact__c` by
+`Email`, or `Enrollment__c.Account__c` by `PersonEmail`), Stage, Start Date, End Date, Intake
+Date, Referral Source, Eligibility Status, Eligibility Basis, Eligibility Date. The program loads
+first and each enrollment links to its row's program (ADR-0147 decision 4); the program is only
+found, never created, and its name is not rewritten, even when a row spells it in other
+capitals. A row whose program or email finds nothing is rejected, and so is one R-EN2 refuses.
+The enrollment rules run as for one made by hand (blank Stage is Enrolled, R-EN3 fills dates).
+No field is added.
+
+**Health Check.** `ProgramsHealthCheckExtension`, registered in
+`HealthCheckExtensions.EXTENSION_CLASSES`, asked only of a viewer who may manage settings and not
+while the module is turned off:
+
+| Key | Severity | Finds | Fix |
+|---|---|---|---|
+| `program_enrollments_open_after_end` | Info | Open enrollments (Applied or Enrolled) in a program that is Completed or whose End Date is past: they still count as open (R-EN2) and in the roster. | Links the first five enrollments. |
+
+**Sample data.** `ProgramsSampleData` implements Core's `SampleDataModule` and is registered in
+`SampleDataModules.MODULE_CLASS_NAMES` after Volunteers. Its load, three stages, builds three
+programs flagged `Sample_Data__c` (two Active, one Completed) with five services, then 18
+enrollments of up to 12 of Core's sample people (contacts), through the enrollment rules, then
+(release 0.13, P-02) 40 service deliveries (29ZB) to the people Enrolled in the two Active
+programs. Its removal, before Volunteers', Giving's and Core's, deletes one chunk per stage: the
+sample people's service deliveries and enrollments in sample programs, then the sample programs
+with no enrollment or delivery left (their services go with them). A sample program a real person
+is enrolled in, or has a delivery in, is kept, and so is a sample program with a sample
+enrollment that has a case note (whoever wrote it, even a note the remover cannot see: that
+enrollment is skipped and kept); one Warning in the Error Log names each one kept.
+
+---
+
+## 29ZA1. Case Note
+
+### Definition
+
+A dated, typed note about a participant, written on their enrollment (P-04, release 0.14): a
+check-in, a call, a home visit, an assessment. Light case notes, not case management: goals and
+service plans are P-10.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number. |
+| Enrollment | reference(Enrollment) | yes | The person's enrollment the note is about; the person and program come from it. |
+| Note Date | date | yes (defaults today) | The day of the contact or event the note records. |
+| Type | picklist(Check-in, Phone Call, Home Visit, Office Visit, Assessment, Referral, Other) | yes (defaults Check-in) | What kind of contact it records. The values are the organization's to change in Setup. |
+| Subject | text(255) | no | A short line saying what the note is about. |
+| Note | long text | no | What happened, what was agreed and what comes next. |
+| Owner | reference(User) | yes | The author, who sees and edits the note. |
+
+### Relationships
+
+- **Case Note to Enrollment**, many to one, through a required lookup, not a detail, so a note
+  has sharing of its own and is not visible to everyone who can see the enrollment.
+
+### Rules
+
+**R-CN1 An enrollment with case notes is kept.** The lookup's delete constraint is Restrict: an
+enrollment with notes cannot be deleted; delete the notes first. A merge moves the enrollment,
+and its notes with it.
+
+**R-CN2 Private by default.** Organization-wide sharing is Private, whatever the participant
+privacy preset (P-08) says: a note is seen by its owner, people above the owner in the role
+hierarchy, and Programs Admin (View All and Modify All). An owner may share a note with a
+colleague through the record's Sharing button, or an admin may add a sharing rule in Setup.
+
+**R-CN3 Who may write.** Programs Staff create notes and edit their own; Programs Admin creates,
+edits and deletes any; Programs Read Only has no access to case notes at all, so a Read Only user
+sees neither the tab nor the related list.
+
+**R-CN4 Erasing the person deletes their notes.** A case note is typed text about the person and
+nothing else, so erasing the person (Section 29H, R-ER8) deletes every note on any of their
+enrollments, read in system mode and deleted as the user; someone who may not delete them all is
+refused with that reason (only Programs Admin may). Erasing a person account also finds notes
+and counts enrollments recorded on that person account's own contact. The enrollments are kept (R-EN5). Deleting a
+person, not erasing them, keeps the notes on the enrollment, which no longer names the person;
+erase a person to remove what was written about them.
+
+### Salesforce implementation
+
+- **Object:** `Case_Note__c`, name field AutoNumber `CN-{000000}`, sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Enrollment | `Enrollment__c` | Lookup to `Enrollment__c`, required, delete constraint Restrict, relationship name Case_Notes |
+| Note Date | `Note_Date__c` | Date, required, default TODAY() |
+| Type | `Type__c` | Picklist, restricted, required, default Check-in |
+| Subject | `Subject__c` | Text(255) |
+| Note | `Note__c` | Long Text Area(32768) |
+
+- **Erasure:** `ProgramsErasureExtension`, registered in Core's
+  `PersonErasureExtensions.EXTENSION_CLASSES`, with `CaseNoteSelector` (without sharing, system
+  mode reads only).
+- **UI:** the Case Notes tab (list views All Case Notes and My Case Notes) and the Case Notes
+  related list on the enrollment. No trigger.
+- **PMM mapping:** none; PMM has no case note object, so MIG-09 carries none.
+
+---
+
+## 29ZB. Service Delivery
+
+### Definition
+
+One service given to one person on one day, or their absence from it (P-02, Programs module):
+a hot meal, two tutoring hours, a missed session. It is both attendance and service delivery, as
+PMM's Service Delivery is: the attendance says whether the person came, the quantity counts what
+they received in the service's unit. Sessions and cohorts are P-11.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number: a delivery is identified by its person, service and date. |
+| Service | reference(Service) | yes | The service given, and through it the program. |
+| Enrollment | reference(Enrollment) | no | The person's enrollment in the service's program. Filled in when left empty (R-SD3). |
+| Contact | reference(Contact) | conditional | The person, where people are Contacts. |
+| Account | reference(Account) | conditional | The person, where people are person Accounts. |
+| Delivery Date | date | yes (defaults today) | The day the service was given, or missed. |
+| Attendance | picklist(Present, Excused Absence, Unexcused Absence) | yes (defaults Present) | Whether the person came. |
+| Quantity | number | yes (defaults 1) | How much was given, in the service's unit of measure. 0 for an absence. |
+
+### Relationships
+
+- **Service Delivery to Service**, many to one, through a required lookup with delete Restrict, not
+  a detail, so participant privacy (P-08) can set deliveries apart from the program as it does
+  enrollments. A service with deliveries cannot be deleted; clear its Active box instead.
+- **Service Delivery to Enrollment**, many to one, optional, delete SetNull.
+- **Service Delivery to a person**, through the Contact and Account pair (Section 4).
+
+### Rules
+
+**R-SD1 Exactly one person.** Contact or Account, never both, never neither (validation rule,
+checked only when the delivery is new or its person changes, as R-EN1).
+
+**R-SD2 An absence delivers nothing.** Quantity is never negative (validation rule). Saving a
+delivery with an absence (Excused or Unexcused) sets its Quantity to 0. Always runs (registry
+row `Service_Delivery_Rules`): totals would otherwise count services nobody received.
+
+**R-SD3 The enrollment is filled in.** A delivery saved with no enrollment is linked to the
+person's enrollment in the service's program: the open one, or else the one that started last.
+A person with no enrollment there is still recorded; the delivery simply has none. Same
+always-run row, as the link is what the roster and the P-05 dashboard count by.
+
+**R-SD4 One row per person, service and day, from the grid.** The Service Delivery Log
+(below) keeps one delivery per person per service per day, changing the row that is there
+instead of adding another. Nothing refuses a second row entered by hand: two separate meals on
+one day are two deliveries. When the log saves a new delivery for a person, service and day
+that already has one the saving user cannot see (under the Private Participant Privacy preset, a
+delivery another staff member logged is hidden), that delivery's Attendance and Quantity are
+changed instead of a second row being added; the hidden delivery is still not shown to the user.
+This needs update access to Service Delivery Attendance and Quantity.
+
+**R-SD6 Participant privacy (P-08).** As R-EN7: sharing Private, every delivery shared with
+`Programs_Participants` through the reason `Programs_Participants__c` (registry row
+`Service_Delivery_Sharing`, always runs), so the Participant Privacy preset decides who sees
+deliveries as it does enrollments.
+
+**R-SD5 Erasing or deleting the person keeps the delivery.** As R-EN5: erasure credits it to the
+anonymous record; deleting the person empties the person (SetNull) and keeps the counts.
+
+### Salesforce implementation
+
+- **Object:** `Service_Delivery__c`, name field AutoNumber `SD-{000000}`, sharing Private
+  (Public Read/Write before P-08), Apex sharing reason `Programs_Participants__c` (R-SD6).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Service | `Service__c` | Lookup to `Service__c`, required, delete constraint Restrict, relationship name Service_Deliveries |
+| Enrollment | `Enrollment__c` | Lookup to `Enrollment__c`, delete constraint SetNull, relationship name Service_Deliveries |
+| Contact | `Contact__c` | Lookup to Contact, delete constraint SetNull, relationship name Service_Deliveries |
+| Account | `Account__c` | Lookup to Account, delete constraint SetNull, relationship name Service_Deliveries |
+| Delivery Date | `Delivery_Date__c` | Date, required, default `TODAY()` |
+| Attendance | `Attendance__c` | Picklist: Present, Excused Absence, Unexcused Absence; required, default Present |
+| Quantity | `Quantity__c` | Number(10, 2), required, default 1 |
+
+- **Validation rules:** `Exactly_One_Person` (R-SD1), `Quantity_Not_Negative` (R-SD2).
+- **Service:** `ServiceDeliveryRulesHandler` (R-SD2, R-SD3) with `ServiceDeliveryService` and
+  `ServiceDeliverySelector`, trigger `ServiceDeliveryTrigger` through `TriggerDispatcher`.
+- **Service Delivery Log:** the `serviceDeliveryLog` panel on the program page
+  (`ServiceDeliveryLogController`): pick an active service and a day, and every open
+  enrollment (Applied or Enrolled) is listed with its attendance and quantity for that day, saved
+  in one go (R-SD4). It works the same on a phone.
+
+### PMM mapping
+
+| BarnCRM | PMM | Note |
+|---|---|---|
+| Service Delivery: Service, Enrollment, Contact, Delivery Date, Attendance, Quantity | Service Delivery: Service, Program Engagement, Contact, Delivery Date, Attendance Status, Quantity | Attendance values match PMM's Present, Excused Absence and Unexcused Absence. Checked against an org with PMM with MIG-09. |
+
+---
+
+## 29ZC. Logic Model
+
+### Definition
+
+The organization's theory of change, built by the organization itself (L-01, Logic Models module,
+ADR-0154 `0154-logic-models-module.md`): what it puts in, what it does, what that produces, what
+changes for people as a result, and the long-run impact. Its elements (29ZD) are the parts, its
+links (29ZE) say which part leads to which and on what assumption, and indicators (29ZF) on its
+outputs and outcomes say how the organization knows. One for the organization, and optionally one
+per program.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the model is called. |
+| Description | long text | no | What the model covers, for a funder or a new board member. |
+| Program | record identifier (text) | no | The program the model is for, when it is not the organization's. A record identifier, not a reference: Logic Models never depends on Programs (R-LM2). |
+| Scope Key | text | yes (set by BarnCRM) | `Organization`, or the program's identifier. Unique, so a scope has one model. |
+
+### Relationships
+
+- **Logic Model to Logic Model Element**, one to many; the element is a detail of the model.
+- **Logic Model to Logic Model Link**, one to many; the link is a detail of the model.
+
+### Rules
+
+**R-LM1 One model per scope.** At most one model has no program (the organization's), and at most
+one names a given program. A second is refused with a message naming the scope, counting models
+the user cannot see. Enforced in Apex by an automation that always runs (registry row
+`Logic_Model_Scope`, ADR-0024), which sets `Scope_Key__c`; the field is unique, so two saves at
+the same moment cannot both win.
+
+**R-LM2 The program is named, not looked up.** `Program_Id__c` holds a record identifier as text
+(ADR-0014). The builder offers programs only where the Programs module's Program object exists, read by
+describe, and shows the name it finds; a program it cannot find is shown as missing. An identifier
+that is not a well-formed record identifier is refused. The 15-character form is stored as 18.
+
+**R-LM3 Deleting a model deletes its parts.** Its elements, links, indicators and periods go with
+it.
+
+### Salesforce implementation
+
+- **Object:** `Logic_Model__c`, name field Text, label Logic Model Name, sharing Public Read/Write.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Description | `Description__c` | Long Text Area(32768) |
+| Program | `Program_Id__c` | Text(18) |
+| Scope Key | `Scope_Key__c` | Text(18), unique, not case sensitive |
+
+- **Trigger:** `LogicModelTrigger`, through the Core dispatcher; handler `LogicModelScopeHandler`
+  (R-LM1, R-LM2), reading every model without sharing through `LogicModelIntegritySelector`.
+
+---
+
+## 29ZD. Logic Model Element
+
+### Definition
+
+One part of a logic model (L-01): an input (staff, funding, a building), an activity (tutoring
+sessions), an output (sessions held, students served), an outcome (reading at grade level), which
+is short, intermediate or long term, or the impact (a community where every child reads).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The element, in a short phrase. |
+| Logic Model | reference(Logic Model) | yes | The model it belongs to. |
+| Type | picklist(Input, Activity, Output, Outcome, Impact) | yes | Its stage in the model. |
+| Outcome Term | picklist(Short Term, Intermediate Term, Long Term) | conditional | For an outcome only: when the change is expected. |
+| Description | long text | no | The element in full. |
+| Sort Order | number | no | Its place in its column; lower first. |
+| Stage Rank | number (formula) | | Input 1, Activity 2, Output 3, short, intermediate and long term outcome 4, 5 and 6, Impact 7. Links must go up the ranks (R-LL2). |
+| Indicator Count | number (roll-up) | | How many indicators it has. |
+
+### Relationships
+
+- **Element to Logic Model**, many to one, as a detail of the model.
+- **Element to Indicator**, one to many; the indicator is a detail of the element.
+- **Element to Logic Model Link**, as the from end or the to end of any number of links.
+
+### Rules
+
+**R-LE1 An outcome has a term, and only an outcome.** An outcome without an Outcome Term, or
+another type with one, is refused (validation rule).
+
+**R-LE2 Indicators only on outputs and outcomes.** An element with indicators cannot become an
+input, activity or impact (validation rule on the Indicator Count roll-up); R-IN1 is the other
+half.
+
+**R-LE3 Deleting an element.** Its indicators and their periods are deleted with it. The builder
+deletes its links first; a delete from the standard record page empties the element on its links
+(SetNull), and the builder does not show a link with an empty end.
+
+### Salesforce implementation
+
+- **Object:** `Logic_Model_Element__c`, name field Text, label Element, sharing Controlled By
+  Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Logic Model | `Logic_Model__c` | Master-Detail to `Logic_Model__c`, relationship name Elements |
+| Type | `Type__c` | Picklist: Input, Activity, Output, Outcome, Impact; required |
+| Outcome Term | `Outcome_Term__c` | Picklist: Short Term, Intermediate Term, Long Term |
+| Description | `Description__c` | Long Text Area(32768) |
+| Sort Order | `Sort_Order__c` | Number(5, 0) |
+| Stage Rank | `Stage_Rank__c` | Formula (Number), from Type and Outcome Term |
+| Indicator Count | `Indicator_Count__c` | Roll-up summary, COUNT of `Indicator__c` |
+
+- **Validation rules:** `Outcome_Term_For_Outcomes` (R-LE1), `Indicators_Need_Output_Or_Outcome`
+  (R-LE2).
+
+---
+
+## 29ZE. Logic Model Link
+
+### Definition
+
+An arrow in a logic model (L-01): one element leads to another, and the assumption says why the
+organization believes it does ("if students attend twice a week, their reading improves").
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number. |
+| Logic Model | reference(Logic Model) | yes | The model it belongs to. |
+| From Element | reference(Logic Model Element) | yes | Where the arrow starts. |
+| To Element | reference(Logic Model Element) | yes | Where it points. |
+| Assumption | long text | no | Why the first is expected to lead to the second. |
+
+### Relationships
+
+- **Link to Logic Model**, many to one, as a detail of the model.
+- **Link to Logic Model Element**, twice, through lookups.
+
+### Rules
+
+**R-LL1 Both ends in the same model.** Both elements are set and belong to the link's model
+(validation rule).
+
+**R-LL2 Forward only.** The To Element's Stage Rank is higher than the From Element's: an input
+leads to an activity or further, a short term outcome to an intermediate or long term one or the
+impact, never back and never to the same stage (validation rule). The builder offers only these.
+Changing a part's column is refused when any arrow attached to it would then point backward (to
+the same or an earlier stage). The message names each such arrow as "From to To" and says to
+delete those arrows first or pick a column that keeps every arrow forward. The builder checks
+before saving and the server refuses the same move.
+
+**R-LL3 One link per pair.** The builder refuses a second link between the same two elements, in
+the same direction.
+
+### Salesforce implementation
+
+- **Object:** `Logic_Model_Link__c`, name field AutoNumber `LML-{000000}`, sharing Controlled By
+  Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Logic Model | `Logic_Model__c` | Master-Detail to `Logic_Model__c`, relationship name Links |
+| From Element | `From_Element__c` | Lookup to `Logic_Model_Element__c`, delete constraint SetNull, relationship name Links_From |
+| To Element | `To_Element__c` | Lookup to `Logic_Model_Element__c`, delete constraint SetNull, relationship name Links_To |
+| Assumption | `Assumption__c` | Long Text Area(32768) |
+
+- **Validation rules:** `Same_Model` (R-LL1), `Forward_Only` (R-LL2).
+
+---
+
+## 29ZF. Indicator
+
+### Definition
+
+How the organization knows an output happened or an outcome changed (L-02, absorbing P-03):
+"students served", "share of students reading at grade level", with its unit, the direction that
+is better and a baseline. Its periods (29ZG) hold the targets and results.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What is measured. |
+| Element | reference(Logic Model Element) | yes | The output or outcome it measures. |
+| Unit | text | no | What a value counts: people, percent, sessions, dollars. |
+| Better When | picklist(Higher, Lower) | yes (defaults Higher) | Which way is better: Lower for an indicator such as emergency room visits. |
+| Baseline Value | number | no | The starting value, before the work. |
+| Baseline Date | date | no | When the baseline was measured. |
+| Description | long text | no | How it is measured. |
+
+### Relationships
+
+- **Indicator to Element**, many to one, as a detail of the element.
+- **Indicator to Indicator Period**, one to many; the period is a detail of the indicator.
+
+### Rules
+
+**R-IN1 Only on outputs and outcomes.** An indicator on an input, activity or impact is refused
+(validation rule reading the element's type).
+
+**R-IN2 Progress.** For a period with a target and a result, the builder shows the result against
+the target: met when the result is at or beyond the target in the indicator's direction, and
+otherwise the share of the way from the baseline (or zero) to the target. Computed in the
+builder's module, never stored.
+
+### Salesforce implementation
+
+- **Object:** `Indicator__c`, name field Text, label Indicator Name, sharing Controlled By
+  Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Element | `Element__c` | Master-Detail to `Logic_Model_Element__c`, relationship name Indicators |
+| Unit | `Unit__c` | Text(40) |
+| Better When | `Better_When__c` | Picklist: Higher, Lower; required, default Higher |
+| Baseline Value | `Baseline_Value__c` | Number(16, 2) |
+| Baseline Date | `Baseline_Date__c` | Date |
+| Description | `Description__c` | Long Text Area(32768) |
+
+- **Validation rules:** `Output_Or_Outcome_Only` (R-IN1).
+
+---
+
+## 29ZG. Indicator Period
+
+### Definition
+
+An indicator's target and result for one stretch of time (L-02): "2026 Q1", "School year
+2026-27".
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The period, as the organization says it. |
+| Indicator | reference(Indicator) | yes | The indicator measured. |
+| Start Date | date | yes | First day of the period. |
+| End Date | date | yes | Last day of the period. |
+| Target Value | number | no | What the organization aims for in the period. |
+| Result Value | number | no | What it reached. Typed by hand in 0.14; L-03 adds import and computed sources. |
+| Notes | long text | no | What explains the result. |
+
+### Relationships
+
+- **Indicator Period to Indicator**, many to one, as a detail of the indicator.
+
+### Rules
+
+**R-IP1 End after start.** End Date is not before Start Date (validation rule).
+
+**R-IP2 One row per period.** The builder refuses a second period with the same start and end
+dates for the same indicator. Periods of different lengths may overlap (a year and its quarters).
+
+### Salesforce implementation
+
+- **Object:** `Indicator_Period__c`, name field Text, label Period, sharing Controlled By Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Indicator | `Indicator__c` | Master-Detail to `Indicator__c`, relationship name Periods |
+| Start Date | `Start_Date__c` | Date, required |
+| End Date | `End_Date__c` | Date, required |
+| Target Value | `Target_Value__c` | Number(16, 2) |
+| Result Value | `Result_Value__c` | Number(16, 2) |
+| Notes | `Notes__c` | Long Text Area(32768) |
+
+- **Validation rules:** `End_After_Start` (R-IP1).
+- **Service:** `LogicModelService` (the builder's reads and writes, R-LL3, R-IP2),
+  `LogicModelBuilderController` (thin, plain JSON shapes); the builder's rules and progress
+  (R-LL2, R-IN2) run in the framework-free module `logicModel.js` with the rank table as JSON
+  (plan 9.9).
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -9056,7 +10479,6 @@ that builds it, before its metadata is created.
 |---|---|---|---|
 | Receipt | Giving | v0.4 (G-13) | Section 4.11, ADR-0010 |
 | Donor Level | Giving | v0.4 (G-14) | Section 5.2 |
-| Program, Service, Enrollment, Attendance, Service Delivery, Outcome | Programs | v0.9 | Section 5.4 |
 | Funder pipeline entities (grant, reporting deadline, award compliance) | Funders | v0.9 | Section 5.5 |
 | Mirror adapter entities and mirror mappings | Mirror | v0.6 onward | Section 4.12 |
 
@@ -9092,6 +10514,15 @@ rollups (V-01 to V-03, ADR-0127). There is no Volunteer entity.
 Skill, Volunteer Skill, Job Skill, Volunteer Requirement, Shift Schedule and Volunteer Letter
 Template left this table in v0.8 (V-04 to V-08) and are specified in Sections 29P to 29U, with
 the volunteer hours import template in 29V.
+
+Program, Service and Enrollment left this table in release 0.12 (P-01, ADR-0151) and are
+specified in Sections 29Y to 29ZA. Outcome left it when P-03 moved to the Logic Models package as
+L-02 (owner decision, 2026-09-23). Attendance and Service Delivery left it in release 0.13
+(P-02) as one entity, Service Delivery, specified in Section 29ZB.
+Logic Model, Logic Model Element, Logic Model Link, Indicator and Indicator Period (L-01 and
+L-02, release 0.14, ADR-0154 `0154-logic-models-module.md`) are specified in Sections 29ZC to
+29ZG. Indicator takes the place of the Outcome entity listed above for Programs: P-03 moved to the
+Logic Models package as L-02 (owner decision, 2026-09-23).
 
 Two v0.4 entities have attributes that already exist on `Gift__c` from v0.2, because the
 object is not worth altering later for fields this cheap: Acknowledgment Status,
@@ -9199,7 +10630,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | API name pass (ADR-0063). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
 | v0.6 | 2026-10-12 | API name pass, access and navigation (ADR-0063). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (ADR-0063). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
-| v0.6 | 2026-10-12 | UX review item 2 (ADR-0064, Giving ships the donor record pages). No object or field added. The giving rollups, the donor level and `Rollups_Last_Calculated__c` on Account and Contact are shown read only in a Giving section of Giving's own `Giving_Account_Record_Page` and `Giving_Contact_Record_Page`, with Dynamic Related Lists for Gifts, Commitments and Soft Credits and a New Gift quick action (`Account.New_Gift`, `Contact.New_Gift`), activated in the Fundraising app. Principle 2 (a rollup shows when it was last calculated) now holds on the donor's record. |
+| v0.6 | 2026-10-12 | UX review item 2 (ADR-0064, Giving ships the donor record pages). No object or field added. The giving rollups, the donor level and `Rollups_Last_Calculated__c` on Account and Contact are shown read only in a Giving section of Giving's own `Giving_Account_Record_Page` and `Giving_Contact_Record_Page`, with Dynamic Related Lists for Gifts, Commitments and Soft Credits and a New Gift quick action (`Account.New_Gift`, `Contact.New_Gift`), activated in the BarnCRM Fundraising app. Principle 2 (a rollup shows when it was last calculated) now holds on the donor's record. |
 | v0.6 | 2026-10-12 | UX review item 10. No object or field added. `Gift__c.Type__c` is relabelled Payment Method (label only; the API name is unchanged), so the gift record, Quick Gift Entry, gift batches, import and the accounting export all say payment method. `Gift_Compact` and `Commitment_Overview` gain the donor (`Donor_Contact__c`, `Donor_Account__c`). On `Gift_Record_Page` (Dynamic Forms, ADR-0043) Donor Contact shows only when Donor Account is empty and Donor Account only when it is filled (R-G1 allows one donor), Original Gift and Refund Reason only when filled, and Matched Gift only when filled or when the donor is an account; the page gains the activity panel (ADR-0042). |
 | v0.6 | 2026-10-12 | UX review quick wins. No object or field added. One minimal fallback page layout each (ADR-0043) for Relationship, Affiliation, Receipt, Receipt Run, Acknowledgment, Acknowledgment Rule, Acknowledgment Run, Stewardship Plan and Stewardship Plan Template, which had tabs and no layout. |
 | v0.6 | 2026-10-12 | Import first names (ADR-0067, plan Section 11.2 item 17, option a). No object or field added. R-IB12: a row's person with a first name is matched only to a record with that first name; a record holding the shared key under another first name or none is not matched or renamed, and the person is created, where before a sole holder was matched and renamed. The shared key alone finds a person only when the row gives no first name. First names are compared ignoring case and runs of spaces, not accents, initials or short forms. |
@@ -9328,7 +10759,24 @@ mirrors the primary member).
 | v0.11 | 2026-10-29 | Edition stored values (ADR-0143, `0143-edition-internal-values.md`). No object or field added. `BarnCRM_Settings__c.Suite__c` stores `Standard` and `Nonprofit` instead of `Community` and `Impact`, and `BarnCRM_Module__mdt.Editions__c` names the same values. Core's post-install steps rewrite an old stored value once. |
 | v0.11 | 2026-10-29 | Security review G-L4 and G-L5 (owner decisions). No object or field added. New R-AK13 (ADR-0144, `0144-acknowledgments-honor-email-opt-out.md`): an email gift whose recipient contact has Email Opt Out is not emailed, gets no row and stays queued, and the letter run takes it as a letter. `Giving_Admin` loses View All on `Commitment__c`, matching `Gift__c`; commitment record access comes from ownership, roles and sharing. |
 | v1.0 | 2026-10-30 | Advanced duplicate management (C-51, D-154, ADR-0145 `0145-advanced-duplicate-management.md`). Object `Merge_Journal__c` added (Section 29A); custom metadata type `Merge_Rule__mdt` added (Section 13); settings keys `Fuzzy_Match_Threshold__c`, `Merge_Default_Rule__c` and `Auto_Merge_Exact_Match__c`. R-DP1 and R-DP4 amended; R-DP7 to R-DP10 added. |
+| v0.13 | 2026-10-31 | Ask cadence reminders (G-29). New Section 25S. `Contact` and `Account` gain `Next_Ask_Date__c`, `Last_Touch_Date__c` and `Ask_Reminder_For_Date__c` (Giving). `Giving_Settings__c` gains `Ask_Reminders_Enabled__c` (default true), `Ask_Reminders_Last_Run__c` and `Ask_Reminders_Last_Run_Summary__c`. Rules R-AC1 to R-AC6: donor level dates only, one switch, one reminder Task per donor per date, a 30 day catch up window, the Task is the owner's, and a Who Is Due list view on each object. No object added. |
 | v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-0149). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a) by any user with the import permission and edit access to the rows; `Import_Batch__c` gains `Retried_By__c` (Rows Retried By) so undo covers their records. R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
+| 0.12 | 2026-10-31 | Setup Changes Log (C-56, plan D-156). Object `Setup_Change__c` added (Section 29W), rules R-SU1 to R-SU8 (prefix R-SU, since R-SC is soft credits); settings key `Setup_Change_Retention_Days__c` (Org Optimizer keys). A nightly job copies new Setup Audit Trail rows and deletes copies past the retention. |
+| v0.12 | 2026-10-31 | Super Transform follow-ups (C-50f1, C-50f2; ADR-0150). New object `Saved_Transform__c` (Section 29X: `Object_Name__c`, `Definition_JSON__c`), org-wide saved step lists, granted to `BarnCRM_Bulk_Update` and `BarnCRM_Admin`. R-IT15 gains the `digits` step (a document that may use it is version 3; Apex `DataTransform.formatDigits` and the JavaScript module `transformFormat` share one test fixture). R-BU7 applies it unchanged. |
+| 0.12 | 2026-10-31 | Programs P-01 (ADR-0151 `0151-programs-module.md`). New in the Programs module: Program (`Program__c`, 29Y), Service (`Service__c`, 29Z) and Enrollment (`Enrollment__c`, 29ZA), with rules R-PG1 to R-PG3, R-SV1 and R-EN1 to R-EN5 and the PMM mapping. Section 30 keeps attendance and service delivery (P-02); Outcome left it for Logic Models (L-02). Specified ahead of the build. |
+| 0.12 | 2026-10-31 | Programs P-01 follow-up. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Program__c` (29Y), so the Programs sample load can be removed in one action; services and enrollments are found through their program. 29ZA gains the person card, the Programs Health Check finding and the sample data paragraph. No object added. |
+| 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29ZB), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |
+| v0.13 | 2026-10-31 | Donor segments (G-28, D-156). New Section 25O, rules R-DS1 to R-DS6: a segment is a Saved Query of Contact or Account (no new object), with five starter templates held as documented JSON, a count, a list and Mailchimp, Constant Contact and all-columns CSV exports; no sending, no settings key. Contact and Account gain the formula `Change_From_Last_Year__c` (Giving This Year minus Giving Last Year), so upgraders can be filtered. |
+| v0.13 | 2026-10-31 | Pledge reminders (G-30). Objects `Pledge_Reminder_Step__c` (Section 25P) and `Pledge_Reminder__c` (25Q) added; `Giving_Settings__c` gains `Pledge_Reminders_Enabled__c` (off by default), `Pledge_Reminders_Last_Run__c` and `Pledge_Reminders_Last_Run_Summary__c`. Rules R-PR1 to R-PR6. No field is added to `Installment__c` or `Commitment__c`. |
+| 0.13 | 2026-10-31 | Solicitation pipeline (G-26, ADR-0153). New entity Ask (Section 25R, `Ask__c`) with rules R-SO1 to R-SO8: an Opportunity-free ask with the organization's own stages, an outcome kept apart from the stage, stage history, and a win that creates or links the gift or commitment. Giving Settings gains `Ask_Stages__c` (Section 21A). `Next_Ask_Date__c` is the hook ask cadence (G-29) reads. |
+| 0.14 | 2026-10-31 | Logic Models L-01 and L-02 (ADR-0154 `0154-logic-models-module.md`). New in the Logic Models module: Logic Model (`Logic_Model__c`, 29ZC), Logic Model Element (`Logic_Model_Element__c`, 29ZD), Logic Model Link (`Logic_Model_Link__c`, 29ZE), Indicator (`Indicator__c`, 29ZF) and Indicator Period (`Indicator_Period__c`, 29ZG), with rules R-LM1 to R-LM3, R-LE1 to R-LE3, R-LL1 to R-LL3, R-IN1, R-IN2, R-IP1 and R-IP2. Indicator takes the place of P-03's Outcome. Specified ahead of the build. |
+| 0.14 | 2026-10-31 | Landing batch A renumbering. No object or field added. Branches built in parallel had reused section letters; in PR order they are now 25O Donor Segments, 25P Pledge Reminder Step, 25Q Pledge Reminder, 25R Ask, 25S Ask cadence, 29W Setup Change, 29X Saved Transform, 29Y Program, 29Z Service, 29ZA Enrollment, 29ZB Service Delivery, 29ZC Logic Model, 29ZD Logic Model Element, 29ZE Logic Model Link, 29ZF Indicator, 29ZG Indicator Period. Every citation in docs and code was repointed to the section its author meant. |
+| 0.14 | 2026-10-31 | Asks feed ask cadence (G-26 with G-29, landing batch A). No object or field added. New R-SO9: an ask's after insert, update and delete writes the donor's earliest open Target Date into the donor's Next Ask Date, and clears it when no open ask remains only if the asks had set it; R-AC1 and the Next Ask Date definition in 25S say so. Registry row `Ask_Donor_Next_Ask_Date`. |
+| 0.14 | 2026-10-31 | Programs P-07. `Enrollment__c` (29ZA) gains Intake Date (`Intake_Date__c`, Date), Referral Source (`Referral_Source__c`), Eligibility Status (`Eligibility_Status__c`, default Not Screened) and Eligibility Basis (`Eligibility_Basis__c`), restricted picklists whose values the organization changes in Setup, and Eligibility Date (`Eligibility_Date__c`, Date), filled by new rule R-EN6 in the `Enrollment_Dates` automation. No PMM counterpart: they stay out of the MIG-09 mapping. The Programs section of BarnCRM Settings opens the module's settings page (`Programs_Settings` tab). |
+| 0.14 | 2026-10-31 | Programs P-04. New in the Programs module: Case Note (`Case_Note__c`, 29ZA1), a dated, typed note on an enrollment, sharing Private, with rules R-CN1 to R-CN4. Erasing a person now deletes their case notes (`ProgramsErasureExtension` in `PersonErasureExtensions`); enrollments are still kept (R-EN5). |
+| 0.14 | 2026-10-31 | Programs P-08. `Enrollment__c` (29ZA) and `Service_Delivery__c` (29ZB) change from Public Read/Write to Private, each shared with the new public group `Programs_Participants` through the Apex sharing reason `Programs_Participants__c` (R-EN7, R-SD6). New hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox, default unchecked): the Participant Privacy preset, Shared by default, which puts All Internal Users in the group, or Private, which takes them out. Programs Admin gains View All and Modify All on both objects. |
+| 0.14 | 2026-10-31 | Programs P-05. The Programs Dashboard (29ZA, "Program dashboard") and the person card's last service date and services attended. No object or field added. |
+| 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29ZA, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
 
 ---
 ## 32. Entity ownership by package
@@ -9375,7 +10823,9 @@ included; standard objects the packages extend are named by the entity that gove
 | Duplicate Dismissal | Core | v0.5 | 29A |
 | Duplicate Reason | Core | v0.8 | 29A |
 | Saved Query | Core | v0.7 | 29D |
+| Saved Transform | Core | v0.12 | 29X |
 | Field Utilization Snapshot | Core | not scheduled (plan Section 6.1 item 10) | 29F |
+| Setup Change | Core | 0.12 (C-56) | 29W |
 | What's New Seen | Core | v0.6 | 12A |
 | Release Note (shipped, read as shipped) | Core, records from any package | v0.6 | 13 |
 | Match Source (shipped default, admin rows) | Core | v0.8 | 13 |
@@ -9384,6 +10834,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Acknowledgment Rule | Giving | v0.4 | 25F |
 | Acknowledgment | Giving | v0.4 | 25G |
 | Acknowledgment Run | Giving | v0.4 | 25H |
+| Pledge Reminder Step | Giving | release 0.13 (G-30) | 25P |
+| Pledge Reminder | Giving | release 0.13 (G-30) | 25Q |
 | Donor Level | Giving | v0.4 | 25A |
 | Receipt | Giving | v0.4 | 25B |
 | Receipt Number Sequence | Giving | v0.4 | 25C |
@@ -9394,6 +10846,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Stewardship Plan | Giving | v0.4 | 25K |
 | Gift Batch | Giving | v0.5 | 25L |
 | Gift Batch Row | Giving | v0.5 | 25M |
+| Donor segments (Change From Last Year on Account and Contact) | Giving | v0.13 | 25O |
+| Ask | Giving | release 0.13 (G-26) | 25R |
 | Gift Transaction mirror | Mirror | v0.6 | 30 |
 | Opportunity mirror (Opportunity ID on Gift) | Mirror | v0.6 | 29C |
 | Campaign sync (Campaign ID on Appeal) | Mirror | v0.6 | 29B |
@@ -9412,7 +10866,18 @@ included; standard objects the packages extend are named by the entity that gove
 | Volunteer Letter Template | Volunteers | v0.8 | 29U |
 | Volunteer Letter Template Default (shipped default) | Volunteers | v0.8 | 29U |
 | Volunteer hours import template (Import Template Default rows) | Volunteers | v0.8 | 29V |
+| Program | Programs | 0.12 (P-01) | 29Y |
+| Service | Programs | 0.12 (P-01) | 29Z |
+| Enrollment | Programs | 0.12 (P-01) | 29ZA |
+| Case Note | Programs | 0.14 (P-04) | 29ZA1 |
+| Programs Settings (custom setting, Participant Privacy preset) | Programs | 0.14 (P-08) | 29ZA |
+| Service Delivery | Programs | 0.13 (P-02) | 29ZB |
 | Programs entities | Programs | v0.9 | 30 |
+| Logic Model | Logic Models | 0.14 (L-01) | 29ZC |
+| Logic Model Element | Logic Models | 0.14 (L-01) | 29ZD |
+| Logic Model Link | Logic Models | 0.14 (L-01) | 29ZE |
+| Indicator | Logic Models | 0.14 (L-02) | 29ZF |
+| Indicator Period | Logic Models | 0.14 (L-02) | 29ZG |
 | Funders entities | Funders | v0.9 | 30 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
@@ -9424,7 +10889,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Component | Package | Mechanism |
 |---|---|---|
 | Hub app (labelled BarnCRM), Home, Households, Organizations, Import and Settings tabs | Core | Metadata |
-| Fundraising app (the nonprofit app) and its tabs | Giving | Metadata (ADR-0018) |
+| BarnCRM Fundraising app (the nonprofit app) and its tabs | Giving | Metadata (ADR-0018) |
 | Setup Assistant: seven neutral steps (fit, naming, access, identity, modules, data, check) | Core | `SetupAssistantService` |
 | Setup Assistant: fund and appeal step, receipt fields and wording of the identity step, first gift check | Giving | `GivingSetupAssistantExtension` through `SetupAssistantExtensions` |
 | Health Check: household, access, settings, org shape findings | Core | `HealthCheckService` |
@@ -9434,6 +10899,8 @@ so nothing below that is nonprofit-specific ships in Core.
 | Custom permission Manage BarnCRM Settings | Core | Metadata |
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
 | Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-0127). Dashboard `Volunteers` and four reports in public read only folders `BarnCRM_Volunteers`; report types Volunteer Hours with Job and Shift, Volunteer Shifts with Job, Volunteer Sign-ups, Volunteers (Contact); `standard-Dashboard` and `standard-report` tabs in the app; report and dashboard user permissions in the four permission sets (V-03) |
+| Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
+| Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror is v0.6, brought forward from

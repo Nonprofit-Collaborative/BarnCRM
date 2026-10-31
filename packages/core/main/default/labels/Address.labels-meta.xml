@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: message shown when the addresses cannot be read</shortDescription>
-        <value>We could not load these addresses. Refresh the page. If it happens again, ask your administrator to check your access to addresses.</value>
+        <value>We could not load these addresses. Refresh the page. If it happens again, ask your BarnCRM admin to check your access to addresses.</value>
     </labels>
     <labels>
         <fullName>Core_Address_Loading</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address automation: primary address could not be copied to standard fields</shortDescription>
-        <value>We could not copy this address to the standard address fields, so nothing was saved. Check that you can edit the household and its people, then try again. If it happens again ask your administrator to check the Error Log.</value>
+        <value>We could not copy this address to the standard address fields, so nothing was saved. Check that you can edit the household and its people, then try again. If it happens again, ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Core_Address_SaveFailed</fullName>

@@ -73,7 +73,7 @@ public with sharing class VolunteerShiftSignupsController {
     @AuraEnabled
     public static Panel getPanel(Id shiftId) {
         if (shiftId == null) {
-            throw badRequest(Label.Volunteers_Signups_ActionFailed);
+            throw UserErrors.message(Label.Volunteers_Signups_ActionFailed);
         }
         try {
             return panelFor(shiftId);
@@ -86,10 +86,10 @@ public with sharing class VolunteerShiftSignupsController {
     @AuraEnabled
     public static Panel addSignup(Id shiftId, Id personId, String status) {
         if (shiftId == null) {
-            throw badRequest(Label.Volunteers_Signups_ActionFailed);
+            throw UserErrors.message(Label.Volunteers_Signups_ActionFailed);
         }
         if (personId == null) {
-            throw badRequest(Label.Volunteers_Signups_PersonRequired);
+            throw UserErrors.message(Label.Volunteers_Signups_PersonRequired);
         }
         Volunteer_Signup__c signup = new Volunteer_Signup__c(Volunteer_Shift__c = shiftId);
         if (String.isNotBlank(status)) {
@@ -115,13 +115,13 @@ public with sharing class VolunteerShiftSignupsController {
     @AuraEnabled
     public static Panel setStatus(Id signupId, String status) {
         if (signupId == null || String.isBlank(status)) {
-            throw badRequest(Label.Volunteers_Signups_ActionFailed);
+            throw UserErrors.message(Label.Volunteers_Signups_ActionFailed);
         }
         String wanted = checkedStatus(status);
         try {
             Volunteer_Signup__c signup = VolunteerSignupSelector.selectById(signupId);
             if (signup == null) {
-                throw badRequest(Label.Volunteers_Signups_ActionFailed);
+                throw UserErrors.message(Label.Volunteers_Signups_ActionFailed);
             }
             Integer hoursBefore = VolunteerSignupSelector.countHoursFor(signupId);
             Database.update(
@@ -148,7 +148,7 @@ public with sharing class VolunteerShiftSignupsController {
     private static Panel panelFor(Id shiftId) {
         Volunteer_Shift__c shift = VolunteerSignupSelector.selectShift(shiftId);
         if (shift == null) {
-            throw badRequest(Label.Volunteers_Signups_ActionFailed);
+            throw UserErrors.message(Label.Volunteers_Signups_ActionFailed);
         }
         Panel panel = new Panel();
         panel.shiftName = shift.Name;
@@ -217,13 +217,7 @@ public with sharing class VolunteerShiftSignupsController {
                 return entry.getValue();
             }
         }
-        throw badRequest(Label.Volunteers_Signups_ActionFailed);
-    }
-
-    private static AuraHandledException badRequest(String message) {
-        AuraHandledException refused = new AuraHandledException(message);
-        refused.setMessage(message);
-        return refused;
+        throw UserErrors.message(Label.Volunteers_Signups_ActionFailed);
     }
 
     /**
@@ -235,9 +229,9 @@ public with sharing class VolunteerShiftSignupsController {
             return (AuraHandledException) failure;
         }
         if (failure instanceof DmlException) {
-            return badRequest(((DmlException) failure).getDmlMessage(0));
+            return UserErrors.message(((DmlException) failure).getDmlMessage(0));
         }
         ErrorLogger.log(failure, CONTEXT, recordId);
-        return badRequest(Label.Volunteers_Signups_ActionFailed);
+        return UserErrors.message(Label.Volunteers_Signups_ActionFailed);
     }
 }

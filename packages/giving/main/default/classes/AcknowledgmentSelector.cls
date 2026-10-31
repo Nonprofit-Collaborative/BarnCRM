@@ -183,30 +183,6 @@ public with sharing class AcknowledgmentSelector {
         return optedOut;
     }
 
-    /** The acknowledgments recorded for these gifts, newest first. */
-    public static List<Acknowledgment__c> forGifts(Set<Id> giftIds) {
-        return [
-            SELECT
-                Id,
-                Name,
-                Gift__c,
-                Rule__c,
-                Rule__r.Name,
-                Channel__c,
-                Template__c,
-                Status__c,
-                Sent_On__c,
-                Recipient_Email__c,
-                Failure_Reason__c,
-                Gift_Key__c
-            FROM Acknowledgment__c
-            WHERE Gift__c IN :giftIds
-            WITH USER_MODE
-            ORDER BY CreatedDate DESC
-            LIMIT 1000
-        ];
-    }
-
     /** The acknowledgments a run produced, whatever their status. */
     public static List<Acknowledgment__c> forRun(Id runId) {
         return [

@@ -80,10 +80,10 @@ public with sharing class AccountingExportController {
                 '.csv';
             return view;
         } catch (AccountingExportService.ExportException refused) {
-            throw asAuraException(refused.getMessage());
+            throw UserErrors.message(refused.getMessage());
         } catch (Exception unexpected) {
             ErrorLogger.log(unexpected, CONTEXT);
-            throw asAuraException(Label.Mirror_AccountingExport_ErrorFailed);
+            throw UserErrors.message(Label.Mirror_AccountingExport_ErrorFailed);
         }
     }
 
@@ -112,23 +112,17 @@ public with sharing class AccountingExportController {
                 digest
             );
         } catch (AccountingExportService.ExportException refused) {
-            throw asAuraException(refused.getMessage());
+            throw UserErrors.message(refused.getMessage());
         } catch (Exception unexpected) {
             ErrorLogger.log(unexpected, CONTEXT);
-            throw asAuraException(Label.Mirror_AccountingExport_ErrorFailed);
+            throw UserErrors.message(Label.Mirror_AccountingExport_ErrorFailed);
         }
     }
 
     /** The export builds a file of every gift the person can see, so it needs its own permission. */
     private static void requireExport() {
         if (!FeatureManagement.checkPermission(EXPORT_PERMISSION)) {
-            throw asAuraException(Label.Mirror_AccountingExport_NoExportPermission);
+            throw UserErrors.message(Label.Mirror_AccountingExport_NoExportPermission);
         }
-    }
-
-    private static AuraHandledException asAuraException(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 }

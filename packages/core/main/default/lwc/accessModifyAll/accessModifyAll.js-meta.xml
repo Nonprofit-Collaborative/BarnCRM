@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Modify All Report view of Access Explorer: who holds Modify All Data, View All Data and
+    object-level Modify All or View All, and through what. Read only, with CSV downloads.
+  </description>
+  <isExposed>false</isExposed>
+  <masterLabel>Access Modify All Report</masterLabel>
+</LightningComponentBundle>

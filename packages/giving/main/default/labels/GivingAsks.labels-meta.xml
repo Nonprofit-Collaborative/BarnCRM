@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <fullName>Giving_Ask_ErrorStageNotInList</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: a stage not in the Ask Stages list ({0} stage, {1} list)</shortDescription>
+    <value>"{0}" is not one of your ask stages. Choose one of: {1}.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorLoad</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: the pipeline board could not load</shortDescription>
+    <value>The ask pipeline could not be loaded. Try again. If it keeps happening, the Error Log has the details.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorNotFound</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: the ask is missing or not visible</shortDescription>
+    <value>That ask is not available. It may have been deleted, or you may not have access to it.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorNoPermission</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: the person may read asks but not change them</shortDescription>
+    <value>You can see asks but not change them. Ask your BarnCRM admin for Giving Staff access.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorOutcome</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: closing needs a closed outcome</shortDescription>
+    <value>Choose how the ask ended: Won, Declined or Withdrawn.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorNoDonor</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: no gift or pledge can be recorded for an ask with no donor</shortDescription>
+    <value>This ask has no donor, so no gift or pledge can be recorded from it. Add a donor to the ask first, or record the result later.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorAmount</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: a pledge needs an amount above zero</shortDescription>
+    <value>Enter the pledge total, above zero.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorPledgeSchedule</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: a pledge needs its payment schedule</shortDescription>
+    <value>Enter how often the donor pays, how many payments, and the date of the first one.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorChooseLink</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: linking needs a gift or pledge chosen</shortDescription>
+    <value>Choose the gift or pledge this ask produced.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorWrongDonor</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: the linked gift or pledge is another donor's</shortDescription>
+    <value>That gift or pledge is from a different donor, or you cannot see it. Choose one from this ask's donor.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Ask_ErrorUnexpected</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Asks: an unexpected failure saving an ask</shortDescription>
+    <value>The ask could not be saved, and nothing was changed. The Error Log has the details.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_Title</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: page title</shortDescription>
+    <value>Ask Pipeline</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_Intro</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: one line under the title</shortDescription>
+    <value>Every open ask by stage. Drag a card to another stage, or use its menu to move or close it.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ViewBoard</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: button showing the board</shortDescription>
+    <value>Board</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ViewList</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: button showing the list</shortDescription>
+    <value>List</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ScopeEveryone</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: button showing every fundraiser's asks</shortDescription>
+    <value>Everyone's Asks</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ScopeMine</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: button showing only my asks</shortDescription>
+    <value>My Asks</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_NewAsk</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: button creating an ask</shortDescription>
+    <value>New Ask</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_TileOpen</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: total of open asks</shortDescription>
+    <value>Open Asks</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_TileOpenAmount</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: sum of open ask amounts</shortDescription>
+    <value>Open Ask Total</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_TileWon</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: asks won this fiscal year</shortDescription>
+    <value>Won This Fiscal Year</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_TileDeclined</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: asks declined this fiscal year</shortDescription>
+    <value>Declined This Fiscal Year</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_WonDetail</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: won tile detail ({0} is the number of asks)</shortDescription>
+    <value>{0} asks</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_OtherColumn</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: column for asks at a removed stage</shortDescription>
+    <value>Not in Your Stage List</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ColumnEmpty</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: a stage with no asks</shortDescription>
+    <value>No asks at this stage.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_Empty</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: no open asks at all</shortDescription>
+    <value>No open asks yet. Choose New Ask, or add one from a person's or organization's page.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_Truncated</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: only the first cards are drawn ({0} is the number)</shortDescription>
+    <value>Showing the first {0} open asks, soonest target date first. The totals count all of them.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ReadOnly</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: the person may look but not change</shortDescription>
+    <value>You can see asks but not change them.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_NoDonor</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: a card whose donor was deleted</shortDescription>
+    <value>No donor</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_DaysInStage</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: time at the stage ({0} is the number of days)</shortDescription>
+    <value>{0} days in this stage</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_MoveTo</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: card menu item ({0} is the stage)</shortDescription>
+    <value>Move to {0}</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_Open</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: card menu item opening the ask</shortDescription>
+    <value>Open</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_CloseAsk</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: card menu item and dialog title for closing</shortDescription>
+    <value>Close Ask</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_CardActions</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: card menu name for screen readers ({0} is the ask)</shortDescription>
+    <value>Actions for {0}</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ColAsk</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline list: ask number column</shortDescription>
+    <value>Ask</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ColDonor</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline list: donor column</shortDescription>
+    <value>Donor</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ColStage</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline list: stage column</shortDescription>
+    <value>Stage</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ColAmount</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline list: ask amount column</shortDescription>
+    <value>Ask Amount</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ColTarget</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline list: target date column</shortDescription>
+    <value>Target Date</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ColNextStep</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline list: next step column</shortDescription>
+    <value>Next Step</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ColAssigned</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline list: assigned to column</shortDescription>
+    <value>Assigned To</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ColDays</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline list: days in stage column</shortDescription>
+    <value>Days in Stage</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_OutcomeLabel</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: the outcome question</shortDescription>
+    <value>How Did It End?</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_OutcomeWon</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: outcome Won</shortDescription>
+    <value>Won</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_OutcomeDeclined</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: outcome Declined</shortDescription>
+    <value>Declined</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_OutcomeWithdrawn</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: outcome Withdrawn</shortDescription>
+    <value>Withdrawn</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ResultLabel</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: the result question for a win</shortDescription>
+    <value>What Did It Produce?</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ResultGift</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: record the gift now</shortDescription>
+    <value>Record the Gift Now</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ResultPledge</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: record a pledge</shortDescription>
+    <value>Record a Pledge</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ResultLink</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: link an existing gift or pledge</shortDescription>
+    <value>Link a Gift or Pledge Already Entered</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ResultLater</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: record the result later</shortDescription>
+    <value>Record It Later</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_FieldAmount</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: gift amount field</shortDescription>
+    <value>Amount</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_FieldGiftDate</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: gift date field</shortDescription>
+    <value>Gift Date</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_FieldGiftType</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: how the gift arrived</shortDescription>
+    <value>How It Arrived</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_FieldPledgeTotal</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: pledge total field</shortDescription>
+    <value>Pledge Total</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_FieldFirstPayment</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: first pledge payment date field</shortDescription>
+    <value>First Payment Date</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_FieldFrequency</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: pledge frequency field</shortDescription>
+    <value>How Often</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_FieldPayments</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: number of pledge payments field</shortDescription>
+    <value>Number of Payments</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_FieldLinkGift</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: gift picker</shortDescription>
+    <value>Gift</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_FieldLinkPledge</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: pledge picker</shortDescription>
+    <value>Or a Pledge</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_LinkHelp</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: help beside the gift and pledge pickers</shortDescription>
+    <value>Choose a gift or a pledge from this ask's donor.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_FieldNextAsk</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: next ask date field</shortDescription>
+    <value>Next Ask Date</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_NextAskHelp</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: help for the next ask date</shortDescription>
+    <value>When to ask this donor again. Optional.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_Save</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: save button</shortDescription>
+    <value>Save</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_Cancel</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Close Ask: cancel button</shortDescription>
+    <value>Cancel</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_Closed</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: toast after closing an ask</shortDescription>
+    <value>Ask closed.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_Moved</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: toast after a move ({0} is the stage)</shortDescription>
+    <value>Moved to {0}.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_ErrorAction</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: a request failed with no message</shortDescription>
+    <value>That did not work. Try again.</value>
+  </labels>
+</CustomLabels>

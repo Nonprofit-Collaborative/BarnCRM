@@ -14,13 +14,13 @@
   <enableSearch>true</enableSearch>
   <enableSharing>true</enableSharing>
   <enableStreamingApi>true</enableStreamingApi>
-  <label>Volunteer Sign-up</label>
+  <label>Volunteer Sign-Up</label>
   <nameField>
     <displayFormat>VS-{000000}</displayFormat>
-    <label>Sign-up Number</label>
+    <label>Sign-Up Number</label>
     <type>AutoNumber</type>
   </nameField>
-  <pluralLabel>Volunteer Sign-ups</pluralLabel>
+  <pluralLabel>Volunteer Sign-Ups</pluralLabel>
   <sharingModel>ControlledByParent</sharingModel>
   <visibility>Public</visibility>
 </CustomObject>

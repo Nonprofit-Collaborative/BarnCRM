@@ -4,6 +4,6 @@
   <defaultValue>true</defaultValue>
   <description>Whether the person who starts a long BarnCRM job gets a notification when it finishes or stops (Q-04). On by default.</description>
   <inlineHelpText>Tell people when their long jobs finish.</inlineHelpText>
-  <label>Job Notifications</label>
+  <label>Send Long Job Notifications</label>
   <type>Checkbox</type>
 </CustomField>

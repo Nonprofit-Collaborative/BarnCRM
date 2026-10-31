@@ -84,7 +84,7 @@ public with sharing class OrgOptimizerSetupController {
     @AuraEnabled
     public static Result getFindings() {
         if (!hasPermission()) {
-            throw asAuraError(Label.Core_OrgOptimizer_ErrorNoPermission);
+            throw UserErrors.message(Label.Core_OrgOptimizer_ErrorNoPermission);
         }
         Datetime now = Datetime.now();
         Result result = new Result();
@@ -222,11 +222,5 @@ public with sharing class OrgOptimizerSetupController {
             return permissionOverride;
         }
         return FeatureManagement.checkPermission(PERMISSION);
-    }
-
-    private static AuraHandledException asAuraError(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
     }
 }

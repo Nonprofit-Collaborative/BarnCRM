@@ -158,6 +158,11 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0147](0147-several-objects-in-one-upload.md) | Several objects in one upload replaces the parent and child load (supersedes ADR-0111) | Accepted (owner decision) |
 | [0148](0148-import-creates-a-new-field-through-an-org-connection.md) | Import creates a new field through a one-time org connection (amends ADR-0047 for this case) | Accepted (owner decision) |
 | [0149](0149-import-row-correction-retention-and-undo.md) | Import rows are corrected on screen, deleted by a retention choice, and never needed by undo | Accepted (owner decision) |
+| [0150](0150-digit-format-step-and-saved-step-lists.md) | A digit-format transform step, a shared fixture, and saved step lists | Proposed (builder decision) |
+| [0151](0151-programs-module.md) | The BarnCRM Programs module: Core only, three objects, enrollment kept apart from its program for privacy | Proposed |
+| [0152](0152-ai-readiness-export.md) | AI-Readiness Export: a browser-built pack, no AI calls, sensitive fields left out by default | Proposed |
+| [0153](0153-solicitation-pipeline-ask-object.md) | The solicitation pipeline is a Giving Ask object, not Opportunity | Accepted (D-156) |
+| [0154](0154-logic-models-module.md) | The BarnCRM Logic Models module: its own package on Core, five objects, a program named by its record identifier | Proposed |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

@@ -4,7 +4,7 @@
   <deleteConstraint>SetNull</deleteConstraint>
   <externalId>false</externalId>
   <inlineHelpText>The sign-up these hours came from, if any. Hours stay if the sign-up is deleted.</inlineHelpText>
-  <label>Volunteer Sign-up</label>
+  <label>Volunteer Sign-Up</label>
   <referenceTo>Volunteer_Signup__c</referenceTo>
   <relationshipLabel>Volunteer Hours</relationshipLabel>
   <relationshipName>Volunteer_Hours</relationshipName>

@@ -13,7 +13,8 @@ public with sharing class PersonErasureExtensions {
     @NamespaceAccessible
     public static final List<String> EXTENSION_CLASSES = new List<String>{
         'GivingPersonErasureExtension',
-        'VolunteersErasureExtension'
+        'VolunteersErasureExtension',
+        'ProgramsErasureExtension'
     };
 
     /** Injected by Core's tests, since no other package is there to resolve. */

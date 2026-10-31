@@ -1,9 +1,14 @@
 import { LightningElement, wire } from 'lwc';
 import listObjects from '@salesforce/apex/DataDictionaryController.listObjects';
 import describeObject from '@salesforce/apex/DataDictionaryController.describeObject';
-import getPlan from '@salesforce/apex/FieldUtilizationController.getPlan';
-import countFields from '@salesforce/apex/FieldUtilizationController.countFields';
-import { toCsv, fileName, format, messageFrom } from 'c/findCsv';
+import {
+  readFillRates,
+  toRow,
+  dictionaryCsv,
+  TABLE_COLUMNS,
+  FILL_RATE_COLUMN
+} from 'c/dictionaryKit';
+import { fileName, format, messageFrom, saveBlob } from 'c/findCsv';
 
 import TITLE from '@salesforce/label/c.Core_DataDictionary_PageTitle';
 import INTRO from '@salesforce/label/c.Core_DataDictionary_PageIntro';
@@ -19,117 +24,7 @@ import PROGRESS from '@salesforce/label/c.Core_DataDictionary_Progress';
 import FILL_PROGRESS from '@salesforce/label/c.Core_DataDictionary_FillProgress';
 import NOT_COUNTED from '@salesforce/label/c.Core_DataDictionary_NotCounted';
 import EMPTY from '@salesforce/label/c.Core_DataDictionary_Empty';
-import YES from '@salesforce/label/c.Core_DataDictionary_Yes';
-import NO from '@salesforce/label/c.Core_DataDictionary_No';
-import COL_OBJECT from '@salesforce/label/c.Core_DataDictionary_ColObject';
-import COL_OBJECT_API_NAME from '@salesforce/label/c.Core_DataDictionary_ColObjectApiName';
-import COL_FIELD from '@salesforce/label/c.Core_DataDictionary_ColField';
-import COL_API_NAME from '@salesforce/label/c.Core_DataDictionary_ColApiName';
-import COL_TYPE from '@salesforce/label/c.Core_DataDictionary_ColType';
-import COL_LENGTH from '@salesforce/label/c.Core_DataDictionary_ColLength';
-import COL_PRECISION from '@salesforce/label/c.Core_DataDictionary_ColPrecision';
-import COL_REQUIRED from '@salesforce/label/c.Core_DataDictionary_ColRequired';
-import COL_UNIQUE from '@salesforce/label/c.Core_DataDictionary_ColUnique';
-import COL_EXTERNAL_ID from '@salesforce/label/c.Core_DataDictionary_ColExternalId';
-import COL_CUSTOM from '@salesforce/label/c.Core_DataDictionary_ColCustom';
-import COL_PICKLIST_VALUES from '@salesforce/label/c.Core_DataDictionary_ColPicklistValues';
-import COL_HELP_TEXT from '@salesforce/label/c.Core_DataDictionary_ColHelpText';
-import COL_FORMULA from '@salesforce/label/c.Core_DataDictionary_ColFormula';
-import COL_RELATED_TO from '@salesforce/label/c.Core_DataDictionary_ColRelatedTo';
-import COL_FILL_RATE from '@salesforce/label/c.Core_DataDictionary_ColFillRate';
-
-const PERCENT = { maximumFractionDigits: 1 };
 const FILE_BASE = 'Data_Dictionary';
-
-const isBlank = (value) => value === null || value === undefined;
-const yesNo = (value) => (value ? YES : NO);
-
-/** A fill rate as a CSV cell: one decimal and a percent sign, or empty when not counted. */
-function fillRateText(share) {
-  return isBlank(share) ? '' : `${Math.round(share * 1000) / 10}%`;
-}
-
-/** The table and CSV row for one described field. */
-function toRow(objectDictionary, field, share) {
-  return {
-    key: `${objectDictionary.objectName}|${field.fieldName}`,
-    objectLabel: objectDictionary.objectLabel,
-    objectName: objectDictionary.objectName,
-    fieldLabel: field.fieldLabel,
-    fieldName: field.fieldName,
-    dataType: field.dataType,
-    length: isBlank(field.length) ? null : field.length,
-    precision: field.precision || '',
-    required: yesNo(field.required),
-    isUnique: yesNo(field.isUnique),
-    externalId: yesNo(field.externalId),
-    isCustom: yesNo(field.isCustom),
-    picklistValues: field.picklistValues || '',
-    helpText: field.helpText || '',
-    formula: field.formula || '',
-    relatedTo: field.relatedTo || '',
-    fillRate: isBlank(share) ? null : share
-  };
-}
-
-/**
- * Fill rates by field API name, from Field Utilization's own counting: each field's filled and
- * record totals are summed across record types.
- */
-function sharesFrom(countRows) {
-  const sums = new Map();
-  for (const row of countRows) {
-    const sum = sums.get(row.fieldName) || { filled: 0, total: 0 };
-    sum.filled += row.filled || 0;
-    sum.total += row.total || 0;
-    sums.set(row.fieldName, sum);
-  }
-  const shares = new Map();
-  sums.forEach((sum, name) => {
-    if (sum.total > 0) {
-      shares.set(name, sum.filled / sum.total);
-    }
-  });
-  return shares;
-}
-
-const TABLE_COLUMNS = [
-  { label: COL_OBJECT, fieldName: 'objectLabel', initialWidth: 160 },
-  { label: COL_FIELD, fieldName: 'fieldLabel', initialWidth: 200 },
-  { label: COL_API_NAME, fieldName: 'fieldName', initialWidth: 200 },
-  { label: COL_TYPE, fieldName: 'dataType', initialWidth: 120 },
-  { label: COL_LENGTH, fieldName: 'length', type: 'number', initialWidth: 90 },
-  { label: COL_PRECISION, fieldName: 'precision', initialWidth: 100 },
-  { label: COL_REQUIRED, fieldName: 'required', initialWidth: 90 },
-  { label: COL_UNIQUE, fieldName: 'isUnique', initialWidth: 90 },
-  { label: COL_EXTERNAL_ID, fieldName: 'externalId', initialWidth: 110 },
-  { label: COL_CUSTOM, fieldName: 'isCustom', initialWidth: 90 },
-  { label: COL_PICKLIST_VALUES, fieldName: 'picklistValues', wrapText: true, initialWidth: 260 },
-  { label: COL_HELP_TEXT, fieldName: 'helpText', wrapText: true, initialWidth: 260 },
-  { label: COL_FORMULA, fieldName: 'formula', wrapText: true, initialWidth: 260 },
-  { label: COL_RELATED_TO, fieldName: 'relatedTo', initialWidth: 160 }
-];
-
-const FILL_RATE_COLUMN = {
-  label: COL_FILL_RATE,
-  fieldName: 'fillRate',
-  type: 'percent',
-  typeAttributes: PERCENT,
-  initialWidth: 100
-};
-
-/** The CSV's columns: the table's, with the object's API name and the fill rate as text. */
-function csvColumns(withFillRates) {
-  const columns = [
-    { label: COL_OBJECT, path: 'objectLabel' },
-    { label: COL_OBJECT_API_NAME, path: 'objectName' },
-    ...TABLE_COLUMNS.slice(1).map((column) => ({ label: column.label, path: column.fieldName }))
-  ];
-  if (withFillRates) {
-    columns.push({ label: COL_FILL_RATE, path: 'fillRateText' });
-  }
-  return columns;
-}
 
 /**
  * The Data Dictionary section of Org Optimizer (plan Section 6.1.1 item 13, D-154, admin guide
@@ -270,37 +165,18 @@ export default class DataDictionary extends LightningElement {
     await this.describeNext(run, names, index + 1, withFillRates);
   }
 
-  /** Counts one chunk of fields, then the next, and returns the count rows of all of them. */
-  async countNext(run, objectName, names, size, start, counted) {
-    if (start >= names.length || run !== this.run) {
-      return counted;
-    }
-    const chunk = await countFields({ objectName, fieldNames: names.slice(start, start + size) });
-    return this.countNext(run, objectName, names, size, start + size, [
-      ...counted,
-      ...(chunk.rows || [])
-    ]);
-  }
-
   /** Fills one object's rows from Field Utilization's plan and counts, within its limits. */
   async addFillRates(run, described) {
     this.fillingLabel = described.objectLabel;
     try {
-      const plan = await getPlan({ objectName: described.objectName });
+      const shares = await readFillRates(described.objectName, () => run === this.run);
       if (run !== this.run) {
         return;
       }
-      if (plan.tooLarge) {
+      if (!shares) {
         this.skipped = [...this.skipped, described.objectLabel];
         return;
       }
-      const names = (plan.fields || []).map((field) => field.fieldName);
-      const size = plan.chunkSize || names.length || 1;
-      const counted = await this.countNext(run, described.objectName, names, size, 0, []);
-      if (run !== this.run) {
-        return;
-      }
-      const shares = sharesFrom(counted);
       this.rows = this.rows.map((row) => {
         const known = row.objectName === described.objectName && shares.has(row.fieldName);
         return known ? { ...row, fillRate: shares.get(row.fieldName) } : row;
@@ -312,16 +188,12 @@ export default class DataDictionary extends LightningElement {
   }
 
   handleDownload() {
-    const rows = this.rows.map((row) => ({ ...row, fillRateText: fillRateText(row.fillRate) }));
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(
-      new Blob([toCsv(csvColumns(this.builtWithFillRates), rows)], {
+    saveBlob(
+      new Blob([dictionaryCsv(this.rows, this.builtWithFillRates)], {
         type: 'text/csv;charset=utf-8'
-      })
+      }),
+      fileName(FILE_BASE)
     );
-    link.download = fileName(FILE_BASE);
-    link.click();
-    URL.revokeObjectURL(link.href);
-    this.noticeMessage = format(DOWNLOADED, String(rows.length));
+    this.noticeMessage = format(DOWNLOADED, String(this.rows.length));
   }
 }

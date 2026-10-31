@@ -87,7 +87,7 @@ queries**. Queries shared with you show the sharer's name, for example "Springfi
 ## To Delete a Saved Query
 
 1. Open the query from **Saved queries**, open the menu next to **Save** and choose **Delete**.
-2. In "Delete this saved query?", press **Delete**, or **Keep It** to leave it.
+2. In "Delete This Saved Query?", press **Delete**, or **Keep It** to leave it.
 
 You should see: "Deleted" followed by the name. This cannot be undone. A shared query is
 removed for everyone.

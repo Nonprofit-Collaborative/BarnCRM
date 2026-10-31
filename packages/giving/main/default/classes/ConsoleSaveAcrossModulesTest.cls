@@ -38,8 +38,8 @@ private class ConsoleSaveAcrossModulesTest {
                 'and the Giving setting on Giving Settings, in the same Save'
             );
             Set<String> audited = new Set<String>();
-            for (SettingsController.ChangeModel change : SettingsController.recentChanges(10)) {
-                audited.add(change.getSettingName());
+            for (Setting_Change__c change : [SELECT Setting_Name__c FROM Setting_Change__c]) {
+                audited.add(change.Setting_Name__c);
             }
             Assert.areEqual(2, audited.size(), 'Both changes are in the history: ' + audited);
         }

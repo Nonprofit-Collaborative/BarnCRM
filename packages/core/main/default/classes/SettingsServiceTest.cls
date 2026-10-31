@@ -498,19 +498,13 @@ private class SettingsServiceTest {
     static void aModeIsReadBackAsItWasSaved() {
         System.runAs(TestUsers.admin()) {
             BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
-            settings.Coexistence_Mode__c = 'NPSP';
             settings.Household_Membership_Mode__c = 'Junction';
             TestDataFactory.saveSettings(settings);
 
             Assert.areEqual(
-                'NPSP',
-                SettingsService.coexistenceMode(),
-                'Maria chose NPSP coexistence.'
-            );
-            Assert.areEqual(
                 'Junction',
                 SettingsService.householdMembershipMode(),
-                'And junction membership.'
+                'Maria chose junction membership.'
             );
         }
     }
@@ -519,19 +513,13 @@ private class SettingsServiceTest {
     static void aModeNobodyRecognizesFallsBackToTheShippedDefault() {
         System.runAs(TestUsers.admin()) {
             BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
-            settings.Coexistence_Mode__c = 'Something a data load put here';
-            settings.Household_Membership_Mode__c = null;
+            settings.Household_Membership_Mode__c = 'Something a data load put here';
             TestDataFactory.saveSettings(settings);
 
             Assert.areEqual(
-                SettingsService.COEXISTENCE_MODE_DEFAULT,
-                SettingsService.coexistenceMode(),
-                'A value outside the list reads as the shipped default (ADR-0019).'
-            );
-            Assert.areEqual(
                 SettingsService.MEMBERSHIP_MODE_DEFAULT,
                 SettingsService.householdMembershipMode(),
-                'So does an empty one.'
+                'A value outside the list reads as the shipped default (ADR-0019).'
             );
         }
     }

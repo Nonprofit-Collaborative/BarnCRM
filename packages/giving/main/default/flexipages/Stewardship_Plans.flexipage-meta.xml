@@ -13,7 +13,7 @@
     <name>main</name>
     <type>Region</type>
   </flexiPageRegions>
-  <masterLabel>Stewardship Plans</masterLabel>
+  <masterLabel>Stewardship Plan Setup</masterLabel>
   <template>
     <name>flexipage:defaultAppHomeTemplate</name>
   </template>

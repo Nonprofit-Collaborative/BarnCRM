@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Program roster</label>
+    <protected>true</protected>
+    <values>
+        <field>Template_Key__c</field>
+        <value xsi:type="xsd:string">program_roster</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">A program roster, one row per person: the program's name, the person's email, and optionally the stage, dates and intake and eligibility. Each row enrolls the person in the program; a row whose program or email finds nothing, or whose person already has an open enrollment there, is reported, not loaded.</value>
+    </values>
+    <values>
+        <field>Column_Mapping_JSON__c</field>
+        <value
+      xsi:type="xsd:string"
+    >{"version": 1, "objects": [{"entity": "Enrollment__c", "operation": "Insert"}, {"entity": "Program__c", "operation": "Update by a matching field", "keyField": "Name"}], "columns": [{"source": "Program", "target": "Program__c.Name"}, {"source": "Email", "target": "Enrollment__c.Account__c", "lookupField": "PersonEmail"}, {"source": "Stage", "target": "Enrollment__c.Stage__c"}, {"source": "Start Date", "target": "Enrollment__c.Start_Date__c"}, {"source": "End Date", "target": "Enrollment__c.End_Date__c"}, {"source": "Intake Date", "target": "Enrollment__c.Intake_Date__c"}, {"source": "Referral Source", "target": "Enrollment__c.Referral_Source__c"}, {"source": "Eligibility Status", "target": "Enrollment__c.Eligibility_Status__c"}, {"source": "Eligibility Basis", "target": "Enrollment__c.Eligibility_Basis__c"}, {"source": "Eligibility Date", "target": "Enrollment__c.Eligibility_Date__c"}]}</value>
+    </values>
+    <values>
+        <field>Matching_Rule__c</field>
+        <value xsi:type="xsd:string">Email exact</value>
+    </values>
+    <values>
+        <field>Person_Mode__c</field>
+        <value xsi:type="xsd:string">Person Accounts</value>
+    </values>
+    <values>
+        <field>Target_Object__c</field>
+        <value xsi:type="xsd:string">Enrollment__c</value>
+    </values>
+    <values>
+        <field>Load_Operation__c</field>
+        <value xsi:type="xsd:string">Insert</value>
+    </values>
+    <values>
+        <field>Default_Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+</CustomMetadata>

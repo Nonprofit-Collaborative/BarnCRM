@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup note, Acknowledgments: clicks in Setup, separated by |</shortDescription>
-        <value>Click Add.|Enter the display name and the address, choose who may use it, then click Save.|Open the email Salesforce sends to that address and click its verification link.|Back here, choose the address in Acknowledgments from address.</value>
+        <value>Click Add.|Enter the display name and address, choose who may use it, then click Save.|Open the email Salesforce sends to that address and click its verification link.|Back here, choose the address in Acknowledgments from address.</value>
     </labels>
     <labels>
         <fullName>Giving_SetupNote_FromAddress_What</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup note, Receipts: what to change for record pages</shortDescription>
-        <value>Assign Gift Record Page as the org default for Gift, so every gift shows the Receipts, Soft credits and Tribute panels. To show giving in the BarnCRM app, also assign Giving Contact Record Page and Giving Account Record Page to that app.</value>
+        <value>Assign Gift Record Page as the org default for Gift, so every gift shows the Receipts, Soft credits and Tribute panels. To show giving in the BarnCRM app, also assign Giving Contact Record Page and Giving Account Record Page to it.</value>
     </labels>
     <labels>
         <fullName>Giving_SetupNote_RecordPages_Why</fullName>

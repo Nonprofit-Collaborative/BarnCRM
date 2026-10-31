@@ -2,7 +2,7 @@ import { LightningElement, wire } from 'lwc';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
 import { toRecords } from './csv';
-import { toCsv } from 'c/findCsv';
+import { toCsv, saveBlob } from 'c/findCsv';
 import { isXlsx, XLSX_ERRORS } from './xlsx';
 import { readFileSheets } from './fileSource';
 import {
@@ -2615,12 +2615,10 @@ export default class ImportWizard extends LightningElement {
 
   /** Saves CSV (c/findCsv: byte-order mark, formula guard) named after the batch. */
   saveCsv(columns, records, suffix) {
-    const blob = new Blob([toCsv(columns, records)], { type: 'text/csv;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `${this.batch ? this.batch.name : 'import'}-${suffix}.csv`;
-    link.click();
-    URL.revokeObjectURL(link.href);
+    saveBlob(
+      new Blob([toCsv(columns, records)], { type: 'text/csv;charset=utf-8' }),
+      `${this.batch ? this.batch.name : 'import'}-${suffix}.csv`
+    );
   }
 
   handleStartOver() {

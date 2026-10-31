@@ -35,6 +35,69 @@
         </template>
 
         <template lwc:if={showCards}>
+            <!-- Saved Step Lists -->
+            <section class="step" data-id="saved-lists" aria-labelledby="saved-heading">
+                <h2 id="saved-heading" class="slds-text-heading_small step__heading">{labels.savedHeading}</h2>
+                <p class="slds-text-color_weak slds-var-m-bottom_x-small">{labels.savedHelp}</p>
+                <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                        <template lwc:if={hasSavedLists}>
+                            <lightning-combobox
+                                data-id="saved-pick"
+                                label={labels.savedChoose}
+                                placeholder={labels.savedPlaceholder}
+                                options={savedOptions}
+                                value={savedListId}
+                                disabled={busy}
+                                onchange={handleSavedPick}
+                            ></lightning-combobox>
+                        </template>
+                        <template lwc:else>
+                            <p class="slds-text-color_weak" data-id="saved-none">{labels.savedNone}</p>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                        <lightning-input
+                            data-id="saved-name"
+                            label={labels.savedName}
+                            value={savedNameText}
+                            maxlength="80"
+                            onchange={handleSavedName}
+                        ></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-var-m-top_x-small">
+                    <lightning-button
+                        data-id="saved-load"
+                        label={labels.savedLoad}
+                        disabled={pickDisabled}
+                        onclick={handleSavedLoad}
+                    ></lightning-button>
+                    <lightning-button
+                        class="slds-var-m-left_x-small"
+                        data-id="saved-save"
+                        label={labels.savedSave}
+                        disabled={saveDisabled}
+                        onclick={handleSavedSave}
+                    ></lightning-button>
+                    <lightning-button
+                        class="slds-var-m-left_x-small"
+                        data-id="saved-rename"
+                        label={labels.savedRename}
+                        disabled={renameDisabled}
+                        onclick={handleSavedRename}
+                    ></lightning-button>
+                    <lightning-button
+                        class="slds-var-m-left_x-small"
+                        data-id="saved-delete"
+                        variant="destructive-text"
+                        label={labels.savedDelete}
+                        disabled={pickDisabled}
+                        onclick={handleSavedDelete}
+                    ></lightning-button>
+                </div>
+            </section>
+
             <!-- 1. Object -->
             <section class="step" data-id="step-object" aria-labelledby="step-object-heading">
                 <h2 id="step-object-heading" class="slds-text-heading_small step__heading">{labels.stepObject}</h2>

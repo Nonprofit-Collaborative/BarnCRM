@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: queued totals failed. {0} is the count.</shortDescription>
-        <value>{0} queued total updates failed five times and wait for you. The Error Log says why, often a validation rule or a record someone was editing. Fix the cause, then click Retry in Needs attention.</value>
+        <value>{0} queued total updates failed five times and are waiting. The Error Log says why, often a validation rule or a record being edited. Fix the cause, then click Retry in Needs attention.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RollupQueueStuckTitle</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: queued totals waited. {0} count, {1} minutes.</shortDescription>
-        <value>{0} queued total updates have waited more than {1} minutes. They usually finish within a minute of the save. Click Start now in Needs attention to recalculate them now; the nightly run also picks them up.</value>
+        <value>{0} queued total updates have waited more than {1} minutes. They normally finish within a minute. Click Start now in Needs attention to recalculate them, or wait for the nightly run.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RollupQueueFix</fullName>

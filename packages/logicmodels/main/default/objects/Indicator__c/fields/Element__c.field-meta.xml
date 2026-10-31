@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Element__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The output or outcome this indicator measures.</inlineHelpText>
+  <label>Element</label>
+  <referenceTo>Logic_Model_Element__c</referenceTo>
+  <relationshipLabel>Indicators</relationshipLabel>
+  <relationshipName>Indicators</relationshipName>
+  <relationshipOrder>0</relationshipOrder>
+  <reparentableMasterDetail>false</reparentableMasterDetail>
+  <trackTrending>false</trackTrending>
+  <type>MasterDetail</type>
+  <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

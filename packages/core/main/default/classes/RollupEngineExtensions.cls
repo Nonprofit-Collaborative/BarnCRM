@@ -41,12 +41,6 @@ public with sharing class RollupEngineExtensions {
         return found;
     }
 
-    /** True when the module's engine is installed. */
-    @NamespaceAccessible
-    public static Boolean isInstalled() {
-        return find() != null;
-    }
-
     /**
      * The installed engine's second seam (`RollupEngineExtensionV2`), or null when there is no
      * engine or it predates that seam.

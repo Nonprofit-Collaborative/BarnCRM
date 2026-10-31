@@ -1,6 +1,6 @@
 # BarnCRM Overview
 
-Applies to: BarnCRM main as of 2026-10-29 (landing batch 13). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-31 (landing batch A head a8489572d, pending the squash commit on main). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## What BarnCRM Is
 
@@ -33,13 +33,13 @@ You choose the edition once, in the first-run setup window; the Setup Assistant 
 
 | Package | What it holds | State on main |
 |---|---|---|
-| **Core** | Households and people, relationships, affiliations, addresses, the BarnCRM apps (everyday and admin, each with standard or console navigation), Settings console, Setup Assistant, Module Manager, access roles, Import, Data Manager, Find, bulk update and delete, Super Transform (bulk changes without a file), Org Optimizer, Duplicates, Health Check, Error Log, erase a person | Built |
+| **Core** | Households and people, relationships, affiliations, addresses, the BarnCRM apps (everyday and admin, each with standard or console navigation), Settings console, Setup Assistant, Module Manager, access roles, Import, Data Manager, Find, bulk update and delete, Super Transform (bulk changes without a file, with saved step lists and a phone format), Org Optimizer, Duplicates, Health Check, Error Log, erase a person | Built |
 | **Rollup Builder** | The rollup engine and the Rollup Builder page where you manage totals | Built (offered in both editions; Giving depends on it) |
-| **Giving** | Gifts, funds, Quick Gift Entry, gift batches, refunds, in-kind gifts, commitments, soft credits, tributes, matching gifts, appeals, acknowledgments, receipts and year-end statements, donor levels, stewardship plans, retention reports, posting and closed periods, gift import, the Giving dashboard, the Fundraising app | Built |
+| **Giving** | Gifts, funds, Quick Gift Entry, gift batches, refunds, in-kind gifts, commitments, pledge reminders, soft credits, tributes, matching gifts, appeals, acknowledgments, receipts and year-end statements, donor levels, stewardship plans, the Ask Pipeline, retention reports, donor segments with export for email tools, posting and closed periods, gift import, the Giving dashboard, the BarnCRM Fundraising app | Built |
 | **Mirror** | Opportunity mirror, Campaign sync, inbound gift API, accounting export | Built (the Gift Transaction mirror for Nonprofit Cloud is planned) |
-| **Volunteers** | Jobs, shifts, sign-ups, hours with approval, skills, requirements, recurring shifts, hour letters and certificates, the BarnCRM Volunteers app | Built and tested on main |
-| **Programs** | Programs, services, enrollments, attendance | Planned; the package is an empty placeholder |
-| **Logic Models** | Inputs, activities, outputs, outcomes and indicators | Planned |
+| **Volunteers** | Jobs, shifts, sign-ups, hours with approval, skills, requirements, recurring shifts, shift reminder emails, suggested volunteers for a shift, hour letters and certificates, the BarnCRM Volunteers app | Built and tested on main |
+| **Programs** | Programs, services, enrollments with stages, the Program Roster panel, a person's Programs card, attendance and service delivery with the Service Delivery Log, intake and eligibility fields, private case notes, a participant privacy preset, a program dashboard, a roster import template, sample data, the BarnCRM Programs app and its settings page | Built (release 0.12, P-01; release 0.13, P-02; release 0.14, P-04 to P-08) |
+| **Logic Models** | The Logic Model Builder: inputs, activities, outputs, outcomes and impact with arrows and assumptions, for the organization or a program, and indicators with a baseline and a target and result per period; the BarnCRM Logic Models app | Built (release 0.14, L-01 and L-02; indicator sources and the report are planned) |
 | **Funders** | Funder pipeline, reporting deadlines, restricted fund tracking | Planned; the package is an empty placeholder |
 | **Events** | Simple event registration and attendance | Planned (after 1.0) |
 
@@ -51,10 +51,10 @@ Install Core and run the Setup Assistant, and you can:
 
 - Keep households and the people in them, with household names and greetings built for you, merge and split households, and record relationships, affiliations, addresses (including seasonal ones), several email addresses and a preferred phone.
 - Bring in a spreadsheet (CSV or Excel) with a preview, matching rules and one-click undo, find and export records, change many records at once, and delete many records with a way back.
-- Review duplicates, check what needs attention in Org Optimizer, document your fields in a downloadable Data Dictionary, and run Health Check, with an Error Log that nothing fails silently into.
-- Control who sees what with ready-made roles, load realistic sample data to try things out, and erase a person's personal data when you must.
+- Review duplicates, check what needs attention in Org Optimizer, document your fields in a downloadable Data Dictionary, download an AI-Readiness Export pack for an AI tool you choose (BarnCRM never calls one itself), see who changed what in Setup long after Salesforce's 180 days, inspect every readable field of a record with the Record Inspector, and run Health Check, with an Error Log that nothing fails silently into.
+- Control who sees what with ready-made roles, see who can see or change what and why in Access Explorer (including a side-by-side compare of two people and a Modify All report), load realistic sample data to try things out, and erase a person's personal data when you must.
 
-Add Giving and you can also record and receipt gifts, run appeals and stewardship, import gifts from NPSP or Nonprofit Cloud exports, and watch the Giving dashboard. Add Volunteers and you can schedule shifts and approve hours. Add Mirror to keep Opportunities and Campaigns in step, accept gifts from a giving page, or export gifts for accounting.
+Add Giving and you can also record and receipt gifts, run appeals and stewardship, get a task when it is time to ask a donor again, import gifts from NPSP or Nonprofit Cloud exports, and watch the Giving dashboard. Add Volunteers and you can schedule shifts and approve hours. Add Mirror to keep Opportunities and Campaigns in step, accept gifts from a giving page, or export gifts for accounting.
 
 BarnCRM runs on Platform-only licenses, Sales and Service Cloud, an org with NPSP installed, and an org on Agentforce Nonprofit.
 

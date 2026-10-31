@@ -278,6 +278,34 @@ describe('c-shift-signups', () => {
     });
   });
 
+  it('reloads when Suggested Volunteers signs someone up for this shift, and stops listening when removed', async () => {
+    getPanel.mockResolvedValue(panelOf([]));
+    const element = build();
+    await flush();
+    expect(getPanel).toHaveBeenCalledTimes(1);
+
+    window.dispatchEvent(
+      new CustomEvent('barnshiftsignupschanged', { detail: { shiftId: 'other' } })
+    );
+    await flush();
+    expect(getPanel).toHaveBeenCalledTimes(1);
+
+    getPanel.mockResolvedValue(panelOf([ANA]));
+    window.dispatchEvent(
+      new CustomEvent('barnshiftsignupschanged', { detail: { shiftId: SHIFT_ID } })
+    );
+    await flush();
+    expect(getPanel).toHaveBeenCalledTimes(2);
+    expect(element.shadowRoot.querySelectorAll('[data-id="signup"]').length).toBe(1);
+
+    document.body.removeChild(element);
+    window.dispatchEvent(
+      new CustomEvent('barnshiftsignupschanged', { detail: { shiftId: SHIFT_ID } })
+    );
+    await flush();
+    expect(getPanel).toHaveBeenCalledTimes(2);
+  });
+
   it('is read only for a person who may not change sign-ups', async () => {
     getPanel.mockResolvedValue(panelOf([ANA], { canAdd: false, canEdit: false }));
     const element = build();

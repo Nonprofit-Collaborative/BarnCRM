@@ -3,7 +3,7 @@
   <fullName>Acknowledgments_Enabled__c</fullName>
   <inlineHelpText>Whether gifts join the acknowledgment queue as they are saved. Off until your rules are written.</inlineHelpText>
   <defaultValue>false</defaultValue>
-  <label>Acknowledge Gifts</label>
+  <label>Send Gift Acknowledgments</label>
   <type>Checkbox</type>
   <trackTrending>false</trackTrending>
   <externalId>false</externalId>

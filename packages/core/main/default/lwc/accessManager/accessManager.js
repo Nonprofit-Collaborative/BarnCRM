@@ -38,6 +38,9 @@ import LOADING_ROLES from '@salesforce/label/c.Core_Access_LoadingRoles';
 import NO_ONE_IN_ROLE from '@salesforce/label/c.Core_Access_NoOneInRole';
 import PAGE_DESCRIPTION from '@salesforce/label/c.Core_Access_PageDescription';
 import PAGE_TITLE from '@salesforce/label/c.Core_Access_PageTitle';
+import OPEN_ACCESS_EXPLORER from '@salesforce/label/c.Core_Access_OpenAccessExplorer';
+import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
+import getOpenLink from '@salesforce/apex/AccessExplorerController.getOpenLink';
 import READ_ONLY_NOTICE from '@salesforce/label/c.Core_Access_ReadOnlyNotice';
 import REMOVE_BUTTON from '@salesforce/label/c.Core_Access_RemoveButton';
 import REMOVE_SUCCESS from '@salesforce/label/c.Core_Access_RemoveSuccess';
@@ -110,6 +113,7 @@ export default class AccessManager extends LightningElement {
     noOneInRole: NO_ONE_IN_ROLE,
     pageDescription: PAGE_DESCRIPTION,
     pageTitle: PAGE_TITLE,
+    openAccessExplorer: OPEN_ACCESS_EXPLORER,
     readOnlyNotice: READ_ONLY_NOTICE,
     removeButton: REMOVE_BUTTON,
     roleLabel: ROLE_LABEL,
@@ -145,6 +149,14 @@ export default class AccessManager extends LightningElement {
 
   overviewResult;
   pendingSearchTerm;
+
+  /** Org Optimizer opened on Access Explorer (C-53); only for people who can open it. */
+  accessExplorerUrl;
+
+  @wire(getOpenLink)
+  wiredOpenLink({ data }) {
+    this.accessExplorerUrl = data && canManageSettings ? data.url : undefined;
+  }
 
   @wire(getAccessOverview)
   handleOverview(response) {

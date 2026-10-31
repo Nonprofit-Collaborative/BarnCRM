@@ -39,7 +39,7 @@ public with sharing class TributeController {
     @AuraEnabled(cacheable=true)
     public static TributeView getTribute(Id giftId) {
         if (giftId == null) {
-            throw badRequest(Label.Giving_TributeNotification_NotFound);
+            throw UserErrors.message(Label.Giving_TributeNotification_NotFound);
         }
         try {
             return viewFor(giftId);
@@ -51,12 +51,12 @@ public with sharing class TributeController {
     @AuraEnabled
     public static TributeView markNotificationSent(Id tributeId) {
         if (tributeId == null) {
-            throw badRequest(Label.Giving_TributeNotification_NotFound);
+            throw UserErrors.message(Label.Giving_TributeNotification_NotFound);
         }
         try {
             List<Tribute__c> found = TributeSelector.selectByIds(new Set<Id>{ tributeId });
             if (found.isEmpty()) {
-                throw badRequest(Label.Giving_TributeNotification_NotFound);
+                throw UserErrors.message(Label.Giving_TributeNotification_NotFound);
             }
             Id giftId = found[0].Gift__c;
             TributeService.markNotificationSent(new Set<Id>{ tributeId });
@@ -116,14 +116,8 @@ public with sharing class TributeController {
         return String.isBlank(third) ? null : third;
     }
 
-    private static AuraHandledException badRequest(String message) {
-        AuraHandledException refused = new AuraHandledException(message);
-        refused.setMessage(message);
-        return refused;
-    }
-
     private static AuraHandledException report(Exception failure, Id recordId) {
         ErrorLogger.log(failure, CONTEXT, recordId);
-        return badRequest(Label.Giving_TributeNotification_ActionFailed);
+        return UserErrors.message(Label.Giving_TributeNotification_ActionFailed);
     }
 }

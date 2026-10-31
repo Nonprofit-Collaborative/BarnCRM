@@ -49,12 +49,13 @@ public with sharing class NightlyJobs {
         List<NightlyJob> jobs = new List<NightlyJob>();
         // A job the administrator has switched off is not one Health Check may schedule.
         if (SeasonalAddressScheduler.isEnabled()) {
-            jobs.add(new SeasonalAddressJob());
+            jobs.add(SeasonalAddressScheduler.nightlyJob());
         }
-        jobs.add(new ErrorDigestJob());
-        jobs.add(new ImportRowPurgeJob());
-        jobs.add(new EmptyHouseholdTidyJob());
-        jobs.add(new TabAccessJob());
+        jobs.add(ErrorDigestScheduler.nightlyJob());
+        jobs.add(ImportRowPurgeScheduler.nightlyJob());
+        jobs.add(EmptyHouseholdTidyScheduler.nightlyJob());
+        jobs.add(TabAccessScheduler.nightlyJob());
+        jobs.add(SetupChangeCopyJob.nightlyJob());
         for (String className : PROVIDER_CLASSES) {
             jobs.addAll(providedBy(className));
         }
@@ -102,10 +103,7 @@ public with sharing class NightlyJobs {
     public static List<String> rescheduleAsRunningUser(List<String> jobNames) {
         Datetime pauseEnds = AutomationControl.pausedUntil();
         for (String name : jobNames) {
-            Id triggerId = ScheduledJobSelector.triggerIdByName(name);
-            if (triggerId != null) {
-                ScheduledJobSelector.abort(triggerId);
-            }
+            ScheduledJobSelector.stopNamed(name);
         }
         scheduleAll();
         if (jobNames.contains(AutomationResumeJob.JOB_NAME) && pauseEnds != null) {
@@ -113,7 +111,7 @@ public with sharing class NightlyJobs {
         }
         List<String> stoppedOnly = new List<String>();
         for (String name : jobNames) {
-            if (ScheduledJobSelector.triggerIdByName(name) == null) {
+            if (!ScheduledJobSelector.isScheduled(name)) {
                 stoppedOnly.add(name);
             }
         }
@@ -147,90 +145,5 @@ public with sharing class NightlyJobs {
             ERROR_CONTEXT
         );
         return null;
-    }
-
-    /** The seasonal address swap, listed while Seasonal Addresses is on in the Addresses section. */
-    public class SeasonalAddressJob implements NightlyJob {
-        public String label() {
-            return System.Label.Core_HealthCheck_JobSeasonalAddresses;
-        }
-
-        public Boolean isScheduled() {
-            return SeasonalAddressScheduler.isScheduled();
-        }
-
-        public void schedule() {
-            SeasonalAddressScheduler.start();
-        }
-    }
-
-    /** The error digest, started and stopped in the Error Log section. */
-    public class ErrorDigestJob implements NightlyJob {
-        public String label() {
-            return System.Label.Core_HealthCheck_JobErrorDigest;
-        }
-
-        public Boolean isScheduled() {
-            // The same test start() makes, so a job it would leave alone counts as scheduled.
-            return ScheduledJobSelector.triggerIdByName(ErrorDigestScheduler.JOB_NAME) != null;
-        }
-
-        public void schedule() {
-            ErrorDigestScheduler.start();
-        }
-    }
-
-    /**
-     * The nightly Import row cleanup (R-IR5). When rows are deleted is the Import setting
-     * Delete Import Rows, and Never keeps them, so the job always belongs on the list.
-     */
-    public class ImportRowPurgeJob implements NightlyJob {
-        public String label() {
-            return System.Label.Core_HealthCheck_JobImportRows;
-        }
-
-        public Boolean isScheduled() {
-            return ImportRowPurgeScheduler.isScheduled();
-        }
-
-        public void schedule() {
-            ImportRowPurgeScheduler.start();
-        }
-    }
-
-    /**
-     * The nightly empty household tidy-up (R-H12a). Whether it removes anything is a
-     * Households setting, so the job always belongs on the list.
-     */
-    public class EmptyHouseholdTidyJob implements NightlyJob {
-        public String label() {
-            return System.Label.Core_HealthCheck_JobEmptyHouseholds;
-        }
-
-        public Boolean isScheduled() {
-            return EmptyHouseholdTidyScheduler.isScheduled();
-        }
-
-        public void schedule() {
-            EmptyHouseholdTidyScheduler.start();
-        }
-    }
-
-    /**
-     * The hourly tab access check (ADR-0124): keeps the switchable tabs with the people who
-     * should see them when roles change outside BarnCRM's Access page.
-     */
-    public class TabAccessJob implements NightlyJob {
-        public String label() {
-            return System.Label.Core_HealthCheck_JobTabAccess;
-        }
-
-        public Boolean isScheduled() {
-            return TabAccessScheduler.isScheduled();
-        }
-
-        public void schedule() {
-            TabAccessScheduler.start();
-        }
     }
 }

@@ -61,6 +61,9 @@ import unitLabel from '@salesforce/label/c.Core_Import_StepsUnit';
 import unitDays from '@salesforce/label/c.Core_Import_StepsUnitDays';
 import unitMonths from '@salesforce/label/c.Core_Import_StepsUnitMonths';
 import whenBlankLabel from '@salesforce/label/c.Core_Import_StepsWhenBlank';
+import opDigits from '@salesforce/label/c.Core_Import_StepsOpDigits';
+import patternLabel from '@salesforce/label/c.Core_Import_StepsPattern';
+import countryLabel from '@salesforce/label/c.Core_Import_StepsCountry';
 
 /** The most changes one column may have, as DataTransform.MAX_STEPS says. */
 const MAX_STEPS = 10;
@@ -143,7 +146,9 @@ export default class ImportColumnTransforms extends LightningElement {
     countLabel,
     amountLabel,
     unitLabel,
-    whenBlankLabel
+    whenBlankLabel,
+    patternLabel,
+    countryLabel
   };
 
   /** The column's steps, as the mapping document holds them. */
@@ -194,7 +199,8 @@ export default class ImportColumnTransforms extends LightningElement {
       { label: opFirst, value: 'first' },
       { label: opLast, value: 'last' },
       { label: opShiftDate, value: 'shiftDate' },
-      { label: opToday, value: 'today' }
+      { label: opToday, value: 'today' },
+      { label: opDigits, value: 'digits' }
     ];
   }
 
@@ -245,6 +251,7 @@ export default class ImportColumnTransforms extends LightningElement {
       isCount: step.op === 'first' || step.op === 'last',
       isShiftDate: step.op === 'shiftDate',
       isToday: step.op === 'today',
+      isDigits: step.op === 'digits',
       columns: step.columns || [],
       pairRows: (step.pairs || []).map((pair, index) => ({
         ...pair,
@@ -440,6 +447,12 @@ export default class ImportColumnTransforms extends LightningElement {
         };
       case 'today':
         return { whenBlank: Boolean(step.whenBlank) };
+      case 'digits':
+        // A new step starts as the US and Canada phone pattern, so its inputs show what is saved.
+        return {
+          pattern: step.pattern === undefined ? '(###) ###-####' : step.pattern,
+          country: step.country === undefined ? '1' : step.country
+        };
       default:
         return {};
     }

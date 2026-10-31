@@ -13,6 +13,7 @@ import SAVE from '@salesforce/label/c.Core_CmdtManager_SaveButton';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
 import LOAD_ERROR from '@salesforce/label/c.Core_CmdtManager_LoadError';
+import { bodyMessage } from 'c/findCsv';
 
 const TYPE_NAME = 'Match_Source__mdt';
 const ADDRESS = 'Address';
@@ -120,7 +121,7 @@ export default class MatchSourceModal extends LightningModal {
       this.errorMessage = undefined;
     } catch (error) {
       this.objectFields = undefined;
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, LOAD_ERROR);
     }
   }
 
@@ -139,13 +140,9 @@ export default class MatchSourceModal extends LightningModal {
       });
       this.close({ jobId, label: form.label });
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, LOAD_ERROR);
     } finally {
       this.busy = false;
     }
-  }
-
-  messageFrom(error) {
-    return error && error.body && error.body.message ? error.body.message : LOAD_ERROR;
   }
 }

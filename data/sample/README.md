@@ -5,7 +5,8 @@
 Tracked as **C-10** in the product plan: 200 realistic households (440 contacts), 25
 organizations, 60 connections between people in different households and 80 affiliations,
 plus, where the Giving package is installed, three years of gifts against 8 funds and 7
-appeals, 24 pledges and recurring commitments with their installments, 30 soft credits and
+appeals, 24 pledges and recurring commitments with their installments, 11 asks across the
+pipeline's stages and outcomes (two won as pledges), 30 soft credits and
 24 tributes. A contributor or reviewer sees the product working immediately, with numbers
 in the reports, without hand-entering data.
 
@@ -130,9 +131,15 @@ The Giving payload:
     }
   ],
   "tributes": [{ "gift": "G0011", "type": "In memory of", "honoreePerson": "H008-2", "recipientPerson": "H008-1", "message": "..." }],
-  "softCredits": [{ "gift": "G0011", "person": "H042-1", "role": "Solicitor", "amount": 2500 }]
+  "softCredits": [{ "gift": "G0011", "person": "H042-1", "role": "Solicitor", "amount": 2500 }],
+  "asks": [{ "key": "A001", "donor": "H004-1", "stage": "Identified", "outcome": "Open", "amount": 1000, "targetDaysAgo": -90, "stageDaysAgo": 12, "closedDaysAgo": null, "nextAskDaysAgo": null, "nextStep": "...", "fund": null, "appeal": null, "commitment": null }]
 }
 ```
+
+Asks use the packaged default stages. A negative offset is a date still to come (a target
+date, a next ask date). A won ask names the sample pledge that closed it in `commitment`, so
+asks load in the reference data stage with the commitments. A stage the org has removed from
+its stage list loads blank and the ask takes the org's first stage.
 
 Giving dates are day offsets (`daysAgo`, `startDaysAgo`, `endDaysAgo`), not calendar dates.
 The loader counts them back from the day the set is loaded, so a set loaded a year from now
@@ -187,14 +194,14 @@ first (record types by DeveloperName, `Sample_Data__c` true, `Sample_Data_Key__c
 then contacts in chunks of 100, then the connections and affiliations. Its finish starts
 any module sample set. Giving is one: `GivingSampleData` implements the Core
 `SampleDataModule` interface, Core finds it by name at runtime (ADR-0017), and its own
-stages (`GivingSampleDataStages`, run by the same batch class) insert the funds, appeals
+stages (`GivingSampleData.LoadStages`, run by the same batch class) insert the funds, appeals
 and commitments and then the gifts in chunks of 100. Batch Apex rather than a queueable
 chain, because Developer Edition, trial and scratch orgs stop a chain after five jobs.
 
 `SampleDataLoader.remove()` starts deleting every record carrying the flag, in stages of
 about a hundred records run by `SampleDataRemoveBatch` (a `SampleDataStageBatch` subclass, so
 removal has no queueable chain limit either): each module's records first
-(`GivingSampleDataRemoveStages`), because a gift points at a person and a household, then
+(`GivingSampleData.RemoveStages`), because a gift points at a person and a household, then
 Core's (`SampleDataRemoveStages`): connections, affiliations, contacts and accounts. Allocations, soft credits and tributes are details of a gift, and
 installments are details of a commitment, so they go with their master. Both actions are
 exposed to admins through **Nonprofit Settings > Sample Data** (`sampleDataManager` LWC);

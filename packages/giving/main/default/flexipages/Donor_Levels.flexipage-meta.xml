@@ -11,7 +11,7 @@
     <name>main</name>
     <type>Region</type>
   </flexiPageRegions>
-  <masterLabel>Donor Levels</masterLabel>
+  <masterLabel>Donor Level Ladder</masterLabel>
   <template>
     <name>flexipage:defaultAppHomeTemplate</name>
   </template>

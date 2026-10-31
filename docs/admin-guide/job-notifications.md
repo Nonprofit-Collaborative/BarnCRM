@@ -18,7 +18,7 @@ Notifications are on from the day BarnCRM is installed. There is nothing to set 
 To turn them off for everyone:
 
 1. Open the **BarnCRM Settings** tab and choose the **General** section.
-2. Clear **Tell people when their long jobs finish**.
+2. Clear **Send Long Job Notifications**.
 3. Click **Save**.
 
 Jobs still run and still record what they did on their own page or record; only the

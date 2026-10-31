@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Donor levels page: what the page is for</shortDescription>
-    <value>Your giving ladder. Each rung is a name you give a group of donors and the amount at which a donor reaches it. Donors are placed on it automatically as their giving changes.</value>
+    <value>Your giving ladder. Each rung is a name for a group of donors and the amount that reaches it. Donors move onto it automatically as their giving changes.</value>
   </labels>
   <labels>
     <fullName>Giving_DonorLevels_MeasuredOn</fullName>
@@ -62,7 +62,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Donor levels page: create a rung</shortDescription>
-    <value>New level</value>
+    <value>New Level</value>
   </labels>
   <labels>
     <fullName>Giving_DonorLevels_Recalculate</fullName>
@@ -70,7 +70,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Donor levels page: recalculate button</shortDescription>
-    <value>Recalculate now</value>
+    <value>Recalculate Now</value>
   </labels>
   <labels>
     <fullName>Giving_DonorLevels_RecalculateStarted</fullName>

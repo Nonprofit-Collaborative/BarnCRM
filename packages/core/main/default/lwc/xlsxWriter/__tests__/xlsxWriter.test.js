@@ -8,7 +8,8 @@ import {
   sheetChunks,
   sheetXml,
   toSerial,
-  writeXlsx
+  writeXlsx,
+  writeZip
 } from 'c/xlsxWriter';
 // The import wizard's reader reads back what the writer wrote.
 import { readXlsx } from '../../importWizard/xlsx';
@@ -123,6 +124,34 @@ describe('c/xlsxWriter', () => {
       expect(read[0]).toEqual(['Name', 'Amount', 'Gift Date', 'Paid']);
       expect(read[1]).toEqual(['Person 0', '0', '2026-01-31', 'TRUE']);
       expect(read[200]).toEqual(['Person 199', '1990', '2026-01-31', 'FALSE']);
+    }
+  });
+
+  it('writes a zip of text files, each entry named, checksummed and readable', async () => {
+    const files = [
+      ['README.md', '# Pack\n\nAccents: é ü'],
+      ['data/Contact.csv', 'Id,Email\r\n003A,a@example.org\r\n']
+    ];
+    for (const options of [{ deflate }, { deflate: null }]) {
+      // eslint-disable-next-line no-await-in-loop
+      const bytes = await writeZip(files, options);
+      const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      const read = [];
+      let at = 0;
+      while (view.getUint32(at, true) === 0x04034b50) {
+        const method = view.getUint16(at + 8, true);
+        const crc = view.getUint32(at + 14, true);
+        const size = view.getUint32(at + 18, true);
+        const nameLength = view.getUint16(at + 26, true);
+        const name = new NodeTextDecoder().decode(bytes.slice(at + 30, at + 30 + nameLength));
+        const data = bytes.slice(at + 30 + nameLength, at + 30 + nameLength + size);
+        // eslint-disable-next-line no-await-in-loop
+        const raw = method === 8 ? await inflate(data) : data;
+        expect(crc32(raw)).toBe(crc);
+        read.push([name, new NodeTextDecoder().decode(raw)]);
+        at += 30 + nameLength + size;
+      }
+      expect(read).toEqual(files);
     }
   });
 });

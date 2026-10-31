@@ -22,7 +22,7 @@ to install and no Setup step.
 1. Open the **BarnCRM Admin** app and choose **BarnCRM Settings**.
 2. In the left navigation choose **People and Households**. The setting is in the
    **Relationships** box.
-3. Leave **Keep both sides of relationships in step** switched on, which is how it ships.
+3. Leave **Keep Both Sides of Relationships in Step** switched on, which is how it ships.
    Switch it off only if your organization deliberately keeps one side of every connection,
    for example because another system writes both sides and you do not want two sources
    writing the same records.

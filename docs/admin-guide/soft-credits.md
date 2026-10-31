@@ -16,7 +16,7 @@ surprise to him.
 ## How to Turn It On
 
 1. Open **BarnCRM Settings** and choose **Giving**.
-2. Find **Automatic household soft credits**. It is on when you install BarnCRM.
+2. Find **Auto-Create Household Soft Credits**. It is on when you install BarnCRM.
 3. Leave it on if your organization thanks and reports on households. Turn it off if you
    want soft credits only where a person entered one by hand.
 
@@ -62,7 +62,7 @@ Garcia household: Harper Garcia, her spouse Luis Garcia, and their son Diego.
    already there, each with the role **Household member**, the amount **500**, and an
    **Automatic** badge. Every other current member of the household is credited, not just
    the spouse, and you did nothing to make that happen.
-4. Now add the solicitor. In the **Soft Credits** panel press **Add credit**, pick the
+4. Now add the solicitor. In the **Soft Credits** panel press **Add Credit**, pick the
    person who asked for the gift, choose the role **Solicitor**, leave the amount at 500,
    and press **Save**. The new credit appears with no Automatic badge, because you entered
    it.

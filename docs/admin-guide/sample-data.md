@@ -34,6 +34,7 @@ With the **Giving** package installed, the same action also loads:
 | Gifts | About 700 | Three years of giving: checks, cards, ACH, cash, stock, grants and about twenty in-kind gifts, weighted the way a real list is (most under 500, a few above 10,000). The in-kind gifts carry no amount, as every in-kind gift does, so they are in the In-kind value total on their donor and in none of the cash totals ([In-kind gifts](in-kind-gifts.md)) |
 | Gift allocations | About 750 | One fund for most gifts, two for the gifts a donor designated twice |
 | Commitments | 24 | 14 monthly recurring gifts and 10 pledges, with the installments the schedule implies and the gifts that have paid them |
+| Asks | 11 | Seven open asks across every default stage of the [Ask Pipeline](ask-pipeline.md) (one past its target date, one for an organization), one declined, one withdrawn, and two won as pledges |
 | Soft credits | 30 entered by hand | Solicitors and influencers on the larger gifts, on top of the household member credits the automatic rule writes for every gift |
 | Tributes | 24 | In memory of and in honour of, with a message, notified to somebody other than the person being remembered |
 
@@ -60,21 +61,42 @@ there:
 |---|---|---|
 | Skills | 4 | First aid, Spanish, Forklift and Gardening, with the jobs that ask for them |
 | Jobs | 3 | Food pantry sort, Front desk and Community garden, each with a description and a location |
-| Shift schedule | 1 | **Saturday sorting**, every Saturday morning for the pantry. Like any schedule, it creates its shifts as far ahead as the **Shift horizon weeks** setting says |
+| Shift schedule | 1 | **Saturday sorting**, every Saturday morning for the pantry. Like any schedule, it creates its shifts as far ahead as the **Weeks Ahead to Create Shifts** setting says |
 | Shifts | 16, plus the schedule's | A morning shift for each job in each of the last four weeks, marked Completed, and four upcoming shifts on the front desk and in the garden |
-| Sign-ups | 44 | Three people attended each past shift; two are booked on each upcoming shift, one Confirmed and one Signed up |
+| Sign-Ups | 44 | Three people attended each past shift; two are booked on each upcoming shift, one Confirmed and one Signed up |
 | Hours | 60 | One entry for each attendance and one garden entry for each of 24 sample people. The newest four wait for approval, the next two are Rejected with a reason, and the rest are Approved |
 | Volunteer skills | 24 | One skill or interest on each of the 24 people |
 | Requirements | 8 | Six completed background checks and two orientations in progress |
 
 The hours get their statuses the way a coordinator gives them, so loading needs the **Manage
 Volunteers** permission (Volunteers Admin includes it). Without it the hours keep the status
-they were saved with: Submitted, or Approved when **Hours Require Approval** is off.
+they were saved with: Submitted, or Approved when **Require Hours Approval** is off.
 
 The set does not generate a letter, because a letter is a file. To see one, open any sample
 volunteer with Approved hours and use the **Volunteer Letter** action with the shipped Hours
 letter template ([Hour letters and certificates](volunteers.md#hour-letters-and-certificates)). Remove the file yourself afterwards: it is yours, not the
 loader's.
+
+### With Programs Installed
+
+With the **Programs** package installed, the same action also loads, after Volunteers if it is
+there:
+
+| Records | How many | What is in them |
+|---|---|---|
+| Programs | 3 | **After-school tutoring** and **Food pantry**, both Active, and **Summer reading**, Completed, each with a target population and dates |
+| Services | 5 | Tutoring hour and Homework club session; Grocery bag and Hot meal; Reading circle |
+| Enrollments | 18 | Six in tutoring (four Enrolled, one Applied, one Withdrawn), eight Enrolled in the pantry and four Completed in summer reading, among 12 sample people |
+| Service deliveries | 40 | A grocery bag a week for the last four weeks to each person in the pantry (one week missed, as an Unexcused Absence), and two tutoring sessions of two hours to each person Enrolled in tutoring |
+
+Removal takes the sample people's service deliveries and enrollments in the sample programs,
+then the sample programs and their services. A sample program one of your own people is enrolled
+in, or has a service delivery in, stays with those records, and so does a sample program with
+a sample enrollment that has a case note (whoever wrote it, even a note you cannot see). One
+Warning in the [Error Log](error-log.md) names it: "Sample data removal kept the sample
+programs {names}, because people of your own are enrolled in them or have services recorded in
+them, or a sample enrollment in them has case notes. Move or delete those enrollments, service
+deliveries and case notes, then select Remove Sample Data again."
 
 ## 2. How to Turn It On
 
@@ -152,7 +174,7 @@ household records, names, greetings, member counts, and Members panel.
    Confirm the dialog. The card shows **Removing** while it deletes the set in steps of
    about a hundred records, the same way it loaded, then returns to **Not loaded**. Every
    record the loader created is gone: households, contacts, organizations, connections, affiliations, and the
-   gifts, allocations, soft credits, tributes, funds, appeals, commitments and installments
+   gifts, allocations, soft credits, tributes, funds, appeals, commitments, installments and asks
    too, along with the household member records that joined people to households if your
    org uses the flexible way. With Volunteers installed, its jobs, skills, schedule, shifts,
   sign-ups, hours, volunteer skills and requirements go first: Approved sample hours are
@@ -230,7 +252,7 @@ household records, names, greetings, member counts, and Members panel.
 |---|---|
 | Sample Data checkbox on households, contacts, and organizations | `Sample_Data__c` on Account and Contact |
 | Sample Data checkbox on connections and affiliations | `Sample_Data__c` on `Relationship__c` and `Affiliation__c` |
-| Sample Data checkbox on gifts, funds, appeals and commitments (with Giving) | `Sample_Data__c` on `Gift__c`, `Fund__c`, `Appeal__c` and `Commitment__c` |
+| Sample Data checkbox on gifts, funds, appeals, commitments and asks (with Giving) | `Sample_Data__c` on `Gift__c`, `Fund__c`, `Appeal__c`, `Commitment__c` and `Ask__c` |
 | Sample Data checkbox on volunteer jobs and skills (with Volunteers) | `Sample_Data__c` on `Volunteer_Job__c` and `Skill__c`; shifts, schedules, sign-ups and hours are found through their job |
 | The key that ties a sample gift to the person who gave it | `Sample_Data_Key__c` on Account and Contact |
 | The join between a sample person and their household, flexible mode only | `Household_Member__c`, removed with the household it belongs to |

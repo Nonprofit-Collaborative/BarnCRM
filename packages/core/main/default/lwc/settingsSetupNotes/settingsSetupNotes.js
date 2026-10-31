@@ -6,11 +6,11 @@ import OPEN_IN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
 import NEW_TAB from '@salesforce/label/c.Core_SetupNote_NewTab';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SetupNote_CheckAgain';
 import SHOW_STEPS from '@salesforce/label/c.Core_SetupNote_ShowSteps';
-import DONE from '@salesforce/label/c.Core_SetupNote_Done';
 import NOT_DONE from '@salesforce/label/c.Core_SetupNote_NotDone';
 import METADATA_WHAT from '@salesforce/label/c.Core_SetupNote_Metadata_What';
 import METADATA_WHY from '@salesforce/label/c.Core_SetupNote_Metadata_Why';
 import METADATA_STEPS from '@salesforce/label/c.Core_SetupNote_Metadata_Steps';
+import METADATA_UNCONFIRMED from '@salesforce/label/c.Core_SetupNote_Metadata_Unconfirmed';
 import DUPLICATES_WHAT from '@salesforce/label/c.Core_SetupNote_Duplicates_What';
 import DUPLICATES_WHY from '@salesforce/label/c.Core_SetupNote_Duplicates_Why';
 import DUPLICATES_STEPS from '@salesforce/label/c.Core_SetupNote_Duplicates_Steps';
@@ -37,7 +37,9 @@ const NOTES = {
       what: METADATA_WHAT,
       why: METADATA_WHY,
       steps: METADATA_STEPS,
-      link: 'apexSettings'
+      link: 'apexSettings',
+      check: 'metadata',
+      unconfirmed: METADATA_UNCONFIRMED
     }
   ],
   'duplicate matching': [
@@ -88,6 +90,10 @@ function splitSteps(steps) {
  * c/setupLinks key, and `met` true or false when the page can tell, or `check` naming a
  * SettingsController.getSetupChecks key (left out, the note is the instruction alone). `notes`,
  * when set, wins over `section`.
+ *
+ * A note whose prerequisite is met is not shown: the box says something needs a change in
+ * Setup, and nothing does (owner QA, 2026-10-31). Not done shows a warning; unknown shows the
+ * instruction, plus the note's `unconfirmed` text when it has one.
  */
 export default class SettingsSetupNotes extends LightningElement {
   labels = {
@@ -132,28 +138,25 @@ export default class SettingsSetupNotes extends LightningElement {
   }
 
   get shownNotes() {
-    return this.entries.map((entry) => {
-      const met = entry.check ? this.checks[entry.check] : entry.met;
-      const hasStatus = met === true || met === false;
-      let iconName = 'utility:info';
-      let iconVariant;
-      if (hasStatus) {
-        iconName = met ? 'utility:success' : 'utility:warning';
-        iconVariant = met ? 'success' : 'warning';
-      }
-      const stepList = splitSteps(entry.steps);
-      return {
-        ...entry,
-        stepList,
-        hasSteps: stepList.length > 0,
-        url: setupPath(entry.link),
-        canCheckAgain: Boolean(entry.check),
-        hasStatus,
-        statusText: hasStatus ? (met ? DONE : NOT_DONE) : HEADING,
-        iconName,
-        iconVariant
-      };
-    });
+    return this.entries
+      .map((entry) => ({ entry, met: entry.check ? this.checks[entry.check] : entry.met }))
+      .filter(({ met }) => met !== true)
+      .map(({ entry, met }) => {
+        const notDone = met === false;
+        const stepList = splitSteps(entry.steps);
+        return {
+          ...entry,
+          stepList,
+          hasSteps: stepList.length > 0,
+          url: setupPath(entry.link),
+          canCheckAgain: Boolean(entry.check),
+          hasStatus: notDone,
+          statusText: notDone ? NOT_DONE : HEADING,
+          showUnconfirmed: !notDone && Boolean(entry.unconfirmed),
+          iconName: notDone ? 'utility:warning' : 'utility:info',
+          iconVariant: notDone ? 'warning' : undefined
+        };
+      });
   }
 
   loadChecksIfNeeded() {

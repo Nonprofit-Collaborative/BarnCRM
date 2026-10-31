@@ -10,6 +10,7 @@ import OTHER_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
 import IMPORT_FROM_DLRS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportButton';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/rollupTabLabel';
+import { bodyMessage } from 'c/findCsv';
 
 const TAB_ICON = 'utility:builder';
 
@@ -51,7 +52,7 @@ export default class RollupBuilder extends LightningElement {
     if (data) {
       this.model = data;
     } else if (error) {
-      this.error = this.messageFrom(error);
+      this.error = bodyMessage(error, UNEXPECTED_ERROR);
     }
   }
 
@@ -113,7 +114,7 @@ export default class RollupBuilder extends LightningElement {
         );
       })
       .catch((error) => {
-        this.error = this.messageFrom(error);
+        this.error = bodyMessage(error, UNEXPECTED_ERROR);
       });
   }
 
@@ -155,9 +156,5 @@ export default class RollupBuilder extends LightningElement {
 
   handleCancel() {
     this.editing = false;
-  }
-
-  messageFrom(error) {
-    return error && error.body && error.body.message ? error.body.message : UNEXPECTED_ERROR;
   }
 }

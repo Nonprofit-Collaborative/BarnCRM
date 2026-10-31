@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <fullName>Giving_AskReminder_Subject</fullName>
+    <categories>Giving, Ask Cadence</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask reminder task: subject, with the donor's name</shortDescription>
+    <value>Ask {0}: next ask is due</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskReminder_Description</fullName>
+    <categories>Giving, Ask Cadence</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask reminder task: description</shortDescription>
+    <value>This donor's Next Ask Date has arrived. Make the ask, then set a new Next Ask Date and update Last Touch Date on the donor record.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskReminder_SummaryFormat</fullName>
+    <categories>Giving, Ask Cadence</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Nightly jobs page: what the last ask reminder pass did</shortDescription>
+    <value>Created {0} ask reminders. {1} could not be created and are in the Error Log.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_NightlyJobs_AskRemindersName</fullName>
+    <categories>Giving, Nightly Jobs</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Nightly jobs page: the ask reminders job and when it runs</shortDescription>
+    <value>Ask Reminders, 3:30 AM</value>
+  </labels>
+  <labels>
+    <fullName>Giving_NightlyJobs_AskRemindersDescription</fullName>
+    <categories>Giving, Nightly Jobs</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Nightly jobs page: what the ask reminders job does</shortDescription>
+    <value>Creates a task for the donor's owner when the donor's Next Ask Date arrives. Does nothing while Ask Reminders is off in Settings.</value>
+  </labels>
+</CustomLabels>

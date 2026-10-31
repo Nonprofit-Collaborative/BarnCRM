@@ -13,14 +13,15 @@ public with sharing class HealthCheckExtensions {
     /**
      * The class names dependent packages register to add findings, in the order they are asked:
      * the Rollup Builder module's rollup checks (ADR-0125), Giving's (G-20 follow-up), then
-     * Mirror's, for its nightly mirror run (X-01), then Volunteers' (canonical model Part G).
+     * Mirror's, for its nightly mirror run (X-01), then Volunteers' (canonical model Part G), then Programs' (29ZA).
      */
     @NamespaceAccessible
     public static final List<String> EXTENSION_CLASSES = new List<String>{
         'RollupsHealthCheckExtension',
         'GivingHealthCheckExtension',
         'MirrorHealthCheckExtension',
-        'VolunteersHealthCheckExtension'
+        'VolunteersHealthCheckExtension',
+        'ProgramsHealthCheckExtension'
     };
 
     /** Injected by Core's tests by class name, since no other package is there to resolve. */

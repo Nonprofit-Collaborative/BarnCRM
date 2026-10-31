@@ -247,13 +247,11 @@ public with sharing class RollupDefinitionTransfer {
 
     /** A message the page can show; anything it cannot explain is logged. */
     private static AuraHandledException asUserError(Exception caught) {
-        String message = caught.getMessage();
-        if (!(caught instanceof RollupService.RollupServiceException)) {
-            ErrorLogger.log(caught, 'RollupDefinitionTransfer');
-            message = Label.Core_Rollups_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof RollupService.RollupServiceException,
+            'RollupDefinitionTransfer',
+            Label.Core_Rollups_UnexpectedError
+        );
     }
 }

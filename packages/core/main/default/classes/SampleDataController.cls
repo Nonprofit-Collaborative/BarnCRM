@@ -21,7 +21,7 @@ public with sharing class SampleDataController {
             enforcePermission();
             SampleDataLoader.load();
         } catch (Exception e) {
-            throw auraError(e, 'SampleDataController.loadSampleData');
+            throw UserErrors.wrap(e, 'SampleDataController.loadSampleData', true);
         }
     }
 
@@ -31,7 +31,7 @@ public with sharing class SampleDataController {
             enforcePermission();
             return SampleDataLoader.remove();
         } catch (Exception e) {
-            throw auraError(e, 'SampleDataController.removeSampleData');
+            throw UserErrors.wrap(e, 'SampleDataController.removeSampleData', true);
         }
     }
 
@@ -40,7 +40,7 @@ public with sharing class SampleDataController {
         try {
             return SampleDataLoader.status();
         } catch (Exception e) {
-            throw auraError(e, 'SampleDataController.getStatus');
+            throw UserErrors.wrap(e, 'SampleDataController.getStatus', true);
         }
     }
 
@@ -60,14 +60,5 @@ public with sharing class SampleDataController {
             return permissionOverride;
         }
         return BarnCRMPermissions.canManageSettings();
-    }
-
-    /**
-     * Logs once and wraps the message for the component. setMessage keeps the readable
-     * label text on the exception, which AuraHandledException otherwise replaces with a
-     * generic "Script-thrown exception".
-     */
-    private static AuraHandledException auraError(Exception e, String context) {
-        return UserErrors.wrap(e, context, true);
     }
 }

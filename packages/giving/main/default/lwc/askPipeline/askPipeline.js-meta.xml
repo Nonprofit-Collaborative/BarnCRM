@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Ask Pipeline: every open ask by stage as a board or a list, the pipeline totals, moving an
+    ask, and closing one with the gift or pledge it produced (G-26).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Ask Pipeline</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

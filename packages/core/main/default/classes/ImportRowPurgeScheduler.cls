@@ -17,15 +17,21 @@ public with sharing class ImportRowPurgeScheduler implements Schedulable {
 
     /** Starts the nightly cleanup, or does nothing when it is already scheduled. */
     public static Id start() {
-        Id existing = ScheduledJobSelector.triggerIdByName(JOB_NAME);
-        if (existing != null) {
-            return existing;
-        }
-        return ScheduledJobSelector.schedule(JOB_NAME, NIGHTLY_CRON, new ImportRowPurgeScheduler());
+        return ScheduledJobSelector.ensure(JOB_NAME, NIGHTLY_CRON, new ImportRowPurgeScheduler());
     }
 
     /** True when the nightly cleanup is scheduled. */
     public static Boolean isScheduled() {
-        return ScheduledJobSelector.triggerIdByName(JOB_NAME) != null;
+        return ScheduledJobSelector.isScheduled(JOB_NAME);
+    }
+
+    /** The cleanup as Health Check's nightly jobs list sees it. */
+    public static NightlyJob nightlyJob() {
+        return new NamedNightlyJob(
+            System.Label.Core_HealthCheck_JobImportRows,
+            JOB_NAME,
+            NIGHTLY_CRON,
+            new ImportRowPurgeScheduler()
+        );
     }
 }

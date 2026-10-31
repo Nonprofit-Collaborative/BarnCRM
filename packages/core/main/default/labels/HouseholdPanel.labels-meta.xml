@@ -9,22 +9,6 @@
         <value>Make Primary</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdPanel_MakePrimaryFor</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Members panel: screen reader name for make primary; {0} is the person</shortDescription>
-        <value>Make {0} the primary contact</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdPanel_MoveFor</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Members panel: screen reader name for move; {0} is the person</shortDescription>
-        <value>Move {0} to another household</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdPanel_MakePrimarySuccess</fullName>
         <categories>Households</categories>
         <language>en_US</language>

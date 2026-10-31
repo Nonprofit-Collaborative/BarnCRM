@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>The indicators of an output or outcome in the Logic Model Builder, with a target and a result per period and their progress.</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

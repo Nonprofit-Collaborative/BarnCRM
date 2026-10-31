@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customObject>true</customObject>
+  <description>
+    The steps of the pledge reminder ladder, in the order they fire around an installment due date.
+  </description>
+  <label>Pledge Reminder Steps</label>
+  <motif>Custom20: Bell</motif>
+</CustomTab>

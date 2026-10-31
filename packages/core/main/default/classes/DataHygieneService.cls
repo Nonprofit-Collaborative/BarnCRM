@@ -1,5 +1,5 @@
 /**
- * The checks on the Data Hygiene tab (C-28, admin guide data-hygiene.md, canonical model R-SQ6,
+ * The checks in the Data Quality section of Org Optimizer (C-28, admin guide data-hygiene.md, canonical model R-SQ6,
  * ADR-0079 `0079-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
  *
  * Each check is a Find query document (R-SQ1) built here when it is counted or opened: names

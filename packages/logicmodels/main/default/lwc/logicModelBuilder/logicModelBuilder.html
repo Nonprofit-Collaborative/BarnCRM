@@ -1,0 +1,174 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom62">
+    <div class="slds-var-p-horizontal_medium slds-is-relative">
+      <template lwc:if={showSpinner}>
+        <lightning-spinner
+          alternative-text={labels.loading}
+          size="small"
+          data-id="loading"
+        ></lightning-spinner>
+      </template>
+
+      <template lwc:if={hasError}>
+        <p
+          role="alert"
+          tabindex="-1"
+          data-id="error-message"
+          class="slds-text-color_error slds-var-m-bottom_small"
+        >
+          {errorMessage}
+        </p>
+      </template>
+      <p role="status" tabindex="-1" data-id="result" class="slds-assistive-text">
+        {resultMessage}
+      </p>
+
+      <template lwc:if={loaded}>
+        <div
+          class="slds-grid slds-wrap slds-grid_vertical-align-center slds-var-m-bottom_small"
+          data-id="scope"
+        >
+          <span class="slds-text-title slds-var-m-right_x-small">{labels.forLabel}</span>
+          <span class="slds-text-body_regular slds-var-m-right_small" data-id="scope-name"
+            >{scopeName}</span
+          >
+          <template lwc:if={canChangeScope}>
+            <lightning-button
+              data-id="change-scope"
+              label={labels.change}
+              variant="base"
+              disabled={busy}
+              onclick={handleChangeScope}
+            ></lightning-button>
+          </template>
+        </div>
+        <template lwc:if={changingScope}>
+          <div class="slds-box slds-var-m-bottom_small" data-id="scope-form">
+            <lightning-combobox
+              data-id="scope-picker"
+              label={labels.forLabel}
+              value={draftProgramId}
+              options={scopeOptions}
+              onchange={handleScopePick}
+            ></lightning-combobox>
+            <div class="slds-var-m-top_small">
+              <lightning-button
+                data-id="scope-save"
+                variant="brand"
+                label={labels.save}
+                disabled={busy}
+                onclick={handleScopeSave}
+                class="slds-var-m-right_x-small"
+              ></lightning-button>
+              <lightning-button
+                data-id="scope-cancel"
+                label={labels.cancel}
+                onclick={handleScopeCancel}
+              ></lightning-button>
+            </div>
+          </div>
+        </template>
+
+        <div class="slds-grid slds-wrap slds-gutters_x-small" data-id="columns">
+          <template for:each={columns} for:item="column">
+            <section
+              key={column.key}
+              class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-7 slds-var-m-bottom_small"
+              data-id="column"
+              data-stage={column.key}
+            >
+              <h3 class="slds-text-title_caps slds-var-m-bottom_x-small">{column.name}</h3>
+              <template lwc:if={column.empty}>
+                <p class="slds-text-color_weak slds-text-body_small slds-var-m-bottom_x-small">
+                  {labels.emptyColumn}
+                </p>
+              </template>
+              <template for:each={column.elements} for:item="element">
+                <button
+                  key={element.id}
+                  type="button"
+                  class={element.className}
+                  aria-pressed={element.pressed}
+                  data-id="part"
+                  data-record-id={element.id}
+                  onclick={handleSelect}
+                >
+                  {element.name}
+                </button>
+              </template>
+              <template lwc:if={canEdit}>
+                <template lwc:if={column.adding}>
+                  <div data-id="add-form">
+                    <lightning-input
+                      data-id="draft-name"
+                      label={labels.name}
+                      value={draftName}
+                      max-length="80"
+                      required
+                      onchange={handleDraftName}
+                    ></lightning-input>
+                    <div class="slds-var-m-top_x-small">
+                      <lightning-button
+                        data-id="add-save"
+                        variant="brand"
+                        label={labels.save}
+                        disabled={addDisabled}
+                        onclick={handleAddSave}
+                        class="slds-var-m-right_x-small"
+                      ></lightning-button>
+                      <lightning-button
+                        data-id="add-cancel"
+                        label={labels.cancel}
+                        onclick={handleAddCancel}
+                      ></lightning-button>
+                    </div>
+                  </div>
+                </template>
+                <template lwc:else>
+                  <lightning-button
+                    data-id="add"
+                    data-stage={column.key}
+                    label={column.addLabel}
+                    icon-name="utility:add"
+                    variant="base"
+                    disabled={busy}
+                    onclick={handleAdd}
+                  ></lightning-button>
+                </template>
+              </template>
+            </section>
+          </template>
+        </div>
+
+        <template lwc:if={hasSelection}>
+          <c-logic-model-part
+            data-id="selected-part"
+            model={model}
+            element-id={selectedId}
+            can-edit={canEdit}
+            can-delete={canDelete}
+            onmodelchange={handleModelChange}
+            onfailure={handleChildError}
+          ></c-logic-model-part>
+        </template>
+        <template lwc:else>
+          <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="select-hint">
+            {labels.selectHint}
+          </p>
+        </template>
+
+        <h3 class="slds-text-heading_small slds-var-m-vertical_small">{labels.lookAt}</h3>
+        <template lwc:if={hasFindings}>
+          <ul class="slds-list_dotted slds-var-m-bottom_small" data-id="findings">
+            <template for:each={findings} for:item="finding">
+              <li key={finding.key}>{finding.text}</li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else>
+          <p class="slds-var-m-bottom_small" data-id="no-findings">{labels.lookAtNone}</p>
+        </template>
+      </template>
+    </div>
+  </lightning-card>
+</template>

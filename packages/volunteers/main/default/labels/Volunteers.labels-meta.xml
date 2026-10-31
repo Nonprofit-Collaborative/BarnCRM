@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Approving hours needs Manage Volunteers</shortDescription>
-        <value>You need the Manage Volunteers permission to approve, reject or reopen volunteer hours. Ask your BarnCRM administrator.</value>
+        <value>You need the Manage Volunteers permission to approve, reject or reopen volunteer hours. Ask your BarnCRM admin.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Hours_RejectionReasonRequired</fullName>
@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>No active template for the letter type: {0} is the type</shortDescription>
-        <value>No volunteer letter template of type {0} is active. Check the type is spelled as on the template (Hours letter or Certificate), and make one template of that type active on the Volunteer Letter Templates tab.</value>
+        <value>No volunteer letter template of type {0} is active. Make one template of that type (Hours letter or Certificate) active on the Volunteer Letter Templates tab.</value>
     </labels>
     <labels>
         <fullName>Volunteers_JobNotice_Letters</fullName>
@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>The letter action found no active template to offer</shortDescription>
-        <value>No volunteer letter template is active. Ask your administrator to activate one on the Volunteer Letter Templates tab.</value>
+        <value>No volunteer letter template is active. Ask your BarnCRM admin to activate one on the Volunteer Letter Templates tab.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Letter_ActionFailed</fullName>
@@ -150,7 +150,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Unexpected failure in the Volunteer letter action</shortDescription>
-        <value>Something went wrong with the letter. Try again, and if it happens again ask your administrator to check the Error Log.</value>
+        <value>Something went wrong with the letter. Try again, and if it happens again ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Volunteers_LetterAction_NoLegalName</fullName>
@@ -158,7 +158,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Letter action: the organization legal name is blank in settings</shortDescription>
-        <value>Your organization's legal name is blank in BarnCRM Settings, so the letter will print without it. Ask your administrator to fill it in under Organization.</value>
+        <value>Your organization's legal name is blank in BarnCRM Settings, so the letter will print without it. Ask your BarnCRM admin to fill it in under Organization.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Loading</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Marked Attended but no hours entry appeared; {0} is the person</shortDescription>
-        <value>{0} is marked Attended, but no hours entry was created. A shift needs a start and an end time for its hours to be created automatically; otherwise enter the hours by hand.</value>
+        <value>{0} is marked Attended, but no hours entry was created. A shift needs a start and end time for automatic hours. Otherwise enter the hours by hand.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Readiness_Empty</fullName>
@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>The readiness card when no requirement types exist</shortDescription>
-        <value>No requirement types are set up yet, so there is nothing to track. Ask your administrator to add types to Volunteer Requirement.</value>
+        <value>No requirement types are set up yet, so there is nothing to track. Ask your BarnCRM admin to add types to Volunteer Requirement.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Letter_BadPeriod</fullName>
@@ -326,7 +326,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Unexpected failure on the Approve Hours screen</shortDescription>
-        <value>Something went wrong with these hours. Try again, and if it happens again ask your administrator to check the Error Log.</value>
+        <value>Something went wrong with these hours. Try again, and if it happens again ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Approve_Title</fullName>
@@ -510,7 +510,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Button that rejects with the reason typed</shortDescription>
-        <value>Reject selected</value>
+        <value>Reject Selected</value>
     </labels>
     <labels>
         <fullName>Volunteers_Approve_Cancel</fullName>
@@ -630,7 +630,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Button that opens the add sign-up form</shortDescription>
-        <value>Add sign-up</value>
+        <value>Add Sign-Up</value>
     </labels>
     <labels>
         <fullName>Volunteers_Signups_Person</fullName>
@@ -678,7 +678,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Table caption; {0} is the shift name</shortDescription>
-        <value>Sign-ups for {0}</value>
+        <value>Sign-Ups for {0}</value>
     </labels>
     <labels>
         <fullName>Volunteers_Signups_StatusFor</fullName>
@@ -710,7 +710,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Mark no show button</shortDescription>
-        <value>No show</value>
+        <value>No Show</value>
     </labels>
     <labels>
         <fullName>Volunteers_Signups_MarkNoShow</fullName>
@@ -774,7 +774,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Unexpected failure on the Sign-ups panel</shortDescription>
-        <value>Something went wrong with sign-ups. Try again, and if it happens again ask your administrator to check the Error Log.</value>
+        <value>Something went wrong with sign-ups. Try again, and if it happens again ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Volunteers_NightlyJobs_SchedulesName</fullName>
@@ -783,6 +783,240 @@
         <protected>true</protected>
         <shortDescription>Nightly jobs: the shift schedule run and when it runs</shortDescription>
         <value>Volunteer Schedules, 3:00 AM</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_NightlyJobs_RemindersName</fullName>
+        <categories>Volunteers, Nightly Jobs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nightly jobs: the shift reminder run and when it runs</shortDescription>
+        <value>Volunteer Shift Reminders, 7:00 AM</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_SendFailed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reminders not sent: {0} unsent, {1} due, {2} the reason</shortDescription>
+        <value>{0} of {1} volunteer shift reminders were not sent and will be tried again tomorrow while the shift is still ahead. Salesforce said: {2}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_StampFailed</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reminders held back: {0} unmarked, {1} due, {2} the reason</shortDescription>
+        <value>{0} of {1} volunteer shift reminders were held back because their booking could not be marked as reminded, so they are not sent twice. They will be tried again tomorrow while the shift is still ahead. Salesforce said: {2}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_Subject</fullName>
+        <categories>Volunteers, Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shift reminder email subject; {0} is the job name</shortDescription>
+        <value>Reminder: your volunteer shift, {0}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_Greeting</fullName>
+        <categories>Volunteers, Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shift reminder email greeting; {0} is the first name</shortDescription>
+        <value>Hello {0},</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_GreetingNoName</fullName>
+        <categories>Volunteers, Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shift reminder email greeting when the person has no first name</shortDescription>
+        <value>Hello,</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_Body</fullName>
+        <categories>Volunteers, Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shift reminder email body; {0} is the job name, {1} the day and time</shortDescription>
+        <value>This is a reminder that you are signed up to volunteer: {0}.
+
+When: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_Where</fullName>
+        <categories>Volunteers, Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shift reminder email location line; {0} is the shift location</shortDescription>
+        <value>Where: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Reminders_Closing</fullName>
+        <categories>Volunteers, Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shift reminder email closing</shortDescription>
+        <value>If you can no longer come, please tell us as soon as you can so someone else can take your place. Thank you for volunteering.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_Title</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers card title</shortDescription>
+        <value>Suggested Volunteers</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_Subtitle</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers: what the ranking uses</shortDescription>
+        <value>Active volunteers not yet signed up, best match first by skills, availability, hours on this job and onboarding.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_Empty</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers: nobody to suggest</shortDescription>
+        <value>No volunteers to suggest. Suggestions come from people whose Volunteer Status is Active and who are not already signed up for this shift.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_Person</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers column heading: the person</shortDescription>
+        <value>Person</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_Why</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers column heading: the reasons</shortDescription>
+        <value>Why</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_Actions</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers column heading: the action</shortDescription>
+        <value>Actions</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_SignUp</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers: the sign-up button</shortDescription>
+        <value>Sign Up</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_SignUpFor</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sign-up button screen reader text; {0} is the person's name</shortDescription>
+        <value>Sign up {0} for this shift</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_Booked</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers: signed up; {0} is the person's name</shortDescription>
+        <value>{0} is signed up for this shift.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_BookFailed</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers: the sign-up did not save</shortDescription>
+        <value>The sign-up could not be saved. Try again, or use Add Sign-Up in the Sign-Ups panel.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_LoadFailed</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers: the suggestions did not load</shortDescription>
+        <value>The suggestions could not be loaded. Refresh the page to try again.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_MoreConsidered</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers note; {0} is how many people were ranked</shortDescription>
+        <value>Ranked from the {0} active volunteers with the most hours. More exist; use Add Sign-Up for anyone not shown.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonSkills</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason; {0} is skills the person has, {1} skills the job needs</shortDescription>
+        <value>Has {0} of the {1} skills this job needs</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonInterests</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason; {0} is interests matched, {1} skills the job needs</shortDescription>
+        <value>Interested in {0} of the {1} skills this job needs</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonAvailable</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason; {0} is the shift's weekday</shortDescription>
+        <value>Available on {0}s</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonUnavailable</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason; {0} is the shift's weekday</shortDescription>
+        <value>Does not list {0}s as an available day</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonNoAvailability</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason: no available days on the person</shortDescription>
+        <value>No available days recorded</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonHours</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason; {0} is approved hours on this job</shortDescription>
+        <value>{0} approved hours on this job</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonCleared</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason: onboarding steps all current</shortDescription>
+        <value>Onboarding steps are current</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonOpen</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason: an onboarding step is not current</shortDescription>
+        <value>An onboarding step is not current</value>
     </labels>
     <labels>
         <fullName>Volunteers_Schedules_SkippedTurnedOff</fullName>
@@ -918,7 +1152,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: hours waiting for approval, why and how to fix</shortDescription>
-        <value>Hours count in no total and no letter until a coordinator approves them, so these volunteers look as if they gave less time than they did. Open Approve Hours, choose Submitted, and approve each entry, or reject it with a reason when it is wrong.</value>
+        <value>Hours count in no total or letter until a coordinator approves them, so these volunteers look as if they gave less time. Open Approve Hours, choose Submitted, and approve each entry, or reject it with a reason.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_HoursWaitingDetailOne</fullName>
@@ -926,7 +1160,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: one hours entry waiting for approval, why and how to fix</shortDescription>
-        <value>Hours count in no total and no letter until a coordinator approves them, so this volunteer looks as if they gave less time than they did. Open Approve Hours, choose Submitted, and approve the entry, or reject it with a reason when it is wrong.</value>
+        <value>Hours count in no total or letter until a coordinator approves them, so this volunteer looks as if they gave less time. Open Approve Hours, choose Submitted, and approve the entry, or reject it with a reason.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_HoursWaitingFix</fullName>
@@ -958,7 +1192,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Past shifts still Open, why and how to fix; {0} is the days</shortDescription>
-        <value>These shifts ended more than {0} days ago and nobody closed them. That usually means attendance was never marked, so the people who came have no hours recorded. Open each shift, mark who came on its Sign-ups panel, then set Status to Completed, or to Cancelled if it did not happen.</value>
+        <value>These shifts ended more than {0} days ago and nobody closed them. Attendance was probably never marked, so the people who came have no hours. Open each shift, mark who came on its Sign-Ups panel, then set Status to Completed, or to Cancelled if it did not happen.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_PastShiftsDetailOne</fullName>
@@ -966,7 +1200,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>One past shift still Open, why and how to fix; {0} is the days</shortDescription>
-        <value>This shift ended more than {0} days ago and nobody closed it. That usually means attendance was never marked, so the people who came have no hours recorded. Open the shift, mark who came on its Sign-ups panel, then set Status to Completed, or to Cancelled if it did not happen.</value>
+        <value>This shift ended more than {0} days ago and nobody closed it. Attendance was probably never marked, so the people who came have no hours. Open the shift, mark who came on its Sign-Ups panel, then set Status to Completed, or to Cancelled if it did not happen.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_PastShiftsFix</fullName>
@@ -998,7 +1232,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Schedule horizon not filled, why and how to fix; {0} is the weeks</shortDescription>
-        <value>These active schedules should have shifts {0} weeks ahead (Shift horizon weeks, Volunteers section) but stop more than two days short, so nobody can be signed up for the days missing. Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it and save it.</value>
+        <value>These active schedules should have shifts {0} weeks ahead (Weeks Ahead to Create Shifts, Volunteers section) but stop more than two days short, so nobody can sign up for the missing days. The nightly Volunteer Schedules job is usually not running: use the fix for unscheduled nightly jobs. To fill one now, open it and save it.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_HorizonDetailOne</fullName>
@@ -1006,7 +1240,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>One schedule horizon not filled, why and how to fix; {0} is the weeks</shortDescription>
-        <value>This active schedule should have shifts {0} weeks ahead (Shift horizon weeks, Volunteers section) but stops more than two days short, so nobody can be signed up for the days missing. Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill the schedule now, open it and save it.</value>
+        <value>This active schedule should have shifts {0} weeks ahead (Weeks Ahead to Create Shifts, Volunteers section) but stops more than two days short, so nobody can sign up for the missing days. The nightly Volunteer Schedules job is usually not running: use the fix for unscheduled nightly jobs. To fill it now, open the schedule and save it.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_CoordinatorAccessTitle</fullName>
@@ -1030,7 +1264,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Coordinators missing their set, why and how to fix; {1} is their names</shortDescription>
-        <value>These people hold the Coordinator role but neither Volunteers Coordinator nor Volunteers Admin, so they cannot approve hours or work with shifts: {1}. BarnCRM gives the set every night, so this happens when the role was given in Setup today or the nightly access check failed. Give it now with the button, or assign the set in Setup.</value>
+        <value>These people have the Coordinator role but neither Volunteers Coordinator nor Volunteers Admin, so they cannot approve hours or work with shifts: {1}. BarnCRM gives the set every night, so the role was likely given today or the nightly check failed. Give it now with the button, or assign the set in Setup.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_CoordinatorAccessDetailOne</fullName>
@@ -1038,7 +1272,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>One coordinator missing their set, why and how to fix; {1} is the name</shortDescription>
-        <value>This person holds the Coordinator role but neither Volunteers Coordinator nor Volunteers Admin, so they cannot approve hours or work with shifts: {1}. BarnCRM gives the set every night, so this happens when the role was given in Setup today or the nightly access check failed. Give it now with the button, or assign the set in Setup.</value>
+        <value>This person has the Coordinator role but neither Volunteers Coordinator nor Volunteers Admin, so they cannot approve hours or work with shifts: {1}. BarnCRM gives the set every night, so the role was likely given today or the nightly check failed. Give it now with the button, or assign the set in Setup.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_CoordinatorAccessFix</fullName>
@@ -1086,7 +1320,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>One volunteer total turned off, why and how to fix; {1} is its name</shortDescription>
-        <value>This volunteer total is inactive, so the field it fills stops updating and the reports, list views and dashboard that use it go stale: {1}. If you turned it off on purpose, nothing is wrong. Otherwise open Rollup Builder, set it Active, then choose Recalculate.</value>
+        <value>This volunteer total is inactive, so its field stops updating and the reports, list views and dashboard that use it go stale: {1}. If that is on purpose, nothing is wrong. Otherwise open Rollup Builder, set it Active, then choose Recalculate.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_RollupsOffFix</fullName>

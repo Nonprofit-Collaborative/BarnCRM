@@ -1,0 +1,195 @@
+{
+  "description": "Cases for the Format digits step: DataTransform.formatDigits (Apex) and transformFormat.formatDigits (JavaScript) must both give each expected value.",
+  "cases": [
+    {
+      "name": "ten plain digits",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "5551234567",
+      "expected": "(555) 123-4567"
+    },
+    {
+      "name": "dots",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "555.123.4567",
+      "expected": "(555) 123-4567"
+    },
+    {
+      "name": "dashes",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "555-123-4567",
+      "expected": "(555) 123-4567"
+    },
+    {
+      "name": "spaces around",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "  555 123 4567  ",
+      "expected": "(555) 123-4567"
+    },
+    {
+      "name": "already formatted",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "(555) 123-4567",
+      "expected": "(555) 123-4567"
+    },
+    {
+      "name": "leading 1",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "15551234567",
+      "expected": "(555) 123-4567"
+    },
+    {
+      "name": "plus 1 and punctuation",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "+1 (555) 123-4567",
+      "expected": "(555) 123-4567"
+    },
+    {
+      "name": "11 digits not the country code",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "25551234567",
+      "expected": "25551234567"
+    },
+    {
+      "name": "11 digits and no country configured",
+      "pattern": "(###) ###-####",
+      "country": "",
+      "input": "15551234567",
+      "expected": "15551234567"
+    },
+    {
+      "name": "country code absent from the step",
+      "pattern": "###-###-####",
+      "country": null,
+      "input": "5551234567",
+      "expected": "555-123-4567"
+    },
+    {
+      "name": "seven digits",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "555-1234",
+      "expected": "555-1234"
+    },
+    {
+      "name": "short pattern",
+      "pattern": "###-####",
+      "country": "",
+      "input": "5551234",
+      "expected": "555-1234"
+    },
+    {
+      "name": "extension x",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "555-123-4567 x89",
+      "expected": "(555) 123-4567 x89"
+    },
+    {
+      "name": "extension ext dot",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "555.123.4567 ext. 12",
+      "expected": "(555) 123-4567 x12"
+    },
+    {
+      "name": "extension word",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "(555) 123-4567 Extension 345",
+      "expected": "(555) 123-4567 x345"
+    },
+    {
+      "name": "extension capital X no space",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "5551234567X7",
+      "expected": "(555) 123-4567 x7"
+    },
+    {
+      "name": "country code and extension",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "+1 555 123 4567 ext 9",
+      "expected": "(555) 123-4567 x9"
+    },
+    {
+      "name": "extension on a number that does not fit",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "123 x5",
+      "expected": "123 x5"
+    },
+    {
+      "name": "extension only",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "x123",
+      "expected": "x123"
+    },
+    {
+      "name": "literal text with a plus",
+      "pattern": "+1 ###-###-####",
+      "country": "1",
+      "input": "(555) 123-4567",
+      "expected": "+1 555-123-4567"
+    },
+    {
+      "name": "words are left alone",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "call the office",
+      "expected": "call the office"
+    },
+    {
+      "name": "too many digits",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "555123456789",
+      "expected": "555123456789"
+    },
+    { "name": "blank", "pattern": "(###) ###-####", "country": "1", "input": "", "expected": "" },
+    {
+      "name": "spaces only",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "   ",
+      "expected": "   "
+    },
+    {
+      "name": "null",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": null,
+      "expected": null
+    },
+    {
+      "name": "no pattern",
+      "pattern": "",
+      "country": "1",
+      "input": "5551234567",
+      "expected": "5551234567"
+    },
+    {
+      "name": "longer than a phone number",
+      "pattern": "(###) ###-####",
+      "country": "1",
+      "input": "5551234567 5551234567 5551234567 5551234567 5551234567 5551234567 5551234567 5551234567",
+      "expected": "5551234567 5551234567 5551234567 5551234567 5551234567 5551234567 5551234567 5551234567"
+    },
+    {
+      "name": "two digit country code",
+      "pattern": "## ## ## ##",
+      "country": "33",
+      "input": "+33 01 02 03 04",
+      "expected": "01 02 03 04"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Ask_Reminder_For_Date__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>
+    The Next Ask Date a reminder task was last created for. Set by the nightly ask reminder job, so a date is never reminded twice.
+  </inlineHelpText>
+  <label>Ask Reminder For Date</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Date</type>
+</CustomField>

@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Creating a household: the user cannot create or edit accounts or a field</shortDescription>
-        <value>You need permission to create and edit accounts, and their fields, to create a household. Nothing was created. Ask your administrator.</value>
+        <value>You need permission to create and edit accounts, and their fields, to create a household. Nothing was created. Ask your BarnCRM admin.</value>
     </labels>
     <labels>
         <fullName>Core_Households_ErrorCreateNoHouseholdAccess</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Save refused: a household member pointed at an organization (simple mode)</shortDescription>
-        <value>This person is in a household, so Account Name must stay a household, not an organization. To connect them to an organization, add an affiliation. To move them, use Move to another household.</value>
+        <value>This person is in a household, so Account Name must stay a household. To connect them to an organization, add an affiliation. To move them, use Move to another household.</value>
     </labels>
     <labels>
         <fullName>Core_Households_ErrorCreateFailedForPerson</fullName>
@@ -102,7 +102,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Move a person: the org stores this person as an account</shortDescription>
-        <value>This person is stored as an account, so they can only be moved when your org uses the flexible way of belonging to a household. Change that setting in BarnCRM Settings first.</value>
+        <value>This person is stored as an account, so they can only be moved when your org uses the flexible way of belonging to a household. Change that in BarnCRM Settings first.</value>
     </labels>
     <labels>
         <fullName>Core_Households_ErrorMoveNoEditAccess</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>The user may not change settings</shortDescription>
-        <value>You do not have permission to do this. Recomputing every household needs the Manage BarnCRM Settings permission: ask your administrator.</value>
+        <value>You do not have permission to do this. Recomputing every household needs the Manage BarnCRM Settings permission: ask your BarnCRM admin.</value>
     </labels>
     <labels>
         <fullName>Core_Households_ErrorNotAHousehold</fullName>
@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>The Household record type is missing or not visible</shortDescription>
-        <value>The Household record type is missing or hidden from you, so no household could be created. Ask your administrator to check your access to household records.</value>
+        <value>The Household record type is missing or hidden from you, so no household could be created. Ask your BarnCRM admin to check your access to household records.</value>
     </labels>
     <labels>
         <fullName>Core_Households_ErrorSaveFailed</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Empty household kept, outside records use it; {0} name, {1} record Id</shortDescription>
-        <value>BarnCRM left the empty household {0} ({1}) in place. Nobody belongs to it in BarnCRM, but records outside BarnCRM still point at it, and deleting the household would delete those records too. Open the household, check what else uses it, and delete it by hand if you are sure.</value>
+        <value>BarnCRM left the empty household {0} ({1}) in place. Nobody belongs to it in BarnCRM, but records outside BarnCRM still point at it, and deleting it would delete those records too. Open the household, check what else uses it, and delete it by hand if you are sure.</value>
     </labels>
     <labels>
         <fullName>Core_Households_ListSeparator</fullName>
@@ -246,7 +246,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Merge tidy-up could not start; {0} kept records, {1} platform message</shortDescription>
-        <value>A merge finished, but BarnCRM could not start the tidy-up it runs afterwards, because Salesforce refused the request to run it ({1}). These kept records may have a stale member count or name, two primary addresses, or a duplicate relationship: {0}. Open each one and correct it by hand.</value>
+        <value>A merge finished, but BarnCRM could not start its tidy-up because Salesforce refused the request ({1}). These kept records may have a stale member count or name, two primary addresses, or a duplicate relationship: {0}. Open each one and correct it by hand.</value>
     </labels>
     <labels>
         <fullName>Core_Households_MergeSettleRefused</fullName>
@@ -254,6 +254,6 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Merge tidy-up refused for records the sender cannot edit; {0} ids, {1} user</shortDescription>
-        <value>A request to tidy up after a merge named records that the person who sent it (user {1}) cannot edit, so BarnCRM left them alone: {0}. A merge only names records the person merging can edit, so check who sent it.</value>
+        <value>A tidy-up request after a merge named records that the person who sent it (user {1}) cannot edit, so BarnCRM left them alone: {0}. A merge only names records the person merging can edit, so check who sent it.</value>
     </labels>
 </CustomLabels>

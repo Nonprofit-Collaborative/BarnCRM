@@ -32,7 +32,7 @@ Open **BarnCRM Settings**, choose the **Giving** section, and open **Stewardship
 The page lists every plan you have written down, how many steps each one lays out, how many
 copies of it are running right now, and whether it is switched on.
 
-1. Choose **New plan** and fill in:
+1. Choose **New Plan** and fill in:
    - a **plan name**, the one your team will recognize, for example "First gift welcome".
      You can rename the plan later: BarnCRM also gives it a hidden key made from this first
      name, which never changes, so it still recognizes the plan after a rename;
@@ -48,7 +48,7 @@ copies of it are running right now, and whether it is switched on.
    - a **description**, optional, which is what somebody reads when picking a plan to start
      by hand.
 2. Leave **On** unchecked until the steps are in. A plan that is off starts nothing.
-3. Choose the plan's name in the list to open its steps, then **Add step** for each task,
+3. Choose the plan's name in the list to open its steps, then **Add Step** for each task,
    with:
    - a **subject**, which is the line the assignee sees in their task list. Write it as an
      instruction: "Call to say thank you", not "Thank you";
@@ -59,7 +59,7 @@ copies of it are running right now, and whether it is switched on.
      to one named person every time;
    - a **priority**;
    - **comments**, optional, which become the task's description.
-4. Use **Move up** and **Move down** to put the steps in the order they should happen.
+4. Use **Move up** and **Move Down** to put the steps in the order they should happen.
 5. Choose **Turn On** in the plan's row when the steps are right.
 
 The page says it where you will read it, and it is worth repeating: editing a plan changes
@@ -68,7 +68,7 @@ laid out, and none of them changes when you edit it.
 
 ## Starting a Plan by Hand
 
-In the Fundraising app, open the person, household or organization and choose **Start
+In the BarnCRM Fundraising app, open the person, household or organization and choose **Start
 Stewardship Plan**. The window lists every plan that is turned on, whatever starts it, and
 shows the description of the one chosen. Choose **Start Plan**. The plan is laid out at once
 and appears in the donor's **Stewardship Plans** list. A plan already running on that donor
@@ -78,7 +78,7 @@ offered no **Start Plan**.
 
 ## A Five-Minute Walkthrough
 
-1. Open **BarnCRM Settings**, **Giving**, **Stewardship Plans**, and choose **New plan**.
+1. Open **BarnCRM Settings**, **Giving**, **Stewardship Plans**, and choose **New Plan**.
    Call it "First gift welcome", started by **First gift**, no
    smallest gift. Leave **On** unchecked and save.
 2. Choose the plan in the list, then add three steps:

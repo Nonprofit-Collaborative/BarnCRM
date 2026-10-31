@@ -111,7 +111,6 @@ private class RollupEngineExtensionsTest {
             RollupEngineExtensions.extensionOverride = engine;
 
             Assert.areEqual(engine, RollupEngineExtensions.find(), 'The injected engine');
-            Assert.isTrue(RollupEngineExtensions.isInstalled(), 'counts as installed');
         }
     }
 
@@ -121,7 +120,6 @@ private class RollupEngineExtensionsTest {
             RollupEngineExtensions.noneForTest = true;
 
             Assert.isNull(RollupEngineExtensions.find(), 'No module, no engine');
-            Assert.isFalse(RollupEngineExtensions.isInstalled(), 'and Core says so');
         }
     }
 
