@@ -39,6 +39,12 @@ import delimiterTab from '@salesforce/label/c.Core_Import_DelimiterTab';
 import delimiterPipe from '@salesforce/label/c.Core_Import_DelimiterPipe';
 import sheetLabel from '@salesforce/label/c.Core_Import_SheetLabel';
 import sheetHelp from '@salesforce/label/c.Core_Import_SheetHelp';
+// C-49d: Create New Field in the column picker.
+import ImportNewFieldModal from 'c/importNewFieldModal';
+import getFieldConnection from '@salesforce/apex/ImportNewFieldController.getConnection';
+import createNewField from '@salesforce/label/c.Core_ImportNewField_ModalTitle';
+import newFieldPerson from '@salesforce/label/c.Core_ImportNewField_ObjectPerson';
+import newFieldOrganization from '@salesforce/label/c.Core_ImportNewField_ObjectOrganization';
 
 import canImport from '@salesforce/apex/ImportController.canImport';
 import getTemplates from '@salesforce/apex/ImportController.getTemplates';
@@ -252,6 +258,8 @@ const DELIMITER_OPTIONS = [
 ];
 
 const IGNORE = 'Ignore';
+/** The picker's Create New Field choice (C-49d); never stored as a target. */
+const NEW_FIELD = '__new_field__';
 
 /**
  * The row entities a module outside Core loads (R-IR6). Their columns are offered only from
@@ -522,6 +530,7 @@ export default class ImportWizard extends LightningElement {
     try {
       this.permitted = await canImport();
       if (this.permitted) {
+        this.loadFieldCreation();
         // Independent reads: one round trip of waiting, not three.
         const [templates, entityTargets, fields] = await Promise.all([
           getTemplates(),
@@ -1207,7 +1216,7 @@ export default class ImportWizard extends LightningElement {
     const changes = {};
     const clears = {};
     const parsed = JSON.parse(suggested || '{}');
-    const offered = new Set(this.targetOptions.map((option) => option.value));
+    const offered = new Set(this.mappableTargets.map((option) => option.value));
     (parsed.columns || []).forEach((column) => {
       targets[column.source] = this.isOfferedTarget(column.target, offered)
         ? column.target
@@ -1371,6 +1380,14 @@ export default class ImportWizard extends LightningElement {
   // ---------------------------------------------------------------------------------------
 
   get targetOptions() {
+    const options = this.mappableTargets;
+    // C-49d: an admin who may create fields gets Create New Field last.
+    return this.newFieldObjects.length > 0
+      ? options.concat([{ label: createNewField, value: NEW_FIELD }])
+      : options;
+  }
+
+  get mappableTargets() {
     if (this.loadsOneObject) {
       // The object's own fields, from describe (R-IT12).
       return [{ label: doNotLoad, value: IGNORE }].concat(
@@ -1553,6 +1570,85 @@ export default class ImportWizard extends LightningElement {
   handleTargetChange(event) {
     const source = event.target.dataset.source;
     const target = event.detail.value;
+    if (target === NEW_FIELD) {
+      this.openNewField(source);
+      return;
+    }
+    this.columns = this.columns.map((column) => {
+      return column.source === source ? { ...column, target, lookupField: LOOKUP_BY_ID } : column;
+    });
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // C-49d: Create New Field. The dialog (c-import-new-field-modal) creates the field; this
+  // only offers it, adds the field to the cached lists and maps the column to it.
+  // ---------------------------------------------------------------------------------------
+
+  canCreateFields = false;
+
+  async loadFieldCreation() {
+    try {
+      const connection = await getFieldConnection();
+      this.canCreateFields = Boolean(connection && connection.canCreate);
+    } catch {
+      // Without BarnCRM Metadata Admin the class is out of reach: no option, no message.
+      this.canCreateFields = false;
+    }
+  }
+
+  /** The objects a new field can go on, with the prefix the column's target takes. */
+  get newFieldObjects() {
+    const template = this.selectedTemplate;
+    if (!this.canCreateFields || !template) {
+      return [];
+    }
+    if (this.loadsOneObject) {
+      return [
+        {
+          label: template.targetObjectLabel || template.targetObject,
+          value: template.targetObject,
+          prefix: 'Record'
+        }
+      ];
+    }
+    return [
+      { label: newFieldPerson, value: 'Contact', prefix: 'Contact1' },
+      { label: newFieldOrganization, value: 'Account', prefix: 'Organization' }
+    ];
+  }
+
+  async openNewField(source) {
+    // Re-render the picker so it does not keep showing Create New Field.
+    this.columns = this.columns.map((column) => ({ ...column }));
+    const created = await ImportNewFieldModal.open({
+      size: 'small',
+      label: createNewField,
+      objects: this.newFieldObjects,
+      heading: source,
+      values: this.records.map((record) => record[source])
+    });
+    if (!created) {
+      return;
+    }
+    const field = { value: created.fieldValue, label: created.fieldLabel };
+    if (created.prefix === 'Record') {
+      field.value = `Record.${created.fieldValue}`;
+      this.objectFields = this.objectFields.concat([
+        { ...field, isLookup: false, lookupFields: [] }
+      ]);
+    } else if (created.prefix === 'Contact1') {
+      this.matchFields = {
+        ...this.matchFields,
+        personFields: this.matchFields.personFields.concat([field])
+      };
+    } else {
+      this.matchFields = {
+        ...this.matchFields,
+        organizationFields: this.matchFields.organizationFields.concat([field])
+      };
+    }
+    const target =
+      created.prefix === 'Record' ? field.value : `${created.prefix}.${created.fieldValue}`;
     this.columns = this.columns.map((column) => {
       return column.source === source ? { ...column, target, lookupField: LOOKUP_BY_ID } : column;
     });
@@ -2007,7 +2103,7 @@ export default class ImportWizard extends LightningElement {
     if (this.loadsOneObject) {
       // Every row would name the same record (R-IT12).
       const key = this.loadFindsByField ? RECORD_PREFIX + this.loadMatchField : null;
-      return this.targetOptions.filter(
+      return this.mappableTargets.filter(
         (option) =>
           option.value !== IGNORE &&
           option.value !== RECORD_ID &&
@@ -2015,7 +2111,7 @@ export default class ImportWizard extends LightningElement {
       );
     }
     const personField = this.isPersonExternalId ? this.personMatchField : null;
-    return this.targetOptions.filter((option) => {
+    return this.mappableTargets.filter((option) => {
       if (option.value === IGNORE) {
         return false;
       }

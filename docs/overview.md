@@ -20,7 +20,7 @@ BarnCRM is in development. No package version exists yet and nothing is installa
 
 ## Two Editions
 
-Both editions include the full core suite of tools: people, households, relationships, addresses, importing with undo, Find, bulk update and bulk delete, duplicate review, Org Optimizer, Health Check, settings and the Setup Assistant.
+Both editions include the full core suite of tools: people, households, relationships, addresses, importing with undo (an admin can create a new field for a column), Find, bulk update and bulk delete, duplicate review, Org Optimizer, Health Check, settings and the Setup Assistant.
 
 | Edition | For | What you get |
 |---|---|---|

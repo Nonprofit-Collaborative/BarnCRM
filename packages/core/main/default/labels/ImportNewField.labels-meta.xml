@@ -128,4 +128,332 @@
         <shortDescription>Field created, permission set skipped; {0} field, {1} set, {2} reason</shortDescription>
         <value>The field {0} was created, but {1} could not be given access to it: {2}</value>
     </labels>
+    <labels>
+        <fullName>Core_ImportNewField_ModalTitle</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create New Field picker option and dialog title</shortDescription>
+        <value>Create New Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_ObjectPerson</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field object choice: people</shortDescription>
+        <value>Person (Contact)</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_ObjectOrganization</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field object choice: organizations</shortDescription>
+        <value>Organization (Account)</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_ObjectField</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field form: object</shortDescription>
+        <value>Object</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_LabelField</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field form: field label</shortDescription>
+        <value>Field Label</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_ApiNameField</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field form: API name</shortDescription>
+        <value>API Name</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_ApiNameHelp</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field form: API name help</shortDescription>
+        <value>Letters, digits and single underscores, starting with a letter. Salesforce adds __c.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypeField</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field form: field type</shortDescription>
+        <value>Field Type</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_LengthField</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field form: text length</shortDescription>
+        <value>Length</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_DecimalsField</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field form: decimal places</shortDescription>
+        <value>Decimal Places</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_ValuesField</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field form: picklist values</shortDescription>
+        <value>Picklist Values (One per Line)</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_PermissionSetField</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field form: extra permission set</shortDescription>
+        <value>Also Give Access Through</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_NoPermissionSet</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field form: no extra permission set</shortDescription>
+        <value>No other permission set</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_AccessNote</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field form: who gets access</shortDescription>
+        <value>BarnCRM Admin and BarnCRM Staff get read and edit access, and BarnCRM Read Only gets read access.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_CreateButton</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field dialog: create button</shortDescription>
+        <value>Create Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_CancelButton</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field dialog: cancel button</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_RefreshButton</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field dialog: refresh button</shortDescription>
+        <value>Refresh Fields</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_Creating</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field dialog: creating status</shortDescription>
+        <value>Creating the field. This usually takes under a minute.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_StillWaiting</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field dialog: polling gave up</shortDescription>
+        <value>The field is still being created. Select Refresh Fields in a minute.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_NoConnection</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field dialog: guidance intro</shortDescription>
+        <value>BarnCRM cannot create this field for you here. Create it in Setup with the details below, then select Refresh Fields. An administrator can set up the connection on BarnCRM Settings, Import page.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_SetupSteps</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field dialog: Setup steps</shortDescription>
+        <value>In Setup, open Object Manager, choose the object, then Fields and Relationships and New. Enter the details below, give BarnCRM Admin and BarnCRM Staff read and edit access, then save.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_DetailsField</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field dialog: details to copy</shortDescription>
+        <value>Field Details</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_NotFound</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New field dialog: refresh found nothing</shortDescription>
+        <value>The field is not there yet. Check its API name in Setup, then select Refresh Fields again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypeText</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type: Text</shortDescription>
+        <value>Text</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypeLongTextArea</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type: Long Text Area</shortDescription>
+        <value>Long Text Area</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypeNumber</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type: Number</shortDescription>
+        <value>Number</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypeCurrency</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type: Currency</shortDescription>
+        <value>Currency</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypePercent</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type: Percent</shortDescription>
+        <value>Percent</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypeDate</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type: Date</shortDescription>
+        <value>Date</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypeDateTime</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type: Date/Time</shortDescription>
+        <value>Date/Time</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypeCheckbox</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type: Checkbox</shortDescription>
+        <value>Checkbox</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypeEmail</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type: Email</shortDescription>
+        <value>Email</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypePhone</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type: Phone</shortDescription>
+        <value>Phone</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypeUrl</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type: URL</shortDescription>
+        <value>URL</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypePicklist</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field type: Picklist</shortDescription>
+        <value>Picklist</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_PanelIntro</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Connection panel: what it is</shortDescription>
+        <value>Lets an administrator create a new field from an import column. BarnCRM calls your org's own Metadata API through a Named Credential it creates once. No password is stored.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_PanelStatus</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Connection panel: status label</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_PanelConnected</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Connection panel: connected</shortDescription>
+        <value>Connected</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_PanelNotConnected</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Connection panel: not set up</shortDescription>
+        <value>Not set up</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_SetUpButton</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Connection panel: set up button</shortDescription>
+        <value>Set Up Connection</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_PanelNeedsPermission</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Connection panel: missing permissions</shortDescription>
+        <value>Setting up the connection needs the BarnCRM Metadata Admin permission set and the Customize Application and Modify Metadata permissions.</value>
+    </labels>
 </CustomLabels>
