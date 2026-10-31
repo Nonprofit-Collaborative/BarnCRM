@@ -1,0 +1,140 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={loading}>
+      <lightning-spinner alternative-text={labels.create} size="small"></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
+        {errorMessage}
+      </p>
+    </template>
+    <template lwc:if={status}>
+      <p class="slds-var-m-bottom_small" data-id="status" role="status">{status}</p>
+    </template>
+    <template lwc:if={choosesObject}>
+      <lightning-combobox
+        data-id="object"
+        data-field="objectApiName"
+        label={labels.object}
+        value={form.objectApiName}
+        options={objectOptions}
+        onchange={handleChange}
+      ></lightning-combobox>
+    </template>
+    <lightning-input
+      data-id="label"
+      data-field="label"
+      label={labels.label}
+      value={form.label}
+      max-length="40"
+      required
+      onchange={handleChange}
+    ></lightning-input>
+    <lightning-input
+      data-id="api-name"
+      data-field="apiName"
+      label={labels.apiName}
+      field-level-help={labels.apiNameHelp}
+      value={form.apiName}
+      max-length="40"
+      required
+      onchange={handleChange}
+    ></lightning-input>
+    <lightning-combobox
+      data-id="type"
+      data-field="type"
+      label={labels.type}
+      value={form.type}
+      options={typeOptions}
+      onchange={handleChange}
+    ></lightning-combobox>
+    <template lwc:if={isText}>
+      <lightning-input
+        data-id="length"
+        data-field="length"
+        type="number"
+        label={labels.length}
+        value={form.length}
+        min="1"
+        max="255"
+        onchange={handleChange}
+      ></lightning-input>
+    </template>
+    <template lwc:if={hasDecimals}>
+      <lightning-input
+        data-id="scale"
+        data-field="scale"
+        type="number"
+        label={labels.decimals}
+        value={form.scale}
+        min="0"
+        max="8"
+        onchange={handleChange}
+      ></lightning-input>
+    </template>
+    <template lwc:if={isPicklist}>
+      <lightning-textarea
+        data-id="values"
+        data-field="valuesText"
+        label={labels.values}
+        value={form.valuesText}
+        onchange={handleChange}
+      ></lightning-textarea>
+    </template>
+
+    <template lwc:if={connected}>
+      <lightning-combobox
+        data-id="permission-set"
+        data-field="permissionSetId"
+        label={labels.permissionSet}
+        value={form.permissionSetId}
+        options={permissionSetOptions}
+        onchange={handleChange}
+      ></lightning-combobox>
+      <p class="slds-text-body_small slds-var-m-top_x-small" data-id="access-note">
+        {labels.accessNote}
+      </p>
+    </template>
+
+    <template lwc:if={showsGuidance}>
+      <div class="slds-var-m-top_medium" data-id="guidance">
+        <p class="slds-var-m-bottom_x-small">{labels.noConnection}</p>
+        <p class="slds-var-m-bottom_x-small">{labels.setupSteps}</p>
+        <lightning-textarea
+          data-id="details"
+          label={labels.details}
+          value={setupDetails}
+          readonly
+        ></lightning-textarea>
+      </div>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      data-id="cancel"
+      label={labels.cancel}
+      onclick={handleCancel}
+    ></lightning-button>
+    <template lwc:if={showsGuidance}>
+      <lightning-button
+        class="slds-var-m-left_x-small"
+        data-id="refresh"
+        variant="brand"
+        label={labels.refresh}
+        disabled={busy}
+        onclick={handleRefresh}
+      ></lightning-button>
+    </template>
+    <template lwc:else>
+      <lightning-button
+        class="slds-var-m-left_x-small"
+        data-id="create"
+        variant="brand"
+        label={labels.create}
+        disabled={cannotCreate}
+        onclick={handleCreate}
+      ></lightning-button>
+    </template>
+  </lightning-modal-footer>
+</template>

@@ -294,3 +294,29 @@ Nell,Ashby,nell.ashby@example.org,555-0303,Omar,Ashby,omar.ashby@example.org,555
 | 5 | In an org installed before 2026-10-28 that has **Generic contact list**, open the Import tab after the upgrade and choose **People and Organizations**. | The first template is still named **Generic contact list** (never renamed), and **Organization List** and **Couples and Households** are listed as well. |
 
 **Cleanup:** undo both imports from **Recent Imports** (see T-IMP-03).
+
+## T-IMP-15: Create a New Field From a Column
+
+**Purpose:** confirm an admin can create a field for an unmapped column, with access, and that others cannot. Setup detail: [Creating a New Field From an Import](../admin-guide/import-new-fields.md).
+**Prerequisites:** a scratch org or sandbox, never production with real data; an admin with the System Administrator profile, BarnCRM Admin and **BarnCRM Metadata Admin**; a second user with BarnCRM Admin only. Save as `import-test-shirts.csv`:
+
+```
+First Name,Last Name,Email,T-Shirt Size,Joined On
+Ada,Zzshirt,ada.zzshirt@example.org,S,2026-10-01
+Ben,Zzshirt,ben.zzshirt@example.org,M,2026-10-02
+Cal,Zzshirt,cal.zzshirt@example.org,S,2026-10-03
+Dot,Zzshirt,dot.zzshirt@example.org,M,2026-10-04
+```
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open BarnCRM Settings, **Import** page, **Create Fields From an Import**. | Status reads **Not set up**, with **Set Up Connection**. |
+| 2 | Choose **People and Organizations**, upload `import-test-shirts.csv` and open the field picker for **T-Shirt Size**. | The last choice is **Create New Field**. |
+| 3 | Choose it. | The dialog shows the details to copy (Object Contact, Field Label T-Shirt Size, API Name T_Shirt_Size__c, Field Type Picklist, values S and M), the Setup steps and **Refresh Fields**; there is no **Create Field**. Close it: the column is still **Do not load**. |
+| 4 | Back on the settings page, select **Set Up Connection**. | Status reads **Connected**. Setup, Named Credentials lists **BarnCRM: this org** (`Barn_Org_Connection`). |
+| 5 | Choose **Create New Field** for **T-Shirt Size** again, keep the suggestions and select **Create Field**. | "Creating the field" shows; within a minute the dialog closes and the column is mapped to **T-Shirt Size**. In Setup, the Contact field `T_Shirt_Size__c` is a picklist with S and M; BarnCRM Admin and BarnCRM Staff have read and edit, BarnCRM Read Only has read. |
+| 6 | Choose **Create New Field** for **Joined On**. | The suggested type is **Date** and the API name `Joined_On`. Change the API name to `T_Shirt_Size` and select **Create Field**: "This API name is already used on this object" shows and the dialog stays open. Cancel. |
+| 7 | Preview and import. | 4 people are created, each with the T-Shirt Size from the file. |
+| 8 | As the second user, open the same file's column step. | The field picker has no **Create New Field**, and the Import page of BarnCRM Settings has no **Create Fields From an Import**. |
+
+**Cleanup:** undo the import (see T-IMP-03), delete the Contact field `T_Shirt_Size__c` in Setup, and delete the Named Credential `Barn_Org_Connection` unless the org keeps it.
