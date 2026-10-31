@@ -892,7 +892,8 @@ export default class SuperTransform extends LightningElement {
       this.changes = loaded.length ? loaded : [this.newChange()];
       this.invalidate();
       this.savedNameText = saved.name;
-      const skipped = wanted.length - kept.length;
+      // Changes the person cannot change now, and conditions the server dropped (field gone).
+      const skipped = wanted.length - kept.length + (saved.droppedConditions || 0);
       this.noticeMessage = skipped
         ? format(SAVED_SKIPPED, saved.name, skipped)
         : format(SAVED_LOADED, saved.name);

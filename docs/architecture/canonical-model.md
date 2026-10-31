@@ -9085,7 +9085,10 @@ ignored). A filter's conditions and a change's fields are not checked against th
 save: that happens when the list is loaded and when the page counts, previews and runs.
 **R-ST3 Loading only fills the page in.** Loading reads the document, then the page loads the
 object's fields as the person: a change whose field the person may not change on the object now
-is left out and the page says how many; nothing runs, and a preview, the confirmation and the
+is left out, and so is a filter condition whose field is gone or not readable by the person
+(checked server-side with `QueryFieldCatalog.resolvePath`, in user mode; when any is left out the
+filter's `logic` key is dropped and the rest are joined by AND); the page says how many in all;
+nothing runs, and a preview, the confirmation and the
 run check everything as the person (R-BU1 to R-BU7). A list is therefore no way past a field
 or record the person cannot reach.
 **R-ST4 Org-wide, one set of permissions.** Every list is visible to, and may be renamed or

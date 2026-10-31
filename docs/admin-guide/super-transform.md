@@ -82,15 +82,19 @@ changes (with their steps) exactly as they stand on the page.
 - **Load List**: choose a list in **Saved List** (shown as name and object) and press **Load
   List**. The page fills in the object, the conditions and the changes, and counts the matching
   records again. Nothing runs: press **Preview** and **Run Super Transform** as usual. If a
-  saved change names a field you cannot change on that object now (a field since deleted, or
-  one you no longer have access to), that change is left out and the page says how many.
+  saved change names a field you cannot change on that object now, or a saved condition names a
+  field that is gone or that you cannot read, that change or condition is left out and the page
+  says how many in total. When a condition is left out, any "1 AND (2 OR 3)" style logic is
+  dropped too and the remaining conditions are joined by AND, which can match more records, so
+  check the conditions and the count before you preview.
 - **Rename List**: choose a list, type the new name in **List Name**, and press **Rename
   List**. The list's content is untouched.
 - **Delete List**: choose a list, press **Delete List** and confirm. Only the saved list is
   deleted; no record changes.
 
-Lists are org-wide: everyone who can use Super Transform sees, loads, renames and deletes every
-list, so name a list for what it does. A list keeps no records and gives no access: loading it
+Lists are org-wide, as every BarnCRM setting is: everyone who can use Super Transform (anyone
+with **Bulk Update Records**) sees, loads, renames and deletes every list, including lists
+someone else saved, so name a list for what it does. A list keeps no records and gives no access: loading it
 is the same as setting the page up by hand, and the preview, confirmation and run check
 everything as the person running them.
 

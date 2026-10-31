@@ -206,7 +206,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Super Transform: loaded with changes left out; {0} list name, {1} how many</shortDescription>
-        <value>Loaded the list {0}. {1} saved change(s) were left out because you cannot change that field on this object now.</value>
+        <value>Loaded the list {0}. {1} saved change(s) or condition(s) were left out because the field is gone or you cannot use it on this object now. Check the conditions and the count before you preview.</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_ActionPhoneFormat</fullName>

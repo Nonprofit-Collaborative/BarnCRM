@@ -50,6 +50,9 @@ public with sharing class SavedTransformService {
         public String objectName;
         @AuraEnabled
         public String definitionJson;
+        /** On load: conditions left out because their field is gone or not readable now. */
+        @AuraEnabled
+        public Integer droppedConditions = 0;
     }
 
     /** Every saved list, by name. */
@@ -72,9 +75,63 @@ public with sharing class SavedTransformService {
         return entries;
     }
 
-    /** One list with its document. */
+    /**
+     * One list with its document. The filter's conditions are checked against the object's
+     * fields as the person sees them now: a condition whose field is gone or not readable is
+     * removed and counted in `droppedConditions`. When any is removed the `logic` key is dropped
+     * too (its numbers no longer match), so the rest are joined by AND; Preview shows the count.
+     */
     public static SavedList load(Id recordId) {
-        return toView(find(recordId));
+        SavedList view = toView(find(recordId));
+        try {
+            Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(
+                view.definitionJson
+            );
+            Object rawFilter = document.get('filter');
+            if (!(rawFilter instanceof Map<String, Object>)) {
+                return view;
+            }
+            Map<String, Object> filter = (Map<String, Object>) rawFilter;
+            if (!(filter.get('conditions') instanceof List<Object>)) {
+                return view;
+            }
+            List<Object> kept = new List<Object>();
+            for (Object each : (List<Object>) filter.get('conditions')) {
+                if (conditionUsable(view.objectName, each)) {
+                    kept.add(each);
+                } else {
+                    view.droppedConditions++;
+                }
+            }
+            if (view.droppedConditions > 0) {
+                filter.put('conditions', kept);
+                filter.remove('logic');
+                if (kept.isEmpty()) {
+                    document.remove('filter');
+                }
+                view.definitionJson = JSON.serialize(document);
+            }
+        } catch (Exception unreadable) {
+            // A document checkDefinition would refuse is returned as stored; the page reports it.
+            view.droppedConditions = 0;
+        }
+        return view;
+    }
+
+    private static Boolean conditionUsable(String objectName, Object condition) {
+        if (!(condition instanceof Map<String, Object>)) {
+            return false;
+        }
+        Object field = ((Map<String, Object>) condition).get('field');
+        if (!(field instanceof String)) {
+            return false;
+        }
+        try {
+            QueryFieldCatalog.resolvePath(objectName, (String) field);
+            return true;
+        } catch (Exception gone) {
+            return false;
+        }
     }
 
     /** Saves a new list; the name must be new and the document must pass the checks. */

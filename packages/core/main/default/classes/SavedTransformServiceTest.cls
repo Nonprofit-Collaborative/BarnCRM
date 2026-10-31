@@ -118,6 +118,77 @@ private class SavedTransformServiceTest {
         }
     }
 
+    private static String withFilter(List<Object> conditions, String logic) {
+        Map<String, Object> filter = new Map<String, Object>{
+            'version' => 1,
+            'conditions' => conditions
+        };
+        if (logic != null) {
+            filter.put('logic', logic);
+        }
+        return JSON.serialize(
+            new Map<String, Object>{
+                'version' => 1,
+                'object' => 'Contact',
+                'filter' => filter,
+                'changes' => new List<Object>()
+            }
+        );
+    }
+
+    private static Map<String, Object> condition(Integer id, String field) {
+        return new Map<String, Object>{
+            'id' => id,
+            'field' => field,
+            'operator' => 'equals',
+            'value' => 'x'
+        };
+    }
+
+    @IsTest
+    static void loadingDropsConditionsWhoseFieldIsGoneAndCountsThem() {
+        System.runAs(named('Maria')) {
+            SavedTransformService.SavedList saved = SavedTransformService.save(
+                'Stale',
+                withFilter(
+                    new List<Object>{
+                        condition(1, 'Title'),
+                        condition(2, 'Gone__c'),
+                        condition(3, 'Account.Nothing__c')
+                    },
+                    '1 OR (2 AND 3)'
+                )
+            );
+            SavedTransformService.SavedList loaded = SavedTransformService.load(saved.recordId);
+            System.assertEquals(2, loaded.droppedConditions);
+            Map<String, Object> filter = (Map<String, Object>) ((Map<String, Object>) JSON.deserializeUntyped(
+                    loaded.definitionJson
+                ))
+                .get('filter');
+            System.assertEquals(1, ((List<Object>) filter.get('conditions')).size());
+            System.assertEquals(false, filter.containsKey('logic'), 'Logic no longer fits.');
+
+            SavedTransformService.SavedList everything = SavedTransformService.save(
+                'All stale',
+                withFilter(new List<Object>{ condition(1, 'Gone__c') }, null)
+            );
+            SavedTransformService.SavedList none = SavedTransformService.load(everything.recordId);
+            System.assertEquals(1, none.droppedConditions);
+            System.assertEquals(
+                false,
+                ((Map<String, Object>) JSON.deserializeUntyped(none.definitionJson))
+                    .containsKey('filter'),
+                'No condition left means no filter.'
+            );
+
+            SavedTransformService.SavedList fine = SavedTransformService.save(
+                'Fine',
+                withFilter(new List<Object>{ condition(1, 'Title') }, null)
+            );
+            System.assertEquals(0, SavedTransformService.load(fine.recordId).droppedConditions);
+        }
+    }
+
     @IsTest
     static void aListIsOrgWide() {
         String savedId;

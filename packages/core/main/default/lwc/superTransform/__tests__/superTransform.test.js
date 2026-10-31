@@ -398,6 +398,7 @@ describe('c-super-transform', () => {
       getSavedLists.mockResolvedValue([ENTRY]);
       loadSavedList.mockResolvedValue({
         ...ENTRY,
+        droppedConditions: 2,
         definitionJson: JSON.stringify(DEFINITION)
       });
       const element = mount();
@@ -417,7 +418,7 @@ describe('c-super-transform', () => {
       const steps = element.shadowRoot.querySelector('c-import-column-transforms');
       expect(steps.transforms).toEqual([{ op: 'trim' }]);
       expect(q(element, 'notice-message').textContent).toBe(
-        'Loaded the list Tidy titles. 1 change(s) were left out.'
+        'Loaded the list Tidy titles. 3 change(s) were left out.'
       );
       expect(q(element, 'preview').disabled).toBe(false);
     });
