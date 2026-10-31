@@ -47,8 +47,8 @@ public without sharing class ImportRowPurgeBatch implements Database.Batchable<S
         String soql = cutoff == null
             ? 'SELECT Id FROM Import_Row__c WHERE Id = null'
             : 'SELECT Id FROM Import_Row__c WHERE ' +
-                  '(Import_Batch__r.Status__c IN :complete AND Import_Batch__r.Completed_At__c <= :cutoff)' +
-                  ' OR (Import_Batch__r.Status__c = :preview AND Import_Batch__r.Completed_At__c < :previewCutoff)';
+              '(Import_Batch__r.Status__c IN :complete AND Import_Batch__r.Completed_At__c <= :cutoff)' +
+              ' OR (Import_Batch__r.Status__c = :preview AND Import_Batch__r.Completed_At__c < :previewCutoff)';
         return Database.getQueryLocatorWithBinds(
             soql,
             new Map<String, Object>{

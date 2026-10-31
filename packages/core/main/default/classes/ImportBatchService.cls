@@ -1002,7 +1002,9 @@ public with sharing class ImportBatchService {
         if (ROWS_NEVER.equals(choice)) {
             return null;
         }
-        return ROW_DAYS.containsKey(choice) ? ROW_DAYS.get(choice) : ROW_DAYS.get(ROWS_AFTER_30_DAYS);
+        return ROW_DAYS.containsKey(choice)
+            ? ROW_DAYS.get(choice)
+            : ROW_DAYS.get(ROWS_AFTER_30_DAYS);
     }
 
     /**

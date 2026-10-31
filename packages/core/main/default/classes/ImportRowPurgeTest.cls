@@ -167,7 +167,11 @@ private class ImportRowPurgeTest {
             };
             for (String choice : expected.keySet()) {
                 deleteRows(choice);
-                Assert.areEqual(expected.get(choice), ImportBatchService.rowRetentionDays(), choice);
+                Assert.areEqual(
+                    expected.get(choice),
+                    ImportBatchService.rowRetentionDays(),
+                    choice
+                );
             }
             deleteRows(null);
             Assert.areEqual(30, ImportBatchService.rowRetentionDays(), 'Blank reads as 30 days.');
