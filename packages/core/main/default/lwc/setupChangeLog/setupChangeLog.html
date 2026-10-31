@@ -1,0 +1,132 @@
+<template>
+    <div>
+        <div class="slds-grid slds-grid_vertical-align-center slds-wrap slds-var-m-bottom_small">
+            <h2 class="slds-text-heading_medium">{labels.title}</h2>
+            <lightning-button-group class="slds-col_bump-left">
+                <lightning-button
+                    label={labels.copyNow}
+                    variant="brand"
+                    disabled={busy}
+                    onclick={handleCopyNow}
+                    data-id="copy-now"
+                ></lightning-button>
+                <lightning-button
+                    label={labels.refresh}
+                    disabled={busy}
+                    onclick={handleRefresh}
+                    data-id="refresh"
+                ></lightning-button>
+            </lightning-button-group>
+        </div>
+        <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+
+        <div class="slds-is-relative">
+            <template lwc:if={busy}>
+                <lightning-spinner alternative-text={labels.refresh} size="small"></lightning-spinner>
+            </template>
+
+            <template lwc:if={errorMessage}>
+                <p class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">
+                    {errorMessage}
+                </p>
+            </template>
+            <template lwc:if={noticeMessage}>
+                <p class="slds-var-m-bottom_small" role="status" aria-live="polite" data-id="notice">
+                    {noticeMessage}
+                </p>
+            </template>
+
+            <p class="slds-var-m-bottom_xx-small" data-id="kept">{keptLine}</p>
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small" data-id="copy-status">
+                {copyLine}
+            </p>
+
+            <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end slds-var-m-bottom_small">
+                <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+                    <lightning-input
+                        type="date"
+                        label={labels.fromDate}
+                        value={filters.fromDate}
+                        data-filter="fromDate"
+                        data-id="from"
+                        onchange={handleFilter}
+                    ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-6">
+                    <lightning-input
+                        type="date"
+                        label={labels.toDate}
+                        value={filters.toDate}
+                        data-filter="toDate"
+                        data-id="to"
+                        onchange={handleFilter}
+                    ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-6">
+                    <lightning-combobox
+                        label={labels.section}
+                        value={filters.section}
+                        options={sectionChoices}
+                        data-filter="section"
+                        data-id="section"
+                        onchange={handleFilter}
+                    ></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-6">
+                    <lightning-input
+                        type="search"
+                        label={labels.search}
+                        field-level-help={labels.searchHelp}
+                        value={filters.search}
+                        data-filter="search"
+                        data-id="search"
+                        onchange={handleFilter}
+                        onkeyup={handleSearchKey}
+                    ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-6">
+                    <lightning-button-group>
+                        <lightning-button
+                            label={labels.runSearch}
+                            disabled={busy}
+                            onclick={handleSearch}
+                            data-id="run-search"
+                        ></lightning-button>
+                        <lightning-button
+                            label={labels.download}
+                            icon-name="utility:download"
+                            disabled={downloadDisabled}
+                            onclick={handleDownload}
+                            data-id="download"
+                        ></lightning-button>
+                    </lightning-button-group>
+                </div>
+            </div>
+
+            <template lwc:if={hasRows}>
+                <lightning-datatable
+                    key-field="id"
+                    data={rows}
+                    columns={columns}
+                    hide-checkbox-column
+                    wrap-text-max-lines="4"
+                    data-id="results"
+                ></lightning-datatable>
+            </template>
+            <template lwc:if={showEmpty}>
+                <c-barn-empty-state
+                    illustration="setup"
+                    message={labels.empty}
+                    heading-level="3"
+                    data-id="empty"
+                ></c-barn-empty-state>
+            </template>
+            <template lwc:if={moreText}>
+                <p class="slds-var-m-top_small" data-id="more">{moreText}</p>
+            </template>
+            <template lwc:if={scanStoppedText}>
+                <p class="slds-var-m-top_small" data-id="scan-stopped">{scanStoppedText}</p>
+            </template>
+        </div>
+    </div>
+</template>
