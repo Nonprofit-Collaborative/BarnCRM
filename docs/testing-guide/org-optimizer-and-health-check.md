@@ -176,5 +176,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 10 | Choose **BarnCRM Permission Sets**. | The BarnCRM roles first (such as **BarnCRM Admin Group** and **Team Member**), then the BarnCRM permission sets, each with **Active People**. Below: **The Tab Access Check is scheduled hourly. Next run:** and a time, or, if it is not scheduled, a message pointing to Health Check. |
 | 11 | Click **Download CSV** under any table. | A file named **Access_Explorer-** and today's date ending .csv downloads with the table's columns and rows, and **Downloaded {n} rows.** shows. |
 | 12 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **Access Explorer** tile or tab. |
+| 13 | As the admin, open **BarnCRM Settings**, then the **Access** page, and click **Open Access Explorer**. | **Org Optimizer** opens on the **Access Explorer** section. |
+| 14 | As an admin without View All Users (no BarnCRM Access Manager permission set), repeat step 5. | Above **People With Access**: **You may not see everyone: without View All Users, this list shows only the people Salesforce lets you see.** With View All Users the line is not shown. |
 
 **Cleanup:** None. Access Explorer changes nothing.

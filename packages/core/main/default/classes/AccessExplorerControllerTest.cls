@@ -271,6 +271,33 @@ private class AccessExplorerControllerTest {
     }
 
     @IsTest
+    static void theOpenLinkNamesOrgOptimizerAndTheSection() {
+        System.runAs(TestUsers.admin()) {
+            AccessExplorerController.OpenLink link;
+            AccessExplorerController.ObjectAccess access;
+            Boolean seesAll;
+            System.runAs(maria()) {
+                link = AccessExplorerController.getOpenLink();
+                access = AccessExplorerController.getObjectAccess(RELATIONSHIP, null);
+                seesAll = [SELECT PermissionsViewAllUsers FROM UserPermissionAccess LIMIT 1]
+                .PermissionsViewAllUsers;
+            }
+            Assert.areEqual(NamespaceUtil.stateKey('section'), link.stateKey, 'The state key.');
+            Assert.areEqual('accessExplorer', link.section, 'The section.');
+            Assert.areEqual(
+                '/lightning/n/' +
+                    NamespaceUtil.qualify('Data_Hygiene') +
+                    '?' +
+                    link.stateKey +
+                    '=accessExplorer',
+                link.url,
+                'Org Optimizer, opened on Access Explorer.'
+            );
+            Assert.areEqual(!seesAll, access.mayMissPeople, 'Said only without View All Users.');
+        }
+    }
+
+    @IsTest
     static void refusalsSayWhatIsWrong() {
         System.runAs(TestUsers.admin()) {
             User staff = TestDataFactory.createUser('Sam', new List<String>{ 'BarnCRM_Staff' });
