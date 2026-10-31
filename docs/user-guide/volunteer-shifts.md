@@ -98,6 +98,22 @@ filled** up by one.
 More people than **Volunteers needed** can be signed up: **Slots remaining** then goes below
 zero.
 
+## To Sign Up Someone From the Suggestions
+
+Under the Sign-Ups panel, **Suggested Volunteers** lists up to ten active volunteers who are not
+yet on the shift, best match first, with why each is suggested (skills the job needs, available
+that weekday, hours already given on this job, onboarding up to date).
+
+1. Open the shift and find **Suggested Volunteers**.
+2. Read the **Why** column for the person you would like.
+3. Click **Sign up** on their row.
+
+They are added as **Signed up**, the **Sign-Ups** panel updates and the person leaves the list.
+Someone who does not list the shift's weekday, or whose onboarding is not current, is listed
+lower with that said, but you can still sign them up. If the card says nobody is left, every
+active volunteer is already on the shift. Use **Add sign-up** for anyone who is not an active
+volunteer.
+
 ## To Change a Sign-Up's Status
 
 1. On the shift's **Sign-Ups** panel, find the person's row.

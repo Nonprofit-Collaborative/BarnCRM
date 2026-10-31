@@ -207,3 +207,19 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 4 | Open **Volunteer Letter Templates** and the list view menu. | **All Volunteer Letter Templates**, **Active Volunteer Letter Templates** and **Inactive Volunteer Letter Templates** are listed. A shipped template that is switched off shows under the Inactive view. |
 
 **Cleanup:** tick **Active** on anything you switched off.
+
+## T-VOL-15: Suggested Volunteers Rank and Sign Up
+
+**Purpose:** confirm the Suggested Volunteers card lists the right people in a sensible order and signs them up through the normal save.
+**Prerequisites:** admin or coordinator; a job with a required skill (a **Job Skill**); an open shift on a Saturday; three contacts with **Volunteer Status** Active: Ana (holds the skill, **Availability Days** Saturday), Ben (no skill, availability Monday only), Cleo (no skill, none recorded); one Prospective contact.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the shift. | **Suggested Volunteers** is under the Sign-Ups panel. |
+| 2 | Read the list. | Ana is first ("Has 1 of the 1 skills this job needs", "Available on Saturdays"), then Cleo ("No available days recorded"), then Ben ("Does not list Saturdays as an available day"). The Prospective contact is not listed. |
+| 3 | Click **Sign up** on Ana's row. | "Ana is signed up for this shift." Ana leaves the list and appears in the Sign-Ups panel as Signed up, without a page refresh. |
+| 4 | Add a Cancelled sign-up for Cleo in the Sign-Ups panel. | Cleo leaves the list (a cancelled sign-up still counts as signed up). |
+| 5 | Set the shift's status to **Cancelled** and reload. | The card is gone. |
+| 6 | Open a shift as a Read Only user. | No Suggested Volunteers card. |
+
+**Cleanup:** delete the test sign-ups and restore the shift's status.

@@ -8252,6 +8252,22 @@ sign-up naming them, so shift counts stand, and empties its Notes. A sign-up Sig
 Confirmed on a shift that has not started is set to Cancelled, so the place is freed and nobody
 expects the person. Done by `VolunteersErasureExtension`, as the user (R-ER5).
 
+**R-VU7 Suggestions are read only and rank on data already held.** The Suggested Volunteers
+card on an Open shift (V-11) offers Contacts whose Volunteer Status is Active and who have no
+sign-up of any status on the shift (R-VU2 would refuse a second), up to the 500 with the most
+total hours. Per person it gathers the available days, the skills and interests that match the
+job's required skills (Job Skill), approved hours on the job and in total, and onboarding
+(`cleared` when the latest step of each Type is current, `open` when one is not, `none` when
+the user sees no steps). It ranks them with the documented weights (admin guide, Suggested
+Volunteers): skills up to 30 (share of required skills held), interests up to 10 (required
+skills held only as interests), an available day +25 or minus 25 when days are listed and the
+shift's is not one, hours on the job up to 20 (capped at 40), total hours up to 5 (capped at
+200), onboarding cleared +10 or open minus 15. The ranking is the framework-free module
+`rankSuggestions`; Apex only gathers facts, in user mode, so a user sees suggestions only from
+what they may read. Nothing is written: booking uses `VolunteerShiftSignupsController.addSignup`,
+so R-VU1 to R-VU4 apply. The card shows nothing to a user who cannot create sign-ups or for a
+shift that is not Open. A person held only as a person account is not suggested.
+
 ### Salesforce implementation
 
 - **Object:** `Volunteer_Signup__c`, name field AutoNumber `VS-{000000}`, sharing Controlled
