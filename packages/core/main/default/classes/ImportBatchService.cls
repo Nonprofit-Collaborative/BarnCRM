@@ -940,6 +940,7 @@ public with sharing class ImportBatchService {
         if (batch == null) {
             throw new ImportException(Label.Core_Import_ErrorBatchGone);
         }
+        // Package bookkeeping (ADR-0021).
         Database.update(
             new Import_Batch__c(Id = batch.Id, Pass_Number__c = nextPass(batch)),
             AccessLevel.SYSTEM_MODE
