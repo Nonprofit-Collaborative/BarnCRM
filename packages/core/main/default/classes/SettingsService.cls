@@ -52,7 +52,8 @@ public with sharing class SettingsService {
     private static final Map<Schema.SObjectField, Boolean> SHIPPED_DEFAULTS = new Map<Schema.SObjectField, Boolean>{
         BarnCRM_Settings__c.Relationship_Auto_Reciprocal__c => true,
         BarnCRM_Settings__c.Auto_Create_Households__c => true,
-        BarnCRM_Settings__c.Job_Notifications__c => true
+        BarnCRM_Settings__c.Job_Notifications__c => true,
+        BarnCRM_Settings__c.Error_Digest_Include_Admin_Summary__c => true
     };
 
     private static BarnCRM_Settings__c cachedSettings;

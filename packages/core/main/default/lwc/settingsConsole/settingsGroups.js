@@ -222,7 +222,12 @@ const PAGE_GROUPS = {
       id: 'Error Digest',
       label: ERROR_DIGEST,
       fallback: true,
-      keys: ['Error_Digest_Job', 'Error_Digest_Recipients__c', 'Error_Digest_Frequency__c']
+      keys: [
+        'Error_Digest_Job',
+        'Error_Digest_Recipients__c',
+        'Error_Digest_Frequency__c',
+        'Error_Digest_Include_Admin_Summary__c'
+      ]
     },
     {
       id: 'Error Log Retention',

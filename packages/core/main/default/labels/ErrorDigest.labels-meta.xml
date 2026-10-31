@@ -280,4 +280,68 @@
         <shortDescription>Error digest reason: no query allowance left to count entries.</shortDescription>
         <value>too little of this run's allowance for reading records was left to count the entries</value>
     </labels>
+    <labels>
+        <fullName>Core_AdminDigest_Subject</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Weekly digest subject when there are no new Error Log entries.</shortDescription>
+        <value>BarnCRM: Weekly Admin Summary</value>
+    </labels>
+    <labels>
+        <fullName>Core_AdminDigest_NoNewErrors</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Weekly digest intro with no new Error Log entries; {0} is a time.</shortDescription>
+        <value>No new Error Log entries since {0}. Here is what else needs a look.</value>
+    </labels>
+    <labels>
+        <fullName>Core_AdminDigest_Heading</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Weekly digest: heading of the admin summary section.</shortDescription>
+        <value>Admin Summary</value>
+    </labels>
+    <labels>
+        <fullName>Core_AdminDigest_Limits</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Weekly digest: heading of the org limits list.</shortDescription>
+        <value>Org limits at 80% or more:</value>
+    </labels>
+    <labels>
+        <fullName>Core_AdminDigest_LimitLine</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Weekly digest: one limit; {0} name, {1} percent, {2} used, {3} allowed.</shortDescription>
+        <value>{0}: {1}% ({2} of {3})</value>
+    </labels>
+    <labels>
+        <fullName>Core_AdminDigest_FailedJobs</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Weekly digest: failed jobs; {0} is a count.</shortDescription>
+        <value>BarnCRM jobs that failed since the last digest: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_AdminDigest_MoreJobs</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Weekly digest: failed jobs not listed; {0} is a count.</shortDescription>
+        <value>  and {0} more</value>
+    </labels>
+    <labels>
+        <fullName>Core_AdminDigest_Duplicates</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Weekly digest: duplicate suggestions waiting; {0} is a count.</shortDescription>
+        <value>Duplicate suggestions waiting for review: {0}</value>
+    </labels>
 </CustomLabels>

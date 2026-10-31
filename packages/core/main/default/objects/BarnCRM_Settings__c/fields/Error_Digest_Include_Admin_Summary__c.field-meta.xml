@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Error_Digest_Include_Admin_Summary__c</fullName>
+  <defaultValue>true</defaultValue>
+  <description>Whether a weekly digest also carries the admin summary: org limits at 80 percent or more, failed BarnCRM jobs, and duplicates waiting for review (C-54).</description>
+  <inlineHelpText>Add limits, failed jobs and duplicates waiting to the weekly digest.</inlineHelpText>
+  <label>Error Digest Include Admin Summary</label>
+  <type>Checkbox</type>
+</CustomField>
