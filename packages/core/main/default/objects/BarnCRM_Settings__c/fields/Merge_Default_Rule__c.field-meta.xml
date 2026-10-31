@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Merge_Default_Rule__c</fullName>
+  <defaultValue>"Not blank"</defaultValue>
+  <description>Duplicate Matching: which value wins on an auto-merge for every person field with no active Merge Rule row (C-51, canonical model R-DP8): Keep master, Not blank (the shipped choice, and what a blank means), Most recent, Oldest record or Most complete. Held as text because a custom setting field cannot be a picklist; the settings console offers the five values.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Which value wins on an auto-merge for a field with no merge rule of its own.</inlineHelpText>
+  <label>Merge Rule For Other Fields</label>
+  <length>40</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

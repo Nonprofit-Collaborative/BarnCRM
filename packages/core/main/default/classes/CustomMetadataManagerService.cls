@@ -170,9 +170,31 @@ public with sharing class CustomMetadataManagerService {
         matchSources.validator = new MatchSourceService.Validator();
         matchSources.listed = false;
 
+        // Which value wins on an auto-merge (C-51, R-DP8): one active row per person field.
+        EditableType mergeRules = new EditableType();
+        mergeRules.type = Merge_Rule__mdt.SObjectType;
+        mergeRules.label = System.Label.Core_DuplicateManagement_MergeRules;
+        mergeRules.help = System.Label.Core_DuplicateManagement_MergeRulesHelp;
+        mergeRules.fields = new List<Schema.SObjectField>{
+            Merge_Rule__mdt.Field_Name__c,
+            Merge_Rule__mdt.Rule__c
+        };
+        mergeRules.required = new Set<Schema.SObjectField>{
+            Merge_Rule__mdt.Field_Name__c,
+            Merge_Rule__mdt.Rule__c
+        };
+        mergeRules.archiveField = Merge_Rule__mdt.Active__c;
+        mergeRules.uniqueField = Merge_Rule__mdt.Field_Name__c;
+        mergeRules.choicesFrom = new Map<Schema.SObjectField, Schema.SObjectField>{
+            Merge_Rule__mdt.Rule__c => Merge_Rule__mdt.Rule__c
+        };
+        mergeRules.choicesObject = Merge_Rule__mdt.SObjectType;
+        mergeRules.validator = new MergeRuleService.Validator();
+
         return new Map<String, EditableType>{
             nameOf(relationshipTypes) => relationshipTypes,
-            nameOf(matchSources) => matchSources
+            nameOf(matchSources) => matchSources,
+            nameOf(mergeRules) => mergeRules
         };
     }
 

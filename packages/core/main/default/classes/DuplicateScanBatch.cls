@@ -107,7 +107,8 @@ public with sharing class DuplicateScanBatch implements Database.Batchable<SObje
     }
 
     /**
-     * One chunk: ask the rules, then the match sources (R-DP6), keep what is new and
+     * One chunk: ask the rules, then the match sources (R-DP6), then similar names (R-DP7,
+     * people only), keep what is new and
      * actionable, write it down. The rules' pairs come first, so a pair both found is written
      * once, as the rule's.
      */
@@ -118,6 +119,7 @@ public with sharing class DuplicateScanBatch implements Database.Batchable<SObje
         }
         List<DuplicateService.Pair> found = DuplicateService.matchesFor(recordIds);
         found.addAll(MatchSourceService.pairsFor(recordIds));
+        found.addAll(FuzzyPairing.pairsFor(recordIds));
         List<DuplicateService.Pair> candidates = DuplicateService.pairsToRecord(
             found,
             DuplicateService.pairsAlreadySuggested(new Set<Id>(recordIds))

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Fuzzy_Match_Threshold__c</fullName>
+  <defaultValue>90</defaultValue>
+  <description>Duplicate Matching: how alike two names must be, in percent, before the duplicate scan pairs two people by name (C-51, canonical model R-DP7). Read as 90 when empty, held between 80 and 100.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>How alike two names must be, in percent, before the scan pairs two people by name.</inlineHelpText>
+  <label>Fuzzy Name Match</label>
+  <precision>3</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

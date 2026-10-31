@@ -201,3 +201,32 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 4 | Read the counts. | The tab and **Possible Duplicates** count suggestions, and the dismissed count reads **Dismissed suggestions**. |
 
 **Cleanup:** None.
+
+## T-DUP-14: Similar Names, Household Aware
+
+**Purpose:** Confirm the scan pairs similar names only with something else in common, and treats one household as family.
+**Prerequisites:** admin. In **BarnCRM Settings**, **Duplicate Matching**, **Fuzzy Name Match** reads **90**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create a contact: First Name `Jonathan`, Last Name `Zzfuzz`, Email `jz.fuzz@example.org`. Create another: First Name `Jonathon`, Last Name `Zzfuzz`, Email `JZ.Fuzz@example.org`; save past any warning. | Both save, each in a household of its own. |
+| 2 | Create a contact `Jonathen Zzfuzz` with Email `other.fuzz@example.org`. | It saves. |
+| 3 | Create a household `Zzfuzz Family Household`, and in it four contacts with no email or phone: `Daniel Zzfuzz`, `Danielle Zzfuzz`, `Sam Zzfuzz` and `Sam Zzfuzz` (save past any warning). | All save in that household. |
+| 4 | On **Duplicate Matching**, **Review**, scan and refresh. | A pair of **Jonathan Zzfuzz** and **Jonathon Zzfuzz**, with the line **Similar names (97%) and the same email**. A pair of the two **Sam Zzfuzz**, with **Same name in the same household** (or a rule's name, if your rules found it first). No pair names **Jonathen Zzfuzz** (nothing else in common), and no pair of **Daniel** and **Danielle**. |
+
+**Cleanup:** Delete the `Zzfuzz` contacts and `Zzfuzz Family Household`; their pairs go with them.
+
+## T-DUP-15: Merge Rules and the Setting for Other Fields
+
+**Purpose:** Confirm merge rules are listed on the Custom Metadata page, a bad one is refused, and the setting for other fields shows its default.
+**Prerequisites:** admin with **BarnCRM Metadata Admin**. In an org where BarnCRM is installed as a package, **Deploy Metadata from Non-Certified Package Versions via Apex** is on in Setup, **Apex Settings**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **BarnCRM Settings**, open **Duplicate Matching**. | **Fuzzy Name Match** reads **90** and **Merge Rule For Other Fields** reads **Not blank**, each with a description. Change **Merge Rule For Other Fields** to **Most recent** and save: **Saved.** Change it back to **Not blank** and save. |
+| 2 | Open **Custom Metadata**. | Two lists: **Relationship types** and **Merge Rules**, the second empty with a line explaining it. |
+| 3 | Under **Merge Rules**, add a row: **Field Name** `AccountId`, **Rule** **Most recent**, and save. | Refused: **AccountId is not a person field a merge can change.** and the rest of the sentence. |
+| 4 | Change **Field Name** to `Email` and save. | **Saved** once Salesforce applies it. The row lists **Email**, **Most recent**. |
+| 5 | Add another row: **Field Name** `Email`, **Rule** **Oldest record**, and save. | Refused: an active row already names **Email**. |
+
+**Cleanup:** Archive the `Email` merge rule.
