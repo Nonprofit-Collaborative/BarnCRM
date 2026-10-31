@@ -61,6 +61,7 @@ import COL_DELETE from '@salesforce/label/c.Core_AccessExplorer_ColDelete';
 import COL_VIEW_ALL from '@salesforce/label/c.Core_AccessExplorer_ColViewAll';
 import COL_MODIFY_ALL from '@salesforce/label/c.Core_AccessExplorer_ColModifyAll';
 import COL_GRANTED_BY from '@salesforce/label/c.Core_AccessExplorer_ColGrantedBy';
+import MAY_MISS_PEOPLE from '@salesforce/label/c.Core_AccessExplorer_MayMissPeople';
 import COL_ACTIVE_PEOPLE from '@salesforce/label/c.Core_AccessExplorer_ColActivePeople';
 import COL_PERSON from '@salesforce/label/c.Core_AccessExplorer_ColPerson';
 
@@ -116,6 +117,7 @@ export default class AccessExplorer extends LightningElement {
     chooseObject: CHOOSE_OBJECT,
     grantsHeading: GRANTS_HEADING,
     peopleHeading: PEOPLE_HEADING,
+    mayMissPeople: MAY_MISS_PEOPLE,
     showMore: SHOW_MORE,
     alwaysField: ALWAYS_FIELD,
     tabCheckScheduled: TAB_CHECK_SCHEDULED,

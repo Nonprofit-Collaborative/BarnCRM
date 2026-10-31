@@ -1,5 +1,7 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
+import { CurrentPageReference } from 'lightning/navigation';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
+import getOpenLink from '@salesforce/apex/AccessExplorerController.getOpenLink';
 import canFind from '@salesforce/customPermission/Find_And_Export_Records';
 import getErrorTile from '@salesforce/apex/ErrorLogController.getTile';
 import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
@@ -210,6 +212,40 @@ export default class OrgOptimizer extends LightningElement {
 
   get accessExplorerOpened() {
     return Boolean(this.opened.accessExplorer);
+  }
+
+  /** The page state, and the key that names a section to open (the Access page's button). */
+  pageState;
+  sectionLink;
+
+  @wire(CurrentPageReference)
+  wiredPage(pageReference) {
+    this.pageState = pageReference && pageReference.state;
+    this.openRequestedSection();
+  }
+
+  @wire(getOpenLink)
+  wiredOpenLink({ data }) {
+    // Refused without Manage BarnCRM Settings: then there is no section to open, and no error.
+    if (data) {
+      this.sectionLink = data;
+      this.openRequestedSection();
+    }
+  }
+
+  /** Opens Access Explorer when the page was opened for it, for administrators only. */
+  openRequestedSection() {
+    const link = this.sectionLink;
+    if (
+      canManageSettings &&
+      link &&
+      this.pageState &&
+      this.pageState[link.stateKey] === link.section
+    ) {
+      if (this.activeSection !== link.section) {
+        this.openSection(link.section);
+      }
+    }
   }
 
   get showHealthCheck() {

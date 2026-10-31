@@ -464,4 +464,12 @@
         <shortDescription>Access explorer: column</shortDescription>
         <value>Person</value>
     </labels>
+    <labels>
+        <fullName>Core_AccessExplorer_MayMissPeople</fullName>
+        <categories>AccessExplorer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: viewer lacks View All Users</shortDescription>
+        <value>You may not see everyone: without View All Users, this list shows only the people Salesforce lets you see.</value>
+    </labels>
 </CustomLabels>

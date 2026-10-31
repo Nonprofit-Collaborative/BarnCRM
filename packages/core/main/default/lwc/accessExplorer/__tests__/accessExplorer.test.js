@@ -249,6 +249,7 @@ describe('c-access-explorer', () => {
     });
     getObjectAccess.mockResolvedValue({
       truncated: true,
+      mayMissPeople: true,
       grants: [{ id: '0PS2', label: 'Team Member', kind: 'group', read: true, activePeople: 3 }]
     });
     getPeopleWithAccess
@@ -279,6 +280,9 @@ describe('c-access-explorer', () => {
     expect(byId(element, 'truncated').textContent).toBe('More than 2,000 give access.');
     expect(byId(element, 'grants').data[0]).toMatchObject({ kindLabel: 'Group', activePeople: 3 });
     expect(byId(element, 'grants').columns).toHaveLength(9);
+    expect(byId(element, 'may-miss-people').textContent).toBe(
+      'c.Core_AccessExplorer_MayMissPeople'
+    );
 
     byId(element, 'show-more').click();
     await flush();
@@ -319,6 +323,7 @@ describe('c-access-explorer', () => {
       'editText',
       'activePeople'
     ]);
+    expect(byId(element, 'may-miss-people')).toBeNull();
   });
 
   it('shows BarnCRM permission sets and the Tab Access Check, and downloads the table', async () => {

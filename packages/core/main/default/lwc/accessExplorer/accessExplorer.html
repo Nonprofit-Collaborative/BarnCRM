@@ -191,6 +191,9 @@
                     ></lightning-button>
 
                     <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.peopleHeading}</h3>
+                    <template lwc:if={objectAccess.mayMissPeople}>
+                        <p data-id="may-miss-people">{labels.mayMissPeople}</p>
+                    </template>
                     <lightning-datatable
                         data-id="people"
                         key-field="key"
