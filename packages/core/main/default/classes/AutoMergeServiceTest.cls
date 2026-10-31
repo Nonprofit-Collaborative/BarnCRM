@@ -24,6 +24,14 @@ private class AutoMergeServiceTest {
         return new Contact(FirstName = firstName, LastName = 'Automerge', Email = email);
     }
 
+    /** The person's live membership rows (empty outside junction mode). */
+    private static Set<Id> membershipIds(Id personId) {
+        return new Map<Id, Household_Member__c>(
+                [SELECT Id FROM Household_Member__c WHERE Contact__c = :personId WITH SYSTEM_MODE]
+            )
+            .keySet();
+    }
+
     private static Merge_Journal__c journalFor(Id mergedId) {
         return [
             SELECT
@@ -145,6 +153,8 @@ private class AutoMergeServiceTest {
             );
             Database.insert(work, AccessLevel.SYSTEM_MODE);
             AutoMergeService.pairsForTest = new List<List<Id>>{ new List<Id>{ kept.Id, other.Id } };
+            Set<Id> keptMemberships = membershipIds(kept.Id);
+            Set<Id> otherMemberships = membershipIds(other.Id);
 
             Integer merged = AutoMergeService.mergeAll(AutoMergeService.candidates(), 'run-1');
 
@@ -185,7 +195,18 @@ private class AutoMergeServiceTest {
                 [SELECT Contact__c FROM Address__c WHERE Id = :work.Id WITH SYSTEM_MODE].Contact__c,
                 'The address moves back.'
             );
-            Assert.areEqual(AutoMergeService.UNDONE, journalFor(other.Id).Status__c);
+            Assert.areEqual(
+                keptMemberships,
+                membershipIds(kept.Id),
+                'The kept person leaves the household they joined only through the merge.'
+            );
+            Assert.areEqual(
+                otherMemberships,
+                membershipIds(other.Id),
+                'The restored person has their own memberships back.'
+            );
+            Merge_Journal__c undone = journalFor(other.Id);
+            Assert.areEqual(AutoMergeService.UNDONE, undone.Status__c, undone.Notes__c);
         }
     }
 

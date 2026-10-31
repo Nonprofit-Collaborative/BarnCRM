@@ -41,6 +41,13 @@ public with sharing class AutoMergeService {
     /** Queries left untouched for the merge itself when recording related records. */
     private static final Integer QUERY_RESERVE = 30;
     private static final Integer MAX_CHILD_ROWS = 2000;
+    /**
+     * Journal key for the membership rows a merge gave the kept person (junction mode). Not an
+     * "Object.Field" link: the contact trigger deletes the merged-away person's own rows before
+     * the merge and copies them to the kept person, and undelete brings the originals back, so
+     * undo removes these copies instead of moving anything (C-20, ContactTriggerHandler).
+     */
+    private static final String ADDED_MEMBERSHIPS = 'Household_Member__c+';
     private static final Set<String> PERSON_FIELDS = new Set<String>{
         'Id',
         'Name',
@@ -359,6 +366,11 @@ public with sharing class AutoMergeService {
             mergedIds.add(pair.mergedId);
         }
         Map<Id, Moved> moved = movedRecords(mergedIds);
+        Set<Id> survivorIds = new Set<Id>();
+        for (Candidate pair : pairs) {
+            survivorIds.add(pair.survivorId);
+        }
+        Map<Id, Set<Id>> membershipsBefore = membershipIds(survivorIds);
         // Not named "merged": Apex names are case-insensitive, so it would hide the MERGED status.
         Integer mergedCount = 0;
         for (Candidate pair : pairs) {
@@ -388,6 +400,10 @@ public with sharing class AutoMergeService {
                         result.getErrors()[0].getMessage()
                     );
                 }
+                List<Id> added = addedMemberships(pair.survivorId, membershipsBefore);
+                if (!added.isEmpty()) {
+                    records.byLink.put(ADDED_MEMBERSHIPS, added);
+                }
                 Database.insert(
                     new Merge_Journal__c(
                         Run_Id__c = runId,
@@ -410,6 +426,45 @@ public with sharing class AutoMergeService {
             }
         }
         return mergedCount;
+    }
+
+    /** Each person's current membership row ids (junction mode; empty otherwise). */
+    private static Map<Id, Set<Id>> membershipIds(Set<Id> personIds) {
+        Map<Id, Set<Id>> result = new Map<Id, Set<Id>>();
+        for (Id personId : personIds) {
+            result.put(personId, new Set<Id>());
+        }
+        if (personIds.isEmpty() || !HouseholdService.isJunctionMode()) {
+            return result;
+        }
+        for (Household_Member__c row : [
+            SELECT Id, Contact__c
+            FROM Household_Member__c
+            WHERE Contact__c IN :personIds
+            WITH USER_MODE
+        ]) {
+            result.get(row.Contact__c).add(row.Id);
+        }
+        return result;
+    }
+
+    /**
+     * The membership rows the merge just gave this kept person. Also records the kept person's
+     * rows now, which is where the next pair with the same kept person starts from.
+     */
+    private static List<Id> addedMemberships(Id survivorId, Map<Id, Set<Id>> before) {
+        if (!HouseholdService.isJunctionMode()) {
+            return new List<Id>();
+        }
+        Set<Id> now = membershipIds(new Set<Id>{ survivorId }).get(survivorId);
+        List<Id> added = new List<Id>();
+        for (Id rowId : now) {
+            if (!before.get(survivorId).contains(rowId)) {
+                added.add(rowId);
+            }
+        }
+        before.put(survivorId, now);
+        return added;
     }
 
     /** The related records of one merged-away person, by "Object.Field", and what was missed. */
@@ -436,7 +491,9 @@ public with sharing class AutoMergeService {
             Schema.DescribeFieldResult field = link.getField().getDescribe();
             Schema.DescribeSObjectResult child = link.getChildSObject()
                 .getDescribe(SObjectDescribeOptions.DEFERRED);
+            // Memberships are not moved by the merge: see ADDED_MEMBERSHIPS.
             if (
+                link.getChildSObject() == Household_Member__c.SObjectType ||
                 !field.isUpdateable() ||
                 !field.isFilterable() ||
                 !child.isQueryable() ||
@@ -509,6 +566,7 @@ public with sharing class AutoMergeService {
         List<Merge_Journal__c> restored = restorePeople(journals, notesById);
         restoreValues(restored, notesById);
         moveBack(restored, notesById);
+        removeAddedMemberships(restored, notesById);
         for (Merge_Journal__c journal : journals) {
             List<String> lines = notesById.get(journal.Id);
             if (journal.Status__c != UNDO_FAILED) {
@@ -659,6 +717,9 @@ public with sharing class AutoMergeService {
                 journal.Moved_Records__c
             );
             for (String key : byLink.keySet()) {
+                if (key == ADDED_MEMBERSHIPS) {
+                    continue;
+                }
                 if (!ownerByLink.containsKey(key)) {
                     ownerByLink.put(key, new Map<Id, Merge_Journal__c>());
                 }
@@ -732,6 +793,72 @@ public with sharing class AutoMergeService {
                         key
                     );
                 }
+            }
+        }
+    }
+
+    /**
+     * Takes away the membership rows each merge gave the kept person, so the kept person leaves
+     * the households they joined only through the merge; the restored person's own rows came
+     * back with the undelete. A row deleted since needs nothing; one moved to somebody else
+     * since is left and noted. Deleted with the user's access, so the membership trigger
+     * recounts and renames the households.
+     */
+    private static void removeAddedMemberships(
+        List<Merge_Journal__c> journals,
+        Map<Id, List<String>> notesById
+    ) {
+        Map<Id, Merge_Journal__c> ownerByRow = new Map<Id, Merge_Journal__c>();
+        for (Merge_Journal__c journal : journals) {
+            if (String.isBlank(journal.Moved_Records__c)) {
+                continue;
+            }
+            Object rows = ((Map<String, Object>) JSON.deserializeUntyped(journal.Moved_Records__c))
+                .get(ADDED_MEMBERSHIPS);
+            for (Object rowId : rows == null ? new List<Object>() : (List<Object>) rows) {
+                ownerByRow.put((Id) String.valueOf(rowId), journal);
+            }
+        }
+        if (ownerByRow.isEmpty()) {
+            return;
+        }
+        String key = String.valueOf(Household_Member__c.SObjectType);
+        List<Household_Member__c> removing = new List<Household_Member__c>();
+        List<Merge_Journal__c> removingOwners = new List<Merge_Journal__c>();
+        try {
+            Set<Id> rowIds = ownerByRow.keySet();
+            for (Household_Member__c row : [
+                SELECT Id, Contact__c
+                FROM Household_Member__c
+                WHERE Id IN :rowIds
+                WITH USER_MODE
+            ]) {
+                Merge_Journal__c owner = ownerByRow.get(row.Id);
+                if (String.valueOf(row.Contact__c) == owner.Survivor_Id__c) {
+                    removing.add(row);
+                    removingOwners.add(owner);
+                } else {
+                    addOnce(notesById, owner, Label.Core_AutoMerge_NoteRecordMovedSince, key);
+                }
+            }
+            List<Database.DeleteResult> results = Database.delete(
+                removing,
+                false,
+                AccessLevel.USER_MODE
+            );
+            for (Integer i = 0; i < results.size(); i++) {
+                if (!results[i].isSuccess()) {
+                    addOnce(
+                        notesById,
+                        removingOwners[i],
+                        Label.Core_AutoMerge_NoteRecordRefused,
+                        key
+                    );
+                }
+            }
+        } catch (Exception unreadable) {
+            for (Merge_Journal__c owner : new Set<Merge_Journal__c>(ownerByRow.values())) {
+                addOnce(notesById, owner, Label.Core_AutoMerge_NoteRecordRefused, key);
             }
         }
     }
