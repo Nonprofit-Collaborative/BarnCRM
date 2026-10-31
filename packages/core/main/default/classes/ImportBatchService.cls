@@ -304,6 +304,14 @@ public with sharing class ImportBatchService {
      */
     @NamespaceAccessible
     public static String retryRefusal(Import_Batch__c batch) {
+        return retryRefusal(batch, false);
+    }
+
+    /**
+     * The same, where anyImporter lets any user with the import permission retry rather than
+     * only the committer: corrected rows retried on screen (R-IB17a).
+     */
+    private static String retryRefusal(Import_Batch__c batch, Boolean anyImporter) {
         if (batch == null) {
             return Label.Core_Import_ErrorBatchGone;
         }
@@ -318,7 +326,7 @@ public with sharing class ImportBatchService {
         if (dataJob || !(complete || open) || isRunning(batch)) {
             return Label.Core_Import_ErrorRetryNotOpen;
         }
-        if (batch.Committed_By__c != UserInfo.getUserId()) {
+        if (!anyImporter && batch.Committed_By__c != UserInfo.getUserId()) {
             return Label.Core_Import_ErrorRetryOtherUser;
         }
         String undo = ImportUndoService.refusal(batch);
@@ -558,7 +566,7 @@ public with sharing class ImportBatchService {
     /** Why rows of this batch cannot be corrected or retried on screen now, or null (R-IR4). */
     @NamespaceAccessible
     public static String rowRetryRefusal(Import_Batch__c batch) {
-        String refused = retryRefusal(batch);
+        String refused = retryRefusal(batch, true);
         if (refused == null && isRetrying(batch)) {
             refused = Label.Core_Import_ErrorRetryByFileOpen;
         }
@@ -628,7 +636,9 @@ public with sharing class ImportBatchService {
         }
         // A retry of corrected rows runs as a retry's commit does (R-IB17a).
         Boolean retrying = isRetrying(batch) || rowIds != null;
-        if (retrying && batch.Committed_By__c != UserInfo.getUserId()) {
+        Id me = UserInfo.getUserId();
+        // Corrected rows may be retried by anyone who runs imports, not only the committer.
+        if (retrying && rowIds == null && batch.Committed_By__c != me) {
             throw new ImportException(Label.Core_Import_ErrorRetryOtherUser);
         }
         if (dryRun && hasCommitted(batch) && !retrying) {
@@ -695,8 +705,11 @@ public with sharing class ImportBatchService {
         batch.Rows_Rejected__c = 0;
         if (!dryRun) {
             // Stamped now as well as at the finish, so a commit the platform aborts part way
-            // can still be undone (R-IB7, R-IB13).
-            batch.Committed_By__c = UserInfo.getUserId();
+            // can still be undone (R-IB7, R-IB13). A corrected-row retry keeps the committer;
+            // its user is added to Rows Retried By instead (R-IB17a).
+            if (rowIds == null) {
+                batch.Committed_By__c = me;
+            }
             batch.Undo_Deadline__c = Datetime.now().addDays(undoWindowDays());
         }
         // Enqueued before the write, so the job is recorded with the pass; both roll back
@@ -721,8 +734,38 @@ public with sharing class ImportBatchService {
         if (trialRows != null) {
             bookkeeping.Trial_Rows__c = trialRows;
         }
+        Set<Id> retriers = retriedBy(batch.Id);
+        if (rowIds != null && batch.Committed_By__c != me && retriers.add(me)) {
+            // Undo counts what this user creates during the import as the import's (R-IB17a).
+            bookkeeping.Retried_By__c = String.join(new List<Id>(retriers), ',');
+        }
         Database.update(bookkeeping, AccessLevel.SYSTEM_MODE);
         return batch.Job_Id__c;
+    }
+
+    /**
+     * The users other than the committer who retried corrected rows of a batch (R-IB17a). The
+     * package's bookkeeping, read in system mode.
+     */
+    @NamespaceAccessible
+    public static Set<Id> retriedBy(Id batchId) {
+        Set<Id> users = new Set<Id>();
+        List<Import_Batch__c> found = [
+            SELECT Retried_By__c
+            FROM Import_Batch__c
+            WHERE Id = :batchId
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        if (found.isEmpty() || String.isBlank(found[0].Retried_By__c)) {
+            return users;
+        }
+        for (String userId : found[0].Retried_By__c.split(',')) {
+            if (String.isNotBlank(userId)) {
+                users.add(Id.valueOf(userId.trim()));
+            }
+        }
+        return users;
     }
 
     /**
@@ -1028,8 +1071,11 @@ public with sharing class ImportBatchService {
         if (dryRun != true) {
             // A commit that failed part way still wrote the chunks that ran, so it is as
             // undoable as one that finished. The deadline is stamped here rather than
-            // computed at undo, so changing the setting never moves it (R-IB7).
-            batch.Committed_By__c = UserInfo.getUserId();
+            // computed at undo, so changing the setting never moves it (R-IB7). A corrected-row
+            // retry keeps the committer (R-IB17a).
+            if (correctedRetry != true) {
+                batch.Committed_By__c = UserInfo.getUserId();
+            }
             batch.Undo_Deadline__c = Datetime.now().addDays(undoWindowDays());
         }
         Database.update(batch, AccessLevel.SYSTEM_MODE);

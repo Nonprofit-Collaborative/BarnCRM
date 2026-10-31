@@ -284,25 +284,92 @@ private class ImportRowCorrectionTest {
     }
 
     @IsTest
-    static void onlyTheCommitterMayRetry() {
-        System.runAs(TestUsers.admin()) {
-            Import_Batch__c batch = committed();
-            // An existing user, so no user is inserted beside the batch update (mixed DML).
-            User other = [
-                SELECT Id
-                FROM User
-                WHERE Id != :UserInfo.getUserId() AND IsActive = TRUE
-                WITH SYSTEM_MODE
-                LIMIT 1
-            ];
-            update new Import_Batch__c(Id = batch.Id, Committed_By__c = other.Id);
-
+    static void anyoneWhoRunsImportsMayCorrectAndRetryAndTheUndoCoversIt() {
+        Id committer = TestUsers.admin().Id;
+        // A second holder of the import permission, who did not commit the import.
+        User importer = TestUsers.withPermissionSets(
+            new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Staff' }
+        );
+        Assert.areNotEqual(committer, importer.Id, 'Two different people.');
+        Id contactId;
+        System.runAs(importer) {
+            Import_Row__c row = rejectedRows()[0];
             Assert.areEqual(
                 Label.Core_Import_ErrorRetryOtherUser,
-                ImportBatchService.rowRetryRefusal(committed()),
-                'Undo tells the import\'s records apart by the one person who committed it.'
+                ImportBatchService.retryRefusal(committed()),
+                'Retry by file stays with the committer.'
             );
-            Assert.isNull(ImportBatchService.rowRetryRefusal(batch), 'The committer may.');
+            ImportRowCorrectionController.RowView view = ImportRowCorrectionController.getRow(
+                row.Id
+            );
+            Assert.isTrue(view.canCorrect, 'Not the committer, yet may correct: ' + view.refusal);
+            ImportRowCorrectionController.saveCorrections(row.Id, lastNameFix('Byanother'));
+
+            Test.startTest();
+            ImportRowCorrectionController.retryRow(row.Id);
+            Test.stopTest();
+
+            contactId = [SELECT Contact_1__c FROM Import_Row__c WHERE Id = :row.Id].Contact_1__c;
+            Assert.isNotNull(contactId, 'The row loaded.');
+        }
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c batch = committed();
+            Assert.areEqual(committer, batch.Committed_By__c, 'The committer is kept.');
+            Assert.isTrue(
+                ImportBatchService.retriedBy(batch.Id).contains(importer.Id),
+                'The other user is recorded for the undo.'
+            );
+            Contact person = [
+                SELECT CreatedById, Created_By_Import_Batch__c
+                FROM Contact
+                WHERE Id = :contactId
+                WITH SYSTEM_MODE
+            ];
+            Assert.areEqual(importer.Id, person.CreatedById);
+            Assert.areEqual(batch.Id, person.Created_By_Import_Batch__c);
+
+            Integer total = ImportUndoService.preview(batch.Id).total;
+            // Started through the service, then run here: the retry was this test's one job.
+            System.abortJob(ImportUndoService.start(batch.Id, total));
+            new ImportUndoTestSupport.Run(batch.Id, total, Datetime.now()).rest();
+
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Contact WHERE Id = :contactId WITH SYSTEM_MODE],
+                'The one undo removed what the other user\'s retry created.'
+            );
+        }
+    }
+
+    @IsTest
+    static void withoutEditAccessToTheRowsItIsReadOnly() {
+        System.runAs(TestUsers.admin()) {
+            Import_Row__c row = rejectedRows()[0];
+            ImportRowCorrectionController.permissionOverride = true;
+            ImportRowCorrectionController.editAccessOverride = false;
+            ImportRowCorrectionController.RowView view = ImportRowCorrectionController.getRow(
+                row.Id
+            );
+            Assert.isFalse(view.canCorrect, 'Sharing withholds the rows.');
+            Assert.areEqual(Label.Core_Import_ErrorNoRowEditAccess, view.refusal);
+            List<String> said = new List<String>();
+            try {
+                ImportRowCorrectionController.saveCorrections(row.Id, lastNameFix('X'));
+            } catch (AuraHandledException e) {
+                said.add(refusalOf(e));
+            }
+            try {
+                ImportRowCorrectionController.retryAllFixed(row.Id);
+            } catch (AuraHandledException e) {
+                said.add(refusalOf(e));
+            }
+            Assert.areEqual(
+                new List<String>{
+                    Label.Core_Import_ErrorNoRowEditAccess,
+                    Label.Core_Import_ErrorNoRowEditAccess
+                },
+                said
+            );
         }
     }
 }
