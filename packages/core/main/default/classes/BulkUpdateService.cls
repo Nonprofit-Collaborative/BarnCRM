@@ -18,6 +18,8 @@ public with sharing class BulkUpdateService {
     public static final Integer MAX_CHANGES = 5;
     /** How many records the preview shows before and after. */
     public static final Integer SAMPLE_SIZE = 5;
+    /** The largest sample a preview shows: Super Transform's (C-50). */
+    public static final Integer MAX_SAMPLE_SIZE = 25;
     /** The run limit's default and highest value (R-BU2). */
     public static final Integer MAX_RUN_LIMIT = 48000;
     /** Query rows left free for the reads around a count. */
@@ -160,6 +162,9 @@ public with sharing class BulkUpdateService {
         public Object before;
         @AuraEnabled
         public Object after;
+        /** True when the record already holds the value, so the run would not save it (C-50). */
+        @AuraEnabled
+        public Boolean unchanged = false;
         /** Why this record's field cannot take the changed value, when it cannot (R-BU7). */
         @AuraEnabled
         public String problem;
@@ -355,6 +360,14 @@ public with sharing class BulkUpdateService {
      * count is the number the person confirms; nothing is saved.
      */
     public static Preview preview(String queryJson, String changesJson) {
+        return preview(queryJson, changesJson, SAMPLE_SIZE);
+    }
+
+    /** The preview with a sample of `sampleSize` records, held between 1 and MAX_SAMPLE_SIZE. */
+    public static Preview preview(String queryJson, String changesJson, Integer sampleSize) {
+        Integer size = sampleSize == null
+            ? SAMPLE_SIZE
+            : Math.max(1, Math.min(sampleSize, MAX_SAMPLE_SIZE));
         Plan checked = plan(queryJson, changesJson);
         Integer ceiling = runLimit();
         Preview result = new Preview();
@@ -372,7 +385,7 @@ public with sharing class BulkUpdateService {
             fields.add(nameField);
         }
         QueryCompiler.Compiled sample = QueryCompiler.compileSelection(queryJson, fields, null);
-        sample.binds.put('sampleSize', SAMPLE_SIZE);
+        sample.binds.put('sampleSize', size);
         for (
             SObject record : Database.queryWithBinds(
                 sample.soql + ' ORDER BY Id LIMIT :sampleSize',
@@ -391,6 +404,7 @@ public with sharing class BulkUpdateService {
                 field.before = record.get(change.target.getName());
                 try {
                     field.after = change.newValueFor(record);
+                    field.unchanged = BulkUpdateBatch.same(field.before, field.after);
                 } catch (BulkUpdateFields.BulkUpdateException refused) {
                     field.problem = refused.getMessage();
                 }

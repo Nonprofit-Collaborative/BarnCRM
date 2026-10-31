@@ -244,10 +244,10 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
 
     /**
      * Whether two values are the same for a bulk update: numbers as numbers, text exactly, so a
-     * value that differs only in capitals is still written.
+     * value that differs only in capitals is still written. The preview marks a value it would
+     * leave alone by the same test (C-50), so the preview says what the run does.
      */
-    @TestVisible
-    private static Boolean same(Object stored, Object wanted) {
+    public static Boolean same(Object stored, Object wanted) {
         if (stored == null || wanted == null) {
             return stored == null && wanted == null;
         }

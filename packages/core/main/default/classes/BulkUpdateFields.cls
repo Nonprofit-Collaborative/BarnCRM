@@ -98,6 +98,15 @@ public with sharing class BulkUpdateFields {
         return described.getSObjectType();
     }
 
+    /** Whether a bulk update may write this object's records, without saying why not (C-50). */
+    public static Boolean isWritable(String objectName) {
+        try {
+            return objectReason(QueryFieldCatalog.describeObject(objectName)) == null;
+        } catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
+            return false;
+        }
+    }
+
     /** Every field of the object a bulk update may write, sorted by label. */
     public static List<Target> targets(String objectName) {
         Schema.SObjectType type = writableObject(objectName);
