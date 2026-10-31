@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Programs_Enrollment_AlreadyOpen</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Second open enrollment refused; {0} is the program name</shortDescription>
+        <value>This person already has an open enrollment in {0}. Change that enrollment instead of adding another, or end it first.</value>
+    </labels>
+</CustomLabels>

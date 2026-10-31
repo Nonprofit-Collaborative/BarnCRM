@@ -1015,7 +1015,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     if volunteers_has_metadata; then
       SETUP_MODULES+=(Volunteers)
     fi
-    SETUP_MODULES+=(Mirror)
+    SETUP_MODULES+=(Programs Mirror)
     for module in "${SETUP_MODULES[@]}"; do
       echo ""
       echo "== Running the ${module} module's setup steps =="
@@ -1061,6 +1061,14 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
       echo "The Volunteers access sync was not queued. Nothing else is affected: the nightly access"
       echo "check syncs the access."
     fi
+  fi
+
+  # The same gap for the Programs permission sets (ADR-NEXT, programs module, decision 7).
+  echo ""
+  echo "== Queueing the Programs access sync =="
+  if ! printf '%s\n' 'new ProgramsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Programs access sync was not queued. Nothing else is affected: the hourly access"
+    echo "check syncs the access."
   fi
 fi
 
