@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import row correction: sharing does not let this user edit the import</shortDescription>
-        <value>You can't edit this import's rows, so you can't correct or retry them. Ask an administrator to share the Data Job with you.</value>
+        <value>You can't edit this import's rows, so you can't correct or retry them. Ask your BarnCRM admin to share the Data Job with you.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorRetryByFileOpen</fullName>

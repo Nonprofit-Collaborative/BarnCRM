@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Run log: confirmed records a stopped job never reached; {0} is the count</shortDescription>
-        <value>Up to {0} of the confirmed records were not reached, because Salesforce stopped part of the job (often a limit reached by automation on many records at once). They were left as they were; run a new job over them.</value>
+        <value>Up to {0} of the confirmed records were not reached, because Salesforce stopped part of the job (often a limit hit by automation on many records at once). They were left as they were. Run a new job over them.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_ErrorObject</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal: a change names a field the person cannot see; {0} field</shortDescription>
-        <value>A change names a field that is not available to you: {0}. Remove that change, or ask your administrator for access.</value>
+        <value>A change names a field that is not available to you: {0}. Remove that change, or ask your BarnCRM admin for access.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_ErrorBadValue</fullName>
@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal: the person lacks the bulk update permissions.</shortDescription>
-        <value>Bulk update needs the Bulk Update Records and Find and Export Records permissions. Ask your administrator.</value>
+        <value>Bulk update needs the Bulk Update Records and Find and Export Records permissions. Ask your BarnCRM admin.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_UnexpectedError</fullName>
@@ -190,7 +190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown when something unexpected went wrong; the details are in the Error Log.</shortDescription>
-        <value>Something went wrong. The details are in the Error Log; try again, or ask your administrator.</value>
+        <value>Something went wrong. The details are in the Error Log; try again, or ask your BarnCRM admin.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_LogStarted</fullName>

@@ -54,7 +54,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>User cannot issue receipts</shortDescription>
-    <value>You do not have permission to issue receipts. Ask your administrator for the Fundraising Staff role.</value>
+    <value>You do not have permission to issue receipts. Ask your BarnCRM admin for the Fundraising Staff role.</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_NoTemplatePermission</fullName>
@@ -62,7 +62,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>User cannot change the receipt letters</shortDescription>
-    <value>You do not have permission to change the receipt letters. Ask your administrator for the BarnCRM Admin role, which carries Manage BarnCRM Settings.</value>
+    <value>You do not have permission to change the receipt letters. Ask your BarnCRM admin for the BarnCRM Admin role, which carries Manage BarnCRM Settings.</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_NotFound</fullName>
@@ -262,7 +262,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts panel: toast title, receipt issued</shortDescription>
-    <value>Receipt issued</value>
+    <value>Receipt Issued</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_IssuedMessage</fullName>
@@ -278,7 +278,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts panel: toast title, receipt not issued</shortDescription>
-    <value>Receipt not issued</value>
+    <value>Receipt Not Issued</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_ReasonNeededTitle</fullName>
@@ -286,7 +286,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts panel: toast title, a void needs a reason</shortDescription>
-    <value>Reason needed</value>
+    <value>Reason Needed</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_ReissuedTitle</fullName>
@@ -294,7 +294,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts panel: toast title, receipt reissued</shortDescription>
-    <value>Receipt reissued</value>
+    <value>Receipt Reissued</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_ReissuedMessage</fullName>
@@ -310,7 +310,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts panel: toast title, receipt not reissued</shortDescription>
-    <value>Receipt not reissued</value>
+    <value>Receipt Not Reissued</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_UnexpectedError</fullName>
@@ -318,7 +318,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts: an unexpected failure with no message</shortDescription>
-    <value>That did not work. Try again, and if it keeps happening, ask your administrator to check the Error Log.</value>
+    <value>That did not work. Try again, and if it keeps happening, ask your BarnCRM admin to check the Error Log.</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_LogoUnreadable</fullName>
@@ -326,6 +326,6 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Error Log warning: the receipt logo file cannot be read</shortDescription>
-    <value>The receipt logo file {0} could not be read, so documents are being produced without a logo. Check that the file still exists and that the people who issue receipts can see it.</value>
+    <value>The receipt logo file {0} could not be read, so documents are made without a logo. Check that the file exists and that people who issue receipts can see it.</value>
   </labels>
 </CustomLabels>

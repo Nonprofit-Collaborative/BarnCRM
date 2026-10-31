@@ -2,7 +2,7 @@
 
 Scripts for soft credits (automatic household credits and credits entered by hand), tributes and their notification, and linking an employer's matching gift. Setup detail: [Soft credits](../admin-guide/soft-credits.md), [Tributes](../admin-guide/tributes.md), [Matching gifts](../admin-guide/matching-gifts.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **Fundraising** app, where gifts open on the packaged gift page with the **Soft Credits** and **Tribute** panels. A default fund must be set (script T-GIFT-01 in [Giving: gifts, funds and batches](giving-gifts-funds-batches.md)). **Automatic household soft credits** (BarnCRM Settings, **Giving**) is on, as shipped. The Garcia Family in the sample data is Harper, Luis and Diego Garcia.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app, where gifts open on the packaged gift page with the **Soft Credits** and **Tribute** panels. A default fund must be set (script T-GIFT-01 in [Giving: gifts, funds and batches](giving-gifts-funds-batches.md)). **Auto-Create Household Soft Credits** (BarnCRM Settings, **Giving**) is on, as shipped. The Garcia Family in the sample data is Harper, Luis and Diego Garcia.
 
 ## T-CRED-01: Automatic Household Soft Credits
 
@@ -26,7 +26,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **Soft Credits** click **Add credit**. | A form: **Person to recognize**, **Why they are recognized** (Solicitor chosen), **Amount**, **Save** (disabled until a person is chosen) and **Cancel**. |
+| 1 | In **Soft Credits** click **Add Credit**. | A form: **Person to recognize**, **Why they are recognized** (Solicitor chosen), **Amount**, **Save** (disabled until a person is chosen) and **Cancel**. |
 | 2 | Pick **Maria Whitfield**, leave **Amount** empty, click **Save**. | Refused: "Enter an amount or a percent for this recognition. BarnCRM works out the other one from the gift." |
 | 3 | Choose **Why they are recognized** `Other` and enter **Amount** `500`, leave **Your own wording** empty, click **Save**. | Refused: "Type your own wording in Custom Role, or choose one of the roles in the list." |
 | 4 | Choose `Solicitor` again, **Amount** `500`, click **Save**. | Maria Whitfield, Solicitor, 500.00, with no **Automatic** badge and a **Remove** button. |
@@ -42,7 +42,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Click **Refund or Write Off**, **Refund part or all of this gift**, **How much is going back** `600`, a reason, **Record it**. | "Recorded..." The gift's **Status** is Refunded and the **Refunds and Write-Offs** list shows the negative gift. |
+| 1 | Click **Refund or Write Off**, **Refund part or all of this gift**, **How much is going back** `600`, a reason, **Record It**. | "Recorded..." The gift's **Status** is Refunded and the **Refunds and Write-Offs** list shows the negative gift. |
 | 2 | Look at **Soft Credits** on the original gift. | Luis and Diego still show 600.00 each, **Automatic**. |
 | 3 | Open the refund gift from **Refunds and Write-Offs**. | Its **Soft Credits** show Luis and Diego at -600.00, **Automatic**. |
 | 4 | Open Luis Garcia and refresh after a few seconds. | **Total Soft Credits** is back to what it was before T-CRED-01. |
@@ -56,10 +56,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, untick **Automatic household soft credits**, **Save**. | Saved. |
+| 1 | Open **BarnCRM Settings**, **Giving**, untick **Auto-Create Household Soft Credits**, **Save**. | Saved. |
 | 2 | Enter a gift of `40` from **Luis Garcia** on Quick Gift Entry and open it. | **Soft Credits**: "Nobody else is recognized for this gift yet." |
 | 3 | Open the T-CRED-01 gift. | Its automatic credits are still there. |
-| 4 | Tick **Automatic household soft credits** again and **Save** (undo). Edit the step 2 gift **Amount** to `45`, save. | Harper and Diego Garcia now appear on it as **Household Member**, 45.00, **Automatic**. |
+| 4 | Tick **Auto-Create Household Soft Credits** again and **Save** (undo). Edit the step 2 gift **Amount** to `45`, save. | Harper and Diego Garcia now appear on it as **Household Member**, 45.00, **Automatic**. |
 
 **Cleanup:** leave the setting on.
 
@@ -73,8 +73,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Open the gift. Look at the **Tribute** panel. | "This gift was not given in honor of or in memory of anyone." |
 | 2 | On the gift's **Tributes** list, click **New**. **Gift** is the gift above; set **Type** `In memory of`, **Honoree Name** `Rosa Testname`, **Notification Recipient Contact** `Harper Garcia`, **Message** `With love from the Tuesday reading group`. Save. | Saved. |
-| 3 | Open the gift again. | The **Tributes** list shows the new tribute. **Tribute** field links to it. Panel: "In memory of Rosa Testname, Notify Harper Garcia", "Not sent yet", the message, and **Mark notification sent**. No amount is shown. |
-| 4 | Click **Mark notification sent**. | The panel says "Notification sent" with today's date; the button is gone. |
+| 3 | Open the gift again. | The **Tributes** list shows the new tribute. **Tribute** field links to it. Panel: "In memory of Rosa Testname, Notify Harper Garcia", "Not sent yet", the message, and **Mark Notification Sent**. No amount is shown. |
+| 4 | Click **Mark Notification Sent**. | The panel says "Notification sent" with today's date; the button is gone. |
 | 5 | Open the tribute. | **Notification Sent** ticked, **Notification Sent Date** today. |
 | 6 | On the **Tributes** tab, open list view **Notifications to Send**. | This tribute is not listed. |
 
@@ -123,7 +123,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Set **Matched Gift** to the T-CRED-07 Founders Consulting Group gift (an organization's gift), save. | Refused: "The gift being matched has to come from a person. Choose the employee's own gift, not another organization's." |
 | 3 | On the Summit Foundation gift, set **Matched Gift** to Harper's gift (already linked). | Refused: "One of these gifts is already linked to a different gift. Unlink it first, then link it here." |
 | 4 | Refund Luis's gift in full (**Refund or Write Off**). Then on the Summit Foundation gift set **Matched Gift** to Luis's gift. | Refused: "A gift that has been refunded or written off cannot be part of a matching gift pair..." |
-| 5 | In the Fundraising app open Diego Garcia, **Edit**, set **Employer** (in the **Person** section) to **Bayview Hardware** and save. Enter a gift from Diego, then link the Summit Foundation gift to it. | Refused: "That gift is from someone whose employer is a different organization. Check the employer on the person's record, or clear it if you are not sure." |
+| 5 | In the BarnCRM Fundraising app open Diego Garcia, **Edit**, set **Employer** (in the **Person** section) to **Bayview Hardware** and save. Enter a gift from Diego, then link the Summit Foundation gift to it. | Refused: "That gift is from someone whose employer is a different organization. Check the employer on the person's record, or clear it if you are not sure." |
 
 **Cleanup:** clear **Employer** on Diego Garcia.
 
@@ -148,8 +148,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the T-CRED-01 gift. | **Soft Credits** lists the credits; **Add credit** is disabled and no **Remove** buttons show. |
-| 2 | Open the second gift from T-CRED-06 (tribute not sent). | The **Tribute** panel shows the summary; no **Mark notification sent** button. |
-| 3 | Open the **Tributes** tab in the Fundraising app. | No **New** button. |
+| 1 | Open the T-CRED-01 gift. | **Soft Credits** lists the credits; **Add Credit** is disabled and no **Remove** buttons show. |
+| 2 | Open the second gift from T-CRED-06 (tribute not sent). | The **Tribute** panel shows the summary; no **Mark Notification Sent** button. |
+| 3 | Open the **Tributes** tab in the BarnCRM Fundraising app. | No **New** button. |
 
 **Cleanup:** none.

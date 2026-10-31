@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Default fund could not be saved</shortDescription>
-        <value>The default fund could not be saved. Nothing was changed. Open BarnCRM Settings, choose Giving, and set the default fund there, or ask your administrator to check the error log.</value>
+        <value>The default fund could not be saved. Nothing was changed. Open BarnCRM Settings, choose Giving, and set the default fund there, or ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Giving_Fund_InUseNotDeletable</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Fund has gifts and cannot be deleted</shortDescription>
-        <value>Gifts have been designated to this fund, so it cannot be deleted: deleting it would leave those gifts pointing at nothing. Untick Active instead, and the fund stops being offered on new gifts while it keeps its history.</value>
+        <value>Gifts are designated to this fund, so it cannot be deleted: those gifts would point at nothing. Untick Active instead. The fund stops being offered on new gifts and keeps its history.</value>
     </labels>
     <labels>
         <fullName>Giving_Fund_OneDefaultAtATime</fullName>
@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Gift actions: an unexpected failure</shortDescription>
-        <value>That did not work, and nothing was changed. Try again, and if it keeps happening, ask your administrator to check the Error Log.</value>
+        <value>That did not work, and nothing was changed. Try again, and if it keeps happening, ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Giving_Gift_AllocationUpdateFailed</fullName>
@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Allocation could not follow the amount</shortDescription>
-        <value>The gift's allocation could not be updated to match the new amount, so nothing was changed. Ask your administrator to check the error log.</value>
+        <value>The gift's allocation could not be updated to match the new amount, so nothing was changed. Ask your BarnCRM admin to check the error log.</value>
     </labels>
     <labels>
         <fullName>Giving_Gift_AllocationsMustTotal</fullName>
@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Default allocation could not be created</shortDescription>
-        <value>The gift could not be allocated to the default fund, so it was not saved. Check that you have access to create allocations, or ask your administrator to check the error log.</value>
+        <value>The gift could not be allocated to the default fund, so it was not saved. Check that you can create allocations, or ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Giving_Gift_DefaultFundMissing</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Receipt lock override recorded</shortDescription>
-        <value>The receipt lock was lifted on gift {0} (receipt number {1}) by a user holding the Override Receipt Lock permission. What changed: {2}. Check that this correction was expected, and remove the permission from whoever holds it.</value>
+        <value>A user holding the Override Receipt Lock permission lifted the receipt lock on gift {0} (receipt number {1}). What changed: {2}. Check that this correction was expected, and remove the permission from whoever holds it.</value>
     </labels>
     <labels>
         <fullName>Giving_Gift_ReceiptNumberLocked</fullName>
@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Receipt number is issued, not typed</shortDescription>
-        <value>A receipt number is issued by BarnCRM when it creates the receipt, and cannot be filled in by hand. Use Issue Receipt on the gift instead. A number typed in here belongs to no receipt, locks the gift, and can end up on a year end statement as well.</value>
+        <value>BarnCRM issues a receipt number when it creates the receipt, so it cannot be typed in. Use Issue Receipt on the gift instead. A number typed here belongs to no receipt, locks the gift, and can end up on a year end statement.</value>
     </labels>
     <labels>
         <fullName>Giving_Gift_ReceiptedGiftNotDeletable</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Gift with a refund cannot be deleted</shortDescription>
-        <value>This gift has a refund or a write-off linked to it, so it cannot be deleted: deleting it would leave the negative gift explaining nothing. Delete the refund first if it was recorded in error.</value>
+        <value>This gift has a refund or write-off linked to it, so it cannot be deleted. Delete the refund first if it was recorded in error.</value>
     </labels>
     <labels>
         <fullName>Giving_RefundGift_AmountLabel</fullName>
@@ -198,7 +198,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Refund screen: confirm button</shortDescription>
-        <value>Record it</value>
+        <value>Record It</value>
     </labels>
     <labels>
         <fullName>Giving_RefundGift_Heading</fullName>
@@ -238,7 +238,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Refund screen: the person may read gifts but not record a refund</shortDescription>
-        <value>You can see this gift but not record money going back. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set.</value>
+        <value>You can see this gift but not record money going back. Ask your BarnCRM admin for the Fundraising Staff role, together with the Giving Staff permission set.</value>
     </labels>
     <labels>
         <fullName>Giving_RefundGift_ReasonRequired</fullName>

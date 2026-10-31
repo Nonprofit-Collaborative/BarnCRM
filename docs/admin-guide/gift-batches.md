@@ -24,7 +24,7 @@ gift entered on Quick Gift Entry does.
 
 Nothing to install and no Setup step. Gift batches arrive with the Giving package.
 
-1. Open the **Fundraising** app from the app launcher. **Gift Batches** is one of its tabs.
+1. Open the **BarnCRM Fundraising** app from the app launcher. **Gift Batches** is one of its tabs.
 2. Check that a default fund is set: **BarnCRM Settings**, then **Giving**, **Default
    fund**. A line with no fund of its own, in a batch with no fund, goes to that fund, and
    without one the batch cannot post.
@@ -38,7 +38,7 @@ There are no settings for batches themselves.
 
 Do this as David, with the Tuesday mail: three checks and a deposit slip that says 350.00.
 
-1. Open **Fundraising**, then **Gift Batches**, and click **New**.
+1. Open **BarnCRM Fundraising**, then **Gift Batches**, and click **New**.
 2. In **Description**, type `Tuesday mail`. In **Control Total**, type `350`. **Default
    Gift Date** is already today and **Default Payment Method** is already Check. Pick
    **Spring Appeal** as the **Default Appeal**. Leave **Default Fund** empty. Click **Save**.

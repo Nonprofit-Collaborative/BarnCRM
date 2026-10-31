@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal: object missing or not readable. {0} is its name.</shortDescription>
-        <value>This object is not available to you: {0}. Choose another, or ask your administrator for access.</value>
+        <value>This object is not available to you: {0}. Choose another, or ask your BarnCRM admin for access.</value>
     </labels>
     <labels>
         <fullName>Core_Filter_ErrorUnknownField</fullName>
@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal: field path missing or not readable. {0} is the path.</shortDescription>
-        <value>A filter names a field that is not available to you: {0}. Remove that condition, or ask your administrator for access.</value>
+        <value>A filter names a field that is not available to you: {0}. Remove that condition, or ask your BarnCRM admin for access.</value>
     </labels>
     <labels>
         <fullName>Core_Filter_AddCondition</fullName>
@@ -230,7 +230,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error when a saved condition names a field the user cannot see. {0}: field.</shortDescription>
-        <value>This field is not available to you: {0}. Remove the condition, or ask your administrator for access.</value>
+        <value>This field is not available to you: {0}. Remove the condition, or ask your BarnCRM admin for access.</value>
     </labels>
     <labels>
         <fullName>Core_Filter_ErrorLogicSyntax</fullName>

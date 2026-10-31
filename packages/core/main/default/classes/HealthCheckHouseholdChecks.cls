@@ -6,7 +6,7 @@
  * is, who can use it and how it is configured, and these ask about the records in it. They
  * detect and link; they never fix. Deciding what a person with no household or an empty
  * household should become is a question about the organization's data, which a button cannot
- * answer, and bulk cleanup belongs to the data hygiene console (C-28).
+ * answer, and bulk cleanup belongs to Data Quality in Org Optimizer (C-28).
  *
  * What counts follows the canonical model: a person is expected to be in a household only
  * while automatic household creation is on (R-C1), and a contact whose account is an
@@ -85,7 +85,7 @@ public with sharing class HealthCheckHouseholdChecks {
             Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
             Set<Id> excluded = new Set<Id>(personTypes);
             excluded.add(householdType);
-            // Counted as the data hygiene console counts them, one rule for both.
+            // Counted as Data Quality counts them, one rule for both.
             count = HouseholdOrphanSelector.countPeopleWithoutMembership(
                 householdType,
                 countCap + 1

@@ -6,7 +6,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Segments: the person lacks the Find permission</shortDescription>
-    <value>Donor segments are Find queries, so they need the BarnCRM Find and Export permission set. Ask your administrator for it.</value>
+    <value>Donor segments are Find queries, so they need the BarnCRM Find and Export permission set. Ask your BarnCRM admin for it.</value>
   </labels>
   <labels>
     <fullName>Giving_Segments_ErrorNotFound</fullName>

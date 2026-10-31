@@ -88,6 +88,7 @@
             <h3 class="slds-text-heading_small slds-var-m-vertical_small">{labels.sensitiveHeading}</h3>
             <template lwc:if={hasFlagged}>
                 <p class="slds-var-m-bottom_small" data-id="sensitive-intro">{labels.sensitiveIntro}</p>
+                <div class="slds-scrollable_x">
                 <table class="slds-table slds-table_bordered slds-table_cell-buffer" data-id="sensitive">
                     <thead>
                         <tr class="slds-line-height_reset">
@@ -120,6 +121,7 @@
                         </template>
                     </tbody>
                 </table>
+                </div>
             </template>
             <template lwc:else>
                 <p data-id="no-sensitive">{labels.noSensitive}</p>

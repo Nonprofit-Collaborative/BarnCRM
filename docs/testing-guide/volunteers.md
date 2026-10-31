@@ -2,7 +2,7 @@
 
 Scripts for jobs, shifts, sign-ups, hours approval, skills and Volunteers access. Setup detail: [Volunteers](../admin-guide/volunteers.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Volunteers deployed and sample data loaded unless a script says otherwise. Volunteers is offered in the **Nonprofit Edition** only: run every script here in that edition (see [Edition modes](before-you-test.md#edition-modes)). Leave **Hours require approval** and **Attendance creates hours** on (the defaults) unless a script says otherwise.
+Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Volunteers deployed and sample data loaded unless a script says otherwise. Volunteers is offered in the **Nonprofit Edition** only: run every script here in that edition (see [Edition modes](before-you-test.md#edition-modes)). Leave **Require Hours Approval** and **Create Hours From Attendance** on (the defaults) unless a script says otherwise.
 
 ## T-VOL-01: Open the Volunteers App
 
@@ -12,10 +12,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | From the App Launcher, open **BarnCRM Volunteers**. | The tabs **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Sign-ups**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer Requirements**, **Dashboards** and **Reports** show. There is no **Volunteer Settings** tab. |
+| 1 | From the App Launcher, open **BarnCRM Volunteers**. | The tabs **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Sign-Ups**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer Requirements**, **Dashboards** and **Reports** show. There is no **Volunteer Settings** tab. |
 | 2 | Open **Volunteer Jobs**, list view **All Jobs**. | **Food pantry sort**, **Front desk** and **Community garden** are listed. |
 | 3 | Open **Volunteer Shifts**, list view **Shifts Needing Volunteers**. | Upcoming Open shifts of **Front desk** and **Community garden** are listed, each named from its job and start (for example "Front desk: 28 Oct 2026, 9:00 AM"). |
-| 3a | Open **Volunteer Sign-ups**, list view **All Sign-Ups**. | The sample sign-ups are listed with their shift, person and status. |
+| 3a | Open **Volunteer Sign-Ups**, list view **All Sign-Ups**. | The sample sign-ups are listed with their shift, person and status. |
 | 4 | Open **Volunteer Hours**, list view **Awaiting Approval**. | Four sample entries with Status **Submitted** are listed. |
 | 5 | Open **Skills**, list view **All Skills**. | **First aid**, **Spanish**, **Forklift** and **Gardening** are listed, each **Active**. |
 
@@ -37,20 +37,20 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 ## T-VOL-03: Sign People Up and Cancel a Sign-Up
 
-**Purpose:** confirm the Sign-ups panel adds people, refuses a second sign-up for the same person, and frees a slot on cancel.
+**Purpose:** confirm the Sign-Ups panel adds people, refuses a second sign-up for the same person, and frees a slot on cancel.
 **Prerequisites:** staff user; "Test shift" from T-VOL-02.
 **Smoke:** yes
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open "Test shift". | The **Sign-Ups** card shows **Volunteers needed** 2, **Slots filled** 0, **Slots remaining** 2 and "Nobody is signed up for this shift yet." |
-| 2 | Click **Add sign-up**. | A form shows a **Person** picker, a **Status** box set to **Signed up**, and **Save** and **Cancel**. **Save** is disabled until a person is chosen. |
+| 2 | Click **Add Sign-Up**. | A form shows a **Person** picker, a **Status** box set to **Signed up**, and **Save** and **Cancel**. **Save** is disabled until a person is chosen. |
 | 3 | Choose a sample person from **The Garcia Family** and click **Save**. | "Sign-up added." shows under the figures and as a toast. **Slots filled** is 1, **Slots remaining** 1. The table **Sign-ups for Test shift** lists the person with Status **Signed up** and **Attended** and **No show** buttons. |
-| 4 | Click **Add sign-up**, choose the same person again and click **Save**. | Refused: "This person is already signed up for Test shift. Change the sign-up that is there instead of adding another." **Slots filled** stays 1. |
+| 4 | Click **Add Sign-Up**, choose the same person again and click **Save**. | Refused: "This person is already signed up for Test shift. Change the sign-up that is there instead of adding another." **Slots filled** stays 1. |
 | 5 | Add a second person from the same household. | **Slots filled** 2, **Slots remaining** 0. |
 | 6 | In the second person's row, change **Status** to **Cancelled**. | A message "(the person's name): Cancelled." shows. **Slots filled** 1, **Slots remaining** 1. The row stays in the table. |
 | 7 | Change the same row back to **Signed up**. | **Slots filled** 2, **Slots remaining** 0. |
-| 8 | Click the first person's name. | Their **Volunteer Sign-up** record opens, linked to "Test shift". |
+| 8 | Click the first person's name. | Their **Volunteer Sign-Up** record opens, linked to "Test shift". |
 
 **Cleanup:** keep both sign-ups for T-VOL-04.
 
@@ -62,7 +62,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open "Test shift". In the first person's row click **Attended**. | Status shows **Attended**, the **Attended** button goes, and the message says "(the person's name): Attended. An hours entry was recorded for this attendance." |
-| 2 | In the second person's row click **No show**. | Status shows **No show**. No hours message shows. |
+| 2 | In the second person's row click **No Show**. | Status shows **No show**. No hours message shows. |
 | 3 | Open **Volunteer Hours**, list view **Awaiting Approval**. | One new entry for the first person: **Hours** 3, **Date Worked** the shift's date, **Job** "Test sorting", **Volunteer Shift** "Test shift", **Status** Submitted. |
 | 4 | Back on the shift, change the first person's Status to **Confirmed**, then click **Attended** again. | No second hours entry is created: **Awaiting Approval** still shows one entry for this shift. |
 
@@ -95,8 +95,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 2 | Set **From** to today and **To** to yesterday. | The field says "From must be on or before To." and the list does not change. |
 | 3 | Clear both dates. In **Job**, choose "Test sorting". | Only the two "Test sorting" entries are listed. |
 | 4 | Tick the 3-hour entry and click **Approve**. | "Entries approved: 1." shows under the buttons and as a toast. The entry leaves the list. |
-| 5 | Tick the 2-hour entry and click **Reject**. Leave **Reason for rejecting** empty and click **Reject selected**. | Nothing is rejected; the field says "Say why these hours are rejected, so the person who entered them knows what to fix." |
-| 6 | Type "Wrong date" and click **Reject selected**. | "Entries rejected: 1." The list says "No hours match these filters." |
+| 5 | Tick the 2-hour entry and click **Reject**. Leave **Reason for rejecting** empty and click **Reject Selected**. | Nothing is rejected; the field says "Say why these hours are rejected, so the person who entered them knows what to fix." |
+| 6 | Type "Wrong date" and click **Reject Selected**. | "Entries rejected: 1." The list says "No hours match these filters." |
 | 7 | Set **Show** to **Rejected**. | The 2-hour entry is listed with **Rejection Reason** "Wrong date". Only **Reopen** shows. |
 | 8 | Tick it and click **Reopen**. | "Entries reopened: 1." It is back under **Submitted**. |
 | 9 | Open the job "Test sorting". | **Total Hours** is 3 (only the Approved entry counts). |
@@ -121,17 +121,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 ## T-VOL-08: Hours Without Approval
 
-**Purpose:** confirm turning **Hours require approval** off makes new hours Approved at once, and back on restores Submitted.
+**Purpose:** confirm turning **Require Hours Approval** off makes new hours Approved at once, and back on restores Submitted.
 **Prerequisites:** admin user.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Volunteers**. | The section shows **Hours require approval**, **Attendance creates hours** and the shift horizon setting (8 weeks). |
-| 2 | Turn **Hours require approval** off. | The change saves at once. |
+| 1 | Open **BarnCRM Settings**, **Volunteers**. | The section shows **Require Hours Approval**, **Create Hours From Attendance** and **Weeks Ahead to Create Shifts** (8 weeks). |
+| 2 | Turn **Require Hours Approval** off. | The change saves at once. |
 | 3 | Create an hours entry for a sample person on job **Front desk**, 1 hour, yesterday. | It saves with **Status** Approved and **Reviewed By** you. |
-| 4 | Turn **Hours require approval** back on. Create a second entry the same way. | It saves with **Status** Submitted. |
+| 4 | Turn **Require Hours Approval** back on. Create a second entry the same way. | It saves with **Status** Submitted. |
 
-**Cleanup:** reopen the Approved entry on **Approve Hours**, then delete both entries. Confirm **Hours require approval** is on.
+**Cleanup:** reopen the Approved entry on **Approve Hours**, then delete both entries. Confirm **Require Hours Approval** is on.
 
 ## T-VOL-09: Skills, and Retiring a Skill
 
@@ -175,7 +175,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 |---|---|---|
 | 1 | Open **BarnCRM Volunteers**. | Tabs **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Hours** and **Skills** show. No **Approve Hours**, **Volunteer Requirements**, or **Volunteer Letter Templates**. |
 | 2 | Open **Volunteer Jobs**. | Jobs list; no **New** button. Opening a job shows no **Edit**. |
-| 3 | Open an upcoming **Front desk** shift. | The **Sign-Ups** card shows the figures and the people with their status as plain text. No **Add sign-up**, no status boxes, no **Attendance** column. |
+| 3 | Open an upcoming **Front desk** shift. | The **Sign-Ups** card shows the figures and the people with their status as plain text. No **Add Sign-Up**, no status boxes, no **Attendance** column. |
 | 4 | Open **Volunteer Hours**, list view **All Hours**. | No entries are listed (hours are private, and this user entered none). |
 | 5 | Open **Skills**. | Skills list; no **New** button. |
 
@@ -215,9 +215,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Volunteers**. | **Send shift reminders** is off by default and **Days before a shift to remind** reads 1. |
+| 1 | Open **BarnCRM Settings**, **Volunteers**. | **Send Shift Reminders** is off by default and **Days Before a Shift to Remind** reads 1. |
 | 2 | Create a shift that starts tomorrow in 3 hours' time or later. Sign up both contacts. Open one sign-up. | **Reminder Sent On** is empty and read-only for a Team Member, editable for a Coordinator. |
-| 3 | Switch **Send shift reminders** on. In the Developer Console, run `VolunteerReminderBatch.startMorning();` as the admin. | The run starts. |
+| 3 | Switch **Send Shift Reminders** on. In the Developer Console, run `VolunteerReminderBatch.startMorning();` as the admin. | The run starts. |
 | 4 | Check the mailbox of the first contact and open each sign-up. | One email naming the job, day and time (and place, if the shift has one). The first sign-up now holds **Reminder Sent On**. The opted-out contact received nothing and has no stamp. |
 | 5 | Run `VolunteerReminderBatch.startMorning();` again. | No second email. |
 | 6 | Clear **Reminder Sent On** on the first sign-up and run it once more. | The email is sent again and the field is filled. |
@@ -225,7 +225,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 8 | Make a new sign-up for a shift that starts later today, after the run in step 6, and run it again with the lead time at 1. | The run stamps and emails only bookings whose shift starts after the run and before the end of the lead time; a booking made after a morning's run for a shift starting before the next morning's run gets no reminder from that run (tell such volunteers directly). |
 | 9 | Check the sender of the email from step 6. | It comes from the user who scheduled the morning reminder job, and replies go to that user. |
 
-**Cleanup:** switch **Send shift reminders** off; cancel the test shift.
+**Cleanup:** switch **Send Shift Reminders** off; cancel the test shift.
 
 ## T-VOL-15: Suggested Volunteers Rank and Sign Up
 
@@ -236,7 +236,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 |---|---|---|
 | 1 | Open the shift. | **Suggested Volunteers** is under the Sign-Ups panel. |
 | 2 | Read the list. | Ana is first ("Has 1 of the 1 skills this job needs", "Available on Saturdays"), then Cleo ("No available days recorded"), then Ben ("Does not list Saturdays as an available day"). The Prospective contact is not listed. |
-| 3 | Click **Sign up** on Ana's row. | "Ana is signed up for this shift." Ana leaves the list and appears in the Sign-Ups panel as Signed up, without a page refresh. |
+| 3 | Click **Sign Up** on Ana's row. | "Ana is signed up for this shift." Ana leaves the list and appears in the Sign-Ups panel as Signed up, without a page refresh. |
 | 4 | Add a Cancelled sign-up for Cleo in the Sign-Ups panel. | Cleo leaves the list (a cancelled sign-up still counts as signed up). |
 | 5 | Set the shift's status to **Cancelled** and reload. | The card is gone. |
 | 6 | Open a shift as a Read Only user. | No Suggested Volunteers card. |

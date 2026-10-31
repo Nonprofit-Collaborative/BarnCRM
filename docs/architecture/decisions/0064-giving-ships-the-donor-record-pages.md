@@ -33,7 +33,7 @@ a donor it does not: the list belongs to Giving and the layout to Core or to the
     the household; on an organization, the ones it gave in its own name;
   - a **New gift** action (a standard Create quick action with the donor filled in) placed
     with Dynamic Actions.
-- **They are activated in the Fundraising app** through its `actionOverrides` (Large and
+- **They are activated in the BarnCRM Fundraising app** through its `actionOverrides` (Large and
   Small), the mechanism Core uses for its own pages in the BarnCRM app. No org default and
   no profile assignment is packaged.
 - **Giving's related lists are Dynamic Related Lists; everything else stays as ADR-0043

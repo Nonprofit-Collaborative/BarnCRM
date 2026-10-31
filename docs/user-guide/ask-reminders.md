@@ -6,7 +6,7 @@ Ask reminders tell you when it is time to ask a donor again. You set a date on t
 
 ## To Set a Next Ask Date
 
-1. Open the person, household or organization in the Fundraising app.
+1. Open the person, household or organization in the BarnCRM Fundraising app.
 2. Click **Edit**, set **Next Ask Date** to the day you should ask again, and, if you just spoke with them, set **Last Touch Date** to today.
 3. Click **Save**.
 

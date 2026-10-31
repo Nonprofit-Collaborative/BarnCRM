@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: packaged automation is paused; {0} is the end time</shortDescription>
-        <value>Automation is paused until {0}. While it is paused, households are not created and names are not recomputed. That is right during a bulk load and wrong the rest of the time.</value>
+        <value>Automation is paused until {0}. While paused, households are not created and names are not recomputed. That suits a bulk load and nothing else.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AutomationPausedTitle</fullName>
@@ -158,7 +158,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains which module holds the mirror for the detected objects.</shortDescription>
-        <value>This org has Nonprofit Cloud Gift Transaction objects and the Mirror module is not installed. Nothing is broken. If you want Nonprofit Cloud's own summaries to keep working alongside BarnCRM, the mirror arrives with the Mirror module.</value>
+        <value>This org has Nonprofit Cloud Gift Transaction objects and the Mirror module is not installed. Nothing is broken. To keep Nonprofit Cloud's own summaries working alongside BarnCRM, install the Mirror module.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MirrorMissingTitle</fullName>
@@ -190,7 +190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: households with no current member.</shortDescription>
-        <value>Nobody is a current member of these households. Some may be kept on purpose, for example when empty households are not deleted automatically. A household kept because records are credited to it is kept on purpose: deleting it unlinks those records. Open each to add a member, merge it into another household, or delete it. Health Check finds these and does not change them.</value>
+        <value>Nobody is a current member of these households. Some may be kept on purpose, for example when empty households are not deleted automatically, or because records are credited to them (deleting one unlinks them). Open each to add a member, merge it into another household, or delete it. Health Check does not change them.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_EmptyHouseholdsTitle</fullName>
@@ -238,7 +238,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: custom fiscal year in Setup; {0} is the start month</shortDescription>
-        <value>Reports filtered or grouped by fiscal year follow your custom fiscal year periods. BarnCRM totals for this year, last year and two years ago run in whole years from the start of {0}, so where a custom year starts on another day or is not twelve months long, the two can disagree.</value>
+        <value>Reports filtered or grouped by fiscal year follow your custom fiscal year periods. BarnCRM totals for this year, last year and two years ago use whole years from the start of {0}, so they can disagree where a custom year starts on another day or is not twelve months long.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_CustomFiscalYearTitle</fullName>
@@ -302,7 +302,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Finding detail: user lacks the organization record type. {0} is its label.</shortDescription>
-        <value>{0} is the record type for organizations (BarnCRM Settings, General), but your profile and permission sets do not give it to you, so you cannot create organizations. Give {0} to everyone who creates organizations, in Setup, or choose a record type they have in that setting.</value>
+        <value>{0} is the record type for organizations (BarnCRM Settings, General), but your profile and permission sets do not give it to you, so you cannot create organizations. In Setup, give {0} to everyone who creates organizations, or choose a record type they have in that setting.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_InactiveOwnerJobsDetail</fullName>
@@ -310,7 +310,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Finding detail: deactivated owner jobs. {0} the job names.</shortDescription>
-        <value>These jobs run as a person who has been deactivated, so they stopped running although their pages still show them as scheduled: {0}. The fix stops each one and schedules it again to run as you.</value>
+        <value>These jobs run as a deactivated person, so they stopped although they still show as scheduled: {0}. The fix stops each one and schedules it again as you.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_InactiveOwnerJobsFix</fullName>
@@ -422,7 +422,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains why contact membership does not work with Person Accounts.</shortDescription>
-        <value>Person Accounts are enabled, but household membership is still set to use the person's account. In a Person Accounts org the person is an account, so households built that way do not work. Switching to the flexible way of belonging, with one membership record per person, fixes it, and the households you already have are not changed.</value>
+        <value>Person Accounts are enabled, but household membership still uses the person's account. In a Person Accounts org the person is an account, so households built that way do not work. Switch to the flexible way of belonging, with one membership record per person. Existing households are not changed.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipFix</fullName>
@@ -462,7 +462,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: mode does not match; {0} mode set, {1} mode recommended</shortDescription>
-        <value>This org is set to {0}, but what is installed points to {1}. If that is deliberate, leave it. If it is not, switch: households and imports behave differently in each mode.</value>
+        <value>This org is set to {0}, but what is installed points to {1}. If that is deliberate, leave it. If not, switch: households and imports behave differently in each mode.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ModeMismatchTitle</fullName>
@@ -510,7 +510,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: nightly jobs not scheduled. {0} the job names.</shortDescription>
-        <value>Not scheduled: {0}. Each keeps something up to date overnight, and none runs until somebody schedules it. The fix schedules each one at its usual time, to run as you. Stop any of them on its own page.</value>
+        <value>Not scheduled: {0}. Each keeps something up to date overnight, and none runs until someone schedules it. The fix schedules each at its usual time, to run as you. Stop any of them on its own page.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NightlyJobsFix</fullName>
@@ -558,7 +558,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains that no new person is getting a household.</shortDescription>
-        <value>Household membership uses membership records, and "create a household automatically" is off, so no person saved from now on gets a household. Nothing fails and nothing is logged while this is true: the people saved in the meantime simply have to be grouped by hand later. Turn automatic households on unless your org deliberately groups people another way.</value>
+        <value>Household membership uses membership records and "create a household automatically" is off, so no person saved from now on gets a household. Nothing fails or is logged, but people saved meanwhile must be grouped by hand later. Turn automatic households on unless your org groups people another way.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NoHouseholdCreationFix</fullName>
@@ -606,7 +606,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check org shape: {0} what was detected, {1} the recommended mode</shortDescription>
-        <value>{0} BarnCRM supports this org shape directly. The coexistence mode it recommends is {1}. Shield Platform Encryption cannot be detected from inside the app: if your org uses it, say so before you load data.</value>
+        <value>{0} BarnCRM supports this org shape directly. The recommended coexistence mode is {1}. Shield Platform Encryption cannot be detected in the app: if your org uses it, say so before you load data.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_OrgShapeTitle</fullName>
@@ -646,7 +646,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: contacts with no account, in contact mode.</shortDescription>
-        <value>These contacts have no account, so they are in no household: they count toward no household total, and no household name or greeting includes them. A contact whose account is an organization is not counted. Open each one and set its account to a household. Health Check finds these and does not change them.</value>
+        <value>These contacts have no account, so they are in no household: they count toward no household total and no household name or greeting. A contact whose account is an organization is not counted. Open each one and set its account to a household. Health Check does not change them.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleWithoutHouseholdJunctionDetail</fullName>
@@ -654,7 +654,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: people with no current membership, junction mode.</shortDescription>
-        <value>No current household membership names these people, so they are in no household: they count toward no household total, and no household name or greeting includes them. Open each one and add them to a household from its members panel. Health Check finds these and does not change them.</value>
+        <value>No current household membership names these people, so they are in no household: they count toward no household total and no household name or greeting. Open each one and add them to a household from the members panel. Health Check does not change them.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleWithoutHouseholdTitle</fullName>
@@ -670,7 +670,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown when someone without the permission tries to change a setting.</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to change this. Ask an administrator for the BarnCRM Admin role.</value>
+        <value>You need the Manage BarnCRM Settings permission to change this. Ask your BarnCRM admin for the BarnCRM Admin role.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PersonAccountsDetected</fullName>
@@ -686,7 +686,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown to someone who can read the report but not act on it.</shortDescription>
-        <value>You can read this report but not change anything. Ask an administrator for the Manage BarnCRM Settings permission.</value>
+        <value>You can read this report but not change anything. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RecommendedModeLabel</fullName>
@@ -742,7 +742,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: automation switches missing. {0} count, {1} names.</shortDescription>
-        <value>These automations run but have no switch on the Automation page, so they cannot be turned off there: {1}. The fix creates each switch set to its shipped default, so nothing that runs now stops. An automation that enforces a rule is listed with its switch locked, because it always runs. Switches you already have keep their setting.</value>
+        <value>These automations run but have no switch on the Automation page, so they cannot be turned off there: {1}. The fix creates each switch at its shipped default, so nothing stops. An automation that enforces a rule gets a locked switch because it always runs. Existing switches keep their setting.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_SwitchesMissingFix</fullName>
@@ -814,7 +814,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: active users hold no BarnCRM role; {0} is the count</shortDescription>
-        <value>{0} active users have a Salesforce license but none of the BarnCRM roles, so the BarnCRM app is invisible to them. Assign roles on the Access page, or ignore this if those people are not meant to use BarnCRM.</value>
+        <value>{0} active users have a Salesforce license but no BarnCRM role, so the BarnCRM app is invisible to them. Assign roles on the Access page, or ignore this if those people are not meant to use BarnCRM.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_UsersWithoutAccessTitle</fullName>
@@ -838,7 +838,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: a pause nothing will end; {0} is the end time</shortDescription>
-        <value>Automation is paused until {0}, and nothing is set to switch it back on by then and record that it did. The pause was started before automatic resume existed, or somewhere other than the Automation page. Open the Automation page and click Resume automation, then pause again for a set time if you still need to.</value>
+        <value>Automation is paused until {0}, and nothing is set to switch it back on then. The pause started before automatic resume existed, or somewhere other than the Automation page. Open the Automation page and click Resume automation, then pause again for a set time if you still need to.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_DigestStaleTitle</fullName>
@@ -854,7 +854,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Detail of the stopped digest finding; {0} is when it last ran.</shortDescription>
-        <value>The error digest is scheduled but last ran {0}. It runs as the person who scheduled it, so it stops when that person is deactivated. Stop it and schedule it again as yourself.</value>
+        <value>The error digest is scheduled but last ran {0}. It runs as the person who scheduled it, so it stops when they are deactivated. Stop it and schedule it again as yourself.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_DigestStaleFix</fullName>
@@ -910,7 +910,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Detail: relationships left with no person after a delete.</shortDescription>
-        <value>The person on one side of these relationships was deleted, so the relationship no longer connects two people, and it cannot be edited until a person is chosen again. Open each one and choose the missing person, or delete the relationship. Health Check finds these and does not change them.</value>
+        <value>One person in each of these relationships was deleted, so the relationship no longer connects two people and cannot be edited until a person is chosen. Open each one and choose the missing person, or delete the relationship. Health Check does not change them.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AffiliationsNoPersonTitle</fullName>
@@ -926,7 +926,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Detail: affiliations left with no person after a delete.</shortDescription>
-        <value>The person in these affiliations was deleted, so they show as an unnamed person. Open each one and choose the person, or delete the affiliation. Health Check finds these and does not change them.</value>
+        <value>The person in these affiliations was deleted, so they show as an unnamed person. Open each one and choose the person, or delete the affiliation. Health Check does not change them.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AffiliationsNoPersonTitleOne</fullName>
@@ -1022,7 +1022,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: one licensed user has no BarnCRM role.</shortDescription>
-        <value>1 active user has a Salesforce license but none of the BarnCRM roles, so the BarnCRM app is invisible to them. Assign roles on the Access page, or ignore this if that person is not meant to use BarnCRM.</value>
+        <value>1 active user has a Salesforce license but no BarnCRM role, so the BarnCRM app is invisible to them. Assign roles on the Access page, or ignore this if that person is not meant to use BarnCRM.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_EmptyHouseholdsDetailOne</fullName>
@@ -1030,7 +1030,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: exactly one household with no current member.</shortDescription>
-        <value>Nobody is a current member of this household. It may be kept on purpose, for example when empty households are not deleted automatically. A household kept because records are credited to it is kept on purpose: deleting it unlinks those records. Open it to add a member, merge it into another household, or delete it. Health Check finds this and does not change it.</value>
+        <value>Nobody is a current member of this household. It may be kept on purpose, for example when empty households are not deleted automatically, or because records are credited to it (deleting it unlinks them). Open it to add a member, merge it into another household, or delete it. Health Check does not change it.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleWithoutHouseholdContactDetailOne</fullName>
@@ -1038,7 +1038,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: exactly one contact with no account, in contact mode.</shortDescription>
-        <value>This contact has no account, so they are in no household: they count toward no household total, and no household name or greeting includes them. A contact whose account is an organization is not counted. Open the contact and set its account to a household. Health Check finds this and does not change it.</value>
+        <value>This contact has no account, so they are in no household: they count toward no household total and no household name or greeting. A contact whose account is an organization is not counted. Open the contact and set its account to a household. Health Check does not change it.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleWithoutHouseholdJunctionDetailOne</fullName>
@@ -1046,7 +1046,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: one person with no current membership, junction mode.</shortDescription>
-        <value>No current household membership names this person, so they are in no household: they count toward no household total, and no household name or greeting includes them. Open the person and add them to a household from its members panel. Health Check finds this and does not change it.</value>
+        <value>No current household membership names this person, so they are in no household: they count toward no household total and no household name or greeting. Open the person and add them to a household from the members panel. Health Check does not change it.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RelationshipsNoPersonDetailOne</fullName>
@@ -1054,7 +1054,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Detail: exactly one relationship left with no person after a delete.</shortDescription>
-        <value>The person on one side of this relationship was deleted, so the relationship no longer connects two people, and it cannot be edited until a person is chosen again. Open it and choose the missing person, or delete the relationship. Health Check finds this and does not change it.</value>
+        <value>One person in this relationship was deleted, so it no longer connects two people and cannot be edited until a person is chosen. Open it and choose the missing person, or delete the relationship. Health Check does not change it.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AffiliationsNoPersonDetailOne</fullName>
@@ -1062,6 +1062,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Detail: exactly one affiliation left with no person after a delete.</shortDescription>
-        <value>The person in this affiliation was deleted, so it shows as an unnamed person. Open it and choose the person, or delete the affiliation. Health Check finds this and does not change it.</value>
+        <value>The person in this affiliation was deleted, so it shows as an unnamed person. Open it and choose the person, or delete the affiliation. Health Check does not change it.</value>
     </labels>
 </CustomLabels>

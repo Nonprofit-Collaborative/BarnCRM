@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import from DLRS wizard introduction</shortDescription>
-        <value>Copy DLRS rollups into BarnCRM. Each copy starts switched off: compare its values with the ones DLRS wrote, then turn it on and switch the DLRS rollup off in DLRS. BarnCRM never changes DLRS.</value>
+        <value>Copy DLRS rollups into BarnCRM. Each copy starts off: compare its values with DLRS, then turn it on and switch the DLRS rollup off in DLRS. BarnCRM never changes DLRS.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_DlrsImportStepChoose</fullName>

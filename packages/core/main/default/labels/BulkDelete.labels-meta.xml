@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal: the person lacks the bulk delete permissions.</shortDescription>
-        <value>Bulk delete needs the Bulk Delete Records and Find and Export Records permissions. Ask your administrator.</value>
+        <value>Bulk delete needs the Bulk Delete Records and Find and Export Records permissions. Ask your BarnCRM admin.</value>
     </labels>
     <labels>
         <fullName>Core_BulkDelete_ErrorObject</fullName>

@@ -13,9 +13,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Giving**, and open **Campaign Sync**. | The **Campaign Sync** card says `Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of BarnCRM Settings, then come back to sync your appeals.` No **Sync all appeals** button shows. |
-| 2 | In **Giving**, tick **Copy appeals to Campaigns** and save. | The setting saves. |
+| 2 | In **Giving**, tick **Copy Appeals to Campaigns** and save. | The setting saves. |
 | 3 | Open **Campaign Sync** again. | `Campaign sync is on. Saving an appeal creates or updates its Campaign.` and `0 of 7 appeals have a Campaign.` **Sync all appeals** is enabled. |
-| 4 | Click **Sync all appeals**. | `Sync all appeals is running in the background. Reload this page in a minute to see the new counts. Anything that could not be copied is in the Error Log.` |
+| 4 | Click **Sync all appeals**. | `Sync all appeals is running in the background. Reload this page in a minute to see new counts. Anything that could not be copied is in the Error Log.` |
 | 5 | Wait a minute and reload the page. | `7 of 7 appeals have a Campaign.` |
 | 6 | Open the App Launcher, search **Campaigns**, and open the list. | Seven Campaigns named after the appeals. **Spring Appeal** shows **Annual Fund** as its Parent Campaign. |
 | 7 | Open the **Appeals** tab and choose the **Appeals and Their Campaigns** list view. | Every appeal has a **Campaign ID** starting `701`. |
@@ -48,9 +48,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 |---|---|---|
 | 1 | As read-only, open the App Launcher and search `Campaign Sync`. | No **Campaign Sync** item is found. |
 | 2 | As staff, open the **Campaign Sync** tab from the App Launcher. | The card shows `You cannot create and edit Campaigns, so appeals you save get no Campaign...` and `Only someone with the Manage BarnCRM Settings permission can sync all appeals.` **Sync all appeals** is disabled. |
-| 3 | As admin, in **BarnCRM Settings**, **Giving**, untick **Copy appeals to Campaigns** and save. | The setting saves. |
+| 3 | As admin, in **BarnCRM Settings**, **Giving**, untick **Copy Appeals to Campaigns** and save. | The setting saves. |
 | 4 | Change the **Goal** of `Giving Tuesday` to 9,000 and save. Reload its Campaign. | Expected Revenue is still 7,500. Every Campaign is still there. |
-| 5 | Tick **Copy appeals to Campaigns** again and save `Giving Tuesday` once more. | The Campaign's Expected Revenue is 9,000. |
+| 5 | Tick **Copy Appeals to Campaigns** again and save `Giving Tuesday` once more. | The Campaign's Expected Revenue is 9,000. |
 
 **Cleanup:** remove the **Campaign Sync** permission set from staff.
 

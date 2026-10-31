@@ -4,6 +4,6 @@
   <defaultValue>true</defaultValue>
   <description>Whether a weekly digest also carries the admin summary: org limits at 80 percent or more, failed BarnCRM jobs, and duplicates waiting for review (C-54).</description>
   <inlineHelpText>Add limits, failed jobs and duplicates waiting to the weekly digest.</inlineHelpText>
-  <label>Error Digest Include Admin Summary</label>
+  <label>Send Weekly Admin Summary</label>
   <type>Checkbox</type>
 </CustomField>

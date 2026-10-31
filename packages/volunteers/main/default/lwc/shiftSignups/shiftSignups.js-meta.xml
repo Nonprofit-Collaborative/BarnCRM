@@ -6,7 +6,7 @@
     and marking each one attended or a no show.
   </description>
   <isExposed>true</isExposed>
-  <masterLabel>Shift Sign-ups</masterLabel>
+  <masterLabel>Shift Sign-Ups</masterLabel>
   <targets>
     <target>lightning__RecordPage</target>
   </targets>

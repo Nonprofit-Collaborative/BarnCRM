@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Unexpected roster failure, logged</shortDescription>
-        <value>Something went wrong with the roster. The details are in the Error Log.</value>
+        <value>The roster could not be updated. The details are in the Error Log.</value>
     </labels>
     <labels>
         <fullName>Programs_Loading</fullName>
@@ -230,7 +230,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check: what open enrollments in ended programs mean</shortDescription>
-        <value>These enrollments are Applied or Enrolled in a program whose Status is Completed or whose End Date is past. They still count as open, so the person cannot be enrolled in that program again. Set each one to Completed or Withdrawn, or, if the program is still running, set it back to Active or move its End Date. The first ones are linked below.</value>
+        <value>These enrollments are Applied or Enrolled in a program that is Completed or past its End Date. They still count as open, so the person cannot enroll again. Set each to Completed or Withdrawn, or, if the program is still running, set it Active or move its End Date. The first ones are linked below.</value>
     </labels>
     <labels>
         <fullName>Programs_HealthCheck_MoreThan</fullName>
@@ -390,7 +390,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Unexpected Service Delivery Log failure, logged</shortDescription>
-        <value>Something went wrong with the service delivery log. The details are in the Error Log.</value>
+        <value>The service delivery log could not be updated. The details are in the Error Log.</value>
     </labels>
     <labels>
         <fullName>Programs_Settings_Title</fullName>
@@ -750,6 +750,6 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Programs dashboard: no access</shortDescription>
-        <value>You need a Programs permission set to see the dashboard. Ask your admin.</value>
+        <value>You need a Programs permission set to see the dashboard. Ask your BarnCRM admin.</value>
     </labels>
 </CustomLabels>

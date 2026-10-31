@@ -5,7 +5,7 @@ answer common questions without building anything. This page lists what each one
 to open, filter and save your own copy. It also explains the totals you see on a donor's or a
 volunteer's record.
 
-**Before you start:** giving reports are in the **Fundraising** app and need a Giving permission
+**Before you start:** giving reports are in the **BarnCRM Fundraising** app and need a Giving permission
 set (it comes with the Fundraising Staff role, or with Read Only plus **Giving Read Only**).
 Volunteer reports are in the **BarnCRM Volunteers** app and need a Volunteers permission set,
 which comes with your BarnCRM role. If a report or dashboard is empty or refuses to open, ask
@@ -57,7 +57,7 @@ The **Volunteers** dashboard shows one chart for each: **Approved hours this yea
 
 ## To Open a Dashboard
 
-1. Open the **Fundraising** app (giving) or the **BarnCRM Volunteers** app (volunteering).
+1. Open the **BarnCRM Fundraising** app (giving) or the **BarnCRM Volunteers** app (volunteering).
 2. Click the **Dashboards** tab.
 3. Open the **BarnCRM Giving** or **BarnCRM Volunteers** folder.
 4. Click **Giving Overview** or **Volunteers**.
@@ -96,7 +96,7 @@ and do not save.
 
 ## To Read the Totals on a Record
 
-**Giving totals.** In the **Fundraising** app, a person, household or organization has a
+**Giving totals.** In the **BarnCRM Fundraising** app, a person, household or organization has a
 **Giving** section: **Total Giving**, **Gift Count**, **First Gift Date**, **Last Gift Date**,
 **Largest Gift**, **Giving This Year**, **Giving Last Year**, **Giving Two Years Ago**,
 **Pledge Balance**, **Total Soft Credits**, **In-kind Value** and others, plus **Donor Level**.

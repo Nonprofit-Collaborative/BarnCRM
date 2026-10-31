@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Delete by file: no Bulk Delete Records permission</shortDescription>
-        <value>Deleting by record ID needs the Bulk Delete Records permission. Ask your administrator.</value>
+        <value>Deleting by record ID needs the Bulk Delete Records permission. Ask your BarnCRM admin.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorDeleteNeedsConfirm</fullName>

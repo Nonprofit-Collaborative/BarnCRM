@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import run log: duplicate rules matched some one-object rows</shortDescription>
-        <value>Your duplicate rules matched some rows to a record you already have, so those rows update it instead of creating a new one. Their Matched By Duplicate Rule box is ticked: check them in the import&apos;s rows before you commit.</value>
+        <value>Your duplicate rules matched some rows to a record you already have, so those rows update it instead of creating a new one. Their Matched By Duplicate Rule box is ticked: check them in the import's rows before you commit.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogNoDuplicateRuleRecords</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import row: duplicate rules matched a record another row loads</shortDescription>
-        <value>Your duplicate rules matched this row to a record an earlier row of the file already loads. Combine the rows, or untick Also match with my duplicate rules, and import the row again.</value>
+        <value>Your duplicate rules matched this row to a record an earlier row already loads. Combine the rows, or untick Also match with my duplicate rules, and import the row again.</value>
     </labels>
     <labels>
         <fullName>Core_Import_DuplicateRulesObjectHelp</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import row: duplicate rules could not be checked</shortDescription>
-        <value>Your duplicate rules could not be checked for this row (Salesforce could not run them), so it was not loaded rather than risk creating a duplicate. Import it again later, or untick Also match with my duplicate rules.</value>
+        <value>Your duplicate rules could not be checked for this row (Salesforce could not run them), so it was not loaded rather than risk a duplicate. Import it again later, or untick Also match with my duplicate rules.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorDuplicateRuleKeyDiffers</fullName>

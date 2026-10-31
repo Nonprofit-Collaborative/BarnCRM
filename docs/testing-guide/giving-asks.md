@@ -2,7 +2,7 @@
 
 Scripts for the Ask Pipeline: stages, the board, moving and closing asks, and the gift or pledge a won ask can produce. Setup detail: [Ask Pipeline](../admin-guide/ask-pipeline.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded. Work in the **Fundraising** app. A default fund must be set (script T-GIFT-01 in [Giving: gifts, funds and batches](giving-gifts-funds-batches.md)). Sample data adds 11 asks: seven open across every default stage (one past its target date, one for an organization), one declined, one withdrawn and two won as pledges.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded. Work in the **BarnCRM Fundraising** app. A default fund must be set (script T-GIFT-01 in [Giving: gifts, funds and batches](giving-gifts-funds-batches.md)). Sample data adds 11 asks: seven open across every default stage (one past its target date, one for an organization), one declined, one withdrawn and two won as pledges.
 
 ## T-ASK-01: Stages in Settings
 
@@ -13,7 +13,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Giving**, and find **Ask stages**. | It shows the default `Identified;Qualified;Cultivating;Ask Planned;Asked`. |
-| 2 | Open the **Ask Pipeline** tab in the **Fundraising** app. | Five columns in that order, each with a count of 0. Page title **Ask Pipeline**. |
+| 2 | Open the **Ask Pipeline** tab in the **BarnCRM Fundraising** app. | Five columns in that order, each with a count of 0. Page title **Ask Pipeline**. |
 | 3 | Set **Ask stages** to `Prospect;Cultivating;Asked` and save. Reload **Ask Pipeline**. | Three columns: **Prospect**, **Cultivating**, **Asked**. |
 | 4 | Open the **Asks** tab, click **New**, choose **Donor Contact** `Luis Garcia`, set **Stage** to `Maybe`, save. | Refused: the stage is not in the list. |
 | 5 | Set **Ask stages** back to the default (or clear it) and save. | The five default columns return. |

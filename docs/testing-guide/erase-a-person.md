@@ -34,8 +34,8 @@ The admin user holds **BarnCRM Erase People** from the create script. It is in n
 | 1 | Open **Luis Garcia**, click **Erase Person**, then **Preview**. | The table from T-ERASE-01. |
 | 2 | Type `TEST-001` in **Request reference**. | Accepted (80 characters at most). |
 | 3 | Type `luis  garcia` (lower case, two spaces) in the name field. | **Erase** becomes enabled: case and extra spaces do not matter. |
-| 4 | Click **Erase**. | **Erased. The list above is what changed, and the Erasure record keeps it.** **Preview** and **Erase** are replaced by **Open the Erasure record**. |
-| 5 | Click **Open the Erasure record**. | The **Erasure** record: **Request Reference** `TEST-001`, **Contact** pointing at the erased record, **Erased Record Id**, and **Details** listing the same rows in the same words. **Details** holds no name, email or other erased value. |
+| 4 | Click **Erase**. | **Erased. The list above is what changed, and the Erasure record keeps it.** **Preview** and **Erase** are replaced by **Open the Erasure Record**. |
+| 5 | Click **Open the Erasure Record**. | The **Erasure** record: **Request Reference** `TEST-001`, **Contact** pointing at the erased record, **Erased Record Id**, and **Details** listing the same rows in the same words. **Details** holds no name, email or other erased value. |
 | 6 | Open the erased contact. | Name **Erased person**. Email, phone, mailing address and birth date are empty. **Email Opt Out** is ticked. |
 | 7 | Open **The Garcia Family**. | Only Harper and Diego are current members. The household's name and greetings are made from them. |
 | 8 | With Giving: check the erased record's and the household's giving totals and gifts. | Gifts and totals are kept, credited to **Erased person**. |

@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicate Matching: shown to someone who may open no area</shortDescription>
-        <value>You do not have access to duplicate matching. Ask a BarnCRM Admin for the BarnCRM Duplicate Review permission set.</value>
+        <value>You do not have access to duplicate matching. Ask your BarnCRM admin for the BarnCRM Duplicate Review permission set.</value>
     </labels>
     <labels>
         <fullName>Core_DuplicateMatching_MatchingLogic</fullName>

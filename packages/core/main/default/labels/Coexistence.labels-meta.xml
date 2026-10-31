@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refused switch to simple mode; {0} people with membership records</shortDescription>
-        <value>You cannot switch to the simple way of belonging yet. {0} people belong to a household through a membership record, and the simple way cannot see those records: their households would be counted as empty, renamed, and possibly deleted. Moving them needs a migration, which BarnCRM does not do yet, so keep the flexible way for now.</value>
+        <value>You cannot switch to the simple way of belonging yet. {0} people belong to a household through a membership record, and the simple way cannot see those records, so their households would count as empty and could be renamed or deleted. Moving them needs a migration BarnCRM does not do yet, so keep the flexible way.</value>
     </labels>
     <labels>
         <fullName>Core_Coexistence_SwitchToJunctionRefused</fullName>
@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refused switch to flexible mode; {0} people linked with no membership</shortDescription>
-        <value>You cannot switch to the flexible way of belonging yet. {0} people are linked straight to their household and have no membership record, so the flexible way would not show them in any household. Moving them needs a migration, which BarnCRM does not do yet, so keep the simple way for now.</value>
+        <value>You cannot switch to the flexible way of belonging yet. {0} people are linked straight to their household with no membership record, so the flexible way would not show them in any household. Moving them needs a migration BarnCRM does not do yet, so keep the simple way.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipHiddenTitle</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: simple mode hides memberships; {0} people affected</shortDescription>
-        <value>{0} people belong to a household through a membership record, but the simple way of belonging is on and cannot see those records. Their households read as empty, and an empty household can be renamed or deleted. Switch back to the flexible way, or plan a migration before changing the setting again.</value>
+        <value>{0} people belong to a household through a membership record, but the simple way of belonging is on and cannot see those records. Their households read as empty and could be renamed or deleted. Switch back to the flexible way, or plan a migration before changing the setting again.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipHiddenByJunctionDetail</fullName>
@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: flexible mode, people lack membership; {0} people</shortDescription>
-        <value>{0} people are linked straight to their household but have no membership record, and the flexible way of belonging only sees membership records. They do not appear in any household. Switch back to the simple way, or plan a migration before changing the setting again.</value>
+        <value>{0} people are linked straight to their household with no membership record, and the flexible way of belonging only sees membership records, so they appear in no household. Switch back to the simple way, or plan a migration first.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipHiddenFix</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: simple mode cannot house person accounts; {0} people</shortDescription>
-        <value>You chose the simple way of belonging, which is fine while everyone is stored as a contact. This org now stores {0} people as accounts, and the simple way cannot put a person stored as an account into a household. Switch to the flexible way, or keep storing people as contacts.</value>
+        <value>You chose the simple way of belonging, which works while everyone is a contact. This org now stores {0} people as accounts, and the simple way cannot put such a person into a household. Switch to the flexible way, or keep storing people as contacts.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleAsAccountsTitleOne</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: simple mode cannot house the one person account</shortDescription>
-        <value>You chose the simple way of belonging, which is fine while everyone is stored as a contact. This org now stores 1 person as an account, and the simple way cannot put a person stored as an account into a household. Switch to the flexible way, or keep storing people as contacts.</value>
+        <value>You chose the simple way of belonging, which works while everyone is a contact. This org now stores 1 person as an account, and the simple way cannot put such a person into a household. Switch to the flexible way, or keep storing people as contacts.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipHiddenByContactDetailOne</fullName>
@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: simple mode hides one person&apos;s membership</shortDescription>
-        <value>1 person belongs to a household through a membership record, but the simple way of belonging is on and cannot see those records. Their household reads as empty, and an empty household can be renamed or deleted. Switch back to the flexible way, or plan a migration before changing the setting again.</value>
+        <value>1 person belongs to a household through a membership record, but the simple way of belonging is on and cannot see it. Their household reads as empty and could be renamed or deleted. Switch back to the flexible way, or plan a migration before changing the setting again.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipHiddenByJunctionDetailOne</fullName>
@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: flexible mode, one person lacks a membership</shortDescription>
-        <value>1 person is linked straight to their household but has no membership record, and the flexible way of belonging only sees membership records. They do not appear in any household. Switch back to the simple way, or plan a migration before changing the setting again.</value>
+        <value>1 person is linked straight to their household with no membership record, and the flexible way of belonging only sees membership records, so they appear in no household. Switch back to the simple way, or plan a migration first.</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_InstallCompleted</fullName>

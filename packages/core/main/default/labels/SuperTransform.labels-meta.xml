@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Super Transform: Empty state: no object the person may change</shortDescription>
-        <value>There is no object you may change. Ask your administrator for edit access to the records you need to change.</value>
+        <value>There is no object you may change. Ask your BarnCRM admin for edit access to the records you need to change.</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_ObjectFirst</fullName>
@@ -375,7 +375,7 @@
         <protected>false</protected>
         <shortDescription>Super Transform: About This Tool text</shortDescription>
         <value
-    >Work down the five steps: choose the object, add conditions for the records to change (the count updates as you type), choose up to five fields and what each becomes, preview the first 25 records before and after, then run. It runs as a bulk update with your own access, so your validation rules and automation apply, and every run is listed under Data Jobs below with its Undo.</value>
+    >Work through five steps: choose the object, add conditions (the count updates as you type), choose up to five fields and their new values, preview the first 25 records, then run. It uses your own access, so validation rules and automation apply. Every run is listed under Data Jobs with its Undo.</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_NoPermissionHeading</fullName>

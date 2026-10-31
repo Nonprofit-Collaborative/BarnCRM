@@ -270,7 +270,7 @@ export default class FindRecords extends LightningElement {
     labelTab(this, label, 'utility:search');
   }
 
-  /** Another page (Data Hygiene, C-28) can link to Find with a saved query to open and run. */
+  /** Another page (Data Quality in Org Optimizer, C-28) can link to Find with a saved query to open and run. */
   @wire(CurrentPageReference)
   handlePageReference(pageReference) {
     const state = (pageReference && pageReference.state) || {};

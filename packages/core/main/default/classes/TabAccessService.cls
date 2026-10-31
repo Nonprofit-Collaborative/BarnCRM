@@ -1,6 +1,6 @@
 /**
  * Gives and takes the BarnCRM Tab permission sets, so a tool feature's tabs (Data Manager,
- * Import, Find, Bulk Update, Data Hygiene, Duplicate Matching) show only while the feature is
+ * Import, Find, Bulk Update, Org Optimizer, Duplicate Matching) show only while the feature is
  * on (ADR-0124, edition gates visibility).
  *
  * Each feature tab has a packaged permission set that shows that tab and nothing else. Its

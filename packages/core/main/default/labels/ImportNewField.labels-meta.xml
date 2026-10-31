@@ -286,7 +286,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>New field dialog: guidance intro</shortDescription>
-        <value>BarnCRM cannot create this field for you here. Create it in Setup with the details below, then select Refresh Fields. An administrator can set up the connection on BarnCRM Settings, Import page.</value>
+        <value>BarnCRM cannot create this field here. Create it in Setup with the details below, then select Refresh Fields. An administrator can set up the connection on the BarnCRM Settings Import page.</value>
     </labels>
     <labels>
         <fullName>Core_ImportNewField_SetupSteps</fullName>
@@ -486,7 +486,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Connection panel: turn on callouts steps</shortDescription>
-        <value>Salesforce creates the connection with callouts turned off, and only an administrator can turn them on. In Setup, enter Named Credentials in Quick Find and open Named Credentials. Select BarnCRM: this org, then Edit. Turn on Enabled for Callouts and select Save. Then select Check Again here.</value>
+        <value>Salesforce creates the connection with callouts off, and only an administrator can turn them on. In Setup, open Named Credentials from Quick Find, select BarnCRM: this org, then Edit. Turn on Enabled for Callouts and select Save. Then select Check Again here.</value>
     </labels>
     <labels>
         <fullName>Core_ImportNewField_CheckAgainButton</fullName>

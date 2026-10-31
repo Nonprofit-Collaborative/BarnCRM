@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Accounting export page: what it does</shortDescription>
-    <value>Download the gifts in a date range as a spreadsheet file for your accounting system: one row for each fund a gift went to, with refunds as negative rows on the day the money went back.</value>
+    <value>Download the gifts in a date range as a spreadsheet for your accounting system: one row for each fund a gift went to, and refunds as negative rows on the day the money went back.</value>
   </labels>
   <labels>
     <fullName>Mirror_AccountingExport_Visibility</fullName>
@@ -142,7 +142,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Export refused: no Accounting Export permission set</shortDescription>
-    <value>The accounting export needs the Accounting Export permission set. Ask your administrator for it.</value>
+    <value>The accounting export needs the Accounting Export permission set. Ask your BarnCRM admin for it.</value>
   </labels>
   <labels>
     <fullName>Mirror_AccountingExport_ErrorFailed</fullName>

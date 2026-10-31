@@ -61,7 +61,7 @@ Assistant flow and labels as before.
    did, and the receipt lock override question only of a viewer who may manage settings.
 4. **Core's app is neutral and Giving's app is the nonprofit one.** Core's app keeps its API
    name and is labelled with the working product title, Open Impact, for both suites; its tabs
-   and record page overrides do not change. Giving's nonprofit app is the Fundraising app it
+   and record page overrides do not change. Giving's nonprofit app is the BarnCRM Fundraising app it
    already ships (ADR-0018). The Fundraising Staff role (`Fundraising_Staff` group, unchanged
    content) moves to Giving; Core's Access page already skips a role that is not in the org.
 5. **Core's wording is neutral.** No Core label, help text, description, tab, app, permission,

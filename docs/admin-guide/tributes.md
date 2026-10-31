@@ -50,7 +50,7 @@ You are David. Start from the sample data.
    the Tuesday reading group**. Save.
 6. The gift now shows a tribute summary: **In memory of Rosa Garcia, notify Harper Garcia,
    not yet sent**.
-7. Post your letter, then come back and press **Mark notification sent**. The panel now
+7. Post your letter, then come back and press **Mark Notification Sent**. The panel now
    says the notification has been sent, and shows the date. The button is gone, because it
    has been done.
 8. Try a tribute with nobody to notify. Add a tribute with an honoree and no notification
@@ -73,7 +73,7 @@ You are David. Start from the sample data.
   that person is stored as a Contact or as an Account. It cannot catch a typed name, so read
   the tribute summary back before you post.
 - **Expecting BarnCRM to send the letter.** It does not. There is no email or mail
-  merge behind **Mark notification sent**: the button records that your organization sent
+  merge behind **Mark Notification Sent**: the button records that your organization sent
   something, and the address or email you write to is on the recipient's own record. A
   recipient with no address and no email is not refused, because a typed name and a phone
   call is a legitimate way to tell a family; it is your judgment, not a validation rule.

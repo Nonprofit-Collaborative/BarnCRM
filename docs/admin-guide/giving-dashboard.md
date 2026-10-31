@@ -14,7 +14,7 @@ else sees.
 
 ## How to Turn It On
 
-1. Open the **Fundraising** app from the app launcher. Tap **Dashboards**, open the
+1. Open the **BarnCRM Fundraising** app from the app launcher. Tap **Dashboards**, open the
    **BarnCRM Giving** folder, and open **Giving Overview**.
 2. Check who the dashboard reads as. It ships set to **The dashboard viewer**, so every
    person sees the gifts they are allowed to see and nothing needs changing. If your
@@ -40,7 +40,7 @@ Nothing here requires Salesforce Setup.
 
 Do this as Tom, from the sample data, after at least a few gifts exist.
 
-1. Open the app launcher and choose **Fundraising**. Choose **Dashboards**, then the
+1. Open the app launcher and choose **BarnCRM Fundraising**. Choose **Dashboards**, then the
    **BarnCRM Giving** folder, then **Giving Overview**.
 2. Read the top left number: **Gifts this month**. It is the total of every gift received
    since the first of this month. Under it, the daily chart shows which days produced it,

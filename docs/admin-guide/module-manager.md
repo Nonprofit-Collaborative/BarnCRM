@@ -49,7 +49,7 @@ No module is installed with Core or by first-run setup: a module is installed on
 install it from this section. An installed module's row links to its own app, where it has
 one. Rollup Builder has no app of its own: its **Rollup Builder** tab is in the **BarnCRM
 Admin** apps. Volunteers has a Settings tab in its app, where its settings live; Giving's
-Fundraising app has no Settings tab, and Mirror has no app of its own. (Some module settings
+BarnCRM Fundraising app has no Settings tab, and Mirror has no app of its own. (Some module settings
 still show in BarnCRM Settings for now; they move to the module's app in a later release.) Core's own
 features are turned on in General instead (see
 [BarnCRM Settings, Features](barncrm-settings.md#features-general)).

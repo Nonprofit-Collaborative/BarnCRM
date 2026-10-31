@@ -186,14 +186,14 @@ reports household members it cannot see, switch back to the way of belonging the
 were made in.
 
 **"I deleted the last person and the household is still there."**
-Either "Delete a household once it is empty" is off, or BarnCRM deliberately
+Either "Delete Empty Households" is off, or BarnCRM deliberately
 left that one alone.
 
 Deleting people never deletes their household straight away; moving them out still tidies it away.
 Deleting the household too would empty those people out of the Recycle Bin, and you could not
 restore them. If you meant to remove both, delete the household by hand.
 
-Unless "Keep the households of deleted people" is on, a nightly tidy-up comes back for the
+Unless "Keep Households of Deleted People" is on, a nightly tidy-up comes back for the
 household once nobody who belonged to it is left in the Recycle Bin (the Recycle Bin empties
 itself after 15 days, or sooner if someone empties it). It then moves the household to the
 Recycle Bin, where you can still restore it. The household's own addresses go to the Recycle

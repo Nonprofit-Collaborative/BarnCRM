@@ -166,7 +166,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Gift batch: batch could not be opened</shortDescription>
-    <value>This batch could not be opened. Ask your administrator to check the Error Log.</value>
+    <value>This batch could not be opened. Ask your BarnCRM admin to check the Error Log.</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_ErrorNoAccess</fullName>
@@ -174,7 +174,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Gift batch: may view but not change batch</shortDescription>
-    <value>You can see this batch but not change or post it. Ask your administrator for the Giving Staff permission set, or for edit access to this batch.</value>
+    <value>You can see this batch but not change or post it. Ask your BarnCRM admin for the Giving Staff permission set, or for edit access to this batch.</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_ErrorNoControlTotal</fullName>
@@ -198,7 +198,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Gift batch: lines total more than control</shortDescription>
-    <value>This batch does not balance: the lines add up to {0} more than the control total. Look for a line entered twice or an amount typed wrong, then post again.</value>
+    <value>This batch does not balance: the lines add up to {0} more than the control total. Look for a line entered twice or a mistyped amount, then post again.</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_ErrorPostFailed</fullName>

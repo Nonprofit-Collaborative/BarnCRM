@@ -70,6 +70,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Unindexed match field; {0} is the field, {1} the object, {2} the limit</shortDescription>
-        <value>Records cannot be found by {0}: {1} holds more than {2} records, and Salesforce cannot search that many quickly by a field it does not index. Match by the record ID, the name, an email, or a field marked External ID or Unique.</value>
+        <value>Records cannot be found by {0}: {1} holds more than {2} records, and Salesforce cannot search that many quickly by a field it does not index. Match by record ID, name, email, or a field marked External ID or Unique.</value>
     </labels>
 </CustomLabels>

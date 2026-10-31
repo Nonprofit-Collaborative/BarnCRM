@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>The button that cancels a commitment and skips its unpaid payments.</shortDescription>
-        <value>Cancel commitment</value>
+        <value>Cancel Commitment</value>
     </labels>
     <labels>
         <fullName>Giving_Commitment_ActionComplete</fullName>
@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>The button that marks a commitment finished.</shortDescription>
-        <value>Mark complete</value>
+        <value>Mark Complete</value>
     </labels>
     <labels>
         <fullName>Giving_Commitment_ActionPause</fullName>
@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Shown when deleting the donor of an open pledge or recurring gift.</shortDescription>
-        <value>This record is the donor of an active or paused pledge or recurring gift, so it cannot be deleted. Cancel the commitment, or change its donor, first. Merging a duplicate still works.</value>
+        <value>This record is the donor of an active or paused pledge or recurring gift, so it cannot be deleted. Cancel the commitment or change its donor first. Merging a duplicate still works.</value>
     </labels>
     <labels>
         <fullName>Giving_Commitment_InvalidSchedule</fullName>
@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Shown when the person may read a commitment but not change it.</shortDescription>
-        <value>You can see this commitment but not change it. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set.</value>
+        <value>You can see this commitment but not change it. Ask your BarnCRM admin for the Fundraising Staff role, together with the Giving Staff permission set.</value>
     </labels>
     <labels>
         <fullName>Giving_Commitment_NotFound</fullName>
@@ -158,7 +158,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Button that generates the schedule for a commitment that has none.</shortDescription>
-        <value>Generate now</value>
+        <value>Generate Now</value>
     </labels>
     <labels>
         <fullName>Giving_SchedulePreview_Generated</fullName>

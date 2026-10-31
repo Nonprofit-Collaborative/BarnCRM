@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import: refused because no column identifies anyone</shortDescription>
-        <value>No column was matched to a name or an email. Check that the first row of your file is the header row, then set at least one column to a last name, a full name, an email, or an organization name.</value>
+        <value>No column was matched to a name or an email. Check that the first row of your file is the header row, then set at least one column to a last name, full name, email, or organization name.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorNoRows</fullName>
@@ -150,7 +150,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import run log: a mapped field the user cannot edit; {0} the field</shortDescription>
-        <value>Not loaded: you do not have access to {0}. Those values were skipped. Ask your administrator for edit access to the field, then import the file again.</value>
+        <value>Not loaded: you do not have access to {0}. Those values were skipped. Ask your BarnCRM admin for edit access to the field, then import the file again.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogMatchFieldNoAccess</fullName>
@@ -158,7 +158,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import run log: a matching field the user cannot read; {0} the field</shortDescription>
-        <value>Not matched on {0}: you do not have access to it, so nobody could be found by it, and a person your org holds only by that field counts as new. Ask your administrator for access to the field before you import.</value>
+        <value>Not matched on {0}: you do not have access to it, so nobody could be found by it, and a person your org holds only by that field counts as new. Ask your BarnCRM admin for access to the field before you import.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogValueNotAccepted</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import run log: checkbox value not yes or no; {0} row, {1} column, {2} value</shortDescription>
-        <value>Row {0}: &quot;{2}&quot; in the {1} column is not a yes or no value, so that checkbox was left as it was. The rest of the row was used. Correct the cell and import again.</value>
+        <value>Row {0}: "{2}" in the {1} column is not a yes or no value, so that checkbox was left as it was. The rest of the row was used. Correct the cell and import again.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogNoExternalIdField</fullName>
@@ -190,7 +190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import run log: user lacks the organization record type; {0} is its label</shortDescription>
-        <value>No new organization was created, because you cannot use the {0} record type, which BarnCRM Settings uses for organizations (Record type for organizations, on General). Rows that needed one were rejected. Ask your Salesforce administrator to give you that record type, or choose another one in that setting, then load the file again.</value>
+        <value>No new organization was created, because you cannot use the {0} record type that BarnCRM Settings uses for organizations (Record type for organizations, on General). Rows that needed one were rejected. Ask your Salesforce administrator for that record type, or choose another in that setting, then load the file again.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogPersonRecordTypeMissing</fullName>
@@ -198,7 +198,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import run log: no usable person account record type</shortDescription>
-        <value>No person account record type is available to you, so no person was created. Ask your administrator to assign one to your profile or a permission set.</value>
+        <value>No person account record type is available to you, so no person was created. Ask your BarnCRM admin to assign one to your profile or a permission set.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogChunkFailed</fullName>
@@ -414,7 +414,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import error: a file row is too long to stage; {0} is the row number</shortDescription>
-        <value>Row {0} of the file is too long to import (over 32,768 characters). A quotation mark that is never closed is the usual cause. Fix the row in your spreadsheet and upload the file again.</value>
+        <value>Row {0} of the file is too long to import (over 32,768 characters), usually from an unclosed quotation mark. Fix the row in your spreadsheet and upload the file again.</value>
     </labels>
     <labels>
         <fullName>Core_Import_CardTitle</fullName>
@@ -750,7 +750,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import rejected rows file capped; {0} rows in the file, {1} rows rejected</shortDescription>
-        <value>The rejected rows file holds the first {0} of {1} rejected rows, the most one download can read. Fix and import those rows, then preview the file again to get the rest.</value>
+        <value>The rejected rows file holds the first {0} of {1} rejected rows, the most one download can read. Fix and import those rows, then preview the file again for the rest.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ReadOnlyMessage</fullName>
@@ -1086,7 +1086,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: an Excel file too large to open</shortDescription>
-        <value>This Excel file is too large to open in the browser: it has more than 500,000 rows or 1,000 columns, or a sheet over 100 MB. Save the sheet as CSV and upload that.</value>
+        <value>This Excel file is too large to open in the browser (over 500,000 rows or 1,000 columns, or a sheet over 100 MB). Save the sheet as CSV and upload that.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorControlCountNegative</fullName>
@@ -1310,7 +1310,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import error: user lacks the record type a new organization gets; {0} label</shortDescription>
-        <value>This row's organization is not in Salesforce yet, and you cannot use the {0} record type that new organizations get (Record type for organizations, BarnCRM Settings). Get that record type from your Salesforce administrator, or have another one chosen, then load the row again.</value>
+        <value>This row's organization is not in Salesforce yet, and you cannot use the {0} record type that new organizations get (Record type for organizations, BarnCRM Settings). Ask your Salesforce administrator for it, or choose another, then load the row again.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorMatchFieldNotAllowed</fullName>
@@ -1334,7 +1334,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import error: a value for every row names one person; {0} the field</shortDescription>
-        <value>A value for every row cannot give a person's name, email or matching ID, because every row would then be the same person. Remove the value for {0} and try again.</value>
+        <value>A value for every row cannot give a person's name, email or matching ID, because every row would be the same person. Remove the value for {0} and try again.</value>
     </labels>
     <labels>
         <fullName>Core_Import_PersonMatchFieldLabel</fullName>
@@ -1534,7 +1534,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import error: no visible record has the row's ID; {0} is the ID</shortDescription>
-        <value>No record with the ID {0} was found that you can see. A row with an ID never creates a record: check the ID and your access to it, then import the row again.</value>
+        <value>No record with the ID {0} was found that you can see. A row with an ID never creates a record: check the ID and your access, then import the row again.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorMatchOnlyNoMatch</fullName>

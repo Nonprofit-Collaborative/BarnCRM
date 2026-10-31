@@ -238,7 +238,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Generic failure</shortDescription>
-        <value>That did not save. Try again, or reload the page.</value>
+        <value>The logic model could not be saved. The details are in the Error Log.</value>
     </labels>
     <labels>
         <fullName>LogicModels_Builder_NotFound</fullName>

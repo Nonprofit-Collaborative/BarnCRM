@@ -94,7 +94,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Add credit button</shortDescription>
-    <value>Add credit</value>
+    <value>Add Credit</value>
   </labels>
   <labels>
     <fullName>Giving_SoftCredits_AmountLabel</fullName>
@@ -222,7 +222,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Mark notification sent button</shortDescription>
-    <value>Mark notification sent</value>
+    <value>Mark Notification Sent</value>
   </labels>
   <labels>
     <fullName>Giving_TributeNotification_None</fullName>
@@ -278,7 +278,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Household recompute deferred</shortDescription>
-    <value>Household soft credits for {0} household(s) could not be recomputed now, because this operation has no asynchronous capacity left. The credits are corrected the next time each gift is saved.</value>
+    <value>Household soft credits for {0} household(s) could not be recomputed now, because no asynchronous capacity was left. They are corrected the next time each gift is saved.</value>
   </labels>
   <labels>
     <fullName>Giving_MatchingGift_GiftNotReceived</fullName>
@@ -286,7 +286,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Matching gift on a refunded gift</shortDescription>
-    <value>A gift that has been refunded or written off cannot be part of a matching gift pair. Unlink the match before recording the refund, or link the replacement gift instead.</value>
+    <value>A gift that has been refunded or written off cannot be part of a matching gift pair. Unlink the match before recording the refund, or link the replacement gift.</value>
   </labels>
   <labels>
     <fullName>Giving_TributeNotification_NoRecipient</fullName>

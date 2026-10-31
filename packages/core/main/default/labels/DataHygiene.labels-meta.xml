@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal without the Find and Export Records permission.</shortDescription>
-        <value>Data Quality needs the Find and Export Records permission. Ask your administrator to assign you the BarnCRM Find and Export permission set.</value>
+        <value>Data Quality needs the Find and Export Records permission. Ask your BarnCRM admin to assign you the BarnCRM Find and Export permission set.</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_PeopleAccountsNotListed</fullName>
@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Note on the people check in membership record mode: count and Find list differ.</shortDescription>
-        <value>The count leaves out erased people and includes people kept as person accounts. Find lists contacts only, so it does not list person accounts, and it may list a contact who has been erased. Health Check links the first five.</value>
+        <value>The count leaves out erased people and includes people kept as person accounts. Find lists contacts only, so it omits person accounts and may list an erased contact. Health Check links the first five.</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_NoAccess</fullName>

@@ -143,6 +143,11 @@ function one(element, id) {
   return element.shadowRoot.querySelector(`[data-id="${id}"]`);
 }
 
+/** Chooses Undo in a job row's menu. */
+function pickUndo(element, id) {
+  one(element, id).dispatchEvent(new CustomEvent('select', { detail: { value: 'undo' } }));
+}
+
 function rows(element) {
   return Array.from(element.shadowRoot.querySelectorAll('[data-id="job-row"]'));
 }
@@ -266,11 +271,24 @@ describe('c-data-job-history', () => {
     expect(one(element, 'error-message').textContent).toBe('No access');
   });
 
+  it('shows each status as a badge and keeps Undo in a row menu', async () => {
+    getUpdatePage.mockResolvedValue({ allowed: true, jobs: [{ ...UPDATE_JOB, status: 'Failed' }] });
+    getDeletePage.mockResolvedValue({ allowed: true, jobs: [] });
+    const element = await render();
+
+    const badges = element.shadowRoot.querySelectorAll('[data-id="status-badge"]');
+    expect(badges.length).toBeGreaterThan(0);
+    const failed = Array.from(badges).find((badge) => badge.label === 'Failed');
+    expect(failed.className).toContain('slds-theme_error');
+    expect(one(element, UPDATE_JOB.recordId).tagName.toLowerCase()).toBe('lightning-button-menu');
+    expect(element.shadowRoot.querySelector('lightning-menu-item').value).toBe('undo');
+  });
+
   it('undoes a bulk update only once the number is typed', async () => {
     undoUpdate.mockResolvedValue({ ...UPDATE_JOB, status: 'Undoing', canUndo: false });
     const element = await render();
 
-    one(element, UPDATE_JOB.recordId).click();
+    pickUndo(element, UPDATE_JOB.recordId);
     await flush();
     expect(one(element, 'undo-line').textContent).toBe('Puts back 37.');
     expect(one(element, 'bulk-undo-start').disabled).toBe(true);
@@ -298,7 +316,7 @@ describe('c-data-job-history', () => {
     });
     undoUpdate.mockResolvedValue({ ...UPDATE_JOB, status: 'Undoing', running: true });
     const element = await render();
-    one(element, UPDATE_JOB.recordId).click();
+    pickUndo(element, UPDATE_JOB.recordId);
     await flush();
     await change(one(element, 'undo-confirm'), '37');
     one(element, 'bulk-undo-start').click();
@@ -325,7 +343,11 @@ describe('c-data-job-history', () => {
     await flush();
     expect(getUpdatePage.mock.calls.length).toBe(readsBefore + 2);
     expect(pending).toHaveLength(0);
-    expect(element.shadowRoot.textContent).toContain('Undone');
+    const badge = Array.from(element.shadowRoot.querySelectorAll('[data-id="status-badge"]')).find(
+      (candidate) => candidate.label === 'Undone'
+    );
+    expect(badge).toBeDefined();
+    expect(badge.className).toContain('slds-theme_success');
     jest.restoreAllMocks();
   });
 
@@ -333,7 +355,7 @@ describe('c-data-job-history', () => {
     undoDelete.mockResolvedValue({ ...DELETE_JOB, status: 'Undoing', canUndo: false });
     const element = await render();
 
-    one(element, DELETE_JOB.recordId).click();
+    pickUndo(element, DELETE_JOB.recordId);
     await flush();
     expect(one(element, 'undo-line').textContent).toBe('Brings back 4.');
     await change(one(element, 'undo-confirm'), '4');
@@ -356,7 +378,7 @@ describe('c-data-job-history', () => {
     startUndo.mockResolvedValue({ ...IMPORT_JOB, status: 'Undoing' });
     const element = await render();
 
-    one(element, IMPORT_JOB.id).click();
+    pickUndo(element, IMPORT_JOB.id);
     await flush();
     await flush();
 
@@ -378,7 +400,7 @@ describe('c-data-job-history', () => {
     previewUndo.mockResolvedValue({ allowed: false, reason: 'The time to undo ended.' });
     const element = await render();
 
-    one(element, IMPORT_JOB.id).click();
+    pickUndo(element, IMPORT_JOB.id);
     await flush();
     await flush();
 

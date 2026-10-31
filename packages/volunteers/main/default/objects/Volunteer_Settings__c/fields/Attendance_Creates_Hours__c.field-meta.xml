@@ -6,7 +6,7 @@
   <inlineHelpText>
     Whether marking a sign-up Attended writes the volunteer hours for that shift.
   </inlineHelpText>
-  <label>Attendance Creates Hours</label>
+  <label>Create Hours From Attendance</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>
 </CustomField>

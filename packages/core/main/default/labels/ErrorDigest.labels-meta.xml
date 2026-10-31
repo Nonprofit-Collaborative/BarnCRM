@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel introduction.</shortDescription>
-        <value>One short email a day or a week to the people who look after BarnCRM, counting the new Error Log entries by source and severity with a link to each. Nothing is sent when nothing is new.</value>
+        <value>One short email a day or a week to the people who look after BarnCRM, counting new Error Log entries by source and severity, with a link to each. Nothing is sent when nothing is new.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_LastRunTitle</fullName>

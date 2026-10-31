@@ -6,7 +6,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments: the permission a send needs</shortDescription>
-    <value>Sending thank yous needs the Send Acknowledgments permission. Ask your administrator for the Fundraising Staff role.</value>
+    <value>Sending thank yous needs the Send Acknowledgments permission. Ask your BarnCRM admin for the Fundraising Staff role.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgment_UnexpectedError</fullName>
@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments: an unexpected failure, with the log pointed at</shortDescription>
-    <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your administrator to check it.</value>
+    <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your BarnCRM admin to check it.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgment_SendFailedUnknown</fullName>
@@ -46,7 +46,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments: the log entry for gifts with no recipient</shortDescription>
-    <value>{0} gifts in this send had nobody to email, so they were left in the queue: {1}. Give the donor a contact with an email address, or write a rule that sends these by letter.</value>
+    <value>{0} gifts in this send had nobody to email and stayed in the queue: {1}. Give the donor a contact with an email address, or write a rule that sends these by letter.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgment_EmailRunSummary</fullName>
@@ -102,7 +102,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: what the page is for</shortDescription>
-    <value>Your thank you rules and what is waiting to go out. Emails are sent from here or overnight; letters come out as a spreadsheet you merge with your own letter and print.</value>
+    <value>Your thank you rules and what is waiting to go out. Emails send from here or overnight. Letters come out as a spreadsheet you merge with your own letter and print.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_Off</fullName>
@@ -182,7 +182,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the button that starts an email run</shortDescription>
-    <value>Send emails now</value>
+    <value>Send Emails Now</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_EmailsStarted</fullName>
@@ -198,7 +198,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the button that produces the letter file</shortDescription>
-    <value>Download letters to merge</value>
+    <value>Download Letters to Merge</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_LettersReady</fullName>
@@ -214,7 +214,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the button that closes a letter run</shortDescription>
-    <value>Mark as sent</value>
+    <value>Mark as Sent</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_LettersMarkedSent</fullName>
@@ -278,7 +278,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the button that creates a rule</shortDescription>
-    <value>New rule</value>
+    <value>New Rule</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_EditRule</fullName>
@@ -406,7 +406,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: an action failed</shortDescription>
-    <value>That did not work. Try again, and if it keeps happening, ask your administrator to check the Error Log.</value>
+    <value>That did not work. Try again, and if it keeps happening, ask your BarnCRM admin to check the Error Log.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_ColumnRule</fullName>

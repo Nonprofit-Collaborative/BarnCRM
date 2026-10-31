@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Run now refused without Manage BarnCRM Settings</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to run the seasonal address swap. Ask your administrator for the BarnCRM Admin role.</value>
+        <value>You need the Manage BarnCRM Settings permission to run the seasonal address swap. Ask your BarnCRM admin for the BarnCRM Admin role.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_ReadOnly</fullName>
@@ -126,6 +126,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Message shown when the seasonal swap panel fails for a reason it cannot explain</shortDescription>
-        <value>Something went wrong with the seasonal address swap. Try again, and if it happens again ask your administrator to check the Error Log.</value>
+        <value>Something went wrong with the seasonal address swap. Try again, and if it happens again ask your BarnCRM admin to check the Error Log.</value>
     </labels>
 </CustomLabels>

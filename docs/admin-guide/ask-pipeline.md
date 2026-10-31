@@ -44,18 +44,18 @@ By default every fundraiser sees every ask (Public Read/Write), because a small 
 
 ## What Fundraisers See
 
-In the **Fundraising** app, the **Ask Pipeline** tab shows:
+In the **BarnCRM Fundraising** app, the **Ask Pipeline** tab shows:
 
 - Totals at the top: **Open Asks** (count), **Open Ask Total**, **Won This Fiscal Year** (count and ask amount) and **Declined This Fiscal Year** (count). The fiscal year is your org's fiscal year from Setup, counted by **Closed Date**. The totals are always exact.
 - The **Board** (one column per stage with its count and total) and the **List**. The board draws up to 1,000 open ask cards and says so when there are more.
 - **Everyone's Asks** and **My Asks** filters, and a **New Ask** button.
 
-The **Asks** tab has the list views **Open Asks**, **My Open Asks** and **All Asks**. An **Asks** related list, with a **New** button, is on person, household and organization pages in the Fundraising app. The user guide page [The Ask Pipeline](../user-guide/ask-pipeline.md) covers the daily steps.
+The **Asks** tab has the list views **Open Asks**, **My Open Asks** and **All Asks**. An **Asks** related list, with a **New** button, is on person, household and organization pages in the BarnCRM Fundraising app. The user guide page [The Ask Pipeline](../user-guide/ask-pipeline.md) covers the daily steps.
 
 ## A Five-Minute Walkthrough
 
 1. Open **BarnCRM Settings**, **Giving**. Leave **Ask stages** empty to use the defaults.
-2. Open the **Fundraising** app and the **Ask Pipeline** tab. The board shows five empty columns.
+2. Open the **BarnCRM Fundraising** app and the **Ask Pipeline** tab. The board shows five empty columns.
 3. Choose **New Ask**. Pick a **Donor Contact**, type an **Ask Amount** of 1,000 and a **Target Date**, and save. The card is in **Identified**.
 4. Drag the card to **Cultivating**. The column counts and totals change.
 5. In the card's menu choose **Close Ask**. Under **How Did It End?** choose **Won**, then **Record the Gift Now**, and save.

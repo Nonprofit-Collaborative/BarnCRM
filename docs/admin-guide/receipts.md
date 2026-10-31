@@ -231,7 +231,7 @@ Recorded here rather than hidden, because each may change what you see:
    conclude anything: check that the logo file is shared with the people who issue receipts,
    because BarnCRM will not print a file the running user cannot see and writes an Error
    Log warning saying so; try the other two values of **Logo delivery route**; and if none of
-   them works, turn **Print the logo on receipts** off so your documents are deliberately
+   them works, turn **Print the Logo on Receipts** off so your documents are deliberately
    plain rather than accidentally so.
 2. **Two people cannot issue receipts at the same instant.** Receipt numbers come from one
    counter, and whoever is using it holds it until their receipt or their statement run

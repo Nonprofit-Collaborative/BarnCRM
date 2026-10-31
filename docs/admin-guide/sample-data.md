@@ -61,16 +61,16 @@ there:
 |---|---|---|
 | Skills | 4 | First aid, Spanish, Forklift and Gardening, with the jobs that ask for them |
 | Jobs | 3 | Food pantry sort, Front desk and Community garden, each with a description and a location |
-| Shift schedule | 1 | **Saturday sorting**, every Saturday morning for the pantry. Like any schedule, it creates its shifts as far ahead as the **Shift horizon weeks** setting says |
+| Shift schedule | 1 | **Saturday sorting**, every Saturday morning for the pantry. Like any schedule, it creates its shifts as far ahead as the **Weeks Ahead to Create Shifts** setting says |
 | Shifts | 16, plus the schedule's | A morning shift for each job in each of the last four weeks, marked Completed, and four upcoming shifts on the front desk and in the garden |
-| Sign-ups | 44 | Three people attended each past shift; two are booked on each upcoming shift, one Confirmed and one Signed up |
+| Sign-Ups | 44 | Three people attended each past shift; two are booked on each upcoming shift, one Confirmed and one Signed up |
 | Hours | 60 | One entry for each attendance and one garden entry for each of 24 sample people. The newest four wait for approval, the next two are Rejected with a reason, and the rest are Approved |
 | Volunteer skills | 24 | One skill or interest on each of the 24 people |
 | Requirements | 8 | Six completed background checks and two orientations in progress |
 
 The hours get their statuses the way a coordinator gives them, so loading needs the **Manage
 Volunteers** permission (Volunteers Admin includes it). Without it the hours keep the status
-they were saved with: Submitted, or Approved when **Hours Require Approval** is off.
+they were saved with: Submitted, or Approved when **Require Hours Approval** is off.
 
 The set does not generate a letter, because a letter is a file. To see one, open any sample
 volunteer with Approved hours and use the **Volunteer Letter** action with the shipped Hours

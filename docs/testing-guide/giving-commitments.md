@@ -2,7 +2,7 @@
 
 Scripts for pledges and recurring gifts: payment schedules, paying a payment with a gift, pausing, cancelling, refunds and the overdue pass. Setup detail: [Commitments: pledges and recurring gifts](../admin-guide/commitments.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **Fundraising** app. A default fund must be set (script T-GIFT-01 in [Giving: gifts, funds and batches](giving-gifts-funds-batches.md)). The **Installments** tab is not in the app's navigation: open it from the app launcher. Leave the **Import** settings **Days either side of a payment's due date** (7) and **Amount difference allowed** (0) at their defaults.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app. A default fund must be set (script T-GIFT-01 in [Giving: gifts, funds and batches](giving-gifts-funds-batches.md)). The **Installments** tab is not in the app's navigation: open it from the app launcher. Leave the **Import** settings **Days either side of a payment's due date** (7) and **Amount difference allowed** (0) at their defaults.
 
 ## T-COM-01: Create a Pledge and See Its Schedule
 
@@ -15,7 +15,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | Open the **Commitments** tab and click **New**. | The form shows **Type**, **Donor**, **Donor Account**, **Status**, **Fund**, **Appeal**, **Amount**, **Frequency**, **Day of Month**, **Start Date**, **End Date**, **Installments Planned** and **Expected Total**. |
 | 2 | **Type** `Pledge`, **Donor** `Luis Garcia`, **Amount** `100`, **Frequency** `Monthly`, **Start Date** today, **Installments Planned** `12`. Leave **Expected Total** and **Day of Month** empty. Save. | The commitment opens on its record page. |
 | 3 | Read the fields. | **Status** Active, **Expected Total** 1,200.00 (filled in as amount times installments), **Household** The Garcia Family. |
-| 4 | Look at the **Payment Schedule** card. | 12 rows, **Number** 1 to 12, first **Due Date** today, monthly after that, each **Expected** 100.00 and **Status** Scheduled. The card shows **Pause**, **Mark complete** and **Cancel commitment**. |
+| 4 | Look at the **Payment Schedule** card. | 12 rows, **Number** 1 to 12, first **Due Date** today, monthly after that, each **Expected** 100.00 and **Status** Scheduled. The card shows **Pause**, **Mark Complete** and **Cancel Commitment**. |
 | 5 | Read **Paid To Date** and **Balance** (refresh after a few seconds if empty). | **Paid To Date** 0.00 (or empty), **Balance** 1,200.00. |
 | 6 | Open the **Commitments** tab, list view **Active Pledges**. | The new pledge is listed with the sample pledges. |
 
@@ -79,7 +79,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the T-COM-03 gift, click **Refund or Write Off**. Choose **Refund part or all of this gift**, **How much is going back** `40`, a reason, **Record it**. | "Recorded. The gift it reverses now shows what happened." |
+| 1 | Open the T-COM-03 gift, click **Refund or Write Off**. Choose **Refund part or all of this gift**, **How much is going back** `40`, a reason, **Record It**. | "Recorded. The gift it reverses now shows what happened." |
 | 2 | Open the pledge. | Payment 1 **Status** Partially paid, **Paid** 60.00. **Paid To Date** 60.00, **Balance** 1,140.00. |
 | 3 | Refund the remaining `60` from the same gift. | Recorded. |
 | 4 | Open the pledge again. | Payment 1 is no longer Paid or Partially paid (Scheduled, or Overdue once past its grace days). **Balance** 1,200.00. |
@@ -95,9 +95,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Open the recurring gift. On **Payment Schedule** click **Pause**. | "The commitment was updated." **Status** Paused. Scheduled payments stay. **Resume** replaces **Pause**. |
 | 2 | Click **Resume** (undo). | **Status** Active; the schedule keeps its dates and numbering. |
-| 3 | Click **Cancel commitment**. | **Status** Cancelled. Every unpaid payment shows **Skipped**. No action buttons remain. |
+| 3 | Click **Cancel Commitment**. | **Status** Cancelled. Every unpaid payment shows **Skipped**. No action buttons remain. |
 | 4 | Open the **Commitments** tab, list view **Active Recurring Gifts**. | The cancelled gift is not listed. |
-| 5 | Open the T-COM-01 pledge, click **Mark complete**. | **Status** Completed. The pledge leaves **Active Pledges**. |
+| 5 | Open the T-COM-01 pledge, click **Mark Complete**. | **Status** Completed. The pledge leaves **Active Pledges**. |
 | 6 | Open **Quick Gift Entry**, pick Luis Garcia, **Amount** `100`. | No **Pays a scheduled payment** list: a completed pledge has no open payments. |
 
 **Cleanup:** none.
@@ -110,8 +110,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Giving**, **Nightly Jobs**, **Open**. | Card **Nightly Jobs** with "The nightly jobs are not scheduled, so no schedule is being extended and no payment will turn Overdue on its own." and **Schedule Nightly Run**. |
-| 2 | Click **Schedule Nightly Run**. | "The nightly jobs are scheduled." Each job shows a **Next Run**. **Stop Nightly Run** and **Run the jobs now** show. |
-| 3 | Click **Run the jobs now**. | "The top up and the overdue pass have started. Refresh this page in a minute to see what they did." |
+| 2 | Click **Schedule Nightly Run**. | "The nightly jobs are scheduled." Each job shows a **Next Run**. **Stop Nightly Run** and **Run the Jobs Now** show. |
+| 3 | Click **Run the Jobs Now**. | "The top up and the overdue pass have started. Refresh this page in a minute to see what they did." |
 | 4 | Refresh after a minute. | **Last Run** for the top up and the overdue pass shows a time and a result line (for example a count of payments marked overdue, or that none were). |
 | 5 | Open the **Installments** tab, list view **Overdue**. | Lists payments with **Status** Overdue, including the sample monthly donor's three overdue payments. Each is more than the grace days (5) past due. |
 | 6 | Switch to **Upcoming 30 Days**. | Payments due in the next 30 days. |
@@ -128,7 +128,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Open the pledge, choose **Delete**, confirm. | Refused: "This commitment cannot be deleted because a gift has been received against one of its payments. Cancel it instead." |
 | 2 | Open one of its Paid payments from the **Installments** tab, choose **Delete**. | Refused: "This payment cannot be deleted because a gift has been received against it. Mark it Skipped instead." |
-| 3 | Open the pledge's donor (Carmen Torres), choose **Delete**. | Refused: "This record is the donor of an active or paused pledge or recurring gift, so it cannot be deleted. Cancel the commitment, or change its donor, first. Merging a duplicate still works." |
+| 3 | Open the pledge's donor (Carmen Torres), choose **Delete**. | Refused: "This record is the donor of an active or paused pledge or recurring gift, so it cannot be deleted. Cancel the commitment or change its donor first. Merging a duplicate still works." |
 
 **Cleanup:** none.
 
@@ -142,7 +142,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | As staff, open any sample pledge. | **Edit** shows; **Delete** does not. |
 | 2 | As read-only, open the **Commitments** tab. | No **New** button. The list views **Active Pledges** and **Active Recurring Gifts** show. |
 | 3 | As read-only, open an Active recurring gift. | No **Edit** or **Delete**. The **Payment Schedule** card lists the payments. |
-| 4 | Look at the card's buttons. | No **Pause**, **Resume**, **Mark complete** or **Cancel commitment**. On a commitment with no payments yet, the card has no **Generate now**. |
+| 4 | Look at the card's buttons. | No **Pause**, **Resume**, **Mark Complete** or **Cancel Commitment**. On a commitment with no payments yet, the card has no **Generate Now**. |
 | 5 | As the step 5 user, open **Commitments**, **All Commitments**, then **Gifts**, **All Gifts**. Create a pledge, then reopen **All Commitments**. | Neither list shows the sample commitments or gifts owned by someone else, the same for both. The new pledge shows, with its **Payment Schedule**. Sharing a sample pledge with this user (**Sharing** on the record) makes it show. |
 **Cleanup:** none.
 
@@ -167,12 +167,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, **Commitments and Installments**. | **Send pledge reminders** is off, and **Pledge Reminders** is listed below it. |
+| 1 | Open **BarnCRM Settings**, **Giving**, **Commitments and Installments**. | **Send Pledge Reminders** is off, and **Pledge Reminders** is listed below it. |
 | 2 | Open **Pledge Reminders**. | A notice says reminders are off. **Send Reminders Now** is disabled. No steps are listed. |
 | 3 | Choose **New Step**. Name `Week late`, **Days From Due Date** `7`, **Channel** `Email`, choose **BarnCRM: pledge installment overdue**. Save. | The step is listed with timing `7 days after the due date` and its template name. |
 | 4 | Choose **New Step** again. Name `Final letter`, **Days From Due Date** `30`, **Channel** `Letter`. Save. | Listed with timing `30 days after the due date`; the template column is empty. |
 | 5 | Choose **New Step** a third time, **Channel** `Email`, and save without choosing a template. | The form asks for an email template and does not save. Cancel. |
-| 6 | In **BarnCRM Settings**, turn on **Send pledge reminders**. Return to **Pledge Reminders**. | The off notice is gone. **Emails** reads 1 and **Letters** reads 1. |
+| 6 | In **BarnCRM Settings**, turn on **Send Pledge Reminders**. Return to **Pledge Reminders**. | The off notice is gone. **Emails** reads 1 and **Letters** reads 1. |
 | 7 | Press **Send Reminders Now**. Wait a minute, then refresh. | Under **Recent Reminders**: `Week late` by Email for the first donor, status **Sent**; `Week late` by Letter for the opted-out donor, status **Queued**. |
 | 8 | Press **Send Reminders Now** again. | No new rows: the same step never reminds the same payment twice. |
 | 9 | Press **Produce Letter File**. | A **Download letters** link appears. The CSV has one row with the opted-out donor, amount, 7 days overdue and the step name. The row is still **Queued**. |
@@ -180,6 +180,6 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 11 | Open the **Pledge Reminders Log** tab, list view **All Pledge Reminders**. | Both rows are listed with their pledge, payment, step, channel and status. |
 | 11a | Repeat steps 7 to 10 for a donor whose email address is blank, and for one whose Email Bounced flag is set (one pledge each, Start Date seven days ago). | Each is reminded by a Queued letter, not an email. |
 | 11b | Add a step with **Days From Due Date** `-3`, **Channel** `Email`, and run reminders for a payment due today. | No reminder is made by that step: a heads-up step stops once the due date arrives. |
-| 12 | In **BarnCRM Settings**, turn **Send pledge reminders** off. Return to the page and press **Send Reminders Now**. | The button is disabled; if the page was open before the change, the error says reminders are turned off. |
+| 12 | In **BarnCRM Settings**, turn **Send Pledge Reminders** off. Return to the page and press **Send Reminders Now**. | The button is disabled; if the page was open before the change, the error says reminders are turned off. |
 
-**Cleanup:** turn **Send pledge reminders** off, and clear **Active** on both steps.
+**Cleanup:** turn **Send Pledge Reminders** off, and clear **Active** on both steps.

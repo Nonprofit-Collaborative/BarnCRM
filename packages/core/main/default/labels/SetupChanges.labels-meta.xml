@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Setup Changes: line under the heading</shortDescription>
-        <value>Who changed what in Setup, and when, from the Salesforce Setup Audit Trail. Salesforce keeps it for 180 days; BarnCRM copies it every night and keeps it longer. Nothing in Setup is changed here.</value>
+        <value>Who changed what in Setup, and when, from the Salesforce Setup Audit Trail. Salesforce keeps it 180 days; BarnCRM copies it nightly and keeps it longer. Nothing in Setup changes here.</value>
     </labels>
     <labels>
         <fullName>Core_SetupChanges_Kept</fullName>

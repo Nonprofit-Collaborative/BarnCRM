@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Record Inspector refusal: no Manage BarnCRM Settings permission.</shortDescription>
-        <value>The Record Inspector needs the Manage BarnCRM Settings permission. Ask a BarnCRM Admin to assign it to you.</value>
+        <value>The Record Inspector needs the Manage BarnCRM Settings permission. Ask your BarnCRM admin to assign it to you.</value>
     </labels>
     <labels>
         <fullName>Core_RecordInspector_ErrorNotFound</fullName>
