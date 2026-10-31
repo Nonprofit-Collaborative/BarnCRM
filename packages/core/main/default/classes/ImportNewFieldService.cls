@@ -449,11 +449,12 @@ public with sharing class ImportNewFieldService {
 
     /**
      * Gives read and edit (read only for BarnCRM Read Only) through the packaged permission sets
-     * and the chosen one. Updates a row that exists, so running it twice is harmless. A
-     * permission set that cannot take the row (no object read) is logged and skipped. System
+     * and the chosen one. Updates a row that exists, so running it twice is harmless. Object
+     * access is never widened: a permission set without Read on the object is skipped, as is one
+     * whose row Salesforce refuses, and each skip is logged in words and returned. System
      * mode: the running user already holds Modify Metadata, which can deploy the same change.
      */
-    public static void grantAccess(
+    public static List<String> grantAccess(
         String objectApiName,
         String fieldName,
         Id chosenId,
@@ -475,6 +476,41 @@ public with sharing class ImportNewFieldService {
             labelById.put(each.Id, each.Label);
         }
         String field = objectApiName + '.' + fieldName;
+        List<String> skipped = new List<String>();
+        Set<Id> canRead = new Set<Id>();
+        for (ObjectPermissions each : [
+            SELECT ParentId
+            FROM ObjectPermissions
+            WHERE
+                ParentId IN :editById.keySet()
+                AND SobjectType = :objectApiName
+                AND PermissionsRead = TRUE
+            WITH SYSTEM_MODE
+        ]) {
+            canRead.add(each.ParentId);
+        }
+        Schema.SObjectType objectType = NamespaceUtil.objectType(objectApiName);
+        String objectLabel = objectType == null
+            ? objectApiName
+            : objectType.getDescribe().getLabel();
+        for (Id parentId : new List<Id>(editById.keySet())) {
+            if (!canRead.contains(parentId)) {
+                editById.remove(parentId);
+                skipped.add(
+                    String.format(
+                        Label.Core_ImportNewField_AccessSkipped,
+                        new List<String>{
+                            field,
+                            labelById.get(parentId),
+                            String.format(
+                                Label.Core_ImportNewField_NoObjectRead,
+                                new List<String>{ objectLabel }
+                            )
+                        }
+                    )
+                );
+            }
+        }
         Map<Id, FieldPermissions> byParent = new Map<Id, FieldPermissions>();
         for (FieldPermissions existing : [
             SELECT Id, ParentId, PermissionsRead, PermissionsEdit
@@ -498,7 +534,6 @@ public with sharing class ImportNewFieldService {
             row.PermissionsEdit = row.PermissionsEdit == true || editById.get(parentId);
             (row.Id == null ? added : changed).add(row);
         }
-        List<String> skipped = new List<String>();
         List<FieldPermissions> rows = new List<FieldPermissions>(added);
         rows.addAll(changed);
         List<Database.SaveResult> results = Database.insert(added, false, AccessLevel.SYSTEM_MODE);
@@ -520,6 +555,7 @@ public with sharing class ImportNewFieldService {
         if (!skipped.isEmpty()) {
             ErrorLogger.logMessages(skipped, logContext, ErrorLogger.SEVERITY_WARNING);
         }
+        return skipped;
     }
 
     // -------------------------------------------------------------------------------------
