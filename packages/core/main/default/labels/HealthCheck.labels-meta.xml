@@ -369,6 +369,14 @@
         <value>Import row cleanup</value>
     </labels>
     <labels>
+        <fullName>Core_HealthCheck_JobSetupChanges</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the nightly job that copies the Setup Audit Trail.</shortDescription>
+        <value>Setup changes copy</value>
+    </labels>
+    <labels>
         <fullName>Core_HealthCheck_JobEmptyHouseholds</fullName>
         <categories>Core</categories>
         <language>en_US</language>

@@ -1156,6 +1156,7 @@ range reads as the nearest end.
 | `Stale_Record_Years__c` | integer | 5 | Years without a change before the Data quality check People not changed lists a person (R-SQ6). From 1 to 20; empty reads as 5. |
 | `Unused_Login_Days__c` | integer | 90 | Days without a login before Unused setup lists an active user. From 30 to 365; empty reads as 90. |
 | `Unused_Report_Days__c` | integer | 365 | Days without a run before Unused setup lists a report. From 90 to 1,095; empty reads as 365. |
+| `Setup_Change_Retention_Days__c` | integer | 730 | Days a copied Setup Audit Trail row is kept before the nightly Setup Changes copy deletes it (R-SU4, C-56). From 180 to 3,650; empty reads as 730, out of range as the nearest end. |
 
 ### Duplicate Matching keys
 
@@ -9045,6 +9046,86 @@ indexed for an org of more than 100,000 accounts; the V-06 Core work adds it, by
 
 ---
 
+## 29W. Setup Change
+
+### Definition
+
+A copy of one row of the Salesforce Setup Audit Trail: who changed what in Setup, and when
+(feature C-56, plan D-156). Salesforce keeps the trail for 180 days; BarnCRM keeps its copy for
+as long as the org chooses, so a part-time administrator can answer "who changed this, and
+when?" long after Setup has forgotten. The copy is read only: BarnCRM never changes Setup.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Audit trail ID | text(18) | yes | The Setup Audit Trail row's ID. Unique: a row is never stored twice. |
+| Changed at | datetime | yes | When the change was made. |
+| Changed by | text(121) | no | The name of the user who made it, as it was when copied. Blank when Salesforce gives no name (an automated process). |
+| Delegate user | text(80) | no | The username of the person who was logged in as that user, when someone was. |
+| Section | text(40) | no | The Setup area, such as Customize Accounts or Manage Users. |
+| Action | text(120) | no | Salesforce's code for the kind of change, such as `changedFieldLabel`. |
+| What changed | long text(1000) | no | Salesforce's own sentence for the change, such as "Changed Phone field label". |
+
+### Rules
+
+**R-SU1 Source.** Rows come only from `SetupAuditTrail`, read with SOQL. BarnCRM reads the
+trail and writes only its own copy; it never changes Setup.
+
+**R-SU2 Copy.** The nightly job "BarnCRM Setup Changes Copy" (1:30, listed among Health
+Check's nightly jobs) copies every trail row made at or after the newest kept row's Changed At,
+or every row the trail holds when nothing is kept yet. A row already kept is found by its Audit
+Trail ID and not stored again. An administrator can also run the same copy from the page
+(**Copy New Changes Now**), which schedules the nightly job when it is not scheduled.
+
+**R-SU3 Who can read the trail.** Salesforce lets a user read the trail only with View Setup
+and Configuration. The copy runs as the user who scheduled it, or who pressed Copy New Changes
+Now; when the trail cannot be read, the run writes one Error Log entry and copies nothing.
+
+**R-SU4 Retention.** After copying, the same run deletes the kept rows whose Changed At is
+older than the Org Optimizer setting Days to Keep Setup Changes
+(`Setup_Change_Retention_Days__c`): 730 days unless changed, from 180 to 3,650.
+
+**R-SU5 Administrators only.** The page and every controller method require Manage BarnCRM
+Settings. Only `BarnCRM_Admin` is granted the object, Read and View All only. Rows are written
+and deleted only by the copy, in system mode (the package's own copy, as ADR-0021 allows), and
+nobody edits them.
+
+**R-SU6 Filters and export.** The page lists kept rows newest first, filtered by From and To
+(dates in the person's time zone, both ends included), Section (the sections kept) and Search
+(case-insensitive words found in What Changed, Section, Action, Changed By or Delegate User).
+It shows the newest 200 matches; **Download CSV** writes up to 5,000 with the same filters
+(R-SQ3 format). One search looks at no more than 40,000 kept rows and says so when it stops.
+
+**R-SU7 Feeds the digest.** The Weekly Admin Digest (C-54) counts rows by Changed At since its
+last send; no other data is needed.
+
+**R-SU8 Off with Org Optimizer.** While the Org Optimizer feature is off, a run (nightly or
+Copy New Changes Now) copies nothing, deletes nothing and logs nothing; kept rows stay as they
+are until it is turned on.
+
+### Salesforce implementation
+
+- **Object** `Setup_Change__c`, auto number Name `SC-{000000}`, public read only sharing,
+  reports on, no activities, feeds, history or search.
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Audit trail ID | `Audit_Trail_Id__c` | Text(18) | External ID, unique, case sensitive. |
+| Changed at | `Changed_At__c` | DateTime | |
+| Changed by | `Changed_By__c` | Text(121) | |
+| Delegate user | `Delegate_User__c` | Text(80) | |
+| Section | `Section__c` | Text(40) | |
+| Action | `Action__c` | Text(120) | |
+| What changed | `Display__c` | LongTextArea(1000) | |
+
+- **Classes:** `SetupChangeCopyJob` (schedulable and batchable: copy, then delete past
+  retention), `SetupChangeController` (summary, search, copy now; every method requires
+  `Manage_BarnCRM_Settings`). The page is the `setupChangeLog` component, the Setup Changes
+  section of Org Optimizer, its only host.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -9329,6 +9410,7 @@ mirrors the primary member).
 | v0.11 | 2026-10-29 | Security review G-L4 and G-L5 (owner decisions). No object or field added. New R-AK13 (ADR-0144, `0144-acknowledgments-honor-email-opt-out.md`): an email gift whose recipient contact has Email Opt Out is not emailed, gets no row and stays queued, and the letter run takes it as a letter. `Giving_Admin` loses View All on `Commitment__c`, matching `Gift__c`; commitment record access comes from ownership, roles and sharing. |
 | v1.0 | 2026-10-30 | Advanced duplicate management (C-51, D-154, ADR-0145 `0145-advanced-duplicate-management.md`). Object `Merge_Journal__c` added (Section 29A); custom metadata type `Merge_Rule__mdt` added (Section 13); settings keys `Fuzzy_Match_Threshold__c`, `Merge_Default_Rule__c` and `Auto_Merge_Exact_Match__c`. R-DP1 and R-DP4 amended; R-DP7 to R-DP10 added. |
 | v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-0149). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a) by any user with the import permission and edit access to the rows; `Import_Batch__c` gains `Retried_By__c` (Rows Retried By) so undo covers their records. R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
+| 0.12 | 2026-10-31 | Setup Changes Log (C-56, plan D-156). Object `Setup_Change__c` added (Section 29W), rules R-SU1 to R-SU8 (prefix R-SU, since R-SC is soft credits); settings key `Setup_Change_Retention_Days__c` (Org Optimizer keys). A nightly job copies new Setup Audit Trail rows and deletes copies past the retention. |
 
 ---
 ## 32. Entity ownership by package
@@ -9376,6 +9458,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Duplicate Reason | Core | v0.8 | 29A |
 | Saved Query | Core | v0.7 | 29D |
 | Field Utilization Snapshot | Core | not scheduled (plan Section 6.1 item 10) | 29F |
+| Setup Change | Core | 0.12 (C-56) | 29W |
 | What's New Seen | Core | v0.6 | 12A |
 | Release Note (shipped, read as shipped) | Core, records from any package | v0.6 | 13 |
 | Match Source (shipped default, admin rows) | Core | v0.8 | 13 |
