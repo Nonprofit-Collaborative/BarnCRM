@@ -99,6 +99,7 @@ import SAVED_RENAMED from '@salesforce/label/c.Core_SuperTransform_SavedRenamed'
 import SAVED_DELETED from '@salesforce/label/c.Core_SuperTransform_SavedDeleted';
 import SAVED_MISSING from '@salesforce/label/c.Core_SuperTransform_SavedMissingFields';
 import SAVED_SKIPPED from '@salesforce/label/c.Core_SuperTransform_SavedSkipped';
+import { messageFrom, format } from 'c/findCsv';
 
 /** A shipped step list: tidy spaces, then capitalize each word (for names). */
 const NAME_CASE_STEPS = [{ op: 'trim' }, { op: 'proper' }];
@@ -120,19 +121,8 @@ const INPUT_TYPES = {
   datetime: 'datetime'
 };
 
-function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
-}
-
 function shown(value) {
   return value === null || value === undefined || value === '' ? BLANK : String(value);
-}
-
-function messageFrom(error) {
-  if (error && error.body && error.body.message) {
-    return error.body.message;
-  }
-  return error && error.message ? error.message : String(error);
 }
 
 /**
@@ -580,7 +570,7 @@ export default class SuperTransform extends LightningElement {
     } catch (error) {
       if (request === this.countRequest) {
         this.counted = undefined;
-        this.errorMessage = messageFrom(error);
+        this.errorMessage = messageFrom(error, String(error));
       }
     } finally {
       if (request === this.countRequest) {
@@ -741,7 +731,7 @@ export default class SuperTransform extends LightningElement {
     this.stopTimer = startPolling(
       () => this.poll(),
       (error) => {
-        this.errorMessage = messageFrom(error);
+        this.errorMessage = messageFrom(error, String(error));
       }
     );
   }
@@ -915,7 +905,7 @@ export default class SuperTransform extends LightningElement {
     try {
       await action();
     } catch (error) {
-      this.errorMessage = messageFrom(error);
+      this.errorMessage = messageFrom(error, String(error));
     } finally {
       this.busy = false;
     }

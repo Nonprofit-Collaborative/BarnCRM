@@ -39,6 +39,7 @@ import FALSE_LABEL from '@salesforce/label/c.Core_BulkUpdate_False';
 import PATH_CHANGES from '@salesforce/label/c.Core_BulkUpdate_PathChanges';
 import PATH_CONFIRM from '@salesforce/label/c.Core_BulkUpdate_PathConfirm';
 import PATH_RUN from '@salesforce/label/c.Core_BulkUpdate_PathRun';
+import { messageFrom, format } from 'c/findCsv';
 
 const STEPS = [
   { value: 'changes', label: PATH_CHANGES },
@@ -56,10 +57,6 @@ const INPUT_TYPES = {
   date: 'date',
   datetime: 'datetime'
 };
-
-function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
-}
 
 function shown(value) {
   return value === null || value === undefined ? '' : String(value);
@@ -386,7 +383,7 @@ export default class BulkUpdate extends LightningElement {
     this.stopTimer = startPolling(
       () => this.poll(),
       (error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = messageFrom(error, String(error));
       }
     );
   }
@@ -422,16 +419,9 @@ export default class BulkUpdate extends LightningElement {
     try {
       await action();
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = messageFrom(error, String(error));
     } finally {
       this.busy = false;
     }
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return error && error.message ? error.message : String(error);
   }
 }

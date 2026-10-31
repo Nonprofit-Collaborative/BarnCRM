@@ -18,6 +18,7 @@ import RUN_NOW_STARTED from '@salesforce/label/c.Core_SeasonalAddress_RunNowStar
 import STALE from '@salesforce/label/c.Core_SeasonalAddress_Stale';
 import READ_ONLY from '@salesforce/label/c.Core_SeasonalAddress_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_SeasonalAddress_UnexpectedError';
+import { bodyMessage } from 'c/findCsv';
 
 /**
  * The seasonal address swap panel on the Addresses page of the BarnCRM Settings console.
@@ -140,14 +141,9 @@ export default class SeasonalAddressJob extends LightningElement {
         await refreshApex(this.wiredSwapResult);
       }
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
     } finally {
       this.busy = false;
     }
-  }
-
-  messageFrom(error) {
-    const body = error && error.body;
-    return (body && body.message) || UNEXPECTED_ERROR;
   }
 }

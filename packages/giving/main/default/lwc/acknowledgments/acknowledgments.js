@@ -71,6 +71,7 @@ import EMAIL_STEPS from '@salesforce/label/c.Giving_SetupNote_Email_Steps';
 import TEMPLATES_WHAT from '@salesforce/label/c.Giving_SetupNote_Templates_What';
 import TEMPLATES_WHY from '@salesforce/label/c.Giving_SetupNote_Templates_Why';
 import TEMPLATES_STEPS from '@salesforce/label/c.Giving_SetupNote_Templates_Steps';
+import { bodyMessage } from 'c/findCsv';
 
 const FILE_DOWNLOAD_PATH = '/sfc/servlet.shepherd/document/download/';
 const CHANNEL_EMAIL = 'Email';
@@ -178,7 +179,7 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
       this.errorMessage = undefined;
     }
     if (result.error) {
-      this.errorMessage = this.messageFrom(result.error);
+      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
     }
   }
 
@@ -416,17 +417,10 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
         return refreshApex(this.wiredPage);
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
       })
       .finally(() => {
         this.busy = false;
       });
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return ACTION_FAILED;
   }
 }

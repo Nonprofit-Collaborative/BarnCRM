@@ -18,6 +18,7 @@ import COLUMN_MB from '@salesforce/label/c.Core_OrgOptimizer_ColumnMB';
 import MORE_THAN from '@salesforce/label/c.Core_OrgOptimizer_MoreThan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import NEAR_LIMIT from '@salesforce/label/c.Core_OrgOptimizer_NearLimit';
+import { format } from 'c/findCsv';
 
 /** A limit used to this percentage or more carries a Near Limit badge. */
 const NEAR_LIMIT_PERCENT = 80;
@@ -29,10 +30,6 @@ const LIMIT_LABELS = {
   DailyAsyncApexExecutions: LIMIT_ASYNC,
   SingleEmail: LIMIT_EMAIL
 };
-
-function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
-}
 
 /**
  * Org Optimizer's Storage and limits section (admin guide org-optimizer.md): the org's storage

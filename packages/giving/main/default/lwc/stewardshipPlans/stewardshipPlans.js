@@ -48,6 +48,7 @@ import SAVED from '@salesforce/label/c.Giving_Stewardship_Saved';
 import ACTION_FAILED from '@salesforce/label/c.Giving_Stewardship_ErrorActionFailed';
 import SELECTED from '@salesforce/label/c.Giving_Stewardship_Selected';
 import COLUMN_ACTIONS from '@salesforce/label/c.Giving_Stewardship_ColumnActions';
+import { bodyMessage } from 'c/findCsv';
 
 const EMPTY_TEMPLATE = {
   recordId: null,
@@ -140,7 +141,7 @@ export default class StewardshipPlans extends LightningElement {
       }
     }
     if (result.error) {
-      this.errorMessage = this.messageFrom(result.error);
+      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
     }
   }
 
@@ -384,7 +385,7 @@ export default class StewardshipPlans extends LightningElement {
         this.noticeMessage = SAVED;
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
       })
       .finally(() => {
         this.busy = false;
@@ -394,12 +395,5 @@ export default class StewardshipPlans extends LightningElement {
   clearMessages() {
     this.errorMessage = undefined;
     this.noticeMessage = undefined;
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return ACTION_FAILED;
   }
 }

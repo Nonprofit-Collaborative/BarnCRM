@@ -8,7 +8,7 @@ import listChildRelationships from '@salesforce/apex/FindController.listChildRel
 import saveEdits from '@salesforce/apex/FindController.saveEdits';
 import getTargets from '@salesforce/apex/BulkUpdateController.getTargets';
 import { CELL_TYPES, writeXlsx } from 'c/xlsxWriter';
-import { fileName, format, messageFrom, toCsv, valueAt, zonedDateTime } from 'c/findCsv';
+import { fileName, format, messageFrom, toCsv, valueAt, zonedDateTime, saveBlob } from 'c/findCsv';
 import TIME_ZONE from '@salesforce/i18n/timeZone';
 import getPage from '@salesforce/apex/FindController.getPage';
 import previewQuery from '@salesforce/apex/FindController.previewQuery';
@@ -921,14 +921,14 @@ export default class FindRecords extends LightningElement {
           rows,
           { sheetName: this.objectApiName, timeZone: TIME_ZONE }
         );
-        this.download(
+        saveBlob(
           new Blob([bytes], {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
           }),
           fileName(this.objectApiName, new Date(), 'xlsx')
         );
       } else {
-        this.download(
+        saveBlob(
           new Blob(
             [
               // Each row is an array, so a column's path is its position.
@@ -1213,13 +1213,5 @@ export default class FindRecords extends LightningElement {
     return path.includes('.')
       ? `${this.pathLabel(path.split('.').slice(0, -1).join('.'))} > ${leaf}`
       : leaf;
-  }
-
-  download(blob, name) {
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = name;
-    link.click();
-    URL.revokeObjectURL(link.href);
   }
 }

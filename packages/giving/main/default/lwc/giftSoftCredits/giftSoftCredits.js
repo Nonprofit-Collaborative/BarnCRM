@@ -20,6 +20,7 @@ import ROLE_LABEL from '@salesforce/label/c.Giving_SoftCredits_RoleLabel';
 import CUSTOM_ROLE_LABEL from '@salesforce/label/c.Giving_SoftCredits_CustomRoleLabel';
 import AMOUNT_LABEL from '@salesforce/label/c.Giving_SoftCredits_AmountLabel';
 import ACTION_FAILED from '@salesforce/label/c.Giving_SoftCredits_ActionFailed';
+import { bodyMessage } from 'c/findCsv';
 
 const ROLE_OTHER = 'Other';
 const DEFAULT_ROLE = 'Solicitor';
@@ -82,7 +83,7 @@ export default class GiftSoftCredits extends LightningElement {
       this.panel = result.data;
       this.errorMessage = undefined;
     } else if (result.error) {
-      this.errorMessage = this.messageFrom(result.error);
+      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
     }
   }
 
@@ -168,7 +169,7 @@ export default class GiftSoftCredits extends LightningElement {
         return refreshApex(this.wiredPanel);
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
       })
       .finally(() => {
         this.busy = false;
@@ -185,7 +186,7 @@ export default class GiftSoftCredits extends LightningElement {
         return refreshApex(this.wiredPanel);
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
       })
       .finally(() => {
         this.busy = false;
@@ -198,12 +199,5 @@ export default class GiftSoftCredits extends LightningElement {
     this.draftRole = DEFAULT_ROLE;
     this.draftCustomRole = undefined;
     this.draftAmount = undefined;
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return ACTION_FAILED;
   }
 }

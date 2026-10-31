@@ -53,6 +53,7 @@ import DELETE_CONFIRM from '@salesforce/label/c.Core_FieldUtilization_DeleteConf
 import DELETE_BUTTON from '@salesforce/label/c.Core_FieldUtilization_DeleteButton';
 import DELETE_CANCEL from '@salesforce/label/c.Core_FieldUtilization_DeleteCancel';
 import DELETED from '@salesforce/label/c.Core_FieldUtilization_Deleted';
+import { bodyMessage } from 'c/findCsv';
 
 const PERCENT = { maximumFractionDigits: 1 };
 
@@ -161,7 +162,7 @@ export default class FieldUtilization extends LightningElement {
     if (data) {
       this.objectOptions = data;
     } else if (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
     }
   }
 
@@ -331,7 +332,7 @@ export default class FieldUtilization extends LightningElement {
       await this.countChunk(run, objectName, names, plan.chunkSize || names.length || 1, 0);
     } catch (error) {
       if (run === this.run) {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
       }
     } finally {
       if (run === this.run) {
@@ -379,7 +380,7 @@ export default class FieldUtilization extends LightningElement {
         await this.loadHistory(run, this.objectName);
       }
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
     } finally {
       this.saving = false;
     }
@@ -451,7 +452,7 @@ export default class FieldUtilization extends LightningElement {
       }
     } catch (error) {
       if (run === this.run) {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
       }
     }
   }
@@ -469,7 +470,7 @@ export default class FieldUtilization extends LightningElement {
         await this.deleteSnapshot(row);
       }
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
     }
   }
 
@@ -529,10 +530,5 @@ export default class FieldUtilization extends LightningElement {
   closeView() {
     this.viewTakenAt = undefined;
     this.viewRecords = [];
-  }
-
-  messageFrom(error) {
-    const body = error && error.body;
-    return (body && body.message) || UNEXPECTED_ERROR;
   }
 }

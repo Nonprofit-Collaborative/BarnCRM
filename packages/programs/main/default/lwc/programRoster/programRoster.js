@@ -23,6 +23,7 @@ import ACTION_FAILED from '@salesforce/label/c.Programs_Roster_ActionFailed';
 import LOADING from '@salesforce/label/c.Programs_Loading';
 
 import { format, rosterRows, stageFigures, stageLabel, stageOptions } from './roster';
+import { bodyMessage } from 'c/findCsv';
 
 const STAGE_ENROLLED = 'Enrolled';
 const MAX_SHOWN = 200;
@@ -81,7 +82,7 @@ export default class ProgramRoster extends NavigationMixin(LightningElement) {
         this.roster = roster;
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
       })
       .finally(() => {
         this.loading = false;
@@ -254,18 +255,11 @@ export default class ProgramRoster extends NavigationMixin(LightningElement) {
         this.focusTarget = 'result';
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
         this.focusTarget = 'error-message';
       })
       .finally(() => {
         this.busy = false;
       });
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return ACTION_FAILED;
   }
 }

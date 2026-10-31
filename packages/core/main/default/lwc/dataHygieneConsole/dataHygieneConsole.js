@@ -15,6 +15,7 @@ import OPENED_NOTICE from '@salesforce/label/c.Core_DataHygiene_OpenedNotice';
 import CHECK_FAILED from '@salesforce/label/c.Core_DataHygiene_CheckFailed';
 import NEEDS_ATTENTION from '@salesforce/label/c.Core_DataHygiene_NeedsAttention';
 import ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
+import { bodyMessage } from 'c/findCsv';
 
 /**
  * Org Optimizer's Data Quality section (C-28, admin guide data-hygiene.md): every check with
@@ -68,7 +69,7 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
       const needsAttention = this.checks.filter((check) => check.count > 0).length;
       this.dispatchEvent(new CustomEvent('summary', { detail: { needsAttention } }));
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, CHECK_FAILED);
     } finally {
       this.busy = false;
     }
@@ -94,13 +95,9 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
         state: { [target.stateKey]: target.savedQueryId }
       });
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, CHECK_FAILED);
     } finally {
       this.busy = false;
     }
-  }
-
-  messageFrom(error) {
-    return (error && error.body && error.body.message) || CHECK_FAILED;
   }
 }

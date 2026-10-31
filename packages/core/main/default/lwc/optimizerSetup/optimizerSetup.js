@@ -17,10 +17,7 @@ import OPEN_IN_SETUP from '@salesforce/label/c.Core_OrgOptimizer_OpenInSetup';
 import MORE_THAN from '@salesforce/label/c.Core_OrgOptimizer_MoreThan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
-
-function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
-}
+import { format } from 'c/findCsv';
 
 /**
  * Org Optimizer's Unused Setup section (admin guide org-optimizer.md): one line per check with
