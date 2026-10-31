@@ -749,7 +749,6 @@ public with sharing class ImportBatchService {
      */
     @NamespaceAccessible
     public static Set<Id> retriedBy(Id batchId) {
-        Set<Id> users = new Set<Id>();
         List<Import_Batch__c> found = [
             SELECT Retried_By__c
             FROM Import_Batch__c
@@ -757,10 +756,20 @@ public with sharing class ImportBatchService {
             WITH SYSTEM_MODE
             LIMIT 1
         ];
-        if (found.isEmpty() || String.isBlank(found[0].Retried_By__c)) {
+        return found.isEmpty() ? new Set<Id>() : retriersIn(found[0].Retried_By__c);
+    }
+
+    /**
+     * The users a batch's Rows Retried By names, for a caller that already read the field, so
+     * no query is spent on it (undo's passes each read the batch once).
+     */
+    @NamespaceAccessible
+    public static Set<Id> retriersIn(String retriedBy) {
+        Set<Id> users = new Set<Id>();
+        if (String.isBlank(retriedBy)) {
             return users;
         }
-        for (String userId : found[0].Retried_By__c.split(',')) {
+        for (String userId : retriedBy.split(',')) {
             if (String.isNotBlank(userId)) {
                 users.add(Id.valueOf(userId.trim()));
             }

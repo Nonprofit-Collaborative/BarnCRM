@@ -19,6 +19,8 @@ private class ImportRowCorrectionTest {
     /** A committed import with 251 rejected rows, built once, as the admin each test runs as. */
     @TestSetup
     static void setUp() {
+        // The second import user, created once for the class.
+        TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Staff' });
         System.runAs(TestUsers.admin()) {
             TestDataFactory.defaultSettings();
             Import_Template__c template = ImportTestDataFactory.template(
@@ -284,7 +286,7 @@ private class ImportRowCorrectionTest {
     }
 
     @IsTest
-    static void anyoneWhoRunsImportsMayCorrectAndRetryAndTheUndoCoversIt() {
+    static void anyoneWhoRunsImportsMayCorrectAndRetry() {
         Id committer = TestUsers.admin().Id;
         // A second holder of the import permission, who did not commit the import.
         User importer = TestUsers.withPermissionSets(
@@ -326,17 +328,59 @@ private class ImportRowCorrectionTest {
                 WITH SYSTEM_MODE
             ];
             Assert.areEqual(importer.Id, person.CreatedById);
-            Assert.areEqual(batch.Id, person.Created_By_Import_Batch__c);
+            Assert.areEqual(batch.Id, person.Created_By_Import_Batch__c, 'Tagged for the undo.');
+        }
+    }
 
+    /**
+     * The undo of an import treats a record another retrier created and saved during it as the
+     * import's own. Its own small import: undoing the 502-row one in one test transaction would
+     * spend more than one job's limits.
+     */
+    @IsTest
+    static void theUndoRemovesWhatAnotherRetrierCreated() {
+        User importer = TestUsers.withPermissionSets(
+            new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Staff' }
+        );
+        Import_Batch__c batch;
+        System.runAs(TestUsers.admin()) {
+            // Core's undo on its own: a module installed in the test org is not asked.
+            ImportEntityProcessors.noneForTest = true;
+            batch = ImportTestDataFactory.batch(
+                ImportTestDataFactory.template(
+                    ImportTestDataFactory.donorMapping(),
+                    ImportTemplateService.RULE_EMAIL
+                )
+            );
+            batch.Is_Dry_Run__c = false;
+            batch.Status__c = ImportBatchService.STATUS_COMPLETE;
+            batch.Started_At__c = Datetime.now().addMinutes(-5);
+            batch.Completed_At__c = Datetime.now().addMinutes(1);
+            batch.Committed_By__c = UserInfo.getUserId();
+            batch.Undo_Deadline__c = Datetime.now().addDays(30);
+            batch.Retried_By__c = importer.Id;
+            // Rows Retried By is the package's bookkeeping, read only to everyone.
+            Database.update(batch, AccessLevel.SYSTEM_MODE);
+        }
+        Contact person = new Contact(
+            FirstName = 'Ana',
+            LastName = 'Byretrier',
+            Created_By_Import_Batch__c = batch.Id
+        );
+        System.runAs(importer) {
+            Database.insert(person, AccessLevel.SYSTEM_MODE);
+        }
+        System.runAs(TestUsers.admin()) {
             Integer total = ImportUndoService.preview(batch.Id).total;
-            // Started through the service, then run here: the retry was this test's one job.
+            Test.startTest();
             System.abortJob(ImportUndoService.start(batch.Id, total));
             new ImportUndoTestSupport.Run(batch.Id, total, Datetime.now()).rest();
+            Test.stopTest();
 
             Assert.areEqual(
                 0,
-                [SELECT COUNT() FROM Contact WHERE Id = :contactId WITH SYSTEM_MODE],
-                'The one undo removed what the other user\'s retry created.'
+                [SELECT COUNT() FROM Contact WHERE Id = :person.Id WITH SYSTEM_MODE],
+                'Saved by a retrier during the import, so not kept as somebody else\'s edit.'
             );
         }
     }
