@@ -131,6 +131,28 @@
                         </template>
                     </template>
                     <template lwc:if={choosingObject}>
+                        <lightning-input
+                            type="file"
+                            data-id="detect-file"
+                            label={labels.detectFileLabel}
+                            accept=".csv,text/csv,.tsv,.txt,text/tab-separated-values,text/plain,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            onchange={handleDetectFile}
+                        ></lightning-input>
+                        <template lwc:if={hasDetection}>
+                            <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="detection">
+                                {detectionText}
+                            </p>
+                            <template lwc:if={hasDetectionSheets}>
+                                <p class="slds-text-body_small" data-id="detection-sheets-help">
+                                    {labels.detectSheetsDiffer}
+                                </p>
+                                <ul class="slds-list_dotted slds-text-body_small" data-id="detection-sheets">
+                                    <template for:each={detectionSheets} for:item="line">
+                                        <li key={line.key}>{line.text}</li>
+                                    </template>
+                                </ul>
+                            </template>
+                        </template>
                         <lightning-combobox
                             data-id="new-object"
                             label={labels.loadObjectLabel}
@@ -185,16 +207,26 @@
                         ></lightning-combobox>
                     </template>
                     <template lwc:if={hasSeveralSheets}>
-                        <lightning-combobox
-                            data-id="sheet"
+                        <lightning-checkbox-group
+                            data-id="sheets"
                             class="slds-var-m-bottom_small"
                             label={labels.sheetLabel}
-                            field-level-help={labels.sheetHelp}
                             options={sheetOptions}
-                            value={sheetName}
+                            value={chosenSheets}
                             disabled={parsing}
                             onchange={handleSheetChange}
-                        ></lightning-combobox>
+                        ></lightning-checkbox-group>
+                        <p class="slds-text-body_small slds-var-m-bottom_small">{labels.sheetHelp}</p>
+                    </template>
+                    <template lwc:if={hasSheetConflict}>
+                        <div class="slds-var-m-bottom_small" role="alert" data-id="sheet-conflict">
+                            <p class="slds-text-color_error">{labels.sheetConflict}</p>
+                            <ul class="slds-list_dotted">
+                                <template for:each={sheetConflictLines} for:item="line">
+                                    <li key={line.key}>{line.text}</li>
+                                </template>
+                            </ul>
+                        </div>
                     </template>
                     <div class="slds-scrollable_x">
                         <table
@@ -251,7 +283,11 @@
                                                 ></lightning-input>
                                             </template>
                                         </td>
-                                        <td class="slds-text-body_small">{column.samples}</td>
+                                        <td class="slds-text-body_small" data-id="examples">
+                                            <template for:each={column.examples} for:item="example">
+                                                <div key={example.key} class="slds-truncate">{example.text}</div>
+                                            </template>
+                                        </td>
                                     </tr>
                                 </template>
                             </tbody>
