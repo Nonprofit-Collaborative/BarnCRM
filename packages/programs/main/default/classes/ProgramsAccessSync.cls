@@ -77,6 +77,12 @@ public with sharing class ProgramsAccessSync implements ModuleAccessSync {
             );
             more = more || left;
         }
+        // The Participant Privacy group follows its preset (P-08), repairing a hand change.
+        try {
+            ProgramsSharing.applyPreset();
+        } catch (Exception e) {
+            ErrorLogger.log(e, CONTEXT);
+        }
         return more;
     }
 

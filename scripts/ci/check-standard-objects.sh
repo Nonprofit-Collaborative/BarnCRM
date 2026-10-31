@@ -114,6 +114,11 @@ for DIR in "${DIRS[@]}"; do
     elif [[ "$FILE" == *"$TEMPLATE_HEADINGS"*.md-meta.xml ||
       "$FILE" == *"$MATCH_SOURCES"*.md-meta.xml ]]; then
       HEADINGS+=("$FILE")
+    elif [[ "$FILE" == packages/programs/* ]] &&
+      ! printf '%s' "${LINE#*:*:}" | sed -E 's/Case Notes?([^A-Za-z0-9_]|$)/\1/g' | grep -qwE "$PATTERN"; then
+      # The Programs module's Case Note (canonical model 29ZA1) is a name, not the standard Case
+      # object: a line whose only match is "Case Note" or "Case Notes" passes.
+      :
     else
       VIOLATIONS+=("$LINE")
     fi

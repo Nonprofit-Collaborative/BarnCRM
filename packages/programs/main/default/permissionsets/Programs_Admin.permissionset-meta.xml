@@ -15,13 +15,31 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>ProgramDashboardController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>ProgramRosterController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>ProgramsSettingsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
     <apexClass>ServiceDeliveryLogController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Case_Note__c.Note__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Case_Note__c.Subject__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
     <field>Enrollment__c.Account__c</field>
@@ -40,6 +58,31 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Enrollment__c.Start_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Enrollment__c.Eligibility_Basis__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Enrollment__c.Eligibility_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Enrollment__c.Eligibility_Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Enrollment__c.Intake_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Enrollment__c.Referral_Source__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -107,9 +150,18 @@
     <allowDelete>true</allowDelete>
     <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
-    <modifyAllRecords>false</modifyAllRecords>
+    <modifyAllRecords>true</modifyAllRecords>
+    <object>Case_Note__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>true</modifyAllRecords>
     <object>Enrollment__c</object>
-    <viewAllRecords>false</viewAllRecords>
+    <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
@@ -134,10 +186,14 @@
     <allowDelete>true</allowDelete>
     <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
-    <modifyAllRecords>false</modifyAllRecords>
+    <modifyAllRecords>true</modifyAllRecords>
     <object>Service_Delivery__c</object>
-    <viewAllRecords>false</viewAllRecords>
+    <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
+  <tabSettings>
+    <tab>Case_Note__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
   <tabSettings>
     <tab>Enrollment__c</tab>
     <visibility>Visible</visibility>
@@ -145,6 +201,14 @@
   <tabSettings>
     <tab>Program__c</tab>
     <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Programs_Dashboard</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Programs_Settings</tab>
+    <visibility>Available</visibility>
   </tabSettings>
   <tabSettings>
     <tab>Service_Delivery__c</tab>

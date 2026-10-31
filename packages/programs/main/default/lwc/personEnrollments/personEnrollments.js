@@ -10,8 +10,10 @@ import LOAD_FAILED from '@salesforce/label/c.Programs_Person_LoadFailed';
 import REFRESH from '@salesforce/label/c.Programs_Person_Refresh';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Person_MoreThanShown';
 import LOADING from '@salesforce/label/c.Programs_Loading';
+import LAST_SERVICE from '@salesforce/label/c.Programs_Person_LastService';
+import SERVICES_ATTENDED from '@salesforce/label/c.Programs_Person_ServicesAttended';
 
-import { canShow, enrollmentRows } from './enrollmentRows';
+import { canShow, enrollmentRows, lastService } from './enrollmentRows';
 
 /**
  * The Programs card on a person (P-01): every enrollment they have, open ones first, with the
@@ -28,7 +30,8 @@ export default class PersonEnrollments extends NavigationMixin(LightningElement)
     ended: ENDED,
     refresh: REFRESH,
     moreThanShown: MORE_THAN_SHOWN,
-    loading: LOADING
+    loading: LOADING,
+    lastService: LAST_SERVICE
   };
 
   result;
@@ -61,6 +64,11 @@ export default class PersonEnrollments extends NavigationMixin(LightningElement)
 
   get rows() {
     return enrollmentRows(this.result);
+  }
+
+  /** The last service line (P-05), or null when the person has attended none. */
+  get lastService() {
+    return lastService(this.result, SERVICES_ATTENDED);
   }
 
   get showEmpty() {

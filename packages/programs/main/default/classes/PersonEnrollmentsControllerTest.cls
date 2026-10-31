@@ -61,6 +61,51 @@ private class PersonEnrollmentsControllerTest {
             Assert.isTrue(result.enrollments[0].isOpen, 'And it is open.');
             Assert.areEqual('Completed', result.enrollments[1].stageLabel, 'With its stage.');
             Assert.isFalse(result.moreThanShown, 'Nothing left out.');
+            Assert.isNull(result.lastServiceDate, 'No service yet.');
+            Assert.areEqual(0, result.servicesAttended, 'None attended.');
+        }
+    }
+
+    @IsTest
+    static void showsTheLastServiceAttendedAndHowMany() {
+        System.runAs(TestUsers.adminWith(ADMIN)) {
+            contactMode();
+            Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Rivera');
+            insert ana;
+            Service__c meal = new Service__c(Name = 'Meal', Program__c = program('Pantry').Id);
+            insert meal;
+            insert new List<Service_Delivery__c>{
+                new Service_Delivery__c(
+                    Service__c = meal.Id,
+                    Contact__c = ana.Id,
+                    Delivery_Date__c = Date.today().addDays(-7)
+                ),
+                new Service_Delivery__c(
+                    Service__c = meal.Id,
+                    Contact__c = ana.Id,
+                    Delivery_Date__c = Date.today().addDays(-3)
+                ),
+                new Service_Delivery__c(
+                    Service__c = meal.Id,
+                    Contact__c = ana.Id,
+                    Delivery_Date__c = Date.today(),
+                    Attendance__c = 'Unexcused Absence',
+                    Quantity__c = 0
+                )
+            };
+
+            Test.startTest();
+            PersonEnrollmentsController.PersonEnrollments result = PersonEnrollmentsController.getEnrollments(
+                ana.Id
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                Date.today().addDays(-3),
+                result.lastServiceDate,
+                'The absence is not a service.'
+            );
+            Assert.areEqual(2, result.servicesAttended, 'Two attended.');
         }
     }
 

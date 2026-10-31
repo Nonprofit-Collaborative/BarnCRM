@@ -10,9 +10,12 @@ an enrollment links a person to a program with a **stage** (Applied, Enrolled, C
 Withdrawn) and its start and end dates. Each time a service is given, or a person misses it, is a
 **service delivery**: attendance and what was received, in one record.
 
-Case notes, a program dashboard, a roster import and intake fields come in later releases (P-04
-to P-08). Until the participant privacy preset (P-08) arrives, everyone who holds a Programs
-permission set can see every enrollment and service delivery.
+Each enrollment also carries the person's **intake and eligibility**: when they were first seen,
+who referred them, and whether they qualify, and staff keep private **case notes** on it. A
+**program dashboard** counts enrollments, people served and attendance for a period. A roster
+import comes in a later release (P-06). Who sees enrollments
+and service deliveries is the **Participant Privacy** preset on the Programs settings page:
+everyone with a Programs permission set (the default), or only the people who need to.
 
 ## Before You Install
 
@@ -26,16 +29,73 @@ permission set can see every enrollment and service delivery.
 ## Installing
 
 Install it from **Module Manager** (see [Module Manager](module-manager.md)). When the install
-finishes, BarnCRM does three things on its own:
+finishes, BarnCRM does four things on its own:
 
 1. Creates the switch rows for the module's automations on the **Automation** page.
 2. Gives you, the person who installed it, the **Programs Admin** permission set.
 3. Gives everyone who already has a BarnCRM role their Programs permission set (see below).
+4. Applies the Participant Privacy preset (Shared until you change it) and shares any
+   enrollments and service deliveries already in the org (see Participant Privacy).
 
-Then open the **BarnCRM Programs** app from the App Launcher. Its tabs are **Programs**,
-**Enrollments** and **Service Deliveries**. These tabs also join the BarnCRM apps.
+Then open the **BarnCRM Programs** app from the App Launcher. Its tabs are **Programs
+Dashboard**, **Programs**, **Enrollments**, **Service Deliveries** and **Case Notes**. These tabs also join the BarnCRM apps.
 
-Programs has no settings yet, so it adds no section to BarnCRM Settings.
+## Programs Settings
+
+The module adds a **Programs** section to BarnCRM Settings (in the Programs group). Its
+**Programs Settings** row opens the module's own settings page, for anyone who can manage BarnCRM
+settings (BarnCRM Admin). Everything on it applies to the whole organization: the intake
+picklists and Participant Privacy.
+
+**Intake and Eligibility Picklists.** The page lists the three intake picklists on an enrollment
+(**Referral Source**, **Eligibility Status** and **Eligibility Basis**) with the choices each
+offers now and its default. They ship with:
+
+| Picklist | Choices it ships with | Default |
+|---|---|---|
+| Referral Source | Self, Family or Friend, Another Agency, School, Health Care Provider, Faith Community, Other | None |
+| Eligibility Status | Not Screened, Awaiting Documents, Eligible, Not Eligible | Not Screened |
+| Eligibility Basis | Income, Age, Residence, Referral, Other | None |
+
+To make them your own, click **Change in Setup** beside a picklist: it opens the enrollment's
+fields in Setup (Object Manager, Enrollment) in a new tab. Click the picklist's name; there you add, rename, reorder or deactivate a choice (Salesforce keeps picklist choices on the
+field itself, so this one step happens in Setup). A deactivated choice stays on the enrollments
+that already have it, and a renamed one is renamed on them too. Keep **Eligible** and **Not
+Eligible** in Eligibility Status: choosing either fills in the Eligibility Date (see Enrollment
+Rules). The lists are restricted: an import or another system can only save a choice the list
+holds.
+
+### Participant Privacy
+
+Who can see enrollments and service deliveries. Program membership can be sensitive (a recovery
+group, a housing program), so you choose:
+
+| Preset | Who sees enrollments and service deliveries |
+|---|---|
+| **Shared** (the default) | Everyone with a Programs permission set, as before this setting existed. |
+| **Private** | The person who created the record (its owner), the people above them in the role hierarchy, and Programs Admin. |
+
+Choose one under **Participant Privacy** and click **Save**. The change applies within a minute,
+to every enrollment and delivery, old and new, and is listed under **Recent Changes** in BarnCRM
+Settings. Case notes are private whichever you choose (see Case Notes).
+
+**How it works, for admins who know Salesforce sharing.** Enrollments and service deliveries
+have a Private organization-wide default. Each one is shared, Read/Write, with the public group
+**Programs Participant Records**. Shared puts **All Internal Users** in that group; Private
+takes them out. To let a few people see every record while the preset is Private (for example a
+program manager outside the role hierarchy), add them, their role or another group to
+**Programs Participant Records** in Setup under **Public Groups**. BarnCRM only ever adds or
+removes All Internal Users there, so your own members stay. With the hourly access check it puts
+All Internal Users back, or takes them out, if the group was changed by hand against the preset.
+
+What Private means day to day:
+
+- A staff member sees on the **Program Roster** panel and in the **Service Delivery Log** only the
+  enrollments they can see. Decide who owns enrollments: the person who enrolls someone owns that
+  enrollment, and a Programs Admin can change the owner.
+- Reports and list views show each person only the records they can see.
+- Program counts that BarnCRM keeps (the rules that stop a second open enrollment, for example)
+  still count every record, whoever can see it.
 
 ## Roles and Permission Sets
 
@@ -100,6 +160,26 @@ panel without the button or the stage pickers. The panel lists up to 200 people;
 You can also create and edit enrollments on the **Enrollments** tab and from the **Enrollments**
 related list on the program. The list views are **Open Enrollments** and **All Enrollments**.
 
+### Importing a Roster
+
+To enroll many people at once, use BarnCRM's import (see [Importing](importing.md)) with the
+shipped **Program roster** template, which Programs adds at install. It is an upload of several
+objects: each row finds its program by name and enrolls the person found by email. Columns:
+
+| Column | Loads | Notes |
+|---|---|---|
+| Program | The program | Found by its exact name, any capitals. Required. A program is never created or renamed. |
+| Email | The person | Found by email (contacts) or person email (person accounts). Required. |
+| Stage | Stage | Applied, Enrolled, Completed or Withdrawn. Blank means Enrolled. |
+| Start Date, End Date | Start Date, End Date | Blank dates are filled as for an enrollment made by hand (Enrollment Rules). |
+| Intake Date, Referral Source, Eligibility Status, Eligibility Basis, Eligibility Date | The intake fields | Choices must be ones the picklist holds (see Programs Settings). |
+
+A row is reported and not loaded when its program or email finds nothing, or when the person
+already has an open enrollment in that program. Undo removes the enrollments one import made.
+Create the programs first, on the **Programs** tab. To load old enrollments with their own dates,
+switch off **Enrollment: fill in the stage dates** on the Automation page while the import runs.
+The importing user needs Programs Staff or Programs Admin as well as the import.
+
 ## Attendance and Services: the Service Delivery Log
 
 A **service delivery** records one service given to one person on one day: its **Service**, the
@@ -137,11 +217,66 @@ Rules:
 Both run as the automation **Service Delivery: absences, enrollment** on the Automation
 page. It always runs (it keeps totals right), so it cannot be switched off.
 
+## Case Notes
+
+A **case note** is a dated, typed note about a participant, written on their enrollment: a
+check-in, a phone call, a home visit, an assessment. Staff add one from the **Case Notes** related
+list on the enrollment (or the **Case Notes** tab): a **Note Date** (today to start with), a
+**Type** (Check-in, Phone Call, Home Visit, Office Visit, Assessment, Referral or Other), a
+**Subject** and the **Note** itself.
+
+**Case notes are private.** A note is seen only by:
+
+- the person who wrote it (its owner), who can also edit it;
+- people above the owner in your role hierarchy;
+- Programs Admins, who see, edit and delete every note.
+
+Colleagues with Programs Staff do not see each other's notes, and Read Only users have no access
+to case notes at all. This holds whatever you choose for Participant Privacy. To let a
+colleague see a note, its owner clicks **Sharing** on the note, or you add a sharing rule in Setup
+(**Sharing Settings**, Case Note) for a team that works together. To hand a caseload to someone
+else, change the notes' owner.
+
+The **Type** choices are yours to change on the field in Setup, as for the intake picklists. An
+enrollment with case notes cannot be deleted: delete its notes first. The list views are **All
+Case Notes** (every note you can see) and **My Case Notes**.
+
+Case notes are light notes, not case management: service plans and goals come later (P-10).
+
+## Program Dashboard
+
+The **Programs Dashboard** tab in the BarnCRM Programs app answers how your programs are doing,
+for everyone with a Programs permission set. Pick a period at the top (**This Month**, the
+default, **Last Month**, **This Year**, **Last Year** or **Last 12 Months**). Tiles show:
+
+| Tile | What it counts |
+|---|---|
+| Active Programs | Programs with Status Active. |
+| Open Enrollments | Enrollments at Applied or Enrolled, now. |
+| New Enrollments | Enrollments whose Start Date falls in the period. |
+| People Served | Different people who attended at least one service in the period. |
+| Services Delivered | Service deliveries marked Present in the period. |
+| Attendance Rate | Present deliveries as a share of all deliveries in the period, absences included. |
+
+Below the tiles, a table gives the same figures for each program, plus **Completed** (enrollments
+completed in the period); click a program's name to open it. It lists every Active program and
+any other program with activity in the period.
+
+Each person sees figures for the records they can see. With Participant Privacy set to Private,
+a staff member's dashboard counts only their own enrollments and deliveries, while Programs Admin
+sees the whole organization. Nothing is stored: the figures are counted each time the page opens
+or the period changes. Salesforce counts at most 50,000 records in one go, so an organization with
+more enrollments or deliveries than that in a period sees a message saying the dashboard could not
+load: pick a shorter period. For a report you can schedule or email, build a standard Salesforce
+report on Enrollments or Service Deliveries.
+
 ## A Person's Programs
 
 In the **BarnCRM Programs** app, a person's record page carries a **Programs** card listing
 every enrollment they have: the program (a link), the stage and the dates, open ones first. It is
-read only: enroll people and change stages from the program's **Program Roster** panel. On an
+read only: enroll people and change stages from the program's **Program Roster** panel. Above
+the list, **Last service** gives the date of the person's latest service they attended and how
+many services they have attended in all (absences are not counted). On an
 account the card shows only for a person account, never on a household or an organization. A
 user without a Programs permission set sees no card.
 
@@ -162,9 +297,20 @@ other BarnCRM apps the person page stays as it was. To show the card there too, 
   so it cannot be switched off on the Automation page.
 - **Dates fill themselves in.** Moving an enrollment to **Enrolled** fills an empty Start Date
   with today; moving it to **Completed** or **Withdrawn** fills an empty End Date with today. A
-  date someone already typed is kept. An End Date before the Start Date is refused. This
-  automation is **Enrollment: fill in the stage dates** on the Automation page; switch it off
-  while you load history whose dates you are typing yourself.
+  date someone already typed is kept. An End Date before the Start Date is refused. Setting
+  **Eligibility Status** to **Eligible** or **Not Eligible** fills an empty **Eligibility Date**
+  with today the same way. This automation is **Enrollment: fill in the stage dates** on the
+  Automation page; switch it off while you load history whose dates you are typing yourself.
+
+## Intake and Eligibility
+
+Each enrollment has an **Intake and Eligibility** section: **Intake Date** (when the person was
+first seen or applied), **Referral Source**, **Eligibility Status** (new enrollments start **Not
+Screened**), **Eligibility Basis** (the main reason they qualify, or do not) and **Eligibility
+Date**. The choices are yours to change (see Programs Settings). They hold choices and dates
+only, never typed notes, so erasing a person leaves nothing on the enrollment to empty; write
+notes about a person in case notes. Add the fields to list views and reports as you need them,
+for example an **Awaiting Documents** list view to chase missing paperwork.
 
 ## People: Merging, Deleting and Erasing
 
@@ -176,7 +322,11 @@ other BarnCRM apps the person page stays as it was. To show the card there too, 
   program counts stand.
 - **Erasing a person** (see [Erase a Person](erase-a-person.md)) keeps their enrollments and
   service deliveries, credited to the anonymous record. Neither holds typed notes, so there is
-  nothing on them to empty.
+  nothing on them to empty. Their **case notes are deleted**, whoever wrote them. Only someone
+  with Programs Admin can delete every note, so anyone else erasing a person who has case notes
+  is refused, with that reason, and nothing is erased.
+- **Deleting a person** keeps their case notes on the enrollment, which no longer names anyone.
+  To remove what was written about someone, erase them rather than delete them.
 
 ## Health Check
 
@@ -221,10 +371,11 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
 
 ## Common Mistakes
 
-- **Looking for a Programs section in BarnCRM Settings.** There is none yet: Programs has no
-  settings until intake fields and the privacy preset arrive.
-- **Expecting enrollments to be private.** Until the participant privacy preset (P-08), anyone
-  with a Programs set sees every enrollment. Do not record sensitive program membership for
-  people outside your program staff until then.
+- **Expecting enrollments to be private straight after install.** The Participant Privacy
+  preset starts as Shared: anyone with a Programs set sees every enrollment. Choose Private on the
+  Programs settings page before you record sensitive program membership.
+- **Choosing Private without deciding who owns enrollments.** A staff member then sees only the
+  enrollments they own or that people below them own. Decide owners first, or add the program's
+  staff to the Programs Participant Records group in Setup.
 - **Deleting a finished program.** Set Status to Completed; the platform will not delete a
   program people were enrolled in.

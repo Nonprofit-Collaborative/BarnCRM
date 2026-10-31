@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Fills in an empty Start Date with today when an enrollment becomes Enrolled, and an empty End Date when it becomes Completed or Withdrawn. A date already typed is kept. Switch it off while you load history whose dates you type yourself.</value>
+        <value xsi:type="xsd:string">Fills in an empty Start Date with today when an enrollment becomes Enrolled, and an empty End Date when it becomes Completed or Withdrawn, and an empty Eligibility Date when its Eligibility Status becomes Eligible or Not Eligible. A date already typed is kept. Switch it off while you load history whose dates you type yourself.</value>
     </values>
     <values>
         <field>Module__c</field>

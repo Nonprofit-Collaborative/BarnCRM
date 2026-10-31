@@ -88,6 +88,7 @@ public with sharing class ModuleManagerService {
             'Volunteer_Skill__c'
         },
         'Programs' => new List<String>{
+            'Case_Note__c',
             'Enrollment__c',
             'Program__c',
             'Service__c',

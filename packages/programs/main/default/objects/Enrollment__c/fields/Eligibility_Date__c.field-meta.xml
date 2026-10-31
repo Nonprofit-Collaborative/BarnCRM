@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Eligibility_Date__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>When the person was found Eligible or Not Eligible. Filled in with today when the status changes to either and this is empty.</inlineHelpText>
+  <label>Eligibility Date</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Date</type>
+</CustomField>

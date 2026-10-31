@@ -11,6 +11,13 @@ Read Only). If the app is missing, ask your admin (see the
 [Programs admin guide](../admin-guide/programs.md#roles-and-permission-sets)). Read Only users
 can look at programs and enrollments but change nothing.
 
+**Which enrollments you see** depends on your organization's Participant Privacy choice. With
+**Shared** (the usual) you see every enrollment and service delivery. With **Private** you see
+the ones you created, the ones created by people who report to you, and any your admin opened to
+you; a roster or list may then show fewer people than are enrolled. If you are missing someone
+you work with, ask your admin (see
+[Participant Privacy](../admin-guide/programs.md#participant-privacy)).
+
 ## To Find a Program or an Enrollment
 
 1. Click the **Programs** tab, or the **Enrollments** tab.
@@ -50,6 +57,32 @@ and the person is listed with today as the Start Date (for Enrolled).
 
 Enrolling someone who already has an Applied or Enrolled enrollment in the same program is
 refused, with a message naming the program. Change the enrollment that is there instead.
+
+## To Import a Roster
+
+1. Make a spreadsheet with a row per person and the columns **Program** (the program's exact
+   name) and **Email**, plus any of **Stage**, **Start Date**, **End Date**, **Intake Date**,
+   **Referral Source**, **Eligibility Status**, **Eligibility Basis** and **Eligibility Date**.
+2. Open BarnCRM's import, upload the file and choose the **Program roster** template.
+3. Check the preview, then load it.
+
+You should see: one enrollment per row. Rows whose program or email finds nothing, or whose
+person already has an open enrollment in that program, are listed as not loaded with the reason.
+Programs are never created by an import: create them on the **Programs** tab first.
+
+## To Record Intake and Eligibility
+
+1. Open the program and click the person's name in the **Program Roster** panel (or open the
+   enrollment from the **Enrollments** tab).
+2. Click **Edit**. In **Intake and Eligibility**, fill in the **Intake Date** and **Referral
+   Source**, then set the **Eligibility Status** (Not Screened, Awaiting Documents, Eligible or
+   Not Eligible) and the **Eligibility Basis**.
+3. Click **Save**.
+
+You should see the values saved. Choosing **Eligible** or **Not Eligible** fills an empty
+**Eligibility Date** with today. The choices in each list are your organization's; if one you
+need is missing, ask your admin. Write anything longer about the person in a case note, not
+here.
 
 ## To Move Someone to Another Stage
 
@@ -92,14 +125,40 @@ For someone who is not enrolled, or a one-off:
 You should see the new delivery. If the person has an enrollment in the program, it is filled in
 for you.
 
+## To Write a Case Note
+
+1. Open the person's enrollment (click their name in the **Program Roster** panel).
+2. In the **Case Notes** related list, click **New**.
+3. Check the **Note Date** (today to start with), pick the **Type** (Check-in, Phone Call, Home
+   Visit, Office Visit, Assessment, Referral or Other), and write a **Subject** and the **Note**.
+4. Click **Save**.
+
+You should see the note in the enrollment's **Case Notes** list. Only you, people above you in
+your organization's roles, and Programs Admins can see it; your colleagues cannot unless you
+share it with **Sharing** on the note. You can edit your own notes but not delete them; ask a
+Programs Admin to remove one written by mistake. The **My Case Notes** list on the **Case Notes**
+tab gathers everything you have written.
+
 ## To See Which Programs Someone Is In
 
 1. In the **BarnCRM Programs** app, open the person.
 2. Look at the **Programs** card on the right.
 
-You should see: every program the person has an enrollment in, open ones first, with the stage
-and the dates. Click a program name to open that enrollment. The card is read only: enroll
-people and change stages on the program. On a household or an organization there is no card.
+You should see: **Last service**, the date the person last attended a service and how many
+services they have attended, then every program the person has an enrollment in, open ones
+first, with the stage and the dates. Click a program name to open that enrollment. The card is
+read only: enroll people and change stages on the program. On a household or an organization
+there is no card.
+
+## To See How Your Programs Are Doing
+
+1. In the **BarnCRM Programs** app, click the **Programs Dashboard** tab.
+2. Pick a period at the top: **This Month** (the default), **Last Month**, **This Year**,
+   **Last Year** or **Last 12 Months**.
+
+You should see: tiles for active programs, open and new enrollments, people served, services
+delivered and the attendance rate, then a table with the same figures for each program. Click a
+program's name to open it. The figures count only the records you can see.
 
 ## To Enroll Someone Again
 

@@ -12,6 +12,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>ProgramDashboardController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>ProgramRosterController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -37,6 +41,31 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Enrollment__c.Start_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Enrollment__c.Eligibility_Basis__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Enrollment__c.Eligibility_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Enrollment__c.Eligibility_Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Enrollment__c.Intake_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Enrollment__c.Referral_Source__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -136,6 +165,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Program__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Programs_Dashboard</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

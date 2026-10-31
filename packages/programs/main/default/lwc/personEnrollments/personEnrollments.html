@@ -17,6 +17,17 @@
         <template lwc:if={errorMessage}>
           <p class="slds-text-color_error" role="alert" data-id="error">{errorMessage}</p>
         </template>
+        <template lwc:if={lastService}>
+          <p class="slds-text-body_regular slds-var-m-bottom_x-small" data-id="last-service">
+            {label.lastService}
+            <lightning-formatted-date-time
+              value={lastService.date}
+              time-zone="UTC"
+              class="slds-var-m-horizontal_xx-small"
+            ></lightning-formatted-date-time>
+            <span class="slds-text-color_weak" data-id="attended">{lastService.attendedText}</span>
+          </p>
+        </template>
         <template lwc:if={showEmpty}>
           <p class="slds-text-body_regular" data-id="empty">{label.empty}</p>
         </template>

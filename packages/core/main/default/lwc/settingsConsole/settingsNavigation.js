@@ -48,7 +48,14 @@ const GROUPS = [
       ['Receipts', 'utility:email']
     ]
   },
-  { name: 'programs', label: PROGRAMS, sections: [['Volunteers', 'utility:people']] },
+  {
+    name: 'programs',
+    label: PROGRAMS,
+    sections: [
+      ['Programs', 'utility:education'],
+      ['Volunteers', 'utility:people']
+    ]
+  },
   { name: 'more', label: MORE, sections: [] },
   {
     name: 'system',

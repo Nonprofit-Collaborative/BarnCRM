@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Enrollment__c</fullName>
+  <deleteConstraint>Restrict</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The person's enrollment the note is about. An enrollment with case notes can't be deleted.</inlineHelpText>
+  <label>Enrollment</label>
+  <referenceTo>Enrollment__c</referenceTo>
+  <relationshipLabel>Case Notes</relationshipLabel>
+  <relationshipName>Case_Notes</relationshipName>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

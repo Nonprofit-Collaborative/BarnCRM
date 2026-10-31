@@ -46,6 +46,10 @@ With the Volunteers module installed, volunteer hours and shift sign-ups are kep
 with their notes emptied; bookings on shifts still to come are cancelled; onboarding
 requirements and skills are deleted. See [Volunteers](volunteers.md#erasing-a-volunteer).
 
+With the Programs module installed, enrollments and service deliveries are kept the same way, and
+the person's case notes are deleted, whoever wrote them; only someone with Programs Admin can
+erase a person who has case notes. See [Programs](programs.md#people-merging-deleting-and-erasing).
+
 Every erasure writes an **Erasure** record: who erased, when, the request reference you typed,
 and each record that changed with the fields that were emptied. It never holds an erased value.
 

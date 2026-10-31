@@ -392,4 +392,356 @@
         <shortDescription>Unexpected Service Delivery Log failure, logged</shortDescription>
         <value>Something went wrong with the service delivery log. The details are in the Error Log.</value>
     </labels>
+    <labels>
+        <fullName>Programs_Settings_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings page title</shortDescription>
+        <value>Programs Settings</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_Intro</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings page introduction</shortDescription>
+        <value>The choices your organization makes for the Programs module. Changes apply to everyone.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PicklistsTitle</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Intake picklists card title</shortDescription>
+        <value>Intake and Eligibility Picklists</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PicklistsIntro</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Intake picklists card introduction</shortDescription>
+        <value>The choices staff pick from on an enrollment. Add, rename or deactivate a choice on the field in Setup; a deactivated choice stays on the enrollments that have it.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_Default</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A picklist's default; {0} is the value</shortDescription>
+        <value>Default: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_ChangeInSetup</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link to change a picklist's values in Setup</shortDescription>
+        <value>Change in Setup</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_ChangeFor</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Accessible name of the Setup link; {0} is the field</shortDescription>
+        <value>Change {0} in Setup</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_NoAccess</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Viewer may not manage settings</shortDescription>
+        <value>Only someone who can manage BarnCRM settings can change the Programs settings.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_LoadFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings could not load, logged</shortDescription>
+        <value>The Programs settings could not be loaded. The details are in the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Erase_NeedProgramsAdmin</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Erasure refused: case notes need Programs Admin</shortDescription>
+        <value>This person has case notes that only Programs Admin can delete. Ask someone with Programs Admin to erase them.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Erase_EnrollmentsKept</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Erasure keeps enrollments, credited to the anonymous record</shortDescription>
+        <value>Kept, credited to the anonymous record, so program counts stand.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PrivacyTitle</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: privacy card title</shortDescription>
+        <value>Participant Privacy</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PrivacyIntro</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: privacy card introduction</shortDescription>
+        <value>Who can see enrollments and service deliveries. Every case note stays private whichever you choose.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PrivacyLegend</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: privacy choice legend</shortDescription>
+        <value>Who sees enrollments and service deliveries</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PrivacyShared</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: Shared preset</shortDescription>
+        <value>Shared: everyone with a Programs permission set</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PrivacyPrivate</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: Private preset</shortDescription>
+        <value>Private: the record's owner, their managers and Programs Admin</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_PrivacyDefault</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: the preset's default</shortDescription>
+        <value>Default: Shared</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_Save</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: save button</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_Saved</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: saved message</shortDescription>
+        <value>Saved. It applies to every enrollment and delivery within a minute.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Settings_SaveFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs settings: save failed</shortDescription>
+        <value>Participant Privacy could not be saved. Try again; if it fails again, the Error Log says why.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_LastService</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card: last service, before its date</shortDescription>
+        <value>Last service:</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_ServicesAttended</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs card: services attended, {0} is the count</shortDescription>
+        <value>({0} attended in all)</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: page title</shortDescription>
+        <value>Programs Dashboard</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Intro</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: page introduction</shortDescription>
+        <value>How your programs are doing in the period you pick. Figures count only the records you can see.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Period</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: period picker label</shortDescription>
+        <value>Period</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_ThisMonth</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: period choice</shortDescription>
+        <value>This Month</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_LastMonth</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: period choice</shortDescription>
+        <value>Last Month</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_ThisYear</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: period choice</shortDescription>
+        <value>This Year</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_LastYear</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: period choice</shortDescription>
+        <value>Last Year</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Last12Months</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: period choice</shortDescription>
+        <value>Last 12 Months</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_ActivePrograms</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: tile and column</shortDescription>
+        <value>Active Programs</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_OpenEnrollments</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: tile and column</shortDescription>
+        <value>Open Enrollments</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_NewEnrollments</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: tile and column</shortDescription>
+        <value>New Enrollments</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Completed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: column</shortDescription>
+        <value>Completed</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_PeopleServed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: tile and column</shortDescription>
+        <value>People Served</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Delivered</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: tile and column</shortDescription>
+        <value>Services Delivered</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_AttendanceRate</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: tile and column</shortDescription>
+        <value>Attendance Rate</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_Program</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: column</shortDescription>
+        <value>Program</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_ByProgram</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: table card title</shortDescription>
+        <value>By Program</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_NoRate</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: attendance rate with no deliveries</shortDescription>
+        <value>None yet</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_NoPrograms</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: empty table</shortDescription>
+        <value>No active programs, and no activity in this period.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_MoreThanShown</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: table cut off</shortDescription>
+        <value>Showing the first 200 programs by name. The tiles count them all.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_LoadFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: load failed</shortDescription>
+        <value>The dashboard could not load. Try a shorter period; if it fails again, the Error Log says why.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Dashboard_NoAccess</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs dashboard: no access</shortDescription>
+        <value>You need a Programs permission set to see the dashboard. Ask your admin.</value>
+    </labels>
 </CustomLabels>

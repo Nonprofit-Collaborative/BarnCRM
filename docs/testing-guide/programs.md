@@ -160,3 +160,92 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 7 | Open **Hot meal** and try to delete it. | Refused: the service has deliveries. |
 
 **Cleanup:** delete the deliveries made in steps 1 and 5. Run T-PRG-08 to remove the sample data.
+
+## T-PRG-11: Intake and Eligibility, and the Programs Settings Page
+
+**Purpose:** confirm the intake fields save, the Eligibility Date fills itself in, and an admin reaches the intake picklists from BarnCRM Settings.
+**Prerequisites:** the admin user and the staff user from T-PRG-01; any program and a person not enrolled in it.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, enroll the person as **Applied** and open the enrollment. | An **Intake and Eligibility** section shows **Eligibility Status** **Not Screened** and the other fields empty. |
+| 2 | Edit: set **Intake Date** to last week, **Referral Source** to **School**, **Eligibility Status** to **Awaiting Documents**. Save. | Saved; **Eligibility Date** stays empty. |
+| 3 | Edit: set **Eligibility Status** to **Eligible** and **Eligibility Basis** to **Income**. Save. | **Eligibility Date** shows today. |
+| 4 | As the admin, open **BarnCRM Settings**. | A **Programs** section is listed in the Programs group, above Volunteers if installed. |
+| 5 | Open it and click **Open Programs Settings**. | The **Programs Settings** page lists **Referral Source**, **Eligibility Status** (Default: Not Screened) and **Eligibility Basis** with their choices. |
+| 6 | Click **Change in Setup** beside **Referral Source**. | The enrollment's **Fields and Relationships** open in Setup in a new tab. Open **Referral Source**, add a choice "Library", save, and reload the Programs Settings page: "Library" is listed. |
+| 7 | As the staff user, open the Programs Settings page by its address (copy it from step 5). | The tab is not available to them, or the page says only someone who can manage BarnCRM settings can change the Programs settings. |
+
+**Cleanup:** remove the "Library" choice in Setup; delete the enrollment.
+
+## T-PRG-12: Case Notes Are Private and Go When the Person Is Erased
+
+**Purpose:** confirm a case note is seen only by its author and Programs Admin, and that erasing the person deletes it.
+**Prerequisites:** the admin user; two staff users with a BarnCRM role of Team Member (Programs Staff), with no role above the other; the Read Only user; any program with a test person enrolled ("Test Person").
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the first staff user, open Test Person's enrollment and click **New** in **Case Notes**. Type **Home Visit**, Subject "First visit", a line of Note. Save. | Saved with today's Note Date; listed in the enrollment's Case Notes and in **My Case Notes**. |
+| 2 | As the second staff user, open the same enrollment and the **Case Notes** tab, **All Case Notes**. | The note is not listed anywhere. |
+| 3 | As the Read Only user, open the enrollment. | No Case Notes list, no Case Notes tab. |
+| 4 | As the admin, open **All Case Notes**. | The note is listed; the admin can open, edit and delete it. |
+| 5 | As the first staff user, try to delete the note. | No Delete action. |
+| 6 | As the admin, try to delete the enrollment. | Refused: it has case notes. |
+| 7 | As the second staff user (if they may erase people), erase Test Person. | Refused: the person has case notes only Programs Admin can delete; nothing is erased. |
+| 8 | As the admin, erase Test Person. | Done; the summary lists the Case Notes as deleted and the Enrollments as kept. The note is gone; the enrollment stays, naming the anonymous record. |
+
+**Cleanup:** delete the enrollment; remove the staff users' roles.
+
+## T-PRG-13: Participant Privacy, Shared and Private
+
+**Purpose:** confirm the Participant Privacy preset decides who sees enrollments and service deliveries, starts as Shared, and is audited.
+**Prerequisites:** the admin user; two staff users with a BarnCRM role of Team Member (Programs Staff), with no role above the other; any active program with a service.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open **BarnCRM Settings**, the **Programs** section, then **Programs Settings**. | A **Participant Privacy** card with **Shared** chosen, "Default: Shared" under it, and **Save** greyed out. |
+| 2 | As the first staff user, enroll a test person in the program on its **Program Roster** panel, then record one delivery for them in the **Service Delivery Log**. | Both saved. |
+| 3 | As the second staff user, open the program and the **Enrollments** and **Service Deliveries** tabs, **All** lists. | The enrollment and the delivery are listed. |
+| 4 | As the admin, choose **Private** on the Participant Privacy card and click **Save**. | "Saved. It applies to every enrollment and delivery within a minute." **Save** is greyed out again. |
+| 5 | Wait a minute. As the second staff user, repeat step 3. | Neither record is listed, on the roster or the tabs. |
+| 6 | As the first staff user, repeat step 3. | Both are listed: they own them. |
+| 7 | As the admin, repeat step 3. | Both are listed. |
+| 8 | As the admin, open **BarnCRM Settings**, **Recent Changes**. | A row for Programs_Settings__c.Private_Participants__c from Shared to Private. |
+| 9 | As the admin, in Setup open **Public Groups**, **Programs Participant Records**. | All Internal Users is not a member. |
+| 10 | Choose **Shared** and **Save**, wait a minute, then as the second staff user repeat step 3. | Both records are listed again, and All Internal Users is back in the group. |
+
+**Cleanup:** delete the enrollment and delivery; leave the preset Shared; remove the staff users' roles.
+
+## T-PRG-14: The Programs Dashboard and a Person's Last Service
+
+**Purpose:** confirm the dashboard counts a period correctly and the person card shows the last service.
+**Prerequisites:** the admin user; Programs sample data loaded (T-PRG-08), or any Active program with a service, two enrolled test people and today's deliveries recorded in the Service Delivery Log (one Present, one Unexcused Absence).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open the **BarnCRM Programs** app. | **Programs Dashboard** is the first tab. |
+| 2 | Open **Programs Dashboard**. | Period **This Month**; six tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Services Delivered, Attendance Rate) and a **By Program** table listing every Active program by name. |
+| 3 | Compare the program's row with its **Program Roster** panel and today's log. | Open Enrollments matches the roster's Applied plus Enrolled; Services Delivered counts the Present delivery only; Attendance Rate is 50%; People Served is 1. |
+| 4 | Pick **Last Year**. | The figures reload for last year; a program with no activity then shows 0 and "None yet" for the rate. |
+| 5 | Click a program's name. | The program opens. |
+| 6 | Open the test person who attended, in the BarnCRM Programs app. | The **Programs** card starts with "Last service:" today's date and "(1 attended in all)". |
+| 7 | Open the test person who was absent. | No Last service line (an absence is not a service). |
+| 8 | On a phone, open the dashboard. | Tiles two to a row; the table stacks each program's figures with their names. |
+
+**Cleanup:** delete the test deliveries if you made them.
+
+## T-PRG-15: Import a Program Roster
+
+**Purpose:** confirm the Program roster template enrolls people by program name and email, and reports rows it cannot load.
+**Prerequisites:** the admin user; an Active program named "Test Pantry"; three test people with emails, none enrolled in it. A CSV with the columns Program, Email, Stage, Start Date, Referral Source and these rows: Test Pantry and the first email, Enrolled, a past date, School; TEST PANTRY and the second email, blank stage; No Such Program and the third email; Test Pantry and nobody@example.org; Test Pantry and the first email again.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open BarnCRM's import and upload the CSV. | **Program roster** is offered as a template. |
+| 2 | Choose it and preview. | Columns map to Program and the enrollment's fields with no manual mapping. |
+| 3 | Load it. | 2 loaded, 3 not loaded: no program "No Such Program", no person with nobody@example.org, and the repeated first email refused as an open enrollment already in Test Pantry. |
+| 4 | Open Test Pantry's **Program Roster** panel. | The first person Enrolled with your start date and Referral Source School; the second Enrolled from today. |
+| 5 | Open the program record. | Its name is still "Test Pantry", not changed to capitals. |
+| 6 | Undo the import. | Both enrollments are removed; the program stays. |
+
+**Cleanup:** none after the undo.

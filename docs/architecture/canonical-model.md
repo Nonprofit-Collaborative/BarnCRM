@@ -9525,14 +9525,19 @@ Log. A job started by a schedule sends none. The record action shows the same ou
 
 The shipped import template that loads a spreadsheet of volunteer hours with the Core import,
 one row per hours record (feature V-06). It adds no entity: it is an `Import_Template_Default__mdt`
-row shipped by Volunteers that loads one object (R-IT12, R-D3).
+row shipped by Volunteers. Since release 0.14 it is an upload of several objects (R-IT20,
+ADR-0147; it loaded one object, R-IT12, before), as the program roster template is (29ZA).
 
 ### Rules
 
 **R-VH1 The shipped rows.** Volunteers ships two rows with the Template Key `volunteer_hours`:
 one with Person Mode Contacts, whose person column fills `Contact__c`, and one with Person Mode
 Person Accounts, whose person column fills `Account__c`. Only the one matching the org's people
-is materialized (R-D3). Target Object `Volunteer_Hours__c`, Load Operation Insert.
+is materialized (R-D3). Target Object `Volunteer_Hours__c`, Load Operation Insert. Its mapping
+lists the objects `Volunteer_Hours__c` (Insert) and `Volunteer_Job__c` (Update by a matching
+field, key Name): the job is found, never created, and its name is not rewritten; each hours
+record links to its row's job (ADR-0147 decision 4). Columns target `Volunteer_Hours__c.<field>`
+and `Volunteer_Job__c.Name`, and the Status default `Volunteer_Hours__c.Status__c`.
 
 **R-VH2 Columns.**
 
@@ -9826,6 +9831,11 @@ participant record; P-02 records what they attended and received.
 | Stage | picklist(Applied, Enrolled, Completed, Withdrawn) | yes (defaults Enrolled) | Where the person stands in the program. Applied and Enrolled are open; Completed and Withdrawn have ended. |
 | Start Date | date | no | When the person was enrolled. |
 | End Date | date | no | When the person completed or withdrew. |
+| Intake Date | date | no | When the person was first seen or applied (P-07, release 0.14). |
+| Referral Source | picklist(Self, Family or Friend, Another Agency, School, Health Care Provider, Faith Community, Other) | no | Who sent the person. The values are the organization's to change (P-07). |
+| Eligibility Status | picklist(Not Screened, Awaiting Documents, Eligible, Not Eligible) | no (defaults Not Screened) | Whether the person has been checked against the program's rules (P-07). The values are the organization's to change; Eligible and Not Eligible decide it (R-EN6). |
+| Eligibility Basis | picklist(Income, Age, Residence, Referral, Other) | no | The main reason the person qualifies or not (P-07). The values are the organization's to change. |
+| Eligibility Date | date | no | When eligibility was decided (R-EN6). |
 
 ### Relationships
 
@@ -9856,13 +9866,43 @@ it so, fills an empty End Date with today. A date already typed is kept. A switc
 
 **R-EN5 Erasing or deleting the person keeps the enrollment.** Erasing a person (Section 29H)
 keeps their enrollments, credited to the anonymous record, so program counts stand; an
-enrollment holds no typed text to empty. Deleting the person empties the person on the
-enrollment (SetNull) and keeps it. A merge moves the enrollments to the record kept.
+enrollment holds no typed text to empty. Their case notes, which are typed text, are deleted
+(R-CN4). Deleting the person empties the person on the enrollment (SetNull) and keeps it. A merge
+moves the enrollments to the record kept.
+
+**R-EN6 The eligibility date is filled in (P-07).** Creating an enrollment with an Eligibility
+Status of Eligible or Not Eligible, or changing it to either, fills an empty Eligibility Date with
+today. A date already typed is kept, and Not Screened or Awaiting Documents leaves it alone. Part
+of the switchable `Enrollment_Dates` automation (R-EN3), so an import of history can turn it off.
+
+**R-EN7 Participant privacy is a preset (P-08).** Organization-wide sharing is Private. Every
+enrollment is shared, Read/Write, with the public group Programs Participant Records
+(`Programs_Participants`), through the Apex sharing reason `Programs_Participants__c`, written by
+an automation that always runs (registry row `Enrollment_Sharing`). The Participant Privacy preset
+on the Programs settings page decides who is in that group:
+
+- **Shared (the default):** the group holds All Internal Users, so everyone with a Programs
+  permission set sees every enrollment, as before P-08.
+- **Private:** the group holds no one BarnCRM put there, so an enrollment is seen by its owner,
+  people above the owner in the role hierarchy, and Programs Admin (View All and Modify All). An
+  admin may add chosen users, roles or groups to the group in Setup; BarnCRM adds and removes
+  only All Internal Users.
+
+The preset is stored in `Programs_Settings__c`, written only by the settings page and audited as
+a settings change. The group follows the preset at once when it is saved, and again at install,
+at Turn on and in the hourly access check, which repairs a group changed by hand.
+
+**Intake fields hold choices, not typed text (P-07).** The intake and eligibility fields are dates
+and restricted picklists, so R-EN5 still holds: erasing a person leaves nothing on an enrollment
+to empty. Notes about a person belong in case notes (P-04). The picklist values are the
+organization's: an admin adds, renames or deactivates them on the field in Setup (Object Manager,
+Enrollment), which the Programs settings page links to; BarnCRM reads them by value, and only
+R-EN6 names two values.
 
 ### Salesforce implementation
 
-- **Object:** `Enrollment__c`, name field AutoNumber `EN-{000000}`, sharing Public Read/Write
-  until P-08.
+- **Object:** `Enrollment__c`, name field AutoNumber `EN-{000000}`, sharing Private (Public
+  Read/Write before P-08), Apex sharing reason `Programs_Participants__c` (R-EN7).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -9872,7 +9912,25 @@ enrollment (SetNull) and keeps it. A merge moves the enrollments to the record k
 | Stage | `Stage__c` | Picklist: Applied, Enrolled, Completed, Withdrawn; required, default Enrolled |
 | Start Date | `Start_Date__c` | Date |
 | End Date | `End_Date__c` | Date |
+| Intake Date | `Intake_Date__c` | Date |
+| Referral Source | `Referral_Source__c` | Picklist, restricted, not required, no default |
+| Eligibility Status | `Eligibility_Status__c` | Picklist, restricted, not required, default Not Screened |
+| Eligibility Basis | `Eligibility_Basis__c` | Picklist, restricted, not required, no default |
+| Eligibility Date | `Eligibility_Date__c` | Date |
 
+- **Settings page:** `ProgramsSettingsController` and the `programsSettings` panel on the
+  `Programs_Settings` app page and tab (Programs Admin only), reached from the Programs section
+  of BarnCRM Settings (`Setting_Definition.Programs_Settings`, a navigation row). It lists the
+  intake picklists' active values and default from describe, with a link to the enrollment's
+  fields in Setup (Object Manager by API name). The section name `Programs` is in Core's
+  `SettingSections`. It also holds the Participant Privacy preset (R-EN7).
+- **Participant privacy (R-EN7, R-SD6):** the public group `Programs_Participants` (no bosses);
+  the hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox,
+  default unchecked, which is Shared); `ProgramsSharing` writes the shares (handler
+  `ProgramsSharingHandler`, registry rows `Enrollment_Sharing` and `Service_Delivery_Sharing`,
+  always run), sets the group's All Internal Users member (queued, as a group member is a setup
+  object), and shares records that have no share yet (`ProgramsSharingBatch`, run at install
+  and when the preset is saved). `ProgramsAccessSync` sets the member hourly.
 - **Validation rules:** `Exactly_One_Person` (R-EN1), `End_After_Start` (R-EN4).
 - **Service:** `EnrollmentService` (the stage values and the roster panel's reads and writes),
   `EnrollmentRulesHandler` (R-EN2), `EnrollmentDatesHandler` (R-EN3), `EnrollmentSelector`
@@ -9899,7 +9957,37 @@ open ones first, each with its program, stage and dates, on the Programs app's o
 Account record pages (`Programs_Contact_Record_Page`, `Programs_Account_Record_Page`: Core's
 pages plus the card, kept in step under ADR-0064). Read in user mode. On an Account it shows only
 for a person account, and lists enrollments naming the account or its one contact, so it needs no
-person account field. A user who cannot read enrollments gets no card.
+person account field. A user who cannot read enrollments gets no card. Since P-05 the card also
+shows the person's last service, the latest Delivery Date of a Present delivery (29ZB), and how
+many Present deliveries they have, both counted in user mode over the deliveries naming the
+person, and left out for a user who cannot read deliveries or when there are none.
+
+**Program dashboard (P-05).** The `programDashboard` panel on the `Programs_Dashboard` app page
+and tab (every Programs set) answers, for a period the user picks (This Month, Last Month, This
+Year, Last Year, Last 12 Months; default This Month): active programs (Status Active), open
+enrollments now (Applied or Enrolled), new enrollments (Start Date in the period), completed
+enrollments (Stage Completed, End Date in the period), people served (distinct people with a
+Present delivery in the period, contacts and accounts counted apart, as a delivery names one or
+the other), services delivered (Present deliveries) and the attendance rate (Present over all
+deliveries, absences included, in the period). The same figures per program, for every Active
+program and any other program with activity in the period, at most 200. Read through
+`ProgramDashboardController` in user mode with aggregate queries, so each user's figures follow
+what they may see (Participant Privacy, R-EN7). No object or field is added; the periods are
+computed in the browser by framework-free JS (plan 9.9).
+
+**Roster import (P-06).** Programs ships two `Import_Template_Default__mdt` rows with the
+Template Key `program_roster`, Person Mode Contacts and Person Accounts, of which only the one
+matching the org's people is materialized (R-D3), at install through Core's
+`materializeDefaultsDuringInstall`. Each is an upload of several objects (R-IT20, ADR-0147):
+objects `Enrollment__c` (Insert, the Target Object) and `Program__c` (Update by a matching
+field, key Name). Columns: Program (`Program__c.Name`), Email (`Enrollment__c.Contact__c` by
+`Email`, or `Enrollment__c.Account__c` by `PersonEmail`), Stage, Start Date, End Date, Intake
+Date, Referral Source, Eligibility Status, Eligibility Basis, Eligibility Date. The program loads
+first and each enrollment links to its row's program (ADR-0147 decision 4); the program is only
+found, never created, and its name is not rewritten, even when a row spells it in other
+capitals. A row whose program or email finds nothing is rejected, and so is one R-EN2 refuses.
+The enrollment rules run as for one made by hand (blank Stage is Enrolled, R-EN3 fills dates).
+No field is added.
 
 **Health Check.** `ProgramsHealthCheckExtension`, registered in
 `HealthCheckExtensions.EXTENSION_CLASSES`, asked only of a viewer who may manage settings and not
@@ -9919,6 +10007,74 @@ sample people's service deliveries and enrollments in sample programs, then the 
 with no enrollment or delivery left (their services go with them). A sample program a real person
 is enrolled in, or has a delivery in, is kept, and one Warning in the Error Log names each one
 kept.
+
+---
+
+## 29ZA1. Case Note
+
+### Definition
+
+A dated, typed note about a participant, written on their enrollment (P-04, release 0.14): a
+check-in, a call, a home visit, an assessment. Light case notes, not case management: goals and
+service plans are P-10.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number. |
+| Enrollment | reference(Enrollment) | yes | The person's enrollment the note is about; the person and program come from it. |
+| Note Date | date | yes (defaults today) | The day of the contact or event the note records. |
+| Type | picklist(Check-in, Phone Call, Home Visit, Office Visit, Assessment, Referral, Other) | yes (defaults Check-in) | What kind of contact it records. The values are the organization's to change in Setup. |
+| Subject | text(255) | no | A short line saying what the note is about. |
+| Note | long text | no | What happened, what was agreed and what comes next. |
+| Owner | reference(User) | yes | The author, who sees and edits the note. |
+
+### Relationships
+
+- **Case Note to Enrollment**, many to one, through a required lookup, not a detail, so a note
+  has sharing of its own and is not visible to everyone who can see the enrollment.
+
+### Rules
+
+**R-CN1 An enrollment with case notes is kept.** The lookup's delete constraint is Restrict: an
+enrollment with notes cannot be deleted; delete the notes first. A merge moves the enrollment,
+and its notes with it.
+
+**R-CN2 Private by default.** Organization-wide sharing is Private, whatever the participant
+privacy preset (P-08) says: a note is seen by its owner, people above the owner in the role
+hierarchy, and Programs Admin (View All and Modify All). An owner may share a note with a
+colleague through the record's Sharing button, or an admin may add a sharing rule in Setup.
+
+**R-CN3 Who may write.** Programs Staff create notes and edit their own; Programs Admin creates,
+edits and deletes any; Programs Read Only has no access to case notes at all, so a Read Only user
+sees neither the tab nor the related list.
+
+**R-CN4 Erasing the person deletes their notes.** A case note is typed text about the person and
+nothing else, so erasing the person (Section 29H, R-ER8) deletes every note on any of their
+enrollments, read in system mode and deleted as the user; someone who may not delete them all is
+refused with that reason (only Programs Admin may). The enrollments are kept (R-EN5). Deleting a
+person, not erasing them, keeps the notes on the enrollment, which no longer names the person;
+erase a person to remove what was written about them.
+
+### Salesforce implementation
+
+- **Object:** `Case_Note__c`, name field AutoNumber `CN-{000000}`, sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Enrollment | `Enrollment__c` | Lookup to `Enrollment__c`, required, delete constraint Restrict, relationship name Case_Notes |
+| Note Date | `Note_Date__c` | Date, required, default TODAY() |
+| Type | `Type__c` | Picklist, restricted, required, default Check-in |
+| Subject | `Subject__c` | Text(255) |
+| Note | `Note__c` | Long Text Area(32768) |
+
+- **Erasure:** `ProgramsErasureExtension`, registered in Core's
+  `PersonErasureExtensions.EXTENSION_CLASSES`, with `CaseNoteSelector` (without sharing, system
+  mode reads only).
+- **UI:** the Case Notes tab (list views All Case Notes and My Case Notes) and the Case Notes
+  related list on the enrollment. No trigger.
+- **PMM mapping:** none; PMM has no case note object, so MIG-09 carries none.
 
 ---
 
@@ -9971,13 +10127,18 @@ always-run row, as the link is what the roster and the P-05 dashboard count by.
 instead of adding another. Nothing refuses a second row entered by hand: two separate meals on
 one day are two deliveries.
 
+**R-SD6 Participant privacy (P-08).** As R-EN7: sharing Private, every delivery shared with
+`Programs_Participants` through the reason `Programs_Participants__c` (registry row
+`Service_Delivery_Sharing`, always runs), so the Participant Privacy preset decides who sees
+deliveries as it does enrollments.
+
 **R-SD5 Erasing or deleting the person keeps the delivery.** As R-EN5: erasure credits it to the
 anonymous record; deleting the person empties the person (SetNull) and keeps the counts.
 
 ### Salesforce implementation
 
-- **Object:** `Service_Delivery__c`, name field AutoNumber `SD-{000000}`, sharing Public
-  Read/Write until P-08.
+- **Object:** `Service_Delivery__c`, name field AutoNumber `SD-{000000}`, sharing Private
+  (Public Read/Write before P-08), Apex sharing reason `Programs_Participants__c` (R-SD6).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -10579,6 +10740,11 @@ mirrors the primary member).
 | 0.14 | 2026-10-31 | Logic Models L-01 and L-02 (ADR-0154 `0154-logic-models-module.md`). New in the Logic Models module: Logic Model (`Logic_Model__c`, 29ZC), Logic Model Element (`Logic_Model_Element__c`, 29ZD), Logic Model Link (`Logic_Model_Link__c`, 29ZE), Indicator (`Indicator__c`, 29ZF) and Indicator Period (`Indicator_Period__c`, 29ZG), with rules R-LM1 to R-LM3, R-LE1 to R-LE3, R-LL1 to R-LL3, R-IN1, R-IN2, R-IP1 and R-IP2. Indicator takes the place of P-03's Outcome. Specified ahead of the build. |
 | 0.14 | 2026-10-31 | Landing batch A renumbering. No object or field added. Branches built in parallel had reused section letters; in PR order they are now 25O Donor Segments, 25P Pledge Reminder Step, 25Q Pledge Reminder, 25R Ask, 25S Ask cadence, 29W Setup Change, 29X Saved Transform, 29Y Program, 29Z Service, 29ZA Enrollment, 29ZB Service Delivery, 29ZC Logic Model, 29ZD Logic Model Element, 29ZE Logic Model Link, 29ZF Indicator, 29ZG Indicator Period. Every citation in docs and code was repointed to the section its author meant. |
 | 0.14 | 2026-10-31 | Asks feed ask cadence (G-26 with G-29, landing batch A). No object or field added. New R-SO9: an ask's after insert, update and delete writes the donor's earliest open Target Date into the donor's Next Ask Date, and clears it when no open ask remains only if the asks had set it; R-AC1 and the Next Ask Date definition in 25S say so. Registry row `Ask_Donor_Next_Ask_Date`. |
+| 0.14 | 2026-10-31 | Programs P-07. `Enrollment__c` (29ZA) gains Intake Date (`Intake_Date__c`, Date), Referral Source (`Referral_Source__c`), Eligibility Status (`Eligibility_Status__c`, default Not Screened) and Eligibility Basis (`Eligibility_Basis__c`), restricted picklists whose values the organization changes in Setup, and Eligibility Date (`Eligibility_Date__c`, Date), filled by new rule R-EN6 in the `Enrollment_Dates` automation. No PMM counterpart: they stay out of the MIG-09 mapping. The Programs section of BarnCRM Settings opens the module's settings page (`Programs_Settings` tab). |
+| 0.14 | 2026-10-31 | Programs P-04. New in the Programs module: Case Note (`Case_Note__c`, 29ZA1), a dated, typed note on an enrollment, sharing Private, with rules R-CN1 to R-CN4. Erasing a person now deletes their case notes (`ProgramsErasureExtension` in `PersonErasureExtensions`); enrollments are still kept (R-EN5). |
+| 0.14 | 2026-10-31 | Programs P-08. `Enrollment__c` (29ZA) and `Service_Delivery__c` (29ZB) change from Public Read/Write to Private, each shared with the new public group `Programs_Participants` through the Apex sharing reason `Programs_Participants__c` (R-EN7, R-SD6). New hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox, default unchecked): the Participant Privacy preset, Shared by default, which puts All Internal Users in the group, or Private, which takes them out. Programs Admin gains View All and Modify All on both objects. |
+| 0.14 | 2026-10-31 | Programs P-05. The Programs Dashboard (29ZA, "Program dashboard") and the person card's last service date and services attended. No object or field added. |
+| 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29ZA, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
 
 ---
 ## 32. Entity ownership by package
@@ -10671,6 +10837,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Program | Programs | 0.12 (P-01) | 29Y |
 | Service | Programs | 0.12 (P-01) | 29Z |
 | Enrollment | Programs | 0.12 (P-01) | 29ZA |
+| Case Note | Programs | 0.14 (P-04) | 29ZA1 |
+| Programs Settings (custom setting, Participant Privacy preset) | Programs | 0.14 (P-08) | 29ZA |
 | Service Delivery | Programs | 0.13 (P-02) | 29ZB |
 | Programs entities | Programs | v0.9 | 30 |
 | Logic Model | Logic Models | 0.14 (L-01) | 29ZC |

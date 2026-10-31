@@ -4,7 +4,7 @@ Scripts for the Next Ask Date and Last Touch Date fields, the nightly reminder t
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Giving deployed and sample data loaded.
 
-## T-ASK-01: A Next Ask Date Creates One Reminder Task
+## T-ASK-09: A Next Ask Date Creates One Reminder Task
 
 **Purpose:** Confirm the nightly job creates one task for the donor's owner, once per date.
 **Prerequisites:** admin (see [Test users](before-you-test.md#test-users)). **Valentina Singh** owned by a known active user.
@@ -22,7 +22,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** Delete the tasks and clear the three date fields.
 
-## T-ASK-02: Dates Outside the Window and the Off Switch
+## T-ASK-10: Dates Outside the Window and the Off Switch
 
 **Purpose:** Confirm future and stale dates get no task, and the setting stops tasks.
 **Prerequisites:** admin. Two donors, for example **Rosa Hall** and **Susan Ortiz**.
