@@ -244,7 +244,12 @@ private class ImportSeveralObjectsSchemaTest {
                 );
 
                 Assert.isTrue(view.severalObjects, 'Several objects.');
-                Assert.areEqual(ACCOUNT_NAME, view.targetObject, 'The first listed is the target.');
+                // R-IT20: the Target Object is the first object listed, whatever the load order.
+                Assert.areEqual(
+                    AFFILIATION_NAME,
+                    view.targetObject,
+                    'The first listed is the target.'
+                );
                 Assert.areEqual(
                     labelOf(Account.SObjectType) + ', ' + labelOf(Affiliation__c.SObjectType),
                     view.targetObjectLabel,
