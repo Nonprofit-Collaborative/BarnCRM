@@ -139,7 +139,7 @@ private class ImportMappingTest {
     static void aOneObjectMappingKeepsItsLookupFieldsAndRecordAttributes() {
         ImportMapping mapping = ImportMapping.parse(
             '{"columns":[' +
-                '{"source":"Program","target":"Record.Program__c","lookupField":"Code__c"},' +
+                '{"source":"Course","target":"Record.Course__c","lookupField":"Code__c"},' +
                 '{"source":"Person","target":"Record.Contact__c","lookupField":"Id"},' +
                 '{"source":"Hours","target":"Record.Hours__c"},' +
                 '{"source":"Email","target":"Contact1.Email","lookupField":"Name"}],' +
@@ -149,12 +149,12 @@ private class ImportMappingTest {
         ImportMapping again = ImportMapping.parse(mapping.serialize());
 
         Assert.areEqual(
-            new Map<String, String>{ 'program__c' => 'Code__c' },
+            new Map<String, String>{ 'course__c' => 'Code__c' },
             again.lookupFieldsByAttribute(),
             'Only a Record lookup named by a field other than the ID.'
         );
         Assert.areEqual(
-            new Set<String>{ 'program__c', 'contact__c', 'hours__c', 'status__c' },
+            new Set<String>{ 'course__c', 'contact__c', 'hours__c', 'status__c' },
             again.recordAttributes(),
             'Columns and values for every row, folded to lower case.'
         );
@@ -163,10 +163,10 @@ private class ImportMappingTest {
     @IsTest
     static void aSeveralObjectMappingReadsAsEachObjectsOwnRecordColumns() {
         ImportMapping mapping = ImportMapping.parse(
-            '{"objects":[{"entity":"Program__c","operation":"Insert"},' +
+            '{"objects":[{"entity":"Course__c","operation":"Insert"},' +
                 '{"entity":"Session__c","operation":"Upsert by external ID","keyField":"Code__c"}],' +
                 '"columns":[' +
-                '{"source":"Program","target":"Program__c.Name","transforms":[{"op":"trim"}]},' +
+                '{"source":"Course","target":"Course__c.Name","transforms":[{"op":"trim"}]},' +
                 '{"source":"Code","target":"Session__c.Code__c","blankClears":true},' +
                 '{"source":"Leader","target":"session__c.Leader__c","lookupField":"Email"},' +
                 '{"source":"Skip","target":"Ignore"}],' +
@@ -191,7 +191,7 @@ private class ImportMappingTest {
         Assert.areEqual(new Set<String>{ 'code__c' }, sessions.clearingAttributes(), 'Clears.');
         Assert.areEqual(
             1,
-            mapping.forEntity('Program__c').transformsBySourceKey().get('program').size(),
+            mapping.forEntity('Course__c').transformsBySourceKey().get('course').size(),
             'And changes.'
         );
         Assert.isFalse(new ImportMapping().loadsSeveralObjects(), 'None by default.');

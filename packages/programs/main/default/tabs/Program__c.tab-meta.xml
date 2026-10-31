@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customObject>true</customObject>
+  <description>
+    The programs the organization runs, with their services and enrollments.
+  </description>
+  <motif>Custom55: Books</motif>
+</CustomTab>
