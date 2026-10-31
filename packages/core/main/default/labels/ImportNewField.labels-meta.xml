@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_ImportNewField_ConnectionLabel</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Named Credential label for the org's own connection</shortDescription>
+        <value>BarnCRM: this org</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_NoPermission</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create field refused: missing permissions</shortDescription>
+        <value>Creating a field needs the BarnCRM Metadata Admin permission set, Import access, and the Salesforce permissions Customize Application and Modify Metadata.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_NotConnected</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create field refused: no connection</shortDescription>
+        <value>The connection is not set up. Set it up on BarnCRM Settings, Import page, or create the field in Setup from the details below.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_ObjectInvalid</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create field refused: object</shortDescription>
+        <value>Choose an object you can create fields on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_LabelRequired</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create field refused: label</shortDescription>
+        <value>Enter a field label of 40 characters or fewer.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_NameInvalid</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create field refused: API name characters</shortDescription>
+        <value>Use an API name that starts with a letter, holds only letters, digits and single underscores, does not end with an underscore, and has 40 characters or fewer.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_NameReserved</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create field refused: reserved word; {0} is the name</shortDescription>
+        <value>{0} is a reserved word. Choose another API name.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_NameTaken</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create field refused: API name in use</shortDescription>
+        <value>This API name is already used on this object. Choose another name, or map the column to the existing field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_TypeInvalid</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create field refused: type</shortDescription>
+        <value>Choose one of the listed field types.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_LengthInvalid</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create field refused: text length</shortDescription>
+        <value>A text field holds 1 to 255 characters.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_ScaleInvalid</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create field refused: decimal places</shortDescription>
+        <value>Decimal places must be 0 to 8.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_PicklistInvalid</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create field refused: picklist values</shortDescription>
+        <value>A picklist needs 1 to 200 different values of 255 characters or fewer.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_Refused</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Metadata API refused the field; {0} is its reason</shortDescription>
+        <value>Salesforce refused the field: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_ConnectionRefused</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Metadata API call failed; {0} is the reason</shortDescription>
+        <value>Your org did not accept BarnCRM's connection ({0}). Create the field in Setup from the details below, then select Refresh Fields.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_JobFailed</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create field job stopped</shortDescription>
+        <value>Creating the field stopped before it finished. The Error Log has the detail. Create the field in Setup from the details below, then select Refresh Fields.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_AccessSkipped</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field created, permission set skipped; {0} field, {1} set, {2} reason</shortDescription>
+        <value>The field {0} was created, but {1} could not be given access to it: {2}</value>
+    </labels>
+</CustomLabels>
