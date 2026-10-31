@@ -32,7 +32,9 @@ Optimizer** tab. Nobody else sees it.
 
 The nightly copy is **BarnCRM Setup Changes Copy** at 1:30. Health Check lists it with the
 other nightly jobs, and its **Schedule all nightly jobs** fix starts it. Pressing **Copy New
-Changes Now** in the section also schedules it when it is not scheduled.
+Changes Now** in the section also schedules it when it is not scheduled. While the **Org
+Optimizer and Health Check** feature is off, the job does nothing: it copies and deletes no
+changes and logs nothing, and what was kept stays until the feature is on again.
 
 The copy runs as the user who scheduled it, and Salesforce shows the trail only to users with
 the **View Setup and Configuration** permission (every System Administrator has it). If that

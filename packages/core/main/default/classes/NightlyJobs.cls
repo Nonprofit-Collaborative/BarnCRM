@@ -236,7 +236,7 @@ public with sharing class NightlyJobs {
     }
 
     /**
-     * The nightly Setup Changes copy (C-56, R-SC2): keeps the Setup Audit Trail beyond
+     * The nightly Setup Changes copy (C-56, R-SU2): keeps the Setup Audit Trail beyond
      * Salesforce's 180 days and deletes copies past the org's retention, so it always belongs
      * on the list.
      */
