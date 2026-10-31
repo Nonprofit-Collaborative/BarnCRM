@@ -1081,6 +1081,7 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 |---|---|---|---|
 | `Error_Digest_Recipients__c` | text (255) | empty | The email addresses of the users who receive the error digest, separated by commas. Each has to belong to an active user of this org. Empty sends it to every active user holding Manage BarnCRM Settings. |
 | `Error_Digest_Frequency__c` | picklist(Daily, Weekly) | Daily | How often the error digest may be sent. Stored as text (ADR-0019); empty reads as Daily. |
+| `Error_Digest_Include_Admin_Summary__c` | checkbox | true | Whether a weekly digest also carries the admin summary (C-54): org limits at 80 percent or more, BarnCRM data jobs (`Import_Batch__c`, Status Failed) that failed in the window, and duplicate suggestions waiting. No effect on a daily digest. |
 | `Error_Digest_Covered_Until__c` | datetime | empty | The end of the window the last digest run covered; the next digest counts entries created after it. Written by the job. |
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
 | `Error_Digest_Last_Run_Summary__c` | text (255) | empty | What the last digest run did, in one sentence. Written by the job. |

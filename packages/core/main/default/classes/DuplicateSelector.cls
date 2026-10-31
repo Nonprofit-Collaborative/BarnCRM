@@ -148,6 +148,25 @@ public with sharing class DuplicateSelector {
     }
 
     /**
+     * How many suggestions are waiting, counting at most `upTo` (the weekly digest's number; a
+     * count spends a query row per record, so it stops). Same filter as `openSets`.
+     */
+    public static Integer openSetCount(Integer upTo) {
+        // Reviewing duplicates is its own permission set: whoever lacks it is told nothing.
+        if (!Schema.SObjectType.DuplicateRecordSet.isAccessible()) {
+            return 0;
+        }
+        List<String> objects = REVIEWED_OBJECTS;
+        return [
+            SELECT COUNT()
+            FROM DuplicateRecordSet
+            WHERE RecordCount > 1 AND DuplicateRule.SobjectType IN :objects
+            WITH USER_MODE
+            LIMIT :upTo
+        ];
+    }
+
+    /**
      * The next window of open sets after `last` (the oldest of the window before), in the same
      * newest-first order, so a reader can page past sets it cannot use.
      */
