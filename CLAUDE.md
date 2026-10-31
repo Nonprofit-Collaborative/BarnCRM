@@ -19,6 +19,8 @@ Read the product plan before any work. Its canonical copy is the BMemory documen
 - Overview (`docs/overview.md`), Admin Guide (`docs/admin-guide/`), User Guide (`docs/user-guide/`) and Testing Guide (`docs/testing-guide/`) are updated in the same PR as any feature added, changed, or removed; each index carries an "Applies to" line naming the main commit it was checked against.
 - Feature catalog (`docs/barncrm-features.md`) is updated in the same PR as any feature added, changed, or removed.
 - Release plan (plan 6.0a, 9.7, D-155) is kept up to date automatically: every newly approved item goes into a release (about 3 major, 3 to 6 minor enhancements); a move up or back that Brandon asks for is re-slotted and the affected releases rebalanced; statuses update as batches land; each landing batch covers 2 or 3 releases, and the release gate, `barn-npc` and `mwdbdevsb` (approval each time) deploys and QA and UX run once per batch.
+- Before each batch is tested (plan 9.8), review the whole solution, all packages, for QA, UX and simplification (unused or deprecated elements, duplicate logic, mergeable components, performance); never remove functionality or usefulness; anything that would remove a capability or reverse a decision goes to Brandon.
+- Prefer portable designs toward BarnCRM for WordPress on Pegwork (plan 9.9) where they cost little: browser-safe logic in framework-free JS modules, configuration as JSON, thin Apex controllers returning plain JSON; never at the cost of security, limits or the Section 4 architecture.
 - Definition of done: plan Section 7.4. Review checklist: Section 9.4.
 
 ## Project docs

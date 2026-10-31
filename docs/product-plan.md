@@ -763,7 +763,8 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 - Brandon's standing authorization (2026-10-31, D-156): new features consistent with the vision may be added to releases without his approval; new modules or editions, reversals of settled decisions or non-goals, and not-approved items go to him as proposals (Section 6.1.5).
 - Order: Brandon's explicit sequencing first; Core before modules (D-38, never dropping functionality); dependencies (C-45 and C-46 before Corporate Hub and Portal Builder, D-118; a new ADR before each new module); then impact.
 - Each landing batch covers 2 or 3 releases. Feature PRs and the incremental gate run per landing branch as today (D-141, D-142); the release gate, the `barn-npc` and `mwdbdevsb` deploys (Brandon's approval each time) and QA and UX testing run once per batch. Each release ships its own What's New record (`Release_Note`, checked by `check-whats-new.py --release`; 0.11 landed in #702).
-- Release numbers continue from 0.11, the last shipped version. The old iterations v0.12 (Beta) and v0.13 (AppExchange) are no longer releases: they become milestones (below), because they wait on outside events, not on build work. Release 0.17 completes the v1.0 scope (the v0.9 and v0.10 iterations, plus the Core, Giving, Volunteers and Programs additions of D-156); it is tagged v1.0 when the v1.0 pilot milestone passes. Releases after it are numbered 1.1, 1.2 and so on.
+- Release numbers continue from 0.11, the last shipped version. The old iterations v0.12 (Beta) and v0.13 (AppExchange) are no longer releases: they become milestones (below), because they wait on outside events, not on build work. Release 0.17 completes the v1.0 scope (the v0.9 and v0.10 iterations, plus the Core, Giving, Volunteers and Programs additions of D-156); it stays the v1.0 candidate. v1.0 is tagged once Brandon's initial QA is complete, expected around or after release 0.17 and before AppExchange approval (milestone M-1, D-157). Releases after it are numbered 1.1, 1.2 and so on.
+- Each batch starts testing only after the whole-solution review (Section 9.8); new work follows the portability preferences toward BarnCRM for WordPress (Section 9.9) where they cost little.
 - Statuses: Planned, In progress, Landed (in `main` through a landing batch), Shipped (the batch's release gate, deploys and QA are done).
 - Upkeep is automatic (Section 9.7): every newly approved item is placed in a release; a move up or back that Brandon asks for is re-slotted and the affected releases rebalanced; statuses change as batches land.
 
@@ -772,11 +773,13 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 | Batch | Releases | Notes |
 |---|---|---|
 | A | 0.12, 0.13, 0.14 | Access Explorer, admin visibility (Setup Changes Log, digest, Record Inspector) and the Core follow-ups first; Programs, solicitation pipeline, Logic Models and volunteer reminders start |
-| B | 0.15, 0.16, 0.17 | Programs depth, Logic Models and Funders complete, Nonprofit Cloud mirror; 0.17 is the v1.0 candidate. Then milestones M-1 to M-4 |
-| C | 1.1, 1.2, 1.3 | Contact Point Sync, Address Verification, Migration Assistant, recurring donor health, generic merge, Corporate Hub documents and compliance |
-| D | 1.4, 1.5, 1.6 | Corporate Hub board governance, migrations, Portal Builder and Board portal, grant management |
-| E | 1.7, 1.8, 1.9 | Scholarships and Outbound Grants, Event Management |
-| F | 1.10, 1.11, 1.12 | Gala seating, multi-brand management, LWC Builder, Territory Management, Grid tool |
+| B | 0.15, 0.16, 0.17 | Programs depth, Logic Models and Funders complete, Nonprofit Cloud mirror, Field Access Manager; 0.17 is the v1.0 candidate. Then milestones M-1 to M-4 |
+| C | 1.1, 1.2, 1.3 | Forms engine, Contact Point Sync, Address Verification, Migration Assistant, volunteer self-service, online donations, recurring donor health, engagement score |
+| D | 1.4, 1.5, 1.6 | Archive by Query, generic merge, field history, Corporate Hub documents and compliance, Memberships, GDPR |
+| E | 1.7, 1.8, 1.9 | Migrations, board governance, Portal Builder, board, volunteer and member portals, grant management |
+| F | 1.10, 1.11, 1.12 | Scholarships and Outbound Grants, Event Management |
+| G | 1.13, 1.14 | Gala seating, multi-brand management, LWC Builder start |
+| H | 1.15, 1.16 | LWC Builder complete, Territory Management, Grid tool; Backup Sets and files import last (D-157) |
 
 #### Release 0.12 (Batch A): Access Explorer, admin visibility, Core follow-ups, Programs start
 
@@ -849,12 +852,11 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 
 #### Release 0.17 (Batch B): Funders complete and Nonprofit Cloud mirror (v1.0 candidate)
 
-Two majors, below the usual three, so the v1.0 candidate closes the v0.10 scope without pulling post-1.0 work forward.
-
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
 | F-03 | Restricted fund tracking | Major | Planned | Section 6 v0.10 |
 | X-07 | Gift Transaction mirror (Nonprofit Cloud) | Major | Planned | Section 6.3 |
+| C-65 | Field Access Manager: grant or remove Read and Edit for chosen fields and objects across chosen permission sets on one page, with a preview and undo; extends Access Explorer (reverses the D-13 permission-management non-goal; ADR first, amends ADR-0047) | Major | Planned | D-157 |
 | F-08 | Deadline calendar view | Minor | Planned | Section 6 v0.10 |
 | L-06 | Link outcomes to grant deliverables when Funders is installed | Minor | Planned | Section 6 v0.10 |
 | X-05 | NPSP coexistence: adopt household accounts | Minor | Planned | Section 6.3 |
@@ -862,33 +864,61 @@ Two majors, below the usual three, so the v1.0 candidate closes the v0.10 scope 
 | C-58 | Technical debt checks in Org Optimizer: Apex, triggers and flows on old API versions, inactive or undescribed flows (SOQL-readable setup only) | Minor | Planned | D-156 |
 | C-60 | Automation inventory in the Data Dictionary: flows and Apex triggers per object; validation rules listed as not covered (Tooling API) | Minor | Planned | D-156 |
 
-#### Release 1.1 (Batch C): Contact points, addresses, Migration Assistant
+#### Release 1.1 (Batch C): Forms engine, Contact Point Sync
+
+The Forms engine comes first after v1.0 so V-09, Event Management, Scholarships applications, the donation page and portals reuse it (D-157). Its parsing, validation and rule logic follow the Section 9.9 portability preferences (framework-free JavaScript modules, form definitions as JSON).
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
+| C-42a | Forms engine and builder: multi-step forms, conditional fields, matching to existing people and organizations, records created or updated in BarnCRM (Forms module; ADR first) | Major | Planned | D-157 |
+| C-42b | Public forms on a Salesforce Site: guest-user security design, spam protection, duplicate-safe matching (ADR first) | Major | Planned | D-157 |
 | C-45 | BarnCRM Contact Point Sync module (ADR first) | Major | Planned | D-111 |
+| C-42c | Forms: file upload and save and resume by emailed link | Minor | Planned | D-157 |
+| C-61 | Duplicate Rules Starter: creates or repairs a recommended matching and duplicate rule for people and households through the C-49d Metadata API connection | Minor | Planned | D-156 |
+| C-63 | Report subscription setup: schedule native report subscriptions (board, retention, rollup freshness) from a BarnCRM page; feasibility check first (needs the Reports REST API through the C-49d connection) | Minor | Planned | D-156 |
+| C-69 | Radius Find: a Find condition "within N miles of a postal code or address" using Salesforce's built-in geocodes, SOQL DISTANCE and a shipped postal-code centroid table; no outside geocoding | Minor | Planned | D-157 |
+
+#### Release 1.2 (Batch C): Address Verification, Migration Assistant, volunteer self-service
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
 | C-46 | BarnCRM Address Verification module (ADR first) | Major | Planned | D-112 |
 | MIG-01 | Migration Assistant framework: in-org source for Import, ordered multi-step runs, verification, retire checklist (Section 6.1.4 item 1; decisions in Section 11.2 item 32 first) | Major | Planned | D-125 |
+| V-09 | Public volunteer sign-up page on the Forms engine (C-42b), with shifts, hours report and profile self-service | Major | Planned | D-157 |
 | MIG-10 | Integrations page: detected apps, compatibility notes and migration links (Section 6.1.4 item 10) | Minor | Planned | D-125 |
 | MIG-06 | Online giving landing: first-party Stripe receiver (X-08) and Zapier recipes (Section 6.1.4 item 6) | Minor | Planned | D-125 |
 | MIG-08 | Rollup migration: DLRS and NPSP customizable rollups into Rollup Builder (Section 6.1.4 item 8) | Minor | Planned | D-125 |
-| C-61 | Duplicate Rules Starter: creates or repairs a recommended matching and duplicate rule for people and households through the C-49d Metadata API connection | Minor | Planned | D-156 |
-| C-63 | Report subscription setup: schedule native report subscriptions (board, retention, rollup freshness) from a BarnCRM page; feasibility check first (needs the Reports REST API through the C-49d connection) | Minor | Planned | D-156 |
+| V-12 | Volunteer value rate: one org-wide hourly value (default set, changeable) on dashboards and hour letters | Minor | Planned | D-156 |
+| V-13 | Volunteer recognition: hour milestones and anniversaries with a thank-you task | Minor | Planned | D-156 |
 
-#### Release 1.2 (Batch C): Recurring donor health, generic merge, Giving and Volunteers minors
+#### Release 1.3 (Batch C): Online donations, recurring donor health, engagement score
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
+| G-34 | Online donation page per appeal on the Forms engine, handing off to the org's own Stripe or PayPal hosted checkout; the gift is written back through the MIG-06 receiver; BarnCRM holds no money | Major | Planned | D-157 |
 | G-27 | Recurring donor health: failed charges, expiring cards and lapsed recurring donors from processor events (after MIG-06), a save-the-sustainer list and a monthly recurring revenue view | Major | Planned | D-156 |
-| C-62 | Generic Record Merge: merge two records of any BarnCRM object with merge rules and a journal, moving children (extends C-51) | Major | Planned | D-156 |
+| C-64 | Engagement score: admin-weighted score and meter from gifts, volunteer hours, event attendance and activity recency (module inputs optional) | Major | Planned | D-157 |
 | G-21 | Stock and planned gift types with extra fields | Minor | Planned | Section 5.2 |
 | G-31 | Donor-advised fund and gift-source fields with a DAF and stock report (pairs with G-21) | Minor | Planned | D-156 |
 | G-32 | Wealth data fields (capacity rating, affinity, screening score) and an import template for screening exports; BarnCRM buys and calls nothing | Minor | Planned | D-156 |
 | G-33 | Quick Gift Entry donor panel: household, previous gifts and open pledges inline | Minor | Planned | D-156 |
-| V-12 | Volunteer value rate: one org-wide hourly value (default set, changeable) on dashboards and hour letters | Minor | Planned | D-156 |
-| V-13 | Volunteer recognition: hour milestones and anniversaries with a thank-you task | Minor | Planned | D-156 |
 
-#### Release 1.3 (Batch C): Corporate Hub, documents and compliance
+#### Release 1.4 (Batch D): Archive, generic merge, field history, Volunteers minors
+
+Archive by Query does not depend on Backup Sets: it uses the shipped Find export, Download before delete and bulk delete, so it is placed by impact here and defines the export file format that Backup Sets (1.16) reuses.
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| C-67 | Archive by Query: pick old records by Find query, export them to a file, confirm, bulk delete, optionally empty the Recycle Bin; reload later through Load one object; storage view picks targets | Major | Planned | D-157 |
+| C-62 | Generic Record Merge: merge two records of any BarnCRM object with merge rules and a journal, moving children (extends C-51) | Major | Planned | D-156 |
+| C-68 | Field History Keeper: history for chosen fields on BarnCRM-owned objects beyond the 20-field limit, with restore through Load | Major | Planned | D-157 |
+| V-14 | Shift minimum and maximum, with a waitlist that promotes on cancellation | Minor | Planned | D-156 |
+| V-15 | Minor volunteers: age check, guardian link and a consent step with expiry | Minor | Planned | D-156 |
+| V-16 | Group and standing sign-ups: a group books a block of slots with a leader; a person holds a standing weekly shift | Minor | Planned | D-156 |
+| V-17 | Background check details on onboarding (V-05): provider name, reference ID; entered or imported, no provider API | Minor | Planned | D-156 |
+| P-09 | Waitlists and capacity | Minor | Planned | Section 5.4 |
+
+#### Release 1.5 (Batch D): Corporate Hub, documents and compliance
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
@@ -899,24 +929,19 @@ Two majors, below the usual three, so the v1.0 candidate closes the v0.10 scope 
 | CH-06 | Recommended extra templates | Minor | Planned | D-118 |
 | CH-07 | Recommended required-policies set | Minor | Planned | D-118 |
 | CH-08 | Contracts and renewals tracking | Minor | Planned | D-118 |
-| V-14 | Shift minimum and maximum, with a waitlist that promotes on cancellation | Minor | Planned | D-156 |
-| V-15 | Minor volunteers: age check, guardian link and a consent step with expiry | Minor | Planned | D-156 |
 
-#### Release 1.4 (Batch D): Corporate Hub, GDPR and board governance
+#### Release 1.6 (Batch D): Memberships, GDPR
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
+| G-22a | BarnCRM Memberships module: membership types and tiers, status and dates, household or organization members; not built on Opportunity (ADR first) | Major | Planned | D-157 |
+| G-22b | Memberships: renewals, reminders and lapse handling; renewals from Giving gifts or recurring gifts when Giving is installed | Major | Planned | D-157 |
 | CH-05 | GDPR template set | Major | Planned | D-118 |
-| CH-09 | Board governance: roster, roles, terms | Major | Planned | D-118 |
-| CH-10 | Board meetings: agendas, packets, attendance, minutes | Major | Planned | D-118 |
-| CH-11 | Motions, votes and resolutions log | Minor | Planned | D-118 |
-| CH-12 | Annual conflict-of-interest disclosures | Minor | Planned | D-118 |
-| CH-13 | Board giving participation (with Giving) | Minor | Planned | D-118 |
-| CH-14 | Board dashboard | Minor | Planned | D-118 |
-| CH-15 | Board skills and diversity matrix with a gap view (demographic fields optional, off by default) | Minor | Planned | D-156 |
-| CH-16 | Meeting action items carried to the next agenda until closed | Minor | Planned | D-156 |
+| G-22c | Memberships: benefits per tier | Minor | Planned | D-157 |
+| G-22d | Memberships Essentials compatibility: coexistence documented and tested, import of its records | Minor | Planned | D-157 |
+| MIG-03 | V4S to BarnCRM Volunteers adapter (with V-09 public sign-up) | Minor | Planned | D-125 |
 
-#### Release 1.5 (Batch D): Migrations
+#### Release 1.7 (Batch E): Migrations
 
 Each needs the Section 11.2 item 32 decisions it depends on (O-1 to O-12).
 
@@ -925,35 +950,45 @@ Each needs the Section 11.2 item 32 decisions it depends on (O-1 to O-12).
 | MIG-02 | Nonprofit Cloud Party Relationship Groups to households, plus NPC relationships and affiliations | Major | Planned | D-125 |
 | MIG-04 | Nonprofit Cloud gifts to Giving, in-org, beside X-07 | Major | Planned | D-125 |
 | MIG-05 | NPSP migration kit (households in place, relationships, affiliations, addresses, recurring donations, allocations, soft credits), with a Levels, Engagement Plans and rollups parity report | Major | Planned | D-125, D-156 |
-| MIG-03 | V4S to BarnCRM Volunteers adapter (public sign-up V-09 is not approved) | Minor | Planned | D-125 |
 | MIG-09 | PMM to BarnCRM Programs | Minor | Planned | D-125 |
 | MIG-07 | Off-Salesforce import templates: DonorPerfect, Bloomerang, Little Green Light, then Neon, CiviCRM, Raiser's Edge NXT | Minor | Planned | D-125 |
-| V-16 | Group and standing sign-ups: a group books a block of slots with a leader; a person holds a standing weekly shift | Minor | Planned | D-156 |
-| V-17 | Background check details on onboarding (V-05): provider name, reference ID; entered or imported, no provider API | Minor | Planned | D-156 |
-| P-09 | Waitlists and capacity | Minor | Planned | Section 5.4 |
+| L-05 | Evidence log | Minor | Planned | Section 5.7 |
 
-#### Release 1.6 (Batch D): Portal Builder and grant management
+#### Release 1.8 (Batch E): Board governance and Portal Builder
 
 PB-01 starts only after the Section 11.2 item 30 terms check confirms option B; if it does not, Portal Builder items are re-slotted.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
+| CH-09 | Board governance: roster, roles, terms | Major | Planned | D-118 |
+| CH-10 | Board meetings: agendas, packets, attendance, minutes | Major | Planned | D-118 |
 | PB-01 | Portal Builder: templates, logins at no added license cost (ADR first) | Major | Planned (blocked: terms check) | D-118, D-120 |
+| CH-11 | Motions, votes and resolutions log | Minor | Planned | D-118 |
+| CH-12 | Annual conflict-of-interest disclosures | Minor | Planned | D-118 |
+| CH-13 | Board giving participation (with Giving) | Minor | Planned | D-118 |
+| CH-14 | Board dashboard | Minor | Planned | D-118 |
+| CH-15 | Board skills and diversity matrix with a gap view (demographic fields optional, off by default) | Minor | Planned | D-156 |
+| CH-16 | Meeting action items carried to the next agenda until closed | Minor | Planned | D-156 |
+
+#### Release 1.9 (Batch E): Board and volunteer portals, grant management
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
 | PB-02 | Board portal template | Major | Planned | D-118 |
 | F-09 | Grant Finder (Grants.gov) | Major | Planned | D-121 |
+| PB-03 | Volunteer portal template: shifts, sign-ups, hours and profile (moved earlier, D-157) | Minor | Planned | D-118, D-157 |
+| PB-09 | Member directory portal template: opt-in searchable directory, profile and renewal status | Minor | Planned | D-157 |
 | F-10 | Application tasks and checklists | Minor | Planned | D-121 |
 | F-11 | Document tracking for LOIs, applications and reports | Minor | Planned | D-121 |
 | F-12 | Budget versus awarded | Minor | Planned | D-121 |
 | F-13 | Renewals | Minor | Planned | D-121 |
-| CH-17 | Committees and working groups: the board roster generalized to committees, task forces and chapters | Minor | Planned | D-156 |
-| CH-18 | Board packet read tracking in the board portal | Minor | Planned | D-156 |
 
-#### Release 1.7 (Batch E): Scholarships and Outbound Grants
+#### Release 1.10 (Batch F): Scholarships and Outbound Grants
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
 | SG-01 | Programs and cycles (module; ADR first) | Major | Planned | D-122 |
-| SG-02 | Applications | Major | Planned | D-122 |
+| SG-02 | Applications on the Forms engine | Major | Planned | D-122 |
 | SG-03 | Reviewers and scoring | Major | Planned | D-122 |
 | SG-04 | Awards | Minor | Planned | D-122 |
 | SG-05 | Disbursements | Minor | Planned | D-122 |
@@ -962,20 +997,21 @@ PB-01 starts only after the Section 11.2 item 30 terms check confirms option B; 
 | PB-06 | Applicant portal template (SG-07) | Minor | Planned | D-122 |
 | SG-09 | Conditional disbursements, blocked until named conditions are met | Minor | Planned | D-156 |
 
-#### Release 1.8 (Batch E): Event Management core
+#### Release 1.11 (Batch F): Event Management core
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
 | EV-01 | Events (module; ADR first) | Major | Planned | D-123 |
-| EV-02 | Registrations and attendees | Major | Planned | D-123 |
+| EV-02 | Registrations and attendees on the Forms engine | Major | Planned | D-123 |
 | EV-04 | Tracks, sessions and agenda | Major | Planned | D-123 |
 | EV-03 | Ticket types | Minor | Planned | D-123 |
 | EV-05 | Speakers | Minor | Planned | D-123 |
 | EV-08 | Volunteer integration | Minor | Planned | D-123 |
 | EV-10 | Summit Events compatibility | Minor | Planned | D-123 |
 | EV-14 | Event reminder and follow-up emails, and a No-Show status | Minor | Planned | D-156 |
+| CH-17 | Committees and working groups: the board roster generalized to committees, task forces and chapters | Minor | Planned | D-156 |
 
-#### Release 1.9 (Batch E): Event Management complete, check-in, donor portal
+#### Release 1.12 (Batch F): Event Management complete, check-in, donor portal
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
@@ -986,24 +1022,21 @@ PB-01 starts only after the Section 11.2 item 30 terms check confirms option B; 
 | PB-07 | Speaker portal template (EV-07) | Minor | Planned | D-123 |
 | EV-15 | Event appointments with hosts | Minor | Planned | D-156 |
 | PB-08 | Donor portal template: giving history, pledge balance, receipts, contact updates; no payments | Minor | Planned | D-156 |
+| CH-18 | Board packet read tracking in the board portal | Minor | Planned | D-156 |
 | CH-19 | Board self-assessment from a template in the board portal | Minor | Planned | D-156 |
-| CH-20 | Meeting availability poll in the board portal | Minor | Planned | D-156 |
 
-#### Release 1.10 (Batch F): Gala seating, multi-brand management, portal templates
+#### Release 1.13 (Batch G): Gala seating, multi-brand management
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
 | EV-13 | Gala tables and seating: tables with capacity and host, guest assignment, seating chart export, dietary and access needs, sponsor tables | Major | Planned | D-156 |
 | C-47a | Brand and Legal Entity records, many-to-many brand assignment (canonical model first) | Major | Planned | D-119, D-120 |
 | C-47b | Brand-aware outputs: receipts, letters, documents, portals | Major | Planned | D-119, D-120 |
-| PB-03 | Volunteer portal template | Minor | Planned | D-118 |
 | PB-04 | Service portal template | Minor | Planned | D-118 |
 | PB-05 | Partner portal template | Minor | Planned | D-118 |
 | SG-10 | Reviewer panels and load balancing | Minor | Planned | D-156 |
-| MIG-11 | Outbound Funds importer, shown only when Outbound Funds is installed (Section 11.2 item 32 O-6) | Minor | Planned | D-156 |
-| L-05 | Evidence log | Minor | Planned | Section 5.7 |
 
-#### Release 1.11 (Batch F): Brand visibility and LWC Builder start
+#### Release 1.14 (Batch G): Brand visibility and LWC Builder start
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
@@ -1014,7 +1047,7 @@ PB-01 starts only after the Section 11.2 item 30 terms check confirms option B; 
 | C-47e | Brand filters on list views, reports and dashboards | Minor | Planned | D-119 |
 | C-47f | Receipt numbering per brand (optional) | Minor | Planned | D-119 |
 
-#### Release 1.12 (Batch F): LWC Builder complete, Territory Management, Grid tool
+#### Release 1.15 (Batch H): LWC Builder complete, Territory Management, Grid tool
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
@@ -1027,6 +1060,18 @@ PB-01 starts only after the Section 11.2 item 30 terms check confirms option B; 
 | C-41b | Saved grids | Minor | Planned | D-98 |
 | C-40b | Round-robin and capacity routing in Territory Management, with preview and undo | Minor | Planned | D-156 |
 
+#### Release 1.16 (Batch H): Backup Sets and files import (late by Brandon's direction)
+
+Two majors: Brandon placed Backup and files import late (D-157).
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| C-66 | Backup Sets: saved Find queries run on demand as CSV files in the admin's Files, with a run list and restore through Load by Id; reuses the C-67 file format; scheduled runs wait for C-38 (ADR first: amends the D-13 "never built: backup" line) | Major | Planned | D-157 |
+| C-70 | Import files and attachments: a zip with a manifest loaded into Files linked to records, with dry run and undo (reverses D-50's "files import not approved") | Major | Planned | D-157 |
+| G-22e | Memberships: certifications and continuing credits | Minor | Planned | D-157 |
+| CH-20 | Meeting availability poll in the board portal | Minor | Planned | D-156 |
+| MIG-11 | Outbound Funds importer, shown only when Outbound Funds is installed (Section 11.2 item 32 O-6) | Minor | Planned | D-156 |
+
 #### Held
 
 - C-38 scheduled imports and connections to other systems: on hold until Brandon starts it (D-39). The Google Sheets source for Super Importer waits with it (Brandon: "later"; it plugs in behind the C-49 file source).
@@ -1036,14 +1081,14 @@ PB-01 starts only after the Section 11.2 item 30 terms check confirms option B; 
 | ID | Milestone | Blocked on | Attaches to |
 |---|---|---|---|
 | M-0 | Device mobile run (v0.11 carry-over); 250,000-row scale run in a tier 2 sandbox (D-90) | A device; a tier 2 sandbox | Before M-1 |
-| M-1 | v1.0 pilot: release 0.17 in a pilot org; tagged v1.0 when it passes | Pilot org | After Batch B |
+| M-1 | v1.0: tagged once Brandon's initial QA is complete (in progress 2026-10-31); expected around or after release 0.17, before AppExchange approval (M-4) | Brandon's initial QA | Around or after Batch B |
 | M-2 | Namespace, Dev Hub, steward entity, first package versions; then Volunteers install-link testing | M-1 (D-87) | After M-1 |
 | M-3 | Beta cohort of at least ten orgs with structured feedback (was iteration v0.12) | M-2 | A 1.x batch |
 | M-4 | Security review submission and AppExchange listing (was iteration v0.13; no AppExchange for now, D-24) | M-2, Brandon's go-ahead | A 1.x batch |
 
 #### Not approved (not in any release)
 
-Section 6.1.1 items 5 (Memberships Essentials compatibility), 6 (document builder), 9 (map and radius search), 10 (field history and restore), 14 (engagement score), 15 (archiving), 17 (scheduled backup export); Memberships (G-22); Forms module (C-42); BarnCRM for WordPress; public volunteer sign-up (V-09); community processor webhooks beyond the Stripe receiver (X-08); donor scoring maturity beyond G-19, G-26 and G-29; multi-currency; localization. Each joins a release only when Brandon approves it; the Section 6.1.5 proposals cover several of them.
+Section 6.1.1 item 6 (document builder); BarnCRM for WordPress as an edition (portability is a design preference meanwhile, Section 9.9); community processor webhooks beyond the Stripe receiver (X-08); donor scoring maturity beyond G-19, G-26, G-29 and C-64; multi-currency; localization. Each joins a release only when Brandon approves it. The eleven Section 6.1.5 proposals were approved 2026-10-31 (D-157) and are placed above.
 
 ### 6.1 Post-1.0 themes (parking, ordered by expected demand)
 
@@ -1414,7 +1459,7 @@ Method: web research on 2026-10-31 across the tools named in this plan and BMemo
 | C-40b | Round-robin and capacity routing | Territory Management | 3 | M | 1.12 |
 | MIG-11 | Outbound Funds importer (only when installed) | Scholarships and Outbound Grants | 2 | M | 1.10 |
 
-**Proposals for Brandon (not in any release until approved).**
+**Proposals for Brandon: all eleven approved 2026-10-31 (D-157).** Brandon: "Backup and Import should be fairly late additions compared to other functionality but otherwise all eleven research proposals are approved." Placed in Section 6.0a as: 1 Forms engine C-42a to C-42c (1.1); 2 V-09 (1.2) and PB-03 (1.9, moved earlier); 3 G-34 online donation page (1.3); 4 Memberships module G-22a to G-22d (1.6), PB-09 member directory (1.9), G-22e certifications (1.16); 5 C-64 engagement score (1.3); 6 C-65 Field Access Manager (0.17); 7 C-66 Backup Sets (1.16, late); 8 C-67 Archive by Query (1.4, placed by impact; it does not depend on Backup Sets and defines the file format they reuse); 9 C-68 Field History Keeper (1.4); 10 C-69 Radius Find (1.1); 11 C-70 files and attachments import (1.16, late).
 
 | # | Proposal | Why it needs Brandon | Impact | Effort |
 |---|---|---|---|---|
@@ -1620,7 +1665,31 @@ Release management is automatic; Brandon is not asked to prompt it. The session 
 - Every newly approved item is placed in a release (about 3 major and 3 to 6 minor enhancements each), ordered by Brandon's sequencing, Core before modules, dependencies, then impact. Unapproved ideas stay in the "Not approved" list; C-38 stays held until Brandon starts it. New features consistent with the vision may be added and placed without his approval (D-156); new modules or editions, reversals of settled decisions or non-goals, and not-approved items go to him as proposals.
 - When Brandon asks to move a feature up or back, it is re-slotted and the affected releases are rebalanced to stay near the size rule; the change is reported in one line.
 - Statuses (Planned, In progress, Landed, Shipped) update as feature branches start, landing batches merge and batches ship.
-- Each landing batch covers 2 or 3 releases. Feature PRs and incremental gates run as in Section 9.6 (D-141, D-142); the release gate (`--release` on `barn-sales` and `oi-test`), the `barn-npc` and `mwdbdevsb` deploys (Brandon's approval for each `mwdbdevsb` deploy) and QA and UX testing run once per batch. Each release ships its What's New record.
+- Each landing batch covers 2 or 3 releases. Feature PRs and incremental gates run as in Section 9.6 (D-141, D-142); the release gate (`--release` on `barn-sales` and `oi-test`), the `barn-npc` and `mwdbdevsb` deploys (Brandon's approval for each `mwdbdevsb` deploy) and QA and UX testing run once per batch, after the whole-solution review (Section 9.8). Each release ships its What's New record.
+
+### 9.8 Whole-solution review before each batch test (owner decision, 2026-10-31)
+
+Brandon, 2026-10-31: "Before each batch is tested, please review the entire solution for QA, UX, and for redundancies/simplifications that may reduce the code base, reduce complexity, or otherwise improve performance. None of these changes should remove functionality or usefulness. This should be an opportunity to remove unused/deprecated elements and to merge elements as would be recommended for optimized simplicity. Please make sure this process is done with the end result in mind (to make things as simple as possible but not too simple)."
+
+- When a batch's builds are integrated and before its release gate runs, review all packages (Core and modules), not only the batch's changes, along three lines: QA (defects, test gaps), UX (consistency, copy, accessibility, navigation), and simplification (unused or deprecated components, duplicate logic, mergeable classes, components or settings, performance).
+- Every change keeps all functionality and usefulness; removals are limited to elements nothing uses or that a merged element fully replaces. Judge each against the end state: as simple as possible, but not simpler.
+- Findings that fit these rules are fixed in the batch before testing; anything that would remove a capability, change settled architecture or reverse a decision goes to Brandon as a recommendation.
+- Removed metadata is listed for the destructive steps of the barn-npc and mwdbdevsb deploys.
+
+### 9.9 Portability toward BarnCRM for WordPress (owner guidance, 2026-10-31)
+
+Brandon, 2026-10-31: "I may later want to re-create a version of all of this as BarnCRM for WordPress (likely to be used alongside my Pegwork for WordPress solution) so please keep that future compatibility in mind if there are ways to build things in a more universal way (ex. LWCs using http, css, and js rather than APEX)." Platform: [Pegwork](/specification/wordpress-platform-plugin.md) (schema registry as JSON, REST, block rendering, automation builder).
+
+Applied as a design preference, never at the cost of the Salesforce edition's security, limits, or the Section 4 architecture:
+
+- **Logic in plain JavaScript where it can safely run in the browser:** parsing, header and value normalization, fuzzy matching, transforms, validation previews and formatting live in framework-free ES modules (no `lightning/*` or `@salesforce/*` imports) that a WordPress block or Node can reuse. Data access, sharing, permissions, DML and anything that must be enforced stay server-side in Apex.
+- **Configuration as data:** templates, field maps, transform steps, rules, match settings and seed data are stored or exportable as plain JSON with documented schemas, so they can map onto Pegwork's registry.
+- **Shared test vectors:** logic that exists in both Apex and JS is tested against the same JSON fixtures.
+- **Thin Apex controllers** that return plain JSON shapes (no Salesforce-only types leaking into the UI contract), so the same UI could call a WordPress REST endpoint.
+- **Styling through a small BarnCRM token layer** on top of SLDS styling hooks, so a block theme can supply the same tokens; copy in labels so it exports as translatable strings.
+- **Canonical model stays platform-neutral** (`docs/architecture/canonical-model.md`): names and relationships describe the domain, not Salesforce mechanics.
+
+The pre-batch review (9.8) checks new work against this list; existing code is moved toward it only where the change is cheap and keeps behavior.
 
 ## 10. v0.1 in detail (the first build)
 
@@ -2022,6 +2091,7 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 | D-154 | Super Importer landing batch additions (Brandon, 2026-10-30): Advanced Duplicate Management (C-51: merge rules for which value wins, household-aware pairing, auto-merge of exact matches with undo; builds on ADR-0139 and C-44; one fuzzy scorer shared with C-49e) and Data Dictionary in Org Optimizer (C-52: exportable objects and fields with fill rates from field utilization; describe only, no Tooling API) join the C-49 and C-50 batch. Saved transform step lists and cleanup presets (name case, phone format, Section 6.1.1 item 11) are absorbed into C-50. C-49c multi-object import replaces the shipped parent-and-child loads (D-50), not a third load path. Access Explorer (6.1.1 item 7) moves to the next batch; AI-Readiness Export (6.1 item 7) later | Leaving these post-1.0; a separate cleanup tool; keeping parent-and-child loads beside multi-object import | They reuse engines already in the batch (fuzzy scorer, field utilization, bulk update), and one load path is simpler to test and explain |
 | D-155 | Release plan (Brandon, 2026-10-31; Section 6.0a, Section 9.7): every open, approved item is placed in a numbered release of about 3 major and 3 to 6 minor enhancements; each landing batch covers 2 or 3 releases, with the release gate, the `barn-npc` and `mwdbdevsb` deploys (Brandon's approval each time) and QA and UX run once per batch. Releases continue from 0.11 (0.12 to 0.15, then 1.1 onward); 0.15 completes the v1.0 scope (v0.9 and v0.10) and is tagged v1.0 when the v1.0 pilot passes. Iterations v0.12 (Beta) and v0.13 (AppExchange) become milestones M-3 and M-4. C-38 stays held (D-39); unapproved ideas stay out of releases. Upkeep is automatic: new approvals are placed, Brandon's move-up or move-back requests are re-slotted with the affected releases rebalanced, statuses update as batches land | Keeping iterations with "not scheduled" and "TBD" targets; one release per batch; keeping Beta and AppExchange as build iterations | Every approved item has a place and an order Brandon can move; batches stay large enough to amortize the release gate and deploys; milestones that wait on outside events no longer block release numbering |
 | D-156 | Competitive research additions (Brandon, 2026-10-31; Section 6.1.5; amends D-155): Brandon gave standing authorization to add features consistent with the vision to the roadmap and releases without his approval. 48 ideas from the research were added (C-53b to C-63, G-26 to G-33, V-10 to V-17, P-10 to P-14, F-14, CH-15 to CH-20, SG-09, SG-10, EV-12 to EV-15, PB-08, C-40b, MIG-11) and catalog items G-21, P-09 and L-05 were scheduled; prioritized by impact first, then impact per effort, Core before modules. Access Explorer takes ID C-53. Releases were rebalanced: pre-1.0 releases are 0.12 to 0.17 (Batches A and B, three releases each), 0.17 is the v1.0 candidate, post-1.0 releases are 1.1 to 1.12 (Batches C to F). New modules or editions, reversals of settled decisions or non-goals, and not-approved items stay proposals for Brandon (eleven listed in 6.1.5) | Asking Brandon about every idea; adding only to the post-1.0 releases | High-impact Core, Giving, Volunteers and Programs gaps close before the v1.0 pilot, where first customers feel them; anything that changes the product's shape still goes to Brandon |
+| D-157 | Research proposals approved and v1.0 timing (Brandon, 2026-10-31; Sections 6.0a, 6.1.5; amends D-13, D-50, D-155, D-156). Brandon: "Backup and Import should be fairly late additions compared to other functionality but otherwise all eleven research proposals are approved." Placed: Forms module C-42a to C-42c first after v1.0 (1.1), so V-09 (1.2), the G-34 online donation page (1.3), Scholarships applications, Event registrations and portals reuse it; PB-03 volunteer portal moved to 1.9; Memberships module G-22a to G-22d (1.6), PB-09 member directory (1.9), G-22e certifications (1.16); C-64 engagement score (1.3); C-65 Field Access Manager (0.17); C-67 Archive by Query (1.4, by impact; it does not need Backup Sets); C-68 Field History Keeper (1.4); C-69 Radius Find (1.1); C-66 Backup Sets and C-70 files and attachments import last (1.16). Post-1.0 releases become 1.1 to 1.16 in Batches C to H. Reversals: C-65 reverses D-13's "never built: permission tools" and the Section 4.9 permission-management non-goal; C-66 reverses D-13's "never built: backup"; C-70 reverses D-50's "files import not approved"; each needs an ADR before build (amending ADR-0047), as do the Forms and Memberships modules (guest-user security design for C-42b). v1.0 timing, Brandon: "v1.0 will be after my initial QA is complete (still in progress as of now) but will likely be before the AppExchange approval. It will likely be around or after release 0.17." Release 0.17 stays the v1.0 candidate; milestone M-1 is now v1.0 once Brandon's initial QA is complete, before AppExchange approval (M-4) | Keeping the eleven as proposals; Backup and files import earlier; Archive by Query after Backup Sets; a separate pilot milestone for v1.0 | Brandon approved them; one shared Forms engine is built once and reused; Archive uses only shipped tools, so it need not wait for Backup; v1.0 follows Brandon's own QA, not a pilot |
 
 ---
 
