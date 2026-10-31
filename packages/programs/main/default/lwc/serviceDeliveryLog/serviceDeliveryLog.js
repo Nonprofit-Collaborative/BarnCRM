@@ -29,6 +29,7 @@ import {
   withAttendance,
   withQuantity
 } from './logRows';
+import { bodyMessage } from 'c/findCsv';
 
 /**
  * The Service Delivery Log panel on a program (P-02): for one active service and one day, the
@@ -70,7 +71,7 @@ export default class ServiceDeliveryLog extends LightningElement {
         this.drafts = {};
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
       })
       .finally(() => {
         this.loading = false;
@@ -193,17 +194,10 @@ export default class ServiceDeliveryLog extends LightningElement {
         this.resultMessage = log.saved === 1 ? SAVED_ONE : format(SAVED, log.saved);
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
       })
       .finally(() => {
         this.busy = false;
       });
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return ACTION_FAILED;
   }
 }
