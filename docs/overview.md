@@ -39,7 +39,7 @@ You choose the edition once, in the first-run setup window; the Setup Assistant 
 | **Mirror** | Opportunity mirror, Campaign sync, inbound gift API, accounting export | Built (the Gift Transaction mirror for Nonprofit Cloud is planned) |
 | **Volunteers** | Jobs, shifts, sign-ups, hours with approval, skills, requirements, recurring shifts, shift reminder emails, suggested volunteers for a shift, hour letters and certificates, the BarnCRM Volunteers app | Built and tested on main |
 | **Programs** | Programs, services, enrollments with stages, the Program Roster panel, a person's Programs card, attendance and service delivery with the Service Delivery Log, sample data, the BarnCRM Programs app | Built (release 0.12, P-01; release 0.13, P-02) |
-| **Logic Models** | Inputs, activities, outputs, outcomes and indicators | Planned |
+| **Logic Models** | The Logic Model Builder: inputs, activities, outputs, outcomes and impact with arrows and assumptions, for the organization or a program, and indicators with a baseline and a target and result per period; the BarnCRM Logic Models app | Built (release 0.14, L-01 and L-02; indicator sources and the report are planned) |
 | **Funders** | Funder pipeline, reporting deadlines, restricted fund tracking | Planned; the package is an empty placeholder |
 | **Events** | Simple event registration and attendance | Planned (after 1.0) |
 

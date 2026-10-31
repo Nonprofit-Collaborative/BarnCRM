@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Logic model, with its builder</comment>
+    <content>Logic_Model_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Logic_Model__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Logic model, with its builder</comment>
+    <content>Logic_Model_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Logic_Model__c</pageOrSobjectType>
+  </actionOverrides>
+  <brand>
+    <headerColor>#0B5CAB</headerColor>
+    <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+  </brand>
+  <description>
+    The BarnCRM Logic Models module: logic models the organization builds, with indicators,
+    targets and results.
+  </description>
+  <formFactors>Large</formFactors>
+  <formFactors>Small</formFactors>
+  <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+  <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+  <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+  <label>BarnCRM Logic Models</label>
+  <navType>Console</navType>
+  <tabs>Logic_Model__c</tabs>
+  <uiType>Lightning</uiType>
+  <workspaceConfig>
+    <mappings>
+      <tab>Logic_Model__c</tab>
+    </mappings>
+  </workspaceConfig>
+</CustomApplication>

@@ -9987,6 +9987,276 @@ anonymous record; deleting the person empties the person (SetNull) and keeps the
 
 ---
 
+## 29Z. Logic Model
+
+### Definition
+
+The organization's theory of change, built by the organization itself (L-01, Logic Models module,
+ADR-NEXT `NEXT-logic-models-module.md`): what it puts in, what it does, what that produces, what
+changes for people as a result, and the long-run impact. Its elements (29ZA) are the parts, its
+links (29ZB) say which part leads to which and on what assumption, and indicators (29ZC) on its
+outputs and outcomes say how the organization knows. One for the organization, and optionally one
+per program.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the model is called. |
+| Description | long text | no | What the model covers, for a funder or a new board member. |
+| Program | record identifier (text) | no | The program the model is for, when it is not the organization's. A record identifier, not a reference: Logic Models never depends on Programs (R-LM2). |
+| Scope Key | text | yes (set by BarnCRM) | `Organization`, or the program's identifier. Unique, so a scope has one model. |
+
+### Relationships
+
+- **Logic Model to Logic Model Element**, one to many; the element is a detail of the model.
+- **Logic Model to Logic Model Link**, one to many; the link is a detail of the model.
+
+### Rules
+
+**R-LM1 One model per scope.** At most one model has no program (the organization's), and at most
+one names a given program. A second is refused with a message naming the scope, counting models
+the user cannot see. Enforced in Apex by an automation that always runs (registry row
+`Logic_Model_Scope`, ADR-0024), which sets `Scope_Key__c`; the field is unique, so two saves at
+the same moment cannot both win.
+
+**R-LM2 The program is named, not looked up.** `Program_Id__c` holds a record identifier as text
+(ADR-0014). The builder offers programs only where the Programs module's Program object exists, read by
+describe, and shows the name it finds; a program it cannot find is shown as missing. An identifier
+that is not a well-formed record identifier is refused. The 15-character form is stored as 18.
+
+**R-LM3 Deleting a model deletes its parts.** Its elements, links, indicators and periods go with
+it.
+
+### Salesforce implementation
+
+- **Object:** `Logic_Model__c`, name field Text, label Logic Model Name, sharing Public Read/Write.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Description | `Description__c` | Long Text Area(32768) |
+| Program | `Program_Id__c` | Text(18) |
+| Scope Key | `Scope_Key__c` | Text(18), unique, not case sensitive |
+
+- **Trigger:** `LogicModelTrigger`, through the Core dispatcher; handler `LogicModelScopeHandler`
+  (R-LM1, R-LM2), reading every model without sharing through `LogicModelSelector`.
+
+---
+
+## 29ZA. Logic Model Element
+
+### Definition
+
+One part of a logic model (L-01): an input (staff, funding, a building), an activity (tutoring
+sessions), an output (sessions held, students served), an outcome (reading at grade level), which
+is short, intermediate or long term, or the impact (a community where every child reads).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The element, in a short phrase. |
+| Logic Model | reference(Logic Model) | yes | The model it belongs to. |
+| Type | picklist(Input, Activity, Output, Outcome, Impact) | yes | Its stage in the model. |
+| Outcome Term | picklist(Short Term, Intermediate Term, Long Term) | conditional | For an outcome only: when the change is expected. |
+| Description | long text | no | The element in full. |
+| Sort Order | number | no | Its place in its column; lower first. |
+| Stage Rank | number (formula) | | Input 1, Activity 2, Output 3, short, intermediate and long term outcome 4, 5 and 6, Impact 7. Links must go up the ranks (R-LL2). |
+| Indicator Count | number (roll-up) | | How many indicators it has. |
+
+### Relationships
+
+- **Element to Logic Model**, many to one, as a detail of the model.
+- **Element to Indicator**, one to many; the indicator is a detail of the element.
+- **Element to Logic Model Link**, as the from end or the to end of any number of links.
+
+### Rules
+
+**R-LE1 An outcome has a term, and only an outcome.** An outcome without an Outcome Term, or
+another type with one, is refused (validation rule).
+
+**R-LE2 Indicators only on outputs and outcomes.** An element with indicators cannot become an
+input, activity or impact (validation rule on the Indicator Count roll-up); R-IN1 is the other
+half.
+
+**R-LE3 Deleting an element.** Its indicators and their periods are deleted with it. The builder
+deletes its links first; a delete from the standard record page empties the element on its links
+(SetNull), and the builder does not show a link with an empty end.
+
+### Salesforce implementation
+
+- **Object:** `Logic_Model_Element__c`, name field Text, label Element, sharing Controlled By
+  Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Logic Model | `Logic_Model__c` | Master-Detail to `Logic_Model__c`, relationship name Elements |
+| Type | `Type__c` | Picklist: Input, Activity, Output, Outcome, Impact; required |
+| Outcome Term | `Outcome_Term__c` | Picklist: Short Term, Intermediate Term, Long Term |
+| Description | `Description__c` | Long Text Area(32768) |
+| Sort Order | `Sort_Order__c` | Number(5, 0) |
+| Stage Rank | `Stage_Rank__c` | Formula (Number), from Type and Outcome Term |
+| Indicator Count | `Indicator_Count__c` | Roll-up summary, COUNT of `Indicator__c` |
+
+- **Validation rules:** `Outcome_Term_For_Outcomes` (R-LE1), `Indicators_Need_Output_Or_Outcome`
+  (R-LE2).
+
+---
+
+## 29ZB. Logic Model Link
+
+### Definition
+
+An arrow in a logic model (L-01): one element leads to another, and the assumption says why the
+organization believes it does ("if students attend twice a week, their reading improves").
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number. |
+| Logic Model | reference(Logic Model) | yes | The model it belongs to. |
+| From Element | reference(Logic Model Element) | yes | Where the arrow starts. |
+| To Element | reference(Logic Model Element) | yes | Where it points. |
+| Assumption | long text | no | Why the first is expected to lead to the second. |
+
+### Relationships
+
+- **Link to Logic Model**, many to one, as a detail of the model.
+- **Link to Logic Model Element**, twice, through lookups.
+
+### Rules
+
+**R-LL1 Both ends in the same model.** Both elements are set and belong to the link's model
+(validation rule).
+
+**R-LL2 Forward only.** The To Element's Stage Rank is higher than the From Element's: an input
+leads to an activity or further, a short term outcome to an intermediate or long term one or the
+impact, never back and never to the same stage (validation rule). The builder offers only these.
+
+**R-LL3 One link per pair.** The builder refuses a second link between the same two elements, in
+the same direction.
+
+### Salesforce implementation
+
+- **Object:** `Logic_Model_Link__c`, name field AutoNumber `LML-{000000}`, sharing Controlled By
+  Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Logic Model | `Logic_Model__c` | Master-Detail to `Logic_Model__c`, relationship name Links |
+| From Element | `From_Element__c` | Lookup to `Logic_Model_Element__c`, delete constraint SetNull, relationship name Links_From |
+| To Element | `To_Element__c` | Lookup to `Logic_Model_Element__c`, delete constraint SetNull, relationship name Links_To |
+| Assumption | `Assumption__c` | Long Text Area(32768) |
+
+- **Validation rules:** `Same_Model` (R-LL1), `Forward_Only` (R-LL2).
+
+---
+
+## 29ZC. Indicator
+
+### Definition
+
+How the organization knows an output happened or an outcome changed (L-02, absorbing P-03):
+"students served", "share of students reading at grade level", with its unit, the direction that
+is better and a baseline. Its periods (29ZD) hold the targets and results.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What is measured. |
+| Element | reference(Logic Model Element) | yes | The output or outcome it measures. |
+| Unit | text | no | What a value counts: people, percent, sessions, dollars. |
+| Better When | picklist(Higher, Lower) | yes (defaults Higher) | Which way is better: Lower for an indicator such as emergency room visits. |
+| Baseline Value | number | no | The starting value, before the work. |
+| Baseline Date | date | no | When the baseline was measured. |
+| Description | long text | no | How it is measured. |
+
+### Relationships
+
+- **Indicator to Element**, many to one, as a detail of the element.
+- **Indicator to Indicator Period**, one to many; the period is a detail of the indicator.
+
+### Rules
+
+**R-IN1 Only on outputs and outcomes.** An indicator on an input, activity or impact is refused
+(validation rule reading the element's type).
+
+**R-IN2 Progress.** For a period with a target and a result, the builder shows the result against
+the target: met when the result is at or beyond the target in the indicator's direction, and
+otherwise the share of the way from the baseline (or zero) to the target. Computed in the
+builder's module, never stored.
+
+### Salesforce implementation
+
+- **Object:** `Indicator__c`, name field Text, label Indicator Name, sharing Controlled By
+  Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Element | `Element__c` | Master-Detail to `Logic_Model_Element__c`, relationship name Indicators |
+| Unit | `Unit__c` | Text(40) |
+| Better When | `Better_When__c` | Picklist: Higher, Lower; required, default Higher |
+| Baseline Value | `Baseline_Value__c` | Number(16, 2) |
+| Baseline Date | `Baseline_Date__c` | Date |
+| Description | `Description__c` | Long Text Area(32768) |
+
+- **Validation rules:** `Output_Or_Outcome_Only` (R-IN1).
+
+---
+
+## 29ZD. Indicator Period
+
+### Definition
+
+An indicator's target and result for one stretch of time (L-02): "2026 Q1", "School year
+2026-27".
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The period, as the organization says it. |
+| Indicator | reference(Indicator) | yes | The indicator measured. |
+| Start Date | date | yes | First day of the period. |
+| End Date | date | yes | Last day of the period. |
+| Target Value | number | no | What the organization aims for in the period. |
+| Result Value | number | no | What it reached. Typed by hand in 0.14; L-03 adds import and computed sources. |
+| Notes | long text | no | What explains the result. |
+
+### Relationships
+
+- **Indicator Period to Indicator**, many to one, as a detail of the indicator.
+
+### Rules
+
+**R-IP1 End after start.** End Date is not before Start Date (validation rule).
+
+**R-IP2 One row per period.** The builder refuses a second period with the same start and end
+dates for the same indicator. Periods of different lengths may overlap (a year and its quarters).
+
+### Salesforce implementation
+
+- **Object:** `Indicator_Period__c`, name field Text, label Period, sharing Controlled By Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Indicator | `Indicator__c` | Master-Detail to `Indicator__c`, relationship name Periods |
+| Start Date | `Start_Date__c` | Date, required |
+| End Date | `End_Date__c` | Date, required |
+| Target Value | `Target_Value__c` | Number(16, 2) |
+| Result Value | `Result_Value__c` | Number(16, 2) |
+| Notes | `Notes__c` | Long Text Area(32768) |
+
+- **Validation rules:** `End_After_Start` (R-IP1).
+- **Service:** `LogicModelService` (the builder's reads and writes, R-LL3, R-IP2),
+  `LogicModelBuilderController` (thin, plain JSON shapes); the builder's rules and progress
+  (R-LL2, R-IN2) run in the framework-free module `logicModel.js` with the rank table as JSON
+  (plan 9.9).
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -10038,6 +10308,10 @@ Program, Service and Enrollment left this table in release 0.12 (P-01, ADR-NEXT)
 specified in Sections 29W to 29Y. Outcome left it when P-03 moved to the Logic Models package as
 L-02 (owner decision, 2026-09-23). Attendance and Service Delivery left it in release 0.13
 (P-02) as one entity, Service Delivery, specified in Section 29Z.
+Logic Model, Logic Model Element, Logic Model Link, Indicator and Indicator Period (L-01 and
+L-02, release 0.14, ADR-NEXT `NEXT-logic-models-module.md`) are specified in Sections 29Z to
+29ZD. Indicator takes the place of the Outcome entity listed above for Programs: P-03 moved to the
+Logic Models package as L-02 (owner decision, 2026-09-23).
 
 Two v0.4 entities have attributes that already exist on `Gift__c` from v0.2, because the
 object is not worth altering later for fields this cheap: Acknowledgment Status,
@@ -10284,6 +10558,7 @@ mirrors the primary member).
 | v0.13 | 2026-10-31 | Donor segments (G-28, D-156). New Section 25O, rules R-DS1 to R-DS6: a segment is a Saved Query of Contact or Account (no new object), with five starter templates held as documented JSON, a count, a list and Mailchimp, Constant Contact and all-columns CSV exports; no sending, no settings key. Contact and Account gain the formula `Change_From_Last_Year__c` (Giving This Year minus Giving Last Year), so upgraders can be filtered. |
 | v0.13 | 2026-10-31 | Pledge reminders (G-30). Objects `Pledge_Reminder_Step__c` (Section 25O) and `Pledge_Reminder__c` (25P) added; `Giving_Settings__c` gains `Pledge_Reminders_Enabled__c` (off by default), `Pledge_Reminders_Last_Run__c` and `Pledge_Reminders_Last_Run_Summary__c`. Rules R-PR1 to R-PR6. No field is added to `Installment__c` or `Commitment__c`. |
 | 0.13 | 2026-10-31 | Solicitation pipeline (G-26, ADR-NEXT). New entity Ask (Section 25O, `Ask__c`) with rules R-SO1 to R-SO8: an Opportunity-free ask with the organization's own stages, an outcome kept apart from the stage, stage history, and a win that creates or links the gift or commitment. Giving Settings gains `Ask_Stages__c` (Section 21A). `Next_Ask_Date__c` is the hook ask cadence (G-29) reads. |
+| 0.14 | 2026-10-31 | Logic Models L-01 and L-02 (ADR-NEXT `NEXT-logic-models-module.md`). New in the Logic Models module: Logic Model (`Logic_Model__c`, 29Z), Logic Model Element (`Logic_Model_Element__c`, 29ZA), Logic Model Link (`Logic_Model_Link__c`, 29ZB), Indicator (`Indicator__c`, 29ZC) and Indicator Period (`Indicator_Period__c`, 29ZD), with rules R-LM1 to R-LM3, R-LE1 to R-LE3, R-LL1 to R-LL3, R-IN1, R-IN2, R-IP1 and R-IP2. Indicator takes the place of P-03's Outcome. Specified ahead of the build. |
 
 ---
 ## 32. Entity ownership by package
@@ -10377,6 +10652,12 @@ included; standard objects the packages extend are named by the entity that gove
 | Service | Programs | 0.12 (P-01) | 29X |
 | Enrollment | Programs | 0.12 (P-01) | 29Y |
 | Service Delivery | Programs | 0.13 (P-02) | 29Z |
+| Programs entities | Programs | v0.9 | 30 |
+| Logic Model | Logic Models | 0.14 (L-01) | 29Z |
+| Logic Model Element | Logic Models | 0.14 (L-01) | 29ZA |
+| Logic Model Link | Logic Models | 0.14 (L-01) | 29ZB |
+| Indicator | Logic Models | 0.14 (L-02) | 29ZC |
+| Indicator Period | Logic Models | 0.14 (L-02) | 29ZD |
 | Funders entities | Funders | v0.9 | 30 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
@@ -10399,6 +10680,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
 | Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-0127). Dashboard `Volunteers` and four reports in public read only folders `BarnCRM_Volunteers`; report types Volunteer Hours with Job and Shift, Volunteer Shifts with Job, Volunteer Sign-ups, Volunteers (Contact); `standard-Dashboard` and `standard-report` tabs in the app; report and dashboard user permissions in the four permission sets (V-03) |
 | Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-NEXT). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
+| Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-NEXT `NEXT-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror is v0.6, brought forward from

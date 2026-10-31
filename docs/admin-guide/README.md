@@ -220,6 +220,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | P-01 Programs: install, roles, programs, services, enrollments, the Program Roster panel | [programs.md](programs.md) | BarnCRM Programs |
 
+### Logic Models
+
+| Feature | Page | Package |
+|---|---|---|
+| L-01 and L-02 Logic Models: install, roles, the Logic Model Builder, arrows and assumptions, indicators with baselines, targets and results by period | [logic-models.md](logic-models.md) | BarnCRM Logic Models |
+
 ### Moving From Another System
 
 | Feature | Page | Package |

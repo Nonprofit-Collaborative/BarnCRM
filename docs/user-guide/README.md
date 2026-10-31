@@ -45,6 +45,10 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages.
 
+### Logic Models (Nonprofit Edition)
+
+- [Logic models](logic-models.md): building a logic model with arrows and assumptions, and measuring outputs and outcomes with indicators, targets and results.
+
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.

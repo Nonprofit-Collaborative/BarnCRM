@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Outcome_Term_For_Outcomes</fullName>
+  <active>true</active>
+  <description>
+    R-LE1: an outcome has a term, and only an outcome.
+  </description>
+  <errorConditionFormula>
+OR(
+  AND(ISPICKVAL(Type__c, &quot;Outcome&quot;), ISBLANK(TEXT(Outcome_Term__c))),
+  AND(NOT(ISPICKVAL(Type__c, &quot;Outcome&quot;)), NOT(ISBLANK(TEXT(Outcome_Term__c))))
+)
+  </errorConditionFormula>
+  <errorMessage>
+    Choose an Outcome Term for an outcome, and leave it empty for every other type.
+  </errorMessage>
+</ValidationRule>

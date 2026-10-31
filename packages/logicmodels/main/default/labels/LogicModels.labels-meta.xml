@@ -1,0 +1,643 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>LogicModels_Scope_OrganizationTaken</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Second organization logic model refused</shortDescription>
+        <value>The organization already has a logic model. Open that one instead of adding another.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Scope_ProgramTaken</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Second logic model for one program refused</shortDescription>
+        <value>This program already has a logic model. Open that one instead of adding another.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Scope_BadProgram</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Program field holds something that is not a program</shortDescription>
+        <value>Choose the program with Change in the Logic Model Builder. This is not a program.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Title</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Logic Model Builder panel title</shortDescription>
+        <value>Logic Model Builder</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_For</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label before whose model this is</shortDescription>
+        <value>For</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_WholeOrganization</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Scope choice: the organization's own model</shortDescription>
+        <value>The whole organization</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_ProgramMissing</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Scope shown when the named program is gone</shortDescription>
+        <value>A program that can no longer be found</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Change</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that changes whose model this is</shortDescription>
+        <value>Change</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Save</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save button</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Cancel</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cancel button</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Add</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add button</shortDescription>
+        <value>Add</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_AddTo</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add button under a column; {0} is the column name</shortDescription>
+        <value>Add to {0}</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Edit</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Edit button</shortDescription>
+        <value>Edit</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Delete</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Delete button</shortDescription>
+        <value>Delete</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Remove</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Remove an arrow</shortDescription>
+        <value>Remove</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Name</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Name of a part</shortDescription>
+        <value>Name</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Description</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Description field</shortDescription>
+        <value>Description</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Column</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Column a part sits in</shortDescription>
+        <value>Column</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_EmptyColumn</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A column with no parts</shortDescription>
+        <value>Nothing here yet.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_SelectHint</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shown when no part is selected</shortDescription>
+        <value>Select a part to change it, link it or measure it.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_LookAt</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading of the findings list</shortDescription>
+        <value>Things to Look At</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_LookAtNone</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No findings</shortDescription>
+        <value>Nothing to look at: every part is linked and every outcome is measured.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_FindingEmptyStage</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Finding; {0} is a column name</shortDescription>
+        <value>{0}: nothing added yet.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_FindingNoArrowIn</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Finding; {0} is a part name</shortDescription>
+        <value>{0} has no arrow coming in.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_FindingNoArrowOut</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Finding; {0} is a part name</shortDescription>
+        <value>{0} has no arrow going out.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_FindingNoIndicator</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Finding; {0} is an outcome name</shortDescription>
+        <value>{0} has no indicator.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Outcomes</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>All outcome columns together</shortDescription>
+        <value>Outcomes</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Saved</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Announced after a save</shortDescription>
+        <value>Saved.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Deleted</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Announced after a delete</shortDescription>
+        <value>Deleted.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_ActionFailed</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Generic failure</shortDescription>
+        <value>That did not save. Try again, or reload the page.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_NotFound</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Model or part no longer there</shortDescription>
+        <value>This logic model, or the part you changed, can no longer be found. Reload the page.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_ArrowExists</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Second arrow between two parts refused</shortDescription>
+        <value>That arrow is already there. Change its assumption instead.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_PeriodExists</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Second period with the same dates refused</shortDescription>
+        <value>This indicator already has a period with these dates. Change that row instead.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Builder_Loading</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Spinner text</shortDescription>
+        <value>Loading</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Stage_Input</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Column name</shortDescription>
+        <value>Inputs</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Stage_Activity</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Column name</shortDescription>
+        <value>Activities</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Stage_Output</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Column name</shortDescription>
+        <value>Outputs</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Stage_OutcomeShort</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Column name</shortDescription>
+        <value>Short Term Outcomes</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Stage_OutcomeIntermediate</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Column name</shortDescription>
+        <value>Intermediate Term Outcomes</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Stage_OutcomeLong</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Column name</shortDescription>
+        <value>Long Term Outcomes</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Stage_Impact</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Column name</shortDescription>
+        <value>Impact</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Part_Title</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Before the selected part's column name</shortDescription>
+        <value>Selected Part</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Part_MoveUp</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Move a part up its column</shortDescription>
+        <value>Move Up</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Part_MoveDown</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Move a part down its column</shortDescription>
+        <value>Move Down</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Part_DeleteConfirm</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Asked before deleting a part</shortDescription>
+        <value>Delete this part? Its arrows, and its indicators with their periods, are deleted too.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Part_LeadsTo</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading: arrows out of the part</shortDescription>
+        <value>Leads To</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Part_ComesFrom</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading: arrows into the part</shortDescription>
+        <value>Comes From</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Part_AddArrow</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that adds an arrow</shortDescription>
+        <value>Add Arrow</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Part_ArrowTarget</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Picker of the part an arrow leads to</shortDescription>
+        <value>Part It Leads To</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Part_Assumption</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Assumption field</shortDescription>
+        <value>Assumption</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Part_NoArrows</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No arrows in a list</shortDescription>
+        <value>No arrows.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Part_NoTargets</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No later part to link to</shortDescription>
+        <value>No later part to link to yet. Add one in a column to the right.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Part_NoAssumption</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>An arrow without an assumption</shortDescription>
+        <value>No assumption written yet.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_Title</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading of the indicators</shortDescription>
+        <value>Indicators</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_Add</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that adds an indicator</shortDescription>
+        <value>Add Indicator</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_Name</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Indicator name field</shortDescription>
+        <value>Indicator Name</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_Unit</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Unit field</shortDescription>
+        <value>Unit</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_BetterWhen</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Which way is better</shortDescription>
+        <value>Better When</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_Higher</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Better when higher</shortDescription>
+        <value>Higher</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_Lower</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Better when lower</shortDescription>
+        <value>Lower</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_Baseline</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Baseline value field</shortDescription>
+        <value>Baseline</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_BaselineDate</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Baseline date field</shortDescription>
+        <value>Baseline Date</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_None</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No indicators</shortDescription>
+        <value>No indicators yet.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_DeleteConfirm</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Asked before deleting an indicator</shortDescription>
+        <value>Delete this indicator and its periods?</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_UnitIs</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Indicator line; {0} is the unit</shortDescription>
+        <value>Unit: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_BetterWhenIs</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Indicator line; {0} is Higher or Lower</shortDescription>
+        <value>Better when {0}.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_BaselineIs</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Indicator line; {0} is the baseline</shortDescription>
+        <value>Baseline: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Indicator_BaselineOn</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Indicator line; {0} baseline, {1} its date</shortDescription>
+        <value>Baseline: {0}, measured {1}.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Period_Add</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that adds a period</shortDescription>
+        <value>Add Period</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Period_Name</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Period name field and column</shortDescription>
+        <value>Period</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Period_StartDate</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Start date</shortDescription>
+        <value>Start Date</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Period_EndDate</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>End date</shortDescription>
+        <value>End Date</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Period_Target</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Target value</shortDescription>
+        <value>Target</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Period_Result</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Result value</shortDescription>
+        <value>Result</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Period_Notes</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Notes on a result</shortDescription>
+        <value>Notes</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Period_Progress</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Progress column</shortDescription>
+        <value>Progress</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Period_Met</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Result reached the target</shortDescription>
+        <value>Met</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Period_Percent</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Progress toward the target; {0} is a whole number</shortDescription>
+        <value>{0}%</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Period_None</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No periods</shortDescription>
+        <value>No periods yet.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Period_Actions</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Actions column</shortDescription>
+        <value>Actions</value>
+    </labels>
+</CustomLabels>

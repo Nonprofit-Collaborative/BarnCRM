@@ -623,12 +623,12 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ### 5.2 Logic Models (separate package)
 
-**Edition:** Nonprofit Edition. Depends on Core only; works alongside Programs without referencing it. No package directory exists yet.
+**Edition:** Nonprofit Edition. Depends on Core only; works alongside Programs without referencing it, naming a program by its record identifier (new ADR, Logic Models module). Package `packages/logicmodels`, app BarnCRM Logic Models.
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Logic model builder | Major | Builds inputs, activities, outputs, outcomes and impact in the app, for the organization and optionally per program. | Planned (v0.9) | L-01 |
-| Indicators | Major | Indicators on outputs and outcomes with unit, baseline, target and result per period. | Planned (v0.9) | L-02 |
+| Logic model builder | Major | Builds inputs, activities, outputs, short, intermediate and long term outcomes and impact in the Logic Model Builder panel, one model for the organization and at most one per program. Arrows go forward only, once per pair, each with its assumption; parts reorder within a column; Things to Look At lists empty columns, unlinked parts and unmeasured outcomes. Logic Models Admin, Staff (cannot delete a whole model) and Read Only permission sets, given through the Access roles. | Built, not merged (release 0.14) | L-01 |
+| Indicators | Major | Indicators on outputs and outcomes with unit, which way is better (higher or lower), a baseline and its date, and a target and result per period, with progress shown as Met or a percent of the way from the baseline. One period per indicator for the same dates. | Built, not merged (release 0.14) | L-02 |
 | Indicator sources | Major | Indicator values entered by hand, imported, or computed from any object. | Planned (v0.9) | L-03 |
 | Logic model report | Minor | Compares periods, ready to send to a funder. | Planned (v0.9) | L-04 |
 | Link outcomes to grant deliverables | Minor | Connects outcomes to grant deliverables when Funders is installed. | Planned (v0.10) | L-06 |
