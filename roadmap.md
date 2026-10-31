@@ -2,7 +2,7 @@
 
 Purpose: planned work with status, by release. Mirrors Section 6 (6.0a release plan, 6.1.5 competitive research) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Feature status detail lives in `docs/barncrm-features.md`.
 
-Status as of 2026-10-31: main at 1ddb4ed9; last shipped version 0.11; release plan adopted (D-155); competitive research added 48 features (D-156); the eleven research proposals approved and placed, v1.0 after Brandon's initial QA (D-157). History: `changelog.md` (newest first) and this file's earlier versions in git (`git log -p -- roadmap.md`; the last iteration-based version is at ef92381b).
+Status as of 2026-10-31: landing batch A (releases 0.12 to 0.14) landed in `main` (status Landed until the batch's release gate, deploys and QA are done); last shipped version 0.11; release plan adopted (D-155); competitive research added 48 features (D-156); the eleven research proposals approved and placed, v1.0 after Brandon's initial QA (D-157). History: `changelog.md` (newest first) and this file's earlier versions in git (`git log -p -- roadmap.md`; the last iteration-based version is at ef92381b).
 
 ## Rules (D-155 to D-157, plan 9.7 to 9.9)
 
@@ -33,43 +33,43 @@ Status as of 2026-10-31: main at 1ddb4ed9; last shipped version 0.11; release pl
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| C-53 | Access Explorer | Major | In progress | D-154 |
-| C-56 | Setup Changes Log | Major | Planned | D-156 |
-| P-01 | Program, Service, Enrollment | Major | Planned | v0.9 |
-| C-50f1 | Super Transform saved step lists | Minor | Planned | D-154 |
-| C-50f2 | Phone format preset with a digit-format step | Minor | Planned | D-154 |
-| C-54 | Weekly Admin Digest | Minor | Planned | D-156 |
-| C-55 | Record Inspector | Minor | Planned | D-156 |
-| C-49f1 | Import R5: Affiliation and Relationship templates, after an org check | Minor | Planned | D-136 |
-| QA-F1 | Platform-only coverage check before the next client deploy | Minor | Planned | Plan 11.3 item 10 |
+| C-53 | Access Explorer | Major | Landed (batch A) | D-154 |
+| C-56 | Setup Changes Log | Major | Landed (batch A) | D-156 |
+| P-01 | Program, Service, Enrollment | Major | Landed (batch A) | v0.9 |
+| C-50f1 | Super Transform saved step lists | Minor | Landed (batch A) | D-154 |
+| C-50f2 | Phone format preset with a digit-format step | Minor | Landed (batch A) | D-154 |
+| C-54 | Weekly Admin Digest | Minor | Landed (batch A) | D-156 |
+| C-55 | Record Inspector | Minor | Landed (batch A) | D-156 |
+| C-49f1 | Import R5: Affiliation and Relationship templates, after an org check | Minor | Landed (batch A) | D-136 |
+| QA-F1 | Platform-only coverage check before the next client deploy | Minor | Landed (batch A) | Plan 11.3 item 10 |
 
 ### 0.13 (Batch A): Programs attendance, solicitation pipeline, AI readiness
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| P-02 | Attendance and service delivery logging | Major | Planned | v0.9 |
-| G-26 | Solicitation pipeline (Opportunity-free asks) | Major | Planned | D-156 |
-| AIR-01 | AI-Readiness Export | Major | Planned | D-154 |
-| UX-F1 | Trim about 200 labels of 20 or more words | Minor | Planned | D-140 |
-| UX-F2 | Cosmos contrast check, "Data Hygiene" comments, Data Jobs section on the UX kit | Minor | Planned | D-140 |
-| C-53b | Permission compare and Modify All report in Access Explorer | Minor | Planned | D-156 |
-| G-28 | Saved donor segments with export | Minor | Planned | D-156 |
-| G-29 | Ask cadence reminders | Minor | Planned | D-156 |
-| G-30 | Pledge reminders | Minor | Planned | D-156 |
+| P-02 | Attendance and service delivery logging | Major | Landed (batch A) | v0.9 |
+| G-26 | Solicitation pipeline (Opportunity-free asks) | Major | Landed (batch A) | D-156 |
+| AIR-01 | AI-Readiness Export | Major | Landed (batch A) | D-154 |
+| UX-F1 | Trim about 200 labels of 20 or more words | Minor | Landed (batch A) | D-140 |
+| UX-F2 | Cosmos contrast check, "Data Hygiene" comments, Data Jobs section on the UX kit | Minor | Landed (batch A) | D-140 |
+| C-53b | Permission compare and Modify All report in Access Explorer | Minor | Landed (batch A) | D-156 |
+| G-28 | Saved donor segments with export | Minor | Landed (batch A) | D-156 |
+| G-29 | Ask cadence reminders | Minor | Landed (batch A) | D-156 |
+| G-30 | Pledge reminders | Minor | Landed (batch A) | D-156 |
 
 ### 0.14 (Batch A): Logic Models start, volunteer reminders, Programs minors
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| L-01 | Logic model builder | Major | Planned | v0.9 |
-| L-02 | Indicators on outputs and outcomes | Major | Planned | v0.9 |
-| V-10 | Volunteer shift reminders | Major | Planned | D-156 |
-| P-04 | Case notes | Minor | Planned | v0.9 |
-| P-05 | Program dashboard | Minor | Planned | v0.9 |
-| P-06 | Program roster template through C-49c (V-06 hours template moves to C-49c too) | Minor | Planned | v0.9, D-154 |
-| P-07 | Intake and eligibility fields | Minor | Planned | v0.9 |
-| P-08 | Participant privacy sharing preset | Minor | Planned | v0.9 |
-| V-11 | Suggested volunteers for a shift | Minor | Planned | D-156 |
+| L-01 | Logic model builder | Major | Landed (batch A) | v0.9 |
+| L-02 | Indicators on outputs and outcomes | Major | Landed (batch A) | v0.9 |
+| V-10 | Volunteer shift reminders | Major | Landed (batch A) | D-156 |
+| P-04 | Case notes | Minor | Landed (batch A) | v0.9 |
+| P-05 | Program dashboard | Minor | Landed (batch A) | v0.9 |
+| P-06 | Program roster template through C-49c (V-06 hours template moves to C-49c too) | Minor | Landed (batch A) | v0.9, D-154 |
+| P-07 | Intake and eligibility fields | Minor | Landed (batch A) | v0.9 |
+| P-08 | Participant privacy sharing preset | Minor | Landed (batch A) | v0.9 |
+| V-11 | Suggested volunteers for a shift | Minor | Landed (batch A) | D-156 |
 
 ### 0.15 (Batch B): Logic Models complete, Programs depth
 
@@ -123,6 +123,8 @@ Status as of 2026-10-31: main at 1ddb4ed9; last shipped version 0.11; release pl
 | C-61 | Duplicate Rules Starter | Minor | Planned | D-156 |
 | C-63 | Report subscription setup (feasibility check first) | Minor | Planned | D-156 |
 | C-69 | Radius Find | Minor | Planned | D-157 |
+| V-10b | Volunteer shift reminders: "still need you" nudge for unfilled shifts (split from V-10) | Minor | Planned | D-165 |
+| UX-F4 | Module UX kit pass: Programs, Giving, Volunteers and Logic Models pages | Minor | Planned | D-165 |
 
 ### 1.2 (Batch C): Address Verification, Migration Assistant, volunteer self-service
 
@@ -136,6 +138,7 @@ Status as of 2026-10-31: main at 1ddb4ed9; last shipped version 0.11; release pl
 | MIG-08 | DLRS and NPSP rollups into Rollup Builder | Minor | Planned | D-125 |
 | V-12 | Volunteer value rate | Minor | Planned | D-156 |
 | V-13 | Volunteer recognition and milestones | Minor | Planned | D-156 |
+| G-35 | Giving setup tabs move to Admin_Tabs | Minor | Planned | D-165 |
 
 ### 1.3 (Batch C): Online donations, recurring donor health, engagement score
 
@@ -148,6 +151,8 @@ Status as of 2026-10-31: main at 1ddb4ed9; last shipped version 0.11; release pl
 | G-31 | Donor-advised fund and gift-source fields | Minor | Planned | D-156 |
 | G-32 | Wealth data fields and import template | Minor | Planned | D-156 |
 | G-33 | Quick Gift Entry donor panel | Minor | Planned | D-156 |
+| G-36 | One staff-facing word for Pledge versus Commitment (needs Brandon) | Minor | Planned | D-165 |
+| G-37 | Pledge reminders on the GivingScheduler Nightly Jobs path (needs Brandon) | Minor | Planned | D-165 |
 
 ### 1.4 (Batch D): Archive, generic merge, field history, Volunteers minors
 
@@ -161,6 +166,7 @@ Status as of 2026-10-31: main at 1ddb4ed9; last shipped version 0.11; release pl
 | V-16 | Group and standing sign-ups | Minor | Planned | D-156 |
 | V-17 | Background check details on onboarding | Minor | Planned | D-156 |
 | P-09 | Waitlists and capacity | Minor | Planned | Plan 5.4 |
+| C-71 | Fold the remaining inline AuraHandledException blocks into UserErrors | Minor | Planned | D-165 |
 
 ### 1.5 (Batch D): Corporate Hub, documents and compliance
 
