@@ -23,6 +23,47 @@ private class ImportObjectSchemaTest {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }
 
+    private static List<ImportMapping.Column> suggestedForContact(List<String> headings) {
+        ImportMapping suggested;
+        System.runAs(admin()) {
+            suggested = ImportObjectSchema.suggestMapping(Contact.SObjectType, headings);
+        }
+        return suggested.columns;
+    }
+
+    @IsTest
+    static void aHeadingNamingAnotherObjectOrAMissingFieldIsNotGuessed() {
+        System.runAs(TestUsers.admin()) {
+            List<ImportMapping.Column> columns = suggestedForContact(
+                new List<String>{ 'Contact.First Name', 'Account.Name', 'Contact.Shoe Size' }
+            );
+
+            Assert.areEqual('Record.FirstName', columns[0].target, 'Object plus field.');
+            Assert.areEqual(
+                ImportMapping.TARGET_IGNORE,
+                columns[1].target,
+                'Another object is not guessed onto this one.'
+            );
+            Assert.areEqual(
+                ImportMapping.TARGET_IGNORE,
+                columns[2].target,
+                'A field this object lacks is not guessed onto another.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aTypoInTheFieldPartOfAnObjectHeadingIsStillGuessed() {
+        System.runAs(TestUsers.admin()) {
+            List<ImportMapping.Column> columns = suggestedForContact(
+                new List<String>{ 'Contact.Frist Name' }
+            );
+
+            Assert.areEqual('Record.FirstName', columns[0].target);
+            Assert.isTrue(columns[0].guessed == true, 'Flagged as a guess.');
+        }
+    }
+
     @IsTest
     static void aPersonEmailFieldCountsAsIndexedLikeEmail() {
         System.runAs(TestUsers.admin()) {

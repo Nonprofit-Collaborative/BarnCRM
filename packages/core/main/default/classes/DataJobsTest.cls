@@ -64,6 +64,49 @@ private class DataJobsTest {
         }
     }
 
+    /** The Data Jobs list polls while a job runs, so an undo still Undoing counts as running. */
+    @IsTest
+    static void anUndoInProgressIsRunning() {
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c job = new Import_Batch__c(
+                Operation__c = BulkUpdateService.OPERATION_UPDATE,
+                Status__c = ImportBatchService.STATUS_COMPLETE,
+                Is_Dry_Run__c = false,
+                Started_At__c = Datetime.now().addMinutes(-5),
+                Completed_At__c = Datetime.now().addMinutes(-1),
+                Committed_By__c = UserInfo.getUserId(),
+                Undo_Deadline__c = Datetime.now().addDays(1)
+            );
+            insert job;
+            Contact changed = new Contact(LastName = 'Okafor', MailingCity = 'Portland');
+            insert changed;
+            ImportJournalService.write(
+                job.Id,
+                ImportJournalService.PHASE_COMMIT,
+                new List<Map<String, Object>>{
+                    ImportJournalService.updated(
+                        'Contact',
+                        changed.Id,
+                        1,
+                        new Map<String, Object>{ 'MailingCity' => 'Salem' },
+                        new Map<String, Object>{ 'MailingCity' => 'Portland' }
+                    )
+                }
+            );
+            Test.startTest();
+            ImportUndoService.start(job.Id, ImportUndoService.preview(job.Id).total);
+            job = [
+                SELECT Id, Name, Operation__c, Status__c, Is_Dry_Run__c, Undo_Deadline__c, Job_Id__c
+                FROM Import_Batch__c
+                WHERE Id = :job.Id
+            ];
+            DataJobs.State state = DataJobs.stateOf(job, false);
+            Assert.areEqual(ImportBatchService.STATUS_UNDOING, state.status);
+            Assert.isTrue(state.running, 'An undo still Undoing is running.');
+            Test.stopTest();
+        }
+    }
+
     @IsTest
     static void aJobWithNoRefusalsListsNone() {
         System.runAs(TestUsers.admin()) {

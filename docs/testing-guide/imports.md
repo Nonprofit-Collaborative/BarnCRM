@@ -310,7 +310,7 @@ Nell,Ashby,nell.ashby@example.org,555-0303,Omar,Ashby,omar.ashby@example.org,555
 | 2 | Look at the columns. | One row each for **First Name**, **Last Name**, **Email** and **Phone**: `Contact.First Name` on the 2026 sheet joined **First Name** (both map to First Name). |
 | 3 | Look at the **Examples** column. | **First Name** shows `Sheeta`, `Sheetb`, `Sheetc`, one per line; **Phone** shows `555-0601` and `(blank)`; **Email** shows `sheeta.zztest@example.org` only. |
 | 4 | Clear **2025**. | The columns are read again: **Email** is gone, and the **First Name** examples are `Sheetb` and `Sheetc`. |
-| 5 | Choose **2025** again, select **Next**, choose **Create new records**, then **Preview**. | **would create** 3, **would be rejected** 0. |
+| 5 | Choose **2025** again and select **Next**. | The load options offer only the ways to update existing Contacts: a Contact cannot be created in a one-object load (people go through the people import), so **Create new records** is not offered. |
 | 6 | Select **Back** to the columns and clear **2025** and **2026**. | "This file has no heading row that BarnCRM can read. Check that the first row of the file holds the column names." No columns show and **Next** is disabled. |
 
 **Cleanup:** none; nothing was imported. Deactivate `Test sheets contact` if you do not keep it.

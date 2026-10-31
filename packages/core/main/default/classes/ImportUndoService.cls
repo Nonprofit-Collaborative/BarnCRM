@@ -397,8 +397,7 @@ public with sharing class ImportUndoService {
             otherTotal += counted.count;
             view.others.add(counted);
         }
-        TaggedCount created = createdCount(batchId);
-        if (created != null) {
+        for (TaggedCount created : createdCounts(batchId)) {
             otherTotal += created.count;
             view.others.add(created);
         }
@@ -406,40 +405,44 @@ public with sharing class ImportUndoService {
     }
 
     /**
-     * The records a one-object import journaled as created (R-IJ3), under their object's plural
-     * label, or null when it created none. A one-object import loads one object, so the first
-     * Created page names it. Read in system mode, as the tagged counts are.
+     * The records an import journaled as created (R-IJ3), counted per object under its plural
+     * label; none when it created none. Read in system mode, as the tagged counts are. Should
+     * the journal be too long to read in full, the rest is counted with the first object so the
+     * total stays right.
      */
-    private static TaggedCount createdCount(Id batchId) {
+    private static List<TaggedCount> createdCounts(Id batchId) {
+        List<TaggedCount> result = new List<TaggedCount>();
         Integer count = ImportJournalService.entryCount(
             batchId,
             ImportJournalService.PHASE_CREATED
         );
         if (count == 0) {
-            return null;
+            return result;
         }
-        String phase = ImportJournalService.PHASE_CREATED;
-        List<Import_Journal__c> first = [
-            SELECT Entries_JSON__c
-            FROM Import_Journal__c
-            WHERE Import_Batch__c = :batchId AND Phase__c = :phase
-            WITH SYSTEM_MODE
-            ORDER BY CreatedDate ASC, Id ASC
-            LIMIT 1
-        ];
-        List<Map<String, Object>> entries = first.isEmpty()
-            ? new List<Map<String, Object>>()
-            : ImportJournalService.entries(first[0]);
-        String objectName = entries.isEmpty() ? null : (String) entries[0].get('object');
-        Schema.SObjectType type = ImportObjectSchema.typeNamed(objectName);
-        TaggedCount counted = new TaggedCount();
-        counted.objectName = type == null
-            ? objectName
-            : type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
-        counted.label = type == null
-            ? objectName
-            : type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
-        counted.count = count;
-        return counted;
+        Map<String, Integer> byObject = ImportJournalService.countsByObject(
+            batchId,
+            ImportJournalService.PHASE_CREATED
+        );
+        Integer counted = 0;
+        for (String objectName : byObject.keySet()) {
+            Schema.SObjectType type = ImportObjectSchema.typeNamed(objectName);
+            TaggedCount each = new TaggedCount();
+            each.objectName = type == null
+                ? objectName
+                : type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+            each.label = type == null
+                ? objectName
+                : type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
+            each.count = byObject.get(objectName);
+            counted += each.count;
+            result.add(each);
+        }
+        if (result.isEmpty()) {
+            result.add(new TaggedCount());
+            result[0].count = count;
+        } else if (counted < count) {
+            result[0].count += count - counted;
+        }
+        return result;
     }
 }
