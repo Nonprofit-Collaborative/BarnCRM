@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    One merge an auto-merge run made: both people, the values the merge rules changed on the
+    kept person and the related records it moved, so undo can put them back (canonical model
+    Section 29A, rule R-DP10). Private: a run belongs to the administrator who ran it, and
+    BarnCRM Admin sees and changes all of them.
+  </description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>false</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Merge Journal</label>
+  <nameField>
+    <displayFormat>MJ-{000000}</displayFormat>
+    <label>Merge Journal Number</label>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Merge Journals</pluralLabel>
+  <sharingModel>Private</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

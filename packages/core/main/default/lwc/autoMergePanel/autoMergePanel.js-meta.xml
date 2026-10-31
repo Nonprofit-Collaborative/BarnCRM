@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>The Auto-Merge area of the Duplicate Matching tab (C-51): preview exact people matches, merge them in one run, undo a run.</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

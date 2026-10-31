@@ -68,6 +68,10 @@ households this way, never with Salesforce's own account merge. The full steps a
 
 You should see: "The two households are now one." Merged pairs leave the list.
 
+To merge the obvious duplicates in one go, an admin opens **Auto-Merge** on the same tab, clicks
+**Preview Exact Matches**, reads the pairs and confirms. A run can be undone for 15 days from
+**Recent Runs**. See [Auto-Merge](../admin-guide/duplicates.md#auto-merge).
+
 ## Why a Pair Is Suggested
 
 Each pair shows a short reason:
