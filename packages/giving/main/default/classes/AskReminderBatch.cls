@@ -71,9 +71,4 @@ public with sharing class AskReminderBatch implements Database.Batchable<SObject
             ErrorLogger.log(finishFailure, 'AskReminderBatch.finish');
         }
     }
-
-    /** How many reminders this run created, for a test or a caller that wants to know. */
-    public Integer remindersCreated() {
-        return created;
-    }
 }

@@ -191,8 +191,6 @@ public with sharing class SetupAssistantService {
         /** For a Navigate field, the Lightning tab it opens. */
         @AuraEnabled
         public String navigationTarget;
-        @AuraEnabled
-        public Boolean fullWidth;
         public Integer sortOrder;
 
         @NamespaceAccessible
@@ -208,7 +206,6 @@ public with sharing class SetupAssistantService {
             this.settingsObject = settingsObject;
             this.key = key;
             this.label = label;
-            this.fullWidth = false;
         }
 
         @NamespaceAccessible
@@ -234,12 +231,6 @@ public with sharing class SetupAssistantService {
         @NamespaceAccessible
         public StepField withNavigationTarget(String navigationTarget) {
             this.navigationTarget = navigationTarget;
-            return this;
-        }
-
-        @NamespaceAccessible
-        public StepField asFullWidth() {
-            this.fullWidth = true;
             return this;
         }
     }

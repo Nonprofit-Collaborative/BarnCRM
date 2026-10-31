@@ -83,9 +83,4 @@ public with sharing class DonorLevelBatch implements Database.Batchable<SObject>
             GIVING_SECTION
         );
     }
-
-    /** How many donors this run moved between levels, for a test or a caller that wants to know. */
-    public Integer donorsMoved() {
-        return moved;
-    }
 }
