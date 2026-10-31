@@ -2725,6 +2725,45 @@ load creates is not affected. A required field or a checkbox is never cleared, a
 names it once. The run log counts the values cleared, or that a commit would clear in a dry
 run. A people template ignores `blankClears`: a blank never clears a field there.
 
+**R-IT20 Several objects in one upload.** A one-object template (R-IT12) may load several
+objects from one upload (ADR-NEXT, `NEXT-several-objects-in-one-upload.md`; D-154, which
+replaces the related records of R-IT17 as a separate path). The R-IT1 document then carries
+`"objects"`: a list of `{ "entity", "operation", "keyField" }`, the object's API name, an R-IT12
+operation (Insert when blank, never Delete) and the field an upsert or an update by a matching
+field finds records by. Its columns and values for every row target `<object API name>.<field>`;
+a column of an object the list does not hold refuses the save, as does an object listed twice.
+The Target Object is the first object listed. No field is added.
+
+- **Steps.** Each chunk loads the objects in steps, each one the R-IT12 to R-IT19 load of one
+  object over the rows that have a value of their own for it (a value for every row alone does
+  not make a row load an object). An object no column or value fills is left out. The run is
+  refused, naming the object, when any step would be.
+- **Order.** Parents load first: an object waits for each listed object it points at through a
+  lookup or master-detail to that object alone that the user may fill in and the package does not
+  keep. Where objects point at each other, the one waiting for the fewest goes first, then the
+  list's order.
+- **Links on a row.** A record links to the row's record of each earlier object it points at,
+  through the field named after the parent (`AccountId`, `Account__c`), else the first by API
+  name. A new record takes it; an existing record only when the field is empty. A column mapped
+  to that field is not read for a row with the parent on it (the run log says so). A record
+  whose parent on its row was not saved, or in a dry run was rejected, is rejected and not saved.
+- **Links across sheets.** A row names a parent on another sheet by a lookup column (R-IT13).
+  The wizard stages the sheets parents first. In a dry run, a lookup to an object the upload may
+  create (Insert or Upsert) that finds nothing is left for the commit and the run log says so.
+- **Repeats.** An object that later objects link to and that finds records by a key groups its
+  repeated keys as R-IT17 does: the first row of a key loads it, later rows link to its record.
+  A row's Processor Key holds the digest of the first keyed object only, so only its repeats are
+  seen across chunks; the other objects' repeats are seen within a chunk.
+- **Results.** A row is Rejected when any of its objects is, with the reason after the object's
+  label; otherwise Created when it created a record, Updated when it changed one, else Matched.
+  Resulting Record holds the row's first record in load order. A failed child leaves its saved
+  parent.
+- **Undo.** Each object's created records are journaled on Created pages in load order, so the
+  undo's Created pass deletes children before parents; updates are journaled as for one object.
+- **Related records.** A template with a Related Object (R-IT17) runs as two steps of this
+  engine: the target object, grouped by its key, then the related object, always inserted and
+  linked through the Related Parent Field; R-IT17's results are kept.
+
 **R-IT3 Person mode.** Person Mode is proposed from the org shape detected by the Setup
 Assistant: Person Accounts where the org uses them, Contacts otherwise. The admin can
 override it per template, and the processor resolves the person references in R-IR1

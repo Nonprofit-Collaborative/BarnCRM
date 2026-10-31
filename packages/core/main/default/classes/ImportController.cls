@@ -81,6 +81,35 @@ public with sharing class ImportController {
         /** The related object's label, for what the template loads (D-136), or null. */
         @AuraEnabled
         public String relatedLabel;
+        /** True for an upload of several objects (R-IT20); targetObjectLabel names them all. */
+        @AuraEnabled
+        public Boolean severalObjects = false;
+    }
+
+    /** One object of an upload of several objects, in load order, as the wizard offers it. */
+    public class SeveralObjectView {
+        @AuraEnabled
+        public String objectName;
+        @AuraEnabled
+        public String objectLabel;
+        @AuraEnabled
+        public String operation;
+        @AuraEnabled
+        public String keyField;
+        @AuraEnabled
+        public List<String> operations = new List<String>();
+        /** External ID fields an upsert can match on. */
+        @AuraEnabled
+        public List<ImportMapping.Target> keyFields = new List<ImportMapping.Target>();
+        /** Text, email and phone fields an update by a matching field can find records by. */
+        @AuraEnabled
+        public List<ImportMapping.Target> matchFields = new List<ImportMapping.Target>();
+        /** The fields a column can fill, `<object>.<field>`, labelled with the object. */
+        @AuraEnabled
+        public List<FieldChoice> fields = new List<FieldChoice>();
+        /** How this object's records link to the row's earlier objects, one sentence each. */
+        @AuraEnabled
+        public List<String> links = new List<String>();
     }
 
     /** One field a column of a one-object template can be mapped to (R-IT12). */
@@ -438,6 +467,9 @@ public with sharing class ImportController {
         public String objectName;
         @AuraEnabled
         public String objectLabel;
+        /** Every object the sheet's two-part headings name, API names (R-IT20). */
+        @AuraEnabled
+        public List<String> namedObjects = new List<String>();
     }
 
     private class SheetHeaders {
@@ -478,6 +510,7 @@ public with sharing class ImportController {
                 sheet.sheetName = names[i];
                 sheet.objectName = found.bySheet[i];
                 sheet.objectLabel = found.labels.get(found.bySheet[i]);
+                sheet.namedObjects = found.namedBySheet[i];
                 view.sheets.add(sheet);
             }
             return view;
@@ -491,24 +524,142 @@ public with sharing class ImportController {
     public static TemplateView createObjectTemplate(String name, String objectName) {
         try {
             enforcePermission();
-            Import_Template__c template = ImportTemplateSelector.selectById(
-                ImportTemplateService.createObjectTemplate(name, objectName).Id
+            return objectTemplateView(
+                ImportTemplateSelector.selectById(
+                    ImportTemplateService.createObjectTemplate(name, objectName).Id
+                )
             );
-            TemplateView view = new TemplateView();
-            view.id = template.Id;
-            view.name = template.Name;
-            view.description = template.Description__c;
-            view.matchingRule = template.Matching_Rule__c;
-            view.personMode = template.Person_Mode__c;
-            view.mapping = template.Column_Mapping_JSON__c;
-            view.isPackageDefault = false;
-            view.isRecurring = false;
-            view.organizationRule = ImportTemplateService.ORGANIZATION_RULE_NAME;
-            view.severalMatches = ImportTemplateService.SEVERAL_REJECT;
-            describeLoad(template, view);
-            return view;
         } catch (Exception e) {
             throw auraError(e, 'ImportController.createObjectTemplate');
+        }
+    }
+
+    /** A template just made to load one object or several, as the wizard shows it. */
+    private static TemplateView objectTemplateView(Import_Template__c template) {
+        TemplateView view = new TemplateView();
+        view.id = template.Id;
+        view.name = template.Name;
+        view.description = template.Description__c;
+        view.matchingRule = template.Matching_Rule__c;
+        view.personMode = template.Person_Mode__c;
+        view.mapping = template.Column_Mapping_JSON__c;
+        view.isPackageDefault = false;
+        view.isRecurring = false;
+        view.organizationRule = ImportTemplateService.ORGANIZATION_RULE_NAME;
+        view.severalMatches = ImportTemplateService.SEVERAL_REJECT;
+        describeLoad(template, view);
+        return view;
+    }
+
+    /** Creates a template that loads several objects from one upload (R-IT20). */
+    @AuraEnabled
+    public static TemplateView createSeveralObjectsTemplate(String name, List<String> objectNames) {
+        try {
+            enforcePermission();
+            Import_Template__c created = ImportTemplateService.createSeveralObjectsTemplate(
+                name,
+                objectNames
+            );
+            return objectTemplateView(ImportTemplateSelector.selectById(created.Id));
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.createSeveralObjectsTemplate');
+        }
+    }
+
+    /**
+     * The objects of an upload of several objects in load order (R-IT20), each with its
+     * operation and key, what it may use, the fields a column can fill and how it links to the
+     * row's other records.
+     */
+    @AuraEnabled
+    public static List<SeveralObjectView> getSeveralObjects(String templateId) {
+        try {
+            enforcePermission();
+            Import_Template__c template = ImportTemplateSelector.selectById(templateId);
+            List<SeveralObjectView> result = new List<SeveralObjectView>();
+            if (template == null) {
+                return result;
+            }
+            List<ImportObjectSchema.Step> steps = ImportObjectSchema.listedSteps(
+                template,
+                ImportMapping.parse(template.Column_Mapping_JSON__c)
+            );
+            for (ImportObjectSchema.Step step : steps) {
+                result.add(severalObjectView(step, steps));
+            }
+            return result;
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getSeveralObjects');
+        }
+    }
+
+    private static SeveralObjectView severalObjectView(
+        ImportObjectSchema.Step step,
+        List<ImportObjectSchema.Step> steps
+    ) {
+        SeveralObjectView view = new SeveralObjectView();
+        view.objectName = step.entity;
+        view.objectLabel = step.label();
+        view.operation = ImportObjectSchema.operationOf(step.template);
+        view.keyField = step.template.Load_Match_Field__c;
+        if (step.type == null) {
+            return view;
+        }
+        for (String operation : ImportObjectSchema.operationsFor(step.type)) {
+            if (operation != ImportObjectSchema.OPERATION_DELETE) {
+                view.operations.add(operation);
+            }
+        }
+        view.keyFields = ImportObjectSchema.keyFields(step.type);
+        view.matchFields = ImportObjectSchema.matchFields(step.type);
+        view.fields = fieldChoices(step.type, step.entity, null, step.entity);
+        for (Integer parent : step.links.keySet()) {
+            view.links.add(
+                String.format(
+                    Label.Core_Import_SeveralLinkLine,
+                    new List<String>{
+                        view.objectLabel,
+                        steps[parent].label(),
+                        ImportObjectSchema.labelOf(step.type, step.links.get(parent))
+                    }
+                )
+            );
+        }
+        return view;
+    }
+
+    /**
+     * The mapping suggested for one sheet of an upload of several objects (R-IT20), as a mapping
+     * document: a heading of the sheet's object, or a two-part heading naming a listed object,
+     * maps to that field. The wizard puts the template's own columns over it, by the column names
+     * the joined sheets have.
+     */
+    @AuraEnabled
+    public static String suggestSheetMapping(
+        String templateId,
+        String objectName,
+        List<String> headers
+    ) {
+        try {
+            enforcePermission();
+            Import_Template__c template = ImportTemplateSelector.selectById(templateId);
+            List<Schema.SObjectType> types = new List<Schema.SObjectType>();
+            if (template != null) {
+                ImportMapping saved = ImportMapping.parse(template.Column_Mapping_JSON__c);
+                for (
+                    ImportObjectSchema.Step step : ImportObjectSchema.listedSteps(template, saved)
+                ) {
+                    types.add(step.type);
+                }
+            }
+            return ImportObjectSchema.suggestSeveralMapping(
+                    types,
+                    ImportObjectSchema.typeNamed(objectName),
+                    headers
+                )
+                .serialize();
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.suggestSheetMapping');
         }
     }
 
@@ -590,7 +741,7 @@ public with sharing class ImportController {
         String objectLabel = type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
         for (ImportMapping.Target target : ImportObjectSchema.writableFields(type)) {
             if (
-                related != null &&
+                parentField != null &&
                 (target.value == ImportObjectSchema.ID_ATTRIBUTE ||
                 target.value == parentField)
             ) {
@@ -662,6 +813,16 @@ public with sharing class ImportController {
         view.relatedLabel = relatedType == null
             ? null
             : relatedType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
+        ImportMapping mapping = ImportMapping.parse(template.Column_Mapping_JSON__c);
+        if (mapping.loadsSeveralObjects()) {
+            // What it loads names every object, in load order (R-IT20).
+            List<String> labels = new List<String>();
+            for (ImportObjectSchema.Step step : ImportObjectSchema.listedSteps(template, mapping)) {
+                labels.add(step.label());
+            }
+            view.severalObjects = true;
+            view.targetObjectLabel = String.join(labels, ', ');
+        }
     }
 
     /** The parent field a saved column names its parent by, for the column with this source. */
@@ -704,30 +865,39 @@ public with sharing class ImportController {
             ImportMapping suggested = ImportObjectSchema.loadsOneObject(template)
                 ? ImportObjectSchema.suggestMapping(ImportObjectSchema.typeOf(template), headers)
                 : ImportColumnLibrary.suggestMapping(headers);
-            if (template != null) {
-                ImportMapping saved = ImportMapping.parse(template.Column_Mapping_JSON__c);
-                Map<String, String> known = saved.targetsBySourceKey();
-                Set<String> ignored = saved.ignoredSourceKeys();
-                for (ImportMapping.Column column : suggested.columns) {
-                    String source = ImportMapping.key(column.source);
-                    String fromTemplate = known.get(source);
-                    if (String.isNotBlank(fromTemplate)) {
-                        column.target = fromTemplate;
-                        column.lookupField = lookupFieldOf(saved, source);
-                        column.blankClears = savedColumn(saved, source).blankClears;
-                        column.transforms = savedColumn(saved, source).transforms;
-                    } else if (ignored.contains(source)) {
-                        column.target = ImportMapping.TARGET_IGNORE;
-                    }
-                }
-                // The rows to load are the mapping's, whatever the file's headings (R-IT18).
-                suggested.skipRows = saved.skipRows;
-                suggested.uniqueBy = saved.uniqueBy;
-            }
-            return suggested.serialize();
+            return withSaved(template, suggested).serialize();
         } catch (Exception e) {
             throw auraError(e, 'ImportController.suggestMapping');
         }
+    }
+
+    /**
+     * The suggestion with the template's own mapping winning for any column it already names,
+     * Do not load included, and the template's rows to load (R-IT18).
+     */
+    private static ImportMapping withSaved(Import_Template__c template, ImportMapping suggested) {
+        if (template == null) {
+            return suggested;
+        }
+        ImportMapping saved = ImportMapping.parse(template.Column_Mapping_JSON__c);
+        Map<String, String> known = saved.targetsBySourceKey();
+        Set<String> ignored = saved.ignoredSourceKeys();
+        for (ImportMapping.Column column : suggested.columns) {
+            String source = ImportMapping.key(column.source);
+            String fromTemplate = known.get(source);
+            if (String.isNotBlank(fromTemplate)) {
+                column.target = fromTemplate;
+                column.lookupField = lookupFieldOf(saved, source);
+                column.blankClears = savedColumn(saved, source).blankClears;
+                column.transforms = savedColumn(saved, source).transforms;
+            } else if (ignored.contains(source)) {
+                column.target = ImportMapping.TARGET_IGNORE;
+            }
+        }
+        // The rows to load are the mapping's, whatever the file's headings (R-IT18).
+        suggested.skipRows = saved.skipRows;
+        suggested.uniqueBy = saved.uniqueBy;
+        return suggested;
     }
 
     /**
