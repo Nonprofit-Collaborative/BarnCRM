@@ -189,10 +189,22 @@ public with sharing class ImportObjectSchema {
      */
     @NamespaceAccessible
     public static List<ImportMapping.Target> loadableObjects() {
+        Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
+        for (Schema.DescribeSObjectResult described : loadableDescribes()) {
+            byLabel.put(
+                described.getLabel() + '|' + described.getName(),
+                new ImportMapping.Target(described.getName(), described.getLabel())
+            );
+        }
+        return sortedValues(byLabel);
+    }
+
+    /** The describe of each object a template may load (R-IT14), in no order. */
+    private static List<Schema.DescribeSObjectResult> loadableDescribes() {
         if (globalDescribe == null) {
             globalDescribe = NamespaceUtil.globalDescribe();
         }
-        Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
+        List<Schema.DescribeSObjectResult> result = new List<Schema.DescribeSObjectResult>();
         for (Schema.SObjectType type : globalDescribe.values()) {
             Schema.DescribeSObjectResult described = type.getDescribe(
                 SObjectDescribeOptions.DEFERRED
@@ -208,12 +220,122 @@ public with sharing class ImportObjectSchema {
             ) {
                 continue;
             }
-            byLabel.put(
-                described.getLabel() + '|' + described.getName(),
-                new ImportMapping.Target(described.getName(), described.getLabel())
-            );
+            result.add(described);
         }
-        return sortedValues(byLabel);
+        return result;
+    }
+
+    // -------------------------------------------------------------------------------------
+    // What a file's names say (C-49a)
+    // -------------------------------------------------------------------------------------
+
+    /**
+     * The objects detection chooses among, set by a test so its names are unique by
+     * construction whatever objects the org has (Nonprofit Cloud adds many).
+     */
+    @TestVisible
+    private static List<Schema.SObjectType> detectionObjectsForTest;
+
+    /** The object each sheet points at, and the one suggested for the whole file. */
+    @NamespaceAccessible
+    public class Detection {
+        /** The suggested object's API name, or null. */
+        @NamespaceAccessible
+        public String suggested;
+        /** Each sheet's object API name (null where it names none), in the order given. */
+        @NamespaceAccessible
+        public List<String> bySheet = new List<String>();
+        /** The label of every object named above, by API name. */
+        @NamespaceAccessible
+        public Map<String, String> labels = new Map<String, String>();
+    }
+
+    /**
+     * The object a file points at (C-49a), for a one-object load with no object chosen yet: for
+     * each sheet, from its two-part headings and then its name; for the file, the first sheet
+     * that names one, then the file name. Exact matches only, among the objects the user may
+     * load, by label, plural label or API name.
+     *
+     * @param fileName the file's name, extension included
+     * @param sheetNames each sheet's name (one blank name for a text file)
+     * @param headersBySheet each sheet's headings, in the same order
+     */
+    @NamespaceAccessible
+    public static Detection detectObject(
+        String fileName,
+        List<String> sheetNames,
+        List<List<String>> headersBySheet
+    ) {
+        List<Schema.DescribeSObjectResult> loadable = new List<Schema.DescribeSObjectResult>();
+        if (detectionObjectsForTest == null) {
+            loadable = loadableDescribes();
+        } else {
+            for (Schema.SObjectType type : detectionObjectsForTest) {
+                loadable.add(type.getDescribe(SObjectDescribeOptions.DEFERRED));
+            }
+        }
+        Map<String, String> keys = objectKeys(loadable);
+        DescribedFieldKeys fields = new DescribedFieldKeys();
+        Detection result = new Detection();
+        for (Integer i = 0; i < sheetNames.size(); i++) {
+            List<String> headers = i < headersBySheet.size() ? headersBySheet[i] : null;
+            String found = ImportHeaderParser.objectOfHeaders(headers, keys, fields);
+            if (found == null) {
+                found = ImportHeaderParser.objectOfName(sheetNames[i], keys);
+            }
+            result.bySheet.add(found);
+            if (result.suggested == null) {
+                result.suggested = found;
+            }
+        }
+        if (result.suggested == null) {
+            result.suggested = ImportHeaderParser.objectOfFileName(fileName, keys);
+        }
+        for (Schema.DescribeSObjectResult described : loadable) {
+            Boolean named =
+                described.getName() == result.suggested ||
+                result.bySheet.contains(described.getName());
+            if (named) {
+                result.labels.put(described.getName(), described.getLabel());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Each object's spellings, normalized: label, plural label, API name, and the API name
+     * without the namespace and without "__c". A spelling two objects share names neither.
+     */
+    private static Map<String, String> objectKeys(List<Schema.DescribeSObjectResult> objects) {
+        Map<String, String> keys = new Map<String, String>();
+        for (Schema.DescribeSObjectResult described : objects) {
+            String name = described.getName();
+            String local = localName(name.toLowerCase());
+            for (
+                String spelling : new List<String>{
+                    described.getLabel(),
+                    described.getLabelPlural(),
+                    name,
+                    local,
+                    local.removeEnd('__c')
+                }
+            ) {
+                ImportHeaderParser.putKey(keys, spelling, name);
+            }
+        }
+        return keys;
+    }
+
+    /** An object's field spellings from describe, for `ImportHeaderParser`, read once per use. */
+    private class DescribedFieldKeys implements ImportHeaderParser.FieldKeys {
+        private Map<String, Map<String, String>> byObject = new Map<String, Map<String, String>>();
+
+        public Map<String, String> keysOf(String objectName) {
+            if (!byObject.containsKey(objectName)) {
+                byObject.put(objectName, fieldKeys(typeNamed(objectName)));
+            }
+            return byObject.get(objectName);
+        }
     }
 
     /**
@@ -498,6 +620,10 @@ public with sharing class ImportObjectSchema {
      * field's label or API name, ignoring case, spaces and punctuation, is mapped to it, and Id
      * or Record Id to the record ID; anything else is Do not load, never a guess. A second
      * heading for one field is left for the administrator.
+     *
+     * A heading that names this object and a field together ("Contact.First Name", "Phone
+     * (Contact)", C-49a) maps to that field; the whole heading is tried as a field first, and a
+     * heading naming another object is Do not load.
      */
     @NamespaceAccessible
     public static ImportMapping suggestMapping(Schema.SObjectType type, List<String> headers) {
@@ -505,6 +631,47 @@ public with sharing class ImportObjectSchema {
         if (headers == null) {
             return mapping;
         }
+        Map<String, String> known = fieldKeys(type);
+        Map<String, String> thisObject = type == null
+            ? new Map<String, String>()
+            : objectKeys(
+                  new List<Schema.DescribeSObjectResult>{
+                      type.getDescribe(SObjectDescribeOptions.DEFERRED)
+                  }
+              );
+        DescribedFieldKeys fields = new DescribedFieldKeys();
+        Set<String> used = new Set<String>();
+        for (String header : headers) {
+            String field = known.get(normalized(header));
+            if (field == null && !thisObject.isEmpty()) {
+                ImportHeaderParser.Resolved named = ImportHeaderParser.resolve(
+                    header,
+                    thisObject,
+                    fields
+                );
+                field = named == null ? null : named.fieldName;
+            }
+            Boolean maps = field != null && !used.contains(field);
+            if (maps) {
+                used.add(field);
+            }
+            mapping.columns.add(
+                new ImportMapping.Column(
+                    header,
+                    maps ? ImportMapping.ENTITY_RECORD + '.' + field : ImportMapping.TARGET_IGNORE
+                )
+            );
+        }
+        return mapping;
+    }
+
+    /**
+     * A writable field's API name by each normalized spelling (label, API name, API name without
+     * the namespace and "__c"), and the record ID by Id, Record Id and Salesforce Record Id. The
+     * first field to claim a spelling keeps it. Not cached: what is writable is the running
+     * user's access.
+     */
+    private static Map<String, String> fieldKeys(Schema.SObjectType type) {
         Map<String, String> known = new Map<String, String>{
             'id' => ID_ATTRIBUTE,
             'recordid' => ID_ATTRIBUTE,
@@ -529,21 +696,7 @@ public with sharing class ImportObjectSchema {
                 }
             }
         }
-        Set<String> used = new Set<String>();
-        for (String header : headers) {
-            String field = known.get(normalized(header));
-            Boolean maps = field != null && !used.contains(field);
-            if (maps) {
-                used.add(field);
-            }
-            mapping.columns.add(
-                new ImportMapping.Column(
-                    header,
-                    maps ? ImportMapping.ENTITY_RECORD + '.' + field : ImportMapping.TARGET_IGNORE
-                )
-            );
-        }
-        return mapping;
+        return known;
     }
 
     // -------------------------------------------------------------------------------------

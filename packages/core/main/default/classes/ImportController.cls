@@ -420,6 +420,72 @@ public with sharing class ImportController {
         }
     }
 
+    /** The object a file points at, suggested before one is chosen (C-49a). */
+    public class ObjectSuggestionView {
+        @AuraEnabled
+        public String objectName;
+        @AuraEnabled
+        public String objectLabel;
+        /** Each sheet and the object it points at; objectName is null where it names none. */
+        @AuraEnabled
+        public List<SheetObjectView> sheets = new List<SheetObjectView>();
+    }
+
+    public class SheetObjectView {
+        @AuraEnabled
+        public String sheetName;
+        @AuraEnabled
+        public String objectName;
+        @AuraEnabled
+        public String objectLabel;
+    }
+
+    private class SheetHeaders {
+        public String name;
+        public List<String> headers;
+    }
+
+    /**
+     * Suggests the object a file loads (C-49a), from its two-part headings, its sheet names,
+     * then its file name, exact matches only.
+     *
+     * @param fileName the file's name
+     * @param sheetsJson a JSON list of `{name, headers}`, one per sheet (one for a text file)
+     */
+    @AuraEnabled
+    public static ObjectSuggestionView suggestObject(String fileName, String sheetsJson) {
+        try {
+            enforcePermission();
+            List<SheetHeaders> sheets = String.isBlank(sheetsJson)
+                ? new List<SheetHeaders>()
+                : (List<SheetHeaders>) JSON.deserialize(sheetsJson, List<SheetHeaders>.class);
+            List<String> names = new List<String>();
+            List<List<String>> headers = new List<List<String>>();
+            for (SheetHeaders sheet : sheets) {
+                names.add(sheet.name);
+                headers.add(sheet.headers == null ? new List<String>() : sheet.headers);
+            }
+            ImportObjectSchema.Detection found = ImportObjectSchema.detectObject(
+                fileName,
+                names,
+                headers
+            );
+            ObjectSuggestionView view = new ObjectSuggestionView();
+            view.objectName = found.suggested;
+            view.objectLabel = found.labels.get(found.suggested);
+            for (Integer i = 0; i < names.size(); i++) {
+                SheetObjectView sheet = new SheetObjectView();
+                sheet.sheetName = names[i];
+                sheet.objectName = found.bySheet[i];
+                sheet.objectLabel = found.labels.get(found.bySheet[i]);
+                view.sheets.add(sheet);
+            }
+            return view;
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.suggestObject');
+        }
+    }
+
     /** Creates a template that loads one object, and returns it as the wizard shows it. */
     @AuraEnabled
     public static TemplateView createObjectTemplate(String name, String objectName) {

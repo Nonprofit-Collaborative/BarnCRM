@@ -88,6 +88,36 @@ private class ImportControllerTest {
     }
 
     @IsTest
+    static void suggestsTheObjectAFilePointsAt() {
+        // One candidate object, so the suggestion is unique by construction in any org.
+        ImportObjectSchema.detectionObjectsForTest = new List<Schema.SObjectType>{
+            Affiliation__c.SObjectType
+        };
+        System.runAs(TestUsers.admin()) {
+            ImportController.permissionOverride = true;
+
+            Test.startTest();
+            ImportController.ObjectSuggestionView view = ImportController.suggestObject(
+                'Affiliations.xlsx',
+                '[{"name":"Sheet1","headers":["Role"]},{"name":"Other","headers":null}]'
+            );
+            ImportController.ObjectSuggestionView none = ImportController.suggestObject(
+                'budget.csv',
+                null
+            );
+            Test.stopTest();
+
+            String affiliation = String.valueOf(Affiliation__c.SObjectType);
+            Assert.areEqual(affiliation, view.objectName, 'From the file name (C-49a).');
+            Assert.areEqual('Affiliation', view.objectLabel, 'With its label.');
+            Assert.areEqual(2, view.sheets.size(), 'One entry per sheet.');
+            Assert.areEqual('Sheet1', view.sheets[0].sheetName, 'In order.');
+            Assert.isNull(view.sheets[0].objectName, 'A sheet that names nothing.');
+            Assert.isNull(none.objectName, 'A file that names nothing suggests nothing.');
+        }
+    }
+
+    @IsTest
     static void suggestsAMappingAndPrefersTheTemplateOwnChoices() {
         System.runAs(TestUsers.admin()) {
             Import_Template__c template = permittedTemplate();
