@@ -276,28 +276,97 @@ private class ImportNewFieldServiceTest {
         Assert.areEqual(2, ImportNewFieldService.problems(request).size());
     }
 
+    /**
+     * BarnCRM's own object, with no master-detail parent, so object Read has no dependency on
+     * another object (Account Read can depend on Contact Read, for example with Person Accounts).
+     */
+    private static String ownObject() {
+        return NamespaceUtil.qualify('Error_Log') + '__c';
+    }
+
+    private static String ownField() {
+        return NamespaceUtil.qualify('Context') + '__c';
+    }
+
+    private static PermissionSet permissionSet(String name, Boolean objectRead) {
+        PermissionSet created = new PermissionSet(Name = name, Label = name.replace('_', ' '));
+        insert as system created;
+        if (objectRead) {
+            insert as system new ObjectPermissions(
+                ParentId = created.Id,
+                SobjectType = ownObject(),
+                PermissionsRead = true
+            );
+        }
+        return created;
+    }
+
+    private static List<FieldPermissions> fieldRows(Id parentId) {
+        return [
+            SELECT PermissionsRead, PermissionsEdit
+            FROM FieldPermissions
+            WHERE ParentId = :parentId AND Field = :(ownObject() + '.' + ownField())
+            WITH SYSTEM_MODE
+        ];
+    }
+
     @IsTest
     static void grantsAccessThroughTheChosenPermissionSet() {
         System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
-            PermissionSet chosen = new PermissionSet(Name = 'Barn_Test_Chosen', Label = 'Chosen');
-            insert as system chosen;
-            insert as system new ObjectPermissions(
-                ParentId = chosen.Id,
-                SobjectType = 'Account',
-                PermissionsRead = true
+            PermissionSet chosen = permissionSet('Barn_Test_Chosen', true);
+            List<String> skipped = ImportNewFieldService.grantAccess(
+                ownObject(),
+                ownField(),
+                chosen.Id,
+                'test'
             );
-            String field = alternateEmail() + '__c';
-            ImportNewFieldService.grantAccess('Account', field, chosen.Id, 'test');
-            ImportNewFieldService.grantAccess('Account', field, chosen.Id, 'test');
+            ImportNewFieldService.grantAccess(ownObject(), ownField(), chosen.Id, 'test');
 
-            List<FieldPermissions> rows = [
-                SELECT PermissionsRead, PermissionsEdit
-                FROM FieldPermissions
-                WHERE ParentId = :chosen.Id AND Field = :('Account.' + field)
-                WITH SYSTEM_MODE
-            ];
+            List<FieldPermissions> rows = fieldRows(chosen.Id);
             Assert.areEqual(1, rows.size(), 'granted once, however often it runs');
             Assert.isTrue(rows[0].PermissionsRead && rows[0].PermissionsEdit);
+            for (String each : skipped) {
+                Assert.isFalse(each.contains('Barn Test Chosen'), each);
+            }
+        }
+    }
+
+    /** A permission set without Read on the object is skipped in words; object access is not widened. */
+    @IsTest
+    static void skipsAPermissionSetThatCannotReadTheObject() {
+        System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
+            PermissionSet chosen = permissionSet('Barn_Test_No_Read', false);
+            List<String> skipped = ImportNewFieldService.grantAccess(
+                ownObject(),
+                ownField(),
+                chosen.Id,
+                'test'
+            );
+
+            Assert.isTrue(fieldRows(chosen.Id).isEmpty(), 'no field access without object Read');
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM ObjectPermissions
+                    WHERE ParentId = :chosen.Id AND SobjectType = :ownObject()
+                    WITH SYSTEM_MODE
+                ],
+                'object access not widened'
+            );
+            String reported;
+            for (String each : skipped) {
+                if (each.contains('Barn Test No Read')) {
+                    reported = each;
+                }
+            }
+            Assert.isNotNull(reported, String.join(skipped, ' | '));
+            Assert.isTrue(
+                reported.contains(
+                    Schema.getGlobalDescribe().get(ownObject()).getDescribe().getLabel()
+                ),
+                reported
+            );
         }
     }
 }

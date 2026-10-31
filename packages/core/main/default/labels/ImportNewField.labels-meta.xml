@@ -457,6 +457,14 @@
         <value>Setting up the connection needs the BarnCRM Metadata Admin permission set and the Customize Application and Modify Metadata permissions.</value>
     </labels>
     <labels>
+        <fullName>Core_ImportNewField_NoObjectRead</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access skipped: no Read; {0} = object label</shortDescription>
+        <value>it has no Read access to {0}. BarnCRM does not widen object access; give the permission set Read on {0}, then give it the field in Setup.</value>
+    </labels>
+    <labels>
         <fullName>Core_ImportNewField_CalloutsOff</fullName>
         <categories>Import New Field</categories>
         <language>en_US</language>
