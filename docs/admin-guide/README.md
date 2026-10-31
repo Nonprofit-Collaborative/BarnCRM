@@ -206,6 +206,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | V-01 to V-08 Volunteers: install, roles, settings, jobs, shifts, sign-ups, hours, skills, requirements, recurring shifts, letters, dashboard | [volunteers.md](volunteers.md) | BarnCRM Volunteers |
 
+### Logic Models
+
+| Feature | Page | Package |
+|---|---|---|
+| L-01 and L-02 Logic Models: install, roles, the Logic Model Builder, arrows and assumptions, indicators with baselines, targets and results by period | [logic-models.md](logic-models.md) | BarnCRM Logic Models |
+
 ### Moving From Another System
 
 | Feature | Page | Package |

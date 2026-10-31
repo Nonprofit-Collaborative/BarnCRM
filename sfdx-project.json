@@ -43,6 +43,14 @@
       "dependencies": [{ "package": "BarnCRM Core" }]
     },
     {
+      "path": "packages/logicmodels",
+      "default": false,
+      "package": "BarnCRM Logic Models",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
       "path": "packages/funders",
       "default": false,
       "package": "BarnCRM Funders",
