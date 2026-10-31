@@ -14,13 +14,7 @@ public with sharing class AskReminderSelector {
     public static Database.QueryLocator contactLocator(Date earliest, Date latest) {
         return Database.getQueryLocator(
             [
-                SELECT
-                    Id,
-                    Name,
-                    AccountId,
-                    OwnerId,
-                    Next_Ask_Date__c,
-                    Ask_Reminder_For_Date__c
+                SELECT Id, Name, AccountId, OwnerId, Next_Ask_Date__c, Ask_Reminder_For_Date__c
                 FROM Contact
                 WHERE Next_Ask_Date__c >= :earliest AND Next_Ask_Date__c <= :latest
                 WITH SYSTEM_MODE

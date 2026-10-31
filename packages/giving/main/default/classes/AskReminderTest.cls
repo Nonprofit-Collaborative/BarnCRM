@@ -3,7 +3,9 @@
  * date reminds once, that the setting switches the pass off, and that a donor whose reminder
  * could not be made is counted and tried again.
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:AskReminderBatch, ApexClass:AskReminderSchedulable, ApexClass:AskReminderSelector, ApexClass:AskReminderService, ApexClass:AskReminderWriter'
+)
 private class AskReminderTest {
     private static final String OWNER_LAST_NAME = 'AskOwner';
 
@@ -113,7 +115,11 @@ private class AskReminderTest {
             Assert.isTrue(forPerson[0].Subject.contains('Donor'), 'It names the donor.');
 
             List<Task> forOrganization = remindersFor(organization.Id);
-            Assert.areEqual(1, forOrganization.size(), 'An organization three days overdue is reminded.');
+            Assert.areEqual(
+                1,
+                forOrganization.size(),
+                'An organization three days overdue is reminded.'
+            );
             Assert.areEqual(
                 today.addDays(-3),
                 forOrganization[0].ActivityDate,
@@ -315,7 +321,10 @@ private class AskReminderTest {
                 AskReminderService.isDue(stamped, today),
                 'Already reminded for this date.'
             );
-            Assert.isTrue(AskReminderService.isDue(restamped, today), 'Reminded for an older date.');
+            Assert.isTrue(
+                AskReminderService.isDue(restamped, today),
+                'Reminded for an older date.'
+            );
             Assert.isFalse(AskReminderService.isDue(new Contact(), today));
             Assert.areEqual(
                 0,

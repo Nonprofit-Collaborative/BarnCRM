@@ -177,12 +177,7 @@ public with sharing class GivingScheduler {
     }
 
     private static List<String> jobNames() {
-        return new List<String>{
-            TOP_UP_JOB_NAME,
-            OVERDUE_JOB_NAME,
-            LEVELS_JOB_NAME,
-            ASK_JOB_NAME
-        };
+        return new List<String>{ TOP_UP_JOB_NAME, OVERDUE_JOB_NAME, LEVELS_JOB_NAME, ASK_JOB_NAME };
     }
 
     private static List<CronTrigger> jobTriggers() {

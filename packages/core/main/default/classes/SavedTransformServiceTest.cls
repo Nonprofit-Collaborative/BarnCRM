@@ -362,7 +362,8 @@ private class SavedTransformServiceTest {
             }
             try {
                 SavedTransformService.remove(
-                    Saved_Transform__c.SObjectType.getDescribe().getKeyPrefix() + '000000000000'
+                    Saved_Transform__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                        .getKeyPrefix() + '000000000000'
                 );
                 System.assert(false, 'No list.');
             } catch (BulkUpdateFields.BulkUpdateException gone) {

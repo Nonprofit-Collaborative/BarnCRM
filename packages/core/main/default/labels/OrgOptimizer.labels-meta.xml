@@ -191,6 +191,8 @@
         <protected>false</protected>
         <shortDescription>Org Optimizer: what the Access Explorer section answers</shortDescription>
         <value>Who can see or change what, and why. Read only.</value>
+    </labels>
+    <labels>
         <fullName>Core_OrgOptimizer_AiExport</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>

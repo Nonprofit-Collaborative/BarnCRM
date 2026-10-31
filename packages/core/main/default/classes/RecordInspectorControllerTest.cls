@@ -48,7 +48,7 @@ private class RecordInspectorControllerTest {
             Assert.isNotNull(find(inspection, 'CreatedDate').value, 'A date reads as text.');
 
             Map<String, Schema.SObjectField> described = Schema.Error_Log__c.SObjectType
-                .getDescribe()
+                .getDescribe(SObjectDescribeOptions.DEFERRED)
                 .fields.getMap();
             String previous = '';
             for (RecordInspectorController.FieldRow row : inspection.fields) {
