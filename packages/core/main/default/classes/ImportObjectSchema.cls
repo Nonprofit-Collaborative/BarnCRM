@@ -229,6 +229,13 @@ public with sharing class ImportObjectSchema {
     // What a file's names say (C-49a)
     // -------------------------------------------------------------------------------------
 
+    /**
+     * The objects detection chooses among, set by a test so its names are unique by
+     * construction whatever objects the org has (Nonprofit Cloud adds many).
+     */
+    @TestVisible
+    private static List<Schema.SObjectType> detectionObjectsForTest;
+
     /** The object each sheet points at, and the one suggested for the whole file. */
     @NamespaceAccessible
     public class Detection {
@@ -259,7 +266,14 @@ public with sharing class ImportObjectSchema {
         List<String> sheetNames,
         List<List<String>> headersBySheet
     ) {
-        List<Schema.DescribeSObjectResult> loadable = loadableDescribes();
+        List<Schema.DescribeSObjectResult> loadable = new List<Schema.DescribeSObjectResult>();
+        if (detectionObjectsForTest == null) {
+            loadable = loadableDescribes();
+        } else {
+            for (Schema.SObjectType type : detectionObjectsForTest) {
+                loadable.add(type.getDescribe(SObjectDescribeOptions.DEFERRED));
+            }
+        }
         Map<String, String> keys = objectKeys(loadable);
         DescribedFieldKeys fields = new DescribedFieldKeys();
         Detection result = new Detection();
