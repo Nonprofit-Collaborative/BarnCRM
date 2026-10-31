@@ -320,10 +320,6 @@ async function zip(parts, deflate) {
  * @returns {Promise<Uint8Array>}
  */
 export function writeXlsx(columns, rows, options = {}) {
-  let deflate = canCompress() ? deflateInBrowser : null;
-  if (Object.prototype.hasOwnProperty.call(options, 'deflate')) {
-    deflate = options.deflate ? (chunks) => options.deflate(joined(chunks)) : null;
-  }
   const sheetName = String(options.sheetName || 'Find')
     .slice(0, 31)
     .replace(/[\\/?*[\]:]/g, ' ');
@@ -336,6 +332,26 @@ export function writeXlsx(columns, rows, options = {}) {
       ['xl/styles.xml', STATIC_PARTS['xl/styles.xml']],
       ['xl/worksheets/sheet1.xml', sheetChunks(columns, rows, options.timeZone)]
     ],
-    deflate
+    deflaterFrom(options)
   );
+}
+
+/** The browser's deflater, or the one `options.deflate` gives, or null (store) when none. */
+function deflaterFrom(options) {
+  if (Object.prototype.hasOwnProperty.call(options, 'deflate')) {
+    return options.deflate ? (chunks) => options.deflate(joined(chunks)) : null;
+  }
+  return canCompress() ? deflateInBrowser : null;
+}
+
+/**
+ * A zip archive's bytes (the AI-Readiness Export's pack, AIR-01), from the same zip writer the
+ * workbook uses.
+ *
+ * @param {Array<[string, string]>} files each a path inside the zip and its text (UTF-8)
+ * @param {object} [options] `deflate`, as for writeXlsx
+ * @returns {Promise<Uint8Array>}
+ */
+export function writeZip(files, options = {}) {
+  return zip(files, deflaterFrom(options));
 }
