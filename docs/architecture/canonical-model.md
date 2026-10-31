@@ -1096,7 +1096,7 @@ Section 29E, R-BD2). Shown in the console's Import section.
 | `Find_Export_Row_Limit__c` | integer | 50000 | The most rows one Find export writes (R-SQ3). From 1 to 500,000; empty reads as 50,000. |
 | `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one bulk update may change (R-BU2). From 1 to 48,000; empty or out of range reads as the nearest end. |
 | `Bulk_Delete_Run_Limit__c` | integer | 10000 | The most records one bulk delete may delete (R-BD2). From 1 to 48,000; empty reads as 10,000, out of range as the nearest end. |
-| `Import_Row_Retention_Days__c` | integer | 90 | How many days after an import finished its staged rows are kept before the nightly Import row cleanup removes them (R-IR5, D-40). From 1 to 3650; 0 keeps them for ever; empty reads as 90, over 3650 as 3650. |
+| `Import_Row_Deletion__c` | picklist(Once_Complete, After_30_Days, After_90_Days, Never) | After_30_Days | Delete Import Rows: when the nightly Import row cleanup deletes the staged rows of a complete import (R-IR5, ADR-NEXT). Stored as text (ADR-0019); a blank or unknown value reads as After_30_Days. Replaces `Import_Row_Retention_Days__c` (a number of days, D-40), which is removed. |
 | `Bulk_Chunk_Size__c` | integer | 200 | Records each chunk of a bulk update or bulk delete handles (R-BU2, R-BD2). From 10 to 200; empty reads as 200, out of range as the nearest end. Stamped on the job when it starts. |
 
 ### v0.8 keys
@@ -3223,6 +3223,19 @@ without processing it, and processes the rest; its finish counts every row (a Re
 counts as nothing), clears Retry After Row and re-stamps the undo deadline. Undo is allowed
 while a retry is open, as for the commit (R-IB8).
 
+**R-IB17a Retrying corrected rows on screen.** A rejected row corrected on screen (R-IR4)
+is retried in place, by Retry This Row or Retry All Fixed Rows (every Rejected row of the
+batch with corrections, at most 10,000), under the same conditions as R-IB17 and only while no
+retry by file is open. The retry is a commit pass over only those rows, through the same
+processing path as the import's commit: the template the commit ran with (R-IB1), the batch's
+file values (R-IB14), the same matching, chunks and tags. There is no separate preview: the
+commit validates each row as a dry run would and rejects a row it cannot load, with its
+reason, keeping the row's corrections for another try. Like a retry by file it keeps Started
+At, File Amount and the control totals, adds its log after the commit's, counts every row of
+the batch when it finishes and re-stamps the undo deadline; the records it creates carry the
+batch's tag and the values it changes are journaled under the batch, so the one undo covers
+them (R-IB8, R-IB9).
+
 ### Salesforce implementation
 
 - **Object:** `Import_Batch__c`, auto-number Name with format `IB-{000000}`.
@@ -3295,6 +3308,8 @@ processor resolves those in dependency order.
 | Import Batch | reference(Import Batch) | yes | The upload this row came from. |
 | Row Number | integer | yes | The row's position in the file, so a message can name it. |
 | Raw Values | long text | yes | The row's original column values exactly as uploaded, held as a document keyed by column name. |
+| Corrected Values | long text | no | The values somebody corrected on screen for a rejected row, held as a document of only the corrected columns, keyed by column name as Raw Values is (R-IR4). Empty when nothing was corrected. |
+| Data Job Status | text | computed | The status of the row's import (Section 16), so a list view can show and filter rows by it (C-49b). |
 | Status | picklist(Pending, Matched, Created, Updated, Rejected, Skipped, Retried) | yes | What the processor did with this row, or would do in a dry run. Retried: a rejected row a retry's commit replaced with its fixed row (R-IB17). |
 | Error Message | long text | no | Why the row was rejected, in language an administrator can act on. |
 | Household | reference(Household) | computed | The household this row resolved to. |
@@ -3366,17 +3381,37 @@ record.
 **R-IR3 Person references.** A row resolves its people to Contacts or to person Accounts
 according to the template's Person Mode, never to both (Section 4 "Person references").
 
-**R-IR4 Raw values are never rewritten.** Raw Values holds what was uploaded. A
-correction is made by fixing the file and re-running, not by editing the staged row, so
-the batch remains an accurate record of what was loaded.
+**R-IR4 Raw values are never rewritten; corrections sit beside them.** Raw Values holds
+what was uploaded and is never changed. A rejected row can be corrected on screen (Brandon,
+2026-10-30, ADR-NEXT, superseding the earlier rule that a correction is made only by fixing
+the file): the corrected values are saved to Corrected Values, only the columns that differ
+from Raw Values, so the row shows each file value next to its correction. A correction is
+saved only on a Rejected row, and only where a retry of its batch is allowed (R-IB17); saving
+no differences clears them. When the row is processed again, each corrected column is read in
+place of its raw value (a corrected blank is a blank cell) and every other column as
+uploaded. Corrections are written in system mode under ADR-0021, after that check.
 
-**R-IR5 Retention.** Rows are kept for `Import_Row_Retention_Days__c` days (90 unless the
-admin changes it, 0 for ever) after their batch's last pass completed (`Completed_At__c`), then
-deleted by the nightly Import row cleanup job (`ImportRowPurgeScheduler`, listed in Health
-Check's nightly jobs), so a large import does not sit in storage forever (D-40). The batch
-keeps its counts and run log. Undo does not read the rows: it reads the tag on the records and
-the journal (R-IB9, Section 17A). A batch whose rows were removed cannot be run again; a pass is
-refused, saying so.
+**R-IR5 Retention.** The Import setting Delete Import Rows (`Import_Row_Deletion__c`)
+decides when the nightly Import row cleanup (`ImportRowPurgeScheduler`, listed in Health
+Check's nightly jobs) deletes a batch's rows: Once Complete (on the first nightly run after
+the batch is complete), After 30 Days (the default, and what a blank or unknown value reads
+as), After 90 Days, or Never (ADR-NEXT, Brandon 2026-10-30, superseding the number of days
+of D-40 and plan Section 4.9's purge on commit). A batch is complete when its last commit
+finished: Status Complete, Failed, Undone or Undo failed, counted from Completed At. Rejected
+rows awaiting correction follow the same setting. A preview never committed (Dry run
+complete) keeps its rows at least 30 days whatever the setting (for ever under Never), so the
+cleanup cannot take a file between its preview and its commit. A batch in any other status
+(Draft, Parsing, a pass running, Trial complete, Retrying, Undoing) keeps its rows. The batch
+keeps its counts and run log, and its undo (R-IR8). A batch whose rows were removed cannot be
+run again or retried; a pass or a correction is refused, saying so.
+
+**R-IR8 Undo never depends on the rows and never re-inserts a copy.** An undo reads only
+the tag on the records, the journal and the batch (R-IB9, Section 17A), never Import Row, so
+deleting the rows under R-IR5 cannot break it; tests prove an undo after the cleanup. Nothing
+an undo restores is recreated from a copy: an import's undo deletes what the import created
+(to the recycle bin) and puts back values on records that still exist, and a bulk delete's
+undo brings a record back only by undeleting it from the recycle bin. A record no longer in
+the recycle bin is counted and journaled as not restorable (NotRestored), never recreated.
 
 **R-IR6 Entities Core cannot resolve.** Core resolves `Organization`, `Household`,
 `Contact1`, `Contact2` and `Affiliation` (R-AF5). `Gift`, `Allocation`, `SoftCredit` and `Tribute`
@@ -3426,6 +3461,8 @@ when the corrected row is loaded again.
 | Import Batch | `Import_Batch__c` | Master-Detail to `Import_Batch__c` |
 | Row Number | `Row_Number__c` | Number |
 | Raw Values | `Raw_Values_JSON__c` | Long Text Area |
+| Corrected Values | `Corrected_Values_JSON__c` | Long Text Area (131072) |
+| Data Job Status | `Batch_Status__c` | Formula (Text): `TEXT(Import_Batch__r.Status__c)` |
 | Status | `Status__c` | Picklist: Pending, Matched, Created, Updated, Rejected, Skipped, Retried |
 | Error Message | `Error_Message__c` | Long Text Area |
 | Household | `Household__c` | Lookup to Account |
@@ -9147,6 +9184,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-29 | Organization record type removed (RT5, ADR-0141, D-134). No object or field added. The packaged `Account.Organization` record type and its compact layout are deleted. `Is_Organization__c` also counts an account of the master record type (no developer name) as an organization when the setting is `Master`. R-O5: a stored record type that is no longer a candidate is replaced by the detected one on each install, upgrade or source deploy, so the formula and `AccountKinds` agree. R-O4: `Master` is offered and saved only when the org has no candidate, and a stored `Master` is stale once it has one. |
 | v0.11 | 2026-10-29 | Edition stored values (ADR-0143, `0143-edition-internal-values.md`). No object or field added. `BarnCRM_Settings__c.Suite__c` stores `Standard` and `Nonprofit` instead of `Community` and `Impact`, and `BarnCRM_Module__mdt.Editions__c` names the same values. Core's post-install steps rewrite an old stored value once. |
 | v0.11 | 2026-10-29 | Security review G-L4 and G-L5 (owner decisions). No object or field added. New R-AK13 (ADR-0144, `0144-acknowledgments-honor-email-opt-out.md`): an email gift whose recipient contact has Email Opt Out is not emailed, gets no row and stays queued, and the letter run takes it as a letter. `Giving_Admin` loses View All on `Commitment__c`, matching `Gift__c`; commitment record access comes from ownership, roles and sharing. |
+| v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-NEXT). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a). R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
 
 ---
 ## 32. Entity ownership by package
