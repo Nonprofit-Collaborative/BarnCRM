@@ -17,6 +17,9 @@ public with sharing class SettingsController {
     /** The Setup prerequisites the console can check, by the key settingsSetupNotes reads. */
     @TestVisible
     private static final String CHECK_EMAIL = 'emailDeliverability';
+    @TestVisible
+    private static final String CHECK_METADATA = 'metadata';
+    private static final String METADATA_PERMISSION = 'Manage_BarnCRM_Metadata';
 
     /**
      * Core picklist settings whose blank means a choice, by key in lower case, with the value
@@ -966,8 +969,9 @@ public with sharing class SettingsController {
     /**
      * Whether each Setup prerequisite a console section can check is already met: true or
      * false, and absent when it could not be read, so the note shows its instruction only.
-     * Reads only what every user can read (whether the org may send email) and changes
-     * nothing. Not cacheable: an admin fixes Setup, then reloads.
+     * Reads only what the person can read (whether the org may send email, their own custom
+     * permission, the change history) and changes nothing. Not cacheable: an admin fixes
+     * Setup, then reloads.
      */
     @AuraEnabled
     public static Map<String, Boolean> getSetupChecks() {
@@ -976,7 +980,37 @@ public with sharing class SettingsController {
         if (emailAllowed != null) {
             checks.put(CHECK_EMAIL, emailAllowed);
         }
+        Boolean metadataReady = metadataSavesReady();
+        if (metadataReady != null) {
+            checks.put(CHECK_METADATA, metadataReady);
+        }
         return checks;
+    }
+
+    /**
+     * Whether Custom Metadata saves can work for this person (owner QA, 2026-10-31). False
+     * without Manage BarnCRM Metadata, which Apex reads directly. Apex cannot read the Apex
+     * Settings option "Deploy Metadata from Non-Certified Package Versions via Apex" (Setup
+     * and the Metadata API only), so the setting counts as on only once a Custom Metadata save
+     * has finished: the audit row CustomMetadataDeployCallback writes for a succeeded
+     * deployment. Null, can't confirm, when the permission is held and no save has worked yet.
+     */
+    private static Boolean metadataSavesReady() {
+        if (!FeatureManagement.checkPermission(METADATA_PERMISSION)) {
+            return false;
+        }
+        try {
+            List<Setting_Change__c> saved = [
+                SELECT Id
+                FROM Setting_Change__c
+                WHERE Deployment_Id__c != NULL
+                WITH USER_MODE
+                LIMIT 1
+            ];
+            return saved.isEmpty() ? null : true;
+        } catch (Exception unreadable) {
+            return null;
+        }
     }
 
     /**
