@@ -135,7 +135,9 @@ const PAGE_GROUPS = {
       keys: [
         'Installment_Generation_Horizon_Months__c',
         'Installment_Overdue_Grace_Days__c',
-        'Auto_Apply_Gifts_To_Installments__c'
+        'Auto_Apply_Gifts_To_Installments__c',
+        'Pledge_Reminders_Enabled__c',
+        'Giving_Pledge_Reminders_Page'
       ]
     },
     {

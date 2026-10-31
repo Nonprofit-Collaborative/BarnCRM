@@ -6173,6 +6173,136 @@ key: there is nothing to configure beyond the saved queries themselves.
 
 ---
 
+## 25O. Pledge Reminder Step
+
+### Definition
+
+One rung of the pledge reminder ladder (feature G-30): how many days before or after an
+installment's due date it fires, and the email template or letter it sends. An organization
+writes a few of them, for example an email a week ahead, a second email two weeks after, and a
+letter a month after, and every open installment on an Active pledge walks the ladder.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The step's name, shown on the page and kept on each reminder it makes. |
+| Days From Due Date | integer | yes | Negative fires before the due date, zero on it, positive after it. |
+| Channel | picklist(Email, Letter) | yes (defaults Email) | Email sends a templated email. Letter adds the installment to a merge file. |
+| Email Template | text | conditional | The developer name of a standard `EmailTemplate`, required for an email step (the same by-name reference an Acknowledgment Rule uses, ADR-0032). The template merges the installment (`WhatId`) and the contact. |
+| Active | boolean | yes (defaults true) | Whether the step fires. |
+
+### Salesforce implementation
+
+- **Object:** `Pledge_Reminder_Step__c`, Giving package. Name is text. Sharing ReadWrite.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Days From Due Date | `Days_From_Due__c` | Number(4, 0) |
+| Channel | `Channel__c` | Picklist (Email, Letter) |
+| Email Template | `Email_Template__c` | Text(80) |
+| Active | `Active__c` | Checkbox |
+
+### Rules
+
+**R-PR1 One step per installment per run.** For each open installment (Scheduled, Overdue or
+Partially paid, on an Active pledge) the run considers the active steps whose day, the due date
+plus Days From Due Date, is today or within the previous 14 days. Only the one with the latest
+day is made. An installment 20 days overdue with steps at 7 and 14 days gets the 14 day step.
+
+**R-PR2 Only recent steps fire.** A step whose day passed more than 14 days ago is never made,
+so a run that missed a night still sends, and turning the feature on does not send a final
+notice about an installment that went overdue months ago.
+
+**R-PR3 Nothing sends unless an administrator turned it on.** `Pledge_Reminders_Enabled__c` is
+off by default (Section 25P). With it off no reminder is made by hand or by the nightly run.
+
+---
+
+## 25P. Pledge Reminder
+
+### Definition
+
+One pledge reminder, recorded (feature G-30): which installment, by which step, by email or
+letter, to whom, and whether it went. It is the log the organization reads to answer "did we
+remind them", and the claim that stops the same step reminding the same installment twice.
+
+It reuses the acknowledgment feature's seams (Sections 25F to 25H): the `AcknowledgmentSender`
+interface, the template picked by developer name, the organization wide from address
+(`Acknowledgment_From_Address__c`), the Send Acknowledgments permission, and the letter merge
+file.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | The record's identifier, assigned automatically. |
+| Installment | reference(Installment) | yes | The installment being reminded about. Deleting it deletes its reminders. |
+| Pledge | reference(Commitment) | no | The pledge the installment belongs to. |
+| Step | reference(Pledge Reminder Step) | no | The step that fired; empty if the step was deleted since. |
+| Step Name | text | no | The step's name when it fired. |
+| Channel | picklist(Email, Letter) | yes | How it goes. An email step becomes a letter for a recipient with Email Opt Out set. |
+| Status | picklist(Queued, Sent, Failed) | yes (defaults Queued) | A letter stays Queued until a person says the letters went. |
+| Template | text | no | The email template used, by developer name. |
+| Recipient Contact | reference(Contact) | no | The person it was addressed to: the pledge's donor, or the organization's primary contact. |
+| Recipient Email | email | no | The address it went to. |
+| Failure Reason | text | conditional | Why it did not go. |
+| Sent On | datetime | conditional | When it went. |
+| Days Overdue | integer | no | The installment's age past due when the reminder was made; negative before the due date. |
+| Reminder Key | text | no | Installment and step identifiers, unique, held while the reminder stands and cleared when a send fails so the next run retries it. |
+| Letter File Document Id | text | no | The merge file the letter is in. |
+
+### Relationships
+
+- **Pledge Reminder to Installment**, many to one (cascade).
+- **Pledge Reminder to Pledge Reminder Step**, many to one (set null).
+- **Pledge Reminder to Pledge** and **to Contact**, many to one (set null).
+
+### Salesforce implementation
+
+- **Object:** `Pledge_Reminder__c`, Giving package. Name is an auto number, `PR-{000000}`.
+  Sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Installment | `Installment__c` | Lookup to `Installment__c` |
+| Pledge | `Commitment__c` | Lookup to `Commitment__c` |
+| Step | `Step__c` | Lookup to `Pledge_Reminder_Step__c` |
+| Step Name | `Step_Name__c` | Text(80) |
+| Channel | `Channel__c` | Picklist (Email, Letter) |
+| Status | `Status__c` | Picklist (Queued, Sent, Failed) |
+| Template | `Template__c` | Text(80) |
+| Recipient Contact | `Recipient_Contact__c` | Lookup to Contact |
+| Recipient Email | `Recipient_Email__c` | Email |
+| Failure Reason | `Failure_Reason__c` | Text(255) |
+| Sent On | `Sent_On__c` | Date/Time |
+| Days Overdue | `Days_Overdue__c` | Number(4, 0) |
+| Reminder Key | `Reminder_Key__c` | Text(40), unique, external id |
+| Letter File Document Id | `Letter_File_Document_Id__c` | Text(18) |
+
+- **Settings keys** (on `Giving_Settings__c`, Section 21A): `Pledge_Reminders_Enabled__c`
+  (boolean, false, whether reminders go out at all), `Pledge_Reminders_Last_Run__c` (datetime)
+  and `Pledge_Reminders_Last_Run_Summary__c` (text, one sentence).
+
+### Rules
+
+**R-PR4 A reminder is claimed before it is sent.** The row, with its unique Reminder Key, is
+written before anything goes, so a retried chunk or two people pressing Send produce one
+reminder per installment and step. A failed send clears the key and marks the row Failed with
+the reason, and the next run tries again while the step is still recent (R-PR2).
+
+**R-PR5 An email reaches only a person with an address who has not opted out.** The recipient
+is the pledge's donor contact, or the organization's primary contact. A pledge with nobody to
+email gets no row and is counted and named in one Error Log entry per chunk. A recipient with
+Email Opt Out set is reminded by letter instead (R-AK13).
+
+**R-PR6 A letter waits for a person.** The package writes a merge file of the queued letters
+(pledge, installment, due date, amount still owed, days overdue, step, donor name, greeting,
+address) and leaves the rows Queued until a person marks them sent, because Salesforce cannot
+know whether anything was printed (R-AK11).
+
+---
+
 ## 26. Packaged default rollups
 
 ### Definition
@@ -9898,6 +10028,7 @@ mirrors the primary member).
 | 0.12 | 2026-10-31 | Programs P-01 follow-up. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Program__c` (29W), so the Programs sample load can be removed in one action; services and enrollments are found through their program. 29Y gains the person card, the Programs Health Check finding and the sample data paragraph. No object added. |
 | 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29Z), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |
 | v0.13 | 2026-10-31 | Donor segments (G-28, D-156). New Section 25O, rules R-DS1 to R-DS6: a segment is a Saved Query of Contact or Account (no new object), with five starter templates held as documented JSON, a count, a list and Mailchimp, Constant Contact and all-columns CSV exports; no sending, no settings key. Contact and Account gain the formula `Change_From_Last_Year__c` (Giving This Year minus Giving Last Year), so upgraders can be filtered. |
+| v0.13 | 2026-10-31 | Pledge reminders (G-30). Objects `Pledge_Reminder_Step__c` (Section 25O) and `Pledge_Reminder__c` (25P) added; `Giving_Settings__c` gains `Pledge_Reminders_Enabled__c` (off by default), `Pledge_Reminders_Last_Run__c` and `Pledge_Reminders_Last_Run_Summary__c`. Rules R-PR1 to R-PR6. No field is added to `Installment__c` or `Commitment__c`. |
 
 ---
 ## 32. Entity ownership by package
@@ -9955,6 +10086,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Acknowledgment Rule | Giving | v0.4 | 25F |
 | Acknowledgment | Giving | v0.4 | 25G |
 | Acknowledgment Run | Giving | v0.4 | 25H |
+| Pledge Reminder Step | Giving | release 0.13 (G-30) | 25O |
+| Pledge Reminder | Giving | release 0.13 (G-30) | 25P |
 | Donor Level | Giving | v0.4 | 25A |
 | Receipt | Giving | v0.4 | 25B |
 | Receipt Number Sequence | Giving | v0.4 | 25C |

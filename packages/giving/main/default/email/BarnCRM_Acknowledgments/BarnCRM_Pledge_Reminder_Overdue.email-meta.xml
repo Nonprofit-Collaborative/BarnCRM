@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+  <available>true</available>
+  <description>
+    A polite follow-up BarnCRM ships to start from for an installment that is past due. Edit it, or
+    write your own and name it in a pledge reminder step. The donor is the contact it is addressed
+    to; the pledge installment is the record it is about.
+  </description>
+  <encodingKey>UTF-8</encodingKey>
+  <name>BarnCRM: pledge installment overdue</name>
+  <style>none</style>
+  <subject>About your pledge installment</subject>
+  <type>text</type>
+  <uiType>Aloha</uiType>
+</EmailTemplate>

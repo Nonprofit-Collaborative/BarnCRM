@@ -74,6 +74,16 @@ You should see: **Status** is **Completed** or **Cancelled**. Cancelling marks t
 
 You should see: the unpaid payments rebuilt; paid and partly paid ones are left alone. Log an activity on the commitment saying why, so the next person knows why the numbers moved.
 
+## Pledge Reminders
+
+If your organization has turned on pledge reminders, donors with a payment coming due or overdue are emailed (or, if they opted out of email or the step is a letter, sent a letter) on the schedule your admin set up. You do not send them yourself unless you have the **Send Acknowledgments** permission.
+
+- Open the **Pledge Reminders Log** tab, list view **All Pledge Reminders**, to see what was sent for a payment, to whom, on what date, and whether it failed. A reminder shows its step name, for example `Week late`.
+- If a donor says they never got one, check the log row's **Recipient Email** and **Status** first. **Failed** rows say why.
+- To stop reminders for one pledge, **Pause** it. Reminders only go to **Active** pledges, so a paused, completed or cancelled pledge is left alone.
+- Once a donor pays, the payment is no longer open and nothing more is sent for it.
+- With the **Send Acknowledgments** permission you can press **Send Reminders Now**, **Produce Letter File** and **Mark Letters Sent** on the **Pledge Reminders** page. Reminders are written and switched on by your admin ([Pledge reminders](../admin-guide/pledge-reminders.md)).
+
 ## Common Problems
 
 - Twelve payments of 1,200 on a 1,200 pledge. The total was typed in **Amount**. Change **Amount** to what is expected each time and save.
@@ -93,4 +103,4 @@ You should see: the unpaid payments rebuilt; paid and partly paid ones are left 
 ## Related
 
 - [Entering gifts](gifts.md), [Gift batches](gift-batches.md), [Refunds and write-offs](refunds.md)
-- Admin Guide: [Commitments](../admin-guide/commitments.md), [Quick Gift Entry](../admin-guide/quick-gift-entry.md)
+- Admin Guide: [Commitments](../admin-guide/commitments.md), [Pledge reminders](../admin-guide/pledge-reminders.md), [Quick Gift Entry](../admin-guide/quick-gift-entry.md)

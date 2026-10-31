@@ -60,6 +60,8 @@ public with sharing class ModuleManagerService {
             'Gift_Batch__c',
             'Gift_Batch_Row__c',
             'Installment__c',
+            'Pledge_Reminder__c',
+            'Pledge_Reminder_Step__c',
             'Receipt__c',
             'Receipt_Number_Sequence__c',
             'Receipt_Run__c',

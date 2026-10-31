@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Email_Step_Names_A_Template</fullName>
+  <active>true</active>
+  <description>An email step with no template could never send.</description>
+  <errorConditionFormula>
+    ISPICKVAL(Channel__c, "Email") &amp;&amp; ISBLANK(Email_Template__c)
+  </errorConditionFormula>
+  <errorDisplayField>Email_Template__c</errorDisplayField>
+  <errorMessage>
+    An email step needs an email template. Edit the step on the Pledge Reminders page and choose one
+    from the list.
+  </errorMessage>
+</ValidationRule>

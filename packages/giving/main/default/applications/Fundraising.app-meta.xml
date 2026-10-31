@@ -109,6 +109,7 @@
   <tabs>Receipt__c</tabs>
   <tabs>Stewardship_Plan__c</tabs>
   <tabs>Acknowledgments</tabs>
+  <tabs>Pledge_Reminders</tabs>
   <tabs>Receipts</tabs>
   <tabs>Donor_Segments</tabs>
   <tabs>Donor_Levels</tabs>

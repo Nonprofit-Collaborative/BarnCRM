@@ -186,6 +186,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | G-10 Matching gifts | [matching-gifts.md](matching-gifts.md) | Giving |
 | G-05 Appeals | [appeals.md](appeals.md) | Giving |
 | G-12 Acknowledgments | [acknowledgments.md](acknowledgments.md) | Giving |
+| G-30 Pledge reminders | [pledge-reminders.md](pledge-reminders.md) | Giving |
 | G-13 Receipts and year-end statements | [receipts.md](receipts.md) | Giving |
 | G-14 Donor levels | [donor-levels.md](donor-levels.md) | Giving |
 | G-15 Stewardship plans | [stewardship-plans.md](stewardship-plans.md) | Giving |
