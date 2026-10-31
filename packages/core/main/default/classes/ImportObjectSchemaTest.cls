@@ -349,7 +349,7 @@ private class ImportObjectSchemaTest {
             }
             Test.stopTest();
 
-            String affiliation = Affiliation__c.SObjectType.getDescribe().getName();
+            String affiliation = String.valueOf(Affiliation__c.SObjectType);
             Assert.isNull(found.bySheet[0], 'Sheet1 names nothing.');
             Assert.areEqual(affiliation, found.bySheet[1], 'By the sheet name.');
             Assert.areEqual(affiliation, found.bySheet[2], 'By a two-part heading.');

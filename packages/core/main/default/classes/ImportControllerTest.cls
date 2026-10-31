@@ -103,7 +103,7 @@ private class ImportControllerTest {
             );
             Test.stopTest();
 
-            String affiliation = Affiliation__c.SObjectType.getDescribe().getName();
+            String affiliation = String.valueOf(Affiliation__c.SObjectType);
             Assert.areEqual(affiliation, view.objectName, 'From the file name (C-49a).');
             Assert.areEqual('Affiliation', view.objectLabel, 'With its label.');
             Assert.areEqual(2, view.sheets.size(), 'One entry per sheet.');
