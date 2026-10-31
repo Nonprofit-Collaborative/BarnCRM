@@ -1,5 +1,5 @@
 /**
- * What the Service Delivery Log panel on a program calls (P-02, canonical model Section 29Z).
+ * What the Service Delivery Log panel on a program calls (P-02, canonical model Section 29ZB).
  *
  * For one of the program's active services and one day, lists everyone with an open enrollment
  * (Applied or Enrolled) with what is recorded for them that day, and saves the attendance and

@@ -3,7 +3,7 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     One pledge reminder, recorded: which installment, by which step, by email or letter, to whom,
-    and whether it went (canonical model 25P, G-30).
+    and whether it went (canonical model 25Q, G-30).
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

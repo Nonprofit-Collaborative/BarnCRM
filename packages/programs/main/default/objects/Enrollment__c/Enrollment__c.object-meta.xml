@@ -5,7 +5,7 @@
   <description>
     A person taking part in a program: applied, enrolled, completed or withdrawn. A lookup to
     its program, not a detail, so participant privacy can be set apart from the program
-    (canonical model Section 29Y).
+    (canonical model Section 29ZA).
   </description>
   <enableActivities>true</enableActivities>
   <enableBulkApi>true</enableBulkApi>

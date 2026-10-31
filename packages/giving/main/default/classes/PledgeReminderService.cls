@@ -1,6 +1,6 @@
 /**
  * Reminding donors about pledge installments that are coming due or are overdue (G-30, canonical
- * model 25O and 25P).
+ * model 25P and 25Q).
  *
  * It reuses the acknowledgment feature's seams rather than building a second send path: the
  * `AcknowledgmentSender` interface (so a test proves what was composed without an org that can

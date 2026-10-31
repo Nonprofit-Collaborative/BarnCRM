@@ -1,5 +1,5 @@
 /**
- * The Ask Pipeline board's arithmetic, with no framework in it (G-26, canonical model Section 25O,
+ * The Ask Pipeline board's arithmetic, with no framework in it (G-26, canonical model Section 25R,
  * plan Section 9.9): the stages become columns in list order, each with the database's exact totals
  * (R-SO6) and the cards that belong in it, asks at a stage no longer in the list gather in one
  * extra column (R-SO2), and each card learns how many days it has sat in its stage (R-SO4).

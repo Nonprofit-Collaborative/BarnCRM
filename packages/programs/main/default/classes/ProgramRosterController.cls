@@ -1,5 +1,5 @@
 /**
- * What the Program Roster panel on a program calls (P-01, canonical model Section 29Y).
+ * What the Program Roster panel on a program calls (P-01, canonical model Section 29ZA).
  *
  * Counts the program's enrollments in each stage, lists its open enrollments (or all of them),
  * enrolls a person and changes an enrollment's stage, all in user mode. Saves go through the

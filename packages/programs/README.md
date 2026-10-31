@@ -9,7 +9,7 @@ service delivery (P-02), case notes (P-04), the program dashboard (P-05), the ro
 ## Design
 
 - ADR-0151 `docs/architecture/decisions/0151-programs-module.md`
-- Canonical model Sections 29W (Program), 29X (Service) and 29Y (Enrollment)
+- Canonical model Sections 29Y (Program), 29Z (Service) and 29ZA (Enrollment)
 - Admin guide `docs/admin-guide/programs.md`
 
 ## First ships in

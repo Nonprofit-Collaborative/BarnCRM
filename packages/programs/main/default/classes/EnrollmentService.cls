@@ -1,5 +1,5 @@
 /**
- * The enrollment rules of the Programs module (canonical model Section 29Y, ADR-0151
+ * The enrollment rules of the Programs module (canonical model Section 29ZA, ADR-0151
  * `0151-programs-module.md`): which stages are open (R-EN2), refusing a second open enrollment
  * for the same person in the same program (R-EN2) and filling in the stage dates (R-EN3). The
  * trigger handlers decide which records each rule applies to.

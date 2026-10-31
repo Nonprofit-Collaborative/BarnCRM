@@ -3,7 +3,7 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     One part of a logic model: an input, activity, output, outcome (short, intermediate or long
-    term) or the impact. A detail of its model (canonical model 29ZA).
+    term) or the impact. A detail of its model (canonical model 29ZD).
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

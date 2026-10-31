@@ -1,5 +1,5 @@
 /**
- * The queries behind the Ask Pipeline board (canonical model Section 25O). Every query runs as the
+ * The queries behind the Ask Pipeline board (canonical model Section 25R). Every query runs as the
  * person, so the board shows only the asks, donors and totals they may see.
  */
 public with sharing class AskSelector {

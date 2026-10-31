@@ -4,7 +4,7 @@
 **Date:** 2026-10-31
 **Source:** plan Section 6.0a (release 0.13, G-26) and Section 6.1.5 (competitive research,
 D-156); ADR-0013 (Core runs on a Platform-only org, standard objects only in Mirror); canonical
-model Section 25O, rules R-SO1 to R-SO8
+model Section 25R, rules R-SO1 to R-SO8
 
 ## Context
 

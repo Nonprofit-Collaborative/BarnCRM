@@ -5,7 +5,7 @@
   <description>
     The organization's theory of change, built by the organization itself: inputs, activities,
     outputs, outcomes and impact, the arrows between them and indicators on outputs and
-    outcomes. One for the organization and at most one per program (canonical model 29Z).
+    outcomes. One for the organization and at most one per program (canonical model 29ZC).
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

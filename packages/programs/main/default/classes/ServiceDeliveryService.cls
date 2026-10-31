@@ -1,5 +1,5 @@
 /**
- * Service delivery logic (P-02, canonical model 29Z): the attendance values, and linking a
+ * Service delivery logic (P-02, canonical model 29ZB): the attendance values, and linking a
  * delivery to the person's enrollment in the service's program (R-SD3).
  */
 @NamespaceAccessible

@@ -1,5 +1,5 @@
 /**
- * The Service Delivery Log panel's server side (canonical model 29Z): the log for a service and
+ * The Service Delivery Log panel's server side (canonical model 29ZB): the log for a service and
  * day, saving new and changed deliveries through the delivery rules, and refusals passed on in
  * their own words.
  */

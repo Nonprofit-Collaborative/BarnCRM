@@ -4287,7 +4287,7 @@ it showed them in before.
 
 ### Release 0.13 keys
 
-Added by the solicitation pipeline (G-26, Section 25O). Shown in the console's Giving section.
+Added by the solicitation pipeline (G-26, Section 25R). Shown in the console's Giving section.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
@@ -6191,7 +6191,7 @@ key: there is nothing to configure beyond the saved queries themselves.
 
 ---
 
-## 25O. Pledge Reminder Step
+## 25P. Pledge Reminder Step
 
 ### Definition
 
@@ -6233,11 +6233,11 @@ so a run that missed a night still sends, and turning the feature on does not se
 notice about an installment that went overdue months ago.
 
 **R-PR3 Nothing sends unless an administrator turned it on.** `Pledge_Reminders_Enabled__c` is
-off by default (Section 25P). With it off no reminder is made by hand or by the nightly run.
+off by default (Section 25Q). With it off no reminder is made by hand or by the nightly run.
 
 ---
 
-## 25P. Pledge Reminder
+## 25Q. Pledge Reminder
 
 ### Definition
 
@@ -6321,7 +6321,7 @@ know whether anything was printed (R-AK11).
 
 ---
 
-## 25O. Ask
+## 25R. Ask
 
 Added by the solicitation pipeline (G-26, release 0.13, ADR-0153).
 
@@ -6452,7 +6452,7 @@ their gifts, still pointing at the anonymized person.
 
 ---
 
-## 25O. Ask cadence
+## 25S. Ask cadence
 
 ### Definition
 
@@ -9624,7 +9624,7 @@ are until it is turned on.
 
 ---
 
-## 29W. Saved Transform
+## 29X. Saved Transform
 
 ### Definition
 
@@ -9692,14 +9692,14 @@ mode. Rename changes only the name; a list is saved new, never overwritten.
 
 ---
 
-## 29W. Program
+## 29Y. Program
 
 ### Definition
 
 Something the organization runs for the people it serves: a food pantry, an after-school
 tutoring program, a job readiness course (P-01, Programs module, ADR-0151
-`0151-programs-module.md`). It is the durable thing; its services (29X) are what it offers and
-its enrollments (29Y) are who takes part.
+`0151-programs-module.md`). It is the durable thing; its services (29Z) are what it offers and
+its enrollments (29ZA) are who takes part.
 
 ### Attributes
 
@@ -9750,7 +9750,7 @@ Planned or Completed program, so history from a spreadsheet or PMM loads as it h
 
 ---
 
-## 29X. Service
+## 29Z. Service
 
 ### Definition
 
@@ -9790,7 +9790,7 @@ program, and deleted with it.
 
 ---
 
-## 29Y. Enrollment
+## 29ZA. Enrollment
 
 ### Definition
 
@@ -9895,7 +9895,7 @@ while the module is turned off:
 `SampleDataModules.MODULE_CLASS_NAMES` after Volunteers. Its load, three stages, builds three
 programs flagged `Sample_Data__c` (two Active, one Completed) with five services, then 18
 enrollments of up to 12 of Core's sample people (contacts), through the enrollment rules, then
-(release 0.13, P-02) 40 service deliveries (29Z) to the people Enrolled in the two Active
+(release 0.13, P-02) 40 service deliveries (29ZB) to the people Enrolled in the two Active
 programs. Its removal, before Volunteers', Giving's and Core's, deletes one chunk per stage: the
 sample people's service deliveries and enrollments in sample programs, then the sample programs
 with no enrollment or delivery left (their services go with them). A sample program a real person
@@ -9904,7 +9904,7 @@ kept.
 
 ---
 
-## 29Z. Service Delivery
+## 29ZB. Service Delivery
 
 ### Definition
 
@@ -9987,14 +9987,14 @@ anonymous record; deleting the person empties the person (SetNull) and keeps the
 
 ---
 
-## 29Z. Logic Model
+## 29ZC. Logic Model
 
 ### Definition
 
 The organization's theory of change, built by the organization itself (L-01, Logic Models module,
 ADR-0154 `0154-logic-models-module.md`): what it puts in, what it does, what that produces, what
-changes for people as a result, and the long-run impact. Its elements (29ZA) are the parts, its
-links (29ZB) say which part leads to which and on what assumption, and indicators (29ZC) on its
+changes for people as a result, and the long-run impact. Its elements (29ZD) are the parts, its
+links (29ZE) say which part leads to which and on what assumption, and indicators (29ZF) on its
 outputs and outcomes say how the organization knows. One for the organization, and optionally one
 per program.
 
@@ -10043,7 +10043,7 @@ it.
 
 ---
 
-## 29ZA. Logic Model Element
+## 29ZD. Logic Model Element
 
 ### Definition
 
@@ -10103,7 +10103,7 @@ deletes its links first; a delete from the standard record page empties the elem
 
 ---
 
-## 29ZB. Logic Model Link
+## 29ZE. Logic Model Link
 
 ### Definition
 
@@ -10153,13 +10153,13 @@ the same direction.
 
 ---
 
-## 29ZC. Indicator
+## 29ZF. Indicator
 
 ### Definition
 
 How the organization knows an output happened or an outcome changed (L-02, absorbing P-03):
 "students served", "share of students reading at grade level", with its unit, the direction that
-is better and a baseline. Its periods (29ZD) hold the targets and results.
+is better and a baseline. Its periods (29ZG) hold the targets and results.
 
 ### Attributes
 
@@ -10206,7 +10206,7 @@ builder's module, never stored.
 
 ---
 
-## 29ZD. Indicator Period
+## 29ZG. Indicator Period
 
 ### Definition
 
@@ -10305,12 +10305,12 @@ Template left this table in v0.8 (V-04 to V-08) and are specified in Sections 29
 the volunteer hours import template in 29V.
 
 Program, Service and Enrollment left this table in release 0.12 (P-01, ADR-0151) and are
-specified in Sections 29W to 29Y. Outcome left it when P-03 moved to the Logic Models package as
+specified in Sections 29Y to 29ZA. Outcome left it when P-03 moved to the Logic Models package as
 L-02 (owner decision, 2026-09-23). Attendance and Service Delivery left it in release 0.13
-(P-02) as one entity, Service Delivery, specified in Section 29Z.
+(P-02) as one entity, Service Delivery, specified in Section 29ZB.
 Logic Model, Logic Model Element, Logic Model Link, Indicator and Indicator Period (L-01 and
-L-02, release 0.14, ADR-0154 `0154-logic-models-module.md`) are specified in Sections 29Z to
-29ZD. Indicator takes the place of the Outcome entity listed above for Programs: P-03 moved to the
+L-02, release 0.14, ADR-0154 `0154-logic-models-module.md`) are specified in Sections 29ZC to
+29ZG. Indicator takes the place of the Outcome entity listed above for Programs: P-03 moved to the
 Logic Models package as L-02 (owner decision, 2026-09-23).
 
 Two v0.4 entities have attributes that already exist on `Gift__c` from v0.2, because the
@@ -10548,17 +10548,18 @@ mirrors the primary member).
 | v0.11 | 2026-10-29 | Edition stored values (ADR-0143, `0143-edition-internal-values.md`). No object or field added. `BarnCRM_Settings__c.Suite__c` stores `Standard` and `Nonprofit` instead of `Community` and `Impact`, and `BarnCRM_Module__mdt.Editions__c` names the same values. Core's post-install steps rewrite an old stored value once. |
 | v0.11 | 2026-10-29 | Security review G-L4 and G-L5 (owner decisions). No object or field added. New R-AK13 (ADR-0144, `0144-acknowledgments-honor-email-opt-out.md`): an email gift whose recipient contact has Email Opt Out is not emailed, gets no row and stays queued, and the letter run takes it as a letter. `Giving_Admin` loses View All on `Commitment__c`, matching `Gift__c`; commitment record access comes from ownership, roles and sharing. |
 | v1.0 | 2026-10-30 | Advanced duplicate management (C-51, D-154, ADR-0145 `0145-advanced-duplicate-management.md`). Object `Merge_Journal__c` added (Section 29A); custom metadata type `Merge_Rule__mdt` added (Section 13); settings keys `Fuzzy_Match_Threshold__c`, `Merge_Default_Rule__c` and `Auto_Merge_Exact_Match__c`. R-DP1 and R-DP4 amended; R-DP7 to R-DP10 added. |
-| v0.13 | 2026-10-31 | Ask cadence reminders (G-29). New Section 25O. `Contact` and `Account` gain `Next_Ask_Date__c`, `Last_Touch_Date__c` and `Ask_Reminder_For_Date__c` (Giving). `Giving_Settings__c` gains `Ask_Reminders_Enabled__c` (default true), `Ask_Reminders_Last_Run__c` and `Ask_Reminders_Last_Run_Summary__c`. Rules R-AC1 to R-AC6: donor level dates only, one switch, one reminder Task per donor per date, a 30 day catch up window, the Task is the owner's, and a Who Is Due list view on each object. No object added. |
+| v0.13 | 2026-10-31 | Ask cadence reminders (G-29). New Section 25S. `Contact` and `Account` gain `Next_Ask_Date__c`, `Last_Touch_Date__c` and `Ask_Reminder_For_Date__c` (Giving). `Giving_Settings__c` gains `Ask_Reminders_Enabled__c` (default true), `Ask_Reminders_Last_Run__c` and `Ask_Reminders_Last_Run_Summary__c`. Rules R-AC1 to R-AC6: donor level dates only, one switch, one reminder Task per donor per date, a 30 day catch up window, the Task is the owner's, and a Who Is Due list view on each object. No object added. |
 | v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-0149). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a) by any user with the import permission and edit access to the rows; `Import_Batch__c` gains `Retried_By__c` (Rows Retried By) so undo covers their records. R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
 | 0.12 | 2026-10-31 | Setup Changes Log (C-56, plan D-156). Object `Setup_Change__c` added (Section 29W), rules R-SU1 to R-SU8 (prefix R-SU, since R-SC is soft credits); settings key `Setup_Change_Retention_Days__c` (Org Optimizer keys). A nightly job copies new Setup Audit Trail rows and deletes copies past the retention. |
-| v0.12 | 2026-10-31 | Super Transform follow-ups (C-50f1, C-50f2; ADR-0150). New object `Saved_Transform__c` (Section 29W: `Object_Name__c`, `Definition_JSON__c`), org-wide saved step lists, granted to `BarnCRM_Bulk_Update` and `BarnCRM_Admin`. R-IT15 gains the `digits` step (a document that may use it is version 3; Apex `DataTransform.formatDigits` and the JavaScript module `transformFormat` share one test fixture). R-BU7 applies it unchanged. |
-| 0.12 | 2026-10-31 | Programs P-01 (ADR-0151 `0151-programs-module.md`). New in the Programs module: Program (`Program__c`, 29W), Service (`Service__c`, 29X) and Enrollment (`Enrollment__c`, 29Y), with rules R-PG1 to R-PG3, R-SV1 and R-EN1 to R-EN5 and the PMM mapping. Section 30 keeps attendance and service delivery (P-02); Outcome left it for Logic Models (L-02). Specified ahead of the build. |
-| 0.12 | 2026-10-31 | Programs P-01 follow-up. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Program__c` (29W), so the Programs sample load can be removed in one action; services and enrollments are found through their program. 29Y gains the person card, the Programs Health Check finding and the sample data paragraph. No object added. |
-| 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29Z), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |
+| v0.12 | 2026-10-31 | Super Transform follow-ups (C-50f1, C-50f2; ADR-0150). New object `Saved_Transform__c` (Section 29X: `Object_Name__c`, `Definition_JSON__c`), org-wide saved step lists, granted to `BarnCRM_Bulk_Update` and `BarnCRM_Admin`. R-IT15 gains the `digits` step (a document that may use it is version 3; Apex `DataTransform.formatDigits` and the JavaScript module `transformFormat` share one test fixture). R-BU7 applies it unchanged. |
+| 0.12 | 2026-10-31 | Programs P-01 (ADR-0151 `0151-programs-module.md`). New in the Programs module: Program (`Program__c`, 29Y), Service (`Service__c`, 29Z) and Enrollment (`Enrollment__c`, 29ZA), with rules R-PG1 to R-PG3, R-SV1 and R-EN1 to R-EN5 and the PMM mapping. Section 30 keeps attendance and service delivery (P-02); Outcome left it for Logic Models (L-02). Specified ahead of the build. |
+| 0.12 | 2026-10-31 | Programs P-01 follow-up. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Program__c` (29Y), so the Programs sample load can be removed in one action; services and enrollments are found through their program. 29ZA gains the person card, the Programs Health Check finding and the sample data paragraph. No object added. |
+| 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29ZB), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |
 | v0.13 | 2026-10-31 | Donor segments (G-28, D-156). New Section 25O, rules R-DS1 to R-DS6: a segment is a Saved Query of Contact or Account (no new object), with five starter templates held as documented JSON, a count, a list and Mailchimp, Constant Contact and all-columns CSV exports; no sending, no settings key. Contact and Account gain the formula `Change_From_Last_Year__c` (Giving This Year minus Giving Last Year), so upgraders can be filtered. |
-| v0.13 | 2026-10-31 | Pledge reminders (G-30). Objects `Pledge_Reminder_Step__c` (Section 25O) and `Pledge_Reminder__c` (25P) added; `Giving_Settings__c` gains `Pledge_Reminders_Enabled__c` (off by default), `Pledge_Reminders_Last_Run__c` and `Pledge_Reminders_Last_Run_Summary__c`. Rules R-PR1 to R-PR6. No field is added to `Installment__c` or `Commitment__c`. |
-| 0.13 | 2026-10-31 | Solicitation pipeline (G-26, ADR-0153). New entity Ask (Section 25O, `Ask__c`) with rules R-SO1 to R-SO8: an Opportunity-free ask with the organization's own stages, an outcome kept apart from the stage, stage history, and a win that creates or links the gift or commitment. Giving Settings gains `Ask_Stages__c` (Section 21A). `Next_Ask_Date__c` is the hook ask cadence (G-29) reads. |
-| 0.14 | 2026-10-31 | Logic Models L-01 and L-02 (ADR-0154 `0154-logic-models-module.md`). New in the Logic Models module: Logic Model (`Logic_Model__c`, 29Z), Logic Model Element (`Logic_Model_Element__c`, 29ZA), Logic Model Link (`Logic_Model_Link__c`, 29ZB), Indicator (`Indicator__c`, 29ZC) and Indicator Period (`Indicator_Period__c`, 29ZD), with rules R-LM1 to R-LM3, R-LE1 to R-LE3, R-LL1 to R-LL3, R-IN1, R-IN2, R-IP1 and R-IP2. Indicator takes the place of P-03's Outcome. Specified ahead of the build. |
+| v0.13 | 2026-10-31 | Pledge reminders (G-30). Objects `Pledge_Reminder_Step__c` (Section 25P) and `Pledge_Reminder__c` (25Q) added; `Giving_Settings__c` gains `Pledge_Reminders_Enabled__c` (off by default), `Pledge_Reminders_Last_Run__c` and `Pledge_Reminders_Last_Run_Summary__c`. Rules R-PR1 to R-PR6. No field is added to `Installment__c` or `Commitment__c`. |
+| 0.13 | 2026-10-31 | Solicitation pipeline (G-26, ADR-0153). New entity Ask (Section 25R, `Ask__c`) with rules R-SO1 to R-SO8: an Opportunity-free ask with the organization's own stages, an outcome kept apart from the stage, stage history, and a win that creates or links the gift or commitment. Giving Settings gains `Ask_Stages__c` (Section 21A). `Next_Ask_Date__c` is the hook ask cadence (G-29) reads. |
+| 0.14 | 2026-10-31 | Logic Models L-01 and L-02 (ADR-0154 `0154-logic-models-module.md`). New in the Logic Models module: Logic Model (`Logic_Model__c`, 29ZC), Logic Model Element (`Logic_Model_Element__c`, 29ZD), Logic Model Link (`Logic_Model_Link__c`, 29ZE), Indicator (`Indicator__c`, 29ZF) and Indicator Period (`Indicator_Period__c`, 29ZG), with rules R-LM1 to R-LM3, R-LE1 to R-LE3, R-LL1 to R-LL3, R-IN1, R-IN2, R-IP1 and R-IP2. Indicator takes the place of P-03's Outcome. Specified ahead of the build. |
+| 0.14 | 2026-10-31 | Landing batch A renumbering. No object or field added. Branches built in parallel had reused section letters; in PR order they are now 25O Donor Segments, 25P Pledge Reminder Step, 25Q Pledge Reminder, 25R Ask, 25S Ask cadence, 29W Setup Change, 29X Saved Transform, 29Y Program, 29Z Service, 29ZA Enrollment, 29ZB Service Delivery, 29ZC Logic Model, 29ZD Logic Model Element, 29ZE Logic Model Link, 29ZF Indicator, 29ZG Indicator Period. Every citation in docs and code was repointed to the section its author meant. |
 
 ---
 ## 32. Entity ownership by package
@@ -10605,7 +10606,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Duplicate Dismissal | Core | v0.5 | 29A |
 | Duplicate Reason | Core | v0.8 | 29A |
 | Saved Query | Core | v0.7 | 29D |
-| Saved Transform | Core | v0.12 | 29W |
+| Saved Transform | Core | v0.12 | 29X |
 | Field Utilization Snapshot | Core | not scheduled (plan Section 6.1 item 10) | 29F |
 | Setup Change | Core | 0.12 (C-56) | 29W |
 | What's New Seen | Core | v0.6 | 12A |
@@ -10616,8 +10617,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Acknowledgment Rule | Giving | v0.4 | 25F |
 | Acknowledgment | Giving | v0.4 | 25G |
 | Acknowledgment Run | Giving | v0.4 | 25H |
-| Pledge Reminder Step | Giving | release 0.13 (G-30) | 25O |
-| Pledge Reminder | Giving | release 0.13 (G-30) | 25P |
+| Pledge Reminder Step | Giving | release 0.13 (G-30) | 25P |
+| Pledge Reminder | Giving | release 0.13 (G-30) | 25Q |
 | Donor Level | Giving | v0.4 | 25A |
 | Receipt | Giving | v0.4 | 25B |
 | Receipt Number Sequence | Giving | v0.4 | 25C |
@@ -10629,7 +10630,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Gift Batch | Giving | v0.5 | 25L |
 | Gift Batch Row | Giving | v0.5 | 25M |
 | Donor segments (Change From Last Year on Account and Contact) | Giving | v0.13 | 25O |
-| Ask | Giving | release 0.13 (G-26) | 25O |
+| Ask | Giving | release 0.13 (G-26) | 25R |
 | Gift Transaction mirror | Mirror | v0.6 | 30 |
 | Opportunity mirror (Opportunity ID on Gift) | Mirror | v0.6 | 29C |
 | Campaign sync (Campaign ID on Appeal) | Mirror | v0.6 | 29B |
@@ -10648,16 +10649,16 @@ included; standard objects the packages extend are named by the entity that gove
 | Volunteer Letter Template | Volunteers | v0.8 | 29U |
 | Volunteer Letter Template Default (shipped default) | Volunteers | v0.8 | 29U |
 | Volunteer hours import template (Import Template Default rows) | Volunteers | v0.8 | 29V |
-| Program | Programs | 0.12 (P-01) | 29W |
-| Service | Programs | 0.12 (P-01) | 29X |
-| Enrollment | Programs | 0.12 (P-01) | 29Y |
-| Service Delivery | Programs | 0.13 (P-02) | 29Z |
+| Program | Programs | 0.12 (P-01) | 29Y |
+| Service | Programs | 0.12 (P-01) | 29Z |
+| Enrollment | Programs | 0.12 (P-01) | 29ZA |
+| Service Delivery | Programs | 0.13 (P-02) | 29ZB |
 | Programs entities | Programs | v0.9 | 30 |
-| Logic Model | Logic Models | 0.14 (L-01) | 29Z |
-| Logic Model Element | Logic Models | 0.14 (L-01) | 29ZA |
-| Logic Model Link | Logic Models | 0.14 (L-01) | 29ZB |
-| Indicator | Logic Models | 0.14 (L-02) | 29ZC |
-| Indicator Period | Logic Models | 0.14 (L-02) | 29ZD |
+| Logic Model | Logic Models | 0.14 (L-01) | 29ZC |
+| Logic Model Element | Logic Models | 0.14 (L-01) | 29ZD |
+| Logic Model Link | Logic Models | 0.14 (L-01) | 29ZE |
+| Indicator | Logic Models | 0.14 (L-02) | 29ZF |
+| Indicator Period | Logic Models | 0.14 (L-02) | 29ZG |
 | Funders entities | Funders | v0.9 | 30 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |

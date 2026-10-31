@@ -1,5 +1,5 @@
 /**
- * The Logic Models records and their rules (canonical model Sections 29Z to 29ZD): one model per
+ * The Logic Models records and their rules (canonical model Sections 29ZC to 29ZG): one model per
  * scope (R-LM1), the program named by identifier (R-LM2), parts deleted with their model (R-LM3),
  * outcome terms (R-LE1), indicators kept on outputs and outcomes (R-LE2, R-IN1), arrows within one
  * model and forward only (R-LL1, R-LL2), period dates (R-IP1), and what each permission set may do.

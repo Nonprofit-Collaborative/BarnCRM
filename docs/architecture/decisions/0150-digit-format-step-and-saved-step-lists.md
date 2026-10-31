@@ -4,7 +4,7 @@
 **Date:** 2026-10-31
 **Source:** plan Section 6.0a C-50f1 and C-50f2 (D-154); Section 9.9 portability. Extends
 `0112-more-transform-steps.md` (ADR-0112) and `0081-data-transform-document.md` (ADR-0081).
-Amends canonical model R-IT15 and adds Section 29W.
+Amends canonical model R-IT15 and adds Section 29X.
 
 ## Context
 

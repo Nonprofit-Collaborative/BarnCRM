@@ -26,7 +26,7 @@ before each new module.
    Service (`Service__c`, a detail of its program; unit of measure, Active) and Enrollment
    (`Enrollment__c`; a person, a program, Stage Applied, Enrolled, Completed or Withdrawn, start
    and end dates). Each maps onto PMM's Program, Service and Program Engagement field by field
-   (canonical model Section 29Y), so the PMM migration (MIG-09) needs no new field. The PMM
+   (canonical model Section 29ZA), so the PMM migration (MIG-09) needs no new field. The PMM
    field names are taken from its public repository; they are checked against an org with PMM
    installed when MIG-09 is built, not before.
 3. **Enrollment is a lookup to its program, not a detail.** Its sharing is its own, so P-08 can

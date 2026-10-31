@@ -1,5 +1,5 @@
 /**
- * The Programs module's Health Check finding (canonical model 29Y, "On a person, Health Check
+ * The Programs module's Health Check finding (canonical model 29ZA, "On a person, Health Check
  * and sample data"; ADR-0057's extension seam). Core finds this class by name
  * (`HealthCheckExtensions.EXTENSION_CLASSES`) and folds the finding into its one report.
  *

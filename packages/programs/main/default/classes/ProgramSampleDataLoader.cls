@@ -1,5 +1,5 @@
 /**
- * Builds and removes the Programs sample data set (C-10, canonical model 29Y "On a person,
+ * Builds and removes the Programs sample data set (C-10, canonical model 29ZA "On a person,
  * Health Check and sample data"): three programs flagged `Sample_Data__c` (After-school
  * tutoring and Food pantry, Active; Summer reading, Completed), five services, and 18
  * enrollments of up to 12 of Core's sample people. Every record is saved in user mode through the

@@ -76,7 +76,7 @@ const messageOf = (error) =>
   (error && error.body && error.body.message) || (error && error.message) || ERROR_ACTION;
 
 /**
- * The Ask Pipeline (G-26, canonical model Section 25O): every open ask by stage as a board or a
+ * The Ask Pipeline (G-26, canonical model Section 25R): every open ask by stage as a board or a
  * list, with the totals at the top, a drag or a menu to move an ask, and the Close Ask dialog that
  * records what a win produced (R-SO5).
  *

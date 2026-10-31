@@ -1,5 +1,5 @@
 /**
- * The Ask Pipeline board (G-26, canonical model Section 25O): the stages, the open asks as cards,
+ * The Ask Pipeline board (G-26, canonical model Section 25R): the stages, the open asks as cards,
  * the totals, moving an ask to another stage, and closing one.
  *
  * Thin by design (plan Section 9.9): it returns plain shapes the board renders, and arranging the

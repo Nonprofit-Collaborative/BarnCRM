@@ -3,7 +3,7 @@
   <apiVersion>67.0</apiVersion>
   <description>
     The Ask Pipeline board's arithmetic in plain JavaScript: stages into columns with their totals,
-    cards into columns, and days in stage (canonical model Section 25O). Imported by askPipeline.
+    cards into columns, and days in stage (canonical model Section 25R). Imported by askPipeline.
   </description>
   <isExposed>false</isExposed>
 </LightningComponentBundle>

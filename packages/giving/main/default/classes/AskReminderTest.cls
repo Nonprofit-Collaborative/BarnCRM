@@ -1,5 +1,5 @@
 /**
- * Ask cadence reminders (canonical model Section 25O, G-29): who is owed a reminder, that each
+ * Ask cadence reminders (canonical model Section 25S, G-29): who is owed a reminder, that each
  * date reminds once, that the setting switches the pass off, and that a donor whose reminder
  * could not be made is counted and tried again.
  */

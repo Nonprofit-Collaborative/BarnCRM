@@ -3,7 +3,7 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     One step of the pledge reminder ladder: how many days before or after an installment's due date
-    it fires, and the email template or letter it sends (canonical model 25O, G-30).
+    it fires, and the email template or letter it sends (canonical model 25P, G-30).
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

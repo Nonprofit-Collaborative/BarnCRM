@@ -1,5 +1,5 @@
 /**
- * The rules every ask follows however it is saved (canonical model Section 25O): the stage comes
+ * The rules every ask follows however it is saved (canonical model Section 25R): the stage comes
  * from the organization's own list (R-SO2), Stage Changed Date follows the stage (R-SO4), and
  * Closed Date follows the outcome (R-SO3).
  *

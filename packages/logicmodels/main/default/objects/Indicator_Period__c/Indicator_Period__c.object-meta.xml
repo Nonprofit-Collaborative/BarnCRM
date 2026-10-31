@@ -3,7 +3,7 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     An indicator's target and result for one stretch of time. A detail of its indicator
-    (canonical model 29ZD).
+    (canonical model 29ZG).
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

@@ -1,5 +1,5 @@
 /**
- * R-SD2 and R-SD3 for Service_Delivery__c (canonical model 29Z), run by the Core trigger
+ * R-SD2 and R-SD3 for Service_Delivery__c (canonical model 29ZB), run by the Core trigger
  * dispatcher through the registry row `Service_Delivery_Rules`, which always runs: totals count
  * the Quantity and roster figures count by enrollment, so neither may be switched off
  * (ADR-0024). Before a save, an absence's Quantity is set to 0, and a delivery with no enrollment

@@ -1,5 +1,5 @@
 /**
- * Every read the pledge reminder feature makes (G-30, canonical model 25O and 25P).
+ * Every read the pledge reminder feature makes (G-30, canonical model 25P and 25Q).
  *
  * All in user mode, so what a person sees on the page is what their sharing lets them see. The
  * nightly run reads as the user who scheduled it, the same as the acknowledgment send.

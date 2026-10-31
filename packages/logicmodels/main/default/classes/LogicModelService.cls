@@ -1,5 +1,5 @@
 /**
- * The Logic Model Builder's reads and writes (L-01, L-02; canonical model Sections 29Z to 29ZD),
+ * The Logic Model Builder's reads and writes (L-01, L-02; canonical model Sections 29ZC to 29ZG),
  * as plain JSON shapes so the same builder could call a WordPress endpoint (plan 9.9). Every query
  * and every write runs in user mode: the builder shows and changes only what the user may.
  *

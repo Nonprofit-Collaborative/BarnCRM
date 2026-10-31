@@ -1,5 +1,5 @@
 /**
- * Service delivery rules (canonical model 29Z): an absence delivers nothing (R-SD2), the
+ * Service delivery rules (canonical model 29ZB): an absence delivers nothing (R-SD2), the
  * enrollment fills itself in (R-SD3), one person per delivery (R-SD1), a negative quantity and a
  * service with deliveries are refused.
  */

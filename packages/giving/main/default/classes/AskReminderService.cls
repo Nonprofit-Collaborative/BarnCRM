@@ -1,6 +1,6 @@
 /**
  * Decides which donors are owed an ask reminder and lays out the task for each (canonical model
- * Section 25O, plan feature G-29).
+ * Section 25S, plan feature G-29).
  *
  * The decision is pure: it reads the donor rows it is handed and builds tasks and stamps, and
  * writes nothing. `AskReminderWriter` does the writing, so the rules here can be tested without

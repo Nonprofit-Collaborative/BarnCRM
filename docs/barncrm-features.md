@@ -606,7 +606,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 5. Programs
 
-**Edition:** Nonprofit Edition only (not shown in the Standard Edition, ADR-0124). Depends on Core only (new ADR, programs module). Being built for release 0.12; the design is in canonical model Sections 29W to 29Y.
+**Edition:** Nonprofit Edition only (not shown in the Standard Edition, ADR-0124). Depends on Core only (new ADR, programs module). Being built for release 0.12; the design is in canonical model Sections 29Y to 29ZA.
 
 ### 5.1 Program Delivery
 

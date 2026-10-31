@@ -33,7 +33,7 @@ package, depending on Core only, and that neither Logic Models nor Programs refe
    links between elements, each carrying the assumption that one leads to the other
    (`Logic_Model_Link__c`, a detail of the model); indicators on outputs and outcomes
    (`Indicator__c`, a detail of the element); and an indicator's target and result for one period
-   (`Indicator_Period__c`, a detail of the indicator). Canonical model Sections 29Z to 29ZD.
+   (`Indicator_Period__c`, a detail of the indicator). Canonical model Sections 29ZC to 29ZG.
 3. **Assumptions live on links.** An assumption is the reason one element leads to another, so it
    is a field of the link, not an element type. A link is a record (not JSON on the model) so the
    evidence log (L-05) can point at the assumption it supports and a report can list them.

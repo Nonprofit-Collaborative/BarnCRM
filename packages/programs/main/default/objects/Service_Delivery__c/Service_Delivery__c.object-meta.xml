@@ -5,7 +5,7 @@
   <description>
     One service given to one person on one day, or their absence from it: attendance and
     service delivery in one record. A lookup to its service, not a detail, so participant
-    privacy can be set apart from the program (canonical model Section 29Z).
+    privacy can be set apart from the program (canonical model Section 29ZB).
   </description>
   <enableActivities>true</enableActivities>
   <enableBulkApi>true</enableBulkApi>

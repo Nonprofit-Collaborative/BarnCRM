@@ -5,7 +5,7 @@
   <description>
     Something the organization runs for the people it serves: a food pantry, a tutoring
     program, a job readiness course. Its services are what it offers and its enrollments are
-    who takes part (canonical model Section 29W).
+    who takes part (canonical model Section 29Y).
   </description>
   <enableActivities>true</enableActivities>
   <enableBulkApi>true</enableBulkApi>

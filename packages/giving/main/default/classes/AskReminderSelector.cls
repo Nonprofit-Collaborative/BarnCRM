@@ -1,5 +1,5 @@
 /**
- * The donors the ask reminder pass walks (canonical model Section 25O).
+ * The donors the ask reminder pass walks (canonical model Section 25S).
  *
  * Both queries run in system mode: a reminder that silently skipped a donor because the user the
  * job happens to run as cannot see the record would be a follow-up that never happened, which is

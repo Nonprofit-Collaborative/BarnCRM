@@ -1,5 +1,5 @@
 /**
- * The Programs records and their rules (canonical model Sections 29W to 29Y): one open
+ * The Programs records and their rules (canonical model Sections 29Y to 29ZA): one open
  * enrollment per person per program (R-EN2), always enforced; stage dates filled in (R-EN3),
  * switchable; one person per enrollment (R-EN1); end after start (R-PG1, R-EN4); a program with
  * enrollments kept (R-PG2); and what each permission set may do.
