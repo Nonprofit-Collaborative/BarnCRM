@@ -6412,6 +6412,19 @@ change to this object.
 and sets each open one to Withdrawn, so no more work is planned about them. The asks are kept, like
 their gifts, still pointing at the anonymized person.
 
+**R-SO9 Open asks set the donor's Next Ask Date.** After an ask is created, deleted, or changes
+its Target Date, Outcome or donor, each donor it names (before and after the change) gets the
+earliest Target Date among their open asks written into the donor's Next Ask Date (Section 25S),
+so the ask cadence reminder and the Who Is Due list follow the pipeline with no second job. Open
+asks without a Target Date are ignored. While a donor has an open ask with a Target Date, the
+donor's Next Ask Date follows the earliest one, overwriting a date entered by hand. When the
+change leaves a donor with no open ask with a Target Date, the donor's Next Ask Date is cleared
+only if it still holds the date the asks had set (the earliest open Target Date before the
+change); a date somebody entered or changed by hand is kept. The ask's own Next Ask Date
+(R-SO7) is not read. Reads and the donor write run in system mode (ADR-0021: a package-owned
+date computed from every open ask, whoever can see them); a donor that cannot be saved is
+logged, and the ask's save is never refused for it.
+
 ### Salesforce implementation
 
 - **Object:** `Ask__c`, Giving package. Name is an auto number, `ASK-{00000000}`. Sharing is
@@ -6442,7 +6455,10 @@ their gifts, still pointing at the anonymized person.
   field.
 - **Automation:** one `Automation_Registry__mdt` row, `Ask_Stage_And_Dates`, handler
   `AskTriggerHandler`, order 10, always running: it fills the first stage, refuses a stage not in
-  the list (R-SO2), and keeps Stage Changed Date and Closed Date in step (R-SO3, R-SO4).
+  the list (R-SO2), and keeps Stage Changed Date and Closed Date in step (R-SO3, R-SO4). A
+  second row, `Ask_Donor_Next_Ask_Date`, handler `AskNextAskDateHandler`, order 20, on by
+  default and switchable in the automation console, runs after insert, update and delete and
+  calls `AskDonorDateSync` (R-SO9).
 - **Settings key** (on `Giving_Settings__c`, Section 21A): `Ask_Stages__c`.
 - **Service:** `AskRules` (the stage list and R-SO2 to R-SO4), `AskSelector` (the board's
   queries, as the person), `AskPipelineController` (the board: totals, moving a stage, closing an
@@ -6466,15 +6482,16 @@ a Salesforce Task, so it appears in the owner's own task list.
 
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
-| Next Ask Date | date | no | The day the donor should next be asked. Entered by staff. |
+| Next Ask Date | date | no | The day the donor should next be asked. Entered by staff, or set from the donor's earliest open ask (R-SO9). |
 | Last Touch Date | date | no | The day somebody last contacted the donor. Entered by staff; the package does not infer it. |
 | Ask Reminder For Date | date | no | The Next Ask Date a reminder Task was last created for. Written only by the daily pass; it is how the pass knows not to create the same reminder twice (R-AC3). Read only to staff. |
 
 ### Rules
 
-**R-AC1 Donor level dates only.** The reminder reads the two dates on the donor. A date on a
-solicitation or ask record (G-26) is a separate date the integrator may connect later; nothing
-here reads it.
+**R-AC1 Donor level dates only.** The reminder reads the two dates on the donor, never a date on
+an ask. The solicitation pipeline (G-26) reaches it by writing the earliest open ask's Target
+Date into the donor's Next Ask Date (R-SO9), so an open ask gets its reminder from this same
+pass, with no second job.
 
 **R-AC2 One switch, on by default.** `Ask_Reminders_Enabled__c` switches the daily pass on and
 off for the whole organization. Off means the pass creates nothing; the Next Ask Date and Last
@@ -10560,6 +10577,7 @@ mirrors the primary member).
 | 0.13 | 2026-10-31 | Solicitation pipeline (G-26, ADR-0153). New entity Ask (Section 25R, `Ask__c`) with rules R-SO1 to R-SO8: an Opportunity-free ask with the organization's own stages, an outcome kept apart from the stage, stage history, and a win that creates or links the gift or commitment. Giving Settings gains `Ask_Stages__c` (Section 21A). `Next_Ask_Date__c` is the hook ask cadence (G-29) reads. |
 | 0.14 | 2026-10-31 | Logic Models L-01 and L-02 (ADR-0154 `0154-logic-models-module.md`). New in the Logic Models module: Logic Model (`Logic_Model__c`, 29ZC), Logic Model Element (`Logic_Model_Element__c`, 29ZD), Logic Model Link (`Logic_Model_Link__c`, 29ZE), Indicator (`Indicator__c`, 29ZF) and Indicator Period (`Indicator_Period__c`, 29ZG), with rules R-LM1 to R-LM3, R-LE1 to R-LE3, R-LL1 to R-LL3, R-IN1, R-IN2, R-IP1 and R-IP2. Indicator takes the place of P-03's Outcome. Specified ahead of the build. |
 | 0.14 | 2026-10-31 | Landing batch A renumbering. No object or field added. Branches built in parallel had reused section letters; in PR order they are now 25O Donor Segments, 25P Pledge Reminder Step, 25Q Pledge Reminder, 25R Ask, 25S Ask cadence, 29W Setup Change, 29X Saved Transform, 29Y Program, 29Z Service, 29ZA Enrollment, 29ZB Service Delivery, 29ZC Logic Model, 29ZD Logic Model Element, 29ZE Logic Model Link, 29ZF Indicator, 29ZG Indicator Period. Every citation in docs and code was repointed to the section its author meant. |
+| 0.14 | 2026-10-31 | Asks feed ask cadence (G-26 with G-29, landing batch A). No object or field added. New R-SO9: an ask's after insert, update and delete writes the donor's earliest open Target Date into the donor's Next Ask Date, and clears it when no open ask remains only if the asks had set it; R-AC1 and the Next Ask Date definition in 25S say so. Registry row `Ask_Donor_Next_Ask_Date`. |
 
 ---
 ## 32. Entity ownership by package

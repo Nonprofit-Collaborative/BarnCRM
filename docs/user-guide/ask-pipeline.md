@@ -42,7 +42,7 @@ You should see: the card in its new column, the counts and totals updated, and "
 
 You should see: the card leaves the board and the totals change. The gift or pledge, the link and the outcome save together, or none of them does.
 
-**Next Ask Date** is only recorded for now. A "who is due" list is planned.
+The ask's **Next Ask Date** is only recorded on the ask. The reminder follows the donor's own **Next Ask Date**: while a donor has open asks, it is the earliest **Target Date** among them, and when the last one closes it is cleared unless someone changed it by hand. After closing a donor's last ask, set the donor's **Next Ask Date** yourself ([Ask reminders](ask-reminders.md)).
 
 ## To Reopen an Ask
 

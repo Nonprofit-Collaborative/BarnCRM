@@ -109,3 +109,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | Log in as that user. Open **Ask Pipeline**. | The board and totals show. |
 | 2 | Look at the top of the page, then try to drag a card and open a card's menu. | A line says you can see asks but not change them. **New Ask** is not shown. Cards do not drag, and the menu offers only **Open**. |
 | 3 | Open an ask and try to edit it. | Refused: no edit access. |
+
+## T-ASK-08: Open Asks Set the Donor's Next Ask Date
+
+**Purpose:** confirm the earliest open ask's Target Date lands on the donor, moves with the asks, and is cleared only when the asks had set it.
+**Prerequisites:** a user with **Giving Staff**; a person with no Next Ask Date and no asks; **Next Ask Date** on the Contact page layout.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create two open asks for the person, Target Dates in 30 days and in 10 days. Open the person. | **Next Ask Date** is the date 10 days out. |
+| 2 | Change the 10-day ask's Target Date to 5 days out. Reload the person. | **Next Ask Date** is 5 days out. |
+| 3 | Close that ask as **Won** (or **Declined**). Reload the person. | **Next Ask Date** is 30 days out, from the ask still open. |
+| 4 | Close the last ask as **Declined**. Reload the person. | **Next Ask Date** is empty. |
+| 5 | Create an open ask with a Target Date 15 days out. Then edit the person's **Next Ask Date** by hand to 90 days out. Close the ask as **Withdrawn**. | **Next Ask Date** stays 90 days out: a date entered by hand is kept. |
+
+**Cleanup:** delete the test asks and clear the person's **Next Ask Date**.

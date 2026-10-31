@@ -6,7 +6,7 @@ Fundraisers keep a date in their head for when to ask a donor again. Ask cadence
 
 Each person (Contact) and each household or organization (Account) gets three fields:
 
-- **Next Ask Date**: the day the donor should next be asked. Staff enter it.
+- **Next Ask Date**: the day the donor should next be asked. Staff enter it, or the donor's open asks set it (see [Asks set the Next Ask Date](#asks-set-the-next-ask-date)).
 - **Last Touch Date**: the day somebody last contacted the donor. Staff enter it. BarnCRM does not guess it from tasks or emails.
 - **Ask Reminder For Date**: the Next Ask Date a reminder was last made for. The nightly job sets it, and nobody edits it. It is how BarnCRM knows not to remind about the same date twice.
 
@@ -33,10 +33,18 @@ Open the **Contacts** or **Accounts** tab and choose the list view **Who Is Due 
 - **No emails.** Reminders are tasks inside Salesforce. Nothing is sent to the donor or to the owner by email.
 - **Health Check.** **Schedule all nightly jobs** in Health Check schedules this job with the other Giving jobs.
 
+## Asks Set the Next Ask Date
+
+When the [Ask Pipeline](ask-pipeline.md) is in use, a donor's open asks keep their Next Ask Date for you, so the same nightly reminder and the **Who Is Due for an Ask** list cover the pipeline. There is no second job.
+
+- **The earliest open ask wins.** Whenever an ask is created, deleted, or its **Target Date**, **Outcome** or donor changes, the donor's Next Ask Date becomes the earliest **Target Date** among their open asks. Open asks with no Target Date are ignored. While such an ask is open, this overwrites a date entered by hand.
+- **When the last open ask closes or is deleted,** the Next Ask Date is cleared, but only if it still holds the date the asks had set. If somebody changed the donor's Next Ask Date by hand after that (to a later follow-up, say), the date is kept.
+- **The ask's own Next Ask Date** (filled as an ask closes) is not copied onto the donor. Enter the donor's next date by hand when you close the last ask.
+- **Turning it off.** The automation is **Ask: donor Next Ask Date** in the automation console. It is on by default. Off, asks and donor dates are independent again.
+
 ## What This Does Not Do Yet
 
 - It does not set the Last Touch Date for you when a task is completed or a gift arrives.
-- It reads only the dates on the donor. A solicitation or ask record with its own date is a separate feature.
 - It does not send a daily digest or a Chatter post.
 
 ## Related

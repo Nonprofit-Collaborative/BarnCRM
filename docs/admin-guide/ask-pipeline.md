@@ -67,7 +67,7 @@ The **Asks** tab has the list views **Open Asks**, **My Open Asks** and **All As
 - **Expecting a renamed stage to rename asks.** Asks already in the old name show in **Not in Your Stage List** until someone moves them.
 - **Choosing two donors, or none.** An ask needs exactly one: **Donor Contact** for a person, or **Donor Account** for an organization or household. This is checked when the ask is created or its donor is changed.
 - **Linking another donor's gift.** The **Link a Gift or Pledge Already Entered** choice refuses a gift or pledge that belongs to a different donor.
-- **Expecting Next Ask Date to do something.** It records when to ask the donor again. This release does nothing else with it.
+- **Expecting the ask's Next Ask Date to remind anyone.** It records on the ask when to ask the donor again, and nothing reads it. The reminder comes from the donor's own Next Ask Date, which the earliest open ask's **Target Date** sets (see [Ask cadence](ask-cadence.md#asks-set-the-next-ask-date)).
 - **Expecting private asks without the Setup step.** Until **Ask** is set to **Private** in Sharing Settings, everyone sees every ask.
 ## Other Things Worth Knowing
 
@@ -77,4 +77,4 @@ The **Asks** tab has the list views **Open Asks**, **My Open Asks** and **All As
 
 ## What This Does Not Do Yet
 
-- **Next Ask Date** has no "who is due" list yet. The planned ask cadence feature (G-29) will use it.
+- **The ask's Next Ask Date** is not read by anything yet. The donor's Next Ask Date, which open asks keep up to date, drives the reminder and the **Who Is Due for an Ask** list ([Ask cadence](ask-cadence.md)).

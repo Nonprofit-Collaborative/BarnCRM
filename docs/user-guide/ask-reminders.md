@@ -12,6 +12,8 @@ Ask reminders tell you when it is time to ask a donor again. You set a date on t
 
 You should see: nothing yet. The reminder appears on the morning of the date. If the **Next Ask Date** field is not on your page, ask your admin to add it ([Ask cadence reminders](../admin-guide/ask-cadence.md)).
 
+While the donor has an open ask with a **Target Date**, the earliest one sets **Next Ask Date** for you and replaces a date typed here.
+
 ## To Work a Reminder
 
 1. Open your tasks. A task named "Ask (donor name): next ask is due" is due on the Next Ask Date. It is assigned to whoever owns the donor.
