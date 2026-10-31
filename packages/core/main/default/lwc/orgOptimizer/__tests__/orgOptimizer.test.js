@@ -153,7 +153,7 @@ describe('c-org-optimizer as an administrator', () => {
     expect(getChecks).not.toHaveBeenCalled();
     const groups = one(element, 'c-barn-tool-grid').groups;
     expect(groups.map((group) => group.tiles.map((tile) => tile.name))).toEqual([
-      ['quality', 'fieldUtilization', 'dataDictionary'],
+      ['quality', 'fieldUtilization', 'dataDictionary', 'aiExport'],
       ['healthCheck', 'errors', 'storage', 'setup', 'setupChanges', 'accessExplorer']
     ]);
     tiles(element).forEach((tile) => expect(tile.iconName).toMatch(/^standard:/));
@@ -273,6 +273,15 @@ describe('c-org-optimizer as an administrator', () => {
     await flush();
 
     expect(one(element, 'lightning-tabset').activeTabValue).toBe('overview');
+  });
+
+  it('creates the AI-Readiness Export only when its tab is first opened', async () => {
+    const element = await render();
+    expect(one(element, 'c-ai-readiness-export')).toBeNull();
+
+    await activate(element, 'aiExport');
+
+    expect(one(element, 'c-ai-readiness-export')).not.toBeNull();
   });
 
   it('opens a section from its Overview tile', async () => {

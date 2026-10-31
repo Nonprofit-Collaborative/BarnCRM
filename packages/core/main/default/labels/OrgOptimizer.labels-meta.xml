@@ -191,6 +191,20 @@
         <protected>false</protected>
         <shortDescription>Org Optimizer: what the Access Explorer section answers</shortDescription>
         <value>Who can see or change what, and why. Read only.</value>
+        <fullName>Core_OrgOptimizer_AiExport</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: AI-Readiness Export section name</shortDescription>
+        <value>AI-Readiness Export</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_AiExportText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: what the AI-Readiness Export section does</shortDescription>
+        <value>Your data model and records as files ready for an AI tool you choose, with sensitive fields left out or masked.</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_HealthCheck</fullName>

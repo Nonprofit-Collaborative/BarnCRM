@@ -45,6 +45,11 @@
                         <c-data-dictionary></c-data-dictionary>
                     </template>
                 </lightning-tab>
+                <lightning-tab label={labels.aiExport} value="aiExport" onactive={handleActive} data-id="tab-aiExport">
+                    <template lwc:if={aiExportOpened}>
+                        <c-ai-readiness-export></c-ai-readiness-export>
+                    </template>
+                </lightning-tab>
                 <lightning-tab label={labels.healthCheck} value="healthCheck" onactive={handleActive} data-id="tab-healthCheck">
                     <template lwc:if={showHealthCheck}>
                         <c-health-check-panel

@@ -21,6 +21,8 @@ import DATA_DICTIONARY from '@salesforce/label/c.Core_OrgOptimizer_DataDictionar
 import DATA_DICTIONARY_TEXT from '@salesforce/label/c.Core_OrgOptimizer_DataDictionaryText';
 import ACCESS_EXPLORER from '@salesforce/label/c.Core_OrgOptimizer_AccessExplorer';
 import ACCESS_EXPLORER_TEXT from '@salesforce/label/c.Core_OrgOptimizer_AccessExplorerText';
+import AI_EXPORT from '@salesforce/label/c.Core_OrgOptimizer_AiExport';
+import AI_EXPORT_TEXT from '@salesforce/label/c.Core_OrgOptimizer_AiExportText';
 import HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_HealthCheck';
 import HEALTH_CHECK_TEXT from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckText';
 import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
@@ -73,6 +75,7 @@ export default class OrgOptimizer extends LightningElement {
     fieldUtilization: FIELD_UTILIZATION,
     dataDictionary: DATA_DICTIONARY,
     accessExplorer: ACCESS_EXPLORER,
+    aiExport: AI_EXPORT,
     healthCheck: HEALTH_CHECK,
     errors: ERRORS,
     storage: STORAGE,
@@ -122,6 +125,7 @@ export default class OrgOptimizer extends LightningElement {
       dataTiles.push(
         this.tile('dataDictionary', DATA_DICTIONARY, DATA_DICTIONARY_TEXT, 'standard:article')
       );
+      dataTiles.push(this.tile('aiExport', AI_EXPORT, AI_EXPORT_TEXT, 'standard:data_mapping'));
       setupTiles.push(
         this.tile('healthCheck', HEALTH_CHECK, HEALTH_CHECK_TEXT, 'standard:approval'),
         this.tile('errors', ERRORS, ERRORS_TEXT, 'standard:incident'),
@@ -205,6 +209,10 @@ export default class OrgOptimizer extends LightningElement {
 
   get dataDictionaryOpened() {
     return Boolean(this.opened.dataDictionary);
+  }
+
+  get aiExportOpened() {
+    return Boolean(this.opened.aiExport);
   }
 
   get errorsOpened() {

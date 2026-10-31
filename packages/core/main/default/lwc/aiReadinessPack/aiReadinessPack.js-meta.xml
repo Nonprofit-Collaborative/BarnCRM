@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The AI-Readiness Export pack (AIR-01): sensitive field flags, record file fields, masking,
+    schema.json and the README. Framework-free. Imported by aiReadinessExport.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

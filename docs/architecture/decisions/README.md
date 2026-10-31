@@ -159,6 +159,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0148](0148-import-creates-a-new-field-through-an-org-connection.md) | Import creates a new field through a one-time org connection (amends ADR-0047 for this case) | Accepted (owner decision) |
 | [0149](0149-import-row-correction-retention-and-undo.md) | Import rows are corrected on screen, deleted by a retention choice, and never needed by undo | Accepted (owner decision) |
 | [NEXT](NEXT-programs-module.md) | The BarnCRM Programs module: Core only, three objects, enrollment kept apart from its program for privacy | Proposed |
+| [ADR-NEXT](NEXT-ai-readiness-export.md) | AI-Readiness Export: a browser-built pack, no AI calls, sensitive fields left out by default | Proposed |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
