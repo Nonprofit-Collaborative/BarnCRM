@@ -712,7 +712,7 @@ fi
 # undeployed this way until 2026-10-13.
 CORE_DIR="packages/core/main/default"
 CORE_STAGED=(objects customMetadata labels staticresources customPermissions notificationtypes
-  classes triggers contentassets permissionsets permissionsetgroups layouts flexipages applications
+  externalCredentials classes triggers contentassets permissionsets permissionsetgroups layouts flexipages applications
   tabs quickActions lwc prompts flows PlatformEventSubscriberConfigs)
 unstaged=()
 for dir in "$CORE_DIR"/*/; do
@@ -813,13 +813,15 @@ deploy_config_separately() {
   deploy_stage "Core (data model, static resources and custom permissions)" \
     "${CORE_DIR}/staticresources" \
     "${CORE_DIR}/customPermissions" \
-    "${CORE_DIR}/notificationtypes" || return $?
+    "${CORE_DIR}/notificationtypes" \
+    "${CORE_DIR}/externalCredentials" || return $?
 }
 deploy_config() {
   if [[ "$CONFIG_STAGES" == "combined" ]]; then
     if ! deploy_stage "Core (config: custom metadata, labels, static resources, custom permissions, notification types)" \
       "${CORE_DIR}/customMetadata" "${CORE_DIR}/labels" "${CORE_DIR}/staticresources" \
-      "${CORE_DIR}/customPermissions" "${CORE_DIR}/notificationtypes"; then
+      "${CORE_DIR}/customPermissions" "${CORE_DIR}/notificationtypes" \
+      "${CORE_DIR}/externalCredentials"; then
       last_failure_opaque || return 1
       echo "== The one-request config deploy failed with no component error. Falling back to three stages =="
       deploy_config_separately || return $?
