@@ -80,6 +80,16 @@
     <sortField>Delivery_Date__c</sortField>
     <sortOrder>Desc</sortOrder>
   </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Note_Date__c</fields>
+    <fields>Type__c</fields>
+    <fields>Subject__c</fields>
+    <fields>OWNER.ALIAS</fields>
+    <relatedList>Case_Note__c.Enrollment__c</relatedList>
+    <sortField>Note_Date__c</sortField>
+    <sortOrder>Desc</sortOrder>
+  </relatedLists>
   <showEmailCheckbox>false</showEmailCheckbox>
   <showHighlightsPanel>false</showHighlightsPanel>
   <showInteractionLogPanel>false</showInteractionLogPanel>

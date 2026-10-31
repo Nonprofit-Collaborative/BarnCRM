@@ -9196,8 +9196,9 @@ it so, fills an empty End Date with today. A date already typed is kept. A switc
 
 **R-EN5 Erasing or deleting the person keeps the enrollment.** Erasing a person (Section 29H)
 keeps their enrollments, credited to the anonymous record, so program counts stand; an
-enrollment holds no typed text to empty. Deleting the person empties the person on the
-enrollment (SetNull) and keeps it. A merge moves the enrollments to the record kept.
+enrollment holds no typed text to empty. Their case notes, which are typed text, are deleted
+(R-CN4). Deleting the person empties the person on the enrollment (SetNull) and keeps it. A merge
+moves the enrollments to the record kept.
 
 **R-EN6 The eligibility date is filled in (P-07).** Creating an enrollment with an Eligibility
 Status of Eligible or Not Eligible, or changing it to either, fills an empty Eligibility Date with
@@ -9282,6 +9283,74 @@ sample people's service deliveries and enrollments in sample programs, then the 
 with no enrollment or delivery left (their services go with them). A sample program a real person
 is enrolled in, or has a delivery in, is kept, and one Warning in the Error Log names each one
 kept.
+
+---
+
+## 29Y1. Case Note
+
+### Definition
+
+A dated, typed note about a participant, written on their enrollment (P-04, release 0.14): a
+check-in, a call, a home visit, an assessment. Light case notes, not case management: goals and
+service plans are P-10.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number. |
+| Enrollment | reference(Enrollment) | yes | The person's enrollment the note is about; the person and program come from it. |
+| Note Date | date | yes (defaults today) | The day of the contact or event the note records. |
+| Type | picklist(Check-in, Phone Call, Home Visit, Office Visit, Assessment, Referral, Other) | yes (defaults Check-in) | What kind of contact it records. The values are the organization's to change in Setup. |
+| Subject | text(255) | no | A short line saying what the note is about. |
+| Note | long text | no | What happened, what was agreed and what comes next. |
+| Owner | reference(User) | yes | The author, who sees and edits the note. |
+
+### Relationships
+
+- **Case Note to Enrollment**, many to one, through a required lookup, not a detail, so a note
+  has sharing of its own and is not visible to everyone who can see the enrollment.
+
+### Rules
+
+**R-CN1 An enrollment with case notes is kept.** The lookup's delete constraint is Restrict: an
+enrollment with notes cannot be deleted; delete the notes first. A merge moves the enrollment,
+and its notes with it.
+
+**R-CN2 Private by default.** Organization-wide sharing is Private, whatever the participant
+privacy preset (P-08) says: a note is seen by its owner, people above the owner in the role
+hierarchy, and Programs Admin (View All and Modify All). An owner may share a note with a
+colleague through the record's Sharing button, or an admin may add a sharing rule in Setup.
+
+**R-CN3 Who may write.** Programs Staff create notes and edit their own; Programs Admin creates,
+edits and deletes any; Programs Read Only has no access to case notes at all, so a Read Only user
+sees neither the tab nor the related list.
+
+**R-CN4 Erasing the person deletes their notes.** A case note is typed text about the person and
+nothing else, so erasing the person (Section 29H, R-ER8) deletes every note on any of their
+enrollments, read in system mode and deleted as the user; someone who may not delete them all is
+refused with that reason (only Programs Admin may). The enrollments are kept (R-EN5). Deleting a
+person, not erasing them, keeps the notes on the enrollment, which no longer names the person;
+erase a person to remove what was written about them.
+
+### Salesforce implementation
+
+- **Object:** `Case_Note__c`, name field AutoNumber `CN-{000000}`, sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Enrollment | `Enrollment__c` | Lookup to `Enrollment__c`, required, delete constraint Restrict, relationship name Case_Notes |
+| Note Date | `Note_Date__c` | Date, required, default TODAY() |
+| Type | `Type__c` | Picklist, restricted, required, default Check-in |
+| Subject | `Subject__c` | Text(255) |
+| Note | `Note__c` | Long Text Area(32768) |
+
+- **Erasure:** `ProgramsErasureExtension`, registered in Core's
+  `PersonErasureExtensions.EXTENSION_CLASSES`, with `CaseNoteSelector` (without sharing, system
+  mode reads only).
+- **UI:** the Case Notes tab (list views All Case Notes and My Case Notes) and the Case Notes
+  related list on the enrollment. No trigger.
+- **PMM mapping:** none; PMM has no case note object, so MIG-09 carries none.
 
 ---
 
@@ -9660,6 +9729,7 @@ mirrors the primary member).
 | 0.12 | 2026-10-31 | Programs P-01 follow-up. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Program__c` (29W), so the Programs sample load can be removed in one action; services and enrollments are found through their program. 29Y gains the person card, the Programs Health Check finding and the sample data paragraph. No object added. |
 | 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29Z), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |
 | 0.14 | 2026-10-31 | Programs P-07. `Enrollment__c` (29Y) gains Intake Date (`Intake_Date__c`, Date), Referral Source (`Referral_Source__c`), Eligibility Status (`Eligibility_Status__c`, default Not Screened) and Eligibility Basis (`Eligibility_Basis__c`), restricted picklists whose values the organization changes in Setup, and Eligibility Date (`Eligibility_Date__c`, Date), filled by new rule R-EN6 in the `Enrollment_Dates` automation. No PMM counterpart: they stay out of the MIG-09 mapping. The Programs section of BarnCRM Settings opens the module's settings page (`Programs_Settings` tab). |
+| 0.14 | 2026-10-31 | Programs P-04. New in the Programs module: Case Note (`Case_Note__c`, 29Y1), a dated, typed note on an enrollment, sharing Private, with rules R-CN1 to R-CN4. Erasing a person now deletes their case notes (`ProgramsErasureExtension` in `PersonErasureExtensions`); enrollments are still kept (R-EN5). |
 
 ---
 ## 32. Entity ownership by package
@@ -9746,6 +9816,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Program | Programs | 0.12 (P-01) | 29W |
 | Service | Programs | 0.12 (P-01) | 29X |
 | Enrollment | Programs | 0.12 (P-01) | 29Y |
+| Case Note | Programs | 0.14 (P-04) | 29Y1 |
 | Service Delivery | Programs | 0.13 (P-02) | 29Z |
 | Funders entities | Funders | v0.9 | 30 |
 | NPSP household adoption | Mirror | v0.9 | 30 |

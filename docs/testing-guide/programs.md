@@ -177,3 +177,21 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 7 | As the staff user, open the Programs Settings page by its address (copy it from step 5). | The tab is not available to them, or the page says only someone who can manage BarnCRM settings can change the Programs settings. |
 
 **Cleanup:** remove the "Library" choice in Setup; delete the enrollment.
+
+## T-PRG-12: Case Notes Are Private and Go When the Person Is Erased
+
+**Purpose:** confirm a case note is seen only by its author and Programs Admin, and that erasing the person deletes it.
+**Prerequisites:** the admin user; two staff users with a BarnCRM role of Team Member (Programs Staff), with no role above the other; the Read Only user; any program with a test person enrolled ("Test Person").
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the first staff user, open Test Person's enrollment and click **New** in **Case Notes**. Type **Home Visit**, Subject "First visit", a line of Note. Save. | Saved with today's Note Date; listed in the enrollment's Case Notes and in **My Case Notes**. |
+| 2 | As the second staff user, open the same enrollment and the **Case Notes** tab, **All Case Notes**. | The note is not listed anywhere. |
+| 3 | As the Read Only user, open the enrollment. | No Case Notes list, no Case Notes tab. |
+| 4 | As the admin, open **All Case Notes**. | The note is listed; the admin can open, edit and delete it. |
+| 5 | As the first staff user, try to delete the note. | No Delete action. |
+| 6 | As the admin, try to delete the enrollment. | Refused: it has case notes. |
+| 7 | As the second staff user (if they may erase people), erase Test Person. | Refused: the person has case notes only Programs Admin can delete; nothing is erased. |
+| 8 | As the admin, erase Test Person. | Done; the summary lists the Case Notes as deleted and the Enrollments as kept. The note is gone; the enrollment stays, naming the anonymous record. |
+
+**Cleanup:** delete the enrollment; remove the staff users' roles.

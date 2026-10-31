@@ -106,6 +106,20 @@ For someone who is not enrolled, or a one-off:
 You should see the new delivery. If the person has an enrollment in the program, it is filled in
 for you.
 
+## To Write a Case Note
+
+1. Open the person's enrollment (click their name in the **Program Roster** panel).
+2. In the **Case Notes** related list, click **New**.
+3. Check the **Note Date** (today to start with), pick the **Type** (Check-in, Phone Call, Home
+   Visit, Office Visit, Assessment, Referral or Other), and write a **Subject** and the **Note**.
+4. Click **Save**.
+
+You should see the note in the enrollment's **Case Notes** list. Only you, people above you in
+your organization's roles, and Programs Admins can see it; your colleagues cannot unless you
+share it with **Sharing** on the note. You can edit your own notes but not delete them; ask a
+Programs Admin to remove one written by mistake. The **My Case Notes** list on the **Case Notes**
+tab gathers everything you have written.
+
 ## To See Which Programs Someone Is In
 
 1. In the **BarnCRM Programs** app, open the person.

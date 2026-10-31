@@ -11,8 +11,9 @@ Withdrawn) and its start and end dates. Each time a service is given, or a perso
 **service delivery**: attendance and what was received, in one record.
 
 Each enrollment also carries the person's **intake and eligibility**: when they were first seen,
-who referred them, and whether they qualify. Case notes, a program dashboard and a roster import
-come in later releases (P-04 to P-06). Until the participant privacy preset (P-08) arrives,
+who referred them, and whether they qualify, and staff keep private **case notes** on it. A
+program dashboard and a roster import come in later releases (P-05, P-06). Until the participant
+privacy preset (P-08) arrives,
 everyone who holds a Programs permission set can see every enrollment and service delivery.
 
 ## Before You Install
@@ -34,7 +35,7 @@ finishes, BarnCRM does three things on its own:
 3. Gives everyone who already has a BarnCRM role their Programs permission set (see below).
 
 Then open the **BarnCRM Programs** app from the App Launcher. Its tabs are **Programs**,
-**Enrollments** and **Service Deliveries**. These tabs also join the BarnCRM apps.
+**Enrollments**, **Service Deliveries** and **Case Notes**. These tabs also join the BarnCRM apps.
 
 ## Programs Settings
 
@@ -160,6 +161,32 @@ Rules:
 Both run as the automation **Service Delivery: absences, enrollment** on the Automation
 page. It always runs (it keeps totals right), so it cannot be switched off.
 
+## Case Notes
+
+A **case note** is a dated, typed note about a participant, written on their enrollment: a
+check-in, a phone call, a home visit, an assessment. Staff add one from the **Case Notes** related
+list on the enrollment (or the **Case Notes** tab): a **Note Date** (today to start with), a
+**Type** (Check-in, Phone Call, Home Visit, Office Visit, Assessment, Referral or Other), a
+**Subject** and the **Note** itself.
+
+**Case notes are private.** A note is seen only by:
+
+- the person who wrote it (its owner), who can also edit it;
+- people above the owner in your role hierarchy;
+- Programs Admins, who see, edit and delete every note.
+
+Colleagues with Programs Staff do not see each other's notes, and Read Only users have no access
+to case notes at all. This holds whatever you choose for participant privacy (P-08). To let a
+colleague see a note, its owner clicks **Sharing** on the note, or you add a sharing rule in Setup
+(**Sharing Settings**, Case Note) for a team that works together. To hand a caseload to someone
+else, change the notes' owner.
+
+The **Type** choices are yours to change on the field in Setup, as for the intake picklists. An
+enrollment with case notes cannot be deleted: delete its notes first. The list views are **All
+Case Notes** (every note you can see) and **My Case Notes**.
+
+Case notes are light notes, not case management: service plans and goals come later (P-10).
+
 ## A Person's Programs
 
 In the **BarnCRM Programs** app, a person's record page carries a **Programs** card listing
@@ -210,7 +237,11 @@ for example an **Awaiting Documents** list view to chase missing paperwork.
   program counts stand.
 - **Erasing a person** (see [Erase a Person](erase-a-person.md)) keeps their enrollments and
   service deliveries, credited to the anonymous record. Neither holds typed notes, so there is
-  nothing on them to empty.
+  nothing on them to empty. Their **case notes are deleted**, whoever wrote them. Only someone
+  with Programs Admin can delete every note, so anyone else erasing a person who has case notes
+  is refused, with that reason, and nothing is erased.
+- **Deleting a person** keeps their case notes on the enrollment, which no longer names anyone.
+  To remove what was written about someone, erase them rather than delete them.
 
 ## Health Check
 

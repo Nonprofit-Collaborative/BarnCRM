@@ -24,6 +24,16 @@
   </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Case_Note__c.Note__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Case_Note__c.Subject__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Enrollment__c.Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -128,6 +138,15 @@
     <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
+    <object>Case_Note__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
     <object>Enrollment__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
@@ -158,6 +177,10 @@
     <object>Service_Delivery__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <tabSettings>
+    <tab>Case_Note__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
   <tabSettings>
     <tab>Enrollment__c</tab>
     <visibility>Visible</visibility>

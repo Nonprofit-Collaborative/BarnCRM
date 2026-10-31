@@ -464,4 +464,20 @@
         <shortDescription>Programs settings could not load, logged</shortDescription>
         <value>The Programs settings could not be loaded. The details are in the Error Log.</value>
     </labels>
+    <labels>
+        <fullName>Programs_Erase_NeedProgramsAdmin</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Erasure refused: case notes need Programs Admin</shortDescription>
+        <value>This person has case notes that only Programs Admin can delete. Ask someone with Programs Admin to erase them.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Erase_EnrollmentsKept</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Erasure keeps enrollments, credited to the anonymous record</shortDescription>
+        <value>Kept, credited to the anonymous record, so program counts stand.</value>
+    </labels>
 </CustomLabels>

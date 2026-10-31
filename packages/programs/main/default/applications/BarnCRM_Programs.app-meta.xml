@@ -65,8 +65,12 @@
   <tabs>Program__c</tabs>
   <tabs>Enrollment__c</tabs>
   <tabs>Service_Delivery__c</tabs>
+  <tabs>Case_Note__c</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
+    <mappings>
+      <tab>Case_Note__c</tab>
+    </mappings>
     <mappings>
       <tab>Enrollment__c</tab>
     </mappings>
