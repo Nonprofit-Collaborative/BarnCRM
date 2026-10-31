@@ -497,11 +497,13 @@ public with sharing class ImportNewFieldService {
         // until it does, the generic message stands in for it.
         result.state = FAILED;
         result.message = Label.Core_ImportNewField_JobFailed;
-        String logContext = LOG_CONTEXT + jobId;
+        // The job writes its 18-character Id; the Id passed here may print as 15 characters
+        // (an enqueueJob result does), so match on the 15-character prefix.
+        String logContext = LOG_CONTEXT + String.valueOf(jobId).left(15) + '%';
         List<Error_Log__c> logged = [
             SELECT Message__c
             FROM Error_Log__c
-            WHERE Context__c = :logContext AND Severity__c = :ErrorLogger.SEVERITY_ERROR
+            WHERE Context__c LIKE :logContext AND Severity__c = :ErrorLogger.SEVERITY_ERROR
             WITH SYSTEM_MODE
             ORDER BY CreatedDate DESC
             LIMIT 1

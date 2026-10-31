@@ -82,22 +82,23 @@ private class ImportNewFieldServiceTest {
     }
 
     /**
-     * The failed job's reason, once ErrorLogger's event has written its row; until then (the
-     * event is delivered asynchronously) the generic message. Either way the poll ends Failed.
+     * The failed job's one Error Log entry, delivered from ErrorLogger's event, names the reason,
+     * and the poll reports it.
      */
-    private static void assertReported(ImportNewFieldService.Outcome outcome, String reason) {
+    private static void assertReported(
+        ImportNewFieldService.Outcome outcome,
+        String reason,
+        Id jobId
+    ) {
         List<Error_Log__c> logged = [
-            SELECT Message__c
+            SELECT Message__c, Context__c
             FROM Error_Log__c
-            WHERE Context__c LIKE 'Import: create field %' AND Severity__c = 'Error'
+            WHERE Severity__c = 'Error'
             WITH SYSTEM_MODE
         ];
-        if (logged.isEmpty()) {
-            Assert.areEqual(Label.Core_ImportNewField_JobFailed, outcome.message);
-        } else {
-            Assert.isTrue(logged[0].Message__c.contains(reason), logged[0].Message__c);
-            Assert.areEqual(logged[0].Message__c, outcome.message);
-        }
+        Assert.areEqual(1, logged.size(), 'One entry for job ' + jobId);
+        Assert.isTrue(logged[0].Message__c.contains(reason), logged[0].Message__c);
+        Assert.areEqual(logged[0].Message__c, outcome.message, logged[0].Context__c);
     }
 
     @IsTest
@@ -116,7 +117,7 @@ private class ImportNewFieldServiceTest {
                 'Shirt_Size'
             );
             Assert.areEqual(ImportNewFieldService.FAILED, outcome.state);
-            assertReported(outcome, 'Too many custom fields');
+            assertReported(outcome, 'Too many custom fields', jobId);
         }
     }
 
@@ -136,7 +137,7 @@ private class ImportNewFieldServiceTest {
                 'Shirt_Size'
             );
             Assert.areEqual(ImportNewFieldService.FAILED, outcome.state);
-            assertReported(outcome, 'INVALID_SESSION_ID');
+            assertReported(outcome, 'INVALID_SESSION_ID', jobId);
         }
     }
 
