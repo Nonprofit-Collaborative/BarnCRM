@@ -53,6 +53,7 @@ import EVERYONE from '@salesforce/label/c.Core_BulkUpdate_EveryonesJobs';
 import OPEN_FIND from '@salesforce/label/c.Core_BulkUpdate_OpenFind';
 import { NavigationMixin } from 'lightning/navigation';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+import { format } from 'c/findCsv';
 
 const FIND_TAB = 'Find';
 
@@ -61,10 +62,6 @@ const UPDATE = 'Update';
 const DELETE = 'Delete';
 const ALL_KINDS = [IMPORT, UPDATE, DELETE];
 const IMPORTS_SHOWN = 10;
-
-function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
-}
 
 function errorText(error) {
   if (error && error.body && error.body.message) {

@@ -29,7 +29,7 @@ import SHORTENED from '@salesforce/label/c.Core_RecordInspector_Shortened';
 import FIELDS_CUT from '@salesforce/label/c.Core_RecordInspector_FieldsCut';
 import OPEN_FIND from '@salesforce/label/c.Core_RecordInspector_OpenFind';
 import OPEN_SETUP from '@salesforce/label/c.Core_RecordInspector_OpenSetup';
-import ERROR_UNEXPECTED from '@salesforce/label/c.Core_UnexpectedError';
+import { bodyMessage } from 'c/findCsv';
 
 /**
  * The Record Inspector (C-55): a record page component that lists every field the viewer may
@@ -169,7 +169,7 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
       })
       .catch((error) => {
         this.inspection = undefined;
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error);
       })
       .finally(() => {
         this.loading = false;
@@ -197,12 +197,5 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
       .catch(() => {
         this.errorMessage = COPY_FAILED;
       });
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return ERROR_UNEXPECTED;
   }
 }

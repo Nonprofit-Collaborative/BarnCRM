@@ -33,6 +33,7 @@ import SHOW_NONPROFIT from '@salesforce/label/c.Core_ModuleManager_ShowNonprofit
 import NONPROFIT_HIDDEN from '@salesforce/label/c.Core_ModuleManager_NonprofitHidden';
 import OTHER_ROLLUP_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
 import { setupPath } from 'c/setupLinks';
+import { bodyMessage } from 'c/findCsv';
 
 const STATUS_TEXT = { On: STATUS_ON, Off: STATUS_OFF, NotInstalled: STATUS_NOT_INSTALLED };
 const INSTALLED_PACKAGES_URL = setupPath('installedPackages');
@@ -201,7 +202,7 @@ export default class ModuleManager extends LightningElement {
       try {
         await grantAdminAccess({ moduleName });
       } catch (error) {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, LOAD_ERROR);
       }
     }
   }
@@ -213,7 +214,7 @@ export default class ModuleManager extends LightningElement {
       this.reports = { ...this.reports, [moduleName]: lines || [] };
       this.errorMessage = undefined;
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, LOAD_ERROR);
     }
   }
 
@@ -225,12 +226,8 @@ export default class ModuleManager extends LightningElement {
       this.errorMessage = undefined;
       return true;
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, LOAD_ERROR);
       return false;
     }
-  }
-
-  messageFrom(error) {
-    return error && error.body && error.body.message ? error.body.message : LOAD_ERROR;
   }
 }

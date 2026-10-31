@@ -14,7 +14,6 @@ import {
   valueProblem
 } from 'c/filterDocument';
 
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import ADD_CONDITION from '@salesforce/label/c.Core_Filter_AddCondition';
 import REMOVE_CONDITION from '@salesforce/label/c.Core_Filter_RemoveCondition';
 import CONDITION_LEGEND from '@salesforce/label/c.Core_Filter_ConditionLegend';
@@ -68,6 +67,7 @@ import OP_THIS_YEAR from '@salesforce/label/c.Core_Filter_OpThisYear';
 import OP_LAST_YEAR from '@salesforce/label/c.Core_Filter_OpLastYear';
 import OP_LAST_N_DAYS from '@salesforce/label/c.Core_Filter_OpLastNDays';
 import LAST_N_DAYS_VALUE from '@salesforce/label/c.Core_Filter_LastNDaysValue';
+import { messageFrom, format } from 'c/findCsv';
 
 const OPERATOR_LABELS = {
   [OPERATORS.EQUALS]: OP_EQUALS,
@@ -110,10 +110,6 @@ const VALUE_PROBLEM_LABELS = {
 
 const FIELD_PREFIX = 'f:';
 const PARENT_PREFIX = 'r:';
-
-function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
-}
 
 /**
  * The shared filter builder: rows of field, operator and value, plus an optional condition logic
@@ -639,7 +635,7 @@ export default class FilterBuilder extends LightningElement {
       this.logicText = parsed.logic;
       this.logicEnabled = !!parsed.logic;
     } catch (failure) {
-      this.loadError = this.messageFrom(failure);
+      this.loadError = messageFrom(failure);
     } finally {
       this.loading = false;
     }
@@ -696,12 +692,5 @@ export default class FilterBuilder extends LightningElement {
     const built = { ...row, segments, operator: condition.operator };
     const kind = valueKindFor(this.leafField(built), condition.operator);
     return { ...built, inputValue: toInputValue(kind, condition.value) };
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return error && error.message ? error.message : UNEXPECTED_ERROR;
   }
 }
