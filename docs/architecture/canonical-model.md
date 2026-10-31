@@ -2881,6 +2881,7 @@ unchanged.
 | Chunk Size | integer | yes | Rows per chunk for this run, defaulted from the org's import chunk size. |
 | Undo Deadline | datetime | no | The end of the window in which this batch can be undone, stamped at commit from the org's undo retention setting (R-IB7). |
 | Committed By | reference(User) | no | The user who committed the batch, empty while it is a dry run. |
+| Rows Retried By | long text | computed | The ids of the users other than the committer who retried corrected rows (R-IB17a), comma separated; undo treats records they created during the import as the committer's (R-IB9). Empty otherwise. |
 | Expected Count | integer | no | The number of rows the administrator expects the file to hold, a control total checked by the dry run (R-IB10). |
 | Expected Amount | decimal | no | The total the administrator expects the file's gift amounts to add up to, a control total checked by the dry run (R-IB10). |
 | File Amount | decimal | computed | The total of the file's gift amounts as the last pass read them, written only when an entity processor reads amounts (R-IB10). |
@@ -3225,8 +3226,12 @@ while a retry is open, as for the commit (R-IB8).
 
 **R-IB17a Retrying corrected rows on screen.** A rejected row corrected on screen (R-IR4)
 is retried in place, by Retry This Row or Retry All Fixed Rows (every Rejected row of the
-batch with corrections, at most 10,000), under the same conditions as R-IB17 and only while no
-retry by file is open. The retry is a commit pass over only those rows, through the same
+batch with corrections, at most 10,000), under the same conditions as R-IB17 except who may
+retry, and only while no retry by file is open. Any user with the Manage BarnCRM Settings
+permission (the one that runs and commits imports) and edit access to the batch's rows by
+sharing may correct and retry, not only the committer; the batch keeps its Committed By, and
+each other user who retries is added to Rows Retried By, so undo counts the records they
+created during the import as the import's (R-IB9). The retry is a commit pass over only those rows, through the same
 processing path as the import's commit: the template the commit ran with (R-IB1), the batch's
 file values (R-IB14), the same matching, chunks and tags. There is no separate preview: the
 commit validates each row as a dry run would and rejects a row it cannot load, with its
@@ -3258,6 +3263,7 @@ them (R-IB8, R-IB9).
 | Chunk Size | `Chunk_Size__c` | Number |
 | Undo Deadline | `Undo_Deadline__c` | DateTime |
 | Committed By | `Committed_By__c` | Lookup to User |
+| Rows Retried By | `Retried_By__c` | Long Text Area (32768) |
 | Expected Count | `Expected_Count__c` | Number (9, 0) |
 | Expected Amount | `Expected_Amount__c` | Currency (16, 2) |
 | File Amount | `File_Amount__c` | Currency (16, 2) |
@@ -9184,7 +9190,7 @@ mirrors the primary member).
 | v0.8 | 2026-10-29 | Organization record type removed (RT5, ADR-0141, D-134). No object or field added. The packaged `Account.Organization` record type and its compact layout are deleted. `Is_Organization__c` also counts an account of the master record type (no developer name) as an organization when the setting is `Master`. R-O5: a stored record type that is no longer a candidate is replaced by the detected one on each install, upgrade or source deploy, so the formula and `AccountKinds` agree. R-O4: `Master` is offered and saved only when the org has no candidate, and a stored `Master` is stale once it has one. |
 | v0.11 | 2026-10-29 | Edition stored values (ADR-0143, `0143-edition-internal-values.md`). No object or field added. `BarnCRM_Settings__c.Suite__c` stores `Standard` and `Nonprofit` instead of `Community` and `Impact`, and `BarnCRM_Module__mdt.Editions__c` names the same values. Core's post-install steps rewrite an old stored value once. |
 | v0.11 | 2026-10-29 | Security review G-L4 and G-L5 (owner decisions). No object or field added. New R-AK13 (ADR-0144, `0144-acknowledgments-honor-email-opt-out.md`): an email gift whose recipient contact has Email Opt Out is not emailed, gets no row and stays queued, and the letter run takes it as a letter. `Giving_Admin` loses View All on `Commitment__c`, matching `Gift__c`; commitment record access comes from ownership, roles and sharing. |
-| v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-NEXT). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a). R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
+| v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-NEXT). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a) by any user with the import permission and edit access to the rows; `Import_Batch__c` gains `Retried_By__c` (Rows Retried By) so undo covers their records. R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
 
 ---
 ## 32. Entity ownership by package

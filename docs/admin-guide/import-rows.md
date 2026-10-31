@@ -50,9 +50,12 @@ Maria imported 200 contacts; 3 were rejected.
 
 ## 4. Common Mistakes
 
-- **The fields are greyed out.** Only a rejected row can be corrected, only by the person who
-  ran the import, only while the import can still be undone, and not while it is running or
-  while a retry by file is open. The card says which applies.
+- **The fields are greyed out.** Only a rejected row can be corrected, only by someone with
+  the Manage BarnCRM Settings permission who can edit the import's rows (sharing on the Data
+  Job decides), only while the import can still be undone, and not while it is running or
+  while a retry by file is open. The card says which applies. Anyone who runs imports may
+  correct and retry a row, not only the person who committed the import, and the one undo
+  covers what each of them loaded.
 - **A retried row is rejected again.** It keeps your corrections and shows the new reason; fix
   that and retry again.
 - **The row is gone.** With **Once Complete**, rows are deleted the night after the import;
