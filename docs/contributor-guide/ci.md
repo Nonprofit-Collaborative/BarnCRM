@@ -484,6 +484,14 @@ custom metadata or a label that an unselected test depends on. The `testFor` and
 annotations (see "Relevant tests" below) narrow the gap; the release gate closes it before a
 version ships.
 
+**Both gates probe the Error Log after the deploy.** `scripts/org/probe-error-log.sh` publishes one
+Info entry through `ErrorLogger`, waits up to two minutes for its `Error_Log__c` row and deletes it.
+No row fails the gate before any test runs: Apex tests cannot see a platform event subscription
+that stopped delivering, and on 2026-10-31 a deploy left `ErrorLogEventTrigger` Running but
+silent on `barn-sales` (QA v21 D4), so every entry was lost. The fix is to restart the
+subscription (Setup, Platform Events, Error Log Event, Suspend then Resume, or deploy the trigger
+Inactive and then Active); redeploying it unchanged, or even with a changed body, does not.
+
 ### The incremental gate
 
 ```
