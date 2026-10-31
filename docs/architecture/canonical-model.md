@@ -3961,7 +3961,7 @@ receipt.
 | Posted to Accounting | `Accounting_Posted_At__c` | Date/Time, package written (v0.6, R-G13) |
 | Posted to Accounting By | `Accounting_Posted_By__c` | Lookup to User, package written (v0.6, R-G13) |
 
-- **Service:** `GiftService`, `GiftDomain`, `GiftSelector`, LWC `quickGiftEntry` (G-03).
+- **Service:** `GiftService`, `GiftTriggerHandler`, `GiftSelector`, LWC `quickGiftEntry` (G-03).
 - **Receipt lock:** handler `GiftReceiptLockHandler`, registry record
   `Automation_Registry.Gift_Receipt_Lock` (execution order 5, Always Runs), custom
   permission `Override_Receipt_Lock` (granted to nobody by the package).
@@ -4038,7 +4038,7 @@ R-G14 apply.
 | Amount | `Amount__c` | Currency |
 | Percent | `Percent__c` | Percent |
 
-- **Service:** `AllocationService`, `AllocationDomain`.
+- **Service:** `GiftAllocationTriggerHandler`, `GiftAllocationSelector`.
 - **Lock (R-GA5):** `GiftAllocationPostingLockHandler`, registry record
   `Automation_Registry.Gift_Allocation_Posting_Lock` (execution order 20, after
   `Gift_Allocation_Totals` works out the amount, Always Runs).
@@ -4106,7 +4106,7 @@ identifier.
 
 Rollup target attributes on `Fund__c` are listed in Section 26.
 
-- **Service:** `FundService`.
+- **Service:** `FundTriggerHandler`, `FundSelector`, `FundDefaultsService`.
 
 ---
 
@@ -4180,7 +4180,7 @@ both shipped by the Mirror package, so Giving itself never names Campaign.
 
 Rollup target attributes on `Appeal__c` are listed in Section 26.
 
-- **Service:** `AppealService`.
+- **Service:** `AppealTriggerHandler`, `AppealSelector`.
 
 ---
 
@@ -4659,7 +4659,7 @@ automatic one, because a spouse can also be the solicitor.
 | Is Automatic | `Is_Automatic__c` | Checkbox |
 
 - **Settings keys:** `Automatic_Household_Soft_Credits__c` (Section 12).
-- **Service:** `SoftCreditService`, `SoftCreditDomain`.
+- **Service:** `SoftCreditService`, `SoftCreditTriggerHandler`, `SoftCreditSelector`.
 
 ---
 
@@ -5058,7 +5058,7 @@ produced without it.
 
 - **Service:** `ReceiptService`, `ReceiptSelector`, `ReceiptNumberSequence`,
   `ReceiptContentBuilder`, `ReceiptRenderer` and `BlobToPdfReceiptRenderer`,
-  `ReceiptLogoSource` (R-RC13), `ReceiptFileWriter` (ADR-0021), batch
+  `ReceiptLogoSource` (R-RC13), `ReceiptWriter` (ADR-0021), batch
   `ReceiptStatementBatch`, LWC `receiptTemplates` and `receiptRunConsole`.
 
 ---
@@ -10245,7 +10245,7 @@ it.
 | Scope Key | `Scope_Key__c` | Text(18), unique, not case sensitive |
 
 - **Trigger:** `LogicModelTrigger`, through the Core dispatcher; handler `LogicModelScopeHandler`
-  (R-LM1, R-LM2), reading every model without sharing through `LogicModelSelector`.
+  (R-LM1, R-LM2), reading every model without sharing through `LogicModelIntegritySelector`.
 
 ---
 
