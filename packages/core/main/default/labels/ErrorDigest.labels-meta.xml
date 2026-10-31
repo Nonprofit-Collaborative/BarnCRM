@@ -344,4 +344,12 @@
         <shortDescription>Weekly digest: duplicate suggestions waiting; {0} is a count.</shortDescription>
         <value>Duplicate suggestions waiting for review: {0}</value>
     </labels>
+    <labels>
+        <fullName>Core_AdminDigest_SetupChanges</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Weekly digest: Setup changes kept since the last digest; {0} is a count.</shortDescription>
+        <value>Setup changes since the last digest: {0} (see Org Optimizer, Setup Changes)</value>
+    </labels>
 </CustomLabels>

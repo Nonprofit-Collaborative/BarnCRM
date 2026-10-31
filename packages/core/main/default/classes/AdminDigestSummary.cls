@@ -1,8 +1,9 @@
 /**
  * The admin summary half of the weekly digest (C-54, extends the error digest of C-23): what an
  * administrator would otherwise have to go and look for. Org limits at or above 80 percent,
- * BarnCRM data jobs that failed in the window, and duplicate suggestions waiting for review.
- * Setup changes (C-56) join it once the Setup Changes Log exists.
+ * BarnCRM data jobs that failed in the window, duplicate suggestions waiting for review, and how
+ * many Setup changes the Setup Changes Log (C-56) kept in the window, counted by Changed At
+ * (canonical model R-SU7).
  *
  * Like the error digest it counts and names, and never copies a record's content: a failed job
  * is named by its record name and operation, and a duplicate suggestion is only counted. Every
@@ -18,6 +19,9 @@ public with sharing class AdminDigestSummary {
     /** The most duplicate suggestions counted; above it the digest says "more than". */
     @TestVisible
     private static final Integer DUPLICATES_CAP = 1000;
+    /** The most Setup changes counted; above it the digest says "more than". */
+    @TestVisible
+    private static final Integer SETUP_CHANGES_CAP = 1000;
 
     /** What the summary found. Everything is read once. */
     public class Summary {
@@ -27,10 +31,12 @@ public with sharing class AdminDigestSummary {
         public List<Import_Batch__c> failedJobList = new List<Import_Batch__c>();
         public Integer duplicatesWaiting = 0;
         public Boolean duplicatesCapped = false;
+        public Integer setupChanges = 0;
+        public Boolean setupChangesCapped = false;
 
         /** True when there is something to say. */
         public Boolean hasContent() {
-            return !limits.isEmpty() || failedJobs > 0 || duplicatesWaiting > 0;
+            return !limits.isEmpty() || failedJobs > 0 || duplicatesWaiting > 0 || setupChanges > 0;
         }
     }
 
@@ -61,6 +67,9 @@ public with sharing class AdminDigestSummary {
         Integer waiting = DuplicateSelector.openSetCount(DUPLICATES_CAP + 1);
         summary.duplicatesCapped = waiting > DUPLICATES_CAP;
         summary.duplicatesWaiting = Math.min(waiting, DUPLICATES_CAP);
+        Integer changed = setupChangeCount(after, upTo);
+        summary.setupChangesCapped = changed > SETUP_CHANGES_CAP;
+        summary.setupChanges = Math.min(changed, SETUP_CHANGES_CAP);
         return summary;
     }
 
@@ -109,8 +118,39 @@ public with sharing class AdminDigestSummary {
                 )
             );
         }
+        if (summary.setupChanges > 0) {
+            lines.add(
+                String.format(
+                    System.Label.Core_AdminDigest_SetupChanges,
+                    new List<Object>{
+                        summary.setupChangesCapped
+                            ? summary.setupChanges + '+'
+                            : String.valueOf(summary.setupChanges)
+                    }
+                )
+            );
+        }
         lines.add('');
         return lines;
+    }
+
+    /**
+     * Setup changes kept with Changed At in the window, up to one past the cap. Zero when the
+     * administrator cannot read the Setup Changes Log (only BarnCRM Admin is granted it).
+     */
+    @TestVisible
+    private static Integer setupChangeCount(Datetime after, Datetime upTo) {
+        if (!Schema.SObjectType.Setup_Change__c.isAccessible()) {
+            return 0;
+        }
+        Integer countLimit = SETUP_CHANGES_CAP + 1;
+        return [
+            SELECT COUNT()
+            FROM Setup_Change__c
+            WHERE Changed_At__c > :after AND Changed_At__c <= :upTo
+            WITH USER_MODE
+            LIMIT :countLimit
+        ];
     }
 
     private static Integer failedJobCount(Datetime after, Datetime upTo) {

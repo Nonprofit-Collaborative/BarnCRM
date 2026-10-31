@@ -491,6 +491,60 @@ private class ErrorDigestServiceTest {
         }
     }
 
+    private static Setup_Change__c setupChange(String auditId, Datetime changedAt) {
+        return new Setup_Change__c(
+            Audit_Trail_Id__c = auditId,
+            Changed_At__c = changedAt,
+            Section__c = 'Customize Contacts',
+            Action__c = 'changedFieldLabel',
+            Display__c = 'Changed Phone field label'
+        );
+    }
+
+    @IsTest
+    static void setupChangesSinceTheLastSendAreCounted() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            Datetime now = System.now();
+            insert new List<Setup_Change__c>{
+                setupChange('0Ym000000000001AAA', now.addDays(-1)),
+                setupChange('0Ym000000000002AAA', now.addDays(-3)),
+                // Before the window: sent in an earlier digest.
+                setupChange('0Ym000000000003AAA', now.addDays(-9))
+            };
+            User admin = maria();
+            AdminDigestSummary.Summary summary;
+            System.runAs(admin) {
+                limitAt(10, 100);
+                summary = AdminDigestSummary.build(now.addDays(-7), now);
+            }
+            Assert.areEqual(2, summary.setupChanges, 'Only changes inside the window count.');
+            Assert.isTrue(summary.hasContent(), 'Setup changes alone are worth an email.');
+            String joined = String.join(AdminDigestSummary.lines(summary, 'https://x'), '\n');
+            Assert.isTrue(
+                joined.contains(
+                    String.format(Label.Core_AdminDigest_SetupChanges, new List<Object>{ '2' })
+                ),
+                'The count is in the summary.'
+            );
+        }
+    }
+
+    @IsTest
+    static void setupChangesAreNotCountedForSomeoneWhoCannotReadThem() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            Datetime now = System.now();
+            insert setupChange('0Ym000000000004AAA', now.addDays(-1));
+            User staff = TestDataFactory.createUser('Sam', new List<String>{ 'BarnCRM_Staff' });
+            Integer counted;
+            System.runAs(staff) {
+                counted = AdminDigestSummary.setupChangeCount(now.addDays(-7), now);
+            }
+            Assert.areEqual(0, counted, 'No access, no count, and no error.');
+        }
+    }
+
     @IsTest
     static void theFirstDigestKeepsTheShippedDefaults() {
         System.runAs(TestUsers.admin()) {

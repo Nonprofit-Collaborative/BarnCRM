@@ -71,15 +71,16 @@ administrator would otherwise have to go looking for:
 - BarnCRM data jobs (imports, bulk updates, bulk deletes and their undos) that failed since the
   last digest, up to ten, each with a link that opens it;
 - how many duplicate suggestions are waiting for review (counted only when the person who
-  scheduled the digest holds the BarnCRM Duplicate Review permission set).
+  scheduled the digest holds the BarnCRM Duplicate Review permission set);
+- how many Setup changes the Setup Changes Log kept since the last digest, counted by when each
+  change was made (see [Setup Changes](setup-changes.md); counted only when the person who
+  scheduled the digest holds BarnCRM Admin, the only set that can read the log).
 
 An email is sent when there are new Error Log entries or something to report; when there is
 neither, nothing is sent. With no new entries the subject reads **BarnCRM: Weekly Admin
 Summary**. Like the rest of the digest, it counts and names; it never copies record content.
 The summary is on by default for a weekly digest. To turn it off, clear **Weekly admin
 summary** on the same page. A daily digest never carries it.
-
-Recent Setup changes will join the summary once the Setup Changes Log exists (C-56).
 
 ### Switch It On
 
