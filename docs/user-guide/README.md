@@ -33,6 +33,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 - [Pledges and recurring gifts](commitments.md): commitments, installments and paying them.
 - [Refunds and write-offs](refunds.md): recording money that went back, and cancelling a pending gift.
 - [Receipts and acknowledgments](receipts-and-acknowledgments.md): receipts, thank-yous and stewardship plans.
+- [Ask reminders](ask-reminders.md): a next ask date on a donor, the task that reminds you, and the Who Is Due list.
 
 ### Volunteers (Nonprofit Edition)
 

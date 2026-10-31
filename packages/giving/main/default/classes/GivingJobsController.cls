@@ -118,6 +118,13 @@ public with sharing class GivingJobsController {
                 System.Label.Giving_NightlyJobs_LevelsDescription,
                 settings.Donor_Levels_Last_Recalculated__c,
                 null
+            ),
+            jobView(
+                statuses.get(GivingScheduler.ASK_JOB_NAME),
+                System.Label.Giving_NightlyJobs_AskRemindersName,
+                System.Label.Giving_NightlyJobs_AskRemindersDescription,
+                settings.Ask_Reminders_Last_Run__c,
+                settings.Ask_Reminders_Last_Run_Summary__c
             )
         };
         return view;
