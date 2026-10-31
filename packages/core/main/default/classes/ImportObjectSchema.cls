@@ -1372,8 +1372,15 @@ public with sharing class ImportObjectSchema {
             .removeEnd('__c');
         for (Schema.SObjectField token : fieldsOf(child).values()) {
             Schema.DescribeFieldResult field = token.getDescribe();
+            String name = field.getName().toLowerCase();
+            // A person account's own fields (PersonContactId, PersonReportsToId, __pc) never link.
+            Boolean personField =
+                child == Account.SObjectType &&
+                ((!field.isCustom() && name.startsWith('person')) || name.endsWith('__pc'));
             if (
                 field.getType() != Schema.DisplayType.REFERENCE ||
+                !field.isCreateable() ||
+                personField ||
                 pointsAt(field, parent) == null ||
                 DataProtectedFields.isProtected(child, field.getName())
             ) {
