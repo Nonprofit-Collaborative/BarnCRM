@@ -62,13 +62,13 @@ public with sharing class OpportunityMirrorController {
     public static Status copyRangeAgain(Date fromDate, Date toDate) {
         Status current = checked(false);
         if (current.direction != OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES) {
-            throw asAuraException(Label.Mirror_OpportunityMirror_CopyAgainGiftsOnly);
+            throw UserErrors.message(Label.Mirror_OpportunityMirror_CopyAgainGiftsOnly);
         }
         if (fromDate == null || toDate == null) {
-            throw asAuraException(Label.Mirror_OpportunityMirror_ErrorDatesRequired);
+            throw UserErrors.message(Label.Mirror_OpportunityMirror_ErrorDatesRequired);
         }
         if (fromDate > toDate) {
-            throw asAuraException(Label.Mirror_OpportunityMirror_ErrorDateOrder);
+            throw UserErrors.message(Label.Mirror_OpportunityMirror_ErrorDateOrder);
         }
         try {
             OpportunityMirrorBatch.runRange(fromDate, toDate);
@@ -95,7 +95,7 @@ public with sharing class OpportunityMirrorController {
     public static Status stop() {
         Status current = status();
         if (!current.canManage) {
-            throw asAuraException(Label.Mirror_OpportunityMirror_NoManagePermission);
+            throw UserErrors.message(Label.Mirror_OpportunityMirror_NoManagePermission);
         }
         try {
             OpportunityMirrorSchedulable.stop();
@@ -112,7 +112,7 @@ public with sharing class OpportunityMirrorController {
         try {
             return OpportunityMirrorReconciliation.compare(fromDate, toDate);
         } catch (OpportunityMirrorReconciliation.ReconciliationException refused) {
-            throw asAuraException(refused.getMessage());
+            throw UserErrors.message(refused.getMessage());
         } catch (Exception unexpected) {
             throw failed(unexpected);
         }
@@ -120,7 +120,7 @@ public with sharing class OpportunityMirrorController {
 
     private static void requireUse() {
         if (!FeatureManagement.checkPermission(USE_PERMISSION)) {
-            throw asAuraException(Label.Mirror_OpportunityMirror_NoUsePermission);
+            throw UserErrors.message(Label.Mirror_OpportunityMirror_NoUsePermission);
         }
     }
 
@@ -134,7 +134,7 @@ public with sharing class OpportunityMirrorController {
         }
         String refusal = refusal(current, scheduling);
         if (refusal != null) {
-            throw asAuraException(refusal);
+            throw UserErrors.message(refusal);
         }
         return current;
     }
@@ -193,12 +193,6 @@ public with sharing class OpportunityMirrorController {
 
     private static AuraHandledException failed(Exception unexpected) {
         ErrorLogger.log(unexpected, CONTEXT);
-        return asAuraException(Label.Mirror_OpportunityMirror_ErrorFailed);
-    }
-
-    private static AuraHandledException asAuraException(String message) {
-        AuraHandledException error = new AuraHandledException(message);
-        error.setMessage(message);
-        return error;
+        return UserErrors.message(Label.Mirror_OpportunityMirror_ErrorFailed);
     }
 }

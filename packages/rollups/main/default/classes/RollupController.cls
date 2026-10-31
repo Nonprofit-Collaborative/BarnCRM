@@ -545,13 +545,11 @@ public with sharing class RollupController {
      * page cannot explain.
      */
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof RollupService.RollupServiceException)) {
-            ErrorLogger.log(caught, context);
-            message = Label.Core_Rollups_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof RollupService.RollupServiceException,
+            context,
+            Label.Core_Rollups_UnexpectedError
+        );
     }
 }

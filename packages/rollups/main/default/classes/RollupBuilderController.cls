@@ -1218,17 +1218,14 @@ public with sharing class RollupBuilderController {
 
     /** A message the Builder can show; anything it cannot explain is logged. */
     private static AuraHandledException asUserError(Exception caught) {
-        String message;
-        if (caught instanceof RollupService.RollupServiceException) {
-            message = caught.getMessage();
-        } else if (caught instanceof DmlException) {
-            message = ((DmlException) caught).getDmlMessage(0);
-        } else {
-            ErrorLogger.log(caught, 'RollupBuilderController');
-            message = Label.Core_Rollups_UnexpectedError;
+        if (caught instanceof DmlException) {
+            return UserErrors.message(((DmlException) caught).getDmlMessage(0));
         }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof RollupService.RollupServiceException,
+            'RollupBuilderController',
+            Label.Core_Rollups_UnexpectedError
+        );
     }
 }

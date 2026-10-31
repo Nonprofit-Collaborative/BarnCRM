@@ -87,7 +87,7 @@ public with sharing class ServiceDeliveryLogController {
     @AuraEnabled
     public static Log getLog(Id programId, Id serviceId, Date deliveryDate) {
         if (programId == null) {
-            throw badRequest(Label.Programs_Log_ActionFailed);
+            throw UserErrors.message(Label.Programs_Log_ActionFailed);
         }
         try {
             return logFor(programId, serviceId, deliveryDate);
@@ -100,7 +100,7 @@ public with sharing class ServiceDeliveryLogController {
     @AuraEnabled
     public static Log save(Id programId, Id serviceId, Date deliveryDate, List<Entry> entries) {
         if (programId == null || serviceId == null || deliveryDate == null) {
-            throw badRequest(Label.Programs_Log_ActionFailed);
+            throw UserErrors.message(Label.Programs_Log_ActionFailed);
         }
         try {
             List<Service_Delivery__c> toInsert = new List<Service_Delivery__c>();
@@ -111,7 +111,7 @@ public with sharing class ServiceDeliveryLogController {
                     continue;
                 }
                 if (!allowed.contains(entry.attendance)) {
-                    throw badRequest(Label.Programs_Log_ActionFailed);
+                    throw UserErrors.message(Label.Programs_Log_ActionFailed);
                 }
                 Decimal quantity = ServiceDeliveryService.isAbsence(entry.attendance)
                     ? 0
@@ -305,21 +305,15 @@ public with sharing class ServiceDeliveryLogController {
         }
     }
 
-    private static AuraHandledException badRequest(String message) {
-        AuraHandledException refused = new AuraHandledException(message);
-        refused.setMessage(message);
-        return refused;
-    }
-
     /** A refusal is passed on in its own words; anything else is logged first. */
     private static AuraHandledException report(Exception failure, Id recordId) {
         if (failure instanceof AuraHandledException) {
             return (AuraHandledException) failure;
         }
         if (failure instanceof DmlException) {
-            return badRequest(((DmlException) failure).getDmlMessage(0));
+            return UserErrors.message(((DmlException) failure).getDmlMessage(0));
         }
         ErrorLogger.log(failure, CONTEXT, recordId);
-        return badRequest(Label.Programs_Log_ActionFailed);
+        return UserErrors.message(Label.Programs_Log_ActionFailed);
     }
 }

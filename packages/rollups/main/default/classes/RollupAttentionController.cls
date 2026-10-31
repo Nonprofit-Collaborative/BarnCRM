@@ -240,15 +240,11 @@ public with sharing class RollupAttentionController {
     }
 
     private static AuraHandledException asUserError(Exception caught) {
-        String message;
-        if (caught instanceof RollupService.RollupServiceException) {
-            message = caught.getMessage();
-        } else {
-            ErrorLogger.log(caught, 'RollupAttentionController');
-            message = Label.Core_Rollups_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof RollupService.RollupServiceException,
+            'RollupAttentionController',
+            Label.Core_Rollups_UnexpectedError
+        );
     }
 }
