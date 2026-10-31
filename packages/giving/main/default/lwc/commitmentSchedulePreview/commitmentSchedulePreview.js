@@ -20,6 +20,7 @@ import ACTION_RESUME from '@salesforce/label/c.Giving_Commitment_ActionResume';
 import ACTION_CANCEL from '@salesforce/label/c.Giving_Commitment_ActionCancel';
 import ACTION_COMPLETE from '@salesforce/label/c.Giving_Commitment_ActionComplete';
 import STATUS_CHANGED from '@salesforce/label/c.Giving_Commitment_StatusChanged';
+import { bodyMessage } from 'c/findCsv';
 
 const BADGE_BY_STATUS = {
   Paid: 'slds-theme_success',
@@ -99,7 +100,7 @@ export default class CommitmentSchedulePreview extends LightningElement {
       this.absorb(await getSchedule({ commitmentId: this.recordId }));
     } catch (error) {
       this.installments = [];
-      this.errorMessage = this.messageFrom(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(error, LOAD_ERROR);
     } finally {
       this.loading = false;
     }
@@ -113,7 +114,7 @@ export default class CommitmentSchedulePreview extends LightningElement {
       this.absorb(await generateNow({ commitmentId: this.recordId }));
       this.noticeMessage = GENERATED;
     } catch (error) {
-      this.errorMessage = this.messageFrom(error, GENERATE_ERROR);
+      this.errorMessage = bodyMessage(error, GENERATE_ERROR);
     } finally {
       this.loading = false;
     }
@@ -129,7 +130,7 @@ export default class CommitmentSchedulePreview extends LightningElement {
       this.absorb(await changeStatus({ commitmentId: this.recordId, action }));
       this.noticeMessage = STATUS_CHANGED;
     } catch (error) {
-      this.errorMessage = this.messageFrom(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(error, LOAD_ERROR);
     } finally {
       this.loading = false;
     }
@@ -151,12 +152,5 @@ export default class CommitmentSchedulePreview extends LightningElement {
       key: row.recordId || `preview-${row.sequence}`,
       badgeClass: BADGE_BY_STATUS[row.status] || 'slds-theme_default'
     }));
-  }
-
-  messageFrom(error, fallback) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return fallback;
   }
 }

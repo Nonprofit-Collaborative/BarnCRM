@@ -10,6 +10,7 @@ import SENT from '@salesforce/label/c.Giving_TributeNotification_Sent';
 import NOT_SENT from '@salesforce/label/c.Giving_TributeNotification_NotSent';
 import NOTIFY_PREFIX from '@salesforce/label/c.Giving_TributeNotification_NotifyPrefix';
 import ACTION_FAILED from '@salesforce/label/c.Giving_TributeNotification_ActionFailed';
+import { bodyMessage } from 'c/findCsv';
 
 export default class TributeNotification extends LightningElement {
   @api recordId;
@@ -36,7 +37,7 @@ export default class TributeNotification extends LightningElement {
       this.errorMessage = undefined;
     }
     if (result.error) {
-      this.errorMessage = this.messageFrom(result.error);
+      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
     }
   }
 
@@ -99,17 +100,10 @@ export default class TributeNotification extends LightningElement {
         return refreshApex(this.wiredTribute);
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
       })
       .finally(() => {
         this.busy = false;
       });
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return ACTION_FAILED;
   }
 }

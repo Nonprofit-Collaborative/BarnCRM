@@ -21,6 +21,7 @@ import RUN_NOW_STARTED from '@salesforce/label/c.Giving_NightlyJobs_RunNowStarte
 import STALE from '@salesforce/label/c.Giving_NightlyJobs_Stale';
 import READ_ONLY from '@salesforce/label/c.Giving_NightlyJobs_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_NightlyJobs_UnexpectedError';
+import { bodyMessage } from 'c/findCsv';
 
 /**
  * The Nightly Jobs page for the Giving module, reached from the Giving section of the Nonprofit
@@ -128,14 +129,9 @@ export default class GivingNightlyJobs extends LightningElement {
         await refreshApex(this.wiredJobsResult);
       }
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
+      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
     } finally {
       this.busy = false;
     }
-  }
-
-  messageFrom(error) {
-    const body = error && error.body;
-    return (body && body.message) || UNEXPECTED_ERROR;
   }
 }
