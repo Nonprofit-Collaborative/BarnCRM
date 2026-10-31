@@ -63,7 +63,7 @@ Status as of 2026-10-31: landing batch A (releases 0.12 to 0.14) landed in `main
 |---|---|---|---|---|
 | L-01 | Logic model builder | Major | Landed (batch A) | v0.9 |
 | L-02 | Indicators on outputs and outcomes | Major | Landed (batch A) | v0.9 |
-| V-10 | Volunteer shift reminders | Major | Landed (batch A) | D-156 |
+| V-10 | Volunteer shift reminders (the unfilled-shift nudge is V-10b) | Major | Landed (batch A) | D-156, D-165 |
 | P-04 | Case notes | Minor | Landed (batch A) | v0.9 |
 | P-05 | Program dashboard | Minor | Landed (batch A) | v0.9 |
 | P-06 | Program roster template through C-49c (V-06 hours template moves to C-49c too) | Minor | Landed (batch A) | v0.9, D-154 |

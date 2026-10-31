@@ -815,7 +815,7 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 |---|---|---|---|---|
 | L-01 | Logic model builder in the app | Major | Landed (batch A) | Section 6 v0.9 |
 | L-02 | Indicators on outputs and outcomes (absorbs P-03) | Major | Landed (batch A) | Section 6 v0.9 |
-| V-10 | Volunteer shift reminders: per-shift email at a chosen lead time and a "still need you" nudge for unfilled shifts; org email limits shown in Settings | Major | Landed (batch A) | D-156 |
+| V-10 | Volunteer shift reminders: per-shift email at a chosen lead time; org email limits shown in Settings (the "still need you" nudge for unfilled shifts is V-10b) | Major | Landed (batch A) | D-156, D-165 |
 | P-04 | Case notes (dated, typed, private by default) | Minor | Landed (batch A) | Section 6 v0.9 |
 | P-05 | Program dashboard | Minor | Landed (batch A) | Section 6 v0.9 |
 | P-06 | Program roster import template, loading through C-49c; the V-06 volunteer hours template moves to C-49c in the same change | Minor | Landed (batch A) | Section 6 v0.9, D-154 |
