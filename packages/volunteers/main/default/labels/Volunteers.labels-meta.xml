@@ -851,6 +851,166 @@ When: {1}</value>
         <value>If you can no longer come, please tell us as soon as you can so someone else can take your place. Thank you for volunteering.</value>
     </labels>
     <labels>
+        <fullName>Volunteers_Suggestions_Title</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers card title</shortDescription>
+        <value>Suggested Volunteers</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_Subtitle</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers: what the ranking uses</shortDescription>
+        <value>Active volunteers not yet signed up, best match first by skills, availability, hours on this job and onboarding.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_Empty</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers: nobody to suggest</shortDescription>
+        <value>No active volunteers are left to suggest for this shift. Everyone with the Active volunteer status is already signed up.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_Person</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers column heading: the person</shortDescription>
+        <value>Person</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_Why</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers column heading: the reasons</shortDescription>
+        <value>Why</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_Actions</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers column heading: the action</shortDescription>
+        <value>Actions</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_SignUp</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers: the sign-up button</shortDescription>
+        <value>Sign up</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_SignUpFor</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sign-up button screen reader text; {0} is the person's name</shortDescription>
+        <value>Sign up {0} for this shift</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_Booked</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers: signed up; {0} is the person's name</shortDescription>
+        <value>{0} is signed up for this shift.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_BookFailed</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers: the sign-up did not save</shortDescription>
+        <value>The sign-up could not be saved. Try again, or use Add sign-up in the Sign-Ups panel.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_LoadFailed</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers: the suggestions did not load</shortDescription>
+        <value>The suggestions could not be loaded. Refresh the page to try again.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_MoreConsidered</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Volunteers note; {0} is how many people were ranked</shortDescription>
+        <value>Ranked from the {0} active volunteers with the most hours. More exist; use Add sign-up for anyone not shown.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonSkills</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason; {0} is skills the person has, {1} skills the job needs</shortDescription>
+        <value>Has {0} of the {1} skills this job needs</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonInterests</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason; {0} is interests matched, {1} skills the job needs</shortDescription>
+        <value>Interested in {0} of the {1} skills this job needs</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonAvailable</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason; {0} is the shift's weekday</shortDescription>
+        <value>Available on {0}s</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonUnavailable</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason; {0} is the shift's weekday</shortDescription>
+        <value>Does not list {0}s as an available day</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonNoAvailability</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason: no available days on the person</shortDescription>
+        <value>No available days recorded</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonHours</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason; {0} is approved hours on this job</shortDescription>
+        <value>{0} approved hours on this job</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonCleared</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason: onboarding steps all current</shortDescription>
+        <value>Onboarding steps are current</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Suggestions_ReasonOpen</fullName>
+        <categories>Volunteers, Suggestions</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reason: an onboarding step is not current</shortDescription>
+        <value>An onboarding step is not current</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_Schedules_SkippedTurnedOff</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>

@@ -77,7 +77,19 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
 
   connectedCallback() {
     this.load();
+    // Suggested Volunteers on the same page tells this panel when it signs someone up (V-11).
+    window.addEventListener('barnshiftsignupschanged', this.handleSignupsChanged);
   }
+
+  disconnectedCallback() {
+    window.removeEventListener('barnshiftsignupschanged', this.handleSignupsChanged);
+  }
+
+  handleSignupsChanged = (event) => {
+    if (event.detail && event.detail.shiftId === this.recordId) {
+      this.load();
+    }
+  };
 
   renderedCallback() {
     if (this.focusTarget) {

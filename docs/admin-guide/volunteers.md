@@ -412,6 +412,41 @@ below zero when more people are booked than were asked for, which is allowed.
 A message under the figures, also shown as a toast, says what changed. Read Only users see the
 panel without the button, pickers or attendance buttons.
 
+## Suggested Volunteers
+
+Below the Sign-Ups panel, the **Suggested Volunteers** card lists up to ten active volunteers
+who could fill the shift, best match first, each with the reasons ("Has 1 of the 2 skills this
+job needs", "Available on Saturdays", "12 approved hours on this job"). **Sign up** on a row books
+the person through the same save as **Add sign-up**, so the same rules apply (one sign-up per
+person per shift, the same permissions), and the Sign-Ups panel updates at once. The card
+changes nothing else and shows nothing to Read Only users or on a shift that is Cancelled or
+Completed. There is nothing to switch on.
+
+**Who is offered.** People whose **Volunteer Status** is **Active** and who have no sign-up on
+that shift (a cancelled one counts: change it instead of adding another). Of an org with more
+than 500 active volunteers, the 500 with the most hours are ranked, and the card says so.
+People held only as person accounts are not offered.
+
+**How they are ranked.** Each person scores points for what the data already says. Nothing
+here is a setting: the weights are fixed and listed so you can predict the order.
+
+| Signal | Points |
+|---|---|
+| Skills the job needs (**Job Skills** on the job) that the person holds as a **Skill** | Up to 30, in proportion to how many of them they hold |
+| Needed skills the person holds only as an **Interest** | Up to 10, in the same proportion |
+| The shift's weekday is one of the person's **Availability Days** | +25 |
+| The person lists availability days and the shift's weekday is not one | minus 25 |
+| No availability days recorded | 0 (the card says so) |
+| Approved hours on this job | Up to 20, reaching it at 40 hours |
+| Approved hours in total | Up to 5, reaching it at 200 hours |
+| Onboarding: the latest step of every type is **Completed** and not expired | +10 |
+| Onboarding: some step is not completed, or has expired | minus 15 |
+
+People with equal scores are listed by name. The onboarding signal needs the person using the
+card to be able to see onboarding steps (Admin and Coordinator); for Team Members it is left
+out. A person is never hidden for a low score: unavailable and not-cleared people sort lower and
+say why, and the coordinator decides.
+
 ## Approving Hours
 
 Coordinators and admins (anyone holding **Manage Volunteers**) approve hours on the **Approve
