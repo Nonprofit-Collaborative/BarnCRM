@@ -590,13 +590,13 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 5. Programs
 
-**Edition:** Nonprofit Edition. Depends on Core. Package is an empty placeholder on main.
+**Edition:** Nonprofit Edition only (not shown in the Standard Edition, ADR-0124). Depends on Core only (new ADR, programs module). Being built for release 0.12; the design is in canonical model Sections 29W to 29Y.
 
 ### 5.1 Program Delivery
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Programs, services and enrollments | Major | Records programs, the services they offer and who is enrolled. | Planned (v0.9) | P-01 |
+| Programs, services and enrollments | Major | Programs (Planned, Active or Completed, with target population, dates and a coordinator), the services each offers (with a unit of measure and an Active switch) and who takes part, as enrollments (a person, Contact or person Account, with a stage: Applied, Enrolled, Completed or Withdrawn, and start and end dates filled in as the stage moves). One open enrollment per person per program, counting ones the user cannot see; a person enrolls again once the first has ended. A program with enrollments is completed, not deleted. A Program Roster panel on the program shows the count in each stage, lists open (or all) enrollments, enrolls a person and changes a stage in one click. The BarnCRM Programs console app (Programs, Enrollments); three permission sets (Admin, Staff, Read Only) given to the BarnCRM roles at install, on the Access page, at Turn on and hourly, never taken away. Erasing or deleting a person keeps their enrollments; merging moves them. Laid out to map onto PMM's Program, Service and Program Engagement without new fields. No settings yet. | In progress (release 0.12) | P-01 |
 | Attendance and service delivery | Major | Logs attendance and services delivered in a grid, including on a phone. | Planned (v0.9) | P-02 |
 | Case notes | Minor | Dated, typed notes, private by default. | Planned (v0.9) | P-04 |
 | Program dashboard | Minor | A packaged program dashboard. | Planned (v0.9) | P-05 |
