@@ -14,8 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: gifts in a closed period that are not posted.</shortDescription>
-        <value
-    >These gifts are locked because their date is on or before Books Closed Through, but none is marked posted to accounting. If they belong in an export you already sent, mark them posted on the Accounting Export page (Mirror). If not, move Books Closed Through back (needs the Override Posting Lock permission).</value>
+        <value>These gifts are locked because their date is on or before Books Closed Through, but none is marked posted to accounting. If they belong in an export you already sent, mark them posted on the Accounting Export page (Mirror). If not, move Books Closed Through back (needs the Override Posting Lock permission).</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_UnpostedClosedPeriodMoreThan</fullName>

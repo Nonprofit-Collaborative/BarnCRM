@@ -374,8 +374,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Super Transform: About This Tool text</shortDescription>
-        <value
-    >Work through five steps: choose the object, add conditions (the count updates as you type), choose up to five fields and their new values, preview the first 25 records, then run. It uses your own access, so validation rules and automation apply. Every run is listed under Data Jobs with its Undo.</value>
+        <value>Work through five steps: choose the object, add conditions (the count updates as you type), choose up to five fields and their new values, preview the first 25 records, then run. It uses your own access, so validation rules and automation apply. Every run is listed under Data Jobs with its Undo.</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_NoPermissionHeading</fullName>
