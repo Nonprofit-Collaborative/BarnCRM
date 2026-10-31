@@ -88,7 +88,7 @@ Templates** and added the same way:
 | Template | For a file of | Columns it reads |
 |---|---|---|
 | **Relationships** | One row per relationship between two people already in BarnCRM. Each person is found by email address. The other side of the relationship (Child for a Parent) is created for you once, so list each relationship once. A row that repeats an existing relationship is rejected. | Person Email, Related Person Email, Relationship Type (for example Parent, Spouse, Sibling), Start Date, End Date, Description |
-| **Affiliations** | One row per link between a person (found by email address) and an organization (found by name), both already in BarnCRM. A person keeps one primary affiliation: when several rows say primary, only one stays primary, and an ended affiliation is never primary. A row that repeats an affiliation covering the same dates is rejected. | Person Email, Organization Name, Role, Is Primary, Start Date, End Date, Description |
+| **Affiliations** | One row per link between a person (found by email address) and an organization (found by name), both already in BarnCRM. A person keeps one primary affiliation: when several rows in one file say primary for the same person, the last of them in file order stays primary, and an ended affiliation is never primary. A row that repeats an affiliation covering the same dates is rejected. | Person Email, Organization Name, Role, Is Primary, Start Date, End Date, Description |
 
 Both insert only, and a row is rejected (never guessed) when an email or name matches no
 record or more than one. Load people and organizations first, then these. The rows are

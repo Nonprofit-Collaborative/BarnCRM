@@ -176,13 +176,22 @@ private class ImportRelationshipTemplatesTest {
                 SELECT
                     Id,
                     Primary_Affiliation__c,
-                    (SELECT Organization__c FROM Affiliations__r WHERE Is_Primary__c = TRUE)
+                    (
+                        SELECT Organization__c, Role__c
+                        FROM Affiliations__r
+                        WHERE Is_Primary__c = TRUE
+                    )
                 FROM Contact
                 WHERE
                     Email LIKE 'pat%@rel.example.org'
                     AND Id IN (SELECT Contact__c FROM Affiliation__c)
             ]) {
                 Assert.areEqual(1, person.Affiliations__r.size(), 'Exactly one primary.');
+                Assert.areEqual(
+                    'Volunteer',
+                    person.Affiliations__r[0].Role__c,
+                    'The last flagged row in file order stays primary.'
+                );
                 Assert.areEqual(
                     person.Affiliations__r[0].Organization__c,
                     person.Primary_Affiliation__c,

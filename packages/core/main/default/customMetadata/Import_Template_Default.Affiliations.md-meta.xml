@@ -8,7 +8,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">One row per link between a person and an organization that are already in BarnCRM: the person is found by email address and the organization by name. Add a role, dates and Is Primary. A person keeps one primary affiliation, so when several rows say primary only one stays primary. A row that repeats an affiliation covering the same dates is rejected.</value>
+    <value xsi:type="xsd:string">One row per link between a person and an organization that are already in BarnCRM: the person is found by email address and the organization by name. Add a role, dates and Is Primary. A person keeps one primary affiliation, so when several rows in the file say primary for the same person, the last of them stays primary. A row that repeats an affiliation covering the same dates is rejected.</value>
   </values>
   <values>
     <field>Column_Mapping_JSON__c</field>
