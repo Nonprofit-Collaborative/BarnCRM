@@ -155,6 +155,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-52 Data Dictionary (the Data Dictionary section of Org Optimizer) | [data-dictionary.md](data-dictionary.md) | Core |
 | C-53 and C-53b Access Explorer, with Compare Two and the Modify All Report (a section of Org Optimizer) | [access-explorer.md](access-explorer.md) | Core |
 | C-56 Setup Changes (who changed what in Setup, kept beyond 180 days; the Setup Changes section of Org Optimizer) | [setup-changes.md](setup-changes.md) | Core |
+| C-55 Record Inspector (every readable field of one record, on record pages) | [record-inspector.md](record-inspector.md) | Core |
 
 ### Automation, Totals and Health
 

@@ -49,6 +49,7 @@ page, even if that puts it out of reading order.
 | [Bulk update and delete](bulk-update-and-delete.md) | BULK | 15 | Bulk update, bulk delete, edit in Find, undo, the bulk path, Super Transform, saved step lists, phone format |
 | [Data Manager and job history](data-manager-and-job-history.md) | DM | 11 | Data Manager, data jobs and undo, data quality checks, field utilization and its snapshot history |
 | [Duplicates](duplicates.md) | DUP | 17 | Duplicate scan, review and merge, match sources, similar names, merge rules, auto-merge and its undo |
+| [Record Inspector](record-inspector.md) | RI | 2 | Inspect a record, search fields, copy an API name, field security and permission |
 | [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 14 | Health Check findings and fixes, Org Optimizer sections, storage and limits, Data Dictionary, Access Explorer, Access compare and Modify All report, weekly admin summary, Setup Changes |
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
 | [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 15 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import |

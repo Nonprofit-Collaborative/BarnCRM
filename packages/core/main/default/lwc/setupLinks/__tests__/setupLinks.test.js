@@ -1,4 +1,4 @@
-import { SETUP_PATHS, setupPath, setupValuePath } from 'c/setupLinks';
+import { SETUP_PATHS, setupPath, setupValuePath, fieldSetupPath } from 'c/setupLinks';
 
 // One row per Setup page: a path Salesforce changes fails here, and is fixed in setupLinks once.
 const EXPECTED = [
@@ -38,6 +38,17 @@ describe('c/setupLinks', () => {
     expect(setupValuePath('FiscalYearStartMonth')).toBe('/lightning/setup/ForecastFiscalYear/home');
     expect(setupValuePath('BillingCity')).toBeUndefined();
     expect(setupValuePath(null)).toBeUndefined();
+  });
+
+  it('links a field to its Object Manager page, and gives nothing without both names', () => {
+    expect(fieldSetupPath('Error_Log__c', 'Context__c')).toBe(
+      '/lightning/setup/ObjectManager/Error_Log__c/FieldsAndRelationships/Context__c/view'
+    );
+    expect(fieldSetupPath('Contact', 'LastName')).toBe(
+      '/lightning/setup/ObjectManager/Contact/FieldsAndRelationships/LastName/view'
+    );
+    expect(fieldSetupPath(undefined, 'LastName')).toBeUndefined();
+    expect(fieldSetupPath('Contact', '')).toBeUndefined();
   });
 
   it('cannot be changed at run time', () => {

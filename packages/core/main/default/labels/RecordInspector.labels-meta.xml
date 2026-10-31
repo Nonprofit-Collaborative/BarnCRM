@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_RecordInspector_Title</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector card title.</shortDescription>
+        <value>Record Inspector</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_Intro</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector text before it has read the record.</shortDescription>
+        <value>See every field you can read on this record, including fields that are not on the page, with API names and values.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_Inspect</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector button that reads the record.</shortDescription>
+        <value>Inspect This Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_Refresh</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector button that reads the record again.</shortDescription>
+        <value>Refresh</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_Loading</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector spinner text.</shortDescription>
+        <value>Reading the record</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_Search</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector search box label.</shortDescription>
+        <value>Search Fields</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_ColumnField</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector column: field label.</shortDescription>
+        <value>Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_ColumnApiName</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector column: API name.</shortDescription>
+        <value>API Name</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_ColumnType</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector column: field type.</shortDescription>
+        <value>Type</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_ColumnValue</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector column: value.</shortDescription>
+        <value>Value</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_Copy</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector button that copies an API name.</shortDescription>
+        <value>Copy</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_OpenFind</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector link that opens Find on this record's object.</shortDescription>
+        <value>Open in Find</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_OpenSetup</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector link that opens a field's page in Setup.</shortDescription>
+        <value>Open in Setup</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_Copied</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector confirmation after copying; {0} is the API name.</shortDescription>
+        <value>Copied {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_CopyFailed</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector message when the browser refuses to copy.</shortDescription>
+        <value>Your browser did not allow copying. Select the API name and copy it by hand.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_Count</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector count of fields; {0} is the number.</shortDescription>
+        <value>{0} fields</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_CountFiltered</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector count when searching; {0} shown, {1} in all.</shortDescription>
+        <value>{0} of {1} fields</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_NoMatch</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector message when a search matches nothing.</shortDescription>
+        <value>No field matches your search.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_Empty</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector marker for a field with no value.</shortDescription>
+        <value>Empty</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_Shortened</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector marker for a value that was cut.</shortDescription>
+        <value>Shortened</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_FieldsCut</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector notice when the object has too many readable fields to show.</shortDescription>
+        <value>This kind of record has more readable fields than one read can carry, so only part of them are shown.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_ErrorNoPermission</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector refusal: no Manage BarnCRM Settings permission.</shortDescription>
+        <value>The Record Inspector needs the Manage BarnCRM Settings permission. Ask a BarnCRM Admin to assign it to you.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_ErrorNotFound</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector refusal: the record cannot be read.</shortDescription>
+        <value>This record could not be found, or you cannot read it.</value>
+    </labels>
+</CustomLabels>

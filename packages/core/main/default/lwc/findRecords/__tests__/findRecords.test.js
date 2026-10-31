@@ -585,6 +585,24 @@ describe('c-find-records', () => {
 
   /* ---------- Advanced Find (C-36) ---------- */
 
+  it('chooses the object a link names in its page state', async () => {
+    const element = await render();
+    navigation.CurrentPageReference.emit({ state: { c__object: 'Gift__c' } });
+    await flush();
+    await flush();
+
+    expect(one(element, 'object').value).toBe('Gift__c');
+    expect(getObjectInfo).toHaveBeenCalledWith({ objectApiName: 'Gift__c' });
+  });
+
+  it('ignores an object a link names that Find does not offer', async () => {
+    const element = await render();
+    navigation.CurrentPageReference.emit({ state: { c__object: 'Nothing__c' } });
+    await flush();
+
+    expect(one(element, 'object').value).toBeFalsy();
+  });
+
   it('opens and runs the saved query a link names in its page state', async () => {
     runQuery.mockResolvedValue({ soql: 'SELECT ...', rows: [] });
     const element = await render();
