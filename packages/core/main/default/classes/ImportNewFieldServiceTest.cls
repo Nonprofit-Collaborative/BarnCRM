@@ -81,6 +81,25 @@ private class ImportNewFieldServiceTest {
         }
     }
 
+    /**
+     * The failed job's reason, once ErrorLogger's event has written its row; until then (the
+     * event is delivered asynchronously) the generic message. Either way the poll ends Failed.
+     */
+    private static void assertReported(ImportNewFieldService.Outcome outcome, String reason) {
+        List<Error_Log__c> logged = [
+            SELECT Message__c
+            FROM Error_Log__c
+            WHERE Context__c LIKE 'Import: create field %' AND Severity__c = 'Error'
+            WITH SYSTEM_MODE
+        ];
+        if (logged.isEmpty()) {
+            Assert.areEqual(Label.Core_ImportNewField_JobFailed, outcome.message);
+        } else {
+            Assert.isTrue(logged[0].Message__c.contains(reason), logged[0].Message__c);
+            Assert.areEqual(logged[0].Message__c, outcome.message);
+        }
+    }
+
     @IsTest
     static void aRefusedFieldIsLoggedAndReported() {
         System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
@@ -97,7 +116,7 @@ private class ImportNewFieldServiceTest {
                 'Shirt_Size'
             );
             Assert.areEqual(ImportNewFieldService.FAILED, outcome.state);
-            Assert.isTrue(outcome.message.contains('Too many custom fields'), outcome.message);
+            assertReported(outcome, 'Too many custom fields');
         }
     }
 
@@ -117,7 +136,7 @@ private class ImportNewFieldServiceTest {
                 'Shirt_Size'
             );
             Assert.areEqual(ImportNewFieldService.FAILED, outcome.state);
-            Assert.isTrue(outcome.message.contains('INVALID_SESSION_ID'), outcome.message);
+            assertReported(outcome, 'INVALID_SESSION_ID');
         }
     }
 

@@ -492,6 +492,11 @@ public with sharing class ImportNewFieldService {
         if (result.state == CREATED) {
             return result;
         }
+        // createMetadata is synchronous, so a finished job whose field is not in describe failed.
+        // The job's Error Log entry arrives through ErrorLogger's event, possibly after this poll;
+        // until it does, the generic message stands in for it.
+        result.state = FAILED;
+        result.message = Label.Core_ImportNewField_JobFailed;
         String logContext = LOG_CONTEXT + jobId;
         List<Error_Log__c> logged = [
             SELECT Message__c
@@ -502,7 +507,6 @@ public with sharing class ImportNewFieldService {
             LIMIT 1
         ];
         if (!logged.isEmpty()) {
-            result.state = FAILED;
             result.message = logged[0].Message__c;
         }
         return result;
