@@ -20,8 +20,9 @@ opens quickly however large your database is.
 | **Data Dictionary** | Every field you can see on the kinds of record you choose, with type, length, required, unique, picklist values, help text and formula, and optionally a fill rate, as a table and a CSV download. See [Data Dictionary](data-dictionary.md). | Administrators |
 | **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you press **Run Health Check**. See [Health Check](health-check.md). | Administrators |
 | **Errors** | How many Error Log entries nobody has read, the most recent ones, **Mark Acknowledged**, and a link to the full Error Log. See [Error Log](error-log.md). | Administrators |
-| **Storage and Limits** | How much of your org's data and file storage, daily API requests, background jobs and single emails are used, each as a bar with a **Near Limit** badge at 80% or more, and how many records BarnCRM keeps for imports, undo, errors and saved field counts, at about 2 KB a record. Read only. | Administrators |
+| **Storage and Limits** | How much of your org's data and file storage, daily API requests, background jobs and single emails are used, each as a bar with a **Near Limit** badge at 80% or more, and how many records BarnCRM keeps for imports, undo, errors, saved field counts and Setup changes, at about 2 KB a record. Read only. | Administrators |
 | **Unused Setup** | Setup nobody seems to use: active users who have not logged in for 90 days, permission sets nobody is assigned, reports not run for 365 days, email templates never used, flows left inactive, scheduled jobs owned by inactive users, objects near their custom field limit, and record types no record uses. Each line gives a count, up to five names and **Open in Setup**. Read only: you decide what to remove, in Setup. See section 5. | Administrators |
+| **Setup Changes** | Who changed what in Setup, and when, from the Salesforce Setup Audit Trail, kept beyond Salesforce's 180 days (two years unless you change it). Filter by day, section and words, and download as CSV. A nightly job copies new changes; **Copy New Changes Now** copies them at once. Read only toward Setup. See [Setup Changes](setup-changes.md). | Administrators |
 
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
 **BarnCRM Admin** role carries. A section you cannot use is not shown.
@@ -75,8 +76,11 @@ Start from the sample data (see [Sample data](sample-data.md)).
    used, and **What BarnCRM Stores** lists the sample data's import and error records.
 6. Choose **Unused Setup**. In a fresh org most lines say **0**; any with a count list the
    first five names, and **Open in Setup** takes you to the page where you can remove them.
-7. Go back to **Data Quality** and press **Recount**: the counts are fresh each time you ask.
-8. Choose **Overview**. The **Data Quality**, **Health Check** and **Storage and Limits** tiles
+7. Choose **Setup Changes** and press **Copy New Changes Now**, then **Refresh** after a minute:
+   the last 180 days of Setup changes are listed, newest first. Type a field's name in
+   **Search** to see who changed it.
+8. Go back to **Data Quality** and press **Recount**: the counts are fresh each time you ask.
+9. Choose **Overview**. The **Data Quality**, **Health Check** and **Storage and Limits** tiles
    now carry badges for what you just looked at.
 
 ## 4. Why Sections Load Only When Opened
@@ -126,5 +130,6 @@ Nothing here is deleted or changed for you:
 
 ## Field Reference
 
-Org Optimizer adds no object and no field. Each section reads and writes what its own page in
-this guide lists.
+Org Optimizer itself adds no object and no field. Each section reads and writes what its own
+page in this guide lists; the Setup Changes section keeps its copy in **Setup Change** records
+(see [Setup Changes](setup-changes.md)).

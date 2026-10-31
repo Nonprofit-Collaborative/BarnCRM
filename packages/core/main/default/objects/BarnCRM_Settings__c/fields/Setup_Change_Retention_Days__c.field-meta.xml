@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Setup_Change_Retention_Days__c</fullName>
+  <defaultValue>730</defaultValue>
+  <description>Days a copied Setup Audit Trail row (Setup_Change__c) is kept before the nightly Setup Changes copy deletes it (C-56, R-SC4). Read as 730 when empty, held between 180 and 3650 (D-40).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Days a copied Setup change is kept before it is deleted.</inlineHelpText>
+  <label>Days to Keep Setup Changes</label>
+  <precision>4</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

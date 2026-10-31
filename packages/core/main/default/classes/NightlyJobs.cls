@@ -55,6 +55,7 @@ public with sharing class NightlyJobs {
         jobs.add(new ImportRowPurgeJob());
         jobs.add(new EmptyHouseholdTidyJob());
         jobs.add(new TabAccessJob());
+        jobs.add(new SetupChangesJob());
         for (String className : PROVIDER_CLASSES) {
             jobs.addAll(providedBy(className));
         }
@@ -231,6 +232,25 @@ public with sharing class NightlyJobs {
 
         public void schedule() {
             TabAccessScheduler.start();
+        }
+    }
+
+    /**
+     * The nightly Setup Changes copy (C-56, R-SC2): keeps the Setup Audit Trail beyond
+     * Salesforce's 180 days and deletes copies past the org's retention, so it always belongs
+     * on the list.
+     */
+    public class SetupChangesJob implements NightlyJob {
+        public String label() {
+            return System.Label.Core_HealthCheck_JobSetupChanges;
+        }
+
+        public Boolean isScheduled() {
+            return SetupChangeCopyJob.isScheduled();
+        }
+
+        public void schedule() {
+            SetupChangeCopyJob.start();
         }
     }
 }
