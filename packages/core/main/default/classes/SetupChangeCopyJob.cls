@@ -1,13 +1,13 @@
 /**
  * The nightly Setup Changes copy (C-56, canonical model Section 29W). Copies the Setup Audit
- * Trail rows made since the newest kept row into `Setup_Change__c` (R-SC2), then deletes kept
- * rows older than the org's Days to Keep Setup Changes (R-SC4). Health Check lists it among the
+ * Trail rows made since the newest kept row into `Setup_Change__c` (R-SU2), then deletes kept
+ * rows older than the org's Days to Keep Setup Changes (R-SU4). Health Check lists it among the
  * nightly jobs (`NightlyJobs`), and Org Optimizer's Setup Changes section runs it on demand.
  *
  * One class, two passes: the copy pass reads the trail, and its finish starts the delete pass.
- * The trail is read with dynamic SOQL, so the class compiles in any org (R-SC1); Salesforce
+ * The trail is read with dynamic SOQL, so the class compiles in any org (R-SU1); Salesforce
  * shows it only to a user with View Setup and Configuration, so a run whose user cannot read it
- * logs one entry and copies nothing (R-SC3). The kept rows are the package's own copy, written
+ * logs one entry and copies nothing (R-SU3). The kept rows are the package's own copy, written
  * and deleted in system mode and without sharing (ADR-0021): a delete that skipped rows its user
  * cannot see would keep them for ever. It changes nothing but `Setup_Change__c` rows.
  */
@@ -21,7 +21,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
     /** Rows per chunk: one upsert or delete of bookkeeping rows nothing fires on. */
     public static final Integer CHUNK_SIZE = 2000;
 
-    /** Days to Keep Setup Changes (`Setup_Change_Retention_Days__c`), R-SC4. */
+    /** Days to Keep Setup Changes (`Setup_Change_Retention_Days__c`), R-SU4. */
     public static final Integer DEFAULT_RETENTION_DAYS = 730;
     public static final Integer MIN_RETENTION_DAYS = 180;
     public static final Integer MAX_RETENTION_DAYS = 3650;
@@ -99,6 +99,11 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
         return true;
     }
 
+    /** Whether the Org Optimizer feature, which owns Setup Changes, is on (R-SU8). */
+    public static Boolean featureOn() {
+        return FeatureSwitchService.isOn(FeatureSwitchService.ORG_OPTIMIZER);
+    }
+
     /** Days to Keep Setup Changes: empty or unreadable reads as 730, out of range as the nearest end. */
     public static Integer retentionDays() {
         String key = 'Setup_Change_Retention_Days__c';
@@ -119,6 +124,13 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
     // -------------------------------------------------------------------------------------
 
     public Database.QueryLocator start(Database.BatchableContext context) {
+        if (!featureOn()) {
+            // R-SU8: while Org Optimizer is off, the run copies and deletes nothing, quietly.
+            return Database.getQueryLocator(
+                'SELECT Id FROM Setup_Change__c WHERE Id = null',
+                AccessLevel.SYSTEM_MODE
+            );
+        }
         if (purging) {
             return Database.getQueryLocatorWithBinds(
                 'SELECT Id FROM Setup_Change__c WHERE Changed_At__c < :cutoff',
@@ -138,7 +150,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
                 AccessLevel.SYSTEM_MODE
             );
         } catch (Exception unreadable) {
-            // R-SC3: the trail is refused to this user. Copy nothing; the delete pass still runs.
+            // R-SU3: the trail is refused to this user. Copy nothing; the delete pass still runs.
             ErrorLogger.logMessage(
                 String.format(
                     Label.Core_SetupChanges_LogCannotRead,
@@ -163,7 +175,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
     }
 
     public void finish(Database.BatchableContext context) {
-        if (!purging && chainPurge) {
+        if (!purging && chainPurge && featureOn()) {
             Database.executeBatch(new SetupChangeCopyJob(true), CHUNK_SIZE);
         }
     }

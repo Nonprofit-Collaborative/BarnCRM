@@ -1,6 +1,6 @@
 /**
  * The nightly Setup Changes copy (C-56, canonical model Section 29W): each trail row is kept
- * once with its fields (R-SC2), the delete pass removes only rows past the retention (R-SC4),
+ * once with its fields (R-SU2), the delete pass removes only rows past the retention (R-SU4),
  * the retention setting reads its default and holds its bounds, the job schedules once and is
  * one of Health Check's nightly jobs, and a run reads the real trail without failing.
  *
@@ -128,6 +128,42 @@ private class SetupChangeCopyJobTest {
         List<Setup_Change__c> rows = kept();
         Assert.areEqual(1, rows.size(), 'Only the change older than 365 days is deleted.');
         Assert.areEqual('new', rows[0].Audit_Trail_Id__c, 'The newer change is kept.');
+    }
+
+    @IsTest
+    static void aRunWhileOrgOptimizerIsOffCopiesAndDeletesNothing() {
+        TestSettings.newInstall();
+        insert as system new Setup_Change__c(
+            Audit_Trail_Id__c = 'old',
+            Changed_At__c = Datetime.now().addDays(-4000)
+        );
+        System.runAs(TestUsers.admin()) {
+            Assert.isFalse(SetupChangeCopyJob.featureOn(), 'A new install starts with it off.');
+            Test.startTest();
+            // A copy that ran would read the trail; a delete that ran would take the old row.
+            Database.executeBatch(new SetupChangeCopyJob(true), SetupChangeCopyJob.CHUNK_SIZE);
+            Test.stopTest();
+            List<SObject> scope = new List<SObject>();
+            Database.QueryLocatorIterator found = new SetupChangeCopyJob().start(null).iterator();
+            while (found.hasNext()) {
+                scope.add(found.next());
+            }
+            Assert.isTrue(scope.isEmpty(), 'The copy pass reads nothing while it is off.');
+        }
+
+        List<Setup_Change__c> rows = kept();
+        Assert.areEqual(1, rows.size(), 'Nothing deleted.');
+        Assert.areEqual('old', rows[0].Audit_Trail_Id__c, 'The old copy is still there.');
+        Assert.areEqual(
+            0,
+            [
+                SELECT COUNT()
+                FROM Error_Log__c
+                WHERE Context__c = 'SetupChangeCopyJob'
+                WITH SYSTEM_MODE
+            ],
+            'And nothing is logged.'
+        );
     }
 
     @IsTest

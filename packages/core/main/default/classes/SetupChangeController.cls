@@ -3,18 +3,18 @@
  * setup-changes.md): the kept copy of the Setup Audit Trail, filtered and listed newest first,
  * and a button that copies new changes now.
  *
- * Every method requires Manage BarnCRM Settings (R-SC5). Kept rows are read in user mode, which
+ * Every method requires Manage BarnCRM Settings (R-SU5). Kept rows are read in user mode, which
  * the BarnCRM Admin permission set allows; the copy itself is `SetupChangeCopyJob`'s. Nothing
  * here reads or changes Setup.
  */
 public with sharing class SetupChangeController {
     private static final String PERMISSION = 'Manage_BarnCRM_Settings';
 
-    /** Rows the table shows (R-SC6). */
+    /** Rows the table shows (R-SU6). */
     public static final Integer PAGE_ROWS = 200;
-    /** Rows a CSV download holds at most (R-SC6). */
+    /** Rows a CSV download holds at most (R-SU6). */
     public static final Integer EXPORT_ROWS = 5000;
-    /** Kept rows one search looks at, newest first, before it stops (R-SC6). */
+    /** Kept rows one search looks at, newest first, before it stops (R-SU6). */
     @TestVisible
     private static Integer scanCap = 40000;
     /** Sections offered in the filter at most. */
@@ -127,7 +127,7 @@ public with sharing class SetupChangeController {
     }
 
     /**
-     * Kept changes matching the filters, newest first (R-SC6). `fromDate` and `toDate` are
+     * Kept changes matching the filters, newest first (R-SU6). `fromDate` and `toDate` are
      * `YYYY-MM-DD` days in the person's time zone, both included, either may be blank; `section`
      * is an exact Section or blank; `search` is words that must each appear, ignoring capitals.
      * `maxRows` is held between 1 and the export cap.
@@ -228,7 +228,7 @@ public with sharing class SetupChangeController {
 
     /**
      * Copies new changes now, as the running user, and schedules the nightly copy when it is not
-     * scheduled (R-SC2). Starts nothing when a copy is already waiting or running.
+     * scheduled (R-SU2). Starts nothing when a copy is already waiting or running.
      */
     @AuraEnabled
     public static CopyResult copyNow() {

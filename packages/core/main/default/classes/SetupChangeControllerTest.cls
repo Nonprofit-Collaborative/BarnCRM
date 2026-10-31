@@ -1,5 +1,5 @@
 /**
- * SetupChangeController (C-56, R-SC5, R-SC6): the summary counts what is kept and lists its
+ * SetupChangeController (C-56, R-SU5, R-SU6): the summary counts what is kept and lists its
  * sections, the search filters by day, section and words, newest first, says when more match
  * and when it stopped looking, Copy New Changes Now starts a copy and schedules the nightly
  * one, and every method refuses a person without Manage BarnCRM Settings.
