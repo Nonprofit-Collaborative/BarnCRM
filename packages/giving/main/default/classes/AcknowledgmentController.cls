@@ -330,13 +330,12 @@ public with sharing class AcknowledgmentController {
         Boolean ours =
             failure instanceof AcknowledgmentService.AcknowledgmentException ||
             failure instanceof AcknowledgmentRunService.AcknowledgmentRunException;
-        String message = failure.getMessage();
-        if (!ours) {
-            ErrorLogger.log(failure, context, recordId);
-            message = Label.Giving_Acknowledgment_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            failure,
+            ours,
+            context,
+            recordId,
+            Label.Giving_Acknowledgment_UnexpectedError
+        );
     }
 }

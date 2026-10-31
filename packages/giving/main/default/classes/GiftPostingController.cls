@@ -67,13 +67,11 @@ public with sharing class GiftPostingController {
     }
 
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof GiftPostingService.GiftPostingException)) {
-            ErrorLogger.log(caught, context);
-            message = Label.Giving_Periods_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof GiftPostingService.GiftPostingException,
+            context,
+            Label.Giving_Periods_UnexpectedError
+        );
     }
 }

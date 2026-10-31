@@ -114,13 +114,11 @@ public with sharing class AccountingPeriodController {
     }
 
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (!(caught instanceof AccountingPeriodException)) {
-            ErrorLogger.log(caught, context);
-            message = Label.Giving_Periods_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return UserErrors.wrap(
+            caught,
+            caught instanceof AccountingPeriodException,
+            context,
+            Label.Giving_Periods_UnexpectedError
+        );
     }
 }

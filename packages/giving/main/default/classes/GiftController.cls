@@ -80,7 +80,7 @@ public with sharing class GiftController {
     }
 
     private static AuraHandledException asUserError(Exception cause) {
-        return GivingErrors.userError(cause, Label.Giving_Gift_UnexpectedError);
+        return UserErrors.wrapShowingDml(cause, Label.Giving_Gift_UnexpectedError);
     }
 
     /**
