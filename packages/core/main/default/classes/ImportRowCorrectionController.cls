@@ -4,14 +4,19 @@
  * corrected row of its import in place (R-IB17a). See docs/admin-guide/import-rows.md.
  *
  * Reading the row is in user mode, so a person sees only rows of imports they can see.
- * Everything that changes anything checks the Manage BarnCRM Settings custom permission and
- * the batch's retry rules first; the corrections themselves are the package's staging and are
+ * Everything that changes anything checks the Manage BarnCRM Settings custom permission (the
+ * one that runs and commits imports), edit access to the row by sharing, and the batch's retry
+ * rules first; any such user may correct and retry, not only the committer; the corrections themselves are the package's staging and are
  * written in system mode after those checks (ADR-0021). Raw values are never written.
  */
 public with sharing class ImportRowCorrectionController {
     /** Injected by the tests, as ImportController's is. Null in production. */
     @TestVisible
     private static Boolean permissionOverride;
+
+    /** Injected by the tests, to stand for a row sharing withholds. Null in production. */
+    @TestVisible
+    private static Boolean editAccessOverride;
 
     /** One column of the row: the file's value and its correction, if any. */
     public class ColumnView {
@@ -112,6 +117,9 @@ public with sharing class ImportRowCorrectionController {
         try {
             enforcePermission();
             Import_Row__c row = readRow(rowId);
+            if (!canEdit(row.Import_Batch__c)) {
+                throw new ImportException(Label.Core_Import_ErrorNoRowEditAccess);
+            }
             return ImportBatchService.startRowRetry(row.Import_Batch__c, null);
         } catch (Exception e) {
             throw UserErrors.wrap(e, 'ImportRowCorrectionController.retryAllFixed', true);
@@ -159,6 +167,9 @@ public with sharing class ImportRowCorrectionController {
     private static String refusal(Import_Row__c row) {
         if (!hasManagePermission()) {
             return Label.Core_Import_ErrorNoPermission;
+        }
+        if (!canEdit(row.Id)) {
+            return Label.Core_Import_ErrorNoRowEditAccess;
         }
         return ImportBatchService.rowRetryRefusal(
             ImportBatchSelector.selectById(row.Import_Batch__c)
@@ -227,5 +238,25 @@ public with sharing class ImportRowCorrectionController {
             return permissionOverride;
         }
         return FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
+    }
+
+    /**
+     * Whether the running user may edit this record, a row or its import (whose rows follow it),
+     * by sharing and object access. Anyone who runs imports may correct and retry, not only the
+     * committer (R-IB17a), so sharing is what narrows it.
+     */
+    private static Boolean canEdit(Id recordId) {
+        if (editAccessOverride != null) {
+            return editAccessOverride;
+        }
+        Id me = UserInfo.getUserId();
+        List<UserRecordAccess> access = [
+            SELECT RecordId, HasEditAccess
+            FROM UserRecordAccess
+            WHERE UserId = :me AND RecordId = :recordId
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        return !access.isEmpty() && access[0].HasEditAccess;
     }
 }

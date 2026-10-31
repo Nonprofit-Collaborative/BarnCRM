@@ -27,7 +27,12 @@ Three earlier rules shaped the staged rows of an import:
    the original run (template the commit ran under, the batch's file values, matching,
    chunks, tags and journal), so the one undo covers them (R-IB17a). The row processor reads
    the corrected value in place of the raw one at its single reading point. Retry by file
-   stays as it is.
+   stays as it is. Unlike retry by file, correcting and retrying a row is open to every user
+   with the Manage BarnCRM Settings permission (the import permission) who can edit the
+   batch's rows by sharing, not only the committer, so the people who run imports can fix
+   rows record by record. The batch keeps its Committed By; each other user who retries is
+   recorded in `Import_Batch__c.Retried_By__c`, and undo counts what any of them created
+   during the import as the import's.
 2. **Retention is a choice of four (supersedes D-40's number of days and plan 4.9's purge on
    commit).** The Import setting Delete Import Rows offers Once Complete, After 30 Days
    (default), After 90 Days and Never. The nightly Import row cleanup deletes the rows of
@@ -44,6 +49,9 @@ Three earlier rules shaped the staged rows of an import:
 ## Consequences
 
 - One more long text field on Import Row; it is empty for every row nobody corrected.
+- One more long text field on Import Batch, Rows Retried By. A record a retrier edited by hand
+  during the import's window is treated as the import's own work, as the committer's edits
+  already are.
 - `BarnCRM_Settings__c.Import_Row_Retention_Days__c` and its setting definition are removed
   from source. No package version exists (the namespace is deferred), so an org that had it
   keeps an unused field until it is deleted in Setup; nothing reads it.
