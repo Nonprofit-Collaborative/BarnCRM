@@ -2,7 +2,7 @@
 
 Purpose: environments, access, layout and gotchas for BarnCRM. Reference facts only, not a task log (work done goes in `changelog.md`). Check here before re-querying a live system.
 
-Last verified 2026-10-30 (main at 19463c55, batch 8 landing #753: Super Importer, Super Transform, C-51, C-52; `mwdbdevsb` also at f8ca0a28; earlier: main at bdf0a7d3, batches 15 to 17; `barn-npc` deployed from it; earlier: landing/batch-14 on main at batch 13, 15d8bebf; ADR-0144 acknowledgments honor email opt-out; landing/batch-13 on main at #714, 44493051; `barn-npc` released from main 112dbdf7; `mwdbdevsb` released at df174bff; `barn-platform` created; ADR-0141 account record types, ADR-0142 Admin View All and Modify All on Account and Contact, ADR-0143 edition stored values).
+Last verified 2026-10-31 (main at 9b5f4e4a, batch 9 landing #758: QA v21 fixes, Error Log probe in the org gate; earlier: 2026-10-30, main at 19463c55, batch 8 landing #753: Super Importer, Super Transform, C-51, C-52; `mwdbdevsb` also at f8ca0a28; earlier: main at bdf0a7d3, batches 15 to 17; `barn-npc` deployed from it; earlier: landing/batch-14 on main at batch 13, 15d8bebf; ADR-0144 acknowledgments honor email opt-out; landing/batch-13 on main at #714, 44493051; `barn-npc` released from main 112dbdf7; `mwdbdevsb` released at df174bff; `barn-platform` created; ADR-0141 account record types, ADR-0142 Admin View All and Modify All on Account and Contact, ADR-0143 edition stored values).
 
 ## Pointers
 
@@ -69,6 +69,10 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - Also: `npm run lint`, `npm run prettier:verify` (Markdown is excluded from Prettier), `npx sfdx-lwc-jest`, Salesforce Code Analyzer with zero high or critical findings.
 
 ## Gotchas
+
+- Redeploying a platform event trigger does not restart a stuck subscription; cycling the trigger Inactive then Active does (hit on `barn-sales` 2026-10-31, `ErrorLogEventTrigger` and `MergeSettlementReadyTrigger`). The org gate now probes the Error Log event path after deploy (`scripts/org/probe-error-log.sh`) and fails with recovery steps if no row lands.
+- ConnectApi named credentials start with callouts disabled and no API can enable them: an admin Setup step ("Enabled for Callouts"), then Check Again in the connection panel (ADR-0148 A1).
+- A new field's permissions must be granted in a new transaction (chained GrantAccessJob), not the one that created the field.
 
 - Synced folder spawns `name 2.ext` duplicates, including inside `.git/`: never `git add -A` or `git add .`; stage by path or `git add -u`.
 - `push.default` is `upstream`: a worktree branch created from a tracking base pushes to the base. Create with `--no-track`, push with an explicit refspec (`git push -u origin <b>:refs/heads/<b>`). A bare push moved PR #200's branch and the rollup S3 branch (2026-10-12).
