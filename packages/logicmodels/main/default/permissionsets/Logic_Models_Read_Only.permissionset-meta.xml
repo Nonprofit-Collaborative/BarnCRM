@@ -7,6 +7,10 @@
     <application>BarnCRM_Logic_Models</application>
     <visible>true</visible>
   </applicationVisibilities>
+  <classAccesses>
+    <apexClass>LogicModelBuilderController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>false</editable>
     <field>Indicator_Period__c.Notes__c</field>
