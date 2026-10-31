@@ -26,6 +26,9 @@ import previewChanges from '@salesforce/apex/ImportController.previewChanges';
 import openRetry from '@salesforce/apex/ImportController.openRetry';
 import copyTemplate from '@salesforce/apex/ImportController.copyTemplate';
 import suggestObject from '@salesforce/apex/ImportController.suggestObject';
+import createSeveralObjectsTemplate from '@salesforce/apex/ImportController.createSeveralObjectsTemplate';
+import getSeveralObjects from '@salesforce/apex/ImportController.getSeveralObjects';
+import suggestSheetMapping from '@salesforce/apex/ImportController.suggestSheetMapping';
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
 import { readSheetNames, readXlsx } from '../xlsx';
 
@@ -138,6 +141,24 @@ jest.mock('@salesforce/apex/ImportController.openRetry', () => ({ default: jest.
 jest.mock('@salesforce/apex/ImportController.suggestObject', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/ImportController.createSeveralObjectsTemplate',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock('@salesforce/apex/ImportController.getSeveralObjects', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.suggestSheetMapping', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/label/c.Core_Import_SheetObjectLabel',
+  () => ({ default: 'Object for {0}' }),
+  {
+    virtual: true
+  }
+);
 jest.mock('@salesforce/label/c.Core_Import_SheetOption', () => ({ default: '{0} ({1} rows)' }), {
   virtual: true
 });
@@ -345,7 +366,7 @@ describe('the import wizard', () => {
     expect(kindPicker.options.map((option) => option.value)).toEqual([
       'people',
       'object',
-      'related',
+      'several',
       'delete',
       'templates'
     ]);
@@ -2048,31 +2069,6 @@ describe('the import wizard loading one object', () => {
     expect(element.shadowRoot.querySelector('[data-id="detection-sheets"]')).toBeNull();
   });
 
-  it('starts a template made from the related records card on upsert', async () => {
-    getLoadableObjects.mockResolvedValue([
-      { value: 'Program_Session__c', label: 'Program Session' }
-    ]);
-    createObjectTemplate.mockResolvedValue(OBJECT_TEMPLATE);
-    getRelatedOptions.mockResolvedValue([]);
-    const element = render();
-    await flush();
-    await chooseKind(element, 'related');
-    const object = element.shadowRoot.querySelector('[data-id="new-object"]');
-    object.dispatchEvent(new CustomEvent('change', { detail: { value: 'Program_Session__c' } }));
-    const name = element.shadowRoot.querySelector('[data-id="new-template-name"]');
-    name.value = 'Sessions and attendees';
-    name.dispatchEvent(new CustomEvent('change'));
-    await flush();
-    click(element, 'create-object-template');
-    await flush();
-    click(element, 'next');
-    await flush();
-    await chooseFile(element, SESSIONS, 'sessions.csv');
-    click(element, 'next');
-    await flush();
-    expect(loadOptions(element).operation).toBe('Upsert by external ID');
-  });
-
   it('starts a template made from the delete card on delete by record ID', async () => {
     getLoadableObjects.mockResolvedValue([
       { value: 'Program_Session__c', label: 'Program Session' }
@@ -2530,5 +2526,283 @@ describe('the import wizard loading one object', () => {
     await flush();
     expect(element.shadowRoot.querySelector('[data-id="start-over"]')).not.toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="retry-file"]')).toBeNull();
+  });
+});
+
+describe('the import wizard loading several objects from one upload (R-IT20)', () => {
+  const SEVERAL_TEMPLATE = {
+    id: 'a09',
+    name: 'Programs and sessions',
+    matchingRule: 'Email exact',
+    mapping: JSON.stringify({
+      version: 2,
+      columns: [{ source: 'Room', target: 'Session__c.Room__c' }],
+      objects: [
+        { entity: 'Program__c', operation: 'Insert' },
+        { entity: 'Session__c', operation: 'Insert' }
+      ]
+    }),
+    targetObject: 'Program__c',
+    targetObjectLabel: 'Program, Session',
+    severalObjects: true,
+    loadOperation: 'Insert',
+    loadOperations: ['Insert', 'Update by record Id', 'Upsert by external ID'],
+    lookupNotFound: 'Reject the row'
+  };
+  const field = (value, label, lookupFields) => ({
+    value,
+    label,
+    isLookup: Boolean(lookupFields),
+    lookupFields: lookupFields || []
+  });
+  const OBJECTS = [
+    {
+      objectName: 'Program__c',
+      objectLabel: 'Program',
+      operation: 'Insert',
+      operations: ['Insert', 'Update by record Id', 'Upsert by external ID'],
+      keyFields: [{ value: 'Code__c', label: 'Code' }],
+      matchFields: [{ value: 'Name', label: 'Program Name' }],
+      fields: [
+        field('Program__c.Id', 'Program: Salesforce record ID'),
+        field('Program__c.Name', 'Program: Program Name'),
+        field('Program__c.Code__c', 'Program: Code')
+      ],
+      links: []
+    },
+    {
+      objectName: 'Session__c',
+      objectLabel: 'Session',
+      operation: 'Insert',
+      operations: ['Insert', 'Update by record Id', 'Upsert by external ID'],
+      keyFields: [{ value: 'Name', label: 'Session Name' }],
+      matchFields: [],
+      fields: [
+        field('Session__c.Name', 'Session: Session Name'),
+        field('Session__c.Program__c', 'Session: Program', [
+          { value: 'Id', label: 'Salesforce record ID' },
+          { value: 'Code__c', label: 'Code' }
+        ]),
+        field('Session__c.Room__c', 'Session: Room')
+      ],
+      links: ['Each Session record is linked to the Program record on its row through Program.']
+    }
+  ];
+  const TARGETS = {
+    Program__c: { Name: 'Program__c.Name', Code: 'Program__c.Code__c' },
+    Session__c: { Name: 'Session__c.Name', Program: 'Session__c.Program__c' }
+  };
+
+  beforeEach(() => {
+    canImport.mockResolvedValue(true);
+    getTemplates.mockResolvedValue([]);
+    getEntityTargets.mockResolvedValue([]);
+    getMatchFields.mockResolvedValue({ fixedTargets: FIXED_TARGETS, contact: [], account: [] });
+    getLoadableObjects.mockResolvedValue([
+      { value: 'Program__c', label: 'Program' },
+      { value: 'Session__c', label: 'Session' },
+      { value: 'Venue__c', label: 'Venue' }
+    ]);
+    suggestObject.mockResolvedValue({
+      objectName: 'Session__c',
+      objectLabel: 'Session',
+      sheets: [
+        { sheetName: 'Sessions', objectName: 'Session__c', namedObjects: [] },
+        { sheetName: 'Programs', objectName: 'Program__c', namedObjects: [] }
+      ]
+    });
+    createSeveralObjectsTemplate.mockResolvedValue(SEVERAL_TEMPLATE);
+    getSeveralObjects.mockResolvedValue(OBJECTS);
+    suggestSheetMapping.mockImplementation(({ objectName, headers }) =>
+      Promise.resolve(
+        JSON.stringify({
+          columns: headers.map((source) => ({
+            source,
+            target: (TARGETS[objectName] || {})[source] || 'Ignore'
+          }))
+        })
+      )
+    );
+    saveFile.mockResolvedValue('069000000000001');
+    createBatch.mockResolvedValue(DRY_RUN_BATCH);
+    stageRows.mockResolvedValue(3);
+    startDryRun.mockResolvedValue(DRY_RUN_BATCH);
+    getBatch.mockResolvedValue(DRY_RUN_BATCH);
+    getRowPage.mockResolvedValue(EMPTY_PAGE);
+  });
+
+  afterEach(() => {
+    while (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild);
+    }
+    jest.clearAllMocks();
+  });
+
+  /** A workbook whose child sheet comes first, so the parents' sheet is moved ahead. */
+  function giveWorkbook() {
+    readSheetNames.mockResolvedValueOnce(['Sessions', 'Programs']);
+    readXlsx
+      .mockResolvedValueOnce([
+        ['Name', 'Program', 'Room'],
+        ['Intro', 'P-1', '101'],
+        ['Advanced', 'P-1', '102']
+      ])
+      .mockResolvedValueOnce([
+        ['Name', 'Code'],
+        ['Reading', 'P-1']
+      ]);
+  }
+
+  /** Chooses the card, reads the workbook, names the template and makes it. */
+  async function createFromWorkbook() {
+    giveWorkbook();
+    const element = render();
+    await flush();
+    await chooseKind(element, 'several');
+    expect(element.shadowRoot.querySelector('[data-id="new-object"]')).toBeNull();
+    const input = element.shadowRoot.querySelector('[data-id="detect-file"]');
+    Object.defineProperty(input, 'files', {
+      value: [new File(['zip bytes'], 'programs.xlsx')],
+      configurable: true
+    });
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    const name = element.shadowRoot.querySelector('[data-id="new-template-name"]');
+    name.value = 'Programs and sessions';
+    name.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    return element;
+  }
+
+  async function toColumnsStep() {
+    const element = await createFromWorkbook();
+    click(element, 'create-several-template');
+    await flush();
+    click(element, 'next');
+    await flush();
+    return element;
+  }
+
+  it('suggests every object the file points at, and makes the template of them', async () => {
+    const element = await createFromWorkbook();
+    const objects = element.shadowRoot.querySelector('[data-id="new-objects"]');
+    expect(objects.options.map((option) => option.value)).toEqual([
+      'Program__c',
+      'Session__c',
+      'Venue__c'
+    ]);
+    expect(objects.value).toEqual(['Session__c', 'Program__c']);
+    objects.dispatchEvent(
+      new CustomEvent('change', { detail: { value: ['Program__c', 'Session__c', 'Venue__c'] } })
+    );
+    await flush();
+    click(element, 'create-several-template');
+    await flush();
+    expect(createSeveralObjectsTemplate).toHaveBeenCalledWith({
+      name: 'Programs and sessions',
+      objectNames: ['Program__c', 'Session__c', 'Venue__c']
+    });
+    expect(element.shadowRoot.querySelector('[data-id="template-creates"]').textContent).toContain(
+      'Program, Session'
+    );
+  });
+
+  it('maps each sheet for its object, parents first, keeping the saved columns', async () => {
+    const element = await toColumnsStep();
+    const sheetObjects = element.shadowRoot.querySelectorAll('[data-id="sheet-object"]');
+    expect(Array.from(sheetObjects).map((each) => [each.dataset.sheet, each.value])).toEqual([
+      ['Sessions', 'Session__c'],
+      ['Programs', 'Program__c']
+    ]);
+    expect(suggestSheetMapping.mock.calls.map(([call]) => call.objectName)).toEqual([
+      'Program__c',
+      'Session__c'
+    ]);
+    const rows = Array.from(element.shadowRoot.querySelectorAll('[data-id="column-row"]'));
+    expect(rows.map((row) => row.querySelector('td').textContent)).toEqual([
+      'Name',
+      'Code',
+      'Name (Sessions)',
+      'Program',
+      'Room'
+    ]);
+    const targets = rows.map((row) => row.querySelector('lightning-combobox').value);
+    expect(targets).toEqual([
+      'Program__c.Name',
+      'Program__c.Code__c',
+      'Session__c.Name',
+      'Session__c.Program__c',
+      'Session__c.Room__c'
+    ]);
+    // A lookup on one object names its parent by a field, as for one object.
+    expect(element.shadowRoot.querySelectorAll('[data-id="lookup-field"]')).toHaveLength(1);
+    expect(element.shadowRoot.querySelector('[data-id="sheet-conflict"]')).toBeNull();
+  });
+
+  it('maps a sheet again for another object', async () => {
+    const element = await toColumnsStep();
+    suggestSheetMapping.mockClear();
+    const sessions = element.shadowRoot.querySelectorAll('[data-id="sheet-object"]')[0];
+    sessions.dispatchEvent(new CustomEvent('change', { detail: { value: 'Program__c' } }));
+    await flush();
+    expect(suggestSheetMapping.mock.calls.map(([call]) => call.objectName)).toEqual([
+      'Program__c',
+      'Program__c'
+    ]);
+  });
+
+  it('asks each object how it finds its records, then sends the objects with the mapping', async () => {
+    const element = await toColumnsStep();
+    click(element, 'next');
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="load-options"]')).toBeNull();
+    const options = element.shadowRoot.querySelectorAll('[data-id="several-load-options"]');
+    expect(options).toHaveLength(2);
+    expect(options[0].hideLookups).toBe(true);
+    expect(element.shadowRoot.querySelector('[data-id="several-link"]').textContent).toContain(
+      'linked to the Program record'
+    );
+    options[1].dispatchEvent(
+      new CustomEvent('change', {
+        detail: { operation: 'Upsert by external ID', matchField: 'Name' }
+      })
+    );
+    element.shadowRoot
+      .querySelector('[data-id="several-not-found"]')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: 'Leave it empty' } }));
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+
+    const call = createBatch.mock.calls[0][0];
+    expect(JSON.parse(call.mappingDocument).objects).toEqual([
+      { entity: 'Program__c', operation: 'Insert' },
+      { entity: 'Session__c', operation: 'Upsert by external ID', keyField: 'Name' }
+    ]);
+    const load = JSON.parse(call.optionsJson).load;
+    expect(load.operation).toBe('Insert');
+    expect(load.lookupNotFound).toBe('Leave it empty');
+    expect(load.related).toBeUndefined();
+    // The parents' rows stage first.
+    expect(JSON.parse(stageRows.mock.calls[0][0].rowsJson)[0]).toEqual({
+      Name: 'Reading',
+      Code: 'P-1',
+      'Name (Sessions)': '',
+      Program: '',
+      Room: ''
+    });
+  });
+
+  it('cannot dry run while an object that finds its records has no key column', async () => {
+    const element = await toColumnsStep();
+    click(element, 'next');
+    await flush();
+    element.shadowRoot
+      .querySelectorAll('[data-id="several-load-options"]')[0]
+      .dispatchEvent(
+        new CustomEvent('change', { detail: { operation: 'Update by record Id', matchField: '' } })
+      );
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="dry-run"]').disabled).toBe(true);
   });
 });

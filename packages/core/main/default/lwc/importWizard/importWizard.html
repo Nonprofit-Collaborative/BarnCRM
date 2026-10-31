@@ -153,13 +153,27 @@
                                 </ul>
                             </template>
                         </template>
-                        <lightning-combobox
-                            data-id="new-object"
-                            label={labels.loadObjectLabel}
-                            value={newObjectName}
-                            options={objectOptions}
-                            onchange={handleNewObjectChange}
-                        ></lightning-combobox>
+                        <template lwc:if={choosingOneObject}>
+                            <lightning-combobox
+                                data-id="new-object"
+                                label={labels.loadObjectLabel}
+                                value={newObjectName}
+                                options={objectOptions}
+                                onchange={handleNewObjectChange}
+                            ></lightning-combobox>
+                        </template>
+                        <template lwc:if={choosingSeveral}>
+                            <lightning-dual-listbox
+                                data-id="new-objects"
+                                label={labels.severalObjectsLabel}
+                                source-label={labels.severalObjectsAvailable}
+                                selected-label={labels.severalObjectsLabel}
+                                field-level-help={labels.severalObjectsHelp}
+                                options={objectOptions}
+                                value={newObjectNames}
+                                onchange={handleNewObjectsChange}
+                            ></lightning-dual-listbox>
+                        </template>
                         <lightning-input
                             data-id="new-template-name"
                             label={labels.loadObjectNameLabel}
@@ -167,13 +181,24 @@
                             max-length="80"
                             onchange={handleNewTemplateNameChange}
                         ></lightning-input>
-                        <lightning-button
-                            class="slds-var-m-top_x-small"
-                            label={labels.loadObjectCreateButton}
-                            data-id="create-object-template"
-                            disabled={cannotCreateObjectTemplate}
-                            onclick={handleCreateObjectTemplate}
-                        ></lightning-button>
+                        <template lwc:if={choosingSeveral}>
+                            <lightning-button
+                                class="slds-var-m-top_x-small"
+                                label={labels.loadObjectCreateButton}
+                                data-id="create-several-template"
+                                disabled={cannotCreateSeveralTemplate}
+                                onclick={handleCreateSeveralTemplate}
+                            ></lightning-button>
+                        </template>
+                        <template lwc:else>
+                            <lightning-button
+                                class="slds-var-m-top_x-small"
+                                label={labels.loadObjectCreateButton}
+                                data-id="create-object-template"
+                                disabled={cannotCreateObjectTemplate}
+                                onclick={handleCreateObjectTemplate}
+                            ></lightning-button>
+                        </template>
                     </template>
                 </template>
 
@@ -217,6 +242,23 @@
                             onchange={handleSheetChange}
                         ></lightning-checkbox-group>
                         <p class="slds-text-body_small slds-var-m-bottom_small">{labels.sheetHelp}</p>
+                    </template>
+                    <template lwc:if={hasSheetObjectRows}>
+                        <div class="slds-var-m-bottom_small" data-id="sheet-objects">
+                            <template for:each={sheetObjectRows} for:item="sheetRow">
+                                <lightning-combobox
+                                    key={sheetRow.key}
+                                    data-id="sheet-object"
+                                    data-sheet={sheetRow.sheetName}
+                                    label={sheetRow.label}
+                                    value={sheetRow.value}
+                                    options={sheetRow.options}
+                                    disabled={parsing}
+                                    onchange={handleSheetObjectChange}
+                                ></lightning-combobox>
+                            </template>
+                            <p class="slds-text-body_small slds-var-m-top_x-small">{labels.sheetObjectHelp}</p>
+                        </div>
                     </template>
                     <template lwc:if={hasSheetConflict}>
                         <div class="slds-var-m-bottom_small" role="alert" data-id="sheet-conflict">
@@ -314,7 +356,42 @@
                 </template>
 
                 <template lwc:if={isStepMatching}>
-                    <template lwc:if={loadsOneObject}>
+                    <template lwc:if={loadsSeveral}>
+                        <p class="slds-text-body_small slds-var-m-bottom_small" data-id="several-matching-help">
+                            {labels.severalMatchingHelp}
+                        </p>
+                        <template for:each={severalObjectRows} for:item="objectRow">
+                            <div key={objectRow.key} class="slds-box slds-var-m-bottom_small" data-id="several-object">
+                                <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{objectRow.objectLabel}</h3>
+                                <c-import-load-options
+                                    data-id="several-load-options"
+                                    data-object={objectRow.objectName}
+                                    operation={objectRow.operation}
+                                    operations={objectRow.operations}
+                                    match-field={objectRow.matchField}
+                                    key-fields={objectRow.keyFields}
+                                    row-match-fields={objectRow.matchFields}
+                                    hide-lookups
+                                    onchange={handleSeveralLoadChange}
+                                ></c-import-load-options>
+                                <template for:each={objectRow.links} for:item="link">
+                                    <p key={link.key} class="slds-text-body_small slds-var-m-top_x-small" data-id="several-link">
+                                        {link.text}
+                                    </p>
+                                </template>
+                            </div>
+                        </template>
+                        <lightning-radio-group
+                            data-id="several-not-found"
+                            name="several-lookup-not-found"
+                            label={labels.notFoundLabel}
+                            value={lookupNotFound}
+                            options={notFoundOptions}
+                            onchange={handleNotFoundChange}
+                        ></lightning-radio-group>
+                        <p class="slds-text-body_small slds-var-m-top_x-small">{notFoundHelp}</p>
+                    </template>
+                    <template lwc:if={loadsSingleObject}>
                         <c-import-load-options
                             data-id="load-options"
                             operation={loadOperation}

@@ -57,22 +57,6 @@
         <value>Create, update or upsert the records of any one object, such as program sessions or one of your own objects.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_KindRelatedTitle</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: title of the related records card</shortDescription>
-        <value>Records With Their Related Records</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_KindRelatedText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the related records card loads</shortDescription>
-        <value>Update or upsert one kind of record and create its related records from the same rows, such as sessions and their attendees.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_KindDeleteTitle</fullName>
         <categories>Import</categories>
         <language>en_US</language>

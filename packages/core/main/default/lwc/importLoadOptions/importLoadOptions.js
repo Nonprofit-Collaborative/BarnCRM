@@ -41,13 +41,31 @@ const OPERATIONS = [
   { value: DELETE, label: deleteOption, help: deleteHelp }
 ];
 
+/** What a row does when a lookup finds no record, for the wizard to ask once for several. */
+export function notFoundChoices() {
+  return [
+    { label: rejectOption, value: LOOKUP_REJECT },
+    { label: leaveEmptyOption, value: LOOKUP_LEAVE_EMPTY }
+  ];
+}
+
+/** What the lookup choice risks. */
+export function notFoundHelpOf(choice) {
+  return choice === LOOKUP_LEAVE_EMPTY ? leaveEmptyHelp : rejectHelp;
+}
+
+/** The lookup choice's label. */
+export const NOT_FOUND_LABEL = notFoundLabel;
+
 /**
  * What a mapping that loads one object does with each row (canonical model R-IT12, R-IT13):
  * insert, update by record ID, update by a field the user chooses, upsert by an external ID
  * field, or delete by record ID (R-BD7), with what each choice risks, the field an update or
- * upsert matches on, and what a row does when a lookup finds no record, and the related records
- * each row also creates (R-IT17), offered under every operation but Insert, which has no parent
- * key, and Delete, which reads only the record ID.
+ * upsert matches on, and what a row does when a lookup finds no record. A template made before
+ * several objects in one upload (D-154) may also create related records (R-IT17): that choice
+ * is shown only while the template has one, under every operation but Insert, which has no
+ * parent key, and Delete, which reads only the record ID. With `hideLookups`, one object of an
+ * upload of several shows only its operation and key, the wizard asking the rest once.
  * Presentational: the wizard owns the values and hears every change through a `change` event
  * whose detail is `{ operation, matchField, lookupNotFound, related }`.
  * See docs/admin-guide/importing.md, section 9.
@@ -69,6 +87,8 @@ export default class ImportLoadOptions extends LightningElement {
   @api related = '';
   /** The related records the object offers: `{ label, value }`. */
   @api relatedOptions = [];
+  /** One object of an upload of several (R-IT20): no lookup choice and no related records. */
+  @api hideLookups = false;
 
   labels = {
     operationLabel,
@@ -79,9 +99,21 @@ export default class ImportLoadOptions extends LightningElement {
     relatedInsertHelp
   };
 
-  /** Related records need a parent key, which Insert does not have; a delete loads none. */
+  /**
+   * Related records need a parent key, which Insert does not have; a delete loads none. Only a
+   * template that has them shows the choice: a new one loads several objects instead (D-154).
+   */
   get offersRelated() {
-    return this.operation !== INSERT && this.operation !== DELETE;
+    return this.hasRelated && this.operation !== INSERT && this.operation !== DELETE;
+  }
+
+  /** Under Insert, a template with related records says why they are not loaded. */
+  get explainsRelatedInsert() {
+    return this.hasRelated && this.operation === INSERT;
+  }
+
+  get hasRelated() {
+    return Boolean(this.related) && !this.hideLookups;
   }
 
   get relatedChoices() {
@@ -105,7 +137,7 @@ export default class ImportLoadOptions extends LightningElement {
 
   /** A delete reads only the record ID, so what a lookup does is not asked. */
   get readsLookups() {
-    return this.operation !== DELETE;
+    return this.operation !== DELETE && !this.hideLookups;
   }
 
   get operationHelp() {
@@ -137,14 +169,11 @@ export default class ImportLoadOptions extends LightningElement {
   }
 
   get notFoundOptions() {
-    return [
-      { label: rejectOption, value: LOOKUP_REJECT },
-      { label: leaveEmptyOption, value: LOOKUP_LEAVE_EMPTY }
-    ];
+    return notFoundChoices();
   }
 
   get notFoundHelp() {
-    return this.lookupNotFound === LOOKUP_LEAVE_EMPTY ? leaveEmptyHelp : rejectHelp;
+    return notFoundHelpOf(this.lookupNotFound);
   }
 
   handleOperationChange(event) {

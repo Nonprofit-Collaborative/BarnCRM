@@ -4,8 +4,8 @@ import kindGiftsTitle from '@salesforce/label/c.Core_Import_KindGiftsTitle';
 import kindGiftsText from '@salesforce/label/c.Core_Import_KindGiftsText';
 import kindObjectTitle from '@salesforce/label/c.Core_Import_KindObjectTitle';
 import kindObjectText from '@salesforce/label/c.Core_Import_KindObjectText';
-import kindRelatedTitle from '@salesforce/label/c.Core_Import_KindRelatedTitle';
-import kindRelatedText from '@salesforce/label/c.Core_Import_KindRelatedText';
+import kindSeveralTitle from '@salesforce/label/c.Core_Import_KindSeveralTitle';
+import kindSeveralText from '@salesforce/label/c.Core_Import_KindSeveralText';
 import kindDeleteTitle from '@salesforce/label/c.Core_Import_KindDeleteTitle';
 import kindDeleteText from '@salesforce/label/c.Core_Import_KindDeleteText';
 import kindTemplatesTitle from '@salesforce/label/c.Core_Import_KindTemplatesTitle';
@@ -35,12 +35,13 @@ import { DELETE } from 'c/importLoadOptions';
 export const KIND_PEOPLE = 'people';
 export const KIND_GIFTS = 'gifts';
 export const KIND_OBJECT = 'object';
-export const KIND_RELATED = 'related';
+/** Several objects in one upload (R-IT20), which replaces the related records card (D-154). */
+export const KIND_SEVERAL = 'several';
 export const KIND_DELETE = 'delete';
 export const KIND_TEMPLATES = 'templates';
 
-/** The choices that make a new one-object template before going on. */
-export const OBJECT_KINDS = [KIND_OBJECT, KIND_RELATED, KIND_DELETE];
+/** The choices that make a new one-object or several-object template before going on. */
+export const OBJECT_KINDS = [KIND_OBJECT, KIND_SEVERAL, KIND_DELETE];
 
 const GIFT_ENTITY = 'Gift';
 /** The shipped people template every org has, whatever an admin has renamed it. */
@@ -112,7 +113,7 @@ export function kindCards(templates, canDelete) {
     cards.push(card(KIND_GIFTS, kindGiftsTitle, kindGiftsText, 'standard:currency'));
   }
   cards.push(card(KIND_OBJECT, kindObjectTitle, kindObjectText, 'standard:record'));
-  cards.push(card(KIND_RELATED, kindRelatedTitle, kindRelatedText, 'standard:related_list'));
+  cards.push(card(KIND_SEVERAL, kindSeveralTitle, kindSeveralText, 'standard:related_list'));
   if (canDelete) {
     cards.push({
       ...card(KIND_DELETE, kindDeleteTitle, kindDeleteText, 'utility:delete'),
