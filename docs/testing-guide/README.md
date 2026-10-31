@@ -1,6 +1,6 @@
 # BarnCRM Testing Guide
 
-Applies to: BarnCRM main as of 2026-10-31 (commit 1ddb4ed91). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-31 (landing batch A head a8489572d, pending the squash commit on main). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 Manual, step-by-step test scripts for checking a build in a scratch org or sandbox, feature by
 feature. Written for a tester: the project owner or a pilot org admin. Start with
@@ -61,7 +61,7 @@ page, even if that puts it out of reading order.
 | [Giving: refunds and write-offs](giving-refunds.md) | REF | 7 | Refunds and their effect on totals |
 | [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 8 | Giving totals, recalculation, dashboards and reports, donor segments |
 | [Mirror](mirror.md) | MIR | 13 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API |
-| [Volunteers](volunteers.md) | VOL | 13 | Jobs, shifts, sign-ups, hours and approval, skills |
+| [Volunteers](volunteers.md) | VOL | 15 | Jobs, shifts, sign-ups, hours and approval, skills, shift reminders, suggested volunteers |
 | [Programs](programs.md) | PRG | 10 | Programs, services, enrollments, the Program Roster panel, a person's Programs card, Programs access, Health Check, sample data, the Service Delivery Log and the delivery rules |
 | [Logic Models](logic-models.md) | LM | 6 | The Logic Model Builder: parts, arrows and assumptions, whose model it is, indicators and periods with progress, staff and read-only access |
 | [Rollup Builder](rollup-builder.md) | RB | 26 | Building, recalculating and switching rollups, standard objects, parity options, export and import, instant totals on other objects |

@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM main as of 2026-10-31 (commit 1ddb4ed91). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-10-31 (landing batch A head a8489572d, pending the squash commit on main). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 
