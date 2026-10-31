@@ -169,10 +169,11 @@ private class SettingsControllerTest {
                 new Set<String>{
                     'Stale_Record_Years__c',
                     'Unused_Login_Days__c',
-                    'Unused_Report_Days__c'
+                    'Unused_Report_Days__c',
+                    'Setup_Change_Retention_Days__c'
                 },
                 after.get(SettingSections.ORG_OPTIMIZER),
-                'The three thresholds are under Org Optimizer once the feature is on'
+                'The thresholds and the Setup Changes retention are under Org Optimizer once the feature is on'
             );
             Assert.isFalse(
                 after.get(SettingSections.GENERAL).contains('Unused_Login_Days__c'),

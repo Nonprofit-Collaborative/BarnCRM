@@ -148,12 +148,13 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core |
 | C-50 Super Transform (bulk change without a file or a Find query) | [super-transform.md](super-transform.md) | Core |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
-| Org Optimizer (Data Quality, Field Utilization, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Access Explorer) | [org-optimizer.md](org-optimizer.md) | Core |
+| Org Optimizer (Data Quality, Field Utilization, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | Core |
 | C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | Core |
 | C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |
 | Field utilization | [field-utilization.md](field-utilization.md) | Core |
 | C-52 Data Dictionary (the Data Dictionary section of Org Optimizer) | [data-dictionary.md](data-dictionary.md) | Core |
 | C-53 and C-53b Access Explorer, with Compare Two and the Modify All Report (a section of Org Optimizer) | [access-explorer.md](access-explorer.md) | Core |
+| C-56 Setup Changes (who changed what in Setup, kept beyond 180 days; the Setup Changes section of Org Optimizer) | [setup-changes.md](setup-changes.md) | Core |
 
 ### Automation, Totals and Health
 

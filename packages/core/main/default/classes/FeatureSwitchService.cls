@@ -121,7 +121,8 @@ public with sharing class FeatureSwitchService {
                         'Health_Check',
                         'Stale_Record_Years',
                         'Unused_Login_Days',
-                        'Unused_Report_Days'
+                        'Unused_Report_Days',
+                        'Setup_Change_Retention_Days'
                     }
                 )
         };

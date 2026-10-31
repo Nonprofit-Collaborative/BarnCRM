@@ -32,7 +32,8 @@ have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matc
 **Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
 **Import** and **Super Transform** are not in the navigation: open them from their cards on
 the **Data Manager** tab. Administrators also find a **Data Dictionary** section inside **Org
-Optimizer**, which lists every field and downloads it as a CSV, and an **Access Explorer**
+Optimizer**, which lists every field and downloads it as a CSV, a **Setup Changes**
+section that shows who changed what in Setup, and when, and an **Access Explorer**
 section there that shows who can see or change what, and why, compares two people side by side
 and lists who holds Modify All Data. If you import files, the
 **Check Columns** step shows a few example values beside each column, so you can see each

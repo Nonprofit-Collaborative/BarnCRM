@@ -9,6 +9,8 @@ import getTile from '@salesforce/apex/ErrorLogController.getTile';
 import getChecks from '@salesforce/apex/DataHygieneController.getChecks';
 import getStorage from '@salesforce/apex/OrgOptimizerStorageController.getStorage';
 import getFindings from '@salesforce/apex/OrgOptimizerSetupController.getFindings';
+import getChangeSummary from '@salesforce/apex/SetupChangeController.getSummary';
+import getChanges from '@salesforce/apex/SetupChangeController.getChanges';
 
 jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
   virtual: true
@@ -49,6 +51,15 @@ jest.mock(
   { virtual: true }
 );
 jest.mock('@salesforce/apex/DataHygieneController.getChecks', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/SetupChangeController.getSummary', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/SetupChangeController.getChanges', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/SetupChangeController.copyNow', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_OrgOptimizer_BadgeNew', () => ({ default: '{0} New' }), {
@@ -143,7 +154,7 @@ describe('c-org-optimizer as an administrator', () => {
     const groups = one(element, 'c-barn-tool-grid').groups;
     expect(groups.map((group) => group.tiles.map((tile) => tile.name))).toEqual([
       ['quality', 'fieldUtilization', 'dataDictionary'],
-      ['healthCheck', 'errors', 'storage', 'setup', 'accessExplorer']
+      ['healthCheck', 'errors', 'storage', 'setup', 'setupChanges', 'accessExplorer']
     ]);
     tiles(element).forEach((tile) => expect(tile.iconName).toMatch(/^standard:/));
   });
@@ -312,6 +323,17 @@ describe('c-org-optimizer as an administrator', () => {
     expect(panel.lastResultFirst).toBe(true);
     expect(one(element, 'c-barn-empty-state[data-id="health-check-empty"]')).toBeNull();
     expect(getReport).not.toHaveBeenCalled();
+  });
+
+  it('reads setup changes only when their section is opened', async () => {
+    getChangeSummary.mockResolvedValue({ keptCount: 0, sections: [], pageRows: 200 });
+    getChanges.mockResolvedValue({ rows: [], more: false, scanStopped: false });
+    const element = await render();
+    expect(getChangeSummary).not.toHaveBeenCalled();
+
+    await activate(element, 'setupChanges');
+    expect(one(element, 'c-setup-change-log')).not.toBeNull();
+    expect(getChangeSummary).toHaveBeenCalledTimes(1);
   });
 
   it('runs Health Check only when asked, and refreshes its badge back on the Overview', async () => {

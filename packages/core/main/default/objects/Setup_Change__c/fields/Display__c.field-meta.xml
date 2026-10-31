@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Display__c</fullName>
+  <description>Salesforce's own sentence for the change, such as Changed Phone field label: the trail's Display.</description>
+  <label>What Changed</label>
+  <length>1000</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

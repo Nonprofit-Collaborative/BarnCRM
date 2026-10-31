@@ -29,6 +29,8 @@ import STORAGE from '@salesforce/label/c.Core_OrgOptimizer_Storage';
 import STORAGE_TEXT from '@salesforce/label/c.Core_OrgOptimizer_StorageText';
 import SETUP from '@salesforce/label/c.Core_OrgOptimizer_Setup';
 import SETUP_TEXT from '@salesforce/label/c.Core_OrgOptimizer_SetupText';
+import SETUP_CHANGES from '@salesforce/label/c.Core_OrgOptimizer_SetupChanges';
+import SETUP_CHANGES_TEXT from '@salesforce/label/c.Core_OrgOptimizer_SetupChangesText';
 import RUN_HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_RunHealthCheck';
 import HEALTH_CHECK_INTRO from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckIntro';
 import HEALTH_CHECK_NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckNotRunHeading';
@@ -75,6 +77,7 @@ export default class OrgOptimizer extends LightningElement {
     errors: ERRORS,
     storage: STORAGE,
     setup: SETUP,
+    setupChanges: SETUP_CHANGES,
     runHealthCheck: RUN_HEALTH_CHECK,
     healthCheckIntro: HEALTH_CHECK_INTRO,
     healthCheckNotRun: HEALTH_CHECK_NOT_RUN
@@ -124,6 +127,7 @@ export default class OrgOptimizer extends LightningElement {
         this.tile('errors', ERRORS, ERRORS_TEXT, 'standard:incident'),
         this.tile('storage', STORAGE, STORAGE_TEXT, 'standard:data_model'),
         this.tile('setup', SETUP, SETUP_TEXT, 'standard:settings'),
+        this.tile('setupChanges', SETUP_CHANGES, SETUP_CHANGES_TEXT, 'standard:timeslot'),
         this.tile('accessExplorer', ACCESS_EXPLORER, ACCESS_EXPLORER_TEXT, 'standard:user_role')
       );
     }
@@ -213,6 +217,10 @@ export default class OrgOptimizer extends LightningElement {
 
   get setupOpened() {
     return Boolean(this.opened.setup);
+  }
+
+  get setupChangesOpened() {
+    return Boolean(this.opened.setupChanges);
   }
 
   get accessExplorerOpened() {

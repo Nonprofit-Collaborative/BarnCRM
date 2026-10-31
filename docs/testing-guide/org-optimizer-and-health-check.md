@@ -216,3 +216,24 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 6 | Set **Digest frequency** back to **Every day** and **Send Now** with a New entry. | The email has the error counts only, with no **Admin Summary**. |
 
 **Cleanup:** Restore **Digest frequency** and **Weekly admin summary** to their earlier values.
+
+## T-HC-14: Setup Changes Keeps Who Changed What
+
+**Purpose:** Confirm an admin can copy the Setup Audit Trail into BarnCRM, find a change by its words, day and section, download it, and that nobody else sees it.
+**Prerequisites:** admin (a System Administrator, so the trail can be read) and staff (see [Test users](before-you-test.md#test-users)). This script copies real Setup changes into **Setup Change** records; in a real-org sandbox that uses about 2 KB of data storage per change.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open **Org Optimizer**. | **Overview** has a **Setup Changes** tile under **Check Your Setup**: **Who changed what in Setup, and when, kept beyond Salesforce's 180 days.** |
+| 2 | Choose **Setup Changes** on an org where nothing has been copied yet. | **Nothing is kept yet. Press Copy New Changes Now to copy the last 180 days of Setup changes.** and **The nightly copy is not scheduled.** (or **New changes are copied every night at 1:30 and kept for 730 days.** if Health Check already scheduled it). The empty state reads **No kept change matches these filters.** |
+| 3 | Click **Copy New Changes Now**. | **The copy has started and runs in the background.** The status line reads **A copy is running.** |
+| 4 | Wait a minute or two (longer in a busy org) and click **Refresh**. | **Kept: {n} changes, from {day} to {day}.**, the status line says the copy runs every night at 1:30 and keeps changes for 730 days, and the table lists changes newest first with **Changed At**, **Changed By**, **Logged In As**, **Section** and **What Changed**. |
+| 5 | In Setup, change the help text of any Contact field. Back on **Setup Changes**, click **Copy New Changes Now**, wait, then **Refresh**. | Your change is at the top, with your name in **Changed By** and the field in **What Changed**. |
+| 6 | Type the field's label in **Search** and click **Search**. | Only changes that mention it. Add a second word that is not in any of them: **No kept change matches these filters.** |
+| 7 | Clear **Search**. Choose a **Section**, and set **From** to today. | Only today's changes in that section. Set **To** to yesterday and click **Search**: **From is after To.** and nothing is asked of the server. |
+| 8 | Clear the filters and click **Download CSV**. | A file named **Setup_Changes-** and today's date ending .csv downloads, and **Saved {n} changes as CSV.** shows. Its header row is **Changed At**, **Changed By**, **Logged In As**, **Section**, **Action**, **What Changed**. |
+| 9 | In **BarnCRM Settings**, **Org Optimizer**, find **Days to Keep Setup Changes**. Set it to `100` and click **Save**. | Shows **730** before you change it. Nothing is saved; the value is marked as outside its range (180 to 3,650). |
+| 10 | Open **Org Optimizer**, **Health Check**, and run it. | If the nightly jobs finding lists jobs, **Setup changes copy** is one of them unless step 3 already scheduled it. |
+| 11 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **Setup Changes** tile or tab. |
+
+**Cleanup:** Change the help text from step 5 back. The copied **Setup Change** records stay until the nightly copy deletes them after **Days to Keep Setup Changes**; nobody edits or deletes them by hand.

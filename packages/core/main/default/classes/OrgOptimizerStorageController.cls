@@ -28,7 +28,8 @@ public with sharing class OrgOptimizerStorageController {
         Import_Row__c.SObjectType,
         Import_Journal__c.SObjectType,
         Error_Log__c.SObjectType,
-        Field_Utilization_Snapshot__c.SObjectType
+        Field_Utilization_Snapshot__c.SObjectType,
+        Setup_Change__c.SObjectType
     };
 
     @TestVisible

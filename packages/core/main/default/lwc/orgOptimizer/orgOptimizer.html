@@ -84,6 +84,16 @@
                     </template>
                 </lightning-tab>
                 <lightning-tab
+                    label={labels.setupChanges}
+                    value="setupChanges"
+                    onactive={handleActive}
+                    data-id="tab-setupChanges"
+                >
+                    <template lwc:if={setupChangesOpened}>
+                        <c-setup-change-log></c-setup-change-log>
+                    </template>
+                </lightning-tab>
+                <lightning-tab
                     label={labels.accessExplorer}
                     value="accessExplorer"
                     onactive={handleActive}
