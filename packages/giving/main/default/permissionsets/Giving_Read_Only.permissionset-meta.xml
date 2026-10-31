@@ -1428,6 +1428,10 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Ask_Pipeline</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Ask__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
