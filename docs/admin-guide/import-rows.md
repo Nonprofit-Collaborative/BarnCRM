@@ -23,7 +23,8 @@ rows") still works too; use it when many rows need the same fix.
 
 Nothing to switch on: it comes with **Import**, which needs the **Data Manager** feature
 (BarnCRM Settings, **General**) and the Manage BarnCRM Settings permission (the BarnCRM Admin
-permission set). The **Import Rows** tab shows for the people who see the **Import** tab.
+permission set). The **Import Rows** tab is in the BarnCRM Admin apps, after **Data Manager**,
+for the people who see the **Import** tab.
 
 **Delete Import Rows** in **BarnCRM Settings**, **Import**, says how long rows are kept after
 an import is complete: **Once Complete**, **After 30 Days** (the default), **After 90 Days** or

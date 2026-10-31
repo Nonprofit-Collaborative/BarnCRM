@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customObject>true</customObject>
+  <description>
+    Super Importer rows: every staged row of every import, with list views by row and import
+    status; open a rejected row to correct and retry it.
+  </description>
+  <motif>Custom83: Pencil</motif>
+</CustomTab>

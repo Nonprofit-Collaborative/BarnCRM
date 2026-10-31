@@ -52,6 +52,7 @@
   <navType>Console</navType>
   <tabs>BarnCRM_Settings</tabs>
   <tabs>Data_Manager</tabs>
+  <tabs>Import_Row__c</tabs>
   <tabs>Data_Hygiene</tabs>
   <tabs>Duplicate_Matching</tabs>
   <tabs>Error_Log__c</tabs>
@@ -68,6 +69,9 @@
     </mappings>
     <mappings>
       <tab>Duplicate_Matching</tab>
+    </mappings>
+    <mappings>
+      <tab>Import_Row__c</tab>
     </mappings>
     <mappings>
       <tab>Error_Log__c</tab>
