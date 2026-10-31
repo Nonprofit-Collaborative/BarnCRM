@@ -115,6 +115,8 @@ const TABLE_EDIT_TYPES = { email: 'email', phone: 'phone', url: 'url' };
 const SAVED_QUERY_STATE = '__savedQueryId';
 /** The state key the Data Manager's bulk cards use, matched by suffix: "update" or "delete" (D-135). */
 const TOOL_STATE = '__tool';
+/** The state key the Record Inspector (C-55) uses to open Find on one object: `c__object`. */
+const OBJECT_STATE = '__object';
 const START_NOTES = { update: START_UPDATE, delete: START_DELETE };
 
 const DEFAULT_ROWS = 200;
@@ -279,12 +281,30 @@ export default class FindRecords extends LightningElement {
       this.requestedSavedQueryId = state[key];
       this.openRequested();
     }
+    const objectKey = Object.keys(state).find((name) => name.endsWith(OBJECT_STATE));
+    if (objectKey && state[objectKey]) {
+      this.requestedObject = state[objectKey];
+      this.openRequestedObject();
+    }
+  }
+
+  /** Chooses the object a link asked for, once the object list is loaded and it is in it. */
+  async openRequestedObject() {
+    const requested = this.requestedObject;
+    if (!requested || !this.objectOptions.some((option) => option.value === requested)) {
+      return;
+    }
+    this.requestedObject = undefined;
+    if (requested !== this.objectApiName) {
+      await this.handleObjectChange({ detail: { value: requested } });
+    }
   }
 
   @wire(listObjects)
   wiredObjects({ data, error }) {
     if (data) {
       this.objectOptions = data.map((option) => ({ label: option.label, value: option.value }));
+      this.openRequestedObject();
     } else if (error) {
       this.errorMessage = messageFrom(error);
     }

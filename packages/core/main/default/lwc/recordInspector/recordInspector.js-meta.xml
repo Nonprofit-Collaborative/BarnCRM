@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Every field you can read on a record, including fields that are not on the page layout, with
+    API names and values. Searchable, with a button that copies an API name. Read only, for
+    BarnCRM Admins.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Record Inspector</masterLabel>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+</LightningComponentBundle>
