@@ -1,0 +1,85 @@
+<template>
+    <div>
+        <h2 class="slds-text-heading_medium slds-var-m-bottom_small">{labels.title}</h2>
+        <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+
+        <template lwc:if={errorMessage}>
+            <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
+                {errorMessage}
+            </p>
+        </template>
+        <template lwc:if={noticeMessage}>
+            <p class="slds-var-m-bottom_small" data-id="notice" role="status" aria-live="polite">
+                {noticeMessage}
+            </p>
+        </template>
+
+        <lightning-dual-listbox
+            data-id="objects"
+            name="objects"
+            label={labels.chooseLabel}
+            source-label={labels.sourceLabel}
+            selected-label={labels.selectedLabel}
+            options={objectOptions}
+            value={selected}
+            disabled={building}
+            onchange={handleSelect}
+        ></lightning-dual-listbox>
+
+        <div class="slds-var-m-vertical_small">
+            <lightning-input
+                data-id="fill-rates"
+                type="checkbox"
+                label={labels.includeFillRates}
+                checked={includeFillRates}
+                disabled={building}
+                onchange={handleFillRates}
+            ></lightning-input>
+            <p class="slds-text-body_small" data-id="fill-rates-help">{labels.includeFillRatesHelp}</p>
+        </div>
+
+        <lightning-button-group class="slds-var-m-bottom_small">
+            <lightning-button
+                data-id="build"
+                label={labels.build}
+                variant="brand"
+                disabled={buildDisabled}
+                onclick={handleBuild}
+            ></lightning-button>
+            <lightning-button
+                data-id="download"
+                label={labels.download}
+                disabled={downloadDisabled}
+                onclick={handleDownload}
+            ></lightning-button>
+        </lightning-button-group>
+
+        <template lwc:if={progressText}>
+            <div class="slds-var-m-vertical_small" data-id="progress">
+                <lightning-progress-bar value={progressValue} size="medium"></lightning-progress-bar>
+                <p class="slds-text-body_small slds-var-m-top_xx-small" role="status" aria-live="polite">
+                    {progressText}
+                </p>
+            </div>
+        </template>
+
+        <template lwc:if={showEmpty}>
+            <p data-id="empty">{labels.empty}</p>
+        </template>
+
+        <template lwc:if={hasRows}>
+            <lightning-datatable
+                data-id="results"
+                key-field="key"
+                data={rows}
+                columns={columns}
+                hide-checkbox-column
+                wrap-text-max-lines="3"
+            ></lightning-datatable>
+        </template>
+
+        <template lwc:if={notCountedMessage}>
+            <p class="slds-var-m-top_small" data-id="not-counted">{notCountedMessage}</p>
+        </template>
+    </div>
+</template>

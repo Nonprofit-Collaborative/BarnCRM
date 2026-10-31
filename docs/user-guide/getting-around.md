@@ -31,7 +31,8 @@ Manager**. **BarnCRM Console** has the same, plus **Addresses**, **Relationships
 have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching** and
 **Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
 **Import** and **Bulk Update** are not in the navigation: open them from their cards on the
-**Data Manager** tab.
+**Data Manager** tab. Administrators also find a **Data Dictionary** section inside **Org
+Optimizer**, which lists every field and downloads it as a CSV.
 
 The **Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,
 **Organizations**, **Gifts**, **Commitments**, **Gift Batches**, **Funds**, **Appeals**,

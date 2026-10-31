@@ -35,6 +35,16 @@
                         <c-field-utilization></c-field-utilization>
                     </template>
                 </lightning-tab>
+                <lightning-tab
+                    label={labels.dataDictionary}
+                    value="dataDictionary"
+                    onactive={handleActive}
+                    data-id="tab-dataDictionary"
+                >
+                    <template lwc:if={dataDictionaryOpened}>
+                        <c-data-dictionary></c-data-dictionary>
+                    </template>
+                </lightning-tab>
                 <lightning-tab label={labels.healthCheck} value="healthCheck" onactive={handleActive} data-id="tab-healthCheck">
                     <template lwc:if={showHealthCheck}>
                         <c-health-check-panel></c-health-check-panel>
