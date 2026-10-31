@@ -8669,6 +8669,7 @@ of what happened. Staff enter sign-ups; there is no portal (V-09 is out of scope
 | Account | reference(Account) | conditional | The person, where people are person Accounts. |
 | Status | picklist(Signed up, Confirmed, Attended, No show, Cancelled) | yes (defaults Signed up) | Where this booking stands, up to whether the person turned up. |
 | Notes | text | no | Anything the coordinator needs to remember about this booking. |
+| Reminder Sent On | datetime | no | When the shift reminder email for this booking went out (V-10, R-VU6). Empty means none was sent. BarnCRM writes it; a coordinator clears it to send the reminder again. |
 
 ### Relationships
 
@@ -8714,6 +8715,18 @@ sign-up naming them, so shift counts stand, and empties its Notes. A sign-up Sig
 Confirmed on a shift that has not started is set to Cancelled, so the place is freed and nobody
 expects the person. Done by `VolunteersErasureExtension`, as the user (R-ER5).
 
+**R-VU6 One reminder per booking.** When Send Shift Reminders is on (29N), a morning job at
+7:00 AM (`VolunteerReminderScheduler`, one of the two Volunteers nightly jobs Health Check
+schedules) emails each booking that is Signed up or Confirmed, on an open shift that starts
+after now and before the start of the day Days Before a Shift to Remind after today (org time
+zone), once: the booking is stamped Reminder Sent On when the platform accepts the message, and
+a stamped booking is never emailed again. Nobody is emailed whose Contact has Email Opt Out
+checked or no email address; a booking named by a person account (no Contact) is not reminded
+in this version. The email goes through the platform's single email call to the Contact's own
+address, so the org's daily email limit applies: a message the platform refuses is not stamped,
+a Warning in the Error Log counts them, and the next morning's run tries them again while the
+shift is still ahead. Reminders ship off.
+
 ### Salesforce implementation
 
 - **Object:** `Volunteer_Signup__c`, name field AutoNumber `VS-{000000}`, sharing Controlled
@@ -8726,7 +8739,11 @@ expects the person. Done by `VolunteersErasureExtension`, as the user (R-ER5).
 | Account | `Account__c` | Lookup to Account, delete constraint SetNull |
 | Status | `Status__c` | Picklist: Signed up, Confirmed, Attended, No show, Cancelled; required, default Signed up |
 | Notes | `Notes__c` | Text Area(255) |
+| Reminder Sent On | `Reminder_Sent_On__c` | DateTime, read-only on the layout; editable (to clear) for Admin and Coordinator |
 
+- **Reminders:** `VolunteerReminderScheduler` (7:00 AM) starts `VolunteerReminderBatch` (100
+  bookings per transaction), which reads through `VolunteerReminderSelector` (system mode) and
+  sends through `VolunteerReminderService`.
 - **Validation rules:** `Exactly_One_Person` (R-VU1), checked only when the sign-up is new or
   its Contact or Account changes, so a sign-up whose person was deleted (the lookup cleared by
   SetNull) can still be edited.
@@ -8886,6 +8903,8 @@ module has no settings page of its own), never in Setup. Defaults are applied in
 | `Hours_Require_Approval__c` | boolean | true | Whether hours are entered as Submitted and wait for a coordinator. Off means an entry is Approved as it is saved and counts at once (R-VG6). |
 | `Attendance_Creates_Hours__c` | boolean | true | Whether marking a sign-up Attended writes the hours for that shift (R-VU3). |
 | `Shift_Horizon_Weeks__c` | integer, 1 to 26 | 8 | How many weeks ahead recurring schedules keep their shifts created (V-07). |
+| `Reminders_Enabled__c` | boolean | false | Whether bookings get one reminder email before their shift (V-10, R-VU6). Ships off, because turning it on emails real people. |
+| `Reminder_Lead_Days__c` | integer, 1 to 14 | 1 | How many days before a shift its reminder goes out (V-10). |
 
 ### Salesforce implementation
 
@@ -8896,6 +8915,8 @@ module has no settings page of its own), never in Setup. Defaults are applied in
 | Hours Require Approval | `Hours_Require_Approval__c` | Checkbox, default true |
 | Attendance Creates Hours | `Attendance_Creates_Hours__c` | Checkbox, default true |
 | Weeks Ahead to Create Shifts | `Shift_Horizon_Weeks__c` | Number(2, 0) |
+| Send Shift Reminders | `Reminders_Enabled__c` | Checkbox, default false |
+| Days Before a Shift to Remind | `Reminder_Lead_Days__c` | Number(2, 0), default 1 |
 
 - **Setting Definition rows:** `Settings_Object__c` `Volunteer_Settings__c`, `Module__c`
   Volunteers, `Section__c` Volunteers, one per key.

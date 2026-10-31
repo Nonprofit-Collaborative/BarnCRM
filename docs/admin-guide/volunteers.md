@@ -215,7 +215,7 @@ and delete those entries (or reject them) before you delete the person.
 
 ## Settings
 
-As an admin, open the **Volunteers** section of **BarnCRM Settings**. It shows these three
+As an admin, open the **Volunteers** section of **BarnCRM Settings**. It shows these
 settings, and each saves as you change it.
 
 | Setting | Default | What it does | Takes effect |
@@ -223,6 +223,42 @@ settings, and each saves as you change it.
 | Hours require approval | On | New hours wait as Submitted for a coordinator. Off means an entry counts as soon as it is saved. | Now |
 | Attendance creates hours | On | Marking a sign-up **Attended** writes the hours for that shift, so nobody types them twice. | Now |
 | Shift horizon weeks | 8 | How many weeks ahead recurring schedules keep their shifts created, from 1 to 26. Blank means 8. | A longer horizon at the next nightly run or schedule save; a shorter one removes no shift already created |
+| Send shift reminders | Off | Volunteers signed up for a shift get one reminder email before it. See Shift Reminders below. | At the next 7:00 AM run |
+| Days before a shift to remind | 1 | How many days before a shift its reminder goes out, from 1 to 14. Blank means 1. | At the next 7:00 AM run |
+
+## Shift Reminders
+
+When **Send shift reminders** is on, every volunteer signed up for a shift gets one email
+before it. A job named **Volunteer Shift Reminders, 7:00 AM** runs each morning and emails
+everyone **Signed up** or **Confirmed** on an open shift that starts within **Days before a
+shift to remind** days. With the default of 1 that is every shift starting today (later than
+now) or tomorrow. The email names the job, the day and time, and the place when the shift has
+one, and asks the person to tell you if they cannot come.
+
+**Turning it on.** The setting ships off, because turning it on emails real people. Switch it on
+in **BarnCRM Settings**, **Volunteers**. The 7:00 AM job is one of the nightly jobs on Health
+Check's list: if Health Check shows it as not scheduled, use its **Schedule all nightly jobs**
+fix once. Nothing else needs setting up.
+
+**One reminder per booking.** After a reminder goes out, the sign-up's **Reminder Sent On** field
+holds the time, and that booking is never emailed again, however long the lead time or often
+the job runs. A person who signs up late, inside the lead time, gets theirs the next morning.
+To send a booking's reminder again, clear **Reminder Sent On** on the sign-up (Admin and
+Coordinator can edit it).
+
+**Who is never emailed.** A person with **Email Opt Out** checked on their contact, a person
+with no email address, a sign-up that is Cancelled or marked No show or Attended, and any
+shift that is Cancelled or has already started. Sign-ups that name a person account instead of
+a contact are not reminded.
+
+**Email limits.** Reminders go out through your Salesforce org's own email, so your org's daily
+limit on emails sent by Apex applies, and the same limit is shared with every other BarnCRM email
+(for example donor acknowledgments). Salesforce says what your edition allows under **Setup**,
+**Company Information**. When the limit is reached the rest are not sent: they stay unstamped,
+a Warning in the **Error Log** counts them, and the next morning's run tries them again while
+their shift is still ahead. The emails come from the address of the person who scheduled the
+job and are plain text, not logged on the person's page. There is no mass email tool, no text
+messages and no "still need you" message for unfilled shifts in this version.
 
 ## Recurring Shifts
 

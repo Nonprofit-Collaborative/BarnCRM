@@ -322,6 +322,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Volunteer_Signup__c.Reminder_Sent_On__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Skill__c.Active__c</field>
     <readable>true</readable>
   </fieldPermissions>

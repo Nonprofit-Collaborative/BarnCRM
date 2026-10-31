@@ -128,6 +128,19 @@ a second time records nothing more, and changing the status back deletes nothing
 To free the place but keep a record that the person had signed up, set the status to
 **Cancelled** instead of deleting.
 
+## To Know Whether a Volunteer Was Reminded
+
+When your admin has turned on **Send shift reminders**, each person signed up for a shift gets one
+reminder email before it, early in the morning, so you do not have to chase them.
+
+1. Open the sign-up (click the person's name in the **Sign-Ups** panel).
+2. Look at **Reminder Sent On**. A date and time means the reminder went out; empty means it has
+   not yet, or the person is not emailed (no email address, or Email Opt Out is checked).
+
+To send a reminder again, a Coordinator clears **Reminder Sent On**; it goes out the next
+morning if the shift is still within the reminder window. To stop a person being reminded,
+change their sign-up to **Cancelled**.
+
 ## Common Problems
 
 - Problem: "This person is already signed up for ..." when you add a sign-up. Why and what to

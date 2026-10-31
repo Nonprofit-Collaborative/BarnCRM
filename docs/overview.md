@@ -37,7 +37,7 @@ You choose the edition once, in the first-run setup window; the Setup Assistant 
 | **Rollup Builder** | The rollup engine and the Rollup Builder page where you manage totals | Built (offered in both editions; Giving depends on it) |
 | **Giving** | Gifts, funds, Quick Gift Entry, gift batches, refunds, in-kind gifts, commitments, pledge reminders, soft credits, tributes, matching gifts, appeals, acknowledgments, receipts and year-end statements, donor levels, stewardship plans, the Ask Pipeline, retention reports, donor segments with export for email tools, posting and closed periods, gift import, the Giving dashboard, the Fundraising app | Built |
 | **Mirror** | Opportunity mirror, Campaign sync, inbound gift API, accounting export | Built (the Gift Transaction mirror for Nonprofit Cloud is planned) |
-| **Volunteers** | Jobs, shifts, sign-ups, hours with approval, skills, requirements, recurring shifts, hour letters and certificates, the BarnCRM Volunteers app | Built and tested on main |
+| **Volunteers** | Jobs, shifts, sign-ups, hours with approval, skills, requirements, recurring shifts, shift reminder emails, hour letters and certificates, the BarnCRM Volunteers app | Built and tested on main |
 | **Programs** | Programs, services, enrollments with stages, the Program Roster panel, a person's Programs card, attendance and service delivery with the Service Delivery Log, sample data, the BarnCRM Programs app | Built (release 0.12, P-01; release 0.13, P-02) |
 | **Logic Models** | Inputs, activities, outputs, outcomes and indicators | Planned |
 | **Funders** | Funder pipeline, reporting deadlines, restricted fund tracking | Planned; the package is an empty placeholder |

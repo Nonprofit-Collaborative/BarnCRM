@@ -207,3 +207,20 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 4 | Open **Volunteer Letter Templates** and the list view menu. | **All Volunteer Letter Templates**, **Active Volunteer Letter Templates** and **Inactive Volunteer Letter Templates** are listed. A shipped template that is switched off shows under the Inactive view. |
 
 **Cleanup:** tick **Active** on anything you switched off.
+
+## T-VOL-14: Shift Reminders Go Out Once
+
+**Purpose:** confirm a signed-up volunteer gets one reminder email before their shift, and nobody is emailed twice or against their wishes.
+**Prerequisites:** admin user; a contact with your own email address; a second contact with **Email Opt Out** checked; Volunteers nightly jobs scheduled (Health Check, **Schedule all nightly jobs**).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Volunteers**. | **Send shift reminders** is off by default and **Days before a shift to remind** reads 1. |
+| 2 | Create a shift that starts tomorrow in 3 hours' time or later. Sign up both contacts. Open one sign-up. | **Reminder Sent On** is empty and read-only for a Team Member, editable for a Coordinator. |
+| 3 | Switch **Send shift reminders** on. In the Developer Console, run `VolunteerReminderBatch.startMorning();` as the admin. | The run starts. |
+| 4 | Check the mailbox of the first contact and open each sign-up. | One email naming the job, day and time (and place, if the shift has one). The first sign-up now holds **Reminder Sent On**. The opted-out contact received nothing and has no stamp. |
+| 5 | Run `VolunteerReminderBatch.startMorning();` again. | No second email. |
+| 6 | Clear **Reminder Sent On** on the first sign-up and run it once more. | The email is sent again and the field is filled. |
+| 7 | Set the sign-up to **Cancelled**, clear **Reminder Sent On**, run it again. | No email. |
+
+**Cleanup:** switch **Send shift reminders** off; cancel the test shift.
