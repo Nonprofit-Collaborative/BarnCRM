@@ -8,14 +8,9 @@
 
 .ask-column {
   flex: 0 0 16rem;
-  min-width: 16rem;
 }
 
 .ask-card {
   cursor: grab;
   background: var(--slds-g-color-surface-container-1, #ffffff);
-}
-
-.ask-tile {
-  height: 100%;
 }

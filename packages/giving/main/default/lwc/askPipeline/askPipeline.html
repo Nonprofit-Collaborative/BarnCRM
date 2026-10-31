@@ -60,16 +60,16 @@
           class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_medium"
           data-id="totals"
         >
-          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
-            <div class="ask-tile slds-box slds-box_x-small">
+          <div class="slds-col slds-grid slds-size_1-of-2 slds-medium-size_1-of-4">
+            <div class="slds-box slds-box_x-small slds-size_1-of-1">
               <p class="slds-text-title">{labels.tileOpen}</p>
               <p class="slds-text-heading_medium" data-id="open-count">
                 <lightning-formatted-number value={board.openCount}></lightning-formatted-number>
               </p>
             </div>
           </div>
-          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
-            <div class="ask-tile slds-box slds-box_x-small">
+          <div class="slds-col slds-grid slds-size_1-of-2 slds-medium-size_1-of-4">
+            <div class="slds-box slds-box_x-small slds-size_1-of-1">
               <p class="slds-text-title">{labels.tileOpenAmount}</p>
               <p class="slds-text-heading_medium" data-id="open-amount">
                 <lightning-formatted-number
@@ -79,8 +79,8 @@
               </p>
             </div>
           </div>
-          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
-            <div class="ask-tile slds-box slds-box_x-small">
+          <div class="slds-col slds-grid slds-size_1-of-2 slds-medium-size_1-of-4">
+            <div class="slds-box slds-box_x-small slds-size_1-of-1">
               <p class="slds-text-title">{labels.tileWon}</p>
               <p class="slds-text-heading_medium" data-id="won-amount">
                 <lightning-formatted-number
@@ -91,8 +91,8 @@
               <p class="slds-text-body_small" data-id="won-count">{wonDetail}</p>
             </div>
           </div>
-          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
-            <div class="ask-tile slds-box slds-box_x-small">
+          <div class="slds-col slds-grid slds-size_1-of-2 slds-medium-size_1-of-4">
+            <div class="slds-box slds-box_x-small slds-size_1-of-1">
               <p class="slds-text-title">{labels.tileDeclined}</p>
               <p class="slds-text-heading_medium" data-id="declined-count">
                 <lightning-formatted-number
