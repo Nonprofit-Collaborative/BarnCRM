@@ -53,8 +53,8 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: the choice of which sheet of a workbook to load</shortDescription>
-        <value>Sheet</value>
+        <shortDescription>Import wizard: the choice of which sheets of a workbook to load</shortDescription>
+        <value>Sheets to load</value>
     </labels>
     <labels>
         <fullName>Core_Import_SheetHelp</fullName>
@@ -62,6 +62,70 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: help for the sheet choice</shortDescription>
-        <value>The workbook has more than one sheet. Choose the one to load; its first row must be the column headings.</value>
+        <value>The chosen sheets load as one file. Each sheet's first row must be the column headings; columns that map to the same field are joined.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SheetOption</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: a sheet to choose; {0} is its name, {1} its rows</shortDescription>
+        <value>{0} ({1} rows)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SheetConflict</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the chosen sheets point at different objects</shortDescription>
+        <value>The sheets you chose point at different objects, and one import loads one object. Clear the sheets for the other objects, or go back and choose the object they point at.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SheetObject</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: a sheet and its object; {0} is the sheet, {1} the object</shortDescription>
+        <value>{0}: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ExampleBlank</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: an example value that is an empty cell</shortDescription>
+        <value>(blank)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_DetectFileLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: file chosen to suggest the object to load</shortDescription>
+        <value>Suggest the object from a file (optional)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_DetectSuggested</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the object suggested; {0} is the object's label</shortDescription>
+        <value>Suggested from your file: {0}. Change it if it is not right.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_DetectNone</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: nothing in the file names an object</shortDescription>
+        <value>Nothing in the file names an object you can load. Choose one from the list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_DetectSheetsDiffer</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the file's sheets point at different objects</shortDescription>
+        <value>The file's sheets point at different objects. One import loads one object; on the Check Columns step, clear the sheets for any other.</value>
     </labels>
 </CustomLabels>

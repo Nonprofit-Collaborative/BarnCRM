@@ -581,8 +581,8 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: column of the picker showing sample values</shortDescription>
-        <value>First Values</value>
+        <shortDescription>Import wizard: column of the picker showing example values</shortDescription>
+        <value>Examples</value>
     </labels>
     <labels>
         <fullName>Core_Import_DoNotLoad</fullName>

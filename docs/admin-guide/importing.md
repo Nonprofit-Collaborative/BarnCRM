@@ -98,12 +98,19 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    Organizations**. **People and Organizations List** (or **Generic contact list** in an older
    org) is chosen for you; select **Next**.
 2. Select **Upload file** and choose your file. BarnCRM reads the header row and shows
-   you every column it found, with the first few values from the file underneath each one.
+   you every column it found. The **Examples** column shows up to three values from the
+   column's first rows, one per line, so you can see the column holds what its mapping says
+   (a long value is cut short, and an empty cell shows as "(blank)").
    For a text file, **Columns are separated by** shows the separator BarnCRM found (commas,
    semicolons, tabs or pipes); change it if the columns look wrong, for example every heading
-   in one column. For a workbook with more than one sheet, **Sheet** chooses which one to load
-   (the first, until you choose another). Changing either reads the file again and suggests
-   the columns afresh.
+   in one column. Changing it reads the file again and suggests the columns afresh.
+   For a workbook with more than one sheet, **Sheets to load** lists every sheet with its
+   number of rows. Every sheet with rows is chosen to start; clear any you do not want (a
+   "Read me" sheet, for example). The chosen sheets load as one file: a column is joined with
+   a column on another sheet when both map to the same field (`First Name` on one sheet,
+   `Contact.First Name` on the next), and any other column stays its own, empty in rows from
+   sheets that do not have it. Rows load in sheet order, and row numbers in the results count
+   across the chosen sheets.
 3. Check the columns. Each column shows what BarnCRM thinks it is, for example
    "Email" for a column headed `Email Address`. Change anything that is wrong from the
    picker beside it. A column you do not want loaded is set to **Do not load**, and its
@@ -360,10 +367,11 @@ than what BarnCRM chose (European exports often use semicolons). Choose the righ
 **Columns are separated by** above the column list. A file of only one column reads as comma
 separated.
 
-**An Excel file shows the wrong columns, or none.** The **first sheet** of a workbook is read
-until you choose another in **Sheet** above the column list, and the sheet's first row must be
-the column headings. A sheet with no rows under its headings shows no columns and you cannot go
-on until you choose another. A formula is read as the value Excel last saved for it,
+**An Excel file shows the wrong columns, or none.** Every sheet with rows is chosen until you
+clear it in **Sheets to load** above the column list, and each sheet's first row must be the
+column headings. A note or summary sheet adds its own columns and rows: clear it. When the chosen
+sheets have no rows under their headings, no columns show and you cannot go on until you choose
+another sheet. A formula is read as the value Excel last saved for it,
 and a date as the date, whatever format the cell shows. An older .xls file, or a
 password-protected workbook, cannot be read: save it as .xlsx or CSV and upload that. A
 browser too old to open a workbook says so; save the sheet as CSV instead. So does a workbook
@@ -510,7 +518,7 @@ so a row whose person or organization is not already in Salesforce is rejected i
 creating them. If those rows are new people, untick **Match only** and load them again.
 
 **Load one object: "No record ... was found for" a lookup.** The value in a lookup column did
-not find a record by the field that column names its parent by (section 9, step 4). Check the
+not find a record by the field that column names its parent by (section 9, step 5). Check the
 value, or choose a different field in the column's second picker, or choose **Leave it empty**
 to load the row without the lookup.
 
@@ -692,13 +700,31 @@ person Accounts) match yours; otherwise it is left out, and the reason is on the
 1. Open the **Import** tab and choose **One Kind of Record** (or **Records With Their Related
    Records**, or **Delete the Records a File Lists**). A template you made before is under
    **Your Templates**.
-2. Choose the object from the list, give the template a name (for example "Program sessions"),
+2. Not sure which object? Under **Suggest the object from a file**, choose the file first.
+   BarnCRM suggests the object its headings, sheet names or file name point at, in that order
+   (for example `Contact.First Name`, a **Contacts** sheet, or `contacts_2026.xlsx`; dates,
+   digits and the words export and import in a name are ignored), and chooses it in the list.
+   It is only a suggestion: change it if it is wrong. When a workbook's sheets point at
+   different objects, each sheet is listed with its object. The same file is read for you
+   after **Next**, so you do not upload it twice.
+3. Choose the object from the list, give the template a name (for example "Program sessions"),
    and select **Create**. The new template is chosen for you, with what it loads shown under
    it. Select **Next**.
-3. Upload the file. Each column is matched to the field whose label or API name is its heading;
-   anything else is **Do not load**. Change any column from the picker, which lists the fields
-   of that object you may create or edit.
-4. For a column that fills a lookup (a field that points at another record), a second picker
+4. Upload the file (unless you chose it in step 2). Each column is matched to the field whose
+   label or API name is its heading. A heading may also name the object and the field
+   together, in any of these forms: `Contact.First Name`, `Contact: Phone`, `Contact / Phone`,
+   `Contact | Phone`, `Contact - Phone`, `Phone: Contact`, `Phone (Contact)` or
+   `Contact_Phone`. The object can be its label, plural label or API name, and case, spaces
+   and line breaks do not matter. A heading that names another object, or that could be read
+   two ways, is not mapped. Matching is exact: anything else is **Do not load**, never a
+   guess. Change any column from the picker, which lists the fields of that object you may
+   create or edit.
+
+   A workbook with several sheets loads them all into the template's one object. When the
+   chosen sheets point at different objects, the step lists each sheet with its object and
+   **Next** waits: clear the sheets for the other objects, or go back and choose the object
+   they point at. Loading several objects from one workbook comes in a later update.
+5. For a column that fills a lookup (a field that points at another record), a second picker
    says how the file names that record: **Salesforce record ID** (the default), the record's
    name, or any of its text, email or phone fields you may read (for example a program code or
    an organization's phone number). Matching is exact, ignoring case and the spaces around the
@@ -710,13 +736,13 @@ person Accounts) match yours; otherwise it is left out, and the reason is on the
    on an object holding more than 100,000 records you can see, the dry run is refused and names
    the field. Choose one of those fields instead, or ask your Salesforce administrator to mark
    the field External ID.
-5. On the next step choose what each row does:
+6. On the next step choose what each row does:
 
 | Choice | What it does | What it risks |
 |---|---|---|
 | **Create new records** | Creates a new record for every row. | Loading the same file twice creates every record twice. |
 | **Update by record ID** | Changes the record whose Salesforce record ID is in the row's ID column. Map that column to **Salesforce record ID**. | A row whose ID is wrong, of another object, or not one you can see is rejected; nothing is created for it. |
-| **Update by a field you choose** | Finds the record whose text, email or phone field you choose holds the row's value (for example Email), and changes it. Map a column to that field. | A row that finds no record is rejected; nothing is created for it. The field follows the matching and large object rules in step 4. |
+| **Update by a field you choose** | Finds the record whose text, email or phone field you choose holds the row's value (for example Email), and changes it. Map a column to that field. | A row that finds no record is rejected; nothing is created for it. The field follows the matching and large object rules in step 5. |
 | **Update or create, matched by external ID** | Finds the record by the ID field you choose (one marked External ID) and changes it, or creates a record when none has that value. | A value typed into the wrong row changes the wrong record. |
 | **Delete by record ID** | Deletes the record whose Salesforce record ID is in the row's ID column, as a bulk delete does. Listed only for people with **Bulk Delete Records**, and only for objects a bulk delete may delete. | Every record the file names goes, with the related records Salesforce deletes with it. See "Deleting the records a file lists" below. |
 
@@ -724,7 +750,7 @@ person Accounts) match yours; otherwise it is left out, and the reason is on the
    **Leave it empty** and load the rest of the row. When a lookup, an update by a field you
    choose, or an upsert finds more than one record, the **When more than one record matches**
    choice applies, as in section 8.
-6. Select **Preview**, read the results, and commit. After the import, **Download Results**
+7. Select **Preview**, read the results, and commit. After the import, **Download Results**
    gives every row with its outcome, the record ID it created, updated or matched, and the
    reason for a rejected row (section 3, step 9).
 

@@ -1,9 +1,20 @@
 import { LightningElement, wire } from 'lwc';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
-import { parseCsv, toRecords, detectDelimiter } from './csv';
+import { toRecords } from './csv';
 import { toCsv } from 'c/findCsv';
-import { isXlsx, readXlsx, readSheetNames, XLSX_ERRORS } from './xlsx';
+import { isXlsx, XLSX_ERRORS } from './xlsx';
+import { readFileSheets } from './fileSource';
+import { defaultSheets, combineSheets, sheetConflicts } from './importSheets';
+import sheetOption from '@salesforce/label/c.Core_Import_SheetOption';
+import sheetConflict from '@salesforce/label/c.Core_Import_SheetConflict';
+import sheetObject from '@salesforce/label/c.Core_Import_SheetObject';
+import exampleBlank from '@salesforce/label/c.Core_Import_ExampleBlank';
+import detectFileLabel from '@salesforce/label/c.Core_Import_DetectFileLabel';
+import detectSuggested from '@salesforce/label/c.Core_Import_DetectSuggested';
+import detectNone from '@salesforce/label/c.Core_Import_DetectNone';
+import detectSheetsDiffer from '@salesforce/label/c.Core_Import_DetectSheetsDiffer';
+import suggestObject from '@salesforce/apex/ImportController.suggestObject';
 import delimiterLabel from '@salesforce/label/c.Core_Import_DelimiterLabel';
 import delimiterHelp from '@salesforce/label/c.Core_Import_DelimiterHelp';
 import delimiterComma from '@salesforce/label/c.Core_Import_DelimiterComma';
@@ -190,9 +201,9 @@ const TABLE_PAGE_ROWS = 200;
 /** Rows per server call while the exceptions file is read (a cursor page holds up to 2,000). */
 const DOWNLOAD_PAGE_ROWS = 500;
 
-/** Fills a label's {0} with a value. */
-function format(label, value) {
-  return label.replace('{0}', value);
+/** Fills a label's {0}, {1} and so on with values. */
+function format(label, ...values) {
+  return values.reduce((text, value, index) => text.replace(`{${index}}`, value), label);
 }
 
 /** A number as an input shows it, or empty. */
@@ -213,8 +224,6 @@ const STAGE_PAGE_SIZE = 500;
  * base64, a third larger, and is decoded on the server, against a 6 MB heap.
  */
 const MAX_STORED_FILE_BYTES = 2500000;
-/** How many values of each column the picker shows, so the choice can be checked by eye. */
-const SAMPLE_VALUES = 3;
 /** The separators a text file's columns may use, as the separator picker offers them. */
 const DELIMITER_OPTIONS = [
   { value: ',', label: delimiterComma },
@@ -305,9 +314,13 @@ export default class ImportWizard extends LightningElement {
   fileName;
   /** How a text file's columns are separated, detected and then as chosen. */
   delimiter;
-  /** A workbook's sheets, and the one being read. */
-  sheetNames = [];
-  sheetName;
+  /** The file's sheets as `{ name, headers, records }`, the names chosen, and their objects. */
+  sheets = [];
+  chosenSheets = [];
+  sheetObjects = [];
+  /** The object suggested from a file on the first step, and that file (C-49a). */
+  detection;
+  detectionFile;
   pollTimer;
   storeFileError;
   enclosingTabId;
@@ -457,6 +470,9 @@ export default class ImportWizard extends LightningElement {
     delimiterHelp,
     sheetLabel,
     sheetHelp,
+    sheetConflict,
+    detectFileLabel,
+    detectSheetsDiffer,
     trialHeading,
     trialHelp,
     trialRowsLabel,
@@ -723,6 +739,60 @@ export default class ImportWizard extends LightningElement {
     this.newTemplateName = event.target.value;
   }
 
+  /**
+   * Reads a file before any object is chosen and suggests the object it points at, from its
+   * two-part headings, its sheet names, then its name (C-49a). The suggestion is chosen in the
+   * list and can be changed; the file is read for the columns after Next.
+   */
+  async handleDetectFile(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) {
+      return;
+    }
+    this.message = undefined;
+    this.detection = undefined;
+    try {
+      this.resetFileState();
+      await this.readIntoSheets(file);
+      const view = await suggestObject({ fileName: file.name, sheetsJson: this.sheetsJson });
+      this.detection = view || {};
+      this.sheetObjects = this.detection.sheets || [];
+      this.detectionFile = file;
+      if (this.detection.objectName) {
+        this.newObjectName = this.detection.objectName;
+      }
+    } catch (error) {
+      this.message = this.errorText(error);
+    }
+  }
+
+  get hasDetection() {
+    return Boolean(this.detection);
+  }
+
+  get detectionText() {
+    return this.detection && this.detection.objectName
+      ? format(detectSuggested, this.detection.objectLabel || this.detection.objectName)
+      : detectNone;
+  }
+
+  /** The sheets of the file read on the first step, when they point at different objects. */
+  get detectionSheets() {
+    const all = this.sheetObjects.map((sheet) => sheet.sheetName);
+    return this.sheetLines(sheetConflicts(all, this.sheetObjects));
+  }
+
+  get hasDetectionSheets() {
+    return this.detectionSheets.length > 0;
+  }
+
+  sheetLines(sheets) {
+    return sheets.map((sheet) => ({
+      key: sheet.sheetName,
+      text: format(sheetObject, sheet.sheetName, sheet.objectLabel || sheet.objectName)
+    }));
+  }
+
   get cannotCreateObjectTemplate() {
     return !this.newObjectName || !String(this.newTemplateName || '').trim();
   }
@@ -798,6 +868,12 @@ export default class ImportWizard extends LightningElement {
       }
     }
     this.handleNext();
+    // A file read on this step to suggest the object is read for its columns too (C-49a).
+    const detected = this.detectionFile;
+    this.detectionFile = undefined;
+    if (detected && this.loadsOneObject) {
+      await this.loadFile(detected);
+    }
   }
 
   // ---------------------------------------------------------------------------------------
@@ -809,22 +885,28 @@ export default class ImportWizard extends LightningElement {
     if (!file) {
       return;
     }
-    // A new file is read with its own separator or first sheet, not the last file's.
-    this.delimiter = undefined;
-    this.sheetNames = [];
-    this.sheetName = undefined;
+    // A new file is read with its own separator and sheets, not the last file's.
+    this.resetFileState();
     await this.loadFile(file);
+  }
+
+  resetFileState() {
+    this.delimiter = undefined;
+    this.sheets = [];
+    this.chosenSheets = [];
+    this.sheetObjects = [];
   }
 
   /** Reads the text file again with the separator the administrator chose. */
   async handleDelimiterChange(event) {
     this.delimiter = event.detail.value;
+    this.sheets = [];
     await this.loadFile(this.pendingFile);
   }
 
-  /** Reads another sheet of the workbook. */
+  /** Loads another choice of the workbook's sheets, already read. */
   async handleSheetChange(event) {
-    this.sheetName = event.detail.value;
+    this.chosenSheets = event.detail.value || [];
     await this.loadFile(this.pendingFile);
   }
 
@@ -833,7 +915,7 @@ export default class ImportWizard extends LightningElement {
   }
 
   get hasSeveralSheets() {
-    return this.sheetNames.length > 1;
+    return this.sheets.length > 1;
   }
 
   get delimiterOptions() {
@@ -841,15 +923,41 @@ export default class ImportWizard extends LightningElement {
   }
 
   get sheetOptions() {
-    return this.sheetNames.map((name) => ({ label: name, value: name }));
+    return this.sheets.map((sheet) => ({
+      label: format(sheetOption, sheet.name, sheet.records.length),
+      value: sheet.name
+    }));
   }
 
-  /** A separator or sheet that read nothing leaves no columns to go on with. */
+  /** The chosen sheets that point at another object than the rest, for a one-object load. */
+  get sheetConflictLines() {
+    if (!this.loadsOneObject) {
+      return [];
+    }
+    const loaded = this.selectedTemplate && this.selectedTemplate.targetObject;
+    return this.sheetLines(sheetConflicts(this.chosenSheets, this.sheetObjects, loaded));
+  }
+
+  get hasSheetConflict() {
+    return this.sheetConflictLines.length > 0;
+  }
+
+  /** A separator or sheets that read nothing, or sheets for two objects, cannot go on. */
   get hasNoColumns() {
-    return this.parsing || this.columns.length === 0;
+    return this.parsing || this.columns.length === 0 || this.hasSheetConflict;
   }
 
-  /** Reads the file into headers and rows, then suggests a mapping for its columns. */
+  /** The sheets' headings, as `suggestObject` reads them. */
+  get sheetsJson() {
+    return JSON.stringify(
+      this.sheets.map((sheet) => ({ name: sheet.name, headers: sheet.headers }))
+    );
+  }
+
+  /**
+   * Reads the file into sheets (once; a new sheet choice reuses them), combines the chosen ones
+   * into headers and rows, then suggests a mapping for its columns.
+   */
   async loadFile(file) {
     if (!file) {
       return;
@@ -857,25 +965,50 @@ export default class ImportWizard extends LightningElement {
     this.message = undefined;
     this.parsing = true;
     this.fileName = file.name;
+    this.pendingFile = file;
     try {
-      const rows = isXlsx(file.name)
-        ? await this.readWorkbook(file)
-        : this.readDelimited(await this.readText(file));
-      const { headers, records } = toRecords(rows);
-      if (headers.length === 0 || records.length === 0) {
+      if (this.sheets.length === 0) {
+        await this.readIntoSheets(file);
+      }
+      const chosen = this.sheets.filter((sheet) => this.chosenSheets.includes(sheet.name));
+      if (!chosen.some((sheet) => sheet.headers.length > 0 && sheet.records.length > 0)) {
         this.message = noHeaderRow;
         this.clearColumns();
         return;
       }
-      this.headers = headers;
-      this.records = records;
-      await this.buildColumns(file);
+      await this.buildColumns(chosen);
+      await this.loadSheetObjects();
       this.step = 3;
     } catch (error) {
       this.message = this.errorText(error);
       this.clearColumns();
     } finally {
       this.parsing = false;
+    }
+  }
+
+  /**
+   * The file's sheets as headers and records, from its source (`fileSource.js`), with every
+   * sheet that has rows chosen (or the one sheet there is).
+   */
+  async readIntoSheets(file) {
+    const { sheets, delimiter } = await this.readSheets(file, this.delimiter);
+    this.delimiter = delimiter;
+    this.sheets = sheets.map((sheet) => ({ name: sheet.name, ...toRecords(sheet.rows) }));
+    this.chosenSheets = defaultSheets(this.sheets);
+  }
+
+  /** The objects a workbook's sheets point at, asked once per file for a one-object load. */
+  async loadSheetObjects() {
+    if (!this.loadsOneObject || this.sheets.length < 2 || this.sheetObjects.length > 0) {
+      return;
+    }
+    try {
+      const view = await suggestObject({ fileName: this.fileName, sheetsJson: this.sheetsJson });
+      this.sheetObjects = (view && view.sheets) || [];
+    } catch {
+      // Without the sheets' objects the load goes on; the columns still map exactly.
+      this.sheetObjects = [];
     }
   }
 
@@ -889,39 +1022,17 @@ export default class ImportWizard extends LightningElement {
     this.columns = [];
   }
 
-  readText(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(reader.error);
-      reader.readAsText(file);
-    });
-  }
-
-  /** A text file's rows, split on the separator detected from it unless one was chosen. */
-  readDelimited(text) {
-    if (!this.delimiter) {
-      this.delimiter = detectDelimiter(text);
-    }
-    return parseCsv(text, this.delimiter);
-  }
-
   /**
-   * The chosen sheet of an Excel workbook (the first until another is chosen), as rows; a file
-   * it cannot read says what to do.
+   * A file's sheets of rows, a text file split on `delimiter` (detected when not given); a
+   * workbook it cannot read says what to do.
    */
-  async readWorkbook(file) {
-    const buffer = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(reader.error);
-      reader.readAsArrayBuffer(file);
-    });
+  async readSheets(file, delimiter) {
     try {
-      this.sheetNames = await readSheetNames(buffer);
-      this.sheetName = this.sheetName || this.sheetNames[0];
-      return await readXlsx(buffer, { sheet: this.sheetName });
+      return await readFileSheets(file, { delimiter });
     } catch (error) {
+      if (!isXlsx(file.name)) {
+        throw error;
+      }
       const sentences = {
         [XLSX_ERRORS.unsupportedBrowser]: xlsxUnsupportedBrowser,
         [XLSX_ERRORS.tooLarge]: xlsxTooLarge
@@ -940,7 +1051,12 @@ export default class ImportWizard extends LightningElement {
     });
   }
 
-  async buildColumns(file) {
+  /**
+   * The chosen sheets as one set of columns: with several, each sheet's headings are suggested
+   * on their own first, so a heading on one sheet joins another sheet's heading for the same
+   * field (C-49a); then the joined headings are suggested as one file.
+   */
+  async buildColumns(chosen) {
     if (this.loadsOneObject && this.objectFields.length === 0) {
       // The object's fields and keys, from the running user's describe (R-IT12).
       const [fields, keys, matchable, related] = await Promise.all([
@@ -955,6 +1071,22 @@ export default class ImportWizard extends LightningElement {
       this.relatedOptions = related || [];
       await this.loadRelatedFields();
     }
+    const targetsBySheet = [];
+    if (chosen.length > 1) {
+      for (const sheet of chosen) {
+        // One sheet at a time, so a failure says which call failed and the order holds.
+        // eslint-disable-next-line no-await-in-loop
+        const each = await suggestMapping({ templateId: this.templateId, headers: sheet.headers });
+        targetsBySheet.push(
+          Object.fromEntries(
+            (JSON.parse(each || '{}').columns || []).map((column) => [column.source, column.target])
+          )
+        );
+      }
+    }
+    const combined = combineSheets(chosen, targetsBySheet, IGNORE, exampleBlank);
+    this.headers = combined.headers;
+    this.records = combined.records;
     const suggested = await suggestMapping({ templateId: this.templateId, headers: this.headers });
     const targets = {};
     const lookups = {};
@@ -979,13 +1111,8 @@ export default class ImportWizard extends LightningElement {
       lookupField: lookups[heading] || LOOKUP_BY_ID,
       transforms: changes[heading] || [],
       blankClears: clears[heading] || false,
-      samples: this.records
-        .slice(0, SAMPLE_VALUES)
-        .map((record) => record[heading])
-        .filter((value) => value && value.length > 0)
-        .join(', ')
+      examples: combined.examples[heading].map((text, index) => ({ key: `${index}`, text }))
     }));
-    this.pendingFile = file;
   }
 
   // ---------------------------------------------------------------------------------------
@@ -1707,10 +1834,10 @@ export default class ImportWizard extends LightningElement {
     this.message = undefined;
     this.loading = true;
     try {
-      const rows = isXlsx(file.name)
-        ? await this.readWorkbook(file)
-        : this.readRetryText(await this.readText(file));
-      const { headers, records } = toRecords(rows);
+      // The fixed rows' own separator, which may differ from the original's; a workbook's
+      // first sheet.
+      const { sheets } = await this.readSheets(file, undefined);
+      const { headers, records } = toRecords(sheets.length > 0 ? sheets[0].rows : []);
       if (headers.length === 0 || records.length === 0) {
         this.message = noHeaderRow;
         return;
@@ -1733,11 +1860,6 @@ export default class ImportWizard extends LightningElement {
     } finally {
       this.loading = false;
     }
-  }
-
-  /** A fixed-rows file's rows, split on its own separator, which may differ from the original's. */
-  readRetryText(text) {
-    return parseCsv(text, detectDelimiter(text));
   }
 
   startPolling() {
@@ -1951,9 +2073,9 @@ export default class ImportWizard extends LightningElement {
     this.columns = [];
     this.fileName = undefined;
     this.pendingFile = undefined;
-    this.delimiter = undefined;
-    this.sheetNames = [];
-    this.sheetName = undefined;
+    this.resetFileState();
+    this.detection = undefined;
+    this.detectionFile = undefined;
     this.message = undefined;
     this.expectedCount = '';
     this.expectedAmount = '';
