@@ -59,6 +59,7 @@ page, even if that puts it out of reading order.
 | [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 7 | Giving totals, recalculation, dashboards and reports |
 | [Mirror](mirror.md) | MIR | 13 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API |
 | [Volunteers](volunteers.md) | VOL | 13 | Jobs, shifts, sign-ups, hours and approval, skills |
+| [Programs](programs.md) | PRG | 5 | Programs, services, enrollments, the Program Roster panel, Programs access |
 | [Rollup Builder](rollup-builder.md) | RB | 26 | Building, recalculating and switching rollups, standard objects, parity options, export and import, instant totals on other objects |
 | [Accessibility and mobile](accessibility-and-mobile.md) | A11Y | 9 | Keyboard, focus, screen reader labels, zoom, Salesforce mobile app |
 
@@ -112,7 +113,7 @@ list in the same org, run them last or refresh the org first.
 
 Every script on every page above, before a release or after a change that touches many areas.
 Run Core pages first (People and households through Erase a person), then Giving, then Mirror,
-Volunteers and Rollup Builder, then Accessibility and mobile. Within a page, run in ID order.
+Volunteers, Programs and Rollup Builder, then Accessibility and mobile. Within a page, run in ID order.
 
 Run it on the Person Accounts shape, then repeat the Core pages and the Giving pages on the
 platform-only shape (Mirror needs Opportunity and Campaign, so skip it there). Scripts that need

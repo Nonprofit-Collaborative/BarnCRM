@@ -93,7 +93,7 @@ too.
 - Change a person's **Stage** in their row: the change saves at once.
 - Click a person's name to open their enrollment, to correct its dates.
 
-A message under the figures, also shown as a toast, says what changed. Read Only users see the
+A message under the figures says what changed. Read Only users see the
 panel without the button or the stage pickers. The panel lists up to 200 people; the
 **Enrollments** tab lists them all.
 
