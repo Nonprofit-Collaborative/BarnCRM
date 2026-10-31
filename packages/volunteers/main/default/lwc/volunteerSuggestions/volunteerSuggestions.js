@@ -25,15 +25,12 @@ import R_HOURS from '@salesforce/label/c.Volunteers_Suggestions_ReasonHours';
 import R_CLEARED from '@salesforce/label/c.Volunteers_Suggestions_ReasonCleared';
 import R_OPEN from '@salesforce/label/c.Volunteers_Suggestions_ReasonOpen';
 import LOADING from '@salesforce/label/c.Volunteers_Loading';
+import { bodyMessage, format } from 'c/findCsv';
 
 /** How many suggestions the card shows. */
 const MAX_SHOWN = 10;
 /** Told to the Sign-ups panel on the same page, so it reloads (see shiftSignups.js). */
 const SIGNUPS_CHANGED = 'barnshiftsignupschanged';
-
-function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
-}
 
 /**
  * Suggested Volunteers on a shift (V-11): active people not yet signed up, best match first,
@@ -163,18 +160,10 @@ export default class VolunteerSuggestions extends NavigationMixin(LightningEleme
         return this.load();
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, BOOK_FAILED);
       })
       .finally(() => {
         this.busy = false;
       });
-  }
-
-  messageFrom(error) {
-    const body = error && error.body;
-    if (body && typeof body.message === 'string' && body.message) {
-      return body.message;
-    }
-    return BOOK_FAILED;
   }
 }

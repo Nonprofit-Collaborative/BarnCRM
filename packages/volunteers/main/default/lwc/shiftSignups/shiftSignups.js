@@ -28,15 +28,12 @@ import MORE_THAN_SHOWN from '@salesforce/label/c.Volunteers_Signups_MoreThanShow
 import ACTION_FAILED from '@salesforce/label/c.Volunteers_Signups_ActionFailed';
 import NO_HOURS_WARNING from '@salesforce/label/c.Volunteers_Signups_NoHoursWarning';
 import LOADING from '@salesforce/label/c.Volunteers_Loading';
+import { bodyMessage, format } from 'c/findCsv';
 
 const STATUS_SIGNED_UP = 'Signed up';
 const STATUS_ATTENDED = 'Attended';
 const STATUS_NO_SHOW = 'No show';
 const MAX_SHOWN = 200;
-
-function format(template, ...values) {
-  return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
-}
 
 /**
  * The Sign-ups panel on a shift (V-02): places filled and remaining, who is booked, adding a
@@ -107,7 +104,7 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
         this.panel = panel;
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
       })
       .finally(() => {
         this.loading = false;
@@ -298,18 +295,11 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
         this.focusTarget = 'result';
       })
       .catch((error) => {
-        this.errorMessage = this.messageFrom(error);
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
         this.focusTarget = 'error-message';
       })
       .finally(() => {
         this.busy = false;
       });
-  }
-
-  messageFrom(error) {
-    if (error && error.body && error.body.message) {
-      return error.body.message;
-    }
-    return ACTION_FAILED;
   }
 }
