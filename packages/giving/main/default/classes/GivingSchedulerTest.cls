@@ -1,5 +1,5 @@
 /**
- * Tests for the three nightly jobs and for the schedule an administrator starts from the
+ * Tests for the four nightly jobs and for the schedule an administrator starts from the
  * Nightly Jobs page of the settings console (ADR-0038).
  */
 @IsTest(testFor='ApexClass:GivingScheduler')
@@ -18,7 +18,7 @@ private class GivingSchedulerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                3,
+                4,
                 [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
                 'Switching the jobs on schedules the top up, the overdue pass and the donor levels pass.'
             );
@@ -44,7 +44,7 @@ private class GivingSchedulerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                3,
+                4,
                 [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
                 'An administrator pressing Schedule twice gets three jobs, not six.'
             );
@@ -106,7 +106,7 @@ private class GivingSchedulerTest {
                 'The overdue pass without the top up is not "on": it marks payments overdue on a schedule nothing is extending.'
             );
             Assert.areEqual(
-                3,
+                4,
                 [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
                 'Scheduling fills in the two jobs that were missing and leaves the one already there alone.'
             );

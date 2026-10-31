@@ -150,7 +150,8 @@ const PAGE_GROUPS = {
         'Acknowledgments_Enabled__c',
         'Acknowledgment_From_Address__c',
         'Giving_Acknowledgments_Page',
-        'Stewardship_Plans_Page'
+        'Stewardship_Plans_Page',
+        'Ask_Reminders_Enabled__c'
       ]
     },
     {

@@ -4219,6 +4219,15 @@ Added by acknowledgments (G-12, ADR-0032).
 | `Acknowledgment_From_Address__c` | text | empty | The organization wide email address acknowledgments are sent from, named by its address. Empty means they are sent from the user who ran the send, which is what a small organization usually wants. |
 | `Acknowledgments_Last_Run__c` | datetime | empty | When the last acknowledgment send finished, shown read only on the Acknowledgments page (R-AK12). |
 | `Acknowledgments_Last_Run_Summary__c` | text | empty | What that run did, in one sentence, because a bare timestamp says the job woke up and not that it sent anything (R-AK12). |
+Added by ask cadence reminders (G-29). Shown in the console's Giving section beside
+acknowledgments and stewardship, because the reminders are tasks of the same kind.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Ask_Reminders_Enabled__c` | boolean | true | Whether the daily pass creates a Task for a donor's owner when the donor's Next Ask Date arrives (R-AC2). On by default: it does nothing until somebody enters a Next Ask Date, and it only creates tasks inside the organization. |
+| `Ask_Reminders_Last_Run__c` | datetime | empty | When the last ask reminder pass finished, whether or not it created anything. |
+| `Ask_Reminders_Last_Run_Summary__c` | text | empty | What that pass did, in one sentence: how many reminders it created and how many donors it could not create one for (R-AC5). |
+
 Added by receipting (G-13). The organization's legal name and address, which a receipt
 prints, are Core keys on `BarnCRM_Settings__c` (Section 12): any organization has them. The
 tax identification number, the logo, the signature and the signer's name and title were Core
@@ -6054,6 +6063,73 @@ installment: each counts toward it.
   `Donation_Match_Date_Window_Days__c`, `Donation_Match_Amount_Tolerance__c`.
 - **Template attributes** (on `Import_Template__c`, Section 15): `Payment_Matching__c`,
   `Match_Date_Window_Days__c`, `Match_Amount_Tolerance__c`.
+
+---
+
+## 25O. Ask cadence
+
+### Definition
+
+Two dates a fundraiser keeps on a donor, and the reminder the package makes from one of them.
+Next Ask Date is when the donor should next be asked; Last Touch Date is when somebody last
+spoke to them. Both are plain fields the staff edit, on Contact where people are Contacts and
+on Account where the donor is an organization or a household. No new object: the reminder is
+a Salesforce Task, so it appears in the owner's own task list.
+
+### Attributes (on Contact and Account)
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Next Ask Date | date | no | The day the donor should next be asked. Entered by staff. |
+| Last Touch Date | date | no | The day somebody last contacted the donor. Entered by staff; the package does not infer it. |
+| Ask Reminder For Date | date | no | The Next Ask Date a reminder Task was last created for. Written only by the daily pass; it is how the pass knows not to create the same reminder twice (R-AC3). Read only to staff. |
+
+### Rules
+
+**R-AC1 Donor level dates only.** The reminder reads the two dates on the donor. A date on a
+solicitation or ask record (G-26) is a separate date the integrator may connect later; nothing
+here reads it.
+
+**R-AC2 One switch, on by default.** `Ask_Reminders_Enabled__c` switches the daily pass on and
+off for the whole organization. Off means the pass creates nothing; the Next Ask Date and Last
+Touch Date fields and the Who Is Due list keep working.
+
+**R-AC3 One reminder per donor per date.** The pass creates a Task for a donor whose Next Ask
+Date is today or earlier (within the catch up window of R-AC4) and whose Ask Reminder For Date
+is not already that date, then stamps Ask Reminder For Date. Running the pass twice in a day,
+or on every day after the date, creates nothing more. Changing the Next Ask Date to a new date
+is a new ask and gets a new reminder.
+
+**R-AC4 Catch up window.** A date more than 30 days in the past gets no Task: the first night
+the setting is on must not bury staff under every stale date an old import left. Those donors
+still appear in the Who Is Due list. A date inside the window that the pass missed (a job that
+was stopped for a week) is caught up.
+
+**R-AC5 The Task belongs to the donor's owner.** The Task is assigned to the owner of the
+Contact or Account, related to the donor (Contact on Who and its Account on What, or the
+Account on What for an account donor), dated the Next Ask Date, subject from a custom label. A donor whose
+owner cannot take a Task is logged to Error Log, counted in the run summary, and left
+unstamped so the next night tries again. The pass never deletes, closes or edits a Task.
+
+**R-AC6 Who Is Due.** A list view named Who Is Due on Contact and one on Account list donors
+whose Next Ask Date is today or earlier, whatever the setting says. A list view cannot carry a
+sort in package metadata, so the list opens unsorted and a click on the Next Ask Date column sorts it.
+
+### Salesforce implementation
+
+| Attribute | API name | Type |
+|---|---|---|
+| Next Ask Date | `Next_Ask_Date__c` | Date |
+| Last Touch Date | `Last_Touch_Date__c` | Date |
+| Ask Reminder For Date | `Ask_Reminder_For_Date__c` | Date |
+
+- **Objects:** the three fields ship on both `Contact` and `Account`, Giving package.
+- **Settings keys** (on `Giving_Settings__c`, Section 12): `Ask_Reminders_Enabled__c`,
+  `Ask_Reminders_Last_Run__c`, `Ask_Reminders_Last_Run_Summary__c`.
+- **Nightly job:** `AskReminderSchedulable` and `AskReminderBatch`, scheduled by
+  `GivingScheduler` as the module's fourth job (`BarnCRM Giving: ask reminders`, 03:30) and
+  listed by `GivingNightlyJobProvider` for Health Check.
+- **Service:** `AskReminderService`, `AskReminderSelector`, `AskReminderWriter`.
 
 ---
 
@@ -9328,6 +9404,7 @@ mirrors the primary member).
 | v0.11 | 2026-10-29 | Edition stored values (ADR-0143, `0143-edition-internal-values.md`). No object or field added. `BarnCRM_Settings__c.Suite__c` stores `Standard` and `Nonprofit` instead of `Community` and `Impact`, and `BarnCRM_Module__mdt.Editions__c` names the same values. Core's post-install steps rewrite an old stored value once. |
 | v0.11 | 2026-10-29 | Security review G-L4 and G-L5 (owner decisions). No object or field added. New R-AK13 (ADR-0144, `0144-acknowledgments-honor-email-opt-out.md`): an email gift whose recipient contact has Email Opt Out is not emailed, gets no row and stays queued, and the letter run takes it as a letter. `Giving_Admin` loses View All on `Commitment__c`, matching `Gift__c`; commitment record access comes from ownership, roles and sharing. |
 | v1.0 | 2026-10-30 | Advanced duplicate management (C-51, D-154, ADR-0145 `0145-advanced-duplicate-management.md`). Object `Merge_Journal__c` added (Section 29A); custom metadata type `Merge_Rule__mdt` added (Section 13); settings keys `Fuzzy_Match_Threshold__c`, `Merge_Default_Rule__c` and `Auto_Merge_Exact_Match__c`. R-DP1 and R-DP4 amended; R-DP7 to R-DP10 added. |
+| v0.13 | 2026-10-31 | Ask cadence reminders (G-29). New Section 25O. `Contact` and `Account` gain `Next_Ask_Date__c`, `Last_Touch_Date__c` and `Ask_Reminder_For_Date__c` (Giving). `Giving_Settings__c` gains `Ask_Reminders_Enabled__c` (default true), `Ask_Reminders_Last_Run__c` and `Ask_Reminders_Last_Run_Summary__c`. Rules R-AC1 to R-AC6: donor level dates only, one switch, one reminder Task per donor per date, a 30 day catch up window, the Task is the owner's, and a Who Is Due list view on each object. No object added. |
 | v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-0149). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a) by any user with the import permission and edit access to the rows; `Import_Batch__c` gains `Retried_By__c` (Rows Retried By) so undo covers their records. R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
 
 ---

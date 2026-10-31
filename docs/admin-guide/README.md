@@ -185,6 +185,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | G-13 Receipts and year-end statements | [receipts.md](receipts.md) | Giving |
 | G-14 Donor levels | [donor-levels.md](donor-levels.md) | Giving |
 | G-15 Stewardship plans | [stewardship-plans.md](stewardship-plans.md) | Giving |
+| G-29 Ask cadence reminders | [ask-cadence.md](ask-cadence.md) | Giving |
 | G-16 Retention reports | [retention-reports.md](retention-reports.md) | Giving |
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving |
 | G-02, ADR-0064 A donor's giving on their record | [donor-records.md](donor-records.md) | Giving |

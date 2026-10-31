@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: what the page is for</shortDescription>
-    <value>Three jobs keep commitments moving overnight: they extend recurring schedules, mark payments overdue, and place donors on their giving level. Until you schedule them here, none of them runs.</value>
+    <value>Four jobs keep giving moving overnight: they extend recurring schedules, mark payments overdue, place donors on their giving level, and remind owners when a donor's next ask arrives. Until you schedule them here, none of them runs.</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_TopUpName</fullName>

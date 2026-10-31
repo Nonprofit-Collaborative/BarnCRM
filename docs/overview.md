@@ -54,7 +54,7 @@ Install Core and run the Setup Assistant, and you can:
 - Review duplicates, check what needs attention in Org Optimizer, document your fields in a downloadable Data Dictionary, and run Health Check, with an Error Log that nothing fails silently into.
 - Control who sees what with ready-made roles, load realistic sample data to try things out, and erase a person's personal data when you must.
 
-Add Giving and you can also record and receipt gifts, run appeals and stewardship, import gifts from NPSP or Nonprofit Cloud exports, and watch the Giving dashboard. Add Volunteers and you can schedule shifts and approve hours. Add Mirror to keep Opportunities and Campaigns in step, accept gifts from a giving page, or export gifts for accounting.
+Add Giving and you can also record and receipt gifts, run appeals and stewardship, get a task when it is time to ask a donor again, import gifts from NPSP or Nonprofit Cloud exports, and watch the Giving dashboard. Add Volunteers and you can schedule shifts and approve hours. Add Mirror to keep Opportunities and Campaigns in step, accept gifts from a giving page, or export gifts for accounting.
 
 BarnCRM runs on Platform-only licenses, Sales and Service Cloud, an org with NPSP installed, and an org on Agentforce Nonprofit.
 
