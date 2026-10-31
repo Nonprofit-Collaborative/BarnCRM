@@ -265,6 +265,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                 Completed_At__c,
                 Started_At__c,
                 Committed_By__c,
+                Retried_By__c,
                 Status__c,
                 Job_Id__c,
                 Operation__c
@@ -284,7 +285,9 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
         }
         startedAt = batch.Started_At__c;
         committedBy = batch.Committed_By__c;
-        committers = ImportBatchService.retriedBy(owner);
+        // Read with the batch: a query more in every pass's start would take from the budget
+        // the judging passes keep records by when they cannot afford to ask.
+        committers = ImportBatchService.retriersIn(batch.Retried_By__c);
         if (committedBy != null) {
             committers.add(committedBy);
         }
