@@ -16,6 +16,12 @@
  */
 @IsTest(testFor='ApexClass:ImportObjectLoader, ApexClass:ImportUndoService')
 private class ImportSeveralObjectsTest {
+    static {
+        // Saved queries are the package's bookkeeping, which an import refuses; here they stand
+        // in for an org's own object a row can create that nothing else needs.
+        DataProtectedFields.ordinaryForTest.add('saved_query__c');
+    }
+
     private static final Integer MANY = 200;
     private static final Integer REPEATS = 60;
 
@@ -456,7 +462,7 @@ private class ImportSeveralObjectsTest {
     // -------------------------------------------------------------------------------------
 
     /**
-     * Saved queries created (the one Core object a row can insert that nothing else needs),
+     * Saved queries created (standing in for an org's own object; see the static block),
      * organizations updated by name and affiliations created pointing at them, listed in that
      * order: a saved query is created before its row's affiliation can fail.
      */
