@@ -8473,7 +8473,7 @@ person's hours, a sample skill a real person's volunteer skill or a real job's j
 which R-VJ1 or the Restrict lookup would refuse, and leaves those out; every delete runs with
 partial success, and a record refused for any other reason is logged as a Warning and left, so
 one record never stops the removal. `finish()` logs one Warning (context
-`VolunteerSampleDataRemoveStages`) naming each kept shift, job and skill and why, then hands on,
+`VolunteersSampleData.RemoveStages`) naming each kept shift, job and skill and why, then hands on,
 so Core's and Giving's sample data are still removed. Each read of what real records point at
 takes up to 200 rows of a kind, so the Warning may not name every kept record when more do;
 nothing real is deleted either way. `hasSampleRecords()` answers true while a sample job or

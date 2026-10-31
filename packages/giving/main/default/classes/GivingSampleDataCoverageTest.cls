@@ -3,7 +3,7 @@
  * entry points and the payload it reads), and the stages that load it. The stages are called
  * directly, since an Apex test runs only one execute of the stage batch.
  */
-@IsTest(testFor='ApexClass:GivingSampleData, ApexClass:GivingSampleDataStages')
+@IsTest(testFor='ApexClass:GivingSampleData')
 private class GivingSampleDataCoverageTest {
     @TestSetup
     static void createTestUser() {
@@ -104,7 +104,7 @@ private class GivingSampleDataCoverageTest {
             Assert.areEqual(0, module.countLoaded(), 'Nothing is loaded yet');
             Assert.areEqual(
                 0,
-                new GivingSampleDataRemoveStages().stageCount(),
+                new GivingSampleData.RemoveStages().stageCount(),
                 'And removing nothing takes no stages'
             );
             Assert.areEqual(0, GivingSampleDataLoader.removeNext(), 'Nor deletes anything');
@@ -168,7 +168,7 @@ private class GivingSampleDataCoverageTest {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             insertSamplePerson();
             GivingSampleData.jsonOverride = payload(5);
-            GivingSampleDataStages stages = new GivingSampleDataStages();
+            GivingSampleData.LoadStages stages = new GivingSampleData.LoadStages();
 
             for (Integer stage = 0; stage < stages.stageCount(); stage++) {
                 stages.runStage(stage);
@@ -181,7 +181,7 @@ private class GivingSampleDataCoverageTest {
             );
             Assert.areEqual(5, new GivingSampleData().countLoaded(), 'And the card counts them');
             Assert.isTrue(new GivingSampleData().hasSampleRecords(), 'Giving has sample records');
-            GivingSampleDataRemoveStages removal = new GivingSampleDataRemoveStages();
+            GivingSampleData.RemoveStages removal = new GivingSampleData.RemoveStages();
             Integer removalStages = removal.stageCount();
             for (Integer stage = 0; stage < removalStages; stage++) {
                 removal.runStage(stage);
@@ -196,7 +196,7 @@ private class GivingSampleDataCoverageTest {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             insertSamplePerson();
             GivingSampleData.jsonOverride = payload(200);
-            GivingSampleDataStages stages = new GivingSampleDataStages();
+            GivingSampleData.LoadStages stages = new GivingSampleData.LoadStages();
             Assert.areEqual(3, stages.stageCount(), 'Reference data, then two gift chunks');
 
             stages.runStage(0);
@@ -220,7 +220,7 @@ private class GivingSampleDataCoverageTest {
             Boolean failed = false;
 
             try {
-                new GivingSampleDataStages().runStage(0);
+                new GivingSampleData.LoadStages().runStage(0);
             } catch (Exception expected) {
                 failed = true;
             }

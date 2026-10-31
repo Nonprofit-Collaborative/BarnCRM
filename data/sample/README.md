@@ -194,14 +194,14 @@ first (record types by DeveloperName, `Sample_Data__c` true, `Sample_Data_Key__c
 then contacts in chunks of 100, then the connections and affiliations. Its finish starts
 any module sample set. Giving is one: `GivingSampleData` implements the Core
 `SampleDataModule` interface, Core finds it by name at runtime (ADR-0017), and its own
-stages (`GivingSampleDataStages`, run by the same batch class) insert the funds, appeals
+stages (`GivingSampleData.LoadStages`, run by the same batch class) insert the funds, appeals
 and commitments and then the gifts in chunks of 100. Batch Apex rather than a queueable
 chain, because Developer Edition, trial and scratch orgs stop a chain after five jobs.
 
 `SampleDataLoader.remove()` starts deleting every record carrying the flag, in stages of
 about a hundred records run by `SampleDataRemoveBatch` (a `SampleDataStageBatch` subclass, so
 removal has no queueable chain limit either): each module's records first
-(`GivingSampleDataRemoveStages`), because a gift points at a person and a household, then
+(`GivingSampleData.RemoveStages`), because a gift points at a person and a household, then
 Core's (`SampleDataRemoveStages`): connections, affiliations, contacts and accounts. Allocations, soft credits and tributes are details of a gift, and
 installments are details of a commitment, so they go with their master. Both actions are
 exposed to admins through **Nonprofit Settings > Sample Data** (`sampleDataManager` LWC);

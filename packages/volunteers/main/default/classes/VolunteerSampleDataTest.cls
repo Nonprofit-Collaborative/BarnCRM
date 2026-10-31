@@ -10,7 +10,7 @@
  * flagged and keyed, in either membership mode.
  */
 @IsTest(
-    testFor='ApexClass:VolunteersSampleData, ApexClass:VolunteerSampleDataLoader, ApexClass:VolunteerSampleDataStages, ApexClass:VolunteerSampleDataRemoveStages, ApexClass:VolunteerSampleDataSelector'
+    testFor='ApexClass:VolunteersSampleData, ApexClass:VolunteerSampleDataLoader, ApexClass:VolunteerSampleDataSelector'
 )
 private class VolunteerSampleDataTest {
     /** The admin, created once and found again by every method. */
@@ -38,14 +38,14 @@ private class VolunteerSampleDataTest {
     }
 
     private static void loadEverything() {
-        VolunteerSampleDataStages stages = new VolunteerSampleDataStages();
+        VolunteersSampleData.LoadStages stages = new VolunteersSampleData.LoadStages();
         for (Integer stage = 0; stage < stages.stageCount(); stage++) {
             stages.runStage(stage);
         }
     }
 
     private static void removeEverything() {
-        VolunteerSampleDataRemoveStages stages = new VolunteerSampleDataRemoveStages();
+        VolunteersSampleData.RemoveStages stages = new VolunteersSampleData.RemoveStages();
         Integer stageCount = stages.stageCount();
         for (Integer stage = 0; stage < stageCount; stage++) {
             stages.runStage(stage);
@@ -434,7 +434,7 @@ private class VolunteerSampleDataTest {
 
             Test.startTest();
             removeEverything();
-            new VolunteerSampleDataRemoveStages().finish();
+            new VolunteersSampleData.RemoveStages().finish();
             Test.stopTest();
 
             Assert.areEqual(
@@ -504,7 +504,7 @@ private class VolunteerSampleDataTest {
             Assert.areEqual(251, hoursByStatus().get(VolunteerHoursService.STATUS_APPROVED));
 
             Test.startTest();
-            Integer stageCount = new VolunteerSampleDataRemoveStages().stageCount();
+            Integer stageCount = new VolunteersSampleData.RemoveStages().stageCount();
             removeEverything();
             Test.stopTest();
 
@@ -553,10 +553,13 @@ private class VolunteerSampleDataTest {
             Assert.areEqual('Volunteers', module.moduleName(), 'The name startAfter looks for');
             Assert.areEqual(
                 'VolunteerSampleDataRemoveStages',
-                new VolunteerSampleDataRemoveStages().name(),
+                new VolunteersSampleData.RemoveStages().name(),
                 'The removal names itself in the Error Log'
             );
-            Assert.areEqual('VolunteerSampleDataStages', new VolunteerSampleDataStages().name());
+            Assert.areEqual(
+                'VolunteerSampleDataStages',
+                new VolunteersSampleData.LoadStages().name()
+            );
             Assert.isFalse(String.isBlank(module.countLabel()), 'The card has its wording');
             Assert.areEqual(0, module.countLoaded(), 'Nothing loaded yet');
             Assert.isFalse(module.hasSampleRecords(), 'No sample job or skill yet');
@@ -564,7 +567,7 @@ private class VolunteerSampleDataTest {
             // With no sample people the jobs still load, and nothing is booked.
             Test.startTest();
             loadEverything();
-            new VolunteerSampleDataStages().finish();
+            new VolunteersSampleData.LoadStages().finish();
             Test.stopTest();
 
             Assert.areEqual(0, [SELECT COUNT() FROM Volunteer_Signup__c], 'Nobody to book');
@@ -606,7 +609,7 @@ private class VolunteerSampleDataTest {
     static void theRemovalHandsOnToTheModuleBeforeOrToCore() {
         System.runAs(admin()) {
             Test.startTest();
-            new VolunteerSampleDataRemoveStages().finish();
+            new VolunteersSampleData.RemoveStages().finish();
             Test.stopTest();
 
             Assert.areEqual(
