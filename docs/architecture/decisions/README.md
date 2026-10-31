@@ -153,6 +153,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0142](0142-admin-view-all-modify-all-on-account-and-contact.md) | BarnCRM Admin keeps View All and Modify All on Account and Contact | Accepted (owner decision) |
 | [0143](0143-edition-internal-values.md) | The edition's stored values are Standard and Nonprofit | Accepted (owner decision) |
 | [0144](0144-acknowledgments-honor-email-opt-out.md) | Acknowledgments honor the donor's email opt-out | Accepted (owner decision) |
+| [NEXT](NEXT-import-reads-every-sheet-and-two-part-headings.md) | The import reads every sheet of a workbook, and headings that name an object | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

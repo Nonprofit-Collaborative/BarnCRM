@@ -285,6 +285,81 @@ private class ImportObjectSchemaTest {
     }
 
     @IsTest
+    static void aHeadingNamingTheObjectAndAFieldIsMapped() {
+        System.runAs(TestUsers.admin()) {
+            ImportMapping suggested;
+            Test.startTest();
+            System.runAs(admin()) {
+                suggested = ImportObjectSchema.suggestMapping(
+                    Affiliation__c.SObjectType,
+                    new List<String>{
+                        'Affiliation.Role',
+                        'Start Date (Affiliations)',
+                        'Contact.Status',
+                        'Affiliation: Shoe Size'
+                    }
+                );
+            }
+            Test.stopTest();
+
+            Assert.isTrue(
+                ImportMapping.attributeOf(suggested.columns[0].target)
+                    .endsWithIgnoreCase('Role__c'),
+                'Object and field label (C-49a).'
+            );
+            Assert.isTrue(
+                ImportMapping.attributeOf(suggested.columns[1].target)
+                    .endsWithIgnoreCase('Start_Date__c'),
+                'Field, then the plural label in parentheses.'
+            );
+            Assert.areEqual(
+                ImportMapping.TARGET_IGNORE,
+                suggested.columns[2].target,
+                'A heading naming another object is not loaded into this one.'
+            );
+            Assert.areEqual(
+                ImportMapping.TARGET_IGNORE,
+                suggested.columns[3].target,
+                'An unknown field is not guessed.'
+            );
+        }
+    }
+
+    @IsTest
+    static void theObjectIsSuggestedFromHeadingsThenSheetThenFileName() {
+        System.runAs(TestUsers.admin()) {
+            ImportObjectSchema.Detection found;
+            ImportObjectSchema.Detection byFile;
+            Test.startTest();
+            System.runAs(admin()) {
+                found = ImportObjectSchema.detectObject(
+                    'contacts_2026.xlsx',
+                    new List<String>{ 'Sheet1', 'Affiliations', 'Notes' },
+                    new List<List<String>>{
+                        new List<String>{ 'Name' },
+                        new List<String>{ 'Role' },
+                        new List<String>{ 'Affiliation.Role', 'Memo' }
+                    }
+                );
+                byFile = ImportObjectSchema.detectObject(
+                    'Affiliations export 2026-10-30.csv',
+                    new List<String>{ '' },
+                    new List<List<String>>{ new List<String>{ 'Role' } }
+                );
+            }
+            Test.stopTest();
+
+            String affiliation = Affiliation__c.SObjectType.getDescribe().getName();
+            Assert.isNull(found.bySheet[0], 'Sheet1 names nothing.');
+            Assert.areEqual(affiliation, found.bySheet[1], 'By the sheet name.');
+            Assert.areEqual(affiliation, found.bySheet[2], 'By a two-part heading.');
+            Assert.areEqual(affiliation, found.suggested, 'The first sheet that names one.');
+            Assert.areEqual('Affiliation', found.labels.get(affiliation), 'With its label.');
+            Assert.areEqual(affiliation, byFile.suggested, 'Then the file name.');
+        }
+    }
+
+    @IsTest
     static void aTemplateThatCannotLoadIsRefusedWithAReason() {
         System.runAs(TestUsers.admin()) {
             DataProtectionExtensions.noneForTest = true;
