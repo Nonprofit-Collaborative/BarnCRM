@@ -24,12 +24,15 @@ role or add-on, use the [Access page](access.md); for anything else, use Setup.
 
 You need the BarnCRM Admin role (the BarnCRM Admin permission set, which carries the Manage
 BarnCRM Settings permission and View Setup and Configuration). It shows you the **Access
-Explorer** tile and section in **Org Optimizer**. Nobody else sees it. There is nothing to
+Explorer** tile and section in **Org Optimizer**, and an **Open Access Explorer** button on the
+**Access** page of BarnCRM Settings. Nobody else sees them. There is nothing to
 schedule and no setting to change.
 
 To list people outside your part of the role hierarchy, you also need **View All Users**. On a
 Salesforce license it comes with the optional **BarnCRM Access Manager** permission set (see
-[Access](access.md)). Without it, Access Explorer lists only the people Salesforce lets you see.
+[Access](access.md)). Without it, Access Explorer lists only the people Salesforce lets you see,
+and **People With Access** says so in one line above the list. Access Explorer never reads past
+user sharing to show you people you could not otherwise see.
 
 ## A Five-Minute Walkthrough
 

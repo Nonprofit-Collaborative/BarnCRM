@@ -25,6 +25,11 @@ public with sharing class AccessExplorerController {
 
     private static final Integer SEARCH_LIMIT = 20;
 
+    /** Org Optimizer's tab (the Data Hygiene tab kept its API name) and this section's name. */
+    private static final String OPTIMIZER_TAB = 'Data_Hygiene';
+    private static final String SECTION_NAME = 'accessExplorer';
+    private static final String SECTION_STATE = 'section';
+
     @TestVisible
     private static final String KIND_PROFILE = 'profile';
     @TestVisible
@@ -155,8 +160,25 @@ public with sharing class AccessExplorerController {
         public Boolean always = false;
         @AuraEnabled
         public Boolean truncated = false;
+        /**
+         * True when the viewer lacks View All Users, so user sharing may hide some people from
+         * the people list (integrator decision 2026-10-31: say so rather than read past sharing).
+         */
+        @AuraEnabled
+        public Boolean mayMissPeople = false;
         @AuraEnabled
         public List<Grant> grants = new List<Grant>();
+    }
+
+    /** Where Access Explorer opens: Org Optimizer's tab, with the section in the page state. */
+    public class OpenLink {
+        @AuraEnabled
+        public String url;
+        /** The page state key that names the section, with the namespace's prefix. */
+        @AuraEnabled
+        public String stateKey;
+        @AuraEnabled
+        public String section = SECTION_NAME;
     }
 
     /** One page of people, in name order. */
@@ -385,6 +407,7 @@ public with sharing class AccessExplorerController {
             result.objectLabel = described.getLabel();
             result.fieldLabel = field?.getLabel();
             result.always = field != null && !field.isPermissionable();
+            result.mayMissPeople = !seesAllUsers();
             if (!result.always) {
                 Map<Id, Grant> grants = grantsFor(described, field, result);
                 countHolders(grants);
@@ -529,6 +552,41 @@ public with sharing class AccessExplorerController {
         } catch (Exception caught) {
             throw asUserError(caught, 'Access explorer overview');
         }
+    }
+
+    /**
+     * Where Access Explorer opens, for the Access page's Open Access Explorer button and for Org
+     * Optimizer, which opens the section the page state names.
+     * @return the tab URL with the section in its state, and the state key
+     */
+    @AuraEnabled(cacheable=true)
+    public static OpenLink getOpenLink() {
+        try {
+            requirePermission();
+            OpenLink link = new OpenLink();
+            link.stateKey = NamespaceUtil.stateKey(SECTION_STATE);
+            link.url =
+                '/lightning/n/' +
+                NamespaceUtil.qualify(OPTIMIZER_TAB) +
+                '?' +
+                link.stateKey +
+                '=' +
+                SECTION_NAME;
+            return link;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Access explorer link');
+        }
+    }
+
+    /** Whether the viewer holds View All Users, after muting, as Salesforce evaluates it. */
+    private static Boolean seesAllUsers() {
+        List<UserPermissionAccess> access = [
+            SELECT PermissionsViewAllUsers
+            FROM UserPermissionAccess
+            WITH USER_MODE
+            LIMIT 1
+        ];
+        return !access.isEmpty() && access[0].PermissionsViewAllUsers;
     }
 
     /** The grants for one kind of record (with View All Data and Modify All Data) or field. */

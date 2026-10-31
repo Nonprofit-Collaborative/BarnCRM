@@ -9,8 +9,9 @@ page also shows you, at a glance, who currently holds each role, so you can answ
 change our settings?" in a few seconds.
 
 To see why someone can (or cannot) open a kind of record or field, including access that
-comes from outside BarnCRM, use [Access Explorer](access-explorer.md) in Org Optimizer. It
-only reads; changes are made here or in Setup.
+comes from outside BarnCRM, use [Access Explorer](access-explorer.md) in Org Optimizer: the
+**Open Access Explorer** button on this page opens it. It only reads; changes are made here or
+in Setup.
 
 Roles ship with BarnCRM and are kept up to date for you.
 
