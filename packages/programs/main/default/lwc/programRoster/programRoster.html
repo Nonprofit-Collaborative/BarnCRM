@@ -1,0 +1,143 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom15">
+    <template lwc:if={canAdd}>
+      <lightning-button
+        slot="actions"
+        data-id="enroll-button"
+        label={labels.enroll}
+        disabled={addDisabled}
+        onclick={handleShowForm}
+      ></lightning-button>
+    </template>
+
+    <div class="slds-var-p-horizontal_medium slds-is-relative">
+      <template lwc:if={showSpinner}>
+        <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
+      </template>
+
+      <template lwc:if={hasError}>
+        <p role="alert" tabindex="-1" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+          {errorMessage}
+        </p>
+      </template>
+
+      <template lwc:if={loaded}>
+        <dl class="slds-grid slds-wrap slds-var-m-bottom_small">
+          <template for:each={figures} for:item="figure">
+            <div key={figure.value} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+              <dt class="slds-text-title">{figure.label}</dt>
+              <dd data-id="figure" data-stage={figure.value} class="slds-text-heading_small">{figure.count}</dd>
+            </div>
+          </template>
+        </dl>
+        <lightning-input
+          data-id="show-ended"
+          type="toggle"
+          label={labels.showEnded}
+          checked={showEnded}
+          disabled={busy}
+          message-toggle-active=""
+          message-toggle-inactive=""
+          onchange={handleShowEndedChange}
+          class="slds-var-m-bottom_small"
+        ></lightning-input>
+      </template>
+
+      <template lwc:if={showForm}>
+        <div data-id="enroll-form" class="slds-box slds-var-m-bottom_small">
+          <lightning-record-picker
+            data-id="person-picker"
+            label={labels.person}
+            object-api-name={personObjectApiName}
+            filter={personFilter}
+            required
+            onchange={handlePersonChange}
+          ></lightning-record-picker>
+          <lightning-combobox
+            data-id="draft-stage"
+            label={labels.stage}
+            value={draftStage}
+            options={stageOptions}
+            onchange={handleDraftStageChange}
+          ></lightning-combobox>
+          <div class="slds-var-m-top_small">
+            <lightning-button
+              data-id="save-button"
+              variant="brand"
+              label={labels.save}
+              disabled={saveDisabled}
+              onclick={handleSave}
+            ></lightning-button>
+            <lightning-button
+              data-id="cancel-button"
+              class="slds-var-m-left_x-small"
+              label={labels.cancel}
+              onclick={handleCancel}
+            ></lightning-button>
+          </div>
+        </div>
+      </template>
+
+      <div data-id="result" tabindex="-1" role="status" class="slds-var-m-bottom_small">
+        <template lwc:if={resultMessage}>
+          <p class="slds-text-body_regular" data-id="result-text">{resultMessage}</p>
+        </template>
+      </div>
+
+      <template lwc:if={isEmpty}>
+        <p data-id="empty-state" class="slds-text-body_regular">{labels.empty}</p>
+      </template>
+
+      <template lwc:if={hasEnrollments}>
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+          <caption data-id="caption" class="slds-text-title_bold slds-text-align_left slds-var-p-vertical_x-small">
+            {caption}
+          </caption>
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th scope="col">{labels.person}</th>
+              <th scope="col">{labels.stage}</th>
+              <th scope="col">{labels.startDate}</th>
+              <th scope="col">{labels.endDate}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={enrollments} for:item="row">
+              <tr key={row.recordId} data-id="enrollment">
+                <th scope="row" data-label={labels.person}>
+                  <a data-id="enrollment-link" href={row.href} data-record-id={row.recordId} onclick={handleOpenEnrollment}
+                    >{row.displayName}</a
+                  >
+                </th>
+                <td data-label={labels.stage}>
+                  <template lwc:if={canEdit}>
+                    <lightning-combobox
+                      class="stage-picker"
+                      data-record-id={row.recordId}
+                      label={row.stageFor}
+                      variant="label-hidden"
+                      value={row.stage}
+                      options={stageOptions}
+                      disabled={busy}
+                      onchange={handleStageChange}
+                    ></lightning-combobox>
+                  </template>
+                  <template lwc:else>{row.stageLabel}</template>
+                </td>
+                <td data-label={labels.startDate}>
+                  <lightning-formatted-date-time value={row.startDate} time-zone="UTC"></lightning-formatted-date-time>
+                </td>
+                <td data-label={labels.endDate}>
+                  <lightning-formatted-date-time value={row.endDate} time-zone="UTC"></lightning-formatted-date-time>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+        <template lwc:if={moreThanShown}>
+          <p data-id="more-than-shown" class="slds-text-body_small slds-var-m-top_x-small">{moreThanShownText}</p>
+        </template>
+      </template>
+    </div>
+  </lightning-card>
+</template>
