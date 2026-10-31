@@ -147,7 +147,7 @@ tool you may use, in short groups:
 | Group | Tile | Opens |
 |---|---|---|
 | **Find and Change** | **Find and Export Records** | The **Find** tab |
-| **Find and Change** | **Update Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Update** (no file needed) |
+| **Find and Change** | **Update Many Records** | **Super Transform**: choose the records and the changes, preview, then run (no file needed; see [Changing many records at once](super-transform.md)) |
 | **Check and Tidy** | **Org Optimizer** | The **Org Optimizer** tab |
 | **Careful** (last) | **Delete Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Delete** (no file needed) |
 

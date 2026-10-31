@@ -149,11 +149,11 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 2 | Log in as read-only. Search the App Launcher for "Find", "Bulk Update" and "Data Manager". | None of these BarnCRM tabs is found. |
 | 3 | As admin, on **Access**, give staff **BarnCRM Find and Export** only. Log in as staff and run a Find query. | Neither **Bulk Update** nor **Bulk Delete** is offered. No **Super Transform** tab in the App Launcher. |
 | 4 | As admin, give staff **BarnCRM Bulk Update** as well. Log in as staff and run a Find query. | **Bulk Update** is offered, and the **Super Transform** tab is available. |
-| 5 | As staff, open the **Super Transform** tab. | The five Super Transform steps, then **Data Jobs** with "A bulk update starts in Find: run a query, then choose Change Records, Bulk Update. Recent bulk updates and their undo are listed here." and **Open Find**. Only staff's own jobs are listed; **Show everyone's jobs** is not offered. |
+| 5 | As staff, open the **Super Transform** tab. | The five Super Transform steps, then **Data Jobs** with "Start a bulk update with Super Transform above, or from a saved query in Find (Change Records, Bulk Update). Recent bulk updates and their undo are listed here." and **Open Find**. Only staff's own jobs are listed; **Show everyone's jobs** is not offered. |
 | 6 | As admin, open the **Super Transform** tab. | **Show everyone's jobs** is offered; ticking it lists other people's jobs too. |
 | 7 | As admin, give staff **BarnCRM Bulk Delete**. Log in as staff and run a Find query. | **Bulk Delete** is offered. On **Access**, the Bulk Delete give step showed the warning "This permission lets the person remove data. Give it only to someone you trust to do that." |
 | 8 | As admin, in Setup, open staff's user and check **Permission Set Assignments**. | **BarnCRM Tab: Bulk Update**, **BarnCRM Tab: Find** and **BarnCRM Tab: Data Manager** are assigned (given by BarnCRM, not by hand). |
-| 9 | As admin, remove **BarnCRM Bulk Update**, **BarnCRM Bulk Delete** and **BarnCRM Find and Export** from staff on **Access**. Log in as staff. | The **Find**, **Bulk Update** and **Data Manager** tabs are gone. |
+| 9 | As admin, remove **BarnCRM Bulk Update**, **BarnCRM Bulk Delete** and **BarnCRM Find and Export** from staff on **Access**. Log in as staff. | The **Find**, **Super Transform** and **Data Manager** tabs are gone. |
 
 **Cleanup:** none (step 9 resets staff).
 
@@ -164,12 +164,12 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Data Manager** and choose the **Update Many Records** tile. | **Find** opens with a note: "Bulk Update starts here: find the records, press Run, then choose Change Records, Bulk Update." |
-| 2 | Choose **Contact**, add **Title**, add the condition **Last Name** **equals** `Garcia`, select **Run**, then **Change Records**, **Bulk Update**. | The **Bulk Update** panel shows a path **Choose Changes**, **Confirm**, **Run**, on **Choose Changes**, and **Add a Change**. |
+| 1 | Open **Data Manager** and choose the **Update Many Records** tile. | The **Super Transform** tab opens on **1. Object**, with no Find note. On a first visit a tip "Bulk Changes Start Here" says to start from Find only for a saved query. Go back. |
+| 2 | Open **Find**. Choose **Contact**, add **Title**, add the condition **Last Name** **equals** `Garcia`, select **Run**, then **Change Records**, **Bulk Update**. | The **Bulk Update** panel shows a path **Choose Changes**, **Confirm**, **Run**, on **Choose Changes**, and **Add a Change**. |
 | 3 | Choose **Title**, **Set to a value**, type `x`, and select **Preview**. | The path moves to **Confirm**. Select **Close**; nothing changed. |
 | 4 | Choose **Change Records**, **Bulk Delete**, then **Preview**. | The **Bulk Delete** panel's path **Preview**, **Confirm**, **Run** is on **Confirm**. Any related records deleted with them show as badges. **Download a Backup First** has an info icon whose popover says what the file holds. Select **Close** without typing the count. |
 | 5 | Open **Data Manager**, choose the **Delete Many Records** tile, then **Continue**. | **Find** opens with "Bulk Delete starts here: find the records, press Run, then choose Change Records, Bulk Delete." |
-| 6 | On **Data Manager**, under **Data Jobs**, select **Open Find**. | **Find** opens with the Bulk Update note from step 1. |
+| 6 | On **Data Manager**, under **Data Jobs**, select **Open Find**. | **Find** opens with a note: "Bulk Update starts here: find the records, press Run, then choose Change Records, Bulk Update." (the way to start from a saved query) |
 
 **Cleanup:** none (nothing was changed or deleted).
 

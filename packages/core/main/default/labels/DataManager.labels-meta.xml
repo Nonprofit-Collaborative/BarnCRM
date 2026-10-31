@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: one line on the bulk update tile</shortDescription>
-        <value>Find records, then change up to five fields at once.</value>
+        <value>Super Transform: change fields on many records, no file needed.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_DeleteTitle</fullName>
