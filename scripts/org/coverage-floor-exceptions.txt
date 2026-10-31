@@ -17,4 +17,3 @@ StewardshipTriggerHandler 70  # 7 of 10 lines
 StewardshipWriter 62  # 37 of 59 lines
 # No coverage row at all in that run: no test executed them.
 AcknowledgmentBatch 0  # no test ran it
-MessagingAcknowledgmentSender 0  # no test ran it

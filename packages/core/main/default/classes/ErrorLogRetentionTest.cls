@@ -101,7 +101,7 @@ private class ErrorLogRetentionTest {
         System.runAs(TestUsers.admin()) {
             age(entries(2, ErrorLogger.STATUS_IGNORED), ErrorLogRetention.DEFAULT_DAYS + 1);
             entries(1, ErrorLogger.STATUS_NEW);
-            ErrorDigestService.capturedMessages = new List<Messaging.SingleEmailMessage>();
+            ErrorDigestService.emailSender = new RecordingEmailSender();
 
             Test.startTest();
             new ErrorDigestScheduler().execute(null);

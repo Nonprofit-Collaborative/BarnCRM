@@ -38,11 +38,6 @@ public with sharing class PledgeReminderSelector {
         ];
     }
 
-    /** The email templates this org has, by label and developer name. */
-    public static List<EmailTemplate> activeTemplates() {
-        return AcknowledgmentSelector.activeTemplates();
-    }
-
     /**
      * The installments still owed, on an Active pledge, due between the two dates, with what a
      * reminder needs to address the donor. A pledge that is Paused, Completed or Cancelled is

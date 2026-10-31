@@ -26,14 +26,6 @@ public with sharing class PledgeReminderController {
         public Boolean active;
     }
 
-    /** One email template the org has, so a step can name it. */
-    public class TemplateView {
-        @AuraEnabled
-        public String label;
-        @AuraEnabled
-        public String developerName;
-    }
-
     /** One logged reminder, for the list on the page. */
     public class ReminderView {
         @AuraEnabled
@@ -89,7 +81,7 @@ public with sharing class PledgeReminderController {
         @AuraEnabled
         public List<StepView> steps;
         @AuraEnabled
-        public List<TemplateView> templates;
+        public List<GivingEmailTemplates.Option> templates;
         @AuraEnabled
         public List<ReminderView> reminders;
     }
@@ -171,17 +163,8 @@ public with sharing class PledgeReminderController {
         view.lastRun = settings.Pledge_Reminders_Last_Run__c;
         view.lastRunSummary = settings.Pledge_Reminders_Last_Run_Summary__c;
 
-        Map<String, String> templateNames = new Map<String, String>();
-        List<TemplateView> templates = new List<TemplateView>();
-        for (EmailTemplate template : PledgeReminderSelector.activeTemplates()) {
-            TemplateView row = new TemplateView();
-            row.label = template.Name;
-            row.developerName = template.DeveloperName;
-            templates.add(row);
-            templateNames.put(template.DeveloperName, template.Name);
-        }
-        view.templates = templates;
-        view.steps = stepViews(templateNames);
+        view.templates = GivingEmailTemplates.options();
+        view.steps = stepViews(GivingEmailTemplates.labelsByDeveloperName(view.templates));
 
         PledgeReminderService.Counts due = PledgeReminderService.preview();
         view.emailsDue = due.emails;

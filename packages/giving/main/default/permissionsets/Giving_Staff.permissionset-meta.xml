@@ -40,14 +40,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>AcknowledgmentSendOutcome</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>AcknowledgmentSender</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>AcknowledgmentService</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -161,10 +153,6 @@
   </classAccesses>
   <classAccesses>
     <apexClass>GivingAccountSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>MessagingAcknowledgmentSender</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>

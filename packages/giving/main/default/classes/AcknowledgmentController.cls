@@ -37,14 +37,6 @@ public with sharing class AcknowledgmentController {
         public Boolean active;
     }
 
-    /** One email template the org has, so the developer name can be copied into a rule. */
-    public class TemplateView {
-        @AuraEnabled
-        public String label;
-        @AuraEnabled
-        public String developerName;
-    }
-
     /** One run, for the list on the page. */
     public class RunView {
         @AuraEnabled
@@ -103,7 +95,7 @@ public with sharing class AcknowledgmentController {
         @AuraEnabled
         public List<RuleView> rules;
         @AuraEnabled
-        public List<TemplateView> templates;
+        public List<GivingEmailTemplates.Option> templates;
         @AuraEnabled
         public List<RunView> runs;
     }
@@ -181,17 +173,8 @@ public with sharing class AcknowledgmentController {
         view.lastRun = settings.Acknowledgments_Last_Run__c;
         view.lastRunSummary = settings.Acknowledgments_Last_Run_Summary__c;
 
-        Map<String, String> templateNames = new Map<String, String>();
-        List<TemplateView> templates = new List<TemplateView>();
-        for (EmailTemplate template : AcknowledgmentSelector.activeTemplates()) {
-            TemplateView row = new TemplateView();
-            row.label = template.Name;
-            row.developerName = template.DeveloperName;
-            templates.add(row);
-            templateNames.put(template.DeveloperName, template.Name);
-        }
-        view.templates = templates;
-        view.rules = ruleViews(templateNames);
+        view.templates = GivingEmailTemplates.options();
+        view.rules = ruleViews(GivingEmailTemplates.labelsByDeveloperName(view.templates));
         view.runs = runViews();
         countQueue(view);
         return view;

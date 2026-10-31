@@ -222,7 +222,9 @@ public with sharing class AcknowledgmentService {
         Map<Id, Contact> recipients = AcknowledgmentSelector.contactsById(
             new Set<Id>(recipientIds)
         );
-        Map<String, Id> templateIds = templateIdsByDeveloperName(developerNamesOf(matches));
+        Map<String, Id> templateIds = GivingEmailTemplates.idsByDeveloperName(
+            developerNamesOf(matches)
+        );
 
         // Pass two: claim. The row is written before anything is sent, so the claim is real.
         List<Acknowledgment__c> rows = new List<Acknowledgment__c>();
@@ -272,7 +274,13 @@ public with sharing class AcknowledgmentService {
                 continue;
             }
             messages.add(
-                messageFor(sendable[index], row.Recipient_Contact__c, templateId, fromAddressId)
+                // The gift is the `WhatId`, so `{!Gift__c.Amount__c}` resolves (ADR-0032).
+                GivingEmailTemplates.message(
+                    sendable[index].Id,
+                    row.Recipient_Contact__c,
+                    templateId,
+                    fromAddressId
+                )
             );
             messageRows.add(row);
         }
@@ -292,12 +300,12 @@ public with sharing class AcknowledgmentService {
             return counts;
         }
 
-        List<AcknowledgmentSendOutcome> outcomes = sender().send(messages);
+        List<EmailSendOutcome> outcomes = emailSender.send(messages);
         List<Acknowledgment__c> settled = new List<Acknowledgment__c>();
         List<String> failures = new List<String>();
         for (Integer index = 0; index < messageRows.size(); index++) {
             Acknowledgment__c row = messageRows[index];
-            AcknowledgmentSendOutcome outcome = index < outcomes.size() ? outcomes[index] : null;
+            EmailSendOutcome outcome = index < outcomes.size() ? outcomes[index] : null;
             if (outcome != null && outcome.sent == true) {
                 row.Status__c = STATUS_SENT;
                 row.Sent_On__c = System.now();
@@ -312,9 +320,10 @@ public with sharing class AcknowledgmentService {
                 counts.sent++;
             } else {
                 row.Status__c = STATUS_FAILED;
-                row.Failure_Reason__c = outcome == null
-                    ? Label.Giving_Acknowledgment_SendFailedUnknown
-                    : outcome.failureReason;
+                row.Failure_Reason__c = failureReasonOf(
+                    outcome,
+                    Label.Giving_Acknowledgment_SendFailedUnknown
+                );
                 // The key goes, so the next send tries this gift again (R-AK7).
                 row.Gift_Key__c = null;
                 settled.add(row);
@@ -372,35 +381,6 @@ public with sharing class AcknowledgmentService {
             }
         }
         return giftIds;
-    }
-
-    /**
-     * One message, composed by the platform rather than by us (ADR-0032).
-     *
-     * The template is a standard email template, the contact is the target so that
-     * `{!Contact.FirstName}` resolves, and the gift is the `WhatId` so that `{!Gift__c.Amount__c}`
-     * does. The package composes no HTML and merges no tokens of its own.
-     *
-     * The activity is not saved, because logging a task per thank you would make this feature
-     * depend on a standard object the packages may not use (plan Section 4.2).
-     */
-    @TestVisible
-    private static Messaging.SingleEmailMessage messageFor(
-        Gift__c gift,
-        Id recipientContactId,
-        Id templateId,
-        Id fromAddressId
-    ) {
-        Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
-        message.setTemplateId(templateId);
-        message.setTargetObjectId(recipientContactId);
-        message.setWhatId(gift.Id);
-        message.setTreatTargetObjectAsRecipient(true);
-        message.setSaveAsActivity(false);
-        if (fromAddressId != null) {
-            message.setOrgWideEmailAddressId(fromAddressId);
-        }
-        return message;
     }
 
     // ---------------------------------------------------------------------------- odds and ends
@@ -477,10 +457,15 @@ public with sharing class AcknowledgmentService {
      * an org that cannot send mail should still be able to prove what this class recorded.
      */
     @TestVisible
-    private static AcknowledgmentSender senderOverride;
+    private static EmailSender emailSender = new MessagingEmailSender();
 
-    private static AcknowledgmentSender sender() {
-        return senderOverride == null ? new MessagingAcknowledgmentSender() : senderOverride;
+    /**
+     * The sentence a person reads on a row whose email did not go: the platform's first error
+     * (the sender trims it to what fits on the record), or `unknown` when it gave none. The rest
+     * of the detail is in the Error Log entry the caller writes.
+     */
+    public static String failureReasonOf(EmailSendOutcome outcome, String unknown) {
+        return outcome == null || String.isBlank(outcome.error) ? unknown : outcome.error;
     }
 
     private static Boolean needsFirstGiftAnswer(List<Acknowledgment_Rule__c> rules) {
@@ -510,21 +495,5 @@ public with sharing class AcknowledgmentService {
             }
         }
         return names;
-    }
-
-    private static Map<String, Id> templateIdsByDeveloperName(Set<String> developerNames) {
-        Map<String, Id> byName = new Map<String, Id>();
-        if (developerNames.isEmpty()) {
-            return byName;
-        }
-        for (EmailTemplate template : [
-            SELECT Id, DeveloperName
-            FROM EmailTemplate
-            WHERE DeveloperName IN :developerNames
-            WITH SYSTEM_MODE
-        ]) {
-            byName.put(template.DeveloperName, template.Id);
-        }
-        return byName;
     }
 }

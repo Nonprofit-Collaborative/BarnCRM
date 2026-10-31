@@ -1,6 +1,6 @@
 /**
- * Test data for the pledge reminder tests (G-30). The stand-in sender is the acknowledgment
- * tests' own, because reminders send through the same `AcknowledgmentSender` seam.
+ * Test data for the pledge reminder tests (G-30). The stand-in sender is Core's
+ * `RecordingEmailSender`, as in the acknowledgment tests.
  */
 @IsTest
 public class PledgeReminderTestData {

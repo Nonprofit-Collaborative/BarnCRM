@@ -3,7 +3,7 @@
  * model 25P and 25Q).
  *
  * It reuses the acknowledgment feature's seams rather than building a second send path: the
- * `AcknowledgmentSender` interface (so a test proves what was composed without an org that can
+ * Core `EmailSender` interface (so a test proves what was composed without an org that can
  * send mail), the email template picked by developer name, the organization wide from address,
  * the Send Acknowledgments permission, and the letter merge file and its CSV escaping. What is
  * new is only what a reminder needs: steps measured in days from the due date, and a log keyed
@@ -349,7 +349,7 @@ public with sharing class PledgeReminderService {
                 templateNames.add(item.step.Email_Template__c.trim());
             }
         }
-        Map<String, Id> templateIds = templateIdsByDeveloperName(templateNames);
+        Map<String, Id> templateIds = GivingEmailTemplates.idsByDeveloperName(templateNames);
         Id fromAddressId = AcknowledgmentService.fromAddressId();
 
         List<Pledge_Reminder__c> unsendable = new List<Pledge_Reminder__c>();
@@ -378,8 +378,9 @@ public with sharing class PledgeReminderService {
                 counts.errors++;
                 continue;
             }
+            // The installment is the `WhatId`, so `{!Installment__c.Due_Date__c}` resolves.
             messages.add(
-                messageFor(
+                GivingEmailTemplates.message(
                     planned[index].installment.Id,
                     row.Recipient_Contact__c,
                     templateId,
@@ -405,19 +406,14 @@ public with sharing class PledgeReminderService {
      * Sends the chunk in one call. A call the platform refuses as a whole sent nothing, so every
      * message comes back failed with the platform's reason, and `settle` releases every key.
      */
-    private static List<AcknowledgmentSendOutcome> sendAll(
-        List<Messaging.SingleEmailMessage> messages
-    ) {
+    private static List<EmailSendOutcome> sendAll(List<Messaging.SingleEmailMessage> messages) {
         try {
-            return sender().send(messages);
+            return emailSender.send(messages);
         } catch (Exception sendFailure) {
             ErrorLogger.log(sendFailure, CONTEXT_SEND);
-            String reason = String.isBlank(sendFailure.getMessage())
-                ? Label.Giving_PledgeReminders_SendFailedUnknown
-                : sendFailure.getMessage().left(255);
-            List<AcknowledgmentSendOutcome> outcomes = new List<AcknowledgmentSendOutcome>();
+            List<EmailSendOutcome> outcomes = new List<EmailSendOutcome>();
             for (Integer index = 0; index < messages.size(); index++) {
-                outcomes.add(AcknowledgmentSendOutcome.failed(reason));
+                outcomes.add(EmailSendOutcome.failed(sendFailure.getMessage()?.left(255)));
             }
             return outcomes;
         }
@@ -429,23 +425,24 @@ public with sharing class PledgeReminderService {
      */
     private static void settle(
         List<Pledge_Reminder__c> messageRows,
-        List<AcknowledgmentSendOutcome> outcomes,
+        List<EmailSendOutcome> outcomes,
         Counts counts
     ) {
         List<Pledge_Reminder__c> settled = new List<Pledge_Reminder__c>();
         List<String> failures = new List<String>();
         for (Integer index = 0; index < messageRows.size(); index++) {
             Pledge_Reminder__c row = messageRows[index];
-            AcknowledgmentSendOutcome outcome = index < outcomes.size() ? outcomes[index] : null;
+            EmailSendOutcome outcome = index < outcomes.size() ? outcomes[index] : null;
             if (outcome != null && outcome.sent == true) {
                 row.Status__c = STATUS_SENT;
                 row.Sent_On__c = System.now();
                 counts.emails++;
             } else {
                 row.Status__c = STATUS_FAILED;
-                row.Failure_Reason__c = outcome == null
-                    ? Label.Giving_PledgeReminders_SendFailedUnknown
-                    : outcome.failureReason;
+                row.Failure_Reason__c = AcknowledgmentService.failureReasonOf(
+                    outcome,
+                    Label.Giving_PledgeReminders_SendFailedUnknown
+                );
                 // The key goes, so the next run tries this reminder again while it is recent.
                 row.Reminder_Key__c = null;
                 failures.add(row.Failure_Reason__c);
@@ -495,31 +492,6 @@ public with sharing class PledgeReminderService {
         if (!stillQueued.isEmpty()) {
             ErrorLogger.logMessages(stillQueued, CONTEXT_SEND, ErrorLogger.SEVERITY_ERROR);
         }
-    }
-
-    /**
-     * One message, composed by the platform from the step's template. The contact is the target
-     * so that `{!Contact.FirstName}` resolves, and the installment is the `WhatId` so that
-     * `{!Installment__c.Due_Date__c}` and `{!Installment__c.Expected_Amount__c}` do. The
-     * activity is not saved, because that would depend on a standard object (plan Section 4.2).
-     */
-    @TestVisible
-    private static Messaging.SingleEmailMessage messageFor(
-        Id installmentId,
-        Id recipientContactId,
-        Id templateId,
-        Id fromAddressId
-    ) {
-        Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
-        message.setTemplateId(templateId);
-        message.setTargetObjectId(recipientContactId);
-        message.setWhatId(installmentId);
-        message.setTreatTargetObjectAsRecipient(true);
-        message.setSaveAsActivity(false);
-        if (fromAddressId != null) {
-            message.setOrgWideEmailAddressId(fromAddressId);
-        }
-        return message;
     }
 
     // --------------------------------------------------------------------------- the letters
@@ -694,27 +666,7 @@ public with sharing class PledgeReminderService {
         return step.Days_From_Due__c == null ? 0 : step.Days_From_Due__c.intValue();
     }
 
-    private static Map<String, Id> templateIdsByDeveloperName(Set<String> developerNames) {
-        Map<String, Id> byName = new Map<String, Id>();
-        if (developerNames.isEmpty()) {
-            return byName;
-        }
-        for (EmailTemplate template : [
-            SELECT Id, DeveloperName
-            FROM EmailTemplate
-            WHERE DeveloperName IN :developerNames
-            WITH SYSTEM_MODE
-        ]) {
-            byName.put(template.DeveloperName, template.Id);
-        }
-        return byName;
-    }
-
     /** Overridable by a test, like the acknowledgment feature's sender. */
     @TestVisible
-    private static AcknowledgmentSender senderOverride;
-
-    private static AcknowledgmentSender sender() {
-        return senderOverride == null ? new MessagingAcknowledgmentSender() : senderOverride;
-    }
+    private static EmailSender emailSender = new MessagingEmailSender();
 }
