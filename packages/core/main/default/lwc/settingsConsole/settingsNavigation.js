@@ -10,7 +10,8 @@ import SYSTEM from '@salesforce/label/c.Core_Settings_NavGroup_System';
  * The section list in groups, each section with its icon. Sections are matched by their stored
  * name (case ignored). A section no group names, such as one a later module adds, goes in More,
  * which sits before System so Error Log is always the last item. A group with no section in
- * this org is left out.
+ * this org is left out. Rollups sits under Data, not Fundraising: the Rollup Builder is used
+ * without Giving, in Standard Edition too (owner QA, 2026-10-31).
  */
 const GROUPS = [
   {
@@ -35,6 +36,7 @@ const GROUPS = [
     sections: [
       ['Import', 'utility:upload'],
       ['Duplicate Matching', 'utility:merge'],
+      ['Rollups', 'utility:summary'],
       ['Org Optimizer', 'utility:magicwand']
     ]
   },
@@ -43,8 +45,7 @@ const GROUPS = [
     label: FUNDRAISING,
     sections: [
       ['Giving', 'utility:moneybag'],
-      ['Receipts', 'utility:email'],
-      ['Rollups', 'utility:summary']
+      ['Receipts', 'utility:email']
     ]
   },
   { name: 'programs', label: PROGRAMS, sections: [['Volunteers', 'utility:people']] },

@@ -37,7 +37,8 @@ entry changes the org's metadata.
    metadata. In Setup, open **Apex Settings** and turn on **Deploy Metadata from
    Non-Certified Package Versions via Apex**. This setting is in Setup only, and BarnCRM
    cannot turn it on for you: it is Salesforce's own safeguard. If it is off, saving an
-   entry says so.
+   entry says so. BarnCRM cannot read this setting either, so the **Needs a Change in Setup**
+   note on **General** stays until your first save here works, then goes for good.
 3. Open the **BarnCRM Admin** app, click **BarnCRM Settings**, choose **General**, and scroll to
    **Custom Metadata**.
 

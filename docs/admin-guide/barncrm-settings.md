@@ -175,8 +175,8 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 2. The console opens with the section list on the
    left and the first section showing on the right. The page name shows once, in the page
    header. The sections are listed in groups: **Organization** (General, Organization),
-   **People** (People and Households, Addresses), **Data** (Import, Duplicate Matching, Org
-   Optimizer), **Fundraising** (Giving, Receipts, Rollups), **Programs** (Volunteers) and
+   **People** (People and Households, Addresses), **Data** (Import, Duplicate Matching,
+   Rollups, Org Optimizer), **Fundraising** (Giving, Receipts), **Programs** (Volunteers) and
    **System** (Modules, Access, Automation, Integrations, Health, Error Log). A section a
    module adds that is not in these groups is listed under **More**, before System, so Error
    Log is always last. Each section's settings sit in bordered boxes with a heading, such as **People** and
@@ -440,10 +440,17 @@ one, a short note at the top of the section says, before any setting:
   to 4 numbered clicks once you are on the Setup page. The steps start closed so the
   settings stay near the top.
 
-Where BarnCRM can read the answer without any extra permission, the note also says whether it
-is already done: **Done** with a green tick, or **Not done yet** with a warning icon, and a
-**Check Again** button reads it again once you have made the change. Otherwise the note is an
-instruction only, and it stays there after you make the change, because BarnCRM cannot tell.
+Where BarnCRM can read the answer, a note that is already done is not shown at all. One that is
+not done says **Not done yet** with a warning icon, and a **Check Again** button reads it again
+once you have made the change: when the change is there, the note goes. Otherwise the note is
+an instruction only, and it stays there after you make the change, because BarnCRM cannot tell.
+
+The General note has two parts. BarnCRM reads whether you hold **BarnCRM Metadata Admin**. It
+cannot read the Apex Settings switch (only Setup shows it), so it counts the switch as on once
+a Custom Metadata save has worked. Until then the note says so: turn the switch on if your
+BarnCRM is an installed package, save an entry on the **Custom Metadata** page, then select
+**Check Again**. Where BarnCRM was deployed as source, not installed as a package, the switch
+is not needed and the first save works without it.
 Nothing on the note changes your org: you make the change in Setup yourself.
 
 Salesforce has no stable link to a single object, permission set or Lightning page, so for
@@ -451,14 +458,14 @@ those the button opens the list and the first step says which one to click.
 
 | Section | What to change in Setup | Open in Setup opens | Checked by BarnCRM |
 |---|---|---|---|
-| General | To save Custom Metadata entries in an installed package: turn on **Deploy Metadata from Non-Certified Package Versions via Apex**. The **BarnCRM Metadata Admin** permission it also needs is given on the Access page, under Extra Permissions | Apex Settings | No |
+| General | To save Custom Metadata entries in an installed package: turn on **Deploy Metadata from Non-Certified Package Versions via Apex**. The **BarnCRM Metadata Admin** permission it also needs is given on the Access page, under Extra Permissions | Apex Settings | Yes, with Check Again: the permission directly, the switch once a Custom Metadata save has worked |
 | Duplicate Matching | To review duplicates: keep the standard duplicate rules active. The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra Permissions, to people with a Sales Cloud or Service Cloud license | Duplicate Rules | No: the Duplicates panel shows each rule as On or Off |
 | Rollups | Create the field a new rollup writes to before you build it | Object Manager (click the object, then Fields & Relationships, New) | No |
 | Error Log | Allow the org to send email, or no digest is sent (Access level: All email) | Deliverability | Yes, with Check Again |
 | Access | Assign a module permission set this page does not list under Extra Permissions. Giving and Mirror permission sets, such as Giving Staff or Opportunity Mirror, and Core's own extra permissions (Find and Export, Bulk Update, Bulk Delete, Erase People, Duplicate Review, Metadata Admin) are given on the page itself; see [Erase a person](erase-a-person.md) for who should have Erase People. Creating the user is the **Create a User in Setup** link on the page itself | Permission Sets (click the set, then Manage Assignments) | No |
 
 If the check cannot be read (for example, your Salesforce did not answer), the note shows the
-instruction without Done or Not done yet.
+instruction without Not done yet.
 
 A module's own settings page, reached from its section here, carries its notes in the same
 form at the top of that page:
