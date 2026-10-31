@@ -414,7 +414,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Connection panel: what it is</shortDescription>
-        <value>Lets an administrator create a new field from an import column. BarnCRM calls your org's own Metadata API through a Named Credential it creates once. No password is stored.</value>
+        <value>Lets an administrator create a new field from an import column. BarnCRM calls your org's own Metadata API through a Named Credential it creates once, which an administrator then turns on in Setup. No password is stored.</value>
     </labels>
     <labels>
         <fullName>Core_ImportNewField_PanelStatus</fullName>
@@ -455,5 +455,37 @@
         <protected>false</protected>
         <shortDescription>Connection panel: missing permissions</shortDescription>
         <value>Setting up the connection needs the BarnCRM Metadata Admin permission set and the Customize Application and Modify Metadata permissions.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_CalloutsOff</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create field refused: callouts off</shortDescription>
+        <value>The connection is set up but not turned on. Turn on Enabled for Callouts as BarnCRM Settings, Import page, describes, or create the field in Setup from the details below.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_PanelCalloutsOff</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Connection panel: callouts off</shortDescription>
+        <value>Set up, one step left</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_PanelEnableSteps</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Connection panel: turn on callouts steps</shortDescription>
+        <value>Salesforce creates the connection with callouts turned off, and only an administrator can turn them on. In Setup, enter Named Credentials in Quick Find and open Named Credentials. Select BarnCRM: this org, then Edit. Turn on Enabled for Callouts and select Save. Then select Check Again here.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ImportNewField_CheckAgainButton</fullName>
+        <categories>Import New Field</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Connection panel: check again button</shortDescription>
+        <value>Check Again</value>
     </labels>
 </CustomLabels>

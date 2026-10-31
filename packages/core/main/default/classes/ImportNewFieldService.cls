@@ -50,8 +50,13 @@ public with sharing class ImportNewFieldService {
 
     @TestVisible
     private static Boolean systemPermissionOverride;
+    /** Stands in for "the Named Credential exists" in tests. */
     @TestVisible
     private static Boolean connectedOverride;
+    /** Stands in for the Named Credential's callout status in tests ('Enabled' or 'Disabled'). */
+    @TestVisible
+    private static String calloutStatusOverride;
+    private static final String ENABLED = 'Enabled';
 
     /** The field the admin asked for. `apiName` is without `__c`. */
     public class FieldRequest {
@@ -68,8 +73,12 @@ public with sharing class ImportNewFieldService {
     public class Connection {
         @AuraEnabled
         public Boolean canCreate = false;
+        /** Set up and enabled for callouts: a field can be created. */
         @AuraEnabled
         public Boolean connected = false;
+        /** Set up, but Enabled for Callouts is off: the admin turns it on in Setup. */
+        @AuraEnabled
+        public Boolean calloutsOff = false;
     }
 
     public class Outcome {
@@ -111,7 +120,8 @@ public with sharing class ImportNewFieldService {
             access[0].PermissionsModifyMetadata;
     }
 
-    public static Boolean isConnected() {
+    /** Whether Set Up Connection has created the Named Credential. */
+    public static Boolean isSetUp() {
         if (connectedOverride != null) {
             return connectedOverride;
         }
@@ -125,17 +135,39 @@ public with sharing class ImportNewFieldService {
             .isEmpty();
     }
 
+    /**
+     * Whether the Named Credential is Enabled for Callouts. A Named Credential created through
+     * ConnectApi starts with callouts disabled, and no ConnectApi input (API 68) can turn them on,
+     * so the admin turns on Enabled for Callouts in Setup once (ADR-0148 amendment A1). Only the
+     * ConnectApi read shows the status; SOQL on NamedCredential has no CalloutStatus column.
+     */
+    public static Boolean calloutsEnabled() {
+        if (calloutStatusOverride != null) {
+            return calloutStatusOverride == ENABLED;
+        }
+        try {
+            return String.valueOf(
+                    ConnectApi.NamedCredentials.getNamedCredential(CONNECTION).calloutStatus
+                ) == ENABLED;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static Connection connection() {
         Connection result = new Connection();
         result.canCreate = canCreate();
-        result.connected = isConnected();
+        if (result.canCreate && isSetUp()) {
+            result.connected = calloutsEnabled();
+            result.calloutsOff = !result.connected;
+        }
         return result;
     }
 
     /** Creates the Named Credential once, pointing at this org's My Domain. */
     public static Connection setUpConnection() {
         enforce();
-        if (!isConnected()) {
+        if (!isSetUp()) {
             ConnectApi.ExternalCredentialInput credential = new ConnectApi.ExternalCredentialInput();
             credential.developerName = NamespaceUtil.qualify(CONNECTION);
             ConnectApi.NamedCredentialCalloutOptionsInput options = new ConnectApi.NamedCredentialCalloutOptionsInput();
@@ -234,8 +266,11 @@ public with sharing class ImportNewFieldService {
     /** Checks the request and queues the job; returns the job's Id for `check`. */
     public static Id start(FieldRequest request) {
         enforce();
-        if (!isConnected()) {
+        if (!isSetUp()) {
             throw new NewFieldException(Label.Core_ImportNewField_NotConnected);
+        }
+        if (!calloutsEnabled()) {
+            throw new NewFieldException(Label.Core_ImportNewField_CalloutsOff);
         }
         List<String> found = problems(request);
         if (!found.isEmpty()) {
@@ -274,6 +309,28 @@ public with sharing class ImportNewFieldService {
                 ErrorLogger.logMessage(failure, logContext, ErrorLogger.SEVERITY_ERROR);
                 return;
             }
+            // FieldPermissions rows for the new field are not saved in the transaction that
+            // created it (QA v21 D3), so access is given by a second job.
+            GrantAccessJob grant = new GrantAccessJob(request, logContext);
+            if (Test.isRunningTest()) {
+                grant.execute(null);
+            } else {
+                System.enqueueJob(grant);
+            }
+        }
+    }
+
+    /** Gives access to the field the previous job created, in a transaction of its own. */
+    public with sharing class GrantAccessJob implements Queueable {
+        private final FieldRequest request;
+        private final String logContext;
+
+        public GrantAccessJob(FieldRequest request, String logContext) {
+            this.request = request;
+            this.logContext = logContext;
+        }
+
+        public void execute(QueueableContext queued) {
             grantAccess(
                 request.objectApiName,
                 request.apiName + '__c',

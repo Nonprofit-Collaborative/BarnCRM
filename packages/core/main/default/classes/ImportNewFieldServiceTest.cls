@@ -45,6 +45,7 @@ private class ImportNewFieldServiceTest {
     private static void connectedAdmin() {
         ImportNewFieldService.systemPermissionOverride = true;
         ImportNewFieldService.connectedOverride = true;
+        ImportNewFieldService.calloutStatusOverride = 'Enabled';
     }
 
     private static String alternateEmail() {
@@ -187,6 +188,43 @@ private class ImportNewFieldServiceTest {
                 ImportNewFieldService.RUNNING,
                 ImportNewFieldController.findField('Account', 'Not_Created_Yet').state
             );
+        }
+    }
+
+    /** QA v21 D3: a Named Credential with callouts off is set up, not connected. */
+    @IsTest
+    static void aConnectionWithCalloutsOffNeedsTheSetupStep() {
+        System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
+            ImportNewFieldService.systemPermissionOverride = true;
+            ImportNewFieldService.connectedOverride = true;
+            ImportNewFieldService.calloutStatusOverride = 'Disabled';
+            ImportNewFieldService.Connection connection = ImportNewFieldController.getConnection();
+            Assert.isFalse(connection.connected, 'callouts off is not connected');
+            Assert.isTrue(connection.calloutsOff, 'the panel shows the Setup step');
+            try {
+                ImportNewFieldService.start(picklist('Shirt_Size'));
+                Assert.fail('Expected a refusal');
+            } catch (ImportNewFieldService.NewFieldException e) {
+                Assert.areEqual(Label.Core_ImportNewField_CalloutsOff, e.getMessage());
+            }
+            ImportNewFieldService.calloutStatusOverride = 'Enabled';
+            connection = ImportNewFieldController.getConnection();
+            Assert.isTrue(connection.connected && !connection.calloutsOff, 'turned on in Setup');
+        }
+        System.runAs(TestUsers.admin()) {
+            ImportNewFieldService.systemPermissionOverride = true;
+            Assert.isFalse(
+                ImportNewFieldController.getConnection().calloutsOff,
+                'only someone who may create fields is shown the step'
+            );
+        }
+    }
+
+    @IsTest
+    static void readsTheCalloutStatusSafely() {
+        System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
+            // No Named Credential in a test: the ConnectApi read fails and counts as off.
+            Assert.isFalse(ImportNewFieldService.calloutsEnabled());
         }
     }
 

@@ -79,3 +79,29 @@ What the platform allows:
   permissions in a subscriber org; the grant then goes only to the chosen permission set. The
   External Credential name is qualified at run time (`NamespaceUtil`).
 - No new BarnCRM object or field; canonical model unchanged.
+
+## Amendment A1, 2026-10-31: the admin turns on callouts in Setup; access is a second job
+
+QA v21 (D3) proved the path on a test org and found two gaps.
+
+1. **Callouts start off.** A Named Credential created through `ConnectApi` has Enabled for
+   Callouts off, and every callout through it fails ("Callout blocked for named credential").
+   No `ConnectApi.NamedCredentialInput` or `NamedCredentialCalloutOptionsInput` property sets
+   it (compile probes at API 68); Tooling API updates need the full metadata and a working
+   callout, which is the thing missing. A `NamedCredential` metadata file with
+   `calloutStatus` Enabled does deploy enabled, and a later `ConnectApi` update of its URL keeps
+   it enabled, but it would have to ship with a placeholder URL that every package upgrade
+   puts back, breaking the connection each release. So the decision stays a one-time
+   connection, with one guided Setup step: Set Up Connection creates the Named Credential,
+   the panel reads its callout status (`ConnectApi.NamedCredentials.getNamedCredential`; SOQL
+   has no such column), shows "Set up, one step left" with the exact steps (Setup, Named
+   Credentials, BarnCRM: this org, Edit, Enabled for Callouts, Save) and **Check Again**, and
+   only then reads **Connected**. Until then the dialog keeps the Setup fallback and creating a
+   field is refused in words. Upgrades never touch the admin's Named Credential.
+2. **Access in its own transaction.** `FieldPermissions` rows for the new field are not saved in
+   the transaction whose `createMetadata` created it (no rows on the test org). The create job
+   now chains a `GrantAccessJob`, which gives the access.
+
+With both, the test org created a Text field through the queued job (the session in the SOAP
+header was accepted), BarnCRM Admin and Staff got read and edit, Read Only read, and
+`deleteMetadata` through the same connection removed it.

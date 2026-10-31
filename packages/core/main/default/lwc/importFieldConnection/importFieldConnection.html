@@ -17,6 +17,15 @@
         onclick={handleSetUp}
       ></lightning-button>
     </template>
+    <template lwc:if={calloutsOff}>
+      <p class="slds-var-m-bottom_x-small" data-id="enable-steps">{labels.enableSteps}</p>
+      <lightning-button
+        data-id="check-again"
+        label={labels.checkAgain}
+        disabled={busy}
+        onclick={handleCheckAgain}
+      ></lightning-button>
+    </template>
     <template lwc:if={needsPermission}>
       <p class="slds-text-body_small slds-text-color_weak" data-id="needs-permission">
         {labels.needsPermission}
