@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check: title for the informational native households finding</shortDescription>
-        <value>Nonprofit Cloud Households Detected</value>
+        <value>Nonprofit Cloud households detected</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NativeHouseholdsDetail</fullName>

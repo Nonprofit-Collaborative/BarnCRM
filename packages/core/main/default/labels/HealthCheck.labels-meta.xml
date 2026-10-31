@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the paused automation finding.</shortDescription>
-        <value>BarnCRM Automation Is Paused</value>
+        <value>BarnCRM automation is paused</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AutomationRunningDetail</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the finding shown when automation is running.</shortDescription>
-        <value>Automation Is Running Normally</value>
+        <value>Automation is running normally</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_CancelButton</fullName>
@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the finding shown when one check throws.</shortDescription>
-        <value>One Check Could Not Run</value>
+        <value>One check could not run</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ConfirmButton</fullName>
@@ -246,7 +246,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the custom fiscal year finding.</shortDescription>
-        <value>Your Org Uses a Custom Fiscal Year</value>
+        <value>Your org uses a custom fiscal year</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_FixCreated</fullName>
@@ -286,7 +286,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Finding title: scheduled jobs owned by a deactivated user</shortDescription>
-        <value>Scheduled Jobs Belong to a Deactivated Person</value>
+        <value>Scheduled jobs belong to a deactivated person</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_OrganizationRecordTypeTitle</fullName>
@@ -294,7 +294,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Finding title: the running user cannot use the record type for organizations</shortDescription>
-        <value>You Cannot Use the Record Type for Organizations</value>
+        <value>You cannot use the record type for organizations</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_OrganizationRecordTypeDetail</fullName>
@@ -438,7 +438,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the household membership finding.</shortDescription>
-        <value>Household Membership Does Not Fit Person Accounts</value>
+        <value>Household membership does not fit Person Accounts</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ModeMatchDetail</fullName>
@@ -454,7 +454,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the finding shown when the mode matches.</shortDescription>
-        <value>Coexistence Mode Matches Your Org</value>
+        <value>Coexistence mode matches your org</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ModeMismatchDetail</fullName>
@@ -470,7 +470,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the mode mismatch finding.</shortDescription>
-        <value>Coexistence Mode Does Not Match Your Org</value>
+        <value>Coexistence mode does not match your org</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ModeUnsetDetail</fullName>
@@ -486,7 +486,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the finding shown when no mode is confirmed.</shortDescription>
-        <value>Coexistence Mode Is Not Confirmed Yet</value>
+        <value>Coexistence mode is not confirmed yet</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MultiCurrencyDetail</fullName>
@@ -502,7 +502,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the multi-currency finding.</shortDescription>
-        <value>This Org Uses More Than One Currency</value>
+        <value>This org uses more than one currency</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NightlyJobsDetail</fullName>
@@ -526,7 +526,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: some nightly jobs are not scheduled.</shortDescription>
-        <value>Nightly Jobs Are Not Scheduled</value>
+        <value>Nightly jobs are not scheduled</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NoAdminDetail</fullName>
@@ -542,7 +542,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the missing administrator finding.</shortDescription>
-        <value>No One Is Assigned the BarnCRM Admin Role</value>
+        <value>No one is assigned the BarnCRM Admin role</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NoFindings</fullName>
@@ -574,7 +574,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the finding for junction membership with no creation path.</shortDescription>
-        <value>No New Person Is Getting a Household</value>
+        <value>No new person is getting a household</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NothingDetected</fullName>
@@ -830,7 +830,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the finding for a pause nothing will end.</shortDescription>
-        <value>Automation Is Paused with No Automatic Resume</value>
+        <value>Automation is paused with no automatic resume</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PausedNoResumeDetail</fullName>
@@ -846,7 +846,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the finding for a scheduled error digest that stopped.</shortDescription>
-        <value>The Error Digest Has Stopped Running</value>
+        <value>The error digest has stopped running</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_DigestStaleDetail</fullName>

@@ -82,7 +82,7 @@ with its start and its end.
 Clicking **Resume Automation** early, or pausing again to get more time, replaces the
 scheduled end: the new length counts from the moment you click.
 
-If Health Check says **Automation Is Paused with No Automatic Resume**, a pause is in effect
+If Health Check says **Automation is paused with no automatic resume**, a pause is in effect
 that nothing is set to end: usually one started before this version of BarnCRM, or one
 set somewhere other than this page. Open this page, click **Resume Automation**, and pause
 again for a set time if you still need to.

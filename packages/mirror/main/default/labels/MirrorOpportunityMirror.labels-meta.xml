@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Health Check: mirror has not run, title</shortDescription>
-    <value>The Opportunity Mirror Has Not Run</value>
+    <value>The Opportunity mirror has not run</value>
   </labels>
   <labels>
     <fullName>Mirror_HealthCheck_MirrorNotRunDetail</fullName>

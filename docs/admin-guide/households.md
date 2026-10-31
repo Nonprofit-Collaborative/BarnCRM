@@ -203,7 +203,7 @@ past membership of someone who moved out (or was erased), or any other record, w
 product made it. Those households stay on the "households with nobody in them" lists in
 Health Check and Org Optimizer's Data Quality for you to review. Households emptied before this
 tidy-up was added, and households a merge or a move emptied, are never part of it. Schedule
-it with Health Check's **Nightly Jobs Are Not Scheduled** fix.
+it with Health Check's **Nightly jobs are not scheduled** fix.
 
 If the setting is off, that is a reasonable choice if you want to keep an empty household
 and its giving history. Delete the household by hand, and turn the setting on if you want

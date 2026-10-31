@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: current mode cannot see some existing membership</shortDescription>
-        <value>Some Household Members Cannot Be Seen</value>
+        <value>Some household members cannot be seen</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipHiddenByContactDetail</fullName>

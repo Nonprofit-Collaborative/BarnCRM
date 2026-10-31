@@ -327,7 +327,7 @@ its next upgrade, so check this row after one.
 BarnCRM's permission sets give no Account record type, so the people who create organizations
 need the chosen one from their profile or a permission set of your own. Without it, import
 rejects the rows that would create an organization, sample data refuses to load, and Health
-Check warns **You Cannot Use the Record Type for Organizations**, each naming the record type.
+Check warns **You cannot use the record type for organizations**, each naming the record type.
 
 **Upgrading from a version that shipped the Organization record type.** The upgrade leaves the
 **Organization** record type and your accounts as they are, and this row keeps it, but

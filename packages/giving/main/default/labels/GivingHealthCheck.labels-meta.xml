@@ -15,7 +15,7 @@
         <protected>false</protected>
         <shortDescription>Health Check detail: gifts in a closed period that are not posted.</shortDescription>
         <value
-    >These gifts are dated on or before the day the books are closed through, so they are already locked from editing, but nothing has marked them posted to accounting. If they genuinely belong in the export you already sent, mark them posted from the Accounting Export page (Mirror). Without Mirror, or if they should not have been closed yet, move Books Closed Through back to reopen the period (needs the Override Posting Lock permission).</value>
+    >These gifts are locked because their date is on or before Books Closed Through, but none is marked posted to accounting. If they belong in an export you already sent, mark them posted on the Accounting Export page (Mirror). If not, move Books Closed Through back (needs the Override Posting Lock permission).</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_UnpostedClosedPeriodMoreThan</fullName>
@@ -23,7 +23,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Stands in for the count at the cap. {0} the cap.</shortDescription>
-        <value>These gifts are locked because their date is on or before Books Closed Through, but none is marked posted to accounting. If they belong in an export you already sent, mark them posted on the Accounting Export page (Mirror). If not, move Books Closed Through back (needs the Override Posting Lock permission).</value>
+        <value>More than {0}</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_UnpostedClosedPeriodFirstListed</fullName>
@@ -47,7 +47,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: someone holds the Override Receipt Lock permission</shortDescription>
-        <value>Someone Can Override the Receipt Lock</value>
+        <value>Someone can override the receipt lock</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_OverrideLockDetail</fullName>

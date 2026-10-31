@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check: BarnCRM and DLRS fill the same field</shortDescription>
-        <value>BarnCRM and DLRS Fill the Same Field</value>
+        <value>BarnCRM and DLRS fill the same field</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_TwoToolsDetail</fullName>

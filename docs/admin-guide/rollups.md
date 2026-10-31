@@ -915,7 +915,7 @@ BarnCRM reads DLRS's rollups (never changes them) to stop the two tools filling 
   switch the DLRS rollup off first.
 - **Switching off and saving a rollup switched off** never ask: a rollup that is off fills
   nothing.
-- **Health Check** warns **BarnCRM and DLRS Fill the Same Field** when such a pair appears
+- **Health Check** warns **BarnCRM and DLRS fill the same field** when such a pair appears
   later, for example when a DLRS rollup is switched back on, and names each field and both
   rollups.
 

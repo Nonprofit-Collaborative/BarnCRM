@@ -471,7 +471,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Build the BarnCRM rollup of T-RB-33 step 1 again and click **OK** to turn it on. | Saved and on. |
-| 2 | Open Health Check and run it. | A warning **BarnCRM and DLRS Fill the Same Field** names `Account.Test_child_count__c`, the BarnCRM rollup and **Test child count** (DLRS), with **Open the Rollup Builder**. |
+| 2 | Open Health Check and run it. | A warning **BarnCRM and DLRS fill the same field** names `Account.Test_child_count__c`, the BarnCRM rollup and **Test child count** (DLRS), with **Open the Rollup Builder**. |
 | 3 | Click **Open the Rollup Builder**. | The **Rollup Builder** tab opens. |
 | 4 | In DLRS, deactivate **Test child count**. Run Health Check again. | The warning is gone. |
 
