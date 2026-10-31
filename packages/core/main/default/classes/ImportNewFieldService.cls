@@ -257,21 +257,18 @@ public with sharing class ImportNewFieldService {
         public void execute(QueueableContext queued) {
             String logContext = LOG_CONTEXT + queued.getJobId();
             String failure;
+            String detail;
             try {
                 failure = create(request, UserInfo.getSessionId());
             } catch (Exception e) {
-                ErrorLogger.logWithMessage(
-                    e,
-                    logContext,
-                    String.format(
-                        Label.Core_ImportNewField_ConnectionRefused,
-                        new List<String>{ e.getMessage() }
-                    )
+                failure = String.format(
+                    Label.Core_ImportNewField_ConnectionRefused,
+                    new List<String>{ e.getMessage() }
                 );
-                return;
+                detail = e.getTypeName() + ': ' + e.getMessage() + '\n' + e.getStackTraceString();
             }
             if (failure != null) {
-                ErrorLogger.logMessage(failure, logContext, ErrorLogger.SEVERITY_ERROR);
+                recordFailure(failure, detail, logContext);
                 return;
             }
             grantAccess(
@@ -281,6 +278,24 @@ public with sharing class ImportNewFieldService {
                 logContext
             );
         }
+    }
+
+    /**
+     * The failed job's Error Log entry, which `check` reads to end the poll as Failed. Written
+     * directly, not through ErrorLogger's platform event: this transaction commits (the job
+     * catches everything), and the event's subscriber writes the row later, so the poll (and a
+     * test) could read Running after the job had already failed.
+     */
+    private static void recordFailure(String message, String detail, String logContext) {
+        insert as system new Error_Log__c(
+            Timestamp__c = System.now(),
+            User__c = UserInfo.getUserId(),
+            Context__c = logContext.left(255),
+            Message__c = message.left(32000),
+            Technical_Detail__c = detail == null ? null : detail.left(32000),
+            Severity__c = ErrorLogger.SEVERITY_ERROR,
+            Status__c = ErrorLogger.STATUS_NEW
+        );
     }
 
     /** Calls createMetadata; returns null on success, else the plain reason. */
