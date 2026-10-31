@@ -75,6 +75,10 @@
                     <template lwc:if={step.isToday}>
                         <lightning-input type="checkbox" label={labels.whenBlankLabel} data-key={step.key} data-name="whenBlank" checked={step.whenBlank} onchange={handleInput}></lightning-input>
                     </template>
+                    <template lwc:if={step.isDigits}>
+                        <lightning-input type="text" label={labels.patternLabel} data-key={step.key} data-name="pattern" data-id="pattern" value={step.pattern} maxlength="30" onchange={handleInput}></lightning-input>
+                        <lightning-input type="text" label={labels.countryLabel} data-key={step.key} data-name="country" data-id="country" value={step.country} maxlength="3" onchange={handleInput}></lightning-input>
+                    </template>
                 </div>
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-12 slds-align-bottom">
                     <lightning-button-icon

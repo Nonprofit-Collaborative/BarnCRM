@@ -61,13 +61,16 @@ public with sharing class DataTransform {
     public static final String OP_SHIFT_DATE = 'shiftDate';
     @NamespaceAccessible
     public static final String OP_TODAY = 'today';
+    @NamespaceAccessible
+    public static final String OP_DIGITS = 'digits';
 
     /**
      * The version of a document whose steps may use the operations from `map` on (ADR-0112,
-     * `0112-more-transform-steps.md`). A reader that does not know an operation skips it.
+     * `0112-more-transform-steps.md`), and from 3 on `digits` (ADR-NEXT, C-50f2). A reader that
+     * does not know an operation skips it.
      */
     @NamespaceAccessible
-    public static final Integer DOCUMENT_VERSION = 2;
+    public static final Integer DOCUMENT_VERSION = 3;
     /** The most rows a value map may have. */
     @NamespaceAccessible
     public static final Integer MAX_PAIRS = 100;
@@ -107,8 +110,30 @@ public with sharing class DataTransform {
         OP_FIRST,
         OP_LAST,
         OP_SHIFT_DATE,
-        OP_TODAY
+        OP_TODAY,
+        OP_DIGITS
     };
+
+    /** The longest pattern a digits step may hold, and the most digits it may place. */
+    @NamespaceAccessible
+    public static final Integer MAX_PATTERN = 30;
+    @NamespaceAccessible
+    public static final Integer MAX_SLOTS = 15;
+    /** The longest country code a digits step may drop. */
+    @NamespaceAccessible
+    public static final Integer MAX_COUNTRY = 3;
+    /** A value longer than this is left alone by a digits step (a phone number is not). */
+    @NamespaceAccessible
+    public static final Integer MAX_DIGITS_VALUE = 100;
+
+    /**
+     * A phone extension at the end of a value: the number before it, a marker (x, ext, ext. or
+     * extension) and the extension digits. The same pattern and flags as the browser module
+     * `transformFormat`, both tested against one JSON fixture.
+     */
+    private static final Pattern EXTENSION = Pattern.compile(
+        '(?i)^(.*?)\\s*(?:ext(?:ension)?\\.?|x)\\s*([0-9]+)\\s*$'
+    );
 
     /** The separator `append` uses when the step names none. */
     private static final String DEFAULT_SEPARATOR = ' ';
@@ -182,6 +207,12 @@ public with sharing class DataTransform {
         /** today: only fill a blank value. */
         @AuraEnabled
         public Boolean whenBlank;
+        /** digits: where each digit goes, one `#` per digit; any other character is literal. */
+        @AuraEnabled
+        public String pattern;
+        /** digits: a leading country code dropped when the digits are that much too long. */
+        @AuraEnabled
+        public String country;
 
         // JSON.deserialize builds a step from the stored document; it needs this constructor.
         @NamespaceAccessible
@@ -343,10 +374,31 @@ public with sharing class DataTransform {
                     ? null
                     : Label.Core_Transform_ErrorShift;
             }
+            when 'digits' {
+                return digitsPatternOk(step) ? null : Label.Core_Transform_ErrorDigits;
+            }
             when else {
                 return null;
             }
         }
+    }
+
+    /** A digits step needs a pattern of 1 to 15 digit places and a numeric country code. */
+    private static Boolean digitsPatternOk(Step step) {
+        if (
+            String.isBlank(step.pattern) ||
+            step.pattern.length() > MAX_PATTERN ||
+            slots(step.pattern) < 1 ||
+            slots(step.pattern) > MAX_SLOTS
+        ) {
+            return false;
+        }
+        return String.isEmpty(step.country) ||
+            (step.country.length() <= MAX_COUNTRY && step.country.isNumeric());
+    }
+
+    private static Integer slots(String pattern) {
+        return pattern.length() - pattern.remove('#').length();
     }
 
     private static Boolean within(Integer given, Integer low, Integer high) {
@@ -472,12 +524,68 @@ public with sharing class DataTransform {
             when 'shiftDate' {
                 return shiftDate(step, value);
             }
+            when 'digits' {
+                return formatDigits(value, step.pattern, step.country);
+            }
             when else {
                 return step.whenBlank == true && String.isNotBlank(value)
                     ? value
                     : iso(Date.today());
             }
         }
+    }
+
+    /**
+     * Keeps the digits of a value and writes them into a pattern: `(###) ###-####` turns
+     * `555.123.4567` into `(555) 123-4567`. A leading country code is dropped when that makes
+     * the digits fit (`+1 555 123 4567`, country `1`). An extension (`x12`, `ext. 12`,
+     * `extension 12`) is kept and written ` x12` after the number. A value whose digits do not
+     * fit the pattern, a blank or an overlong one is returned unchanged, so a bad number is
+     * never mangled. The same rules, and the same fixture, as the browser module
+     * `transformFormat` (plan 9.9).
+     */
+    @NamespaceAccessible
+    public static String formatDigits(String value, String pattern, String country) {
+        if (
+            String.isBlank(value) ||
+            String.isBlank(pattern) ||
+            value.length() > MAX_DIGITS_VALUE ||
+            pattern.length() > MAX_PATTERN
+        ) {
+            return value;
+        }
+        String main = value.trim();
+        String suffix = '';
+        Matcher found = EXTENSION.matcher(main);
+        if (found.matches()) {
+            main = found.group(1);
+            suffix = found.group(2);
+        }
+        String digits = main.replaceAll('[^0-9]', '');
+        Integer places = slots(pattern);
+        String code = String.isBlank(country) ? '' : country.trim();
+        if (
+            code.length() > 0 &&
+            digits.length() == places + code.length() &&
+            digits.startsWith(code)
+        ) {
+            digits = digits.substring(code.length());
+        }
+        if (places < 1 || digits.length() != places) {
+            return value;
+        }
+        List<String> out = new List<String>();
+        Integer next = 0;
+        for (Integer at = 0; at < pattern.length(); at++) {
+            String character = pattern.substring(at, at + 1);
+            if (character == '#') {
+                out.add(digits.substring(next, next + 1));
+                next++;
+            } else {
+                out.add(character);
+            }
+        }
+        return String.join(out, '') + (suffix.length() > 0 ? ' x' + suffix : '');
     }
 
     /** Whether two texts are the same, ignoring capitals unless asked not to. */

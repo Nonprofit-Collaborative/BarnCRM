@@ -471,7 +471,7 @@ private class DataTransformTest {
             }
             Assert.isNull(DataTransform.problemWith(ifThenStep('blank', null, 'x')));
             Assert.isNull(DataTransform.problemWith(step(DataTransform.OP_TODAY)));
-            Assert.areEqual(2, DataTransform.DOCUMENT_VERSION, 'The step document is version 2.');
+            Assert.areEqual(3, DataTransform.DOCUMENT_VERSION, 'The step document is version 3.');
         }
     }
 

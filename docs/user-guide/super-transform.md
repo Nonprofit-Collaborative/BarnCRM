@@ -22,6 +22,9 @@ Open the **Super Transform** tab and work down the five steps.
    - **Change With Steps**: tidy each record's own value, for example find and replace.
    - **Fix Name Capitals**: a ready-made set of steps that removes extra spaces and capitalizes
      each word, so `ana  GARCIA` becomes `Ana Garcia`.
+   - **Format Phone Number** (on phone and short text fields): writes each number as
+     `(555) 123-4567`, dropping a leading `1` and keeping an extension as ` x12`. A value that
+     does not fit, such as a seven-digit number, is left as it is.
 
    Press **Add a Field** to change more than one field (up to five).
 4. **Preview**: press **Preview**. The table shows up to 25 matching records with each field's
@@ -31,6 +34,14 @@ Open the **Super Transform** tab and work down the five steps.
 5. **Run**: press **Run Super Transform**, check the object, number and fields in the
    confirmation, type the number if asked, and press **Run**. The bar shows the progress, and
    the result says how many records were updated, already held the values, or failed.
+
+## Saving a Change to Use Again
+
+The **Saved Step Lists** card at the top keeps what you have set up. Type a **List Name** and
+press **Save as New List**. Later, choose it in **Saved List** and press **Load List**: the
+object, conditions and changes fill in again and nothing runs until you press **Preview** and
+**Run Super Transform**. **Rename List** and **Delete List** work on the list you chose. Lists
+are shared with everyone who uses Super Transform, and a saved list changes no records.
 
 ## Undoing a Change
 

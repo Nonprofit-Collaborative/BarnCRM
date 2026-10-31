@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Framework-free digit-format logic for the Format digits transform step (C-50f2), the twin of
+    DataTransform.formatDigits, tested against one shared JSON fixture. Imported by
+    importColumnTransforms and superTransform.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
