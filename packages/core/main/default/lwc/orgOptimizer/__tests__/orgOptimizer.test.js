@@ -300,6 +300,20 @@ describe('c-org-optimizer as an administrator', () => {
     expect(getFindings).toHaveBeenCalledTimes(1);
   });
 
+  // Owner QA 2026-10-31: the tile said Warnings: 2 while the section said Health Check had not
+  // run. With a stored run, the section shows that run (no new run) so the two agree.
+  it('shows the stored run in the Health Check section without running it', async () => {
+    getLastRun.mockResolvedValue({ ranAt: '2026-10-28T10:00:00Z', errors: 0, warnings: 2 });
+    const element = await render();
+
+    await activate(element, 'healthCheck');
+    const panel = one(element, 'c-health-check-panel');
+    expect(panel).not.toBeNull();
+    expect(panel.lastResultFirst).toBe(true);
+    expect(one(element, 'c-barn-empty-state[data-id="health-check-empty"]')).toBeNull();
+    expect(getReport).not.toHaveBeenCalled();
+  });
+
   it('runs Health Check only when asked, and refreshes its badge back on the Overview', async () => {
     const element = await render();
 

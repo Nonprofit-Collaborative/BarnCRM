@@ -109,11 +109,9 @@ describe('c-settings-setup-notes', () => {
     expect(note(element, 'duplicates')).toBeNull();
   });
 
-  it('says Done when the check is met and Not done yet when it is not', async () => {
+  it('hides a note whose check is met and says Not done yet when it is not', async () => {
     getSetupChecks.mockResolvedValue({ emailDeliverability: true });
-    const met = note(await render('Error Log'), 'emailDeliverability');
-    expect(met.querySelector('[data-id="status"]').textContent).toBe('c.Core_SetupNote_Done');
-    expect(met.querySelector('lightning-icon').iconName).toBe('utility:success');
+    expect(note(await render('Error Log'), 'emailDeliverability')).toBeNull();
 
     document.body.removeChild(document.body.firstChild);
     getSetupChecks.mockResolvedValue({ emailDeliverability: false });
@@ -123,7 +121,7 @@ describe('c-settings-setup-notes', () => {
     expect(email.querySelector('lightning-icon').iconName).toBe('utility:warning');
   });
 
-  it('Check Again reads the check again and shows the new answer', async () => {
+  it('Check Again reads the check again and the note goes once it is met', async () => {
     getSetupChecks.mockResolvedValue({ emailDeliverability: false });
     const element = await render('Error Log');
     const before = note(element, 'emailDeliverability');
@@ -134,16 +132,51 @@ describe('c-settings-setup-notes', () => {
     await flushPromises();
 
     expect(getSetupChecks).toHaveBeenCalledTimes(2);
-    const after = note(element, 'emailDeliverability');
-    expect(after.querySelector('[data-id="status"]').textContent).toBe('c.Core_SetupNote_Done');
+    expect(note(element, 'emailDeliverability')).toBeNull();
   });
 
   it('has no fiscal year note: the General page shows the Setup value as a row instead', async () => {
     const general = await render('General');
 
     expect(note(general, 'fiscalYear')).toBeNull();
-    expect(note(general, 'metadata').querySelector('[data-id="status"]')).toBeNull();
-    expect(getSetupChecks).not.toHaveBeenCalled();
+  });
+
+  // Owner QA 2026-10-31: the note stayed after Deploy Metadata from Non-Certified Package
+  // Versions via Apex was turned on.
+  describe('Custom Metadata note on General', () => {
+    it('goes once Apex confirms saves work', async () => {
+      getSetupChecks.mockResolvedValue({ metadata: true });
+
+      expect(note(await render('General'), 'metadata')).toBeNull();
+      expect(getSetupChecks).toHaveBeenCalledTimes(1);
+    });
+
+    it('says Not done yet without the Metadata Admin permission', async () => {
+      getSetupChecks.mockResolvedValue({ metadata: false });
+      const metadata = note(await render('General'), 'metadata');
+
+      expect(metadata.querySelector('[data-id="status"]').textContent).toBe(
+        'c.Core_SetupNote_NotDone'
+      );
+      expect(metadata.querySelector('[data-id="unconfirmed"]')).toBeNull();
+    });
+
+    it('says it cannot confirm the setting, with Check Again, until a save works', async () => {
+      getSetupChecks.mockResolvedValue({});
+      const element = await render('General');
+      const metadata = note(element, 'metadata');
+
+      expect(metadata.querySelector('[data-id="status"]')).toBeNull();
+      expect(metadata.querySelector('[data-id="unconfirmed"]').textContent.trim()).toBe(
+        'c.Core_SetupNote_Metadata_Unconfirmed'
+      );
+
+      getSetupChecks.mockResolvedValue({ metadata: true });
+      metadata.querySelector('[data-id="check-again"]').click();
+      await flushPromises();
+
+      expect(note(element, 'metadata')).toBeNull();
+    });
   });
 
   it('asks Apex once however often the section changes', async () => {
@@ -202,9 +235,7 @@ describe('c-settings-setup-notes', () => {
     expect(note(element, 'pages').querySelector('[data-id="status"]').textContent).toBe(
       'c.Core_SetupNote_NotDone'
     );
-    const email = note(element, 'email');
-    expect(email.querySelector('[data-id="status"]').textContent).toBe('c.Core_SetupNote_Done');
-    expect(email.querySelector('[data-id="check-again"]')).not.toBeNull();
+    expect(note(element, 'email')).toBeNull();
     expect(getSetupChecks).toHaveBeenCalledTimes(1);
   });
 });

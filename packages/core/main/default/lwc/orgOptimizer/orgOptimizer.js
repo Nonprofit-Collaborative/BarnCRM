@@ -52,8 +52,10 @@ function badge(label, variant) {
  * The Org Optimizer page (ADR-0103 org-optimizer-and-data-manager-pages, admin guide
  * org-optimizer.md), on the UX kit (D-140): a page shell, an Overview of tool tiles, and one
  * vertical tab per section. A section's component is created only when its tab is first opened,
- * and Health Check only on Run Health Check, so opening the page runs no check (core review
- * ADMIN-7). Tile badges show only what is already known: the unread error count and the last
+ * and Health Check never runs on open, so opening the page runs no check (core review ADMIN-7).
+ * The Health Check section shows the same stored last run the tile badges (date, counts and
+ * Run now), or Not Run Yet with Run Health Check when there is none, so the tile and the
+ * section always agree (owner QA, 2026-10-31). Tile badges show only what is already known: the unread error count and the last
  * Health Check run (two small reads, administrators only), and the Data Quality and Storage
  * results once those sections have reported them. Data Quality needs Find and Export Records;
  * the other sections need Manage BarnCRM Settings. Each embedded component keeps its own server
@@ -83,6 +85,8 @@ export default class OrgOptimizer extends LightningElement {
   /** The sections opened so far; a section stays loaded once opened. */
   opened = {};
   healthCheckRequested = false;
+  /** The stored last Health Check run (getLastRun), once read. */
+  lastRun;
   /** Tile badges by section name, each { badgeLabel, badgeVariant }. */
   badges = {};
 
@@ -156,7 +160,8 @@ export default class OrgOptimizer extends LightningElement {
   async readHealthCheckBadge() {
     try {
       // One badge rule, shared with the Health Check summary on BarnCRM Home.
-      this.setBadge('healthCheck', healthCheckBadge(await getLastRun()));
+      this.lastRun = await getLastRun();
+      this.setBadge('healthCheck', healthCheckBadge(this.lastRun));
     } catch {
       // As above: the Health Check section itself reports a failure to read.
     }
@@ -248,8 +253,18 @@ export default class OrgOptimizer extends LightningElement {
     }
   }
 
+  get hasLastRun() {
+    return Boolean(this.lastRun && this.lastRun.ranAt);
+  }
+
+  /** The panel shows once asked to run, or straight away when a stored run is there to show. */
   get showHealthCheck() {
-    return Boolean(this.opened.healthCheck) && this.healthCheckRequested;
+    return Boolean(this.opened.healthCheck) && (this.healthCheckRequested || this.hasLastRun);
+  }
+
+  /** Until Run Health Check is pressed here, the panel shows the stored run, not a new one. */
+  get healthCheckLastResultFirst() {
+    return !this.healthCheckRequested;
   }
 
   handleActive(event) {
@@ -265,8 +280,9 @@ export default class OrgOptimizer extends LightningElement {
     if (!this.opened[name]) {
       this.opened = { ...this.opened, [name]: true };
     }
-    // Back on the Overview after a run, the Health Check tile shows that run.
-    if (name === OVERVIEW_TAB && canManageSettings && this.healthCheckRequested) {
+    // Back on the Overview after a run (Run Health Check, or Run now in the panel), the Health
+    // Check tile shows that run.
+    if (name === OVERVIEW_TAB && canManageSettings && this.opened.healthCheck) {
       this.readHealthCheckBadge();
     }
   }

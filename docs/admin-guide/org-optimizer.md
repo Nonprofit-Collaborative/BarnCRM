@@ -18,7 +18,7 @@ opens quickly however large your database is.
 | **Data Quality** | Which records need tidying up: people with no household, empty households, orphaned memberships and addresses, incomplete or failed primary addresses, people nobody can reach, deceased people who can still be emailed, and people not changed for years. Each check shows its count, a **Needs Attention** or **All Clear** badge, and **Open in Find**. See [Data Quality](data-hygiene.md). | Anyone with **Find and Export Records** |
 | **Field Utilization** | How often each field of a kind of record is filled in, by record type, with saved counts for trends. See [Field utilization](field-utilization.md). | Administrators |
 | **Data Dictionary** | Every field you can see on the kinds of record you choose, with type, length, required, unique, picklist values, help text and formula, and optionally a fill rate, as a table and a CSV download. See [Data Dictionary](data-dictionary.md). | Administrators |
-| **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you press **Run Health Check**. See [Health Check](health-check.md). | Administrators |
+| **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you ask: opening it shows the last full run (when it ran and its counts, with **Run Now**), or **Run Health Check** when it has never run. See [Health Check](health-check.md). | Administrators |
 | **Errors** | How many Error Log entries nobody has read, the most recent ones, **Mark Acknowledged**, and a link to the full Error Log. See [Error Log](error-log.md). | Administrators |
 | **Storage and Limits** | How much of your org's data and file storage, daily API requests, background jobs and single emails are used, each as a bar with a **Near Limit** badge at 80% or more, and how many records BarnCRM keeps for imports, undo, errors and saved field counts, at about 2 KB a record. Read only. | Administrators |
 | **Unused Setup** | Setup nobody seems to use: active users who have not logged in for 90 days, permission sets nobody is assigned, reports not run for 365 days, email templates never used, flows left inactive, scheduled jobs owned by inactive users, objects near their custom field limit, and record types no record uses. Each line gives a count, up to five names and **Open in Setup**. Read only: you decide what to remove, in Setup. See section 5. | Administrators |
@@ -36,7 +36,7 @@ already known:
 | Tile | Badge |
 |---|---|
 | **Errors** | **{n} New** when Error Log entries are unread, **All Clear** when none are. Read as the page opens (one small count). |
-| **Health Check** | The last full run: **{n} Errors**, **{n} Warnings**, **Passed**, or **Not Run Yet**. Updated when you come back to **Overview** after a run. |
+| **Health Check** | The last full run, from here or from **BarnCRM Settings**, **Health** (which runs Health Check as it opens): **{n} Errors**, **{n} Warnings**, **Passed**, or **Not Run Yet**. The **Health Check** section shows the same run with its date. Updated when you come back to **Overview** after a run. |
 | **Data Quality** | **{n} Need Attention** (checks that found records) or **All Clear**, once you have opened the section. |
 | **Storage and Limits** | **Data Storage {n}%** once you have opened the section, in warning colors from 80%. |
 
@@ -70,8 +70,9 @@ Start from the sample data (see [Sample data](sample-data.md)).
    No Household** says **0** on fresh sample data, with an **All Clear** badge.
 3. Choose **Field Utilization**. In **Kind of Record** choose **Account**, and watch the table
    fill. Sort by **Filled** to see the fields nobody uses.
-4. Choose **Health Check** and press **Run Health Check**. The findings appear, most serious
-   first, each with what to do.
+4. Choose **Health Check** and press **Run Health Check** (or **Run Now**, if it has run
+   before: the section first shows that run). The findings appear, most serious first, each
+   with what to do.
 5. Choose **Storage and Limits**. **Data Storage (MB)** shows how much of your allowance is
    used, and **What BarnCRM Stores** lists the sample data's import and error records.
 6. Choose **Unused Setup**. In a fresh org most lines say **0**; any with a count list the

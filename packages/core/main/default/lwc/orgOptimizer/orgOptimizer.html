@@ -47,7 +47,9 @@
                 </lightning-tab>
                 <lightning-tab label={labels.healthCheck} value="healthCheck" onactive={handleActive} data-id="tab-healthCheck">
                     <template lwc:if={showHealthCheck}>
-                        <c-health-check-panel></c-health-check-panel>
+                        <c-health-check-panel
+                            last-result-first={healthCheckLastResultFirst}
+                        ></c-health-check-panel>
                     </template>
                     <template lwc:else>
                         <c-barn-empty-state
