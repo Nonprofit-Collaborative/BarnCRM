@@ -15,6 +15,11 @@ private class DataDictionaryControllerTest {
         .getName();
     private static final String ROW_STATUS = Import_Row__c.Status__c.getDescribe().getName();
 
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static User maria() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }
@@ -122,7 +127,9 @@ private class DataDictionaryControllerTest {
             System.runAs(maria()) {
                 dictionary = DataDictionaryController.describeObject(DISMISSAL);
                 for (
-                    Schema.SObjectField token : Duplicate_Dismissal__c.SObjectType.getDescribe()
+                    Schema.SObjectField token : Duplicate_Dismissal__c.SObjectType.getDescribe(
+                            SObjectDescribeOptions.DEFERRED
+                        )
                         .fields.getMap()
                         .values()
                 ) {

@@ -1,4 +1,3 @@
-/* global Buffer */
 import { createElement } from 'lwc';
 import DataDictionary from 'c/dataDictionary';
 import listObjects from '@salesforce/apex/DataDictionaryController.listObjects';
@@ -103,10 +102,11 @@ const countRow = (fieldName, recordType, filled, total) => ({
   total
 });
 
-const flush = async () => {
-  for (let i = 0; i < 12; i++) {
-    // eslint-disable-next-line no-await-in-loop
+/** Lets every pending promise settle, then renders. */
+const flush = async (turns = 30) => {
+  if (turns > 0) {
     await Promise.resolve();
+    await flush(turns - 1);
   }
 };
 
@@ -145,13 +145,16 @@ async function downloadedCsv(element) {
   find(element, 'download').click();
   await flush();
   click.mockRestore();
-  const text = await new Promise((resolve) => {
+  const bytes = await new Promise((resolve) => {
     const reader = new FileReader();
     // Read as bytes: reading as text would drop the byte-order mark.
-    reader.onload = () => resolve(Buffer.from(reader.result).toString('utf8'));
+    reader.onload = () => resolve(Array.from(new Uint8Array(reader.result)));
     reader.readAsArrayBuffer(blob);
   });
-  return { text, name };
+  const hasBom = bytes.slice(0, 3).join(',') === '239,187,191';
+  // The test text is plain ASCII after the byte-order mark.
+  const text = String.fromCharCode(...bytes.slice(hasBom ? 3 : 0));
+  return { text, name, hasBom };
 }
 
 describe('c-data-dictionary', () => {
@@ -299,11 +302,11 @@ describe('c-data-dictionary', () => {
     await flush();
     await build(element);
 
-    const { text, name } = await downloadedCsv(element);
+    const { text, name, hasBom } = await downloadedCsv(element);
 
     expect(name).toMatch(/^Data_Dictionary-\d{4}-\d{2}-\d{2}\.csv$/);
-    expect(text.charCodeAt(0)).toBe(0xfeff);
-    const lines = text.slice(1).split('\r\n');
+    expect(hasBom).toBe(true);
+    const lines = text.split('\r\n');
     expect(lines[0].startsWith('Object,Object API Name,Field,')).toBe(true);
     expect(lines[0]).not.toContain('Fill Rate');
     expect(text).toContain('"Rating, ""Overall"""');
@@ -331,7 +334,7 @@ describe('c-data-dictionary', () => {
 
     const { text } = await downloadedCsv(element);
 
-    const lines = text.slice(1).split('\r\n');
+    const lines = text.split('\r\n');
     expect(lines[0].endsWith(',Fill Rate')).toBe(true);
     expect(lines[1].endsWith(',33.3%')).toBe(true);
     expect(lines[2].endsWith(',')).toBe(true);

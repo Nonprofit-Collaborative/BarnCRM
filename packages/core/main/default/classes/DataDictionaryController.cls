@@ -15,44 +15,23 @@ public with sharing class DataDictionaryController {
     private static final Integer MAX_PICKLIST_CHARS = 4000;
 
     /**
-     * This package's own objects, by name without a prefix, preselected in the picker. Each is
+     * Core's own data objects, by name without a prefix, preselected in the picker. Each is
      * resolved through NamespaceUtil, so a subscriber's object of the same name never matches
-     * and no prefix is written here. Account and Contact are the commonly used standard objects.
+     * and no prefix is written here. Once the namespace exists, every object of the package's
+     * prefix is preselected too, modules included (Core names no module object). Account and
+     * Contact are the commonly used standard objects.
      */
     private static final Set<String> DEFAULT_PACKAGED = new Set<String>{
-        'Acknowledgment_Rule__c',
-        'Acknowledgment_Run__c',
-        'Acknowledgment__c',
         'Address__c',
         'Affiliation__c',
-        'Appeal__c',
-        'Commitment__c',
-        'Donor_Level__c',
         'Duplicate_Dismissal__c',
         'Erasure__c',
-        'Fund__c',
-        'Gift_Allocation__c',
-        'Gift_Batch_Row__c',
-        'Gift_Batch__c',
-        'Gift__c',
         'Household_Member__c',
         'Import_Batch__c',
         'Import_Row__c',
         'Import_Template__c',
-        'Installment__c',
-        'Job_Skill__c',
-        'Receipt__c',
         'Relationship__c',
-        'Rollup_Definition__c',
-        'Saved_Query__c',
-        'Shift_Schedule__c',
-        'Skill__c',
-        'Soft_Credit__c',
-        'Tribute__c',
-        'Volunteer_Hours__c',
-        'Volunteer_Job__c',
-        'Volunteer_Shift__c',
-        'Volunteer_Signup__c'
+        'Saved_Query__c'
     };
     private static final Set<String> DEFAULT_STANDARD = new Set<String>{ 'account', 'contact' };
 
@@ -117,7 +96,10 @@ public with sharing class DataDictionaryController {
         public List<FieldRow> fields = new List<FieldRow>();
     }
 
-    /** Every object the person may document, by label, with the default choices marked. */
+    /**
+     * Every object the person may document, by label, with the default choices marked.
+     * @return the picker's options
+     */
     @AuraEnabled(cacheable=true)
     public static List<Option> listObjects() {
         try {
@@ -144,7 +126,11 @@ public with sharing class DataDictionaryController {
         }
     }
 
-    /** The fields of one object the person can see, sorted by label. */
+    /**
+     * The fields of one object the person can see, sorted by label.
+     * @param objectName the object's API name, as the picker offers it
+     * @return the object and its visible fields
+     */
     @AuraEnabled
     public static ObjectDictionary describeObject(String objectName) {
         try {
@@ -173,11 +159,16 @@ public with sharing class DataDictionaryController {
     }
 
     private static Boolean isDefault(Schema.DescribeSObjectResult described) {
+        String name = described.getName().toLowerCase();
         if (!described.isCustom()) {
-            return DEFAULT_STANDARD.contains(described.getName().toLowerCase());
+            return DEFAULT_STANDARD.contains(name);
         }
-        for (String name : DEFAULT_PACKAGED) {
-            Schema.SObjectType packaged = NamespaceUtil.packagedObjectType(name);
+        String prefix = NamespaceUtil.prefix().toLowerCase();
+        if (!String.isBlank(prefix) && name.startsWith(prefix)) {
+            return true;
+        }
+        for (String packagedName : DEFAULT_PACKAGED) {
+            Schema.SObjectType packaged = NamespaceUtil.packagedObjectType(packagedName);
             if (packaged != null && packaged == described.getSObjectType()) {
                 return true;
             }

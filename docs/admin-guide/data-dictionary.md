@@ -43,8 +43,10 @@ Optimizer** tab. Nobody else sees it. There is nothing to schedule and no settin
 Start from the sample data (see [Sample data](sample-data.md)).
 
 1. Open the **Org Optimizer** tab and choose **Data Dictionary**.
-2. **Kinds of Record** starts with every BarnCRM object plus Account and Contact chosen. Move
-   everything out of **Selected** except **Account**, using the arrows.
+2. **Kinds of Record** starts with Core's data objects (such as Address and Relationship) plus
+   Account and Contact chosen. Objects from the modules you installed are in **Available**:
+   add the ones you want. For this walkthrough, move everything out of **Selected** except
+   **Account**, using the arrows.
 3. Press **Build Dictionary**. The table fills with Account's fields, sorted by label, and the
    page reads, for example, "Described 1 of 1 kinds of record."
 4. Find **Website**: its **Type** is url, **Length** is 255, and **Custom** is No. Find a field
@@ -100,7 +102,7 @@ results of a Find query, not a table the page built.
 missing, check your field-level security, or build the dictionary as an administrator who can see
 it.
 
-**Turning on Fill Rates for every object.** With about fifty BarnCRM objects chosen, fill rates
+**Turning on Fill Rates for every object.** With dozens of kinds of record chosen, fill rates
 count each one in turn. Choose the kinds of record you care about first.
 
 **Looking for descriptions or automation.** Field descriptions, flows and triggers are outside

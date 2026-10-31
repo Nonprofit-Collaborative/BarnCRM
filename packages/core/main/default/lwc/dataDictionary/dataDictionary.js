@@ -240,23 +240,7 @@ export default class DataDictionary extends LightningElement {
     this.done = 0;
     this.total = names.length;
     try {
-      for (const objectName of names) {
-        // One call at a time, so the server never runs two.
-        // eslint-disable-next-line no-await-in-loop
-        const described = await describeObject({ objectName });
-        if (run !== this.run) {
-          return;
-        }
-        this.done += 1;
-        this.rows = [...this.rows, ...described.fields.map((field) => toRow(described, field))];
-        if (withFillRates) {
-          // eslint-disable-next-line no-await-in-loop
-          await this.addFillRates(run, described);
-          if (run !== this.run) {
-            return;
-          }
-        }
-      }
+      await this.describeNext(run, names, 0, withFillRates);
     } catch (error) {
       if (run === this.run) {
         this.errorMessage = messageFrom(error);
@@ -267,6 +251,35 @@ export default class DataDictionary extends LightningElement {
         this.fillingLabel = undefined;
       }
     }
+  }
+
+  /** Describes one object, then the next: one call at a time, so the server never runs two. */
+  async describeNext(run, names, index, withFillRates) {
+    if (index >= names.length || run !== this.run) {
+      return;
+    }
+    const described = await describeObject({ objectName: names[index] });
+    if (run !== this.run) {
+      return;
+    }
+    this.done += 1;
+    this.rows = [...this.rows, ...described.fields.map((field) => toRow(described, field))];
+    if (withFillRates) {
+      await this.addFillRates(run, described);
+    }
+    await this.describeNext(run, names, index + 1, withFillRates);
+  }
+
+  /** Counts one chunk of fields, then the next, and returns the count rows of all of them. */
+  async countNext(run, objectName, names, size, start, counted) {
+    if (start >= names.length || run !== this.run) {
+      return counted;
+    }
+    const chunk = await countFields({ objectName, fieldNames: names.slice(start, start + size) });
+    return this.countNext(run, objectName, names, size, start + size, [
+      ...counted,
+      ...(chunk.rows || [])
+    ]);
   }
 
   /** Fills one object's rows from Field Utilization's plan and counts, within its limits. */
@@ -283,17 +296,9 @@ export default class DataDictionary extends LightningElement {
       }
       const names = (plan.fields || []).map((field) => field.fieldName);
       const size = plan.chunkSize || names.length || 1;
-      const counted = [];
-      for (let start = 0; start < names.length; start += size) {
-        // eslint-disable-next-line no-await-in-loop
-        const chunk = await countFields({
-          objectName: described.objectName,
-          fieldNames: names.slice(start, start + size)
-        });
-        if (run !== this.run) {
-          return;
-        }
-        counted.push(...(chunk.rows || []));
+      const counted = await this.countNext(run, described.objectName, names, size, 0, []);
+      if (run !== this.run) {
+        return;
       }
       const shares = sharesFrom(counted);
       this.rows = this.rows.map((row) => {
