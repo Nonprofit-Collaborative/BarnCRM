@@ -2,7 +2,7 @@
 
 Purpose: environments, access, layout and gotchas for BarnCRM. Reference facts only, not a task log (work done goes in `changelog.md`). Check here before re-querying a live system.
 
-Last verified 2026-10-30 (main at bdf0a7d3, batches 15 to 17; `barn-npc` deployed from it; earlier: landing/batch-14 on main at batch 13, 15d8bebf; ADR-0144 acknowledgments honor email opt-out; landing/batch-13 on main at #714, 44493051; `barn-npc` released from main 112dbdf7; `mwdbdevsb` released at df174bff; `barn-platform` created; ADR-0141 account record types, ADR-0142 Admin View All and Modify All on Account and Contact, ADR-0143 edition stored values).
+Last verified 2026-10-30 (main at 19463c55, batch 8 landing #753: Super Importer, Super Transform, C-51, C-52; `mwdbdevsb` also at f8ca0a28; earlier: main at bdf0a7d3, batches 15 to 17; `barn-npc` deployed from it; earlier: landing/batch-14 on main at batch 13, 15d8bebf; ADR-0144 acknowledgments honor email opt-out; landing/batch-13 on main at #714, 44493051; `barn-npc` released from main 112dbdf7; `mwdbdevsb` released at df174bff; `barn-platform` created; ADR-0141 account record types, ADR-0142 Admin View All and Modify All on Account and Contact, ADR-0143 edition stored values).
 
 ## Pointers
 
@@ -62,6 +62,10 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - Data jobs: `Import_Batch__c.Operation__c` (Import, Update, Delete) plus `Operation_JSON__c` make the import batch the general data job (object label Data Job); bulk updates and deletes reuse `Import_Journal__c` and undo, listed under Data jobs on the Data Manager tab. Bulk update run limit `Bulk_Update_Run_Limit__c`, at most 48,000 (query rows).
 - CMDT Manager: `Relationship_Type__mdt.Is_Shipped__c`; subscriber rows are named `Org_*`; `Setting_Change__c.Deployment_Id__c` audits each save; `Manage_BarnCRM_Metadata` is granted only by `BarnCRM_Metadata_Admin`. Needs the org setting "Deploy Metadata from Non-Certified Package Versions via Apex" for an unlocked package (unverified in an org).
 - Field utilization: `Field_Utilization_Snapshot__c`, counted on demand inside Org Optimizer; no scheduled job or automatic cleanup (D-37, D-63).
+- Super Importer (batch 8, #753; ADRs 0145 to 0149): `Barn_Org_Connection` External Credential and Named Credential (C-49d, new-field creation through the org's own Metadata API; admin sets it up in Settings, Import; `deploy-packages.sh` has an externalCredentials stage). `fileSource.js` is the source interface for file readers (C-38 adds Google Sheets behind it). `ImportHeaderParser` seam: `match` (exact), `find` (exact, else guess) and `guess` (`FuzzyMatch.bestMatch`, threshold 0.88; exact matches always win, guesses must be accepted before Next). `Import_Row_Deletion__c` replaces `Import_Row_Retention_Days__c` (the old field is left unused in deployed orgs; optional delete in Setup). `Import_Batch__c.Retried_By__c` (undo counts the committer and retriers); `Import_Row__c.Corrected_Values_JSON__c`, `Loaded_Records_JSON__c` and formula `Batch_Status__c`. The Import Row record page is assigned in the two admin apps (app-level overrides).
+- Super Transform (C-50): the Bulk_Update tab and flexipage API names are unchanged; only the label reads Super Transform.
+- Duplicates (C-51): `Merge_Journal__c`, `Merge_Rule__mdt` and the C-51 settings `Auto_Merge_Exact_Match__c` (Exact Match For Auto-Merge), `Merge_Default_Rule` and `Fuzzy_Match_Threshold` (each with a default in the Settings console); undo of an auto-merge is offered for 15 days; `FuzzyMatch` API: `normalize`, `score`, `matches`, `bestMatch`, `jaroWinkler` (shared by `FuzzyPairing`, `DuplicateScanBatch` and `ImportHeaderParser`).
+- Data Dictionary (C-52): shows Help Text because describe has no Description; describe only, no Tooling API.
 - Also: `npm run lint`, `npm run prettier:verify` (Markdown is excluded from Prettier), `npx sfdx-lwc-jest`, Salesforce Code Analyzer with zero high or critical findings.
 
 ## Gotchas
@@ -98,6 +102,10 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - The `oi-test` running user lacks Bulk API Hard Delete: hard delete fails there, so scale cleanup falls back to soft delete.
 - `sf data delete bulk --json` returns the job id at `.result.jobInfo.id`.
 - The synced folder can create `name 2` duplicate git refs inside `.git` that break `git fetch`; check they are stale, then move them out of `.git`.
+- An object-level View override pointing at a new FlexiPage fails to deploy, because objects deploy before flexipages (batch 8, Import Row record page): assign the page in app-level overrides in the apps instead.
+- Apex names are case-insensitive, so a local variable or constant can hide an sObject type or another constant (batch 8 compile errors).
+- A Decimal literal does not bind to a Double parameter in Apex (batch 8 compile error); use a Double literal or cast.
+- A 15-character and an 18-character Id are different strings: compare job ids after normalizing (batch 8 new-field job poll bug).
 - `FOR UPDATE` works on a hierarchy custom setting's org-level row; Core uses `Rollup_Run_Lock__c` as a run lock (#398, 2026-10-14).
 - A new ADR on a branch uses the placeholder file `NEXT-<title>.md` and never a chosen number; the integrator numbers it at merge (see the repo `CLAUDE.md`).
 - The journal cursor is `(CreatedDate, Id)` (keyset paging, #401).
