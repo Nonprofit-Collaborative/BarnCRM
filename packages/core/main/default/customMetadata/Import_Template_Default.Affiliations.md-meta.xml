@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Affiliations</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">affiliations</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">One row per link between a person and an organization that are already in BarnCRM: the person is found by email address and the organization by name. Add a role, dates and Is Primary. A person keeps one primary affiliation, so when several rows in the file say primary for the same person, the last of them stays primary. A row that repeats an affiliation covering the same dates is rejected.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 1, "columns": [{"source": "Person Email", "target": "Record.Contact__c", "lookupField": "Email"}, {"source": "Organization Name", "target": "Record.Organization__c", "lookupField": "Name"}, {"source": "Role", "target": "Record.Role__c"}, {"source": "Is Primary", "target": "Record.Is_Primary__c"}, {"source": "Start Date", "target": "Record.Start_Date__c"}, {"source": "End Date", "target": "Record.End_Date__c"}, {"source": "Description", "target": "Record.Description__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Affiliation__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

@@ -164,15 +164,27 @@ public with sharing class AffiliationService {
                 continue;
             }
             if (justSaved != null && justSaved.contains(affiliation.Id)) {
-                if (fromThisSave == null || affiliation.CreatedDate > fromThisSave.CreatedDate) {
+                if (fromThisSave == null || isNewer(affiliation, fromThisSave)) {
                     fromThisSave = affiliation;
                 }
             }
-            if (newest == null || affiliation.CreatedDate > newest.CreatedDate) {
+            if (newest == null || isNewer(affiliation, newest)) {
                 newest = affiliation;
             }
         }
         return fromThisSave != null ? fromThisSave : newest;
+    }
+
+    /**
+     * Whether the first affiliation was created after the second. Records created in one save
+     * share a created time, so the higher Id, the later one in save order (the last row of an
+     * import file), wins the tie instead of whichever the query listed first.
+     */
+    private static Boolean isNewer(Affiliation__c candidate, Affiliation__c other) {
+        if (candidate.CreatedDate != other.CreatedDate) {
+            return candidate.CreatedDate > other.CreatedDate;
+        }
+        return String.valueOf(candidate.Id) > String.valueOf(other.Id);
     }
 
     /** Takes the flag off the affiliations that lost it, without re-entering this handler. */
