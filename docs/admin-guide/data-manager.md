@@ -62,7 +62,7 @@ the Recycle Bin, and **Undo** brings them back (section 4).
 **Import Templates.** A template remembers how a file's columns match BarnCRM fields, so every
 file with the same layout (for example, a monthly donations export) opens already matched.
 BarnCRM ships some (**People and Organizations List**, called **Generic contact list** in an
-older org, **Organization List** and **Couples and Households**, and with Giving the gift and
+older org, **Organization List**, **Couples and Households**, **Relationships** and **Affiliations**, and with Giving the gift and
 migration templates). To make your own, open **Import a File** and choose **One Kind of
 Record** in the first step (**What Are You Importing?**): choose the object, type a
 **Template name**, and select **Create** ([Importing](importing.md), section 9); for a people
