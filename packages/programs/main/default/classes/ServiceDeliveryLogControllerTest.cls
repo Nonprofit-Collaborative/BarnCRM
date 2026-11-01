@@ -226,6 +226,7 @@ private class ServiceDeliveryLogControllerTest {
             SELECT Quantity__c
             FROM Service_Delivery__c
             WHERE Contact__c = :ana.Id
+            WITH SYSTEM_MODE
         ];
         Assert.areEqual(1, rows.size(), 'R-SD4: one row per person, service and day.');
         Assert.areEqual(3, rows[0].Quantity__c, 'The existing row was changed.');

@@ -97,6 +97,14 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     private static final Integer RELATIONSHIPS_PER_QUERY = 20;
 
     /**
+     * The subqueries (each child relationship asked counts against the platform's aggregate
+     * query limit of 300) the checks leave for the delete and the automation it sets off. Not
+     * a share like the top-level headroom: an Account in Nonprofit Cloud has about 200 checked
+     * relationships, so one chunk's checks need most of the 300.
+     */
+    private static final Integer SUBQUERY_RESERVE = 40;
+
+    /**
      * How long after a commit completes its own follow-on work (rollups, household naming,
      * run as the person who committed) may still be writing to what it created.
      */
@@ -1123,6 +1131,10 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
         if (relationships.isEmpty()) {
             return;
         }
+        if (!enoughSubqueries(relationships.size())) {
+            notChecked(keep, ids);
+            return;
+        }
         Map<String, Object> binds = new Map<String, Object>{
             'ids' => ids,
             'completedAt' => completedAt,
@@ -1325,6 +1337,15 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 
     private static Boolean enoughQueries() {
         return Limits.getQueries() < Limits.getLimitQueries() / QUERY_HEADROOM_DIVISOR;
+    }
+
+    /**
+     * Whether a check asking this many child relationships leaves the reserve of subqueries.
+     * Past the aggregate limit the platform ends the chunk, which cannot be caught.
+     */
+    private static Boolean enoughSubqueries(Integer relationships) {
+        return Limits.getAggregateQueries() + relationships <=
+            Limits.getLimitAggregateQueries() - SUBQUERY_RESERVE;
     }
 
     /** Keeps each record not already kept for a reason a check found. */

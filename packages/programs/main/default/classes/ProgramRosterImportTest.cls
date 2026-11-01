@@ -255,6 +255,7 @@ private class ProgramRosterImportTest {
             SELECT Stage__c, Start_Date__c
             FROM Enrollment__c
             WHERE Program__r.Name = 'Tutoring'
+            WITH SYSTEM_MODE
         ];
         Assert.areEqual('Enrolled', blank.Stage__c, 'A blank stage is Enrolled.');
         Assert.areEqual(Date.today(), blank.Start_Date__c, 'And its start date is filled in.');

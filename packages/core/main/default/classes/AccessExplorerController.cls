@@ -611,22 +611,20 @@ public with sharing class AccessExplorerController {
                 new Map<String, Object>()
             );
             // A holder of View All Data or Modify All Data has it on every kind of record, so
-            // its own object rows would only bury the real object-level grants.
-            Set<Id> dataSetIds = new Set<Id>();
-            for (PermissionSet permissionSet : dataSets) {
-                if (
-                    permissionSet.PermissionsViewAllData || permissionSet.PermissionsModifyAllData
-                ) {
-                    dataSetIds.add(permissionSet.Id);
-                }
-            }
+            // its own object rows would only bury the real object-level grants. Rows whose parent
+            // is a user license or permission set license are left out too: nobody is given them,
+            // and an org with many licenses (Nonprofit Cloud) has thousands, which cut the report.
             List<ObjectPermissions> permissions = [
                 SELECT ParentId, SobjectType, PermissionsViewAllRecords, PermissionsModifyAllRecords
                 FROM ObjectPermissions
                 WHERE
                     (PermissionsViewAllRecords = TRUE
                     OR PermissionsModifyAllRecords = TRUE)
-                    AND ParentId NOT IN :dataSetIds
+                    AND ParentId IN (
+                        SELECT Id
+                        FROM PermissionSet
+                        WHERE PermissionsViewAllData = FALSE AND PermissionsModifyAllData = FALSE
+                    )
                 WITH USER_MODE
                 ORDER BY SobjectType, ParentId
                 LIMIT :cap
