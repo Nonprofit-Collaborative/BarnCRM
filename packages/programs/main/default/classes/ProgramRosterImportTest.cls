@@ -240,7 +240,11 @@ private class ProgramRosterImportTest {
             row('Food Pantry', emails[0])
         };
 
+        // Today in the importer's time zone, which fills the start date: the test's own user
+        // may already be in tomorrow.
+        Date importersToday;
         System.runAs(importer()) {
+            importersToday = Date.today();
             Test.startTest();
             ImportRowProcessor.Outcome outcome = load(shipped, values);
             Test.stopTest();
@@ -258,7 +262,7 @@ private class ProgramRosterImportTest {
             WITH SYSTEM_MODE
         ];
         Assert.areEqual('Enrolled', blank.Stage__c, 'A blank stage is Enrolled.');
-        Assert.areEqual(Date.today(), blank.Start_Date__c, 'And its start date is filled in.');
+        Assert.areEqual(importersToday, blank.Start_Date__c, 'And its start date is filled in.');
         List<String> names = new List<String>();
         for (Program__c each : [SELECT Name FROM Program__c ORDER BY Name]) {
             names.add(each.Name);
