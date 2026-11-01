@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-31 (landing batch A: D-158 to D-165 added, open questions 39 to 41 added, release 0.12 to 0.14 statuses Landed). Earlier: 2026-10-31 (proposals approved, plan commit 6f10daf3; through D-157: D-155 to D-157 added, Sections 6.0a, 6.1.5, 9.7, 9.8 and 9.9 added). Earlier: 2026-10-30 (batch 8 landing #753, plan commit 7c468565; through D-154: D-150 to D-154 added; open questions 34 to 38 are in the plan and resolved there). Earlier: 2026-10-29 (landing batch 13, plan commit 898f195; through D-148, D-145 to D-147 added in landing batch 13, D-148 in landing batch 14; open question 30 open, 31 resolved by D-120, 32 open and deferred until after Core QA, 33 resolved by D-134 and closed by RT5).
+Last refreshed from BMemory 2026-11-01 (batch A barn-npc release: D-166 added). Earlier: 2026-10-31 (landing batch A: D-158 to D-165 added, open questions 39 to 41 added, release 0.12 to 0.14 statuses Landed). Earlier: 2026-10-31 (proposals approved, plan commit 6f10daf3; through D-157: D-155 to D-157 added, Sections 6.0a, 6.1.5, 9.7, 9.8 and 9.9 added). Earlier: 2026-10-30 (batch 8 landing #753, plan commit 7c468565; through D-154: D-150 to D-154 added; open questions 34 to 38 are in the plan and resolved there). Earlier: 2026-10-29 (landing batch 13, plan commit 898f195; through D-148, D-145 to D-147 added in landing batch 13, D-148 in landing batch 14; open question 30 open, 31 resolved by D-120, 32 open and deferred until after Core QA, 33 resolved by D-134 and closed by RT5).
 
 ## Decision log (plan Section 12)
 
@@ -173,6 +173,7 @@ Last refreshed from BMemory 2026-10-31 (landing batch A: D-158 to D-165 added, o
 | D-163 | 2026-10-31 | A pledge reminder with a blank or bounced email address goes to the letter channel |
 | D-164 | 2026-10-31 | A logic model stage change is refused when an arrow would point backward |
 | D-165 | 2026-10-31 | Batch A pre-batch review (plan 9.8): 23 QA fixes, 17 UX fixes, simplification of about -1,650 net lines with no functionality removed; follow-ups placed in releases: V-10b, UX-F4, G-35, G-36, G-37, C-71 |
+| D-166 | 2026-11-01 | Batch A deployed to barn-npc (main a3a2e7f3, 4,028 of 4,028 tests) after four barn-npc-only test fixes (#806); functional QA there passed every batch A feature; findings became QA-F2 to QA-F6 in release 0.15, none blocking use |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
