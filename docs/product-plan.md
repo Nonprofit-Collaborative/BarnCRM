@@ -836,6 +836,11 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 | P-13 | Referrals in and out, with status and outcome (feeds PB-05) | Minor | Planned | D-156 |
 | P-14 | Eligibility screening results from rules over intake fields (Eligible, Not Eligible, Review, with the reason) | Minor | Planned | D-156 |
 | UX-F3 | Module tab motifs (Giving, Volunteers, Rollup Builder) on documented icon numbers, as D-144 did for Core | Minor | Planned | D-144 |
+| QA-F2 | Checkbox settings that ship on and are added in an upgrade start on in orgs that already saved settings (one-time upgrade step with a version marker, plus a CI check): Include Admin Summary (C-54), Ask Reminders (G-29) | Minor | Planned | D-166 |
+| QA-F3 | Person account orgs: shift reminders reach bookings made on the person account (V-10); suggested volunteers return the account, as the Sign-ups panel books (V-11); asks use one donor field (G-26) | Minor | Planned | D-166 |
+| QA-F4 | Enrollments and service deliveries require a person, never an organization account, on every path (rule in the handlers, not only the record picker) | Minor | Planned | D-166 |
+| QA-F5 | Nonprofit Cloud Program Management coexistence: Integrations entry, admin guide note and a Health Check info finding when its Program objects are present | Minor | Planned | D-166 |
+| QA-F6 | Batch A QA text fixes: nightly job names in one style, Data Dictionary trims object labels, Include Admin Summary description states its default, import template names in one casing, Ask record number with 6 digits, Programs Admin description names case notes and service deliveries | Minor | Planned | D-166 |
 
 #### Release 0.16 (Batch B): Funders start, Where Used
 
@@ -2109,6 +2114,7 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 | D-163 | Pledge reminder with a blank or bounced email address goes to the letter channel | Skipping the reminder | Brandon's recommended call in the pre-batch review; no reminder is silently dropped |
 | D-164 | Logic model stage change is refused when an arrow would point backward (L-01) | Allowing the change and leaving a backward arrow | Keeps the model's flow consistent |
 | D-165 | Batch A pre-batch review (Section 9.8, 2026-10-31): 23 QA fixes, 17 UX fixes and a simplification pass of about -1,650 net lines with no functionality removed; follow-ups placed in releases: V-10b, UX-F4, G-35, G-36, G-37 and C-71 (Sections 6.0a, 9.7) | Testing batch A without the review | Section 9.8 requires the review before each batch test; follow-ups are slotted per Section 9.7 |
+| D-166 | Batch A deployed to barn-npc 2026-11-01 (main a3a2e7f3, 4,028 of 4,028 tests) after four barn-npc-only test fixes (#806); functional QA there (no browser) passed every batch A feature, and its findings became QA-F2 to QA-F6 in release 0.15 | Holding the release for the findings | None blocks use: two settings start off on upgraded orgs, person account gaps in Volunteers and Programs, and text fixes; they land first in Batch B |
 
 ---
 

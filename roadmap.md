@@ -84,6 +84,11 @@ Status as of 2026-10-31: landing batch A (releases 0.12 to 0.14) landed in `main
 | P-13 | Referrals in and out | Minor | Planned | D-156 |
 | P-14 | Eligibility screening results | Minor | Planned | D-156 |
 | UX-F3 | Module tab motifs | Minor | Planned | D-144 |
+| QA-F2 | Ship-on checkbox settings added in an upgrade start on (Include Admin Summary, Ask Reminders) | Minor | Planned | D-166 |
+| QA-F3 | Person account orgs: shift reminders, suggested volunteers, one ask donor field | Minor | Planned | D-166 |
+| QA-F4 | Enrollments and service deliveries require a person account on every path | Minor | Planned | D-166 |
+| QA-F5 | Nonprofit Cloud Program Management coexistence: Integrations, admin guide, Health Check info | Minor | Planned | D-166 |
+| QA-F6 | Batch A QA text fixes | Minor | Planned | D-166 |
 
 ### 0.16 (Batch B): Funders start, Where Used
 
