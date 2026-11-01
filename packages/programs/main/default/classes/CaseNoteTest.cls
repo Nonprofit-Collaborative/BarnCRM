@@ -68,7 +68,10 @@ private class CaseNoteTest {
         }
         Case_Note__c written = note(enrolled.Id, 'First visit');
         User author = writer();
+        // The default date is the author's today, which can differ from this user's near midnight.
+        Date authorToday;
         System.runAs(author) {
+            authorToday = Date.today();
             insert written;
         }
 
@@ -95,7 +98,7 @@ private class CaseNoteTest {
             FROM Case_Note__c
             WHERE Id = :written.Id
         ];
-        Assert.areEqual(Date.today(), saved.Note_Date__c, 'Dated today by default.');
+        Assert.areEqual(authorToday, saved.Note_Date__c, 'Dated today by default.');
         Assert.areEqual('Check-in', saved.Type__c, 'A check-in by default.');
         Assert.areEqual(author.Id, saved.OwnerId, 'Owned by its author.');
         Assert.areEqual(0, byColleague, 'A colleague does not see it.');

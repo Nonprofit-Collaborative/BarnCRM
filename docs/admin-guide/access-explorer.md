@@ -99,7 +99,9 @@ report answers "who holds these, and through what".
 - **Kinds of Record** has one row per kind of record and holder with Modify All or View All on
   it, for standard objects and custom objects alike (**Scope** says which). Modify All always
   includes View All. Holders of Modify All Data or View All Data are left out of this table,
-  because they hold it on every kind of record; they are in **Data-Wide Access**.
+  because they hold it on every kind of record; they are in **Data-Wide Access**. The access
+  rows Salesforce keeps for user licenses and permission set licenses are left out too: they are
+  limits on what a license allows, not access given to anyone.
 - **Through what.** A holder that is a permission set inside a group says so under **In Groups**:
   a person may hold it only through that group.
 - If more than 2,000 rows qualify, the first 2,000 are listed and the page says the list is cut.

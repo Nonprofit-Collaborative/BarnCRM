@@ -136,11 +136,13 @@ private class ImportUndoTest {
      * what they cannot afford to ask about, so a budget the earlier passes spent here would
      * keep records the job itself deletes. Only for a caller that has not used Test.startTest.
      *
-     * In that mode the earlier passes are each handed their records as one chunk. A chunk's
-     * checks cost about the same whatever its size, and the platform gives every chunk its own
-     * limits, so two chunks sharing this one transaction would spend a budget the job never
-     * shares. An org with many relationships on Contact (Nonprofit Cloud: about 18 queries a
-     * chunk) otherwise leaves the second chunk unchecked and kept, which the job would not do.
+     * In that mode every pass, the last included, is handed its records as one chunk. A
+     * chunk's checks cost about the same whatever its size, and the platform gives every chunk
+     * its own limits, so two chunks sharing this one transaction would spend a budget the job
+     * never shares. An org with many relationships on Contact (Nonprofit Cloud: about 18
+     * queries a chunk) otherwise leaves the second chunk unchecked and kept, which the job
+     * would not do; one with many on Account (Nonprofit Cloud: about 200 subqueries a chunk)
+     * otherwise passes the aggregate query limit of 300 in the second household chunk.
      */
     private static void runDeletePasses(
         Import_Batch__c batch,
@@ -161,7 +163,7 @@ private class ImportUndoTest {
                 Test.startTest();
             }
             // Otherwise as the platform does: one chunk at a time, 100 at most.
-            Integer chunkSize = accountsPassAlone && !alone ? MAX_ONE_CHUNK : 100;
+            Integer chunkSize = accountsPassAlone ? MAX_ONE_CHUNK : 100;
             Database.QueryLocatorIterator records = job.start(null).iterator();
             List<SObject> scope = new List<SObject>();
             while (records.hasNext()) {
