@@ -1,0 +1,292 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom11">
+    <div slot="actions">
+      <template lwc:if={showAddGoal}>
+        <lightning-button
+          data-id="add-goal"
+          label={labels.addGoal}
+          disabled={controlsDisabled}
+          onclick={handleAddGoal}
+        ></lightning-button>
+      </template>
+    </div>
+    <div class="slds-var-p-horizontal_medium slds-is-relative">
+      <template lwc:if={showSpinner}>
+        <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+          {errorMessage}
+        </p>
+      </template>
+      <div role="status" data-id="result" class="slds-assistive-text">{resultMessage}</div>
+
+      <template lwc:if={draft}>
+        <section data-id="goal-form" class="slds-box slds-var-m-bottom_medium" aria-label={formTitle}>
+          <h3 class="slds-text-heading_small slds-var-m-bottom_small">{formTitle}</h3>
+          <div class="slds-grid slds-wrap slds-gutters_x-small">
+            <div class="slds-col slds-size_1-of-1">
+              <lightning-input
+                data-id="goal-name"
+                data-field="name"
+                label={labels.goal}
+                value={draft.name}
+                max-length="80"
+                required
+                onchange={handleDraftChange}
+              ></lightning-input>
+            </div>
+            <div class="slds-col slds-size_1-of-1">
+              <lightning-textarea
+                data-id="goal-description"
+                data-field="description"
+                label={labels.description}
+                value={draft.description}
+                onchange={handleDraftChange}
+              ></lightning-textarea>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+              <lightning-combobox
+                data-id="goal-status"
+                data-field="status"
+                label={labels.status}
+                value={draft.status}
+                options={statusOptions}
+                onchange={handleDraftChange}
+              ></lightning-combobox>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+              <lightning-record-picker
+                data-id="goal-assigned"
+                data-field="assignedToId"
+                label={labels.assignedTo}
+                object-api-name="User"
+                value={draft.assignedToId}
+                onchange={handleDraftChange}
+              ></lightning-record-picker>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+              <lightning-input
+                data-id="goal-target"
+                data-field="targetDate"
+                type="date"
+                label={labels.targetDate}
+                value={draft.targetDate}
+                onchange={handleDraftChange}
+              ></lightning-input>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+              <lightning-input
+                data-id="goal-next-review"
+                data-field="nextReviewDate"
+                type="date"
+                label={labels.nextReview}
+                value={draft.nextReviewDate}
+                onchange={handleDraftChange}
+              ></lightning-input>
+            </div>
+            <template lwc:if={showOutcome}>
+              <div class="slds-col slds-size_1-of-1">
+                <lightning-combobox
+                  data-id="goal-outcome"
+                  data-field="outcomeId"
+                  label={labels.outcome}
+                  value={draft.outcomeId}
+                  options={outcomeChoices}
+                  onchange={handleDraftChange}
+                ></lightning-combobox>
+              </div>
+            </template>
+          </div>
+          <div class="slds-grid slds-grid_align-end slds-var-m-top_small">
+            <lightning-button
+              data-id="cancel-goal"
+              label={labels.cancel}
+              disabled={controlsDisabled}
+              onclick={handleCancel}
+              class="slds-var-m-right_x-small"
+            ></lightning-button>
+            <lightning-button
+              data-id="save-goal"
+              variant="brand"
+              label={labels.save}
+              disabled={controlsDisabled}
+              onclick={handleSaveGoal}
+            ></lightning-button>
+          </div>
+        </section>
+      </template>
+
+      <template lwc:if={isEmpty}>
+        <p data-id="empty" class="slds-text-body_regular slds-var-m-bottom_small">{labels.empty}</p>
+      </template>
+
+      <ul class="slds-has-dividers_bottom-space">
+        <template for:each={goals} for:item="goal">
+          <li key={goal.id} class="slds-item" data-id="goal" data-goal={goal.id}>
+            <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-gutters_x-small">
+              <div class="slds-col slds-grow">
+                <h3 class="slds-text-heading_small" data-id="goal-title">{goal.name}</h3>
+              </div>
+              <div class="slds-col slds-grow-none">
+                <span class={goal.statusClass} data-id="goal-status-badge">{goal.status}</span>
+                <template lwc:if={goal.reviewDue}>
+                  <span class="slds-badge slds-theme_warning slds-var-m-left_xx-small" data-id="review-due"
+                    >{labels.reviewDue}</span
+                  >
+                </template>
+              </div>
+            </div>
+            <template lwc:if={goal.facts}>
+              <p class="slds-text-body_small slds-text-color_weak" data-id="goal-facts">{goal.facts}</p>
+            </template>
+            <template lwc:if={goal.reviews}>
+              <p class="slds-text-body_small slds-text-color_weak" data-id="goal-reviews">{goal.reviews}</p>
+            </template>
+            <template lwc:if={goal.outcome}>
+              <p class="slds-text-body_small" data-id="goal-outcome-line">{goal.outcome}</p>
+            </template>
+            <template lwc:if={goal.outcomeMissing}>
+              <p class="slds-text-body_small slds-text-color_error" data-id="outcome-missing">
+                {labels.outcomeMissing}
+              </p>
+            </template>
+            <template lwc:if={goal.description}>
+              <p class="slds-text-body_regular slds-var-m-top_xx-small">{goal.description}</p>
+            </template>
+
+            <template lwc:if={goal.progress}>
+              <p class="slds-text-body_small slds-var-m-top_x-small" data-id="progress">{goal.progress}</p>
+            </template>
+            <ul class="slds-var-m-left_small">
+              <template for:each={goal.steps} for:item="step">
+                <li key={step.id} class="slds-var-m-vertical_xx-small" data-id="step">
+                  <template lwc:if={canEdit}>
+                    <lightning-input
+                      data-id="step-done"
+                      data-step={step.id}
+                      type="checkbox"
+                      label={step.name}
+                      checked={step.done}
+                      disabled={controlsDisabled}
+                      onchange={handleStepToggle}
+                    ></lightning-input>
+                  </template>
+                  <template lwc:else>
+                    <span data-id="step-name">{step.name}</span> <span class="slds-text-color_weak"> {step.status}</span>
+                  </template>
+                  <template lwc:if={step.facts}>
+                    <p class="slds-text-body_small slds-text-color_weak slds-var-m-left_large">{step.facts}</p>
+                  </template>
+                </li>
+              </template>
+            </ul>
+            <template lwc:if={canEdit}>
+              <div class="slds-grid slds-grid_vertical-align-end slds-gutters_xx-small slds-var-m-left_small">
+                <div class="slds-col slds-grow">
+                  <lightning-input
+                    data-id="new-step"
+                    data-goal={goal.id}
+                    label={goal.newStepFor}
+                    variant="label-hidden"
+                    placeholder={labels.newStep}
+                    max-length="80"
+                    value={goal.stepName}
+                    onchange={handleStepNameChange}
+                  ></lightning-input>
+                </div>
+                <div class="slds-col slds-grow-none">
+                  <lightning-button
+                    data-id="add-step"
+                    data-goal={goal.id}
+                    label={labels.addStep}
+                    disabled={controlsDisabled}
+                    onclick={handleAddStep}
+                  ></lightning-button>
+                </div>
+              </div>
+            </template>
+
+            <template lwc:if={goal.hasNotes}>
+              <p class="slds-text-title_caps slds-var-m-top_small">{labels.notes}</p>
+              <ul>
+                <template for:each={goal.notes} for:item="note">
+                  <li key={note.id} class="slds-text-body_small" data-id="note">
+                    <a href="#" data-note={note.id} onclick={handleOpenNote}>{note.line}</a>
+                  </li>
+                </template>
+              </ul>
+              <template lwc:if={goal.moreNotes}>
+                <p class="slds-text-body_small slds-text-color_weak" data-id="more-notes">{goal.moreNotes}</p>
+              </template>
+            </template>
+
+            <template lwc:if={goal.reviewing}>
+              <div class="slds-box slds-var-m-top_small" data-id="review-form">
+                <p class="slds-text-body_regular slds-var-m-bottom_x-small">{labels.reviewIntro}</p>
+                <lightning-input
+                  data-id="review-next"
+                  type="date"
+                  label={labels.nextReview}
+                  value={nextReview}
+                  onchange={handleNextReviewChange}
+                ></lightning-input>
+                <div class="slds-grid slds-grid_align-end slds-var-m-top_small">
+                  <lightning-button
+                    data-id="cancel-review"
+                    label={labels.cancel}
+                    disabled={controlsDisabled}
+                    onclick={handleCancel}
+                    class="slds-var-m-right_x-small"
+                  ></lightning-button>
+                  <lightning-button
+                    data-id="save-review"
+                    variant="brand"
+                    label={labels.saveReview}
+                    disabled={controlsDisabled}
+                    onclick={handleSaveReview}
+                  ></lightning-button>
+                </div>
+              </div>
+            </template>
+
+            <div class="slds-grid slds-wrap slds-var-m-top_small slds-var-m-bottom_x-small">
+              <template lwc:if={canEdit}>
+                <lightning-button
+                  data-id="edit-goal"
+                  data-goal={goal.id}
+                  variant="base"
+                  label={labels.editGoal}
+                  disabled={controlsDisabled}
+                  onclick={handleEditGoal}
+                  class="slds-var-m-right_medium"
+                ></lightning-button>
+                <template lwc:if={goal.open}>
+                  <lightning-button
+                    data-id="mark-reviewed"
+                    data-goal={goal.id}
+                    variant="base"
+                    label={labels.markReviewed}
+                    disabled={controlsDisabled}
+                    onclick={handleOpenReview}
+                    class="slds-var-m-right_medium"
+                  ></lightning-button>
+                </template>
+              </template>
+              <template lwc:if={canAddNote}>
+                <lightning-button
+                  data-id="new-note"
+                  data-goal={goal.id}
+                  variant="base"
+                  label={labels.newNote}
+                  onclick={handleNewNote}
+                ></lightning-button>
+              </template>
+            </div>
+          </li>
+        </template>
+      </ul>
+    </div>
+  </lightning-card>
+</template>

@@ -48,6 +48,22 @@
     <type>Flexipage</type>
     <pageOrSobjectType>Contact</pageOrSobjectType>
   </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Enrollment, with the participant's service plan</comment>
+    <content>Enrollment_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Enrollment__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Enrollment, with the participant's service plan</comment>
+    <content>Enrollment_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Enrollment__c</pageOrSobjectType>
+  </actionOverrides>
   <brand>
     <headerColor>#0B5CAB</headerColor>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
@@ -67,6 +83,7 @@
   <tabs>Enrollment__c</tabs>
   <tabs>Service_Delivery__c</tabs>
   <tabs>Case_Note__c</tabs>
+  <tabs>Goal__c</tabs>
   <tabs>standard-report</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
@@ -75,6 +92,9 @@
     </mappings>
     <mappings>
       <tab>Enrollment__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Goal__c</tab>
     </mappings>
     <mappings>
       <tab>Program__c</tab>
