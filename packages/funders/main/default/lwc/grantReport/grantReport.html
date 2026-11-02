@@ -1,0 +1,37 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom18">
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
+      </template>
+
+      <template lwc:if={noTemplates}>
+        <p data-id="no-templates" class="slds-text-body_small">{labels.noTemplates}</p>
+      </template>
+
+      <template lwc:if={hasTemplates}>
+        <lightning-combobox
+          data-id="template"
+          label={labels.template}
+          options={options}
+          value={templateId}
+          onchange={handleTemplate}
+        ></lightning-combobox>
+        <lightning-button
+          data-id="download"
+          class="slds-var-m-top_small"
+          variant="brand"
+          icon-name="utility:download"
+          label={labels.download}
+          onclick={handleDownload}
+        ></lightning-button>
+        <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small">{labels.help}</p>
+        <p role="status" data-id="result" class="slds-text-body_small">{resultMessage}</p>
+      </template>
+    </div>
+  </lightning-card>
+</template>

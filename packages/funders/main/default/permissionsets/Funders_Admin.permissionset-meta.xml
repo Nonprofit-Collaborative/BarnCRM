@@ -23,6 +23,25 @@
     <apexClass>GrantProgramController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>GrantReportController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Funder_Report_Template__c.Active__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Funder_Report_Template__c.Body__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Funder_Report_Template__c.Template_Key__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
     <field>Grant_Answer__c.Answer__c</field>
@@ -159,6 +178,15 @@
     <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
+    <object>Funder_Report_Template__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
     <object>Grant_Answer__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
@@ -180,6 +208,10 @@
     <object>Grant__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <tabSettings>
+    <tab>Funder_Report_Template__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
   <tabSettings>
     <tab>Grant_Answer__c</tab>
     <visibility>Visible</visibility>

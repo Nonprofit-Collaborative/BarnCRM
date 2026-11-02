@@ -15,8 +15,9 @@ An award's **requirements** (the reports and deliverables the funder expects) ea
 date and the staff member doing them, and BarnCRM reminds that person with a task and an email
 before each is due. A grant also carries the fields a government award needs (see [Government
 Awards](#government-awards)), and the [Answer Library](#answer-library) keeps the application
-answers you reuse. Restricted fund tracking (F-03), multi-year award schedules, a funder report template, a board dashboard and a deadline calendar come in later
-releases.
+answers you reuse. A [funder report template](#funder-report-templates) turns a grant into a
+printable report. Restricted fund tracking (F-03), multi-year award schedules, a board dashboard
+and a deadline calendar come in later releases.
 
 ## Before You Install
 
@@ -35,7 +36,8 @@ finishes, BarnCRM does three things on its own:
 3. Gives everyone who already has a BarnCRM role their Funders permission set (see below).
 
 Then open the **BarnCRM Funders** app from the App Launcher. Its tabs are **Grant Pipeline**,
-**Grants**, **Grant Requirements**, **Grant Answers**, **Reports** and **Error Log**; Grant Pipeline and Grants also
+**Grants**, **Grant Requirements**, **Grant Answers**, **Funder Report Templates** (admins only),
+**Reports** and **Error Log**; Grant Pipeline and Grants also
 join the BarnCRM apps. Run Health Check's **Schedule all nightly jobs** fix once to start the
 morning reminder job (see [Reminders](#reminders)).
 
@@ -235,6 +237,41 @@ for a year stand out for a refresh. The card lists up to 500 answers, by title.
 Funders Admin and Funders Staff add, edit and delete answers; Funders Read Only can search and
 copy them (their copies do not change the last used date). Answers are shared with everyone who
 has a Funders set. Topics are typed, not a picklist, so there is nothing to set up in Setup.
+
+## Funder Report Templates
+
+Each grant's page has a **Funder Report** card: choose a template and click **Download
+Printable** to get the report as an HTML file, filled in with the grant, its requirements and,
+with Logic Models installed, the results of the outcomes its requirements report on. Open the file
+in a browser to print it or save it as a PDF, or in a word processor to edit it before you send
+it. Nothing is saved in BarnCRM.
+
+BarnCRM ships one template, **Grant report**, copied in at install. To change it or add your own,
+open the **Funder Report Templates** tab (Funders Admin only):
+
+| Field | What to put |
+|---|---|
+| Template Name | What staff choose, for example "Interim report". |
+| Body | The report's HTML, with the tokens below. |
+| Active | Only active templates are offered. Clear it to retire one without deleting it. |
+| Template Key | Set by BarnCRM on the shipped template. Leave it blank on your own. |
+
+| Token | Becomes |
+|---|---|
+| `{OrganizationName}` | Your organization's legal name from BarnCRM Settings (or the org name) |
+| `{Today}` | Today's date |
+| `{GrantName}`, `{FunderName}`, `{FunderContactName}`, `{OwnerName}`, `{Stage}`, `{FundingSource}` | The grant's fields |
+| `{AmountRequested}`, `{AmountAwarded}` | The amounts, in your currency |
+| `{ApplicationDeadline}`, `{AwardStartDate}`, `{AwardEndDate}` | The dates |
+| `{Purpose}` | The grant's Purpose, line breaks kept |
+| `{ProgramName}` | The program it pays for (Programs installed) |
+| `{AssistanceListingNumber}`, `{AwardNumber}`, `{FederalAgency}` | The government award fields |
+| `{RequirementTable}` | A table of the grant's requirements: name, type, due date, status and submitted date |
+| `{OutcomeResults}` | Each outcome a requirement reports on, with its indicators' targets and results for the award period (Logic Models installed; empty otherwise) |
+
+Every value is written as text, so a grant name with `<` or `&` cannot break the HTML. A token
+with no value becomes empty, and anything else in braces stays as you typed it. An upgrade never
+changes a template you already have; delete the shipped one and run Finish Setup to get it back.
 
 ## Settings
 

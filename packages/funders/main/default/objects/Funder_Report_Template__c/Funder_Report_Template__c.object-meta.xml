@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>The HTML a funder report is merged from on a grant's page, with tokens for the grant, its requirements and linked outcome results (canonical model Section 29ZO).</description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>false</enableReports>
+  <enableSearch>false</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Funder Report Template</label>
+  <nameField>
+    <label>Template Name</label>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+  </nameField>
+  <pluralLabel>Funder Report Templates</pluralLabel>
+  <sharingModel>Read</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

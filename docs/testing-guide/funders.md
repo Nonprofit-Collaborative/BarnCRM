@@ -1,6 +1,6 @@
 # Funders
 
-Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), government award fields (F-04), the answer library (F-14) and links to Logic Models outcomes (L-06). Setup detail: [Funders](../admin-guide/funders.md).
+Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), government award fields (F-04), the answer library (F-14), links to Logic Models outcomes (L-06) and funder report templates (F-06). Setup detail: [Funders](../admin-guide/funders.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder,
 Giving and Funders deployed. Programs is optional; T-FUN-04 needs it for its second half. Funders
@@ -192,3 +192,20 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 7 | In an org without Logic Models, open a grant. | The card says `Install the Logic Models module to link each requirement to the outcome it reports on.` |
 
 **Cleanup:** none.
+
+## T-FUN-15: Funder Report from a Template
+
+**Purpose:** confirm the funder report merge template (F-06, R-FT1 to R-FT3).
+**Prerequisites:** admin, staff and read-only users; the awarded grant `Youth Grant` from T-FUN-14 with its requirement `Final report` linked to the outcome; Award Number `S287C250001`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open the **Funder Report Templates** tab. | One active template, **Grant report**. |
+| 2 | As staff, open `Youth Grant`. | A **Funder Report** card with **Grant report** chosen. |
+| 3 | Click **Download Printable**, then open the downloaded file. | `Report downloaded.`; the file shows the grant name, funder, amount awarded in currency, the award period, `S287C250001`, a requirements table with `Final report`, and the outcome with `2026: target 30, result 25`. |
+| 4 | As the admin, add a template `Short` with body `<p>{GrantName} for {FunderName} {Unknown}</p>`. As staff, reload the grant, choose `Short` and download. | The file shows `Youth Grant for` the funder's name, and `{Unknown}` as typed. |
+| 5 | As the admin, rename the grant `Youth <Grant>` and download again as staff. | The name shows as typed, not as markup. |
+| 6 | As the admin, clear **Active** on both templates; reload the grant as staff. | The card says no active template is available. |
+| 7 | As read-only, open the **Funder Report Templates** tab. | The templates are listed; **New** is not offered. |
+
+**Cleanup:** make **Grant report** active again, delete `Short`, rename the grant `Youth Grant`.

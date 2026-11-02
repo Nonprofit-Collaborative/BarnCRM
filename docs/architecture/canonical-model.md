@@ -10774,6 +10774,67 @@ the date is then not stamped.
 
 ---
 
+## 29ZO. Funder Report Template
+
+### Definition
+
+The HTML a funder report is merged from (F-06, ADR-NEXT `NEXT-funders-reporting-links.md`
+decision 3): the organization's own wording with tokens for the grant, its requirements and,
+where Logic Models is installed, the results of the outcomes its requirements report on. Staff
+merge it from the grant's page into a printable HTML file they edit and send. BarnCRM ships one
+template, copied in at install.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the template is called, for example "Interim report". |
+| Body | long text | yes (R-FT1) | The report's HTML with tokens (R-FT2). |
+| Active | boolean | yes (defaults true) | Whether staff can choose it. |
+| Template Key | text | no (set by BarnCRM) | The shipped default it was copied from; unique; empty for a template the organization wrote (R-FT3). |
+
+### Rules
+
+**R-FT1 Only an active template with a body is offered.**
+
+**R-FT2 A closed set of tokens, every value escaped.** `{OrganizationName}`, `{Today}`,
+`{GrantName}`, `{FunderName}`, `{FunderContactName}`, `{OwnerName}`, `{Stage}`,
+`{AmountRequested}`, `{AmountAwarded}`, `{ApplicationDeadline}`, `{AwardStartDate}`,
+`{AwardEndDate}`, `{Purpose}`, `{ProgramName}`, `{FundingSource}`, `{AssistanceListingNumber}`,
+`{AwardNumber}`, `{FederalAgency}`, `{RequirementTable}` (a table of the grant's requirements)
+and `{OutcomeResults}` (each linked outcome with its indicator results for the award period,
+R-GQ6; empty without Logic Models). Values are HTML-escaped; amounts and dates are written in the
+person's locale; a token with no value merges as empty; any other text in braces is left as
+typed. The merge is one pass, so a value that looks like a token is never merged again.
+
+**R-FT3 Shipped templates are copied once.** At install and every upgrade, each shipped default
+(`Funder_Report_Template_Default__mdt`) whose key no template has is copied in, active; a copied
+template is never changed by an upgrade (plan Section 4.8), so an edited one is kept.
+
+### Salesforce implementation
+
+- **Object:** `Funder_Report_Template__c`, name field Text, label Template Name, sharing Public
+  Read Only (templates are the organization's; Funders Admin edits them), tab Funder Report
+  Templates (Funders Admin only).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Body | `Body__c` | Long Text Area(131072), required on the layout |
+| Active | `Active__c` | Checkbox, default true |
+| Template Key | `Template_Key__c` | Text(80), unique, external ID |
+
+- **Shipped default:** `Funder_Report_Template_Default__mdt` (`Template_Name__c`, `Body__c`), one row
+  `Grant_Report`; copied by `FunderReportTemplates` from `FundersPostInstall`.
+- **Merge:** `GrantReportController` (thin: the active templates, the grant, its requirements
+  with their field labels from describe, the linked outcomes through `GrantOutcomeService`,
+  the organization's name and currency, as plain JSON); the merge and the printable document run
+  in the framework-free `grantReportModel.js`; the `grantReport` card on the Grant record page
+  downloads the file. Nothing is saved.
+- **Permission sets:** Funders Admin creates, edits and deletes templates; Funders Staff and
+  Funders Read Only read them and merge reports.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -11091,6 +11152,7 @@ mirrors the primary member).
 | 0.16 | 2026-11-02 | Funders F-04. `Grant__c` (29ZH) gains Funding Source (`Funding_Source__c`), Assistance Listing Number (`Assistance_Listing_Number__c`), Award Number (`Award_Number__c`), Federal Agency (`Federal_Agency__c`), Indirect Cost Rate (`Indirect_Cost_Rate__c`) and Match Required (`Match_Required__c`), with rule R-GN8. The period of performance is the existing award period; drawdowns are F-03's. |
 | 0.16 | 2026-11-02 | Funders F-14. New Section 29ZN Grant Answer (`Grant_Answer__c`), the answer library, with rules R-GA1 to R-GA3. Section 30's Funders row drops the answer library. |
 | 0.16 | 2026-11-02 | Logic Models L-06 (ADR-NEXT `NEXT-funders-reporting-links.md`). `Grant_Requirement__c` (29ZI) gains Logic Model Outcome (`Outcome_Id__c`, Text(18)), a Logic Models element named by record identifier, with rule R-GQ6. Neither module references the other. |
+| 0.16 | 2026-11-02 | Funders F-06 (ADR-NEXT `NEXT-funders-reporting-links.md`). New Section 29ZO Funder Report Template (`Funder_Report_Template__c` and the shipped `Funder_Report_Template_Default__mdt`), rules R-FT1 to R-FT3. |
 
 ---
 ## 32. Entity ownership by package
@@ -11196,6 +11258,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Grant Requirement | Funders | 0.16 (F-02) | 29ZI |
 | Funders Settings (custom setting, reminder settings) | Funders | 0.16 (F-02) | 29ZJ |
 | Grant Answer | Funders | 0.16 (F-14) | 29ZN |
+| Funder Report Template | Funders | 0.16 (F-06) | 29ZO |
+| Funder Report Template Default (shipped default) | Funders | 0.16 (F-06) | 29ZO |
 | Funders entities still to come | Funders | 0.16 and 0.17 | 30 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
