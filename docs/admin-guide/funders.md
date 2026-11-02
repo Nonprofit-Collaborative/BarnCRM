@@ -132,6 +132,24 @@ says that programs are not installed and there is nothing to choose. The grant s
 program's record ID, so Funders works without Programs; if the program is later deleted, the card
 says the program cannot be found and you can choose another.
 
+### Outcomes a Requirement Reports On
+
+With the Logic Models module installed as well, the grant's page has a **Logic Model Outcomes**
+card. It lists the grant's requirements; for each one you can choose the outcome or output from
+your logic models that it reports on (a deliverable such as "200 students tutored", or the final
+narrative report on "Students read at grade level"), and click **Save**. Under each linked
+outcome the card shows its indicators with the target and result of each period that overlaps
+the grant's award period (every period when the grant has no award period yet), so you see at a
+glance what you will report.
+
+Any requirement type can name an outcome; Deliverable and Narrative Report are the usual ones. The
+requirement stores the outcome's record ID in **Logic Model Outcome**, so Funders and Logic Models
+never need each other: without Logic Models the card says it is not installed, and if the outcome
+is later deleted the card says it cannot be found. The automation **Requirement: outcome is an
+outcome** always runs and refuses anything in that field that is not one. Choosing an
+outcome needs edit access to requirements (Funders Staff or Admin) and read access to Logic
+Models; the outcomes and results shown follow each person's own Logic Models access.
+
 ## The Grant Pipeline Tab
 
 The **Grant Pipeline** tab is where most people work:

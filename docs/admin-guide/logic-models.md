@@ -140,6 +140,15 @@ The same start and end dates twice for one indicator are refused: change the row
 A part with indicators cannot be moved to the Inputs, Activities or Impact column; delete or
 move its indicators first.
 
+## With the Funders Module
+
+When the Funders module is installed too, each grant requirement (a report or deliverable a
+funder expects) can name the outcome or output it reports on, from a **Logic Model Outcomes** card
+on the grant's page; the card shows that outcome's indicators with their targets and results for
+the award period. Nothing changes in your logic models: the link is kept on the requirement, by
+record ID, so neither module needs the other. See
+[Funders](funders.md#outcomes-a-requirement-reports-on).
+
 ## A Five-Minute Walkthrough
 
 Do this as Maria, who holds the Admin role.

@@ -10608,10 +10608,13 @@ member assigned, and BarnCRM reminds that person before it is due.
 | Assigned To | reference(User) | no | The staff member doing it. Reminders go to them, or to the grant's owner (R-GQ3). |
 | Instructions | long text | no | What the funder asks for: the template, the portal, the questions. |
 | Reminder Sent For | date | no (set by BarnCRM) | The due date the last reminder was made for (R-GQ3). |
+| Logic Model Outcome | record identifier (text) | no | The Logic Models outcome or output this requirement reports on, when Logic Models is installed (L-06, R-GQ6). A record identifier, not a reference: neither module depends on the other. |
 
 ### Relationships
 
 - **Grant Requirement to Grant**, many to one, as a detail of the grant.
+- **Grant Requirement to Logic Model Element** (29ZD), many to one, optional, by record
+  identifier only (R-GQ6); many requirements, across grants, can name one outcome.
 - **Grant Requirement to User** (Assigned To), many to one, optional; a deactivated user stays
   named, and reminders go to the grant's owner instead.
 
@@ -10640,6 +10643,16 @@ off or both reminder settings are off.
 **R-GQ5 Overdue requirements are found.** Health Check lists open requirements whose Due Date has
 passed.
 
+**R-GQ6 The outcome is named, not looked up (L-06, ADR-NEXT `NEXT-funders-reporting-links.md`).**
+`Outcome_Id__c` holds a Logic Models element's record identifier as text. An automation that
+always runs (registry row `Grant_Requirement_Rules`) stores it in its 18-character form and refuses
+text that is not a record identifier, or, where Logic Models' element object exists, an identifier
+of another object. The grant's Logic Model Outcomes card offers only elements of type Outcome or
+Output, read by describe in the person's access, shows for each linked outcome its indicators'
+targets and results for the periods that overlap the award period (all periods when the grant has
+no award period), and shows an outcome it cannot find as missing. Any requirement type can name an
+outcome; Deliverable and Narrative Report are the usual ones.
+
 ### Salesforce implementation
 
 - **Object:** `Grant_Requirement__c`, name field Text, label Requirement Name, sharing Controlled
@@ -10655,10 +10668,15 @@ passed.
 | Assigned To | `Assigned_To__c` | Lookup to User, delete constraint SetNull, relationship name Grant_Requirements |
 | Instructions | `Instructions__c` | Long Text Area(32768) |
 | Reminder Sent For | `Reminder_Sent_For__c` | Date, read only in every permission set but Funders Admin |
+| Logic Model Outcome | `Outcome_Id__c` | Text(18) |
 
-- **Trigger:** `GrantRequirementTrigger`, through the Core dispatcher; handler
-  `GrantRequirementDatesHandler` (R-GQ2, registry row `Grant_Requirement_Dates`, switchable);
+- **Trigger:** `GrantRequirementTrigger`, through the Core dispatcher; handlers
+  `GrantRequirementDatesHandler` (R-GQ2, registry row `Grant_Requirement_Dates`, switchable) and
+  `GrantRequirementRulesHandler` (R-GQ6, registry row `Grant_Requirement_Rules`, always runs);
   the rules in `GrantRequirementService`.
+- **Outcomes (L-06):** `GrantOutcomeService` reads Logic Models' `Logic_Model_Element__c`,
+  `Indicator__c` and `Indicator_Period__c` by describe, in user mode, into plain maps;
+  `GrantOutcomeController` (thin) serves the `grantOutcomes` card on the Grant record page.
 - **Reminders:** `GrantReminderScheduler` (Schedulable, job "BarnCRM Grant Reminders", listed by
   `FundersNightlyJobProvider`), `GrantReminderBatch`, `GrantReminderService` (decides, pure),
   `GrantReminderSelector`; email through Core's `EmailSender`.
@@ -11072,6 +11090,7 @@ mirrors the primary member).
 | 0.16 | 2026-11-02 | Funders F-01 and F-02 (ADR-NEXT `NEXT-funders-module.md`). New Sections 29ZH Grant (`Grant__c`), 29ZI Grant Requirement (`Grant_Requirement__c`, a detail of the grant) and 29ZJ Funders Settings (`Funders_Settings__c`), rules R-GN1 to R-GN7, R-GQ1 to R-GQ5 and R-FS1. Section 30's funder pipeline row narrows to the entities still to come. |
 | 0.16 | 2026-11-02 | Funders F-04. `Grant__c` (29ZH) gains Funding Source (`Funding_Source__c`), Assistance Listing Number (`Assistance_Listing_Number__c`), Award Number (`Award_Number__c`), Federal Agency (`Federal_Agency__c`), Indirect Cost Rate (`Indirect_Cost_Rate__c`) and Match Required (`Match_Required__c`), with rule R-GN8. The period of performance is the existing award period; drawdowns are F-03's. |
 | 0.16 | 2026-11-02 | Funders F-14. New Section 29ZN Grant Answer (`Grant_Answer__c`), the answer library, with rules R-GA1 to R-GA3. Section 30's Funders row drops the answer library. |
+| 0.16 | 2026-11-02 | Logic Models L-06 (ADR-NEXT `NEXT-funders-reporting-links.md`). `Grant_Requirement__c` (29ZI) gains Logic Model Outcome (`Outcome_Id__c`, Text(18)), a Logic Models element named by record identifier, with rule R-GQ6. Neither module references the other. |
 
 ---
 ## 32. Entity ownership by package

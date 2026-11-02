@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Funders_Outcomes_Title</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Logic Model Outcomes card title</shortDescription>
+        <value>Logic Model Outcomes</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Outcomes_NotInstalled</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Outcomes card without Logic Models</shortDescription>
+        <value>Install the Logic Models module to link each requirement to the outcome it reports on.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Outcomes_NoRequirements</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Outcomes card on a grant with no requirements</shortDescription>
+        <value>This grant has no requirements yet. Add one under Requirements, then link it to an outcome here.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Outcomes_None</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Outcomes card choice: no outcome</shortDescription>
+        <value>No outcome</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Outcomes_Missing</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Outcome named by a requirement cannot be found</shortDescription>
+        <value>The outcome this requirement named cannot be found. Choose another.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Outcomes_Saved</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Outcome saved on a requirement</shortDescription>
+        <value>Outcome saved.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Outcomes_BadOutcome</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Requirement outcome field holds something that is not an outcome</shortDescription>
+        <value>Choose an outcome or output from a logic model in the Logic Model Outcomes card on the grant's page. This is not one.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Outcomes_NoIndicators</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Linked outcome has no indicators or periods in the award period</shortDescription>
+        <value>No indicator results for the award period yet.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Outcomes_PeriodLine</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>One indicator period: {0} period name, {1} target, {2} result</shortDescription>
+        <value>{0}: target {1}, result {2}</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Outcomes_NotSet</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A target or result with no value</shortDescription>
+        <value>not set</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Outcomes_ErrorLoad</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Outcomes card could not load</shortDescription>
+        <value>The outcomes could not be loaded. Reload the page; if it happens again, tell your BarnCRM admin.</value>
+    </labels>
+</CustomLabels>

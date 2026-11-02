@@ -631,7 +631,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Indicators | Major | Indicators on outputs and outcomes with unit, which way is better (higher or lower), a baseline and its date, and a target and result per period, with progress shown as Met or a percent of the way from the baseline. One period per indicator for the same dates. | Shipped | L-02 |
 | Indicator sources | Major | Indicator values entered by hand, imported, or computed from any object. | Planned (v0.9) | L-03 |
 | Logic model report | Minor | Compares periods, ready to send to a funder. | Planned (v0.9) | L-04 |
-| Link outcomes to grant deliverables | Minor | Connects outcomes to grant deliverables when Funders is installed. | Planned (v0.10) | L-06 |
+| Link outcomes to grant deliverables | Minor | With Funders and Logic Models both installed, a Logic Model Outcomes card on each grant links every requirement (deliverable, report) to the outcome or output it reports on and shows that outcome's indicator targets and results for the award period. The link is a record ID on the requirement, checked by an always-run rule, so neither module depends on the other; a deleted outcome shows as missing (ADR-NEXT, Funders reporting links). | In review (release 0.16) | L-06 |
 | Evidence log | Minor | Records what supports each assumption, with its source. | Planned (1.x) | L-05 |
 
 ---
