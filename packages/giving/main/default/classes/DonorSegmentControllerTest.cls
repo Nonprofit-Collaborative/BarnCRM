@@ -33,7 +33,7 @@ private class DonorSegmentControllerTest {
     static void everyTemplateBuildsAQueryFindCanRunForPeopleAndOrganizations() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             List<DonorSegmentTemplates.Template> templates = DonorSegmentTemplates.all();
-            Assert.areEqual(5, templates.size(), 'Five starter templates ship (R-DS2).');
+            Assert.areEqual(7, templates.size(), 'Seven starter templates ship (R-DS2, R-DT6).');
             for (DonorSegmentTemplates.Template template : templates) {
                 Assert.isTrue(String.isNotBlank(template.label), 'Each template has a name.');
                 Assert.isTrue(String.isNotBlank(template.description), 'And says what it finds.');
@@ -79,7 +79,7 @@ private class DonorSegmentControllerTest {
                 '  Lapsed people  '
             );
             Assert.isNotNull(page.savedId, 'The page is told which segment was written.');
-            Assert.areEqual(5, page.templates.size(), 'The page offers the templates.');
+            Assert.areEqual(7, page.templates.size(), 'The page offers the templates.');
             Assert.isTrue(String.isNotBlank(page.findTabApiName), 'And says where Find is.');
             Assert.isTrue(page.exportLimit > 0, 'And how many rows an export may hold.');
             DonorSegmentService.Segment listed;

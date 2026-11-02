@@ -143,7 +143,14 @@ const PAGE_GROUPS = {
     {
       id: 'Donor Levels',
       label: DONOR_LEVELS,
-      keys: ['Donor_Levels_Enabled__c', 'Donor_Level_Source_Field__c', 'Donor_Levels_Page']
+      keys: [
+        'Donor_Levels_Enabled__c',
+        'Donor_Level_Source_Field__c',
+        'Donor_Levels_Page',
+        'Donor_Score_Recency_Days__c',
+        'Donor_Score_Frequency_Gifts__c',
+        'Donor_Score_Monetary_Amount__c'
+      ]
     },
     {
       id: 'Acknowledgments and Stewardship',

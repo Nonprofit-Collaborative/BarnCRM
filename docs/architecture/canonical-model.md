@@ -6570,6 +6570,79 @@ sort in package metadata, so the list opens unsorted and a click on the Next Ask
 
 ---
 
+## 25T. Donor scoring
+
+### Definition
+
+Donor scoring (feature G-19) rates every donor on recency, frequency and monetary value (RFM)
+and names a segment from the three scores. It adds no object. The inputs are rollups the
+engine already runs (Section 26), the scores are plain attributes on Contact and Account, and
+the cutoffs are org-wide settings with visible defaults, so a score is explainable from three
+numbers printed beside it and an organization can change what "recent" means without code.
+
+### Rules
+
+- **R-DT1 Inputs are rollups.** Days since the last gift is a formula on `Last_Gift_Date__c`
+  (Section 26). Gifts in the recent window and giving in the recent window are two new
+  shipped rollups on each of Account, Contact and Household (Section 26): a COUNT and a SUM of
+  gifts whose `Gift_Date__c` is in the last 730 days, with the ADR-0022 status filter and
+  `Amount__c` greater than 0 for the count. The window is a `last n days` condition on the
+  definition: an administrator changes 730 to any other day count in Rollup Builder, and the
+  nightly rollup run keeps the totals right as the date moves.
+- **R-DT2 Scores are 1 to 5.** Recency is 5 when the days since the last gift are at or under the
+  first cutoff, 4 at or under the second, 3, 2, and 1 beyond the fourth. Frequency and Monetary
+  are 5 when the value reaches the first cutoff, then 4, 3, 2 for the next three, and 1 below
+  the fourth. A donor with no gift (empty `Last_Gift_Date__c`) has no scores and no segment,
+  and any score or segment held is cleared. `RFM_Score__c` is the three scores added
+  (3 to 15).
+- **R-DT3 Cutoffs are settings.** `Donor_Score_Recency_Days__c` default `90,180,365,730`,
+  `Donor_Score_Frequency_Gifts__c` default `6,4,2,1` and `Donor_Score_Monetary_Amount__c`
+  default `5000,1000,250,50`, each four comma-separated numbers (days rise, gifts and amounts
+  fall). A value that is not four numbers in order is ignored in favour of the default, so a
+  typo never stops scoring. Settings are org-wide (Principle 3).
+- **R-DT4 Segment.** The first rule that fits, with R, F and M the three scores: Champion
+  (R 4 or 5, F 4 or 5, M 4 or 5); Loyal (R 3 or more, F 3 or more); Promising (R 4 or 5, F 1 or
+  2); At Risk (R 1 or 2, and F 3 or more or M 4 or 5); Lapsed (R 1 or 2); Occasional (anything
+  else). The segment is stored as its English name in `RFM_Segment__c` (text, ADR-0019).
+- **R-DT5 When it runs.** In the before insert and before update of Account and Contact, in the
+  same save that changes a rollup, as donor levels do (ADR-0028, R-DL6), and again in the
+  nightly donor levels pass, because days since the last gift change with no record saved.
+  Only a record whose five scoring values change is written by the pass. Two Automation
+  Registry rows (`Donor_Score_Assignment_Account`, `Donor_Score_Assignment_Contact`) let the
+  Automation page switch it off; they are on by default.
+- **R-DT6 Find and segments.** Every attribute below is a normal field, so Find can filter,
+  sort and show it, and two donor segment starter templates (Section 25O) use it: Champions
+  and Slipping Donors (the At Risk segment).
+
+### Salesforce implementation
+
+- **Fields on Account and Contact** (shipped by Giving, read only on the donor record pages):
+
+| Attribute | API name | Type |
+|---|---|---|
+| Recent Gift Count | `Recent_Gift_Count__c` | Number (rollup, R-DT1) |
+| Recent Giving | `Recent_Giving__c` | Currency (rollup, R-DT1) |
+| Days Since Last Gift | `Days_Since_Last_Gift__c` | Formula (Number) |
+| Recency Score | `RFM_Recency_Score__c` | Number |
+| Frequency Score | `RFM_Frequency_Score__c` | Number |
+| Monetary Score | `RFM_Monetary_Score__c` | Number |
+| RFM Score | `RFM_Score__c` | Number |
+| RFM Segment | `RFM_Segment__c` | Text (40) |
+
+- **Fields on `Giving_Settings__c`:** the three cutoff fields of R-DT3 (Text, with defaults).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Donor Score Recency Days | `Donor_Score_Recency_Days__c` | Text (default `90,180,365,730`) |
+| Donor Score Frequency Gifts | `Donor_Score_Frequency_Gifts__c` | Text (default `6,4,2,1`) |
+| Donor Score Monetary Amount | `Donor_Score_Monetary_Amount__c` | Text (default `5000,1000,250,50`) |
+
+- **Code:** `DonorScoreService` (pure scoring in `DonorScoreMath`, a plain class with no org access),
+`DonorScoreTriggerHandler` registered for Account and Contact, and the existing
+`DonorLevelBatch` pass, which now scores the same records after placing them on the ladder.
+
+---
+
 ## 26. Packaged default rollups
 
 ### Definition
@@ -11014,6 +11087,7 @@ mirrors the primary member).
 | 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29ZB), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |
 | v0.13 | 2026-10-31 | Donor segments (G-28, D-156). New Section 25O, rules R-DS1 to R-DS6: a segment is a Saved Query of Contact or Account (no new object), with five starter templates held as documented JSON, a count, a list and Mailchimp, Constant Contact and all-columns CSV exports; no sending, no settings key. Contact and Account gain the formula `Change_From_Last_Year__c` (Giving This Year minus Giving Last Year), so upgraders can be filtered. |
 | v0.13 | 2026-10-31 | Pledge reminders (G-30). Objects `Pledge_Reminder_Step__c` (Section 25P) and `Pledge_Reminder__c` (25Q) added; `Giving_Settings__c` gains `Pledge_Reminders_Enabled__c` (off by default), `Pledge_Reminders_Last_Run__c` and `Pledge_Reminders_Last_Run_Summary__c`. Rules R-PR1 to R-PR6. No field is added to `Installment__c` or `Commitment__c`. |
+| v0.15 | 2026-11-02 | Donor scoring (G-19). New Section 25T, rules R-DT1 to R-DT6. Eight attributes added to Account and Contact (`Recent_Gift_Count__c`, `Recent_Giving__c`, `Days_Since_Last_Gift__c`, `RFM_Recency_Score__c`, `RFM_Frequency_Score__c`, `RFM_Monetary_Score__c`, `RFM_Score__c`, `RFM_Segment__c`); six rollup definition rows (`Contact_`, `Account_` and `Household_` `Recent_Gift_Count` and `Recent_Giving`, last 730 days); `Giving_Settings__c` gains the three cutoff fields; two Automation Registry rows; two donor segment templates. No object added. |
 | 0.13 | 2026-10-31 | Solicitation pipeline (G-26, ADR-0153). New entity Ask (Section 25R, `Ask__c`) with rules R-SO1 to R-SO8: an Opportunity-free ask with the organization's own stages, an outcome kept apart from the stage, stage history, and a win that creates or links the gift or commitment. Giving Settings gains `Ask_Stages__c` (Section 21A). `Next_Ask_Date__c` is the hook ask cadence (G-29) reads. |
 | 0.14 | 2026-10-31 | Logic Models L-01 and L-02 (ADR-0154 `0154-logic-models-module.md`). New in the Logic Models module: Logic Model (`Logic_Model__c`, 29ZC), Logic Model Element (`Logic_Model_Element__c`, 29ZD), Logic Model Link (`Logic_Model_Link__c`, 29ZE), Indicator (`Indicator__c`, 29ZF) and Indicator Period (`Indicator_Period__c`, 29ZG), with rules R-LM1 to R-LM3, R-LE1 to R-LE3, R-LL1 to R-LL3, R-IN1, R-IN2, R-IP1 and R-IP2. Indicator takes the place of P-03's Outcome. Specified ahead of the build. |
 | 0.14 | 2026-10-31 | Landing batch A renumbering. No object or field added. Branches built in parallel had reused section letters; in PR order they are now 25O Donor Segments, 25P Pledge Reminder Step, 25Q Pledge Reminder, 25R Ask, 25S Ask cadence, 29W Setup Change, 29X Saved Transform, 29Y Program, 29Z Service, 29ZA Enrollment, 29ZB Service Delivery, 29ZC Logic Model, 29ZD Logic Model Element, 29ZE Logic Model Link, 29ZF Indicator, 29ZG Indicator Period. Every citation in docs and code was repointed to the section its author meant. |

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Donor_Score_Frequency_Gifts__c</fullName>
+  <defaultValue>"6,4,2,1"</defaultValue>
+  <description>Donor Score Frequency Gifts Stored as text under ADR-0019 (G-19).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Four gift counts, falling. A donor with at least the first number of gifts in the recent window earns a frequency score of 5, then 4, 3, 2, and 1 below the last.</inlineHelpText>
+  <label>Donor Score Frequency Gifts</label>
+  <length>40</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

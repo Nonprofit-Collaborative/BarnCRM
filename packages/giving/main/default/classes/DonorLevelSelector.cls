@@ -86,10 +86,20 @@ public with sharing class DonorLevelSelector {
                     Largest_Gift__c,
                     Donor_Level__c,
                     Previous_Donor_Level__c,
-                    Donor_Level_Changed_Date__c
+                    Donor_Level_Changed_Date__c,
+                    Last_Gift_Date__c,
+                    Recent_Gift_Count__c,
+                    Recent_Giving__c,
+                    RFM_Recency_Score__c,
+                    RFM_Frequency_Score__c,
+                    RFM_Monetary_Score__c,
+                    RFM_Score__c,
+                    RFM_Segment__c
                 FROM Account
                 WHERE
-                    Total_Giving__c != NULL
+                    Last_Gift_Date__c != NULL
+                    OR RFM_Segment__c != NULL
+                    OR Total_Giving__c != NULL
                     OR Giving_This_Year__c != NULL
                     OR Giving_Last_Year__c != NULL
                     OR Largest_Gift__c != NULL
@@ -111,10 +121,20 @@ public with sharing class DonorLevelSelector {
                     Largest_Gift__c,
                     Donor_Level__c,
                     Previous_Donor_Level__c,
-                    Donor_Level_Changed_Date__c
+                    Donor_Level_Changed_Date__c,
+                    Last_Gift_Date__c,
+                    Recent_Gift_Count__c,
+                    Recent_Giving__c,
+                    RFM_Recency_Score__c,
+                    RFM_Frequency_Score__c,
+                    RFM_Monetary_Score__c,
+                    RFM_Score__c,
+                    RFM_Segment__c
                 FROM Contact
                 WHERE
-                    Total_Giving__c != NULL
+                    Last_Gift_Date__c != NULL
+                    OR RFM_Segment__c != NULL
+                    OR Total_Giving__c != NULL
                     OR Giving_This_Year__c != NULL
                     OR Giving_Last_Year__c != NULL
                     OR Largest_Gift__c != NULL

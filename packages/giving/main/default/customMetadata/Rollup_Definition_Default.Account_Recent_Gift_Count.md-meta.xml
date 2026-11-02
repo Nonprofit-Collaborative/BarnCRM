@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Account recent gift count</label>
+    <protected>true</protected>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">How many gifts this organization or person account gave in the recent window, which is the last 730 days (two years); change the 730 in the Rollup Builder to change the window. Counted rather than added, so a gift refunded later still counts as one gift. The frequency half of donor scoring.</value>
+    </values>
+    <values>
+        <field>Definition_Key__c</field>
+        <value xsi:type="xsd:string">Account_Recent_Gift_Count</value>
+    </values>
+    <values>
+        <field>Source_Object__c</field>
+        <value xsi:type="xsd:string">Gift__c</value>
+    </values>
+    <values>
+        <field>Target_Object__c</field>
+        <value xsi:type="xsd:string">Account</value>
+    </values>
+    <values>
+        <field>Relationship_Path__c</field>
+        <value xsi:type="xsd:string">Donor_Account__c</value>
+    </values>
+    <values>
+        <field>Aggregate__c</field>
+        <value xsi:type="xsd:string">COUNT</value>
+    </values>
+    <values>
+        <field>Source_Field__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Order_By_Field__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Target_Field__c</field>
+        <value xsi:type="xsd:string">Recent_Gift_Count__c</value>
+    </values>
+    <values>
+        <field>Filter_JSON__c</field>
+        <value xsi:type="xsd:string">{"version": 1, "conditions": [{"id": 1, "field": "Status__c", "operator": "in", "value": ["Received", "Refunded", "Written off"]}, {"id": 2, "field": "Amount__c", "operator": "greater than", "value": 0}, {"id": 3, "field": "Gift_Date__c", "operator": "last n days", "value": 730}]}</value>
+    </values>
+    <values>
+        <field>Target_Filter_JSON__c</field>
+        <value xsi:type="xsd:string">{"version": 1, "conditions": [{"id": 1, "field": "RecordType.DeveloperName", "operator": "not equals", "value": "Household"}]}</value>
+    </values>
+    <values>
+        <field>Fiscal_Year_Aware__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Fiscal_Year_Offset__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Fiscal_Date_Field__c</field>
+        <value xsi:nil="true" />
+    </values>
+    <values>
+        <field>Mode__c</field>
+        <value xsi:type="xsd:string">Both</value>
+    </values>
+    <values>
+        <field>Default_Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Package__c</field>
+        <value xsi:type="xsd:string">Giving</value>
+    </values>
+</CustomMetadata>
