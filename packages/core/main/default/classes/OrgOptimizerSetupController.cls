@@ -9,6 +9,13 @@
  * BarnCRM Settings (owner decision 2026-10-13: these checks are admin only). Every query is
  * dynamic and runs in user mode, so an org that hides one of these objects from the person, or
  * lacks one, reports that check as "could not check" instead of failing the section.
+ *
+ * The same section carries the Technical Debt checks (plan 6.1.5 item C-58, canonical model
+ * Section 29H, R-OO1 to R-OO3): Apex classes, Apex triggers and flows saved on an API version
+ * older than the Old API Version setting, flows with no description, and flows with no active
+ * version. Only what a user-mode SOQL query can read: ApexClass, ApexTrigger and
+ * FlowDefinitionView. Validation rules, workflow rules, process builders, Lightning and
+ * Visualforce components and anything else that needs the Tooling API are not covered.
  */
 public with sharing class OrgOptimizerSetupController {
     private static final String PERMISSION = 'Manage_BarnCRM_Settings';
@@ -28,6 +35,16 @@ public with sharing class OrgOptimizerSetupController {
     public static final Integer DEFAULT_REPORT_DAYS = 365;
     public static final Integer MIN_REPORT_DAYS = 90;
     public static final Integer MAX_REPORT_DAYS = 1095;
+    /**
+     * Apex, triggers and flows saved on an API version below this are listed as technical debt:
+     * `Old_Api_Version__c`, empty reads as the default, held between the bounds (C-58).
+     */
+    public static final Integer DEFAULT_API_VERSION = 50;
+    public static final Integer MIN_API_VERSION = 21;
+    public static final Integer MAX_API_VERSION = 80;
+    /** The check groups the page lists under separate headings. */
+    public static final String KIND_UNUSED = 'unused';
+    public static final String KIND_DEBT = 'debt';
     /** Templates and flows younger than this are left out: they may be new work. */
     private static final Integer NEW_DAYS = 90;
 
@@ -41,6 +58,9 @@ public with sharing class OrgOptimizerSetupController {
     public class Finding {
         @AuraEnabled
         public String key;
+        /** Which heading the page lists it under: unused or debt. */
+        @AuraEnabled
+        public String kind = KIND_UNUSED;
         @AuraEnabled
         public Integer count;
         /** True when the count stopped at the cap. */
@@ -64,6 +84,9 @@ public with sharing class OrgOptimizerSetupController {
         public Integer loginDays = loginDays();
         @AuraEnabled
         public Integer reportDays = reportDays();
+        /** API versions below this are listed as technical debt. */
+        @AuraEnabled
+        public Integer apiVersion = apiVersion();
     }
 
     private class Check {
@@ -72,6 +95,13 @@ public with sharing class OrgOptimizerSetupController {
         /** The field that names a row; a dotted name reads through one relationship. */
         String nameField;
         String setupUrl;
+        String kind = KIND_UNUSED;
+
+        /** Lists the check under Technical Debt. */
+        Check debt() {
+            this.kind = KIND_DEBT;
+            return this;
+        }
 
         Check(String key, String soql, String nameField, String setupUrl) {
             this.key = key;
@@ -92,6 +122,7 @@ public with sharing class OrgOptimizerSetupController {
             'loginCutoff' => now.addDays(-result.loginDays),
             'reportCutoff' => now.addDays(-result.reportDays),
             'newCutoff' => now.addDays(-NEW_DAYS),
+            'oldApi' => Decimal.valueOf(result.apiVersion),
             'readUpTo' => COUNT_CAP + 1
         };
         for (Check check : checks()) {
@@ -141,7 +172,40 @@ public with sharing class OrgOptimizerSetupController {
                 ' AND NamespacePrefix = null AND LastModifiedDate < :newCutoff ORDER BY Label',
                 'Label',
                 '/lightning/setup/Flows/home'
-            ),
+            )
+                .debt(),
+            new Check(
+                'apexOldApi',
+                'SELECT Name FROM ApexClass WHERE NamespacePrefix = null AND Status = \'Active\'' +
+                ' AND ApiVersion < :oldApi ORDER BY Name',
+                'Name',
+                '/lightning/setup/ApexClasses/home'
+            )
+                .debt(),
+            new Check(
+                'triggersOldApi',
+                'SELECT Name FROM ApexTrigger WHERE NamespacePrefix = null AND Status = \'Active\'' +
+                ' AND ApiVersion < :oldApi ORDER BY Name',
+                'Name',
+                '/lightning/setup/ApexTriggers/home'
+            )
+                .debt(),
+            new Check(
+                'flowsOldApi',
+                'SELECT Label FROM FlowDefinitionView WHERE NamespacePrefix = null' +
+                ' AND ApiVersion < :oldApi ORDER BY Label',
+                'Label',
+                '/lightning/setup/Flows/home'
+            )
+                .debt(),
+            new Check(
+                'flowsNoDescription',
+                'SELECT Label FROM FlowDefinitionView WHERE NamespacePrefix = null' +
+                ' AND IsActive = true AND Description = null ORDER BY Label',
+                'Label',
+                '/lightning/setup/Flows/home'
+            )
+                .debt(),
             new Check(
                 'jobsOfInactiveUsers',
                 'SELECT CronJobDetail.Name FROM CronTrigger' +
@@ -158,6 +222,7 @@ public with sharing class OrgOptimizerSetupController {
         Finding finding = new Finding();
         finding.key = check.key;
         finding.setupUrl = check.setupUrl;
+        finding.kind = check.kind;
         try {
             String soql = check.key == failCheck ? check.soql + ' BROKEN' : check.soql;
             List<SObject> rows = Database.queryWithBinds(
@@ -192,6 +257,16 @@ public with sharing class OrgOptimizerSetupController {
             DEFAULT_REPORT_DAYS,
             MIN_REPORT_DAYS,
             MAX_REPORT_DAYS
+        );
+    }
+
+    /** The API version below which Apex, triggers and flows are listed, from BarnCRM Settings. */
+    public static Integer apiVersion() {
+        return bounded(
+            'Old_Api_Version__c',
+            DEFAULT_API_VERSION,
+            MIN_API_VERSION,
+            MAX_API_VERSION
         );
     }
 

@@ -1158,6 +1158,20 @@ range reads as the nearest end.
 | `Unused_Login_Days__c` | integer | 90 | Days without a login before Unused setup lists an active user. From 30 to 365; empty reads as 90. |
 | `Unused_Report_Days__c` | integer | 365 | Days without a run before Unused setup lists a report. From 90 to 1,095; empty reads as 365. |
 | `Setup_Change_Retention_Days__c` | integer | 730 | Days a copied Setup Audit Trail row is kept before the nightly Setup Changes copy deletes it (R-SU4, C-56). From 180 to 3,650; empty reads as 730, out of range as the nearest end. |
+| `Old_Api_Version__c` | integer | 50 | API version below which the Technical Debt checks list an Apex class, trigger or flow as old (R-OO1, C-58). From 21 to 80; empty reads as 50, out of range as the nearest end. |
+
+**Technical Debt checks (C-58, plan 6.1.5).** Rules for the checks Org Optimizer's Unused Setup
+section lists under Technical Debt; they add no object.
+**R-OO1 Old API versions.** Active Apex classes and triggers with no namespace, and flows with
+no namespace, whose `ApiVersion` is below `Old_Api_Version__c` (default 50) are counted and
+the first five names shown, from `ApexClass`, `ApexTrigger` and `FlowDefinitionView`.
+**R-OO2 Flow hygiene.** Active flows with no description, and flows with no active version
+(the existing inactive flows check, not changed in the number it reports), are counted.
+**R-OO3 Read only, SOQL only, user mode.** Every check is a dynamic SOQL query in user mode,
+capped at 1,000 rows ("more than"); a check the person cannot run reads "Could not check". Not
+covered, because it needs the Tooling API or the Metadata API: validation rules, workflow
+rules, process builders, Lightning web and Aura components, Visualforce pages, the API version
+of anything inside a managed package, and flow contents (such as elements on old versions).
 
 ### Duplicate Matching keys
 
@@ -10777,6 +10791,7 @@ mirrors the primary member).
 | 0.14 | 2026-10-31 | Programs P-08. `Enrollment__c` (29ZA) and `Service_Delivery__c` (29ZB) change from Public Read/Write to Private, each shared with the new public group `Programs_Participants` through the Apex sharing reason `Programs_Participants__c` (R-EN7, R-SD6). New hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox, default unchecked): the Participant Privacy preset, Shared by default, which puts All Internal Users in the group, or Private, which takes them out. Programs Admin gains View All and Modify All on both objects. |
 | 0.14 | 2026-10-31 | Programs P-05. The Programs Dashboard (29ZA, "Program dashboard") and the person card's last service date and services attended. No object or field added. |
 | 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29ZA, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
+| 0.17 | 2026-11-02 | C-58 technical debt checks in Org Optimizer (plan 6.1.5). `BarnCRM_Settings__c` gains `Old_Api_Version__c` (Org Optimizer keys, default 50); rules R-OO1 to R-OO3. No object added. |
 
 ---
 ## 32. Entity ownership by package
