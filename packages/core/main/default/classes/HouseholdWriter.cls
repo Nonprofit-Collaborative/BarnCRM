@@ -220,6 +220,34 @@ public with sharing class HouseholdWriter {
     }
 
     /**
+     * Saves an NPSP household adoption or its undo (X-05, canonical model R-HA3 and R-HA4,
+     * ADR-NEXT): the record type and the four household fields (Custom Name, the two greetings,
+     * Primary Contact) of Accounts the caller has checked the running user can edit. The one
+     * place outside household creation that changes an Account's record type, which no user is
+     * given (ADR-0141). Each Account is saved on its own, past the org's duplicate rules as a
+     * created household is. Answers the refused Accounts with the platform's reason; each
+     * refusal is logged.
+     */
+    public static Map<Id, String> saveAdoptionChanges(List<Account> accounts) {
+        Map<Id, String> refused = new Map<Id, String>();
+        if (accounts == null || accounts.isEmpty()) {
+            return refused;
+        }
+        List<Database.SaveResult> saves = Database.update(
+            accounts,
+            householdSaveOptions(),
+            AccessLevel.SYSTEM_MODE
+        );
+        logFailures(saves, Label.Core_NpspAdoption_ErrorContext);
+        for (Integer i = 0; i < saves.size(); i++) {
+            if (!saves[i].isSuccess()) {
+                refused.put(accounts[i].Id, failureReason(saves[i]));
+            }
+        }
+        return refused;
+    }
+
+    /**
      * Saves computed values on existing households: the name, the two greetings, and the
      * member count.
      */
