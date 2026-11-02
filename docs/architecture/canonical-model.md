@@ -10601,7 +10601,8 @@ member assigned, and BarnCRM reminds that person before it is due.
 done. Only open requirements are reminded, counted overdue or listed as upcoming.
 
 **R-GQ2 The submitted date is stamped.** Moving to Submitted or Accepted fills an empty Submitted
-Date with today. Part of the switchable `Grant_Dates` automation (R-GN3).
+Date with today. A switchable automation of its own, `Grant_Requirement_Dates`, beside the
+grant's `Grant_Dates` (R-GN3).
 
 **R-GQ3 One reminder per due date.** A morning job (6:00 AM org time) reminds each open requirement
 whose Due Date is no more than the lead time ahead (Funders Settings, R-FS1) and no more than 30

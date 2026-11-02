@@ -17,6 +17,26 @@
   </classAccesses>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Grant_Requirement__c.Assigned_To__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Grant_Requirement__c.Instructions__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Grant_Requirement__c.Reminder_Sent_For__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Grant_Requirement__c.Submitted_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Grant__c.Amount_Awarded__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -81,11 +101,24 @@
     <allowEdit>false</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
+    <object>Grant_Requirement__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
     <object>Grant__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <tabSettings>
     <tab>Grant_Pipeline</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Grant_Requirement__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

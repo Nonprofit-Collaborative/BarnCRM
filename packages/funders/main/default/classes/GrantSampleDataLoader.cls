@@ -1,7 +1,8 @@
 /**
  * Builds and removes the Funders sample data set (C-10, canonical model 29ZH): three grants
  * flagged `Sample_Data__c` to Core's sample organizations, one at each point of the pipeline
- * (Prospect, Applied, Awarded), owned by the person loading them. Every record is saved in user
+ * (Prospect, Applied, Awarded), owned by the person loading them, and three requirements on the
+ * award (29ZI). Every record is saved in user
  * mode through the grant rules, as an administrator's would be.
  *
  * Removal deletes the sample grants, one chunk per call; their requirements go with them.
@@ -70,6 +71,53 @@ public with sharing class GrantSampleDataLoader {
         awarded.Purpose__c = 'General support for after-school programs for one year.';
 
         Database.insert(new List<Grant__c>{ prospect, applied, awarded }, AccessLevel.USER_MODE);
+        loadRequirements(awarded.Id, today);
+    }
+
+    /**
+     * F-02: what the award asks for, one requirement done, one coming due and one later. They go
+     * with their grant when the sample data is removed.
+     */
+    private static void loadRequirements(Id grantId, Date today) {
+        if (!Schema.SObjectType.Grant_Requirement__c.isCreateable()) {
+            return;
+        }
+        Database.insert(
+            new List<Grant_Requirement__c>{
+                requirement(grantId, 'Site visit', 'Site Visit', today.addDays(-10), 'Accepted'),
+                requirement(
+                    grantId,
+                    'Quarter 1 financial report',
+                    'Financial Report',
+                    today.addDays(10),
+                    'In Progress'
+                ),
+                requirement(
+                    grantId,
+                    'Interim narrative report',
+                    'Narrative Report',
+                    today.addDays(75),
+                    'Not Started'
+                )
+            },
+            AccessLevel.USER_MODE
+        );
+    }
+
+    private static Grant_Requirement__c requirement(
+        Id grantId,
+        String name,
+        String type,
+        Date due,
+        String status
+    ) {
+        return new Grant_Requirement__c(
+            Grant__c = grantId,
+            Name = name,
+            Type__c = type,
+            Due_Date__c = due,
+            Status__c = status
+        );
     }
 
     // ------------------------------------------------------------------------- status card

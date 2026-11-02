@@ -17,7 +17,8 @@ public with sharing class NightlyJobs {
         'RollupsNightlyJobProvider',
         'GivingNightlyJobProvider',
         'MirrorNightlyJobProvider',
-        'VolunteersNightlyJobProvider'
+        'VolunteersNightlyJobProvider',
+        'FundersNightlyJobProvider'
     };
 
     private static final String ERROR_CONTEXT = 'NightlyJobs';

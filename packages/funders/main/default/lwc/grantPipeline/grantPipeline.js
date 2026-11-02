@@ -3,6 +3,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getBoard from '@salesforce/apex/GrantPipelineController.getBoard';
 import moveStage from '@salesforce/apex/GrantPipelineController.moveStage';
+import markSubmitted from '@salesforce/apex/GrantPipelineController.markSubmitted';
 import { buildColumns, deadlineRows, moveTargets } from 'c/grantPipelineModel';
 
 import TITLE from '@salesforce/label/c.Funders_Pipeline_Title';
@@ -33,8 +34,12 @@ import SAVE from '@salesforce/label/c.Funders_Pipeline_Save';
 import CANCEL from '@salesforce/label/c.Funders_Pipeline_Cancel';
 import MOVED from '@salesforce/label/c.Funders_Pipeline_Moved';
 import ERROR_ACTION from '@salesforce/label/c.Funders_Pipeline_ErrorUnexpected';
+import MARK_SUBMITTED from '@salesforce/label/c.Funders_Pipeline_MarkSubmitted';
+import MARKED_SUBMITTED from '@salesforce/label/c.Funders_Pipeline_MarkedSubmitted';
+import KIND_APPLICATION_LABEL from '@salesforce/label/c.Funders_Pipeline_KindApplication';
 
 const ACTION_OPEN = 'open';
+const KIND_REQUIREMENT = 'requirement';
 const MOVE_PREFIX = 'move:';
 const STAGE_AWARDED = 'Awarded';
 
@@ -68,6 +73,7 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
     deadlines: DEADLINES,
     deadlinesEmpty: DEADLINES_EMPTY,
     awardAmount: AWARD_AMOUNT,
+    markSubmitted: MARK_SUBMITTED,
     save: SAVE,
     cancel: CANCEL
   };
@@ -100,12 +106,21 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
       this.columns = this.decorate(
         buildColumns(this.board.stages, this.board.stageTotals, this.board.cards)
       );
-      this.deadlines = deadlineRows(this.board.deadlines, this.board.today).map((row) => ({
-        ...row,
-        funderLabel: row.funderName || NO_FUNDER,
-        whenText: this.whenText(row.daysLeft),
-        whenClass: row.overdue ? 'slds-text-color_error' : 'slds-text-color_weak'
-      }));
+      const canMark = Boolean(this.board.canMarkSubmitted);
+      this.deadlines = deadlineRows(this.board.deadlines, this.board.today).map((row) => {
+        const isRequirement = row.kind === KIND_REQUIREMENT;
+        return {
+          ...row,
+          objectApiName: isRequirement ? 'Grant_Requirement__c' : 'Grant__c',
+          whatText: isRequirement
+            ? `${row.requirementType || ''}: ${row.grantName || ''}`
+            : KIND_APPLICATION_LABEL,
+          showMark: isRequirement && canMark,
+          funderLabel: row.funderName || NO_FUNDER,
+          whenText: this.whenText(row.daysLeft),
+          whenClass: row.overdue ? 'slds-text-color_error' : 'slds-text-color_weak'
+        };
+      });
     } catch (error) {
       this.errorMessage = messageOf(error);
       this.columns = [];
@@ -217,14 +232,26 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
   }
 
   handleOpenDeadline(event) {
-    this.openRecord(event.currentTarget.dataset.id);
+    const { id, object } = event.currentTarget.dataset;
+    this.openRecord(id, object);
   }
 
-  openRecord(recordId) {
+  openRecord(recordId, objectApiName = 'Grant__c') {
     this[NavigationMixin.Navigate]({
       type: 'standard__recordPage',
-      attributes: { recordId, objectApiName: 'Grant__c', actionName: 'view' }
+      attributes: { recordId, objectApiName, actionName: 'view' }
     });
+  }
+
+  async handleMarkSubmitted(event) {
+    const requirementId = event.currentTarget.dataset.id;
+    try {
+      await markSubmitted({ requirementId });
+      this.toast(MARKED_SUBMITTED, 'success');
+      await this.load();
+    } catch (error) {
+      this.toast(messageOf(error), 'error');
+    }
   }
 
   handleCardMenu(event) {

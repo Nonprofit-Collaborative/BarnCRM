@@ -88,6 +88,16 @@
     </layoutColumns>
   </layoutSections>
   <relatedLists>
+    <fields>NAME</fields>
+    <fields>Type__c</fields>
+    <fields>Due_Date__c</fields>
+    <fields>Status__c</fields>
+    <fields>Assigned_To__c</fields>
+    <relatedList>Grant_Requirement__c.Grant__c</relatedList>
+    <sortField>Due_Date__c</sortField>
+    <sortOrder>Asc</sortOrder>
+  </relatedLists>
+  <relatedLists>
     <relatedList>RelatedActivityList</relatedList>
   </relatedLists>
   <relatedLists>

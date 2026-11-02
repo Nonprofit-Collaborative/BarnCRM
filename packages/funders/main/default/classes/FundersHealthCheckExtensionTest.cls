@@ -72,6 +72,42 @@ private class FundersHealthCheckExtensionTest {
     }
 
     @IsTest
+    static void overdueRequirementsAreCountedAndLinked() {
+        System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
+            Date today = Date.today();
+            Account funder = GrantTestData.funder('Lakeside Foundation');
+            Grant__c grant = GrantTestData.grant('Award', funder.Id, GrantService.STAGE_AWARDED);
+            insert grant;
+            Grant_Requirement__c late = GrantTestData.requirement(
+                'Late',
+                grant.Id,
+                today.addDays(-1)
+            );
+            Grant_Requirement__c done = GrantTestData.requirement(
+                'Done',
+                grant.Id,
+                today.addDays(-1)
+            );
+            done.Status__c = GrantRequirementService.STATUS_WAIVED;
+            Grant_Requirement__c inTime = GrantTestData.requirement('In time', grant.Id, today);
+            insert new List<Grant_Requirement__c>{ late, done, inTime };
+
+            Test.startTest();
+            Map<String, Object> finding = byKey(new FundersHealthCheckExtension().findings())
+                .get(FundersHealthCheckExtension.KEY_OVERDUE);
+            Test.stopTest();
+
+            Assert.isNotNull(finding, 'The overdue requirement is reported');
+            Assert.areEqual(
+                Label.Funders_HealthCheck_OverdueTitleOne,
+                finding.get('title'),
+                'Only the open one past its date'
+            );
+            Assert.areEqual(1, ((List<Object>) finding.get('links')).size(), 'It is linked');
+        }
+    }
+
+    @IsTest
     static void oneLateApplicationAndTheCapAreWordedForTheirCount() {
         System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
             Account funder = GrantTestData.funder('Lakeside Foundation');

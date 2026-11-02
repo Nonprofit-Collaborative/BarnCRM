@@ -52,6 +52,9 @@ public with sharing class SettingSections {
     /** Receipts, which Giving ships: its own section because a receipt run is its own job. */
     @NamespaceAccessible
     public static final String RECEIPTS = 'Receipts';
+    /** The Funders module's grant reminder settings, listed under Fundraising. */
+    @NamespaceAccessible
+    public static final String FUNDERS = 'Funders';
     @NamespaceAccessible
     public static final String ROLLUPS = 'Rollups';
     @NamespaceAccessible
@@ -80,6 +83,7 @@ public with sharing class SettingSections {
             ADDRESSES,
             GIVING,
             RECEIPTS,
+            FUNDERS,
             ROLLUPS,
             PROGRAMS,
             VOLUNTEERS,

@@ -49,9 +49,9 @@ a deadline, an award period, and obligations after the award.
    History is the platform's field history on Stage, Amount Requested and Amount Awarded.
 5. **Stage dates are stamped.** Moving to Applied fills an empty Submitted Date; moving to
    Awarded, Declined or Withdrawn fills an empty Decision Date; a requirement moving to Submitted
-   or Accepted fills its empty Submitted Date. A switchable automation (registry row
-   `Grant_Dates`), as for enrollments (ADR-0151, decision 6), so an import of history can turn it
-   off.
+   or Accepted fills its empty Submitted Date. Switchable automations (registry rows
+   `Grant_Dates` and `Grant_Requirement_Dates`), as for enrollments (ADR-0151, decision 6), so an
+   import of history can turn them off.
 6. **The program is named by record identifier, never looked up.** `Program_Id__c` holds a
    Programs record identifier as text (ADR-0014, ADR-0154 decision 5), so Funders installs without
    Programs. An automation that always runs (registry row `Grant_Rules`) stores it in its

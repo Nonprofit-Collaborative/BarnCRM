@@ -60,6 +60,16 @@ private class FundersSampleDataTest {
                 WHERE Stage__c = :GrantService.STAGE_AWARDED
             ];
             Assert.areEqual(35000, awarded.Amount_Awarded__c, 'The award is filled in');
+            Assert.areEqual(
+                3,
+                [
+                    SELECT COUNT()
+                    FROM Grant_Requirement__c
+                    WHERE Grant__c = :awarded.Id
+                    WITH SYSTEM_MODE
+                ],
+                'The award has its three requirements'
+            );
         }
     }
 
@@ -91,6 +101,11 @@ private class FundersSampleDataTest {
             );
             Assert.areEqual(0, [SELECT COUNT() FROM Grant__c WHERE Sample_Data__c = TRUE]);
             Assert.areEqual(1, [SELECT COUNT() FROM Grant__c], 'The real grant stays');
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Grant_Requirement__c WITH SYSTEM_MODE],
+                'The sample requirements went with their grant'
+            );
         }
     }
 
