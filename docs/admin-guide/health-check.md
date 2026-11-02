@@ -128,16 +128,17 @@ Nothing is broken today.
 | Settings | With the Rollup Builder module: whether totals waiting in the rollup queue failed five times (the Error Log says why), or have waited more than an hour. **Open Needs attention** takes you to the Rollup Builder, where **Retry** and **Start Now** put them through again. |
 | Settings | With Giving: whether any gift dated in a closed accounting period has not been marked posted to accounting. |
 | Settings | With Mirror: whether the Opportunity mirror's nightly run is scheduled but has not completed a run for more than two days. |
+| Settings | With Mirror, in an org with Nonprofit Cloud fundraising: the same question for the Gift Transaction mirror. |
 | Settings | With Volunteers: hours waiting more than 14 days for approval, past shifts nobody closed, shift schedules that have not created shifts far enough ahead, and shipped volunteer totals turned off. See [Volunteers, Health Check findings](volunteers.md#health-check-findings). |
 | Access | With Volunteers: whether anyone holding the Coordinator role is missing the Volunteers Coordinator permission set. |
 | Settings | With Programs: enrollments still open in a program that has ended. See [Programs, Health Check](programs.md#health-check). |
 
-Four of those need a module: the Override Receipt Lock permission, the failed receipts, the
-unposted gifts in a closed period (all with Giving), and the stalled Opportunity mirror (with
-Mirror). Each one is a quiet problem, where nothing looks broken and the cost arrives months
-later, so each is explained in full below.
+Five of those need a module: the Override Receipt Lock permission, the failed receipts, the
+unposted gifts in a closed period (all with Giving), and the stalled Opportunity and Gift
+Transaction mirrors (with Mirror). Each one is a quiet problem, where nothing looks broken and
+the cost arrives months later, so each is explained in full below.
 
-## The Four Quiet Findings
+## The Five Quiet Findings
 
 | Finding | What it means | Why it matters | What to do |
 |---|---|---|---|
@@ -145,6 +146,7 @@ later, so each is explained in full below.
 | **Receipts failed to generate** (with Giving) | There are receipts with status **Void** and the reason **Generation failed**. | Every receipt number is used once. When a document fails to generate after its number was handed out, BarnCRM records the number as a void receipt so an auditor asking what happened to number 47 gets an answer. One of those is ordinary. A number of them means receipt generation is failing over and over, donors are not getting the documents they are waiting for, and nobody has looked. | Open the Error Log from the finding and read the receipt entries: they say what failed. Fix the cause (most often a missing letter template or a donor with no address), then re-run the receipt or the statement run. The void records stay: they are the audit trail for the numbers that were consumed, and deleting them is not a fix. |
 | **Gifts in a closed period are not posted** (with Giving) | One or more gifts are dated on or before **Books Closed Through**, so they are already locked from editing, but nothing has marked them **Posted to Accounting**. | A gift in this state fell into a closed period without the ordinary export-and-mark step ever reaching it: the period was closed before it was exported, or it was entered after the close. Either way, your books and BarnCRM can quietly disagree about what has actually been recorded, and the gift is now locked, so nobody can fix it by editing the gift itself. | Read the linked gifts. If they genuinely belong in the export you already sent your accounting system, mark them posted from the **Accounting Export** page in Mirror. Without Mirror, or if they should not have been closed yet, move **Books Closed Through** back on the Accounting Periods page, which needs the **Override Posting Lock** permission and is written to the Error Log. The **Open Giving settings** button on the finding opens the Giving section, which the Accounting Periods page lives in. |
 | **The Opportunity mirror has not run** (with Mirror) | The Opportunity mirror's nightly run is scheduled and a direction is chosen, but no run has completed for more than two days. | The scheduled run executes as the person who scheduled it. When that person is deactivated, or loses the Opportunity Mirror permission set or Opportunity access, every run fails before it starts, and gifts and Opportunities quietly drift apart. | Open **Opportunity mirror** from the Giving section of BarnCRM Settings, read **Last completed run**, then **Stop Nightly Run** and **Schedule nightly** again as someone who can still run it. The Error Log says why the runs failed. |
+| **The Gift Transaction mirror has not run** (with Mirror) | The Gift Transaction mirror's nightly run is scheduled and its direction is chosen, but no run has completed for more than two days. | The same as for the Opportunity mirror: the run executes as the person who scheduled it, and without their access, or the Fundraising User permission in Nonprofit Cloud, gifts and Nonprofit Cloud's donor summaries quietly drift apart. A run that had to leave some gifts for want of room is not counted as completed either. | Open **Gift Transaction Mirror** from the Giving section of BarnCRM Settings, read **Last completed run** and the Error Log, then **Stop Nightly Run** and **Schedule Nightly Run** again as someone who can still run it ([Gift Transaction Mirror](gift-transaction-mirror.md)). |
 
 With Rollup Builder in an org that also runs DLRS, Health Check warns **BarnCRM and DLRS fill
 the same field** when an active BarnCRM rollup and an active DLRS rollup write the same field,

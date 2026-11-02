@@ -1,8 +1,8 @@
 # Mirror
 
-Scripts for Campaign sync, the Opportunity mirror, the accounting export, the Inbound Gift API and the Record Inbound Gift action. Setup detail: [Campaign Sync](../admin-guide/campaign-sync.md), [Opportunity Mirror](../admin-guide/opportunity-mirror.md), [Accounting Export](../admin-guide/accounting-export.md), [Inbound Gift API](../admin-guide/inbound-gift-api.md).
+Scripts for Campaign sync, the Opportunity mirror, the accounting export, the Inbound Gift API, the Record Inbound Gift action and the Gift Transaction mirror. Setup detail: [Campaign Sync](../admin-guide/campaign-sync.md), [Opportunity Mirror](../admin-guide/opportunity-mirror.md), [Accounting Export](../admin-guide/accounting-export.md), [Inbound Gift API](../admin-guide/inbound-gift-api.md), [Gift Transaction Mirror](../admin-guide/gift-transaction-mirror.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core, Giving and Mirror deployed and sample data loaded unless a script says otherwise. Campaign sync and the Opportunity mirror need Opportunity and Campaign, so use the Person Accounts (or `sales-cloud`) shape, not platform-only: see [Create a test org](before-you-test.md#create-a-test-org). Each Mirror feature has its own permission set (**Campaign Sync**, **Opportunity Mirror**, **Accounting Export**, **Inbound Gift API**, **Record Inbound Gift Action**). No role includes them, and the admin user does not have them until a script gives them: open **BarnCRM Settings**, **Access**, find the person, and use **Extra Permissions**, **Give Permission**.
+Before you start: an org from [Before you test](before-you-test.md), with Core, Giving and Mirror deployed and sample data loaded unless a script says otherwise. Campaign sync and the Opportunity mirror need Opportunity and Campaign, so use the Person Accounts (or `sales-cloud`) shape, not platform-only: see [Create a test org](before-you-test.md#create-a-test-org). The Gift Transaction mirror needs Nonprofit Cloud fundraising for T-MIR-15; T-MIR-14 runs in any org. Each Mirror feature has its own permission set (**Campaign Sync**, **Opportunity Mirror**, **Accounting Export**, **Inbound Gift API**, **Record Inbound Gift Action**, **Gift Transaction Mirror**). No role includes them, and the admin user does not have them until a script gives them: open **BarnCRM Settings**, **Access**, find the person, and use **Extra Permissions**, **Give Permission**.
 
 ## T-MIR-01: Switch on Campaign Sync and Sync All Appeals
 
@@ -215,3 +215,36 @@ If step 1 answers `donor_not_found`, the API user cannot see contacts: see [Inbo
 | 4 | Change **Donor Email** to `nobody@example.org` and **External Id** to `test:flow-2`. Run. | **Outcome** `rejected`, **Error Code** `donor_not_found`. |
 
 **Cleanup:** close the flow without activating it; delete the `test:flow-1` gift.
+
+## T-MIR-14: Gift Transaction Mirror Without Nonprofit Cloud
+
+**Purpose:** confirm the Gift Transaction mirror stays out of the way in an org without Nonprofit Cloud, and its page is closed to people without the permission set.
+**Prerequisites:** admin, in any org without Nonprofit Cloud fundraising; staff without the **Gift Transaction Mirror** permission set.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, give yourself the **Gift Transaction Mirror** permission set, then open **BarnCRM Settings**, **Giving**. | **Gift Transaction mirror direction** shows **Off**, **Gift Transaction mirror paid status** shows `Paid`, and **Gift Transaction mirror start date** is empty. |
+| 2 | Open **Gift Transaction Mirror** from **Giving**. | `This org has no Nonprofit Cloud Gift Transactions you can use, so there is nothing to mirror. ...` No run buttons and no **Reconciliation** section. |
+| 3 | Set the direction to **Gifts to Gift Transactions**, the start date to today, and save. Record a gift of 25 from Luis Garcia on **Quick Gift Entry**. | The gift saves as usual. The page still says the mirror is not available, and the **Error Log** has no Gift Transaction mirror entry. |
+| 4 | On the **Gifts** tab, choose **Gifts and Their Gift Transactions**, type `abc` into a gift's **Gift Transaction ID** and save. | Saved: without Gift Transactions nothing is checked. Clear the value again. |
+| 5 | As staff, search the App Launcher for `Gift Transaction Mirror`. | No **Gift Transaction Mirror** item is found. |
+
+**Cleanup:** set the direction to **Off**, clear the start date, delete the 25 gift, and remove the permission set.
+
+## T-MIR-15: Gift Transaction Mirror With Nonprofit Cloud
+
+**Purpose:** confirm a run copies gifts and their designations to Gift Transactions, keeps them up to date, and the reconciliation agrees.
+**Prerequisites:** admin with the Fundraising User permission and the **Gift Transaction Mirror** permission set, in an org with Nonprofit Cloud fundraising, at least one Gift Designation, and sample data.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **Giving**, set **Gift Transaction mirror paid status** to a value that is not a Status of your Gift Transactions, the start date to the first of this month, the direction to **Gifts to Gift Transactions**, and save. Open **Gift Transaction Mirror**. | `The Gift Transaction mirror paid status, <value>, is not one of the active Status values ...` **Run Now** is disabled. |
+| 2 | Set the paid status back to your paid value (`Paid` in a standard org) and reopen the page. | `Direction: Gifts to Gift Transactions. Received gifts dated on or after <date> get a matching Gift Transaction with status <value>.` |
+| 3 | On the **Funds** tab, choose **Funds and Their Gift Designations** and paste a Gift Designation's record ID into the default fund's **Gift Designation ID**. | Saved. |
+| 4 | Record a gift of 100 from Luis Garcia on **Quick Gift Entry**, dated today. On the page click **Run Now**, wait a minute and reload. | `Last completed run: started <time>. Gift Transaction mirror run: <n> Gift Transactions created, ...` with at least one designation written. The gift's **Gift Transaction ID** is filled in; that Gift Transaction has Original Amount 100, Transaction Date today and one designation of 100. |
+| 5 | Change the gift's amount to 150, click **Run Now**, wait and reload the Gift Transaction. | Original Amount 150. The designation is unchanged. |
+| 6 | Under **Reconciliation**, choose this month and click **Compare**. | Both sides show the same count and total, apart from Gift Transactions your org already had, listed as `Paid Gift Transaction with no received gift visible to you`. |
+| 7 | Change the Gift Transaction's Original Amount to 175 in Nonprofit Cloud, then **Compare** again. | The gift is listed with `Amount differs`, and **Copy These Gifts Again** shows. Click it, wait, and **Compare**: the difference is gone. |
+| 8 | Click **Schedule Nightly Run**, then **Stop Nightly Run**. | `Next nightly run: <date> 1:35 AM`, then `The nightly run is not scheduled.` |
+
+**Cleanup:** set the direction to **Off**; delete the 150 gift (its Gift Transaction stays, and the Error Log has one Warning naming it) and delete that Gift Transaction in Nonprofit Cloud.

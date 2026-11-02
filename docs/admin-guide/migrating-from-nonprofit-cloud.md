@@ -68,6 +68,10 @@ in section 4 produce. Create a default fund called **General Fund**, a fund call
    already have: the gift transaction's record ID is each gift's external ID, so nothing is
    created twice.
 
+If you then turn on the [Gift Transaction Mirror](gift-transaction-mirror.md), set its start date
+to the day after your last gift load, so the gifts you loaded are not copied back to Nonprofit
+Cloud as a second Gift Transaction each.
+
 ## 4. Moving Everything, Step by Step
 
 Do it in this order. People come before gifts because the people file carries each person's

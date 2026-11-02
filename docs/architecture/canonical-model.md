@@ -3827,7 +3827,8 @@ is the change that upgrades handle worst.
 
 **R-G10 No standard-object reference.** Nothing on this entity points at Opportunity or
 Campaign. The mirrors live in Mirror (ADR-0004). The Opportunity mirror's Opportunity ID is a
-text attribute Mirror adds to Gift, not a reference (Section 29C).
+text attribute Mirror adds to Gift, not a reference (Section 29C), and so is the Gift
+Transaction mirror's Gift Transaction ID (Section 29C1).
 
 **R-G11 Matching gift linkage (G-10).** An employer's matching gift is linked to the
 employee's gift through Matched Gift, which both records carry, so the link is visible
@@ -4104,7 +4105,8 @@ identifier.
 | Is Default | `Is_Default__c` | Checkbox |
 | Sample Data | `Sample_Data__c` | Checkbox (v0.4) |
 
-Rollup target attributes on `Fund__c` are listed in Section 26.
+Rollup target attributes on `Fund__c` are listed in Section 26. Mirror adds Gift Designation
+ID (`Gift_Designation_Id__c`) for the Gift Transaction mirror (Section 29C1).
 
 - **Service:** `FundTriggerHandler`, `FundSelector`, `FundDefaultsService`.
 
@@ -7449,7 +7451,10 @@ Opportunity may be named (plan Section 4.2), and even there only through dynamic
 Mirror installs on an org where the object is absent and its feature says it is unavailable.
 The inbound gift API and the accounting export add nothing to the model (Section 30). Campaign
 sync (X-02) adds one attribute to Appeal and Mirror's own settings object. The Opportunity
-mirror (X-01) adds one attribute to Gift and two keys to that settings object.
+mirror (X-01) adds one attribute to Gift and two keys to that settings object. The Gift
+Transaction mirror (X-07, Section 29C1) adds one attribute to Gift, one to Fund and five keys to
+that settings object, and is the only place a Nonprofit Cloud object is named, by string,
+through describe.
 
 ---
 
@@ -7760,6 +7765,214 @@ only, because a gift is never edited from its Opportunity.
   only to someone who has it (the Setting Definition's `Required_Permission__c`).
 - **List view** `Gifts_And_Opportunities` on Gift, shipped by Mirror, where Opportunity ID is
   typed or cleared (R-OM10).
+
+---
+
+## 29C1. Gift Transaction Mirror
+
+### Definition
+
+A one-way copy of gifts to Nonprofit Cloud (Agentforce Nonprofit) Gift Transaction records, with
+their designations (plan Sections 4.5 and 4.12, feature X-07, ADR-NEXT). Nonprofit Cloud's donor
+gift summaries, donor pages, giving levels, actionable lists and Agentforce actions read Gift
+Transactions only, so an organization that records its gifts in BarnCRM turns the mirror on to
+keep those features seeing its giving. A reconciliation page shows where the two sides disagree.
+
+The mirror is not an entity of its own. It is one attribute on Gift and one on Fund, held by
+Mirror because no other package may name a Nonprofit Cloud object, and five keys on Mirror
+Settings. There is no link object, for the reason Section 29C gives (ADR-0058). Every Nonprofit
+Cloud object and field is reached through describe, by name, never at compile time; the names
+used are those of `docs/architecture/reference/nonprofit-cloud-data-model.md` Sections 3.1 to
+3.3, and the types it marks as inferred are checked at run time (R-GT1).
+
+The reverse direction, Gift Transactions to Gifts, is not built: it is the open owner question
+O-7 (plan Section 11.2 item 32). The direction setting is a list so that it can be added without
+a model change.
+
+### Attributes added to Gift
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Gift Transaction ID | text (18) | no | The record identifier of the Gift Transaction this gift is mirrored to. Written by the mirror's runs; an administrator may type an existing Gift Transaction's identifier to link to it, or clear it. Unique, so two gifts never share one Gift Transaction. Independent of Opportunity ID (Section 29C): a gift may have both. |
+
+### Attributes added to Fund
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Gift Designation ID | text (18) | no | The record identifier of the Nonprofit Cloud Gift Designation this fund stands for, typed by an administrator. Not unique: two funds may share one designation. Empty means the fund's share of a gift is not designated (R-GT5). |
+
+Both are text rather than lookups for the reason Section 29B gives: a lookup to a Nonprofit Cloud
+object would stop Mirror installing on every org without Nonprofit Cloud (ADR-0009, ADR-0013).
+
+### Mirror Settings keys (release 0.17)
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Gift_Transaction_Mirror_Direction__c` | text | Off | `GiftsToGiftTransactions` or `Off`, shown as Gifts to Gift Transactions and Off. Empty reads as Off (R-GT1). |
+| `Gift_Transaction_Mirror_Status__c` | text | Paid | The API value of the Gift Transaction Status that means paid in this org, written on each Gift Transaction the mirror creates. Empty, or a value the org's Status list does not have active, means nothing is copied (R-GT2). |
+| `Gift_Transaction_Mirror_Start__c` | datetime | empty | Only gifts dated on or after this date are copied, read as a date in the org's default time zone. Empty means nothing is copied (R-GT2). |
+| `Gift_Transaction_Mirror_Last_Run__c` | datetime | empty | Written by the runs, not by an administrator: when the last completed run started (R-GT6). |
+| `Gift_Transaction_Mirror_Last_Summary__c` | text | empty | Written by the runs: one sentence saying what the last completed run did (R-GT6). |
+
+### Rules
+
+**R-GT1 Off until chosen, and nothing at all without Nonprofit Cloud.** The mirror does nothing
+until an administrator sets the direction to Gifts to Gift Transactions in BarnCRM Settings. It
+is independent of the Opportunity mirror (Section 29C). The mirror is available only when the
+running person's describe has the Gift Transaction object (Nonprofit Cloud fundraising, which
+needs the Fundraising Access license and the Fundraising User permission) and its fields are the
+shape this version expects: Donor a reference to Account, Transaction Date a date, Original
+Amount an amount, Status a picklist. Otherwise the mirror is unavailable: the page says so, runs
+do nothing, and no query names a Nonprofit Cloud object. Saving a gift never reads Nonprofit
+Cloud records (R-GT6), so an org without Nonprofit Cloud pays nothing for the feature being
+installed.
+
+**R-GT2 Nothing moves until the paid status and the start date are right.** Gift Transaction
+Status values are the org's configuration, so the paid status is a setting, shipped as `Paid`
+and checked against the org's active Status values before a run does anything. The start date
+has no default: a gift loaded from Nonprofit Cloud into the same org (the Nonprofit Cloud import
+templates, C-14) already has its Gift Transaction, and copying it back would count every
+historical gift twice in Nonprofit Cloud's summaries. Setting the start date to the day after the
+last load is how an administrator says where the mirror begins.
+
+**R-GT3 Which gifts are copied.** A gift is copied when its Status is Received, its Amount is
+above zero, its Type is not In-kind, and its Gift Date is on or after the start date. A refund or
+write-off, which is a negative gift (R-G3), is never copied: Nonprofit Cloud records money given
+back on the Gift Transaction itself, so a negative Gift Transaction would count as one more gift
+in its summaries. A refunded or written off original that has no Gift Transaction yet is not
+copied; one that already has one keeps it unchanged, and the reconciliation lists it (R-GT10). An
+in-kind gift carries no money (R-G12) and is not copied. Pending and Cancelled gifts are not
+copied.
+
+**R-GT4 What is copied.** Donor Account to Donor, or Household when the donor is a person stored
+as a contact; Gift Date to Transaction Date; Amount to Original Amount. On creation only: Amount
+to Current Amount, the paid status of R-GT2 to Status, and the gift's name to Name, each only
+where the org has the field and the person running may write it. A later run updates Donor,
+Transaction Date and Original Amount when the gift's differ, and never Status or Current Amount,
+which Nonprofit Cloud maintains once the transaction exists (a refund recorded there lowers
+Current Amount). Nothing else is written: no campaign, source code, payment or tax field, and
+never a record Nonprofit Cloud calculates (Donor Gift Summary, the Gift Designation totals). A
+gift with neither a Donor Account nor a Household cannot be copied and is logged as R-GT7
+describes.
+
+**R-GT5 Designations.** When a run creates a Gift Transaction, it gives it one Gift Transaction
+Designation per allocation of the gift (R-G5) whose fund has a Gift Designation ID naming a Gift
+Designation: Gift Transaction to the new record, Gift Designation to the fund's, and Amount to the
+allocation's amount. A fund is matched only by that identifier, never by name, because a renamed
+fund would otherwise move money between designations. Designations are written at creation only,
+and only when the new Gift Transaction has none (Nonprofit Cloud may give it a default one): after
+that they belong to Nonprofit Cloud, a later run never changes them, and the reconciliation does
+not compare them. An allocation whose fund has no Gift Designation ID, or one that does not name a
+Gift Designation, is left undesignated and counted in the run's summary; a designation the
+platform refuses is logged as R-GT7 describes, and the Gift Transaction stays. Designations are
+written only where the org's describe has Gift Transaction Designation with Gift Transaction and
+Gift Designation references and an Amount, and the person running may create it with them;
+otherwise the run copies gifts without designations and its summary says so.
+
+**R-GT6 Runs, never on save.** The Gift Transaction mirror page offers **Run Now** and a nightly
+schedule (Schedule and Stop, the shape of ADR-0038, at 01:35). Saving a gift copies nothing:
+Nonprofit Cloud calculates its donor summaries in its own scheduled runs, so a copy on save would
+be seen no sooner, and Gift Transactions are open only to people with the Fundraising User
+permission, which not everyone who enters gifts has. A run copies every gift of R-GT3 that has no
+Gift Transaction yet, and every linked gift of R-GT3 changed since the last completed run
+started. Starting a run or the schedule needs the Manage BarnCRM Settings permission, and only
+one run is in progress at a time. A run executes as the person who started or scheduled it, in
+user mode. While automation is paused (ADR-0055) or the `Gift_Transaction_Mirror` switch is off,
+a run does nothing and writes one Info entry saying so, checked when it starts and before each
+chunk; a run whose paid status or start date is missing or unknown, or whose person can no longer
+read or write what the copy needs, does nothing and writes one Warning. A chunk that starts
+without half of the transaction's queries and DML statements, and 40 percent of its CPU time,
+unspent is skipped and counted, with one Warning for the run. A run writes a summary at Info when
+it ends; one that left no chunk also records its start time and summary on Mirror Settings, which
+the page shows, so a run that left chunks is followed by one that rechecks from the last complete
+run. Health Check warns when the nightly run is scheduled, the direction is chosen, and no run
+has completed for more than two days, and lists the nightly run with the other nightly jobs while
+the direction is chosen (ADR-0075).
+
+**R-GT7 A refusal never stops the run.** Every write is in user mode with partial success. A
+record the platform refuses is counted, and one Warning per distinct message is written when the
+run ends, giving the count and naming up to ten records, with at most 50 distinct messages kept
+(`MirrorSync.Warnings`, as R-OM6). A Gift Transaction created for a gift whose Gift Transaction
+ID then could not be stored is deleted again in the same run, so the next run does not make a
+second one; one it cannot delete is named in a Warning.
+
+**R-GT8 Nothing the org had is deleted.** Deleting a gift leaves its Gift Transaction in place,
+and one Warning per delete names the gifts and their Gift Transactions. A linked Gift Transaction
+the person running cannot find is logged as "deleted or not visible to you" and is not replaced:
+clearing the gift's Gift Transaction ID makes a new one.
+
+**R-GT9 One gift, one Gift Transaction.** Gift Transaction ID is unique, so a Gift Transaction
+mirrors at most one gift. A typed value that is not a Gift Transaction's identifier is refused on
+save wherever the person saving can see Gift Transactions, and a 15 character identifier is stored
+in its 18 character form. Typing an existing Gift Transaction's identifier links to it, and the
+next run writes the gift's values of R-GT4 onto it.
+
+**R-GT10 Reconciliation.** For a date range, the page compares the gifts of R-GT3 dated in the
+range (without the start date) with the Gift Transactions of the paid status dated in the range,
+both as the person viewing can see them, and shows each side's count and total and the
+differences: a gift with no Gift Transaction; a gift whose Gift Transaction is deleted or not
+visible; a linked pair whose amount, date or status disagree; and a Gift Transaction that no gift
+of R-GT3 names. It reads in user mode and writes nothing; it refuses in words a viewer who cannot
+read Gift Transactions, their Name, Original Amount, Transaction Date and Status, or the gift's
+Gift Transaction ID, and a range over 10,000 records a side or more than the transaction can
+read, as R-OM11 does. It offers **Copy These Gifts Again**, a run over the gifts of R-GT3 in the
+range that are dated on or after the start date.
+
+### Salesforce implementation
+
+- **Attribute on `Gift__c`, shipped by Mirror** (in `packages/mirror`):
+
+| Attribute | API name | Type |
+|---|---|---|
+| Gift Transaction ID | `Gift_Transaction_Id__c` | Text(18), unique, external ID, case sensitive |
+
+- **Attribute on `Fund__c`, shipped by Mirror**:
+
+| Attribute | API name | Type |
+|---|---|---|
+| Gift Designation ID | `Gift_Designation_Id__c` | Text(18) |
+
+- **Custom setting `Mirror_Settings__c`** (Section 29B) gains:
+
+| Attribute | API name | Type |
+|---|---|---|
+| Gift Transaction Mirror Direction | `Gift_Transaction_Mirror_Direction__c` | Text(40), default `Off` |
+| Gift Transaction Mirror Status | `Gift_Transaction_Mirror_Status__c` | Text(255), default `Paid` |
+| Gift Transaction Mirror Start | `Gift_Transaction_Mirror_Start__c` | Date/Time |
+| Gift Transaction Mirror Last Run | `Gift_Transaction_Mirror_Last_Run__c` | Date/Time |
+| Gift Transaction Mirror Last Summary | `Gift_Transaction_Mirror_Last_Summary__c` | Text(255) |
+
+- **Nonprofit Cloud names read, all through describe:** the object `GiftTransaction` and its
+  fields `DonorId`, `TransactionDate`, `OriginalAmount`, `CurrentAmount`, `Status` and `Name`;
+  the object `GiftTransactionDesignation` and its fields `GiftTransactionId`,
+  `GiftDesignationId` and `Amount`; the object `GiftDesignation`, whose identifiers the funds
+  hold. Their types, required flags and `Status` values are not verified by the reference, which
+  is why R-GT1 and R-GT5 check the types and R-GT2 checks the status. `CurrentAmount` and `Name`
+  are optional: without them, or without write access to them, a Gift Transaction is created
+  without them. The names are held in one place, `GiftTransactionMirrorSchema`, which tests point
+  at stand-in objects of the same shape (Gift, Gift Allocation and Fund), so the copy is tested
+  in an org without Nonprofit Cloud.
+- **Automation:** `Automation_Registry__mdt` row `Gift_Transaction_Mirror` on `Gift__c`, order
+  51, enabled by default, handler `GiftTransactionMirrorTriggerHandler`, running before insert and
+  before update (R-GT9, only when the link is typed or changed) and after delete (R-GT8). It
+  copies nothing; its switch also stops the runs. Its switch row is created by
+  `MirrorPostInstall`.
+- **Service:** `GiftTransactionMirrorSchema` (the names, the describe and the shape checks of
+  R-GT1 and R-GT5), `GiftTransactionMirrorService` (settings, the link check, the copy and the
+  designations), `GiftTransactionMirrorSelector` (gift, allocation, fund and Gift Transaction
+  reads, Nonprofit Cloud objects by dynamic query only), `GiftTransactionMirrorBatch` and
+  `GiftTransactionMirrorSchedulable` (R-GT6), `GiftTransactionMirrorReconciliation` (R-GT10),
+  `GiftTransactionMirrorController` and the `giftTransactionMirror` page reached from the Giving
+  section of BarnCRM Settings. Shared with the Opportunity mirror: `MirrorSync`,
+  `MirrorSettingsWriter` (the runs' record of their last completed run),
+  `MirrorHealthCheckExtension` (the stale run finding) and `MirrorNightlyJobProvider` (the
+  nightly jobs list). Permission set: `Gift_Transaction_Mirror`, which also carries the custom
+  permission `Use_Gift_Transaction_Mirror`: the page's reads require it, and the console shows
+  the page's row only to someone who has it. It is offered on the Access page through an
+  `Access_Add_On__mdt` row.
+- **List views** `Gifts_And_Gift_Transactions` on Gift, where Gift Transaction ID is typed or
+  cleared (R-GT9), and `Funds_And_Gift_Designations` on Fund, where Gift Designation ID is typed
+  (R-GT5), both shipped by Mirror.
 
 ---
 
@@ -10502,7 +10715,8 @@ two attributes on Gift and one Giving settings key, and no new entity (R-G13, R-
 
 Campaign sync (X-02) left this table in v0.6 and is specified in Section 29B. It adds no
 entity: one attribute on Appeal, shipped by Mirror, and Mirror's own settings object. The
-Gift Transaction mirror and NPSP household adoption are still to come.
+Gift Transaction mirror left this table in release 0.17 and is specified in Section 29C1; NPSP
+household adoption is still to come.
 
 The Opportunity mirror (X-01) left this table in v0.6 and is specified in Section 29C. It adds no
 entity either: one attribute on Gift, shipped by Mirror, and two keys on Mirror Settings.
@@ -10777,6 +10991,7 @@ mirrors the primary member).
 | 0.14 | 2026-10-31 | Programs P-08. `Enrollment__c` (29ZA) and `Service_Delivery__c` (29ZB) change from Public Read/Write to Private, each shared with the new public group `Programs_Participants` through the Apex sharing reason `Programs_Participants__c` (R-EN7, R-SD6). New hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox, default unchecked): the Participant Privacy preset, Shared by default, which puts All Internal Users in the group, or Private, which takes them out. Programs Admin gains View All and Modify All on both objects. |
 | 0.14 | 2026-10-31 | Programs P-05. The Programs Dashboard (29ZA, "Program dashboard") and the person card's last service date and services attended. No object or field added. |
 | 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29ZA, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
+| 0.17 | 2026-11-02 | Gift Transaction mirror (X-07, ADR-NEXT). New Section 29C1, rules R-GT1 to R-GT10, leaving Section 30. No object added. Mirror adds Gift Transaction ID (`Gift_Transaction_Id__c`, Text(18), unique) to `Gift__c`, Gift Designation ID (`Gift_Designation_Id__c`, Text(18)) to `Fund__c`, and five keys to `Mirror_Settings__c`. One way only, Gifts to Gift Transactions, with designations written from each fund's Gift Designation ID; the reverse direction waits on owner question O-7. Ported from the 2026-09-27 salvage design, which had both directions and no designations. |
 
 ---
 ## 32. Entity ownership by package
@@ -10848,7 +11063,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Gift Batch Row | Giving | v0.5 | 25M |
 | Donor segments (Change From Last Year on Account and Contact) | Giving | v0.13 | 25O |
 | Ask | Giving | release 0.13 (G-26) | 25R |
-| Gift Transaction mirror | Mirror | v0.6 | 30 |
+| Gift Transaction mirror (Gift Transaction ID on Gift, Gift Designation ID on Fund) | Mirror | release 0.17 | 29C1 |
 | Opportunity mirror (Opportunity ID on Gift) | Mirror | v0.6 | 29C |
 | Campaign sync (Campaign ID on Appeal) | Mirror | v0.6 | 29B |
 | Mirror Settings | Mirror | v0.6 | 29B |
@@ -10903,6 +11118,6 @@ so nothing below that is nonprofit-specific ships in Core.
 | Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
-orgs: the Gift Transaction mirror is v0.6, brought forward from
-v0.9, and NPSP household adoption is v0.9, moved back from v0.6. The plan's roadmap table
+orgs: the Gift Transaction mirror was brought forward from v0.9 to v0.6 and is built in release
+0.17 (plan Section 6.0a), and NPSP household adoption is v0.9, moved back from v0.6. The plan's roadmap table
 is the place that reprioritization is recorded permanently; this table follows it.
