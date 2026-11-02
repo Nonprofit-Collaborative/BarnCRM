@@ -18,8 +18,9 @@ import { LABELS, format, messageFrom, stageLabel } from 'c/logicModelText';
 const ORGANIZATION = '';
 
 /**
- * The Logic Model Builder panel on a logic model (L-01, L-02): whose model it is, the seven
- * columns of parts, the selected part with its arrows and indicators, and what needs attention.
+ * The Logic Model Builder panel on a logic model (L-01 to L-04): whose model it is, the seven
+ * columns of parts, the selected part with its arrows and indicators, what needs attention, and
+ * the Logic Model Report.
  * Every save returns the whole model, which the panel redraws.
  */
 export default class LogicModelBuilder extends LightningElement {

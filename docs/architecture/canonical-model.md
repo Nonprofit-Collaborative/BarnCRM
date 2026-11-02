@@ -11039,6 +11039,12 @@ At is set and Source Status cleared. A failure writes Source Status and changes 
 **R-IN6 Unique counts.** Count Unique keeps each period's values in the batch's state; near the
 heap limit it stops and writes Source Status instead of a wrong number.
 
+**R-IN7 Report.** The logic model report compares chosen periods: one row per indicator, in
+column, part and indicator order, with its baseline and, per period, the target, result and
+progress (R-IN2). Periods of different indicators with the same start and end dates are one
+period. The report is worked out in the browser from the model as the user can read it; it stores
+nothing and exports as CSV or one printable HTML page.
+
 ### Salesforce implementation
 
 - **Object:** `Indicator__c`, name field Text, label Indicator Name, sharing Controlled By
@@ -11062,6 +11068,8 @@ heap limit it stops and writes Source Status instead of a wrong number.
 - **Service:** `IndicatorSourceService` (R-IN3, R-IN4), `IndicatorResultsBatch` (without sharing,
   R-IN5, R-IN6), `IndicatorResultsScheduler` with `LogicModelsNightlyJobProvider` (R-IN5).
 - **Import template:** `Import_Template_Default.Indicator_Results` (R-IN3).
+- **Report:** the `logicModelReport` panel with the framework-free `logicModelRules` (R-IN7); no
+  stored data, no new field.
 
 ---
 
@@ -11615,6 +11623,7 @@ mirrors the primary member).
 | 0.15 | 2026-11-02 | Programs P-10 (ADR-NEXT `NEXT-programs-service-plans-cohorts-sessions.md`). New in the Programs module: Goal (`Goal__c`, 29ZA2), a detail of Enrollment, and Goal Step (`Goal_Step__c`, 29ZA3), a detail of Goal, with rules R-GL1 to R-GL6 and R-GS1; a goal names a Logic Models outcome by record identifier (`Outcome_Id__c`), never a lookup. `Case_Note__c` gains `Goal__c` (Lookup, SetNull) with rule R-CN5. Erasing a person now also deletes their goals. |
 | 0.15 | 2026-11-02 | Programs P-11 (same ADR-NEXT). New in the Programs module: Cohort (`Cohort__c`, 29ZA4) and Session (`Session__c`, 29ZA5), both Public Read/Write, with rules R-CO1 to R-CO3 and R-SE1 to R-SE5. `Enrollment__c` gains `Cohort__c` (Lookup, SetNull) with rule R-EN8; `Service_Delivery__c` gains `Session__c` (Lookup, Restrict) with rule R-SD7. Attendance per session is Service Delivery; there is no attendance or membership object. |
 | 0.15 | 2026-11-02 | Logic Models L-03 indicator sources (ADR-NEXT `NEXT-indicator-sources.md`). `Indicator__c` (29ZF) gains Source (`Source__c`), Source Query (`Source_Query__c`, lookup to `Saved_Query__c`), Source Definition (`Source_Definition__c`), Source Status (`Source_Status__c`) and Computed At (`Computed_At__c`), with rules R-IN3 to R-IN6; the one-object import template Indicator Results loads Indicator Period results. |
+| 0.15 | 2026-11-02 | Logic Models L-04 logic model report: rule R-IN7 on Indicator (29ZF); no new object or field. |
 
 ---
 ## 32. Entity ownership by package

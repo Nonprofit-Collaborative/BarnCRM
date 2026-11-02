@@ -9,8 +9,8 @@ baseline and a target and result per period. Separate from Programs on purpose (
 
 ## First ships in
 
-Release **0.14** (L-01 builder, L-02 indicators). Release **0.15** (L-03 indicator sources;
-L-04 the logic model report follows).
+Release **0.14** (L-01 builder, L-02 indicators). Release **0.15** (L-03 indicator sources,
+L-04 the logic model report).
 
 ## Depends on
 
@@ -26,6 +26,8 @@ its record identifier (text), resolved by describe only where a `Program__c` obj
 - The **Logic Model Builder** panel (`logicModelBuilder`) on the Logic Model record page, with its
   framework-free rules module `logicModelRules` and the thin controller
   `LogicModelBuilderController`.
+- The **Logic Model Report** (`logicModelReport`, L-04) at the bottom of the builder: report,
+  CSV and printable HTML worked out by `logicModelRules`; no Apex, nothing stored.
 - Permission sets Logic Models Admin, Staff and Read Only, given by role through
   `LogicModelsAccessSync`.
 - Indicator sources (L-03, ADR `NEXT-indicator-sources.md`): `IndicatorSourceService`, the

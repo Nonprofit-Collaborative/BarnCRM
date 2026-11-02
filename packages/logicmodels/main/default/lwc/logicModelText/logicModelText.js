@@ -104,6 +104,19 @@ import SUM_OF from '@salesforce/label/c.LogicModels_Source_SumOf';
 import UNIQUE_OF from '@salesforce/label/c.LogicModels_Source_UniqueOf';
 import DOWNLOAD_RESULTS from '@salesforce/label/c.LogicModels_Results_Download';
 import NO_RESULT_ROWS from '@salesforce/label/c.LogicModels_Results_None';
+import REPORT_TITLE from '@salesforce/label/c.LogicModels_Report_Title';
+import REPORT_PERIODS from '@salesforce/label/c.LogicModels_Report_Periods';
+import REPORT_NO_PERIODS from '@salesforce/label/c.LogicModels_Report_NoPeriods';
+import REPORT_NO_INDICATORS from '@salesforce/label/c.LogicModels_Report_NoIndicators';
+import REPORT_CHOOSE_ONE from '@salesforce/label/c.LogicModels_Report_ChooseOne';
+import REPORT_DOWNLOAD_CSV from '@salesforce/label/c.LogicModels_Report_DownloadCsv';
+import REPORT_PRINTABLE from '@salesforce/label/c.LogicModels_Report_Printable';
+import REPORT_PRINT_HELP from '@salesforce/label/c.LogicModels_Report_PrintHelp';
+import REPORT_PART from '@salesforce/label/c.LogicModels_Report_Part';
+import REPORT_INDICATOR from '@salesforce/label/c.LogicModels_Report_Indicator';
+import REPORT_META from '@salesforce/label/c.LogicModels_Report_Meta';
+import REPORT_PERIOD_DATES from '@salesforce/label/c.LogicModels_Report_PeriodDates';
+import REPORT_DOWNLOADED from '@salesforce/label/c.LogicModels_Report_Downloaded';
 
 export const LABELS = Object.freeze({
   title: TITLE,
@@ -200,7 +213,20 @@ export const LABELS = Object.freeze({
   sumOf: SUM_OF,
   uniqueOf: UNIQUE_OF,
   downloadResults: DOWNLOAD_RESULTS,
-  noResultRows: NO_RESULT_ROWS
+  noResultRows: NO_RESULT_ROWS,
+  reportTitle: REPORT_TITLE,
+  reportPeriods: REPORT_PERIODS,
+  reportNoPeriods: REPORT_NO_PERIODS,
+  reportNoIndicators: REPORT_NO_INDICATORS,
+  reportChooseOne: REPORT_CHOOSE_ONE,
+  reportDownloadCsv: REPORT_DOWNLOAD_CSV,
+  reportPrintable: REPORT_PRINTABLE,
+  reportPrintHelp: REPORT_PRINT_HELP,
+  reportPart: REPORT_PART,
+  reportIndicator: REPORT_INDICATOR,
+  reportMeta: REPORT_META,
+  reportPeriodDates: REPORT_PERIOD_DATES,
+  reportDownloaded: REPORT_DOWNLOADED
 });
 
 const STAGE_LABELS = Object.freeze({

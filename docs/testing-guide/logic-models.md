@@ -1,6 +1,7 @@
 # Logic Models
 
-Scripts for the Logic Model Builder (L-01), indicators (L-02) and indicator sources (L-03). Setup
+Scripts for the Logic Model Builder (L-01), indicators (L-02), indicator sources (L-03) and the
+Logic Model Report (L-04). Setup
 detail:
 [Logic Models](../admin-guide/logic-models.md).
 
@@ -136,3 +137,23 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 | 10 | In **Health Check**, look at nightly jobs. | `Indicator Results, 3:30 AM` is listed; **Schedule all nightly jobs** schedules it. |
 
 **Cleanup:** Delete `People in our records`.
+
+## T-LM-09: The Logic Model Report
+
+**Purpose:** confirm the report compares chosen periods and downloads as CSV and a printable page.
+**Prerequisites:** staff and read-only, the model from T-LM-03. On `Students reading daily` add
+periods `2026 Q2` (1 April to 30 June 2026, target 30, result 25), `2026 Q3`, `2026 Q4` and
+`2027 Q1` (three months each, target 30, no result).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff, open the model and scroll to **Logic Model Report**. | **Periods to Compare** lists five periods oldest first; the latest four are ticked. One row per indicator shows its column, part and baseline `10`. |
+| 2 | Tick `2026 Q1` and untick `2027 Q1`. | `2026 Q1` columns show target `30`, result and progress as in the builder; `2027 Q1` columns are gone. |
+| 3 | Add a period with `2026 Q2`'s dates to another indicator, named `Spring`. | The report still lists one period for those dates; the other indicator's row fills its cells. An indicator without a period shows empty cells. |
+| 4 | Change a result in the builder and save. | The report shows the new result without reloading; the ticked periods stay ticked. |
+| 5 | Click **Download CSV**. Open the file. | Columns `Column`, `Part`, `Indicator`, `Unit`, `Better When`, `Baseline`, `Baseline Date`, then `Target`, `Result`, `Progress` for each ticked period, headed with its name. |
+| 6 | Click **Download Printable Report**, open the file in a browser and print preview. | The model's name, whose model it is, today's date and the table; the header repeats on each printed page. |
+| 7 | Untick every period. | `Choose at least one period to compare.` shows; both download buttons are disabled. |
+| 8 | As read-only, open the model. | The report shows and both downloads work. |
+
+**Cleanup:** None.
