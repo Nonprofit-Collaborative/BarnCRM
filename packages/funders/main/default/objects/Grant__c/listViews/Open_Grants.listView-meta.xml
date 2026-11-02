@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Open_Grants</fullName>
+  <columns>NAME</columns>
+  <columns>Funder__c</columns>
+  <columns>Stage__c</columns>
+  <columns>Amount_Requested__c</columns>
+  <columns>Application_Deadline__c</columns>
+  <columns>OWNER.ALIAS</columns>
+  <filters>
+    <field>Stage__c</field>
+    <operation>equals</operation>
+    <value>Prospect,Letter of Inquiry,Invited to Apply,Applied</value>
+  </filters>
+  <filterScope>Everything</filterScope>
+  <label>Open Grants</label>
+</ListView>

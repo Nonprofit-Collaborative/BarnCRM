@@ -929,6 +929,8 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(programs)
   # Logic Models depends on Core only (ADR-0154, logic models module).
   MODULES+=(logicmodels)
+  # Funders depends on Core, the Rollup Builder module and Giving (ADR-NEXT, funders module).
+  MODULES+=(funders)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")
@@ -981,7 +983,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # BarnCRM_Module__mdt record (ADR-0137). The app
   # copies are written to a temporary metadata-format package; the repository's app files are
   # never changed. Nothing is deployed when no module names a tab.
-  deployed_modules=(rollups giving mirror programs logicmodels)
+  deployed_modules=(rollups giving mirror programs logicmodels funders)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
   python3 scripts/org/module-app-tabs.py "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1

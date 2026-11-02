@@ -104,7 +104,8 @@ public with sharing class ModuleManagerService {
             'Logic_Model__c',
             'Logic_Model_Element__c',
             'Logic_Model_Link__c'
-        }
+        },
+        'Funders' => new List<String>{ 'Grant__c' }
     };
 
     /** The permission set Turn on gives the person who turned the module on. */
@@ -114,7 +115,8 @@ public with sharing class ModuleManagerService {
         'Rollups' => 'Rollup_Builder_Admin',
         'Volunteers' => 'Volunteers_Admin',
         'Programs' => 'Programs_Admin',
-        'LogicModels' => 'Logic_Models_Admin'
+        'LogicModels' => 'Logic_Models_Admin',
+        'Funders' => 'Funders_Admin'
     };
 
     /** Raised for a module the org does not have, or one that cannot be switched. */

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Award_End_After_Start</fullName>
+  <active>true</active>
+  <description>R-GN2: the award period's end is not before its start.</description>
+  <errorConditionFormula>
+AND(
+  NOT(ISBLANK(Award_Start_Date__c)),
+  NOT(ISBLANK(Award_End_Date__c)),
+  Award_End_Date__c &lt; Award_Start_Date__c
+)
+  </errorConditionFormula>
+  <errorMessage>Award End Date can't be before Award Start Date.</errorMessage>
+</ValidationRule>
