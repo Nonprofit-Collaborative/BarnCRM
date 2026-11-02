@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import DataDictionary from 'c/dataDictionary';
+import WhereUsedModal from 'c/whereUsedModal';
 import listObjects from '@salesforce/apex/DataDictionaryController.listObjects';
 import describeObject from '@salesforce/apex/DataDictionaryController.describeObject';
 import getAutomation from '@salesforce/apex/DataDictionaryController.getAutomation';
@@ -223,6 +224,15 @@ describe('c-data-dictionary', () => {
     expect(table.columns.map((column) => column.fieldName)).not.toContain('fillRate');
     expect(find(element, 'empty')).toBeNull();
     expect(find(element, 'download').disabled).toBe(false);
+
+    table.dispatchEvent(
+      new CustomEvent('rowaction', {
+        detail: { action: { name: 'whereUsed' }, row: table.data[2] }
+      })
+    );
+    expect(WhereUsedModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ objectName: 'Contact', fieldName: 'LastName' })
+    );
   });
 
   it('cannot build with nothing chosen', async () => {

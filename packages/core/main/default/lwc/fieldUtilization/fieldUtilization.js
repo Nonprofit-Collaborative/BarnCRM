@@ -54,6 +54,8 @@ import DELETE_BUTTON from '@salesforce/label/c.Core_FieldUtilization_DeleteButto
 import DELETE_CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import DELETED from '@salesforce/label/c.Core_FieldUtilization_Deleted';
 import { bodyMessage } from 'c/findCsv';
+import WhereUsedModal from 'c/whereUsedModal';
+import WHERE_USED from '@salesforce/label/c.Core_WhereUsed_Action';
 
 const PERCENT = { maximumFractionDigits: 1 };
 
@@ -84,7 +86,8 @@ const COLUMNS = [
     sortable: true,
     typeAttributes: PERCENT
   },
-  { label: COL_SAMPLED, fieldName: 'sampled', type: 'boolean' }
+  { label: COL_SAMPLED, fieldName: 'sampled', type: 'boolean' },
+  { type: 'action', typeAttributes: { rowActions: [{ label: WHERE_USED, name: 'whereUsed' }] } }
 ];
 
 const isBlank = (value) => value === null || value === undefined;
@@ -459,6 +462,22 @@ export default class FieldUtilization extends LightningElement {
         this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
       }
     }
+  }
+
+  /** A field row's Where Used action (C-59): which BarnCRM setup uses the field. */
+  handleRowAction(event) {
+    const { action, row } = event.detail;
+    if (action.name !== 'whereUsed') {
+      return;
+    }
+    const chosen = (this.objectOptions || []).find((option) => option.value === this.objectName);
+    WhereUsedModal.open({
+      size: 'medium',
+      objectName: this.objectName,
+      objectLabel: chosen ? chosen.label : this.objectName,
+      fieldName: row.fieldName,
+      fieldLabel: row.fieldLabel
+    });
   }
 
   async handleHistoryAction(event) {

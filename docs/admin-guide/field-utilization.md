@@ -42,6 +42,9 @@ Start from the sample data (see [Sample data](sample-data.md)).
    **Count Again**. The Website row for Organization now shows a higher percentage, **Saved**
    shows the percentage you saved in step 4, and **Change (Points)** shows how many percentage
    points it moved since then.
+6. For a field almost nobody fills in, open the action menu at the end of its row and choose
+   **Where Used** to see which BarnCRM setup still uses it before you retire it
+   ([Where Used and Retire a Field](where-used.md)).
 
 ## What Is Counted
 

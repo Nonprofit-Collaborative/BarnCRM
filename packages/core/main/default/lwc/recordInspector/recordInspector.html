@@ -103,6 +103,16 @@
                                                         >{row.openSetup}</a
                                                     >
                                                 </template>
+                                                <lightning-button-icon
+                                                    class="where-used-button slds-var-m-left_xx-small"
+                                                    icon-name="utility:search"
+                                                    variant="bare"
+                                                    size="small"
+                                                    alternative-text={row.whereUsedLabel}
+                                                    title={row.whereUsedLabel}
+                                                    data-api-name={row.apiName}
+                                                    onclick={handleWhereUsed}
+                                                ></lightning-button-icon>
                                             </td>
                                             <td class="slds-cell-wrap">{row.type}</td>
                                             <td class="slds-cell-wrap">

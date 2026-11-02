@@ -13,6 +13,8 @@ import {
   FILL_RATE_COLUMN
 } from 'c/dictionaryKit';
 import { fileName, format, messageFrom, saveBlob } from 'c/findCsv';
+import WhereUsedModal from 'c/whereUsedModal';
+import WHERE_USED from '@salesforce/label/c.Core_WhereUsed_Action';
 
 import TITLE from '@salesforce/label/c.Core_DataDictionary_PageTitle';
 import INTRO from '@salesforce/label/c.Core_DataDictionary_PageIntro';
@@ -39,6 +41,11 @@ import DOWNLOAD_AUTOMATION from '@salesforce/label/c.Core_DataDictionary_Downloa
 import DOWNLOADED_AUTOMATION from '@salesforce/label/c.Core_DataDictionary_DownloadedAutomation';
 const FILE_BASE = 'Data_Dictionary';
 const AUTOMATION_FILE_BASE = 'Automation_Inventory';
+/** Each row's Where Used action (C-59); the table only, never the CSV. */
+const WHERE_USED_COLUMN = {
+  type: 'action',
+  typeAttributes: { rowActions: [{ label: WHERE_USED, name: 'whereUsed' }] }
+};
 
 /**
  * The Data Dictionary section of Org Optimizer (plan Section 6.1.1 item 13, D-154, admin guide
@@ -105,7 +112,24 @@ export default class DataDictionary extends LightningElement {
   }
 
   get columns() {
-    return this.builtWithFillRates ? [...TABLE_COLUMNS, FILL_RATE_COLUMN] : TABLE_COLUMNS;
+    return this.builtWithFillRates
+      ? [...TABLE_COLUMNS, FILL_RATE_COLUMN, WHERE_USED_COLUMN]
+      : [...TABLE_COLUMNS, WHERE_USED_COLUMN];
+  }
+
+  /** A field row's Where Used action: which BarnCRM setup uses the field. */
+  handleRowAction(event) {
+    const { action, row } = event.detail;
+    if (action.name !== 'whereUsed') {
+      return;
+    }
+    WhereUsedModal.open({
+      size: 'medium',
+      objectName: row.objectName,
+      objectLabel: row.objectLabel,
+      fieldName: row.fieldName,
+      fieldLabel: row.fieldLabel
+    });
   }
 
   get hasRows() {

@@ -56,6 +56,8 @@ Start from the sample data (see [Sample data](sample-data.md)).
 5. Tick **Include Fill Rates** and press **Build Dictionary** again. A **Fill Rate** column
    appears, with the percentage of Account records that have each field filled in.
 6. Press **Download CSV**. The file opens in a spreadsheet with the same columns.
+7. Open the action menu at the end of a row and choose **Where Used** to see which BarnCRM setup
+   uses that field, and how to retire it safely ([Where Used and Retire a Field](where-used.md)).
 
 ## What Is Listed
 

@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import RecordInspector from 'c/recordInspector';
+import WhereUsedModal from 'c/whereUsedModal';
 import inspect from '@salesforce/apex/RecordInspectorController.inspect';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 import { filterRows, normalize } from '../inspectorRows';
@@ -204,6 +205,11 @@ describe('c-record-inspector', () => {
       '/lightning/setup/ObjectManager/Contact/FieldsAndRelationships/Notes__c/view'
     );
     expect(link.getAttribute('target')).toBe('_blank');
+
+    q(element, 'tr[data-row="Notes__c"] .where-used-button').click();
+    expect(WhereUsedModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ objectName: 'Contact', fieldName: 'Notes__c', fieldLabel: 'Notes' })
+    );
   });
 
   it('shows the refusal Apex gives', async () => {
