@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Restricted_Received__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The total of this grant's Received restricted fund entries.</inlineHelpText>
+  <label>Restricted Received</label>
+  <trackTrending>false</trackTrending>
+  <type>Summary</type>
+  <summaryFilterItems>
+    <field>Grant_Fund_Entry__c.Type__c</field>
+    <operation>equals</operation>
+    <value>Received</value>
+  </summaryFilterItems>
+  <summarizedField>Grant_Fund_Entry__c.Amount__c</summarizedField>
+  <summaryForeignKey>Grant_Fund_Entry__c.Grant__c</summaryForeignKey>
+  <summaryOperation>sum</summaryOperation>
+</CustomField>

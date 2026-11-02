@@ -132,6 +132,31 @@ You should see: `Saved.`, the payment **Received** with today's date, and **Amou
 the top of the card going up by its amount. If it came in on another day, open the payment and
 change **Received Date**.
 
+## To Keep a Restricted Grant's Ledger
+
+When a funder limits the money to a purpose, tick **Restricted** on the grant (your admin may
+have done it). Then:
+
+- **Money that came in.** Marking a payment **Received** adds a **Received** entry to the grant's
+  **Restricted Fund Entries** list for you. Money that came in another way: click **New** in that
+  list, **Type** Received.
+- **Money spent on the purpose.** Click **New**, **Type** Spent, the **Amount**, the **Entry
+  Date** and a **Description**, for example `Q1 tutor salaries`.
+- **Restriction lifted.** When the funder releases the money, or the restriction lapses, add a
+  **Released** entry.
+
+You should see: the grant's **Restricted Received**, **Restricted Spent**, **Restricted
+Released** and **Restricted Balance** change at once.
+A balance below zero means more was spent than came in so far, which is normal for a
+reimbursement grant.
+
+## To Name the Giving Fund
+
+With Giving installed, choose the fund the money is booked to on the grant's **Giving Fund**
+card and click **Save**.
+
+You should see: `Saved.` and the fund's name on the card.
+
 ## Tips
 
 - **Declined is history worth keeping.** Set Declined rather than deleting: it tells you whom to

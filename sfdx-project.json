@@ -56,11 +56,7 @@
       "package": "BarnCRM Funders",
       "versionName": "v0.1",
       "versionNumber": "0.1.0.NEXT",
-      "dependencies": [
-        { "package": "BarnCRM Core" },
-        { "package": "BarnCRM Rollup Builder" },
-        { "package": "BarnCRM Giving" }
-      ]
+      "dependencies": [{ "package": "BarnCRM Core" }, { "package": "BarnCRM Rollup Builder" }]
     },
     {
       "path": "packages/mirror",

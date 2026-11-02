@@ -111,8 +111,8 @@ public with sharing class GrantService {
         }
     }
 
-    /** The text as a record identifier, or null when it is not one. */
-    private static Id asId(String text) {
+    /** The text as a record identifier, or null when it is not one (also used for the fund). */
+    public static Id asId(String text) {
         try {
             return Id.valueOf(text.trim());
         } catch (StringException notAnId) {

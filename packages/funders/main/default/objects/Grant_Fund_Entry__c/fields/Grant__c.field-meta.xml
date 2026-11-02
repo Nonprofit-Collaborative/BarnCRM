@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Grant__c</fullName>
+  <inlineHelpText>The grant whose restricted money this is.</inlineHelpText>
+  <label>Grant</label>
+  <trackTrending>false</trackTrending>
+  <type>MasterDetail</type>
+  <referenceTo>Grant__c</referenceTo>
+  <relationshipLabel>Restricted Fund Entries</relationshipLabel>
+  <relationshipName>Fund_Entries</relationshipName>
+  <relationshipOrder>0</relationshipOrder>
+  <reparentableMasterDetail>false</reparentableMasterDetail>
+  <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

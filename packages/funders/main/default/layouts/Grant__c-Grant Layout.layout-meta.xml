@@ -101,6 +101,37 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
+    <label>Restricted Funds</label>
+    <style>TwoColumnsTopToBottom</style>
+    <layoutColumns>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Restricted__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Readonly</behavior>
+        <field>Restricted_Balance__c</field>
+      </layoutItems>
+    </layoutColumns>
+    <layoutColumns>
+      <layoutItems>
+        <behavior>Readonly</behavior>
+        <field>Restricted_Received__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Readonly</behavior>
+        <field>Restricted_Spent__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Readonly</behavior>
+        <field>Restricted_Released__c</field>
+      </layoutItems>
+    </layoutColumns>
+  </layoutSections>
+  <layoutSections>
+    <customLabel>true</customLabel>
+    <detailHeading>true</detailHeading>
+    <editHeading>true</editHeading>
     <label>Purpose</label>
     <style>OneColumn</style>
     <layoutColumns>
@@ -128,6 +159,16 @@
     <fields>Received_Date__c</fields>
     <relatedList>Grant_Payment__c.Grant__c</relatedList>
     <sortField>Due_Date__c</sortField>
+    <sortOrder>Asc</sortOrder>
+  </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Type__c</fields>
+    <fields>Amount__c</fields>
+    <fields>Entry_Date__c</fields>
+    <fields>Description__c</fields>
+    <relatedList>Grant_Fund_Entry__c.Grant__c</relatedList>
+    <sortField>Entry_Date__c</sortField>
     <sortOrder>Asc</sortOrder>
   </relatedLists>
   <relatedLists>
