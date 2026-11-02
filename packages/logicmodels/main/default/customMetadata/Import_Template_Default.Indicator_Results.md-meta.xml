@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Indicator results</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">indicator_results</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Logic model indicator results, one row per period, from the Logic Model Builder's Download Results Sheet: the Period Id, then the target, result and notes. Each row updates that period; nothing is created, and a row whose Period Id names no period you can see is reported, not loaded. Other columns in the sheet are ignored.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "columns": [{"source": "Period Id", "target": "Record.Id"}, {"source": "Target", "target": "Record.Target_Value__c"}, {"source": "Result", "target": "Record.Result_Value__c"}, {"source": "Notes", "target": "Record.Notes__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Indicator_Period__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Update by record Id</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

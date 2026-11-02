@@ -9,8 +9,8 @@ baseline and a target and result per period. Separate from Programs on purpose (
 
 ## First ships in
 
-Release **0.14** (L-01 builder, L-02 indicators). L-03 indicator sources and L-04 the logic model
-report follow in 0.15.
+Release **0.14** (L-01 builder, L-02 indicators). Release **0.15** (L-03 indicator sources;
+L-04 the logic model report follows).
 
 ## Depends on
 
@@ -28,3 +28,8 @@ its record identifier (text), resolved by describe only where a `Program__c` obj
   `LogicModelBuilderController`.
 - Permission sets Logic Models Admin, Staff and Read Only, given by role through
   `LogicModelsAccessSync`.
+- Indicator sources (L-03, ADR `NEXT-indicator-sources.md`): `IndicatorSourceService`, the
+  batch `IndicatorResultsBatch` (system mode, `without sharing`), the nightly
+  `IndicatorResultsScheduler` registered with Core through `LogicModelsNightlyJobProvider`, and
+  the Core import template **Indicator Results** (`Import_Template_Default.Indicator_Results`),
+  made at install by `LogicModelsPostInstall`.

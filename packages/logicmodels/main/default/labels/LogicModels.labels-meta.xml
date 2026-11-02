@@ -520,4 +520,300 @@
         <shortDescription>No periods</shortDescription>
         <value>No periods yet.</value>
     </labels>
+    <labels>
+        <fullName>LogicModels_Source_Invalid</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Source choice not usable</shortDescription>
+        <value>Choose a source, and for Computed a saved query, a date field and what to work out.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_QueryRefused</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Saved query cannot run; {0} is Find's reason</shortDescription>
+        <value>The saved query can't be used: {0}</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_QueryMissing</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Saved query gone</shortDescription>
+        <value>The saved query can't be found. It may have been deleted or not shared with you: choose another under Source.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_DateField</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Date field not a date; {0} is the field label</shortDescription>
+        <value>{0} is not a date field. Choose a date or date and time field to place records in periods.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_SumField</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sum field not a number; {0} is the field label</shortDescription>
+        <value>{0} is not a number field, so it can't be added up.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_UniqueField</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Unique field not countable; {0} is the field label</shortDescription>
+        <value>{0} can't be counted once per value. Choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_CannotRefresh</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Refresh needs edit access</shortDescription>
+        <value>You can't change results, so you can't refresh them.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_NotComputed</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Refresh of a non-computed indicator</shortDescription>
+        <value>Only a computed indicator's results can be refreshed.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_RefreshFailed</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Refresh failed</shortDescription>
+        <value>The results couldn't be worked out. The Error Log has the details.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_TooManyUnique</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Too many unique values</shortDescription>
+        <value>There are too many different values to count once. Narrow the saved query or count records instead.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_NightlyJobs_ResultsName</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nightly jobs: the indicator results run and when it runs</shortDescription>
+        <value>Indicator Results, 3:30 AM</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_Title</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Source button and form title</shortDescription>
+        <value>Source</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_Manual</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Source: typed in</shortDescription>
+        <value>Typed In</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_Import</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Source: imported</shortDescription>
+        <value>Imported</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_Computed</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Source: computed</shortDescription>
+        <value>Computed</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_ResultsAre</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Indicator results source line; {0} is the source name</shortDescription>
+        <value>Results: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_ComputedFrom</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Computed line: {0} saved query, {1} what is worked out, {2} date field</shortDescription>
+        <value>Results: computed from {0}, {1} by {2}.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_SomeQuery</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A saved query the user cannot open</shortDescription>
+        <value>a saved query</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_LastRun</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>When results were last computed; {0} is the date and time</shortDescription>
+        <value>Last worked out {0}.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_NotRunYet</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Results not computed yet</shortDescription>
+        <value>Not worked out yet.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_Query</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Saved query picker</shortDescription>
+        <value>Saved Query</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_QueryHelp</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Saved query help</shortDescription>
+        <value>Build and save the query in Find. Leave dates out of it: each period adds its own.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_NoQueries</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No saved queries</shortDescription>
+        <value>No saved queries yet. Build and save one in Find first.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_DateFieldLabel</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Date field picker</shortDescription>
+        <value>Date Field</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_Function</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>What to work out picker</shortDescription>
+        <value>Work Out</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_Count</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Count records</shortDescription>
+        <value>Count</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_Sum</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sum a field</shortDescription>
+        <value>Sum</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_Unique</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Count unique values</shortDescription>
+        <value>Count Unique</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_FieldLabel</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Field to sum or count once</shortDescription>
+        <value>Field</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_Refresh</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Refresh results button</shortDescription>
+        <value>Refresh Results</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_Refreshing</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Refresh started</shortDescription>
+        <value>Working out the results. They appear in a few minutes: reload the page to see them.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_ResultComputed</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Result box note for computed</shortDescription>
+        <value>Worked out from the source, so it can't be typed.</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_CountOf</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Count summary</shortDescription>
+        <value>count of records</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_SumOf</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sum summary; {0} is the field label</shortDescription>
+        <value>sum of {0}</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Source_UniqueOf</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Count unique summary; {0} is the field label</shortDescription>
+        <value>count of unique {0}</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Results_Download</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Download results sheet button</shortDescription>
+        <value>Download Results Sheet</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Results_None</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nothing to download</shortDescription>
+        <value>There are no periods to fill in: add periods, or every indicator is computed.</value>
+    </labels>
 </CustomLabels>

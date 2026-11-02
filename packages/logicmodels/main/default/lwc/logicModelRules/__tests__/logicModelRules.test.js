@@ -1,16 +1,20 @@
 import {
+  RESULTS_SHEET_COLUMNS,
   STAGES,
   backwardLinks,
   canLink,
   columns,
   findings,
+  isComputed,
   linkTargets,
   liveLinks,
   moveOrders,
   nextOrder,
   progress,
   rankOf,
+  resultsSheetRows,
   samePeriodExists,
+  sourceReady,
   stageOf,
   takesIndicators
 } from 'c/logicModelRules';
@@ -141,5 +145,78 @@ describe('logicModelRules', () => {
     expect(moveOrders(model(), 'nope', 1)).toEqual([]);
     expect(nextOrder(model(), 'Activity')).toBe(30);
     expect(nextOrder(model(), 'Outcome_Long')).toBe(10);
+  });
+
+  it('decides when a source can be saved', () => {
+    expect(sourceReady({ source: 'Manual' })).toBe(true);
+    expect(sourceReady({ source: 'Import' })).toBe(true);
+    expect(sourceReady({ source: 'Guessed' })).toBe(false);
+    expect(sourceReady(undefined)).toBe(false);
+    const computed = { source: 'Computed', queryId: 'q1', dateField: 'D__c', function: 'count' };
+    expect(sourceReady(computed)).toBe(true);
+    expect(sourceReady({ ...computed, queryId: null })).toBe(false);
+    expect(sourceReady({ ...computed, dateField: '' })).toBe(false);
+    expect(sourceReady({ ...computed, function: 'median' })).toBe(false);
+    expect(sourceReady({ ...computed, function: 'sum' })).toBe(false);
+    expect(sourceReady({ ...computed, function: 'sum', field: 'Hours__c' })).toBe(true);
+    expect(sourceReady({ ...computed, function: 'unique', field: 'Contact__c' })).toBe(true);
+    expect(isComputed({ source: 'Computed' })).toBe(true);
+    expect(isComputed({ source: 'Import' })).toBe(false);
+    expect(isComputed(undefined)).toBe(false);
+  });
+
+  it('writes the results sheet for every period not computed, in column order', () => {
+    const sheet = {
+      ...model(),
+      name: 'Reading Model',
+      indicators: [
+        {
+          id: 'i2',
+          elementId: 'oc1',
+          name: 'Reading daily',
+          unit: 'students',
+          source: 'Import',
+          periods: [
+            {
+              id: 'p3',
+              name: 'Q1',
+              startDate: '2026-01-01',
+              endDate: '2026-03-31',
+              targetValue: 30,
+              resultValue: null,
+              notes: null
+            }
+          ]
+        },
+        {
+          id: 'i1',
+          elementId: 'ou1',
+          name: 'Sessions',
+          source: 'Manual',
+          periods: [{ id: 'p1', name: 'Q1', startDate: '2026-01-01', endDate: '2026-03-31' }]
+        },
+        {
+          id: 'i3',
+          elementId: 'ou1',
+          name: 'Counted',
+          source: 'Computed',
+          periods: [{ id: 'p9', name: 'Q1' }]
+        }
+      ]
+    };
+    const rows = resultsSheetRows(sheet);
+    expect(rows.map((row) => row.periodId)).toEqual(['p1', 'p3']);
+    expect(rows[1]).toMatchObject({
+      model: 'Reading Model',
+      part: 'Reads at home',
+      indicator: 'Reading daily',
+      unit: 'students',
+      period: 'Q1',
+      target: 30
+    });
+    expect(RESULTS_SHEET_COLUMNS.map((column) => column.label)).toEqual(
+      expect.arrayContaining(['Period Id', 'Target', 'Result', 'Notes'])
+    );
+    expect(resultsSheetRows(undefined)).toEqual([]);
   });
 });

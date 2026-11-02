@@ -228,7 +228,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 
 | Feature | Page | Package |
 |---|---|---|
-| L-01 and L-02 Logic Models: install, roles, the Logic Model Builder, arrows and assumptions, indicators with baselines, targets and results by period | [logic-models.md](logic-models.md) | BarnCRM Logic Models |
+| L-01 to L-03 Logic Models: install, roles, the Logic Model Builder, arrows and assumptions, indicators with baselines, targets and results by period, results typed in, imported or computed from a saved query | [logic-models.md](logic-models.md) | BarnCRM Logic Models |
 
 ### Moving From Another System
 

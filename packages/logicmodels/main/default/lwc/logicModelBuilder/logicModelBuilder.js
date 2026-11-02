@@ -4,7 +4,15 @@ import getPrograms from '@salesforce/apex/LogicModelBuilderController.getProgram
 import setProgram from '@salesforce/apex/LogicModelBuilderController.setProgram';
 import saveElement from '@salesforce/apex/LogicModelBuilderController.saveElement';
 
-import { columns, findings, nextOrder, stageByKey } from 'c/logicModelRules';
+import { downloadCsv } from 'c/findCsv';
+import {
+  RESULTS_SHEET_COLUMNS,
+  columns,
+  findings,
+  nextOrder,
+  resultsSheetRows,
+  stageByKey
+} from 'c/logicModelRules';
 import { LABELS, format, messageFrom, stageLabel } from 'c/logicModelText';
 
 const ORGANIZATION = '';
@@ -93,6 +101,20 @@ export default class LogicModelBuilder extends LightningElement {
 
   get scopeOptions() {
     return [{ value: ORGANIZATION, label: LABELS.wholeOrganization }, ...this.programOptions];
+  }
+
+  /**
+   * Saves the results sheet (L-03, R-IN3): one row per period of every indicator that is not
+   * computed, with the columns the Indicator Results import template reads.
+   */
+  handleDownloadResults() {
+    const rows = resultsSheetRows(this.model);
+    if (!rows.length) {
+      this.errorMessage = LABELS.noResultRows;
+      return;
+    }
+    this.errorMessage = undefined;
+    downloadCsv('Indicator_Results', RESULTS_SHEET_COLUMNS, rows);
   }
 
   handleChangeScope() {

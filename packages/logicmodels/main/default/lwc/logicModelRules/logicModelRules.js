@@ -236,3 +236,86 @@ export function nextOrder(model, stageKey) {
   const orders = (column ? column.elements : []).map((item) => item.sortOrder || 0);
   return (orders.length ? Math.max(...orders) : 0) + 10;
 }
+
+// ------------------------------------------------------------------- sources (L-03, R-IN3)
+
+/** Where an indicator's results come from, as Indicator__c.Source__c holds it. */
+export const SOURCES = Object.freeze({ MANUAL: 'Manual', IMPORT: 'Import', COMPUTED: 'Computed' });
+
+/** What a computed source works out, as its definition holds it (R-IN4). */
+export const FUNCTIONS = Object.freeze({ COUNT: 'count', SUM: 'sum', UNIQUE: 'unique' });
+
+/** True when the indicator's results are worked out by the refresh, never typed. */
+export function isComputed(indicator) {
+  return Boolean(indicator) && indicator.source === SOURCES.COMPUTED;
+}
+
+/**
+ * True when a source draft can be saved: any source but Computed as it is; Computed with a saved
+ * query, a date field and what to work out, plus a field for a sum or a unique count.
+ */
+export function sourceReady(draft) {
+  if (!draft || !Object.values(SOURCES).includes(draft.source)) {
+    return false;
+  }
+  if (draft.source !== SOURCES.COMPUTED) {
+    return true;
+  }
+  if (!draft.queryId || !draft.dateField || !Object.values(FUNCTIONS).includes(draft.function)) {
+    return false;
+  }
+  return draft.function === FUNCTIONS.COUNT || Boolean(draft.field);
+}
+
+/**
+ * The results sheet's columns, in order. Period Id, Target, Result and Notes are the columns the
+ * shipped Import template Indicator Results reads (R-IN3), so their headers never change; the
+ * others are there for the person filling it in and are ignored by the import.
+ */
+export const RESULTS_SHEET_COLUMNS = Object.freeze([
+  { label: 'Period Id', path: 'periodId' },
+  { label: 'Logic Model', path: 'model' },
+  { label: 'Part', path: 'part' },
+  { label: 'Indicator', path: 'indicator' },
+  { label: 'Unit', path: 'unit' },
+  { label: 'Period', path: 'period' },
+  { label: 'Start Date', path: 'startDate' },
+  { label: 'End Date', path: 'endDate' },
+  { label: 'Target', path: 'target' },
+  { label: 'Result', path: 'result' },
+  { label: 'Notes', path: 'notes' }
+]);
+
+/**
+ * The results sheet's rows: one per period of every indicator that is not computed, in column
+ * order, then the parts' order, the indicators' order and the periods' order.
+ */
+export function resultsSheetRows(model) {
+  const indicators = (model && model.indicators) || [];
+  const rows = [];
+  for (const column of columns(model)) {
+    for (const element of column.elements) {
+      for (const indicator of indicators) {
+        if (indicator.elementId !== element.id || isComputed(indicator)) {
+          continue;
+        }
+        for (const period of indicator.periods || []) {
+          rows.push({
+            periodId: period.id,
+            model: model.name,
+            part: element.name,
+            indicator: indicator.name,
+            unit: indicator.unit,
+            period: period.name,
+            startDate: period.startDate,
+            endDate: period.endDate,
+            target: period.targetValue,
+            result: period.resultValue,
+            notes: period.notes
+          });
+        }
+      }
+    }
+  }
+  return rows;
+}

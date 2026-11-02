@@ -1,5 +1,15 @@
 <template>
   <lightning-card title={labels.title} icon-name="custom:custom62">
+    <template lwc:if={canEdit}>
+      <lightning-button
+        slot="actions"
+        data-id="download-results"
+        label={labels.downloadResults}
+        icon-name="utility:download"
+        disabled={busy}
+        onclick={handleDownloadResults}
+      ></lightning-button>
+    </template>
     <div class="slds-var-p-horizontal_medium slds-is-relative">
       <template lwc:if={showSpinner}>
         <lightning-spinner

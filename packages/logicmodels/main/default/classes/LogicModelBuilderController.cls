@@ -115,6 +115,73 @@ public with sharing class LogicModelBuilderController {
     }
 
     /**
+     * The Find saved queries the person can open, for a computed source (L-03).
+     *
+     * @return value, label and objectName
+     */
+    @AuraEnabled
+    public static List<Map<String, String>> getSourceQueries() {
+        try {
+            return IndicatorSourceService.queries();
+        } catch (Exception e) {
+            throw handled(e);
+        }
+    }
+
+    /**
+     * The fields of a saved query's object a computed source may use.
+     *
+     * @param queryId the saved query
+     * @return objectName, objectLabel, dateFields, numberFields, uniqueFields
+     */
+    @AuraEnabled
+    public static Map<String, Object> getSourceFields(Id queryId) {
+        try {
+            return IndicatorSourceService.fields(queryId);
+        } catch (Exception e) {
+            throw handled(e);
+        }
+    }
+
+    /**
+     * Saves where an indicator's results come from; a computed source starts working out its
+     * results at once.
+     *
+     * @param modelId the logic model
+     * @param sourceJson id, source, and for Computed: queryId, dateField, function, field
+     * @return the model
+     */
+    @AuraEnabled
+    public static Map<String, Object> saveSource(Id modelId, String sourceJson) {
+        try {
+            Map<String, Object> fields = parse(sourceJson);
+            if (IndicatorSourceService.save(fields)) {
+                IndicatorSourceService.refresh(Id.valueOf(String.valueOf(fields.get('id'))));
+            }
+            return LogicModelService.read(modelId);
+        } catch (Exception e) {
+            throw handled(e);
+        }
+    }
+
+    /**
+     * Starts working out a computed indicator's results now.
+     *
+     * @param modelId the logic model
+     * @param indicatorId the indicator
+     * @return the model
+     */
+    @AuraEnabled
+    public static Map<String, Object> refreshResults(Id modelId, Id indicatorId) {
+        try {
+            IndicatorSourceService.refresh(indicatorId);
+            return LogicModelService.read(modelId);
+        } catch (Exception e) {
+            throw handled(e);
+        }
+    }
+
+    /**
      * Adds or changes a period's target and result.
      *
      * @param periodJson id, indicatorId, name, startDate, endDate, targetValue, resultValue, notes
