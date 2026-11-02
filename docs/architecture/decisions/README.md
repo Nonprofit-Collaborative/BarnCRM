@@ -163,6 +163,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0152](0152-ai-readiness-export.md) | AI-Readiness Export: a browser-built pack, no AI calls, sensitive fields left out by default | Proposed |
 | [0153](0153-solicitation-pipeline-ask-object.md) | The solicitation pipeline is a Giving Ask object, not Opportunity | Accepted (D-156) |
 | [0154](0154-logic-models-module.md) | The BarnCRM Logic Models module: its own package on Core, five objects, a program named by its record identifier | Proposed |
+| [NEXT](NEXT-npsp-household-adoption-in-core.md) | NPSP household adoption lives in Core, converts Accounts in place, and is undone from a journal | Proposed |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

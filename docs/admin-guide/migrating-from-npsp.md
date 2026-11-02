@@ -12,6 +12,10 @@ file, with a preview first and an undo afterwards.
 
 The templates only name columns. Nothing in BarnCRM depends on NPSP being installed.
 
+If BarnCRM is installed in the same org as NPSP, start by adopting NPSP's households in place
+([Adopting Your NPSP Households](npsp-households.md)) rather than loading the contacts file:
+your people are already there.
+
 ## 2. How to Turn It On
 
 BarnCRM brings the contacts template, and the Giving module brings the two payment templates.
@@ -166,7 +170,7 @@ These are not loaded by the three templates. Each has what to do in the meantime
 
 | Not loaded | What to do meanwhile |
 |---|---|
-| Households and who is in them | Each contact gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). Household names are made by BarnCRM's naming. |
+| Households and who is in them | When BarnCRM is installed in the NPSP org itself, do not load contacts at all: adopt NPSP's households in place ([Adopting Your NPSP Households](npsp-households.md)), which keeps every family and its people as they are. When you load files into another org, each contact gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). Household names are made by BarnCRM's naming. |
 | Relationships and affiliations | No ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **One Kind of Record** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
 | Recurring donations and their schedules | No import yet. Create each active recurring gift by hand as a commitment ([Commitments](commitments.md)) before loading payments. With **Match or create**, a payment dated near one of its scheduled payments pays it; older payments load as gifts on their own. |
 | General accounting unit allocations | Every gift goes to the default fund. For opportunities with one allocation, export `SELECT npsp__Opportunity__c, npsp__General_Accounting_Unit__r.Name FROM npsp__Allocation__c`, add `npe01__Opportunity__c` to the payment query, and fill a new column headed `Fund` from the allocation file with a lookup on the opportunity. Delete the opportunity column before loading, and check on the column step that `Fund` reads **Gift: fund**. |

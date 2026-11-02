@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_NpspAdoption_ErrorContext</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log context for NPSP household adoption.</shortDescription>
+        <value>NPSP household adoption</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_ErrorNoPermission</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal when the user lacks Manage BarnCRM Settings.</shortDescription>
+        <value>You need the Manage BarnCRM Settings permission to adopt NPSP households. Ask your BarnCRM admin.</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_ErrorJunctionMode</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal while household membership is Junction.</shortDescription>
+        <value>Household membership is set to membership records, and NPSP households keep their people on each contact&apos;s account. Set Household membership to Contact on the General page, then adopt.</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_ErrorNothingToAdopt</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal when no NPSP household is left to adopt.</shortDescription>
+        <value>There are no NPSP households left to adopt, or none you can see.</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_ErrorNothingToUndo</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal when a run has nothing left to undo.</shortDescription>
+        <value>This adoption has nothing left to undo.</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_ErrorCountChanged</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal when the count changed. {0} now, {1} confirmed.</shortDescription>
+        <value>{0} households match now, not the {1} you confirmed. Refresh the panel and confirm the new number.</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_ErrorRunning</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal while another adoption or undo runs.</shortDescription>
+        <value>An adoption or undo is already running. Wait for it to finish, then try again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_RunSummary</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log Info entry after a run. {0} adopted, {1} skipped, {2} refused.</shortDescription>
+        <value>NPSP household adoption finished: {0} adopted, {1} skipped because you cannot edit them, {2} refused (each refusal has its own Error Log entry).</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_UndoSummary</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log Info entry after an undo. {0} put back, {1} not put back.</shortDescription>
+        <value>NPSP household adoption undo finished: {0} put back, {1} not put back (the reason is on each Household Adoption record).</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_NoteGone</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo note: the account was deleted.</shortDescription>
+        <value>The account no longer exists.</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_NoteNotHousehold</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo note: the account is no longer a household.</shortDescription>
+        <value>The account is no longer a household, so it was left as it is.</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_NoteNoAccess</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo note: the user cannot edit the account.</shortDescription>
+        <value>You cannot edit this account.</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_NoteRefused</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo note: Salesforce refused the save. {0} is its reason.</shortDescription>
+        <value>Salesforce refused the change: {0}</value>
+    </labels>
+</CustomLabels>
