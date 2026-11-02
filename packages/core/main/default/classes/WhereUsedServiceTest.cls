@@ -360,6 +360,45 @@ private class WhereUsedServiceTest {
     }
 
     @IsTest
+    static void namePatternsAreFoundByTheFieldsTheirBlanksRead() {
+        System.runAs(TestUsers.admin()) {
+            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+            settings.Household_Name_Pattern__c = 'The {!LastName} Household';
+            settings.Formal_Greeting_Pattern__c = '{FirstName} {LastName}';
+            settings.Informal_Greeting_Pattern__c = null;
+            upsert as system settings;
+            SettingsService.clearCaches();
+            noModules();
+
+            List<WhereUsedService.Reference> lastName = ofKind(
+                WhereUsedService.find('Contact', 'LastName'),
+                WhereUsedService.KIND_SETTING
+            );
+            List<WhereUsedService.Reference> firstName = ofKind(
+                WhereUsedService.find('Contact', 'FirstName'),
+                WhereUsedService.KIND_SETTING
+            );
+            List<WhereUsedService.Reference> salutation = ofKind(
+                WhereUsedService.find('Contact', 'Salutation'),
+                WhereUsedService.KIND_SETTING
+            );
+
+            Assert.areEqual(2, lastName.size(), 'The name pattern and the formal greeting.');
+            Assert.areEqual(
+                2,
+                firstName.size(),
+                'The formal greeting, and the informal one through its default.'
+            );
+            Assert.areEqual(0, salutation.size(), 'No pattern in use reads the salutation.');
+            Assert.areEqual(System.Label.Core_WhereUsed_BreaksPattern, lastName[0].breaks);
+            Assert.areEqual(
+                'People and Households',
+                lastName[0].editState.get(NamespaceUtil.stateKey('section'))
+            );
+        }
+    }
+
+    @IsTest
     static void aWholeObjectFindsWhatWorksOnIt() {
         System.runAs(TestUsers.admin()) {
             noModules();
