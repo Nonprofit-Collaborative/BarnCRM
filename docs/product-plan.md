@@ -175,7 +175,7 @@ Person Account dependency, batch-only rollups with compute credits, permission s
 | **Volunteers** | Volunteer profiles, jobs, shifts, sign-ups, hours, skills | Core |
 | **Programs** | Programs, services, enrollments, attendance, service deliveries, light case notes | Core |
 | **Logic Models** | Logic models the organization builds itself (inputs, activities, outputs, outcomes, impact), indicators with baselines, targets and results by period, evidence, logic model reports. Separate from Programs on purpose (Section 5.7) | Core |
-| **Funders** | Funder pipeline (grants received and applied for), reporting deadlines, restricted fund tracking, government award compliance fields; later Grant Finder and full grant management (F-09 to F-13, D-121) | Core, Giving |
+| **Funders** | Funder pipeline (grants received and applied for), reporting deadlines, restricted fund tracking, government award compliance fields; later Grant Finder and full grant management (F-09 to F-13, D-121) | Core and Rollup Builder only (no Giving dependency: a restricted fund names the Giving fund by record ID) |
 | **Scholarships and Outbound Grants** (planned, Nonprofit Edition proposed, D-122) | Grantmaking: programs and cycles, applications, reviewers and scoring, awards, disbursements, recipient reporting, applicant portal through Portal Builder (Section 5.11) | Core (Giving optional, through an optional link) |
 | **Mirror** | Adapters: Opportunity mirror (NPSP and Sales Cloud), Campaign sync, Gift Transaction mirror (Agentforce Nonprofit), inbound gift REST API, accounting export | Core, Giving |
 | **Event Management** (planned, both editions proposed, D-123; replaces the post-1.0 Events package) | Events and registrations, ticket types, tracks, sessions, speakers, call for speakers with review, speaker portal through Portal Builder, volunteer shifts, sponsorship management; able to run a community "Dreamin" conference (Section 5.12) | Core (Volunteers, Giving, Funders and Portal Builder optional, through optional links) |
@@ -265,7 +265,7 @@ The data model is written once as a platform-neutral specification in `docs/arch
 | Mode | When chosen | Household membership | Gift system of record | Mirror behavior |
 |---|---|---|---|---|
 | **Standalone** (default) | Fresh org, Platform or Sales/Service licenses | Contact.AccountId (NPSP-style) | `Gift__c` | Optional Opportunity mirror off by default |
-| **NPSP coexistence** | NPSP detected | Adopt NPSP household Accounts (record type mapping) | `Gift__c`, with Opportunity mirror **on** so NPSP rollups and dependent apps keep working | Opportunity mirror one-way `Gift__c` to Opportunity by default; "Opportunity is source" option for orgs whose online giving writes Opportunities |
+| **NPSP coexistence** | NPSP detected | Adopt NPSP household Accounts in place, with a record type mapping and an undo per run (X-05, in Core) | `Gift__c`, with Opportunity mirror **on** so NPSP rollups and dependent apps keep working | Opportunity mirror one-way `Gift__c` to Opportunity by default; "Opportunity is source" option for orgs whose online giving writes Opportunities |
 | **Agentforce Nonprofit coexistence** | Industries objects or Person Accounts detected | Junction (`Household_Member__c`) | `Gift__c`, optional Gift Transaction mirror | Mirror off by default; enable if the org uses native donor summaries |
 
 Detection is automatic in the Setup Assistant (describe calls for `npsp__` objects, `GiftTransaction`, Person Account enablement) with the admin confirming.
@@ -324,7 +324,7 @@ NPC has no address object; NPSP's was one of its most valued features for donor 
 
 **Purpose:** let Maria load the old spreadsheet and every later export, fix many records at once, and find and export exactly the records she needs, without a consultant, Setup, API names or an outside tool, and with every change previewed, recorded and reversible. The engine is neutral and lives in Core, so the Standard Edition gets import, update and find; gift meaning, donation matching and gift templates live in Giving. Tags **[v1]** and **[later]** mark what ships before 1.0 and what is planned after it (Section 6). The scope and its phasing are an owner decision (Brandon, 2026-09-23; D-13): NPSP Data Importer parity, a Jetstream-style find and bulk update, and the useful dataimporter.io capabilities, with the most useful in v1 and the rest later.
 
-**What we deliberately do not build.** Metadata deploy, anonymous Apex, permission management, API exploration, org-wide automation switches, org-to-org migration and backup. Setup, Data Loader and Jetstream do these well for the rare technical user; inside a package they would add security review risk and nothing Maria needs. Jetstream's code is not reused (Apache-2.0 with the Commons Clause, not an open source license); its ideas are.
+**What we deliberately do not build.** Metadata deploy, anonymous Apex, permission management (except the Field Access Manager, C-65, which grants and removes Read and Edit on chosen fields and objects across chosen permission sets, with a preview and undo, and never touches profiles or BarnCRM's own permission sets; D-157 and a new ADR that amends ADR-0047), API exploration, org-wide automation switches, org-to-org migration and backup. Setup, Data Loader and Jetstream do these well for the rare technical user; inside a package they would add security review risk and nothing Maria needs. Jetstream's code is not reused (Apache-2.0 with the Commons Clause, not an open source license); its ideas are.
 
 **Objects.**
 - `Import_Template__c`: a reusable mapping (source columns to canonical targets, matching rules, defaults) [v1, built].
@@ -369,7 +369,7 @@ NPC has no address object; NPSP's was one of its most valued features for donor 
 
 **Bulk performance:** Batch Apex with the configurable chunk size; progress on the job record; results and undo on the History page.
 
-**Super Importer and Super Transform** [planned, C-49, C-50; Brandon, 2026-10-30]: the import wizard becomes Super Importer and bulk update gains Super Transform, a one-screen bulk change on the C-35 engine. Section 5.1; open questions in Section 11.2 items 34 to 38.
+**Super Importer and Super Transformer** [planned, C-49, C-50; Brandon, 2026-10-30]: the import wizard becomes Super Importer and bulk update gains Super Transformer, a one-screen bulk change on the C-35 engine. Section 5.1; open questions in Section 11.2 items 34 to 38.
 
 ### 4.10 Rollup engine (Core; used by every module) (moving to the BarnCRM Rollup Builder module, D-101; landed 2026-10-15 in #438, ADR-0125)
 
@@ -482,7 +482,7 @@ Priority: **P0** must ship before v1.0; **P1** should ship before v1.0 if the it
 | C-47 | Multi-brand management: one organization runs several brands (programs, chapters, affiliates, a thrift store, DBAs), each with its own name, logo, address, phone, website, colors, default email sender (org-wide email address), letter signature and active flag, with one default brand; each brand belongs to one Legal Entity record (legal name, tax or registration ID, registered address, fiscal year start; the default entity is the org itself), since some brands are separate legal entities; brands assigned to people, households and organizations many-to-many through a junction (one person can relate to several brands and entities), and a Brand lookup in modules on gifts, appeals, campaigns, volunteer jobs and programs, defaulting from the creating user's or the parent record's brand, set in bulk through Bulk Update and mapped on import; brand-aware outputs (Giving receipts and acknowledgments, Volunteers hour letters, Corporate Hub documents, Portal Builder portals) with optional receipt numbering per brand; list views, reports and dashboards filterable by brand; optional brand-restricted visibility, off by default (Section 6.1 item 17) | M | P2 | 1.x | Planned, after v1.0, not scheduled; both editions. Owner request (Brandon, 2026-10-26; D-119), legal entities and brand-restricted visibility added (Brandon, 2026-10-26; D-120); Section 6.1 theme. Module features consume it: gifts, funds, receipts and receipt numbering belong to the receiving legal entity (Giving), and Corporate Hub obligations are per legal entity. Standard Salesforce features only (no Experience Cloud); brand-restricted visibility needs share rows BarnCRM keeps in step, custom sharing code for this feature only, with an ADR before build (Section 11.2 item 31, resolved); staff can belong to several brands; canonical model updated before any object is added; namespace-neutral; works with Nonprofit Cloud coexistence (Mirror) without Core touching NPC objects |
 | C-48 | Integrations page in BarnCRM Settings: roadmap only, listing planned integrations and migrations as "In Progress", with a request path for users and providers; tools that overlap a BarnCRM module (V4S, PMM, Outbound Funds) shown only when installed in the org; complementary apps (Summit Events, Community Commons Membership, DLRS) may be listed always; Mass Action Scheduler never listed | m | P1 | 1.0 | Brandon, 2026-10-26 (D-125); being built now; detection by describe only. No integration is built from it until Core QA and development are done (Section 6.1.4) |
 | C-49 | Super Importer (renames and extends the Core import wizard; the Import tab becomes Super Importer): upload CSV and Excel (Google Sheets later, under C-38); single-object or multi-object upload; several Excel worksheets chosen; objects and fields named in headers, tab names or the file name mapped automatically, every mapping changeable; the mapping step shows two or three example values per column from the file; label or API names with separators, spaces and line breaks normalized ("Contact.FirstName", "Object__c-CustomField__c", "object - field", "field:object", "Phone (Contact)"); exact match first, fuzzy only when no exact match; map to a new field, created with permissions; every upload lands on Import Row staging where validations run and failing rows are saved for record-by-record correction; browse rows by one batch, all batches or batch status; staging retention setting (delete once complete, after 30 days as default, after 90 days, never) | L | P1 | 1.0 | Shipped (#753, 2026-10-30). Brandon, 2026-10-30; Section 4.9. Slices C-49a to C-49e (Section 6.0 item 11); decisions D-150 to D-153 (Section 11.2 items 34 to 37) |
-| C-50 | Super Transform: bulk change records without a file on one screen: pick object, filter (plain-language builder, live match count), one or more fields and new values, sample of affected records with before and after values, confirm, run, undo. The Bulk Update tab becomes Super Transform | M | P1 | 1.0 | Shipped (#753, 2026-10-30). Brandon, 2026-10-30; reuses the C-35 bulk update engine (ADR-0077, ADR-0081). Like Jetstream's Update Records but easier: no raw SOQL, sample preview, several fields per run, undo. Naming: Section 11.2 item 38. Absorbs saved transform step lists and cleanup presets (name case, phone format) from Section 6.1.1 item 11 (D-154) |
+| C-50 | Super Transformer: bulk change records without a file on one screen: pick object, filter (plain-language builder, live match count), one or more fields and new values, sample of affected records with before and after values, confirm, run, undo. The Bulk Update tab becomes Super Transformer | M | P1 | 1.0 | Shipped (#753, 2026-10-30). Brandon, 2026-10-30; reuses the C-35 bulk update engine (ADR-0077, ADR-0081). Like Jetstream's Update Records but easier: no raw SOQL, sample preview, several fields per run, undo. Naming: Section 11.2 item 38. Absorbs saved transform step lists and cleanup presets (name case, phone format) from Section 6.1.1 item 11 (D-154) |
 | C-51 | Advanced Duplicate Management: merge rules for which value wins, household-aware pairing, auto-merge of exact matches with undo | M | P1 | 1.0 | Shipped (#753, 2026-10-30; ADR-0145). Brandon, 2026-10-30 (D-154); from Section 6.1.1 item 4 and 6.1.2 item 4. Builds on the Duplicate Matching tool (ADR-0139) and C-44; shares one fuzzy scorer with C-49e |
 | C-52 | Data Dictionary in Org Optimizer: exportable list of objects and fields with fill rates from field utilization | S | P1 | 1.0 | Shipped (#753, 2026-10-30). Brandon, 2026-10-30 (D-154); from Section 6.1.1 item 13. Describe only, no Tooling API |
 
@@ -550,9 +550,9 @@ Priority: **P0** must ship before v1.0; **P1** should ship before v1.0 if the it
 |---|---|---|---|---|---|
 | F-01 | Funder pipeline: opportunities applied for, awards, stages, amounts, decision dates | M | P0 | 0.10 | Funder is an Organization Account |
 | F-02 | Reporting requirements and deadlines with reminders | M | P0 | 0.10 | Serves market need #1 |
-| F-03 | Restricted fund tracking: received, released or spent entries, balance | M | P0 | 0.10 | Simple ledger, not accounting |
+| F-03 | Restricted fund tracking: received, released or spent entries, balance | M | P0 | 0.10 | Simple per-grant ledger (Grant Fund Entry), not accounting; the Giving fund is named by record ID, so no Giving dependency |
 | F-04 | Government award fields (assistance listing number, award number, period, drawdowns) | m | P0 | 0.10 | |
-| F-05 | Multi-year award schedules | m | P0 | 0.10 | Reuses Commitment and Installment |
+| F-05 | Multi-year award schedules | m | P0 | 0.10 | Grant Payment, the grant's own (not Commitment and Installment, which would need Giving) |
 | F-06 | Funder report merge template | m | P0 | 0.10 | |
 | F-07 | Board dashboard (revenue mix, concentration, restricted balances) | m | P0 | 0.10 | |
 | F-08 | Deadline calendar view | m | P0 | 0.10 | |
@@ -572,7 +572,7 @@ Owner request (Brandon, 2026-10-26; D-121): "Is a Grant Finder, Tracker, and/or 
 | X-02 | Campaign sync from Appeals | m | P0 | 0.6 | |
 | X-03 | Inbound gift REST API and Flow-invocable action | M | P0 | 0.6 | Idempotent by external ID |
 | X-04 | Accounting export (CSV by fund, date, method) | m | P0 | 0.6 | |
-| X-05 | NPSP coexistence: adopt household accounts, map record types | m | P0 | 0.6 | |
+| X-05 | NPSP coexistence: adopt household accounts, map record types (in Core, ADR) | m | P0 | 0.6 | |
 | X-06 | API documentation and sample payloads | m | P0 | 0.6 | |
 | X-07 | Gift Transaction mirror (Agentforce Nonprofit) | M | P0 | 0.6 | Dynamic Apex only; moved from v0.10 to v0.6 (Section 6.3) |
 | X-08 | Webhook receivers for common processors (community-contributed) | m | P2 | 1.x | Belongs to the community |
@@ -724,11 +724,11 @@ Each iteration targets about three major and five minor features, plus engineeri
 8. Integrations and migrations (D-125): wait until Core QA and development are done, preferably after v1.0 unless applicable now; the review's top 10 are post-1.0 roadmap items (Section 6.1.4) and its decisions are open (Section 11.2 item 32).
 9. Core UX plan approved 2026-10-28 (Brandon, D-140): a small `c-barn-*` component kit (SLDS 2 styling hooks only), then 12 Core UX PRs in this order: 1 UX kit 1 (shell, tiles, empty state, help), in progress on `feature/ux-kit-1`; 2 Admin navigation; 3 Data Manager on the kit; 4 UX kit 2 and Import; 5 Org Optimizer; 6 Settings console; 7 Setup Checklist and first run; 8 Find and Bulk tools; 9 Duplicate Matching; 10 Copy and accessibility sweep; 11 Home hub; 12 Record panels. Duplicate Matching (9) moved ahead of Find and Bulk tools (8) in priority after the 2026-10-28 oi-test screenshots, and Admin navigation is high impact; the listed order stands. PR 2's navigation is settled (D-144): Find, Import and Bulk Update stay off the navigation and open from Data Manager, each Core tab has its own real icon, and PR 2 is being built on `feature/ux-2-admin-navigation`. Org Optimizer is the one tool name, with Data Quality as its data section. Module screens (Rollup Builder, Giving settings, gift batch, Volunteers) come later, recorded only.
 10. Automation performance, approved 2026-10-28 (Brandon, D-143), in progress: profile the trigger chain on Contact, Account, Address and Gift saves in `oi-test`, then PRs `perf/automation-1` onward that remove repeated work (writes that change nothing, repeated describes, rollup re-parsing, double address updates) without losing functionality. PR 1: no-op standard address writes skipped, global describe read once per transaction.
-11. Super Importer (C-49) and Super Transform (C-50), requested 2026-10-30 (Brandon; requested as C-40 and C-41, IDs already taken by Territory Management and Grid). One PR per slice, tested as one landing batch:
+11. Super Importer (C-49) and Super Transformer (C-50), requested 2026-10-30 (Brandon; requested as C-40 and C-41, IDs already taken by Territory Management and Grid). One PR per slice, tested as one landing batch:
    - C-49a parsing (worksheet picker, two-part headers, object detection from tab name, file name and header, two or three example values per column in the mapping step): Shipped (#753); extends ADR-0049 to several sheets (ADR-0146); exact matching first.
    - C-49b row browser, row correction and retry, retention setting and purge: Shipped (#753; D-152, D-153; ADR-0149).
    - C-49c multi-object loads: Shipped (#753; ADR-0147 supersedes ADR-0111); replaces the shipped parent-and-child loads (D-50) rather than adding a third load path (D-154).
-   - C-50 Super Transform screen: Shipped (#753). Follow-ups: saved step lists; phone format preset (needs a digit-format step).
+   - C-50 Super Transformer screen: Shipped (#753). Follow-ups: saved step lists; phone format preset (needs a digit-format step).
    - C-49d new-field creation: Shipped (#753; D-151; ADR-0148).
    - C-49e fuzzy matching: Shipped (#753; D-150).
    - C-51 Advanced Duplicate Management: Shipped (#753; ADR-0145).
@@ -765,7 +765,7 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 - Each landing batch covers 2 or 3 releases. Feature PRs and the incremental gate run per landing branch as today (D-141, D-142); the release gate, the `barn-npc` and `mwdbdevsb` deploys (Brandon's approval each time) and QA and UX testing run once per batch. Each release ships its own What's New record (`Release_Note`, checked by `check-whats-new.py --release`; 0.11 landed in #702).
 - Release numbers continue from 0.11, the last shipped version. The old iterations v0.12 (Beta) and v0.13 (AppExchange) are no longer releases: they become milestones (below), because they wait on outside events, not on build work. Release 0.17 completes the v1.0 scope (the v0.9 and v0.10 iterations, plus the Core, Giving, Volunteers and Programs additions of D-156); it stays the v1.0 candidate. v1.0 is tagged once Brandon's initial QA is complete, expected around or after release 0.17 and before AppExchange approval (milestone M-1, D-157). Releases after it are numbered 1.1, 1.2 and so on.
 - Each batch starts testing only after the whole-solution review (Section 9.8); new work follows the portability preferences toward BarnCRM for WordPress (Section 9.9) where they cost little.
-- Statuses: Planned, In progress, Landed (in `main` through a landing batch), Shipped (the batch's release gate, deploys and QA are done).
+- Statuses: Planned, In progress, Built (landing batch B: finished on feature branches, not yet landed; added 2026-11-02, D-167), Landed (in `main` through a landing batch), Shipped (the batch's release gate, deploys and QA are done).
 - Upkeep is automatic (Section 9.7): every newly approved item is placed in a release; a move up or back that Brandon asks for is re-slotted and the affected releases rebalanced; statuses change as batches land.
 
 #### Batches
@@ -788,7 +788,7 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 | C-53 | Access Explorer: who can see and edit what, and why; extends the Access page and Health Check (Section 6.1.1 item 7) | Major | Landed (batch A) | D-154 |
 | C-56 | Setup Changes Log: Setup Audit Trail in plain words with filters, kept beyond 180 days in a BarnCRM object, feeds C-54 | Major | Landed (batch A) | D-156 |
 | P-01 | Programs: Program, Service, Enrollment (Programs package; canonical model first) | Major | Landed (batch A) | Section 6 v0.9 |
-| C-50f1 | Super Transform saved step lists | Minor | Landed (batch A) | D-154 |
+| C-50f1 | Super Transformer saved step lists | Minor | Landed (batch A) | D-154 |
 | C-50f2 | Phone format preset, with the digit-format transform step it needs | Minor | Landed (batch A) | D-154 |
 | C-54 | Weekly Admin Digest: one optional weekly email (new errors, failed or stalled jobs, limits at 80%, duplicate pairs waiting, rollups needing attention, Setup changes); nothing sent when nothing is new | Minor | Landed (batch A) | D-156 |
 | C-55 | Record Inspector: every field the viewer may read on a record, including fields off the layout, with API names, copy value, Open in Find or Setup; respects field security | Minor | Landed (batch A) | D-156 |
@@ -827,47 +827,47 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| L-03 | Indicator sources: manual, import, or computed from any object | Major | Planned | Section 6 v0.9 |
-| P-10 | Participant service plans and goals: goals, steps, owner, target date, status and review dates, linked to case notes and, with Logic Models, outcomes (case management lite) | Major | Planned | D-156 |
-| P-11 | Cohorts, sessions and mass enrollment, with attendance per session | Major | Planned | D-156 |
-| L-04 | Logic model report, comparing periods | Minor | Planned | Section 6 v0.9 |
-| G-19 | Donor scoring (recency, frequency, monetary) as rollups | Minor | Planned | Section 6 v0.9 |
-| P-12 | Anonymous and aggregate service counts for drop-in services | Minor | Planned | D-156 |
-| P-13 | Referrals in and out, with status and outcome (feeds PB-05) | Minor | Planned | D-156 |
-| P-14 | Eligibility screening results from rules over intake fields (Eligible, Not Eligible, Review, with the reason) | Minor | Planned | D-156 |
-| UX-F3 | Module tab motifs (Giving, Volunteers, Rollup Builder) on documented icon numbers, as D-144 did for Core | Minor | Planned | D-144 |
-| QA-F2 | Checkbox settings that ship on and are added in an upgrade start on in orgs that already saved settings (one-time upgrade step with a version marker, plus a CI check): Include Admin Summary (C-54), Ask Reminders (G-29) | Minor | Planned | D-166 |
-| QA-F3 | Person account orgs: shift reminders reach bookings made on the person account (V-10); suggested volunteers return the account, as the Sign-ups panel books (V-11); asks use one donor field (G-26) | Minor | Planned | D-166 |
-| QA-F4 | Enrollments and service deliveries require a person, never an organization account, on every path (rule in the handlers, not only the record picker) | Minor | Planned | D-166 |
-| QA-F5 | Nonprofit Cloud Program Management coexistence: Integrations entry, admin guide note and a Health Check info finding when its Program objects are present | Minor | Planned | D-166 |
-| QA-F6 | Batch A QA text fixes: nightly job names in one style, Data Dictionary trims object labels, Include Admin Summary description states its default, import template names in one casing, Ask record number with 6 digits, Programs Admin description names case notes and service deliveries | Minor | Planned | D-166 |
+| L-03 | Indicator sources: manual, import, or computed from any object | Major | Built (landing batch B) | Section 6 v0.9 |
+| P-10 | Participant service plans and goals: goals, steps, owner, target date, status and review dates, linked to case notes and, with Logic Models, outcomes (case management lite) | Major | Built (landing batch B) | D-156 |
+| P-11 | Cohorts, sessions and mass enrollment, with attendance per session | Major | Built (landing batch B) | D-156 |
+| L-04 | Logic model report, comparing periods | Minor | Built (landing batch B) | Section 6 v0.9 |
+| G-19 | Donor scoring (recency, frequency, monetary) as rollups | Minor | Built (landing batch B) | Section 6 v0.9 |
+| P-12 | Anonymous and aggregate service counts for drop-in services | Minor | Built (landing batch B) | D-156 |
+| P-13 | Referrals in and out, with status and outcome (feeds PB-05) | Minor | Built (landing batch B) | D-156 |
+| P-14 | Eligibility screening results from rules over intake fields (Eligible, Not Eligible, Review, with the reason) | Minor | Built (landing batch B) | D-156 |
+| UX-F3 | Module tab motifs (Giving, Volunteers, Rollup Builder) on documented icon numbers, as D-144 did for Core | Minor | Built (landing batch B) | D-144 |
+| QA-F2 | Checkbox settings that ship on and are added in an upgrade start on in orgs that already saved settings (one-time upgrade step with a version marker, plus a CI check): Include Admin Summary (C-54), Ask Reminders (G-29) | Minor | Built (landing batch B) | D-166 |
+| QA-F3 | Person account orgs: shift reminders reach bookings made on the person account (V-10); suggested volunteers return the account, as the Sign-ups panel books (V-11); asks use one donor field (G-26) | Minor | Built (landing batch B) | D-166 |
+| QA-F4 | Enrollments and service deliveries require a person, never an organization account, on every path (rule in the handlers, not only the record picker) | Minor | Built (landing batch B) | D-166 |
+| QA-F5 | Nonprofit Cloud Program Management coexistence: Integrations entry, admin guide note and a Health Check info finding when its Program objects are present | Minor | Built (landing batch B) | D-166 |
+| QA-F6 | Batch A QA text fixes: nightly job names in one style, Data Dictionary trims object labels, Include Admin Summary description states its default, import template names in one casing, Ask record number with 6 digits, Programs Admin description names case notes and service deliveries | Minor | Built (landing batch B) | D-166 |
 
 #### Release 0.16 (Batch B): Funders start, Where Used
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| F-01 | Funder pipeline (Funders package; canonical model first) | Major | Planned | Section 6 v0.10 |
-| F-02 | Reporting requirements and deadlines with reminders | Major | Planned | Section 6 v0.10 |
-| C-59 | Where Used for BarnCRM setup: rollups, import templates, saved queries, transform steps, merge and matching rules that reference a field or object, ending in a Retire a Field path; no Tooling API coverage promised | Major | Planned | D-156 |
-| F-04 | Government award fields | Minor | Planned | Section 6 v0.10 |
-| F-05 | Multi-year award schedules | Minor | Planned | Section 6 v0.10 |
-| F-06 | Funder report merge template | Minor | Planned | Section 6 v0.10 |
-| F-07 | Board dashboard (revenue mix, concentration, restricted balances) | Minor | Planned | Section 6 v0.10 |
-| F-14 | Answer and boilerplate library for applications, tagged by topic, with last-used date | Minor | Planned | D-156 |
+| F-01 | Funder pipeline (Funders package; canonical model first) | Major | Built (landing batch B) | Section 6 v0.10 |
+| F-02 | Reporting requirements and deadlines with reminders | Major | Built (landing batch B) | Section 6 v0.10 |
+| C-59 | Where Used for BarnCRM setup: rollups, import templates, saved queries, transform steps, merge and matching rules that reference a field or object, ending in a Retire a Field path; no Tooling API coverage promised | Major | Built (landing batch B) | D-156 |
+| F-04 | Government award fields | Minor | Built (landing batch B) | Section 6 v0.10 |
+| F-05 | Multi-year award schedules | Minor | Built (landing batch B) | Section 6 v0.10 |
+| F-06 | Funder report merge template | Minor | Built (landing batch B) | Section 6 v0.10 |
+| F-07 | Board dashboard (revenue mix, concentration, restricted balances) | Minor | Built (landing batch B) | Section 6 v0.10 |
+| F-14 | Answer and boilerplate library for applications, tagged by topic, with last-used date | Minor | Built (landing batch B) | D-156 |
 
 #### Release 0.17 (Batch B): Funders complete and Nonprofit Cloud mirror (v1.0 candidate)
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| F-03 | Restricted fund tracking | Major | Planned | Section 6 v0.10 |
-| X-07 | Gift Transaction mirror (Nonprofit Cloud) | Major | Planned | Section 6.3 |
-| C-65 | Field Access Manager: grant or remove Read and Edit for chosen fields and objects across chosen permission sets on one page, with a preview and undo; extends Access Explorer (reverses the D-13 permission-management non-goal; ADR first, amends ADR-0047) | Major | Planned | D-157 |
-| F-08 | Deadline calendar view | Minor | Planned | Section 6 v0.10 |
-| L-06 | Link outcomes to grant deliverables when Funders is installed | Minor | Planned | Section 6 v0.10 |
-| X-05 | NPSP coexistence: adopt household accounts | Minor | Planned | Section 6.3 |
-| C-57 | Picklist value usage in Field Utilization: records per value and last use | Minor | Planned | D-156 |
-| C-58 | Technical debt checks in Org Optimizer: Apex, triggers and flows on old API versions, inactive or undescribed flows (SOQL-readable setup only) | Minor | Planned | D-156 |
-| C-60 | Automation inventory in the Data Dictionary: flows and Apex triggers per object; validation rules listed as not covered (Tooling API) | Minor | Planned | D-156 |
+| F-03 | Restricted fund tracking | Major | Built (landing batch B) | Section 6 v0.10 |
+| X-07 | Gift Transaction mirror (Nonprofit Cloud) | Major | Built (landing batch B) | Section 6.3 |
+| C-65 | Field Access Manager: grant or remove Read and Edit for chosen fields and objects across chosen permission sets on one page, with a preview and undo; extends Access Explorer (reverses the D-13 permission-management non-goal; ADR first, amends ADR-0047) | Major | Built (landing batch B) | D-157 |
+| F-08 | Deadline calendar view | Minor | Built (landing batch B) | Section 6 v0.10 |
+| L-06 | Link outcomes to grant deliverables when Funders is installed | Minor | Built (landing batch B) | Section 6 v0.10 |
+| X-05 | NPSP coexistence: adopt household accounts | Minor | Built (landing batch B) | Section 6.3 |
+| C-57 | Picklist value usage in Field Utilization: records per value and last use | Minor | Built (landing batch B) | D-156 |
+| C-58 | Technical debt checks in Org Optimizer: Apex, triggers and flows on old API versions, inactive or undescribed flows (SOQL-readable setup only) | Minor | Built (landing batch B) | D-156 |
+| C-60 | Automation inventory in the Data Dictionary: flows and Apex triggers per object; validation rules listed as not covered (Tooling API) | Minor | Built (landing batch B) | D-156 |
 
 #### Release 1.1 (Batch C): Forms engine, Contact Point Sync
 
@@ -1086,6 +1086,17 @@ Two majors: Brandon placed Backup and files import late (D-157).
 #### Held
 
 - C-38 scheduled imports and connections to other systems: on hold until Brandon starts it (D-39). The Google Sheets source for Super Importer waits with it (Brandon: "later"; it plugs in behind the C-49 file source).
+
+#### Later items from Batch B (plan notes, 2026-11-02; D-168)
+
+Not yet scheduled; each is slotted into a release under Section 9.7 when Brandon or the integrator picks it up.
+
+- Sample data for goals, cohorts and sessions (P-10, P-11): the built features ship without sample records.
+- Person-field eligibility rules (P-14): rules over fields on the person, beyond the intake fields the rules cover now.
+- X-05 Junction mode: household adoption into the `Household_Member__c` junction model; refused for the Batch B build, which converts NPSP households in place only.
+- L-04 PDF: the logic model report is a CSV plus a printable HTML page; a PDF output is later.
+- Pre-batch review candidates (Section 9.8, before the next batch test): drop the unused Rollup Builder dependency from Funders; merge the grantProgram and grantFund cards. Also for that review: Opportunity mirror buttons ("Run now", "Schedule nightly run") to Title Case; Where Used extensions for Programs eligibility rules, Logic Models computed indicators and Funders; a nightly schedule collision check at 3:30 AM (Logic Models indicator job and the Ask reminder job).
+- Subscriber picklists are not updated by a package upgrade, so the new Eligibility Status value Review (P-14) needs an admin step in upgraded orgs; the admin guide says so.
 
 #### Milestones and blocked (not counted as enhancements)
 
@@ -1409,7 +1420,7 @@ Method: web research on 2026-10-31 across the tools named in this plan and BMemo
 
 **Gaps by area.**
 - Fundraising: BarnCRM matches or beats NPSP on households, gift entry, commitments, soft credits, levels, stewardship, receipts and retention reports. Gaps: an Opportunity-free solicitation pipeline, ask cadence, saved segments for outside email tools, pledge reminders, recurring donor health (needs processor data), DAF and wealth fields. Online giving pages, peer-to-peer, mass email and wealth screening stay outside BarnCRM.
-- Admin and data: Find, Super Importer, Super Transform, duplicates, Data Dictionary and Org Optimizer cover most of Jetstream, Data Loader and DemandTools for small orgs. Gaps: who changed Setup, an admin digest, a record field inspector, permission compare, where-used before retiring a field, automation and technical debt in the Data Dictionary, merge beyond Account and Contact. Backup, archiving, field history and radius search are proposals (Section 6.1.1 items not yet approved).
+- Admin and data: Find, Super Importer, Super Transformer, duplicates, Data Dictionary and Org Optimizer cover most of Jetstream, Data Loader and DemandTools for small orgs. Gaps: who changed Setup, an admin digest, a record field inspector, permission compare, where-used before retiring a field, automation and technical debt in the Data Dictionary, merge beyond Account and Contact. Backup, archiving, field history and radius search are proposals (Section 6.1.1 items not yet approved).
 - Programs: thinnest against PMM and Nonprofit Cloud: cohorts and sessions, service plans and goals, referrals, eligibility screening, aggregate counts.
 - Volunteers: strong on staff-side management; gaps are reminders, matching, waitlists, groups, minors, recognition and the value of hours. Self-service sign-up (V-09) is the largest gap and needs Brandon.
 - Funders and grantmaking: answer library; conditional disbursements and reviewer panels for Scholarships and Outbound Grants.
@@ -1832,9 +1843,9 @@ The pre-batch review (9.8) checks new work against this list; existing code is m
 35. (C-49d) New-field creation from Super Importer needs the app to call its own org's Metadata API through a one-time admin-set connection (the ADR-0082 S15 pattern), reversing ADR-0047's no-self-callout rule and its never-built list (Section 4.9 "What we deliberately do not build"). Raised 2026-10-30. Recommendation: admins only; the new field gets read and edit through the BarnCRM permission sets; orgs without the connection are told to create the field in Setup and refresh. **Resolved 2026-10-30 (Brandon): "Approved to allow it", as recommended; recorded as Decision D-151.** Supersedes ADR-0047 for this case; an ADR on the C-49d branch records it.
 36. (C-49b) Row correction reverses canonical model R-IR4 (fix the file, never edit the staged row). Raised 2026-10-30. Recommendation: edit a failed row on screen with the original file values kept beside the corrections, then Retry This Row or Retry All Fixed Rows. **Resolved 2026-10-30 (Brandon): approved as recommended; supersedes R-IR4; recorded as Decision D-152.**
 37. (C-49b) Staging retention setting (delete once complete, after 30 days as default, after 90 days, never) must be reconciled with the Section 4.9 purge rule (D-40) and R-IR5. Raised 2026-10-30. Recommendation: check whether undo reads staged rows and, if so, move undo onto its own journal so the four options work as named; undo keeps its own window. **Resolved 2026-10-30 (Brandon):** "Undo should be able to bring the deleted record(s) back from the trash, not create a redundant copy." The four options apply to staging rows; undo never depends on staging rows and never re-inserts a copy: a record an undo restores is undeleted from the Recycle Bin, and one no longer there is reported as not restorable. Recorded as Decision D-153.
-38. (C-50 naming) Names and tabs. Raised 2026-10-30. Recommendation: the Import tab is renamed Super Importer and the Bulk Update tab is renamed Super Transform, each keeping its history on the same tab. **Resolved 2026-10-30:** integrator call (small and reversible), Brandon named both tools; Import tab becomes Super Importer, Bulk Update tab becomes Super Transform, histories stay on the same tab.
+38. (C-50 naming) Names and tabs. Raised 2026-10-30. Recommendation: the Import tab is renamed Super Importer and the Bulk Update tab is renamed Super Transformer, each keeping its history on the same tab. **Resolved 2026-10-30:** integrator call (small and reversible), Brandon named both tools; Import tab becomes Super Importer, Bulk Update tab becomes Super Transformer, histories stay on the same tab.
 39. (G-26) Ask__c sharing: Public Read/Write as built, or Private plus View All (Gift is Private with no View All in the Giving permission sets). Raised 2026-10-31 at batch A. Pending Brandon.
-40. (Core naming) One name for Super Transform, Update Many Records and Bulk Update. Raised 2026-10-31 in the batch A UX review. Pending Brandon.
+40. (Core naming) One name for Super Transformer, Update Many Records and Bulk Update. Raised 2026-10-31 in the batch A UX review. Pending Brandon.
 41. (Health Check) Finding titles in sentence case or Title Case. Raised 2026-10-31 in the batch A UX review. Pending Brandon.
 
 ### 11.3 Parking lot (good ideas, deliberately not now)
@@ -2115,6 +2126,9 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 | D-164 | Logic model stage change is refused when an arrow would point backward (L-01) | Allowing the change and leaving a backward arrow | Keeps the model's flow consistent |
 | D-165 | Batch A pre-batch review (Section 9.8, 2026-10-31): 23 QA fixes, 17 UX fixes and a simplification pass of about -1,650 net lines with no functionality removed; follow-ups placed in releases: V-10b, UX-F4, G-35, G-36, G-37 and C-71 (Sections 6.0a, 9.7) | Testing batch A without the review | Section 9.8 requires the review before each batch test; follow-ups are slotted per Section 9.7 |
 | D-166 | Batch A deployed to barn-npc 2026-11-01 (main a3a2e7f3, 4,028 of 4,028 tests) after four barn-npc-only test fixes (#806); functional QA there (no browser) passed every batch A feature, and its findings became QA-F2 to QA-F6 in release 0.15 | Holding the release for the findings | None blocks use: two settings start off on upgraded orgs, person account gaps in Volunteers and Programs, and text fixes; they land first in Batch B |
+| D-167 | Brandon 2026-11-02: all v1.0 development (releases 0.15 to 0.17, Batch B) is built before any testing cycle; landing, the release gate, barn-npc and mwdbdevsb deploys and QA and UX then run once for the whole v1.0 scope | A testing cycle per batch slice (Section 9.7 cadence) | One end-to-end cycle for v1.0; builders still run their own class tests on barn-sales |
+| D-168 | Batch B build decisions (integrator, 2026-11-02; releases 0.15 to 0.17 built, awaiting landing batch B): cohort membership is the enrollment's Cohort lookup (no junction object); session attendance is one Service_Delivery__c per person per session; goals cascade-delete with their enrollment (matches erasure); referrals stay Private case-note style records; Funders depends on Core and Rollup Builder only (no Giving dependency: restricted funds name the Giving fund by record ID, Grant Payment is the grant's own object); Funders Email Reminders ships off (tasks on); funder reports are a browser HTML merge, no PDF; board concentration thresholds are fixed at 25% and 50%; L-06 links an outcome to a deliverable of any requirement type; donor scoring (G-19) is on by default (computed, no outreach); X-05 NPSP household adoption lives in Core (precedent X-09, a new ADR), Junction mode refused; C-65 excludes profiles and blocks BarnCRM's own permission sets (generated list plus a CI check); C-58 default API version is 50, inactive flows counted; label budget cap 4,500 with target 4,000 using shared labels (Core_Shared_*, Core_Format_*); changing help paragraphs to links is held unless needed to fit the budget | Per-item alternatives rejected: a cohort junction object, a Giving dependency in Funders, PDF funder reports, configurable board thresholds, moving X-05 to Mirror, profile support in C-65 | Each keeps the Section 4 architecture and the no-dependency rule, uses less metadata, and stays reversible; sample data for goals, cohorts and sessions, person-field eligibility rules, X-05 Junction mode, the L-04 PDF and two pre-batch review candidates are plan notes in Section 6.0a (Later items from Batch B) |
+| D-169 | Owner decisions 2026-11-02 (Brandon): the bulk change tool is renamed Super Transformer (visible text only; replaces Super Transform wherever the plan names the tool); Health Check finding titles are in Title Case (descriptions stay sentence case); Ask sharing stays Public Read/Write (option B, Private plus View All, declined); the v1.0 build is deployed to mwdbdevsb after testing, check-only first (each deploy still needs his approval) | Keeping the name Super Transform; sentence case titles; Private Ask sharing with View All | Title Case matches the title rule for every BarnCRM title; Public Read/Write keeps Ask sharing simple and unchanged for upgraded orgs |
 
 ---
 
