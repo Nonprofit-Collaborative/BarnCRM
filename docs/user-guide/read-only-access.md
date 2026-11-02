@@ -100,6 +100,10 @@ None of these change anything. Nothing is saved when an action is refused.
   who entered them and to coordinators. Totals on each person still show.
 - Problem: you need to change something. Ask your admin for a role that allows it, such as
   Team Member.
+- Problem: a field you need is missing from a record, or shows but cannot be changed. Your
+  permission sets do not give it. Tell your admin which field and on which kind of record:
+  they can give Read or Edit to a whole group at once with the Field Access Manager (see the
+  [Admin Guide](../admin-guide/field-access-manager.md)).
 
 ## Related
 

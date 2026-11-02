@@ -7,7 +7,7 @@
 
 The **Access Explorer** section of **Org Optimizer** answers "who can see or change what, and
 why". It reads your org's profiles, permission sets and permission set groups and shows the
-answer five ways:
+answer five ways, and a sixth view changes field access:
 
 | View | What it shows |
 |---|---|
@@ -16,10 +16,13 @@ answer five ways:
 | **BarnCRM Permission Sets** | Every permission set and role BarnCRM ships, how many active people hold each, and whether the hourly Tab Access Check is scheduled. |
 | **Compare Two** | Two people, or two profiles, permission sets or groups, side by side: what each can do on every kind of record (and on the fields of one), showing only the differences unless you ask for everything, with a similarity score. |
 | **Modify All Report** | Every profile, permission set and group that holds **Modify All Data**, **View All Data** or **Author Apex**, and every one that holds **Modify All** or **View All** on a kind of record, with how many active people hold each and the groups it sits inside. |
+| **Change Field Access** | The [Field Access Manager](field-access-manager.md): give or remove Read and Edit on fields and kinds of record across up to 10 of your own permission sets, with a preview and undo. |
 
 Each table has **Download CSV**, which saves what it shows.
 
-Access Explorer is **read only**. It never gives or takes access. To change who holds a BarnCRM
+The first five views are **read only**: they never give or take access. **Change Field Access**
+changes only Read and Edit, only on permission sets your organization made, and only after a
+preview (see [Field Access Manager](field-access-manager.md)). To change who holds a BarnCRM
 role or add-on, use the [Access page](access.md); for anything else, use Setup.
 
 ## How to Turn It On
