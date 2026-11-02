@@ -319,6 +319,22 @@ private class VolunteerReminderServiceTest {
         }
     }
 
+    /**
+     * QA-F3: in an org that stores people as accounts, a person account booked with no Contact
+     * is reminded at the account's own email; elsewhere the query names no person account field.
+     * The person account branch runs for real in the person account test org.
+     */
+    @IsTest
+    static void personAccountBookingsAreRemindedOnlyWherePeopleAreAccounts() {
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            String withAccounts = VolunteerReminderSelector.dueQuery(true);
+            String withoutAccounts = VolunteerReminderSelector.dueQuery(false);
+            Assert.isTrue(withAccounts.contains('Account__r.PersonEmail != NULL'));
+            Assert.isTrue(withAccounts.contains('Account__r.PersonHasOptedOutOfEmail = FALSE'));
+            Assert.isFalse(withoutAccounts.contains('Person'), 'No person account field.');
+        }
+    }
+
     @IsTest
     static void leadDaysReadAsTheShippedValueWhenBlankOrOutOfRange() {
         System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {

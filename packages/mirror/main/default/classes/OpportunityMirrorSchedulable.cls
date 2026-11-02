@@ -7,7 +7,7 @@
  * and the rollups at 02:00, which then count the gifts it made.
  */
 public with sharing class OpportunityMirrorSchedulable implements Schedulable {
-    public static final String JOB_NAME = 'BarnCRM Mirror: Opportunity mirror';
+    public static final String JOB_NAME = 'BarnCRM Mirror Opportunity Mirror';
     private static final String CRON = '0 30 1 * * ?';
     /** The scheduled Apex job type, which is what CronJobDetail calls a scheduled class. */
     private static final String SCHEDULED_APEX = '7';
@@ -72,14 +72,25 @@ public with sharing class OpportunityMirrorSchedulable implements Schedulable {
             .isEmpty();
     }
 
+    /**
+     * The job's trigger, matched by `ScheduledJobSelector.nameKey`, so a job still scheduled under
+     * its earlier spelling ("BarnCRM Mirror: Opportunity mirror", before QA-F6) is found too.
+     */
     private static CronTrigger job() {
-        List<CronTrigger> jobs = [
-            SELECT Id, NextFireTime, StartTime
+        String key = ScheduledJobSelector.nameKey(JOB_NAME);
+        for (CronTrigger found : [
+            SELECT Id, NextFireTime, StartTime, CronJobDetail.Name
             FROM CronTrigger
-            WHERE CronJobDetail.Name = :JOB_NAME AND CronJobDetail.JobType = :SCHEDULED_APEX
+            WHERE
+                CronJobDetail.Name LIKE 'BarnCRM Mirror%'
+                AND CronJobDetail.JobType = :SCHEDULED_APEX
             WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return jobs.isEmpty() ? null : jobs[0];
+            LIMIT 100
+        ]) {
+            if (ScheduledJobSelector.nameKey(found.CronJobDetail.Name) == key) {
+                return found;
+            }
+        }
+        return null;
     }
 }

@@ -2,7 +2,8 @@
  * Shift reminders (V-10, R-VU6): one email to each person booked on a shift that starts within
  * the lead time, once per booking.
  *
- * Sent through the platform's single email call, to the Contact's own address, so the org's
+ * Sent through the platform's single email call, to the Contact's own address (or, for a person
+ * account booked with no Contact, the account's own email, QA-F3), so the org's
  * email limits apply and nothing outside Salesforce is needed. A person with Email Opt Out
  * checked, no address, a cancelled booking or a cancelled shift is never emailed (the selector
  * leaves them out). A booking stamped Reminder Sent On is never emailed again; clearing the
@@ -123,7 +124,14 @@ public with sharing class VolunteerReminderService {
         if (shift.End_Time__c != null) {
             whenText += ' - ' + shift.End_Time__c.format(TIME_FORMAT, zone);
         }
-        String firstName = signup.Contact__r.FirstName;
+        // A person account booked with no Contact (QA-F3) is read from the account by name.
+        SObject person = signup.Contact__c != null
+            ? (SObject) signup.Contact__r
+            : signup.getSObject('Account__r');
+        String firstName = (String) person.get('FirstName');
+        String email = (String) person.get(
+            signup.Contact__c != null ? 'Email' : VolunteerReminderSelector.PERSON_EMAIL
+        );
         String greeting = String.isBlank(firstName)
             ? System.Label.Volunteers_Reminders_GreetingNoName
             : String.format(
@@ -148,7 +156,7 @@ public with sharing class VolunteerReminderService {
         body += '\n\n' + System.Label.Volunteers_Reminders_Closing;
 
         Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
-        message.setToAddresses(new List<String>{ signup.Contact__r.Email });
+        message.setToAddresses(new List<String>{ email });
         message.setSubject(
             String.format(System.Label.Volunteers_Reminders_Subject, new List<Object>{ jobName })
         );

@@ -142,4 +142,27 @@ private class ProgramsHealthCheckExtensionTest {
             );
         }
     }
+
+    /** QA-F5: Nonprofit Cloud Program Management alongside Programs is reported, as information. */
+    @IsTest
+    static void nonprofitCloudProgramManagementIsReportedWhenPresent() {
+        System.runAs(TestUsers.adminWith(ADMIN)) {
+            ProgramsHealthCheckExtension.npcProgramsOverride = true;
+            Map<String, Object> finding = byKey(new ProgramsHealthCheckExtension().findings())
+                .get(ProgramsHealthCheckExtension.NPC_KEY);
+            Assert.areEqual(Label.Programs_HealthCheck_NpcProgramsTitle, finding.get('title'));
+            Assert.areEqual(HealthCheckService.SEVERITY_INFO, finding.get('severity'));
+
+            ProgramsHealthCheckExtension.npcProgramsOverride = false;
+            Assert.isFalse(
+                byKey(new ProgramsHealthCheckExtension().findings())
+                    .containsKey(ProgramsHealthCheckExtension.NPC_KEY),
+                'Not reported where those objects are absent.'
+            );
+
+            ProgramsHealthCheckExtension.npcProgramsOverride = null;
+            // The real describe answers either way without throwing.
+            ProgramsHealthCheckExtension.hasNonprofitCloudPrograms();
+        }
+    }
 }

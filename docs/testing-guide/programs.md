@@ -244,7 +244,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open BarnCRM's import and upload the CSV. | **Program roster** is offered as a template. |
+| 1 | Open BarnCRM's import and upload the CSV. | **Program Roster** is offered as a template. |
 | 2 | Choose it and preview. | Columns map to Program and the enrollment's fields with no manual mapping. |
 | 3 | Load it. | 2 loaded, 3 not loaded: no program "No Such Program", no person with nobody@example.org, and the repeated first email refused as an open enrollment already in Test Pantry. |
 | 4 | Open Test Pantry's **Program Roster** panel. | The first person Enrolled with your start date and Referral Source School; the second Enrolled from today. |

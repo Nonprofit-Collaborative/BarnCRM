@@ -9,6 +9,11 @@
  * scheduler used to make two or three queries of its own. Scheduling or aborting through this
  * class forgets what was read, so a later question in the same transaction sees the change.
  *
+ * A name is matched by `nameKey`, which ignores case, colons and repeated spaces. The job names
+ * were put in one style (QA-F6: "BarnCRM Giving Ask Reminders", not "BarnCRM Giving: ask
+ * reminders"), and a long-lived org keeps a job scheduled under the old spelling until someone
+ * stops it, so the old spelling has to keep reading as the same job.
+ *
  * The setup objects are read in system mode: an administrator without View Setup must still
  * see whether a job the package owns is running, and only the package's own jobs are read.
  */
@@ -16,8 +21,17 @@
 public with sharing class ScheduledJobSelector {
     private static final String NAME_PATTERN = 'BarnCRM%';
 
-    /** The package's scheduled jobs by name, read once per transaction; null until asked. */
+    /** The package's scheduled jobs by `nameKey`, read once per transaction; null until asked. */
     private static Map<String, CronTrigger> byName;
+
+    /**
+     * What a job name is matched by: lower case, colons read as spaces, spaces collapsed. So
+     * "BarnCRM Giving: ask reminders" and "BarnCRM Giving Ask Reminders" are the same job.
+     */
+    @NamespaceAccessible
+    public static String nameKey(String jobName) {
+        return jobName == null ? null : jobName.replace(':', ' ').normalizeSpace().toLowerCase();
+    }
 
     /** The Id of the trigger behind the named scheduled Apex job, or null when there is none. */
     @NamespaceAccessible
@@ -51,8 +65,11 @@ public with sharing class ScheduledJobSelector {
     @NamespaceAccessible
     public static List<String> namesOwnedByInactiveUsers() {
         Map<String, Id> ownerByName = new Map<String, Id>();
-        for (String name : all().keySet()) {
-            ownerByName.put(name, ownerOverride != null ? ownerOverride : all().get(name).OwnerId);
+        for (CronTrigger job : all().values()) {
+            ownerByName.put(
+                job.CronJobDetail.Name,
+                ownerOverride != null ? ownerOverride : job.OwnerId
+            );
         }
         Set<Id> ownerIds = new Set<Id>(ownerByName.values());
         Set<Id> inactive = new Set<Id>();
@@ -132,7 +149,7 @@ public with sharing class ScheduledJobSelector {
         if (String.isBlank(jobName)) {
             return null;
         }
-        return all().get(jobName);
+        return all().get(nameKey(jobName));
     }
 
     private static Map<String, CronTrigger> all() {
@@ -145,7 +162,7 @@ public with sharing class ScheduledJobSelector {
                 WHERE CronJobDetail.JobType = '7' AND CronJobDetail.Name LIKE :NAME_PATTERN
                 WITH SYSTEM_MODE
             ]) {
-                byName.put(job.CronJobDetail.Name, job);
+                byName.put(nameKey(job.CronJobDetail.Name), job);
             }
         }
         return byName;

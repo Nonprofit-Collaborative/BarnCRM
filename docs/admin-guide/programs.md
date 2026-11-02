@@ -163,7 +163,7 @@ related list on the program. The list views are **Open Enrollments** and **All E
 ### Importing a Roster
 
 To enroll many people at once, use BarnCRM's import (see [Importing](importing.md)) with the
-shipped **Program roster** template, which Programs adds at install. It is an upload of several
+shipped **Program Roster** template, which Programs adds at install. It is an upload of several
 objects: each row finds its program by name and enrolls the person found by email. Columns:
 
 | Column | Loads | Notes |

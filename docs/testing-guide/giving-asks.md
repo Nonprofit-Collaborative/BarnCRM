@@ -29,7 +29,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the person `Luis Garcia`. In the **Asks** related list click **New**. | The form opens with the donor already chosen. |
-| 2 | Enter **Ask Amount** `5000`, **Target Date** 30 days out, **Next Step** `Call about the roof`. Leave **Stage** empty. Save. | The ask is saved and numbered like ASK-00000001. |
+| 2 | Enter **Ask Amount** `5000`, **Target Date** 30 days out, **Next Step** `Call about the roof`. Leave **Stage** empty. Save. | The ask is saved and numbered like ASK-000001. |
 | 3 | Read the fields. | **Stage** is the first stage, **Outcome** is Open, **Assigned To** is you, **Stage Changed Date** is filled in, **Closed Date** is empty. |
 | 4 | Click **New** again. Choose both **Donor Contact** and **Donor Account**. Save. | Refused: an ask needs exactly one donor. |
 | 5 | Clear both donors. Save. | Refused for the same reason. |

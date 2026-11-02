@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Shipped_Defaults_Applied__c</fullName>
+  <description>How many ship-on checkbox settings added in an upgrade each BarnCRM package has turned on once in this org, as package:count pairs (core:1,giving:1). Written by the setup steps (QA-F2), so a setting an administrator turns off afterwards stays off.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Package bookkeeping: which settings added in upgrades have been turned on once.</inlineHelpText>
+  <label>Shipped Defaults Applied</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>

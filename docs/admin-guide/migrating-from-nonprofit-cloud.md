@@ -30,9 +30,9 @@ If one is missing (an install that logged a problem, for example), add it from H
    and names them.
 3. Select **Restore Import Templates**. Your own templates, and any shipped template you have
    edited, are not touched.
-4. Open the **Import** tab. The list now has **Nonprofit Cloud: person accounts**,
-   **Nonprofit Cloud: gift transactions**, **Nonprofit Cloud: undesignated gifts**
-   and **Nonprofit Cloud: organization gifts**.
+4. Open the **Import** tab. The list now has **Nonprofit Cloud: Person Accounts**,
+   **Nonprofit Cloud: Gift Transactions**, **Nonprofit Cloud: Undesignated Gifts**
+   and **Nonprofit Cloud: Organization Gifts**.
 
 Before loading gifts, create in BarnCRM every fund and appeal the gifts name, with the same
 names they have in Nonprofit Cloud (see [Funds](funds.md) and [Appeals](appeals.md)), and mark
@@ -45,12 +45,12 @@ The four sample files in [samples](samples/) are small exports in exactly the sh
 in section 4 produce. Create a default fund called **General Fund**, a fund called
 **Scholarships** and an appeal called **Spring Appeal** first.
 
-1. Open the **Import** tab, select **Nonprofit Cloud: person accounts**, then **Next**, and
+1. Open the **Import** tab, select **Nonprofit Cloud: Person Accounts**, then **Next**, and
    upload `npc-person-accounts.csv`. Every column is already mapped, `PersonEmail` to
    the person's email, `PersonMailingCity` to their mailing city, and so on.
 2. Preview, then import. Ana Okafor and Wei Lee are created, each with a household of their
    own.
-3. Import `npc-gift-transactions.csv` with **Nonprofit Cloud: gift transactions**.
+3. Import `npc-gift-transactions.csv` with **Nonprofit Cloud: Gift Transactions**.
    Leave donation matching at **Match or create**. The preview says 2 rows would create a gift
    and 2 would be rejected. The rejected two are the two lines of one gift split across two
    funds, each saying "The split adds up to 300.00, not the gift amount of 500.00." (and 200.00
@@ -58,10 +58,10 @@ in section 4 produce. Create a default fund called **General Fund**, a fund call
 4. Import these rows. Open Ana Okafor: she has two gifts, one of 250.00 to Scholarships with the appeal
    Spring Appeal and the payment method Card, one of 100.00 to General Fund. She was found by
    her email, not created again.
-5. Import `npc-undesignated-gifts.csv` with **Nonprofit Cloud: undesignated
-   gifts**. Both gifts are created, to General Fund, one for Ana and one for Wei.
-6. Import `npc-organization-gifts.csv` with **Nonprofit Cloud: organization
-   gifts**. Riverside Foundation is created as an organization and gives one gift of 1,000.00,
+5. Import `npc-undesignated-gifts.csv` with **Nonprofit Cloud: Undesignated
+   Gifts**. Both gifts are created, to General Fund, one for Ana and one for Wei.
+6. Import `npc-organization-gifts.csv` with **Nonprofit Cloud: Organization
+   Gifts**. Riverside Foundation is created as an organization and gives one gift of 1,000.00,
    split 600.00 to Scholarships and 400.00 to General Fund. This file is the split gift of
    step 3 done the right way: two lines combined into one row.
 7. Load any of the gift files again and preview it. Every gift row says it matches a gift you
@@ -95,7 +95,7 @@ to 500,000 rows can be previewed as one file; split anything larger.
    ```
 
 4. **Gifts from people, with their designations.** Export one row per designation, and load
-   the file with **Nonprofit Cloud: gift transactions**.
+   the file with **Nonprofit Cloud: Gift Transactions**.
 
    ```sql
    SELECT GiftTransactionId, GiftTransaction.OriginalAmount, GiftTransaction.TransactionDate,
@@ -109,7 +109,7 @@ to 500,000 rows can be previewed as one file; split anything larger.
    ```
 
 5. **Gifts from organizations.** The same query with the donor's name in place of the four
-   person columns, loaded with **Nonprofit Cloud: organization gifts**.
+   person columns, loaded with **Nonprofit Cloud: Organization Gifts**.
 
    ```sql
    SELECT GiftTransactionId, GiftTransaction.OriginalAmount, GiftTransaction.TransactionDate,
@@ -188,7 +188,7 @@ These are not loaded by the four templates. Each has what to do in the meantime.
 | Additional addresses | Only the mailing address loads. Add seasonal and other addresses by hand ([Addresses](addresses.md)). |
 | Funds and appeals | Create them by hand first (section 4, step 1). |
 | An organization's details | A gift file creates an organization with its name only. Add its address and phone by hand. |
-| In-kind gifts (payment method In-kind) | BarnCRM wants an in-kind gift's value as its fair market value, with no amount, so these rows are rejected. Load them with the **Generic gift list**, the value mapped to **Gift: fair market value**. |
+| In-kind gifts (payment method In-kind) | BarnCRM wants an in-kind gift's value as its fair market value, with no amount, so these rows are rejected. Load them with the **Generic Gift List**, the value mapped to **Gift: fair market value**. |
 
 ## 7. Loading Into the Org Nonprofit Cloud Is In
 

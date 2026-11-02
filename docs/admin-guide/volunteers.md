@@ -645,7 +645,7 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
 
 ## Importing Volunteer Hours
 
-To bring in hours kept in a spreadsheet, use the **Volunteer hours** template on the Import tab.
+To bring in hours kept in a spreadsheet, use the **Volunteer Hours** template on the Import tab.
 It is added when Volunteers is installed and appears only where Volunteers is. It loads one
 Volunteer Hours record per row, using the Core import's **One Kind of Record** (see
 [Importing](importing.md), section 9), so the preview, results, rejected rows download and undo
@@ -675,7 +675,7 @@ repeat; the hours still count toward the job.
 1. Make a file with the columns above, for example `volunteer@example.org, Food pantry,
    2026-03-14, 3, Sorted donations`. Every job named must already exist under **Volunteer
    Jobs**, and every email must belong to someone already in BarnCRM.
-2. Open the **Import** tab, select **Volunteer hours**, then **Next**, and upload the file.
+2. Open the **Import** tab, select **Volunteer Hours**, then **Next**, and upload the file.
 3. Check that each column is matched to its field, then select **Preview**. Nothing is written.
 4. Read the counts. A row whose email matches nobody, or whose job matches no job, is
    **rejected** and named in the table with the reason; select **Download Rejected Rows**, correct

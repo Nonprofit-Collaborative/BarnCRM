@@ -160,6 +160,37 @@ private class AskRulesTest {
         }
     }
 
+    /**
+     * QA-F3: in an org that stores people as accounts, an ask saved on the contact behind a person
+     * account names the account. An ordinary account stands in for the person account here.
+     */
+    @IsTest
+    static void aPersonAccountsContactBecomesTheDonorAccount() {
+        System.runAs(staff()) {
+            Contact behind = person();
+            Contact plain = new Contact(FirstName = 'Lee', LastName = 'Chen');
+            insert plain;
+            Account personAccount = GivingTestDataFactory.insertOrganization('Ana Ramirez');
+            AskRules.accountsBehindForTest = new Map<Id, Id>{ behind.Id => personAccount.Id };
+
+            Ask__c moved = new Ask__c(Donor_Contact__c = behind.Id);
+            Ask__c kept = new Ask__c(Donor_Contact__c = plain.Id);
+            insert new List<Ask__c>{ moved, kept };
+
+            Map<Id, Ask__c> saved = new Map<Id, Ask__c>(
+                [
+                    SELECT Donor_Contact__c, Donor_Account__c
+                    FROM Ask__c
+                    WHERE Id IN (:moved.Id, :kept.Id)
+                    WITH SYSTEM_MODE
+                ]
+            );
+            Assert.areEqual(personAccount.Id, saved.get(moved.Id).Donor_Account__c);
+            Assert.isNull(saved.get(moved.Id).Donor_Contact__c, 'One donor field, the account.');
+            Assert.areEqual(plain.Id, saved.get(kept.Id).Donor_Contact__c, 'A contact stays.');
+        }
+    }
+
     @IsTest
     static void anAskNeedsExactlyOneDonorButAnOrphanCanStillBeClosed() {
         System.runAs(staff()) {

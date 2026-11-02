@@ -9,6 +9,14 @@
         <value>This person already has an open enrollment in {0}. Change that enrollment instead of adding another, or end it first.</value>
     </labels>
     <labels>
+        <fullName>Programs_Person_NotAPerson</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Enrollment or service delivery refused for an account that is not a person</shortDescription>
+        <value>Choose a person. An organization or household account cannot be enrolled or receive a service.</value>
+    </labels>
+    <labels>
         <fullName>Programs_Roster_Title</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -239,6 +247,22 @@
         <protected>true</protected>
         <shortDescription>Health Check count that stopped at its cap; {0} is the cap</shortDescription>
         <value>More than {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_HealthCheck_NpcProgramsTitle</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check title: Nonprofit Cloud Program Management is in the org</shortDescription>
+        <value>Nonprofit Cloud Program Management is also in this org</value>
+    </labels>
+    <labels>
+        <fullName>Programs_HealthCheck_NpcProgramsDetail</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: Nonprofit Cloud Program Management alongside Programs</shortDescription>
+        <value>This org has the Nonprofit Cloud Program and Program Enrollment objects. BarnCRM Programs keeps its own programs, enrollments and service deliveries and does not read or write those objects, so the two do not share records. Choose one for each program; the Programs admin guide explains how they coexist. Nothing needs fixing.</value>
     </labels>
     <labels>
         <fullName>Programs_SampleData_CountLabel</fullName>

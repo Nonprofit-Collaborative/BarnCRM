@@ -45,6 +45,9 @@
  * because of a bootstrap step, so a failure is written to the Error Log instead, and the
  * Rollups page still offers the same button.
  *
+ * Alongside these, a checkbox setting that ships on and was added in an upgrade is turned on once
+ * in an org that saved Giving Settings before it existed (QA-F2, `SHIPPED_ON_ADDED_IN_UPGRADES`).
+ *
  * The steps are `runSetup`, which also adds the module to Core's setup marker and is what
  * Finish Setup runs for a module copied into an org by hand (FS1, `ModuleSetups`).
  */
@@ -57,6 +60,17 @@ public with sharing class GivingPostInstall implements InstallHandler, ModuleSet
     private static final String SWITCH_CONTEXT = 'GivingPostInstall.ensureAutomationSwitches';
     private static final String IMPORT_CONTEXT = 'GivingPostInstall.ensureImportTemplates';
     private static final String FUND_CONTEXT = 'GivingPostInstall.ensureDefaultFund';
+
+    /**
+     * Giving checkboxes that ship on and were added in an upgrade, oldest first: each is turned
+     * on once in an org that saved Giving Settings before it existed (Core's
+     * `ShippedDefaultUpgrades`, QA-F2). Append only; `scripts/ci/check-setting-defaults.py`
+     * fails the build when a new ship-on checkbox is missing here.
+     */
+    @TestVisible
+    private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
+        Giving_Settings__c.Ask_Reminders_Enabled__c
+    };
 
     /**
      * Called by the platform after the package is installed or upgraded.
@@ -89,6 +103,11 @@ public with sharing class GivingPostInstall implements InstallHandler, ModuleSet
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);
         FundDefaultsService.installDefaultFundDuringInstall(FUND_CONTEXT);
+        ShippedDefaultUpgrades.apply(
+            MODULE_KEY,
+            Giving_Settings__c.SObjectType,
+            SHIPPED_ON_ADDED_IN_UPGRADES
+        );
         ModuleSetups.markRan(MODULE_KEY);
     }
 }

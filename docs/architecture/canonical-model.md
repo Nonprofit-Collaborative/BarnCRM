@@ -1111,6 +1111,7 @@ Added by the suite choice (C-30) and the Module Manager (C-24).
 | `Features_Turned_On__c` | text (255) | empty | The comma separated keys of the Core features turned on (`DataManager`, `DuplicateReview`, `OrgOptimizer`, `HouseholdUpkeep`, `Addresses`, `Relationships`, `Affiliations`, `PreferredEmail`). Empty means every feature is on: an org upgraded from before features existed. A new install stores `None` (every feature off) until first-run setup; finishing it with every feature unticked stores `NoneChosen` (every feature off, setup done). A key once added is never removed: features are one-way. While a key is missing, its tabs' BarnCRM Tab permission sets are held by nobody, its rows are hidden in BarnCRM Settings, and its group's automations do not run. Written by General, Features and first-run setup, not edited as a setting (ADR-0124, `0124-edition-gates-visibility.md`). |
 | `Hide_Nonprofit_Modules__c` | boolean | false | Whether the Module Manager hides the nonprofit modules: the modules in the module catalog whose `Editions__c` does not name the Standard edition (`Standard`), so only the Nonprofit Edition offers them. Stored as the opposite of the page's Show Nonprofit Modules checkbox (checked when this is false) so that a settings row saved before the field existed, or a blank value, shows the modules: only a deliberate tick hides. When true, the Modules section keeps its Show Nonprofit Modules checkbox, shows a count of installed nonprofit modules that are hidden, and lists no nonprofit module. Org-wide; it hides rows only and installs, removes and turns off nothing. Written by the Module Manager's checkbox through `ModuleManagerService`, which checks Manage BarnCRM Settings; not edited as a Setting Definition row. Ships off, so it needs no `SHIPPED_DEFAULTS` entry (ADR-0035). |
 | `Modules_Setup_Run__c` | text (255) | empty | The comma separated keys (`Core` and the module catalog's names, such as `Giving`) of the packages whose setup steps have run in this org. Each package's post-install class adds its own key at the end of its steps, at every install and upgrade, when `scripts/org/deploy-packages.sh` runs those steps, and when an administrator presses Finish Setup (FS1). A package that is here, ships setup steps (its post-install class implements `ModuleSetup`) and is not listed gets a Health Check finding and a notice on the Modules page. Bookkeeping written by `ModuleSetups` with no audit row; not edited as a Setting Definition row. Empty until the first setup runs, so it needs no `SHIPPED_DEFAULTS` entry. |
+| `Shipped_Defaults_Applied__c` | text (255) | empty | How many entries of each package's `SHIPPED_ON_ADDED_IN_UPGRADES` list (the checkbox settings that ship on and were added in an upgrade, in its post-install class) this org has had turned on once, as lower case `package:count` pairs (`core:1,giving:1`) (QA-F2). The setup steps (`ShippedDefaultUpgrades`) set each entry past the count to true on a stored settings record, so an org that saved its settings before the field existed gets the shipped value, then raise the count; an org that never saved those settings is only counted, since its shipped default already applies. A setting turned off afterwards stays off. Bookkeeping with no audit row; not edited as a Setting Definition row. |
 
 ### Field utilization keys
 
@@ -6437,7 +6438,8 @@ logged, and the ask's save is never refused for it.
 
 ### Salesforce implementation
 
-- **Object:** `Ask__c`, Giving package. Name is an auto number, `ASK-{00000000}`. Sharing is
+- **Object:** `Ask__c`, Giving package. Name is an auto number, `ASK-{000000}` (six digits, as Gift, Enrollment and most record
+  numbers; eight until QA-F6, so asks created before keep their eight digit numbers). Sharing is
   Public Read/Write (`ReadWrite`): a small development team works one shared pipeline, and an
   organization that wants each fundraiser to see only their own asks sets it to Private in Setup
   (ADR-0153). Field history is on for Stage, Outcome, Ask Amount and Target Date (R-SO4).
@@ -6544,7 +6546,7 @@ sort in package metadata, so the list opens unsorted and a click on the Next Ask
 - **Settings keys** (on `Giving_Settings__c`, Section 12): `Ask_Reminders_Enabled__c`,
   `Ask_Reminders_Last_Run__c`, `Ask_Reminders_Last_Run_Summary__c`.
 - **Nightly job:** `AskReminderSchedulable` and `AskReminderBatch`, scheduled by
-  `GivingScheduler` as the module's fourth job (`BarnCRM Giving: ask reminders`, 03:30) and
+  `GivingScheduler` as the module's fourth job (`BarnCRM Giving Ask Reminders`, 03:30) and
   listed by `GivingNightlyJobProvider` for Health Check.
 - **Service:** `AskReminderService`, `AskReminderSelector`, `AskReminderWriter`.
 
@@ -10777,6 +10779,7 @@ mirrors the primary member).
 | 0.14 | 2026-10-31 | Programs P-08. `Enrollment__c` (29ZA) and `Service_Delivery__c` (29ZB) change from Public Read/Write to Private, each shared with the new public group `Programs_Participants` through the Apex sharing reason `Programs_Participants__c` (R-EN7, R-SD6). New hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox, default unchecked): the Participant Privacy preset, Shared by default, which puts All Internal Users in the group, or Private, which takes them out. Programs Admin gains View All and Modify All on both objects. |
 | 0.14 | 2026-10-31 | Programs P-05. The Programs Dashboard (29ZA, "Program dashboard") and the person card's last service date and services attended. No object or field added. |
 | 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29ZA, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
+| 0.15 | 2026-11-02 | Ship-on settings added in an upgrade (QA-F2, D-166). New field `Shipped_Defaults_Applied__c` on BarnCRM Settings (Section 12, v0.8 keys): how many of each package's ship-on checkboxes added in an upgrade have been turned on once, so Send Weekly Admin Summary (C-54) and Ask Reminders (G-29) start on in orgs that saved settings before them. No object added. |
 
 ---
 ## 32. Entity ownership by package

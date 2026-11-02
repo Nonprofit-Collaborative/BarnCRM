@@ -12,10 +12,12 @@
  */
 public with sharing class GivingScheduler {
     /** The names the scheduled jobs carry, so the settings page can find them again. */
-    public static final String TOP_UP_JOB_NAME = 'BarnCRM Giving: installment top up';
-    public static final String OVERDUE_JOB_NAME = 'BarnCRM Giving: installments overdue';
-    public static final String LEVELS_JOB_NAME = 'BarnCRM Giving: donor levels';
-    public static final String ASK_JOB_NAME = 'BarnCRM Giving: ask reminders';
+    public static final String TOP_UP_JOB_NAME = 'BarnCRM Giving Installment Top Up';
+    public static final String OVERDUE_JOB_NAME = 'BarnCRM Giving Installments Overdue';
+    public static final String LEVELS_JOB_NAME = 'BarnCRM Giving Donor Levels';
+    public static final String ASK_JOB_NAME = 'BarnCRM Giving Ask Reminders';
+    /** Every Giving job name starts so, in today's spelling and the one before QA-F6. */
+    private static final String GIVING_JOB_PATTERN = 'BarnCRM Giving%';
 
     /**
      * The times, and why they are these times. The top up runs first so the overdue pass sees
@@ -164,11 +166,12 @@ public with sharing class GivingScheduler {
             status.jobName = jobName;
             byName.put(jobName, status);
         }
+        Map<String, JobStatus> byKey = new Map<String, JobStatus>();
+        for (JobStatus status : byName.values()) {
+            byKey.put(ScheduledJobSelector.nameKey(status.jobName), status);
+        }
         for (CronTrigger job : jobTriggers()) {
-            JobStatus status = byName.get(job.CronJobDetail.Name);
-            if (status == null) {
-                continue;
-            }
+            JobStatus status = byKey.get(ScheduledJobSelector.nameKey(job.CronJobDetail.Name));
             status.scheduled = true;
             status.nextRunAt = job.NextFireTime;
             status.previousFireTime = job.PreviousFireTime;
@@ -180,15 +183,30 @@ public with sharing class GivingScheduler {
         return new List<String>{ TOP_UP_JOB_NAME, OVERDUE_JOB_NAME, LEVELS_JOB_NAME, ASK_JOB_NAME };
     }
 
+    /**
+     * The four jobs' triggers, matched by `ScheduledJobSelector.nameKey`, so a job still scheduled
+     * under its earlier spelling ("BarnCRM Giving: ask reminders", before QA-F6) is found too.
+     */
     private static List<CronTrigger> jobTriggers() {
-        List<String> names = jobNames();
-        return [
+        Set<String> keys = new Set<String>();
+        for (String jobName : jobNames()) {
+            keys.add(ScheduledJobSelector.nameKey(jobName));
+        }
+        List<CronTrigger> found = new List<CronTrigger>();
+        for (CronTrigger job : [
             SELECT Id, NextFireTime, PreviousFireTime, CronJobDetail.Name
             FROM CronTrigger
-            WHERE CronJobDetail.Name IN :names AND CronJobDetail.JobType = :SCHEDULED_APEX
+            WHERE
+                CronJobDetail.Name LIKE :GIVING_JOB_PATTERN
+                AND CronJobDetail.JobType = :SCHEDULED_APEX
             WITH SYSTEM_MODE
-            LIMIT 10
-        ];
+            LIMIT 100
+        ]) {
+            if (keys.contains(ScheduledJobSelector.nameKey(job.CronJobDetail.Name))) {
+                found.add(job);
+            }
+        }
+        return found;
     }
 
     private static Id scheduleJob(

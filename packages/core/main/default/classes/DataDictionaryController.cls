@@ -110,7 +110,8 @@ public with sharing class DataDictionaryController {
             ) {
                 Option option = new Option();
                 option.value = described.getName();
-                option.label = described.getLabel();
+                // Trimmed: some platform objects carry spaces around their label (QA-F6).
+                option.label = described.getLabel().trim();
                 option.isDefault = isDefault(described);
                 byKey.put(option.label.toLowerCase() + '\u0000' + option.value, option);
             }
@@ -138,7 +139,7 @@ public with sharing class DataDictionaryController {
             Schema.DescribeSObjectResult described = requireObject(objectName);
             ObjectDictionary result = new ObjectDictionary();
             result.objectName = described.getName();
-            result.objectLabel = described.getLabel();
+            result.objectLabel = described.getLabel().trim();
             result.isCustom = described.isCustom();
             Map<String, Schema.DescribeFieldResult> byKey = new Map<String, Schema.DescribeFieldResult>();
             for (Schema.SObjectField token : described.fields.getMap().values()) {

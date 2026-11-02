@@ -4,7 +4,7 @@
 
 An ask is a request you plan to make, or have made, to one donor: "ask the Garcia family for 5,000 for the new roof by March." The Ask Pipeline keeps every open ask in one place, shows which step each one is at, and records how it ended. Fundraisers see it as a board of cards, one column per step.
 
-It does this without the Salesforce Opportunity object. Giving runs on a Salesforce Platform license, so BarnCRM keeps its own **Ask** record (numbered ASK-00000001, ASK-00000002 and so on).
+It does this without the Salesforce Opportunity object. Giving runs on a Salesforce Platform license, so BarnCRM keeps its own **Ask** record (numbered ASK-000001, ASK-000002 and so on; asks created before release 0.15 keep their eight digit numbers).
 
 Things to hold on to:
 

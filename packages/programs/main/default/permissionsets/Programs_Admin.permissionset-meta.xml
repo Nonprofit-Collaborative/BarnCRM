@@ -3,8 +3,8 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>Programs Admin</label>
   <description>
-    Runs programs: programs, services and enrollments, including deleting a record entered
-    by accident.
+    Runs programs: programs, services, enrollments, case notes and service deliveries,
+    including deleting a record entered by accident.
   </description>
   <applicationVisibilities>
     <application>BarnCRM_Programs</application>

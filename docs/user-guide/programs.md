@@ -63,7 +63,7 @@ refused, with a message naming the program. Change the enrollment that is there 
 1. Make a spreadsheet with a row per person and the columns **Program** (the program's exact
    name) and **Email**, plus any of **Stage**, **Start Date**, **End Date**, **Intake Date**,
    **Referral Source**, **Eligibility Status**, **Eligibility Basis** and **Eligibility Date**.
-2. Open BarnCRM's import, upload the file and choose the **Program roster** template.
+2. Open BarnCRM's import, upload the file and choose the **Program Roster** template.
 3. Check the preview, then load it.
 
 You should see: one enrollment per row. Rows whose program or email finds nothing, or whose

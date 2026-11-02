@@ -49,6 +49,8 @@
  * edition saved gets the recommended one, and every run schedules the hourly tab access check
  * unless it is already scheduled. When Seasonal Addresses is on and its nightly job is missing,
  * the job is scheduled too; an upgraded org that already runs the job has the switch turned on.
+ * A checkbox that ships on and was added in an upgrade is turned on once in an org that saved its
+ * settings before it existed (`ShippedDefaultUpgrades`, QA-F2).
  *
  * An org built by deploying the source runs no install handler, so `runAsSourceDeploy` runs the
  * same steps there, called by `scripts/org/deploy-packages.sh` once Core is in. Finish Setup
@@ -72,6 +74,17 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
     private static final String SEASONAL_CONTEXT = 'CorePostInstall.alignSeasonalAddresses';
     private static final String ORGANIZATION_CONTEXT = 'CorePostInstall.storeOrganizationRecordType';
     private static final String SAVED_QUERY_CONTEXT = 'CorePostInstall.renameDataQualityQueries';
+
+    /**
+     * Core checkboxes that ship on and were added in an upgrade, oldest first: each is turned on
+     * once in an org that saved its settings before it existed (`ShippedDefaultUpgrades`, QA-F2).
+     * Append only; `scripts/ci/check-setting-defaults.py` fails the build when a new ship-on
+     * checkbox is missing here.
+     */
+    @TestVisible
+    private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
+        BarnCRM_Settings__c.Error_Digest_Include_Admin_Summary__c
+    };
 
     /** Test seam: true lets a test see the hourly tab access check scheduled. */
     @TestVisible
@@ -192,6 +205,11 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
         scheduleTabAccessCheck();
         alignSeasonalAddresses(isUpgrade);
         renameDataQualityQueries();
+        ShippedDefaultUpgrades.apply(
+            ModuleSetups.CORE,
+            BarnCRM_Settings__c.SObjectType,
+            SHIPPED_ON_ADDED_IN_UPGRADES
+        );
         ModuleSetups.markRan(ModuleSetups.CORE);
         if (installerId == null) {
             return;

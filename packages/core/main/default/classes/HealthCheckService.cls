@@ -53,6 +53,7 @@ public with sharing class HealthCheckService {
     public static final String SEVERITY_WARNING = 'Warning';
     public static final String SEVERITY_ERROR = 'Error';
 
+    @NamespaceAccessible
     public static final String CATEGORY_ORG_SHAPE = 'OrgShape';
     public static final String CATEGORY_LICENSES = 'Licenses';
     @NamespaceAccessible

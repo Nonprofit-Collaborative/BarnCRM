@@ -59,6 +59,30 @@ private class ScheduledJobSelectorTest {
         }
     }
 
+    /** QA-F6: a job scheduled under an earlier spelling of its name is found by today's. */
+    @IsTest
+    static void aJobScheduledUnderItsEarlierSpellingIsTheSameJob() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            Id old = ScheduledJobSelector.schedule(
+                'BarnCRM Selector: old  style',
+                DAILY,
+                new ErrorDigestScheduler()
+            );
+            Id found = ScheduledJobSelector.ensure(
+                'BarnCRM Selector Old Style',
+                DAILY,
+                new ErrorDigestScheduler()
+            );
+            ScheduledJobSelector.stopNamed('BarnCRM Selector Old Style');
+            Boolean after = ScheduledJobSelector.isScheduled('BarnCRM Selector: old  style');
+            Test.stopTest();
+
+            Assert.areEqual(old, found, 'Not scheduled a second time.');
+            Assert.isFalse(after, 'Stopped by the new name.');
+        }
+    }
+
     @IsTest
     static void everyQuestionInATransactionCostsOneQuery() {
         System.runAs(TestUsers.admin()) {
