@@ -28,7 +28,7 @@ is and the restricted balances.
 ## Before You Install
 
 - Funders is offered in the **Nonprofit Edition** only (see [Editions](editions.md)).
-- It needs BarnCRM Core and the Rollup Builder module installed first.
+- It needs only BarnCRM Core installed first.
 - It does not need the Programs, Giving or Logic Models modules. With Programs installed, a grant
   can name a program; with Giving installed, it can name the Giving fund its money is booked to,
   and the Board Dashboard reads Giving's totals.

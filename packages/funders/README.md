@@ -18,7 +18,6 @@ links follow in 0.17.
 ## Depends on
 
 - BarnCRM Core
-- BarnCRM Rollup Builder
 
 Nothing in this package references Giving or Programs (ADR-0162
 `0162-funders-restricted-funds-schedules-calendar.md` decision 1): a grant may name a program

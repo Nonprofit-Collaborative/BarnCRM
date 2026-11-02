@@ -929,8 +929,8 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(programs)
   # Logic Models depends on Core only (ADR-0154, logic models module).
   MODULES+=(logicmodels)
-  # Funders depends on Core and the Rollup Builder module, not Giving (ADR-0161, amended by
-  # ADR-0162 decision 1).
+  # Funders depends on Core only (ADR-0161, amended by ADR-0162 decision 1): its totals are
+  # platform roll-up summaries, not Rollup Builder definitions.
   MODULES+=(funders)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)

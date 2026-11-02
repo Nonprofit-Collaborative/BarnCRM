@@ -1,6 +1,6 @@
 # ADR-0163: Funders reporting: outcomes linked to requirements, a funder report template merged in the browser, a board dashboard that reads Giving when it can
 
-**Status:** Proposed (built for release 0.16, L-06, F-06 and F-07; awaits owner confirmation)
+**Status:** Proposed (built for release 0.16, F-06 and F-07, and release 0.17, L-06; awaits owner confirmation)
 **Date:** 2026-11-02
 **Source:** plan Section 5.5 (F-06, F-07), Section 5.7 (L-06: "no hard dependency in either
 direction"), Section 9.9 (portability); builds on ADR-0014, ADR-0016, ADR-0129, ADR-0154 and ADR-0161
@@ -8,7 +8,7 @@ direction"), Section 9.9 (portability); builds on ADR-0014, ADR-0016, ADR-0129, 
 
 ## Context
 
-Three release 0.16 items reach across modules. L-06 links a Logic Models outcome to what a grant
+Three items reach across modules (F-06 and F-07 in release 0.16, L-06 in release 0.17). L-06 links a Logic Models outcome to what a grant
 requires, while neither Funders nor Logic Models may need the other. F-06 merges a grant, its
 requirements and, where Logic Models is installed, indicator results into a report for the funder.
 F-07 shows a board the revenue mix, how concentrated it is and the restricted balances, from Giving
@@ -40,8 +40,8 @@ both Apex, both closed sets of `{Token}` names in an HTML body, both rendering P
    requirements, the linked outcomes' indicator results and the active templates as plain JSON.
    No PDF and no saved file: a funder report is edited before it is sent, and an HTML file opens in
    any word processor. This keeps the merge portable (plan 9.9) and costs no file storage.
-4. **The board dashboard reads Giving by describe too.** Funders lists Giving as a package
-   dependency (ADR-0161 `0161-funders-module.md` decision 1), but release 0.16 still references no
+4. **The board dashboard reads Giving by describe too.** Funders does not depend on Giving
+   (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md` decision 1) and references no
    Giving object, so F-07 reads Giving's totals (`Fund__c` with `Restricted__c` and the year's
    raised amount, and the top accounts by `Giving_This_Year__c`) by describe, and shows the grant
    figures alone where Giving is absent or unreadable. The restricted balance per fund comes from

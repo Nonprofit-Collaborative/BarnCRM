@@ -27,11 +27,13 @@ What the three features need:
 
 ## Decision
 
-1. **Funders depends on Core and Rollup Builder; Giving is dropped.** Amends decision 1 of
+1. **Funders depends on Core only; Giving and Rollup Builder are dropped.** Amends decision 1 of
    ADR-0161 `0161-funders-module.md`. Nothing in Funders references a Giving object or class; a
-   Giving fund is named by record identifier (decision 4). `sfdx-project.json` lists Core and
-   Rollup Builder, and Core's catalog row `BarnCRM_Module.Funders` requires `Rollups` only, so an
-   org can install Funders without Giving. A Fundraising Staff holder still gets Funders Staff
+   Giving fund is named by record identifier (decision 4). Nothing in Funders uses a Rollup
+   Builder definition, class or object either: every total is a platform roll-up summary
+   (decision 3). `sfdx-project.json` lists Core only, and Core's catalog row
+   `BarnCRM_Module.Funders` requires nothing, so an org can install Funders without Giving or
+   Rollup Builder (pre-batch review, landing batch B). A Fundraising Staff holder still gets Funders Staff
    where Giving is installed: the role is matched by permission set name.
 2. **The restricted ledger is the grant's own.** Restricted Fund Entry (`Grant_Fund_Entry__c`,
    canonical model 29ZL) is a detail of the grant: a type (Received, Spent or Released), a positive
