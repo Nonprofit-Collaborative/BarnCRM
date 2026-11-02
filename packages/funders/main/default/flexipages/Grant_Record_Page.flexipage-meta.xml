@@ -55,6 +55,12 @@
     </itemInstances>
     <itemInstances>
       <componentInstance>
+        <componentName>grantOutcomes</componentName>
+        <identifier>grantOutcomesCard</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>grantAnswerLibrary</componentName>
         <identifier>grantAnswerLibraryCard</identifier>
       </componentInstance>

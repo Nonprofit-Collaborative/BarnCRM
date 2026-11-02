@@ -87,6 +87,19 @@ You should see: `Program saved.` Choose **No program** and **Save** to clear it.
 the card says to install the Programs module. If the program was deleted, the card says so;
 choose another.
 
+## To Link a Requirement to the Outcome It Reports On
+
+Only when your organization uses Logic Models.
+
+1. On the grant's page, find the **Logic Model Outcomes** card. It lists the grant's requirements.
+2. For a requirement, choose the outcome or output it reports on, shown as "Logic model: Outcome".
+3. Click **Save**.
+
+You should see: `Outcome saved.`, and under the requirement each of the outcome's indicators
+with the target and result of every period in the award period, for example `2026 Q1: target 30,
+result 25`. Choose **No outcome** and **Save** to clear it. If the outcome was deleted, the card
+says so; choose another.
+
 ## To Add What an Award Requires
 
 Funders usually want reports back. Record each one on the grant.

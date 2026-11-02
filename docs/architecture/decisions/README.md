@@ -170,6 +170,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [NEXT](NEXT-gift-transaction-mirror.md) | The Gift Transaction mirror copies gifts one way, in runs, with designations from each fund's link | Accepted (builder decision) |
 | [NEXT](NEXT-funders-module.md) | The BarnCRM Funders module: a Grant and its requirements, the funder an organization, a program named by its record identifier | Proposed |
 | [NEXT](NEXT-funders-restricted-funds-schedules-calendar.md) | Funders restricted funds, award schedules and the deadline calendar, with no Giving dependency | Proposed |
+| [NEXT](NEXT-funders-reporting-links.md) | Funders reporting: outcomes linked to requirements, a funder report template merged in the browser, a board dashboard that reads Giving when it can | Proposed |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

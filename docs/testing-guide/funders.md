@@ -3,6 +3,7 @@
 Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), award schedules (F-05), restricted funds (F-03) and the Grant Calendar (F-08). Setup detail: [Funders](../admin-guide/funders.md).
 Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02) and government award fields (F-04). Setup detail: [Funders](../admin-guide/funders.md).
 Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02) government award fields (F-04) and the answer library (F-14). Setup detail: [Funders](../admin-guide/funders.md).
+Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), government award fields (F-04), the answer library (F-14) and links to Logic Models outcomes (L-06). Setup detail: [Funders](../admin-guide/funders.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder
 and Funders deployed. Programs and Giving are optional; T-FUN-04 needs Programs and T-FUN-10
@@ -237,3 +238,20 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 9 | As read-only, open the **Grant Answers** tab. | The answers are listed; **New** is not offered. |
 
 **Cleanup:** delete the two answers as staff.
+
+## T-FUN-14: Requirements Linked to Logic Model Outcomes
+
+**Purpose:** confirm the optional link from a requirement to a Logic Models outcome (L-06, R-GQ6).
+**Prerequisites:** Logic Models deployed (steps 1 to 6) and an org without it (step 7); admin and staff with Logic Models access; a logic model "Reading" with an outcome "Students read at home" carrying an indicator "Students reading daily" (unit students) with periods 2024 (target 30, result 20) and 2026 (target 30, result 25), and an activity "Tutoring"; an awarded grant `Youth Grant` with award period 1 January to 31 December 2026 and a requirement `Final report`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff, open `Youth Grant`. | A **Logic Model Outcomes** card listing `Final report (Narrative Report)` with **No outcome**. |
+| 2 | Open the list. | `No outcome` and `Reading: Students read at home`; the activity is not offered. |
+| 3 | Choose the outcome and click **Save**. | `Outcome saved.`; under the requirement `Students reading daily (students)` and `2026: target 30, result 25`; the 2024 period is not shown. |
+| 4 | Open `Final report`. | **Logic Model Outcome** holds an 18-character record ID. |
+| 5 | Edit `Final report` and type `abc` into **Logic Model Outcome**; **Save**. | Refused: `Choose an outcome or output from a logic model in the Logic Model Outcomes card on the grant's page. This is not one.` |
+| 6 | As the admin, delete the outcome in the Logic Model Builder, then reopen `Youth Grant`. | The card says `The outcome this requirement named cannot be found. Choose another.` |
+| 7 | In an org without Logic Models, open a grant. | The card says `Install the Logic Models module to link each requirement to the outcome it reports on.` |
+
+**Cleanup:** none.
