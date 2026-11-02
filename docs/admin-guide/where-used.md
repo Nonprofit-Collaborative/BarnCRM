@@ -15,8 +15,9 @@ field, and BarnCRM lists every BarnCRM setup record that names it, grouped by ki
 | **Import Mappings** | Every column and default value that loads the field, the matching fields (Email, External ID and the like), the object a one-object mapping loads, and the link field of related records |
 | **Merge Rules** | The field a rule decides, including a whole address rule for any of its parts |
 | **Matching Sources** | The value, parent and postal code fields of each duplicate matching source |
-| **BarnCRM Settings** | Settings that hold a list of fields, such as Address Card Fields |
+| **BarnCRM Settings** | Every setting whose value names a field: Address Card Fields, and the Household Name, Formal Greeting and Informal Greeting patterns (their {FirstName}, {LastName} and {Salutation} blanks; a blank pattern counts as its default) |
 | **Rollups** (Rollup Builder module) | The counted field, sort field, fiscal date field, both filters, the relationship path and the result field |
+| **BarnCRM Settings** (Giving module) | The Donor Level source total, on both people and organizations |
 | **Import Mappings** (Giving module) | Columns and default values that load gifts, allocations, soft credits and tributes |
 
 For each record it shows its name, where in it the field is named (for example "Filter" or
