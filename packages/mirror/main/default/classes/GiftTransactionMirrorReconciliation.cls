@@ -172,9 +172,7 @@ public with sharing class GiftTransactionMirrorReconciliation {
     /** Refuses a comparison that cannot be made, in words the page shows. */
     private static void checkReady(Date fromDate, Date toDate) {
         if (fromDate == null || toDate == null) {
-            throw new ReconciliationException(
-                Label.Mirror_OpportunityMirror_ErrorDatesRequired
-            );
+            throw new ReconciliationException(Label.Mirror_OpportunityMirror_ErrorDatesRequired);
         }
         if (fromDate > toDate) {
             throw new ReconciliationException(Label.Mirror_OpportunityMirror_ErrorDateOrder);

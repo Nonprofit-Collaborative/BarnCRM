@@ -144,7 +144,10 @@ private class FundersHealthCheckExtensionTest {
             Assert.isTrue(
                 ((String) cappedFields.get('title'))
                     .contains(
-                        String.format(Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ '1' })
+                        String.format(
+                            Label.Core_HealthCheck_OrphansMoreThan,
+                            new List<Object>{ '1' }
+                        )
                     ),
                 'Past the cap it says more than'
             );

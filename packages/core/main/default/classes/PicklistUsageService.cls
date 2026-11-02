@@ -74,6 +74,26 @@ public with sharing class PicklistUsageService {
         );
     }
 
+    /** The aggregate query behind usage: every name is escaped, the row cap is a constant. */
+    private static String usageQuery(
+        Schema.DescribeSObjectResult described,
+        String fieldName,
+        String dateField
+    ) {
+        return 'SELECT ' +
+            String.escapeSingleQuotes(fieldName) +
+            ' v, COUNT(Id) n' +
+            (dateField == null
+                ? ''
+                : ', MAX(' + String.escapeSingleQuotes(dateField) + ') lastUsed') +
+            ' FROM ' +
+            String.escapeSingleQuotes(described.getName()) +
+            ' GROUP BY ' +
+            String.escapeSingleQuotes(fieldName) +
+            ' ORDER BY COUNT(Id) DESC LIMIT ' +
+            (MAX_VALUES + 1);
+    }
+
     /** Groups one field's records by value: one aggregate query in user mode (R-FU9). */
     public static FieldResult usage(
         Schema.DescribeSObjectResult described,
@@ -83,22 +103,10 @@ public with sharing class PicklistUsageService {
         String dateField = known.containsKey('lastmodifieddate')
             ? 'LastModifiedDate'
             : (known.containsKey('createddate') ? 'CreatedDate' : null);
-        String fieldName = String.escapeSingleQuotes(field.getName());
-        String query =
-            'SELECT ' +
-            fieldName +
-            ' v, COUNT(Id) n' +
-            (dateField == null ? '' : ', MAX(' + dateField + ') lastUsed') +
-            ' FROM ' +
-            String.escapeSingleQuotes(described.getName()) +
-            ' GROUP BY ' +
-            fieldName +
-            ' ORDER BY COUNT(Id) DESC LIMIT ' +
-            (MAX_VALUES + 1);
         Map<String, Usage> observed = new Map<String, Usage>();
         for (
             AggregateResult row : (List<AggregateResult>) Database.query(
-                query,
+                usageQuery(described, field.getName(), dateField),
                 AccessLevel.USER_MODE
             )
         ) {

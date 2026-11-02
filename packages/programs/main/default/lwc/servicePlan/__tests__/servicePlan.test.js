@@ -39,9 +39,13 @@ jest.mock('lightning/pageReferenceUtils', () => ({ encodeDefaultFieldValues: (v)
 });
 jest.mock('@salesforce/i18n/timeZone', () => ({ default: 'UTC' }), { virtual: true });
 jest.mock('@salesforce/i18n/locale', () => ({ default: 'en-US' }), { virtual: true });
-jest.mock('@salesforce/label/c.Core_SetupAssistant_ProgressFormat', () => ({ default: '{0} of {1} done' }), {
-  virtual: true
-});
+jest.mock(
+  '@salesforce/label/c.Core_SetupAssistant_ProgressFormat',
+  () => ({ default: '{0} of {1} done' }),
+  {
+    virtual: true
+  }
+);
 jest.mock('@salesforce/label/c.Programs_Plan_Target', () => ({ default: 'Target {0}' }), {
   virtual: true
 });

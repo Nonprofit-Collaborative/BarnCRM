@@ -72,7 +72,8 @@ private class GiftTransactionMirrorSchemaTest {
             Assert.isTrue(GiftTransactionMirrorSchema.canWriteDesignations(), 'R-GT5.');
             Assert.areEqual(Fund__c.SObjectType, GiftTransactionMirrorSchema.designationType());
             Assert.areEqual(
-                Gift_Allocation__c.SObjectType.getDescribe().getName(),
+                Gift_Allocation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .getName(),
                 GiftTransactionMirrorSchema.linkObjectName()
             );
         }
