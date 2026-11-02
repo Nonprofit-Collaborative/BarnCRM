@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Access Explorer's Change Field Access view (the Field Access Manager): give or remove Read
+    and Edit on fields and kinds of record for chosen permission sets, with a preview and undo.
+  </description>
+  <isExposed>false</isExposed>
+  <masterLabel>Field Access Manager</masterLabel>
+</LightningComponentBundle>

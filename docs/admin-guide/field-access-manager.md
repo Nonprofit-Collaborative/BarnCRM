@@ -86,11 +86,11 @@ called **Event Volunteers** (no license) if you do not have one to try this on.
    record, with **Now**, **After** and **Why**: **Contact** **Read** shows "Needed for field
    access" if the set could not read Contacts. The line above it says how many rows change and
    how many are already right.
-7. Press **Apply Changes** and confirm. The page says how many rows changed and until when the
-   change can be undone. Access Explorer's **By Person or Permission Set** view now shows the
+7. Press **Apply Changes** and confirm. The page says how many rows changed and how many were
+   refused, and that the change can be undone under **Recent Changes**. Access Explorer's **By Person or Permission Set** view now shows the
    new access.
 8. Under **Recent Changes**, the change is listed first with **When**, **By**, **Rows Changed**,
-   **Refused** and **Status**. Press **Undo** and confirm: every row goes back to what it was,
+   **Refused**, **Status** and **Undo Until**. Press **Undo** and confirm: every row goes back to what it was,
    and the status reads **Undone**.
 
 ## Preview, Apply and Undo

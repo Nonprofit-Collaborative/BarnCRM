@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Access explorer: section introduction</shortDescription>
-        <value>Who can see or change what, and why. Access Explorer only reads: it never gives or takes access.</value>
+        <value>Who can see or change what, and why. Every view only reads, except Change Field Access, which shows each change before it is made.</value>
     </labels>
     <labels>
         <fullName>Core_AccessExplorer_Show</fullName>

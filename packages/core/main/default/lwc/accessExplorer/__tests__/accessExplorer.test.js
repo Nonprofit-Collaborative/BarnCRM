@@ -370,9 +370,11 @@ describe('c-access-explorer', () => {
       'object',
       'barncrm',
       'compare',
-      'modifyAll'
+      'modifyAll',
+      'change'
     ]);
     expect(byId(element, 'compare')).toBeNull();
+    expect(byId(element, 'change')).toBeNull();
 
     await choose(element, 'view', 'compare');
     expect(byId(element, 'compare')).not.toBeNull();
