@@ -1,0 +1,96 @@
+.barn-calendar {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.barn-calendar th {
+  padding: var(--slds-g-spacing-1, 0.25rem);
+  text-align: left;
+}
+
+.barn-day {
+  height: 6rem;
+  padding: var(--slds-g-spacing-1, 0.25rem);
+  vertical-align: top;
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #e5e5e5);
+}
+
+.barn-day_outside {
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
+}
+
+.barn-day_today .barn-day-number {
+  font-weight: 700;
+  color: var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.barn-day-number {
+  display: block;
+  font-size: 0.75rem;
+}
+
+.barn-calendar ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.barn-item {
+  display: block;
+  width: 100%;
+  margin-top: 0.125rem;
+  padding: 0 var(--slds-g-spacing-1, 0.25rem);
+  overflow: hidden;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: var(--slds-g-radius-border-1, 0.125rem);
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
+  color: var(--slds-g-color-on-surface-2, #2e2e2e);
+  font-size: 0.75rem;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.barn-item:focus {
+  outline: 2px solid var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.barn-item_application {
+  border-left-color: var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.barn-item_requirement {
+  border-left-color: var(--slds-g-color-warning-base-60, #dd7a01);
+}
+
+.barn-item_payment {
+  border-left-color: var(--slds-g-color-success-base-50, #2e844a);
+}
+
+/* At phone width the grid becomes a list of the days that have something on them. */
+@media (max-width: 48em) {
+  .barn-calendar thead {
+    display: none;
+  }
+
+  .barn-calendar tr,
+  .barn-calendar td {
+    display: block;
+    width: 100%;
+  }
+
+  .barn-day {
+    height: auto;
+  }
+
+  .barn-day_empty {
+    display: none;
+  }
+
+  .barn-item {
+    white-space: normal;
+  }
+}

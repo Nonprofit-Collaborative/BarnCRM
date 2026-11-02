@@ -88,6 +88,9 @@ public with sharing class GrantPipelineController {
         public String grantName;
         @AuraEnabled
         public String requirementType;
+        /** For a payment row on the Grant Calendar (F-08): the amount expected. */
+        @AuraEnabled
+        public Decimal amount;
     }
 
     public static final String KIND_APPLICATION = 'application';
@@ -99,11 +102,8 @@ public with sharing class GrantPipelineController {
         try {
             Map<String, Object> binds = new Map<String, Object>{
                 'openStages' => GrantService.OPEN_STAGES,
-                'beforeSubmitting' => GrantService.BEFORE_SUBMITTING,
                 'awarded' => GrantService.STAGE_AWARDED,
-                'horizon' => Date.today().addDays(DEADLINE_DAYS),
                 'maxCards' => maxCards,
-                'maxDeadlines' => MAX_DEADLINES,
                 'ownerId' => UserInfo.getUserId()
             };
             String mine = mineOnly == true ? ' AND OwnerId = :ownerId' : '';
@@ -158,24 +158,29 @@ public with sharing class GrantPipelineController {
                 ? 0
                 : (Decimal) awarded.get('amount');
 
+            // The same reader as the Grant Calendar (GrantDeadlineSelector), overdue included.
+            Date horizon = Date.today().addDays(DEADLINE_DAYS);
             for (
-                Grant__c grant : (List<Grant__c>) Database.queryWithBinds(
-                    selectCards() +
-                        ' WHERE Stage__c IN :beforeSubmitting' +
-                        ' AND Application_Deadline__c != null' +
-                        ' AND Application_Deadline__c <= :horizon' +
-                        mine +
-                        ' ORDER BY Application_Deadline__c ASC, Name LIMIT :maxDeadlines',
-                    binds,
-                    AccessLevel.USER_MODE
+                Grant__c grant : GrantDeadlineSelector.applications(
+                    null,
+                    horizon,
+                    mineOnly,
+                    MAX_DEADLINES
                 )
             ) {
                 Card row = toCard(grant);
                 row.kind = KIND_APPLICATION;
                 board.deadlines.add(row);
             }
-            if (Schema.SObjectType.Grant_Requirement__c.isAccessible()) {
-                addRequirementDeadlines(board, binds, mineOnly == true);
+            for (
+                Grant_Requirement__c requirement : GrantDeadlineSelector.requirements(
+                    null,
+                    horizon,
+                    mineOnly,
+                    MAX_DEADLINES
+                )
+            ) {
+                board.deadlines.add(toRequirementRow(requirement));
             }
             board.canMarkSubmitted = Schema.SObjectType.Grant_Requirement__c.fields.Status__c.isUpdateable();
             return board;
@@ -211,44 +216,20 @@ public with sharing class GrantPipelineController {
         }
     }
 
-    /**
-     * F-02: open requirements due within the window or overdue, as deadline rows. Mine means
-     * assigned to the person, or on a grant the person owns.
-     */
-    private static void addRequirementDeadlines(
-        Board board,
-        Map<String, Object> binds,
-        Boolean mineOnly
-    ) {
-        binds.put('openStatuses', GrantRequirementService.OPEN_STATUSES);
-        String mine = mineOnly
-            ? ' AND (Assigned_To__c = :ownerId OR Grant__r.OwnerId = :ownerId)'
-            : '';
-        for (
-            Grant_Requirement__c requirement : (List<Grant_Requirement__c>) Database.queryWithBinds(
-                'SELECT Id, Name, Type__c, Due_Date__c, Grant__c, Grant__r.Name,' +
-                    ' Grant__r.Funder__c, Grant__r.Funder__r.Name, Assigned_To__r.Name' +
-                    ' FROM Grant_Requirement__c WHERE Status__c IN :openStatuses' +
-                    ' AND Due_Date__c <= :horizon' +
-                    mine +
-                    ' ORDER BY Due_Date__c ASC, Name LIMIT :maxDeadlines',
-                binds,
-                AccessLevel.USER_MODE
-            )
-        ) {
-            Card row = new Card();
-            row.id = requirement.Id;
-            row.name = requirement.Name;
-            row.kind = KIND_REQUIREMENT;
-            row.deadline = requirement.Due_Date__c;
-            row.requirementType = requirement.Type__c;
-            row.grantId = requirement.Grant__c;
-            row.grantName = requirement.Grant__r?.Name;
-            row.funderId = requirement.Grant__r?.Funder__c;
-            row.funderName = requirement.Grant__r?.Funder__r?.Name;
-            row.ownerName = requirement.Assigned_To__r?.Name;
-            board.deadlines.add(row);
-        }
+    /** F-02: an open requirement as a deadline row; the Grant Calendar draws the same shape. */
+    public static Card toRequirementRow(Grant_Requirement__c requirement) {
+        Card row = new Card();
+        row.id = requirement.Id;
+        row.name = requirement.Name;
+        row.kind = KIND_REQUIREMENT;
+        row.deadline = requirement.Due_Date__c;
+        row.requirementType = requirement.Type__c;
+        row.grantId = requirement.Grant__c;
+        row.grantName = requirement.Grant__r?.Name;
+        row.funderId = requirement.Grant__r?.Funder__c;
+        row.funderName = requirement.Grant__r?.Funder__r?.Name;
+        row.ownerName = requirement.Assigned_To__r?.Name;
+        return row;
     }
 
     /** F-02: marks one requirement Submitted; the dates automation fills its Submitted Date. */
@@ -272,7 +253,8 @@ public with sharing class GrantPipelineController {
             ' Application_Deadline__c, Next_Step__c, Owner.Name FROM Grant__c';
     }
 
-    private static Card toCard(Grant__c grant) {
+    /** A grant as a card or deadline row; the Grant Calendar draws the same shape. */
+    public static Card toCard(Grant__c grant) {
         Card card = new Card();
         card.id = grant.Id;
         card.name = grant.Name;

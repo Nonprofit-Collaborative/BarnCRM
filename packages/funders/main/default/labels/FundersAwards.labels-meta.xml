@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Funders_Calendar_ErrorLoad</fullName>
+        <categories>GrantCalendar</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant Calendar: load failed</shortDescription>
+        <value>The Grant Calendar could not load. Try again, or ask your admin to look at the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Calendar_Next</fullName>
+        <categories>GrantCalendar</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant Calendar: button to the month after</shortDescription>
+        <value>Next Month</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Calendar_Previous</fullName>
+        <categories>GrantCalendar</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant Calendar: button to the month before</shortDescription>
+        <value>Previous Month</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Calendar_Title</fullName>
+        <categories>GrantCalendar</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant Calendar tab heading</shortDescription>
+        <value>Grant Calendar</value>
+    </labels>
+    <labels>
         <fullName>Funders_Fund_Missing</fullName>
         <categories>GivingFund</categories>
         <language>en_US</language>

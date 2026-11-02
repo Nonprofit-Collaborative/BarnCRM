@@ -8,6 +8,10 @@
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
+    <apexClass>GrantCalendarController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>GrantFundController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -199,6 +203,10 @@
     <object>Grant__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <tabSettings>
+    <tab>Grant_Calendar</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
   <tabSettings>
     <tab>Grant_Pipeline</tab>
     <visibility>Visible</visibility>

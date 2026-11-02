@@ -1,6 +1,6 @@
 # Funders
 
-Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), award schedules (F-05) and restricted funds (F-03). Setup detail: [Funders](../admin-guide/funders.md).
+Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), award schedules (F-05), restricted funds (F-03) and the Grant Calendar (F-08). Setup detail: [Funders](../admin-guide/funders.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder
 and Funders deployed. Programs and Giving are optional; T-FUN-04 needs Programs and T-FUN-10
@@ -181,3 +181,22 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 11 | As the admin, delete `Restricted Award`. | Its entries and payments go with it. |
 
 **Cleanup:** Remove sample data.
+
+## T-FUN-11: The Grant Calendar
+
+**Purpose:** confirm the calendar shows the same deadlines as the pipeline, plus expected payments, by month and scope.
+**Prerequisites:** admin, staff and read-only; load sample data. As staff, create a grant `Calendar Test` at **Prospect** with **Application Deadline** in 10 days, owned by staff.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff, open the **Grant Calendar** tab in **BarnCRM Funders**. | This month, today in bold. `Application: Calendar Test` on its day; the sample requirements and the sample award's expected payment on theirs if they fall this month. The tab is next to **Grant Pipeline**. |
+| 2 | Open **Grant Pipeline**. | Every application and requirement under **Upcoming Deadlines** that falls this month is on the calendar too, and red on both when overdue. |
+| 3 | Click **Next Month** until the sample award's second payment shows. | `Grant Payment: Youth Programs Award 17,500` on its due date. |
+| 4 | Click the payment, then go back and click `Calendar Test`. | Each opens its record. |
+| 5 | Mark the payment **Received** and return to the calendar. | It is gone: only expected payments show. |
+| 6 | Choose **Mine**. | Only `Calendar Test` and requirements assigned to staff or on staff's grants. |
+| 7 | As read-only, open **Grant Calendar**. | The same entries for **Everyone**; nothing to change. |
+| 8 | Narrow the window to phone width (or use the Salesforce mobile app). | Only days with entries are listed, one under another, with no sideways scrolling. |
+| 9 | With a screen reader, step through the calendar. | The month is announced; each entry is a button that says what it is. |
+
+**Cleanup:** Remove sample data; delete `Calendar Test` as the admin.

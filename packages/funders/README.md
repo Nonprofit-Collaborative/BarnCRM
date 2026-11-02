@@ -34,4 +34,7 @@ and a Giving fund by record identifier (text), resolved by describe only where a
 - `Grant_Fund_Entry__c` (29ZL), a restricted grant's ledger, kept in step with received payments
   by `GrantPaymentService.syncLedger`; the Giving Fund card (`grantFund`, `GrantFundController`,
   `GrantFundService`) on the Grant record page.
+- The **Grant Calendar** tab (`grantCalendar`, framework-free `grantCalendarModel`,
+  `GrantCalendarController`), reading the same rows as Upcoming Deadlines through
+  `GrantDeadlineSelector`.
 - Permission sets Funders Admin, Staff and Read Only, given by role through `FundersAccessSync`.

@@ -31,6 +31,7 @@
   <label>BarnCRM Funders</label>
   <navType>Console</navType>
   <tabs>Grant_Pipeline</tabs>
+  <tabs>Grant_Calendar</tabs>
   <tabs>Grant__c</tabs>
   <tabs>Grant_Requirement__c</tabs>
   <tabs>standard-report</tabs>
@@ -39,6 +40,9 @@
   <workspaceConfig>
     <mappings>
       <tab>Error_Log__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Grant_Calendar</tab>
     </mappings>
     <mappings>
       <tab>Grant_Pipeline</tab>
