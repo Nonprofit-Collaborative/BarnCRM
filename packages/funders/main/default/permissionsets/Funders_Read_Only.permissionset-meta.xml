@@ -15,6 +15,15 @@
     <apexClass>GrantProgramController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>GrantScheduleController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Grant_Payment__c.Received_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
     <field>Grant_Requirement__c.Assigned_To__c</field>
@@ -42,7 +51,17 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Grant__c.Amount_Received__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Grant__c.Amount_Requested__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Grant__c.Amount_Scheduled__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -77,6 +96,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Grant__c.Payment_Frequency__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Grant__c.Program_Id__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -95,6 +119,15 @@
     <field>Grant__c.Submitted_Date__c</field>
     <readable>true</readable>
   </fieldPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Grant_Payment__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
   <objectPermissions>
     <allowCreate>false</allowCreate>
     <allowDelete>false</allowDelete>

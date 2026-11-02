@@ -110,6 +110,28 @@ You should see: `Marked submitted.` and the row leaves the list. The requirement
 **Status** yourself: **Accepted** when the funder approves it, **Waived** when the funder excuses
 it.
 
+## To Set Up an Award's Payments
+
+When a funder pays an award in parts (for example once a year for three years):
+
+1. Open the grant. It must be **Awarded**, with **Amount Awarded**, **Award Start Date** and
+   **Award End Date** filled in.
+2. On the **Award Schedule** card, choose the **Payment Frequency**.
+3. Check the payments listed: the amount split evenly, the first on the award start date.
+4. Click **Build Schedule**.
+
+You should see: `Saved.` and the payments in the card, each **Expected**. **Amount Scheduled**
+shows the total. To change one payment's date or amount, or add or cancel one, use the grant's
+**Payments** list.
+
+## To Record a Payment That Came In
+
+On the grant's **Award Schedule** card, click **Mark Received** on the payment.
+
+You should see: `Saved.`, the payment **Received** with today's date, and **Amount Received** at
+the top of the card going up by its amount. If it came in on another day, open the payment and
+change **Received Date**.
+
 ## Tips
 
 - **Declined is history worth keeping.** Set Declined rather than deleting: it tells you whom to

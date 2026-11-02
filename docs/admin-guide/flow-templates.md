@@ -68,6 +68,7 @@ offer it anywhere else.
 | Goal Step: fill in the completed date | None | The same for a step marked Done. Switch it off while you load past steps whose dates you type yourself. |
 | Grant: fill in the stage dates | None | It only fills an empty Submitted Date or Decision Date with today when a grant's stage moves, which a record-triggered flow with two assignments can copy if you want a different date. Switch it off while you load past grants whose dates you type yourself. |
 | Requirement: fill in the submitted date | None | It only fills an empty Submitted Date with today when a grant requirement becomes Submitted or Accepted, which a record-triggered flow with one assignment can copy if you want a different date. Switch it off while you load past requirements whose dates you type yourself. |
+| Grant payment received | None | It only fills an empty Received Date with today when a grant payment becomes Received, which a record-triggered flow with one assignment can copy if you want a different date. Switch it off while you load past payments whose dates you type yourself. |
 
 With Giving, Giving's automations are listed on the same page. Their templates are not built
 yet, and this page lists them when they are.

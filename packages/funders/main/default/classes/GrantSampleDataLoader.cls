@@ -72,6 +72,36 @@ public with sharing class GrantSampleDataLoader {
 
         Database.insert(new List<Grant__c>{ prospect, applied, awarded }, AccessLevel.USER_MODE);
         loadRequirements(awarded.Id, today);
+        loadPayments(awarded);
+    }
+
+    /**
+     * F-05: the award's schedule, two halves six months apart, the first received. They go with
+     * their grant when the sample data is removed.
+     */
+    private static void loadPayments(Grant__c awarded) {
+        if (!Schema.SObjectType.Grant_Payment__c.isCreateable()) {
+            return;
+        }
+        Decimal half = awarded.Amount_Awarded__c / 2;
+        Database.insert(
+            new List<Grant_Payment__c>{
+                new Grant_Payment__c(
+                    Grant__c = awarded.Id,
+                    Due_Date__c = awarded.Award_Start_Date__c,
+                    Amount__c = half,
+                    Status__c = GrantPaymentService.STATUS_RECEIVED,
+                    Received_Date__c = awarded.Award_Start_Date__c
+                ),
+                new Grant_Payment__c(
+                    Grant__c = awarded.Id,
+                    Due_Date__c = awarded.Award_Start_Date__c.addMonths(6),
+                    Amount__c = half,
+                    Status__c = GrantPaymentService.STATUS_EXPECTED
+                )
+            },
+            AccessLevel.USER_MODE
+        );
     }
 
     /**

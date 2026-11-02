@@ -77,6 +77,29 @@
   <layoutSections>
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
+    <editHeading>false</editHeading>
+    <label>Payments</label>
+    <style>TwoColumnsTopToBottom</style>
+    <layoutColumns>
+      <layoutItems>
+        <behavior>Readonly</behavior>
+        <field>Amount_Scheduled__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Payment_Frequency__c</field>
+      </layoutItems>
+    </layoutColumns>
+    <layoutColumns>
+      <layoutItems>
+        <behavior>Readonly</behavior>
+        <field>Amount_Received__c</field>
+      </layoutItems>
+    </layoutColumns>
+  </layoutSections>
+  <layoutSections>
+    <customLabel>true</customLabel>
+    <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
     <label>Purpose</label>
     <style>OneColumn</style>
@@ -94,6 +117,16 @@
     <fields>Status__c</fields>
     <fields>Assigned_To__c</fields>
     <relatedList>Grant_Requirement__c.Grant__c</relatedList>
+    <sortField>Due_Date__c</sortField>
+    <sortOrder>Asc</sortOrder>
+  </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Due_Date__c</fields>
+    <fields>Amount__c</fields>
+    <fields>Status__c</fields>
+    <fields>Received_Date__c</fields>
+    <relatedList>Grant_Payment__c.Grant__c</relatedList>
     <sortField>Due_Date__c</sortField>
     <sortOrder>Asc</sortOrder>
   </relatedLists>

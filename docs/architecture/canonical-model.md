@@ -11554,6 +11554,7 @@ Government award fields (F-04) add to this entity later (Section 30).
 | Restricted Balance | currency (derived) | no | Restricted Received minus Restricted Spent minus Restricted Released; may be below zero (R-FE2). |
 | Amount Scheduled | currency (derived) | no | Sum of the grant's payments that are not Cancelled (R-GP1). |
 | Amount Received | currency (derived) | no | Sum of its Received payments (R-GP1). |
+| Payment Frequency | picklist(Once, Annual, Semiannual, Quarterly, Monthly) | no | How often the funder pays the award; Build Schedule splits at it and keeps it (R-GP2). |
 
 ### Relationships
 
@@ -11628,6 +11629,7 @@ shows a fund it cannot find as missing.
 | Restricted Balance | `Restricted_Balance__c` | Formula (Currency): Received minus Spent minus Released, blanks as zero |
 | Amount Scheduled | `Amount_Scheduled__c` | Roll-up summary: SUM of `Grant_Payment__c.Amount__c` where Status is not Cancelled |
 | Amount Received | `Amount_Received__c` | Roll-up summary: SUM of `Grant_Payment__c.Amount__c` where Status is Received |
+| Payment Frequency | `Payment_Frequency__c` | Picklist (restricted): Once, Annual, Semiannual, Quarterly, Monthly; no default |
 
 - **Validation rules:** `Amounts_Not_Negative`, `Award_End_After_Start` (R-GN2).
 - **Trigger:** `GrantTrigger`, through the Core dispatcher; handlers `GrantRulesHandler` (R-GN4,
@@ -11849,7 +11851,9 @@ payment. It splits Amount Awarded evenly over payments at a frequency (Once, Ann
 Quarterly, Monthly): the first on the award start date, each later one a period later while on or
 before the award end date, the last taking the cents left by rounding. The split runs in the
 framework-free module `grantScheduleModel.js`; the server checks every row (a date, an amount
-above zero, the grant still without Expected or Received payments) and inserts them as the user.
+above zero, the grant still without Expected or Received payments) and inserts them as the user,
+and keeps the frequency in the grant's Payment Frequency. The card's headings and frequency
+choices are the field labels, read by describe, so no custom label repeats them.
 
 **R-GP3 Received payments are dated and enter the restricted ledger.** A switchable automation
 (registry row `Grant_Payment_Received`): a payment becoming Received gets today as an empty
@@ -12215,7 +12219,7 @@ mirrors the primary member).
 | 0.15 | 2026-11-02 | Logic Models L-04 logic model report: rule R-IN7 on Indicator (29ZF); no new object or field. |
 | 0.17 | 2026-11-02 | Gift Transaction mirror (X-07, ADR-NEXT). New Section 29C1, rules R-GT1 to R-GT10, leaving Section 30. No object added. Mirror adds Gift Transaction ID (`Gift_Transaction_Id__c`, Text(18), unique) to `Gift__c`, Gift Designation ID (`Gift_Designation_Id__c`, Text(18)) to `Fund__c`, and five keys to `Mirror_Settings__c`. One way only, Gifts to Gift Transactions, with designations written from each fund's Gift Designation ID; the reverse direction waits on owner question O-7. Ported from the 2026-09-27 salvage design, which had both directions and no designations. |
 | 0.16 | 2026-11-02 | Funders F-01 and F-02 (ADR-NEXT `NEXT-funders-module.md`). New Sections 29ZH Grant (`Grant__c`), 29ZI Grant Requirement (`Grant_Requirement__c`, a detail of the grant) and 29ZJ Funders Settings (`Funders_Settings__c`), rules R-GN1 to R-GN7, R-GQ1 to R-GQ5 and R-FS1. Section 30's funder pipeline row narrows to the entities still to come. |
-| 0.17 | 2026-11-02 | Funders F-03 and F-08 (release 0.17) and F-05 (release 0.16) (ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md`). New Sections 29ZL Restricted Fund Entry (`Grant_Fund_Entry__c`) and 29ZM Grant Payment (`Grant_Payment__c`), both details of the grant, rules R-FE1, R-FE2 and R-GP1 to R-GP4. Grant (29ZH) gains Restricted, Giving Fund (a record identifier, R-GN8) and six totals; R-GN6 covers the new details. Funders no longer depends on Giving. |
+| 0.17 | 2026-11-02 | Funders F-03 and F-08 (release 0.17) and F-05 (release 0.16) (ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md`). New Sections 29ZL Restricted Fund Entry (`Grant_Fund_Entry__c`) and 29ZM Grant Payment (`Grant_Payment__c`), both details of the grant, rules R-FE1, R-FE2 and R-GP1 to R-GP4. Grant (29ZH) gains Restricted, Giving Fund (a record identifier, R-GN8), Payment Frequency and six totals; R-GN6 covers the new details. Funders no longer depends on Giving. |
 
 ---
 ## 32. Entity ownership by package

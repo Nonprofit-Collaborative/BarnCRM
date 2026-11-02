@@ -64,7 +64,7 @@ private class ModuleManagerControllerTest {
 
             Test.startTest();
             try {
-                ModuleManagerController.turnOff('Funders');
+                ModuleManagerController.turnOff('Not_A_Module');
             } catch (AuraHandledException e) {
                 message = e.getMessage();
             }
