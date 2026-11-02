@@ -291,7 +291,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Delete the downloaded zip files.
 
-## T-HC-16: Data Dictionary Labels Are Trimmed
+## T-HC-18: Data Dictionary Labels Are Trimmed
 
 **Purpose:** confirm object labels in the Data Dictionary carry no leading or trailing spaces.
 **Prerequisites:** the admin user.
@@ -303,7 +303,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Delete the downloaded file.
 
-## T-HC-16: Field Access Manager Gives and Removes Field Access, With a Preview and Undo
+## T-HC-19: Field Access Manager Gives and Removes Field Access, With a Preview and Undo
 
 **Purpose:** Confirm an admin can give and remove Read and Edit on fields and kinds of record across permission sets the organization made, that every change is previewed with the access it needs added, that it can be undone, and that profiles, groups, packaged sets and other people are kept out.
 **Prerequisites:** admin and staff (see [Test users](before-you-test.md#test-users)); sample data loaded. In Setup, create two permission sets with no license: **FAM Test One** and **FAM Test Two**, neither giving anything.
@@ -327,9 +327,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** In Setup, delete **FAM Test One** and **FAM Test Two**.
 
-## T-HC-16: Where Used Lists the BarnCRM Setup That Uses a Field
+## T-HC-20: Where Used Lists the BarnCRM Setup That Uses a Field
 
-**Purpose:** Confirm Where Used finds saved queries, Super Transform step lists, import mappings and rollups that name a field, links each, offers the whole object, and ends in a Retire a Field checklist that never deletes anything. Setup detail: [Where Used and Retire a Field](../admin-guide/where-used.md).
+**Purpose:** Confirm Where Used finds saved queries, Super Transformer step lists, import mappings and rollups that name a field, links each, offers the whole object, and ends in a Retire a Field checklist that never deletes anything. Setup detail: [Where Used and Retire a Field](../admin-guide/where-used.md).
 **Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); the Rollup Builder module installed for step 6; a test custom field on Contact, such as **Test Retire** (`Test_Retire__c`, text), created in Setup.
 **Smoke:** no
 

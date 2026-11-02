@@ -31,22 +31,19 @@ Manager**. **BarnCRM Console** has the same, plus **Addresses**, **Relationships
 have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching** and
 **Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
 **Import** and **Super Transformer** are not in the navigation: open them from their cards on
-the **Data Manager** tab. Administrators also find a **Data Dictionary** section inside **Org
-Optimizer**, which lists every field (and, when asked, the flows and Apex triggers that run on
-each kind of record) and downloads it as a CSV, an **AI-Readiness Export**
 the **Data Manager** tab. Every tab, including those Giving, Volunteers and Programs add,
-has its own icon, so a tab is easy to spot in the menu. Administrators also find a **Data Dictionary** section inside **Org
-section, which downloads a zip that explains your data to an AI tool of their choice, a
-**Setup Changes** section that shows who changed what in Setup, and when, and an **Access
-Explorer** section that shows who can see or change what, and why, compares two people side by
-side and lists who holds Modify All Data. Its **Field Utilization** section also shows, for any
-picklist, how many records hold each value and when they were last changed. If you import files, the
-side and lists who holds Modify All Data. Its **Unused Setup** section also lists Apex and
-flows on old API versions under **Technical Debt**. If you import files, the
-side and lists who holds Modify All Data. Each field row in the Data Dictionary, Field
-Utilization and the Record Inspector has a **Where Used** action, which lists the BarnCRM setup
-(saved queries, import mappings, rollups and more) that uses the field and walks an
-administrator through retiring it safely. If you import files, the
+has its own icon, so a tab is easy to spot in the menu. Administrators also find a **Data
+Dictionary** section inside **Org Optimizer**, which lists every field (and, when asked, the
+flows and Apex triggers that run on each kind of record) and downloads it as a CSV, an
+**AI-Readiness Export** section, which downloads a zip that explains your data to an AI tool of
+their choice, a **Setup Changes** section that shows who changed what in Setup, and when, and
+an **Access Explorer** section that shows who can see or change what, and why, compares two
+people side by side and lists who holds Modify All Data. Its **Field Utilization** section also
+shows, for any picklist, how many records hold each value and when they were last changed, and
+its **Unused Setup** section lists Apex and flows on old API versions under **Technical Debt**.
+Each field row in the Data Dictionary, Field Utilization and the Record Inspector has a **Where
+Used** action, which lists the BarnCRM setup (saved queries, import mappings, rollups and more)
+that uses the field and walks an administrator through retiring it safely. If you import files, the
 **Check Columns** step shows a few example values beside each column, so you can see each
 column lands in the right field before anything loads; a column matched from a near spelling
 (`Frist Name`) shows a **Best Guess, Check It** badge, and you accept it or choose another

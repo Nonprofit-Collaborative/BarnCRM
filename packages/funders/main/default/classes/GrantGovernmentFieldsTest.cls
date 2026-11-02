@@ -1,5 +1,5 @@
 /**
- * The government award fields on a grant (F-04, canonical model 29ZH R-GN8): Funders Staff record
+ * The government award fields on a grant (F-04, canonical model 29ZH R-GN10): Funders Staff record
  * them, and the Assistance Listing Number, Indirect Cost Rate and Match Required are checked.
  */
 @IsTest

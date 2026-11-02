@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM main as of 2026-11-02 (commit 6c0d82877, landing batch A, plus P-12 to P-14). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM landing/batch-b (v1.0 scope, releases 0.15 to 0.17), to be set to the final main merge commit at landing. Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 
@@ -43,9 +43,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Programs (Nonprofit Edition)
 
-- [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages, taking attendance, counting drop-in visitors without names, recording referrals and screening for eligibility.
-- [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages, and keeping a participant's service plan.
-- [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages, keeping a participant's service plan, and putting people in cohorts with scheduled sessions and attendance.
+- [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages, taking attendance, counting drop-in visitors without names, recording referrals, screening for eligibility, keeping a participant's service plan, and putting people in cohorts with scheduled sessions and attendance.
 
 ### Logic Models (Nonprofit Edition)
 
@@ -53,7 +51,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Funders (Nonprofit Edition)
 
-- [Grants and funders](funders.md): adding grants, moving them through the stages on the Grant Pipeline, the deadlines coming up and the Grant Calendar, the program a grant pays for, an award's payments, and a restricted grant's ledger and Giving fund.
+- [Grants and funders](funders.md): adding grants, moving them through the stages on the Grant Pipeline, the deadlines coming up and the Grant Calendar, the program a grant pays for, an award's payments, a restricted grant's ledger and Giving fund, government award fields, the answer library, linking a requirement to the outcome it reports on, funder reports and the Board Dashboard.
 
 ### Reports
 

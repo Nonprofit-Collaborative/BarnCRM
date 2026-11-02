@@ -11,7 +11,7 @@ field, and BarnCRM lists every BarnCRM setup record that names it, grouped by ki
 | Group | What is checked |
 |---|---|
 | **Saved Find Queries** | Columns, filter, sort, related-records conditions, related record columns and summary of every saved query in Find. Donor segments (Giving) are saved queries, so they are listed here. |
-| **Super Transform Step Lists** | The filter and every change (the field written, a field copied from, and the fields named inside steps) |
+| **Super Transformer Step Lists** | The filter and every change (the field written, a field copied from, and the fields named inside steps) |
 | **Import Mappings** | Every column and default value that loads the field, the matching fields (Email, External ID and the like), the object a one-object mapping loads, and the link field of related records |
 | **Merge Rules** | The field a rule decides, including a whole address rule for any of its parts |
 | **Matching Sources** | The value, parent and postal code fields of each duplicate matching source |

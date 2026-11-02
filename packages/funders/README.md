@@ -3,13 +3,17 @@
 ## Purpose
 
 Funder pipeline (grants applied for and awarded), reporting requirements and deadlines with
-reminders, and later restricted fund tracking, government award fields, multi-year award
-schedules and grant management (plan Section 5.5, ADR-0161 `0161-funders-module.md`).
+reminders, government award fields, multi-year award schedules, restricted fund tracking, the
+Grant Calendar, an answer library, requirements linked to Logic Models outcomes, funder report
+templates and the Board Dashboard (plan Section 5.5, ADR-0161 `0161-funders-module.md`, ADR-0162
+`0162-funders-restricted-funds-schedules-calendar.md`, ADR-0163 `0163-funders-reporting-links.md`).
 
 ## First ships in
 
-Release **0.16** (F-01 funder pipeline, F-02 reporting requirements and reminders). F-03
-restricted fund tracking follows in 0.17.
+Release **0.16** (F-01 funder pipeline, F-02 reporting requirements and reminders, F-04
+government award fields, F-05 award schedules, F-06 funder report template, F-07 board dashboard,
+F-14 answer library). F-03 restricted fund tracking, F-08 deadline calendar and L-06 outcome
+links follow in 0.17.
 
 ## Depends on
 
@@ -37,4 +41,12 @@ and a Giving fund by record identifier (text), resolved by describe only where a
 - The **Grant Calendar** tab (`grantCalendar`, framework-free `grantCalendarModel`,
   `GrantCalendarController`), reading the same rows as Upcoming Deadlines through
   `GrantDeadlineSelector`.
+- `Grant_Answer__c` (29ZN), the answer library (`grantAnswerLibrary`, framework-free
+  `grantAnswerModel`, `GrantAnswerController`).
+- The Logic Models outcomes card on a requirement (`grantOutcomes`, `GrantOutcomeController`,
+  `GrantOutcomeService`), resolved by describe only where Logic Models is installed.
+- `Funder_Report_Template__c` (29ZO) and its shipped defaults, merged in the browser by the
+  Funder Report card (`grantReport`, framework-free `grantReportModel`, `GrantReportController`).
+- The **Funders Board** tab (`fundersBoard`, framework-free `fundersBoardModel`,
+  `FundersBoardController`).
 - Permission sets Funders Admin, Staff and Read Only, given by role through `FundersAccessSync`.

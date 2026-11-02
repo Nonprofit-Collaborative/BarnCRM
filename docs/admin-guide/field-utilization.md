@@ -133,7 +133,7 @@ each value with:
 
 Click a column heading to sort. Sort by **Status** to bring the retired values still in your
 data together, or by **Records** to see the least used values first. To replace a retired value
-in bulk, use [Super Transform](super-transform.md) or
+in bulk, use [Super Transformer](super-transform.md) or
 [Bulk update](bulk-update.md).
 
 How it counts: one query per picklist field, run as you (so you see the counts for the records

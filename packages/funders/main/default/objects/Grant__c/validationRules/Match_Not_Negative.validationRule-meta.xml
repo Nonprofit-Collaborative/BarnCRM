@@ -2,7 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Match_Not_Negative</fullName>
   <active>true</active>
-  <description>R-GN8: Match Required is not negative.</description>
+  <description>R-GN10: Match Required is not negative.</description>
   <errorConditionFormula>Match_Required__c &lt; 0</errorConditionFormula>
   <errorDisplayField>Match_Required__c</errorDisplayField>
   <errorMessage>Match Required can't be negative.</errorMessage>

@@ -1,11 +1,6 @@
 # Funders
 
-Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), award schedules (F-05), restricted funds (F-03) and the Grant Calendar (F-08). Setup detail: [Funders](../admin-guide/funders.md).
-Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02) and government award fields (F-04). Setup detail: [Funders](../admin-guide/funders.md).
-Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02) government award fields (F-04) and the answer library (F-14). Setup detail: [Funders](../admin-guide/funders.md).
-Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), government award fields (F-04), the answer library (F-14) and links to Logic Models outcomes (L-06). Setup detail: [Funders](../admin-guide/funders.md).
-Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), government award fields (F-04), the answer library (F-14), links to Logic Models outcomes (L-06) and funder report templates (F-06). Setup detail: [Funders](../admin-guide/funders.md).
-Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), government award fields (F-04), the answer library (F-14), links to Logic Models outcomes (L-06), funder report templates (F-06) and the board dashboard (F-07). Setup detail: [Funders](../admin-guide/funders.md).
+Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), award schedules (F-05), restricted funds (F-03), the Grant Calendar (F-08), government award fields (F-04), the answer library (F-14), links to Logic Models outcomes (L-06), funder report templates (F-06) and the board dashboard (F-07). Setup detail: [Funders](../admin-guide/funders.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder
 and Funders deployed. Programs and Giving are optional; T-FUN-04 needs Programs and T-FUN-10
@@ -208,7 +203,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 ## T-FUN-12: Government Award Fields
 
-**Purpose:** confirm the government award fields and their checks (F-04, R-GN8).
+**Purpose:** confirm the government award fields and their checks (F-04, R-GN10).
 **Prerequisites:** staff and read-only; a grant `Youth Grant` to `Lakeside Foundation`.
 
 | Step | Action | Expected result |

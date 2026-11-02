@@ -18,25 +18,20 @@ turn it on, an email) before each is due.
 A multi-year award's **payments** form its schedule, built in one step and marked received as the
 money comes in. A **restricted** grant keeps a simple ledger of the money received, spent and
 released, with its balance; received payments enter it on their own. The **Grant Calendar** tab
-shows every deadline and expected payment on a month calendar. Government award fields, a funder
-report template and a board dashboard come in later releases.
-before each is due. A grant also carries the fields a government award needs (see [Government
-Awards](#government-awards)). Restricted fund tracking (F-03), multi-year award schedules, a funder report template, a board dashboard and a deadline calendar come in later
-Awards](#government-awards)), and the [Answer Library](#answer-library) keeps the application
-answers you reuse. Restricted fund tracking (F-03), multi-year award schedules, a funder report template, a board dashboard and a deadline calendar come in later
-answers you reuse. A [funder report template](#funder-report-templates) turns a grant into a
-printable report, and the [Board Dashboard](#the-board-dashboard-tab) shows your board the
-year's revenue mix, how concentrated it is and the restricted balances. Restricted fund tracking
-(F-03), multi-year award schedules and a deadline calendar come in later releases.
+shows every deadline and expected payment on a month calendar. A grant also carries the fields a
+government award needs (see [Government Awards](#government-awards)), and the [Answer
+Library](#answer-library) keeps the application answers you reuse. A [funder report
+template](#funder-report-templates) turns a grant into a printable report, and the [Board
+Dashboard](#the-board-dashboard-tab) shows your board the year's revenue mix, how concentrated it
+is and the restricted balances.
 
 ## Before You Install
 
 - Funders is offered in the **Nonprofit Edition** only (see [Editions](editions.md)).
 - It needs BarnCRM Core and the Rollup Builder module installed first.
-- It does not need the Programs or Giving modules. With Programs installed, a grant can name a
-  program; with Giving installed, it can name the Giving fund its money is booked to.
-  nothing in Giving except the totals the Board Dashboard reads; restricted fund tracking (F-03)
-  and award schedules (F-05) will.
+- It does not need the Programs, Giving or Logic Models modules. With Programs installed, a grant
+  can name a program; with Giving installed, it can name the Giving fund its money is booked to,
+  and the Board Dashboard reads Giving's totals.
 
 ## Installing
 
@@ -48,12 +43,9 @@ finishes, BarnCRM does three things on its own:
 3. Gives everyone who already has a BarnCRM role their Funders permission set (see below).
 
 Then open the **BarnCRM Funders** app from the App Launcher. Its tabs are **Grant Pipeline**,
-**Grant Calendar**, **Grants**, **Grant Requirements**, **Reports** and **Error Log**; Grant Pipeline and Grants also
-**Grants**, **Grant Requirements**, **Grant Answers**, **Reports** and **Error Log**; Grant Pipeline and Grants also
-**Grants**, **Grant Requirements**, **Grant Answers**, **Funder Report Templates** (admins only),
-**Board Dashboard**, **Grants**, **Grant Requirements**, **Grant Answers**, **Funder Report Templates** (admins only),
-**Reports** and **Error Log**; Grant Pipeline and Grants also
-join the BarnCRM apps. Run Health Check's **Schedule all nightly jobs** fix once to start the
+**Board Dashboard**, **Grant Calendar**, **Grants**, **Grant Requirements**, **Grant Answers**,
+**Funder Report Templates** (admins only), **Reports** and **Error Log**; Grant Pipeline and
+Grants also join the BarnCRM apps. Run Health Check's **Schedule all nightly jobs** fix once to start the
 morning reminder job (see [Reminders](#reminders)).
 
 ## Roles and Permission Sets

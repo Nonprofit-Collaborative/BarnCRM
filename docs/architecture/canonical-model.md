@@ -11345,8 +11345,8 @@ One request for money to one funder, from the first idea through the decision an
 the award period (F-01, Funders module, ADR-0161 `0161-funders-module.md`). The funder is an
 organization; the grant's requirements (29ZI) are the reports and deliverables the award brings.
 Its restricted ledger (29ZL, F-03) and its payment schedule (29ZM, F-05) add the restricted and
-payment totals below (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`).
-Government award fields (F-04) add to this entity later (Section 30).
+payment totals below (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`), and the
+government award fields (F-04) describe a government award (R-GN10).
 
 ### Attributes
 
@@ -11377,11 +11377,11 @@ Government award fields (F-04) add to this entity later (Section 30).
 | Amount Received | currency (derived) | no | Sum of its Received payments (R-GP1). |
 | Payment Frequency | picklist(Once, Annual, Semiannual, Quarterly, Monthly) | no | How often the funder pays the award; Build Schedule splits at it and keeps it (R-GP2). |
 | Funding Source | picklist(Foundation, Corporate, Federal, Federal Pass-Through, State, Local Government, Other) | no | What kind of funder it is (F-04). Federal Pass-Through: federal money passed on by another body, usually a state agency, which is then the Funder. The board dashboard's revenue mix groups awards by it (F-07). |
-| Assistance Listing Number | text | no | The federal Assistance Listing (formerly CFDA) number, two digits, a point and three characters, for example 84.287 (R-GN8). |
+| Assistance Listing Number | text | no | The federal Assistance Listing (formerly CFDA) number, two digits, a point and three characters, for example 84.287 (R-GN10). |
 | Award Number | text | no | The funder's number for the award: the Federal Award Identification Number (FAIN) for a direct federal award, the subaward number from a pass-through. |
 | Federal Agency | text | no | The federal agency the money comes from, also when it reaches the organization through a pass-through. |
-| Indirect Cost Rate | percent | no | The indirect (overhead) rate the award allows, from 0 to 100 (R-GN8). |
-| Match Required | currency | no | The cost share or match the award requires the organization to put in; blank when none (R-GN8). |
+| Indirect Cost Rate | percent | no | The indirect (overhead) rate the award allows, from 0 to 100 (R-GN10). |
+| Match Required | currency | no | The cost share or match the award requires the organization to put in; blank when none (R-GN10). |
 
 ### Relationships
 
@@ -11427,7 +11427,7 @@ that is not a record identifier, or, where that object exists, an identifier of 
 The record page offers the active funds only where it exists, read by describe in user mode, and
 shows a fund it cannot find as missing.
 
-**R-GN8 Government award values make sense (F-04).** An Assistance Listing Number is two digits, a
+**R-GN10 Government award values make sense (F-04).** An Assistance Listing Number is two digits, a
 point and three digits or capital letters; Indirect Cost Rate is from 0 to 100; Match Required is
 not negative (validation rules). The award fields apply to any grant: a state or foundation award
 can carry an award number and a match too. The period of performance is the award period (Award
@@ -11478,16 +11478,15 @@ grant figures alone. Every read runs in user mode, so a person sees totals of wh
 | Amount Scheduled | `Amount_Scheduled__c` | Roll-up summary: SUM of `Grant_Payment__c.Amount__c` where Status is not Cancelled |
 | Amount Received | `Amount_Received__c` | Roll-up summary: SUM of `Grant_Payment__c.Amount__c` where Status is Received |
 | Payment Frequency | `Payment_Frequency__c` | Picklist (restricted): Once, Annual, Semiannual, Quarterly, Monthly; no default |
-
-- **Validation rules:** `Amounts_Not_Negative`, `Award_End_After_Start` (R-GN2).
 | Funding Source | `Funding_Source__c` | Picklist (restricted): Foundation, Corporate, Federal, Federal Pass-Through, State, Local Government, Other; no default |
 | Assistance Listing Number | `Assistance_Listing_Number__c` | Text(6) |
 | Award Number | `Award_Number__c` | Text(50) |
 | Federal Agency | `Federal_Agency__c` | Text(255) |
 | Indirect Cost Rate | `Indirect_Cost_Rate__c` | Percent(5, 2) |
 | Match Required | `Match_Required__c` | Currency(16, 2) |
+
 - **Validation rules:** `Amounts_Not_Negative`, `Award_End_After_Start` (R-GN2);
-  `Assistance_Listing_Format`, `Indirect_Cost_Rate_In_Range`, `Match_Not_Negative` (R-GN8). The
+  `Assistance_Listing_Format`, `Indirect_Cost_Rate_In_Range`, `Match_Not_Negative` (R-GN10). The
   government award fields sit in a Government Award section of the page layout.
 - **Trigger:** `GrantTrigger`, through the Core dispatcher; handlers `GrantRulesHandler` (R-GN4,
   always runs) and `GrantDatesHandler` (R-GN3, switchable).
@@ -11499,7 +11498,7 @@ grant figures alone. Every read runs in user mode, so a person sees totals of wh
 - **Deadlines:** `GrantDeadlineSelector` reads the deadline rows for the Grant Pipeline and for the
   Grant Calendar tab (`grantCalendar`, `GrantCalendarController`, framework-free
   `grantCalendarModel.js`), which also shows expected payments (R-GP4).
-  module `grantPipelineModel.js` (plan 9.9). The board dashboard (R-GN9): `FundersBoardController`
+- **Board dashboard (R-GN9):** `FundersBoardController`
   (plain JSON; `restrictedFunds` is the F-03 integration point), the `fundersBoard` component on
   the `Funders_Board` tab, shares and flags in `fundersBoardModel.js`.
 - **Health Check:** `FundersHealthCheckExtension` (R-GN7, R-GQ5). **Sample data:**
@@ -12073,9 +12072,6 @@ that builds it, before its metadata is created.
 |---|---|---|---|
 | Receipt | Giving | v0.4 (G-13) | Section 4.11, ADR-0010 |
 | Donor Level | Giving | v0.4 (G-14) | Section 5.2 |
-| Funders entities still to come (government award fields F-04, answer library F-14) | Funders | releases 0.16 and 0.17 | Section 5.5 |
-| Funders entities still to come (fund ledger F-03, award schedules F-05, answer library F-14) | Funders | releases 0.16 and 0.17 | Section 5.5 |
-| Funders entities still to come (fund ledger F-03, award schedules F-05) | Funders | releases 0.16 and 0.17 | Section 5.5 |
 | Mirror adapter entities and mirror mappings | Mirror | v0.6 onward | Section 4.12 |
 
 Receipt left this table in v0.4 and is specified in Sections 25B to 25E, together with
@@ -12088,6 +12084,10 @@ as Stewardship Plan Template, Stewardship Plan Step and the running Stewardship 
 
 Gift Batch left this table in v0.5 and is specified in Section 25L, together with Gift
 Batch Row (25M), the line of a batch.
+
+The Funders entities left this table in releases 0.16 and 0.17 and are specified in Sections
+29ZH to 29ZO (grant, requirement, settings, restricted fund entry, payment, answer and funder
+report template); the government award fields (F-04) are fields of the grant.
 
 The v0.6 inbound gift API (X-03) and accounting export (X-04) add no Mirror entity (the export is
 gated by the custom permission `Export_Accounting`, on the `Accounting_Export` permission set, see
@@ -12396,7 +12396,7 @@ mirrors the primary member).
 | 0.17 | 2026-11-02 | Gift Transaction mirror (X-07, ADR-0157). New Section 29C1, rules R-GT1 to R-GT10, leaving Section 30. No object added. Mirror adds Gift Transaction ID (`Gift_Transaction_Id__c`, Text(18), unique) to `Gift__c`, Gift Designation ID (`Gift_Designation_Id__c`, Text(18)) to `Fund__c`, and five keys to `Mirror_Settings__c`. One way only, Gifts to Gift Transactions, with designations written from each fund's Gift Designation ID; the reverse direction waits on owner question O-7. Ported from the 2026-09-27 salvage design, which had both directions and no designations. |
 | 0.16 | 2026-11-02 | Funders F-01 and F-02 (ADR-0161 `0161-funders-module.md`). New Sections 29ZH Grant (`Grant__c`), 29ZI Grant Requirement (`Grant_Requirement__c`, a detail of the grant) and 29ZJ Funders Settings (`Funders_Settings__c`), rules R-GN1 to R-GN7, R-GQ1 to R-GQ5 and R-FS1. Section 30's funder pipeline row narrows to the entities still to come. |
 | 0.17 | 2026-11-02 | Funders F-03 and F-08 (release 0.17) and F-05 (release 0.16) (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). New Sections 29ZL Restricted Fund Entry (`Grant_Fund_Entry__c`) and 29ZM Grant Payment (`Grant_Payment__c`), both details of the grant, rules R-FE1, R-FE2 and R-GP1 to R-GP4. Grant (29ZH) gains Restricted, Giving Fund (a record identifier, R-GN8), Payment Frequency and six totals; R-GN6 covers the new details. Funders no longer depends on Giving. |
-| 0.16 | 2026-11-02 | Funders F-04. `Grant__c` (29ZH) gains Funding Source (`Funding_Source__c`), Assistance Listing Number (`Assistance_Listing_Number__c`), Award Number (`Award_Number__c`), Federal Agency (`Federal_Agency__c`), Indirect Cost Rate (`Indirect_Cost_Rate__c`) and Match Required (`Match_Required__c`), with rule R-GN8. The period of performance is the existing award period; drawdowns are F-03's. |
+| 0.16 | 2026-11-02 | Funders F-04. `Grant__c` (29ZH) gains Funding Source (`Funding_Source__c`), Assistance Listing Number (`Assistance_Listing_Number__c`), Award Number (`Award_Number__c`), Federal Agency (`Federal_Agency__c`), Indirect Cost Rate (`Indirect_Cost_Rate__c`) and Match Required (`Match_Required__c`), with rule R-GN10 (numbered at landing B; R-GN8 is F-03's Giving fund rule). The period of performance is the existing award period; drawdowns are F-03's. |
 | 0.16 | 2026-11-02 | Funders F-14. New Section 29ZN Grant Answer (`Grant_Answer__c`), the answer library, with rules R-GA1 to R-GA3. Section 30's Funders row drops the answer library. |
 | 0.16 | 2026-11-02 | Logic Models L-06 (ADR-0163 `0163-funders-reporting-links.md`). `Grant_Requirement__c` (29ZI) gains Logic Model Outcome (`Outcome_Id__c`, Text(18)), a Logic Models element named by record identifier, with rule R-GQ6. Neither module references the other. |
 | 0.16 | 2026-11-02 | Funders F-06 (ADR-0163 `0163-funders-reporting-links.md`). New Section 29ZO Funder Report Template (`Funder_Report_Template__c` and the shipped `Funder_Report_Template_Default__mdt`), rules R-FT1 to R-FT3. |

@@ -15,8 +15,10 @@ who referred them, and whether they qualify, and staff keep private **case notes
 **service plan**: the person's goals, the steps toward each, and when each is next reviewed.
 A program can group its participants into **cohorts** (the spring class, the Tuesday group),
 add many people to a cohort at once, schedule **sessions** of a service, and take attendance
-per session. A **program dashboard** counts enrollments, people served and attendance for a period. A roster
-import comes in a later release (P-06). Who sees enrollments
+per session. Staff can also count drop-in visitors without names, record **referrals** in and
+out, and screen enrollments against a program's **eligibility rules**. A **program dashboard**
+counts enrollments, people served and attendance for a period, and a roster import template
+loads enrollments from a spreadsheet. Who sees enrollments
 and service deliveries is the **Participant Privacy** preset on the Programs settings page:
 everyone with a Programs permission set (the default), or only the people who need to.
 
@@ -48,7 +50,9 @@ finishes, BarnCRM does four things on its own:
    enrollments and service deliveries already in the org (see Participant Privacy).
 
 Then open the **BarnCRM Programs** app from the App Launcher. Its tabs are **Programs
-Dashboard**, **Programs**, **Enrollments**, **Service Deliveries** and **Case Notes**. These tabs also join the BarnCRM apps.
+Dashboard**, **Programs**, **Cohorts**, **Sessions**, **Enrollments**, **Service Deliveries**,
+**Case Notes**, **Referrals**, **Service Counts**, **Goals** and **Reports**. These tabs also join
+the BarnCRM apps.
 
 ## Programs Settings
 
@@ -579,11 +583,9 @@ Read Only has no access. Erasing a person **deletes** their referrals (see below
   nothing on them to empty. Their **case notes are deleted**, whoever wrote them. Only someone
   with Programs Admin can delete every note, so anyone else erasing a person who has case notes
   is refused, with that reason, and nothing is erased. Their **referrals are deleted** the same
-  way: a referral is typed text about the person, so Programs Admin is needed for it too.
-  Service counts name no one and are never touched. Erasing a person account also finds the
-  is refused, with that reason, and nothing is erased. Their **goals and steps are deleted** too,
-  for the same reason and with the same rule. Erasing a person account also finds the
-  case notes, and counts the enrollments, recorded on that person account's own contact.
+  way: a referral is typed text about the person, so Programs Admin is needed for it too. Their
+  **goals and steps are deleted** too, for the same reason and with the same rule. Service counts
+  name no one and are never touched. Erasing a person account also finds the case notes, and counts the enrollments, recorded on that person account's own contact.
 - **Deleting a person** keeps their case notes on the enrollment, which no longer names anyone.
   To remove what was written about someone, erase them rather than delete them.
 

@@ -268,7 +268,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 **Cleanup:** delete the test enrollments.
 
-## T-PRG-16: Count People Without Names
+## T-PRG-17: Count People Without Names
 
 **Purpose:** confirm a drop-in count is added from the Service Delivery Log, totals for the day, and shows on the dashboard apart from named people.
 **Prerequisites:** the admin user and the staff user; an Active program with an Active service and one enrolled test person with a Present delivery today (T-PRG-09).
@@ -287,7 +287,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 **Cleanup:** delete the two counts and the test delivery.
 
-## T-PRG-17: Referrals In and Out
+## T-PRG-18: Referrals In and Out
 
 **Purpose:** confirm referrals record direction, status and outcome, are private, and are deleted when their person is erased.
 **Prerequisites:** the admin user and a staff user with the Programs Staff set; a test person enrolled in a program.
@@ -306,7 +306,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 **Cleanup:** delete the remaining test referrals and enrollment.
 
-## T-PRG-18: Eligibility Screening Rules
+## T-PRG-19: Eligibility Screening Rules
 
 **Purpose:** confirm rules are built and checked, the preview matches what screening saves, and a decision made by hand is not overwritten.
 **Prerequisites:** the admin user and a staff user; a program with three open enrollments whose **Referral Source** is Self, School and Other.
@@ -326,7 +326,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 **Cleanup:** clear the rules (remove each rule and **Save Rules**) and reset the enrollments' eligibility.
 
-## T-PRG-16: Keep a Service Plan With Goals, Steps, Reviews and Notes
+## T-PRG-20: Keep a Service Plan With Goals, Steps, Reviews and Notes
 
 **Purpose:** confirm staff keep a participant's goals and steps on the enrollment, that the dates fill in, that reviews and notes attach to a goal, that a plan is seen as its enrollment is, and that erasing the person deletes it.
 **Prerequisites:** the admin user; a staff user with a BarnCRM role of Team Member (Programs Staff); the Read Only user; a program with a test person enrolled ("Test Person"). For step 9, Logic Models installed with a logic model for that program holding an outcome.
@@ -347,7 +347,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 **Cleanup:** delete the enrollments; remove the staff user's role.
 
-## T-PRG-17: Cohorts, Mass Enrollment, Scheduled Sessions and Session Attendance
+## T-PRG-21: Cohorts, Mass Enrollment, Scheduled Sessions and Session Attendance
 
 **Purpose:** confirm a cohort takes people already enrolled and enrolls new ones in one step, that sessions are scheduled over a date range, that attendance on a session is one service delivery per person and takes over a delivery already logged that day, and that a cancelled session takes no attendance.
 **Prerequisites:** the admin user; a staff user with a BarnCRM role of Team Member (Programs Staff); the Read Only user; a program with an active service "Tutoring", two people enrolled in it ("Ana" and "Ben") and a third person not enrolled ("Cara").

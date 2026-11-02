@@ -11,7 +11,7 @@ ADR-0057.
 Before an administrator deletes a field, they need to know what uses it. Salesforce answers part
 of that on the field's Setup page ("Where is this used?"), but it does not read BarnCRM's own
 setup, which names fields as text inside records and JSON documents: saved Find queries (also
-Giving's donor segments, R-DS1), Super Transform step lists (R-ST1), import mappings (R-IT1),
+Giving's donor segments, R-DS1), Super Transformer step lists (R-ST1), import mappings (R-IT1),
 merge rules, matching sources, settings whose value names a field, and the Rollup Builder's
 definitions (R-R1, R-R2). A field deleted under any of these breaks it quietly.
 

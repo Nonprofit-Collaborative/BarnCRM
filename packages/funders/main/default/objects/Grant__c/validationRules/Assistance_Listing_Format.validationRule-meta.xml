@@ -2,7 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Assistance_Listing_Format</fullName>
   <active>true</active>
-  <description>R-GN8: an Assistance Listing Number is two digits, a point and three digits or capital letters.</description>
+  <description>R-GN10: an Assistance Listing Number is two digits, a point and three digits or capital letters.</description>
   <errorConditionFormula>
 AND(
   NOT(ISBLANK(Assistance_Listing_Number__c)),
