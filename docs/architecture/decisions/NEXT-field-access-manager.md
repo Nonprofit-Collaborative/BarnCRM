@@ -43,6 +43,15 @@ fields and permission sets with hundreds of rows each.
    own included once packaged). Every query of `ObjectPermissions` and `FieldPermissions` is
    filtered by the Ids of the sets chosen and checked, so license-owned rows are never read or
    written. Up to 10 sets per change.
+   **Never a set BarnCRM ships, packaged or not.** The package and the access syncs
+   (`TabAccessService`, `ModuleAccessSyncBase`, `RollupAccessSync`) manage those sets' access,
+   so an edit there would be overwritten or would drift from what the syncs expect. A packaged
+   install hides them by namespace; an unpackaged install (a source deploy, as on the test
+   orgs) does not, so they are also excluded by name. The names come from
+   `BarnCRMShippedPermissionSets`, generated from every package directory in
+   `sfdx-project.json` by `scripts/ci/check-shipped-permission-sets.py`, which fails CI when the
+   class and the packages differ. A hand-kept list was rejected: it goes stale when a module
+   adds a set.
 3. **Never profiles or groups.** Profiles are excluded: Salesforce is moving permissions off
    profiles, a profile change reaches everyone on it at once, and standard profiles cannot be
    changed. A group is changed by changing a set inside it, which Salesforce then recalculates,

@@ -41,6 +41,10 @@ Only permission sets your organization made. Field Access Manager never lists or
 - **muting permission sets**, **standard permission sets** Salesforce ships, and **permission
   sets installed by a managed package** (BarnCRM's own included, once installed as a package):
   those cannot be changed, or an upgrade would put them back;
+- **BarnCRM's own permission sets**, such as BarnCRM Staff or Volunteers Coordinator, however
+  BarnCRM was installed: BarnCRM keeps their access up to date itself, so a change made here
+  would be overwritten. To give BarnCRM users more access, assign them a permission set your
+  organization made as well;
 - the access rows Salesforce keeps for user licenses and permission set licenses.
 
 You can choose up to 10 permission sets for one change.
