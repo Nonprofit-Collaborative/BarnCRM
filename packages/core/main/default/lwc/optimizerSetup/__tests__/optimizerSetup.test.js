@@ -106,6 +106,45 @@ describe('c-optimizer-setup', () => {
     expect(flows.querySelector('[data-id="examples"]')).toBeNull();
   });
 
+  it('lists the technical debt checks under their own heading with the version in the title', async () => {
+    getFindings.mockResolvedValue({
+      ...RESULT,
+      apiVersion: 50,
+      findings: [
+        { ...RESULT.findings[0] },
+        {
+          key: 'apexOldApi',
+          kind: 'debt',
+          count: 3,
+          moreThan: false,
+          failed: false,
+          examples: ['OldClass'],
+          setupUrl: '/lightning/setup/ApexClasses/home'
+        }
+      ]
+    });
+    const element = await render();
+
+    const debt = element.shadowRoot.querySelector('[data-id="debt-section"]');
+    expect(debt.querySelector('h3').textContent).toBe('c.Core_TechDebt_DebtHeading');
+    expect(debt.querySelector('[data-id="debt-intro"]')).not.toBeNull();
+    const apex = debt.querySelector('[data-id="apexOldApi"]');
+    expect(apex).not.toBeNull();
+    expect(apex.querySelector('[data-id="count"]').textContent).toBe('3');
+    // The unused list keeps its checks, and the heading shows now that there are two groups.
+    const unused = element.shadowRoot.querySelector('[data-id="unused-section"]');
+    expect(unused.querySelector('[data-id="inactiveUsers"]')).not.toBeNull();
+    expect(unused.querySelector('[data-id="apexOldApi"]')).toBeNull();
+    expect(unused.querySelector('h3')).not.toBeNull();
+  });
+
+  it('shows no heading when there are no technical debt checks', async () => {
+    getFindings.mockResolvedValue(RESULT);
+    const element = await render();
+    expect(element.shadowRoot.querySelector('[data-id="debt-section"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('h3')).toBeNull();
+  });
+
   it('shows the server refusal and reads again on Refresh', async () => {
     getFindings.mockRejectedValueOnce({ body: { message: 'Needs Manage BarnCRM Settings' } });
     const element = await render();

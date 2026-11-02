@@ -132,13 +132,28 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Org Optimizer**, choose **Unused Setup**. | **Nothing here is changed for you. Open each item in Setup and decide whether to remove it.** Then eight checks, including **Active Users Who Have Not Logged In for 90 Days**, **Permission Sets Nobody Is Assigned**, **Reports Not Run for 365 Days**, **Email Templates Never Used**, **Inactive Flows**, **Scheduled Jobs Owned by Inactive Users**, **Objects Near Their Custom Field Limit**, **Record Types No Record Uses, or Inactive**. |
+| 1 | Open **Org Optimizer**, choose **Unused Setup**. | **Nothing here is changed for you. Open each item in Setup and decide whether to remove it.** Then twelve checks (five of them under **Technical Debt**, see T-HC-16), including **Active Users Who Have Not Logged In for 90 Days**, **Permission Sets Nobody Is Assigned**, **Reports Not Run for 365 Days**, **Email Templates Never Used**, **Inactive Flows**, **Scheduled Jobs Owned by Inactive Users**, **Objects Near Their Custom Field Limit**, **Record Types No Record Uses, or Inactive**. |
 | 2 | Read a check with a count above 0. | The count in a warning-colored badge, up to five names, and **Open in Setup** with a new-window icon. A check the org does not allow reads **Could not check: your access or this org does not allow it.** |
 | 3 | Click **Open in Setup** on one check. | The matching Setup page opens. Nothing was removed. |
 | 4 | In **BarnCRM Settings**, **Org Optimizer**, set **Days before a user is unused** to `10` and click **Save**. | Nothing is saved; the value is marked as outside its range (30 to 365). |
 | 5 | Set it to `60`, **Save**, then **Refresh** on **Unused Setup**. | **Your settings are saved.** The first check reads **Active Users Who Have Not Logged In for 60 Days**. |
 
 **Cleanup:** Set **Days before a user is unused** back to `90`.
+
+## T-HC-16: Technical Debt Checks Follow the Old API Version Setting
+
+**Purpose:** Confirm the Technical Debt checks list Apex and flows on old API versions, state what they do not cover, and follow a bounded setting.
+**Prerequisites:** admin.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Org Optimizer**, choose **Unused Setup**. | Two headings: **Unused Setup** and **Technical Debt**. Under **Technical Debt**, a line reading "Covers Apex classes, Apex triggers and flows... Not covered: validation rules, workflow rules, process builders...". |
+| 2 | Read the checks under **Technical Debt**. | **Active Apex Classes Below API Version 50**, **Active Apex Triggers Below API Version 50**, **Flows Below API Version 50**, **Active Flows With No Description** and **Inactive Flows**, each with a count and **Open in Setup**. |
+| 3 | In **BarnCRM Settings**, **Org Optimizer**, set **Old API version** to `10` and click **Save**. | Nothing is saved; the value is marked as outside its range (21 to 80). |
+| 4 | Set it to `80`, **Save**, then **Refresh**. | The three version checks read **Below API Version 80**; **Active Apex Classes** shows a count above 0 with up to five names. |
+| 5 | Click **Open in Setup** on **Active Apex Classes**. | The Apex Classes page opens. Nothing was changed. |
+
+**Cleanup:** Set **Old API version** back to `50`.
 
 ## T-HC-10: Data Dictionary Lists Fields, Fill Rates and a CSV
 

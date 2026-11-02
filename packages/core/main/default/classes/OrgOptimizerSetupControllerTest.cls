@@ -18,7 +18,11 @@ private class OrgOptimizerSetupControllerTest {
         'inactiveFlows',
         'jobsOfInactiveUsers',
         'objectsNearFieldLimit',
-        'unusedRecordTypes'
+        'unusedRecordTypes',
+        'apexOldApi',
+        'triggersOldApi',
+        'flowsOldApi',
+        'flowsNoDescription'
     };
 
     private static Map<String, OrgOptimizerSetupController.Finding> byKey(
@@ -64,6 +68,50 @@ private class OrgOptimizerSetupControllerTest {
                 'It is named among the examples, which are in label order.'
             );
             Assert.isFalse(findings.get('inactiveUsers').failed, 'Users are always readable.');
+        }
+    }
+
+    @IsTest
+    static void technicalDebtChecksFollowTheOldApiVersionSetting() {
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                OrgOptimizerSetupController.DEFAULT_API_VERSION,
+                OrgOptimizerSetupController.apiVersion(),
+                'Empty reads as the default.'
+            );
+            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+            settings.Old_Api_Version__c = 5;
+            HouseholdTestDataFactory.save(settings);
+            Assert.areEqual(21, OrgOptimizerSetupController.apiVersion(), 'Below 21 reads as 21.');
+            settings.Old_Api_Version__c = 500;
+            HouseholdTestDataFactory.save(settings);
+            Assert.areEqual(80, OrgOptimizerSetupController.apiVersion(), 'Above 80 reads as 80.');
+            // Every class in the org is below version 80, so the check has something to list.
+            OrgOptimizerSetupController.permissionOverride = true;
+
+            OrgOptimizerSetupController.Result result = OrgOptimizerSetupController.getFindings();
+
+            Assert.areEqual(80, result.apiVersion, 'The page is told the version in use.');
+            Map<String, OrgOptimizerSetupController.Finding> findings = byKey(result);
+            for (String key : new List<String>{ 'apexOldApi', 'triggersOldApi', 'flowsOldApi' }) {
+                Assert.areEqual(
+                    OrgOptimizerSetupController.KIND_DEBT,
+                    findings.get(key).kind,
+                    'Listed under Technical Debt: ' + key
+                );
+            }
+            Assert.areEqual(
+                OrgOptimizerSetupController.KIND_DEBT,
+                findings.get('inactiveFlows').kind,
+                'Flows with no active version are a technical debt check.'
+            );
+            Assert.areEqual(
+                OrgOptimizerSetupController.KIND_UNUSED,
+                findings.get('inactiveUsers').kind,
+                'The unused setup checks keep their heading.'
+            );
+            Assert.isFalse(findings.get('apexOldApi').failed, 'Apex classes are readable.');
+            Assert.isTrue(findings.get('apexOldApi').count > 0, 'Classes are on versions below 80.');
         }
     }
 

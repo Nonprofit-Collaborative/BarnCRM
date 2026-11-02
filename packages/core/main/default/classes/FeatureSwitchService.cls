@@ -122,7 +122,8 @@ public with sharing class FeatureSwitchService {
                         'Stale_Record_Years',
                         'Unused_Login_Days',
                         'Unused_Report_Days',
-                        'Setup_Change_Retention_Days'
+                        'Setup_Change_Retention_Days',
+                        'Old_Api_Version'
                     }
                 )
         };

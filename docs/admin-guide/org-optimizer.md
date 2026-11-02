@@ -106,7 +106,7 @@ Each count stops at 1,000 and then says **More than 1000**.
 | Permission Sets Nobody Is Assigned | Your own permission sets with no user assigned. | Profile permission sets, permission sets from installed packages, and those inside a permission set group. |
 | Reports Not Run for 365 Days | Reports nobody has run for a year (or the days you set), or ever. Only reports you can see are counted. | Reports from installed packages. |
 | Email Templates Never Used | Templates that have never been sent and are more than 90 days old. | Templates from installed packages, and new ones. |
-| Inactive Flows | Flows with no active version, last changed more than 90 days ago. | Flows from installed packages, and recent work. |
+| Inactive Flows (listed under **Technical Debt**) | Flows with no active version, last changed more than 90 days ago. | Flows from installed packages, and recent work. |
 | Scheduled Jobs Owned by Inactive Users | Scheduled jobs still waiting to run whose owner is no longer active. These may stop working. | Finished and deleted jobs. |
 | Objects Near Their Custom Field Limit | Account, Contact and BarnCRM's own objects with 80% or more of the custom fields your edition allows (100 on Professional, 500 on Enterprise and Developer, 800 on Unlimited and Performance, 500 when the edition is not known). Each example says how many of how many. | Fields from installed packages, which do not count against the limit, and every other object. |
 | Record Types No Record Uses, or Inactive | Record types on Account, Contact and BarnCRM's own objects that are inactive, or that no record you can see uses. At most 50 active record types are looked at. | Record types on other objects. |
@@ -117,6 +117,33 @@ is unused** (90 unless you change it; 30 to 365) and **Days before a report is u
 check's name shows the number in use. The 90 days that keep new email templates and flows out are fixed.
 Nothing here is deleted or changed for you:
 **Open in Setup** opens the Setup page where you can review and remove each item.
+
+### Technical Debt
+
+Under its own **Technical Debt** heading, the same section also lists the code and flows in your
+org that are old or undocumented. These checks read only what a Salesforce query can read, so
+they run without any extra access, and they list your own setup, not anything from an installed
+package.
+
+| Check | What counts | Left out |
+|---|---|---|
+| Active Apex Classes Below API Version 50 | Active Apex classes saved on an API version below the one in use (50 unless you change it). Salesforce keeps old versions running, but they miss newer behavior and eventually reach retirement. | Classes from installed packages, and inactive classes. |
+| Active Apex Triggers Below API Version 50 | The same for Apex triggers. | The same. |
+| Flows Below API Version 50 | Flows saved on an older API version, active or not. | Flows from installed packages. |
+| Active Flows With No Description | Active flows with an empty description, so nobody can tell what they are for. | Inactive flows and flows from installed packages. |
+| Inactive Flows | The check described above: flows with no active version, last changed more than 90 days ago. | Flows from installed packages, and recent work. |
+
+The version is a setting, **Old API version**, in the **Org Optimizer** section of **BarnCRM
+Settings**. It starts at **50**; anything from 21 to 80 is accepted, and the settings page
+refuses a value outside that range. Each check's name shows the number in use. Counts stop at
+1,000, show up to five names, and each has an **Open in Setup** link, as above.
+
+**Not covered.** Technical Debt does not look at validation rules, workflow rules, process
+builders, Lightning web or Aura components, Visualforce pages, or anything inside an installed
+package, and it does not look inside a flow (for example, elements built on old versions).
+Reading those needs a Salesforce developer interface that BarnCRM does not use, so the page says
+what it covers and leaves the rest to Setup. Open **Setup**, **Flows**, **Apex Classes** and
+**Apex Triggers** to act: the page changes nothing.
 
 ## 6. Common Mistakes
 

@@ -38,6 +38,8 @@ section, which downloads a zip that explains your data to an AI tool of their ch
 Explorer** section that shows who can see or change what, and why, compares two people side by
 side and lists who holds Modify All Data. Its **Field Utilization** section also shows, for any
 picklist, how many records hold each value and when they were last changed. If you import files, the
+side and lists who holds Modify All Data. Its **Unused Setup** section also lists Apex and
+flows on old API versions under **Technical Debt**. If you import files, the
 **Check Columns** step shows a few example values beside each column, so you can see each
 column lands in the right field before anything loads; a column matched from a near spelling
 (`Frist Name`) shows a **Best Guess, Check It** badge, and you accept it or choose another
