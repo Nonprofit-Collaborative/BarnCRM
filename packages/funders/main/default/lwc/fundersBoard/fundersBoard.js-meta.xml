@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Board Dashboard: this fiscal year's revenue mix, funder concentration and restricted
+    balances, from grants and, when installed, Giving (F-07, canonical model 29ZH R-GN9).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Funders Board Dashboard</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

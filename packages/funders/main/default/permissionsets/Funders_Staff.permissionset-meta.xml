@@ -42,6 +42,10 @@
     <apexClass>GrantAnswerController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>FundersBoardController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Grant_Fund_Entry__c.Description__c</field>
@@ -319,6 +323,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Grant_Answer__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Funders_Board</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

@@ -1,0 +1,108 @@
+<template>
+  <lightning-card title={labels.title} icon-name="standard:dashboard">
+    <div class="slds-var-p-horizontal_medium">
+      <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small">{labels.help}</p>
+
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
+      </template>
+
+      <template lwc:if={board}>
+        <div class="slds-grid slds-wrap slds-gutters">
+          <section class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-var-m-bottom_medium">
+            <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.mix}</h2>
+            <template lwc:if={hasMix}>
+              <table class="slds-table slds-table_cell-buffer slds-table_bordered" data-id="mix">
+                <tbody>
+                  <template for:each={mixRows} for:item="row">
+                    <tr key={row.key}>
+                      <th scope="row">{row.name}</th>
+                      <td class="slds-text-align_right">{row.amount}</td>
+                      <td class="slds-text-align_right">{row.share}</td>
+                    </tr>
+                  </template>
+                  <tr>
+                    <th scope="row"><strong>{labels.total}</strong></th>
+                    <td class="slds-text-align_right" data-id="mix-total"><strong>{mixTotal}</strong></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </template>
+            <template lwc:else>
+              <p data-id="mix-empty" class="slds-text-body_small">{labelsRestricted.empty}</p>
+            </template>
+          </section>
+
+          <section class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-var-m-bottom_medium">
+            <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.concentration}</h2>
+            <template lwc:if={hasMix}>
+              <template lwc:if={hasFlags}>
+                <template for:each={flags} for:item="flag">
+                  <p key={flag.key} role="status" data-id="flag" class="slds-text-color_error slds-var-m-bottom_x-small">
+                    <lightning-icon icon-name="utility:warning" size="x-small" variant="warning"></lightning-icon>
+                    {flag.text}
+                  </p>
+                </template>
+              </template>
+              <template lwc:else>
+                <p data-id="no-risk" class="slds-var-m-bottom_x-small">{noRiskText}</p>
+              </template>
+              <table class="slds-table slds-table_cell-buffer slds-table_bordered" data-id="sources">
+                <tbody>
+                  <template for:each={sourceRows} for:item="row">
+                    <tr key={row.key}>
+                      <th scope="row">{row.name}</th>
+                      <td class="slds-text-align_right">{row.amount}</td>
+                      <td class="slds-text-align_right">{row.share}</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </template>
+            <template lwc:else>
+              <p class="slds-text-body_small">{labelsRestricted.empty}</p>
+            </template>
+          </section>
+
+          <section class="slds-col slds-size_1-of-1 slds-var-m-bottom_medium">
+            <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labelsRestricted.title}</h2>
+            <template lwc:if={hasFunds}>
+              <h3 class="slds-text-title_caps slds-var-m-vertical_x-small">{labelsRestricted.funds}</h3>
+              <table class="slds-table slds-table_cell-buffer slds-table_bordered" data-id="funds">
+                <tbody>
+                  <template for:each={fundRows} for:item="row">
+                    <tr key={row.key}>
+                      <th scope="row">{row.name}</th>
+                      <td class="slds-text-align_right">{row.amount}</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </template>
+            <template lwc:if={hasGrants}>
+              <h3 class="slds-text-title_caps slds-var-m-vertical_x-small">{labelsRestricted.grants}</h3>
+              <table class="slds-table slds-table_cell-buffer slds-table_bordered" data-id="grants">
+                <tbody>
+                  <template for:each={grantRows} for:item="row">
+                    <tr key={row.key}>
+                      <th scope="row">{row.name}</th>
+                      <td class="slds-text-align_right">{row.amount}</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </template>
+            <template lwc:if={noRestricted}>
+              <p data-id="restricted-empty" class="slds-text-body_small">{labelsRestricted.empty}</p>
+            </template>
+          </section>
+        </div>
+      </template>
+    </div>
+  </lightning-card>
+</template>

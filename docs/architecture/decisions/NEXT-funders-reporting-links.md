@@ -69,4 +69,6 @@ both Apex, both closed sets of `{Token}` names in an HTML body, both rendering P
 - A requirement can name an outcome that is later deleted; the card shows it as missing, as the
   Program card does.
 - The report's look is the organization's HTML; a template with broken HTML still merges.
-- When F-03's ledger lands, `FundersBoardController.restrictedFunds` reads the balance from it.
+- `FundersBoardController.restrictedFunds` reads each restricted grant's balance from F-03's
+  Grant fields (`Restricted__c`, `Restricted_Balance__c`) by describe, so the board lists them as
+  soon as the ledger is merged, with no change here, and runs without it meanwhile.
