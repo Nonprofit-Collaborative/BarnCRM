@@ -11516,6 +11516,216 @@ adoption job in system mode (ADR-0021).
 
 ---
 
+## 29ZH. Grant
+
+### Definition
+
+One request for money to one funder, from the first idea through the decision and, when awarded,
+the award period (F-01, Funders module, ADR-NEXT `NEXT-funders-module.md`). The funder is an
+organization; the grant's requirements (29ZI) are the reports and deliverables the award brings.
+Restricted fund tracking (F-03), government award fields (F-04) and multi-year schedules (F-05)
+add to this entity in release 0.17 and later (Section 30).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the grant is called, for example "2027 Literacy Grant". |
+| Funder | reference(Organization) | yes | The foundation, company or government body asked. |
+| Funder Contact | reference(Contact) | no | The program officer or other contact at the funder. |
+| Stage | picklist(Prospect, Letter of Inquiry, Invited to Apply, Applied, Awarded, Declined, Withdrawn) | yes (defaults Prospect) | Where the request stands. The first four are open, the last three closed (R-GN1). |
+| Amount Requested | currency | no | What the organization asked for. |
+| Amount Awarded | currency | no | What the funder awarded. |
+| Application Deadline | date | no | When the application (or letter of inquiry) is due. |
+| Submitted Date | date | no | When the application went in (R-GN3). |
+| Decision Date | date | no | When the funder decides, or decided (R-GN3). |
+| Award Start Date | date | no | First day of the award period. |
+| Award End Date | date | no | Last day of the award period. |
+| Purpose | long text | no | What the money is for, in words a report can quote. |
+| Next Step | text | no | The next thing to do on this request. |
+| Program | record identifier (text) | no | The program the grant pays for, when the Programs module is installed. A record identifier, not a reference: Funders never depends on Programs (R-GN4). |
+| Owner | reference(User) | yes | The staff member responsible (the record owner). Reminders fall back to the owner (R-GQ3). |
+
+### Relationships
+
+- **Grant to Organization**, many to one, through a required lookup to Account with delete
+  Restrict (R-GN5).
+- **Grant to Contact** (Funder Contact), many to one, optional; deleting the contact empties it.
+- **Grant to Grant Requirement**, one to many; the requirement is a detail of the grant (R-GN6).
+
+### Rules
+
+**R-GN1 Open and closed stages.** Prospect, Letter of Inquiry, Invited to Apply and Applied are
+open; Awarded, Declined and Withdrawn are closed. The Grant Pipeline board shows open grants; an
+awarded grant's requirements stay on the deadline list until they are done.
+
+**R-GN2 Amounts and dates make sense.** Amount Requested and Amount Awarded are not negative, and
+Award End Date is not before Award Start Date (validation rules).
+
+**R-GN3 Stage dates are stamped.** Moving to Applied fills an empty Submitted Date with today;
+moving to Awarded, Declined or Withdrawn fills an empty Decision Date. A date already typed is
+kept. A switchable automation (registry row `Grant_Dates`), off while history is imported.
+
+**R-GN4 The program is named, not looked up.** `Program_Id__c` holds a record identifier as text
+(ADR-0014). An automation that always runs (registry row `Grant_Rules`) stores the 18-character
+form and refuses text that is not a record identifier, or, where the Programs module's Program
+object exists, an identifier of another object. The record page offers programs only where that
+object exists, read by describe, and shows a program it cannot find as missing.
+
+**R-GN5 A funder with grants is kept.** The Funder lookup is required with delete Restrict, so the
+platform refuses to delete an organization with grants; a merge moves its grants to the record
+kept.
+
+**R-GN6 Deleting a grant deletes its requirements.**
+
+**R-GN7 Open applications past their deadline are found.** Health Check lists open grants in
+Prospect, Letter of Inquiry or Invited to Apply whose Application Deadline has passed, so each is
+moved on or closed.
+
+### Salesforce implementation
+
+- **Object:** `Grant__c`, name field Text, label Grant Name, sharing Public Read/Write, field
+  history on Stage, Amount Requested and Amount Awarded, activities on (reminder tasks, R-GQ3).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Funder | `Funder__c` | Lookup to Account, required, delete constraint Restrict, relationship name Grants |
+| Funder Contact | `Funder_Contact__c` | Lookup to Contact, delete constraint SetNull, relationship name Funder_Grants |
+| Stage | `Stage__c` | Picklist (restricted): Prospect (default), Letter of Inquiry, Invited to Apply, Applied, Awarded, Declined, Withdrawn; required |
+| Amount Requested | `Amount_Requested__c` | Currency(16, 2) |
+| Amount Awarded | `Amount_Awarded__c` | Currency(16, 2) |
+| Application Deadline | `Application_Deadline__c` | Date |
+| Submitted Date | `Submitted_Date__c` | Date |
+| Decision Date | `Decision_Date__c` | Date |
+| Award Start Date | `Award_Start_Date__c` | Date |
+| Award End Date | `Award_End_Date__c` | Date |
+| Purpose | `Purpose__c` | Long Text Area(32768) |
+| Next Step | `Next_Step__c` | Text(255) |
+| Program | `Program_Id__c` | Text(18) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false |
+
+- **Validation rules:** `Amounts_Not_Negative`, `Award_End_After_Start` (R-GN2).
+- **Trigger:** `GrantTrigger`, through the Core dispatcher; handlers `GrantRulesHandler` (R-GN4,
+  always runs) and `GrantDatesHandler` (R-GN3, switchable).
+- **Service:** `GrantService` (stages, the program rule, the stage dates), `GrantPipelineController`
+  (thin, plain JSON shapes); the board's columns and the deadline rows run in the framework-free
+  module `grantPipelineModel.js` (plan 9.9).
+- **Health Check:** `FundersHealthCheckExtension` (R-GN7, R-GQ5). **Sample data:**
+  `FundersSampleData` (three grants to Core's sample organizations, flagged `Sample_Data__c`).
+
+---
+
+## 29ZI. Grant Requirement
+
+### Definition
+
+One thing a funder expects by a date because of a grant: an interim or final narrative report, a
+financial report, a deliverable, a site visit (F-02). Each has a due date, a status and the staff
+member assigned, and BarnCRM reminds that person before it is due.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What is due, for example "Year 1 interim report". |
+| Grant | reference(Grant) | yes | The grant it belongs to. A requirement is a detail of its grant. |
+| Type | picklist(Narrative Report, Financial Report, Deliverable, Site Visit, Other) | yes (defaults Narrative Report) | What kind of obligation it is. |
+| Due Date | date | yes | When the funder expects it. |
+| Status | picklist(Not Started, In Progress, Submitted, Accepted, Waived) | yes (defaults Not Started) | Where it stands. Not Started and In Progress are open (R-GQ1). |
+| Submitted Date | date | no | When it went to the funder (R-GQ2). |
+| Assigned To | reference(User) | no | The staff member doing it. Reminders go to them, or to the grant's owner (R-GQ3). |
+| Instructions | long text | no | What the funder asks for: the template, the portal, the questions. |
+| Reminder Sent For | date | no (set by BarnCRM) | The due date the last reminder was made for (R-GQ3). |
+
+### Relationships
+
+- **Grant Requirement to Grant**, many to one, as a detail of the grant.
+- **Grant Requirement to User** (Assigned To), many to one, optional; a deactivated user stays
+  named, and reminders go to the grant's owner instead.
+
+### Rules
+
+**R-GQ1 Open and done.** Not Started and In Progress are open; Submitted, Accepted and Waived are
+done. Only open requirements are reminded, counted overdue or listed as upcoming.
+
+**R-GQ2 The submitted date is stamped.** Moving to Submitted or Accepted fills an empty Submitted
+Date with today. Part of the switchable `Grant_Dates` automation (R-GN3).
+
+**R-GQ3 One reminder per due date.** A morning job (6:00 AM org time) reminds each open requirement
+whose Due Date is no more than the lead time ahead (Funders Settings, R-FS1) and no more than 30
+days past, and whose Reminder Sent For is not its Due Date. The reminder is a task (when tasks
+are on) for the assignee, or the grant's owner when there is no active assignee, on the grant,
+due on the Due Date; and an email to the same person (when emails are on), addressed by user
+record. Reminder Sent For is then set to the Due Date, so each date is reminded once and a moved
+date is reminded again. A requirement whose task could not be saved is not stamped and is tried
+the next morning; a failed email is logged. Nobody active to remind: no reminder, and the Health
+Check overdue finding (R-GQ5) still lists it.
+
+**R-GQ4 Reminders need the module on and a setting on.** Nothing runs while the module is turned
+off or both reminder settings are off.
+
+**R-GQ5 Overdue requirements are found.** Health Check lists open requirements whose Due Date has
+passed.
+
+### Salesforce implementation
+
+- **Object:** `Grant_Requirement__c`, name field Text, label Requirement Name, sharing Controlled
+  By Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Grant | `Grant__c` | Master-Detail to `Grant__c`, relationship name Requirements |
+| Type | `Type__c` | Picklist (restricted): Narrative Report (default), Financial Report, Deliverable, Site Visit, Other; required |
+| Due Date | `Due_Date__c` | Date, required |
+| Status | `Status__c` | Picklist (restricted): Not Started (default), In Progress, Submitted, Accepted, Waived; required |
+| Submitted Date | `Submitted_Date__c` | Date |
+| Assigned To | `Assigned_To__c` | Lookup to User, delete constraint SetNull, relationship name Grant_Requirements |
+| Instructions | `Instructions__c` | Long Text Area(32768) |
+| Reminder Sent For | `Reminder_Sent_For__c` | Date, read only in every permission set but Funders Admin |
+
+- **Trigger:** `GrantRequirementTrigger`, through the Core dispatcher; handler
+  `GrantRequirementDatesHandler` (R-GQ2, registry row `Grant_Requirement_Dates`, switchable).
+- **Reminders:** `GrantReminderScheduler` (Schedulable, job "BarnCRM Grant Reminders", listed by
+  `FundersNightlyJobProvider`), `GrantReminderBatch`, `GrantReminderService` (decides, pure),
+  `GrantReminderSelector`; email through Core's `EmailSender`.
+
+---
+
+## 29ZJ. Funders Settings
+
+### Definition
+
+The Funders module's org-wide settings (F-02), edited in the Funders section of BarnCRM Settings.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Create Reminder Tasks | boolean | yes (defaults true) | Whether the morning job makes a task for each requirement coming due (R-GQ3). |
+| Email Reminders | boolean | yes (defaults true) | Whether the morning job also emails the person reminded. |
+| Days Before a Deadline to Remind | number | yes (defaults 14) | The lead time, from 1 to 90 days (R-FS1). |
+
+### Rules
+
+**R-FS1 A value out of range reads as the default.** A blank or out of range lead time reads as
+14; a never-saved setting reads as its shipped value.
+
+### Salesforce implementation
+
+- **Object:** `Funders_Settings__c`, hierarchy custom setting, visibility Protected, read through
+  Core's `SettingsService` by `FundersSettings`.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Create Reminder Tasks | `Reminder_Tasks_Enabled__c` | Checkbox, default true |
+| Email Reminders | `Reminder_Emails_Enabled__c` | Checkbox, default true |
+| Days Before a Deadline to Remind | `Reminder_Lead_Days__c` | Number(2, 0), default 14 |
+
+- **Setting Definitions:** `Funders_Reminder_Tasks_Enabled`, `Funders_Reminder_Emails_Enabled`,
+  `Funders_Reminder_Lead_Days`, section Funders.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -11527,7 +11737,7 @@ that builds it, before its metadata is created.
 |---|---|---|---|
 | Receipt | Giving | v0.4 (G-13) | Section 4.11, ADR-0010 |
 | Donor Level | Giving | v0.4 (G-14) | Section 5.2 |
-| Funder pipeline entities (grant, reporting deadline, award compliance) | Funders | v0.9 | Section 5.5 |
+| Funders entities still to come (fund ledger F-03, government award fields F-04, award schedules F-05, answer library F-14) | Funders | releases 0.16 and 0.17 | Section 5.5 |
 | Mirror adapter entities and mirror mappings | Mirror | v0.6 onward | Section 4.12 |
 
 Receipt left this table in v0.4 and is specified in Sections 25B to 25E, together with
@@ -11572,6 +11782,10 @@ Logic Model, Logic Model Element, Logic Model Link, Indicator and Indicator Peri
 L-02, release 0.14, ADR-0154 `0154-logic-models-module.md`) are specified in Sections 29ZC to
 29ZG. Indicator takes the place of the Outcome entity listed above for Programs: P-03 moved to the
 Logic Models package as L-02 (owner decision, 2026-09-23).
+
+Grant and Grant Requirement (F-01 and F-02, release 0.16, ADR-NEXT `NEXT-funders-module.md`) left
+the funder pipeline row and are specified in Sections 29ZH and 29ZI, with Funders Settings in
+29ZJ. The rest of the Funders entities stay in the table until their release.
 
 Two v0.4 entities have attributes that already exist on `Gift__c` from v0.2, because the
 object is not worth altering later for fields this cheap: Acknowledgment Status,
@@ -11839,6 +12053,7 @@ mirrors the primary member).
 | 0.15 | 2026-11-02 | Logic Models L-03 indicator sources (ADR-NEXT `NEXT-indicator-sources.md`). `Indicator__c` (29ZF) gains Source (`Source__c`), Source Query (`Source_Query__c`, lookup to `Saved_Query__c`), Source Definition (`Source_Definition__c`), Source Status (`Source_Status__c`) and Computed At (`Computed_At__c`), with rules R-IN3 to R-IN6; the one-object import template Indicator Results loads Indicator Period results. |
 | 0.15 | 2026-11-02 | Logic Models L-04 logic model report: rule R-IN7 on Indicator (29ZF); no new object or field. |
 | 0.17 | 2026-11-02 | Gift Transaction mirror (X-07, ADR-NEXT). New Section 29C1, rules R-GT1 to R-GT10, leaving Section 30. No object added. Mirror adds Gift Transaction ID (`Gift_Transaction_Id__c`, Text(18), unique) to `Gift__c`, Gift Designation ID (`Gift_Designation_Id__c`, Text(18)) to `Fund__c`, and five keys to `Mirror_Settings__c`. One way only, Gifts to Gift Transactions, with designations written from each fund's Gift Designation ID; the reverse direction waits on owner question O-7. Ported from the 2026-09-27 salvage design, which had both directions and no designations. |
+| 0.16 | 2026-11-02 | Funders F-01 and F-02 (ADR-NEXT `NEXT-funders-module.md`). New Sections 29ZH Grant (`Grant__c`), 29ZI Grant Requirement (`Grant_Requirement__c`, a detail of the grant) and 29ZJ Funders Settings (`Funders_Settings__c`), rules R-GN1 to R-GN7, R-GQ1 to R-GQ5 and R-FS1. Section 30's funder pipeline row narrows to the entities still to come. |
 
 ---
 ## 32. Entity ownership by package
@@ -11946,6 +12161,10 @@ included; standard objects the packages extend are named by the entity that gove
 | Indicator Period | Logic Models | 0.14 (L-02) | 29ZG |
 | Household Adoption | Core | 0.17 (X-05) | 29ZH |
 | Funders entities | Funders | v0.9 | 30 |
+| Grant | Funders | 0.16 (F-01) | 29ZH |
+| Grant Requirement | Funders | 0.16 (F-02) | 29ZI |
+| Funders Settings (custom setting, reminder settings) | Funders | 0.16 (F-02) | 29ZJ |
+| Funders entities still to come | Funders | 0.16 and 0.17 | 30 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
@@ -11968,6 +12187,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-0127). Dashboard `Volunteers` and four reports in public read only folders `BarnCRM_Volunteers`; report types Volunteer Hours with Job and Shift, Volunteer Shifts with Job, Volunteer Sign-ups, Volunteers (Contact); `standard-Dashboard` and `standard-report` tabs in the app; report and dashboard user permissions in the four permission sets (V-03) |
 | Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
 | Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
+| Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and `FundersAccessSync` (ADR-NEXT `NEXT-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantProgram`) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror was brought forward from v0.9 to v0.6 and is built in release
