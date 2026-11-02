@@ -34,9 +34,17 @@ public with sharing class HouseholdNamingService {
     private static final String TOKEN_FIRST_NAME = '{FirstName}';
     private static final String TOKEN_LAST_NAME = '{LastName}';
     private static final String TOKEN_SALUTATION = '{Salutation}';
-    private static final String DEFAULT_NAME_PATTERN = 'The {LastName} Family';
-    private static final String DEFAULT_FORMAL_PATTERN = '{Salutation} {FirstName} {LastName}';
-    private static final String DEFAULT_INFORMAL_PATTERN = '{FirstName}';
+    /** The patterns used while a setting is blank; Where Used (C-59) reads them too. */
+    public static final String DEFAULT_NAME_PATTERN = 'The {LastName} Family';
+    public static final String DEFAULT_FORMAL_PATTERN = '{Salutation} {FirstName} {LastName}';
+    public static final String DEFAULT_INFORMAL_PATTERN = '{FirstName}';
+
+    /** The Contact field behind each blank, keyed by the blank as written in a pattern. */
+    public static final Map<String, String> TOKEN_FIELDS = new Map<String, String>{
+        '{FirstName}' => 'FirstName',
+        '{LastName}' => 'LastName',
+        '{Salutation}' => 'Salutation'
+    };
 
     /** Field lengths read from the describe, by field; see fieldLength. */
     private static final Map<String, Integer> FIELD_LENGTHS = new Map<String, Integer>();
