@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field access: set cannot be changed</shortDescription>
-        <value>A chosen permission set cannot be changed here. Choose permission sets your organization made; profiles, groups and packaged permission sets are changed in Setup.</value>
+        <value>A chosen permission set cannot be changed here. Choose permission sets your organization made. Profiles, groups and packaged permission sets are changed in Setup; BarnCRM keeps its own permission sets up to date itself.</value>
     </labels>
     <labels>
         <fullName>Core_FieldAccess_NoSets</fullName>

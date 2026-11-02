@@ -149,6 +149,41 @@ private class FieldAccessServiceTest {
     }
 
     @IsTest
+    static void neverOffersAPermissionSetBarnCrmShips() {
+        Assert.isTrue(
+            BarnCRMShippedPermissionSets.NAMES.contains(HealthCheckService.PERMISSION_SET_ADMIN),
+            'The generated list holds the sets Core ships.'
+        );
+        System.runAs(TestUsers.admin()) {
+            // BarnCRM_Admin is installed with Core, unpackaged or not.
+            PermissionSet shipped = [
+                SELECT Id, Label
+                FROM PermissionSet
+                WHERE Name = :HealthCheckService.PERMISSION_SET_ADMIN
+                WITH SYSTEM_MODE
+                LIMIT 1
+            ];
+            for (
+                FieldAccessController.SetChoice choice : FieldAccessController.searchSets(
+                    shipped.Label
+                )
+            ) {
+                Assert.areNotEqual(
+                    String.valueOf(shipped.Id),
+                    choice.id,
+                    'A set BarnCRM ships is never offered.'
+                );
+            }
+            try {
+                FieldAccessService.requireSets(new List<Object>{ shipped.Id });
+                Assert.fail('A set BarnCRM ships must never be changed.');
+            } catch (FieldAccessService.FieldAccessException expected) {
+                Assert.areEqual(System.Label.Core_FieldAccess_SetNotAllowed, expected.getMessage());
+            }
+        }
+    }
+
+    @IsTest
     static void fieldsListChangeableFieldsWithTodaysAccess() {
         System.runAs(TestUsers.admin()) {
             PermissionSet given = newSet('FAM_Fields_Given');
