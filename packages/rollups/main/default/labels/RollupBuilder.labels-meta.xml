@@ -193,14 +193,6 @@
         <value>Comparison</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_Value</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter builder label for the value of a condition.</shortDescription>
-        <value>Value</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupFilter_Logic</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -569,14 +561,6 @@
         <value>Only for some records</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Name</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 5 label: the rollup's name.</shortDescription>
-        <value>Name</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_Description</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -623,14 +607,6 @@
         <protected>false</protected>
         <shortDescription>Rollup Builder button: create a rollup.</shortDescription>
         <value>New Rollup</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Edit</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Row button: edit this rollup in the Builder.</shortDescription>
-        <value>Edit</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Copy</fullName>
@@ -737,14 +713,6 @@
         <value>One recalculation of every total is set for the next {0}.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_AttentionTitle</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: section title</shortDescription>
-        <value>Needs Attention</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_Waiting</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -775,14 +743,6 @@
         <protected>false</protected>
         <shortDescription>Needs attention: no failed records</shortDescription>
         <value>Every total was saved.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ColumnRecord</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: record column</shortDescription>
-        <value>Record</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ColumnError</fullName>
@@ -873,14 +833,6 @@
         <value>Started. The waiting totals are recalculated in the background, usually within a minute. Refresh to see what is left.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Delete</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Row button: delete this rollup</shortDescription>
-        <value>Delete</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_DeleteShipped</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -959,22 +911,6 @@
         <protected>false</protected>
         <shortDescription>Import preview: the rollup replaces the one with the same key</shortDescription>
         <value>Will replace the rollup here with the same Definition Key</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ImportCreated</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import result: created</shortDescription>
-        <value>Created</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ImportUpdated</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import result: updated</shortDescription>
-        <value>Updated</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ImportRefused</fullName>

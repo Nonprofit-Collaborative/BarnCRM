@@ -217,28 +217,12 @@
     <value>Not scheduled</value>
   </labels>
   <labels>
-    <fullName>Giving_PledgeReminders_LastRun</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: last run</shortDescription>
-    <value>Last run</value>
-  </labels>
-  <labels>
     <fullName>Giving_PledgeReminders_NeverRun</fullName>
     <categories>Giving, Pledge Reminders</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Pledge reminders page: never run</shortDescription>
     <value>Never run</value>
-  </labels>
-  <labels>
-    <fullName>Giving_PledgeReminders_StepsHeading</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: steps heading</shortDescription>
-    <value>Steps</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_NewStep</fullName>
@@ -249,28 +233,12 @@
     <value>New Step</value>
   </labels>
   <labels>
-    <fullName>Giving_PledgeReminders_EditStep</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: edit step button</shortDescription>
-    <value>Edit</value>
-  </labels>
-  <labels>
     <fullName>Giving_PledgeReminders_EditStepOf</fullName>
     <categories>Giving, Pledge Reminders</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Pledge reminders page: edit step title {0}</shortDescription>
     <value>Edit the step {0}</value>
-  </labels>
-  <labels>
-    <fullName>Giving_PledgeReminders_NewStepHeading</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: new step form heading</shortDescription>
-    <value>New Step</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_EditStepHeading</fullName>
@@ -345,14 +313,6 @@
     <value>No reminders yet.</value>
   </labels>
   <labels>
-    <fullName>Giving_PledgeReminders_Inactive</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: inactive step marker</shortDescription>
-    <value>Inactive</value>
-  </labels>
-  <labels>
     <fullName>Giving_PledgeReminders_ActionFailed</fullName>
     <categories>Giving, Pledge Reminders</categories>
     <language>en_US</language>
@@ -377,14 +337,6 @@
     <value>When</value>
   </labels>
   <labels>
-    <fullName>Giving_PledgeReminders_ColumnTemplate</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: column template</shortDescription>
-    <value>Template</value>
-  </labels>
-  <labels>
     <fullName>Giving_PledgeReminders_ColumnPledge</fullName>
     <categories>Giving, Pledge Reminders</categories>
     <language>en_US</language>
@@ -399,14 +351,6 @@
     <protected>false</protected>
     <shortDescription>Pledge reminders page: column installment</shortDescription>
     <value>Installment</value>
-  </labels>
-  <labels>
-    <fullName>Giving_PledgeReminders_ColumnStatus</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: column status</shortDescription>
-    <value>Status</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_ColumnSentOn</fullName>

@@ -15,14 +15,14 @@ import splitHousehold from '@salesforce/apex/HouseholdMergeController.splitHouse
 import getMembers from '@salesforce/apex/HouseholdController.getMembers';
 
 import TITLE from '@salesforce/label/c.Core_HouseholdMerge_Title';
-import TAB_MERGE from '@salesforce/label/c.Core_HouseholdMerge_TabMerge';
-import TAB_SPLIT from '@salesforce/label/c.Core_HouseholdMerge_TabSplit';
+import TAB_MERGE from '@salesforce/label/c.Core_HouseholdMerge_MergeButton';
+import TAB_SPLIT from '@salesforce/label/c.Core_HouseholdMerge_SplitButton';
 import SEARCH_LABEL from '@salesforce/label/c.Core_HouseholdMerge_SearchLabel';
 import SEARCH_PLACEHOLDER from '@salesforce/label/c.Core_HouseholdMerge_SearchPlaceholder';
 import NO_RESULTS from '@salesforce/label/c.Core_HouseholdMerge_NoResults';
 import SELECT_OTHER from '@salesforce/label/c.Core_HouseholdMerge_SelectOther';
 import COMPARISON_TABLE from '@salesforce/label/c.Core_HouseholdMerge_ComparisonTable';
-import COLUMN_FIELD from '@salesforce/label/c.Core_DataDictionary_ColField';
+import COLUMN_FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import COLUMN_THIS from '@salesforce/label/c.Core_HouseholdMerge_ColumnThis';
 import COLUMN_OTHER from '@salesforce/label/c.Core_HouseholdMerge_ColumnOther';
 import MEMBERS_HEADING from '@salesforce/label/c.Core_HouseholdMerge_MembersHeading';

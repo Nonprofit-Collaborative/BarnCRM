@@ -17,14 +17,6 @@
         <value>{0} did not finish</value>
     </labels>
     <labels>
-        <fullName>Core_JobNotice_Import</fullName>
-        <categories>Job Notifications</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Job notification: name of an import</shortDescription>
-        <value>Import</value>
-    </labels>
-    <labels>
         <fullName>Core_JobNotice_ImportPreview</fullName>
         <categories>Job Notifications</categories>
         <language>en_US</language>

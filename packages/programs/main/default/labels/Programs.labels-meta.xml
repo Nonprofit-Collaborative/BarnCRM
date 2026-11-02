@@ -25,38 +25,6 @@
         <value>Enroll Someone</value>
     </labels>
     <labels>
-        <fullName>Programs_Roster_Person</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Person picker and column heading</shortDescription>
-        <value>Person</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Roster_Stage</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Stage picker and column heading</shortDescription>
-        <value>Stage</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Roster_StartDate</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Start date column heading</shortDescription>
-        <value>Start Date</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Roster_EndDate</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>End date column heading</shortDescription>
-        <value>End Date</value>
-    </labels>
-    <labels>
         <fullName>Programs_Roster_ShowEnded</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -137,36 +105,12 @@
         <value>Loading</value>
     </labels>
     <labels>
-        <fullName>Programs_Person_Title</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Title of the Programs card on a person</shortDescription>
-        <value>Programs</value>
-    </labels>
-    <labels>
         <fullName>Programs_Person_Empty</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Programs card when the person has no enrollment</shortDescription>
         <value>Not enrolled in any program.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Person_Started</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs card: before the start date</shortDescription>
-        <value>Started</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Person_Ended</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs card: before the end date</shortDescription>
-        <value>Ended</value>
     </labels>
     <labels>
         <fullName>Programs_Person_LoadFailed</fullName>
@@ -239,14 +183,6 @@
         <protected>true</protected>
         <shortDescription>Service Delivery Log: service picker</shortDescription>
         <value>Service</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Log_Date</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service Delivery Log: date picker</shortDescription>
-        <value>Date</value>
     </labels>
     <labels>
         <fullName>Programs_Log_Attendance</fullName>
@@ -535,14 +471,6 @@
         <protected>true</protected>
         <shortDescription>Programs dashboard: page introduction</shortDescription>
         <value>How your programs are doing in the period you pick. Figures count only the records you can see.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Dashboard_Period</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs dashboard: period picker label</shortDescription>
-        <value>Period</value>
     </labels>
     <labels>
         <fullName>Programs_Dashboard_ThisMonth</fullName>

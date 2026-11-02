@@ -49,14 +49,6 @@
         <value>Saved By</value>
     </labels>
     <labels>
-        <fullName>Core_FieldUtilization_HistoryColFields</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: history fields column</shortDescription>
-        <value>Fields</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldUtilization_HistoryColAverage</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>
@@ -79,14 +71,6 @@
         <protected>false</protected>
         <shortDescription>Field utilization: history view button</shortDescription>
         <value>View</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_HistoryDelete</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: history delete button</shortDescription>
-        <value>Delete</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_ViewTitle</fullName>

@@ -702,7 +702,7 @@ public with sharing class HealthCheckService {
             if (loggerFault != null) {
                 throw loggerFault;
             }
-            ErrorLogger.log(e, System.Label.Core_HealthCheck_ErrorContext);
+            ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
         } catch (Exception loggingFailed) {
             // Deliberate last resort: ErrorLogger.log itself failed, so the debug log is the only remaining place to note it. Kept intentionally (PMD AvoidDebugStatements finding accepted, not suppressed).
             System.debug(LoggingLevel.ERROR, loggingFailed);

@@ -529,14 +529,6 @@
         <value>Choose Changes</value>
     </labels>
     <labels>
-        <fullName>Core_BulkUpdate_PathPreview</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Bulk delete path: the step before the preview.</shortDescription>
-        <value>Preview</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkUpdate_PathConfirm</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>

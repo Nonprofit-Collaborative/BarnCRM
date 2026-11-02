@@ -3,7 +3,7 @@ import { LightningElement, api } from 'lwc';
 import ADD_CONDITION from '@salesforce/label/c.Core_Filter_AddCondition';
 import FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import OPERATOR from '@salesforce/label/c.Core_RollupFilter_Operator';
-import VALUE from '@salesforce/label/c.Core_RollupFilter_Value';
+import VALUE from '@salesforce/label/c.Core_Filter_Value';
 import REMOVE from '@salesforce/label/c.Core_Filter_RemoveCondition';
 import LOGIC from '@salesforce/label/c.Core_RollupFilter_Logic';
 import LOGIC_HELP from '@salesforce/label/c.Core_RollupFilter_LogicHelp';

@@ -9,10 +9,10 @@ import { apiNameFrom, distinctValues, suggestField } from './fieldSuggestions';
 
 import OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
 import LABEL from '@salesforce/label/c.Core_ImportNewField_LabelField';
-import API_NAME from '@salesforce/label/c.Core_ImportNewField_ApiNameField';
+import API_NAME from '@salesforce/label/c.Core_AccessExplorer_ColApiName';
 import API_NAME_HELP from '@salesforce/label/c.Core_ImportNewField_ApiNameHelp';
 import TYPE from '@salesforce/label/c.Core_ImportNewField_TypeField';
-import LENGTH from '@salesforce/label/c.Core_ImportNewField_LengthField';
+import LENGTH from '@salesforce/label/c.Core_DataDictionary_ColLength';
 import DECIMALS from '@salesforce/label/c.Core_ImportNewField_DecimalsField';
 import VALUES from '@salesforce/label/c.Core_ImportNewField_ValuesField';
 import PERMISSION_SET from '@salesforce/label/c.Core_ImportNewField_PermissionSetField';

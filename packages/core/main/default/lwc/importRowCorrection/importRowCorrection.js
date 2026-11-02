@@ -7,7 +7,7 @@ import retryAllFixed from '@salesforce/apex/ImportRowCorrectionController.retryA
 import TITLE from '@salesforce/label/c.Core_ImportRow_Title';
 import HELP from '@salesforce/label/c.Core_ImportRow_Help';
 import STATUS_LABEL from '@salesforce/label/c.Core_ImportRow_StatusLabel';
-import IMPORT_LABEL from '@salesforce/label/c.Core_ImportRow_ImportLabel';
+import IMPORT_LABEL from '@salesforce/label/c.Core_DataJobs_KindImport';
 import REASON_HEADING from '@salesforce/label/c.Core_ImportRow_ReasonHeading';
 import COLUMN_HEADER from '@salesforce/label/c.Core_ImportRow_ColumnHeader';
 import FILE_VALUE_HEADER from '@salesforce/label/c.Core_ImportRow_FileValueHeader';

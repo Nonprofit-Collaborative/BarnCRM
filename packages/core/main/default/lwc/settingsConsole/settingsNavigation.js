@@ -1,5 +1,5 @@
 import ORGANIZATION from '@salesforce/label/c.Core_Settings_NavGroup_Organization';
-import PEOPLE from '@salesforce/label/c.Core_Settings_NavGroup_People';
+import PEOPLE from '@salesforce/label/c.Core_SettingsGroup_People';
 import DATA from '@salesforce/label/c.Core_Settings_NavGroup_Data';
 import FUNDRAISING from '@salesforce/label/c.Core_Settings_NavGroup_Fundraising';
 import PROGRAMS from '@salesforce/label/c.Core_Settings_NavGroup_Programs';

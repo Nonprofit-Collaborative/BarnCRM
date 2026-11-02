@@ -241,14 +241,6 @@
         <value>Calculates the same total as {0}, into another field.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_ColumnStatus</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup list column: how each rollup's recalculation stands.</shortDescription>
-        <value>Status</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_Search</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -263,14 +255,6 @@
         <protected>false</protected>
         <shortDescription>Rollup list search box help text.</shortDescription>
         <value>Finds rollups by name, description, what they count, or the object and field that show the total.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_Group</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup list group heading: {0} is the object, {1} how many rollups.</shortDescription>
-        <value>{0} ({1})</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_NoMatches</fullName>
@@ -319,14 +303,6 @@
         <protected>false</protected>
         <shortDescription>Builder sentence: {0} is how many conditions the records must meet.</shortDescription>
         <value>only those that meet its conditions ({0})</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_TargetPart</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder sentence: {0} is the object, {1} the field showing the total.</shortDescription>
-        <value>{0}: {1}</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_NotForField</fullName>
@@ -633,60 +609,12 @@
         <value>Number for counts and totals, Currency for amounts, Date or Date/Time for first and last dates, Text for a copied value, Text Area (Long) for a text list, Checkbox for Any and None.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_KindNumber</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field type, as Setup names it.</shortDescription>
-        <value>Number</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_KindCurrency</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field type, as Setup names it.</shortDescription>
-        <value>Currency</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_KindDate</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field type, as Setup names it.</shortDescription>
-        <value>Date</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_KindDateTime</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field type, as Setup names it.</shortDescription>
-        <value>Date/Time</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_KindText</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field type, as Setup names it.</shortDescription>
-        <value>Text</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_KindLongText</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field type, as Setup names it.</shortDescription>
         <value>Text Area (Long)</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_KindCheckbox</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field type, as Setup names it.</shortDescription>
-        <value>Checkbox</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_WriteField</fullName>

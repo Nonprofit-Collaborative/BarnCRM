@@ -153,14 +153,6 @@
         <value>Inactive</value>
     </labels>
     <labels>
-        <fullName>Core_MatchLogic_Shipped</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: marks a source BarnCRM ships</shortDescription>
-        <value>Shipped with BarnCRM</value>
-    </labels>
-    <labels>
         <fullName>Core_MatchLogic_NotUsable</fullName>
         <categories>DuplicateMatching</categories>
         <language>en_US</language>
@@ -279,14 +271,6 @@
         <protected>false</protected>
         <shortDescription>Matching Logic: button that opens the try a value box</shortDescription>
         <value>Try a Value</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchLogic_TryValue</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: the value to try</shortDescription>
-        <value>Value</value>
     </labels>
     <labels>
         <fullName>Core_MatchLogic_TryPostal</fullName>

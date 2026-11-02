@@ -140,7 +140,7 @@
         <fullName>Core_SettingsGroup_People</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Settings console, People and Households page: box heading for people</shortDescription>
         <value>People</value>
     </labels>

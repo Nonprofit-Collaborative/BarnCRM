@@ -137,14 +137,6 @@
         <value>No Import Templates Yet</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_ColumnName</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: templates column, the template name</shortDescription>
-        <value>Template</value>
-    </labels>
-    <labels>
         <fullName>Core_DataManager_ColumnLoads</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
@@ -175,14 +167,6 @@
         <protected>false</protected>
         <shortDescription>Data Manager: what a people template loads</shortDescription>
         <value>People and organizations</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_LoadsGifts</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: what a gift template loads</shortDescription>
-        <value>Gifts</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_SalesforceHeading</fullName>

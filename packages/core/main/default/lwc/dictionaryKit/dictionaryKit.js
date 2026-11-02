@@ -10,9 +10,9 @@ import { toCsv } from 'c/findCsv';
 
 import YES from '@salesforce/label/c.Core_AccessExplorer_Yes';
 import NO from '@salesforce/label/c.Core_DataDictionary_No';
-import COL_OBJECT from '@salesforce/label/c.Core_DataDictionary_ColObject';
+import COL_OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
 import COL_OBJECT_API_NAME from '@salesforce/label/c.Core_DataDictionary_ColObjectApiName';
-import COL_FIELD from '@salesforce/label/c.Core_DataDictionary_ColField';
+import COL_FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import COL_API_NAME from '@salesforce/label/c.Core_AccessExplorer_ColApiName';
 import COL_TYPE from '@salesforce/label/c.Core_DataDictionary_ColType';
 import COL_LENGTH from '@salesforce/label/c.Core_DataDictionary_ColLength';

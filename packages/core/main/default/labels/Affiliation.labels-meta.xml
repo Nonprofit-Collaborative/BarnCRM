@@ -129,14 +129,6 @@
         <value>An affiliation needs a person.</value>
     </labels>
     <labels>
-        <fullName>Core_Affiliation_PrimaryBadge</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Affiliation card: badge on the person's chief organization</shortDescription>
-        <value>Primary</value>
-    </labels>
-    <labels>
         <fullName>Core_Affiliation_PrimaryFailed</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>

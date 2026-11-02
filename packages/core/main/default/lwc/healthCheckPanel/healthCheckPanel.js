@@ -12,7 +12,7 @@ import applyJunctionMembership from '@salesforce/apex/HealthCheckController.appl
 import enableAutomaticHouseholds from '@salesforce/apex/HealthCheckController.enableAutomaticHouseholds';
 import applyFix from '@salesforce/apex/HealthCheckController.applyFix';
 
-import CATEGORY_ACCESS from '@salesforce/label/c.Core_HealthCheck_CategoryAccess';
+import CATEGORY_ACCESS from '@salesforce/label/c.Core_Access_PageTitle';
 import CATEGORY_LICENSES from '@salesforce/label/c.Core_HealthCheck_CategoryLicenses';
 import CATEGORY_ORG_SHAPE from '@salesforce/label/c.Core_HealthCheck_CategoryOrgShape';
 import CATEGORY_SETTINGS from '@salesforce/label/c.Core_HealthCheck_CategorySettings';

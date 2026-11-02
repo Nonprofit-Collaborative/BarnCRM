@@ -65,14 +65,6 @@
         <value>Automation is running normally</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_CategoryAccess</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Heading for the access findings.</shortDescription>
-        <value>Access</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_CategoryLicenses</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -191,14 +183,6 @@
         <protected>false</protected>
         <shortDescription>Health Check title: households with no members. {0} count or more than.</shortDescription>
         <value>{0} households have nobody in them</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_ErrorContext</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error Log context for Health Check failures.</shortDescription>
-        <value>Health Check</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ErrorLogDetail</fullName>

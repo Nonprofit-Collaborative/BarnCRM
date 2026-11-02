@@ -41,14 +41,6 @@
         <value>Loading household members</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdPanel_OfPersonTitle</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Household panel on a person: card title</shortDescription>
-        <value>Household</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdPanel_OfPersonEmpty</fullName>
         <categories>Households</categories>
         <language>en_US</language>

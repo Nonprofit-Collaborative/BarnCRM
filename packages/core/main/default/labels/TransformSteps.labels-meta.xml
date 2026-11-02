@@ -105,14 +105,6 @@
         <value>If the value</value>
     </labels>
     <labels>
-        <fullName>Core_Import_StepsTestText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>If then: the text compared</shortDescription>
-        <value>Text</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_StepsThenValue</fullName>
         <categories>Import</categories>
         <language>en_US</language>

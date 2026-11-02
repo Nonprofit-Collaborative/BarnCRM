@@ -761,7 +761,7 @@ public with sharing class ImportController {
             choice.label = related == null
                 ? target.label
                 : String.format(
-                      Label.Core_Import_RelatedFieldLabel,
+                      Label.Core_Format_Pair,
                       new List<String>{ objectLabel, target.label }
                   );
             Schema.SObjectField token = ImportObjectSchema.fieldNamed(type, target.value);

@@ -65,14 +65,6 @@
         <value>Who can see or change what, and why. Access Explorer only reads: it never gives or takes access.</value>
     </labels>
     <labels>
-        <fullName>Core_AccessExplorer_Show</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: view choice label</shortDescription>
-        <value>Show</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessExplorer_ViewSubject</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>
@@ -105,22 +97,6 @@
         <value>Look Up</value>
     </labels>
     <labels>
-        <fullName>Core_AccessExplorer_LookUpPerson</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: look up a person</shortDescription>
-        <value>Person</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_LookUpSet</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: look up a permission set</shortDescription>
-        <value>Permission Set</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessExplorer_SearchPlaceholder</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>
@@ -143,14 +119,6 @@
         <protected>false</protected>
         <shortDescription>Access explorer: empty state before a choice</shortDescription>
         <value>Choose a person or permission set to see their access.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_Inactive</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: an inactive person</shortDescription>
-        <value>Inactive</value>
     </labels>
     <labels>
         <fullName>Core_AccessExplorer_KindProfile</fullName>
@@ -191,14 +159,6 @@
         <protected>false</protected>
         <shortDescription>Access explorer: object picker for field access</shortDescription>
         <value>Field Access For</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_FieldsHeading</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: heading of the field table</shortDescription>
-        <value>Fields</value>
     </labels>
     <labels>
         <fullName>Core_AccessExplorer_ViewAllDataNote</fullName>
@@ -353,14 +313,6 @@
         <value>Loading</value>
     </labels>
     <labels>
-        <fullName>Core_AccessExplorer_ColName</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: column</shortDescription>
-        <value>Name</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessExplorer_ColKind</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>
@@ -447,14 +399,6 @@
         <protected>false</protected>
         <shortDescription>Access explorer: column</shortDescription>
         <value>Active People</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_ColPerson</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: column</shortDescription>
-        <value>Person</value>
     </labels>
     <labels>
         <fullName>Core_AccessExplorer_MayMissPeople</fullName>

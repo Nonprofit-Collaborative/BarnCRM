@@ -60,7 +60,7 @@ jest.mock(
   () => ({ default: 'Deleted the list {0}.' }),
   { virtual: true }
 );
-jest.mock('@salesforce/label/c.Core_SuperTransform_SavedOption', () => ({ default: '{0} ({1})' }), {
+jest.mock('@salesforce/label/c.Core_Format_Parenthetical', () => ({ default: '{0} ({1})' }), {
   virtual: true
 });
 

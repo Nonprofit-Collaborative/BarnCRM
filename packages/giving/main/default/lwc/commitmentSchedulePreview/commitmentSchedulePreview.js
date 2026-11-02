@@ -9,11 +9,11 @@ import GENERATE_NOW from '@salesforce/label/c.Giving_SchedulePreview_GenerateNow
 import GENERATED from '@salesforce/label/c.Giving_SchedulePreview_Generated';
 import GENERATE_ERROR from '@salesforce/label/c.Giving_SchedulePreview_GenerateError';
 import LOAD_ERROR from '@salesforce/label/c.Giving_SchedulePreview_LoadError';
-import COLUMN_SEQUENCE from '@salesforce/label/c.Giving_SchedulePreview_ColumnSequence';
+import COLUMN_SEQUENCE from '@salesforce/label/c.Giving_Receipt_ColumnNumber';
 import COLUMN_DUE_DATE from '@salesforce/label/c.Giving_SchedulePreview_ColumnDueDate';
 import COLUMN_AMOUNT from '@salesforce/label/c.Giving_SchedulePreview_ColumnAmount';
 import COLUMN_PAID from '@salesforce/label/c.Giving_SchedulePreview_ColumnPaid';
-import COLUMN_STATUS from '@salesforce/label/c.Giving_SchedulePreview_ColumnStatus';
+import COLUMN_STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import TOTAL from '@salesforce/label/c.Giving_SchedulePreview_Total';
 import ACTION_PAUSE from '@salesforce/label/c.Giving_Commitment_ActionPause';
 import ACTION_RESUME from '@salesforce/label/c.Giving_Commitment_ActionResume';

@@ -17,14 +17,6 @@
         <value>Who gave this gift</value>
     </labels>
     <labels>
-        <fullName>Giving_QuickGiftEntry_DonorKindPerson</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: donor kind, a person</shortDescription>
-        <value>Person</value>
-    </labels>
-    <labels>
         <fullName>Giving_QuickGiftEntry_DonorKindOrganization</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
@@ -33,28 +25,12 @@
         <value>Organization</value>
     </labels>
     <labels>
-        <fullName>Giving_QuickGiftEntry_PersonLabel</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: person donor picker</shortDescription>
-        <value>Donor</value>
-    </labels>
-    <labels>
         <fullName>Giving_QuickGiftEntry_NewPerson</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: opens the standard new person form</shortDescription>
         <value>Not in the list? Add a new person</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_OrganizationLabel</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: organization donor picker</shortDescription>
-        <value>Organization</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_InKindDescriptionLabel</fullName>
@@ -119,14 +95,6 @@
         <protected>false</protected>
         <shortDescription>Quick gift entry: appeal</shortDescription>
         <value>Appeal</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_FundLabel</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: fund</shortDescription>
-        <value>Fund</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_PaymentReferenceLabel</fullName>

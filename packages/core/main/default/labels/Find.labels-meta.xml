@@ -409,14 +409,6 @@
         <value>Choose at least one column.</value>
     </labels>
     <labels>
-        <fullName>Core_Find_Loading</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Assistive text while Find works.</shortDescription>
-        <value>Working</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_Purpose</fullName>
         <categories>Find</categories>
         <language>en_US</language>

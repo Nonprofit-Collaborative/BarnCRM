@@ -11,7 +11,7 @@ import RESTORE from '@salesforce/label/c.Core_CmdtManager_RestoreAction';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
-import STATUS from '@salesforce/label/c.Core_CmdtManager_StatusColumn';
+import STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import IN_USE from '@salesforce/label/c.Core_CmdtManager_StatusInUse';
 import ARCHIVED from '@salesforce/label/c.Core_CmdtManager_StatusArchived';
 import OWN_HEADING from '@salesforce/label/c.Core_CmdtManager_OwnHeading';

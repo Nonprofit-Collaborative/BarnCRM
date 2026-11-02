@@ -153,14 +153,6 @@
         <value>Encrypted</value>
     </labels>
     <labels>
-        <fullName>Core_AiExport_ReasonName</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: flag reason, a person's name</shortDescription>
-        <value>Name</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_ReasonBirthDate</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
@@ -255,14 +247,6 @@
         <protected>false</protected>
         <shortDescription>AI-Readiness Export: checks could not be read</shortDescription>
         <value>The Data Quality checks could not be read, so the pack leaves them out.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeTitle</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: title</shortDescription>
-        <value>AI-Readiness Export</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ReadmeIntro</fullName>
@@ -407,14 +391,6 @@
         <protected>false</protected>
         <shortDescription>README low fill: {0} is the percent, {1} is a list of fields</shortDescription>
         <value>Filled on fewer than {0}% of records: {1}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeQualityCheck</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>README check line: {0} is the check title, {1} is its count</shortDescription>
-        <value>{0}: {1}.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ReadmeQualityNone</fullName>

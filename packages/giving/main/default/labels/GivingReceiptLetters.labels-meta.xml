@@ -41,14 +41,6 @@
     <value>Letter</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_LetterOption</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: one letter in the picker, name and kind</shortDescription>
-    <value>{0} ({1})</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_LetterOptionOff</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
@@ -79,14 +71,6 @@
     <protected>false</protected>
     <shortDescription>Receipts page: button, switch this letter on</shortDescription>
     <value>Use This Letter</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_PreviewButton</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: button, preview the letter</shortDescription>
-    <value>Preview</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_PreviewHeading</fullName>
@@ -153,36 +137,12 @@
     <value>Statement year</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_GenerateButton</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: button, generate statements</shortDescription>
-    <value>Generate</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_ColumnRun</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: column, run name</shortDescription>
-    <value>Run</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_ColumnYear</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: column, statement year</shortDescription>
     <value>Year</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_ColumnErrors</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: column, errors</shortDescription>
-    <value>Errors</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_NoRuns</fullName>

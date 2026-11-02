@@ -20,7 +20,7 @@ import leaveEmptyOption from '@salesforce/label/c.Core_Import_LookupLeaveEmptyOp
 import rejectHelp from '@salesforce/label/c.Core_Import_LookupRejectHelp';
 import leaveEmptyHelp from '@salesforce/label/c.Core_Import_LookupLeaveEmptyHelp';
 import relatedLabel from '@salesforce/label/c.Core_Import_RelatedLabel';
-import relatedNone from '@salesforce/label/c.Core_Import_RelatedNone';
+import relatedNone from '@salesforce/label/c.Core_AccessCompare_None';
 import relatedHelp from '@salesforce/label/c.Core_Import_RelatedHelp';
 import relatedInsertHelp from '@salesforce/label/c.Core_Import_RelatedInsertHelp';
 

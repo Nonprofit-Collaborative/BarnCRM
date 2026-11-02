@@ -49,14 +49,6 @@
         <value>Mode</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_ColumnActive</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Column heading for the active toggle.</shortDescription>
-        <value>Active</value>
-    </labels>
-    <labels>
         <fullName>Core_Rollups_ColumnLastCalculated</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

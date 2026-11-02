@@ -1,8 +1,8 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import HEADING from '@salesforce/label/c.Core_HubHome_QuickLinksHeading';
-import SETTINGS from '@salesforce/label/c.Core_HubHome_QuickLinkSettings';
-import HOUSEHOLDS from '@salesforce/label/c.Core_HubHome_QuickLinkHouseholds';
+import SETTINGS from '@salesforce/label/c.Core_Settings_Title';
+import HOUSEHOLDS from '@salesforce/label/c.Core_SettingsGroup_Households';
 import ORGANIZATIONS from '@salesforce/label/c.Core_HubHome_QuickLinkOrganizations';
 import SETTINGS_LINE from '@salesforce/label/c.Core_HubHome_QuickLinkSettingsLine';
 import HOUSEHOLDS_LINE from '@salesforce/label/c.Core_HubHome_QuickLinkHouseholdsLine';

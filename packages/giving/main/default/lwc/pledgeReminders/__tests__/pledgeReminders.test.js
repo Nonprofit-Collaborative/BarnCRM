@@ -72,7 +72,7 @@ jest.mock(
   () => ({ default: 'The run has started.' }),
   { virtual: true }
 );
-jest.mock('@salesforce/label/c.Giving_PledgeReminders_Inactive', () => ({ default: 'Inactive' }), {
+jest.mock('@salesforce/label/c.Core_MatchLogic_Inactive', () => ({ default: 'Inactive' }), {
   virtual: true
 });
 

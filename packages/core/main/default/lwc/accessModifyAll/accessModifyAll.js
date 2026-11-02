@@ -11,13 +11,13 @@ import COL_AUTHOR_APEX from '@salesforce/label/c.Core_AccessModifyAll_ColAuthorA
 import COL_IN_GROUPS from '@salesforce/label/c.Core_AccessModifyAll_ColInGroups';
 import COL_SCOPE from '@salesforce/label/c.Core_AccessModifyAll_ColScope';
 import SCOPE_STANDARD from '@salesforce/label/c.Core_AccessModifyAll_ScopeStandard';
-import SCOPE_CUSTOM from '@salesforce/label/c.Core_AccessModifyAll_ScopeCustom';
+import SCOPE_CUSTOM from '@salesforce/label/c.Core_DataDictionary_ColCustom';
 import TRUNCATED from '@salesforce/label/c.Core_AccessModifyAll_Truncated';
 import KIND_PROFILE from '@salesforce/label/c.Core_AccessExplorer_KindProfile';
 import KIND_GROUP from '@salesforce/label/c.Core_AccessExplorer_KindGroup';
 import KIND_SET from '@salesforce/label/c.Core_AccessExplorer_KindSet';
 import KIND_OF_RECORD from '@salesforce/label/c.Core_AccessExplorer_KindOfRecord';
-import COL_NAME from '@salesforce/label/c.Core_AccessExplorer_ColName';
+import COL_NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
 import COL_KIND from '@salesforce/label/c.Core_AccessExplorer_ColKind';
 import COL_API_NAME from '@salesforce/label/c.Core_AccessExplorer_ColApiName';
 import COL_VIEW_ALL from '@salesforce/label/c.Core_AccessExplorer_ColViewAll';

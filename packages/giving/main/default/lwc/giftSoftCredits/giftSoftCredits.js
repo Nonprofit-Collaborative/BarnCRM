@@ -10,7 +10,7 @@ import removeCredit from '@salesforce/apex/SoftCreditController.removeCredit';
 import TITLE from '@salesforce/label/c.Giving_SoftCredits_Title';
 import EMPTY from '@salesforce/label/c.Giving_SoftCredits_Empty';
 import ADD from '@salesforce/label/c.Giving_SoftCredits_Add';
-import REMOVE from '@salesforce/label/c.Giving_SoftCredits_Remove';
+import REMOVE from '@salesforce/label/c.Core_Find_Remove';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import AUTOMATIC_BADGE from '@salesforce/label/c.Giving_SoftCredits_AutomaticBadge';

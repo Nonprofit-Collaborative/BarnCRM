@@ -12,7 +12,7 @@ import INSTALLED from '@salesforce/label/c.Core_Integrations_Installed';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Integrations_NotInstalled';
 import STATUS_IN_PROGRESS from '@salesforce/label/c.Core_Integrations_StatusInProgress';
 import STATUS_AVAILABLE from '@salesforce/label/c.Core_Integrations_StatusAvailable';
-import REQUEST_HEADING from '@salesforce/label/c.Core_Integrations_RequestHeading';
+import REQUEST_HEADING from '@salesforce/label/c.Core_Integrations_RequestLink';
 import REQUEST_INTRO from '@salesforce/label/c.Core_Integrations_RequestIntro';
 import REQUEST_LINK from '@salesforce/label/c.Core_Integrations_RequestLink';
 import REQUEST_URL from '@salesforce/label/c.Core_Integrations_RequestUrl';

@@ -164,7 +164,7 @@ describe('c-integrations-panel', () => {
 
     const request = element.shadowRoot.querySelector('[data-id="request"]');
     expect(request.querySelector('[data-id="request-heading"]').textContent).toBe(
-      'c.Core_Integrations_RequestHeading'
+      'c.Core_Integrations_RequestLink'
     );
     for (const id of ['request-link', 'partner-link', 'guide-link']) {
       const link = request.querySelector(`[data-id="${id}"]`);

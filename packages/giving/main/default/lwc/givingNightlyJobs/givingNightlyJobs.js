@@ -9,7 +9,7 @@ import runNow from '@salesforce/apex/GivingJobsController.runNow';
 
 import TITLE from '@salesforce/label/c.Giving_NightlyJobs_Title';
 import INTRO from '@salesforce/label/c.Giving_NightlyJobs_Intro';
-import LAST_RUN_HEADING from '@salesforce/label/c.Giving_NightlyJobs_LastRunHeading';
+import LAST_RUN_HEADING from '@salesforce/label/c.Core_ErrorDigest_LastRunTitle';
 import NEXT_RUN_HEADING from '@salesforce/label/c.Giving_NightlyJobs_NextRunHeading';
 import NEVER_RUN from '@salesforce/label/c.Giving_NightlyJobs_NeverRun';
 import NOT_SCHEDULED from '@salesforce/label/c.Giving_NightlyJobs_NotScheduled';

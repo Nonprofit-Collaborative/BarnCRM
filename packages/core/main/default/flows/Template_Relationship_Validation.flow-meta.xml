@@ -227,7 +227,7 @@
   <formulas>
     <name>fFromName</name>
     <dataType>String</dataType>
-    <expression>BLANKVALUE({!$Record.Contact__r.Name}, BLANKVALUE({!$Record.Person_Account__r.Name}, {!$Label.Core_Relationship_UnnamedPerson}))</expression>
+    <expression>BLANKVALUE({!$Record.Contact__r.Name}, BLANKVALUE({!$Record.Person_Account__r.Name}, {!$Label.Core_Affiliation_UnnamedPerson}))</expression>
   </formulas>
   <formulas>
     <description>True for a new relationship with a type, and for an edit that changed either person or the type.</description>
@@ -257,7 +257,7 @@
   <formulas>
     <name>fToName</name>
     <dataType>String</dataType>
-    <expression>BLANKVALUE({!$Record.Related_Contact__r.Name}, BLANKVALUE({!$Record.Related_Person_Account__r.Name}, {!$Label.Core_Relationship_UnnamedPerson}))</expression>
+    <expression>BLANKVALUE({!$Record.Related_Contact__r.Name}, BLANKVALUE({!$Record.Related_Person_Account__r.Name}, {!$Label.Core_Affiliation_UnnamedPerson}))</expression>
   </formulas>
   <interviewLabel>BarnCRM template: Check relationships before saving {!$Flow.CurrentDateTime}</interviewLabel>
   <isTemplate>true</isTemplate>

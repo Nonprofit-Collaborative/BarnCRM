@@ -73,14 +73,6 @@
         <value>Status</value>
     </labels>
     <labels>
-        <fullName>Core_ImportRow_ImportLabel</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import row card: import label</shortDescription>
-        <value>Import</value>
-    </labels>
-    <labels>
         <fullName>Core_ImportRow_ReasonHeading</fullName>
         <categories>Import</categories>
         <language>en_US</language>

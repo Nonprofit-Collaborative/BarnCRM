@@ -178,8 +178,8 @@ public with sharing class MatchSourceController {
             );
             for (Schema.SObjectType target : holders.keySet()) {
                 String kind = target == Contact.SObjectType
-                    ? System.Label.Core_Duplicates_ObjectPerson
-                    : System.Label.Core_Duplicates_ObjectHousehold;
+                    ? System.Label.Core_Section_Person
+                    : System.Label.Core_Section_Household;
                 for (
                     SObject record : MatchSourceSelector.namesOf(
                         target,

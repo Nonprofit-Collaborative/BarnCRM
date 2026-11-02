@@ -22,7 +22,7 @@ jest.mock(
   },
   { virtual: true }
 );
-jest.mock('@salesforce/label/c.Giving_Segments_OptionMine', () => ({ default: '{0} ({1})' }), {
+jest.mock('@salesforce/label/c.Core_Format_Parenthetical', () => ({ default: '{0} ({1})' }), {
   virtual: true
 });
 jest.mock(
@@ -156,7 +156,7 @@ describe('c-donor-segments', () => {
       'lapsed',
       'new'
     ]);
-    expect(byId(element, 'name').value).toBe('Lapsed Donors (c.Giving_Segments_People)');
+    expect(byId(element, 'name').value).toBe('Lapsed Donors (c.Core_SettingsGroup_People)');
     expect(byId(element, 'template-description').textContent).toContain('Gave last year.');
     const options = byId(element, 'segment').options;
     expect(options).toHaveLength(2);
@@ -192,7 +192,7 @@ describe('c-donor-segments', () => {
     expect(saveFromTemplate).toHaveBeenCalledWith({
       templateKey: 'lapsed',
       objectName: 'Contact',
-      name: 'Lapsed Donors (c.Giving_Segments_People)'
+      name: 'Lapsed Donors (c.Core_SettingsGroup_People)'
     });
     expect(byId(element, 'notice-message')).not.toBeNull();
     expect(countSegment).toHaveBeenCalledWith({ segmentId: PEOPLE_SEGMENT.recordId });

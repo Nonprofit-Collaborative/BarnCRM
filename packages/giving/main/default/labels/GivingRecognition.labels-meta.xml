@@ -137,14 +137,6 @@
     <value>Person to recognize</value>
   </labels>
   <labels>
-    <fullName>Giving_SoftCredits_Remove</fullName>
-    <categories>Giving, Soft Credits</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Remove credit button</shortDescription>
-    <value>Remove</value>
-  </labels>
-  <labels>
     <fullName>Giving_SoftCredits_RoleLabel</fullName>
     <categories>Giving, Soft Credits</categories>
     <language>en_US</language>

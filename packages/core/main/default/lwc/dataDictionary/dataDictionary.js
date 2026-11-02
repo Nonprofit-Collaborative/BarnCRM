@@ -12,8 +12,8 @@ import { fileName, format, messageFrom, saveBlob } from 'c/findCsv';
 
 import TITLE from '@salesforce/label/c.Core_DataDictionary_PageTitle';
 import INTRO from '@salesforce/label/c.Core_DataDictionary_PageIntro';
-import CHOOSE_LABEL from '@salesforce/label/c.Core_DataDictionary_ChooseLabel';
-import SOURCE_LABEL from '@salesforce/label/c.Core_DataDictionary_SourceLabel';
+import CHOOSE_LABEL from '@salesforce/label/c.Core_AccessCompare_KindsHeading';
+import SOURCE_LABEL from '@salesforce/label/c.Core_Filter_AvailableValues';
 import SELECTED_LABEL from '@salesforce/label/c.Core_DataDictionary_SelectedLabel';
 import INCLUDE_FILL_RATES from '@salesforce/label/c.Core_DataDictionary_IncludeFillRates';
 import INCLUDE_FILL_RATES_HELP from '@salesforce/label/c.Core_DataDictionary_IncludeFillRatesHelp';

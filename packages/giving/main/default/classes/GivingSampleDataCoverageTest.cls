@@ -97,7 +97,7 @@ private class GivingSampleDataCoverageTest {
                 'Core finds it by name'
             );
             Assert.areEqual(
-                System.Label.Giving_SampleData_GiftsLabel,
+                System.Label.Core_Import_KindGiftsTitle,
                 module.countLabel(),
                 'It counts gifts'
             );

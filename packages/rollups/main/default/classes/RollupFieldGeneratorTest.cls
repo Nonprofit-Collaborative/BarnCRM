@@ -53,7 +53,7 @@ private class RollupFieldGeneratorTest {
                 String.format(
                     Label.Core_RollupEase_FieldStepType,
                     new List<String>{
-                        Label.Core_RollupEase_KindNumber,
+                        Label.Core_ImportNewField_TypeNumber,
                         'Rollup Test Tally',
                         'Rollup_Test_Tally'
                     }

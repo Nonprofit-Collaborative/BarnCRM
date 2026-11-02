@@ -113,14 +113,6 @@
         <value>Remove the Trigger</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantCopy</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Instant totals: button that copies the code</shortDescription>
-        <value>Copy</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_InstantCopied</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

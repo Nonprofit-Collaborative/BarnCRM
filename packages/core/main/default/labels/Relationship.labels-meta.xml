@@ -89,14 +89,6 @@
         <value>A relationship needs a person on each side.</value>
     </labels>
     <labels>
-        <fullName>Core_Relationship_RemoveButton</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Relationship card: button that deletes one relationship and its other side</shortDescription>
-        <value>Remove</value>
-    </labels>
-    <labels>
         <fullName>Core_Relationship_RemoveFailed</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>
@@ -143,13 +135,5 @@
         <protected>false</protected>
         <shortDescription>Save refused: the other side of the relationship could not be written</shortDescription>
         <value>BarnCRM could not update the other side of this relationship, so nothing was saved. The Error Log has the details.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Relationship_UnnamedPerson</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Stands in for a person's name in a message when the name cannot be read</shortDescription>
-        <value>this person</value>
     </labels>
 </CustomLabels>

@@ -161,14 +161,6 @@
         <value>Field Label</value>
     </labels>
     <labels>
-        <fullName>Core_ImportNewField_ApiNameField</fullName>
-        <categories>Import New Field</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>New field form: API name</shortDescription>
-        <value>API Name</value>
-    </labels>
-    <labels>
         <fullName>Core_ImportNewField_ApiNameHelp</fullName>
         <categories>Import New Field</categories>
         <language>en_US</language>
@@ -183,14 +175,6 @@
         <protected>false</protected>
         <shortDescription>New field form: field type</shortDescription>
         <value>Field Type</value>
-    </labels>
-    <labels>
-        <fullName>Core_ImportNewField_LengthField</fullName>
-        <categories>Import New Field</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>New field form: text length</shortDescription>
-        <value>Length</value>
     </labels>
     <labels>
         <fullName>Core_ImportNewField_DecimalsField</fullName>
@@ -399,14 +383,6 @@
         <protected>false</protected>
         <shortDescription>Connection panel: what it is</shortDescription>
         <value>Lets an administrator create a new field from an import column. BarnCRM calls your org's own Metadata API through a Named Credential it creates once, which an administrator then turns on in Setup. No password is stored.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ImportNewField_PanelStatus</fullName>
-        <categories>Import New Field</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Connection panel: status label</shortDescription>
-        <value>Status</value>
     </labels>
     <labels>
         <fullName>Core_ImportNewField_PanelConnected</fullName>

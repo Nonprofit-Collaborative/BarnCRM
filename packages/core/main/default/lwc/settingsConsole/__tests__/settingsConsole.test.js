@@ -7,7 +7,7 @@ import getRecentChanges from '@salesforce/apex/SettingsController.getRecentChang
 import * as navigation from 'lightning/navigation';
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
 
-jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
+jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }), {
   virtual: true
 });
 

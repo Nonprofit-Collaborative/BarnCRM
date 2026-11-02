@@ -24,7 +24,7 @@ import PANEL_TITLE from '@salesforce/label/c.Core_Feature_Addresses_Name';
 import ADD_BUTTON from '@salesforce/label/c.Core_Address_AddButton';
 import ADD_FORM_TITLE from '@salesforce/label/c.Core_Address_AddFormTitle';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import DEFAULT_BADGE from '@salesforce/label/c.Core_Address_DefaultBadge';
+import DEFAULT_BADGE from '@salesforce/label/c.Core_HouseholdMembersPanel_Primary';
 import EMPTY_MESSAGE from '@salesforce/label/c.Core_Address_Empty';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Address_EmptyHeading';
 import LOAD_FAILED from '@salesforce/label/c.Core_Address_LoadFailed';

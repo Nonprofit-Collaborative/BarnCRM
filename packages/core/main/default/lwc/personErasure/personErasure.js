@@ -8,12 +8,12 @@ import erasePerson from '@salesforce/apex/PersonErasureController.erase';
 
 import TITLE from '@salesforce/label/c.Core_EraseAction_Title';
 import WARNING from '@salesforce/label/c.Core_EraseAction_Warning';
-import PREVIEW from '@salesforce/label/c.Core_EraseAction_Preview';
+import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import WORKING from '@salesforce/label/c.Core_EraseAction_Working';
 import COLUMN_ACTION from '@salesforce/label/c.Core_EraseAction_ColumnAction';
-import COLUMN_OBJECT from '@salesforce/label/c.Core_EraseAction_ColumnObject';
+import COLUMN_OBJECT from '@salesforce/label/c.Core_BulkUpdate_Record';
 import COLUMN_COUNT from '@salesforce/label/c.Core_EraseAction_ColumnCount';
-import COLUMN_FIELDS from '@salesforce/label/c.Core_EraseAction_ColumnFields';
+import COLUMN_FIELDS from '@salesforce/label/c.Core_AccessCompare_FieldsHeading';
 import COLUMN_NOTE from '@salesforce/label/c.Core_EraseAction_ColumnNote';
 import CHANGES_TABLE from '@salesforce/label/c.Core_EraseAction_ChangesTable';
 import ACTION_CLEARED from '@salesforce/label/c.Core_EraseAction_Cleared';

@@ -22,7 +22,7 @@ jest.mock(
     virtual: true
   }
 );
-jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
+jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }), {
   virtual: true
 });
 // The nested components are replaced by stubs so this test sees only the Builder's own work.

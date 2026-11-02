@@ -13,8 +13,8 @@ import mergeHouseholds from '@salesforce/apex/DuplicateController.mergeHousehold
 
 import TITLE from '@salesforce/label/c.Core_Duplicates_Title';
 import RULES_HEADING from '@salesforce/label/c.Core_Duplicates_RulesHeading';
-import RULE_ACTIVE from '@salesforce/label/c.Core_Duplicates_RuleActive';
-import RULE_INACTIVE from '@salesforce/label/c.Core_Duplicates_RuleInactive';
+import RULE_ACTIVE from '@salesforce/label/c.Core_Feature_On';
+import RULE_INACTIVE from '@salesforce/label/c.Core_Feature_Off';
 import ACTIVATE_LINK from '@salesforce/label/c.Core_Duplicates_ActivateLink';
 import NO_RULES_NOTICE from '@salesforce/label/c.Core_Duplicates_NoRulesNotice';
 import SCAN_BUTTON from '@salesforce/label/c.Core_Duplicates_ScanButton';
@@ -24,8 +24,8 @@ import LAST_SCAN from '@salesforce/label/c.Core_Duplicates_LastScan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import SUGGESTIONS_HEADING from '@salesforce/label/c.Core_Duplicates_SuggestionsHeading';
 import EMPTY from '@salesforce/label/c.Core_Duplicates_Empty';
-import OBJECT_PERSON from '@salesforce/label/c.Core_Duplicates_ObjectPerson';
-import OBJECT_HOUSEHOLD from '@salesforce/label/c.Core_Duplicates_ObjectHousehold';
+import OBJECT_PERSON from '@salesforce/label/c.Core_Section_Person';
+import OBJECT_HOUSEHOLD from '@salesforce/label/c.Core_Section_Household';
 import PEOPLE_MERGE_NOTICE from '@salesforce/label/c.Core_Duplicates_PeopleMergeNotice';
 import MERGE_BUTTON from '@salesforce/label/c.Core_Duplicates_MergeButton';
 import MERGE_HEADING from '@salesforce/label/c.Core_Duplicates_MergeHeading';
@@ -37,12 +37,12 @@ import MERGE_FULL_SCREEN from '@salesforce/label/c.Core_Duplicates_MergeFullScre
 import MERGE_CONFIRM from '@salesforce/label/c.Core_Duplicates_MergeConfirm';
 import MERGE_SUCCESS from '@salesforce/label/c.Core_Duplicates_MergeSuccess';
 import DISMISS_BUTTON from '@salesforce/label/c.Core_Duplicates_DismissButton';
-import DISMISS_HEADING from '@salesforce/label/c.Core_Duplicates_DismissHeading';
+import DISMISS_HEADING from '@salesforce/label/c.Core_Duplicates_DismissButton';
 import DISMISS_BODY from '@salesforce/label/c.Core_Duplicates_DismissBody';
 import DISMISS_REASON_LABEL from '@salesforce/label/c.Core_Import_ResultsReason';
 import DISMISS_SUCCESS from '@salesforce/label/c.Core_Duplicates_DismissSuccess';
 import DISMISSED_COUNT from '@salesforce/label/c.Core_Duplicates_DismissedCount';
-import VIEW_DISMISSED from '@salesforce/label/c.Core_Duplicates_ViewDismissed';
+import VIEW_DISMISSED from '@salesforce/label/c.Core_FieldUtilization_HistoryView';
 import READ_ONLY from '@salesforce/label/c.Core_Duplicates_ReadOnlyNotice';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Duplicates_ErrorUnexpected';

@@ -90,7 +90,7 @@ private class DataManagerControllerTest {
                 'A people file loads people and organizations'
             );
             Assert.areEqual(
-                System.Label.Core_DataManager_LoadsGifts,
+                System.Label.Core_Import_KindGiftsTitle,
                 loadsByName.get('Mapping 1001'),
                 'A people file with gift columns loads gifts'
             );

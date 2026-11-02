@@ -153,14 +153,6 @@
         <value>Whole value only</value>
     </labels>
     <labels>
-        <fullName>Core_Import_ChangesValue</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Column change: the value an empty cell takes</shortDescription>
-        <value>Value</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_ChangesColumns</fullName>
         <categories>Import</categories>
         <language>en_US</language>

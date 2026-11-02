@@ -35,7 +35,7 @@ import MAPPINGS_INTRO from '@salesforce/label/c.Core_DataManager_MappingsIntro';
 import MAPPINGS_EMPTY from '@salesforce/label/c.Core_DataManager_MappingsEmpty';
 import MAPPINGS_EMPTY_HINT from '@salesforce/label/c.Core_DataManager_MappingsEmptyHint';
 import CREATE_TEMPLATE from '@salesforce/label/c.Core_DataManager_CreateTemplate';
-import COLUMN_NAME from '@salesforce/label/c.Core_DataManager_ColumnName';
+import COLUMN_NAME from '@salesforce/label/c.Core_Import_StepTemplate';
 import COLUMN_LOADS from '@salesforce/label/c.Core_DataManager_ColumnLoads';
 import COLUMN_SOURCE from '@salesforce/label/c.Core_DataManager_ColumnSource';
 import COLUMN_LAST_LOADED from '@salesforce/label/c.Core_DataManager_ColumnLastLoaded';

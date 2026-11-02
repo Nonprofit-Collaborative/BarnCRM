@@ -73,22 +73,6 @@
         <value>Import</value>
     </labels>
     <labels>
-        <fullName>Core_DataJobs_KindUpdate</fullName>
-        <categories>DataJobs</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data job history: the kind of a bulk update job</shortDescription>
-        <value>Bulk update</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataJobs_KindDelete</fullName>
-        <categories>DataJobs</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data job history: the kind of a bulk delete job</shortDescription>
-        <value>Bulk delete</value>
-    </labels>
-    <labels>
         <fullName>Core_DataJobs_ImportSummary</fullName>
         <categories>DataJobs</categories>
         <language>en_US</language>

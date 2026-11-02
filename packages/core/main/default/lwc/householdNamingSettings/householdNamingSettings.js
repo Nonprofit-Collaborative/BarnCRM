@@ -13,7 +13,7 @@ import FORMAL_LABEL from '@salesforce/label/c.Core_HouseholdNamingSettings_Forma
 import INFORMAL_LABEL from '@salesforce/label/c.Core_HouseholdNamingSettings_InformalLabel';
 import TOKEN_HELP from '@salesforce/label/c.Core_HouseholdNamingSettings_TokenHelp';
 import PREVIEW_HEADING from '@salesforce/label/c.Core_HouseholdNamingSettings_PreviewHeading';
-import COLUMN_MEMBERS from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnMembers';
+import COLUMN_MEMBERS from '@salesforce/label/c.Core_SettingsGroup_People';
 import COLUMN_NAME from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnName';
 import COLUMN_FORMAL from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnFormal';
 import COLUMN_INFORMAL from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnInformal';

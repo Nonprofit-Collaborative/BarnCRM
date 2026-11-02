@@ -12,18 +12,18 @@ import getPaymentChoices from '@salesforce/apex/QuickGiftEntryController.getPaym
 
 import heading from '@salesforce/label/c.Giving_QuickGiftEntry_Heading';
 import donorKindLabel from '@salesforce/label/c.Giving_QuickGiftEntry_DonorKindLabel';
-import donorKindPerson from '@salesforce/label/c.Giving_QuickGiftEntry_DonorKindPerson';
+import donorKindPerson from '@salesforce/label/c.Core_Section_Person';
 import donorKindOrganization from '@salesforce/label/c.Giving_QuickGiftEntry_DonorKindOrganization';
-import personLabel from '@salesforce/label/c.Giving_QuickGiftEntry_PersonLabel';
+import personLabel from '@salesforce/label/c.Giving_GiftBatch_ColumnDonor';
 import newPerson from '@salesforce/label/c.Giving_QuickGiftEntry_NewPerson';
-import organizationLabel from '@salesforce/label/c.Giving_QuickGiftEntry_OrganizationLabel';
+import organizationLabel from '@salesforce/label/c.Giving_QuickGiftEntry_DonorKindOrganization';
 import donorPlaceholder from '@salesforce/label/c.Core_HouseholdPanel_AddExistingPlaceholder';
 import amountLabel from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
 import dateLabel from '@salesforce/label/c.Giving_QuickGiftEntry_DateLabel';
 import typeLabel from '@salesforce/label/c.Giving_QuickGiftEntry_TypeLabel';
 import typePlaceholder from '@salesforce/label/c.Giving_QuickGiftEntry_TypePlaceholder';
 import appealLabel from '@salesforce/label/c.Giving_QuickGiftEntry_AppealLabel';
-import fundLabel from '@salesforce/label/c.Giving_QuickGiftEntry_FundLabel';
+import fundLabel from '@salesforce/label/c.Giving_GiftBatch_ColumnFund';
 import paymentReferenceLabel from '@salesforce/label/c.Giving_QuickGiftEntry_PaymentReferenceLabel';
 import inKindDescriptionLabel from '@salesforce/label/c.Giving_QuickGiftEntry_InKindDescriptionLabel';
 import inKindDescriptionHelp from '@salesforce/label/c.Giving_QuickGiftEntry_InKindDescriptionHelp';

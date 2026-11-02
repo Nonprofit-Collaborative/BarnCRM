@@ -27,7 +27,7 @@ import AUTOMATIC_ACCESS_HELP from '@salesforce/label/c.Core_Access_AutomaticAcce
 import AUTOMATIC_ACCESS_LINK from '@salesforce/label/c.Core_Access_AutomaticAccessLink';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CONFIRM_ADD_MESSAGE from '@salesforce/label/c.Core_Access_ConfirmAddMessage';
-import CONFIRM_ADD_TITLE from '@salesforce/label/c.Core_Access_ConfirmAddTitle';
+import CONFIRM_ADD_TITLE from '@salesforce/label/c.Core_Access_AddButton';
 import CONFIRM_REMOVE_MESSAGE from '@salesforce/label/c.Core_Access_ConfirmRemoveMessage';
 import CONFIRM_REMOVE_TITLE from '@salesforce/label/c.Core_Access_ConfirmRemoveTitle';
 import CREATE_USER_HELP from '@salesforce/label/c.Core_Access_CreateUserHelp';
@@ -42,7 +42,7 @@ import OPEN_ACCESS_EXPLORER from '@salesforce/label/c.Core_Access_OpenAccessExpl
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import getOpenLink from '@salesforce/apex/AccessExplorerController.getOpenLink';
 import READ_ONLY_NOTICE from '@salesforce/label/c.Core_Access_ReadOnlyNotice';
-import REMOVE_BUTTON from '@salesforce/label/c.Core_Access_RemoveButton';
+import REMOVE_BUTTON from '@salesforce/label/c.Core_Find_Remove';
 import REMOVE_SUCCESS from '@salesforce/label/c.Core_Access_RemoveSuccess';
 import ROLE_LABEL from '@salesforce/label/c.Core_Access_RoleLabel';
 import ROLE_PICKER_PLACEHOLDER from '@salesforce/label/c.Core_Access_RolePickerPlaceholder';

@@ -90,7 +90,7 @@ jest.mock(
 jest.mock('@salesforce/label/c.Core_SetupChanges_ColSection', () => ({ default: 'Section' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_SetupChanges_ColAction', () => ({ default: 'Action' }), {
+jest.mock('@salesforce/label/c.Core_SuperTransform_Action', () => ({ default: 'Action' }), {
   virtual: true
 });
 jest.mock(

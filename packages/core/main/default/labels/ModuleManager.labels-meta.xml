@@ -84,7 +84,7 @@
         <fullName>Core_ModuleManager_TurnOnButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Module Manager: button that turns a module on</shortDescription>
         <value>Turn On</value>
     </labels>

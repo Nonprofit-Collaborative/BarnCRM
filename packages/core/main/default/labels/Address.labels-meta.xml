@@ -25,14 +25,6 @@
         <value>This is the address in use. To change that, make another address the primary, or delete this one.</value>
     </labels>
     <labels>
-        <fullName>Core_Address_DefaultBadge</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: badge on the address currently in use</shortDescription>
-        <value>Primary</value>
-    </labels>
-    <labels>
         <fullName>Core_Address_Empty</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
@@ -367,13 +359,5 @@
         <protected>false</protected>
         <shortDescription>Address moves: same-named person; {0} is the name, {1} the birthdate</shortDescription>
         <value>{0} (born {1})</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_SameNameEmail</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address moves: same-named person; {0} is the name, {1} the email</shortDescription>
-        <value>{0} ({1})</value>
     </labels>
 </CustomLabels>

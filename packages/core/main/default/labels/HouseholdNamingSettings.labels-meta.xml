@@ -17,14 +17,6 @@
         <value>Informal Greeting</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdNamingSettings_ColumnMembers</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Preview column heading</shortDescription>
-        <value>People</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdNamingSettings_ColumnName</fullName>
         <categories>Households</categories>
         <language>en_US</language>

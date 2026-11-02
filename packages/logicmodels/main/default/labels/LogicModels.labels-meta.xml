@@ -73,46 +73,6 @@
         <value>Add to {0}</value>
     </labels>
     <labels>
-        <fullName>LogicModels_Builder_Edit</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Edit button</shortDescription>
-        <value>Edit</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Builder_Delete</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Delete button</shortDescription>
-        <value>Delete</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Builder_Remove</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Remove an arrow</shortDescription>
-        <value>Remove</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Builder_Name</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Name of a part</shortDescription>
-        <value>Name</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Builder_Description</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Description field</shortDescription>
-        <value>Description</value>
-    </labels>
-    <labels>
         <fullName>LogicModels_Builder_EmptyColumn</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>
@@ -183,14 +143,6 @@
         <protected>true</protected>
         <shortDescription>All outcome columns together</shortDescription>
         <value>Outcomes</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Builder_Saved</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Announced after a save</shortDescription>
-        <value>Saved.</value>
     </labels>
     <labels>
         <fullName>LogicModels_Builder_Deleted</fullName>
@@ -319,14 +271,6 @@
         <protected>true</protected>
         <shortDescription>Move a part up its column</shortDescription>
         <value>Move Up</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Part_MoveDown</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Move a part down its column</shortDescription>
-        <value>Move Down</value>
     </labels>
     <labels>
         <fullName>LogicModels_Part_DeleteConfirm</fullName>
@@ -529,44 +473,12 @@
         <value>Add Period</value>
     </labels>
     <labels>
-        <fullName>LogicModels_Period_Name</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Period name field and column</shortDescription>
-        <value>Period</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Period_StartDate</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Start date</shortDescription>
-        <value>Start Date</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Period_EndDate</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>End date</shortDescription>
-        <value>End Date</value>
-    </labels>
-    <labels>
         <fullName>LogicModels_Period_Target</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Target value</shortDescription>
         <value>Target</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Period_Result</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Result value</shortDescription>
-        <value>Result</value>
     </labels>
     <labels>
         <fullName>LogicModels_Period_Notes</fullName>
@@ -607,13 +519,5 @@
         <protected>true</protected>
         <shortDescription>No periods</shortDescription>
         <value>No periods yet.</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Period_Actions</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Actions column</shortDescription>
-        <value>Actions</value>
     </labels>
 </CustomLabels>

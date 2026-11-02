@@ -81,14 +81,6 @@
         <value>Erased household</value>
     </labels>
     <labels>
-        <fullName>Core_Erase_Household</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: a household in the list of changes</shortDescription>
-        <value>Household</value>
-    </labels>
-    <labels>
         <fullName>Core_Erase_NoteRequired</fullName>
         <categories>Erase</categories>
         <language>en_US</language>
@@ -193,14 +185,6 @@
         <value>Erasing removes what your organization holds about this person, and it cannot be undone. Press Preview first: it lists exactly what will change, and changes nothing.</value>
     </labels>
     <labels>
-        <fullName>Core_EraseAction_Preview</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase person action: the preview button</shortDescription>
-        <value>Preview</value>
-    </labels>
-    <labels>
         <fullName>Core_EraseAction_Working</fullName>
         <categories>Erase</categories>
         <language>en_US</language>
@@ -217,28 +201,12 @@
         <value>What Happens</value>
     </labels>
     <labels>
-        <fullName>Core_EraseAction_ColumnObject</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase person action: column heading</shortDescription>
-        <value>Record</value>
-    </labels>
-    <labels>
         <fullName>Core_EraseAction_ColumnCount</fullName>
         <categories>Erase</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Erase person action: column heading</shortDescription>
         <value>How Many</value>
-    </labels>
-    <labels>
-        <fullName>Core_EraseAction_ColumnFields</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase person action: column heading</shortDescription>
-        <value>Fields</value>
     </labels>
     <labels>
         <fullName>Core_EraseAction_ColumnNote</fullName>

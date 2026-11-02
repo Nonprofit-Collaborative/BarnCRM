@@ -473,36 +473,12 @@
         <value>Preview</value>
     </labels>
     <labels>
-        <fullName>Core_Import_StepResults</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: step six heading</shortDescription>
-        <value>Results</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_TabLabel</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: console tab name, before the file name</shortDescription>
-        <value>Import</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_NextButton</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shared: button that moves to the next step</shortDescription>
         <value>Next</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_DryRunButton</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: button that starts the dry run</shortDescription>
-        <value>Preview</value>
     </labels>
     <labels>
         <fullName>Core_Import_CommitButton</fullName>
@@ -695,22 +671,6 @@
         <protected>false</protected>
         <shortDescription>Import results: heading above the table of failed rows</shortDescription>
         <value>Rows That Were Rejected</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_RowNumberHeader</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import results: table column of file row numbers</shortDescription>
-        <value>Row</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_ReasonHeader</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import results: table column of rejection reasons</shortDescription>
-        <value>Reason</value>
     </labels>
     <labels>
         <fullName>Core_Import_NoRejectedRows</fullName>
@@ -1431,14 +1391,6 @@
         <protected>false</protected>
         <shortDescription>Import wizard: what a value for every row is for</shortDescription>
         <value>Value for</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_FileValueLabel</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: the value given to every row</shortDescription>
-        <value>Value</value>
     </labels>
     <labels>
         <fullName>Core_Import_TargetFirstPersonField</fullName>

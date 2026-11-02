@@ -17,7 +17,7 @@ import RECENT_HEADING from '@salesforce/label/c.Core_Settings_RecentChangesHeadi
 import RECENT_EMPTY from '@salesforce/label/c.Core_Settings_RecentChangesEmpty';
 import COLUMN_SETTING from '@salesforce/label/c.Core_Settings_ColumnSetting';
 import COLUMN_OLD from '@salesforce/label/c.Core_Settings_ColumnOldValue';
-import COLUMN_NEW from '@salesforce/label/c.Core_Settings_ColumnNewValue';
+import COLUMN_NEW from '@salesforce/label/c.Core_SuperTransform_NewValue';
 import COLUMN_BY from '@salesforce/label/c.Core_SetupChanges_ColChangedBy';
 import COLUMN_AT from '@salesforce/label/c.Core_SetupChanges_ColChangedAt';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Settings_ComponentNotInstalled';
@@ -39,7 +39,7 @@ import KEEP_DEFAULT_ARIA from '@salesforce/label/c.Core_Settings_KeepDefaultAria
 import SUGGESTION from '@salesforce/label/c.Core_Settings_CompanySuggestion';
 import USE_SUGGESTION from '@salesforce/label/c.Core_Settings_UseSuggestion';
 import USE_SUGGESTION_ARIA from '@salesforce/label/c.Core_Settings_UseSuggestionAria';
-import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
+import TAB_LABEL from '@salesforce/label/c.Core_Format_Pair';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
 import { groupRows, findBox } from './settingsGroups';

@@ -217,14 +217,6 @@
         <value>Give {0} the {1} role?</value>
     </labels>
     <labels>
-        <fullName>Core_Access_ConfirmAddTitle</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: heading of the confirmation shown before a role is given</shortDescription>
-        <value>Give Access</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_ConfirmRemoveMessage</fullName>
         <categories>Access</categories>
         <language>en_US</language>
@@ -359,14 +351,6 @@
         <protected>true</protected>
         <shortDescription>Access page: notice shown to a user who may look but not change roles</shortDescription>
         <value>You can see this page but you cannot change roles. Ask someone with the BarnCRM Admin role to make the change, or to give you that role.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_RemoveButton</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: button that takes a role away from a person</shortDescription>
-        <value>Remove</value>
     </labels>
     <labels>
         <fullName>Core_Access_RemoveSuccess</fullName>

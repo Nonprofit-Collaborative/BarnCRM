@@ -89,22 +89,6 @@
     <value>New Plan</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_EditPlan</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, edit a template</shortDescription>
-    <value>Edit</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_TurnOn</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, make a template active</shortDescription>
-    <value>Turn on</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_TurnOff</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
@@ -129,44 +113,12 @@
     <value>What Starts It</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_ColumnSteps</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: column, how many steps</shortDescription>
-    <value>Steps</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_ColumnRunning</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: column, how many plans are running</shortDescription>
     <value>Running Now</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_ColumnActive</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: column, whether the plan is on</shortDescription>
-    <value>On</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_Active</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: the plan is active</shortDescription>
-    <value>On</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_Inactive</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: the plan is not active</shortDescription>
-    <value>Off</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_FieldName</fullName>
@@ -199,14 +151,6 @@
     <protected>false</protected>
     <shortDescription>Stewardship: help, the minimum is for gift events only</shortDescription>
     <value>Only for the two gift events. Leave it empty to start on any gift.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_FieldDescription</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: field, the plan description</shortDescription>
-    <value>Description</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_StepsHeading</fullName>
@@ -247,22 +191,6 @@
     <protected>false</protected>
     <shortDescription>Stewardship: button, move a step earlier</shortDescription>
     <value>Move up</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_MoveDown</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, move a step later</shortDescription>
-    <value>Move Down</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_RemoveStep</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, remove a step</shortDescription>
-    <value>Remove</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_StepSubject</fullName>
@@ -321,14 +249,6 @@
     <value>Comments</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_Saved</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: the change was saved</shortDescription>
-    <value>Saved.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_ErrorNotPermitted</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
@@ -361,36 +281,12 @@
     <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your BarnCRM admin to check it.</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_Selected</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: screen reader text on the plan being edited</shortDescription>
-    <value>Selected</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_ColumnActions</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: screen reader name of the buttons column</shortDescription>
-    <value>Actions</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_StartHeading</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Start plan action: heading</shortDescription>
     <value>Start a Stewardship Plan</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_StartPlanLabel</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Start plan action: label of the plan picker</shortDescription>
-    <value>Plan</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_StartChoose</fullName>

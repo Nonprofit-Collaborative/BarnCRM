@@ -273,14 +273,6 @@
     <value>Ask</value>
   </labels>
   <labels>
-    <fullName>Giving_AskPipeline_ColStage</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Ask Pipeline list: stage column</shortDescription>
-    <value>Stage</value>
-  </labels>
-  <labels>
     <fullName>Giving_AskPipeline_ColAmount</fullName>
     <categories>Giving, Asks</categories>
     <language>en_US</language>
@@ -447,14 +439,6 @@
     <protected>false</protected>
     <shortDescription>Close Ask: number of pledge payments field</shortDescription>
     <value>Number of Payments</value>
-  </labels>
-  <labels>
-    <fullName>Giving_AskPipeline_FieldLinkGift</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Close Ask: gift picker</shortDescription>
-    <value>Gift</value>
   </labels>
   <labels>
     <fullName>Giving_AskPipeline_FieldLinkPledge</fullName>

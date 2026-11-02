@@ -189,7 +189,7 @@ private class PersonErasureTest {
             for (PersonErasure.Change change : result.changes) {
                 if (
                     change.action == PersonErasure.CLEARED &&
-                    change.objectLabel == Label.Core_Erase_Household
+                    change.objectLabel == Label.Core_Section_Household
                 ) {
                     householdRow = change;
                 }
@@ -240,7 +240,7 @@ private class PersonErasureTest {
             PersonErasure.Change personRow;
             for (PersonErasure.Change change : result.changes) {
                 if (change.action == PersonErasure.CLEARED) {
-                    if (change.objectLabel == Label.Core_Erase_Household) {
+                    if (change.objectLabel == Label.Core_Section_Household) {
                         householdRow = change;
                     } else if (change.recordIds.contains(jordan.Id)) {
                         personRow = change;
@@ -264,7 +264,7 @@ private class PersonErasureTest {
                 'Lists the greetings it emptied: ' + householdRow.fields
             );
             Assert.isTrue(
-                personRow.fields.contains(Label.Core_Erase_Household),
+                personRow.fields.contains(Label.Core_Section_Household),
                 'The contact account reads as its household: ' + personRow.fields
             );
             Assert.isFalse(
@@ -275,7 +275,7 @@ private class PersonErasureTest {
             .Details__c;
             Assert.isTrue(
                 details.contains(
-                    Label.Core_EraseAction_Cleared + ' | ' + Label.Core_Erase_Household + ' | 1'
+                    Label.Core_EraseAction_Cleared + ' | ' + Label.Core_Section_Household + ' | 1'
                 ),
                 'The Erasure record uses the same words: ' + details
             );
@@ -289,7 +289,7 @@ private class PersonErasureTest {
     ) {
         for (PersonErasure.Change change : result.changes) {
             if (
-                change.objectLabel == Label.Core_Erase_Household &&
+                change.objectLabel == Label.Core_Section_Household &&
                 change.action != PersonErasure.CLEARED &&
                 change.recordIds.contains(householdId)
             ) {
@@ -455,14 +455,14 @@ private class PersonErasureTest {
                 'An employer reads as the account field: ' + personRow.fields
             );
             Assert.isFalse(
-                personRow.fields.contains(Label.Core_Erase_Household),
+                personRow.fields.contains(Label.Core_Section_Household),
                 'Not as a household: ' + personRow.fields
             );
             String details = [SELECT Details__c FROM Erasure__c WHERE Id = :result.erasureId]
             .Details__c;
             Assert.isFalse(
                 details.contains(
-                    Label.Core_EraseAction_Cleared + ' | ' + Label.Core_Erase_Household + ' | 1'
+                    Label.Core_EraseAction_Cleared + ' | ' + Label.Core_Section_Household + ' | 1'
                 ),
                 'The Erasure record does not call it a household: ' + details
             );
@@ -604,7 +604,7 @@ private class PersonErasureTest {
                 'Lists the address'
             );
             Assert.isTrue(
-                actions.contains(PersonErasure.DELETED + ' ' + Label.Core_Erase_Household),
+                actions.contains(PersonErasure.DELETED + ' ' + Label.Core_Section_Household),
                 'Lists the household'
             );
             Assert.isFalse(result.erased, 'A preview erases nothing');

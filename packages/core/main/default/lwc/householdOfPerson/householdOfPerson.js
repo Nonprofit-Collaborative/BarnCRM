@@ -4,7 +4,7 @@ import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { followLinkInWorkspace } from 'c/workspaceTabs';
 import getHouseholdsForPerson from '@salesforce/apex/HouseholdOfPersonController.getHouseholdsForPerson';
 
-import TITLE from '@salesforce/label/c.Core_HouseholdPanel_OfPersonTitle';
+import TITLE from '@salesforce/label/c.Core_Section_Household';
 import EMPTY from '@salesforce/label/c.Core_HouseholdPanel_OfPersonEmpty';
 import EMPTY_HEADING from '@salesforce/label/c.Core_HouseholdPanel_OfPersonEmptyHeading';
 import LOADING from '@salesforce/label/c.Core_HouseholdPanel_OfPersonLoading';

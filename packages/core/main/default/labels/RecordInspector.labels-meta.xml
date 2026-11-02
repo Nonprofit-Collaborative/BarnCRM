@@ -41,14 +41,6 @@
         <value>Search Fields</value>
     </labels>
     <labels>
-        <fullName>Core_RecordInspector_ColumnValue</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector column: value.</shortDescription>
-        <value>Value</value>
-    </labels>
-    <labels>
         <fullName>Core_RecordInspector_Copy</fullName>
         <categories>Core</categories>
         <language>en_US</language>

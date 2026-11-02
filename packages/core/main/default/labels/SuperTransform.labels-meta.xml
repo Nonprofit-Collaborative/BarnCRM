@@ -153,14 +153,6 @@
         <value>Set To</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_ActionClear</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Action option: empty the field</shortDescription>
-        <value>Clear</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_ActionCopy</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
@@ -207,14 +199,6 @@
         <protected>false</protected>
         <shortDescription>Super Transform: Line by Add a Field; {0} most changes</shortDescription>
         <value>Up to {0} fields in one run.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_Preview</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Button: work out the preview</shortDescription>
-        <value>Preview</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_PreviewHint</fullName>
@@ -287,14 +271,6 @@
         <protected>false</protected>
         <shortDescription>Super Transform: Confirmation detail line</shortDescription>
         <value>It runs in the background with your own access. You can undo it from Data Jobs for as long as an import can be undone.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_ConfirmButton</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Confirmation button: start</shortDescription>
-        <value>Run</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_TypeToConfirm</fullName>

@@ -31,7 +31,7 @@ import CLOSE_ASK from '@salesforce/label/c.Giving_AskPipeline_CloseAsk';
 import CARD_ACTIONS from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
 import COL_ASK from '@salesforce/label/c.Giving_AskPipeline_ColAsk';
 import COL_DONOR from '@salesforce/label/c.Giving_GiftBatch_ColumnDonor';
-import COL_STAGE from '@salesforce/label/c.Giving_AskPipeline_ColStage';
+import COL_STAGE from '@salesforce/label/c.Core_Shared_Stage';
 import COL_AMOUNT from '@salesforce/label/c.Giving_AskPipeline_ColAmount';
 import COL_TARGET from '@salesforce/label/c.Giving_AskPipeline_ColTarget';
 import COL_NEXT_STEP from '@salesforce/label/c.Giving_AskPipeline_ColNextStep';
@@ -53,7 +53,7 @@ import FIELD_PLEDGE_TOTAL from '@salesforce/label/c.Giving_AskPipeline_FieldPled
 import FIELD_FIRST_PAYMENT from '@salesforce/label/c.Giving_AskPipeline_FieldFirstPayment';
 import FIELD_FREQUENCY from '@salesforce/label/c.Giving_AskPipeline_FieldFrequency';
 import FIELD_PAYMENTS from '@salesforce/label/c.Giving_AskPipeline_FieldPayments';
-import FIELD_LINK_GIFT from '@salesforce/label/c.Giving_AskPipeline_FieldLinkGift';
+import FIELD_LINK_GIFT from '@salesforce/label/c.Giving_Section_Gift';
 import FIELD_LINK_PLEDGE from '@salesforce/label/c.Giving_AskPipeline_FieldLinkPledge';
 import LINK_HELP from '@salesforce/label/c.Giving_AskPipeline_LinkHelp';
 import FIELD_NEXT_ASK from '@salesforce/label/c.Giving_AskPipeline_FieldNextAsk';

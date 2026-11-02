@@ -199,14 +199,14 @@ describe('c-access-explorer', () => {
     await type(element, 'Pat');
 
     const result = all(element, '[data-id="results"] lightning-button')[0];
-    expect(result.label).toBe('Pat Doe, Standard User, c.Core_AccessExplorer_Inactive');
+    expect(result.label).toBe('Pat Doe, Standard User, c.Core_MatchLogic_Inactive');
     result.click();
     await flush();
     await flush();
 
     expect(getAccess).toHaveBeenCalledWith({ subjectId: '005A' });
     expect(byId(element, 'subject').textContent).toBe(
-      'Pat Doe (Standard User, c.Core_AccessExplorer_Inactive)'
+      'Pat Doe (Standard User, c.Core_MatchLogic_Inactive)'
     );
     expect(all(element, '[data-id="all-data"]').map((note) => note.textContent)).toEqual([
       'System Administrator gives Modify All Data.'

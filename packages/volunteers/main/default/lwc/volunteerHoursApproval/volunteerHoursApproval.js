@@ -6,14 +6,14 @@ import reopenHours from '@salesforce/apex/VolunteerHoursApprovalController.reope
 
 import TITLE from '@salesforce/label/c.Volunteers_Approve_Title';
 import READ_ONLY from '@salesforce/label/c.Volunteers_Hours_NeedManagePermission';
-import SHOW from '@salesforce/label/c.Volunteers_Approve_Show';
+import SHOW from '@salesforce/label/c.Core_DataJobs_Show';
 import SUBMITTED from '@salesforce/label/c.Volunteers_Approve_StatusSubmitted';
 import APPROVED from '@salesforce/label/c.Volunteers_Approve_StatusApproved';
-import REJECTED from '@salesforce/label/c.Volunteers_Approve_StatusRejected';
+import REJECTED from '@salesforce/label/c.Core_Import_ResultRejected';
 import JOB from '@salesforce/label/c.Volunteers_Approve_Job';
-import FROM_DATE from '@salesforce/label/c.Volunteers_Approve_From';
-import TO_DATE from '@salesforce/label/c.Volunteers_Approve_To';
-import PERSON from '@salesforce/label/c.Volunteers_Approve_Person';
+import FROM_DATE from '@salesforce/label/c.Core_SetupChanges_From';
+import TO_DATE from '@salesforce/label/c.Core_SetupChanges_To';
+import PERSON from '@salesforce/label/c.Core_Section_Person';
 import SHIFT from '@salesforce/label/c.Volunteers_Approve_Shift';
 import DATE_WORKED from '@salesforce/label/c.Volunteers_Approve_DateWorked';
 import HOURS from '@salesforce/label/c.Volunteers_Approve_Hours';

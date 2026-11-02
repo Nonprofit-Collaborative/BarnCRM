@@ -41,22 +41,6 @@
         <value>Lists every field you can see on the kinds of record you choose, with its type, rules, picklist values, help text and formula. Read only: nothing is changed.</value>
     </labels>
     <labels>
-        <fullName>Core_DataDictionary_ChooseLabel</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: object picker label</shortDescription>
-        <value>Kinds of Record</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_SourceLabel</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: picker list of available objects</shortDescription>
-        <value>Available</value>
-    </labels>
-    <labels>
         <fullName>Core_DataDictionary_SelectedLabel</fullName>
         <categories>DataDictionary</categories>
         <language>en_US</language>
@@ -137,28 +121,12 @@
         <value>No</value>
     </labels>
     <labels>
-        <fullName>Core_DataDictionary_ColObject</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: column, kind of record</shortDescription>
-        <value>Object</value>
-    </labels>
-    <labels>
         <fullName>Core_DataDictionary_ColObjectApiName</fullName>
         <categories>DataDictionary</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data dictionary: CSV column, object API name</shortDescription>
         <value>Object API Name</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_ColField</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shared: column, field label</shortDescription>
-        <value>Field</value>
     </labels>
     <labels>
         <fullName>Core_DataDictionary_ColType</fullName>

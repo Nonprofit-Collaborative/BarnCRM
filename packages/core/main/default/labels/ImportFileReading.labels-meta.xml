@@ -81,14 +81,6 @@
         <value>The sheets you chose point at different objects, and one import loads one object. Clear the sheets for other objects, or go back and choose the object they point at.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_SheetObject</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: a sheet and its object; {0} is the sheet, {1} the object</shortDescription>
-        <value>{0}: {1}</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_DetectFileLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>

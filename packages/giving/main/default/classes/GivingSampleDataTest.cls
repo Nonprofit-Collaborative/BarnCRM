@@ -837,7 +837,7 @@ private class GivingSampleDataTest {
                 'the module names itself the way Core knows it'
             );
             System.assertEquals(
-                System.Label.Giving_SampleData_GiftsLabel,
+                System.Label.Core_Import_KindGiftsTitle,
                 module.countLabel(),
                 'the card is given the packaged label rather than a hard-coded word'
             );

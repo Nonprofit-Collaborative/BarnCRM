@@ -19,7 +19,7 @@ public with sharing class HealthCheckController {
         try {
             return HealthCheckService.buildReport();
         } catch (Exception e) {
-            ErrorLogger.log(e, System.Label.Core_HealthCheck_ErrorContext);
+            ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
             throw new AuraHandledException(System.Label.Core_HealthCheck_LoadFailed);
         }
     }
@@ -33,7 +33,7 @@ public with sharing class HealthCheckController {
         try {
             return HealthCheckLastRun.read();
         } catch (Exception e) {
-            ErrorLogger.log(e, System.Label.Core_HealthCheck_ErrorContext);
+            ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
             throw new AuraHandledException(System.Label.Core_HealthCheck_LoadFailed);
         }
     }
@@ -51,7 +51,7 @@ public with sharing class HealthCheckController {
         } catch (CoexistenceService.CoexistenceException e) {
             throw new AuraHandledException(e.getMessage());
         } catch (Exception e) {
-            ErrorLogger.log(e, System.Label.Core_HealthCheck_ErrorContext);
+            ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
             throw new AuraHandledException(System.Label.Core_HealthCheck_FixFailed);
         }
     }
@@ -68,7 +68,7 @@ public with sharing class HealthCheckController {
         } catch (CoexistenceService.CoexistenceException e) {
             throw new AuraHandledException(e.getMessage());
         } catch (Exception e) {
-            ErrorLogger.log(e, System.Label.Core_HealthCheck_ErrorContext);
+            ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
             throw new AuraHandledException(System.Label.Core_HealthCheck_FixFailed);
         }
     }
@@ -84,7 +84,7 @@ public with sharing class HealthCheckController {
             HouseholdService.enableAutomaticHouseholds();
             return HealthCheckService.buildReport();
         } catch (Exception e) {
-            ErrorLogger.log(e, System.Label.Core_HealthCheck_ErrorContext);
+            ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
             throw new AuraHandledException(System.Label.Core_HealthCheck_FixFailed);
         }
     }
@@ -152,7 +152,7 @@ public with sharing class HealthCheckController {
             throw e;
         } catch (Exception e) {
             Database.rollback(beforeFix);
-            ErrorLogger.log(e, System.Label.Core_HealthCheck_ErrorContext);
+            ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
             throw UserErrors.message(System.Label.Core_HealthCheck_FixFailed);
         }
     }

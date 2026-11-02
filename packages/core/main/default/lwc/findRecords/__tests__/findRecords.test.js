@@ -15,7 +15,7 @@ import BarnConfirmModal from 'c/barnConfirmModal';
 import listChildRelationships from '@salesforce/apex/FindController.listChildRelationships';
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
 
-jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
+jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }), {
   virtual: true
 });
 import saveEdits from '@salesforce/apex/FindController.saveEdits';

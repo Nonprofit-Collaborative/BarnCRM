@@ -89,14 +89,6 @@
         <value>To</value>
     </labels>
     <labels>
-        <fullName>Core_SetupChanges_Section</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: Setup area filter</shortDescription>
-        <value>Section</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupChanges_AllSections</fullName>
         <categories>SetupChanges</categories>
         <language>en_US</language>
@@ -207,14 +199,6 @@
         <protected>false</protected>
         <shortDescription>Setup Changes: column for the Setup area</shortDescription>
         <value>Section</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_ColAction</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: CSV column for Salesforce's code for the change</shortDescription>
-        <value>Action</value>
     </labels>
     <labels>
         <fullName>Core_SetupChanges_ColWhatChanged</fullName>

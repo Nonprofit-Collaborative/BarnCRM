@@ -25,28 +25,12 @@
         <value>The home page could not load everything. The error is recorded in the Error Log.</value>
     </labels>
     <labels>
-        <fullName>Core_HubHome_QuickLinkHouseholds</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: quick link to the Households tab</shortDescription>
-        <value>Households</value>
-    </labels>
-    <labels>
         <fullName>Core_HubHome_QuickLinkOrganizations</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shared: the word Organizations as a link or heading</shortDescription>
         <value>Organizations</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_QuickLinkSettings</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: quick link to the BarnCRM Settings tab</shortDescription>
-        <value>BarnCRM Settings</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_QuickLinksHeading</fullName>

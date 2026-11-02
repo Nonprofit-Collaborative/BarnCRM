@@ -6,11 +6,11 @@ import previewLetter from '@salesforce/apex/VolunteerLetterController.preview';
 import generateLetter from '@salesforce/apex/VolunteerLetterController.generate';
 
 import HEADING from '@salesforce/label/c.Volunteers_LetterAction_Heading';
-import TEMPLATE from '@salesforce/label/c.Volunteers_LetterAction_Template';
-import FROM_DATE from '@salesforce/label/c.Volunteers_LetterAction_From';
-import TO_DATE from '@salesforce/label/c.Volunteers_LetterAction_To';
+import TEMPLATE from '@salesforce/label/c.Core_Import_StepTemplate';
+import FROM_DATE from '@salesforce/label/c.Core_SetupChanges_From';
+import TO_DATE from '@salesforce/label/c.Core_SetupChanges_To';
 import PREVIEW from '@salesforce/label/c.Volunteers_LetterAction_Preview';
-import GENERATE from '@salesforce/label/c.Volunteers_LetterAction_Generate';
+import GENERATE from '@salesforce/label/c.Core_Shared_Generate';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import SAVED from '@salesforce/label/c.Volunteers_LetterAction_Saved';
 import NOT_A_PERSON from '@salesforce/label/c.Volunteers_Letter_NotAPerson';

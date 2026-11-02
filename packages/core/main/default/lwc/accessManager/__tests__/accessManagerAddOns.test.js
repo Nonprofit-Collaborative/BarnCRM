@@ -247,7 +247,7 @@ describe('c-access-manager extra permissions', () => {
     await flush();
 
     const dialog = BarnConfirmModal.open.mock.calls[0][0];
-    expect(dialog.confirmLabel).toBe('c.Core_Access_RemoveButton');
+    expect(dialog.confirmLabel).toBe('c.Core_Find_Remove');
     expect(dialog.details).toEqual([]);
     expect(removeAddOn).toHaveBeenCalledWith({
       userId: PRIYA_ID,

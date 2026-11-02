@@ -41,14 +41,6 @@
         <value>Not a Duplicate</value>
     </labels>
     <labels>
-        <fullName>Core_Duplicates_DismissHeading</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: dismiss dialog heading</shortDescription>
-        <value>Not a Duplicate</value>
-    </labels>
-    <labels>
         <fullName>Core_Duplicates_DismissSuccess</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
@@ -233,22 +225,6 @@
         <value>Suggestions need duplicate record set access, given only with Sales or Service Cloud licenses. Rules still run on save.</value>
     </labels>
     <labels>
-        <fullName>Core_Duplicates_ObjectHousehold</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: a record is a household</shortDescription>
-        <value>Household</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ObjectPerson</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: a record is a person</shortDescription>
-        <value>Person</value>
-    </labels>
-    <labels>
         <fullName>Core_Duplicates_PeopleMergeNotice</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
@@ -263,22 +239,6 @@
         <protected>false</protected>
         <shortDescription>Duplicates panel: read only notice</shortDescription>
         <value>You can see this list. Scanning, dismissing and merging here need the Manage BarnCRM Settings permission.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_RuleActive</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: rule is on</shortDescription>
-        <value>On</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_RuleInactive</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: rule is off</shortDescription>
-        <value>Off</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_RulesHeading</fullName>
@@ -407,14 +367,6 @@
         <protected>false</protected>
         <shortDescription>Duplicates panel: title</shortDescription>
         <value>Duplicates</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ViewDismissed</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: view dismissed pairs link</shortDescription>
-        <value>View</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_ReasonEmail</fullName>

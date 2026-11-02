@@ -4,7 +4,7 @@ import save from '@salesforce/apex/ServiceDeliveryLogController.save';
 
 import TITLE from '@salesforce/label/c.Programs_Log_Title';
 import SERVICE from '@salesforce/label/c.Programs_Log_Service';
-import DATE from '@salesforce/label/c.Programs_Log_Date';
+import DATE from '@salesforce/label/c.Core_ImportNewField_TypeDate';
 import ATTENDANCE from '@salesforce/label/c.Programs_Log_Attendance';
 import QUANTITY from '@salesforce/label/c.Programs_Log_Quantity';
 import NOT_RECORDED from '@salesforce/label/c.Programs_Log_NotRecorded';

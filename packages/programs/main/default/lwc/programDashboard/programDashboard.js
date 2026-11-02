@@ -4,7 +4,7 @@ import getDashboard from '@salesforce/apex/ProgramDashboardController.getDashboa
 
 import TITLE from '@salesforce/label/c.Programs_Dashboard_Title';
 import INTRO from '@salesforce/label/c.Programs_Dashboard_Intro';
-import PERIOD from '@salesforce/label/c.Programs_Dashboard_Period';
+import PERIOD from '@salesforce/label/c.Core_Shared_Period';
 import THIS_MONTH from '@salesforce/label/c.Programs_Dashboard_ThisMonth';
 import LAST_MONTH from '@salesforce/label/c.Programs_Dashboard_LastMonth';
 import THIS_YEAR from '@salesforce/label/c.Programs_Dashboard_ThisYear';

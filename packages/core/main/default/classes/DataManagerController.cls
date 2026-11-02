@@ -95,7 +95,7 @@ public with sharing class DataManagerController {
             .mappedEntities()
             .contains(GIFT_ENTITY);
         return loadsGifts
-            ? System.Label.Core_DataManager_LoadsGifts
+            ? System.Label.Core_Import_KindGiftsTitle
             : System.Label.Core_DataManager_LoadsPeople;
     }
 

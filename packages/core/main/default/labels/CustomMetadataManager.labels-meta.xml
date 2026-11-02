@@ -148,7 +148,7 @@
         <fullName>Core_CmdtManager_EditAction</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Custom metadata page: row action that opens the row in the form</shortDescription>
         <value>Edit</value>
     </labels>
@@ -180,17 +180,9 @@
         <fullName>Core_CmdtManager_NameField</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Custom metadata page: the row's name, column and form box</shortDescription>
         <value>Name</value>
-    </labels>
-    <labels>
-        <fullName>Core_CmdtManager_StatusColumn</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Custom metadata page: column saying whether the row is in use</shortDescription>
-        <value>Status</value>
     </labels>
     <labels>
         <fullName>Core_CmdtManager_StatusInUse</fullName>

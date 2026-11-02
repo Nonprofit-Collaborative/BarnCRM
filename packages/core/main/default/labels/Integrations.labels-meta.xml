@@ -145,14 +145,6 @@
         <value>No other products are listed.</value>
     </labels>
     <labels>
-        <fullName>Core_Integrations_RequestHeading</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Integrations: heading of the request section at the bottom</shortDescription>
-        <value>Request an Integration</value>
-    </labels>
-    <labels>
         <fullName>Core_Integrations_RequestIntro</fullName>
         <categories>Core</categories>
         <language>en_US</language>

@@ -289,22 +289,6 @@
         <value>Merged. The household you kept now holds everyone from both.</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdMerge_TabMerge</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Merge tab</shortDescription>
-        <value>Merge</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_TabSplit</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Split tab</shortDescription>
-        <value>Split</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdMerge_Title</fullName>
         <categories>Households</categories>
         <language>en_US</language>

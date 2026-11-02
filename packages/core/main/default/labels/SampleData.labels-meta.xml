@@ -25,14 +25,6 @@
         <value>Sample Data</value>
     </labels>
     <labels>
-        <fullName>Core_SampleData_ConfirmButton</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Confirm button</shortDescription>
-        <value>Confirm</value>
-    </labels>
-    <labels>
         <fullName>Core_SampleData_ContactsLabel</fullName>
         <categories>Sample Data</categories>
         <language>en_US</language>
@@ -111,22 +103,6 @@
         <protected>false</protected>
         <shortDescription>Missing permission error</shortDescription>
         <value>You need the Manage BarnCRM Settings permission to do this.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_RelationshipsLabel</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Relationships count label</shortDescription>
-        <value>Relationships</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_AffiliationsLabel</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Affiliations count label</shortDescription>
-        <value>Affiliations</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_ProductionWarning</fullName>

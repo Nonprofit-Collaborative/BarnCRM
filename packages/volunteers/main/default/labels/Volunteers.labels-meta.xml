@@ -241,44 +241,12 @@
         <value>Volunteer Letter</value>
     </labels>
     <labels>
-        <fullName>Volunteers_LetterAction_Template</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Volunteer letter action: template field</shortDescription>
-        <value>Template</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_LetterAction_From</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Volunteer letter action: start of the period</shortDescription>
-        <value>From</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_LetterAction_To</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Volunteer letter action: end of the period</shortDescription>
-        <value>To</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_LetterAction_Preview</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Volunteer letter action: preview button and region</shortDescription>
         <value>Preview</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_LetterAction_Generate</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Volunteer letter action: generate button</shortDescription>
-        <value>Generate</value>
     </labels>
     <labels>
         <fullName>Volunteers_LetterAction_Saved</fullName>
@@ -321,14 +289,6 @@
         <value>Approve Volunteer Hours</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Approve_Show</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Approve Hours status filter label</shortDescription>
-        <value>Show</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Approve_StatusSubmitted</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
@@ -345,44 +305,12 @@
         <value>Approved</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Approve_StatusRejected</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Status filter choice: rejected</shortDescription>
-        <value>Rejected</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Approve_Job</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Job filter label and column heading</shortDescription>
         <value>Job</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Approve_From</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Earliest date worked filter label</shortDescription>
-        <value>From</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Approve_To</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Latest date worked filter label</shortDescription>
-        <value>To</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Approve_Person</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Person column heading</shortDescription>
-        <value>Person</value>
     </labels>
     <labels>
         <fullName>Volunteers_Approve_Shift</fullName>
@@ -601,22 +529,6 @@
         <value>Add Sign-Up</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Signups_Person</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Person picker label and column heading</shortDescription>
-        <value>Person</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Signups_Status</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Status picker label and column heading</shortDescription>
-        <value>Status</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Signups_Actions</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
@@ -687,14 +599,6 @@
         <protected>true</protected>
         <shortDescription>After adding a sign-up</shortDescription>
         <value>Sign-up added.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Signups_Changed</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>After a status change; {0} is the person, {1} the new status</shortDescription>
-        <value>{0}: {1}.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Signups_HoursWritten</fullName>
@@ -835,28 +739,12 @@ When: {1}</value>
         <value>No volunteers to suggest. Suggestions come from people whose Volunteer Status is Active and who are not already signed up for this shift.</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Suggestions_Person</fullName>
-        <categories>Volunteers, Suggestions</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Suggested Volunteers column heading: the person</shortDescription>
-        <value>Person</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Suggestions_Why</fullName>
         <categories>Volunteers, Suggestions</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Suggested Volunteers column heading: the reasons</shortDescription>
         <value>Why</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Suggestions_Actions</fullName>
-        <categories>Volunteers, Suggestions</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Suggested Volunteers column heading: the action</shortDescription>
-        <value>Actions</value>
     </labels>
     <labels>
         <fullName>Volunteers_Suggestions_SignUp</fullName>

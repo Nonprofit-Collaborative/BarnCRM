@@ -30,7 +30,7 @@ import COPY_STARTED from '@salesforce/label/c.Core_SetupChanges_CopyStarted';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import FROM_DATE from '@salesforce/label/c.Core_SetupChanges_From';
 import TO_DATE from '@salesforce/label/c.Core_SetupChanges_To';
-import SECTION from '@salesforce/label/c.Core_SetupChanges_Section';
+import SECTION from '@salesforce/label/c.Core_SetupChanges_ColSection';
 import ALL_SECTIONS from '@salesforce/label/c.Core_SetupChanges_AllSections';
 import SEARCH from '@salesforce/label/c.Core_SetupChanges_Search';
 import SEARCH_HELP from '@salesforce/label/c.Core_SetupChanges_SearchHelp';
@@ -45,7 +45,7 @@ import CHANGED_AT from '@salesforce/label/c.Core_SetupChanges_ColChangedAt';
 import CHANGED_BY from '@salesforce/label/c.Core_SetupChanges_ColChangedBy';
 import LOGGED_IN_AS from '@salesforce/label/c.Core_SetupChanges_ColLoggedInAs';
 import SECTION_COL from '@salesforce/label/c.Core_SetupChanges_ColSection';
-import ACTION_COL from '@salesforce/label/c.Core_SetupChanges_ColAction';
+import ACTION_COL from '@salesforce/label/c.Core_SuperTransform_Action';
 import WHAT_CHANGED from '@salesforce/label/c.Core_SetupChanges_ColWhatChanged';
 
 const FILE_BASE = 'Setup_Changes';

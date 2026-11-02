@@ -30,10 +30,10 @@ jest.mock('@salesforce/label/c.Core_RollupBuilder_ImportWillCreate', () => ({ de
 jest.mock('@salesforce/label/c.Core_RollupBuilder_ImportRefused', () => ({ default: 'Refused' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_RollupBuilder_ImportCreated', () => ({ default: 'Created' }), {
+jest.mock('@salesforce/label/c.Core_Import_ResultCreated', () => ({ default: 'Created' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_RollupEase_Group', () => ({ default: '{0} ({1})' }), {
+jest.mock('@salesforce/label/c.Core_Format_Parenthetical', () => ({ default: '{0} ({1})' }), {
   virtual: true
 });
 

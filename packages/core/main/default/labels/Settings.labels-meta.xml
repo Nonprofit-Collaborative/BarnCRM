@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_Settings_ColumnNewValue</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: recent changes column for the value after the change</shortDescription>
-        <value>New Value</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_ColumnOldValue</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -103,14 +95,6 @@
         <protected>true</protected>
         <shortDescription>Settings console: message shown when a section has no settings yet</shortDescription>
         <value>This section has no settings yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Settings_ErrorForSetting</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: a save error naming the setting ({0}) before the reason ({1})</shortDescription>
-        <value>{0}: {1}</value>
     </labels>
     <labels>
         <fullName>Core_Settings_InvalidValueError</fullName>
@@ -353,14 +337,6 @@
         <value>Organization</value>
     </labels>
     <labels>
-        <fullName>Core_Settings_NavGroup_People</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: section list group heading</shortDescription>
-        <value>People</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_NavGroup_Data</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -380,7 +356,7 @@
         <fullName>Core_Settings_NavGroup_Programs</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Settings console: section list group heading</shortDescription>
         <value>Programs</value>
     </labels>

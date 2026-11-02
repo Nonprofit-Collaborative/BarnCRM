@@ -15,7 +15,7 @@ import {
 } from 'c/accessDiff';
 
 import COMPARE from '@salesforce/label/c.Core_AccessCompare_Compare';
-import PEOPLE from '@salesforce/label/c.Core_AccessCompare_People';
+import PEOPLE from '@salesforce/label/c.Core_SettingsGroup_People';
 import SETS from '@salesforce/label/c.Core_AccessCompare_Sets';
 import FIRST from '@salesforce/label/c.Core_AccessCompare_First';
 import SECOND from '@salesforce/label/c.Core_AccessCompare_Second';
@@ -32,7 +32,7 @@ import NONE from '@salesforce/label/c.Core_AccessCompare_None';
 import COL_DIFFERENCE from '@salesforce/label/c.Core_AccessCompare_ColDifference';
 import SEARCH_PLACEHOLDER from '@salesforce/label/c.Core_AccessExplorer_SearchPlaceholder';
 import NO_MATCHES from '@salesforce/label/c.Core_AccessExplorer_NoMatches';
-import INACTIVE from '@salesforce/label/c.Core_AccessExplorer_Inactive';
+import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
 import KIND_PROFILE from '@salesforce/label/c.Core_AccessExplorer_KindProfile';
 import KIND_GROUP from '@salesforce/label/c.Core_AccessExplorer_KindGroup';
 import KIND_SET from '@salesforce/label/c.Core_AccessExplorer_KindSet';

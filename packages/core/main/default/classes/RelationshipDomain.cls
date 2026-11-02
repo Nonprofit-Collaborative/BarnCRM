@@ -224,12 +224,12 @@ public with sharing class RelationshipDomain {
                 PersonReference.nameOf(
                     existing.Contact__r,
                     existing.Person_Account__r,
-                    Label.Core_Relationship_UnnamedPerson
+                    Label.Core_Affiliation_UnnamedPerson
                 ),
                 PersonReference.nameOf(
                     existing.Related_Contact__r,
                     existing.Related_Person_Account__r,
-                    Label.Core_Relationship_UnnamedPerson
+                    Label.Core_Affiliation_UnnamedPerson
                 ),
                 existing.Name
             }

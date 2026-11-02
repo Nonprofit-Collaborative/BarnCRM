@@ -18,9 +18,9 @@ import COLUMN_LEVEL from '@salesforce/label/c.Giving_DonorLevels_ColumnLevel';
 import COLUMN_FROM from '@salesforce/label/c.Giving_DonorLevels_ColumnFrom';
 import COLUMN_UP_TO from '@salesforce/label/c.Giving_DonorLevels_ColumnUpTo';
 import COLUMN_DONORS from '@salesforce/label/c.Giving_DonorLevels_ColumnDonors';
-import COLUMN_ACTIVE from '@salesforce/label/c.Giving_DonorLevels_ColumnActive';
+import COLUMN_ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
 import TOP_OF_LADDER from '@salesforce/label/c.Giving_DonorLevels_TopOfLadder';
-import INACTIVE from '@salesforce/label/c.Giving_DonorLevels_Inactive';
+import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
 import ACTION_FAILED from '@salesforce/label/c.Giving_DonorLevels_ActionFailed';
 import { bodyMessage } from 'c/findCsv';
 

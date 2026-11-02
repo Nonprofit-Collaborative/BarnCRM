@@ -21,7 +21,7 @@ import LOADING from '@salesforce/label/c.Core_Affiliation_Loading';
 import MAKE_PRIMARY_BUTTON from '@salesforce/label/c.Core_HouseholdPanel_MakePrimary';
 import MAKE_PRIMARY_FAILED from '@salesforce/label/c.Core_Affiliation_MakePrimaryFailed';
 import MAKE_PRIMARY_SUCCESS from '@salesforce/label/c.Core_Affiliation_MakePrimarySuccess';
-import PRIMARY_BADGE from '@salesforce/label/c.Core_Affiliation_PrimaryBadge';
+import PRIMARY_BADGE from '@salesforce/label/c.Core_HouseholdMembersPanel_Primary';
 import SAVE_FAILED from '@salesforce/label/c.Core_Affiliation_SaveFailed';
 import SAVE_SUCCESS from '@salesforce/label/c.Core_Affiliation_SaveSuccess';
 import UNNAMED_PERSON from '@salesforce/label/c.Core_Affiliation_UnnamedPerson';

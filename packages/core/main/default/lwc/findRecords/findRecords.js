@@ -19,7 +19,7 @@ import deleteQuery from '@salesforce/apex/FindController.deleteQuery';
 import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
 
 import TITLE from '@salesforce/label/c.Core_Find_Title';
-import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
+import TAB_LABEL from '@salesforce/label/c.Core_Format_Pair';
 import INTRO from '@salesforce/label/c.Core_Find_Intro';
 import OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
 import CHOOSE_OBJECT from '@salesforce/label/c.Core_Find_ChooseObject';
@@ -62,7 +62,7 @@ import DELETE_CONFIRM_CANCEL from '@salesforce/label/c.Core_Find_DeleteConfirmCa
 import DELETED_NOTICE from '@salesforce/label/c.Core_Find_DeletedNotice';
 import FIX_CONDITIONS from '@salesforce/label/c.Core_Find_FixConditions';
 import CHOOSE_COLUMNS from '@salesforce/label/c.Core_Find_ChooseColumns';
-import LOADING from '@salesforce/label/c.Core_Find_Loading';
+import LOADING from '@salesforce/label/c.Core_EraseAction_Working';
 import BULK_UPDATE from '@salesforce/label/c.Core_BulkUpdate_Title';
 import BULK_DELETE from '@salesforce/label/c.Core_BulkDelete_Title';
 import EXPORT_EXCEL from '@salesforce/label/c.Core_Find_ExportExcel';

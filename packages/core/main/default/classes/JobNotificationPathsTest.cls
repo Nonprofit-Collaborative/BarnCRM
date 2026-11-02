@@ -100,7 +100,7 @@ private class JobNotificationPathsTest {
 
             JobNotifier.Notice notice = assertOneAboutRecord(
                 committed.Id,
-                title(System.Label.Core_JobNotice_Finished, System.Label.Core_JobNotice_Import)
+                title(System.Label.Core_JobNotice_Finished, System.Label.Core_DataJobs_KindImport)
             );
             Assert.isTrue(notice.body.contains('0'), 'With the counts');
 

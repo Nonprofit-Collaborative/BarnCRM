@@ -15,12 +15,12 @@ import EMPTY_HEADING from '@salesforce/label/c.Core_Relationship_EmptyHeading';
 import FORMER_BADGE from '@salesforce/label/c.Core_Affiliation_FormerBadge';
 import LOAD_FAILED from '@salesforce/label/c.Core_Relationship_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_Relationship_Loading';
-import REMOVE_BUTTON from '@salesforce/label/c.Core_Relationship_RemoveButton';
+import REMOVE_BUTTON from '@salesforce/label/c.Core_Find_Remove';
 import REMOVE_FAILED from '@salesforce/label/c.Core_Relationship_RemoveFailed';
 import REMOVE_SUCCESS from '@salesforce/label/c.Core_Relationship_RemoveSuccess';
 import SAVE_FAILED from '@salesforce/label/c.Core_Relationship_SaveFailed';
 import SAVE_SUCCESS from '@salesforce/label/c.Core_Relationship_SaveSuccess';
-import UNNAMED_PERSON from '@salesforce/label/c.Core_Relationship_UnnamedPerson';
+import UNNAMED_PERSON from '@salesforce/label/c.Core_Affiliation_UnnamedPerson';
 
 const RELATIONSHIP_OBJECT = 'Relationship__c';
 const FORM_FIELDS = ['Type__c', 'Status__c', 'Start_Date__c', 'End_Date__c', 'Description__c'];

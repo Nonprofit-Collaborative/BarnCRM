@@ -590,12 +590,12 @@ public with sharing class PersonErasure {
                     Address__c.SObjectType,
                     result
                 );
-                save(anonymous, result, Label.Core_Erase_Household, keptHouseholdNote());
+                save(anonymous, result, Label.Core_Section_Household, keptHouseholdNote());
             }
         }
         deletedIds.addAll(gone);
         if (!gone.isEmpty()) {
-            add(result, DELETED, Label.Core_Erase_Household, gone, null, null);
+            add(result, DELETED, Label.Core_Section_Household, gone, null, null);
         }
         settleSharedHouseholds(shared, remaining, before, result);
     }
@@ -642,7 +642,7 @@ public with sharing class PersonErasure {
             List<String> changed = changedWording(before.get(householdId), after.get(householdId));
             Change change = new Change(
                 changed.isEmpty() ? KEPT : UPDATED,
-                Label.Core_Erase_Household,
+                Label.Core_Section_Household,
                 new List<Id>{ householdId },
                 changed
             );
@@ -940,7 +940,7 @@ public with sharing class PersonErasure {
         Boolean accountIsHousehold
     ) {
         return accountIsHousehold && field.getName() == 'AccountId'
-            ? Label.Core_Erase_Household
+            ? Label.Core_Section_Household
             : field.getLabel();
     }
 
