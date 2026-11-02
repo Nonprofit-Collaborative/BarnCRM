@@ -233,6 +233,22 @@
         <value>The setting skips the missing field; remove it from the list to keep the setting tidy.</value>
     </labels>
     <labels>
+        <fullName>Core_WhereUsed_BreaksPattern</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What breaks for a name or greeting pattern that reads the field.</shortDescription>
+        <value>Names and greetings written from this pattern would leave this blank empty.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_BreaksSettingValue</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What breaks for a setting whose chosen value is the field.</shortDescription>
+        <value>The setting falls back to its default; choose another value before you delete the field.</value>
+    </labels>
+    <labels>
         <fullName>Core_WhereUsed_Action</fullName>
         <categories>Core</categories>
         <language>en_US</language>
