@@ -38,6 +38,18 @@
             <p class="slds-text-body_small" data-id="fill-rates-help">{labels.includeFillRatesHelp}</p>
         </div>
 
+        <div class="slds-var-m-vertical_small">
+            <lightning-input
+                data-id="automation"
+                type="checkbox"
+                label={labels.includeAutomation}
+                checked={includeAutomation}
+                disabled={building}
+                onchange={handleAutomation}
+            ></lightning-input>
+            <p class="slds-text-body_small" data-id="automation-help">{labels.includeAutomationHelp}</p>
+        </div>
+
         <lightning-button-group class="slds-var-m-bottom_small">
             <lightning-button
                 data-id="build"
@@ -80,6 +92,42 @@
 
         <template lwc:if={notCountedMessage}>
             <p class="slds-var-m-top_small" data-id="not-counted">{notCountedMessage}</p>
+        </template>
+
+        <template lwc:if={showAutomation}>
+            <div class="slds-var-m-top_large" data-id="automation-section">
+                <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_x-small">
+                    <h3 class="slds-text-heading_small slds-col">{labels.automationTitle}</h3>
+                    <lightning-button
+                        data-id="download-automation"
+                        label={labels.downloadAutomation}
+                        disabled={downloadAutomationDisabled}
+                        onclick={handleDownloadAutomation}
+                    ></lightning-button>
+                </div>
+                <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id="automation-note">
+                    {labels.automationNote}
+                </p>
+                <template lwc:if={hasAutomationRows}>
+                    <lightning-datatable
+                        data-id="automation-results"
+                        key-field="key"
+                        data={automationRows}
+                        columns={automationColumns}
+                        hide-checkbox-column
+                        wrap-text-max-lines="3"
+                    ></lightning-datatable>
+                </template>
+                <template lwc:if={showAutomationEmpty}>
+                    <p data-id="automation-empty">{labels.automationEmpty}</p>
+                </template>
+                <template lwc:if={automationTruncatedMessage}>
+                    <p class="slds-var-m-top_x-small" data-id="automation-truncated">{automationTruncatedMessage}</p>
+                </template>
+                <template lwc:if={automationNotReadMessage}>
+                    <p class="slds-var-m-top_x-small" data-id="automation-not-read">{automationNotReadMessage}</p>
+                </template>
+            </div>
         </template>
     </div>
 </template>

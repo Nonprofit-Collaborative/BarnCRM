@@ -26,7 +26,8 @@ Choose one or more kinds of record, and it lists every field you can see, with:
 | **Fill Rate** | Optional: the share of records with the field filled in (see below) |
 
 It reads only what Salesforce reports about the fields. It never changes a record, field or
-setting, and it does not list flows, triggers or other automation.
+setting. Flows and Apex triggers are listed only when you ask (see **Automation Inventory**
+below).
 
 **Descriptions are not included.** A field's Description (the internal note in Setup) is not
 available to this kind of read, so the dictionary shows Help Text instead. Fill in Help Text
@@ -96,6 +97,38 @@ never runs it as a formula. The file name is `Data_Dictionary-` and the date.
 Saving the file to the **Files** tab is not offered: the export-to-Files service writes the
 results of a Find query, not a table the page built.
 
+## Automation Inventory
+
+Tick **Include Flows and Apex Triggers** before **Build Dictionary**, and a second table,
+**Automation Inventory**, appears under the fields. For each kind of record you chose, it lists
+what runs when a record of that kind is saved or deleted:
+
+| Column | What it shows |
+|---|---|
+| **Object** | The kind of record. |
+| **Type** | **Apex Trigger** or **Flow**. |
+| **Name** and **API Name** | The trigger's name, or the flow's label and API name. |
+| **Status** | **Active** or **Inactive**. A flow with no active version is inactive. |
+| **Runs** | For a trigger, the events it runs on (for example `before insert, after update`). For a flow, the point in the save it runs at (**Before save**, **After save**, **Before delete**), and **Process Builder** for a process. |
+| **API Version** | The API version the trigger or flow is saved on. |
+
+**Download Automation CSV** saves this table as its own file, `Automation_Inventory-` and the
+date, in the same format as the dictionary CSV and with the object's API name added. The field
+table and its **Download CSV** are unchanged.
+
+What it reads: Apex triggers and flows, each with one Salesforce query run as you, so it shows
+what your access lets you see. A trigger or flow that belongs to an installed package is listed
+too, so you can see everything that runs on the record. At most 200 triggers and 200 flows are
+listed for one kind of record; the page names a kind of record that hit the limit, and one whose
+triggers or flows it could not read.
+
+**Not covered.** Validation rules, workflow rules and process builder criteria are not listed:
+Salesforce only exposes them through the Tooling API, which BarnCRM does not use. Flows that no
+record triggers (screen flows, scheduled flows, flows another flow calls) belong to no kind of
+record and are not listed. A flow that is not saved yet, and automation written in other
+tools, are not seen either. To review validation rules, open **Setup**, **Object Manager**, the
+kind of record, then **Validation Rules**. Nothing here is changed for you.
+
 ## Common Mistakes
 
 **Expecting every field.** The dictionary lists what you can read. If a field you expect is
@@ -105,8 +138,9 @@ it.
 **Turning on Fill Rates for every object.** With dozens of kinds of record chosen, fill rates
 count each one in turn. Choose the kinds of record you care about first.
 
-**Looking for descriptions or automation.** Field descriptions, flows and triggers are outside
-what this section reads. Use Setup, or the Unused Setup section, for those.
+**Looking for descriptions or validation rules.** Field descriptions and validation rules are
+outside what this section reads. Use Setup for those. Flows and triggers are in the
+**Automation Inventory**, once you tick **Include Flows and Apex Triggers**.
 
 ## Related
 

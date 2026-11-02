@@ -158,6 +158,22 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Remove the help text added in step 6.
 
+## T-HC-17: Data Dictionary Automation Inventory Lists Triggers and Flows
+
+**Purpose:** Confirm the Data Dictionary lists the Apex triggers and record-triggered flows of each chosen kind of record on request, says what it does not cover, and downloads its own CSV.
+**Prerequisites:** admin; Core deployed (it ships an Account trigger and template flows for Affiliation and Account).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Org Optimizer**, choose **Data Dictionary**, and read under **Include Fill Rates**. | A second checkbox, **Include Flows and Apex Triggers**, off, with a line saying validation rules are not covered. |
+| 2 | Move everything except **Account** and **Affiliation** out of **Selected**, leave the new box off, and click **Build Dictionary**. | The field table only. No **Automation Inventory**. |
+| 3 | Tick **Include Flows and Apex Triggers** and click **Build Dictionary**. | After the field table, **Automation Inventory** with a note beginning "Covers Apex triggers and record-triggered flows". Rows include **Apex Trigger** **AccountTrigger** (Status **Active**, **Runs** `before insert, ...`), **Apex Trigger** **AffiliationTrigger**, and **Flow** rows for the Affiliation templates (Status **Inactive**, **Runs** **After save**, **Before save** or **Before delete**). |
+| 4 | Read the note under **Automation Inventory**. | It says validation rules, workflow rules and process builder criteria are not covered. |
+| 5 | Click **Download Automation CSV**. | A file named **Automation_Inventory-** and today's date ending .csv downloads, and **Downloaded {n} automation rows.** shows. The header starts **Object**, **Object API Name**, **Type**. |
+| 6 | Click **Download CSV** at the top. | The usual dictionary file, with no automation rows in it. |
+| 7 | Choose a kind of record nothing runs on (a custom object with no trigger or flow) and build with the box ticked. | **No Apex triggers or record-triggered flows run on these kinds of record.** |
+| 8 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **Data Dictionary** tile or tab. |
+
 ## T-HC-11: Access Explorer Shows Who Can See What, and Why
 
 **Purpose:** Confirm an admin can see a person's access and its sources, a permission set's access, who has access to a kind of record or field, and BarnCRM's permission sets, that each table downloads, and that nobody else sees it.

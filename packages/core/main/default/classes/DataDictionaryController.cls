@@ -1,7 +1,10 @@
 /**
  * The Data Dictionary section of Org Optimizer (plan Section 6.1.1 item 13, D-154): one object
  * at a time, every field the person can see, as describe reports it. Describe only: no Tooling
- * API, no callout, no automation listing. Fill rates are not counted here; the page asks
+ * API, no callout. The automation inventory (C-60, `getAutomation`) adds, on request, the Apex
+ * triggers and record-triggered flows of an object from user-mode SOQL
+ * (AutomationInventoryService); validation rules need the Tooling API and are not covered.
+ * Fill rates are not counted here; the page asks
  * FieldUtilizationController for them, so there is one counting implementation and one set of
  * limits. Every method requires `Manage_BarnCRM_Settings`, like Field Utilization.
  *
@@ -155,6 +158,87 @@ public with sharing class DataDictionaryController {
             return result;
         } catch (Exception caught) {
             throw asUserError(caught, 'Data dictionary describe');
+        }
+    }
+
+    /** One Apex trigger or flow that runs on an object. */
+    public class AutomationRow {
+        @AuraEnabled
+        public String key;
+        @AuraEnabled
+        public String objectLabel;
+        @AuraEnabled
+        public String objectName;
+        /** ApexTrigger or Flow. */
+        @AuraEnabled
+        public String automationType;
+        @AuraEnabled
+        public String name;
+        @AuraEnabled
+        public String apiName;
+        @AuraEnabled
+        public String status;
+        /** Trigger events, or a flow's kind and the point in the save it runs at. */
+        @AuraEnabled
+        public String detail;
+        @AuraEnabled
+        public Integer apiVersion;
+    }
+
+    /** One object's automation, and which parts could not be read. */
+    public class AutomationInventory {
+        @AuraEnabled
+        public String objectName;
+        @AuraEnabled
+        public String objectLabel;
+        @AuraEnabled
+        public List<AutomationRow> rows = new List<AutomationRow>();
+        @AuraEnabled
+        public Boolean triggersFailed = false;
+        @AuraEnabled
+        public Boolean flowsFailed = false;
+        /** True when the triggers or the flows stopped at the most listed for one object. */
+        @AuraEnabled
+        public Boolean truncated = false;
+    }
+
+    /**
+     * The Apex triggers and record-triggered flows of one object (C-60), read as the person with
+     * user-mode SOQL. Validation rules, workflow rules and process builder criteria need the
+     * Tooling API and are not covered; flows that no record triggers are not tied to an object.
+     * @param objectName the object's API name, as the picker offers it
+     * @return the object's triggers and flows
+     */
+    @AuraEnabled
+    public static AutomationInventory getAutomation(String objectName) {
+        try {
+            requirePermission();
+            Schema.DescribeSObjectResult described = requireObject(objectName);
+            AutomationInventoryService.Result found = AutomationInventoryService.forObject(
+                described
+            );
+            AutomationInventory result = new AutomationInventory();
+            result.objectName = described.getName();
+            result.objectLabel = described.getLabel();
+            result.triggersFailed = found.triggersFailed;
+            result.flowsFailed = found.flowsFailed;
+            result.truncated = found.truncated;
+            for (AutomationInventoryService.Item item : found.items) {
+                AutomationRow row = new AutomationRow();
+                row.key = result.objectName + '|' + item.automationType + '|' + item.apiName;
+                row.objectLabel = result.objectLabel;
+                row.objectName = result.objectName;
+                row.automationType = item.automationType;
+                row.name = item.name;
+                row.apiName = item.apiName;
+                row.status = item.status;
+                row.detail = item.detail;
+                row.apiVersion = item.apiVersion;
+                result.rows.add(row);
+            }
+            return result;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Data dictionary automation inventory');
         }
     }
 

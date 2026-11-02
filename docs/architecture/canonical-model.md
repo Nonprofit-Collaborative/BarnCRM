@@ -8221,6 +8221,28 @@ current one, with the change in percentage points.
   `Manage_BarnCRM_Settings`). The page is the `fieldUtilization` component, embedded in Org
   Optimizer, its only host (no app page or tab of its own).
 
+### Data Dictionary automation inventory (C-60, plan 6.1.5)
+
+On request, the Data Dictionary section of Org Optimizer lists the automation that runs on each
+chosen object. It adds no object or field and stores nothing.
+
+**R-AI1 What is listed.** For one object (`DataDictionaryController.getAutomation`, which
+requires `Manage_BarnCRM_Settings` and checks the name against describe like `describeObject`): its
+Apex triggers (`ApexTrigger`, matched on `TableEnumOrId`) and its record-triggered flows and
+processes (`FlowDefinitionView`, matched on `TriggerObjectOrEventId`), with name, API name,
+status, the events a trigger runs on or the point in the save a flow runs at, and API version.
+Packaged triggers and flows are included.
+**R-AI2 Custom objects.** A flow names a custom object by Id, so the object's
+`EntityDefinition.DurableId` (15 character form too) is read and matched along with the API
+name. When it cannot be read, only the API name matches and a flow on a custom object may be
+missed.
+**R-AI3 User mode, capped, partial.** Every query is user-mode SOQL, at most 200 triggers and 200
+flows per object. A part that cannot be read is reported (triggers failed, flows failed) and the
+other part is still listed; a capped object is named on the page.
+**R-AI4 Not covered.** Validation rules, workflow rules and process builder criteria need the
+Tooling API and are not listed, and the page and guide say so. Flows no
+record triggers (screen, scheduled, called by another flow) belong to no object and are not listed.
+
 ---
 
 ---
@@ -10777,6 +10799,7 @@ mirrors the primary member).
 | 0.14 | 2026-10-31 | Programs P-08. `Enrollment__c` (29ZA) and `Service_Delivery__c` (29ZB) change from Public Read/Write to Private, each shared with the new public group `Programs_Participants` through the Apex sharing reason `Programs_Participants__c` (R-EN7, R-SD6). New hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox, default unchecked): the Participant Privacy preset, Shared by default, which puts All Internal Users in the group, or Private, which takes them out. Programs Admin gains View All and Modify All on both objects. |
 | 0.14 | 2026-10-31 | Programs P-05. The Programs Dashboard (29ZA, "Program dashboard") and the person card's last service date and services attended. No object or field added. |
 | 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29ZA, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
+| 0.17 | 2026-11-02 | C-60 automation inventory in the Data Dictionary (plan 6.1.5). Section 29F: rules R-AI1 to R-AI4. No object or field added. |
 
 ---
 ## 32. Entity ownership by package
