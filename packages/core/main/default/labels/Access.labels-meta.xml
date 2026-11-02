@@ -209,14 +209,6 @@
         <value>Set Up Automatic Access</value>
     </labels>
     <labels>
-        <fullName>Core_Access_CancelButton</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: button that closes a confirmation without changing anything</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_ConfirmAddMessage</fullName>
         <categories>Access</categories>
         <language>en_US</language>

@@ -173,7 +173,7 @@
         <categories>DuplicateMatching</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Matching Logic: the related object, by API name in the form</shortDescription>
+        <shortDescription>Shared: object picker or form label</shortDescription>
         <value>Object</value>
     </labels>
     <labels>

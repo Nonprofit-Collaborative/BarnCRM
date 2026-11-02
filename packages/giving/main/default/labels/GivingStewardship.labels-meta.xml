@@ -321,22 +321,6 @@
     <value>Comments</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_Save</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, save</shortDescription>
-    <value>Save</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_Cancel</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, cancel</shortDescription>
-    <value>Cancel</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_Saved</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
@@ -373,7 +357,7 @@
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Stewardship: the page could not do what was asked</shortDescription>
+    <shortDescription>Giving: the page could not do what was asked</shortDescription>
     <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your BarnCRM admin to check it.</value>
   </labels>
   <labels>

@@ -57,22 +57,6 @@
         <value>Organization</value>
     </labels>
     <labels>
-        <fullName>Giving_QuickGiftEntry_DonorPlaceholder</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: donor search placeholder</shortDescription>
-        <value>Search by name</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_AmountLabel</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: amount</shortDescription>
-        <value>Amount</value>
-    </labels>
-    <labels>
         <fullName>Giving_QuickGiftEntry_InKindDescriptionLabel</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
@@ -151,14 +135,6 @@
         <protected>false</protected>
         <shortDescription>Quick gift entry: check or reference number</shortDescription>
         <value>Check or reference number</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_SaveButton</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: save button</shortDescription>
-        <value>Save</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_SaveAndNewButton</fullName>

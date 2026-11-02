@@ -22,7 +22,7 @@ import SEARCH_PLACEHOLDER from '@salesforce/label/c.Core_HouseholdMerge_SearchPl
 import NO_RESULTS from '@salesforce/label/c.Core_HouseholdMerge_NoResults';
 import SELECT_OTHER from '@salesforce/label/c.Core_HouseholdMerge_SelectOther';
 import COMPARISON_TABLE from '@salesforce/label/c.Core_HouseholdMerge_ComparisonTable';
-import COLUMN_FIELD from '@salesforce/label/c.Core_HouseholdMerge_ColumnField';
+import COLUMN_FIELD from '@salesforce/label/c.Core_DataDictionary_ColField';
 import COLUMN_THIS from '@salesforce/label/c.Core_HouseholdMerge_ColumnThis';
 import COLUMN_OTHER from '@salesforce/label/c.Core_HouseholdMerge_ColumnOther';
 import MEMBERS_HEADING from '@salesforce/label/c.Core_HouseholdMerge_MembersHeading';
@@ -33,8 +33,8 @@ import MEMBER_FROM_OTHER from '@salesforce/label/c.Core_HouseholdMerge_MemberFro
 import MERGE_BUTTON from '@salesforce/label/c.Core_HouseholdMerge_MergeButton';
 import CONFIRM_HEADING from '@salesforce/label/c.Core_HouseholdMerge_ConfirmHeading';
 import CONFIRM_BODY from '@salesforce/label/c.Core_HouseholdMerge_ConfirmBody';
-import CONFIRM_BUTTON from '@salesforce/label/c.Core_HouseholdMerge_ConfirmButton';
-import CANCEL from '@salesforce/label/c.Core_HouseholdMerge_Cancel';
+import CONFIRM_BUTTON from '@salesforce/label/c.Core_Duplicates_MergeButton';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import MERGE_SUCCESS from '@salesforce/label/c.Core_HouseholdMerge_Success';
 import CUSTOM_NAME_KEPT from '@salesforce/label/c.Core_HouseholdMerge_CustomNameKept';
 import READ_ONLY from '@salesforce/label/c.Core_HouseholdMerge_ReadOnly';

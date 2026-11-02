@@ -7,7 +7,7 @@ import EMPTY from '@salesforce/label/c.Programs_Person_Empty';
 import STARTED from '@salesforce/label/c.Programs_Person_Started';
 import ENDED from '@salesforce/label/c.Programs_Person_Ended';
 import LOAD_FAILED from '@salesforce/label/c.Programs_Person_LoadFailed';
-import REFRESH from '@salesforce/label/c.Programs_Person_Refresh';
+import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Person_MoreThanShown';
 import LOADING from '@salesforce/label/c.Programs_Loading';
 import LAST_SERVICE from '@salesforce/label/c.Programs_Person_LastService';

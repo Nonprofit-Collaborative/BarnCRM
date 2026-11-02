@@ -15,7 +15,7 @@ import reasonHeader from '@salesforce/label/c.Core_Import_ReasonHeader';
 import noRejectedRows from '@salesforce/label/c.Core_Import_NoRejectedRows';
 import rejectedShownOf from '@salesforce/label/c.Core_Import_RejectedShownOf';
 import runningMessage from '@salesforce/label/c.Core_Import_RunningMessage';
-import loadingAltText from '@salesforce/label/c.Core_Import_LoadingAltText';
+import loadingAltText from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import changedValuesHeading from '@salesforce/label/c.Core_Import_ChangedValuesHeading';
 import columnHeader from '@salesforce/label/c.Core_Import_ColumnHeader';
 import beforeHeader from '@salesforce/label/c.Core_Import_ChangesBefore';

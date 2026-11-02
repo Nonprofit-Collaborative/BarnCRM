@@ -24,7 +24,7 @@ import R_NO_AVAILABILITY from '@salesforce/label/c.Volunteers_Suggestions_Reason
 import R_HOURS from '@salesforce/label/c.Volunteers_Suggestions_ReasonHours';
 import R_CLEARED from '@salesforce/label/c.Volunteers_Suggestions_ReasonCleared';
 import R_OPEN from '@salesforce/label/c.Volunteers_Suggestions_ReasonOpen';
-import LOADING from '@salesforce/label/c.Volunteers_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { bodyMessage, format } from 'c/findCsv';
 
 /** How many suggestions the card shows. */

@@ -7,7 +7,7 @@ import getNamingSettings from '@salesforce/apex/HouseholdController.getNamingSet
 import recomputeAll from '@salesforce/apex/HouseholdController.recomputeAll';
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
 
-import TITLE from '@salesforce/label/c.Core_HouseholdNamingSettings_Title';
+import TITLE from '@salesforce/label/c.Core_SettingsGroup_HouseholdNames';
 import NAME_LABEL from '@salesforce/label/c.Core_HouseholdNamingSettings_NameLabel';
 import FORMAL_LABEL from '@salesforce/label/c.Core_HouseholdNamingSettings_FormalLabel';
 import INFORMAL_LABEL from '@salesforce/label/c.Core_HouseholdNamingSettings_InformalLabel';
@@ -17,13 +17,13 @@ import COLUMN_MEMBERS from '@salesforce/label/c.Core_HouseholdNamingSettings_Col
 import COLUMN_NAME from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnName';
 import COLUMN_FORMAL from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnFormal';
 import COLUMN_INFORMAL from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnInformal';
-import SAVE from '@salesforce/label/c.Core_HouseholdNamingSettings_Save';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import SAVED from '@salesforce/label/c.Core_HouseholdNamingSettings_Saved';
 import RECOMPUTE from '@salesforce/label/c.Core_HouseholdNamingSettings_Recompute';
 import RECOMPUTE_CONFIRM from '@salesforce/label/c.Core_HouseholdNamingSettings_RecomputeConfirm';
 import RECOMPUTE_STARTED from '@salesforce/label/c.Core_HouseholdNamingSettings_RecomputeStarted';
 import READ_ONLY from '@salesforce/label/c.Core_HouseholdNamingSettings_ReadOnly';
-import CANCEL from '@salesforce/label/c.Core_HouseholdNamingSettings_Cancel';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CONFIRM from '@salesforce/label/c.Core_HouseholdNamingSettings_Confirm';
 import SAVING from '@salesforce/label/c.Core_HouseholdScreens_Saving';
 

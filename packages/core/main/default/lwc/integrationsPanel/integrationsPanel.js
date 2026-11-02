@@ -26,10 +26,10 @@ import LICENSE_COST from '@salesforce/label/c.Core_Integrations_LicenseCost';
 import RELATED_MODULE from '@salesforce/label/c.Core_Integrations_RelatedModule';
 import COMPATIBILITY_HEADING from '@salesforce/label/c.Core_Integrations_CompatibilityHeading';
 import MIGRATION_PATH from '@salesforce/label/c.Core_Integrations_MigrationPath';
-import LEARN_MORE from '@salesforce/label/c.Core_Integrations_LearnMore';
+import LEARN_MORE from '@salesforce/label/c.Core_Kit_LearnMore';
 import EMPTY from '@salesforce/label/c.Core_Integrations_EmptyMessage';
 import LOAD_ERROR from '@salesforce/label/c.Core_Integrations_LoadErrorMessage';
-import NEW_TAB from '@salesforce/label/c.Core_SuiteChoice_NewTab';
+import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 
 /** The groups in the order the page shows them, by the category a catalog row stores. */

@@ -193,7 +193,7 @@ private class BulkUpdateSuperTransformTest {
                 System.Assert.fail('Data jobs cannot be changed');
             } catch (AuraHandledException refused) {
                 System.Assert.isFalse(
-                    refused.getMessage() == System.Label.Core_BulkUpdate_UnexpectedError,
+                    refused.getMessage() == System.Label.Core_UnexpectedError,
                     'Refused with a reason the person can act on'
                 );
             }

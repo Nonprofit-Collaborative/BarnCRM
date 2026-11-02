@@ -161,14 +161,6 @@
         <value>Your organization's legal name is blank in BarnCRM Settings, so the letter will print without it. Ask your BarnCRM admin to fill it in under Organization.</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Loading</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>What a screen reader hears while a Volunteers screen loads</shortDescription>
-        <value>Loading</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Signups_NoHoursWarning</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
@@ -287,14 +279,6 @@
         <protected>true</protected>
         <shortDescription>Volunteer letter action: generate button</shortDescription>
         <value>Generate</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_LetterAction_Cancel</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Volunteer letter action: cancel button</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Volunteers_LetterAction_Saved</fullName>
@@ -513,28 +497,12 @@
         <value>Reject Selected</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Approve_Cancel</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cancel button</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Approve_Previous</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Previous page button</shortDescription>
         <value>Previous</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Approve_Next</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Next page button</shortDescription>
-        <value>Next</value>
     </labels>
     <labels>
         <fullName>Volunteers_Approve_DateRange</fullName>
@@ -655,22 +623,6 @@
         <protected>true</protected>
         <shortDescription>Attendance buttons column heading</shortDescription>
         <value>Attendance</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Signups_Save</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Save button</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Signups_Cancel</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cancel button</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Volunteers_Signups_Caption</fullName>
@@ -1083,14 +1035,6 @@ When: {1}</value>
         <value>Readiness could not be loaded. Click Refresh, or reload the page.</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Readiness_Refresh</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Refresh button on the readiness card</shortDescription>
-        <value>Refresh</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Erase_HoursKept</fullName>
         <categories>Erase</categories>
         <language>en_US</language>
@@ -1105,30 +1049,6 @@ When: {1}</value>
         <protected>false</protected>
         <shortDescription>Erase a person: why shift sign-ups are kept</shortDescription>
         <value>Kept, so shift counts stay right. Bookings on shifts still to come are cancelled and notes are emptied.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_HealthCheck_MoreThan</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check count that stopped at its cap; {0} is the cap</shortDescription>
-        <value>More than {0}</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_HealthCheck_FirstListed</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check example records; {0} is how many are linked</shortDescription>
-        <value>The first {0} are linked below.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_HealthCheck_FirstListedOne</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check example record when there is only one</shortDescription>
-        <value>It is linked below.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_HoursWaitingTitle</fullName>

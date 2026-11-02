@@ -185,14 +185,6 @@
         <value>Access Comes From</value>
     </labels>
     <labels>
-        <fullName>Core_AccessExplorer_ObjectsHeading</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: heading of the object table</shortDescription>
-        <value>Kinds of Record</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessExplorer_FieldAccessFor</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>
@@ -229,7 +221,7 @@
         <categories>AccessExplorer</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Access explorer: object picker and column label</shortDescription>
+        <shortDescription>Shared: object picker and column label</shortDescription>
         <value>Kind of Record</value>
     </labels>
     <labels>
@@ -237,7 +229,7 @@
         <categories>AccessExplorer</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Access explorer: field picker and column label</shortDescription>
+        <shortDescription>Shared: field picker or column label</shortDescription>
         <value>Field</value>
     </labels>
     <labels>
@@ -277,7 +269,7 @@
         <categories>AccessExplorer</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Access explorer: load the next page of people</shortDescription>
+        <shortDescription>Shared: button that loads the next page of results</shortDescription>
         <value>Show More</value>
     </labels>
     <labels>
@@ -317,7 +309,7 @@
         <categories>AccessExplorer</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Access explorer: download a table</shortDescription>
+        <shortDescription>Shared: button that downloads a table as a CSV file</shortDescription>
         <value>Download CSV</value>
     </labels>
     <labels>
@@ -357,7 +349,7 @@
         <categories>AccessExplorer</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Access explorer: spinner text</shortDescription>
+        <shortDescription>Shared: spinner text while something loads</shortDescription>
         <value>Loading</value>
     </labels>
     <labels>
@@ -389,7 +381,7 @@
         <categories>AccessExplorer</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Access explorer: column</shortDescription>
+        <shortDescription>Shared: column for an API name</shortDescription>
         <value>API Name</value>
     </labels>
     <labels>

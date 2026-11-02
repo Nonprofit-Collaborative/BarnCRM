@@ -12,7 +12,7 @@ import REMAINING_LABEL from '@salesforce/label/c.Giving_RefundGift_RemainingLabe
 import MODE_REFUND from '@salesforce/label/c.Giving_RefundGift_ModeRefund';
 import MODE_WRITE_OFF from '@salesforce/label/c.Giving_RefundGift_ModeWriteOff';
 import CONFIRM from '@salesforce/label/c.Giving_RefundGift_Confirm';
-import CANCEL from '@salesforce/label/c.Giving_RefundGift_Cancel';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import SUCCESS from '@salesforce/label/c.Giving_RefundGift_Success';
 import REASON_REQUIRED from '@salesforce/label/c.Giving_RefundGift_ReasonRequired';
 import NO_ACCESS from '@salesforce/label/c.Giving_RefundGift_NoPermission';

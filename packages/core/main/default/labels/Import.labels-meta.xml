@@ -273,14 +273,6 @@
         <value>full name in one column</value>
     </labels>
     <labels>
-        <fullName>Core_Import_TargetAttributeEmail</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: column target attribute, email</shortDescription>
-        <value>email</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_TargetAttributePhone</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -319,14 +311,6 @@
         <protected>false</protected>
         <shortDescription>Import wizard: column target attribute, state or province</shortDescription>
         <value>state or province</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_TargetAttributePostalCode</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: column target attribute, postal code</shortDescription>
-        <value>postal code</value>
     </labels>
     <labels>
         <fullName>Core_Import_TargetAttributeCountry</fullName>
@@ -509,7 +493,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: button that moves to the next step</shortDescription>
+        <shortDescription>Shared: button that moves to the next step</shortDescription>
         <value>Next</value>
     </labels>
     <labels>
@@ -751,22 +735,6 @@
         <protected>false</protected>
         <shortDescription>Import rejected rows file capped; {0} rows in the file, {1} rows rejected</shortDescription>
         <value>The rejected rows file holds the first {0} of {1} rejected rows, the most one download can read. Fix and import those rows, then preview the file again for the rest.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_ReadOnlyMessage</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import page: shown to a user without the permission</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to import. Ask whoever set up your org for the BarnCRM Admin role.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_LoadingAltText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import page: alternative text of the spinner</shortDescription>
-        <value>Loading</value>
     </labels>
     <labels>
         <fullName>Core_Import_ParsingMessage</fullName>
@@ -1401,14 +1369,6 @@
         <value>When more than one record matches a row</value>
     </labels>
     <labels>
-        <fullName>Core_Import_SeveralRejectOption</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: several matches option, reject the row</shortDescription>
-        <value>Reject the row</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_SeveralRecentOption</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -1543,14 +1503,6 @@
         <protected>false</protected>
         <shortDescription>Import error: a match-only file found no record for the row</shortDescription>
         <value>Nothing matches this row, and this file only matches, so nothing was created. To add new people or organizations, untick Match only and import the row again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_RecordIdFieldName</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: the name of a column holding a Salesforce record ID</shortDescription>
-        <value>Salesforce record ID</value>
     </labels>
     <labels>
         <fullName>Core_Import_MatchOnlyLabel</fullName>

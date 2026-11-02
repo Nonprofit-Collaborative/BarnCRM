@@ -18,7 +18,7 @@ import SELECTED_LABEL from '@salesforce/label/c.Core_DataDictionary_SelectedLabe
 import INCLUDE_FILL_RATES from '@salesforce/label/c.Core_DataDictionary_IncludeFillRates';
 import INCLUDE_FILL_RATES_HELP from '@salesforce/label/c.Core_DataDictionary_IncludeFillRatesHelp';
 import BUILD from '@salesforce/label/c.Core_DataDictionary_Build';
-import DOWNLOAD from '@salesforce/label/c.Core_DataDictionary_Download';
+import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';
 import DOWNLOADED from '@salesforce/label/c.Core_DataDictionary_Downloaded';
 import PROGRESS from '@salesforce/label/c.Core_DataDictionary_Progress';
 import FILL_PROGRESS from '@salesforce/label/c.Core_DataDictionary_FillProgress';

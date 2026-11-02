@@ -25,7 +25,7 @@ import NO_ONE_HAS_ADD_ON from '@salesforce/label/c.Core_Access_NoOneHasAddOn';
 import ASSIGN_SUCCESS from '@salesforce/label/c.Core_Access_AssignSuccess';
 import AUTOMATIC_ACCESS_HELP from '@salesforce/label/c.Core_Access_AutomaticAccessHelp';
 import AUTOMATIC_ACCESS_LINK from '@salesforce/label/c.Core_Access_AutomaticAccessLink';
-import CANCEL_BUTTON from '@salesforce/label/c.Core_Access_CancelButton';
+import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CONFIRM_ADD_MESSAGE from '@salesforce/label/c.Core_Access_ConfirmAddMessage';
 import CONFIRM_ADD_TITLE from '@salesforce/label/c.Core_Access_ConfirmAddTitle';
 import CONFIRM_REMOVE_MESSAGE from '@salesforce/label/c.Core_Access_ConfirmRemoveMessage';

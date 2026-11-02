@@ -16,7 +16,7 @@ import CATEGORY_ACCESS from '@salesforce/label/c.Core_HealthCheck_CategoryAccess
 import CATEGORY_LICENSES from '@salesforce/label/c.Core_HealthCheck_CategoryLicenses';
 import CATEGORY_ORG_SHAPE from '@salesforce/label/c.Core_HealthCheck_CategoryOrgShape';
 import CATEGORY_SETTINGS from '@salesforce/label/c.Core_HealthCheck_CategorySettings';
-import CANCEL from '@salesforce/label/c.Core_HealthCheck_CancelButton';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CONFIRM from '@salesforce/label/c.Core_HealthCheck_ConfirmButton';
 import CONFIRM_HEADING from '@salesforce/label/c.Core_HealthCheck_ConfirmHeading';
 import CONFIRM_INTRO from '@salesforce/label/c.Core_HealthCheck_ConfirmIntro';

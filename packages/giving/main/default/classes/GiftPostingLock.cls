@@ -220,7 +220,7 @@ public with sharing class GiftPostingLock {
                 continue;
             }
             if (overridden) {
-                overrides.add(describe(gift.Id, Label.Giving_Posting_OverrideDeleted));
+                overrides.add(describe(gift.Id, Label.Giving_Gift_OverrideDeleted));
             } else {
                 gift.addError(refusal);
             }

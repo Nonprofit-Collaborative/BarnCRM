@@ -166,9 +166,11 @@ describe('c-donor-segments', () => {
   it('follows the template and records choices in the default name', async () => {
     const element = await render();
     await choose(element, 'object', 'Account');
-    expect(byId(element, 'name').value).toBe('Lapsed Donors (c.Giving_Segments_Organizations)');
+    expect(byId(element, 'name').value).toBe(
+      'Lapsed Donors (c.Core_HubHome_QuickLinkOrganizations)'
+    );
     await choose(element, 'template', 'new');
-    expect(byId(element, 'name').value).toBe('New Donors (c.Giving_Segments_Organizations)');
+    expect(byId(element, 'name').value).toBe('New Donors (c.Core_HubHome_QuickLinkOrganizations)');
     await choose(element, 'name', 'My own name');
     await choose(element, 'template', 'lapsed');
     expect(byId(element, 'name').value).toBe('My own name');
@@ -260,7 +262,10 @@ describe('c-donor-segments', () => {
     expect(lines[0]).toBe('Email Address,First Name,Last Name,Tags');
     expect(lines).toHaveLength(3);
     expect(lines[1]).toBe('ana@example.org,Ana,Ruiz,Lapsed people');
-    expect(byId(element, 'notice-message').textContent).toContain('c.Giving_Segments_Exported');
+    // One address is shared, so the notice is the one that also counts duplicates left out.
+    expect(byId(element, 'notice-message').textContent).toContain(
+      'c.Giving_Segments_ExportedDuplicates'
+    );
   });
 
   it('stops at the export row limit', async () => {

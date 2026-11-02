@@ -97,30 +97,6 @@
         <value>Snapshot Taken {0}</value>
     </labels>
     <labels>
-        <fullName>Core_FieldUtilization_ViewClose</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: snapshot rows close button</shortDescription>
-        <value>Close</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_ViewColObject</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: snapshot rows kind of record column</shortDescription>
-        <value>Kind of Record</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_ViewColFillRate</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: snapshot rows fill rate column</shortDescription>
-        <value>Fill Rate</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldUtilization_DeleteTitle</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>
@@ -143,14 +119,6 @@
         <protected>false</protected>
         <shortDescription>Field utilization: delete confirm button</shortDescription>
         <value>Delete Snapshot</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_DeleteCancel</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: delete confirm cancel button</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_Deleted</fullName>

@@ -95,7 +95,7 @@ private class VolunteersHealthCheckExtensionTest {
                 'Only that one, counted in the singular'
             );
             Assert.isTrue(
-                ((String) open.get('detail')).endsWith(Label.Volunteers_HealthCheck_FirstListedOne),
+                ((String) open.get('detail')).endsWith(Label.Core_HealthCheck_OrphansLinkedOnly),
                 'One shift is linked, in the singular'
             );
             Assert.areEqual(HealthCheckService.SEVERITY_INFO, open.get('severity'));

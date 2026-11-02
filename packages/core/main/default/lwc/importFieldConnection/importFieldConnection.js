@@ -10,7 +10,7 @@ import SET_UP from '@salesforce/label/c.Core_ImportNewField_SetUpButton';
 import NEEDS_PERMISSION from '@salesforce/label/c.Core_ImportNewField_PanelNeedsPermission';
 import CALLOUTS_OFF from '@salesforce/label/c.Core_ImportNewField_PanelCalloutsOff';
 import ENABLE_STEPS from '@salesforce/label/c.Core_ImportNewField_PanelEnableSteps';
-import CHECK_AGAIN from '@salesforce/label/c.Core_ImportNewField_CheckAgainButton';
+import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import UNEXPECTED from '@salesforce/label/c.Core_UnexpectedError';
 
 /**

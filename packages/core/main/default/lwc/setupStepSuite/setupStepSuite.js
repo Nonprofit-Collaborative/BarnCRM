@@ -8,7 +8,7 @@ import INSTALL_HELP from '@salesforce/label/c.Core_SuiteChoice_InstallHelp';
 import NO_INSTALL_LINK from '@salesforce/label/c.Core_SuiteChoice_NoInstallLink';
 import READ_ABOUT from '@salesforce/label/c.Core_SuiteChoice_ReadAbout';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
-import NEW_TAB from '@salesforce/label/c.Core_SuiteChoice_NewTab';
+import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import STANDARD_NAME from '@salesforce/label/c.Core_SuiteChoice_StandardName';
 import NONPROFIT_NAME from '@salesforce/label/c.Core_SuiteChoice_NonprofitName';
 import CHOSEN_ONCE from '@salesforce/label/c.Core_SuiteChoice_ChosenOnce';

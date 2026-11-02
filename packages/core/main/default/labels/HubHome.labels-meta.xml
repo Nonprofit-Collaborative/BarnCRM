@@ -9,28 +9,12 @@
         <value>BarnCRM automation is paused. Households and greetings are not being updated until it resumes.</value>
     </labels>
     <labels>
-        <fullName>Core_HubHome_ChecklistHeading</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: heading above the setup checklist</shortDescription>
-        <value>Setup Checklist</value>
-    </labels>
-    <labels>
         <fullName>Core_HubHome_ErrorTileHeading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Hub home: heading of the tile counting unreviewed errors</shortDescription>
         <value>Errors to Review</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_ErrorTileLinkLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: link from the error tile to the Error Log tab</shortDescription>
-        <value>Open the Error Log</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_LoadErrorMessage</fullName>
@@ -52,8 +36,8 @@
         <fullName>Core_HubHome_QuickLinkOrganizations</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: quick link to the Organizations tab</shortDescription>
+        <protected>false</protected>
+        <shortDescription>Shared: the word Organizations as a link or heading</shortDescription>
         <value>Organizations</value>
     </labels>
     <labels>
@@ -135,14 +119,6 @@
         <protected>true</protected>
         <shortDescription>Hub home: badge on a nightly job tile that has run before and is now late</shortDescription>
         <value>Overdue</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_ResumeAutomationLink</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: link in the paused automation warning, for administrators</shortDescription>
-        <value>Resume Automation</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_QuickLinkHouseholdsLine</fullName>

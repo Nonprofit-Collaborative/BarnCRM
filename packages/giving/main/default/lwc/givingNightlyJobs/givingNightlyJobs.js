@@ -20,7 +20,7 @@ import RUN_NOW from '@salesforce/label/c.Giving_NightlyJobs_RunNow';
 import RUN_NOW_STARTED from '@salesforce/label/c.Giving_NightlyJobs_RunNowStarted';
 import STALE from '@salesforce/label/c.Giving_NightlyJobs_Stale';
 import READ_ONLY from '@salesforce/label/c.Giving_NightlyJobs_ReadOnly';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_NightlyJobs_UnexpectedError';
+import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Periods_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
 
 /**

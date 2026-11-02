@@ -65,22 +65,6 @@
         <value>Search Objects</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_Object</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Object picker label</shortDescription>
-        <value>Object</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_ChooseObject</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Object picker placeholder</shortDescription>
-        <value>Choose an object</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_NoObjects</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
@@ -151,22 +135,6 @@
         <protected>false</protected>
         <shortDescription>Super Transform: Live count while a condition is unfinished</shortDescription>
         <value>Finish the conditions above to count the records.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_Field</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Field picker label in a change row</shortDescription>
-        <value>Field</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_ChooseField</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Field picker placeholder</shortDescription>
-        <value>Choose a field</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_Action</fullName>
@@ -289,14 +257,6 @@
         <value>no change</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_Blank</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Shown for an empty value in the preview</shortDescription>
-        <value>(blank)</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_Run</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
@@ -335,14 +295,6 @@
         <protected>false</protected>
         <shortDescription>Super Transform: Confirmation button: start</shortDescription>
         <value>Run</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_Cancel</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Confirmation button: do nothing</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_TypeToConfirm</fullName>

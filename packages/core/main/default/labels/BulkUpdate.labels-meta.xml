@@ -9,14 +9,6 @@
         <value>Up to {0} of the confirmed records were not reached, because Salesforce stopped part of the job (often a limit hit by automation on many records at once). They were left as they were. Run a new job over them.</value>
     </labels>
     <labels>
-        <fullName>Core_BulkUpdate_ErrorObject</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal: object cannot be bulk updated; {0} object, {1} reason</shortDescription>
-        <value>{0} cannot be bulk updated: {1}</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkUpdate_ErrorField</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>
@@ -185,28 +177,12 @@
         <value>Bulk update needs the Bulk Update Records and Find and Export Records permissions. Ask your BarnCRM admin.</value>
     </labels>
     <labels>
-        <fullName>Core_BulkUpdate_UnexpectedError</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when something unexpected went wrong; the details are in the Error Log.</shortDescription>
-        <value>Something went wrong. The details are in the Error Log; try again, or ask your BarnCRM admin.</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkUpdate_LogStarted</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk update log: {0} person, {1} time, {2} count, {3} object, {4} confirmed</shortDescription>
         <value>{0} started a bulk update on {1}: {2} {3} matched; {4} confirmed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkUpdate_LogStopped</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Run log: the bulk update stopped; {0} is the reason</shortDescription>
-        <value>Stopped, leaving every record not yet reached as it was: {0}</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_LogFinished</fullName>
@@ -255,14 +231,6 @@
         <protected>false</protected>
         <shortDescription>Heading over the list of changes.</shortDescription>
         <value>Changes</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkUpdate_Field</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Label: the field a change writes.</shortDescription>
-        <value>Field</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_ChooseField</fullName>
@@ -361,22 +329,6 @@
         <value>Record</value>
     </labels>
     <labels>
-        <fullName>Core_BulkUpdate_Before</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Sample column: the value before.</shortDescription>
-        <value>Before</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkUpdate_After</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Sample column: the value after.</shortDescription>
-        <value>After</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkUpdate_Confirm</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>
@@ -433,22 +385,6 @@
         <value>Show everyone's jobs</value>
     </labels>
     <labels>
-        <fullName>Core_BulkUpdate_Refresh</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button: read the recent bulk updates again.</shortDescription>
-        <value>Refresh</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkUpdate_Undo</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button: undo one bulk update.</shortDescription>
-        <value>Undo</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkUpdate_UndoConfirm</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>
@@ -481,28 +417,12 @@
         <value>Can be undone until</value>
     </labels>
     <labels>
-        <fullName>Core_BulkUpdate_Cancel</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button: cancel the undo.</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkUpdate_Close</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Button: close the bulk update panel.</shortDescription>
+        <shortDescription>Shared: button that closes a panel or box</shortDescription>
         <value>Close</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkUpdate_Loading</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Spinner alternative text.</shortDescription>
-        <value>Loading</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_True</fullName>

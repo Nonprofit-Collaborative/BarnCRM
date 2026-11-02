@@ -192,12 +192,4 @@
     <shortDescription>Nightly jobs page: refusal for a user without the permission</shortDescription>
     <value>Scheduling the nightly jobs needs the Manage BarnCRM Settings permission.</value>
   </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_UnexpectedError</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: unexpected failure</shortDescription>
-    <value>Something went wrong. The details are in the Error Log.</value>
-  </labels>
 </CustomLabels>

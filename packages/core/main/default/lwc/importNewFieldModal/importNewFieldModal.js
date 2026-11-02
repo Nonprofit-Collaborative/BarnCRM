@@ -7,7 +7,7 @@ import checkField from '@salesforce/apex/ImportNewFieldController.checkField';
 import findField from '@salesforce/apex/ImportNewFieldController.findField';
 import { apiNameFrom, distinctValues, suggestField } from './fieldSuggestions';
 
-import OBJECT from '@salesforce/label/c.Core_ImportNewField_ObjectField';
+import OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
 import LABEL from '@salesforce/label/c.Core_ImportNewField_LabelField';
 import API_NAME from '@salesforce/label/c.Core_ImportNewField_ApiNameField';
 import API_NAME_HELP from '@salesforce/label/c.Core_ImportNewField_ApiNameHelp';
@@ -19,7 +19,7 @@ import PERMISSION_SET from '@salesforce/label/c.Core_ImportNewField_PermissionSe
 import NO_PERMISSION_SET from '@salesforce/label/c.Core_ImportNewField_NoPermissionSet';
 import ACCESS_NOTE from '@salesforce/label/c.Core_ImportNewField_AccessNote';
 import CREATE from '@salesforce/label/c.Core_ImportNewField_CreateButton';
-import CANCEL from '@salesforce/label/c.Core_ImportNewField_CancelButton';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import REFRESH from '@salesforce/label/c.Core_ImportNewField_RefreshButton';
 import CREATING from '@salesforce/label/c.Core_ImportNewField_Creating';
 import STILL_WAITING from '@salesforce/label/c.Core_ImportNewField_StillWaiting';

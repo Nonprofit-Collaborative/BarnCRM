@@ -85,7 +85,7 @@
         <categories>AccessExplorer</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Access compare: object table heading</shortDescription>
+        <shortDescription>Shared: heading over a list of objects</shortDescription>
         <value>Kinds of Record</value>
     </labels>
     <labels>
@@ -151,14 +151,6 @@
         <protected>false</protected>
         <shortDescription>Modify all report: data-wide table heading</shortDescription>
         <value>Data-Wide Access</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessModifyAll_ObjectsHeading</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Modify all report: object table heading</shortDescription>
-        <value>Kinds of Record</value>
     </labels>
     <labels>
         <fullName>Core_AccessModifyAll_ColViewAllData</fullName>

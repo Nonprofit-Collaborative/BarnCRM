@@ -11,9 +11,9 @@ import SETUP_NOT_RUN from '@salesforce/label/c.Core_ModuleSetup_NotRunNotice';
 
 import STATUS_ON from '@salesforce/label/c.Core_ModuleManager_StatusOn';
 import STATUS_OFF from '@salesforce/label/c.Core_ModuleManager_StatusOff';
-import STATUS_NOT_INSTALLED from '@salesforce/label/c.Core_ModuleManager_StatusNotInstalled';
+import STATUS_NOT_INSTALLED from '@salesforce/label/c.Core_Integrations_NotInstalled';
 import LEARN_MORE from '@salesforce/label/c.Core_SetupAssistant_ModuleLearnMore';
-import NEW_TAB from '@salesforce/label/c.Core_SuiteChoice_NewTab';
+import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import INSTALL from '@salesforce/label/c.Core_SuiteChoice_ModuleInstallLink';
 import NO_INSTALL_LINK from '@salesforce/label/c.Core_ModuleManager_NoInstallLink';
 import TURN_OFF from '@salesforce/label/c.Core_ModuleManager_TurnOffButton';

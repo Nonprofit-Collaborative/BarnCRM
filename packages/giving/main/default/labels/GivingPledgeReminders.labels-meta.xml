@@ -17,14 +17,6 @@
     <value>Sending pledge reminders needs the Send Acknowledgments permission. Ask your BarnCRM admin for the Fundraising Staff role.</value>
   </labels>
   <labels>
-    <fullName>Giving_PledgeReminders_UnexpectedError</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders: an unexpected failure</shortDescription>
-    <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your BarnCRM admin to check it.</value>
-  </labels>
-  <labels>
     <fullName>Giving_PledgeReminders_NoRecipient</fullName>
     <categories>Giving, Pledge Reminders</categories>
     <language>en_US</language>
@@ -47,14 +39,6 @@
     <protected>false</protected>
     <shortDescription>Pledge reminders: reminders that could not go for a missing template {0}</shortDescription>
     <value>{0} pledge reminders could not be sent because their step names an email template that does not exist.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_PledgeReminders_SendFailedUnknown</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders: a send failed with no message</shortDescription>
-    <value>The email could not be sent and Salesforce gave no reason.</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_MergeFileTitle</fullName>
@@ -337,14 +321,6 @@
     <value>Save Step</value>
   </labels>
   <labels>
-    <fullName>Giving_PledgeReminders_CancelStep</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: cancel step</shortDescription>
-    <value>Cancel</value>
-  </labels>
-  <labels>
     <fullName>Giving_PledgeReminders_StepSaved</fullName>
     <categories>Giving, Pledge Reminders</categories>
     <language>en_US</language>
@@ -367,14 +343,6 @@
     <protected>false</protected>
     <shortDescription>Pledge reminders page: empty log</shortDescription>
     <value>No reminders yet.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_PledgeReminders_TemplateMissing</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: a step's template is missing</shortDescription>
-    <value>Template not found</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_Inactive</fullName>
@@ -407,14 +375,6 @@
     <protected>false</protected>
     <shortDescription>Pledge reminders page: column timing</shortDescription>
     <value>When</value>
-  </labels>
-  <labels>
-    <fullName>Giving_PledgeReminders_ColumnChannel</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: column channel</shortDescription>
-    <value>Channel</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_ColumnTemplate</fullName>

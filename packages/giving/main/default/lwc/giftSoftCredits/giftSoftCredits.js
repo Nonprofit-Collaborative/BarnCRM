@@ -11,14 +11,14 @@ import TITLE from '@salesforce/label/c.Giving_SoftCredits_Title';
 import EMPTY from '@salesforce/label/c.Giving_SoftCredits_Empty';
 import ADD from '@salesforce/label/c.Giving_SoftCredits_Add';
 import REMOVE from '@salesforce/label/c.Giving_SoftCredits_Remove';
-import SAVE from '@salesforce/label/c.Giving_SoftCredits_Save';
-import CANCEL from '@salesforce/label/c.Giving_SoftCredits_Cancel';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import AUTOMATIC_BADGE from '@salesforce/label/c.Giving_SoftCredits_AutomaticBadge';
 import AUTOMATIC_HELP from '@salesforce/label/c.Giving_SoftCredits_AutomaticHelp';
 import PERSON_LABEL from '@salesforce/label/c.Giving_SoftCredits_PersonLabel';
 import ROLE_LABEL from '@salesforce/label/c.Giving_SoftCredits_RoleLabel';
 import CUSTOM_ROLE_LABEL from '@salesforce/label/c.Giving_SoftCredits_CustomRoleLabel';
-import AMOUNT_LABEL from '@salesforce/label/c.Giving_SoftCredits_AmountLabel';
+import AMOUNT_LABEL from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
 import ACTION_FAILED from '@salesforce/label/c.Giving_SoftCredits_ActionFailed';
 import { bodyMessage } from 'c/findCsv';
 

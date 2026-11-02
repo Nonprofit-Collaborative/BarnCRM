@@ -89,14 +89,6 @@
         <value>Build Dictionary</value>
     </labels>
     <labels>
-        <fullName>Core_DataDictionary_Download</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: download button</shortDescription>
-        <value>Download CSV</value>
-    </labels>
-    <labels>
         <fullName>Core_DataDictionary_Downloaded</fullName>
         <categories>DataDictionary</categories>
         <language>en_US</language>
@@ -137,14 +129,6 @@
         <value>Choose kinds of record and press Build Dictionary.</value>
     </labels>
     <labels>
-        <fullName>Core_DataDictionary_Yes</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: yes</shortDescription>
-        <value>Yes</value>
-    </labels>
-    <labels>
         <fullName>Core_DataDictionary_No</fullName>
         <categories>DataDictionary</categories>
         <language>en_US</language>
@@ -173,16 +157,8 @@
         <categories>DataDictionary</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data dictionary: column, field label</shortDescription>
+        <shortDescription>Shared: column, field label</shortDescription>
         <value>Field</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_ColApiName</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: column, field API name</shortDescription>
-        <value>API Name</value>
     </labels>
     <labels>
         <fullName>Core_DataDictionary_ColType</fullName>

@@ -209,14 +209,6 @@
         <value>Kept: this record was not created by the person who ran this import while it ran, so the undo left it in place.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_LoadObjectLabel</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: picker for the object a new mapping loads</shortDescription>
-        <value>Object</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_LoadObjectNameLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>

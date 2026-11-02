@@ -17,14 +17,6 @@
         <value>New Relationship</value>
     </labels>
     <labels>
-        <fullName>Core_Relationship_CancelButton</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Relationship card: button that closes the form without saving</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_Relationship_Duplicate</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>
@@ -65,14 +57,6 @@
         <value>No Relationships Yet</value>
     </labels>
     <labels>
-        <fullName>Core_Relationship_FormerBadge</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Relationship card: badge on a relationship that has ended</shortDescription>
-        <value>Former</value>
-    </labels>
-    <labels>
         <fullName>Core_Relationship_LoadFailed</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>
@@ -87,14 +71,6 @@
         <protected>false</protected>
         <shortDescription>Relationship card: what a screen reader hears while the card loads</shortDescription>
         <value>Loading relationships</value>
-    </labels>
-    <labels>
-        <fullName>Core_Relationship_PanelTitle</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Relationship card: the card heading</shortDescription>
-        <value>Relationships</value>
     </labels>
     <labels>
         <fullName>Core_Relationship_PersonAmbiguous</fullName>

@@ -634,7 +634,7 @@ describe('the import wizard', () => {
       Array.from(row.querySelectorAll('[data-id="examples"] div')).map((each) => each.textContent);
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
     expect(examples(rows[0])).toEqual(['Ramirez', 'Okafor']);
-    expect(examples(rows[2])).toEqual(['vip', 'c.Core_Import_ExampleBlank']);
+    expect(examples(rows[2])).toEqual(['vip', 'c.Core_Find_Blank']);
     expect(suggestObject).not.toHaveBeenCalled();
   });
 

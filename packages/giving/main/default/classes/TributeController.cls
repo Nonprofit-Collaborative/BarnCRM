@@ -118,6 +118,6 @@ public with sharing class TributeController {
 
     private static AuraHandledException report(Exception failure, Id recordId) {
         ErrorLogger.log(failure, CONTEXT, recordId);
-        return UserErrors.message(Label.Giving_TributeNotification_ActionFailed);
+        return UserErrors.message(Label.Giving_SoftCredits_ActionFailed);
     }
 }

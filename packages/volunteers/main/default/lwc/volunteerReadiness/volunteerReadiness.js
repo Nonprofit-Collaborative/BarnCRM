@@ -12,9 +12,9 @@ import NOT_CURRENT from '@salesforce/label/c.Volunteers_Readiness_NotCurrent';
 import COMPLETED from '@salesforce/label/c.Volunteers_Readiness_Completed';
 import EXPIRES from '@salesforce/label/c.Volunteers_Readiness_Expires';
 import LOAD_FAILED from '@salesforce/label/c.Volunteers_Readiness_LoadFailed';
-import REFRESH from '@salesforce/label/c.Volunteers_Readiness_Refresh';
+import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import EMPTY from '@salesforce/label/c.Volunteers_Readiness_Empty';
-import LOADING from '@salesforce/label/c.Volunteers_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 /**
  * Volunteer readiness on a person (canonical model R-VQ3): each requirement type's most recently

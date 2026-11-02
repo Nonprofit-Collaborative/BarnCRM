@@ -209,14 +209,6 @@
         <value>Your data model and records as files ready for an AI tool you choose, with sensitive fields left out or masked.</value>
     </labels>
     <labels>
-        <fullName>Core_OrgOptimizer_HealthCheck</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: Health Check section name</shortDescription>
-        <value>Health Check</value>
-    </labels>
-    <labels>
         <fullName>Core_OrgOptimizer_HealthCheckText</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
@@ -353,22 +345,6 @@
         <value>Records BarnCRM keeps for imports, undo and errors. Salesforce counts most records as 2 KB.</value>
     </labels>
     <labels>
-        <fullName>Core_OrgOptimizer_ColumnObject</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: storage column, the kind of record</shortDescription>
-        <value>Kind of Record</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_ColumnRecords</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: storage column, how many records</shortDescription>
-        <value>Records</value>
-    </labels>
-    <labels>
         <fullName>Core_OrgOptimizer_ColumnMB</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
@@ -377,19 +353,11 @@
         <value>About (MB)</value>
     </labels>
     <labels>
-        <fullName>Core_OrgOptimizer_MoreThan</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: a count that stopped at its cap; {0} is the cap</shortDescription>
-        <value>More than {0}</value>
-    </labels>
-    <labels>
         <fullName>Core_OrgOptimizer_Refresh</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Org Optimizer: button that reads the section again</shortDescription>
+        <shortDescription>Shared: button that reads the data again</shortDescription>
         <value>Refresh</value>
     </labels>
     <labels>
@@ -487,14 +455,6 @@
         <protected>false</protected>
         <shortDescription>Org Optimizer: shown when a check could not run</shortDescription>
         <value>Could not check: your access or this org does not allow it.</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_OpenInSetup</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: link to the Setup page for a check</shortDescription>
-        <value>Open in Setup</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_CheckFieldLimit</fullName>

@@ -73,14 +73,6 @@
     <value>Your organization's name, address and logo print above this letter on every document. To change them, change your organization and receipt settings, not the letter.</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_SaveButton</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: button, save the letter</shortDescription>
-    <value>Save</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_UseLetterButton</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
@@ -169,14 +161,6 @@
     <value>Generate</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_RefreshButton</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: button, refresh the runs</shortDescription>
-    <value>Refresh</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_ColumnRun</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
@@ -191,14 +175,6 @@
     <protected>false</protected>
     <shortDescription>Receipts page: column, statement year</shortDescription>
     <value>Year</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_ColumnDonors</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: column, donors processed</shortDescription>
-    <value>Donors</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_ColumnErrors</fullName>

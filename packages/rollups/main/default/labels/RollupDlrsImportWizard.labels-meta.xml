@@ -113,38 +113,6 @@
         <value>Copy Switched Off</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportNext</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS button to the next step</shortDescription>
-        <value>Next</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DlrsImportBack</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS button to the step before</shortDescription>
-        <value>Back</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DlrsImportClose</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS button that leaves the wizard</shortDescription>
-        <value>Close</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DlrsImportFinish</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS button that ends the wizard</shortDescription>
-        <value>Finish</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_DlrsImportCompare</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

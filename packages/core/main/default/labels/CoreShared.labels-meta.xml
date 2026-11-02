@@ -231,14 +231,6 @@
         <value>No settings match that search. Try a shorter word, for example greeting.</value>
     </labels>
     <labels>
-        <fullName>Core_SettingsSearch_Placeholder</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings search: the placeholder inside the search box</shortDescription>
-        <value>Search settings</value>
-    </labels>
-    <labels>
         <fullName>Core_UnexpectedError</fullName>
         <categories>Core</categories>
         <language>en_US</language>

@@ -4,7 +4,7 @@
         <fullName>Core_HouseholdMembersPanel_ActionsFor</fullName>
         <categories>Households</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Member actions menu for a screen reader; {0} is the member name</shortDescription>
         <value>Actions for {0}</value>
     </labels>
@@ -23,14 +23,6 @@
         <protected>true</protected>
         <shortDescription>A person was added to the household</shortDescription>
         <value>Added. The household name and greetings have been brought up to date.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMembersPanel_Cancel</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cancel button</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMembersPanel_Deceased</fullName>
@@ -95,14 +87,6 @@
         <protected>true</protected>
         <shortDescription>Badge for the primary member</shortDescription>
         <value>Primary</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMembersPanel_Save</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Save button</shortDescription>
-        <value>Save</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMembersPanel_Title</fullName>

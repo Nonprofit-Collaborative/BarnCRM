@@ -23,8 +23,8 @@ import NO_FIELDS from '@salesforce/label/c.Core_FieldUtilization_NoFields';
 import NOT_COUNTED from '@salesforce/label/c.Core_FieldUtilization_NotCounted';
 import COMPARED_WITH from '@salesforce/label/c.Core_FieldUtilization_ComparedWith';
 import NEVER_SAVED from '@salesforce/label/c.Core_FieldUtilization_NeverSaved';
-import COL_FIELD from '@salesforce/label/c.Core_FieldUtilization_ColField';
-import COL_API_NAME from '@salesforce/label/c.Core_FieldUtilization_ColApiName';
+import COL_FIELD from '@salesforce/label/c.Core_DataDictionary_ColField';
+import COL_API_NAME from '@salesforce/label/c.Core_AccessExplorer_ColApiName';
 import COL_RECORD_TYPE from '@salesforce/label/c.Core_FieldUtilization_ColRecordType';
 import COL_FILLED from '@salesforce/label/c.Core_FieldUtilization_ColFilled';
 import COL_WITH_VALUE from '@salesforce/label/c.Core_FieldUtilization_ColWithValue';
@@ -45,13 +45,13 @@ import HISTORY_COMPARE from '@salesforce/label/c.Core_FieldUtilization_HistoryCo
 import HISTORY_VIEW from '@salesforce/label/c.Core_FieldUtilization_HistoryView';
 import HISTORY_DELETE from '@salesforce/label/c.Core_FieldUtilization_HistoryDelete';
 import VIEW_TITLE from '@salesforce/label/c.Core_FieldUtilization_ViewTitle';
-import VIEW_CLOSE from '@salesforce/label/c.Core_FieldUtilization_ViewClose';
-import VIEW_COL_OBJECT from '@salesforce/label/c.Core_FieldUtilization_ViewColObject';
-import VIEW_COL_FILL_RATE from '@salesforce/label/c.Core_FieldUtilization_ViewColFillRate';
+import VIEW_CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
+import VIEW_COL_OBJECT from '@salesforce/label/c.Core_AccessExplorer_KindOfRecord';
+import VIEW_COL_FILL_RATE from '@salesforce/label/c.Core_DataDictionary_ColFillRate';
 import DELETE_TITLE from '@salesforce/label/c.Core_FieldUtilization_DeleteTitle';
 import DELETE_CONFIRM from '@salesforce/label/c.Core_FieldUtilization_DeleteConfirm';
 import DELETE_BUTTON from '@salesforce/label/c.Core_FieldUtilization_DeleteButton';
-import DELETE_CANCEL from '@salesforce/label/c.Core_FieldUtilization_DeleteCancel';
+import DELETE_CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import DELETED from '@salesforce/label/c.Core_FieldUtilization_Deleted';
 import { bodyMessage } from 'c/findCsv';
 

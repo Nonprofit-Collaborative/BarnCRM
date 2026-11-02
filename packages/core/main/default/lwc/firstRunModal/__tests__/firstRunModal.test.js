@@ -70,7 +70,7 @@ describe('c-first-run-modal', () => {
       'c.Core_SuiteChoice_NonprofitName'
     ]);
     expect(picker.options.every((option) => option.iconName && option.description)).toBe(true);
-    expect(byId(element, 'finish').label).toBe('c.Core_FirstRun_Finish');
+    expect(byId(element, 'finish').label).toBe('c.Core_ModuleSetup_FinishButton');
   });
 
   it('tells someone who cannot finish that an administrator needs to', async () => {
@@ -88,7 +88,7 @@ describe('c-first-run-modal', () => {
 
     expect(element.disableClose).toBe(false);
     const close = byId(element, 'close');
-    expect(close.label).toBe('c.Core_FirstRun_Close');
+    expect(close.label).toBe('c.Core_BulkUpdate_Close');
     close.click();
     expect(closed).toHaveBeenCalled();
   });

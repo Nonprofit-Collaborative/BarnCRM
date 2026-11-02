@@ -117,7 +117,7 @@
         <categories>Households</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Members panel: placeholder text in the search box, flexible membership mode</shortDescription>
+        <shortDescription>Shared: placeholder in a person or donor search box</shortDescription>
         <value>Search by name</value>
     </labels>
     <labels>

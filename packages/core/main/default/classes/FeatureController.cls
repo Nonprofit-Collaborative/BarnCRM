@@ -85,7 +85,7 @@ public with sharing class FeatureController {
                 return System.Label.Core_Feature_DataManager_Name;
             }
             when 'DuplicateReview' {
-                return System.Label.Core_Feature_DuplicateReview_Name;
+                return System.Label.Core_DuplicateMatching_Title;
             }
             when 'OrgOptimizer' {
                 return System.Label.Core_Feature_OrgOptimizer_Name;

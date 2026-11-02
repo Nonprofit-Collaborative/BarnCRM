@@ -65,14 +65,6 @@
         <value>Automation is running normally</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_CancelButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button that closes the confirm box without running the fix.</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_CategoryAccess</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -215,14 +207,6 @@
         <protected>false</protected>
         <shortDescription>Health Check: unread Error Log entries; {0} is the count</shortDescription>
         <value>The Error Log has {0} new entries. Each one says what went wrong and what to do about it. Work through them, then mark them resolved.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_ErrorLogFix</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button that opens the Error Log from a finding.</shortDescription>
-        <value>Open the Error Log</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ErrorLogTitle</fullName>
@@ -621,7 +605,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Says how many orphan records are linked. {0} number linked.</shortDescription>
+        <shortDescription>Shared: says how many records are linked. {0} number linked.</shortDescription>
         <value>The first {0} are linked below.</value>
     </labels>
     <labels>
@@ -629,7 +613,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Stands in for an orphan count at the cap. {0} the cap.</shortDescription>
+        <shortDescription>Shared: stands in for a count at its cap. {0} the cap.</shortDescription>
         <value>More than {0}</value>
     </labels>
     <labels>
@@ -798,14 +782,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that applies the recommended coexistence mode.</shortDescription>
-        <value>Use Recommended Mode</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_UseRecommendedFix</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Fix button on a coexistence mode finding.</shortDescription>
         <value>Use Recommended Mode</value>
     </labels>
     <labels>

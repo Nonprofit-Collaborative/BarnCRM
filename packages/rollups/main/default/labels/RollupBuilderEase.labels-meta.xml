@@ -777,14 +777,6 @@
         <value>Download Field Package</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_RefreshFields</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder step 1: button that reloads the fields.</shortDescription>
-        <value>Refresh Fields</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_ExplainTitle</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -841,14 +833,6 @@
         <value>The counts and the list include only records you can open; the total includes them all.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_ExplainRefresh</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Explain These Totals: button that reads the totals again.</shortDescription>
-        <value>Refresh</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_TplButton</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -879,14 +863,6 @@
         <protected>false</protected>
         <shortDescription>Starter Templates: opens one rollup in the Builder, prefilled.</shortDescription>
         <value>Open in Builder</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_TplClose</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Starter Templates: closes the panel.</shortDescription>
-        <value>Close</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_TplStarter</fullName>

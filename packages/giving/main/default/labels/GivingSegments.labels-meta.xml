@@ -193,14 +193,6 @@
     <value>People</value>
   </labels>
   <labels>
-    <fullName>Giving_Segments_Organizations</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: the organizations choice</shortDescription>
-    <value>Organizations</value>
-  </labels>
-  <labels>
     <fullName>Giving_Segments_NameField</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>
@@ -329,28 +321,12 @@
     <value>All Columns</value>
   </labels>
   <labels>
-    <fullName>Giving_Segments_Export</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: button that exports the segment</shortDescription>
-    <value>Export</value>
-  </labels>
-  <labels>
     <fullName>Giving_Segments_Exporting</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Segments: progress; {0} is the rows read so far</shortDescription>
     <value>Exporting: {0} rows read.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_Exported</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: export done; {0} is the rows written</shortDescription>
-    <value>Exported {0} rows.</value>
   </labels>
   <labels>
     <fullName>Giving_Segments_ExportedDuplicates</fullName>

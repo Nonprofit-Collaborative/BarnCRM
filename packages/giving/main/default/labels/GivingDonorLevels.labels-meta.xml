@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
   <labels>
-    <fullName>Giving_DonorLevels_Title</fullName>
-    <categories>Giving, Donor Levels</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Donor levels page: heading</shortDescription>
-    <value>Donor Levels</value>
-  </labels>
-  <labels>
     <fullName>Giving_DonorLevels_Intro</fullName>
     <categories>Giving, Donor Levels</categories>
     <language>en_US</language>

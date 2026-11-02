@@ -20,10 +20,10 @@ import IS_DEFAULT_FIELD from '@salesforce/schema/Address__c.Is_Default__c';
 import STATUS_FIELD from '@salesforce/schema/Address__c.Status__c';
 import END_DATE_FIELD from '@salesforce/schema/Address__c.End_Date__c';
 
-import PANEL_TITLE from '@salesforce/label/c.Core_Address_PanelTitle';
+import PANEL_TITLE from '@salesforce/label/c.Core_Feature_Addresses_Name';
 import ADD_BUTTON from '@salesforce/label/c.Core_Address_AddButton';
 import ADD_FORM_TITLE from '@salesforce/label/c.Core_Address_AddFormTitle';
-import CANCEL_BUTTON from '@salesforce/label/c.Core_Address_CancelButton';
+import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import DEFAULT_BADGE from '@salesforce/label/c.Core_Address_DefaultBadge';
 import EMPTY_MESSAGE from '@salesforce/label/c.Core_Address_Empty';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Address_EmptyHeading';

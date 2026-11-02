@@ -42,7 +42,7 @@ jest.mock(
   }
 );
 jest.mock(
-  '@salesforce/label/c.Giving_PledgeReminders_TemplateMissing',
+  '@salesforce/label/c.Giving_Acknowledgments_TemplateNotFound',
   () => ({ default: 'Template not found' }),
   { virtual: true }
 );

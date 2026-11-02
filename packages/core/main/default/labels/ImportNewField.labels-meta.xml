@@ -153,14 +153,6 @@
         <value>Organization (Account)</value>
     </labels>
     <labels>
-        <fullName>Core_ImportNewField_ObjectField</fullName>
-        <categories>Import New Field</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>New field form: object</shortDescription>
-        <value>Object</value>
-    </labels>
-    <labels>
         <fullName>Core_ImportNewField_LabelField</fullName>
         <categories>Import New Field</categories>
         <language>en_US</language>
@@ -247,14 +239,6 @@
         <protected>false</protected>
         <shortDescription>New field dialog: create button</shortDescription>
         <value>Create Field</value>
-    </labels>
-    <labels>
-        <fullName>Core_ImportNewField_CancelButton</fullName>
-        <categories>Import New Field</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>New field dialog: cancel button</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Core_ImportNewField_RefreshButton</fullName>
@@ -487,13 +471,5 @@
         <protected>false</protected>
         <shortDescription>Connection panel: turn on callouts steps</shortDescription>
         <value>Salesforce creates the connection with callouts off, and only an administrator can turn them on. In Setup, open Named Credentials from Quick Find, select BarnCRM: this org, then Edit. Turn on Enabled for Callouts and select Save. Then select Check Again here.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ImportNewField_CheckAgainButton</fullName>
-        <categories>Import New Field</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Connection panel: check again button</shortDescription>
-        <value>Check Again</value>
     </labels>
 </CustomLabels>

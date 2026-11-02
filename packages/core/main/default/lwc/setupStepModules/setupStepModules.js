@@ -1,10 +1,10 @@
 import { LightningElement, api } from 'lwc';
 import PRESENT from '@salesforce/label/c.Core_SetupAssistant_ModulePresent';
-import ABSENT from '@salesforce/label/c.Core_SetupAssistant_ModuleAbsent';
+import ABSENT from '@salesforce/label/c.Core_Integrations_NotInstalled';
 import LEARN_MORE from '@salesforce/label/c.Core_SetupAssistant_ModuleLearnMore';
 import MANAGER_NOTICE from '@salesforce/label/c.Core_SetupAssistant_ModuleManagerNotice';
 import INSTALL from '@salesforce/label/c.Core_SuiteChoice_ModuleInstallLink';
-import NEW_TAB from '@salesforce/label/c.Core_SuiteChoice_NewTab';
+import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import INSTALL_FIRST from '@salesforce/label/c.Core_ModuleManager_InstallFirst';
 import STAFF_TABS from '@salesforce/label/c.Core_SetupAssistant_ModuleStaffTabs';
 import ADMIN_TABS from '@salesforce/label/c.Core_SetupAssistant_ModuleAdminTabs';

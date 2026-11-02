@@ -17,14 +17,6 @@
         <value>New Address</value>
     </labels>
     <labels>
-        <fullName>Core_Address_CancelButton</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: button that closes the new address form</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_Address_CannotUntickOnlyDefault</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
@@ -111,14 +103,6 @@
         <protected>false</protected>
         <shortDescription>Address panel: the household chosen is not one the person belongs to</shortDescription>
         <value>This person is not a current member of that household, so nothing was changed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_PanelTitle</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: card heading</shortDescription>
-        <value>Addresses</value>
     </labels>
     <labels>
         <fullName>Core_Address_PropagationFailed</fullName>

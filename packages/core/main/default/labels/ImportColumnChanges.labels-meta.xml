@@ -33,14 +33,6 @@
         <value>Changes run in order, before the values are matched or saved, and are saved with the template.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_ChangesAdd</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: adds a change to a column</shortDescription>
-        <value>Add a Change</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_ChangesKind</fullName>
         <categories>Import</categories>
         <language>en_US</language>

@@ -115,12 +115,12 @@ public with sharing class HealthCheckGivingChecks {
                     HealthCheckService.SEVERITY_INFO,
                     HealthCheckService.CATEGORY_SETTINGS
                 )
-                .withFix(Label.Giving_HealthCheck_ErrorLogFix, ErrorLogCountSelector.listViewUrl());
+                .withFix(Label.Core_ErrorLogTile_ViewAll, ErrorLogCountSelector.listViewUrl());
         }
 
         String counted = failures.capped == true
             ? String.format(
-                  Label.Giving_HealthCheck_ReceiptFailedMoreThan,
+                  Label.Core_HealthCheck_OrphansMoreThan,
                   new List<Object>{ failures.count.format() }
               )
             : String.valueOf(failures.count);
@@ -132,7 +132,7 @@ public with sharing class HealthCheckGivingChecks {
                 HealthCheckService.SEVERITY_WARNING,
                 HealthCheckService.CATEGORY_SETTINGS
             )
-            .withFix(Label.Giving_HealthCheck_ErrorLogFix, ErrorLogCountSelector.listViewUrl());
+            .withFix(Label.Core_ErrorLogTile_ViewAll, ErrorLogCountSelector.listViewUrl());
     }
 
     /**
@@ -202,7 +202,7 @@ public with sharing class HealthCheckGivingChecks {
 
         String counted = count > countCap
             ? String.format(
-                  Label.Giving_HealthCheck_UnpostedClosedPeriodMoreThan,
+                  Label.Core_HealthCheck_OrphansMoreThan,
                   new List<Object>{ countCap.format() }
               )
             : count.format();
@@ -212,7 +212,7 @@ public with sharing class HealthCheckGivingChecks {
             text +=
                 ' ' +
                 String.format(
-                    Label.Giving_HealthCheck_UnpostedClosedPeriodFirstListed,
+                    Label.Core_HealthCheck_OrphansFirstListed,
                     new List<Object>{ String.valueOf(first.size()) }
                 );
         }

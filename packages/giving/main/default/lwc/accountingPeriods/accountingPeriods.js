@@ -6,7 +6,7 @@ import TITLE from '@salesforce/label/c.Giving_Periods_Title';
 import INTRO from '@salesforce/label/c.Giving_Periods_Intro';
 import CLOSED_THROUGH_HEADING from '@salesforce/label/c.Giving_Periods_ClosedThroughHeading';
 import NOT_CLOSED from '@salesforce/label/c.Giving_Periods_NotClosed';
-import SAVE_BUTTON from '@salesforce/label/c.Giving_Periods_SaveButton';
+import SAVE_BUTTON from '@salesforce/label/c.Core_Kit_Save';
 import SAVED from '@salesforce/label/c.Giving_Periods_Saved';
 import REOPEN_NOTE from '@salesforce/label/c.Giving_Periods_ReopenNote';
 import READ_ONLY from '@salesforce/label/c.Giving_Periods_ReadOnly';

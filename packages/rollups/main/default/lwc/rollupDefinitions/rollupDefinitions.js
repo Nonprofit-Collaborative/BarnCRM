@@ -23,7 +23,6 @@ import INTRO from '@salesforce/label/c.Core_Rollups_PageIntro';
 import COLUMN_ROLLUP from '@salesforce/label/c.Core_Rollups_ColumnRollup';
 import COLUMN_COUNTS from '@salesforce/label/c.Core_Rollups_ColumnCounts';
 import COUNTS_SEPARATED_BY from '@salesforce/label/c.Core_Rollups_CountsSeparatedBy';
-import COLUMN_TARGET from '@salesforce/label/c.Core_Rollups_ColumnTarget';
 import COLUMN_MODE from '@salesforce/label/c.Core_Rollups_ColumnMode';
 import COLUMN_ACTIVE from '@salesforce/label/c.Core_Rollups_ColumnActive';
 import COLUMN_LAST_CALCULATED from '@salesforce/label/c.Core_Rollups_ColumnLastCalculated';
@@ -44,20 +43,18 @@ import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import NEW_ROLLUP from '@salesforce/label/c.Core_RollupBuilder_New';
 import EDIT from '@salesforce/label/c.Core_RollupBuilder_Edit';
 import COPY from '@salesforce/label/c.Core_RollupBuilder_Copy';
-import OPEN_BUILDER from '@salesforce/label/c.Core_RollupBuilder_Open';
+import OPEN_BUILDER from '@salesforce/label/c.Core_HealthCheck_TwoToolsFix';
 import WORKING_HOURS from '@salesforce/label/c.Core_RollupBuilder_EstimateWorkingHours';
 import START_NOW from '@salesforce/label/c.Core_RollupBuilder_StartNow';
 import RUN_TONIGHT from '@salesforce/label/c.Core_RollupBuilder_RunTonight';
-import CANCEL from '@salesforce/label/c.Core_RollupBuilder_Cancel';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import DELETE_ROLLUP from '@salesforce/label/c.Core_RollupBuilder_Delete';
-import DELETE_TITLE from '@salesforce/label/c.Core_RollupBuilder_DeleteTitle';
-import DELETE_CONFIRM from '@salesforce/label/c.Core_RollupBuilder_DeleteConfirm';
 import DELETE_SHIPPED from '@salesforce/label/c.Core_RollupBuilder_DeleteShipped';
 import DELETED from '@salesforce/label/c.Core_RollupBuilder_Deleted';
 import EXPORT_ROLLUPS from '@salesforce/label/c.Core_RollupBuilder_Export';
 import EXPORT_SELECT from '@salesforce/label/c.Core_RollupBuilder_ExportSelect';
 import IMPORT_FILE from '@salesforce/label/c.Core_RollupBuilder_ImportFile';
-import IMPORT_COLUMN from '@salesforce/label/c.Core_RollupBuilder_ImportColumn';
+import IMPORT_COLUMN from '@salesforce/label/c.Core_EraseAction_ColumnAction';
 import IMPORT_APPLY from '@salesforce/label/c.Core_RollupBuilder_ImportApply';
 import IMPORT_DONE from '@salesforce/label/c.Core_RollupBuilder_ImportDone';
 import IMPORT_WILL_CREATE from '@salesforce/label/c.Core_RollupBuilder_ImportWillCreate';
@@ -142,8 +139,6 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     runTonight: RUN_TONIGHT,
     cancel: CANCEL,
     deleteRollup: DELETE_ROLLUP,
-    deleteTitle: DELETE_TITLE,
-    deleteConfirm: DELETE_CONFIRM,
     deleteShipped: DELETE_SHIPPED,
     deleted: DELETED,
     exportRollups: EXPORT_ROLLUPS,
@@ -156,7 +151,6 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     columnRollup: COLUMN_ROLLUP,
     columnCounts: COLUMN_COUNTS,
     countsSeparatedBy: COUNTS_SEPARATED_BY,
-    columnTarget: COLUMN_TARGET,
     columnMode: COLUMN_MODE,
     columnActive: COLUMN_ACTIVE,
     columnLastCalculated: COLUMN_LAST_CALCULATED,

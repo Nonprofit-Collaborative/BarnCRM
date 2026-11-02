@@ -105,30 +105,6 @@
         <value>If the value</value>
     </labels>
     <labels>
-        <fullName>Core_Import_StepsTestEquals</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>If then: the value equals the text</shortDescription>
-        <value>equals</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_StepsTestContains</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>If then: the value contains the text</shortDescription>
-        <value>contains</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_StepsTestBlank</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>If then: the value is empty</shortDescription>
-        <value>is empty</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_StepsTestText</fullName>
         <categories>Import</categories>
         <language>en_US</language>

@@ -14,10 +14,9 @@ import HEADING from '@salesforce/label/c.Core_SetupAssistant_Heading';
 import DONE_BADGE from '@salesforce/label/c.Core_SetupAssistant_DoneBadge';
 import TODO_BADGE from '@salesforce/label/c.Core_SetupAssistant_ToDoBadge';
 import SKIPPED_BADGE from '@salesforce/label/c.Core_SetupAssistant_SkippedBadge';
-import NEXT from '@salesforce/label/c.Core_SetupAssistant_NextButton';
+import NEXT from '@salesforce/label/c.Core_Import_NextButton';
 import SKIP from '@salesforce/label/c.Core_SetupAssistant_SkipButton';
 import FINISH from '@salesforce/label/c.Core_SetupAssistant_FinishButton';
-import SAVE from '@salesforce/label/c.Core_SetupAssistant_SaveButton';
 import READ_ONLY from '@salesforce/label/c.Core_SetupAssistant_ReadOnlyNotice';
 import RULE_SETTING from '@salesforce/label/c.Core_SetupAssistant_RuleSetting';
 import RULE_ACTION from '@salesforce/label/c.Core_SetupAssistant_RuleAction';
@@ -26,11 +25,11 @@ import COMPLETE_HEADING from '@salesforce/label/c.Core_SetupAssistant_CompleteHe
 import ELAPSED from '@salesforce/label/c.Core_SetupAssistant_ElapsedLabel';
 import REOPEN from '@salesforce/label/c.Core_SetupAssistant_ReopenButton';
 import USER_LABEL from '@salesforce/label/c.Core_SetupAssistant_UserLabel';
-import ROLE_LABEL from '@salesforce/label/c.Core_SetupAssistant_RoleLabel';
-import GIVE_ACCESS from '@salesforce/label/c.Core_SetupAssistant_GiveAccessButton';
+import ROLE_LABEL from '@salesforce/label/c.Core_Access_RoleLabel';
+import GIVE_ACCESS from '@salesforce/label/c.Core_Access_AddButton';
 import ACCESS_GRANTED from '@salesforce/label/c.Core_SetupAssistant_AccessGrantedMessage';
-import CREATE_USER from '@salesforce/label/c.Core_SetupAssistant_CreateUserLink';
-import AUTOMATIC_ACCESS from '@salesforce/label/c.Core_SetupAssistant_AutomaticAccessLink';
+import CREATE_USER from '@salesforce/label/c.Core_Access_CreateUserLink';
+import AUTOMATIC_ACCESS from '@salesforce/label/c.Core_Access_AutomaticAccessLink';
 import LOAD_SAMPLE from '@salesforce/label/c.Core_SetupAssistant_LoadSampleButton';
 import IMPORT_BUTTON from '@salesforce/label/c.Core_SetupAssistant_ImportButton';
 import IMPORT_MISSING from '@salesforce/label/c.Core_SetupAssistant_ImportMissingNotice';
@@ -87,7 +86,6 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     next: NEXT,
     skip: SKIP,
     finish: FINISH,
-    save: SAVE,
     readOnly: READ_ONLY,
     completeHeading: COMPLETE_HEADING,
     elapsed: ELAPSED,

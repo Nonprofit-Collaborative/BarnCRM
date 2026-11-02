@@ -87,7 +87,7 @@ public with sharing class SeasonalAddressBatch implements Database.Batchable<SOb
         SeasonalAddressService.recordRun(this.summary, System.now());
         JobNotifier.aboutSettings(
             this.notifyUserId,
-            System.Label.Core_JobNotice_SeasonalAddress,
+            System.Label.Core_HealthCheck_JobSeasonalAddresses,
             false,
             this.summary.text(),
             JobNotifier.SECTION_ADDRESSES

@@ -41,14 +41,6 @@
         <value>Condition {0}</value>
     </labels>
     <labels>
-        <fullName>Core_Filter_Field</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Label of the field picker in a filter condition.</shortDescription>
-        <value>Field</value>
-    </labels>
-    <labels>
         <fullName>Core_Filter_FieldOn</fullName>
         <categories>Filter</categories>
         <language>en_US</language>
@@ -63,14 +55,6 @@
         <protected>false</protected>
         <shortDescription>Field picker option that opens a lookup's own fields. {0} is the lookup.</shortDescription>
         <value>{0}: more fields</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ChooseField</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Placeholder of the field picker in a filter condition.</shortDescription>
-        <value>Choose a field</value>
     </labels>
     <labels>
         <fullName>Core_Filter_Operator</fullName>
@@ -127,22 +111,6 @@
         <protected>false</protected>
         <shortDescription>Right list heading of the picklist value chooser in a filter.</shortDescription>
         <value>Chosen</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_True</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Checkbox value True in a filter condition.</shortDescription>
-        <value>True</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_False</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Checkbox value False in a filter condition.</shortDescription>
-        <value>False</value>
     </labels>
     <labels>
         <fullName>Core_Filter_UseLogic</fullName>

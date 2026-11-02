@@ -27,7 +27,7 @@ import CONFIRM from '@salesforce/label/c.Core_EraseAction_Confirm';
 import ERASE from '@salesforce/label/c.Core_EraseAction_Erase';
 import DONE from '@salesforce/label/c.Core_EraseAction_Done';
 import OPEN_AUDIT from '@salesforce/label/c.Core_EraseAction_OpenAudit';
-import CLOSE from '@salesforce/label/c.Core_EraseAction_Close';
+import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import NO_PERMISSION from '@salesforce/label/c.Core_Erase_NoPermission';
 
 const ACTION_LABELS = {

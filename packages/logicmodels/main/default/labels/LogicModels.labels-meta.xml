@@ -65,30 +65,6 @@
         <value>Change</value>
     </labels>
     <labels>
-        <fullName>LogicModels_Builder_Save</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Save button</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Builder_Cancel</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cancel button</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Builder_Add</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Add button</shortDescription>
-        <value>Add</value>
-    </labels>
-    <labels>
         <fullName>LogicModels_Builder_AddTo</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>
@@ -135,14 +111,6 @@
         <protected>true</protected>
         <shortDescription>Description field</shortDescription>
         <value>Description</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Builder_Column</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Column a part sits in</shortDescription>
-        <value>Column</value>
     </labels>
     <labels>
         <fullName>LogicModels_Builder_EmptyColumn</fullName>
@@ -279,14 +247,6 @@
         <protected>true</protected>
         <shortDescription>Second period with the same dates refused</shortDescription>
         <value>This indicator already has a period with these dates. Change that row instead.</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Builder_Loading</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Spinner text</shortDescription>
-        <value>Loading</value>
     </labels>
     <labels>
         <fullName>LogicModels_Stage_Input</fullName>

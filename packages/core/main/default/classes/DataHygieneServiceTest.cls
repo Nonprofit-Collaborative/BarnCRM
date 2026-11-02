@@ -509,7 +509,7 @@ private class DataHygieneServiceTest {
         System.runAs(TestUsers.admin()) {
             Assert.areEqual(
                 String.format(
-                    System.Label.Core_DataHygiene_MoreThan,
+                    System.Label.Core_HealthCheck_OrphansMoreThan,
                     new List<Object>{ DataHygieneService.COUNT_CAP.format() }
                 ),
                 DataHygieneService.countLabel(DataHygieneService.COUNT_CAP + 1),

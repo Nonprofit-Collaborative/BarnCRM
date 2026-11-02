@@ -247,7 +247,7 @@ public with sharing class PledgeReminderService {
             return Database.executeBatch(new PledgeReminderBatch(), PledgeReminderBatch.SCOPE);
         } catch (Exception queueFailure) {
             ErrorLogger.log(queueFailure, CONTEXT_START);
-            throw new PledgeReminderException(Label.Giving_PledgeReminders_UnexpectedError);
+            throw new PledgeReminderException(Label.Giving_Stewardship_ErrorActionFailed);
         }
     }
 
@@ -441,7 +441,7 @@ public with sharing class PledgeReminderService {
                 row.Status__c = STATUS_FAILED;
                 row.Failure_Reason__c = AcknowledgmentService.failureReasonOf(
                     outcome,
-                    Label.Giving_PledgeReminders_SendFailedUnknown
+                    Label.Giving_Acknowledgment_SendFailedUnknown
                 );
                 // The key goes, so the next run tries this reminder again while it is recent.
                 row.Reminder_Key__c = null;
@@ -474,7 +474,7 @@ public with sharing class PledgeReminderService {
                     Status__c = row.Status__c,
                     Sent_On__c = row.Sent_On__c,
                     Reminder_Key__c = row.Reminder_Key__c,
-                    Failure_Reason__c = sent ? null : Label.Giving_PledgeReminders_SendFailedUnknown
+                    Failure_Reason__c = sent ? null : Label.Giving_Acknowledgment_SendFailedUnknown
                 )
             );
         }

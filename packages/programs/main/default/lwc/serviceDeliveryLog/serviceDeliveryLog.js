@@ -9,7 +9,7 @@ import ATTENDANCE from '@salesforce/label/c.Programs_Log_Attendance';
 import QUANTITY from '@salesforce/label/c.Programs_Log_Quantity';
 import NOT_RECORDED from '@salesforce/label/c.Programs_Log_NotRecorded';
 import MARK_ALL_PRESENT from '@salesforce/label/c.Programs_Log_MarkAllPresent';
-import SAVE from '@salesforce/label/c.Programs_Log_Save';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import SAVED from '@salesforce/label/c.Programs_Log_Saved';
 import SAVED_ONE from '@salesforce/label/c.Programs_Log_SavedOne';
 import NOTHING_TO_SAVE from '@salesforce/label/c.Programs_Log_NothingToSave';

@@ -157,7 +157,7 @@ public with sharing class HealthCheckOrgShapeChecks {
                     HealthCheckService.CATEGORY_ORG_SHAPE
                 )
                 .withFix(
-                    System.Label.Core_HealthCheck_UseRecommendedFix,
+                    System.Label.Core_HealthCheck_UseRecommendedButton,
                     HealthCheckService.FIX_APPLY_RECOMMENDED_MODE
                 );
         }
@@ -178,7 +178,7 @@ public with sharing class HealthCheckOrgShapeChecks {
                     HealthCheckService.CATEGORY_ORG_SHAPE
                 )
                 .withFix(
-                    System.Label.Core_HealthCheck_UseRecommendedFix,
+                    System.Label.Core_HealthCheck_UseRecommendedButton,
                     HealthCheckService.FIX_APPLY_RECOMMENDED_MODE
                 );
         }

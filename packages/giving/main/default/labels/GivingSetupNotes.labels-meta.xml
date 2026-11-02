@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Giving_SetupNote_Email_Steps</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, Acknowledgments: clicks in Setup, separated by |</shortDescription>
-        <value>Under Access to Send Email, set Access level to All email.|Click Save.|Come back here and click Check Again.</value>
-    </labels>
-    <labels>
         <fullName>Giving_SetupNote_Email_What</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

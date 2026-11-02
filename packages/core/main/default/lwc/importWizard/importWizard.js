@@ -25,7 +25,7 @@ import severalMatchingHelp from '@salesforce/label/c.Core_Import_SeveralMatching
 import sheetOption from '@salesforce/label/c.Core_Import_SheetOption';
 import sheetConflict from '@salesforce/label/c.Core_Import_SheetConflict';
 import sheetObject from '@salesforce/label/c.Core_Import_SheetObject';
-import exampleBlank from '@salesforce/label/c.Core_Import_ExampleBlank';
+import exampleBlank from '@salesforce/label/c.Core_Find_Blank';
 import detectFileLabel from '@salesforce/label/c.Core_Import_DetectFileLabel';
 import detectSuggested from '@salesforce/label/c.Core_Import_DetectSuggested';
 import detectNone from '@salesforce/label/c.Core_Import_DetectNone';
@@ -110,8 +110,8 @@ import matchingRuleLabel from '@salesforce/label/c.Core_Import_MatchingRuleLabel
 import matchingEmailHelp from '@salesforce/label/c.Core_Import_MatchingEmailHelp';
 import matchingNamePostalHelp from '@salesforce/label/c.Core_Import_MatchingNamePostalHelp';
 import matchingExternalIdHelp from '@salesforce/label/c.Core_Import_MatchingExternalIdHelp';
-import readOnlyMessage from '@salesforce/label/c.Core_Import_ReadOnlyMessage';
-import loadingAltText from '@salesforce/label/c.Core_Import_LoadingAltText';
+import readOnlyMessage from '@salesforce/label/c.Core_Import_ErrorNoPermission';
+import loadingAltText from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import parsingMessage from '@salesforce/label/c.Core_Import_ParsingMessage';
 import noHeaderRow from '@salesforce/label/c.Core_Import_NoHeaderRow';
 import xlsxUnreadable from '@salesforce/label/c.Core_Import_XlsxUnreadable';
@@ -143,7 +143,7 @@ import organizationMatchFieldLabel from '@salesforce/label/c.Core_Import_Organiz
 import noMatchFields from '@salesforce/label/c.Core_Import_NoMatchFields';
 import matchFieldNotMapped from '@salesforce/label/c.Core_Import_MatchFieldNotMapped';
 import severalMatchesLabel from '@salesforce/label/c.Core_Import_SeveralMatchesLabel';
-import severalRejectOption from '@salesforce/label/c.Core_Import_SeveralRejectOption';
+import severalRejectOption from '@salesforce/label/c.Core_Import_LookupRejectOption';
 import severalRecentOption from '@salesforce/label/c.Core_Import_SeveralRecentOption';
 import severalRejectHelp from '@salesforce/label/c.Core_Import_SeveralRejectHelp';
 import severalRecentHelp from '@salesforce/label/c.Core_Import_SeveralRecentHelp';
@@ -156,7 +156,7 @@ import fileValueLabel from '@salesforce/label/c.Core_Import_FileValueLabel';
 import targetFirstPersonField from '@salesforce/label/c.Core_Import_TargetFirstPersonField';
 import targetSecondPersonField from '@salesforce/label/c.Core_Import_TargetSecondPersonField';
 import targetOrganizationField from '@salesforce/label/c.Core_Import_TargetOrganizationField';
-import recordIdFieldName from '@salesforce/label/c.Core_Import_RecordIdFieldName';
+import recordIdFieldName from '@salesforce/label/c.Core_Import_RecordIdOption';
 import matchOnlyLabel from '@salesforce/label/c.Core_Import_MatchOnlyLabel';
 import matchOnlyHelp from '@salesforce/label/c.Core_Import_MatchOnlyHelp';
 import stepKind from '@salesforce/label/c.Core_Import_StepKind';
@@ -184,7 +184,7 @@ import {
   firstTemplateOfKind,
   createsText
 } from './importKinds';
-import loadObjectLabel from '@salesforce/label/c.Core_Import_LoadObjectLabel';
+import loadObjectLabel from '@salesforce/label/c.Core_MatchLogic_Object';
 import loadObjectNameLabel from '@salesforce/label/c.Core_Import_LoadObjectNameLabel';
 import loadObjectCreateButton from '@salesforce/label/c.Core_Import_LoadObjectCreateButton';
 import lookupFieldLabel from '@salesforce/label/c.Core_Import_LookupFieldLabel';

@@ -17,11 +17,11 @@ import productionWarning from '@salesforce/label/c.Core_SampleData_ProductionWar
 import statusLoaded from '@salesforce/label/c.Core_SampleData_StatusLoaded';
 import statusNotLoaded from '@salesforce/label/c.Core_SampleData_StatusNotLoaded';
 import statusRemoving from '@salesforce/label/c.Core_SampleData_StatusRemoving';
-import statusLoading from '@salesforce/label/c.Core_SampleData_StatusLoading';
-import loadingAltText from '@salesforce/label/c.Core_SampleData_LoadingAltText';
-import householdsLabel from '@salesforce/label/c.Core_SampleData_HouseholdsLabel';
+import statusLoading from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import loadingAltText from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import householdsLabel from '@salesforce/label/c.Core_HubHome_QuickLinkHouseholds';
 import contactsLabel from '@salesforce/label/c.Core_SampleData_ContactsLabel';
-import organizationsLabel from '@salesforce/label/c.Core_SampleData_OrganizationsLabel';
+import organizationsLabel from '@salesforce/label/c.Core_HubHome_QuickLinkOrganizations';
 import relationshipsLabel from '@salesforce/label/c.Core_SampleData_RelationshipsLabel';
 import affiliationsLabel from '@salesforce/label/c.Core_SampleData_AffiliationsLabel';
 import readOnlyMessage from '@salesforce/label/c.Core_SampleData_ReadOnlyMessage';
@@ -30,7 +30,7 @@ import removeSuccess from '@salesforce/label/c.Core_SampleData_RemoveSuccess';
 import loadError from '@salesforce/label/c.Core_SampleData_LoadError';
 import removeError from '@salesforce/label/c.Core_SampleData_RemoveError';
 import statusError from '@salesforce/label/c.Core_SampleData_StatusError';
-import cancelButtonLabel from '@salesforce/label/c.Core_SampleData_CancelButton';
+import cancelButtonLabel from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import confirmButtonLabel from '@salesforce/label/c.Core_SampleData_ConfirmButton';
 import junctionModeNote from '@salesforce/label/c.Core_SampleData_JunctionModeNote';
 

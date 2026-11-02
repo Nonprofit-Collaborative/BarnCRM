@@ -30,7 +30,7 @@ import KIND_PROFILE from '@salesforce/label/c.Core_AccessExplorer_KindProfile';
 import KIND_GROUP from '@salesforce/label/c.Core_AccessExplorer_KindGroup';
 import KIND_SET from '@salesforce/label/c.Core_AccessExplorer_KindSet';
 import SOURCES_HEADING from '@salesforce/label/c.Core_AccessExplorer_SourcesHeading';
-import OBJECTS_HEADING from '@salesforce/label/c.Core_AccessExplorer_ObjectsHeading';
+import OBJECTS_HEADING from '@salesforce/label/c.Core_AccessCompare_KindsHeading';
 import FIELD_ACCESS_FOR from '@salesforce/label/c.Core_AccessExplorer_FieldAccessFor';
 import FIELDS_HEADING from '@salesforce/label/c.Core_AccessExplorer_FieldsHeading';
 import VIEW_ALL_DATA_NOTE from '@salesforce/label/c.Core_AccessExplorer_ViewAllDataNote';

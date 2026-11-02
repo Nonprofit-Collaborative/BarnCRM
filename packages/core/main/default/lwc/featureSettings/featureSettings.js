@@ -9,7 +9,7 @@ import ON from '@salesforce/label/c.Core_Feature_On';
 import OFF from '@salesforce/label/c.Core_Feature_Off';
 import CONFIRM_TITLE from '@salesforce/label/c.Core_Feature_ConfirmTitle';
 import CONFIRM_MESSAGE from '@salesforce/label/c.Core_Feature_ConfirmMessage';
-import CANCEL from '@salesforce/label/c.Core_Feature_Cancel';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import TURNED_ON from '@salesforce/label/c.Core_Feature_TurnedOn';
 
 /**

@@ -2,7 +2,7 @@ import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import USER_ID from '@salesforce/user/Id';
 import UPLOAD_HELP from '@salesforce/label/c.Core_SetupAssistant_UploadHelp';
-import SAVE from '@salesforce/label/c.Core_SetupAssistant_SaveButton';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
 
 const FILE_URL = '/sfc/servlet.shepherd/document/download/';
 const TEXT = 'Text';

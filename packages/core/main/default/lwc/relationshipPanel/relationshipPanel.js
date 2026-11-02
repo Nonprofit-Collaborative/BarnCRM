@@ -6,13 +6,13 @@ import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 
 import RELATIONSHIP_SCHEMA from '@salesforce/schema/Relationship__c';
 
-import PANEL_TITLE from '@salesforce/label/c.Core_Relationship_PanelTitle';
+import PANEL_TITLE from '@salesforce/label/c.Core_Feature_Relationships_Name';
 import ADD_BUTTON from '@salesforce/label/c.Core_Relationship_AddButton';
 import ADD_FORM_TITLE from '@salesforce/label/c.Core_Relationship_AddFormTitle';
-import CANCEL_BUTTON from '@salesforce/label/c.Core_Relationship_CancelButton';
+import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import EMPTY_MESSAGE from '@salesforce/label/c.Core_Relationship_Empty';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Relationship_EmptyHeading';
-import FORMER_BADGE from '@salesforce/label/c.Core_Relationship_FormerBadge';
+import FORMER_BADGE from '@salesforce/label/c.Core_Affiliation_FormerBadge';
 import LOAD_FAILED from '@salesforce/label/c.Core_Relationship_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_Relationship_Loading';
 import REMOVE_BUTTON from '@salesforce/label/c.Core_Relationship_RemoveButton';

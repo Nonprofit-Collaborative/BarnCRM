@@ -97,14 +97,6 @@
         <value>Continue</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_DeleteCancel</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: button that closes the delete warning box</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_DataManager_OptimizerTitle</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>

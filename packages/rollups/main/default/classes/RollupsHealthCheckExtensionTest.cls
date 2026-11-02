@@ -310,7 +310,7 @@ private class RollupsHealthCheckExtensionTest {
 
                 HealthCheckService.Finding jobs = find(found, 'nightly_jobs_not_scheduled');
                 Assert.areEqual(
-                    new List<String>{ System.Label.Core_HealthCheck_JobRollups },
+                    new List<String>{ System.Label.Core_JobNotice_Rollups },
                     jobs.getFixScope(),
                     'The nightly jobs finding names the rollup run.'
                 );
@@ -331,7 +331,7 @@ private class RollupsHealthCheckExtensionTest {
                 Assert.areEqual(
                     String.format(
                         System.Label.Core_HealthCheck_FixScheduled,
-                        new List<Object>{ System.Label.Core_HealthCheck_JobRollups }
+                        new List<Object>{ System.Label.Core_JobNotice_Rollups }
                     ),
                     report.getFixOutcome(),
                     'The panel is told which jobs were scheduled.'

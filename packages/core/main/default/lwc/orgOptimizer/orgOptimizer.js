@@ -23,7 +23,7 @@ import ACCESS_EXPLORER from '@salesforce/label/c.Core_OrgOptimizer_AccessExplore
 import ACCESS_EXPLORER_TEXT from '@salesforce/label/c.Core_OrgOptimizer_AccessExplorerText';
 import AI_EXPORT from '@salesforce/label/c.Core_OrgOptimizer_AiExport';
 import AI_EXPORT_TEXT from '@salesforce/label/c.Core_OrgOptimizer_AiExportText';
-import HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_HealthCheck';
+import HEALTH_CHECK from '@salesforce/label/c.Core_HealthCheck_ErrorContext';
 import HEALTH_CHECK_TEXT from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckText';
 import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
 import ERRORS_TEXT from '@salesforce/label/c.Core_OrgOptimizer_ErrorsText';

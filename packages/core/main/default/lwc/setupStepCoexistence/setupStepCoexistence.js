@@ -4,9 +4,9 @@ import SHAPE_NPSP from '@salesforce/label/c.Core_SetupAssistant_ShapeNpsp';
 import SHAPE_FRESH from '@salesforce/label/c.Core_SetupAssistant_ShapeFresh';
 import RECOMMENDED from '@salesforce/label/c.Core_SetupAssistant_RecommendedLabel';
 import MODE_LABEL from '@salesforce/label/c.Core_SetupAssistant_ModeLabel';
-import MODE_STANDALONE from '@salesforce/label/c.Core_SetupAssistant_ModeStandalone';
-import MODE_NPSP from '@salesforce/label/c.Core_SetupAssistant_ModeNpsp';
-import MODE_NONPROFIT_CLOUD from '@salesforce/label/c.Core_SetupAssistant_ModeNonprofitCloud';
+import MODE_STANDALONE from '@salesforce/label/c.Core_CoexistenceMode_Standalone';
+import MODE_NPSP from '@salesforce/label/c.Core_CoexistenceMode_Npsp';
+import MODE_NONPROFIT_CLOUD from '@salesforce/label/c.Core_CoexistenceMode_NonprofitCloud';
 import CONFIRM from '@salesforce/label/c.Core_SetupAssistant_ConfirmButton';
 import OTHER_ROLLUP_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
 

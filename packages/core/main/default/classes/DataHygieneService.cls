@@ -247,7 +247,7 @@ public with sharing class DataHygieneService {
     public static String countLabel(Integer count) {
         return count > COUNT_CAP
             ? String.format(
-                  System.Label.Core_DataHygiene_MoreThan,
+                  System.Label.Core_HealthCheck_OrphansMoreThan,
                   new List<Object>{ COUNT_CAP.format() }
               )
             : count.format();

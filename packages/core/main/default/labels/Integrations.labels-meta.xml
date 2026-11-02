@@ -77,7 +77,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Integrations: badge on a product that is not in this org</shortDescription>
+        <shortDescription>Shared: badge on a product or module not in this org</shortDescription>
         <value>Not installed</value>
     </labels>
     <labels>
@@ -135,14 +135,6 @@
         <protected>false</protected>
         <shortDescription>Integrations: where to find a migration. {0} is the migration note</shortDescription>
         <value>Migration: {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_Integrations_LearnMore</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Integrations: link to a product's own page</shortDescription>
-        <value>Learn More</value>
     </labels>
     <labels>
         <fullName>Core_Integrations_EmptyMessage</fullName>

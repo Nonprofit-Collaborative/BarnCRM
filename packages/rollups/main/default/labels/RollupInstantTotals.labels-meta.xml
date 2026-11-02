@@ -113,14 +113,6 @@
         <value>Remove the Trigger</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantClose</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Instant totals: button that closes the steps</shortDescription>
-        <value>Close</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_InstantCopy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

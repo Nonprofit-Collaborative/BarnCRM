@@ -24,7 +24,7 @@ private class FeatureControllerTest {
             Assert.areEqual(8, model.features.size(), 'Three tools and five groups');
             Map<String, String> labelNames = new Map<String, String>{
                 'DataManager' => System.Label.Core_Feature_DataManager_Name,
-                'DuplicateReview' => System.Label.Core_Feature_DuplicateReview_Name,
+                'DuplicateReview' => System.Label.Core_DuplicateMatching_Title,
                 'OrgOptimizer' => System.Label.Core_Feature_OrgOptimizer_Name,
                 'HouseholdUpkeep' => System.Label.Core_Feature_HouseholdUpkeep_Name,
                 'Addresses' => System.Label.Core_Feature_Addresses_Name,

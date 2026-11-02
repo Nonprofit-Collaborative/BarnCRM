@@ -4,7 +4,7 @@ import { format, messageFrom, downloadCsv } from 'c/findCsv';
 
 import INTRO from '@salesforce/label/c.Core_AccessModifyAll_Intro';
 import DATA_HEADING from '@salesforce/label/c.Core_AccessModifyAll_DataHeading';
-import OBJECTS_HEADING from '@salesforce/label/c.Core_AccessModifyAll_ObjectsHeading';
+import OBJECTS_HEADING from '@salesforce/label/c.Core_AccessCompare_KindsHeading';
 import COL_VIEW_ALL_DATA from '@salesforce/label/c.Core_AccessModifyAll_ColViewAllData';
 import COL_MODIFY_ALL_DATA from '@salesforce/label/c.Core_AccessModifyAll_ColModifyAllData';
 import COL_AUTHOR_APEX from '@salesforce/label/c.Core_AccessModifyAll_ColAuthorApex';

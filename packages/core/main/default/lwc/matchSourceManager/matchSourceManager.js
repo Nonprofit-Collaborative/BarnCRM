@@ -41,7 +41,7 @@ import EDIT_TITLE from '@salesforce/label/c.Core_CmdtManager_EditTitle';
 import SAVING from '@salesforce/label/c.Core_CmdtManager_Saving';
 import SAVED from '@salesforce/label/c.Core_CmdtManager_Saved';
 import STILL_SAVING from '@salesforce/label/c.Core_CmdtManager_StillSaving';
-import CHECK_AGAIN from '@salesforce/label/c.Core_CmdtManager_CheckAgain';
+import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import LOAD_ERROR from '@salesforce/label/c.Core_CmdtManager_LoadError';
 import { bodyMessage } from 'c/findCsv';
 

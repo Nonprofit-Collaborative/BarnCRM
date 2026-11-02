@@ -334,11 +334,6 @@ public with sharing class DataJobs {
             caught instanceof QueryCompiler.QueryCompilerException ||
             caught instanceof QueryFieldCatalog.QueryFieldCatalogException ||
             caught instanceof ImportException;
-        return UserErrors.wrap(
-            caught,
-            shown,
-            context,
-            System.Label.Core_BulkUpdate_UnexpectedError
-        );
+        return UserErrors.wrap(caught, shown, context, System.Label.Core_UnexpectedError);
     }
 }

@@ -4,8 +4,8 @@ import searchPeople from '@salesforce/apex/HouseholdOfPersonController.searchPeo
 import addExistingPerson from '@salesforce/apex/HouseholdOfPersonController.addExistingPerson';
 import addNewPerson from '@salesforce/apex/HouseholdOfPersonController.addNewPerson';
 
-import SAVE from '@salesforce/label/c.Core_HouseholdMembersPanel_Save';
-import CANCEL from '@salesforce/label/c.Core_HouseholdMembersPanel_Cancel';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import ADD_EXISTING_HEADING from '@salesforce/label/c.Core_HouseholdPanel_AddExistingHeading';
 import ADD_EXISTING_PLACEHOLDER from '@salesforce/label/c.Core_HouseholdPanel_AddExistingPlaceholder';
 import ADD_EXISTING_RESULT_FOR from '@salesforce/label/c.Core_HouseholdPanel_AddExistingResultFor';

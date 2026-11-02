@@ -41,7 +41,7 @@ jest.mock(
   () => ({ default: 'Downloaded {0} fields.' }),
   { virtual: true }
 );
-jest.mock('@salesforce/label/c.Core_DataDictionary_Yes', () => ({ default: 'Yes' }), {
+jest.mock('@salesforce/label/c.Core_AccessExplorer_Yes', () => ({ default: 'Yes' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_DataDictionary_No', () => ({ default: 'No' }), {

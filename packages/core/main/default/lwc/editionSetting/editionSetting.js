@@ -13,8 +13,8 @@ import TO_NONPROFIT from '@salesforce/label/c.Core_Edition_SwitchToNonprofit';
 import CONFIRM_TITLE from '@salesforce/label/c.Core_Edition_ConfirmTitle';
 import CONFIRM_TO_NONPROFIT from '@salesforce/label/c.Core_Edition_ConfirmToNonprofit';
 import CONFIRM_TO_STANDARD from '@salesforce/label/c.Core_Edition_ConfirmToStandard';
-import CONFIRM_BUTTON from '@salesforce/label/c.Core_Edition_ConfirmButton';
-import CANCEL_BUTTON from '@salesforce/label/c.Core_Edition_CancelButton';
+import CONFIRM_BUTTON from '@salesforce/label/c.Core_Edition_ChangeToggle';
+import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import SAVED from '@salesforce/label/c.Core_Edition_Saved';
 
 const STANDARD = 'Standard';

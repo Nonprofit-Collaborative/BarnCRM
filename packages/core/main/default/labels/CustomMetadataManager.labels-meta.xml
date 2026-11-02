@@ -140,7 +140,7 @@
         <fullName>Core_CmdtManager_AddButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Custom metadata page: button that opens the form for a new row</shortDescription>
         <value>Add</value>
     </labels>
@@ -169,19 +169,11 @@
         <value>Restore</value>
     </labels>
     <labels>
-        <fullName>Core_CmdtManager_SaveButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Custom metadata page: button that saves the form</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
         <fullName>Core_CmdtManager_CancelButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Custom metadata page: button that closes the form without saving</shortDescription>
+        <protected>false</protected>
+        <shortDescription>Shared: button that closes a form or box without saving</shortDescription>
         <value>Cancel</value>
     </labels>
     <labels>
@@ -279,14 +271,6 @@
         <protected>true</protected>
         <shortDescription>Custom metadata page: a save has not finished after a minute</shortDescription>
         <value>Still saving. Click Check again in a minute. If it failed, the reason is in the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_CmdtManager_CheckAgain</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Custom metadata page: button that reloads the list and the save's outcome</shortDescription>
-        <value>Check Again</value>
     </labels>
     <labels>
         <fullName>Core_CmdtManager_MatchSources</fullName>

@@ -9,7 +9,7 @@ import PAUSED_BANNER from '@salesforce/label/c.Core_HubHome_AutomationPausedBann
 import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
 import NEW_HOUSEHOLD from '@salesforce/label/c.Core_HubHomeActions_NewHousehold';
 import NEW_HOUSEHOLD_FAILED from '@salesforce/label/c.Core_HubHomeActions_NewHouseholdFailed';
-import RESUME from '@salesforce/label/c.Core_HubHome_ResumeAutomationLink';
+import RESUME from '@salesforce/label/c.Core_AutomationControl_ResumeButton';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 
 const AUTOMATION_SECTION = 'Automation';

@@ -4,7 +4,7 @@ import { refreshApex } from '@salesforce/apex';
 import getLadder from '@salesforce/apex/DonorLevelController.getLadder';
 import recalculate from '@salesforce/apex/DonorLevelController.recalculate';
 
-import TITLE from '@salesforce/label/c.Giving_DonorLevels_Title';
+import TITLE from '@salesforce/label/c.Core_SettingsGroup_DonorLevels';
 import INTRO from '@salesforce/label/c.Giving_DonorLevels_Intro';
 import MEASURED_ON from '@salesforce/label/c.Giving_DonorLevels_MeasuredOn';
 import LAST_RECALCULATED from '@salesforce/label/c.Giving_DonorLevels_LastRecalculated';

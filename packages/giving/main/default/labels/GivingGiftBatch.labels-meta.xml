@@ -65,14 +65,6 @@
     <value>Fund</value>
   </labels>
   <labels>
-    <fullName>Giving_GiftBatch_ColumnGift</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: column: gift</shortDescription>
-    <value>Gift</value>
-  </labels>
-  <labels>
     <fullName>Giving_GiftBatch_ColumnLine</fullName>
     <categories>Giving, Gift Batch</categories>
     <language>en_US</language>
@@ -111,14 +103,6 @@
     <protected>false</protected>
     <shortDescription>Gift batch: hidden label of the person or organization choice</shortDescription>
     <value>Person or organization</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_DonorPlaceholder</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: donor search hint</shortDescription>
-    <value>Search by name</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_EnteredLabel</fullName>
@@ -343,14 +327,6 @@
     <protected>false</protected>
     <shortDescription>Gift batch: remove a line, {0} is the line number</shortDescription>
     <value>Remove line {0}</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_Save</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: save the lines</shortDescription>
-    <value>Save</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_Saved</fullName>

@@ -169,14 +169,6 @@
     <value>Status</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_ColumnAmount</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts panel: column, amount</shortDescription>
-    <value>Amount</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_ColumnIssued</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>

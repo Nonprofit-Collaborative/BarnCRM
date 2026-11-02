@@ -329,14 +329,6 @@
         <value>No rollups are set up yet. Restore the shipped rollups to start with the ones BarnCRM provides.</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_ColumnTarget</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Target column heading</shortDescription>
-        <value>Where It Shows</value>
-    </labels>
-    <labels>
         <fullName>Core_Rollups_NeverCalculated</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

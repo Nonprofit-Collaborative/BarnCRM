@@ -17,8 +17,8 @@ import donorKindOrganization from '@salesforce/label/c.Giving_QuickGiftEntry_Don
 import personLabel from '@salesforce/label/c.Giving_QuickGiftEntry_PersonLabel';
 import newPerson from '@salesforce/label/c.Giving_QuickGiftEntry_NewPerson';
 import organizationLabel from '@salesforce/label/c.Giving_QuickGiftEntry_OrganizationLabel';
-import donorPlaceholder from '@salesforce/label/c.Giving_QuickGiftEntry_DonorPlaceholder';
-import amountLabel from '@salesforce/label/c.Giving_QuickGiftEntry_AmountLabel';
+import donorPlaceholder from '@salesforce/label/c.Core_HouseholdPanel_AddExistingPlaceholder';
+import amountLabel from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
 import dateLabel from '@salesforce/label/c.Giving_QuickGiftEntry_DateLabel';
 import typeLabel from '@salesforce/label/c.Giving_QuickGiftEntry_TypeLabel';
 import typePlaceholder from '@salesforce/label/c.Giving_QuickGiftEntry_TypePlaceholder';
@@ -29,7 +29,7 @@ import inKindDescriptionLabel from '@salesforce/label/c.Giving_QuickGiftEntry_In
 import inKindDescriptionHelp from '@salesforce/label/c.Giving_QuickGiftEntry_InKindDescriptionHelp';
 import fairMarketValueLabel from '@salesforce/label/c.Giving_QuickGiftEntry_FairMarketValueLabel';
 import fairMarketValueHelp from '@salesforce/label/c.Giving_QuickGiftEntry_FairMarketValueHelp';
-import saveButton from '@salesforce/label/c.Giving_QuickGiftEntry_SaveButton';
+import saveButton from '@salesforce/label/c.Core_Kit_Save';
 import saveAndNewButton from '@salesforce/label/c.Giving_QuickGiftEntry_SaveAndNewButton';
 import savingMessage from '@salesforce/label/c.Giving_QuickGiftEntry_SavingMessage';
 import successTitle from '@salesforce/label/c.Giving_QuickGiftEntry_SuccessTitle';

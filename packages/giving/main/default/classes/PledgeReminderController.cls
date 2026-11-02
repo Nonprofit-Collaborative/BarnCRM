@@ -230,11 +230,6 @@ public with sharing class PledgeReminderController {
         Boolean ours =
             failure instanceof PledgeReminderService.PledgeReminderException ||
             failure instanceof AcknowledgmentService.AcknowledgmentException;
-        return UserErrors.wrap(
-            failure,
-            ours,
-            context,
-            Label.Giving_PledgeReminders_UnexpectedError
-        );
+        return UserErrors.wrap(failure, ours, context, Label.Giving_Stewardship_ErrorActionFailed);
     }
 }

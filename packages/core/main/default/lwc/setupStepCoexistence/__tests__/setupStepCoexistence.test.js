@@ -29,7 +29,7 @@ describe('c-setup-step-coexistence', () => {
     const shape = element.shadowRoot.querySelector('[data-id="shape"]');
     expect(shape.textContent).toContain('Core_SetupAssistant_ShapePersonAccounts');
     const recommended = element.shadowRoot.querySelector('[data-id="recommended"]');
-    expect(recommended.textContent).toContain('Core_SetupAssistant_ModeNonprofitCloud');
+    expect(recommended.textContent).toContain('Core_CoexistenceMode_NonprofitCloud');
   });
 
   it('offers the recommendation already chosen, and the other two modes', () => {

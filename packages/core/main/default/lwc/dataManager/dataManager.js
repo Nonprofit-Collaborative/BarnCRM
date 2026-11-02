@@ -27,7 +27,7 @@ import DELETE_TITLE from '@salesforce/label/c.Core_DataManager_DeleteTitle';
 import DELETE_TEXT from '@salesforce/label/c.Core_DataManager_DeleteText';
 import DELETE_WARNING from '@salesforce/label/c.Core_DataManager_DeleteWarning';
 import DELETE_CONTINUE from '@salesforce/label/c.Core_DataManager_DeleteContinue';
-import DELETE_CANCEL from '@salesforce/label/c.Core_DataManager_DeleteCancel';
+import DELETE_CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import OPTIMIZER_TITLE from '@salesforce/label/c.Core_DataManager_OptimizerTitle';
 import OPTIMIZER_TEXT from '@salesforce/label/c.Core_DataManager_OptimizerText';
 import MAPPINGS_HEADING from '@salesforce/label/c.Core_DataManager_MappingsHeading';

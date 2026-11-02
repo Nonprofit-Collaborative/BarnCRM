@@ -17,10 +17,10 @@ import {
 import ADD_CONDITION from '@salesforce/label/c.Core_Filter_AddCondition';
 import REMOVE_CONDITION from '@salesforce/label/c.Core_Filter_RemoveCondition';
 import CONDITION_LEGEND from '@salesforce/label/c.Core_Filter_ConditionLegend';
-import FIELD from '@salesforce/label/c.Core_Filter_Field';
+import FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import FIELD_ON from '@salesforce/label/c.Core_Filter_FieldOn';
 import PARENT_FIELDS from '@salesforce/label/c.Core_Filter_ParentFields';
-import CHOOSE_FIELD from '@salesforce/label/c.Core_Filter_ChooseField';
+import CHOOSE_FIELD from '@salesforce/label/c.Core_BulkUpdate_ChooseField';
 import OPERATOR from '@salesforce/label/c.Core_Filter_Operator';
 import CHOOSE_OPERATOR from '@salesforce/label/c.Core_Filter_ChooseOperator';
 import VALUE from '@salesforce/label/c.Core_Filter_Value';
@@ -28,8 +28,8 @@ import VALUES_ONE_PER_LINE from '@salesforce/label/c.Core_Filter_ValuesOnePerLin
 import DAYS from '@salesforce/label/c.Core_Filter_Days';
 import AVAILABLE_VALUES from '@salesforce/label/c.Core_Filter_AvailableValues';
 import CHOSEN_VALUES from '@salesforce/label/c.Core_Filter_ChosenValues';
-import TRUE_LABEL from '@salesforce/label/c.Core_Filter_True';
-import FALSE_LABEL from '@salesforce/label/c.Core_Filter_False';
+import TRUE_LABEL from '@salesforce/label/c.Core_BulkUpdate_True';
+import FALSE_LABEL from '@salesforce/label/c.Core_BulkUpdate_False';
 import USE_LOGIC from '@salesforce/label/c.Core_Filter_UseLogic';
 import LOGIC from '@salesforce/label/c.Core_Filter_Logic';
 import LOGIC_HELP from '@salesforce/label/c.Core_Filter_LogicHelp';

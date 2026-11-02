@@ -33,14 +33,6 @@
         <value>No period is closed.</value>
     </labels>
     <labels>
-        <fullName>Giving_Periods_SaveButton</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Save close date button</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
         <fullName>Giving_Periods_Saved</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

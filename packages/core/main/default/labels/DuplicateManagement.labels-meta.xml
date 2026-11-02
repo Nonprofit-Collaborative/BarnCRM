@@ -233,22 +233,6 @@
         <value>Preview Exact Matches</value>
     </labels>
     <labels>
-        <fullName>Core_AutoMerge_Refresh</fullName>
-        <categories>DuplicateManagement</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Auto-Merge button: reload</shortDescription>
-        <value>Refresh</value>
-    </labels>
-    <labels>
-        <fullName>Core_AutoMerge_Loading</fullName>
-        <categories>DuplicateManagement</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Auto-Merge: spinner text</shortDescription>
-        <value>Loading</value>
-    </labels>
-    <labels>
         <fullName>Core_AutoMerge_Running</fullName>
         <categories>DuplicateManagement</categories>
         <language>en_US</language>
@@ -305,14 +289,6 @@
         <value>{0}: {1} becomes {2}</value>
     </labels>
     <labels>
-        <fullName>Core_AutoMerge_Blank</fullName>
-        <categories>DuplicateManagement</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Auto-Merge: shown for an empty value</shortDescription>
-        <value>(blank)</value>
-    </labels>
-    <labels>
         <fullName>Core_AutoMerge_More</fullName>
         <categories>DuplicateManagement</categories>
         <language>en_US</language>
@@ -343,14 +319,6 @@
         <protected>false</protected>
         <shortDescription>Auto-Merge confirm text; {0} is the number of pairs</shortDescription>
         <value>Merge {0} pairs now? Each pair is checked again first. The run happens in the background, and you can undo it for 15 days.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AutoMerge_Cancel</fullName>
-        <categories>DuplicateManagement</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Auto-Merge confirm: cancel button</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Core_AutoMerge_Started</fullName>

@@ -25,14 +25,6 @@
         <value>Match source {0} was skipped because this run had used most of its database queries or rows, so some duplicates may be missed. Run the duplicate scan or import again with fewer records at a time.</value>
     </labels>
     <labels>
-        <fullName>Core_Duplicates_Cancel</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: cancel button</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_Duplicates_DismissBody</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
@@ -55,14 +47,6 @@
         <protected>false</protected>
         <shortDescription>Duplicates panel: dismiss dialog heading</shortDescription>
         <value>Not a Duplicate</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_DismissReasonLabel</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: dismiss reason field</shortDescription>
-        <value>Reason</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_DismissSuccess</fullName>
@@ -281,14 +265,6 @@
         <value>You can see this list. Scanning, dismissing and merging here need the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
-        <fullName>Core_Duplicates_Refresh</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: refresh button</shortDescription>
-        <value>Refresh</value>
-    </labels>
-    <labels>
         <fullName>Core_Duplicates_RuleActive</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
@@ -367,14 +343,6 @@
         <protected>false</protected>
         <shortDescription>Duplicates panel: count past the cap; {0} shown, {1} the cap</shortDescription>
         <value>Showing {0} of more than {1} suggestions, newest first.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ShowMore</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: button that shows the next page of pairs</shortDescription>
-        <value>Show More</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_EmptyHeading</fullName>

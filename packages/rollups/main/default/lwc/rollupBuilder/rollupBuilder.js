@@ -2,8 +2,8 @@ import { LightningElement, wire } from 'lwc';
 import getModel from '@salesforce/apex/RollupBuilderController.getModel';
 import getDraft from '@salesforce/apex/RollupBuilderController.getDraft';
 
-import TITLE from '@salesforce/label/c.Core_RollupBuilder_Title';
-import COPY_OF from '@salesforce/label/c.Core_RollupBuilder_CopyOf';
+import TITLE from '@salesforce/label/c.Core_SettingsGroup_RollupBuilder';
+import COPY_OF from '@salesforce/label/c.Core_Import_CopyTemplateDefaultName';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
 import OTHER_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';

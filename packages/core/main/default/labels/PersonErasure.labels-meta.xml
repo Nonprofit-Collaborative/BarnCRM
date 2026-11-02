@@ -344,12 +344,4 @@
         <shortDescription>Erase person action: open the audit record</shortDescription>
         <value>Open the Erasure Record</value>
     </labels>
-    <labels>
-        <fullName>Core_EraseAction_Close</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase person action: close</shortDescription>
-        <value>Close</value>
-    </labels>
 </CustomLabels>

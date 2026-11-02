@@ -93,16 +93,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup assistant: re-read what is installed</shortDescription>
+        <shortDescription>Shared: button that checks again</shortDescription>
         <value>Check Again</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuiteChoice_NewTab</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Assistive text: a link opens in a new tab</shortDescription>
-        <value>(opens in a new tab)</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_ModuleInstallLink</fullName>
@@ -207,22 +199,6 @@
         <protected>true</protected>
         <shortDescription>Edition change confirmation: what switching to Standard does</shortDescription>
         <value>BarnCRM will stop showing and offering nonprofit modules that are not installed, to every admin and user. Modules already installed stay listed and keep working. Nothing is removed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Edition_ConfirmButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Edition change confirmation: the button that saves the change</shortDescription>
-        <value>Change Edition</value>
-    </labels>
-    <labels>
-        <fullName>Core_Edition_CancelButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Edition change confirmation: the button that leaves it as it is</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Core_Edition_Saved</fullName>

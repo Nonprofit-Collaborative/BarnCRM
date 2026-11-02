@@ -252,7 +252,7 @@ private class JobNotificationPathsTest {
                 JobNotifier.SECTION_ADDRESSES,
                 title(
                     System.Label.Core_JobNotice_Finished,
-                    System.Label.Core_JobNotice_SeasonalAddress
+                    System.Label.Core_HealthCheck_JobSeasonalAddresses
                 )
             );
         }

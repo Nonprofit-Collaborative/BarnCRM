@@ -79,11 +79,6 @@ jest.mock('@salesforce/apex/RollupController.deleteRollup', () => ({ default: je
   virtual: true
 });
 jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_DeleteConfirm',
-  () => ({ default: 'Delete {0}? The values stay.' }),
-  { virtual: true }
-);
-jest.mock(
   '@salesforce/label/c.Core_RollupEase_DeleteQuestion',
   () => ({ default: 'Delete {0}? This cannot be undone.' }),
   { virtual: true }

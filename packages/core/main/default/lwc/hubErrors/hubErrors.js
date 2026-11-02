@@ -2,7 +2,7 @@ import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
 import HEADING from '@salesforce/label/c.Core_HubHome_ErrorTileHeading';
-import LINK from '@salesforce/label/c.Core_HubHome_ErrorTileLinkLabel';
+import LINK from '@salesforce/label/c.Core_ErrorLogTile_ViewAll';
 import INSTALL_COMPLETED from '@salesforce/label/c.Core_HubHome_InstallCompleted';
 import INSTALL_PROBLEMS from '@salesforce/label/c.Core_HubHome_InstallProblems';
 import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
