@@ -98,6 +98,18 @@ programs {names}, because people of your own are enrolled in them or have servic
 them, or a sample enrollment in them has case notes. Move or delete those enrollments, service
 deliveries and case notes, then select Remove Sample Data again."
 
+### With Funders Installed
+
+With the **Funders** package installed, the same action also loads, after Programs if it is
+there:
+
+| Records | How many | What is in them |
+|---|---|---|
+| Grants | 3 | **Capacity Building Grant** (Prospect, deadline in 30 days), **Community Literacy Grant** (Applied) and **Youth Programs Award** (Awarded 35,000, with a one-year award period), to three of the sample organizations, owned by you |
+
+Removal deletes the sample grants; your own grants are never touched. Nothing is loaded for
+Funders when the core sample organizations are not there.
+
 ## 2. How to Turn It On
 
 1. Open **BarnCRM Settings**.
