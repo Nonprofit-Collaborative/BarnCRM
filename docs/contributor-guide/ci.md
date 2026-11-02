@@ -127,8 +127,9 @@ Salesforce org is needed for this job. Steps:
    `packages/`. An org allows 5,000 custom labels; installed managed package labels do not
    count, but every source deploy does, beside the org's own labels, and a source deploy
    never deletes a label. Reuse an existing label of the same text and meaning (Core's
-   `Core_Kit_Save`, `Core_CmdtManager_CancelButton`, `Core_OrgOptimizer_Refresh` and the
-   like; modules may use Core labels) before adding one.
+   `Core_Kit_Save`, `Core_CmdtManager_CancelButton`, `Core_OrgOptimizer_Refresh`, the
+   `Core_Shared_*` words and the `Core_Format_*` patterns such as `{0} ({1})`; modules may
+   use a Core label once it is unprotected) before adding one.
    `scripts/ci/check-metadata-lengths.py` (`npm run check:metadata-lengths`) covers the
    other limits only an org reports: a description over 255 characters on a custom
    permission, permission set, permission set group, FlexiPage, Lightning web component
