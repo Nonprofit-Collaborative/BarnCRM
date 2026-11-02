@@ -58,4 +58,34 @@ private class GivingWhereUsedExtensionTest {
             );
         }
     }
+
+    @IsTest
+    static void theDonorLevelSourceIsFoundOnPeopleAndOrganizations() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            String source = DonorLevelService.sourceField();
+            String other = source == 'Largest_Gift__c' ? 'Total_Giving__c' : 'Largest_Gift__c';
+
+            List<WhereUsedService.Reference> onContact = GivingWhereUsedExtension.settingReferences(
+                WhereUsedService.target('Contact', source)
+            );
+            List<WhereUsedService.Reference> onAccount = GivingWhereUsedExtension.settingReferences(
+                WhereUsedService.target('Account', source)
+            );
+            List<WhereUsedService.Reference> notChosen = GivingWhereUsedExtension.settingReferences(
+                WhereUsedService.target('Contact', other)
+            );
+
+            Assert.areEqual(1, onContact.size());
+            Assert.areEqual(1, onAccount.size());
+            Assert.areEqual(
+                Schema.Giving_Settings__c.Donor_Level_Source_Field__c.getDescribe().getLabel(),
+                onContact[0].getName()
+            );
+            Assert.areEqual(
+                System.Label.Core_WhereUsed_BreaksSettingValue,
+                onContact[0].getBreaks()
+            );
+            Assert.isTrue(notChosen.isEmpty(), 'A total the levels do not run on finds nothing.');
+        }
+    }
 }
