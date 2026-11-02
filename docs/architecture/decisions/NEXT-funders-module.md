@@ -24,11 +24,10 @@ a deadline, an award period, and obligations after the award.
 
 ## Decision
 
-1. **The package stays as listed: Core, Rollup Builder and Giving.** Release 0.16 references no
-   Giving object, but F-03 (restricted fund ledger on Giving's Fund) and F-05 (award schedules on
-   Commitment and Installment) do, and changing a package's dependencies after its first version
-   is harder than keeping one it will need. The module key is `Funders`, so the classes Core finds
-   by name are `FundersAccessSync`, `FundersPostInstall`, `FundersHealthCheckExtension`,
+1. **The package depends on Core and Rollup Builder.** Giving was listed too, for F-03 and F-05;
+   ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md` (decision 1) drops it and links
+   a Giving fund by record identifier, as a program is linked (decision 6). The module key is
+   `Funders`, so the classes Core finds by name are `FundersAccessSync`, `FundersPostInstall`, `FundersHealthCheckExtension`,
    `FundersNightlyJobProvider` and `FundersSampleData`.
 2. **Two objects in release 0.16.** Grant (`Grant__c`, canonical model 29ZH): one request to one
    funder, from prospect to awarded or declined, with the amounts requested and awarded, the
@@ -97,11 +96,12 @@ a deadline, an award period, and obligations after the award.
 
 ## Room Left for Later Releases
 
-- F-03 adds a fund ledger against Giving's `Fund__c` and a Fund lookup on Grant; F-12 compares a
-  budget with the award and that ledger.
+- F-03 adds a restricted ledger on the grant and names a Giving fund by record identifier
+  (ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md`); F-12 compares a budget with
+  the award and that ledger.
 - F-04 adds the government award fields to Grant (assistance listing number, award number,
   drawdowns); the award period is already there.
-- F-05 adds a Commitment lookup on Grant for multi-year schedules.
+- F-05 adds Grant Payments, the grant's own schedule (same ADR).
 - F-08 draws the same deadline rows (`grantPipelineModel.deadlineRows`) as a calendar.
 - L-06 links logic model outcomes to grant requirements of type Deliverable.
 
@@ -111,8 +111,7 @@ a deadline, an award period, and obligations after the award.
   and no obligations after the win; adding them would burden every individual ask.
 - **Grants as Commitments.** Rejected: an application that is declined is not a promise the books
   track (the reason ADR-0153 gave for asks).
-- **Funders depending on Core only.** Rejected for now: F-03 and F-05 need Giving within two
-  releases (decision 1).
+- **Keeping Giving as a dependency.** Dropped (decision 1).
 - **Requirement dates as fields on Grant.** Rejected: an award has a varying number of reports,
   each with its own status and owner (decision 2).
 - **Reminders as emails only, or tasks only.** Rejected: a task stays on the person's list and the

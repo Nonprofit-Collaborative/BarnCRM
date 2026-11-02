@@ -107,8 +107,10 @@ there:
 |---|---|---|
 | Grants | 3 | **Capacity Building Grant** (Prospect, deadline in 30 days), **Community Literacy Grant** (Applied) and **Youth Programs Award** (Awarded 35,000, with a one-year award period), to three of the sample organizations, owned by you |
 | Grant requirements | 3 | On the Youth Programs Award: **Site visit** (Accepted, 10 days ago), **Quarter 1 financial report** (In Progress, due in 10 days) and **Interim narrative report** (Not Started, due in 75 days). With reminders on, the next morning's run reminds you about the financial report. |
+| Grant payments | 2 | On the Youth Programs Award, which is **Restricted**: 17,500 at the award start (Received) and 17,500 six months later (Expected). |
+| Restricted fund entries | 2 | On the same award: the first payment's **Received** entry (17,500) and **Spent** 6,000 on tutor stipends, so the **Restricted Balance** is 11,500. |
 
-Removal deletes the sample grants and their requirements; your own grants are never touched. Nothing is loaded for
+Removal deletes the sample grants with their requirements, payments and entries; your own grants are never touched. Nothing is loaded for
 Funders when the core sample organizations are not there.
 
 ## 2. How to Turn It On
