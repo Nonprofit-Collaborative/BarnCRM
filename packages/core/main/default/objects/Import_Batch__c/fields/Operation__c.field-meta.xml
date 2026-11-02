@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Operation__c</fullName>
-  <description>What kind of data job this is: a file import, a bulk update or a bulk delete of the records a Find query returned (canonical model R-BU1, R-BD1). Empty reads as Import.</description>
-  <inlineHelpText>Import loads a file. Update changes, and Delete deletes, the records a Find query returned.</inlineHelpText>
+  <description>What kind of data job this is: a file import, a bulk update or a bulk delete of the records a Find query returned, or a field access change (canonical model R-BU1, R-BD1, R-FA1). Empty reads as Import.</description>
+  <inlineHelpText>Import loads a file. Update changes, and Delete deletes, the records a Find query returned. Access changes field access on permission sets.</inlineHelpText>
   <label>Operation</label>
   <required>false</required>
   <trackTrending>false</trackTrending>
@@ -25,6 +25,11 @@
         <fullName>Delete</fullName>
         <default>false</default>
         <label>Delete</label>
+      </value>
+      <value>
+        <fullName>Access</fullName>
+        <default>false</default>
+        <label>Access</label>
       </value>
     </valueSetDefinition>
   </valueSet>

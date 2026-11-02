@@ -59,7 +59,8 @@ public with sharing class ImportBatchSelector {
                 'limitSize' => limitSize,
                 'notImports' => new List<String>{
                     BulkUpdateService.OPERATION_UPDATE,
-                    BulkDeleteService.OPERATION_DELETE
+                    BulkDeleteService.OPERATION_DELETE,
+                    FieldAccessService.OPERATION_ACCESS
                 }
             },
             AccessLevel.USER_MODE
