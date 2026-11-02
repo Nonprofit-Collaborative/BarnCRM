@@ -830,35 +830,91 @@ public with sharing class WhereUsedService {
         return found;
     }
 
-    /** Settings that hold a list of field names: Address Card Fields (R-AD10). */
+    /**
+     * Core settings whose value names a field: Address Card Fields (R-AD10) and the household
+     * name and greeting patterns (R-H4 to R-H9), whose blanks read Contact fields. A blank
+     * pattern counts as its default, because the default is what runs. Module settings answer
+     * through their own extension (the Giving donor level source, for example).
+     */
     @TestVisible
     private static List<Reference> settingReferences(Target target) {
         List<Reference> found = new List<Reference>();
-        String chosen = SettingsService.getSettings().Address_Card_Fields__c;
-        if (target.isObject() || String.isBlank(chosen)) {
+        if (target.isObject()) {
             return found;
         }
-        for (String name : chosen.split(',')) {
-            if (target.matchesField('Address__c', name)) {
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
+        if (listNames(target, 'Address__c', settings.Address_Card_Fields__c)) {
+            found.add(
+                settingReference(
+                    Schema.BarnCRM_Settings__c.Address_Card_Fields__c.getDescribe().getLabel(),
+                    System.Label.Core_WhereUsed_BreaksSetting,
+                    'Addresses'
+                )
+            );
+        }
+        Map<Schema.SObjectField, String> patterns = new Map<Schema.SObjectField, String>{
+            Schema.BarnCRM_Settings__c.Household_Name_Pattern__c => HouseholdNamingService.DEFAULT_NAME_PATTERN,
+            Schema.BarnCRM_Settings__c.Formal_Greeting_Pattern__c => HouseholdNamingService.DEFAULT_FORMAL_PATTERN,
+            Schema.BarnCRM_Settings__c.Informal_Greeting_Pattern__c => HouseholdNamingService.DEFAULT_INFORMAL_PATTERN
+        };
+        for (Schema.SObjectField field : patterns.keySet()) {
+            String pattern = (String) settings.get(field);
+            if (patternNames(target, String.isBlank(pattern) ? patterns.get(field) : pattern)) {
                 found.add(
-                    new Reference(
-                            KIND_SETTING,
-                            System.Label.Core_WhereUsed_KindSetting,
-                            Schema.BarnCRM_Settings__c.Address_Card_Fields__c.getDescribe()
-                                .getLabel(),
-                            null
-                        )
-                        .addPart(System.Label.Core_WhereUsed_PartField)
-                        .withBreaks(System.Label.Core_WhereUsed_BreaksSetting)
-                        .withEdit(
-                            'BarnCRM_Settings',
-                            new Map<String, String>{ 'section' => 'Addresses' }
-                        )
+                    settingReference(
+                        field.getDescribe().getLabel(),
+                        System.Label.Core_WhereUsed_BreaksPattern,
+                        'People and Households'
+                    )
                 );
-                break;
             }
         }
         return found;
+    }
+
+    /**
+     * A BarnCRM setting that names the target, linked to its section of BarnCRM Settings. Module
+     * extensions build their settings' references with it, so every setting reads alike.
+     */
+    @NamespaceAccessible
+    public static Reference settingReference(String settingLabel, String breaks, String section) {
+        return new Reference(
+                KIND_SETTING,
+                System.Label.Core_WhereUsed_KindSetting,
+                settingLabel,
+                null
+            )
+            .addPart(System.Label.Core_WhereUsed_PartField)
+            .withBreaks(breaks)
+            .withEdit('BarnCRM_Settings', new Map<String, String>{ 'section' => section });
+    }
+
+    /** True when a comma separated list of field names on an object names the target. */
+    private static Boolean listNames(Target target, String onObject, String names) {
+        if (String.isBlank(names)) {
+            return false;
+        }
+        for (String name : names.split(',')) {
+            if (target.matchesField(onObject, name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** True when a household name or greeting pattern has a blank that reads the target. */
+    @TestVisible
+    private static Boolean patternNames(Target target, String pattern) {
+        String normalized = pattern == null ? '' : pattern.replace('{!', '{');
+        for (String token : HouseholdNamingService.TOKEN_FIELDS.keySet()) {
+            if (
+                normalized.containsIgnoreCase(token) &&
+                target.matchesField('Contact', HouseholdNamingService.TOKEN_FIELDS.get(token))
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** A stored JSON document as a map; an empty map when it is blank or unreadable. */

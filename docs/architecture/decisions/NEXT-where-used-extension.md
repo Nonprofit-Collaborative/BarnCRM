@@ -12,7 +12,7 @@ Before an administrator deletes a field, they need to know what uses it. Salesfo
 of that on the field's Setup page ("Where is this used?"), but it does not read BarnCRM's own
 setup, which names fields as text inside records and JSON documents: saved Find queries (also
 Giving's donor segments, R-DS1), Super Transform step lists (R-ST1), import mappings (R-IT1),
-merge rules, matching sources, settings such as Address Card Fields, and the Rollup Builder's
+merge rules, matching sources, settings whose value names a field, and the Rollup Builder's
 definitions (R-R1, R-R2). A field deleted under any of these breaks it quietly.
 
 Two constraints shape the answer. Core may not depend on a module (plan Section 4.1, ADR-0014,
