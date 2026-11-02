@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Gift Transaction mirror page: whether it can run here, Run Now, the nightly schedule, and
+    the reconciliation of gifts against paid Nonprofit Cloud Gift Transactions.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Gift Transaction Mirror</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

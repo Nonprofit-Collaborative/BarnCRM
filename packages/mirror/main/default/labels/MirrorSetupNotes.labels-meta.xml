@@ -72,4 +72,28 @@
     <shortDescription>Setup note, Opportunity mirror: why it needs Setup</shortDescription>
     <value>Opportunities are written with the access of the person saving the gift; without it the nightly run catches them up instead.</value>
   </labels>
+  <labels>
+    <fullName>Mirror_SetupNote_GiftTransactionMirror_What</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Setup note, Gift Transaction mirror: what to change</shortDescription>
+    <value>Whoever runs or schedules the Gift Transaction mirror needs Nonprofit Cloud's Fundraising User permission set, so they can create and edit Gift Transactions and their designations. Give yourself Gift Transaction Mirror on the Access page.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_SetupNote_GiftTransactionMirror_Why</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Setup note, Gift Transaction mirror: why it needs Setup</shortDescription>
+    <value>Each run writes with the access of the person who started or scheduled it; without it the run copies nothing and says why in the Error Log.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_SetupNote_GiftTransactionMirror_Steps</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Setup note, Gift Transaction mirror: clicks in Setup, separated by |</shortDescription>
+    <value>Click Fundraising User (or the permission set your org uses for Nonprofit Cloud fundraising).|Click Manage Assignments, then Add Assignment.|Tick the people who run the mirror, then click Assign.</value>
+  </labels>
 </CustomLabels>
