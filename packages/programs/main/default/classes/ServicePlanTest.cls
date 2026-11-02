@@ -478,6 +478,38 @@ private class ServicePlanTest {
     }
 
     @IsTest
+    static void aGoalWhoseOutcomeIsNoLongerOfferedCanStillBeChanged() {
+        Enrollment__c enrolled = sharedEnrollment();
+        // An identifier the picker never offers stands for an outcome since deleted or moved.
+        String goneOutcome = (String) enrolled.Program__c;
+        Goal__c stored = new Goal__c(
+            Enrollment__c = enrolled.Id,
+            Name = 'Housed',
+            Outcome_Id__c = goneOutcome
+        );
+        System.runAs(TestUsers.adminWith(ADMIN)) {
+            insert stored;
+        }
+        Test.startTest();
+        System.runAs(planner()) {
+            Map<String, Object> goal = goalJson(enrolled.Id, 'Housed by spring');
+            goal.put('id', stored.Id);
+            goal.put('outcomeId', goneOutcome);
+            ServicePlanController.saveGoal(JSON.serialize(goal));
+        }
+        Test.stopTest();
+
+        Goal__c saved = [
+            SELECT Name, Outcome_Id__c
+            FROM Goal__c
+            WHERE Id = :stored.Id
+            WITH SYSTEM_MODE
+        ];
+        Assert.areEqual('Housed by spring', saved.Name, 'The goal\'s other fields still save.');
+        Assert.areEqual(goneOutcome, saved.Outcome_Id__c, 'The unchanged outcome is kept.');
+    }
+
+    @IsTest
     static void unexpectedFailuresAreLoggedAndReportedPlainly() {
         Test.startTest();
         AuraHandledException handled;

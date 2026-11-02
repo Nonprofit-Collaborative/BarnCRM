@@ -98,7 +98,9 @@ public with sharing class GiftTransactionMirrorReconciliation {
             new Map<String, Object>{
                 'statuses' => GiftTransactionMirrorService.MIRRORED_STATUSES,
                 'inKind' => GiftTransactionMirrorService.TYPE_IN_KIND,
-                'fromDate' => fromDate,
+                // Gifts dated before the start date are never copied (R-GT2), so they are not
+                // differences either.
+                'fromDate' => giftsFrom(fromDate),
                 'toDate' => toDate,
                 'cap' => cap
             },
@@ -167,6 +169,12 @@ public with sharing class GiftTransactionMirrorReconciliation {
             }
         }
         return result;
+    }
+
+    /** The first gift date compared: the range's start, or the mirror's start date if later. */
+    private static Date giftsFrom(Date fromDate) {
+        Date start = GiftTransactionMirrorService.startDate();
+        return start != null && start > fromDate ? start : fromDate;
     }
 
     /** Refuses a comparison that cannot be made, in words the page shows. */

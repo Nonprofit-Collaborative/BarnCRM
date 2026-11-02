@@ -155,7 +155,7 @@ public with sharing class GrantReminderService {
         logShortfall(
             Label.Funders_Reminder_StampFailed,
             ready.size() - reminded,
-            due,
+            ready,
             stampFailure
         );
         sendAll(messages, due);

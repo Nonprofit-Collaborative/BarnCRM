@@ -473,7 +473,8 @@ public with sharing class FieldUtilizationController {
                     System.Label.Core_FieldUtilization_UnexpectedError
                 );
             }
-            requireNotTooLarge(PicklistUsageService.total(described));
+            Integer total = PicklistUsageService.total(described);
+            requireNotTooLarge(total);
             Map<String, Schema.DescribeFieldResult> fields = PicklistUsageService.picklistFieldsByName(
                 described
             );
@@ -481,6 +482,13 @@ public with sharing class FieldUtilizationController {
             for (String fieldName : new Set<String>(fieldNames)) {
                 Schema.DescribeFieldResult field = fields.get(fieldName);
                 if (field == null) {
+                    continue;
+                }
+                // Each grouped count reads every record toward the query-row limit, and running
+                // past that limit cannot be caught, so a field that would cross it is reported as
+                // failed instead.
+                if (Limits.getQueryRows() + total > Limits.getLimitQueryRows()) {
+                    result.failed.add(field.getLabel());
                     continue;
                 }
                 try {

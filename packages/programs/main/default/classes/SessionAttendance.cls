@@ -99,8 +99,8 @@ public with sharing class SessionAttendance {
             row.accountId = delivery.Account__c;
             row.enrollmentId = delivery.Enrollment__c;
             row.personName = delivery.Contact__c != null
-                ? delivery.Contact__r.Name
-                : delivery.Account__r.Name;
+                ? delivery.Contact__r?.Name
+                : delivery.Account__r?.Name;
             fill(row, delivery);
             log.rows.add(row);
         }

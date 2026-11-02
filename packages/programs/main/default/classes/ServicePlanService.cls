@@ -406,7 +406,12 @@ public with sharing class ServicePlanService {
             goal.Status__c = status;
         }
         if (fields.containsKey('outcomeId')) {
-            goal.Outcome_Id__c = checkedOutcome(enrollmentId, text(fields, 'outcomeId'));
+            String outcomeId = text(fields, 'outcomeId');
+            // An unchanged outcome is kept as it is, even one the picker no longer offers (its
+            // outcome deleted or its logic model moved), so the goal's other fields stay editable.
+            if (goalId == null || !sameId(outcomeId, storedOutcome(goalId))) {
+                goal.Outcome_Id__c = checkedOutcome(enrollmentId, outcomeId);
+            }
         }
         if (goalId == null) {
             goal.Enrollment__c = enrollmentId;
@@ -493,6 +498,28 @@ public with sharing class ServicePlanService {
             }
         }
         throw new PlanException(Label.Programs_Plan_BadOutcome);
+    }
+
+    /** The outcome identifier a goal holds now, or null. */
+    private static String storedOutcome(Id goalId) {
+        List<Goal__c> goals = [
+            SELECT Outcome_Id__c
+            FROM Goal__c
+            WHERE Id = :goalId
+            WITH USER_MODE
+        ];
+        return goals.isEmpty() ? null : goals[0].Outcome_Id__c;
+    }
+
+    /** Whether two identifiers name the same record, comparing 15 and 18 character forms. */
+    private static Boolean sameId(String left, String right) {
+        if (left == null || right == null) {
+            return left == right;
+        }
+        if (left.length() >= 15 && right.length() >= 15) {
+            return left.left(15).equals(right.left(15));
+        }
+        return left.equals(right);
     }
 
     private static Id enrollmentOf(Id goalId) {
