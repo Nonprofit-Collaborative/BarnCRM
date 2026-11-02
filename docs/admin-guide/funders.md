@@ -20,6 +20,8 @@ money comes in. A **restricted** grant keeps a simple ledger of the money receiv
 released, with its balance; received payments enter it on their own. The **Grant Calendar** tab
 shows every deadline and expected payment on a month calendar. Government award fields, a funder
 report template and a board dashboard come in later releases.
+before each is due. A grant also carries the fields a government award needs (see [Government
+Awards](#government-awards)). Restricted fund tracking (F-03), multi-year award schedules, a funder report template, a board dashboard and a deadline calendar come in later
 
 ## Before You Install
 
@@ -82,6 +84,25 @@ On the **Grants** tab click **New** and fill in:
 | Purpose | What the money is for, in words you can reuse in a report. |
 | Next Step | The next thing to do. |
 | Owner | The staff member responsible. |
+| Funding Source | What kind of funder: Foundation, Corporate, Federal, Federal Pass-Through, State, Local Government or Other. The board dashboard groups awards by it. |
+
+### Government Awards
+
+A grant's **Government Award** section holds what a government award (or any award that asks for
+it) carries. Every field is optional:
+
+| Field | What to put |
+|---|---|
+| Assistance Listing Number | The federal Assistance Listing number (formerly CFDA), for example 84.287: two digits, a point and three digits or capital letters. |
+| Award Number | The funder's number for the award: the FAIN on a direct federal award, the subaward number from a pass-through. |
+| Federal Agency | The federal agency the money comes from, also when it reaches you through a state or another pass-through. |
+| Indirect Cost Rate | The indirect (overhead) rate the award allows, from 0 to 100 percent. |
+| Match Required | The match or cost share you must put in. Leave it blank when there is none. |
+
+For federal money passed on by a state agency or another body, set **Funding Source** to
+**Federal Pass-Through**, make that body the **Funder**, and name the federal agency in **Federal
+Agency**. The period of performance is the award period (**Award Start Date** and **Award End
+Date**). Drawdowns are recorded as money received in the fund ledger (restricted fund tracking).
 
 ### Stages
 

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Funding_Source__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>What kind of funder it is. Federal Pass-Through: federal money passed on by another body, such as a state agency, which is then the Funder.</inlineHelpText>
+  <label>Funding Source</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Foundation</fullName>
+        <default>false</default>
+        <label>Foundation</label>
+      </value>
+      <value>
+        <fullName>Corporate</fullName>
+        <default>false</default>
+        <label>Corporate</label>
+      </value>
+      <value>
+        <fullName>Federal</fullName>
+        <default>false</default>
+        <label>Federal</label>
+      </value>
+      <value>
+        <fullName>Federal Pass-Through</fullName>
+        <default>false</default>
+        <label>Federal Pass-Through</label>
+      </value>
+      <value>
+        <fullName>State</fullName>
+        <default>false</default>
+        <label>State</label>
+      </value>
+      <value>
+        <fullName>Local Government</fullName>
+        <default>false</default>
+        <label>Local Government</label>
+      </value>
+      <value>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>
