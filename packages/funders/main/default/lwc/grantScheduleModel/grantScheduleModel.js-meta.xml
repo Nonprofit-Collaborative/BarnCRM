@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Award Schedule card's arithmetic in plain JavaScript: the amount awarded split evenly over
+    payments a period apart within the award period (canonical model 29ZM R-GP2). Imported by
+    grantSchedule.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

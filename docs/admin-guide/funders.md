@@ -213,16 +213,18 @@ The grant's page has an **Award Schedule** card. Once the grant is **Awarded** w
 Awarded**, an **Award Start Date** and an **Award End Date**, and has no expected or received
 payment yet, the card offers **Build Schedule**:
 
-1. Choose how often the funder pays: **Once**, **Annual**, **Semiannual**, **Quarterly** or
+1. Choose the **Payment Frequency**: **Once**, **Annual**, **Semiannual**, **Quarterly** or
    **Monthly**.
 2. The card shows the payments it will make: the amount awarded split evenly, the first on the
    award start date and each later one a period apart, up to the award end date. The last payment
    takes any cents left by rounding.
-3. Click **Save Schedule**.
+3. Click **Build Schedule**. The payments are saved, and the frequency is kept in the grant's
+   **Payment Frequency**.
 
 After that, change a payment's date or amount, add one, or cancel one in the grant's **Payments**
 list. **Mark Received** on the card sets a payment Received; its **Received Date** fills in with
-today unless you typed one.
+today unless you typed one. That is the automation **Grant payment received** on the
+**Automation** page; switch it off while you import past payments.
 
 ## Restricted Funds
 
@@ -245,8 +247,8 @@ On a restricted grant, marking a payment **Received** adds its **Received** entr
 entry follows the payment: a changed amount or date changes it, and setting the payment back to
 Expected or Cancelled, or deleting it, removes it. Entries you type yourself are never changed.
 Ticking **Restricted** after payments came in adds no entries for them: add those yourself. The
-automation is **Payment received: fill the date and add a restricted fund entry** on the
-**Automation** page; switch it off while you import past payments and entries.
+automation is **Grant payment received** on the **Automation** page; switch it off while you
+import past payments and entries.
 
 ### The Giving Fund a Grant Is Booked To
 
@@ -301,7 +303,7 @@ Do this as Maria, who holds the Admin role, with a second user, Dana, who has no
    today.
 10. On the grant, set **Award Start Date** to January 1 next year and **Award End Date** to
     December 31 the year after, and tick **Restricted**. On the **Award Schedule** card choose
-    **Annual**: two payments of 12,500, a year apart. Click **Save Schedule**.
+    **Annual**: two payments of 12,500, a year apart. Click **Build Schedule**.
 11. Open **Grant Calendar** and move to January next year: the first payment is on January 1.
 12. Back on the grant, click **Mark Received** on the first payment. **Amount Received** and
     **Restricted Received** show 12,500, and the **Restricted Fund Entries** list has its Received

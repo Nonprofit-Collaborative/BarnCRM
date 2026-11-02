@@ -55,11 +55,13 @@ private class FundersSampleDataTest {
             Assert.areEqual(3, module.countLoaded(), 'Three sample grants are counted');
             Assert.isTrue(module.hasSampleRecords(), 'The card sees them');
             Grant__c awarded = [
-                SELECT Amount_Awarded__c, Decision_Date__c
+                SELECT Amount_Awarded__c, Decision_Date__c, Amount_Scheduled__c, Amount_Received__c
                 FROM Grant__c
                 WHERE Stage__c = :GrantService.STAGE_AWARDED
             ];
             Assert.areEqual(35000, awarded.Amount_Awarded__c, 'The award is filled in');
+            Assert.areEqual(35000, awarded.Amount_Scheduled__c, 'The whole award is scheduled');
+            Assert.areEqual(17500, awarded.Amount_Received__c, 'The first half is received');
             Assert.areEqual(
                 3,
                 [

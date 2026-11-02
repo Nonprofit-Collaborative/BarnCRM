@@ -29,4 +29,6 @@ where a `Program__c` object exists.
   `grantPipelineModel` and the thin controller `GrantPipelineController`; the program picker
   (`grantProgram`) on the Grant record page.
 - The morning reminder job (`GrantReminderScheduler`, `GrantReminderBatch`).
+- `Grant_Payment__c` (29ZM), an award's schedule, with the Award Schedule card (`grantSchedule`,
+  framework-free `grantScheduleModel`, `GrantScheduleController`) on the Grant record page.
 - Permission sets Funders Admin, Staff and Read Only, given by role through `FundersAccessSync`.

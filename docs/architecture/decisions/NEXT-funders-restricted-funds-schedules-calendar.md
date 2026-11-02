@@ -69,7 +69,9 @@ What the three features need:
    date, every later one a period apart while on or before the award end date, and the last one
    taking the cents left by rounding. The split is a framework-free JavaScript module
    (`grantScheduleModel`, plan 9.9) the card previews before saving; `GrantScheduleController`
-   checks the rows again and inserts them in user mode. **Mark Received** on an expected payment
+   checks the rows again and inserts them in user mode, keeping the frequency in the grant's new
+   **Payment Frequency** picklist. The card's headings and frequency choices are field labels read
+   by describe, so it adds few custom labels (the org limit of 5,000 is close). **Mark Received** on an expected payment
    sets it Received; anything else is edited in the Payments related list.
 7. **A received payment on a restricted grant writes its Received entry.** A switchable automation
    (registry row `Grant_Payment_Received`) fills an empty Received Date with today when a payment

@@ -1,6 +1,6 @@
 # Funders
 
-Scripts for the funder pipeline (F-01) and reporting requirements with reminders (F-02). Setup detail: [Funders](../admin-guide/funders.md).
+Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02) and award schedules (F-05). Setup detail: [Funders](../admin-guide/funders.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder,
 Giving and Funders deployed. Programs is optional; T-FUN-04 needs it for its second half. Funders
@@ -140,3 +140,22 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 6 | Load sample data. | The **Youth Programs Award** has three requirements: Site visit (Accepted), Quarter 1 financial report (In Progress, due in 10 days), Interim narrative report (Not Started). |
 
 **Cleanup:** Remove sample data; delete the test grants as the admin.
+
+## T-FUN-09: Award Schedules
+
+**Purpose:** confirm Build Schedule, its checks, Mark Received and the totals.
+**Prerequisites:** admin, staff and read-only; a grant `Two Year Award` to `Lakeside Foundation`, **Awarded**, **Amount Awarded** 25,000, **Award Start Date** January 1 next year, **Award End Date** December 31 the year after.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff, open `Two Year Award`. | The **Award Schedule** card shows Amount Awarded 25,000, Amount Scheduled 0, Amount Received 0, **Payment Frequency** Annual and **Build Schedule**. |
+| 2 | Choose **Quarterly**, then **Annual**. | Eight payments of 3,125, then two of 12,500 on January 1 of each year. |
+| 3 | Click **Build Schedule**. | `Saved.`; two **Expected** payments; Amount Scheduled 25,000; **Build Schedule** is gone. The grant's **Payment Frequency** is Annual. |
+| 4 | Click **Mark Received** on the first payment. | `Saved.`; it is **Received** with today's date; Amount Received 12,500, on the card and on the grant. |
+| 5 | In the **Payments** list, set the second payment to **Cancelled**. | Scheduled 12,500. **Build Schedule** stays hidden (a payment is Received). |
+| 6 | Create a grant `Not Yet` at **Applied** and open it. | The card says what a schedule needs; no **Build Schedule**. |
+| 7 | As read-only, open `Two Year Award`. | The payments show; no **Mark Received** and no **Build Schedule**. |
+| 8 | Load sample data and open **Youth Programs Award**. | Two payments of 17,500: the first Received on the award start date, the second Expected six months later. |
+| 9 | As the admin, delete `Two Year Award`. | Its payments go with it. |
+
+**Cleanup:** Remove sample data; delete `Not Yet` as the admin.
