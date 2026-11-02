@@ -228,6 +228,10 @@
             <c-access-modify-all data-id="modify-all"></c-access-modify-all>
         </template>
 
+        <template lwc:if={isChangeView}>
+            <c-field-access-manager data-id="change"></c-field-access-manager>
+        </template>
+
         <template lwc:if={isBarnCrmView}>
             <div class="slds-var-m-top_medium" data-id="barncrm-view">
                 <template lwc:if={overview}>

@@ -19,6 +19,7 @@ import VIEW_OBJECT from '@salesforce/label/c.Core_AccessExplorer_ViewObject';
 import VIEW_BARNCRM from '@salesforce/label/c.Core_AccessExplorer_ViewBarnCrm';
 import VIEW_COMPARE from '@salesforce/label/c.Core_AccessCompare_ViewCompare';
 import VIEW_MODIFY_ALL from '@salesforce/label/c.Core_AccessCompare_ViewModifyAll';
+import VIEW_CHANGE from '@salesforce/label/c.Core_FieldAccess_ViewChange';
 import LOOK_UP from '@salesforce/label/c.Core_AccessExplorer_LookUp';
 import LOOK_UP_PERSON from '@salesforce/label/c.Core_Section_Person';
 import LOOK_UP_SET from '@salesforce/label/c.Core_AccessExplorer_KindSet';
@@ -134,7 +135,8 @@ export default class AccessExplorer extends LightningElement {
     { label: VIEW_OBJECT, value: 'object' },
     { label: VIEW_BARNCRM, value: 'barncrm' },
     { label: VIEW_COMPARE, value: 'compare' },
-    { label: VIEW_MODIFY_ALL, value: 'modifyAll' }
+    { label: VIEW_MODIFY_ALL, value: 'modifyAll' },
+    { label: VIEW_CHANGE, value: 'change' }
   ];
   lookUpOptions = [
     { label: LOOK_UP_PERSON, value: 'person' },
@@ -192,6 +194,10 @@ export default class AccessExplorer extends LightningElement {
 
   get isModifyAllView() {
     return this.view === 'modifyAll';
+  }
+
+  get isChangeView() {
+    return this.view === 'change';
   }
 
   get noResults() {
