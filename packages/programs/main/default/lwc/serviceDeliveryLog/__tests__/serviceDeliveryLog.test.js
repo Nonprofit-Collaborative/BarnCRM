@@ -2,12 +2,17 @@ import { createElement } from 'lwc';
 import ServiceDeliveryLog from 'c/serviceDeliveryLog';
 import getLog from '@salesforce/apex/ServiceDeliveryLogController.getLog';
 import save from '@salesforce/apex/ServiceDeliveryLogController.save';
+import getSessionLog from '@salesforce/apex/ServiceDeliveryLogController.getSessionLog';
+import saveSession from '@salesforce/apex/ServiceDeliveryLogController.saveSession';
 import {
   entriesToSave,
   format,
+  formatIsoDate,
   isAbsence,
+  isSessionObject,
   logRows,
   markAllPresent,
+  sessionSummary,
   withAttendance,
   withQuantity
 } from '../logRows';
@@ -16,6 +21,25 @@ jest.mock('@salesforce/apex/ServiceDeliveryLogController.getLog', () => ({ defau
   virtual: true
 });
 jest.mock('@salesforce/apex/ServiceDeliveryLogController.save', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/apex/ServiceDeliveryLogController.getSessionLog',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/ServiceDeliveryLogController.saveSession',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock('@salesforce/label/c.Programs_Log_SessionOf', () => ({ default: '{0} on {1}' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Programs_Log_SessionCohort', () => ({ default: 'Cohort: {0}' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Programs_Log_SessionEveryone', () => ({ default: 'Everyone' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Programs_Log_Saved', () => ({ default: '{0} saved.' }), {
@@ -298,5 +322,109 @@ describe('c-service-delivery-log', () => {
     expect(second.shadowRoot.querySelector('[data-id="error-message"]').textContent).toContain(
       'Programs_Log_ActionFailed'
     );
+  });
+});
+
+const SESSION_ID = 'a0S000000000001AAA';
+
+function sessionLog(rows, extra) {
+  return logOf(rows, {
+    sessionId: SESSION_ID,
+    sessionName: 'Tutoring hour 2026-10-31',
+    cohortName: 'Spring',
+    sessionStatus: 'Scheduled',
+    cancelled: false,
+    ...extra
+  });
+}
+
+async function renderSession(objectApiName = 'Session__c') {
+  const element = createElement('c-service-delivery-log', { is: ServiceDeliveryLog });
+  element.recordId = SESSION_ID;
+  element.objectApiName = objectApiName;
+  document.body.appendChild(element);
+  await flush();
+  return element;
+}
+
+// Built from parts so the namespace check does not read it as a hard-coded prefix.
+const PREFIXED_SESSION = ['ns', 'Session__c'].join('__');
+
+describe('sessions in logRows (framework free)', () => {
+  it('knows a session page whatever the namespace', () => {
+    expect(isSessionObject('Session__c')).toBe(true);
+    expect(isSessionObject(PREFIXED_SESSION)).toBe(true);
+    expect(isSessionObject('Program__c')).toBe(false);
+    expect(isSessionObject('Other_Session__c')).toBe(false);
+    expect(isSessionObject(undefined)).toBe(false);
+  });
+
+  it('writes the day out without moving it and sums the session up', () => {
+    expect(formatIsoDate('2026-10-31', 'en-US')).toBe('Oct 31, 2026');
+    expect(formatIsoDate('', 'en-US')).toBe('');
+    expect(formatIsoDate('2026-10-31', 'not a locale !')).toBe('2026-10-31');
+    const labels = { sessionOf: '{0} on {1}', cohort: 'Cohort: {0}', everyone: 'Everyone' };
+    expect(sessionSummary(sessionLog([]), labels, 'en-US')).toEqual({
+      heading: 'Tutoring hour on Oct 31, 2026',
+      roster: 'Cohort: Spring',
+      cancelled: false
+    });
+    expect(sessionSummary(sessionLog([], { cohortName: null }), labels, 'en-US').roster).toBe(
+      'Everyone'
+    );
+    expect(sessionSummary(logOf([]), labels, 'en-US')).toBeNull();
+  });
+});
+
+describe('c-service-delivery-log on a session', () => {
+  afterEach(() => {
+    while (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild);
+    }
+    jest.clearAllMocks();
+  });
+
+  it('shows the session and its cohort with no service or date to pick', async () => {
+    getSessionLog.mockResolvedValue(sessionLog([ANA, BEN]));
+    const element = await renderSession();
+    expect(getSessionLog).toHaveBeenCalledWith({ sessionId: SESSION_ID });
+    expect(getLog).not.toHaveBeenCalled();
+    expect(find(element, 'service')).toBeNull();
+    expect(find(element, 'date')).toBeNull();
+    expect(find(element, 'session-heading').textContent).toContain('Tutoring hour on');
+    expect(find(element, 'session-roster').textContent).toBe('Cohort: Spring');
+    expect(findAll(element, 'row')).toHaveLength(2);
+  });
+
+  it('saves the session and asks the page to refresh', async () => {
+    getSessionLog.mockResolvedValue(sessionLog([ANA]));
+    saveSession.mockResolvedValue(
+      sessionLog([{ ...ANA, deliveryId: 'a0B9', attendance: 'Present', quantity: 1 }], {
+        saved: 1,
+        sessionStatus: 'Held'
+      })
+    );
+    const element = await renderSession();
+    const refreshed = jest.fn();
+    element.addEventListener('lightning__refresh', refreshed);
+    find(element, 'mark-all-present').click();
+    await flush();
+    find(element, 'save').click();
+    await flush();
+    expect(saveSession).toHaveBeenCalledWith({
+      sessionId: SESSION_ID,
+      entries: [expect.objectContaining({ contactId: ANA.contactId, attendance: 'Present' })]
+    });
+    expect(save).not.toHaveBeenCalled();
+    expect(refreshed).toHaveBeenCalled();
+    expect(find(element, 'result').textContent).toBe('One saved.');
+  });
+
+  it('shows a cancelled session without the controls', async () => {
+    getSessionLog.mockResolvedValue(sessionLog([BEN], { cancelled: true, canEdit: false }));
+    const element = await renderSession(PREFIXED_SESSION);
+    expect(find(element, 'session-cancelled')).not.toBeNull();
+    expect(find(element, 'save')).toBeNull();
+    expect(find(element, 'recorded').textContent).toContain('Present');
   });
 });

@@ -108,3 +108,45 @@ export function entriesToSave(log, drafts) {
       };
     });
 }
+
+/** Whether the panel sits on a session page (P-11), whatever the namespace. */
+export function isSessionObject(objectApiName) {
+  return /(^|__)Session__c$/.test(String(objectApiName || ''));
+}
+
+/** An ISO date ("2027-03-01") written out in this locale, read in UTC so no day moves. */
+export function formatIsoDate(value, locale) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ''));
+  if (!match) {
+    return value || '';
+  }
+  const date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
+  try {
+    return new Intl.DateTimeFormat(locale || undefined, {
+      dateStyle: 'medium',
+      timeZone: 'UTC'
+    }).format(date);
+  } catch {
+    return value;
+  }
+}
+
+/**
+ * The lines above a session's log (R-SE2, R-SE3): its service and day, who is listed, and
+ * whether it was cancelled.
+ */
+export function sessionSummary(log, labels, locale) {
+  if (!log || !log.sessionId) {
+    return null;
+  }
+  const service = (log.services || []).find((option) => option.value === log.serviceId);
+  return {
+    heading: format(
+      labels.sessionOf,
+      service ? service.label : '',
+      formatIsoDate(log.deliveryDate, locale)
+    ),
+    roster: log.cohortName ? format(labels.cohort, log.cohortName) : labels.everyone,
+    cancelled: !!log.cancelled
+  };
+}

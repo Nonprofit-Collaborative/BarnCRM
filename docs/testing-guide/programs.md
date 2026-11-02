@@ -273,3 +273,26 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 11 | As the admin, erase Test Person. | The summary lists Goals as deleted; the goal and its steps are gone, the enrollment stays. |
 
 **Cleanup:** delete the enrollments; remove the staff user's role.
+
+## T-PRG-17: Cohorts, Mass Enrollment, Scheduled Sessions and Session Attendance
+
+**Purpose:** confirm a cohort takes people already enrolled and enrolls new ones in one step, that sessions are scheduled over a date range, that attendance on a session is one service delivery per person and takes over a delivery already logged that day, and that a cancelled session takes no attendance.
+**Prerequisites:** the admin user; a staff user with a BarnCRM role of Team Member (Programs Staff); the Read Only user; a program with an active service "Tutoring", two people enrolled in it ("Ana" and "Ben") and a third person not enrolled ("Cara").
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, open the program and, in **Cohorts**, click **New**. Name it "Spring", Start Date the first of next month, End Date two weeks later. Save. | The cohort opens with the **Cohort Members** panel ("Members (0)") and the **Schedule Sessions** panel. An End Date before the Start Date is refused. |
+| 2 | Under **Add People**, tick Ana and Ben. Pick Cara under the person picker and click **Add to List**. Click **Add to Cohort**. | "3 people added." All three are members; Cara now has an Enrolled enrollment in the program, in the cohort. |
+| 3 | Pick Ana again, add her to the list and click **Add to Cohort**. | Ana is listed under **Not Added** with the reason; nobody is added twice. |
+| 4 | Click **Remove** by Ben. | Ben leaves the members and is offered again under the people to add; his enrollment stays, with no cohort. |
+| 5 | On an enrollment in another program, set **Cohort** to Spring. | Refused: the cohort must belong to the enrollment's program. |
+| 6 | In **Schedule Sessions**, pick Tutoring, keep the cohort's dates, tick Monday and Wednesday, set a Start Time. | The line under the form gives the number of sessions (4 for a range starting on a Monday). Click **Schedule**: "4 sessions scheduled.", listed under the cohort's **Sessions**, each named "Tutoring (date)". |
+| 7 | Set **To** before **From**, then untick every day. | The line asks for dates, then for days; **Schedule** is off. |
+| 8 | As the staff user, open the program's **Service Delivery Log**, pick Tutoring and the first session's date, mark Ana Present and save. Then open that session. | The session's log lists only the cohort members (Ana, Cara) with Ana already Present. |
+| 9 | Mark Cara Present and save. | "2 service deliveries saved."; the session's Status is Held. The session's **Service Deliveries** list shows two, and the program has no second delivery for Ana that day. |
+| 10 | Open another session and set its Status to Cancelled. | The log shows the session is cancelled with no controls; saving attendance on it is refused. |
+| 11 | Try to delete the held session. | Refused while it has service deliveries. |
+| 12 | As the Read Only user, open the cohort and a session. | Members, sessions and attendance are shown with no Add, Remove, Schedule or Save. |
+| 13 | On the program, schedule a session in **Schedule Sessions** (no cohort). Open it. | The log lists everyone with an open enrollment in the program. |
+
+**Cleanup:** delete the sessions without deliveries and the cohort; delete the enrollments; remove the staff user's role.

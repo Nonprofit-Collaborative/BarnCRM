@@ -11,6 +11,10 @@
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
+    <apexClass>CohortController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>PersonEnrollmentsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -34,6 +38,10 @@
     <apexClass>ServicePlanController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>SessionScheduleController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Case_Note__c.Goal__c</field>
@@ -51,7 +59,22 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Cohort__c.End_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Cohort__c.Start_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Enrollment__c.Account__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Enrollment__c.Cohort__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -204,6 +227,21 @@
     <field>Service_Delivery__c.Enrollment__c</field>
     <readable>true</readable>
   </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Service_Delivery__c.Session__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Session__c.Cohort__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Session__c.Start_Time__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
     <allowDelete>true</allowDelete>
@@ -212,6 +250,15 @@
     <modifyAllRecords>true</modifyAllRecords>
     <object>Case_Note__c</object>
     <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Cohort__c</object>
+    <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
@@ -267,8 +314,21 @@
     <object>Service_Delivery__c</object>
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Session__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
   <tabSettings>
     <tab>Case_Note__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Cohort__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
@@ -293,6 +353,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Service_Delivery__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Session__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

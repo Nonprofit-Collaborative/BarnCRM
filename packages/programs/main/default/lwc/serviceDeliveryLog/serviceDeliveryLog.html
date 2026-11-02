@@ -15,8 +15,20 @@
         <p data-id="no-services" class="slds-text-body_regular">{labels.noServices}</p>
       </template>
 
+      <template lwc:if={session}>
+        <div data-id="session" class="slds-var-m-bottom_small">
+          <p class="slds-text-heading_small" data-id="session-heading">{session.heading}</p>
+          <p class="slds-text-body_small slds-text-color_weak" data-id="session-roster">{session.roster}</p>
+          <template lwc:if={session.cancelled}>
+            <p class="slds-text-body_regular slds-var-m-top_x-small" data-id="session-cancelled">
+              {labels.sessionCancelled}
+            </p>
+          </template>
+        </div>
+      </template>
+
       <template lwc:if={hasServices}>
-        <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small">
+        <div lwc:if={showPickers} class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small">
           <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
             <lightning-combobox
               data-id="service"

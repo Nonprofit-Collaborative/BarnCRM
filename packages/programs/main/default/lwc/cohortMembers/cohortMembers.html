@@ -1,0 +1,151 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom15">
+    <div class="slds-var-p-horizontal_medium slds-is-relative">
+      <template lwc:if={showSpinner}>
+        <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+          {errorMessage}
+        </p>
+      </template>
+
+      <div role="status" data-id="result" class="slds-var-m-bottom_small">{resultMessage}</div>
+
+      <template lwc:if={hasFailures}>
+        <div data-id="failures" class="slds-box slds-theme_shade slds-var-m-bottom_small">
+          <p class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.notAdded}</p>
+          <ul class="slds-list_dotted">
+            <template for:each={failures} for:item="failure">
+              <li key={failure.key} data-id="failure">{failure.personName}: {failure.message}</li>
+            </template>
+          </ul>
+        </div>
+      </template>
+
+      <template lwc:if={loaded}>
+        <p data-id="member-count" class="slds-text-title_caps slds-var-m-bottom_x-small">{memberCount}</p>
+        <template lwc:if={hasMembers}>
+          <ul class="slds-has-dividers_bottom-space">
+            <template for:each={members} for:item="member">
+              <li key={member.key} class="slds-item" data-id="member">
+                <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                  <div class="slds-col">
+                    <p class="slds-text-heading_small">{member.personName}</p>
+                    <p class="slds-text-body_small slds-text-color_weak">{member.stage}</p>
+                  </div>
+                  <template lwc:if={canEdit}>
+                    <div class="slds-col slds-grow-none">
+                      <lightning-button
+                        data-id="remove"
+                        data-enrollment={member.enrollmentId}
+                        label={labels.remove}
+                        title={member.removeLabel}
+                        onclick={handleRemove}
+                      ></lightning-button>
+                    </div>
+                  </template>
+                </div>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else>
+          <p data-id="members-empty" class="slds-text-body_regular">{labels.membersEmpty}</p>
+        </template>
+        <template lwc:if={moreThanShown}>
+          <p data-id="more" class="slds-text-body_small slds-text-color_weak">{labels.moreThanShown}</p>
+        </template>
+
+        <template lwc:if={canEdit}>
+          <section class="slds-var-m-top_medium" aria-label={labels.addPeople} data-id="add-people">
+            <h3 class="slds-text-heading_small slds-var-m-bottom_small">{labels.addPeople}</h3>
+
+            <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_x-small">
+              <p class="slds-col slds-text-title_caps">{labels.candidates}</p>
+              <template lwc:if={hasCandidates}>
+                <lightning-button
+                  data-id="select-all"
+                  class="slds-col slds-grow-none"
+                  variant="base"
+                  label={labels.selectAll}
+                  onclick={handleSelectAll}
+                ></lightning-button>
+              </template>
+            </div>
+            <template lwc:if={hasCandidates}>
+              <ul>
+                <template for:each={candidates} for:item="candidate">
+                  <li key={candidate.key} data-id="candidate">
+                    <lightning-input
+                      data-id="tick"
+                      data-enrollment={candidate.enrollmentId}
+                      type="checkbox"
+                      label={candidate.personName}
+                      title={candidate.tickLabel}
+                      checked={candidate.checked}
+                      onchange={handleTick}
+                    ></lightning-input>
+                  </li>
+                </template>
+              </ul>
+            </template>
+            <template lwc:else>
+              <p data-id="no-candidates" class="slds-text-body_small slds-text-color_weak">{labels.noCandidates}</p>
+            </template>
+
+            <template lwc:if={canEnroll}>
+              <p class="slds-text-title_caps slds-var-m-top_medium slds-var-m-bottom_x-small">{labels.someoneElse}</p>
+              <div class="slds-grid slds-wrap slds-grid_vertical-align-end slds-gutters_x-small">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+                  <lightning-record-picker
+                    data-id="person-picker"
+                    label={labels.person}
+                    object-api-name={personObjectApiName}
+                    filter={personFilter}
+                    onchange={handlePersonChange}
+                  ></lightning-record-picker>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                  <lightning-button
+                    data-id="add-to-list"
+                    label={labels.addToList}
+                    disabled={addToListDisabled}
+                    onclick={handleAddToList}
+                  ></lightning-button>
+                </div>
+              </div>
+              <template lwc:if={hasPicked}>
+                <div class="slds-var-m-top_x-small" data-id="picked-list">
+                  <template for:each={pickedPeople} for:item="person">
+                    <lightning-pill
+                      key={person.id}
+                      data-id="picked"
+                      data-person={person.id}
+                      label={person.name}
+                      title={person.takeOffLabel}
+                      onremove={handleTakeOff}
+                    ></lightning-pill>
+                  </template>
+                </div>
+              </template>
+            </template>
+
+            <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-end slds-var-m-vertical_small">
+              <p data-id="chosen" class="slds-col slds-text-body_small" aria-live="polite">{chosenMessage}</p>
+              <lightning-button
+                data-id="add"
+                class="slds-col slds-grow-none"
+                variant="brand"
+                label={labels.addToCohort}
+                disabled={addDisabled}
+                onclick={handleAdd}
+              ></lightning-button>
+            </div>
+          </section>
+        </template>
+      </template>
+    </div>
+  </lightning-card>
+</template>
