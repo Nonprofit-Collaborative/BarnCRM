@@ -136,6 +136,8 @@ function importCoreComponent(name) {
       return import('c/integrationsPanel');
     case 'importFieldConnection':
       return import('c/importFieldConnection');
+    case 'npspHouseholdAdoption':
+      return import('c/npspHouseholdAdoption');
     default:
       return null;
   }
