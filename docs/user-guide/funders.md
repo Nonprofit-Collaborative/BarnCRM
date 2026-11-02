@@ -100,6 +100,18 @@ with the target and result of every period in the award period, for example `202
 result 25`. Choose **No outcome** and **Save** to clear it. If the outcome was deleted, the card
 says so; choose another.
 
+## To Make a Funder Report
+
+1. On the grant's page, find the **Funder Report** card.
+2. In **Template**, choose the report template, for example **Grant report**.
+3. Click **Download Printable**.
+
+You should see: `Report downloaded.`, and a file named like `Funder_Report-2026-11-02.html` in
+your downloads. Open it in your browser to read it, print it, or save it as a PDF from the print
+dialog. It holds the grant's details, its requirements table and, with Logic Models, the results
+of each linked outcome. Nothing is saved in BarnCRM. If the card says there is no active
+template, ask your admin to add one on the **Funder Report Templates** tab.
+
 ## To Add What an Award Requires
 
 Funders usually want reports back. Record each one on the grant.

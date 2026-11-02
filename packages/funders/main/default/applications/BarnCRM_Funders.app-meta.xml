@@ -35,6 +35,7 @@
   <tabs>Grant__c</tabs>
   <tabs>Grant_Requirement__c</tabs>
   <tabs>Grant_Answer__c</tabs>
+  <tabs>Funder_Report_Template__c</tabs>
   <tabs>standard-report</tabs>
   <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
@@ -44,6 +45,9 @@
     </mappings>
     <mappings>
       <tab>Grant_Calendar</tab>
+    </mappings>
+    <mappings>
+      <tab>Funder_Report_Template__c</tab>
     </mappings>
     <mappings>
       <tab>Grant_Answer__c</tab>

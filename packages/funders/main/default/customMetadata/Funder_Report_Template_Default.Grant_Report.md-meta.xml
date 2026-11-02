@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Grant report</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Name__c</field>
+    <value xsi:type="xsd:string">Grant report</value>
+  </values>
+  <values>
+    <field>Body__c</field>
+    <value xsi:type="xsd:string">&lt;h1&gt;{GrantName}&lt;/h1&gt;
+&lt;p&gt;{OrganizationName}&lt;br/&gt;Report to {FunderName}, {Today}&lt;/p&gt;
+&lt;h2&gt;The Award&lt;/h2&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;th&gt;Amount awarded&lt;/th&gt;&lt;td&gt;{AmountAwarded}&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Award period&lt;/th&gt;&lt;td&gt;{AwardStartDate} to {AwardEndDate}&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Program&lt;/th&gt;&lt;td&gt;{ProgramName}&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Award number&lt;/th&gt;&lt;td&gt;{AwardNumber}&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;Program officer&lt;/th&gt;&lt;td&gt;{FunderContactName}&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;h2&gt;Purpose&lt;/h2&gt;
+&lt;p&gt;{Purpose}&lt;/p&gt;
+&lt;h2&gt;Progress&lt;/h2&gt;
+&lt;p&gt;Write here what the award made possible this period.&lt;/p&gt;
+&lt;h2&gt;Outcomes&lt;/h2&gt;
+{OutcomeResults}
+&lt;h2&gt;Reports and Deliverables&lt;/h2&gt;
+{RequirementTable}
+&lt;p&gt;Contact: {OwnerName}, {OrganizationName}&lt;/p&gt;
+</value>
+  </values>
+</CustomMetadata>

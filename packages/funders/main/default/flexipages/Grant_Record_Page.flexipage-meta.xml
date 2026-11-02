@@ -61,6 +61,12 @@
     </itemInstances>
     <itemInstances>
       <componentInstance>
+        <componentName>grantReport</componentName>
+        <identifier>grantReportCard</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>grantAnswerLibrary</componentName>
         <identifier>grantAnswerLibraryCard</identifier>
       </componentInstance>
