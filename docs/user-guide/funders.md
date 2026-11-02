@@ -1,7 +1,8 @@
 # Grants and Funders
 
 This page covers tracking grants in BarnCRM: the requests you send to foundations, companies and
-government funders, how far along each one is, and the deadlines coming up.
+government funders, how far along each one is, the deadlines coming up, and the reports an award
+requires.
 
 **Before you start:** open the **BarnCRM Funders** app from the App Launcher. Fundraising Staff,
 Team Members and Coordinators add grants and move them through the stages, but cannot delete a
@@ -62,7 +63,9 @@ Change it if the funder gave a different amount, then click **Save**.
 ## To See the Deadlines Coming Up
 
 Under the board, **Upcoming Deadlines** lists every grant at Prospect, Letter of Inquiry or
-Invited to Apply whose application deadline is past or within the next 60 days, soonest first.
+Invited to Apply whose application deadline is past or within the next 60 days, and every open
+requirement due in that time or overdue, soonest first. Under each name it says **Application**,
+or the requirement's type and grant.
 Each row says how many days are left, `Due today`, or how many days overdue (in red). Click a
 grant's name to open it.
 
@@ -76,6 +79,36 @@ Only when your organization uses Programs.
 You should see: `Program saved.` Choose **No program** and **Save** to clear it. Without Programs
 the card says to install the Programs module. If the program was deleted, the card says so;
 choose another.
+
+## To Add What an Award Requires
+
+Funders usually want reports back. Record each one on the grant.
+
+1. On the grant's page, in the **Requirements** list, click **New**.
+2. Type a **Requirement Name**, for example "Year 1 interim report", and choose its **Type**.
+3. Fill in the **Due Date** and, in **Assigned To**, the person doing it.
+4. Paste what the funder asks for into **Instructions**, then click **Save**.
+
+You should see: the requirement in the grant's **Requirements** list, and on the **Grant
+Pipeline** under **Upcoming Deadlines** once it is due within 60 days.
+
+## Your Reminders
+
+When a requirement assigned to you is coming due (14 days ahead unless your admin changed it),
+you get a task on the grant, due on the due date, and, if your admin turned email reminders on,
+an email with a link to the grant. If
+nobody is assigned, the grant's owner gets them. You are reminded once for each due date; if the
+date changes, you are reminded again.
+
+## To Mark a Requirement Submitted
+
+1. On the **Grant Pipeline**, under **Upcoming Deadlines**, find the requirement.
+2. Click **Mark Submitted**.
+
+You should see: `Marked submitted.` and the row leaves the list. The requirement's **Status** is
+**Submitted** and its **Submitted Date** today. You can also open the requirement and set
+**Status** yourself: **Accepted** when the funder approves it, **Waived** when the funder excuses
+it.
 
 ## Tips
 

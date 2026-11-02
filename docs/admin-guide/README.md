@@ -236,6 +236,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | Feature | Page | Package |
 |---|---|---|
 | F-01 Funders: install, roles, grants and their stages, the program a grant pays for, the Grant Pipeline tab | [funders.md](funders.md) | BarnCRM Funders |
+| F-02 Reporting requirements and deadlines: grant requirements, morning reminder tasks and emails, the Funders settings, overdue requirements in Health Check | [funders.md](funders.md#grant-requirements) | BarnCRM Funders |
 
 ### Moving From Another System
 

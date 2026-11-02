@@ -1,6 +1,6 @@
 # Funders
 
-Scripts for the funder pipeline (F-01). Setup detail: [Funders](../admin-guide/funders.md).
+Scripts for the funder pipeline (F-01) and reporting requirements with reminders (F-02). Setup detail: [Funders](../admin-guide/funders.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder,
 Giving and Funders deployed. Programs is optional; T-FUN-04 needs it for its second half. Funders
@@ -89,3 +89,54 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 7 | **Remove Sample Data**. | The sample grants are gone; your own grants stay. |
 
 **Cleanup:** Delete the test grants as the admin.
+
+## T-FUN-06: Grant Requirements and the Submitted Date
+
+**Purpose:** confirm requirements belong to their grant and the submitted date fills itself in.
+**Prerequisites:** staff; an Awarded grant `Youth Grant`.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open `Youth Grant`. In **Requirements**, click **New**. Name `Year 1 report`, leave **Due Date** empty, **Save**. | Refused: **Due Date** is required. **Type** shows Narrative Report and **Status** Not Started. |
+| 2 | Due Date 5 days from today, **Assigned To** the staff user, **Save**. | The requirement is in the grant's **Requirements** list. |
+| 3 | **Edit**, Status **In Progress**, **Save**. | **Submitted Date** stays empty. |
+| 4 | **Edit**, Status **Submitted**, **Save**. | **Submitted Date** is today. |
+| 5 | Add `Site visit`, Type **Site Visit**, Status **Accepted**, Submitted Date last week, **Save**. | **Submitted Date** stays last week. |
+| 6 | As staff, delete `Site visit`. | Deleted (staff may delete requirements, not grants). |
+
+**Cleanup:** Set `Year 1 report` back to **Not Started** and clear its Submitted Date (T-FUN-07 uses it).
+
+## T-FUN-07: Reminders and Their Settings
+
+**Purpose:** confirm one task and one email per due date, to the right person, as the settings say.
+**Prerequisites:** admin and staff; `Year 1 report` from T-FUN-06; the nightly jobs scheduled (Health Check, **Schedule all nightly jobs**).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Funders** (under Fundraising). | **Create Reminder Tasks** on, **Email Reminders** off, **Days Before a Deadline to Remind** 14. Turn **Email Reminders** on and save. |
+| 2 | Health Check, nightly jobs list. | **Grant Requirement Reminders, 6:00 AM** is scheduled. |
+| 3 | In the Developer Console run `GrantReminderBatch.startMorning();`, or wait until the next morning. | The staff user has a task `Year 1 report due for Youth Grant` on the grant, due on the due date, and an email with a link to the grant. **Reminder Sent For** on the requirement shows the due date. |
+| 4 | Run it again. | No second task or email. |
+| 5 | Change the requirement's **Due Date** to 7 days from today and run it again. | A new task and email for the new date. |
+| 6 | Clear **Assigned To** and change the due date again; run it. | The task goes to the grant's owner. |
+| 7 | Set **Days Before a Deadline to Remind** to `120`. | Refused: from 1 to 90. |
+| 8 | Turn both reminder settings off and run it after changing the due date. | Nothing is made. Turn **Create Reminder Tasks** back on and leave **Email Reminders** off (the shipped values). |
+
+**Cleanup:** Delete the test tasks.
+
+## T-FUN-08: Requirement Deadlines on the Pipeline and in Health Check
+
+**Purpose:** confirm requirement rows, Mark Submitted and the overdue finding.
+**Prerequisites:** admin, staff and read-only; `Year 1 report` open and due in 7 days; a second open requirement `Q1 financial` due 3 days ago.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff, open **Grant Pipeline**, **Upcoming Deadlines**. | `Q1 financial` first with `3 days overdue` in red, then `Year 1 report` with `7 days left`; under each, its type and `Youth Grant`. Each has **Mark Submitted**. |
+| 2 | Click **Mark Submitted** on `Year 1 report`. | `Marked submitted.`; the row leaves the list; its **Submitted Date** is today. |
+| 3 | As read-only, open **Grant Pipeline**. | `Q1 financial` is listed with no **Mark Submitted**. |
+| 4 | As the admin, open **Health Check**. | `1 grant requirement is overdue`, linked to `Q1 financial`. |
+| 5 | Set `Q1 financial` to **Waived** and run Health Check again. | The finding is gone. |
+| 6 | Load sample data. | The **Youth Programs Award** has three requirements: Site visit (Accepted), Quarter 1 financial report (In Progress, due in 10 days), Interim narrative report (Not Started). |
+
+**Cleanup:** Remove sample data; delete the test grants as the admin.

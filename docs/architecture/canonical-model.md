@@ -11649,7 +11649,8 @@ member assigned, and BarnCRM reminds that person before it is due.
 done. Only open requirements are reminded, counted overdue or listed as upcoming.
 
 **R-GQ2 The submitted date is stamped.** Moving to Submitted or Accepted fills an empty Submitted
-Date with today. Part of the switchable `Grant_Dates` automation (R-GN3).
+Date with today. A switchable automation of its own, `Grant_Requirement_Dates`, beside the
+grant's `Grant_Dates` (R-GN3).
 
 **R-GQ3 One reminder per due date.** A morning job (6:00 AM org time) reminds each open requirement
 whose Due Date is no more than the lead time ahead (Funders Settings, R-FS1) and no more than 30
@@ -11684,7 +11685,8 @@ passed.
 | Reminder Sent For | `Reminder_Sent_For__c` | Date, read only in every permission set but Funders Admin |
 
 - **Trigger:** `GrantRequirementTrigger`, through the Core dispatcher; handler
-  `GrantRequirementDatesHandler` (R-GQ2, registry row `Grant_Requirement_Dates`, switchable).
+  `GrantRequirementDatesHandler` (R-GQ2, registry row `Grant_Requirement_Dates`, switchable);
+  the rules in `GrantRequirementService`.
 - **Reminders:** `GrantReminderScheduler` (Schedulable, job "BarnCRM Grant Reminders", listed by
   `FundersNightlyJobProvider`), `GrantReminderBatch`, `GrantReminderService` (decides, pure),
   `GrantReminderSelector`; email through Core's `EmailSender`.
@@ -11702,7 +11704,7 @@ The Funders module's org-wide settings (F-02), edited in the Funders section of 
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Create Reminder Tasks | boolean | yes (defaults true) | Whether the morning job makes a task for each requirement coming due (R-GQ3). |
-| Email Reminders | boolean | yes (defaults true) | Whether the morning job also emails the person reminded. |
+| Email Reminders | boolean | yes (defaults false) | Whether the morning job also emails the person reminded. |
 | Days Before a Deadline to Remind | number | yes (defaults 14) | The lead time, from 1 to 90 days (R-FS1). |
 
 ### Rules
@@ -11718,7 +11720,7 @@ The Funders module's org-wide settings (F-02), edited in the Funders section of 
 | Attribute | API name | Type |
 |---|---|---|
 | Create Reminder Tasks | `Reminder_Tasks_Enabled__c` | Checkbox, default true |
-| Email Reminders | `Reminder_Emails_Enabled__c` | Checkbox, default true |
+| Email Reminders | `Reminder_Emails_Enabled__c` | Checkbox, default false |
 | Days Before a Deadline to Remind | `Reminder_Lead_Days__c` | Number(2, 0), default 14 |
 
 - **Setting Definitions:** `Funders_Reminder_Tasks_Enabled`, `Funders_Reminder_Emails_Enabled`,

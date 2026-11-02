@@ -14,9 +14,13 @@ private class SettingSectionsTest {
             Test.stopTest();
 
             Assert.areEqual(
-                18,
+                19,
                 sections.size(),
-                'Eighteen section names are agreed across the suite'
+                'Nineteen section names are agreed across the suite'
+            );
+            Assert.isTrue(
+                SettingSections.isKnown(SettingSections.FUNDERS),
+                'Funders is a section the Funders module ships rows into'
             );
             Assert.isTrue(
                 SettingSections.isKnown(SettingSections.INTEGRATIONS),

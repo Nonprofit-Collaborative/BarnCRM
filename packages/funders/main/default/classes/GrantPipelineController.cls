@@ -43,6 +43,8 @@ public with sharing class GrantPipelineController {
         @AuraEnabled
         public Boolean canCreate = false;
         @AuraEnabled
+        public Boolean canMarkSubmitted = false;
+        @AuraEnabled
         public Date today;
     }
 
@@ -76,7 +78,20 @@ public with sharing class GrantPipelineController {
         public String nextStep;
         @AuraEnabled
         public String ownerName;
+        /** For a deadline row: `application` (a grant's deadline) or `requirement` (F-02). */
+        @AuraEnabled
+        public String kind;
+        /** For a requirement row: its grant and its type. */
+        @AuraEnabled
+        public String grantId;
+        @AuraEnabled
+        public String grantName;
+        @AuraEnabled
+        public String requirementType;
     }
+
+    public static final String KIND_APPLICATION = 'application';
+    public static final String KIND_REQUIREMENT = 'requirement';
 
     /** The tab, for everyone's grants or only the person's own. */
     @AuraEnabled
@@ -155,8 +170,14 @@ public with sharing class GrantPipelineController {
                     AccessLevel.USER_MODE
                 )
             ) {
-                board.deadlines.add(toCard(grant));
+                Card row = toCard(grant);
+                row.kind = KIND_APPLICATION;
+                board.deadlines.add(row);
             }
+            if (Schema.SObjectType.Grant_Requirement__c.isAccessible()) {
+                addRequirementDeadlines(board, binds, mineOnly == true);
+            }
+            board.canMarkSubmitted = Schema.SObjectType.Grant_Requirement__c.fields.Status__c.isUpdateable();
             return board;
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.getBoard');
@@ -186,6 +207,62 @@ public with sharing class GrantPipelineController {
             throw UserErrors.message(e.getDmlMessage(0));
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.moveStage', grantId);
+            throw UserErrors.message(Label.Funders_Pipeline_ErrorUnexpected);
+        }
+    }
+
+    /**
+     * F-02: open requirements due within the window or overdue, as deadline rows. Mine means
+     * assigned to the person, or on a grant the person owns.
+     */
+    private static void addRequirementDeadlines(
+        Board board,
+        Map<String, Object> binds,
+        Boolean mineOnly
+    ) {
+        binds.put('openStatuses', GrantRequirementService.OPEN_STATUSES);
+        String mine = mineOnly
+            ? ' AND (Assigned_To__c = :ownerId OR Grant__r.OwnerId = :ownerId)'
+            : '';
+        for (
+            Grant_Requirement__c requirement : (List<Grant_Requirement__c>) Database.queryWithBinds(
+                'SELECT Id, Name, Type__c, Due_Date__c, Grant__c, Grant__r.Name,' +
+                    ' Grant__r.Funder__c, Grant__r.Funder__r.Name, Assigned_To__r.Name' +
+                    ' FROM Grant_Requirement__c WHERE Status__c IN :openStatuses' +
+                    ' AND Due_Date__c <= :horizon' +
+                    mine +
+                    ' ORDER BY Due_Date__c ASC, Name LIMIT :maxDeadlines',
+                binds,
+                AccessLevel.USER_MODE
+            )
+        ) {
+            Card row = new Card();
+            row.id = requirement.Id;
+            row.name = requirement.Name;
+            row.kind = KIND_REQUIREMENT;
+            row.deadline = requirement.Due_Date__c;
+            row.requirementType = requirement.Type__c;
+            row.grantId = requirement.Grant__c;
+            row.grantName = requirement.Grant__r?.Name;
+            row.funderId = requirement.Grant__r?.Funder__c;
+            row.funderName = requirement.Grant__r?.Funder__r?.Name;
+            row.ownerName = requirement.Assigned_To__r?.Name;
+            board.deadlines.add(row);
+        }
+    }
+
+    /** F-02: marks one requirement Submitted; the dates automation fills its Submitted Date. */
+    @AuraEnabled
+    public static void markSubmitted(Id requirementId) {
+        if (!Schema.SObjectType.Grant_Requirement__c.fields.Status__c.isUpdateable()) {
+            throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+        }
+        try {
+            GrantRequirementService.markSubmitted(requirementId);
+        } catch (DmlException e) {
+            throw UserErrors.message(e.getDmlMessage(0));
+        } catch (Exception e) {
+            ErrorLogger.log(e, CONTEXT + '.markSubmitted', requirementId);
             throw UserErrors.message(Label.Funders_Pipeline_ErrorUnexpected);
         }
     }

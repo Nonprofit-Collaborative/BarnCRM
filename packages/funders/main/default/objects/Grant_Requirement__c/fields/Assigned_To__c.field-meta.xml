@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Assigned_To__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <referenceTo>User</referenceTo>
+  <relationshipLabel>Grant Requirements</relationshipLabel>
+  <relationshipName>Grant_Requirements</relationshipName>
+  <required>false</required>
+  <externalId>false</externalId>
+  <inlineHelpText>The staff member doing it. Reminders go to them, or to the grant's owner when nobody active is assigned.</inlineHelpText>
+  <label>Assigned To</label>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

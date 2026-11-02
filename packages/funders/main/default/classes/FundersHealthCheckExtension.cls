@@ -4,7 +4,8 @@
  * findings into its one report.
  *
  * Open grant applications past their deadline: a grant at Prospect, Letter of Inquiry or Invited
- * to Apply whose Application Deadline has passed. Asked only of a viewer who may manage settings,
+ * to Apply whose Application Deadline has passed. Overdue grant requirements (29ZI, R-GQ5): an
+ * open requirement whose Due Date has passed. Asked only of a viewer who may manage settings,
  * and not while the module is turned off. A check that throws becomes a single "check failed"
  * finding.
  *
@@ -15,6 +16,8 @@
 public with sharing class FundersHealthCheckExtension implements HealthCheckExtension {
     @TestVisible
     private static final String KEY_PAST_DEADLINE = 'funders_applications_past_deadline';
+    @TestVisible
+    private static final String KEY_OVERDUE = 'funders_requirements_overdue';
 
     /** Counts stop here, and the finding says "more than" this many. */
     @TestVisible
@@ -46,7 +49,42 @@ public with sharing class FundersHealthCheckExtension implements HealthCheckExte
         } catch (Exception e) {
             found.add(HealthCheckService.checkFailed(KEY_PAST_DEADLINE, e));
         }
+        if (!Schema.SObjectType.Grant_Requirement__c.isAccessible()) {
+            return found;
+        }
+        try {
+            HealthCheckService.Finding finding = overdueRequirements();
+            if (finding != null) {
+                found.add(finding);
+            }
+        } catch (Exception e) {
+            found.add(HealthCheckService.checkFailed(KEY_OVERDUE, e));
+        }
         return found;
+    }
+
+    /** R-GQ5: open requirements whose due date has passed. */
+    private static HealthCheckService.Finding overdueRequirements() {
+        Date today = Date.today();
+        Integer cap = countCap + 1;
+        List<Grant_Requirement__c> late = [
+            SELECT Id, Name
+            FROM Grant_Requirement__c
+            WHERE Status__c IN :GrantRequirementService.OPEN_STATUSES AND Due_Date__c < :today
+            WITH USER_MODE
+            ORDER BY Due_Date__c, Name
+            LIMIT :cap
+        ];
+        if (late.isEmpty()) {
+            return null;
+        }
+        return finding(
+            KEY_OVERDUE,
+            late,
+            Label.Funders_HealthCheck_OverdueTitleOne,
+            Label.Funders_HealthCheck_OverdueTitle,
+            Label.Funders_HealthCheck_OverdueDetail
+        );
     }
 
     private static HealthCheckService.Finding pastDeadline() {

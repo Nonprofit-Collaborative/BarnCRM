@@ -177,13 +177,13 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    left and the first section showing on the right. The page name shows once, in the page
    header. The sections are listed in groups: **Organization** (General, Organization),
    **People** (People and Households, Addresses), **Data** (Import, Duplicate Matching,
-   Rollups, Org Optimizer), **Fundraising** (Giving, Receipts), **Programs** (Volunteers) and
+   Rollups, Org Optimizer), **Fundraising** (Giving, Receipts, Funders), **Programs** (Volunteers) and
    **System** (Modules, Access, Automation, Integrations, Health, Error Log). A section a
    module adds that is not in these groups is listed under **More**, before System, so Error
    Log is always last. Each section's settings sit in bordered boxes with a heading, such as **People** and
    **Households** on People and Households. You only see
    the ones that have something in them, and a feature that is off hides its sections: Giving and
-   Receipts come with the Giving module, and Giving also adds the receipt details to the
+   Receipts come with the Giving module, Funders with the Funders module, and Giving also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer. General starts with
    **Edition**, shown read-only: it is chosen once in first-run setup, and the
    **Change Edition** link under it is the way to change it later (see

@@ -2,10 +2,21 @@ import { createElement } from 'lwc';
 import GrantPipeline from 'c/grantPipeline';
 import getBoard from '@salesforce/apex/GrantPipelineController.getBoard';
 import moveStage from '@salesforce/apex/GrantPipelineController.moveStage';
+import markSubmitted from '@salesforce/apex/GrantPipelineController.markSubmitted';
 
 jest.mock('@salesforce/apex/GrantPipelineController.getBoard', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/GrantPipelineController.markSubmitted',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Funders_Pipeline_KindApplication',
+  () => ({ default: 'Application' }),
+  { virtual: true }
+);
 jest.mock('@salesforce/apex/GrantPipelineController.moveStage', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -178,6 +189,54 @@ describe('c-grant-pipeline', () => {
     one(element, '[data-id="award-cancel"]').click();
     await flush();
     expect(one(element, '[data-id="award-dialog"]')).toBeNull();
+  });
+
+  it('lists a requirement coming due and marks it submitted', async () => {
+    markSubmitted.mockResolvedValue();
+    const element = await render({
+      ...BOARD,
+      canMarkSubmitted: true,
+      deadlines: [
+        ...BOARD.deadlines,
+        {
+          id: 'a03000000000001AAA',
+          name: 'Year 1 report',
+          kind: 'requirement',
+          requirementType: 'Narrative Report',
+          grantName: 'Youth Grant',
+          funderName: 'River Trust',
+          deadline: '2026-11-05'
+        }
+      ]
+    });
+    const rows = all(element, '[data-deadline]');
+    expect(rows).toHaveLength(3);
+    expect(rows[1].querySelector('[data-id="what"]').textContent.trim()).toBe(
+      'Narrative Report: Youth Grant'
+    );
+    expect(rows[0].querySelector('[data-id="what"]').textContent.trim()).toBe('Application');
+    expect(all(element, '[data-mark]')).toHaveLength(1);
+
+    all(element, '[data-mark]')[0].click();
+    await flush();
+    expect(markSubmitted).toHaveBeenCalledWith({ requirementId: 'a03000000000001AAA' });
+    expect(getBoard).toHaveBeenCalledTimes(2);
+  });
+
+  it('offers no Mark Submitted to someone who cannot change requirements', async () => {
+    const element = await render({
+      ...BOARD,
+      canMarkSubmitted: false,
+      deadlines: [
+        {
+          id: 'a03000000000001AAA',
+          name: 'Year 1 report',
+          kind: 'requirement',
+          deadline: '2026-11-05'
+        }
+      ]
+    });
+    expect(all(element, '[data-mark]')).toHaveLength(0);
   });
 
   it('switches to Mine', async () => {

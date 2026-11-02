@@ -32,6 +32,7 @@
   <navType>Console</navType>
   <tabs>Grant_Pipeline</tabs>
   <tabs>Grant__c</tabs>
+  <tabs>Grant_Requirement__c</tabs>
   <tabs>standard-report</tabs>
   <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
@@ -44,6 +45,9 @@
     </mappings>
     <mappings>
       <tab>Grant__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Grant_Requirement__c</tab>
     </mappings>
     <mappings>
       <tab>standard-report</tab>

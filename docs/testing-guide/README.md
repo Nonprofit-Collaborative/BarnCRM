@@ -73,6 +73,7 @@ page, even if that puts it out of reading order.
 | [Logic Models](logic-models.md) | LM | 8 | The Logic Model Builder: parts, arrows and assumptions, whose model it is, indicators and periods with progress, staff and read-only access, imported and computed results |
 | [Logic Models](logic-models.md) | LM | 9 | The Logic Model Builder: parts, arrows and assumptions, whose model it is, indicators and periods with progress, staff and read-only access, imported and computed results, the Logic Model Report |
 | [Funders](funders.md) | FUN | 5 | Grants and their stage dates, the Grant Pipeline board, totals and deadlines, moving and awarding a grant, the program a grant pays for, Funders access, Health Check and sample data |
+| [Funders](funders.md) | FUN | 8 | Grants and their stage dates, the Grant Pipeline board, totals and deadlines, moving and awarding a grant, the program a grant pays for, Funders access, Health Check and sample data, grant requirements, reminder tasks and emails and their settings, Mark Submitted, overdue requirements |
 | [Rollup Builder](rollup-builder.md) | RB | 26 | Building, recalculating and switching rollups, standard objects, parity options, export and import, instant totals on other objects |
 | [Accessibility and mobile](accessibility-and-mobile.md) | A11Y | 9 | Keyboard, focus, screen reader labels, zoom, Salesforce mobile app |
 

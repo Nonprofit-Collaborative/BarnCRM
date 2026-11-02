@@ -189,20 +189,24 @@
                 <div
                   class="slds-grid slds-wrap slds-grid_vertical-align-center slds-gutters_x-small"
                 >
-                  <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
                     <button
                       type="button"
                       class="slds-button slds-text-link"
                       data-id={row.id}
+                      data-object={row.objectApiName}
                       onclick={handleOpenDeadline}
                     >
                       {row.name}
                     </button>
+                    <p class="slds-text-body_small slds-text-color_weak" data-id="what">
+                      {row.whatText}
+                    </p>
                   </div>
-                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-3 slds-truncate">
+                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-truncate">
                     {row.funderLabel}
                   </div>
-                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-3">
+                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
                     <lightning-formatted-date-time
                       value={row.deadline}
                       time-zone="UTC"
@@ -211,6 +215,16 @@
                       <span class="slds-var-m-horizontal_xx-small" aria-hidden="true">|</span
                       >{row.whenText}</span
                     >
+                  </div>
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                    <template lwc:if={row.showMark}>
+                      <lightning-button
+                        data-id={row.id}
+                        data-mark
+                        label={labels.markSubmitted}
+                        onclick={handleMarkSubmitted}
+                      ></lightning-button>
+                    </template>
                   </div>
                 </div>
               </li>
