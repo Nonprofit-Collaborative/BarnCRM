@@ -8,6 +8,10 @@
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
+    <apexClass>FundersBoardController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>GrantAnswerController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -210,6 +214,10 @@
   </objectPermissions>
   <tabSettings>
     <tab>Funder_Report_Template__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Funders_Board</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

@@ -10546,6 +10546,21 @@ not negative (validation rules). The award fields apply to any grant: a state or
 can carry an award number and a match too. The period of performance is the award period (Award
 Start Date and Award End Date); drawdowns are received entries in the fund ledger (F-03).
 
+**R-GN9 The board dashboard reads, never stores (F-07).** The Board Dashboard tab shows the
+current fiscal year from records already kept, with no object of its own:
+- **Revenue mix:** grants awarded this fiscal year (Stage Awarded, Decision Date in the fiscal
+  year, Amount Awarded) by Funding Source, a blank source shown as not set; with Giving, one more
+  slice for gifts designated this fiscal year (the sum of every fund's Total Raised This Year).
+- **Concentration:** each organization's share of that revenue, its awards plus, with Giving, its
+  Giving This Year. One source above 25 percent, or the five largest together above 50 percent,
+  is flagged as a risk to discuss. The thresholds are fixed board guidance, not settings
+  (ADR-NEXT `NEXT-funders-reporting-links.md` decision 5).
+- **Restricted balances:** with Giving, each active restricted fund and what it raised this
+  fiscal year; once the fund ledger (F-03) is installed, each restricted grant's Restricted
+  Balance too, read by describe so the dashboard works before and after it.
+Giving is read by describe only; without it, or without access to it, the dashboard shows the
+grant figures alone. Every read runs in user mode, so a person sees totals of what they can read.
+
 ### Salesforce implementation
 
 - **Object:** `Grant__c`, name field Text, label Grant Name, sharing Public Read/Write, field
@@ -10581,7 +10596,9 @@ Start Date and Award End Date); drawdowns are received entries in the fund ledge
   always runs) and `GrantDatesHandler` (R-GN3, switchable).
 - **Service:** `GrantService` (stages, the program rule, the stage dates), `GrantPipelineController`
   (thin, plain JSON shapes); the board's columns and the deadline rows run in the framework-free
-  module `grantPipelineModel.js` (plan 9.9).
+  module `grantPipelineModel.js` (plan 9.9). The board dashboard (R-GN9): `FundersBoardController`
+  (plain JSON; `restrictedFunds` is the F-03 integration point), the `fundersBoard` component on
+  the `Funders_Board` tab, shares and flags in `fundersBoardModel.js`.
 - **Health Check:** `FundersHealthCheckExtension` (R-GN7, R-GQ5). **Sample data:**
   `FundersSampleData` (three grants to Core's sample organizations, flagged `Sample_Data__c`).
 
@@ -11153,6 +11170,7 @@ mirrors the primary member).
 | 0.16 | 2026-11-02 | Funders F-14. New Section 29ZN Grant Answer (`Grant_Answer__c`), the answer library, with rules R-GA1 to R-GA3. Section 30's Funders row drops the answer library. |
 | 0.16 | 2026-11-02 | Logic Models L-06 (ADR-NEXT `NEXT-funders-reporting-links.md`). `Grant_Requirement__c` (29ZI) gains Logic Model Outcome (`Outcome_Id__c`, Text(18)), a Logic Models element named by record identifier, with rule R-GQ6. Neither module references the other. |
 | 0.16 | 2026-11-02 | Funders F-06 (ADR-NEXT `NEXT-funders-reporting-links.md`). New Section 29ZO Funder Report Template (`Funder_Report_Template__c` and the shipped `Funder_Report_Template_Default__mdt`), rules R-FT1 to R-FT3. |
+| 0.16 | 2026-11-02 | Funders F-07 (ADR-NEXT `NEXT-funders-reporting-links.md`). Grant (29ZH) gains rule R-GN9, the board dashboard (revenue mix, concentration, restricted balances), read from grants and, by describe, Giving and the F-03 ledger; no new object or field. |
 
 ---
 ## 32. Entity ownership by package

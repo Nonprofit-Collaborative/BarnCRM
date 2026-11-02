@@ -1,6 +1,6 @@
 # Funders
 
-Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), government award fields (F-04), the answer library (F-14), links to Logic Models outcomes (L-06) and funder report templates (F-06). Setup detail: [Funders](../admin-guide/funders.md).
+Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), government award fields (F-04), the answer library (F-14), links to Logic Models outcomes (L-06), funder report templates (F-06) and the board dashboard (F-07). Setup detail: [Funders](../admin-guide/funders.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder,
 Giving and Funders deployed. Programs is optional; T-FUN-04 needs it for its second half. Funders
@@ -209,3 +209,19 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 7 | Make **Grant report** active again. As read-only, open the **BarnCRM Funders** app, then `Youth Grant`. | No **Funder Report Templates** tab; the **Funder Report** card still downloads the report. |
 
 **Cleanup:** delete `Short`, rename the grant `Youth Grant`.
+
+## T-FUN-16: Board Dashboard
+
+**Purpose:** confirm the board dashboard's revenue mix, concentration flags and restricted balances (F-07, R-GN9).
+**Prerequisites:** Giving installed; staff with Giving read access and staff without it; no other grants awarded this fiscal year. Two organizations, `Lakeside Foundation` and `State Agency`. Awarded with a decision date this fiscal year: `Federal award` (Lakeside, 30,000, Funding Source Federal) and `State award` (State Agency, 20,000, no funding source). Awarded two fiscal years ago: `Old award` (Lakeside, 99,000). In Giving, gifts this fiscal year of 12,000 to an active restricted fund `Scholarships` and 38,000 to an unrestricted fund, 5,000 of it from `Lakeside Foundation`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff with Giving access, open the **Board Dashboard** tab. | **Revenue Mix**: `Gifts to funds` 50,000 (50%), `Federal` 30,000 (30%), `Not set` 20,000 (20%), **Total** 100,000. `Old award` is not counted. |
+| 2 | Read **Concentration**. | `Lakeside Foundation` 35,000 (35%) first, then `State Agency`; a warning that Lakeside gives 35% (above 25 percent); a warning that the five largest give more than half. |
+| 3 | Read **Restricted Balances**. | Under **Restricted Funds: Raised This Fiscal Year**, `Scholarships` 12,000; the unrestricted fund is not listed. |
+| 4 | As staff without Giving access, open the tab. | Revenue Mix shows `Federal` and `Not set` only, total 50,000; Restricted Balances says `Nothing to show for this fiscal year yet.` |
+| 5 | As the admin, give `State award` the Funding Source **State**; reload as staff. | `Not set` is replaced by `State`. |
+| 6 | With restricted fund tracking (F-03) installed, mark `Federal award` restricted and record 10,000 received; reload. | Under **Restricted Grants: Balance**, `Federal award` 10,000. |
+
+**Cleanup:** none.

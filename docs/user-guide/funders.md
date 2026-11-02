@@ -69,6 +69,21 @@ or the requirement's type and grant.
 Each row says how many days are left, `Due today`, or how many days overdue (in red). Click a
 grant's name to open it.
 
+## To Show the Board Where the Money Comes From
+
+1. In the **BarnCRM Funders** app, open the **Board Dashboard** tab.
+2. Read the three parts, all for this fiscal year:
+   - **Revenue Mix**: grants awarded by funding source and, if you use Giving, gifts to funds,
+     each with its amount and share.
+   - **Concentration**: the five organizations giving the most, with a warning when one gives
+     more than 25 percent or the five together more than half.
+   - **Restricted Balances**: restricted funds and what each raised, and restricted grants'
+     balances once fund tracking is in use.
+
+You should see: amounts in your currency and shares as percents, or `Nothing to show for this
+fiscal year yet.` To print it for a board packet, use your browser's print command. If a line says
+**Not set**, those grants have no **Funding Source**; fill it in on each grant.
+
 ## To Name the Program a Grant Pays For
 
 Only when your organization uses Programs.

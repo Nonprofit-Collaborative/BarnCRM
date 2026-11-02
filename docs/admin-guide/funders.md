@@ -16,14 +16,16 @@ date and the staff member doing them, and BarnCRM reminds that person with a tas
 before each is due. A grant also carries the fields a government award needs (see [Government
 Awards](#government-awards)), and the [Answer Library](#answer-library) keeps the application
 answers you reuse. A [funder report template](#funder-report-templates) turns a grant into a
-printable report. Restricted fund tracking (F-03), multi-year award schedules, a board dashboard
-and a deadline calendar come in later releases.
+printable report, and the [Board Dashboard](#the-board-dashboard-tab) shows your board the
+year's revenue mix, how concentrated it is and the restricted balances. Restricted fund tracking
+(F-03), multi-year award schedules and a deadline calendar come in later releases.
 
 ## Before You Install
 
 - Funders is offered in the **Nonprofit Edition** only (see [Editions](editions.md)).
 - It needs BarnCRM Core, the Rollup Builder module and Giving installed first. Release 0.16 uses
-  nothing in Giving yet; restricted fund tracking (F-03) and award schedules (F-05) will.
+  nothing in Giving except the totals the Board Dashboard reads; restricted fund tracking (F-03)
+  and award schedules (F-05) will.
 - It does not need the Programs module. With Programs installed, a grant can name a program.
 
 ## Installing
@@ -36,7 +38,7 @@ finishes, BarnCRM does three things on its own:
 3. Gives everyone who already has a BarnCRM role their Funders permission set (see below).
 
 Then open the **BarnCRM Funders** app from the App Launcher. Its tabs are **Grant Pipeline**,
-**Grants**, **Grant Requirements**, **Grant Answers**, **Funder Report Templates** (admins only),
+**Board Dashboard**, **Grants**, **Grant Requirements**, **Grant Answers**, **Funder Report Templates** (admins only),
 **Reports** and **Error Log**; Grant Pipeline and Grants also
 join the BarnCRM apps. Run Health Check's **Schedule all nightly jobs** fix once to start the
 morning reminder job (see [Reminders](#reminders)).
@@ -169,6 +171,30 @@ The **Grant Pipeline** tab is where most people work:
 
 Moving and the menu's stage choices are offered only to people who can edit grants, and **Mark
 Submitted** only to people who can change requirements.
+
+## The Board Dashboard Tab
+
+The **Board Dashboard** tab answers the questions a board asks about money, for the current
+fiscal year. Everyone with a Funders set sees it; it only reads, and it stores nothing.
+
+- **Revenue Mix**: grants awarded this fiscal year (stage Awarded, decision date this fiscal year)
+  totaled by **Funding Source**, and, with Giving, one more line for gifts designated to funds
+  this fiscal year. Each line shows its amount and share. Grants with no funding source show as
+  "Not set"; fill it in so the mix is right.
+- **Concentration**: the organizations giving the most, each with its share of that revenue (its
+  grants awarded plus, with Giving, its Giving This Year). The dashboard flags a single source
+  above 25 percent, or the five largest together above 50 percent, as a risk to discuss: losing
+  one funder would hurt. These thresholds are common board guidance and are fixed, not settings.
+- **Restricted Balances**: with Giving, each active restricted fund and what it raised this
+  fiscal year. Once restricted fund tracking (F-03) is installed, each restricted grant's balance
+  (received less spent and released) is listed too.
+
+Without Giving, or for someone without access to it, the dashboard shows the grant figures alone.
+Each person sees totals of the records they can read. Print it with your browser's print command
+for a board packet.
+
+If grant money is recorded both on the grant and as a gift in Giving, it counts in both lines;
+record each payment in one place.
 
 ## Grant Requirements
 
