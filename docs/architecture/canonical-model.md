@@ -10637,7 +10637,8 @@ passed.
 | Reminder Sent For | `Reminder_Sent_For__c` | Date, read only in every permission set but Funders Admin |
 
 - **Trigger:** `GrantRequirementTrigger`, through the Core dispatcher; handler
-  `GrantRequirementDatesHandler` (R-GQ2, registry row `Grant_Requirement_Dates`, switchable).
+  `GrantRequirementDatesHandler` (R-GQ2, registry row `Grant_Requirement_Dates`, switchable);
+  the rules in `GrantRequirementService`.
 - **Reminders:** `GrantReminderScheduler` (Schedulable, job "BarnCRM Grant Reminders", listed by
   `FundersNightlyJobProvider`), `GrantReminderBatch`, `GrantReminderService` (decides, pure),
   `GrantReminderSelector`; email through Core's `EmailSender`.
