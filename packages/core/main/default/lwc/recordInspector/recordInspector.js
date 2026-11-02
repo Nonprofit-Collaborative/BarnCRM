@@ -29,7 +29,9 @@ import SHORTENED from '@salesforce/label/c.Core_RecordInspector_Shortened';
 import FIELDS_CUT from '@salesforce/label/c.Core_RecordInspector_FieldsCut';
 import OPEN_FIND from '@salesforce/label/c.Core_RecordInspector_OpenFind';
 import OPEN_SETUP from '@salesforce/label/c.Core_RecordInspector_OpenSetup';
-import { bodyMessage } from 'c/findCsv';
+import { bodyMessage, format } from 'c/findCsv';
+import WhereUsedModal from 'c/whereUsedModal';
+import WHERE_USED_ALT from '@salesforce/label/c.Core_WhereUsed_ActionAlt';
 
 /**
  * The Record Inspector (C-55): a record page component that lists every field the viewer may
@@ -114,8 +116,22 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
       copyLabel: `${COPY}: ${field.apiName}`,
       setupUrl: fieldSetupPath(this.inspection.objectApiName, field.apiName),
       setupLabel: `${OPEN_SETUP}: ${field.label}`,
-      openSetup: OPEN_SETUP
+      openSetup: OPEN_SETUP,
+      whereUsedLabel: format(WHERE_USED_ALT, field.label)
     }));
+  }
+
+  /** A field row's Where Used button (C-59): which BarnCRM setup uses the field. */
+  handleWhereUsed(event) {
+    const apiName = event.currentTarget.dataset.apiName;
+    const field = (this.inspection.fields || []).find((one) => one.apiName === apiName);
+    WhereUsedModal.open({
+      size: 'medium',
+      objectName: this.inspection.objectApiName,
+      objectLabel: this.inspection.objectLabel,
+      fieldName: apiName,
+      fieldLabel: field ? field.label : apiName
+    });
   }
 
   /** Opens Find on this record's object, the same for every field. */

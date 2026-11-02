@@ -259,3 +259,23 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 11 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **AI-Readiness Export** tile or tab. |
 
 **Cleanup:** Delete the downloaded zip files.
+
+## T-HC-16: Where Used Lists the BarnCRM Setup That Uses a Field
+
+**Purpose:** Confirm Where Used finds saved queries, Super Transform step lists, import mappings and rollups that name a field, links each, offers the whole object, and ends in a Retire a Field checklist that never deletes anything. Setup detail: [Where Used and Retire a Field](../admin-guide/where-used.md).
+**Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); the Rollup Builder module installed for step 6; a test custom field on Contact, such as **Test Retire** (`Test_Retire__c`, text), created in Setup.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **Find**, build a query on **Contact** with **Test Retire** as a column and a filter **Test Retire is not blank**; save it as **Retire Check**. | The query saves. |
+| 2 | In **Import**, start a people import with a file that has a column named **Retire**, map it to the person's **Test Retire** and save the mapping as **Retire Mapping**. | The mapping saves. |
+| 3 | Open **Org Optimizer**, choose **Data Dictionary**, build it for **Contact**, open the action menu on the **Test Retire** row and choose **Where Used**. | A window titled **Where Used: Test Retire (Contact)** with a note that flows, Apex code, page layouts, reports and the rest are not checked, and an **Open in Setup** link. It lists **Retire Check** under **Saved Find Queries** (Named in: Columns, Filter) and **Retire Mapping** under **Import Mappings** (Named in: Column "Retire"), each with an "If deleted" line. |
+| 4 | Click **Retire Check**. | Find opens in a new tab with the query loaded. |
+| 5 | Look at **Retire a Field**. | Five steps: edit the records above, check Salesforce's own uses (Open in Setup), back up the values (Open in Find), hide the field, delete it in Setup (Open in Setup). Ticking two shows **2 of 5 steps done**. Nothing is deleted. |
+| 6 | In **Rollup Builder**, make a rollup that counts Contacts with **Test Retire** not blank on their organization; then repeat step 3. | The rollup is listed under **Rollups** (Named in: Filter on counted records). |
+| 7 | Click **Show Uses of the Whole Object**. | The title becomes **Where Used: Contact**, the list shows setup that works on Contact, and **Retire a Field** is gone. Click **Show Uses of This Field** to go back. |
+| 8 | Repeat step 3 for the standard field **Last Name**. | The last step says the field can't be deleted and to keep it hidden. |
+| 9 | Choose **Field Utilization**, count **Contact**, and choose **Where Used** on a row; then open a Contact with the **Record Inspector**, inspect it and click the **Where Used** button beside **Test Retire**. | The same window opens from both places. |
+
+**Cleanup:** Delete **Retire Check**, **Retire Mapping**, the rollup and the **Test Retire** field.

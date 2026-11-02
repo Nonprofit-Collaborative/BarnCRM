@@ -1,0 +1,109 @@
+<template>
+    <lightning-modal-header label={heading}></lightning-modal-header>
+    <lightning-modal-body>
+        <p class="slds-text-body_small slds-var-m-bottom_small" data-id="not-checked">
+            {labels.notChecked}
+            <a
+                class="slds-var-m-left_xx-small"
+                href={setupUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-id="setup-link"
+                >{labels.openSetup}</a
+            >
+        </p>
+
+        <template lwc:if={canSwitch}>
+            <lightning-button
+                class="slds-var-m-bottom_small"
+                data-id="switch"
+                label={switchLabel}
+                disabled={loading}
+                onclick={handleSwitch}
+            ></lightning-button>
+        </template>
+
+        <template lwc:if={loading}>
+            <div class="slds-is-relative slds-var-p-vertical_large" data-id="loading">
+                <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+            </div>
+        </template>
+
+        <template lwc:if={errorMessage}>
+            <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
+                {errorMessage}
+            </p>
+        </template>
+
+        <template lwc:if={incomplete}>
+            <p class="slds-text-color_error slds-var-m-bottom_small" data-id="incomplete" role="status">
+                {labels.incomplete}
+            </p>
+        </template>
+
+        <template lwc:if={showEmpty}>
+            <p class="slds-var-m-bottom_small" data-id="none" role="status">{noneText}</p>
+        </template>
+
+        <template lwc:if={hasReferences}>
+            <p class="slds-var-m-bottom_small" data-id="count" role="status">{countText}</p>
+            <template for:each={groups} for:item="group">
+                <section key={group.key} class="slds-var-m-bottom_medium" data-id="group">
+                    <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{group.label}</h3>
+                    <ul class="slds-has-dividers_bottom-space">
+                        <template for:each={group.items} for:item="item">
+                            <li key={item.key} class="slds-item" data-id="reference">
+                                <template lwc:if={item.url}>
+                                    <a href={item.url} target="_blank" rel="noopener noreferrer" data-id="edit-link"
+                                        >{item.name}</a
+                                    >
+                                </template>
+                                <template lwc:else>
+                                    <span>{item.name}</span>
+                                </template>
+                                <p class="slds-text-body_small">{item.partsText}</p>
+                                <p class="slds-text-body_small slds-text-color_weak">{item.breaksText}</p>
+                            </li>
+                        </template>
+                    </ul>
+                </section>
+            </template>
+        </template>
+
+        <template lwc:if={showRetire}>
+            <section class="slds-var-m-top_medium" data-id="retire">
+                <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.retireTitle}</h3>
+                <p class="slds-text-body_small slds-var-m-bottom_small">{labels.retireIntro}</p>
+                <ol class="slds-list_ordered">
+                    <template for:each={steps} for:item="step">
+                        <li key={step.key} class="slds-var-m-bottom_x-small" data-step={step.key}>
+                            <lightning-input
+                                type="checkbox"
+                                label={step.text}
+                                checked={step.checked}
+                                data-step={step.key}
+                                onchange={handleTick}
+                            ></lightning-input>
+                            <template lwc:if={step.linkUrl}>
+                                <a
+                                    class="slds-var-m-left_large slds-text-body_small"
+                                    href={step.linkUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    data-id="step-link"
+                                    >{step.linkLabel}</a
+                                >
+                            </template>
+                        </li>
+                    </template>
+                </ol>
+                <p class="slds-text-body_small" data-id="progress" role="status" aria-live="polite">
+                    {progressText}
+                </p>
+            </section>
+        </template>
+    </lightning-modal-body>
+    <lightning-modal-footer>
+        <lightning-button label={labels.close} data-id="close" onclick={handleClose}></lightning-button>
+    </lightning-modal-footer>
+</template>

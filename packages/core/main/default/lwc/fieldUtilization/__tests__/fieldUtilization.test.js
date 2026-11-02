@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import FieldUtilization from 'c/fieldUtilization';
+import WhereUsedModal from 'c/whereUsedModal';
 import listObjects from '@salesforce/apex/FieldUtilizationController.listObjects';
 import getPlan from '@salesforce/apex/FieldUtilizationController.getPlan';
 import countFields from '@salesforce/apex/FieldUtilizationController.countFields';
@@ -245,6 +246,15 @@ describe('c-field-utilization', () => {
     await flush();
 
     expect(find(element, 'results').data.map((r) => r.fieldName)).toEqual(['Website', 'Phone']);
+
+    find(element, 'results').dispatchEvent(
+      new CustomEvent('rowaction', {
+        detail: { action: { name: 'whereUsed' }, row: find(element, 'results').data[0] }
+      })
+    );
+    expect(WhereUsedModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ objectName: 'Account', fieldName: 'Website' })
+    );
   });
 
   it('shows the server message when a count fails', async () => {
