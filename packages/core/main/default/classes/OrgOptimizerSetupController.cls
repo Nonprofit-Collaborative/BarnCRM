@@ -167,44 +167,44 @@ public with sharing class OrgOptimizerSetupController {
                 '/lightning/setup/CommunicationTemplatesEmail/home'
             ),
             new Check(
-                'inactiveFlows',
-                'SELECT Label FROM FlowDefinitionView WHERE IsActive = false' +
-                ' AND NamespacePrefix = null AND LastModifiedDate < :newCutoff ORDER BY Label',
-                'Label',
-                '/lightning/setup/Flows/home'
-            )
+                    'inactiveFlows',
+                    'SELECT Label FROM FlowDefinitionView WHERE IsActive = false' +
+                    ' AND NamespacePrefix = null AND LastModifiedDate < :newCutoff ORDER BY Label',
+                    'Label',
+                    '/lightning/setup/Flows/home'
+                )
                 .debt(),
             new Check(
-                'apexOldApi',
-                'SELECT Name FROM ApexClass WHERE NamespacePrefix = null AND Status = \'Active\'' +
-                ' AND ApiVersion < :oldApi ORDER BY Name',
-                'Name',
-                '/lightning/setup/ApexClasses/home'
-            )
+                    'apexOldApi',
+                    'SELECT Name FROM ApexClass WHERE NamespacePrefix = null AND Status = \'Active\'' +
+                    ' AND ApiVersion < :oldApi ORDER BY Name',
+                    'Name',
+                    '/lightning/setup/ApexClasses/home'
+                )
                 .debt(),
             new Check(
-                'triggersOldApi',
-                'SELECT Name FROM ApexTrigger WHERE NamespacePrefix = null AND Status = \'Active\'' +
-                ' AND ApiVersion < :oldApi ORDER BY Name',
-                'Name',
-                '/lightning/setup/ApexTriggers/home'
-            )
+                    'triggersOldApi',
+                    'SELECT Name FROM ApexTrigger WHERE NamespacePrefix = null AND Status = \'Active\'' +
+                    ' AND ApiVersion < :oldApi ORDER BY Name',
+                    'Name',
+                    '/lightning/setup/ApexTriggers/home'
+                )
                 .debt(),
             new Check(
-                'flowsOldApi',
-                'SELECT Label FROM FlowDefinitionView WHERE NamespacePrefix = null' +
-                ' AND ApiVersion < :oldApi ORDER BY Label',
-                'Label',
-                '/lightning/setup/Flows/home'
-            )
+                    'flowsOldApi',
+                    'SELECT Label FROM FlowDefinitionView WHERE NamespacePrefix = null' +
+                    ' AND ApiVersion < :oldApi ORDER BY Label',
+                    'Label',
+                    '/lightning/setup/Flows/home'
+                )
                 .debt(),
             new Check(
-                'flowsNoDescription',
-                'SELECT Label FROM FlowDefinitionView WHERE NamespacePrefix = null' +
-                ' AND IsActive = true AND Description = null ORDER BY Label',
-                'Label',
-                '/lightning/setup/Flows/home'
-            )
+                    'flowsNoDescription',
+                    'SELECT Label FROM FlowDefinitionView WHERE NamespacePrefix = null' +
+                    ' AND IsActive = true AND Description = null ORDER BY Label',
+                    'Label',
+                    '/lightning/setup/Flows/home'
+                )
                 .debt(),
             new Check(
                 'jobsOfInactiveUsers',
@@ -262,12 +262,7 @@ public with sharing class OrgOptimizerSetupController {
 
     /** The API version below which Apex, triggers and flows are listed, from BarnCRM Settings. */
     public static Integer apiVersion() {
-        return bounded(
-            'Old_Api_Version__c',
-            DEFAULT_API_VERSION,
-            MIN_API_VERSION,
-            MAX_API_VERSION
-        );
+        return bounded('Old_Api_Version__c', DEFAULT_API_VERSION, MIN_API_VERSION, MAX_API_VERSION);
     }
 
     /** A number setting: empty or unreadable reads as the default, out of range as the nearest end. */

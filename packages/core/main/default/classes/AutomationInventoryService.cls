@@ -76,9 +76,9 @@ public with sharing class AutomationInventoryService {
             fail(TYPE_TRIGGER);
             List<SObject> triggers = Database.queryWithBinds(
                 'SELECT Name, Status, ApiVersion, UsageBeforeInsert, UsageAfterInsert,' +
-                ' UsageBeforeUpdate, UsageAfterUpdate, UsageBeforeDelete, UsageAfterDelete,' +
-                ' UsageAfterUndelete FROM ApexTrigger WHERE TableEnumOrId IN :keys' +
-                ' ORDER BY Name LIMIT :readUpTo',
+                    ' UsageBeforeUpdate, UsageAfterUpdate, UsageBeforeDelete, UsageAfterDelete,' +
+                    ' UsageAfterUndelete FROM ApexTrigger WHERE TableEnumOrId IN :keys' +
+                    ' ORDER BY Name LIMIT :readUpTo',
                 binds,
                 AccessLevel.USER_MODE
             );
@@ -93,8 +93,8 @@ public with sharing class AutomationInventoryService {
             fail(TYPE_FLOW);
             List<SObject> flows = Database.queryWithBinds(
                 'SELECT ApiName, Label, IsActive, ProcessType, TriggerType, ApiVersion' +
-                ' FROM FlowDefinitionView WHERE TriggerObjectOrEventId IN :keys' +
-                ' ORDER BY Label LIMIT :readUpTo',
+                    ' FROM FlowDefinitionView WHERE TriggerObjectOrEventId IN :keys' +
+                    ' ORDER BY Label LIMIT :readUpTo',
                 binds,
                 AccessLevel.USER_MODE
             );
@@ -117,11 +117,13 @@ public with sharing class AutomationInventoryService {
         List<String> keys = new List<String>{ described.getName() };
         if (described.isCustom()) {
             try {
-                for (SObject row : Database.queryWithBinds(
-                    'SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName = :name',
-                    new Map<String, Object>{ 'name' => described.getName() },
-                    AccessLevel.USER_MODE
-                )) {
+                for (
+                    SObject row : Database.queryWithBinds(
+                        'SELECT DurableId FROM EntityDefinition WHERE QualifiedApiName = :name',
+                        new Map<String, Object>{ 'name' => described.getName() },
+                        AccessLevel.USER_MODE
+                    )
+                ) {
                     String durable = (String) row.get('DurableId');
                     keys.add(durable);
                     if (durable != null && durable.length() > 15) {
@@ -177,7 +179,11 @@ public with sharing class AutomationInventoryService {
             parts.add(PROCESS_TYPES.get(processType));
         }
         if (triggerType != null) {
-            parts.add(FLOW_TRIGGERS.containsKey(triggerType) ? FLOW_TRIGGERS.get(triggerType) : triggerType);
+            parts.add(
+                FLOW_TRIGGERS.containsKey(triggerType)
+                    ? FLOW_TRIGGERS.get(triggerType)
+                    : triggerType
+            );
         }
         item.detail = String.join(parts, ', ');
         return item;

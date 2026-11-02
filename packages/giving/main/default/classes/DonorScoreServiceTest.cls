@@ -2,7 +2,9 @@
  * Donor scoring on real records (G-19): the trigger path, the nightly pass, the Automation switch,
  * the organization's own cutoffs, and the shipped rollups that feed it.
  */
-@IsTest(testFor='ApexClass:DonorScoreService, ApexClass:DonorScoreTriggerHandler, ApexClass:DonorLevelBatch')
+@IsTest(
+    testFor='ApexClass:DonorScoreService, ApexClass:DonorScoreTriggerHandler, ApexClass:DonorLevelBatch'
+)
 private class DonorScoreServiceTest {
     @TestSetup
     static void makeData() {
@@ -56,7 +58,11 @@ private class DonorScoreServiceTest {
             ana.Recent_Gift_Count__c = 1;
             ana.Recent_Giving__c = 10;
             update ana;
-            Assert.areEqual('Promising', scored(ana.Id).RFM_Segment__c, 'Scored once there is a gift.');
+            Assert.areEqual(
+                'Promising',
+                scored(ana.Id).RFM_Segment__c,
+                'Scored once there is a gift.'
+            );
 
             ana.Last_Gift_Date__c = null;
             update ana;
@@ -88,7 +94,11 @@ private class DonorScoreServiceTest {
             Contact saved = scored(ana.Id);
             Assert.areEqual(2, saved.RFM_Recency_Score__c, '35 days is inside 40 but not 30.');
             Assert.areEqual(3, saved.RFM_Frequency_Score__c, 'One gift reaches the third cutoff.');
-            Assert.areEqual(3, saved.RFM_Monetary_Score__c, 'A bad setting uses the default: 300 reaches 250.');
+            Assert.areEqual(
+                3,
+                saved.RFM_Monetary_Score__c,
+                'A bad setting uses the default: 300 reaches 250.'
+            );
         }
     }
 
@@ -156,7 +166,11 @@ private class DonorScoreServiceTest {
                 FROM Contact
                 WHERE Id = :ana.Id
             ];
-            Assert.areEqual(3, recalculated.Recent_Gift_Count__c, 'The 800 day old gift is outside 730 days.');
+            Assert.areEqual(
+                3,
+                recalculated.Recent_Gift_Count__c,
+                'The 800 day old gift is outside 730 days.'
+            );
             Assert.areEqual(300, recalculated.Recent_Giving__c, 'Only the three recent gifts.');
             Assert.areEqual(
                 'Loyal',

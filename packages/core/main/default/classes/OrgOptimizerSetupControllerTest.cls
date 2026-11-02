@@ -111,7 +111,10 @@ private class OrgOptimizerSetupControllerTest {
                 'The unused setup checks keep their heading.'
             );
             Assert.isFalse(findings.get('apexOldApi').failed, 'Apex classes are readable.');
-            Assert.isTrue(findings.get('apexOldApi').count > 0, 'Classes are on versions below 80.');
+            Assert.isTrue(
+                findings.get('apexOldApi').count > 0,
+                'Classes are on versions below 80.'
+            );
         }
     }
 

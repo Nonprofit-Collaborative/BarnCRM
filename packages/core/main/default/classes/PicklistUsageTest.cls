@@ -74,10 +74,7 @@ private class PicklistUsageTest {
             }
             Assert.isTrue(offered.contains(STATUS), 'Status is a single-select picklist.');
             Assert.isFalse(planned.tooLarge, 'Well under the size limit.');
-            Map<String, FieldUtilizationController.PicklistValueRow> rows = byValue(
-                chunk,
-                STATUS
-            );
+            Map<String, FieldUtilizationController.PicklistValueRow> rows = byValue(chunk, STATUS);
             Assert.areEqual(3, rows.get('Acknowledged').records, 'Records holding the value.');
             Assert.areEqual('Active', rows.get('Acknowledged').status, 'An active value.');
             Assert.isNotNull(rows.get('Acknowledged').lastUsed, 'Last Modified Date is read.');
@@ -107,10 +104,7 @@ private class PicklistUsageTest {
                     new List<String>{ STATUS }
                 );
             }
-            Map<String, FieldUtilizationController.PicklistValueRow> rows = byValue(
-                chunk,
-                STATUS
-            );
+            Map<String, FieldUtilizationController.PicklistValueRow> rows = byValue(chunk, STATUS);
             Assert.areEqual('NoValue', rows.get('').status, 'Blank is its own row.');
             Assert.areEqual(1, rows.get('').records, 'The one record with no value.');
         }
