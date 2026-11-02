@@ -230,7 +230,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field access: set search help ({0} = the most sets)</shortDescription>
-        <value>Choose the permission sets to change, up to {0}. Profiles, groups and packaged permission sets are not offered.</value>
+        <value>Choose the permission sets to change, up to {0}. Profiles, groups, packaged permission sets and BarnCRM's own permission sets are not offered: BarnCRM keeps its own up to date itself.</value>
     </labels>
     <labels>
         <fullName>Core_FieldAccess_ObjectAccess</fullName>
