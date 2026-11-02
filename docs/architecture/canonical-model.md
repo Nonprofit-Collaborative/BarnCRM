@@ -6594,9 +6594,9 @@ numbers printed beside it and an organization can change what "recent" means wit
   sort and show it, and two donor segment starter templates (Section 25O) use it: Champions
   and Slipping Donors (the At Risk segment).
 
-### Attributes
+### Salesforce implementation
 
-On Account and Contact, shipped by Giving, read only on the donor record pages:
+- **Fields on Account and Contact** (shipped by Giving, read only on the donor record pages):
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -6609,11 +6609,15 @@ On Account and Contact, shipped by Giving, read only on the donor record pages:
 | RFM Score | `RFM_Score__c` | Number |
 | RFM Segment | `RFM_Segment__c` | Text (40) |
 
-On `Giving_Settings__c`: the three cutoff fields of R-DT3 (Text, with defaults).
+- **Fields on `Giving_Settings__c`:** the three cutoff fields of R-DT3 (Text, with defaults).
 
-### Salesforce implementation
+| Attribute | API name | Type |
+|---|---|---|
+| Donor Score Recency Days | `Donor_Score_Recency_Days__c` | Text (default `90,180,365,730`) |
+| Donor Score Frequency Gifts | `Donor_Score_Frequency_Gifts__c` | Text (default `6,4,2,1`) |
+| Donor Score Monetary Amount | `Donor_Score_Monetary_Amount__c` | Text (default `5000,1000,250,50`) |
 
-`DonorScoreService` (pure scoring in `DonorScoreMath`, a plain class with no org access),
+- **Code:** `DonorScoreService` (pure scoring in `DonorScoreMath`, a plain class with no org access),
 `DonorScoreTriggerHandler` registered for Account and Contact, and the existing
 `DonorLevelBatch` pass, which now scores the same records after placing them on the ladder.
 

@@ -1,6 +1,7 @@
 /**
  * The rules of donor scoring as plain functions (R-DT2 to R-DT4): no records, no org.
  */
+// runs-as: deploying user (pure functions over numbers, no DML, SOQL or settings)
 @IsTest(testFor='ApexClass:DonorScoreMath')
 private class DonorScoreMathTest {
     @IsTest
