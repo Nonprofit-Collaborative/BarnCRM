@@ -3,5 +3,5 @@
   <description>Volunteer hours waiting for a coordinator to approve or reject them.</description>
   <flexiPage>Volunteer_Approve_Hours</flexiPage>
   <label>Approve Hours</label>
-  <motif>Custom20: Clock</motif>
+  <motif>Custom91: Shield</motif>
 </CustomTab>

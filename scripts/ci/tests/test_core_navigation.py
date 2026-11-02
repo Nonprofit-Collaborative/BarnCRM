@@ -41,7 +41,10 @@ class CoreTabMotifs(unittest.TestCase):
     def test_each_core_tab_names_its_real_icon_once(self):
         self.assertEqual(len(MOTIFS), 100)
         seen = {}
-        for path in sorted(glob.glob(os.path.join(CORE, "tabs", "*.tab-meta.xml"))):
+        # Every package's tabs (UX-F3): module tabs follow the Core rule, and no number repeats
+        # anywhere in BarnCRM (docs/contributor-guide/tab-icons.md lists them).
+        pattern = os.path.join(ROOT, "packages", "*", "main", "default", "tabs", "*.tab-meta.xml")
+        for path in sorted(glob.glob(pattern)):
             name = os.path.basename(path).replace(".tab-meta.xml", "")
             motif = ET.parse(path).getroot().findtext("m:motif", namespaces=NS) or ""
             match = re.fullmatch(r"Custom(\d+): (\S+)", motif.strip())

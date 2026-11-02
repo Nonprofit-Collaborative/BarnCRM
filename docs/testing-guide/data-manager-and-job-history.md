@@ -21,6 +21,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 7 | Click the **Recycle Bin** tile. | A new browser tab opens Salesforce's Recycle Bin. Close it. |
 | 8 | Close **About This Tool** and reload the page. | It stays closed. |
 | 9 | Check the app's navigation bar, in **BarnCRM** and in **BarnCRM Admin**. | **Data Manager** is there in both. **Find**, **Import** and **Bulk Update** are in neither. |
+| 10 | With Giving and Volunteers installed, look at the module tabs in the navigation (for example **Gifts**, **Donor Levels**, **Volunteer Hours**). | Each tab has its own icon, and no two BarnCRM tabs show the same one. |
 
 **Cleanup:** None.
 
