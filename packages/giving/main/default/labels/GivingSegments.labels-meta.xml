@@ -145,6 +145,38 @@
     <value>A largest gift of 1,000 or more or total giving of 5,000 or more, and a gift in the last two years.</value>
   </labels>
   <labels>
+    <fullName>Giving_Segments_ChampionsName</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: name of the champions template</shortDescription>
+    <value>Champions</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_ChampionsDescription</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: what the champions template finds</shortDescription>
+    <value>Donors whose RFM segment is Champion: they gave recently, often and generously.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_SlippingName</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: name of the slipping donors template</shortDescription>
+    <value>Slipping Donors</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Segments_SlippingDescription</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: what the slipping donors template finds</shortDescription>
+    <value>Donors whose RFM segment is At Risk: they gave often or generously before, but not recently.</value>
+  </labels>
+  <labels>
     <fullName>Giving_Segments_Title</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>

@@ -47,7 +47,17 @@ public with sharing class DonorSegmentTemplates {
         '"filter":{"version":1,"logic":"(1 OR 2) AND 3","conditions":[' +
         '{"id":1,"field":"Largest_Gift__c","operator":"greater or equal","value":1000},' +
         '{"id":2,"field":"Total_Giving__c","operator":"greater or equal","value":5000},' +
-        '{"id":3,"field":"Last_Gift_Date__c","operator":"last n days","value":730}]}}' +
+        '{"id":3,"field":"Last_Gift_Date__c","operator":"last n days","value":730}]}},' +
+        '{"key":"champions","objects":["Contact","Account"],' +
+        '"fields":["Name","RFM_Segment__c","RFM_Score__c","Days_Since_Last_Gift__c","Recent_Gift_Count__c","Recent_Giving__c"],' +
+        '"orderBy":{"field":"RFM_Score__c","direction":"DESC"},' +
+        '"filter":{"version":1,"conditions":[' +
+        '{"id":1,"field":"RFM_Segment__c","operator":"equals","value":"Champion"}]}},' +
+        '{"key":"slipping","objects":["Contact","Account"],' +
+        '"fields":["Name","RFM_Segment__c","RFM_Score__c","Days_Since_Last_Gift__c","Recent_Gift_Count__c","Total_Giving__c"],' +
+        '"orderBy":{"field":"Total_Giving__c","direction":"DESC"},' +
+        '"filter":{"version":1,"conditions":[' +
+        '{"id":1,"field":"RFM_Segment__c","operator":"equals","value":"At Risk"}]}}' +
         ']}';
 
     /** One template as the page offers it. */
@@ -184,6 +194,18 @@ public with sharing class DonorSegmentTemplates {
                 return new List<String>{
                     System.Label.Giving_Segments_LevelMoversName,
                     System.Label.Giving_Segments_LevelMoversDescription
+                };
+            }
+            when 'champions' {
+                return new List<String>{
+                    System.Label.Giving_Segments_ChampionsName,
+                    System.Label.Giving_Segments_ChampionsDescription
+                };
+            }
+            when 'slipping' {
+                return new List<String>{
+                    System.Label.Giving_Segments_SlippingName,
+                    System.Label.Giving_Segments_SlippingDescription
                 };
             }
             when else {

@@ -51,7 +51,11 @@ public with sharing class DonorLevelBatch implements Database.Batchable<SObject>
         try {
             DonorLevelService.clearCache();
             List<SObject> changed = DonorLevelService.assignAll(scope);
-            DonorLevelWriter.save(changed);
+            // The same pass keeps donor scores right as the days go by (G-19, R-DT5).
+            List<SObject> rescored = DonorScoreService.scoreAll(scope);
+            Map<Id, SObject> toSave = new Map<Id, SObject>(changed);
+            toSave.putAll(rescored);
+            DonorLevelWriter.save(toSave.values());
             moved += changed.size();
         } catch (Exception chunkFailure) {
             // One bad chunk must not stop the rest of the org being re-placed.

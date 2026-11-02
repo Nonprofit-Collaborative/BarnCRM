@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console, Giving page: box heading for donor levels</shortDescription>
-        <value>Donor Levels</value>
+        <value>Donor Levels and Scores</value>
     </labels>
     <labels>
         <fullName>Core_SettingsGroup_EditionAndFeatures</fullName>
