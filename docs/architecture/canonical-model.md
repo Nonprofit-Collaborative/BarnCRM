@@ -2989,7 +2989,7 @@ unchanged.
 | Job Id | text | computed | The job running the current dry run or commit, so a pass still running can be told from one the platform aborted (R-IB13). |
 | File Values | long text | no | Values applied to every row of this file that does not carry its own, held as the defaults half of a mapping document (R-IT1, R-IB14). |
 | Match Only | boolean | yes (defaults false) | When true, this file only matches: a row whose person or organization matches no record is rejected rather than creating one (R-IB15). |
-| Operation | picklist(Import, Update, Delete) | yes (defaults Import) | What kind of data job this is: a file import, a bulk update (R-BU1) or a bulk delete (R-BD1). Empty on a batch created before v0.7, which reads as Import. |
+| Operation | picklist(Import, Update, Delete, Access) | yes (defaults Import) | What kind of data job this is: a file import, a bulk update (R-BU1), a bulk delete (R-BD1) or a field access change (R-FA1). Empty on a batch created before v0.7, which reads as Import. |
 | Bulk Update Definition | long text | conditional | For a bulk update, the query document, the changes and the confirmed count it ran with (R-BU1); for a bulk delete, the query document and the confirmed count (R-BD1); empty for an import. |
 | Rows Deleted | integer | computed | How many records a bulk delete deleted (R-BD3); empty for any other data job. |
 | Trial Rows | integer | computed | How many of the file's first rows a trial import committed (R-IB16); empty when the file was committed whole. |
@@ -3371,7 +3371,7 @@ them (R-IB8, R-IB9).
 | Job Id | `Job_Id__c` | Text (18) |
 | File Values | `File_Values_JSON__c` | Long Text Area (32768) |
 | Match Only | `Match_Only__c` | Checkbox (default false) |
-| Operation | `Operation__c` | Picklist: Import, Update, Delete (default Import) |
+| Operation | `Operation__c` | Picklist: Import, Update, Delete, Access (default Import) |
 | Bulk Update Definition | `Operation_JSON__c` | Long Text Area (131072) |
 | Rows Deleted | `Rows_Deleted__c` | Number (9, 0) |
 | Trial Rows | `Trial_Rows__c` | Number (9, 0) |
@@ -10535,6 +10535,104 @@ dates for the same indicator. Periods of different lengths may overlap (a year a
 
 ---
 
+## 29ZH. Field access change
+
+### Definition
+
+One change to who can read and edit fields and kinds of record, made by an administrator on the
+Field Access Manager (feature C-65, plan D-157, ADR-NEXT): Read and Edit given or removed on
+chosen fields and objects, across chosen permission sets, previewed row by row and undoable.
+It adds no object of its own: it is a data job (Section 16) with Operation Access, journaled in
+the import journal (Section 17A). The permission rows it changes are Salesforce's own
+`ObjectPermissions` and `FieldPermissions`, which the model does not own.
+
+### Rules
+
+**R-FA1 A data job with Operation Access.** A field access change is an `Import_Batch__c` with
+Operation Access, no template, no file and no staged rows. Its Bulk Update Definition holds the
+change document and the confirmed count: `{ "version": 1, "change": { ... }, "confirmedCount":
+42 }`. Committed By is the administrator; the Undo Deadline is stamped from the import undo
+window (R-IB7). Rows Updated counts the permission rows changed and Rows Rejected the rows the
+platform refused. Status is Complete when any row changed, Failed when none did. The import
+history and the import undo leave Access jobs out: they are listed and undone only on
+the Field Access Manager.
+
+**R-FA2 Who, and on what.** Every read and write requires Manage BarnCRM Settings and the
+system permission Manage Profiles and Permission Sets. A permission set can be chosen only when
+it is custom, not owned by a profile, of type Regular (not a group's calculated set, not a
+muting set), has no namespace and is not one BarnCRM ships (by name, from the generated
+`BarnCRMShippedPermissionSets`, kept complete by `check-shipped-permission-sets.py`, since the
+access syncs manage those); at most 10 per change. Permission rows are read and written
+only for the Ids of the sets chosen and checked, so rows held by a user license or permission
+set license are never touched. Profiles and permission set groups are never changed.
+
+**R-FA3 The change document.** Plain JSON, built in the browser and checked again in Apex:
+
+```
+{
+  "version": 1,
+  "setIds": ["0PS..."],
+  "items": [
+    { "object": "Contact", "field": "Contact.Email", "access": "edit" },
+    { "object": "Volunteer_Job__c", "field": null, "access": "read" }
+  ]
+}
+```
+
+`access` is `read`, `edit` or `none`. A blank `field` means the kind of record itself. Object
+and field names come only from describe results; a field that is not permissionable (required
+and system fields, fields everyone who reads the record sees) is refused, and a formula, roll-up
+summary or auto number field takes `read` or `none` only. At most 500 items.
+
+**R-FA4 Dependencies are added, not left to fail.** Field Read or Edit adds object Read where
+the set lacks it. Edit gives Read, on a field and on a kind of record. Removing object Edit also
+removes Delete and Modify All. Removing object Read removes every object permission (Read,
+Create, Edit, Delete, View All, Modify All) and the set's access to every field of that kind of
+record. Each added change names its reason in the preview.
+
+**R-FA5 Preview, confirmed count, ceiling.** The preview lists every permission row the change
+would write, with its set, kind of record, field, access now, access after and reason; rows
+already at the asked access are counted as unchanged and not written. Apply works the rows out
+again and refuses when their number differs from the count the administrator confirmed. One
+change writes at most 2,000 rows.
+
+**R-FA6 Written as the administrator, in order, journaled.** Rows are written in user mode with
+partial success: object grants first, then field grants, then field removals, then object
+removals. A row with no access left is deleted rather than saved empty. Every row written is a
+journal entry in the Commit phase; every row refused is a Failed entry with the platform's
+reason and goes to the Error Log:
+
+```
+{ "action": "Updated", "object": "FieldPermissions", "id": "01k...", "set": "0PS...",
+  "target": "Contact.Email", "before": { "read": true, "edit": false },
+  "after": { "read": true, "edit": true } }
+```
+
+`action` is `Created` (no row before), `Updated` or `Deleted` (no row after). An
+`ObjectPermissions` entry's before and after hold `read`, `create`, `edit`, `del`, `viewAll`
+and `modifyAll`. Salesforce also records each row change in its Setup Audit Trail, which Setup
+Changes copies (Section 29W).
+
+**R-FA7 Undo.** Within the Undo Deadline, an undo puts each journaled row back to its before
+access (deleting a created row, recreating a deleted one, in the reverse of R-FA6's order) when
+the row's access now is still its after access; a row changed since is kept and recorded as a
+`NotRestored` entry in the Undo phase. Status becomes Undone, or Undo failed when the platform
+refused every row the undo tried and none was put back; an Undo failed change can be undone
+again, an Undone one cannot. The permission rows are setup records, which cannot share a
+transaction with the data job, its journal or the Error Log (mixed DML), so the apply and the
+undo write the rows and a queued job (`FieldAccessRecordJob`) writes the data job, the journal
+pages and any refusals straight after, as the same person.
+
+### Salesforce implementation
+
+- **No new object or field.** `Import_Batch__c.Operation__c` gains the value Access (Section 16).
+- **Service:** `FieldAccessService` (eligibility, preview, apply, undo), `FieldAccessRecordJob`
+  (the data job, journal and Error Log entries, in their own transaction), `FieldAccessController`
+  (thin, plain JSON shapes, the R-FA2 check); the change document, its checks and the preview's
+  grouping and counts run in the framework-free module `fieldAccessPlan.js` (plan 9.9).
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -10849,6 +10947,7 @@ mirrors the primary member).
 | 0.17 | 2026-11-02 | C-57 picklist value usage (plan 6.1.5). Section 29F: rules R-FU9 to R-FU11 (records per picklist value and last use, value status, what Last Used means). No object or field added. |
 | 0.17 | 2026-11-02 | C-58 technical debt checks in Org Optimizer (plan 6.1.5). `BarnCRM_Settings__c` gains `Old_Api_Version__c` (Org Optimizer keys, default 50); rules R-OO1 to R-OO3. No object added. |
 | 0.17 | 2026-11-02 | C-60 automation inventory in the Data Dictionary (plan 6.1.5). Section 29F: rules R-AI1 to R-AI4. No object or field added. |
+| 0.17 | 2026-11-02 | Field Access Manager (C-65, D-157, ADR-NEXT). New Section 29ZH, rules R-FA1 to R-FA7: a field access change is a data job; `Import_Batch__c.Operation__c` gains the value Access. No object or field added. |
 
 ---
 ## 32. Entity ownership by package

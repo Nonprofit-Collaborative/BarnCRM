@@ -52,6 +52,7 @@ page, even if that puts it out of reading order.
 | [Record Inspector](record-inspector.md) | RI | 2 | Inspect a record, search fields, copy an API name, field security and permission |
 | [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 16 | Health Check findings and fixes, Org Optimizer sections, technical debt checks, storage and limits, Data Dictionary, Access Explorer, Access compare and Modify All report, weekly admin summary, Setup Changes, AI-Readiness Export |
 | [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 17 | Health Check findings and fixes, Org Optimizer sections, storage and limits, Data Dictionary and its automation inventory, Access Explorer, Access compare and Modify All report, weekly admin summary, Setup Changes, AI-Readiness Export |
+| [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 16 | Health Check findings and fixes, Org Optimizer sections, storage and limits, Data Dictionary, Access Explorer, Access compare and Modify All report, Field Access Manager, weekly admin summary, Setup Changes, AI-Readiness Export |
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
 | [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 15 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import |
 | [Giving: commitments](giving-commitments.md) | COM | 11 | Pledges, recurring gifts, payments, nightly jobs, pledge reminders |

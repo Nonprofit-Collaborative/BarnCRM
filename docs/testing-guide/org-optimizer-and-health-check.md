@@ -196,7 +196,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As the admin, open **Org Optimizer** and choose the **Access Explorer** tile. | **Access Explorer**, **Who can see or change what, and why. Access Explorer only reads: it never gives or takes access.**, a **Show** choice with **By Person or Permission Set** selected, **Look Up** set to **Person**, and **Choose a person or permission set to see their access.** |
+| 1 | As the admin, open **Org Optimizer** and choose the **Access Explorer** tile. | **Access Explorer**, **Who can see or change what, and why. Every view only reads, except Change Field Access, which shows each change before it is made.**, a **Show** choice with **By Person or Permission Set** selected, **Look Up** set to **Person**, and **Choose a person or permission set to see their access.** |
 | 2 | Type the first two letters of the staff user's name in **Person** and choose them. | **Access Comes From** lists their profile (**Profile**), then **Team Member** (**Permission Set Group**, **Includes** BarnCRM Staff and the other sets in the role). A **Kinds of Record** table follows, sorted by name, with **Read**, **Create**, **Edit**, **Delete**, **View All**, **Modify All** and **Granted By**. **Relationship** has **Read**, **Create**, **Edit** and **Delete** as **Yes**, and **Granted By** reads **Team Member (through BarnCRM Staff)**. |
 | 3 | Choose **Relationship** in **Field Access For**. | A **Fields** table with **Field**, **API Name**, **Read**, **Edit** and **Granted By**. **Description** shows **Yes** for **Read** and **Edit**; **Relationship Number** (Name) shows **Always**. |
 | 4 | Type one letter in **Person**. | No search runs and nothing is listed until a second letter is typed. |
@@ -302,3 +302,27 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 2 | Choose **Account** and download the CSV. | The object label column reads `Account` with no space before or after it. |
 
 **Cleanup:** Delete the downloaded file.
+
+## T-HC-16: Field Access Manager Gives and Removes Field Access, With a Preview and Undo
+
+**Purpose:** Confirm an admin can give and remove Read and Edit on fields and kinds of record across permission sets the organization made, that every change is previewed with the access it needs added, that it can be undone, and that profiles, groups, packaged sets and other people are kept out.
+**Prerequisites:** admin and staff (see [Test users](before-you-test.md#test-users)); sample data loaded. In Setup, create two permission sets with no license: **FAM Test One** and **FAM Test Two**, neither giving anything.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open **Org Optimizer**, choose **Access Explorer**, then **Change Field Access** under **Show**. | **Permission Sets** with a search box, **Kind of Record**, an empty **Changes** list and **Recent Changes**. **Preview** is disabled. |
+| 2 | Type `FAM` in **Permission Sets** and choose both test sets. | Both appear under the search box. Type `System Administrator` and `Team Member`: neither a profile nor a permission set group is offered. Type `BarnCRM`, then `Volunteers`: no permission set BarnCRM ships is offered, packaged or not. |
+| 3 | Choose **Contact** in **Kind of Record**. | A **Fields** table with **Field**, **API Name** and **Now**, reading **Read: 0 of 2. Edit: 0 of 2.** Required and system fields (Last Name, Created By) are not listed. A formula field says **Read only**. |
+| 4 | Tick **Email** and **Phone**, choose **Read and Edit** in **Access for the Ticked Fields**, press **Add to Changes**. | **Changes** lists **Contact**, **Email**, **Read and Edit** and **Contact**, **Phone**, **Read and Edit**. |
+| 5 | Choose **Relationship**, set **Access to the Kind of Record** to **Read**, press **Add to Changes**. | **Changes** adds **Relationship**, **(The kind of record)**, **Read**. |
+| 6 | Press **Preview**. | **Preview** lists 8 rows, each with **Permission Set**, **Kind of Record**, **Field**, **Now**, **After** and **Why**: per set, Contact **No Access** to **Read** with **Needed for field access**, Email and Phone **No Access** to **Read and Edit** with **Asked**, and Relationship **No Access** to **Read** with **Asked**. The line above says 8 rows change on 2 permission sets and 0 are already right. |
+| 7 | Press **Apply Changes**, then **Apply** in the confirmation. | **Changed 8 rows.** and the date until which it can be undone. **Recent Changes** lists it first with **Rows Changed** 8, **Refused** 0 and **Status** **Complete**. |
+| 8 | Choose **By Person or Permission Set**, look up **Permission Set** `FAM Test One`. | **Contact** and **Relationship** have **Read**; under **Field Access For** **Contact**, **Email** and **Phone** have **Read** and **Edit**. |
+| 9 | Back on **Change Field Access**, with both sets chosen, choose **Contact**, set **Access to the Kind of Record** to **No Access**, press **Add to Changes**, then **Preview**. | Per set: **Contact** **Read** to **No Access** with **Asked**, and **Email** and **Phone** **Read and Edit** to **No Access** with **Removed with the kind of record**. |
+| 10 | Press **Clear** under **Changes**. In **Recent Changes**, press **Undo** on the change from step 7 and confirm. | **Status** reads **Undone**. Look up `FAM Test One` again: it gives nothing. |
+| 11 | In Setup, give **FAM Test One** Read on Account, then add **Account**, **Read** here and press **Preview** but not **Apply**. In Setup, remove that Read again, then press **Apply Changes**. | Nothing is saved, and the page asks you to preview again, because the number of rows to change is different. |
+| 12 | Open **Org Optimizer**, **Setup Changes**, and press **Copy New Changes Now**. | Rows for **FAM Test One** and **FAM Test Two** field and object permission changes are listed. |
+| 13 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **Access Explorer** tile, so **Change Field Access** is not reachable. |
+| 14 | As an admin who holds BarnCRM Admin but not Manage Profiles and Permission Sets, open **Change Field Access**. | **You need the Manage Profiles and Permission Sets permission to change field access.** and nothing to choose. |
+
+**Cleanup:** In Setup, delete **FAM Test One** and **FAM Test Two**.

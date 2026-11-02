@@ -10,8 +10,9 @@ change our settings?" in a few seconds.
 
 To see why someone can (or cannot) open a kind of record or field, including access that
 comes from outside BarnCRM, use [Access Explorer](access-explorer.md) in Org Optimizer: the
-**Open Access Explorer** button on this page opens it. It only reads; changes are made here or
-in Setup.
+**Open Access Explorer** button on this page opens it. To give a permission set Read or Edit on
+fields and kinds of record, use its **Change Field Access** view, the
+[Field Access Manager](field-access-manager.md); everything else is changed here or in Setup.
 
 Roles ship with BarnCRM and are kept up to date for you.
 
