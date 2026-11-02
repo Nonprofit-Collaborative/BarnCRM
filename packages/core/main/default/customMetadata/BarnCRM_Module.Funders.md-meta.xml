@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Staff_Tabs__c</field>
-    <value xsi:type="xsd:string">Grant__c</value>
+    <value xsi:type="xsd:string">Grant_Pipeline;Grant__c</value>
   </values>
   <values>
     <field>Admin_Tabs__c</field>

@@ -1,0 +1,272 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom92">
+    <div slot="actions" class="slds-grid slds-grid_vertical-align-center slds-wrap">
+      <lightning-radio-group
+        data-id="scope"
+        class="slds-var-m-right_small"
+        name="scope"
+        label={labels.scopeEveryone}
+        variant="label-hidden"
+        type="button"
+        options={scopeOptions}
+        value={scope}
+        onchange={handleScope}
+      ></lightning-radio-group>
+      <template lwc:if={canCreate}>
+        <lightning-button
+          data-id="new-grant"
+          label={labels.newGrant}
+          onclick={handleNewGrant}
+        ></lightning-button>
+      </template>
+    </div>
+
+    <div class="slds-var-p-horizontal_medium">
+      <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
+
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={hasError}>
+        <p
+          role="alert"
+          data-id="error-message"
+          class="slds-text-color_error slds-var-m-bottom_small"
+        >
+          {errorMessage}
+        </p>
+      </template>
+
+      <template lwc:if={showReadOnly}>
+        <p data-id="read-only" class="slds-text-body_small slds-var-m-bottom_small">
+          {labels.readOnly}
+        </p>
+      </template>
+
+      <template lwc:if={hasBoard}>
+        <div
+          class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_medium"
+          data-id="totals"
+        >
+          <div class="slds-col slds-grid slds-size_1-of-1 slds-medium-size_1-of-3">
+            <div class="slds-box slds-box_x-small slds-size_1-of-1">
+              <p class="slds-text-title">{labels.tileOpen}</p>
+              <p class="slds-text-heading_medium" data-id="open-count">
+                <lightning-formatted-number value={board.openCount}></lightning-formatted-number>
+              </p>
+            </div>
+          </div>
+          <div class="slds-col slds-grid slds-size_1-of-1 slds-medium-size_1-of-3">
+            <div class="slds-box slds-box_x-small slds-size_1-of-1">
+              <p class="slds-text-title">{labels.tileRequested}</p>
+              <p class="slds-text-heading_medium" data-id="open-amount">
+                <lightning-formatted-number
+                  value={board.openAmount}
+                  format-style="currency"
+                ></lightning-formatted-number>
+              </p>
+            </div>
+          </div>
+          <div class="slds-col slds-grid slds-size_1-of-1 slds-medium-size_1-of-3">
+            <div class="slds-box slds-box_x-small slds-size_1-of-1">
+              <p class="slds-text-title">{labels.tileAwarded}</p>
+              <p class="slds-text-heading_medium" data-id="awarded-amount">
+                <lightning-formatted-number
+                  value={board.awardedAmount}
+                  format-style="currency"
+                ></lightning-formatted-number>
+              </p>
+              <p class="slds-text-body_small" data-id="awarded-count">{awardedDetail}</p>
+            </div>
+          </div>
+        </div>
+
+        <template lwc:if={truncatedMessage}>
+          <p role="status" data-id="truncated" class="slds-text-body_small slds-var-m-bottom_small">
+            {truncatedMessage}
+          </p>
+        </template>
+      </template>
+
+      <template lwc:if={isEmpty}>
+        <p data-id="empty-state" class="slds-text-body_regular slds-var-m-bottom_medium">
+          {labels.empty}
+        </p>
+      </template>
+
+      <template lwc:if={showColumns}>
+        <div class="grant-board" data-id="board">
+          <template for:each={columns} for:item="column">
+            <section
+              key={column.key}
+              class="grant-column slds-box slds-box_x-small slds-theme_shade"
+              data-id="column"
+              data-stage={column.stage}
+              aria-label={column.stage}
+            >
+              <header class="slds-var-m-bottom_x-small">
+                <h2 class="slds-text-heading_small slds-truncate" title={column.stage}>
+                  {column.stage}
+                </h2>
+                <p class="slds-text-body_small" data-id="column-total">
+                  <lightning-formatted-number value={column.count}></lightning-formatted-number>
+                  <span class="slds-var-m-horizontal_xx-small" aria-hidden="true">|</span>
+                  <lightning-formatted-number
+                    value={column.amount}
+                    format-style="currency"
+                  ></lightning-formatted-number>
+                </p>
+              </header>
+              <template lwc:if={column.isEmpty}>
+                <p class="slds-text-body_small slds-text-color_weak">{labels.columnEmpty}</p>
+              </template>
+              <ul class="slds-has-dividers_around-space">
+                <template for:each={column.cards} for:item="card">
+                  <li
+                    key={card.id}
+                    class="slds-item grant-card slds-var-m-bottom_x-small"
+                    data-id={card.id}
+                    data-card
+                  >
+                    <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-start">
+                      <h3 class="slds-text-title_bold slds-truncate" title={card.name}>
+                        {card.name}
+                      </h3>
+                      <lightning-button-menu
+                        data-id={card.id}
+                        alternative-text={card.menuLabel}
+                        icon-size="x-small"
+                        menu-alignment="right"
+                        onselect={handleCardMenu}
+                      >
+                        <template for:each={card.menuItems} for:item="item">
+                          <lightning-menu-item
+                            key={item.key}
+                            label={item.label}
+                            value={item.value}
+                          ></lightning-menu-item>
+                        </template>
+                      </lightning-button-menu>
+                    </div>
+                    <p class="slds-text-body_regular slds-truncate" title={card.funderLabel}>
+                      {card.funderLabel}
+                    </p>
+                    <p class="slds-text-body_regular">
+                      <lightning-formatted-number
+                        value={card.amountRequested}
+                        format-style="currency"
+                      ></lightning-formatted-number>
+                    </p>
+                    <template lwc:if={card.deadline}>
+                      <p class="slds-text-body_small">
+                        <lightning-formatted-date-time
+                          value={card.deadline}
+                          time-zone="UTC"
+                        ></lightning-formatted-date-time>
+                      </p>
+                    </template>
+                    <template lwc:if={card.nextStep}>
+                      <p class="slds-text-body_small">{card.nextStep}</p>
+                    </template>
+                    <p class="slds-text-body_small slds-text-color_weak">{card.ownerName}</p>
+                  </li>
+                </template>
+              </ul>
+            </section>
+          </template>
+        </div>
+      </template>
+
+      <template lwc:if={hasBoard}>
+        <h2 class="slds-text-heading_small slds-var-m-top_medium slds-var-m-bottom_x-small">
+          {labels.deadlines}
+        </h2>
+        <template lwc:if={hasDeadlines}>
+          <ul class="slds-has-dividers_bottom-space slds-var-m-bottom_medium" data-id="deadlines">
+            <template for:each={deadlines} for:item="row">
+              <li key={row.id} class="slds-item" data-deadline>
+                <div
+                  class="slds-grid slds-wrap slds-grid_vertical-align-center slds-gutters_x-small"
+                >
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <button
+                      type="button"
+                      class="slds-button slds-text-link"
+                      data-id={row.id}
+                      onclick={handleOpenDeadline}
+                    >
+                      {row.name}
+                    </button>
+                  </div>
+                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-3 slds-truncate">
+                    {row.funderLabel}
+                  </div>
+                  <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-3">
+                    <lightning-formatted-date-time
+                      value={row.deadline}
+                      time-zone="UTC"
+                    ></lightning-formatted-date-time>
+                    <span class={row.whenClass} data-id="when">
+                      <span class="slds-var-m-horizontal_xx-small" aria-hidden="true">|</span
+                      >{row.whenText}</span
+                    >
+                  </div>
+                </div>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else>
+          <p data-id="deadlines-empty" class="slds-text-body_small slds-var-m-bottom_medium">
+            {labels.deadlinesEmpty}
+          </p>
+        </template>
+      </template>
+    </div>
+  </lightning-card>
+
+  <template lwc:if={isAwarding}>
+    <section
+      role="dialog"
+      tabindex="-1"
+      aria-modal="true"
+      aria-labelledby="award-title"
+      class="slds-modal slds-fade-in-open"
+    >
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <h2 id="award-title" class="slds-modal__title slds-hyphenate">{awardTitle}</h2>
+        </header>
+        <div class="slds-modal__content slds-var-p-around_medium" data-id="award-dialog">
+          <lightning-input
+            data-id="award-amount"
+            type="number"
+            formatter="currency"
+            step="0.01"
+            min="0"
+            label={labels.awardAmount}
+            value={awardAmount}
+            onchange={handleAwardAmount}
+          ></lightning-input>
+        </div>
+        <footer class="slds-modal__footer">
+          <lightning-button
+            data-id="award-cancel"
+            label={labels.cancel}
+            onclick={handleCancelAward}
+          ></lightning-button>
+          <lightning-button
+            data-id="award-save"
+            class="slds-var-m-left_x-small"
+            variant="brand"
+            label={labels.save}
+            disabled={isSaving}
+            onclick={handleSaveAward}
+          ></lightning-button>
+        </footer>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+  </template>
+</template>

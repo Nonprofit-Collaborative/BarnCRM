@@ -51,6 +51,10 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Logic models](logic-models.md): building a logic model with arrows and assumptions, and measuring outputs and outcomes with indicators, targets and results, filled in by hand, from a spreadsheet or worked out from your records, and comparing periods in a report for funders.
 
+### Funders (Nonprofit Edition)
+
+- [Grants and funders](funders.md): adding grants, moving them through the stages on the Grant Pipeline, the deadlines coming up, and the program a grant pays for.
+
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.

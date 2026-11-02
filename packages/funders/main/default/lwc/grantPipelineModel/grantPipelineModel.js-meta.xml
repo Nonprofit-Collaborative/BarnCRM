@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Grant Pipeline tab's arithmetic in plain JavaScript: open stages into columns with their
+    totals, and upcoming deadlines with days left (canonical model 29ZH). Imported by grantPipeline.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>Every open grant by stage, with the totals and the deadlines coming up.</description>
+  <flexiPage>Grant_Pipeline</flexiPage>
+  <label>Grant Pipeline</label>
+  <motif>Custom92: Ship</motif>
+</CustomTab>
