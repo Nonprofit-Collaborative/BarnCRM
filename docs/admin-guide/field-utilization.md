@@ -109,6 +109,38 @@ Each row has three actions:
 If the kind of record has no saved counts, the list reads "No snapshots have been saved for this
 kind of record yet."
 
+## Picklist Value Usage
+
+Under the Field Utilization table, **Picklist Value Usage** answers a different question: which
+values of a picklist are still used? Choose a kind of record, then click **Show Picklist Value
+Usage**. Nothing is read until you click.
+
+For every single-select picklist field of the kind of record that you can read, the table lists
+each value with:
+
+- **Status.** **Active** (a value on the picklist that records hold), **Inactive, Still in Data**
+  (a value that is no longer on the picklist, or was retired, but records still hold it),
+  **Never Used** (an active value that no record holds), or **No Value** (one row for the records
+  where the field is empty).
+- **Records.** How many records hold the value.
+- **Last Used.** The newest **Last Modified Date** among the records that hold the value. It is
+  the latest time a record holding the value was changed, not the time the value was chosen:
+  any later edit to such a record moves it. On a kind of record with no Last Modified Date,
+  Created Date is used. A value with no records has no date.
+
+Click a column heading to sort. Sort by **Status** to bring the retired values still in your
+data together, or by **Records** to see the least used values first. To replace a retired value
+in bulk, use [Super Transform](super-transform.md) or
+[Bulk update](bulk-update.md).
+
+How it counts: one query per picklist field, run as you (so you see the counts for the records
+you can see), 20 fields at a time with a progress bar. Only the 500 most used values found in
+the data are shown for a field; if a field has more, the page names it under the table. A kind
+of record with more than 1,000,000 records is not read, as for the field counts above.
+
+Not covered: multi-select picklists, and picklist values you cannot read because the field is
+hidden from you. Nothing is saved; the table is gone when you leave the page.
+
 ## Common Mistakes
 
 **Reading a sampled row as the whole picture.** A long text field marked **Sampled** shows the

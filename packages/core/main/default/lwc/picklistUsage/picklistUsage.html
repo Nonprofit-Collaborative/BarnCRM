@@ -1,0 +1,48 @@
+<template>
+    <div class="slds-var-m-top_large" data-id="picklist-usage">
+        <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.title}</h3>
+        <p class="slds-var-m-bottom_x-small" data-id="intro">{labels.intro}</p>
+        <lightning-button
+            data-id="show"
+            label={labels.show}
+            disabled={showDisabled}
+            onclick={handleShow}
+        ></lightning-button>
+
+        <template lwc:if={errorMessage}>
+            <p class="slds-text-color_error slds-var-m-top_small" data-id="error" role="alert">
+                {errorMessage}
+            </p>
+        </template>
+        <template lwc:if={showProgress}>
+            <div class="slds-var-m-vertical_small" data-id="progress">
+                <lightning-progress-bar value={progressValue} size="medium"></lightning-progress-bar>
+                <p class="slds-text-body_small slds-var-m-top_xx-small" role="status" aria-live="polite">
+                    {progressText}
+                </p>
+            </div>
+        </template>
+        <template lwc:if={showEmpty}>
+            <p class="slds-var-m-top_small" data-id="no-fields">{labels.noFields}</p>
+        </template>
+        <template lwc:if={hasRows}>
+            <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="note">{labels.note}</p>
+            <lightning-datatable
+                data-id="results"
+                key-field="key"
+                data={tableRows}
+                columns={columns}
+                hide-checkbox-column
+                sorted-by={sortedBy}
+                sorted-direction={sortedDirection}
+                onsort={handleSort}
+            ></lightning-datatable>
+        </template>
+        <template lwc:if={truncatedMessage}>
+            <p class="slds-var-m-top_x-small" data-id="truncated">{truncatedMessage}</p>
+        </template>
+        <template lwc:if={notCheckedMessage}>
+            <p class="slds-var-m-top_x-small" data-id="not-checked">{notCheckedMessage}</p>
+        </template>
+    </div>
+</template>

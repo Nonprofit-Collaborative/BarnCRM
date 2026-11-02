@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_PicklistUsage_NoValue</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: records with no value</shortDescription>
+        <value>(No Value)</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_Title</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: section title</shortDescription>
+        <value>Picklist Value Usage</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_Intro</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: what the section shows</shortDescription>
+        <value>For each picklist field of this kind of record, how many records hold each value and when the newest of those records was last changed. Use it to find values that are retired but still in your data (Inactive) or that no record holds (Never Used).</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_Show</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: button</shortDescription>
+        <value>Show Picklist Value Usage</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_Progress</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: progress; {0} done, {1} total</shortDescription>
+        <value>Checked {0} of {1} picklist fields.</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_NoFields</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: no picklist fields</shortDescription>
+        <value>This kind of record has no picklist fields you can read.</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_LastUsedNote</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: what Last Used means</shortDescription>
+        <value>Last Used is the newest Last Modified Date among the records that hold the value (Created Date on a kind of record that has no Last Modified Date). Any later edit to a record moves it, so it is the latest time a record holding the value was touched, not the time the value was chosen. Multi-select picklists are not included.</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_NotChecked</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: fields that could not be checked; {0} is the list</shortDescription>
+        <value>Could not check: {0}. The Error Log has the details.</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_Truncated</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: values cut; {0} is the field list</shortDescription>
+        <value>Only the 500 most used values in the data are shown for: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_ColField</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: column</shortDescription>
+        <value>Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_ColValue</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: column</shortDescription>
+        <value>Value</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_ColStatus</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: column</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_ColRecords</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: column</shortDescription>
+        <value>Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_ColLastUsed</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: column</shortDescription>
+        <value>Last Used</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_StatusActive</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: status</shortDescription>
+        <value>Active</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_StatusInactive</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: status</shortDescription>
+        <value>Inactive, Still in Data</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_StatusNeverUsed</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: status</shortDescription>
+        <value>Never Used</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_StatusNoValue</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: status</shortDescription>
+        <value>No Value</value>
+    </labels>
+</CustomLabels>

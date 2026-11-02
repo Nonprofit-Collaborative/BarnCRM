@@ -202,3 +202,20 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 9 | Choose a kind of record with no saved counts, such as **Contact** if you have not saved it. | **No snapshots have been saved for this kind of record yet.** |
 
 **Cleanup:** Delete the remaining snapshot with **Delete** if you want a tidy org.
+
+## T-DM-13: Picklist Value Usage Lists Values, Records and Last Used
+
+**Purpose:** Confirm Picklist Value Usage reads on request and marks used, unused and retired values.
+**Prerequisites:** admin; sample data loaded; at least one sample address (its **Status** picklist has **Current**, **Former** and **Undeliverable**).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Org Optimizer**, choose **Field Utilization**, and choose **Address**. | After the count, **Picklist Value Usage** appears under the table with a **Show Picklist Value Usage** button. Nothing is listed yet. |
+| 2 | Click **Show Picklist Value Usage**. | A progress bar reads **Checked N of N picklist fields.** A table with **Field**, **Value**, **Status**, **Records** and **Last Used** appears. |
+| 3 | Find the **Status** field's rows. | **Current** shows **Active** with a record count and a date. A value no address holds shows **Never Used**, **0** records and no date. |
+| 4 | Click the **Status** column heading. | The rows sort by status. |
+| 5 | In **Setup**, **Object Manager**, **Address**, **Fields**, **Verification Status**, deactivate one value that addresses hold (a sandbox only), then click **Show Picklist Value Usage** again. | That value shows **Inactive, Still in Data** with its record count. Reactivate the value afterward. |
+| 6 | Read the small text above the table. | It explains that **Last Used** is the newest **Last Modified Date** among the records holding the value. |
+| 7 | Choose another kind of record. | The table is gone until you click the button again. |
+
+**Cleanup:** Reactivate any value you deactivated in step 5.

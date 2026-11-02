@@ -8196,6 +8196,19 @@ Rows are never edited and no job deletes them; old rows are cleared with Bulk de
 standard delete.
 **R-FU8 Previous count shown.** The page shows the object's latest saved count next to the
 current one, with the change in percentage points.
+**R-FU9 Picklist value usage (C-57).** On request, for each single-select picklist field the
+person can read and group by, one aggregate query in user mode groups the object's records by the
+field's value and returns `COUNT(Id)` and `MAX(LastModifiedDate)` (`MAX(CreatedDate)` on an
+object with no Last Modified Date). Fields are read 20 per call, one query each; at most 500
+distinct values in the data are kept per field, the field is named on the page when more were cut;
+the 1,000,000-record guard of R-FU5 applies. Multi-select picklists are not included. Nothing is
+stored: no object or field is added.
+**R-FU10 Value status.** A value found in the data that is an active value of the picklist is
+Active; one that is not active (retired, or removed) is Inactive, Still in Data; an active value
+no record holds is Never Used (zero records, no date); records with no value are one No Value row.
+**R-FU11 What Last Used means.** The date is the newest Last Modified Date among the records that
+hold the value, so any later edit to such a record moves it: it is the latest time a record
+holding the value was touched, not the time the value was chosen. The page says so.
 
 ### Salesforce implementation
 
@@ -10777,6 +10790,7 @@ mirrors the primary member).
 | 0.14 | 2026-10-31 | Programs P-08. `Enrollment__c` (29ZA) and `Service_Delivery__c` (29ZB) change from Public Read/Write to Private, each shared with the new public group `Programs_Participants` through the Apex sharing reason `Programs_Participants__c` (R-EN7, R-SD6). New hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox, default unchecked): the Participant Privacy preset, Shared by default, which puts All Internal Users in the group, or Private, which takes them out. Programs Admin gains View All and Modify All on both objects. |
 | 0.14 | 2026-10-31 | Programs P-05. The Programs Dashboard (29ZA, "Program dashboard") and the person card's last service date and services attended. No object or field added. |
 | 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29ZA, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
+| 0.17 | 2026-11-02 | C-57 picklist value usage (plan 6.1.5). Section 29F: rules R-FU9 to R-FU11 (records per picklist value and last use, value status, what Last Used means). No object or field added. |
 
 ---
 ## 32. Entity ownership by package
