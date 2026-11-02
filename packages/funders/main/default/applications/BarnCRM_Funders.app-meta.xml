@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Grant, with its Program card</comment>
+    <content>Grant_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Grant__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Grant, with its Program card</comment>
+    <content>Grant_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Grant__c</pageOrSobjectType>
+  </actionOverrides>
   <brand>
     <headerColor>#0B5CAB</headerColor>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
@@ -14,6 +30,7 @@
   <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
   <label>BarnCRM Funders</label>
   <navType>Console</navType>
+  <tabs>Grant_Pipeline</tabs>
   <tabs>Grant__c</tabs>
   <tabs>standard-report</tabs>
   <tabs>Error_Log__c</tabs>
@@ -21,6 +38,9 @@
   <workspaceConfig>
     <mappings>
       <tab>Error_Log__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Grant_Pipeline</tab>
     </mappings>
     <mappings>
       <tab>Grant__c</tab>

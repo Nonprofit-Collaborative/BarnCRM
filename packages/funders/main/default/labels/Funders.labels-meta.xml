@@ -48,4 +48,308 @@
         <shortDescription>Sample data card: what the Funders number counts</shortDescription>
         <value>Grants</value>
     </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Title</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant Pipeline tab title</shortDescription>
+        <value>Grant Pipeline</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Intro</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant Pipeline intro</shortDescription>
+        <value>Every open grant by stage, and the application deadlines coming up. Use a card's menu to open a grant or move it to another stage.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ScopeEveryone</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Scope choice: all open grants</shortDescription>
+        <value>Everyone</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ScopeMine</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Scope choice: grants the person owns</shortDescription>
+        <value>Mine</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_NewGrant</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button: create a grant</shortDescription>
+        <value>New Grant</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_TileOpen</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Total: number of open grants</shortDescription>
+        <value>Open Requests</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_TileRequested</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Total: amount requested on open grants</shortDescription>
+        <value>Amount Requested</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_TileAwarded</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Total: amount awarded this fiscal year</shortDescription>
+        <value>Awarded This Fiscal Year</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_AwardedDetail</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Under the awarded total; {0} is how many grants</shortDescription>
+        <value>{0} grants awarded</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ColumnEmpty</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A stage column with no grants</shortDescription>
+        <value>No grants at this stage.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Empty</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No open grants at all</shortDescription>
+        <value>No open grants yet. Click New Grant to add the first one.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Truncated</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board shows only some cards; {0} is how many</shortDescription>
+        <value>Showing the first {0} grants. The totals count every open grant.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ReadOnly</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shown to someone who cannot edit grants</shortDescription>
+        <value>You can look at the pipeline but not change it.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_NoFunder</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Card whose funder cannot be shown</shortDescription>
+        <value>Funder not shown</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_MoveTo</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Card menu item; {0} is a stage</shortDescription>
+        <value>Move to {0}</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Open</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Card menu item: open the grant</shortDescription>
+        <value>Open</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_CardActions</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Card menu alternative text; {0} is the grant name</shortDescription>
+        <value>Actions for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Deadlines</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Upcoming deadlines heading</shortDescription>
+        <value>Upcoming Deadlines</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_DeadlinesEmpty</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>No deadlines coming up</shortDescription>
+        <value>No application deadlines in the next 60 days.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_DaysLeft</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Deadline still ahead; {0} is days</shortDescription>
+        <value>{0} days left</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_DueToday</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Deadline is today</shortDescription>
+        <value>Due today</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Overdue</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Deadline has passed; {0} is days</shortDescription>
+        <value>{0} days overdue</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_AwardTitle</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Award dialog title</shortDescription>
+        <value>Record the Award</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_AwardAmount</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Award dialog field</shortDescription>
+        <value>Amount Awarded</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Save</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Award dialog save button</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Cancel</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Award dialog cancel button</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Moved</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Toast after a move; {0} is the stage</shortDescription>
+        <value>Moved to {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ErrorLoad</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The pipeline could not load</shortDescription>
+        <value>The Grant Pipeline could not load. Try again, or ask your admin to look at the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ErrorNoPermission</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The person cannot edit grants</shortDescription>
+        <value>You do not have permission to change grants. Ask your admin for a Funders role.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ErrorStage</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A move named an unknown stage</shortDescription>
+        <value>Choose one of the grant stages.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ErrorUnexpected</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Something unexpected went wrong</shortDescription>
+        <value>Something went wrong and the change was not saved. Try again, or ask your admin to look at the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Program_Title</fullName>
+        <categories>GrantProgram</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Program card title</shortDescription>
+        <value>Program</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Program_None</fullName>
+        <categories>GrantProgram</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Choice: no program</shortDescription>
+        <value>No program</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Program_NotInstalled</fullName>
+        <categories>GrantProgram</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shown without the Programs module</shortDescription>
+        <value>Install the Programs module to name the program this grant pays for.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Program_Missing</fullName>
+        <categories>GrantProgram</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The named program cannot be found</shortDescription>
+        <value>The program this grant named has been deleted or you cannot see it. Choose another, or No program.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Program_Save</fullName>
+        <categories>GrantProgram</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Program card save button</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Program_Saved</fullName>
+        <categories>GrantProgram</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Toast after saving the program</shortDescription>
+        <value>Program saved.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Program_ErrorLoad</fullName>
+        <categories>GrantProgram</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The Program card could not load</shortDescription>
+        <value>The program could not load. Try again, or ask your admin to look at the Error Log.</value>
+    </labels>
 </CustomLabels>

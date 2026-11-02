@@ -638,13 +638,13 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 6. Funders
 
-**Edition:** Nonprofit Edition. Depends on Core and Giving. Package is an empty placeholder on main.
+**Edition:** Nonprofit Edition. Depends on Core, Rollup Builder and Giving; works alongside Programs without referencing it, naming a program by its record identifier (new ADR, Funders module). Package `packages/funders`, app BarnCRM Funders.
 
 ### 6.1 Grants and Funders
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Funder pipeline | Major | Tracks grants applied for and awarded, with stages, amounts and decision dates; a funder is an organization record. | Planned (v0.10) | F-01 |
+| Funder pipeline | Major | Tracks grants from a funder organization through Prospect, Letter of Inquiry, Invited to Apply and Applied to Awarded, Declined or Withdrawn, with amounts requested and awarded, the application deadline, submitted and decision dates filled in as the stage moves, the award period, a next step, field history and a staff owner. A Program card names the program a grant pays for where Programs is installed. The Grant Pipeline tab shows open grants by stage with exact totals, grants awarded this fiscal year, Everyone or Mine, moving a grant from its card (Awarded asks the amount awarded), and application deadlines past or within 60 days. Health Check lists open applications past their deadline; sample data adds three grants. Funders Admin, Staff (cannot delete a grant) and Read Only permission sets, given through the Access roles. | In review (release 0.16) | F-01 |
 | Reporting requirements and deadlines | Major | Tracks funder reports due, with reminders. | Planned (v0.10) | F-02 |
 | Restricted fund tracking | Major | A simple ledger of restricted money received, released or spent, with a balance. | Planned (v0.10) | F-03 |
 | Government award fields | Minor | Assistance listing number, award number, period and drawdowns. | Planned (v0.10) | F-04 |

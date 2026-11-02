@@ -64,6 +64,7 @@ page, even if that puts it out of reading order.
 | [Volunteers](volunteers.md) | VOL | 15 | Jobs, shifts, sign-ups, hours and approval, skills, shift reminders, suggested volunteers |
 | [Programs](programs.md) | PRG | 15 | Programs, services, enrollments, roster import, the Program Roster panel, a person's Programs card and last service, Programs access, Health Check, sample data, the Service Delivery Log and the delivery rules, intake and eligibility, the Programs Settings page, case notes, participant privacy, the Programs Dashboard |
 | [Logic Models](logic-models.md) | LM | 6 | The Logic Model Builder: parts, arrows and assumptions, whose model it is, indicators and periods with progress, staff and read-only access |
+| [Funders](funders.md) | FUN | 5 | Grants and their stage dates, the Grant Pipeline board, totals and deadlines, moving and awarding a grant, the program a grant pays for, Funders access, Health Check and sample data |
 | [Rollup Builder](rollup-builder.md) | RB | 26 | Building, recalculating and switching rollups, standard objects, parity options, export and import, instant totals on other objects |
 | [Accessibility and mobile](accessibility-and-mobile.md) | A11Y | 9 | Keyboard, focus, screen reader labels, zoom, Salesforce mobile app |
 
@@ -117,7 +118,7 @@ list in the same org, run them last or refresh the org first.
 
 Every script on every page above, before a release or after a change that touches many areas.
 Run Core pages first (People and households through Erase a person), then Giving, then Mirror,
-Volunteers, Programs, Logic Models and Rollup Builder, then Accessibility and mobile. Within a page, run in ID order.
+Volunteers, Programs, Logic Models, Funders and Rollup Builder, then Accessibility and mobile. Within a page, run in ID order.
 
 Run it on the Person Accounts shape, then repeat the Core pages and the Giving pages on the
 platform-only shape (Mirror needs Opportunity and Campaign, so skip it there). Scripts that need

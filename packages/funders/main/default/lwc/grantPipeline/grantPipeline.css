@@ -1,0 +1,15 @@
+.grant-board {
+  display: flex;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  overflow-x: auto;
+  padding-bottom: var(--slds-g-spacing-3, 0.75rem);
+  align-items: flex-start;
+}
+
+.grant-column {
+  flex: 0 0 16rem;
+}
+
+.grant-card {
+  background: var(--slds-g-color-surface-container-1, #ffffff);
+}

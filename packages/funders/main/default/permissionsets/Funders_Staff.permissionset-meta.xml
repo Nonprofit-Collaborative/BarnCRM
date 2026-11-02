@@ -3,12 +3,21 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>Funders Staff</label>
   <description>
-    Creates and edits grants and moves them through the stages; adds, changes and removes a grant's requirements. Never deletes a grant.
+    Creates and edits grants and moves them through the stages; adds, changes and removes a grant's
+    requirements. Never deletes a grant.
   </description>
   <applicationVisibilities>
     <application>BarnCRM_Funders</application>
     <visible>true</visible>
   </applicationVisibilities>
+  <classAccesses>
+    <apexClass>GrantPipelineController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>GrantProgramController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Grant__c.Amount_Awarded__c</field>
@@ -78,6 +87,10 @@
     <object>Grant__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <tabSettings>
+    <tab>Grant_Pipeline</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
   <tabSettings>
     <tab>Grant__c</tab>
     <visibility>Visible</visibility>

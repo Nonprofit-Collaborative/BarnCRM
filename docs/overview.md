@@ -40,7 +40,7 @@ You choose the edition once, in the first-run setup window; the Setup Assistant 
 | **Volunteers** | Jobs, shifts, sign-ups, hours with approval, skills, requirements, recurring shifts, shift reminder emails, suggested volunteers for a shift, hour letters and certificates, the BarnCRM Volunteers app | Built and tested on main |
 | **Programs** | Programs, services, enrollments with stages, the Program Roster panel, a person's Programs card, attendance and service delivery with the Service Delivery Log, intake and eligibility fields, private case notes, a participant privacy preset, a program dashboard, a roster import template, sample data, the BarnCRM Programs app and its settings page | Built (release 0.12, P-01; release 0.13, P-02; release 0.14, P-04 to P-08) |
 | **Logic Models** | The Logic Model Builder: inputs, activities, outputs, outcomes and impact with arrows and assumptions, for the organization or a program, and indicators with a baseline and a target and result per period; the BarnCRM Logic Models app | Built (release 0.14, L-01 and L-02; indicator sources and the report are planned) |
-| **Funders** | Funder pipeline, reporting deadlines, restricted fund tracking | Planned; the package is an empty placeholder |
+| **Funders** | Grants from funder organizations through the stages from prospect to awarded or declined, with amounts requested and awarded, stage dates, the program a grant pays for, the Grant Pipeline board with totals and upcoming deadlines, the BarnCRM Funders app; reporting deadlines and restricted fund tracking to come | In progress (release 0.16, F-01 built on a branch; F-02 and F-03 to come) |
 | **Events** | Simple event registration and attendance | Planned (after 1.0) |
 
 The feature-by-feature list, with the status of each item, is the [feature catalog](barncrm-features.md).
@@ -67,7 +67,7 @@ This is the plan as recorded in the product plan (Section 6 and 6.0). Dates are 
 - **BarnCRM Contact Point Sync.** An optional module, approved but not yet scheduled, for orgs that use Salesforce Contact Points: it keeps them in step with a person's email and phone and with their addresses, so Core itself never touches those objects.
 - **BarnCRM Address Verification.** An optional module, approved but not yet scheduled, that verifies addresses with your own provider key (set in BarnCRM Settings) and records each address's verification status and date. No provider is bundled.
 - **Programs and Logic Models.** Track programs, services, enrollments and attendance, and build logic models with indicators and a report you can send to a funder.
-- **Funders.** A grant and funder pipeline, reporting deadlines and restricted fund tracking.
+- **Funders.** A grant and funder pipeline (in progress), then reporting deadlines with reminders and restricted fund tracking.
 - **Scheduled imports and connections.** On hold until the owner starts the next version.
 - **Hardening, beta and listing.** Security review, scale testing, a beta with real organizations, then the Salesforce AppExchange listing and version 1.0.
 

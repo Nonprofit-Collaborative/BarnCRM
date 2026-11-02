@@ -2,13 +2,19 @@
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
   <label>Funders Read Only</label>
-  <description>
-    Looks at grants, their requirements and the Grant Pipeline.
-  </description>
+  <description>Looks at grants, their requirements and the Grant Pipeline.</description>
   <applicationVisibilities>
     <application>BarnCRM_Funders</application>
     <visible>true</visible>
   </applicationVisibilities>
+  <classAccesses>
+    <apexClass>GrantPipelineController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>GrantProgramController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>false</editable>
     <field>Grant__c.Amount_Awarded__c</field>
@@ -78,6 +84,10 @@
     <object>Grant__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <tabSettings>
+    <tab>Grant_Pipeline</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
   <tabSettings>
     <tab>Grant__c</tab>
     <visibility>Visible</visibility>
