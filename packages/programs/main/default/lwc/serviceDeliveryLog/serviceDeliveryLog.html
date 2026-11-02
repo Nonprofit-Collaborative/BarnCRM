@@ -120,6 +120,36 @@
             ></lightning-button>
           </div>
         </template>
+
+        <template lwc:if={showCounts}>
+          <div class="slds-box slds-var-m-bottom_small" data-id="counts">
+            <p class="slds-text-body_regular" data-id="counted">{countedText}</p>
+            <template lwc:if={canCount}>
+              <div class="slds-grid slds-grid_vertical-align-end slds-gutters_x-small">
+                <div class="slds-col slds-size_2-of-3">
+                  <lightning-input
+                    data-id="count-input"
+                    type="number"
+                    min="0"
+                    step="1"
+                    label={labels.countInput}
+                    value={countDraft}
+                    disabled={controlsDisabled}
+                    onchange={handleCountChange}
+                  ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                  <lightning-button
+                    data-id="add-count"
+                    label={labels.addCount}
+                    disabled={addCountDisabled}
+                    onclick={handleAddCount}
+                  ></lightning-button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
       </template>
     </div>
   </lightning-card>

@@ -42,6 +42,15 @@
     <sortField>Delivery_Date__c</sortField>
     <sortOrder>Desc</sortOrder>
   </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Count_Date__c</fields>
+    <fields>People_Served__c</fields>
+    <fields>Note__c</fields>
+    <relatedList>Service_Count__c.Service__c</relatedList>
+    <sortField>Count_Date__c</sortField>
+    <sortOrder>Desc</sortOrder>
+  </relatedLists>
   <showEmailCheckbox>false</showEmailCheckbox>
   <showHighlightsPanel>false</showHighlightsPanel>
   <showInteractionLogPanel>false</showInteractionLogPanel>

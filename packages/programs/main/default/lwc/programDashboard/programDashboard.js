@@ -15,6 +15,7 @@ import OPEN_ENROLLMENTS from '@salesforce/label/c.Programs_Dashboard_OpenEnrollm
 import NEW_ENROLLMENTS from '@salesforce/label/c.Programs_Dashboard_NewEnrollments';
 import COMPLETED from '@salesforce/label/c.Programs_Dashboard_Completed';
 import PEOPLE_SERVED from '@salesforce/label/c.Programs_Dashboard_PeopleServed';
+import PEOPLE_COUNTED from '@salesforce/label/c.Programs_Dashboard_PeopleCounted';
 import DELIVERED from '@salesforce/label/c.Programs_Dashboard_Delivered';
 import ATTENDANCE_RATE from '@salesforce/label/c.Programs_Dashboard_AttendanceRate';
 import PROGRAM from '@salesforce/label/c.Programs_Dashboard_Program';
@@ -43,6 +44,7 @@ export default class ProgramDashboard extends NavigationMixin(LightningElement) 
     newEnrollments: NEW_ENROLLMENTS,
     completed: COMPLETED,
     peopleServed: PEOPLE_SERVED,
+    peopleCounted: PEOPLE_COUNTED,
     delivered: DELIVERED,
     attendanceRate: ATTENDANCE_RATE,
     byProgram: BY_PROGRAM,
@@ -100,6 +102,7 @@ export default class ProgramDashboard extends NavigationMixin(LightningElement) 
       openEnrollments: OPEN_ENROLLMENTS,
       newEnrollments: NEW_ENROLLMENTS,
       peopleServed: PEOPLE_SERVED,
+      peopleCounted: PEOPLE_COUNTED,
       delivered: DELIVERED,
       attendanceRate: ATTENDANCE_RATE,
       noRate: NO_RATE

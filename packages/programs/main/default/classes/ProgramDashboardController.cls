@@ -42,6 +42,9 @@ public with sharing class ProgramDashboardController {
         public Integer delivered = 0;
         @AuraEnabled
         public Integer deliveries = 0;
+        /** People counted without names (P-12), kept apart from `peopleServed`. */
+        @AuraEnabled
+        public Integer peopleCounted = 0;
     }
 
     /** The counts of one program. */
@@ -76,6 +79,9 @@ public with sharing class ProgramDashboardController {
             if (Schema.SObjectType.Service_Delivery__c.isAccessible()) {
                 countDeliveries(byProgram, fromDate, toDate);
                 result.totals.peopleServed = countPeople(byProgram, fromDate, toDate);
+            }
+            if (Schema.SObjectType.Service_Count__c.isAccessible()) {
+                countAnonymous(byProgram, fromDate, toDate);
             }
             fillPrograms(result, byProgram);
             return result;
@@ -141,6 +147,24 @@ public with sharing class ProgramDashboardController {
             if ((String) row.get('attendance') == PRESENT) {
                 figures.delivered += count(row);
             }
+        }
+    }
+
+    /** People counted without names (P-12) in the period, per program; never mixed into the named counts. */
+    private static void countAnonymous(
+        Map<Id, ProgramFigures> byProgram,
+        Date fromDate,
+        Date toDate
+    ) {
+        for (AggregateResult row : [
+            SELECT Service__r.Program__c program, SUM(People_Served__c) total
+            FROM Service_Count__c
+            WHERE Count_Date__c >= :fromDate AND Count_Date__c <= :toDate
+            WITH USER_MODE
+            GROUP BY Service__r.Program__c
+        ]) {
+            Decimal total = (Decimal) row.get('total');
+            figuresOf(byProgram, row).peopleCounted = total == null ? 0 : total.intValue();
         }
     }
 
@@ -304,6 +328,7 @@ public with sharing class ProgramDashboardController {
             result.totals.completedEnrollments += figures.completedEnrollments;
             result.totals.delivered += figures.delivered;
             result.totals.deliveries += figures.deliveries;
+            result.totals.peopleCounted += figures.peopleCounted;
         }
     }
 

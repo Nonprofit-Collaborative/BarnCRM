@@ -113,6 +113,47 @@ date again: what was saved shows, and saving changes it rather than adding a sec
 The panel works the same in the Salesforce mobile app, one person per card. Read Only users see
 what was recorded without the controls.
 
+## To Count People Without Naming Them
+
+For a drop-in service where nobody is recorded by name (a walk-in meal, a pantry line):
+
+1. On the program, in the **Service Delivery Log** panel, pick the **Service** and the **Date**.
+2. Under the rows, find **People counted without names for this service and day**. Type how many
+   people you served in **People Served, Not Named**.
+3. Click **Add to the Count**.
+
+You should see: "Added (number) to the count." and the day's total go up. Each click adds to
+the total, so you can add a second count later the same day. To correct one, open the
+**Service Counts** tab or the **Service Counts** list on the service and edit the row. These
+people show on the dashboard as **Counted Without Names**, apart from the people you named.
+
+## To Record a Referral
+
+1. Open the person's enrollment (click their name in the **Program Roster** panel) and, in the
+   **Referrals** list, click **New**. Or open the **Referrals** tab and click **New**.
+2. Pick the **Direction**: **Out** if you sent the person to another organization, **In** if
+   another organization sent them to you.
+3. Name the person (a **Contact** or an **Account**, not both) and fill in **Other
+   Organization**, the **Referral Date** and any **Notes**.
+4. Click **Save**. The **Status** starts as **Open**.
+
+As it moves on, change the **Status** (Open, Accepted or Closed) and, when it ends, pick an
+**Outcome** such as Service Received or Declined by Person. Only you, people above you in your
+organization's roles and Programs Admins can see a referral you make. The **Open Referrals** list
+on the **Referrals** tab shows everything not yet closed.
+
+## To Check Whether Someone Is Eligible
+
+If your admin has set up eligibility rules, the program page has an **Eligibility Rules** panel.
+Under **Preview and Screen**, choose a person from **Open Enrollment** to see what the rules
+would decide (Eligible, Not Eligible or Review) and why, then click **Screen This Enrollment** to
+save that result, or **Screen Open Enrollments** to do everyone. Screening sets the person's
+**Eligibility Status**, **Eligibility Basis** and **Eligibility Reason** on the enrollment.
+Someone already marked Eligible or Not Eligible is left alone unless you tick **Also screen
+enrollments already Eligible or Not Eligible**. **Review** means a person should look at the
+case. Only a Programs Admin changes the rules; you can still edit an enrollment's eligibility
+by hand.
+
 ## To Record a Service by Hand
 
 For someone who is not enrolled, or a one-off:
@@ -158,8 +199,8 @@ there is no card.
 2. Pick a period at the top: **This Month** (the default), **Last Month**, **This Year**,
    **Last Year** or **Last 12 Months**.
 
-You should see: tiles for active programs, open and new enrollments, people served, services
-delivered and the attendance rate, then a table with the same figures for each program. Click a
+You should see: tiles for active programs, open and new enrollments, people served, people
+counted without names, services delivered and the attendance rate, then a table with the same figures for each program. Click a
 program's name to open it. The figures count only the records you can see.
 
 ## To Enroll Someone Again

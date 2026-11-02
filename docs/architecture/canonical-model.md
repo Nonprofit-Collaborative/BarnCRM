@@ -9888,6 +9888,17 @@ its enrollments (29ZA) are who takes part.
 | Start Date | date | no | When the program began, or will begin. |
 | End Date | date | no | When the program ended, or will end. |
 | Coordinator | reference(User) | no | The staff member who runs this program. |
+| Eligibility Rules | long text (JSON) | no | The program's eligibility screening rules (P-14, R-EN8): ordered rules over the enrollment's intake fields, in the documented format below. Edited in the Eligibility Rules panel, never by hand. |
+
+**Eligibility rules format (version 1).** `{ "version": 1, "defaultResult": "Review",
+"defaultReason": "...", "rules": [ { "id": "r1", "all": [ { "field": "Referral_Source__c",
+"operator": "equals", "value": "Self" } ], "result": "Eligible", "reason": "...", "basis":
+"Income" } ] }`. A rule has one to ten conditions, all of which must hold, a `result` of
+Eligible, Not Eligible or Review, a `reason` of at most 255 characters and an optional `basis`
+(an Eligibility Basis value). Operators: `equals`, `notEquals`, `in`, `notIn` (a list value),
+`greaterThan`, `greaterOrEqual`, `lessThan`, `lessOrEqual`, `isBlank`, `isNotBlank` (no value). A
+program has at most 50 rules. Field names are those of the enrollment's custom intake fields
+that hold text, a choice, a number, a date or a checkbox, matched without regard to case.
 
 ### Relationships
 
@@ -9921,6 +9932,7 @@ Planned or Completed program, so history from a spreadsheet or PMM loads as it h
 | End Date | `End_Date__c` | Date |
 | Coordinator | `Coordinator__c` | Lookup to User, delete constraint SetNull |
 | Sample Data | `Sample_Data__c` | Checkbox, default false (release 0.12) |
+| Eligibility Rules | `Eligibility_Rules__c` | Long Text Area(32768), not required (P-14, release 0.15) |
 
 - **Validation rules:** `End_After_Start` (R-PG1).
 
@@ -9986,9 +9998,10 @@ participant record; P-02 records what they attended and received.
 | End Date | date | no | When the person completed or withdrew. |
 | Intake Date | date | no | When the person was first seen or applied (P-07, release 0.14). |
 | Referral Source | picklist(Self, Family or Friend, Another Agency, School, Health Care Provider, Faith Community, Other) | no | Who sent the person. The values are the organization's to change (P-07). |
-| Eligibility Status | picklist(Not Screened, Awaiting Documents, Eligible, Not Eligible) | no (defaults Not Screened) | Whether the person has been checked against the program's rules (P-07). The values are the organization's to change; Eligible and Not Eligible decide it (R-EN6). |
+| Eligibility Status | picklist(Not Screened, Awaiting Documents, Eligible, Not Eligible, Review) | no (defaults Not Screened) | Whether the person has been checked against the program's rules (P-07). The values are the organization's to change; Eligible and Not Eligible decide it (R-EN6); Review (P-14) means screening could not decide and a person should look. |
 | Eligibility Basis | picklist(Income, Age, Residence, Referral, Other) | no | The main reason the person qualifies or not (P-07). The values are the organization's to change. |
 | Eligibility Date | date | no | When eligibility was decided (R-EN6). |
+| Eligibility Reason | text(255) | no | Why screening gave its result: the reason of the rule that decided it (P-14, R-EN8). Set by screening. |
 
 ### Relationships
 
@@ -10033,6 +10046,18 @@ Status of Eligible or Not Eligible, or changing it to either, fills an empty Eli
 today. A date already typed is kept, and Not Screened or Awaiting Documents leaves it alone. Part
 of the switchable `Enrollment_Dates` automation (R-EN3), so an import of history can turn it off.
 
+**R-EN8 Screening sets the eligibility fields from the program's rules (P-14).** Screening an
+enrollment (one, or the program's open ones, Applied or Enrolled, up to 200 a run) evaluates the
+program's eligibility rules (Section 29Y) over the enrollment's intake fields: the first rule
+whose conditions all hold decides, else the rules' default (Review unless set). The result sets
+Eligibility Status (Eligible, Not Eligible or Review), Eligibility Reason, and Eligibility Basis
+when the rule names one. When the status changes, Eligibility Date becomes today for Eligible
+and Not Eligible and empty for Review. A bulk run leaves enrollments already Eligible or Not
+Eligible alone unless asked, so a decision made by hand stands; screening one enrollment always
+applies. A program with no rules screens nothing. Read and written as the user, so the user needs
+edit access to the eligibility fields. The same rules are evaluated for the preview by the
+framework-free `eligibilityEngine.js` (plan 9.9); the two evaluators agree by shared test cases.
+
 **R-EN7 Participant privacy is a preset (P-08).** Organization-wide sharing is Private. Every
 enrollment is shared, Read/Write, with the public group Programs Participant Records
 (`Programs_Participants`), through the Apex sharing reason `Programs_Participants__c`, written by
@@ -10075,7 +10100,12 @@ R-EN6 names two values.
 | Eligibility Status | `Eligibility_Status__c` | Picklist, restricted, not required, default Not Screened |
 | Eligibility Basis | `Eligibility_Basis__c` | Picklist, restricted, not required, no default |
 | Eligibility Date | `Eligibility_Date__c` | Date |
+| Eligibility Reason | `Eligibility_Reason__c` | Text(255) (P-14, release 0.15) |
 
+- **Eligibility screening (R-EN8):** `EligibilityRules` (validation and evaluation of the JSON
+  rules, no query or save), `EligibilityController` (state, saving rules, screening) and the
+  `eligibilityRules` panel on the program record page, whose `eligibilityEngine.js` evaluates
+  the same rules for the preview. Eligibility Status gains the value Review.
 - **Settings page:** `ProgramsSettingsController` and the `programsSettings` panel on the
   `Programs_Settings` app page and tab (Programs Admin only), reached from the Programs section
   of BarnCRM Settings (`Setting_Definition.Programs_Settings`, a navigation row). It lists the
@@ -10240,6 +10270,77 @@ erase a person to remove what was written about them.
 
 ---
 
+## 29ZA2. Referral
+
+### Definition
+
+A person sent to another organization (Out) or sent to this one (In), with where the referral
+stands and how it turned out (P-13, release 0.15). The fields are generic so a later partner
+portal (PB-05) can show the same records. Not case management and not a referral to a funder.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number. |
+| Direction | picklist(Out, In) | yes (defaults Out) | Out: the person was sent to another organization. In: another organization sent the person here. |
+| Referral Date | date | yes (defaults today) | The day the referral was made or received. |
+| Contact | reference(Contact) | conditional | The person, where people are Contacts. |
+| Account | reference(Account) | conditional | The person, where people are person Accounts. |
+| Enrollment | reference(Enrollment) | no | The person's enrollment the referral belongs to, if any. |
+| Other Organization | text(255) | no | The organization the person was sent to (Out) or came from (In). |
+| Status | picklist(Open, Accepted, Closed) | yes (defaults Open) | Where the referral stands. The values are the organization's to change. |
+| Outcome | picklist(Service Received, Declined by Organization, Declined by Person, Unable to Reach, No Capacity, Other) | no | How it turned out, once closed. The values are the organization's to change. |
+| Notes | long text | no | What was agreed, what was sent and what comes next. |
+| Owner | reference(User) | yes | The staff member who made or received it, who sees and edits it. |
+
+### Relationships
+
+- **Referral to a person**, through the Contact and Account pair (Section 4), delete SetNull.
+- **Referral to Enrollment**, many to one, optional, delete SetNull.
+
+### Rules
+
+**R-RF1 Exactly one person.** Contact or Account, never both, never neither (validation rule,
+checked only when the referral is new or its person changes, as R-EN1).
+
+**R-RF2 Private, as a case note.** Organization-wide sharing is Private, whatever the participant
+privacy preset says (R-CN2): the owner, people above them in the role hierarchy and Programs
+Admin (View All and Modify All) see a referral.
+
+**R-RF3 Who may write.** Programs Staff create referrals and edit their own and never delete;
+Programs Admin creates, edits and deletes any; Programs Read Only has no access at all.
+
+**R-RF4 Erasing the person deletes their referrals.** A referral is typed text about the person
+(the other organization, the notes), so erasing the person (Section 29H, R-ER8) deletes every
+referral naming them or, for a person account, its own contacts: read in system mode and deleted
+as the user, so only Programs Admin can, and anyone else erasing is refused with that reason.
+Deleting a person, not erasing them, keeps the referral, which no longer names the person.
+
+### Salesforce implementation
+
+- **Object:** `Referral__c`, name field AutoNumber `RF-{000000}`, sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Direction | `Direction__c` | Picklist, restricted, required, default Out |
+| Referral Date | `Referral_Date__c` | Date, required, default `TODAY()` |
+| Contact | `Contact__c` | Lookup to Contact, delete constraint SetNull, relationship name Referrals |
+| Account | `Account__c` | Lookup to Account, delete constraint SetNull, relationship name Referrals |
+| Enrollment | `Enrollment__c` | Lookup to `Enrollment__c`, delete constraint SetNull, relationship name Referrals |
+| Other Organization | `Other_Organization__c` | Text(255) |
+| Status | `Status__c` | Picklist, restricted, required, default Open |
+| Outcome | `Outcome__c` | Picklist, restricted, not required |
+| Notes | `Notes__c` | Long Text Area(32768) |
+
+- **Validation rules:** `Exactly_One_Person` (R-RF1).
+- **Erasure:** `ProgramsErasureExtension` with `ReferralSelector` (without sharing, system mode
+  reads only).
+- **UI:** the Referrals tab (list views All Referrals and Open Referrals) and the Referrals
+  related list on the enrollment. No trigger.
+
+---
+
 ## 29ZB. Service Delivery
 
 ### Definition
@@ -10331,6 +10432,65 @@ anonymous record; deleting the person empties the person (SetNull) and keeps the
 | BarnCRM | PMM | Note |
 |---|---|---|
 | Service Delivery: Service, Enrollment, Contact, Delivery Date, Attendance, Quantity | Service Delivery: Service, Program Engagement, Contact, Delivery Date, Attendance Status, Quantity | Attendance values match PMM's Present, Excused Absence and Unexcused Absence. Checked against an org with PMM with MIG-09. |
+
+---
+
+## 29ZB1. Service Count
+
+### Definition
+
+How many people a service served on a day, without naming them (P-12, release 0.15): a walk-in
+meal, a pantry line, a clinic drop-in. Kept apart from Service Delivery (29ZB), which names each
+person, so counts of unnamed people are never mistaken for, or added to, named people served.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number. |
+| Service | reference(Service) | yes | The service the people were served by, and through it the program. |
+| Count Date | date | yes (defaults today) | The day the people were served. |
+| People Served | number(10, 0) | yes (defaults 1) | How many people, not named. Never negative; 0 is allowed. |
+| Note | text(255) | no | Anything worth saying about the count, such as a shift or a site. |
+
+### Relationships
+
+- **Service Count to Service**, many to one, through a required lookup with delete Restrict. A
+  service with counts cannot be deleted; clear its Active box instead.
+
+### Rules
+
+**R-SC1 Never negative.** People Served is not negative (validation rule).
+
+**R-SC2 Counts add up.** A service and day may have several counts (two shifts, two sites); the
+Service Delivery Log adds a row for each count entered, and every total adds the rows.
+
+**R-SC3 Counted apart from named people.** The Programs Dashboard shows the sum of People Served
+in the period as Counted Without Names, per program and in total. It is never added to People
+Served (named people with a Present delivery).
+
+**R-SC4 No person, so no privacy or erasure rule.** A count names no one, so organization-wide
+sharing is Public Read/Write (object permissions decide who may add and change: Programs Admin
+and Staff create and edit, Admin alone deletes, Read Only reads) and erasing a person never
+reaches a count.
+
+### Salesforce implementation
+
+- **Object:** `Service_Count__c`, name field AutoNumber `SC-{000000}`, sharing Public Read/Write.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Service | `Service__c` | Lookup to `Service__c`, required, delete constraint Restrict, relationship name Service_Counts |
+| Count Date | `Count_Date__c` | Date, required, default `TODAY()` |
+| People Served | `People_Served__c` | Number(10, 0), required, default 1 |
+| Note | `Note__c` | Text(255) |
+
+- **Validation rules:** `People_Not_Negative` (R-SC1).
+- **Service Delivery Log:** `ServiceDeliveryLogController.addCount` inserts a count as the user;
+  `ServiceCountSelector` totals a service and day. The dashboard sums them in
+  `ProgramDashboardController`.
+- **UI:** the Service Counts tab (list views All Service Counts and This Week) and the Service
+  Counts related list on the service. No trigger.
 
 ---
 

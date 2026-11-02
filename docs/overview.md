@@ -1,6 +1,6 @@
 # BarnCRM Overview
 
-Applies to: BarnCRM main as of 2026-10-31 (commit 78e64110, landing batch A). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-11-02 (commit 6c0d82877, landing batch A, plus P-12 to P-14). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## What BarnCRM Is
 
@@ -38,7 +38,7 @@ You choose the edition once, in the first-run setup window; the Setup Assistant 
 | **Giving** | Gifts, funds, Quick Gift Entry, gift batches, refunds, in-kind gifts, commitments, pledge reminders, soft credits, tributes, matching gifts, appeals, acknowledgments, receipts and year-end statements, donor levels, donor scores (recency, frequency, monetary), stewardship plans, the Ask Pipeline, retention reports, donor segments with export for email tools, posting and closed periods, gift import, the Giving dashboard, the BarnCRM Fundraising app | Built |
 | **Mirror** | Opportunity mirror, Campaign sync, inbound gift API, accounting export | Built (the Gift Transaction mirror for Nonprofit Cloud is planned) |
 | **Volunteers** | Jobs, shifts, sign-ups, hours with approval, skills, requirements, recurring shifts, shift reminder emails, suggested volunteers for a shift, hour letters and certificates, the BarnCRM Volunteers app | Built and tested on main |
-| **Programs** | Programs, services, enrollments with stages, the Program Roster panel, a person's Programs card, attendance and service delivery with the Service Delivery Log, intake and eligibility fields, private case notes, a participant privacy preset, a program dashboard, a roster import template, sample data, the BarnCRM Programs app and its settings page | Built (release 0.12, P-01; release 0.13, P-02; release 0.14, P-04 to P-08) |
+| **Programs** | Programs, services, enrollments with stages, the Program Roster panel, a person's Programs card, attendance and service delivery with the Service Delivery Log, intake and eligibility fields, private case notes, a participant privacy preset, a program dashboard, a roster import template, counts of people served without names, referrals in and out, eligibility screening rules, sample data, the BarnCRM Programs app and its settings page | Built (release 0.12, P-01; release 0.13, P-02; release 0.14, P-04 to P-08; release 0.15, P-12 to P-14, in review) |
 | **Logic Models** | The Logic Model Builder: inputs, activities, outputs, outcomes and impact with arrows and assumptions, for the organization or a program, and indicators with a baseline and a target and result per period; the BarnCRM Logic Models app | Built (release 0.14, L-01 and L-02; indicator sources and the report are planned) |
 | **Funders** | Funder pipeline, reporting deadlines, restricted fund tracking | Planned; the package is an empty placeholder |
 | **Events** | Simple event registration and attendance | Planned (after 1.0) |

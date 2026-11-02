@@ -5,7 +5,8 @@
 Programs, the services they offer, and the people enrolled in them (P-01), attendance and
 service delivery (P-02), private case notes (P-04), intake and eligibility fields with the
 Programs Settings page (P-07), the participant privacy preset (P-08), and the program dashboard
-with a person's last service (P-05), and the program roster import template (P-06).
+with a person's last service (P-05), the program roster import template (P-06), counts of people
+served without names (P-12), referrals in and out (P-13) and eligibility screening rules (P-14).
 
 ## Design
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Eligibility_Reason__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Why screening gave the result it did: the reason of the rule that decided it. Set by Screen, never by hand.</inlineHelpText>
+  <label>Eligibility Reason</label>
+  <length>255</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+</CustomField>
