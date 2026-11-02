@@ -63,7 +63,7 @@ page, even if that puts it out of reading order.
 | [Mirror](mirror.md) | MIR | 13 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API |
 | [Volunteers](volunteers.md) | VOL | 15 | Jobs, shifts, sign-ups, hours and approval, skills, shift reminders, suggested volunteers |
 | [Programs](programs.md) | PRG | 15 | Programs, services, enrollments, roster import, the Program Roster panel, a person's Programs card and last service, Programs access, Health Check, sample data, the Service Delivery Log and the delivery rules, intake and eligibility, the Programs Settings page, case notes, participant privacy, the Programs Dashboard |
-| [Logic Models](logic-models.md) | LM | 8 | The Logic Model Builder: parts, arrows and assumptions, whose model it is, indicators and periods with progress, staff and read-only access, imported and computed results |
+| [Logic Models](logic-models.md) | LM | 9 | The Logic Model Builder: parts, arrows and assumptions, whose model it is, indicators and periods with progress, staff and read-only access, imported and computed results, the Logic Model Report |
 | [Rollup Builder](rollup-builder.md) | RB | 26 | Building, recalculating and switching rollups, standard objects, parity options, export and import, instant totals on other objects |
 | [Accessibility and mobile](accessibility-and-mobile.md) | A11Y | 9 | Keyboard, focus, screen reader labels, zoom, Salesforce mobile app |
 

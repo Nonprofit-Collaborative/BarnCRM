@@ -178,6 +178,12 @@
         <template lwc:else>
           <p class="slds-var-m-bottom_small" data-id="no-findings">{labels.lookAtNone}</p>
         </template>
+
+        <c-logic-model-report
+          data-id="report-panel"
+          model={model}
+          scope-name={scopeName}
+        ></c-logic-model-report>
       </template>
     </div>
   </lightning-card>

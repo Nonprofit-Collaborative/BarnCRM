@@ -10428,6 +10428,12 @@ At is set and Source Status cleared. A failure writes Source Status and changes 
 **R-IN6 Unique counts.** Count Unique keeps each period's values in the batch's state; near the
 heap limit it stops and writes Source Status instead of a wrong number.
 
+**R-IN7 Report.** The logic model report compares chosen periods: one row per indicator, in
+column, part and indicator order, with its baseline and, per period, the target, result and
+progress (R-IN2). Periods of different indicators with the same start and end dates are one
+period. The report is worked out in the browser from the model as the user can read it; it stores
+nothing and exports as CSV or one printable HTML page.
+
 ### Salesforce implementation
 
 - **Object:** `Indicator__c`, name field Text, label Indicator Name, sharing Controlled By
@@ -10451,6 +10457,8 @@ heap limit it stops and writes Source Status instead of a wrong number.
 - **Service:** `IndicatorSourceService` (R-IN3, R-IN4), `IndicatorResultsBatch` (without sharing,
   R-IN5, R-IN6), `IndicatorResultsScheduler` with `LogicModelsNightlyJobProvider` (R-IN5).
 - **Import template:** `Import_Template_Default.Indicator_Results` (R-IN3).
+- **Report:** the `logicModelReport` panel with the framework-free `logicModelRules` (R-IN7); no
+  stored data, no new field.
 
 ---
 
@@ -10815,6 +10823,7 @@ mirrors the primary member).
 | 0.14 | 2026-10-31 | Programs P-05. The Programs Dashboard (29ZA, "Program dashboard") and the person card's last service date and services attended. No object or field added. |
 | 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29ZA, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
 | 0.15 | 2026-11-02 | Logic Models L-03 indicator sources (ADR-NEXT `NEXT-indicator-sources.md`). `Indicator__c` (29ZF) gains Source (`Source__c`), Source Query (`Source_Query__c`, lookup to `Saved_Query__c`), Source Definition (`Source_Definition__c`), Source Status (`Source_Status__c`) and Computed At (`Computed_At__c`), with rules R-IN3 to R-IN6; the one-object import template Indicator Results loads Indicator Period results. |
+| 0.15 | 2026-11-02 | Logic Models L-04 logic model report: rule R-IN7 on Indicator (29ZF); no new object or field. |
 
 ---
 ## 32. Entity ownership by package

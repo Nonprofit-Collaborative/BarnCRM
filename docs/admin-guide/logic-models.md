@@ -15,8 +15,8 @@ program records until you choose a program for a model.
 
 Each indicator's results are typed in by hand, loaded from a spreadsheet with BarnCRM Import, or
 worked out every night from other records (for example service deliveries, volunteer hours or
-gifts) through a query you save in Find (L-03). A logic model report that compares periods (L-04)
-comes in the same release.
+gifts) through a query you save in Find (L-03). The **Logic Model Report** compares periods side by side
+and downloads as a spreadsheet or a page to print for a funder (L-04).
 
 ## How to Turn It On
 
@@ -209,6 +209,26 @@ details, and only a Logic Models Admin can choose what is counted.
 out, so editing the query in Find changes the next results, and deleting it stops them (the
 builder says so). Choose another query under **Source**.
 
+## The Logic Model Report
+
+The **Logic Model Report** is at the bottom of the Logic Model Builder, under **Things to Look
+At**, and changes as soon as you save in the builder. It shows one
+row per indicator, in the builder's column and part order, with its baseline and, for each period
+you choose, the target, the result and the progress (**Met** or a percent).
+
+- **Periods to Compare** lists every period of the model's indicators, oldest first. Periods of
+  different indicators with the same start and end dates count as one period, so name your
+  periods the same way across indicators (for example "2026 Q1"). The latest four are chosen when
+  the report opens.
+- An indicator without a chosen period shows an empty cell for it.
+- **Download CSV** saves the report as a spreadsheet: Column, Part, Indicator, Unit, Better When,
+  Baseline and Baseline Date, then a Target, Result and Progress column for each period.
+- **Download Printable Report** saves one web page with the table and the model's name. Open it
+  in your browser and print it, or print it to PDF, to send to a funder.
+
+Everyone who can open the model can see and download its report, including Read Only users. The
+report shows only what the person can read and stores nothing. Nothing needs setting up.
+
 ## A Five-Minute Walkthrough
 
 Do this as Maria, who holds the Admin role.
@@ -239,6 +259,9 @@ Do this as Maria, who holds the Admin role.
     people", Date Field **Created Date**, **Count**, and save. Add a period covering this year:
     within a few minutes its result shows how many contacts were created this year, and the
     **Result** box is read only.
+12. Scroll to **Logic Model Report**. Each indicator has a row with its baseline, and each chosen
+    period its target, result and progress. Untick a period: its columns go. Click **Download
+    Printable Report**, open the file and print it.
 
 ## Common Mistakes
 

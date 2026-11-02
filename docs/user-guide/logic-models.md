@@ -103,6 +103,18 @@ what stopped them.
 You should see: the periods that have started show new results. Only an admin can change what an
 indicator counts (its **Source**).
 
+## To Compare Periods for a Funder
+
+1. Scroll to **Logic Model Report** at the bottom of the builder.
+2. Under **Periods to Compare**, tick the periods you want side by side. The latest four are
+   ticked when the page opens.
+3. Click **Download CSV** for a spreadsheet, or **Download Printable Report** for a page to open
+   in your browser and print, or save as a PDF.
+
+You should see: one row per indicator with its baseline and, for each period, the target, the
+result and the progress. Periods with the same dates count as one, so name them the same way on
+every indicator.
+
 ## To See What Needs Attention
 
 **Things to Look At**, at the bottom of the builder, lists columns with nothing in them, parts with
