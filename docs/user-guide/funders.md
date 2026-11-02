@@ -91,6 +91,10 @@ You should see: amounts in your currency and shares as percents, or `Nothing to 
 fiscal year yet.` To print it for a board packet, use your browser's print command. If a line says
 **Not set**, those grants have no **Funding Source**; fill it in on each grant.
 
+If your organization also enters a grant's payments as Giving gifts, that money is counted twice:
+once in the grant lines and once in the gifts line, and in that funder's share. Ask your
+administrator which one your organization records awards in.
+
 ## To Name the Program a Grant Pays For
 
 Only when your organization uses Programs.

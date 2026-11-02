@@ -198,6 +198,12 @@ Without Giving, or for someone without access to it, the dashboard shows the gra
 Each person sees totals of the records they can read. Print it with your browser's print command
 for a board packet.
 
+**A grant also recorded as a Giving gift is counted twice.** The dashboard adds grants and gifts
+side by side and does not match one to the other, so a grant whose payment you also enter as a
+gift designated to a fund appears in the grant lines and again in the gifts line, and its funder's
+share in **Concentration** includes both. Record each award in one place (the grant, or the gift),
+or read the two lines knowing they overlap.
+
 If grant money is recorded both on the grant and as a gift in Giving, it counts in both lines;
 record each payment in one place.
 
