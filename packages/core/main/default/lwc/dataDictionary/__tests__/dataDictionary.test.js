@@ -490,7 +490,7 @@ describe('c-data-dictionary', () => {
       });
 
       expect(name).toContain('Automation_Inventory');
-      const lines = text.replace(/^﻿/, '').split('\r\n');
+      const lines = text.replace(/^\uFEFF/, '').split('\r\n');
       expect(lines[0].split(',')[1]).toBe('Object API Name');
       expect(lines[1]).toContain('AccountTrigger');
       expect(lines[1]).toContain('Account,Account');

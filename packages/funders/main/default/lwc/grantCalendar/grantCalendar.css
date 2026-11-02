@@ -1,5 +1,5 @@
+/* Widths of 100% come from the slds-size_full utility class on the table and each item. */
 .barn-calendar {
-  width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
 }
@@ -10,7 +10,7 @@
 }
 
 .barn-day {
-  height: 6rem;
+  height: calc(var(--slds-g-sizing-10, 3rem) * 2);
   padding: var(--slds-g-spacing-1, 0.25rem);
   vertical-align: top;
   border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #e5e5e5);
@@ -21,13 +21,13 @@
 }
 
 .barn-day_today .barn-day-number {
-  font-weight: 700;
+  font-weight: var(--slds-g-font-weight-7, 700);
   color: var(--slds-g-color-brand-base-50, #0176d3);
 }
 
 .barn-day-number {
   display: block;
-  font-size: 0.75rem;
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
 }
 
 .barn-calendar ul {
@@ -38,16 +38,15 @@
 
 .barn-item {
   display: block;
-  width: 100%;
-  margin-top: 0.125rem;
+  margin-top: var(--slds-g-sizing-1, 0.125rem);
   padding: 0 var(--slds-g-spacing-1, 0.25rem);
   overflow: hidden;
   border: 0;
-  border-left: 3px solid transparent;
+  border-left: var(--slds-g-sizing-border-3, 3px) solid transparent;
   border-radius: var(--slds-g-radius-border-1, 0.125rem);
   background: var(--slds-g-color-surface-container-2, #f3f3f3);
   color: var(--slds-g-color-on-surface-2, #2e2e2e);
-  font-size: 0.75rem;
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -55,7 +54,7 @@
 }
 
 .barn-item:focus {
-  outline: 2px solid var(--slds-g-color-brand-base-50, #0176d3);
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-brand-base-50, #0176d3);
 }
 
 .barn-item_application {
@@ -79,7 +78,6 @@
   .barn-calendar tr,
   .barn-calendar td {
     display: block;
-    width: 100%;
   }
 
   .barn-day {

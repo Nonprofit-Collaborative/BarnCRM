@@ -94,7 +94,9 @@ public with sharing class ModuleManagerService {
             'Goal__c',
             'Goal_Step__c',
             'Program__c',
+            'Referral__c',
             'Service__c',
+            'Service_Count__c',
             'Service_Delivery__c',
             'Session__c'
         },

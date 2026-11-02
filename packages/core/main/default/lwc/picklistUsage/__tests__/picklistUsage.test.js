@@ -23,6 +23,7 @@ jest.mock('@salesforce/label/c.Core_PicklistUsage_NotChecked', () => ({ default:
   virtual: true
 });
 
+// eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 function mount(objectName = 'Account') {

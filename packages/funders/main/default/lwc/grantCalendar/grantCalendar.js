@@ -21,9 +21,9 @@ const OBJECT_BY_KIND = {
   payment: 'Grant_Payment__c'
 };
 const CLASS_BY_KIND = {
-  application: 'barn-item barn-item_application',
-  requirement: 'barn-item barn-item_requirement',
-  payment: 'barn-item barn-item_payment'
+  application: 'barn-item barn-item_application slds-size_full',
+  requirement: 'barn-item barn-item_requirement slds-size_full',
+  payment: 'barn-item barn-item_payment slds-size_full'
 };
 
 const messageOf = (error) =>
