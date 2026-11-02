@@ -1,4 +1,6 @@
 import { LightningElement, api } from 'lwc';
+import { RefreshEvent } from 'lightning/refresh';
+import LOCALE from '@salesforce/i18n/locale';
 import getLog from '@salesforce/apex/ServiceDeliveryLogController.getLog';
 import save from '@salesforce/apex/ServiceDeliveryLogController.save';
 import addCount from '@salesforce/apex/ServiceDeliveryLogController.addCount';
@@ -6,6 +8,12 @@ import COUNTED from '@salesforce/label/c.Programs_Log_Counted';
 import COUNT_INPUT from '@salesforce/label/c.Programs_Log_CountInput';
 import ADD_COUNT from '@salesforce/label/c.Programs_Log_AddCount';
 import COUNT_ADDED from '@salesforce/label/c.Programs_Log_CountAdded';
+import getSessionLog from '@salesforce/apex/ServiceDeliveryLogController.getSessionLog';
+import saveSession from '@salesforce/apex/ServiceDeliveryLogController.saveSession';
+import SESSION_OF from '@salesforce/label/c.Programs_Log_SessionOf';
+import SESSION_COHORT from '@salesforce/label/c.Programs_Log_SessionCohort';
+import SESSION_EVERYONE from '@salesforce/label/c.Programs_Log_SessionEveryone';
+import SESSION_CANCELLED from '@salesforce/label/c.Programs_Log_SessionCancelled';
 
 import TITLE from '@salesforce/label/c.Programs_Log_Title';
 import SERVICE from '@salesforce/label/c.Programs_Log_Service';
@@ -29,8 +37,10 @@ import LOADING from '@salesforce/label/c.Programs_Loading';
 import {
   entriesToSave,
   format,
+  isSessionObject,
   logRows,
   markAllPresent,
+  sessionSummary,
   withAttendance,
   withQuantity
 } from './logRows';
@@ -40,9 +50,12 @@ import { bodyMessage } from 'c/findCsv';
  * The Service Delivery Log panel on a program (P-02): for one active service and one day, the
  * attendance and quantity of everyone with an open enrollment, saved in one go. One person per
  * row on a desktop, one per card on a phone. Saves go through the delivery rules (R-SD2, R-SD3).
+ * On a session page (P-11, R-SE2) the service and day are the session's, the cohort is listed,
+ * and a Cancelled session shows what was recorded without the controls (R-SE3).
  */
 export default class ServiceDeliveryLog extends LightningElement {
   @api recordId;
+  @api objectApiName;
 
   labels = {
     title: TITLE,
@@ -56,6 +69,7 @@ export default class ServiceDeliveryLog extends LightningElement {
     moreThanShown: MORE_THAN_SHOWN,
     countInput: COUNT_INPUT,
     addCount: ADD_COUNT,
+    sessionCancelled: SESSION_CANCELLED,
     loading: LOADING
   };
 
@@ -71,9 +85,16 @@ export default class ServiceDeliveryLog extends LightningElement {
     this.load();
   }
 
+  get isSession() {
+    return isSessionObject(this.objectApiName);
+  }
+
   load(serviceId, deliveryDate) {
     this.loading = true;
-    return getLog({ programId: this.recordId, serviceId, deliveryDate })
+    const read = this.isSession
+      ? getSessionLog({ sessionId: this.recordId })
+      : getLog({ programId: this.recordId, serviceId, deliveryDate });
+    return read
       .then((log) => {
         this.log = log;
         this.drafts = {};
@@ -186,6 +207,19 @@ export default class ServiceDeliveryLog extends LightningElement {
     return !!(this.log && this.log.moreThanShown);
   }
 
+  /** On a program, the service and date to choose; on a session they are the session's. */
+  get showPickers() {
+    return this.hasServices && !this.isSession;
+  }
+
+  get session() {
+    return sessionSummary(
+      this.log,
+      { sessionOf: SESSION_OF, cohort: SESSION_COHORT, everyone: SESSION_EVERYONE },
+      LOCALE
+    );
+  }
+
   // ------------------------------------------------------------------------- choosing
 
   handleServiceChange(event) {
@@ -234,16 +268,23 @@ export default class ServiceDeliveryLog extends LightningElement {
       return Promise.resolve();
     }
     this.busy = true;
-    return save({
-      programId: this.recordId,
-      serviceId: this.log.serviceId,
-      deliveryDate: this.log.deliveryDate,
-      entries
-    })
+    const write = this.isSession
+      ? saveSession({ sessionId: this.recordId, entries })
+      : save({
+          programId: this.recordId,
+          serviceId: this.log.serviceId,
+          deliveryDate: this.log.deliveryDate,
+          entries
+        });
+    return write
       .then((log) => {
         this.log = log;
         this.drafts = {};
         this.resultMessage = log.saved === 1 ? SAVED_ONE : format(SAVED, log.saved);
+        if (this.isSession) {
+          // The session is now Held: the page's details show it.
+          this.dispatchEvent(new RefreshEvent());
+        }
       })
       .catch((error) => {
         this.errorMessage = bodyMessage(error, ACTION_FAILED);

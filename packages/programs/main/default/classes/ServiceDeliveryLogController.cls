@@ -78,6 +78,18 @@ public with sharing class ServiceDeliveryLogController {
         /** How many deliveries the last save wrote, 0 on a plain read. */
         @AuraEnabled
         public Integer saved = 0;
+        /** On a session page (P-11): the session, its cohort and status. */
+        @AuraEnabled
+        public Id sessionId;
+        @AuraEnabled
+        public String sessionName;
+        @AuraEnabled
+        public String cohortName;
+        @AuraEnabled
+        public String sessionStatus;
+        /** A Cancelled session takes no attendance (R-SE3). */
+        @AuraEnabled
+        public Boolean cancelled = false;
         /** People counted without names for this service and day (P-12), all rows added up. */
         @AuraEnabled
         public Integer peopleCounted = 0;
@@ -189,6 +201,42 @@ public with sharing class ServiceDeliveryLogController {
             return log;
         } catch (Exception failure) {
             throw report(failure, programId);
+        }
+    }
+
+    /**
+     * The log on a session page (P-11, R-SE2): the session's service and day, and its cohort's
+     * open enrollments, or the program's when it has no cohort. See `SessionAttendance`.
+     */
+    @AuraEnabled
+    public static Log getSessionLog(Id sessionId) {
+        if (sessionId == null) {
+            throw UserErrors.message(Label.Programs_Log_ActionFailed);
+        }
+        try {
+            return SessionAttendance.logFor(sessionId);
+        } catch (Exception failure) {
+            throw report(failure, sessionId);
+        }
+    }
+
+    /**
+     * Saves these entries as the session's deliveries, one per person per session (R-SD7), marks a
+     * Scheduled session Held, then returns the log as it now stands. A Cancelled session is
+     * refused (R-SE3).
+     */
+    @AuraEnabled
+    public static Log saveSession(Id sessionId, List<Entry> entries) {
+        if (sessionId == null) {
+            throw UserErrors.message(Label.Programs_Log_ActionFailed);
+        }
+        try {
+            Integer saved = SessionAttendance.save(sessionId, entries);
+            Log log = SessionAttendance.logFor(sessionId);
+            log.saved = saved;
+            return log;
+        } catch (Exception failure) {
+            throw report(failure, sessionId);
         }
     }
 

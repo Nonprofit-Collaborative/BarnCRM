@@ -217,6 +217,49 @@ for a review. You can add and change goals and steps but not delete them: set a 
 dropping to **Not Achieved**, or ask a Programs Admin to remove one entered by mistake. Read Only
 users see plans but change nothing.
 
+## To Put People in a Cohort
+
+A cohort is a group that goes through a program together, such as the spring class.
+
+1. Open the program and, in the **Cohorts** list, click **New**. Give the cohort a **Cohort
+   Name**, and a **Start Date** and **End Date** if it has them. Click **Save**.
+2. On the cohort, the **Cohort Members** panel lists who is in it. Under **Add People**:
+   - tick the people already enrolled in the program who are not in a cohort, or click **Select
+     All**;
+   - for anyone else, pick the person and click **Add to List**, as many times as you need.
+3. Click **Add to Cohort**.
+
+You should see: "(number) people added." Someone already enrolled in the program is moved into
+the cohort; someone who was not is enrolled, as Enrolled, in the cohort. Anyone who could not be
+added is listed under **Not Added**, with the reason. To take someone out, click **Remove** by
+their name: their enrollment stays, out of the cohort. You can also change a person's cohort in
+the **Cohort** field on their enrollment.
+
+## To Schedule Sessions
+
+1. Open the cohort (for its sessions) or the program (for sessions open to everyone enrolled).
+2. In the **Schedule Sessions** panel, pick the **Service**, the **From** and **To** dates and
+   the **Days of the Week**, and a **Start Time** if you like.
+3. Check the line under the form, for example "12 sessions will be scheduled", and click
+   **Schedule**.
+
+You should see: "12 sessions scheduled." The sessions are in the cohort's **Sessions** list and
+on the **Sessions** tab. To move or call off one session, open it and edit its date or set its
+**Status** to **Cancelled**.
+
+## To Take Attendance at a Session
+
+1. Open the session (from the **Sessions** tab or the cohort's **Sessions** list).
+2. The **Service Delivery Log** panel shows the session's service and day and lists the
+   cohort's members (everyone enrolled in the program for a session with no cohort). Set each
+   person's **Attendance** and **Quantity**, or click **Mark All Present**.
+3. Click **Save**.
+
+You should see: "(number) service deliveries saved." and the session's **Status** becomes
+**Held**. Saving again changes what you recorded. A delivery already recorded for that person and
+day on the program's log is taken over by the session, not counted twice. A **Cancelled**
+session takes no attendance.
+
 ## To See Which Programs Someone Is In
 
 1. In the **BarnCRM Programs** app, open the person.

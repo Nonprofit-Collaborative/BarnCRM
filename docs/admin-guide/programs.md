@@ -12,8 +12,10 @@ Withdrawn) and its start and end dates. Each time a service is given, or a perso
 
 Each enrollment also carries the person's **intake and eligibility**: when they were first seen,
 who referred them, and whether they qualify, and staff keep private **case notes** on it and a
-**service plan**: the person's goals, the steps toward each, and when each is next reviewed. A
-**program dashboard** counts enrollments, people served and attendance for a period. A roster
+**service plan**: the person's goals, the steps toward each, and when each is next reviewed.
+A program can group its participants into **cohorts** (the spring class, the Tuesday group),
+add many people to a cohort at once, schedule **sessions** of a service, and take attendance
+per session. A **program dashboard** counts enrollments, people served and attendance for a period. A roster
 import comes in a later release (P-06). Who sees enrollments
 and service deliveries is the **Participant Privacy** preset on the Programs settings page:
 everyone with a Programs permission set (the default), or only the people who need to.
@@ -113,9 +115,9 @@ You never assign the Programs permission sets by hand. Give people their BarnCRM
 | BarnCRM role | Programs set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Programs Admin | Everything, including deleting a record entered by accident |
-| Coordinator | Programs Staff | Set up programs and services, enroll people and move them through the stages, keep service plans; never deletes |
+| Coordinator | Programs Staff | Set up programs, services, cohorts and sessions, enroll people and move them through the stages, take attendance, keep service plans; never deletes |
 | Team Member | Programs Staff | The same as Coordinator |
-| Read Only | Programs Read Only | Look at programs, services, enrollments and service plans |
+| Read Only | Programs Read Only | Look at programs, services, cohorts, sessions, enrollments and service plans |
 
 When it happens:
 
@@ -209,8 +211,10 @@ panel under the roster:
    saving changes its Attendance and Quantity instead of adding a second row, and it is still
    not shown to you. This needs update access to Service Delivery Attendance and Quantity.
 
-People left at **Not Recorded** get no delivery. The panel works the same in the Salesforce
-mobile app, one person per card, so attendance can be taken in the room. Read Only users see
+People left at **Not Recorded** get no delivery. The same panel sits on each **session** page,
+for attendance at one scheduled session (see [Cohorts and Sessions](#cohorts-and-sessions)). The
+panel works the same in the Salesforce mobile app, one person per card, so attendance can be
+taken in the room. Read Only users see
 what is recorded without the controls. The panel lists up to 200 people.
 
 You can also enter a delivery by hand on the **Service Deliveries** tab, for example for a person
@@ -329,6 +333,87 @@ choose another.
 **Goal: fill in the closed date** and **Goal Step: fill in the completed date**, on the
 [Automation](automation.md) page. Switch them off while you load history whose dates you type
 yourself.
+
+## Cohorts and Sessions
+
+### Cohorts
+
+A **cohort** is a group of participants who go through a program together: the spring class of
+a job readiness course, the Tuesday group of a tutoring program. Create one from the **Cohorts**
+tab or the **Cohorts** related list on the program, with a **Cohort Name**, its **Program**, a
+**Status** (Planned, Active or Completed; Active to start with) and optional **Start Date** and
+**End Date** (the end cannot be before the start).
+
+A person is in a cohort when their enrollment in the program names it, in the enrollment's
+**Cohort** field. There is no separate membership record: the enrollment already carries the
+person, the stage and the privacy. Since a person has one open enrollment per program, they are in
+one cohort of a program at a time. Only a cohort of the enrollment's own program can be chosen.
+
+A cohort holds no participant details, so every user with a Programs permission set sees every
+cohort, as for programs. Who is in it is seen through the enrollments, so **Participant
+Privacy** still decides which members each user sees. Deleting a cohort (Programs Admin) keeps
+its enrollments and sessions and empties their Cohort.
+
+### Adding People: the Cohort Members Panel
+
+The cohort page opens on the **Cohort Members** panel. It lists the cohort's members, with
+their stage, and a **Remove** button on each (the enrollment is kept, out of the cohort). Under
+**Add People**:
+
+- **Enrolled in the program, not in a cohort:** the program's open enrollments that have no
+  cohort, each with a box. Tick the ones to add, or **Select All**.
+- **Someone else:** pick a person and click **Add to List**. Repeat for as many as you need.
+
+Click **Add to Cohort**. A ticked enrollment, or a picked person who already has an open
+enrollment in the program, is moved into the cohort. A picked person with no open enrollment is
+enrolled, at stage **Enrolled**, in the cohort, through the usual enrollment rules. Each person is
+added or refused on their own: the panel says how many were added and lists anyone refused, with
+the reason (for example an open enrollment in the program you cannot see under Private). At most
+200 people are added in one go.
+
+### Sessions
+
+A **session** is one scheduled occurrence of a service: the 6 pm class on 3 March. It has a
+**Session Name**, its **Service**, an optional **Cohort** (a cohort of the service's program;
+empty means everyone enrolled in the program), a **Session Date**, a **Start Time** and a
+**Status**: **Scheduled**, **Held** (set when attendance is saved) or **Cancelled**. The
+**Sessions** tab lists them (**All Sessions**, **Upcoming Sessions**); a service, a cohort and the
+program's services list their sessions too.
+
+Sessions, like cohorts, hold no participant details and are seen by every Programs user.
+Programs Staff create and edit them; Programs Admins also delete them. A session with attendance
+cannot be deleted: set it to **Cancelled** instead. A service with sessions cannot be deleted:
+clear its **Active** box.
+
+### Scheduling Sessions
+
+The **Schedule Sessions** panel, on the cohort page (sessions for that cohort) and the program
+page (sessions with no cohort), creates many sessions at once:
+
+1. Pick the **Service** (only Active ones are offered).
+2. Choose the **From** and **To** dates (a cohort's own dates to start with), the **Days of the
+   Week**, and a **Start Time** if you want one.
+3. The panel shows how many sessions that makes. Click **Schedule**. One Scheduled session is
+   created for each chosen weekday between the two dates, named after the service and the date.
+
+At most 200 sessions are created at a time. Nothing keeps the pattern: each session is then
+edited or cancelled on its own, and scheduling again adds more.
+
+### Taking Attendance on a Session
+
+Open the session. The **Service Delivery Log** panel shows its service and day, and lists the
+cohort's open enrollments (or the program's, when the session has no cohort), with what is
+recorded for each at that session. Set attendance and click **Save**, as on the program.
+
+- Each person gets one delivery for the session, naming it; saving again changes it.
+- A delivery already recorded for that person, service and day with no session (for example from
+  the program's log) is taken over by the session rather than doubled. This also applies to one
+  you cannot see under Private, as on the program.
+- Saving on a **Scheduled** session marks it **Held**.
+- A **Cancelled** session shows what was recorded and takes no attendance.
+
+Attendance taken on a session is an ordinary service delivery, so the program dashboard, a
+person's Programs card, the delivery rules and Participant Privacy all count it as before.
 
 ## Program Dashboard
 

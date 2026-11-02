@@ -1,0 +1,85 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom20">
+    <div class="slds-var-p-horizontal_medium slds-is-relative">
+      <template lwc:if={showSpinner}>
+        <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+          {errorMessage}
+        </p>
+      </template>
+
+      <template lwc:if={noServices}>
+        <p data-id="no-services" class="slds-text-body_regular">{labels.noServices}</p>
+      </template>
+
+      <template lwc:if={canSchedule}>
+        <p data-id="intro" class="slds-text-body_regular slds-var-m-bottom_small">{intro}</p>
+        <div class="slds-grid slds-wrap slds-gutters_x-small">
+          <div class="slds-col slds-size_1-of-1">
+            <lightning-combobox
+              data-id="service"
+              label={labels.service}
+              value={serviceId}
+              options={serviceOptions}
+              required
+              onchange={handleServiceChange}
+            ></lightning-combobox>
+          </div>
+          <div class="slds-col slds-size_1-of-2">
+            <lightning-input
+              data-id="from"
+              type="date"
+              label={labels.from}
+              value={fromDate}
+              required
+              onchange={handleFromChange}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-2">
+            <lightning-input
+              data-id="to"
+              type="date"
+              label={labels.to}
+              value={toDate}
+              required
+              onchange={handleToChange}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-var-m-top_x-small">
+            <lightning-checkbox-group
+              data-id="weekdays"
+              label={labels.weekdays}
+              options={weekdayOptions}
+              value={chosenWeekdays}
+              required
+              onchange={handleWeekdaysChange}
+            ></lightning-checkbox-group>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-input
+              data-id="start-time"
+              type="time"
+              label={labels.startTime}
+              value={startTime}
+              onchange={handleStartTimeChange}
+            ></lightning-input>
+          </div>
+        </div>
+        <p data-id="preview" class="slds-text-body_small slds-var-m-top_small" aria-live="polite">{preview}</p>
+        <div role="status" data-id="result" class="slds-var-m-vertical_small">{resultMessage}</div>
+        <div class="slds-grid slds-grid_align-end slds-var-m-bottom_small">
+          <lightning-button
+            data-id="schedule"
+            variant="brand"
+            label={labels.schedule}
+            disabled={scheduleDisabled}
+            onclick={handleSchedule}
+          ></lightning-button>
+        </div>
+      </template>
+    </div>
+  </lightning-card>
+</template>

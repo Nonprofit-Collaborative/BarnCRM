@@ -45,6 +45,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages, taking attendance, counting drop-in visitors without names, recording referrals and screening for eligibility.
 - [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages, and keeping a participant's service plan.
+- [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages, keeping a participant's service plan, and putting people in cohorts with scheduled sessions and attendance.
 
 ### Logic Models (Nonprofit Edition)
 

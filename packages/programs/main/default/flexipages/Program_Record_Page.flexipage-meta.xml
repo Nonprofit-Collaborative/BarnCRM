@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    The program record page: the Program Roster panel, where staff enroll people and move them
-    through the stages, above the program's details and its Services and Enrollments lists.
+    The program record page: the Program Roster panel, the Service Delivery Log and the Schedule
+    Sessions panel, above the program's details and its Services, Enrollments and Cohorts lists.
   </description>
   <flexiPageRegions>
     <itemInstances>
@@ -39,6 +39,12 @@
       <componentInstance>
         <componentName>eligibilityRules</componentName>
         <identifier>eligibilityRulesPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>sessionScheduler</componentName>
+        <identifier>sessionSchedulerPanel</identifier>
       </componentInstance>
     </itemInstances>
     <itemInstances>

@@ -976,4 +976,436 @@
         <shortDescription>Service plan: saved message</shortDescription>
         <value>Saved.</value>
     </labels>
+    <labels>
+        <fullName>Programs_Cohort_ActionFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: unexpected failure</shortDescription>
+        <value>Something went wrong with the cohort. Try again, or ask your BarnCRM admin to check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_AddPeople</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: add section heading</shortDescription>
+        <value>Add People</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_AddToCohort</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: add button</shortDescription>
+        <value>Add to Cohort</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_AddToList</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: add a picked person to the list</shortDescription>
+        <value>Add to List</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_AddedMany</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: many added; {0} is the count</shortDescription>
+        <value>{0} people added.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_AddedOne</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: one added</shortDescription>
+        <value>1 person added.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_Candidates</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: open enrollments in no cohort</shortDescription>
+        <value>Enrolled in the program, not in a cohort</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_Chosen</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: how many chosen; {0} is the count</shortDescription>
+        <value>Chosen: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_MemberCount</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: member count; {0} is the count</shortDescription>
+        <value>Members ({0})</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_MembersEmpty</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: no members yet</shortDescription>
+        <value>Nobody is in this cohort yet.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_MoreThanShown</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: more than 200 members</shortDescription>
+        <value>Only the first 200 members are listed. The Enrollments tab lists them all.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_NoCandidates</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: no open enrollments to add</shortDescription>
+        <value>Everyone enrolled in the program is already in a cohort.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_NobodyChosen</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: add with nobody chosen</shortDescription>
+        <value>Choose at least one person to add.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_NotAdded</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: heading over the refused people</shortDescription>
+        <value>Not Added</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_NotFound</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: cohort not found</shortDescription>
+        <value>This cohort can't be found, or you don't have access to it.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_NotFoundOne</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: enrollment not found</shortDescription>
+        <value>This enrollment can't be found, or you don't have access to it.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_NotOpen</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: enrollment not open in this program</shortDescription>
+        <value>Only an open enrollment in this cohort's program can be added.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_Remove</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: remove button</shortDescription>
+        <value>Remove</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_RemoveFor</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: remove button title; {0} is the person</shortDescription>
+        <value>Remove {0} from the cohort</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_Removed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: removed</shortDescription>
+        <value>Removed from the cohort. The enrollment is kept.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_SelectAll</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: tick every open enrollment</shortDescription>
+        <value>Select All</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_SomeFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: some refused; {0} is the count</shortDescription>
+        <value>{0} could not be added; see below.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_SomeoneElse</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: pick other people</shortDescription>
+        <value>Someone else</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_TakeOffList</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: take a picked person off the list; {0} is the person</shortDescription>
+        <value>Take {0} off the list</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_TickFor</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: tick box title; {0} is the person</shortDescription>
+        <value>Add {0} to the cohort</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: panel title</shortDescription>
+        <value>Cohort Members</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_TooMany</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: more than the most per add; {0} is the most</shortDescription>
+        <value>Add at most {0} people at a time.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_SessionCancelled</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service delivery log: the session was cancelled</shortDescription>
+        <value>This session was cancelled, so it takes no attendance.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_SessionCohort</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service delivery log: whose session; {0} is the cohort</shortDescription>
+        <value>Cohort: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_SessionEveryone</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service delivery log: session with no cohort</shortDescription>
+        <value>Everyone enrolled in the program</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_SessionOf</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service delivery log: session heading; {0} service, {1} date</shortDescription>
+        <value>{0} on {1}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_ActionFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: unexpected failure</shortDescription>
+        <value>Something went wrong scheduling sessions. Try again, or ask your BarnCRM admin to check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_BadTime</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: start time not understood</shortDescription>
+        <value>Enter the start time as hours and minutes, for example 18:30.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_ChooseDates</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: dates missing or the wrong way round</shortDescription>
+        <value>Choose a From date and a To date on or after it.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_ChooseWeekdays</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: no weekday chosen</shortDescription>
+        <value>Choose at least one day of the week.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_CreatedMany</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: many created; {0} is the count</shortDescription>
+        <value>{0} sessions scheduled.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_CreatedOne</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: one created</shortDescription>
+        <value>1 session scheduled.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_From</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: first date</shortDescription>
+        <value>From</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_IntroCohort</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: on a cohort; {0} is the cohort</shortDescription>
+        <value>Sessions scheduled here are for {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_IntroProgram</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: on a program</shortDescription>
+        <value>Sessions scheduled here are for everyone enrolled in the program. To schedule for one cohort, use the panel on the cohort.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_NoDates</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: no dates sent</shortDescription>
+        <value>Choose the dates and days of the week first.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_NoServices</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: the program has no active service</shortDescription>
+        <value>Add an active service to the program to schedule its sessions.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_PreviewMany</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: how many will be created; {0} is the count</shortDescription>
+        <value>{0} sessions will be scheduled.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_PreviewNone</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: no day matches</shortDescription>
+        <value>None of the chosen days falls between these dates.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_PreviewOne</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: one will be created</shortDescription>
+        <value>1 session will be scheduled.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_Schedule</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: schedule button</shortDescription>
+        <value>Schedule</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_ServiceRequired</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: no active service of the program chosen</shortDescription>
+        <value>Choose an active service of this program.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_StartTime</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: start time</shortDescription>
+        <value>Start Time</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: panel title</shortDescription>
+        <value>Schedule Sessions</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_To</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: last date</shortDescription>
+        <value>To</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_TooMany</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: more than the most at once; {0} is the most</shortDescription>
+        <value>Schedule at most {0} sessions at a time: choose fewer days or a shorter span.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_Weekdays</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: weekday choices</shortDescription>
+        <value>Days of the Week</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Session_CancelledNoAttendance</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Session attendance: saving on a cancelled session</shortDescription>
+        <value>This session was cancelled, so it takes no attendance. Change its status first if it did take place.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Session_NotFound</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Session attendance: session not found</shortDescription>
+        <value>This session can't be found, or you don't have access to it.</value>
+    </labels>
 </CustomLabels>
