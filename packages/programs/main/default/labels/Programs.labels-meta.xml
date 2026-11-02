@@ -664,4 +664,316 @@
         <shortDescription>Health Check: Nonprofit Cloud Program Management alongside Programs</shortDescription>
         <value>This org has the Nonprofit Cloud Program and Program Enrollment objects. BarnCRM Programs keeps its own programs, enrollments and service deliveries and does not read or write those objects, so the two do not share records. Choose one for each program; the Programs admin guide explains how they coexist. Nothing needs fixing.</value>
     </labels>
+    <labels>
+        <fullName>Programs_Plan_NotFound</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: enrollment or goal not found</shortDescription>
+        <value>This enrollment or goal can't be found, or you don't have access to it.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NameRequired</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: a goal or step needs a name</shortDescription>
+        <value>Give the goal or step a name.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NextReviewPast</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: next review date before today</shortDescription>
+        <value>The next review can't be before today.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_BadOutcome</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: outcome not offered for this enrollment</shortDescription>
+        <value>Choose an outcome from the list.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_ActionFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: unexpected failure</shortDescription>
+        <value>Something went wrong with the service plan. Try again, or ask your BarnCRM admin to check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_OutcomeOption</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Outcome choice; {0} is the outcome, {1} is its logic model</shortDescription>
+        <value>{0} ({1})</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan panel title</shortDescription>
+        <value>Service Plan</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Empty</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: no goals yet</shortDescription>
+        <value>No goals yet. Add the first goal this person is working toward.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_AddGoal</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: add a goal button</shortDescription>
+        <value>Add Goal</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_EditGoal</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: edit a goal button</shortDescription>
+        <value>Edit Goal</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Goal</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: goal name field label</shortDescription>
+        <value>Goal</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Description</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: goal description field label</shortDescription>
+        <value>Description</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Status</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: status field label</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_TargetDate</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: target date field label</shortDescription>
+        <value>Target Date</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_AssignedTo</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: assigned to field label</shortDescription>
+        <value>Assigned To</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NextReview</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: next review field label</shortDescription>
+        <value>Next Review</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Outcome</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: outcome field label</shortDescription>
+        <value>Outcome</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NoOutcome</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: the no outcome choice</shortDescription>
+        <value>No outcome</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Save</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: save button</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Cancel</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: cancel button</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Target</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Goal or step target; {0} is the date</shortDescription>
+        <value>Target {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Assigned</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Goal or step owner; {0} is the staff member's name</shortDescription>
+        <value>Assigned to {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NextReviewOn</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Goal next review; {0} is the date</shortDescription>
+        <value>Next review {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_LastReviewedOn</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Goal last review; {0} is the date</shortDescription>
+        <value>Last reviewed {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_ClosedOn</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Goal closed; {0} is the date</shortDescription>
+        <value>Closed {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_ReviewDue</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: badge on a goal past its review date</shortDescription>
+        <value>Review due</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_WorksToward</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Goal outcome; {0} is the outcome and its logic model</shortDescription>
+        <value>Works toward {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_OutcomeMissing</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: the goal's outcome was deleted</shortDescription>
+        <value>Its outcome is no longer in Logic Models. Edit the goal to choose another.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_StepsDone</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Step progress; {0} is the steps done, {1} is all steps</shortDescription>
+        <value>{0} of {1} steps done</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NewStep</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: new step input label</shortDescription>
+        <value>New step</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NewStepFor</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>New step input label; {0} is the goal</shortDescription>
+        <value>New step for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_AddStep</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: add a step button</shortDescription>
+        <value>Add Step</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_MarkReviewed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: mark a goal reviewed button</shortDescription>
+        <value>Mark Reviewed</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_SaveReview</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: save a review button</shortDescription>
+        <value>Save Review</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_ReviewIntro</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: asks for the next review date</shortDescription>
+        <value>Reviewed today. When is the next review? Leave it blank for none.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Notes</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: case notes heading under a goal</shortDescription>
+        <value>Case Notes</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_MoreNotes</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>More notes than shown; {0} is how many notes in all</shortDescription>
+        <value>{0} notes in all. Open the goal to see every one.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NewNote</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: new case note button</shortDescription>
+        <value>New Note</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Saved</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: saved message</shortDescription>
+        <value>Saved.</value>
+    </labels>
 </CustomLabels>

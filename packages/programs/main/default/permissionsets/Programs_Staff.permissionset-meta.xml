@@ -27,6 +27,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>ServicePlanController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>EligibilityController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -83,6 +87,56 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Enrollment__c.Referral_Source__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Goal__c.Assigned_To__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Goal__c.Closed_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Goal__c.Description__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Goal__c.Last_Review_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Goal__c.Next_Review_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Goal__c.Outcome_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Goal__c.Target_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Goal_Step__c.Assigned_To__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Goal_Step__c.Completed_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Goal_Step__c.Target_Date__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -185,6 +239,11 @@
     <field>Service_Count__c.Note__c</field>
     <readable>true</readable>
   </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Case_Note__c.Goal__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
     <allowDelete>false</allowDelete>
@@ -201,6 +260,24 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <object>Enrollment__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Goal__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Goal_Step__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
@@ -254,6 +331,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Enrollment__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Goal__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

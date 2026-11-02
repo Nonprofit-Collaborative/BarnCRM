@@ -72,6 +72,14 @@
   </layoutSections>
   <relatedLists>
     <fields>NAME</fields>
+    <fields>Status__c</fields>
+    <fields>Target_Date__c</fields>
+    <fields>Assigned_To__c</fields>
+    <fields>Next_Review_Date__c</fields>
+    <relatedList>Goal__c.Enrollment__c</relatedList>
+  </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
     <fields>Service__c</fields>
     <fields>Delivery_Date__c</fields>
     <fields>Attendance__c</fields>

@@ -10008,6 +10008,7 @@ participant record; P-02 records what they attended and received.
 - **Enrollment to Program**, many to one, through a required lookup, not a detail, so the
   enrollment has sharing of its own (participant privacy, P-08; ADR-0151 decision 3).
 - **Enrollment to a person**, through the Contact and Account pair (Section 4).
+- **Enrollment to Goal**, one to many, master-detail: the participant's service plan (29ZA2, P-10).
 
 ### Rules
 
@@ -10219,6 +10220,7 @@ service plans are P-10.
 | Type | picklist(Check-in, Phone Call, Home Visit, Office Visit, Assessment, Referral, Other) | yes (defaults Check-in) | What kind of contact it records. The values are the organization's to change in Setup. |
 | Subject | text(255) | no | A short line saying what the note is about. |
 | Note | long text | no | What happened, what was agreed and what comes next. |
+| Goal | reference(Goal) | no | The goal on the same enrollment the note is about (P-10, R-CN5). |
 | Owner | reference(User) | yes | The author, who sees and edits the note. |
 
 ### Relationships
@@ -10247,7 +10249,12 @@ enrollments, read in system mode and deleted as the user; someone who may not de
 refused with that reason (only Programs Admin may). Erasing a person account also finds notes
 and counts enrollments recorded on that person account's own contact. The enrollments are kept (R-EN5). Deleting a
 person, not erasing them, keeps the notes on the enrollment, which no longer names the person;
-erase a person to remove what was written about them.
+erase a person to remove what was written about them. Their goals (29ZA2) go too (R-GL6).
+
+**R-CN5 A note may be about a goal (P-10).** A note may name one goal of its own enrollment
+(29ZA2); a goal of another enrollment is refused (validation rule). The note stays private to its
+author (R-CN2): a goal shows only the notes its viewer may see. Deleting the goal empties the
+note's Goal and keeps the note.
 
 ### Salesforce implementation
 
@@ -10260,7 +10267,9 @@ erase a person to remove what was written about them.
 | Type | `Type__c` | Picklist, restricted, required, default Check-in |
 | Subject | `Subject__c` | Text(255) |
 | Note | `Note__c` | Long Text Area(32768) |
+| Goal | `Goal__c` | Lookup to `Goal__c`, delete constraint SetNull, relationship name Case_Notes (R-CN5) |
 
+- **Validation rule:** `Goal_On_Same_Enrollment` (R-CN5).
 - **Erasure:** `ProgramsErasureExtension`, registered in Core's
   `PersonErasureExtensions.EXTENSION_CLASSES`, with `CaseNoteSelector` (without sharing, system
   mode reads only).
@@ -10338,6 +10347,150 @@ Deleting a person, not erasing them, keeps the referral, which no longer names t
   reads only).
 - **UI:** the Referrals tab (list views All Referrals and Open Referrals) and the Referrals
   related list on the enrollment. No trigger.
+
+---
+
+## 29ZA2. Goal
+
+### Definition
+
+Something a participant is working toward within their enrollment, with the steps to get there
+(P-10, release 0.15, ADR-NEXT `NEXT-programs-service-plans-cohorts-sessions.md`): find stable
+housing, pass the high school equivalency test, open a bank account. A participant's service plan
+is the set of goals on their enrollment; there is no plan record (ADR-NEXT decision 1). Case
+management lite: who is responsible, by when, how it stands, and when it is next reviewed.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text(80) | yes | The goal, in a line the participant would recognize. |
+| Enrollment | reference(Enrollment) | yes | The enrollment, and through it the person and program, the goal belongs to. |
+| Description | long text | no | What success looks like and anything agreed about it. |
+| Status | picklist(Not Started, In Progress, Achieved, Not Achieved) | yes (defaults Not Started) | Where the goal stands. Achieved and Not Achieved are closed. |
+| Target Date | date | no | When the goal should be reached. |
+| Assigned To | reference(User) | no | The staff member responsible for the goal. |
+| Last Reviewed | date | no | When the goal was last reviewed with the participant. |
+| Next Review | date | no | When the goal is next to be reviewed. |
+| Closed Date | date | no | When the goal was Achieved or Not Achieved (R-GL2). |
+| Outcome Id | text(18) | no | The Logic Models outcome the goal works toward, by record identifier (R-GL5). |
+
+### Relationships
+
+- **Goal to Enrollment**, many to one, master-detail: the goal's visibility is the enrollment's
+  (R-GL1).
+- **Goal to Goal Step**, one to many (29ZA3).
+- **Goal to Case Note**, one to many, through the note's optional lookup (R-CN5).
+- **Goal to a Logic Models outcome**, by record identifier only, never a lookup (R-GL5).
+
+### Rules
+
+**R-GL1 A goal is seen as its enrollment is.** Goal is a detail of Enrollment, so whoever sees
+the enrollment under the Participant Privacy preset (R-EN7) sees its goals, and editing a goal
+needs edit access to the enrollment. No sharing code. Deleting an enrollment deletes its goals and
+their steps.
+
+**R-GL2 The closed date is filled in.** Moving a goal to Achieved or Not Achieved, or creating it
+so, fills an empty Closed Date with today; moving it back to Not Started or In Progress empties
+it. A switchable automation (registry row `Goal_Dates`), so an import of history can turn it off.
+
+**R-GL3 Reviews.** Mark Reviewed on the Service Plan panel sets Last Reviewed to today and Next
+Review to the date the user confirms, offered three months on. An open goal whose Next Review is
+before today is due for review: flagged on the panel and listed by the Reviews Due list view.
+Both dates may also be typed on the record.
+
+**R-GL4 Who may write.** Programs Admin creates, edits and deletes goals and steps; Programs Staff
+create and edit them, never delete (close a goal as Not Achieved instead); Programs Read Only
+reads them.
+
+**R-GL5 Outcome by record identifier.** Outcome Id names a Logic Model Element of type Outcome
+(29ZD) by its Id, as text (ADR-0014; ADR-0154 decision 5 is the same pattern the other way).
+Programs never references Logic Models' schema: the Service Plan panel offers the outcome picker
+only where `Logic_Model_Element__c` exists and the user can read it, lists the outcomes of the
+logic model whose program is the enrollment's program, then the organization's model, and saves
+only the Id of an outcome it found that way. An outcome deleted later is shown as missing.
+
+**R-GL6 Erasing the person deletes their goals.** A goal is typed text about the person, so
+erasing the person (Section 29H) deletes the goals on all their enrollments, and their steps with
+them, as R-CN4; the enrollments are kept (R-EN5). Only someone who may delete them (Programs Admin)
+can erase a person who has goals.
+
+### Salesforce implementation
+
+- **Object:** `Goal__c`, name field Text(80) labelled Goal, sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Enrollment | `Enrollment__c` | Master-Detail to `Enrollment__c`, relationship name Goals, not reparentable |
+| Description | `Description__c` | Long Text Area(32768) |
+| Status | `Status__c` | Picklist, restricted, required, default Not Started |
+| Target Date | `Target_Date__c` | Date |
+| Assigned To | `Assigned_To__c` | Lookup to User, delete constraint SetNull, relationship name Assigned_Goals |
+| Last Reviewed | `Last_Review_Date__c` | Date |
+| Next Review | `Next_Review_Date__c` | Date |
+| Closed Date | `Closed_Date__c` | Date |
+| Outcome Id | `Outcome_Id__c` | Text(18) |
+
+- **Automation:** trigger `GoalTrigger` through `TriggerDispatcher`, handler
+  `ServicePlanDatesHandler` (registry row `Goal_Dates`, switchable, R-GL2).
+- **List views:** All Goals, Open Goals, Reviews Due (open, Next Review before today).
+- **Service Plan panel:** the `servicePlan` panel on the enrollment page
+  (`Enrollment_Record_Page`) through `ServicePlanController` (thin, plain JSON, user mode): goals
+  open first, each with its steps, status, target date, who is responsible, review dates, its
+  outcome and the case notes about it the user may see; add and edit goals and steps, mark a step
+  done, Mark Reviewed and New Note. Sorting, flags and default dates are worked out in the
+  framework-free module `servicePlan/plan.js` (plan 9.9).
+- **Erasure:** `ProgramsErasureExtension` deletes the goals (R-GL6), found by `CaseNoteSelector`.
+- **PMM mapping:** none; PMM has no goal object.
+
+---
+
+## 29ZA3. Goal Step
+
+### Definition
+
+One action toward a goal (P-10): fill in the housing application, book the test, bring proof of
+address.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text(80) | yes | The step, as a short action. |
+| Goal | reference(Goal) | yes | The goal the step leads to. |
+| Status | picklist(Not Started, In Progress, Done) | yes (defaults Not Started) | Where the step stands. |
+| Assigned To | reference(User) | no | The staff member responsible for the step. |
+| Target Date | date | no | When the step should be done. |
+| Completed Date | date | no | When the step was Done (R-GS1). |
+
+### Relationships
+
+- **Goal Step to Goal**, many to one, master-detail: visibility follows the goal and so the
+  enrollment (R-GL1).
+
+### Rules
+
+**R-GS1 The completed date is filled in.** Moving a step to Done, or creating it so, fills an empty
+Completed Date with today; moving it back empties it. A switchable automation (registry row
+`Goal_Step_Dates`).
+
+R-GL1, R-GL4 and R-GL6 apply to steps through their goal.
+
+### Salesforce implementation
+
+- **Object:** `Goal_Step__c`, name field Text(80) labelled Step, sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Goal | `Goal__c` | Master-Detail to `Goal__c`, relationship name Steps, not reparentable |
+| Status | `Status__c` | Picklist, restricted, required, default Not Started |
+| Assigned To | `Assigned_To__c` | Lookup to User, delete constraint SetNull, relationship name Assigned_Goal_Steps |
+| Target Date | `Target_Date__c` | Date |
+| Completed Date | `Completed_Date__c` | Date |
+
+- **Automation:** trigger `GoalStepTrigger`, handler `ServicePlanDatesHandler` (registry row
+  `Goal_Step_Dates`, switchable, R-GS1).
+- **PMM mapping:** none.
 
 ---
 
@@ -11264,6 +11417,7 @@ mirrors the primary member).
 | 0.17 | 2026-11-02 | C-60 automation inventory in the Data Dictionary (plan 6.1.5). Section 29F: rules R-AI1 to R-AI4. No object or field added. |
 | 0.17 | 2026-11-02 | Field Access Manager (C-65, D-157, ADR-NEXT). New Section 29ZH, rules R-FA1 to R-FA7: a field access change is a data job; `Import_Batch__c.Operation__c` gains the value Access. No object or field added. |
 | 0.17 | 2026-11-02 | NPSP household adoption (X-05, ADR-NEXT `NEXT-npsp-household-adoption-in-core.md`). New Core object Household Adoption (`Household_Adoption__c`, 29ZH) with rules R-HA1 to R-HA5: NPSP household Accounts become BarnCRM households in place (record type, greetings, primary contact, custom name), journaled for undo. NPSP read by describe only. |
+| 0.15 | 2026-11-02 | Programs P-10 (ADR-NEXT `NEXT-programs-service-plans-cohorts-sessions.md`). New in the Programs module: Goal (`Goal__c`, 29ZA2), a detail of Enrollment, and Goal Step (`Goal_Step__c`, 29ZA3), a detail of Goal, with rules R-GL1 to R-GL6 and R-GS1; a goal names a Logic Models outcome by record identifier (`Outcome_Id__c`), never a lookup. `Case_Note__c` gains `Goal__c` (Lookup, SetNull) with rule R-CN5. Erasing a person now also deletes their goals. |
 
 ---
 ## 32. Entity ownership by package
@@ -11357,6 +11511,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Service | Programs | 0.12 (P-01) | 29Z |
 | Enrollment | Programs | 0.12 (P-01) | 29ZA |
 | Case Note | Programs | 0.14 (P-04) | 29ZA1 |
+| Goal | Programs | 0.15 (P-10) | 29ZA2 |
+| Goal Step | Programs | 0.15 (P-10) | 29ZA3 |
 | Programs Settings (custom setting, Participant Privacy preset) | Programs | 0.14 (P-08) | 29ZA |
 | Service Delivery | Programs | 0.13 (P-02) | 29ZB |
 | Programs entities | Programs | v0.9 | 30 |

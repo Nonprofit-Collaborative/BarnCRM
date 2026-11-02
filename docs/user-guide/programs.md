@@ -182,6 +182,41 @@ share it with **Sharing** on the note. You can edit your own notes but not delet
 Programs Admin to remove one written by mistake. The **My Case Notes** list on the **Case Notes**
 tab gathers everything you have written.
 
+A note can be about one of the person's goals: pick the goal in the note's **Goal** field, or
+start the note with **New Note** under the goal (see below).
+
+## To Keep Someone's Service Plan
+
+A person's service plan is their goals, each with the steps toward it, kept on their enrollment.
+
+1. Open the person's enrollment (click their name in the **Program Roster** panel).
+2. On the **Service Plan** panel, click **Add Goal**. Write the **Goal** (for example, "Find stable
+   housing"), and fill in what you know: a **Description**, the **Status**, who it is **Assigned
+   To**, a **Target Date** and the **Next Review** date. Where your organization uses Logic Models
+   you can also pick the **Outcome** the goal works toward.
+3. Click **Save**.
+4. Under the goal, type a step (for example, "Fill in the housing application") and click **Add
+   Step**. Add as many as you need.
+
+You should see the goal on the panel with its steps and "0 of 2 steps done" (or however many).
+Open goals come first, soonest target date first.
+
+**As the work goes on:**
+
+- **Tick a step** when it is done; it records today as its completed date. Untick it to reopen it.
+- **Edit Goal** to change the goal, or to set its Status to **Achieved** or **Not Achieved** when
+  it is finished. Its closed date is filled in for you.
+- **Mark Reviewed** after you go over the goal with the person: it records today and offers the
+  next review three months on. Change the date, or clear it for no further review, and click
+  **Save Review**. A goal past its next review shows **Review due**.
+- **New Note** opens a new case note about the goal with the enrollment and goal already filled
+  in. The goal lists its three latest notes you can see.
+
+The **Goals** tab lists every goal you can see; its **Reviews Due** list shows the goals waiting
+for a review. You can add and change goals and steps but not delete them: set a goal you are
+dropping to **Not Achieved**, or ask a Programs Admin to remove one entered by mistake. Read Only
+users see plans but change nothing.
+
 ## To See Which Programs Someone Is In
 
 1. In the **BarnCRM Programs** app, open the person.
