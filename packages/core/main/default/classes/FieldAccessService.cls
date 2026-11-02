@@ -32,10 +32,14 @@ public with sharing class FieldAccessService {
     }
     private static final Integer SEARCH_LIMIT = 20;
     private static final String SETTINGS_PERMISSION = 'Manage_BarnCRM_Settings';
-    /** Permission sets the organization made: not a profile's, a group's, a muting or a packaged set. */
+    /**
+     * Permission sets the organization made: not a profile's, a group's, a muting, a packaged
+     * set, or one BarnCRM ships (its access syncs manage those, so an edit would drift). Binds
+     * :shipped.
+     */
     private static final String ELIGIBLE =
         'IsOwnedByProfile = FALSE AND IsCustom = TRUE AND NamespacePrefix = NULL' +
-        ' AND Type = \'Regular\' AND PermissionSetGroupId = NULL';
+        ' AND Type = \'Regular\' AND PermissionSetGroupId = NULL AND Name NOT IN :shipped';
 
     /** Set by a test to stand in for Manage Profiles and Permission Sets. */
     @TestVisible
@@ -173,7 +177,13 @@ public with sharing class FieldAccessService {
             'SELECT Id, Label, Name, Description FROM PermissionSet WHERE ' +
                 ELIGIBLE +
                 ' AND Label LIKE :pattern ORDER BY Label LIMIT :howMany',
-            new Map<String, Object>{ 'pattern' => '%' + trimmed + '%', 'howMany' => SEARCH_LIMIT },
+            new Map<String, Object>{
+                'pattern' => '%' +
+                trimmed +
+                '%',
+                'howMany' => SEARCH_LIMIT,
+                'shipped' => BarnCRMShippedPermissionSets.NAMES
+            },
             AccessLevel.USER_MODE
         );
     }
@@ -202,7 +212,10 @@ public with sharing class FieldAccessService {
         Map<Id, PermissionSet> found = new Map<Id, PermissionSet>(
             (List<PermissionSet>) Database.queryWithBinds(
                 'SELECT Id, Label, Name FROM PermissionSet WHERE ' + ELIGIBLE + ' AND Id IN :ids',
-                new Map<String, Object>{ 'ids' => ids },
+                new Map<String, Object>{
+                    'ids' => ids,
+                    'shipped' => BarnCRMShippedPermissionSets.NAMES
+                },
                 AccessLevel.USER_MODE
             )
         );

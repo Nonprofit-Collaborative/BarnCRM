@@ -268,7 +268,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As the admin, open **Org Optimizer**, choose **Access Explorer**, then **Change Field Access** under **Show**. | **Permission Sets** with a search box, **Kind of Record**, an empty **Changes** list and **Recent Changes**. **Preview** is disabled. |
-| 2 | Type `FAM` in **Permission Sets** and choose both test sets. | Both appear under the search box. Type `System Administrator` and `Team Member`: neither a profile nor a permission set group is offered. Type `BarnCRM`: in a packaged install, no BarnCRM permission set is offered. |
+| 2 | Type `FAM` in **Permission Sets** and choose both test sets. | Both appear under the search box. Type `System Administrator` and `Team Member`: neither a profile nor a permission set group is offered. Type `BarnCRM`, then `Volunteers`: no permission set BarnCRM ships is offered, packaged or not. |
 | 3 | Choose **Contact** in **Kind of Record**. | A **Fields** table with **Field**, **API Name** and **Now**, reading **Read: 0 of 2. Edit: 0 of 2.** Required and system fields (Last Name, Created By) are not listed. A formula field says **Read only**. |
 | 4 | Tick **Email** and **Phone**, choose **Read and Edit** in **Access for the Ticked Fields**, press **Add to Changes**. | **Changes** lists **Contact**, **Email**, **Read and Edit** and **Contact**, **Phone**, **Read and Edit**. |
 | 5 | Choose **Relationship**, set **Access to the Kind of Record** to **Read**, press **Add to Changes**. | **Changes** adds **Relationship**, **(The kind of record)**, **Read**. |

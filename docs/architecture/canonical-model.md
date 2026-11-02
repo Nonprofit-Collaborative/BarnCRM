@@ -10493,7 +10493,9 @@ the Field Access Manager.
 **R-FA2 Who, and on what.** Every read and write requires Manage BarnCRM Settings and the
 system permission Manage Profiles and Permission Sets. A permission set can be chosen only when
 it is custom, not owned by a profile, of type Regular (not a group's calculated set, not a
-muting set) and has no namespace; at most 10 per change. Permission rows are read and written
+muting set), has no namespace and is not one BarnCRM ships (by name, from the generated
+`BarnCRMShippedPermissionSets`, kept complete by `check-shipped-permission-sets.py`, since the
+access syncs manage those); at most 10 per change. Permission rows are read and written
 only for the Ids of the sets chosen and checked, so rows held by a user license or permission
 set license are never touched. Profiles and permission set groups are never changed.
 

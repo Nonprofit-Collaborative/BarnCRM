@@ -38,6 +38,7 @@ ALLOWED_LITERALS = {
     "ModuleDetectionServiceTest.cls": "asserts the detection probes",
     "ModuleManagerServiceTest.cls": "asserts the admin permission set each module names",
     "NamespaceUtilTest.cls": "resolves a module object name without the module",
+    "BarnCRMShippedPermissionSets.cls": "every shipped set, never offered by C-65 (generated)",
 }
 
 # Module catalog records (BarnCRM_Module__mdt): their Probe_Object__c values name a module
