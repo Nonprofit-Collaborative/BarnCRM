@@ -543,6 +543,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | BarnCRM Fundraising app navigation and fallback layouts | Minor | Adds Contacts, Households, Organizations and Commitments tabs, plain list view names, and a fallback layout for each object. | Shipped | UX pass |
 | Giving owns the nonprofit setup steps | Minor | Giving contributes its own Setup Assistant steps (default fund and appeal, organization identity) and Health Check questions. | Shipped | C-29 |
 | Giving settings that ship on stay on | Minor | The first Giving settings save no longer switches off settings that ship on (apply gifts to installments, household soft credits, receipt logo). | Shipped | plan 11.3 |
+| New ship-on settings start on after an upgrade | Minor | A setting added in an upgrade that ships on (Send Weekly Admin Summary, Ask Reminders) is turned on once in an org that saved its settings before it, by the upgrade's post-install or a source deploy's setup step; an admin who turns it off afterwards keeps it off. A CI check makes every new ship-on checkbox join this step. | Shipped | QA-F2 |
 
 ---
 

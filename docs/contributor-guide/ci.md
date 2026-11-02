@@ -217,7 +217,15 @@ Salesforce org is needed for this job. Steps:
    So a feature that ships on reads as switched off on every fresh install and does nothing,
    silently, which is a defect only an org run finds (ADR-0035). This ran because C-15 had
    been writing one side of every relationship since it merged: the reciprocal upkeep read
-   its own shipped default as false.
+   its own shipped default as false. The same script also fails the build if a checkbox that
+   ships switched on is neither in its package's `SHIPPED_ON_ADDED_IN_UPGRADES` list (read by
+   `ShippedDefaultUpgrades.apply` from the package's post-install class) nor in the closed
+   `SHIPPED_BEFORE_UPGRADE_STEP` list of settings that shipped before that step existed, or if
+   a listed field no longer ships on (QA-F2). A setting added in an upgrade is otherwise off in
+   every org that saved settings before it, because the stored record already has the column
+   as false. The step turns each listed field on once per org, tracked by a count in
+   `Shipped_Defaults_Applied__c`, so an admin's later choice is never overridden. Append new
+   fields to the end of the list; never reorder or remove one.
    `scripts/ci/check-setting-object-explicit.py` fails the build if a Setting Definition
    record omits `Settings_Object__c`. A custom metadata default is applied only when a record
    is created, never when a record that omits the field is redeployed or upgraded, so an org

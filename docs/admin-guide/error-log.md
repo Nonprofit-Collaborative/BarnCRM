@@ -80,8 +80,9 @@ administrator would otherwise have to go looking for:
 An email is sent when there are new Error Log entries or something to report; when there is
 neither, nothing is sent. With no new entries the subject reads **BarnCRM: Weekly Admin
 Summary**. Like the rest of the digest, it counts and names; it never copies record content.
-The summary is on by default for a weekly digest. To turn it off, clear **Weekly admin
-summary** on the same page. A daily digest never carries it. The setting reads: the weekly
+The summary is on by default for a weekly digest, including in an org that saved its BarnCRM
+Settings before the setting existed: the upgrade that adds it turns it on once. To turn it off,
+clear **Weekly admin summary** on the same page; it then stays off through later upgrades. A daily digest never carries it. The setting reads: the weekly
 summary reports BarnCRM jobs that failed this week, how many Setup changes were kept this week,
 and two standing counts as they are when sent: org limits at 80 percent or more and duplicates
 waiting for review. If reading the admin summary fails, the failure is logged to the Error Log
