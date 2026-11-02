@@ -1,7 +1,7 @@
 /**
  * The one way Mirror saves a run record on its protected org-level settings in system mode:
- * the Opportunity mirror's last completed run and its summary (R-OM8, ADR-0038 point 4), read by
- * the Opportunity mirror page and by Health Check.
+ * the last completed run and its summary of the Opportunity mirror (R-OM8, ADR-0038 point 4) and
+ * of the Gift Transaction mirror (R-GT6), read by each mirror's page and by Health Check.
  *
  * A run executes as the administrator who started or scheduled it, and Mirror Settings is a
  * protected setting nobody edits outside the BarnCRM Settings console, so the run cannot save
@@ -12,10 +12,33 @@
  */
 public without sharing class MirrorSettingsWriter {
     public static void recordOpportunityMirrorRun(Datetime ranAt, String summary) {
-        Mirror_Settings__c keys = new Mirror_Settings__c(
-            Opportunity_Mirror_Last_Run__c = ranAt,
-            Opportunity_Mirror_Last_Summary__c = summary == null ? null : summary.left(255)
+        record(
+            Mirror_Settings__c.Opportunity_Mirror_Last_Run__c,
+            Mirror_Settings__c.Opportunity_Mirror_Last_Summary__c,
+            ranAt,
+            summary
         );
+    }
+
+    /** The Gift Transaction mirror's last completed run and its summary (X-07, R-GT6). */
+    public static void recordGiftTransactionMirrorRun(Datetime ranAt, String summary) {
+        record(
+            Mirror_Settings__c.Gift_Transaction_Mirror_Last_Run__c,
+            Mirror_Settings__c.Gift_Transaction_Mirror_Last_Summary__c,
+            ranAt,
+            summary
+        );
+    }
+
+    private static void record(
+        Schema.SObjectField runField,
+        Schema.SObjectField summaryField,
+        Datetime ranAt,
+        String summary
+    ) {
+        Mirror_Settings__c keys = new Mirror_Settings__c();
+        keys.put(runField, ranAt);
+        keys.put(summaryField, summary == null ? null : summary.left(255));
         Id stored = lockStored();
         if (stored == null) {
             Mirror_Settings__c created = (Mirror_Settings__c) Mirror_Settings__c.SObjectType.newSObject(
@@ -23,8 +46,8 @@ public without sharing class MirrorSettingsWriter {
                 true
             );
             created.SetupOwnerId = UserInfo.getOrganizationId();
-            created.Opportunity_Mirror_Last_Run__c = keys.Opportunity_Mirror_Last_Run__c;
-            created.Opportunity_Mirror_Last_Summary__c = keys.Opportunity_Mirror_Last_Summary__c;
+            created.put(runField, keys.get(runField));
+            created.put(summaryField, keys.get(summaryField));
             try {
                 Database.insert(created, AccessLevel.SYSTEM_MODE);
                 return;

@@ -96,4 +96,180 @@
     <shortDescription>Gift Transaction mirror: no start date</shortDescription>
     <value>Nothing is copied until you set Gift Transaction mirror start date in BarnCRM Settings, Giving. Only gifts dated on or after it are copied.</value>
   </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_Unavailable</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: no Gift Transactions here</shortDescription>
+    <value>This org has no Nonprofit Cloud Gift Transactions you can use, so there is nothing to mirror. The Gift Transaction mirror needs Nonprofit Cloud fundraising and, for you, the Fundraising User permission. It is also unavailable when this org's Gift Transaction fields differ from what this version of BarnCRM expects.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_NoAccess</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: runner lacks access</shortDescription>
+    <value>You cannot create, edit or read Gift Transactions as the mirror needs, or you do not have the Gift Transaction Mirror permission set, so a run started by you would copy nothing.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_RunPaused</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: run skipped while paused</shortDescription>
+    <value>The Gift Transaction mirror run did nothing, because automation is paused on the Automation page. The next run after it resumes catches up.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_RunSwitchedOff</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: run skipped, switched off</shortDescription>
+    <value>The Gift Transaction mirror run did nothing, because the Gift Transaction mirror is switched off on the Automation page. Switch it on for its runs to work again.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_RunNotReady</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: run skipped, not ready</shortDescription>
+    <value>The Gift Transaction mirror run did nothing. {0}</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_LogNoHeadroom</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: records left for next run</shortDescription>
+    <value>The Gift Transaction mirror left some gifts for the next run, because copying them in the same transaction would have gone past Salesforce limits. The next run copies them.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_LogRun</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: run summary</shortDescription>
+    <value>Gift Transaction mirror run: {0} Gift Transactions created, {1} updated, {2} already up to date, {3} could not be copied (see the Warnings), {4} left for the next run; {5} designations written, {6} allocations to funds with no Gift Designation ID.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_DesignationsUnavailable</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: designations not writable</shortDescription>
+    <value>No designations were written: the person running the mirror cannot create Gift Transaction Designations, or this org's designation objects differ from what this version of BarnCRM expects.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_ErrorDatesRequired</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: compare needs both dates</shortDescription>
+    <value>Choose a start date and an end date.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_ErrorDateOrder</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: compare dates out of order</shortDescription>
+    <value>The start date must be on or before the end date.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_ErrorTooMany</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: compare range too large</shortDescription>
+    <value>This range holds more than 10,000 gifts or more than 10,000 Gift Transactions, or more records than one comparison can read. Choose a shorter range.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_NoLinkAccess</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: compare needs link access</shortDescription>
+    <value>Comparing needs the Gift Transaction Mirror permission set, which lets you read the Gift Transaction ID on a gift.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_NoRead</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: compare needs read access</shortDescription>
+    <value>Comparing needs read access to Gift Transactions and to their Name, Donor, Transaction Date, Original Amount and Status. Ask your administrator for it.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_DiffNoGiftTransaction</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: difference, not copied</shortDescription>
+    <value>No Gift Transaction</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_DiffMissing</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: difference, link gone</shortDescription>
+    <value>Gift Transaction deleted or not visible to you</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_DiffAmount</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: difference, amount</shortDescription>
+    <value>Amount differs</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_DiffDate</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: difference, date</shortDescription>
+    <value>Date differs</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_DiffStatus</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: difference, status</shortDescription>
+    <value>Gift Transaction does not have the paid status</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_DiffNoGift</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: difference, no gift</shortDescription>
+    <value>Paid Gift Transaction with no received gift visible to you</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_NightlyJob_GiftTransactionMirrorName</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Nightly jobs list: Gift Transaction mirror</shortDescription>
+    <value>Gift Transaction Mirror, 1:35 AM</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_HealthCheck_GiftTransactionMirrorNotRunTitle</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Health Check: Gift Transaction mirror stale, title</shortDescription>
+    <value>The Gift Transaction mirror has not run</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_HealthCheck_GiftTransactionMirrorNotRunDetail</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Health Check: Gift Transaction mirror stale, detail</shortDescription>
+    <value>The Gift Transaction mirror's nightly run is scheduled, but no run has completed since {0}. It runs as the person who scheduled it: if they were deactivated or lost access, every run fails before it starts. Open Gift Transaction Mirror in BarnCRM Settings, then stop the nightly run and schedule it again as someone who can run it. The Error Log says why the runs failed.</value>
+  </labels>
 </CustomLabels>
