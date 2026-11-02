@@ -46,6 +46,18 @@ Built so far (iteration 0.6):
   `Mirror_Settings__c.Opportunity_Mirror_Direction__c` is chosen. Shared pieces with Campaign
   sync are in `MirrorSync`. Permission set: `Opportunity_Mirror`. See
   `docs/admin-guide/opportunity-mirror.md` and canonical model Section 29C.
+- **Gift Transaction mirror (X-07).** Copies each received gift to a Nonprofit Cloud Gift
+  Transaction, with designations for funds that carry a `Gift_Designation_Id__c`, in runs only:
+  `GiftTransactionMirrorBatch` is Run Now and the nightly run (`GiftTransactionMirrorSchedulable`,
+  01:35), over `GiftTransactionMirrorService`. The link is `Gift__c.Gift_Transaction_Id__c`; the
+  `Gift_Transaction_Mirror` automation (`GiftTransactionMirrorTriggerHandler`) only checks a
+  typed link and reports deleted linked gifts. Every Nonprofit Cloud object is named only in
+  `GiftTransactionMirrorSchema` and resolved through describe, so Mirror installs without
+  Nonprofit Cloud and the mirror reports itself unavailable there; tests use its stand-ins.
+  `GiftTransactionMirrorReconciliation` compares a date range on the `giftTransactionMirror`
+  page. Off until `Mirror_Settings__c.Gift_Transaction_Mirror_Direction__c` is chosen and a
+  start date is set. Permission set: `Gift_Transaction_Mirror`. See
+  `docs/admin-guide/gift-transaction-mirror.md` and canonical model Section 29C1.
 
 ## How to test it alone
 

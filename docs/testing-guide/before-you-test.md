@@ -125,7 +125,7 @@ scripts/org/deploy-packages.sh <alias>
 Then give your login user the module admin permission sets:
 
 ```bash
-sf org assign permset --target-org <alias> --name Rollup_Builder_Admin --name Giving_Admin --name Volunteers_Admin --name Opportunity_Mirror --name Campaign_Sync --name Accounting_Export --name Inbound_Gift_API --name Record_Inbound_Gift_Action
+sf org assign permset --target-org <alias> --name Rollup_Builder_Admin --name Giving_Admin --name Volunteers_Admin --name Opportunity_Mirror --name Gift_Transaction_Mirror --name Campaign_Sync --name Accounting_Export --name Inbound_Gift_API --name Record_Inbound_Gift_Action
 ```
 
 To test Core alone (the Standard Edition with nothing else installed), skip this step and use a

@@ -272,4 +272,116 @@
     <shortDescription>Health Check: Gift Transaction mirror stale, detail</shortDescription>
     <value>The Gift Transaction mirror's nightly run is scheduled, but no run has completed since {0}. It runs as the person who scheduled it: if they were deactivated or lost access, every run fails before it starts. Open Gift Transaction Mirror in BarnCRM Settings, then stop the nightly run and schedule it again as someone who can run it. The Error Log says why the runs failed.</value>
   </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_Title</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: title</shortDescription>
+    <value>Gift Transaction Mirror</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_Intro</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: introduction</shortDescription>
+    <value>Gives each received gift a matching Nonprofit Cloud Gift Transaction, with its designations, so Nonprofit Cloud's donor summaries count the gifts you enter in BarnCRM. Run Now copies what is waiting. The nightly run catches up at 1:35 AM, your organization's time zone.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_SwitchedOff</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: direction is Off</shortDescription>
+    <value>The Gift Transaction mirror is off. Choose a direction in BarnCRM Settings, Giving, Gift Transaction mirror direction.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_DirectionGifts</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: what the direction does</shortDescription>
+    <value>Direction: Gifts to Gift Transactions. Received gifts dated on or after {0} get a matching Gift Transaction with status {1}.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_NoUsePermission</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: needs the permission set</shortDescription>
+    <value>The Gift Transaction mirror page needs the Gift Transaction Mirror permission set. Ask your BarnCRM admin for it.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_RunNow</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: Run Now button</shortDescription>
+    <value>Run Now</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_ScheduleNightly</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: schedule button</shortDescription>
+    <value>Schedule Nightly Run</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_StopSchedule</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: stop button</shortDescription>
+    <value>Stop Nightly Run</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_ReconciliationIntro</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: reconciliation intro</shortDescription>
+    <value>Compare the received gifts dated in a range with the Gift Transactions of the paid status dated in it, as you can see them.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_CopyAgain</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: copy range button</shortDescription>
+    <value>Copy These Gifts Again</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_GiftTransactionSide</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: paid count and total</shortDescription>
+    <value>Paid Gift Transactions: {0}, total {1}</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_ColumnGiftTransaction</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: column</shortDescription>
+    <value>Gift Transaction</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_ColumnGiftTransactionAmount</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: column</shortDescription>
+    <value>Original Amount</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_ColumnTransactionDate</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror page: column</shortDescription>
+    <value>Transaction Date</value>
+  </labels>
 </CustomLabels>
