@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Funders_Grant_BadProgram</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant Program field holds something that is not a program</shortDescription>
+        <value>Choose the program in the Program card on the grant's page. This is not a program.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_HealthCheck_PastDeadlineTitleOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: one open application past its deadline</shortDescription>
+        <value>1 grant application is past its deadline</value>
+    </labels>
+    <labels>
+        <fullName>Funders_HealthCheck_PastDeadlineTitle</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: open applications past deadline; {0} is how many</shortDescription>
+        <value>{0} grant applications are past their deadline</value>
+    </labels>
+    <labels>
+        <fullName>Funders_HealthCheck_PastDeadlineDetail</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: what open applications past deadline mean</shortDescription>
+        <value>These grants are still at Prospect, Letter of Inquiry or Invited to Apply, but their Application Deadline has passed. Move each to Applied if it went in, set it to Withdrawn if you did not apply, or change the deadline if the funder extended it. The first ones are linked below.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_HealthCheck_MoreThan</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check count that stopped at its cap; {0} is the cap</shortDescription>
+        <value>More than {0}</value>
+    </labels>
+    <labels>
+        <fullName>Funders_SampleData_CountLabel</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sample data card: what the Funders number counts</shortDescription>
+        <value>Grants</value>
+    </labels>
+</CustomLabels>

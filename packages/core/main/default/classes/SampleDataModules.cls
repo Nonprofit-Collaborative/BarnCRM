@@ -8,7 +8,7 @@
  *
  * Loading is one module at a time on purpose. Core's stage batch finishes by starting the
  * first module, and each module's own load finishes by calling `startAfter` with its name,
- * which starts the module after it (Giving, then Volunteers, then Programs), so a module never needs to know
+ * which starts the module after it (Giving, then Volunteers, then Programs, then Funders), so a module never needs to know
  * which modules come after it. A module runs its stages through
  * SampleDataStageBatch (see SampleDataStages), because a queueable chain stops after five
  * jobs in Developer Edition, trial and scratch orgs.
@@ -22,7 +22,8 @@ public with sharing class SampleDataModules {
     private static final List<String> MODULE_CLASS_NAMES = new List<String>{
         'GivingSampleData',
         'VolunteersSampleData',
-        'ProgramsSampleData'
+        'ProgramsSampleData',
+        'FundersSampleData'
     };
 
     /** Injected by the tests, which have no other package to resolve a real module from. */

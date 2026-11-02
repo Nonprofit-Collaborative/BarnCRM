@@ -1020,7 +1020,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     if volunteers_has_metadata; then
       SETUP_MODULES+=(Volunteers)
     fi
-    SETUP_MODULES+=(Programs LogicModels Mirror)
+    SETUP_MODULES+=(Programs LogicModels Funders Mirror)
     for module in "${SETUP_MODULES[@]}"; do
       echo ""
       echo "== Running the ${module} module's setup steps =="
@@ -1081,6 +1081,14 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   echo "== Queueing the Logic Models access sync =="
   if ! printf '%s\n' 'new LogicModelsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
     echo "The Logic Models access sync was not queued. Nothing else is affected: the hourly access"
+    echo "check syncs the access."
+  fi
+
+  # The same gap for the Funders permission sets (ADR-NEXT, funders module, decision 9).
+  echo ""
+  echo "== Queueing the Funders access sync =="
+  if ! printf '%s\n' 'new FundersAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Funders access sync was not queued. Nothing else is affected: the hourly access"
     echo "check syncs the access."
   fi
 fi
