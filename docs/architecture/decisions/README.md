@@ -167,6 +167,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [NEXT](NEXT-npsp-household-adoption-in-core.md) | NPSP household adoption lives in Core, converts Accounts in place, and is undone from a journal | Proposed |
 | [NEXT](NEXT-where-used-extension.md) | Where Used reads BarnCRM's own setup records, and modules add theirs through an extension seam | Proposed (builder decision) |
 | [NEXT](NEXT-indicator-sources.md) | Indicator sources: hand entry, a Core Import template, or a Find saved query counted per period in system mode | Proposed |
+| [NEXT](NEXT-gift-transaction-mirror.md) | The Gift Transaction mirror copies gifts one way, in runs, with designations from each fund's link | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

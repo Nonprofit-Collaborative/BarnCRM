@@ -64,7 +64,7 @@ page, even if that puts it out of reading order.
 | [Giving: donor scoring](giving-donor-scoring.md) | RFM | 3 | Scores and segment on the donor, cutoffs, segment templates |
 | [Giving: refunds and write-offs](giving-refunds.md) | REF | 7 | Refunds and their effect on totals |
 | [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 8 | Giving totals, recalculation, dashboards and reports, donor segments |
-| [Mirror](mirror.md) | MIR | 13 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API |
+| [Mirror](mirror.md) | MIR | 15 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API, Gift Transaction mirror |
 | [Volunteers](volunteers.md) | VOL | 15 | Jobs, shifts, sign-ups, hours and approval, skills, shift reminders, suggested volunteers |
 | [Programs](programs.md) | PRG | 18 | Programs, services, enrollments, roster import, the Program Roster panel, a person's Programs card and last service, Programs access, Health Check, sample data, the Service Delivery Log and the delivery rules, intake and eligibility, the Programs Settings page, case notes, participant privacy, the Programs Dashboard, counts without names, referrals, eligibility screening rules |
 | [Programs](programs.md) | PRG | 16 | Programs, services, enrollments, roster import, the Program Roster panel, a person's Programs card and last service, Programs access, Health Check, sample data, the Service Delivery Log and the delivery rules, intake and eligibility, the Programs Settings page, case notes, participant privacy, the Programs Dashboard, service plans and goals |
