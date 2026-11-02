@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Cohort_In_Program</fullName>
+  <active>true</active>
+  <description>
+    R-EN8: an enrollment's cohort is a cohort of the enrollment's program.
+  </description>
+  <errorConditionFormula>
+AND(
+  NOT(ISBLANK(Cohort__c)),
+  Cohort__r.Program__c &lt;&gt; Program__c
+)
+  </errorConditionFormula>
+  <errorDisplayField>Cohort__c</errorDisplayField>
+  <errorMessage>
+    Choose a cohort of this program.
+  </errorMessage>
+</ValidationRule>

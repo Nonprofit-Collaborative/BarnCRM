@@ -89,12 +89,14 @@ public with sharing class ModuleManagerService {
         },
         'Programs' => new List<String>{
             'Case_Note__c',
+            'Cohort__c',
             'Enrollment__c',
             'Goal__c',
             'Goal_Step__c',
             'Program__c',
             'Service__c',
-            'Service_Delivery__c'
+            'Service_Delivery__c',
+            'Session__c'
         },
         'LogicModels' => new List<String>{
             'Indicator__c',
