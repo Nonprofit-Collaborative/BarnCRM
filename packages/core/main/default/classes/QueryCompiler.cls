@@ -11,7 +11,9 @@
  * Giving's donor segments (G-28, canonical model R-DS3 to R-DS5) count, list and export saved
  * queries through this class, so it and exactly the members they reach are namespace accessible:
  * `QueryCompilerException`, `Compiled`, `EXPORT_PAGE_SIZE`, `compile`, `compileExportPage`,
- * `count(String, Integer)`, `run` and `resolve`.
+ * `count(String, Integer)`, `run` and `resolve`. Logic Models' computed indicators (L-03,
+ * canonical model R-IN4 and R-IN5) compile a saved query as the person and read its records in
+ * batches, so `Compiled.objectName`, `Compiled.fromWhere` and `Compiled.binds` are too.
  */
 @NamespaceAccessible
 public with sharing class QueryCompiler {
@@ -50,10 +52,13 @@ public with sharing class QueryCompiler {
     public class Compiled {
         public String soql;
         public String display;
+        @NamespaceAccessible
         public Map<String, Object> binds;
+        @NamespaceAccessible
         public String objectName;
         public List<String> fields;
         /** The FROM and WHERE part, for a count of the same records. */
+        @NamespaceAccessible
         public String fromWhere;
     }
 

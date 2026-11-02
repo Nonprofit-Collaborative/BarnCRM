@@ -47,6 +47,11 @@ public with sharing class LogicModelService {
             'programsAvailable' => programType() != null,
             'canEdit' => elements.isCreateable() && elements.isUpdateable(),
             'canDelete' => elements.isDeletable(),
+            'canSetSource' => Schema.SObjectType.Indicator__c.fields.Source__c.isUpdateable(),
+            'canRefresh' => Indicator_Period__c.SObjectType.getDescribe(
+                    SObjectDescribeOptions.DEFERRED
+                )
+                .isUpdateable(),
             'elements' => elementsOf(modelId),
             'links' => linksOf(modelId),
             'indicators' => indicatorsOf(modelId)
@@ -103,7 +108,7 @@ public with sharing class LogicModelService {
 
     private static List<Map<String, Object>> indicatorsOf(Id modelId) {
         List<Map<String, Object>> rows = new List<Map<String, Object>>();
-        for (Indicator__c indicator : [
+        List<Indicator__c> indicators = [
             SELECT
                 Id,
                 Name,
@@ -113,6 +118,10 @@ public with sharing class LogicModelService {
                 Baseline_Value__c,
                 Baseline_Date__c,
                 Description__c,
+                Source__c,
+                Source_Definition__c,
+                Source_Status__c,
+                Computed_At__c,
                 (
                     SELECT
                         Id,
@@ -129,7 +138,20 @@ public with sharing class LogicModelService {
             WHERE Element__r.Logic_Model__c = :modelId
             WITH USER_MODE
             ORDER BY CreatedDate
+        ];
+        // The source query's Id in system mode: a person without access to Find's saved queries
+        // cannot read the lookup, yet still sees the indicator. Its name is read as them.
+        Map<Id, Id> queryByIndicator = new Map<Id, Id>();
+        for (Indicator__c indicator : [
+            SELECT Id, Source_Query__c
+            FROM Indicator__c
+            WHERE Id IN :indicators AND Source_Query__c != NULL
+            WITH SYSTEM_MODE
         ]) {
+            queryByIndicator.put(indicator.Id, indicator.Source_Query__c);
+        }
+        Map<Id, String> queryNames = queryNames(new Set<Id>(queryByIndicator.values()));
+        for (Indicator__c indicator : indicators) {
             List<Map<String, Object>> periods = new List<Map<String, Object>>();
             for (Indicator_Period__c period : indicator.Periods__r) {
                 periods.add(
@@ -154,11 +176,56 @@ public with sharing class LogicModelService {
                     'baselineValue' => indicator.Baseline_Value__c,
                     'baselineDate' => indicator.Baseline_Date__c,
                     'description' => indicator.Description__c,
+                    'source' => String.isBlank(indicator.Source__c)
+                        ? IndicatorSourceService.MANUAL
+                        : indicator.Source__c,
+                    'queryId' => queryByIndicator.get(indicator.Id),
+                    'queryName' => queryNames.get(queryByIndicator.get(indicator.Id)),
+                    'definition' => definitionOf(indicator.Source_Definition__c),
+                    'status' => indicator.Source_Status__c,
+                    'computedAt' => indicator.Computed_At__c,
                     'periods' => periods
                 }
             );
         }
         return rows;
+    }
+
+    /** A computed source's choices as plain JSON, or null. */
+    private static Map<String, Object> definitionOf(String stored) {
+        IndicatorSourceService.Definition definition = IndicatorSourceService.parse(stored);
+        return definition == null
+            ? null
+            : new Map<String, Object>{
+                  'dateField' => definition.dateField,
+                  'function' => definition.function,
+                  'field' => definition.field,
+                  'dateLabel' => definition.dateLabel,
+                  'fieldLabel' => definition.fieldLabel
+              };
+    }
+
+    /**
+     * The names of the saved queries the person can open; a query they cannot open has no name
+     * here, and the builder says "a saved query".
+     */
+    private static Map<Id, String> queryNames(Set<Id> queryIds) {
+        Map<Id, String> names = new Map<Id, String>();
+        if (
+            queryIds.isEmpty() ||
+            !Saved_Query__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()
+        ) {
+            return names;
+        }
+        for (Saved_Query__c query : [
+            SELECT Id, Name
+            FROM Saved_Query__c
+            WHERE Id IN :queryIds
+            WITH USER_MODE
+        ]) {
+            names.put(query.Id, query.Name);
+        }
+        return names;
     }
 
     // ------------------------------------------------------------------------------ programs
@@ -486,14 +553,23 @@ public with sharing class LogicModelService {
         if (same > 0) {
             throw new BuilderException(Label.LogicModels_Builder_PeriodExists);
         }
+        Indicator__c indicator = [
+            SELECT Element__c, Source__c
+            FROM Indicator__c
+            WHERE Id = :indicatorId
+            WITH USER_MODE
+        ];
         Indicator_Period__c period = new Indicator_Period__c(
             Name = text(fields, 'name'),
             Start_Date__c = startDate,
             End_Date__c = endDate,
             Target_Value__c = number(fields, 'targetValue'),
-            Result_Value__c = number(fields, 'resultValue'),
             Notes__c = text(fields, 'notes')
         );
+        // A computed indicator's results are written by its refresh only (R-IN3).
+        if (indicator.Source__c != IndicatorSourceService.COMPUTED) {
+            period.Result_Value__c = number(fields, 'resultValue');
+        }
         if (periodId == null) {
             period.Indicator__c = indicatorId;
             insert as user period;
@@ -501,9 +577,7 @@ public with sharing class LogicModelService {
             period.Id = periodId;
             update as user period;
         }
-        Id elementId = [SELECT Element__c FROM Indicator__c WHERE Id = :indicatorId WITH USER_MODE]
-        .Element__c;
-        return modelOfElement(elementId);
+        return modelOfElement(indicator.Element__c);
     }
 
     /**

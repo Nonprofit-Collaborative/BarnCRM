@@ -78,6 +78,32 @@ import MET from '@salesforce/label/c.LogicModels_Period_Met';
 import PERCENT from '@salesforce/label/c.LogicModels_Period_Percent';
 import NO_PERIODS from '@salesforce/label/c.LogicModels_Period_None';
 import ACTIONS from '@salesforce/label/c.LogicModels_Period_Actions';
+import SOURCE from '@salesforce/label/c.LogicModels_Source_Title';
+import SOURCE_MANUAL from '@salesforce/label/c.LogicModels_Source_Manual';
+import SOURCE_IMPORT from '@salesforce/label/c.LogicModels_Source_Import';
+import SOURCE_COMPUTED from '@salesforce/label/c.LogicModels_Source_Computed';
+import RESULTS_ARE from '@salesforce/label/c.LogicModels_Source_ResultsAre';
+import COMPUTED_FROM from '@salesforce/label/c.LogicModels_Source_ComputedFrom';
+import SOME_QUERY from '@salesforce/label/c.LogicModels_Source_SomeQuery';
+import LAST_RUN from '@salesforce/label/c.LogicModels_Source_LastRun';
+import NOT_RUN_YET from '@salesforce/label/c.LogicModels_Source_NotRunYet';
+import SAVED_QUERY from '@salesforce/label/c.LogicModels_Source_Query';
+import SAVED_QUERY_HELP from '@salesforce/label/c.LogicModels_Source_QueryHelp';
+import NO_QUERIES from '@salesforce/label/c.LogicModels_Source_NoQueries';
+import DATE_FIELD from '@salesforce/label/c.LogicModels_Source_DateFieldLabel';
+import WORK_OUT from '@salesforce/label/c.LogicModels_Source_Function';
+import COUNT from '@salesforce/label/c.LogicModels_Source_Count';
+import SUM from '@salesforce/label/c.LogicModels_Source_Sum';
+import UNIQUE from '@salesforce/label/c.LogicModels_Source_Unique';
+import FIELD from '@salesforce/label/c.LogicModels_Source_FieldLabel';
+import REFRESH from '@salesforce/label/c.LogicModels_Source_Refresh';
+import REFRESHING from '@salesforce/label/c.LogicModels_Source_Refreshing';
+import RESULT_COMPUTED from '@salesforce/label/c.LogicModels_Source_ResultComputed';
+import COUNT_OF from '@salesforce/label/c.LogicModels_Source_CountOf';
+import SUM_OF from '@salesforce/label/c.LogicModels_Source_SumOf';
+import UNIQUE_OF from '@salesforce/label/c.LogicModels_Source_UniqueOf';
+import DOWNLOAD_RESULTS from '@salesforce/label/c.LogicModels_Results_Download';
+import NO_RESULT_ROWS from '@salesforce/label/c.LogicModels_Results_None';
 
 export const LABELS = Object.freeze({
   title: TITLE,
@@ -148,7 +174,33 @@ export const LABELS = Object.freeze({
   met: MET,
   percent: PERCENT,
   noPeriods: NO_PERIODS,
-  actions: ACTIONS
+  actions: ACTIONS,
+  source: SOURCE,
+  sourceManual: SOURCE_MANUAL,
+  sourceImport: SOURCE_IMPORT,
+  sourceComputed: SOURCE_COMPUTED,
+  resultsAre: RESULTS_ARE,
+  computedFrom: COMPUTED_FROM,
+  someQuery: SOME_QUERY,
+  lastRun: LAST_RUN,
+  notRunYet: NOT_RUN_YET,
+  savedQuery: SAVED_QUERY,
+  savedQueryHelp: SAVED_QUERY_HELP,
+  noQueries: NO_QUERIES,
+  dateField: DATE_FIELD,
+  workOut: WORK_OUT,
+  count: COUNT,
+  sum: SUM,
+  unique: UNIQUE,
+  field: FIELD,
+  refresh: REFRESH,
+  refreshing: REFRESHING,
+  resultComputed: RESULT_COMPUTED,
+  countOf: COUNT_OF,
+  sumOf: SUM_OF,
+  uniqueOf: UNIQUE_OF,
+  downloadResults: DOWNLOAD_RESULTS,
+  noResultRows: NO_RESULT_ROWS
 });
 
 const STAGE_LABELS = Object.freeze({

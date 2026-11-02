@@ -10383,11 +10383,17 @@ is better and a baseline. Its periods (29ZG) hold the targets and results.
 | Baseline Value | number | no | The starting value, before the work. |
 | Baseline Date | date | no | When the baseline was measured. |
 | Description | long text | no | How it is measured. |
+| Source | picklist(Manual, Import, Computed) | no (defaults Manual) | Where the results come from (L-03). Blank reads as Manual. |
+| Source Query | reference(Saved Query) | conditional | For Computed: the Find saved query whose records are counted (its object and filter). |
+| Source Definition | long text (JSON) | conditional | For Computed: `{"version": 1, "dateField": "...", "function": "count", "field": null}`; function count, sum or unique; field is the number summed or the value counted once (R-IN4). |
+| Source Status | text | no | For Computed: blank when the last refresh worked, else what stopped it, in plain words. |
+| Computed At | date-time | no | For Computed: when the results were last worked out. |
 
 ### Relationships
 
 - **Indicator to Element**, many to one, as a detail of the element.
 - **Indicator to Indicator Period**, one to many; the period is a detail of the indicator.
+- **Indicator to Saved Query**, many to one, optional (Computed); deleting the query empties it.
 
 ### Rules
 
@@ -10398,6 +10404,29 @@ is better and a baseline. Its periods (29ZG) hold the targets and results.
 the target: met when the result is at or beyond the target in the indicator's direction, and
 otherwise the share of the way from the baseline (or zero) to the target. Computed in the
 builder's module, never stored.
+
+**R-IN3 Sources (L-03, ADR-NEXT).** Manual results are typed in the builder. Import results are
+loaded with the shipped one-object Import template Indicator Results (Indicator Period, Update by
+record Id; columns Period Id, Target, Result, Notes), filled in from the builder's Download
+Results Sheet, in the user's own access. Computed results are written only by the refresh
+(R-IN5): the builder shows them read only and a period save keeps the stored result. Only Logic
+Models Admin can edit the source fields.
+
+**R-IN4 Computed definition.** Saved only when the saved query is one the person can open and it
+compiles as them (Find, R-SQ2), the date field is a date or date-time of the query's object, a
+sum field is a number and a unique field is groupable, each resolved through the person's
+describe. A record belongs to every period whose start and end dates hold its date (a date-time
+read in the running user's time zone).
+
+**R-IN5 Refresh.** A batch, one indicator at a time, started by Refresh Results, by saving a
+computed source, and nightly (job BarnCRM Indicator Results, a `NightlyJobProvider` job). The
+query compiles as the running user; its records are read in system mode, so the result is the
+organization's figure whatever the runner's sharing. Every period that has started gets its
+Result Value (zero when no record falls in it); a period not yet started is left alone; Computed
+At is set and Source Status cleared. A failure writes Source Status and changes no result.
+
+**R-IN6 Unique counts.** Count Unique keeps each period's values in the batch's state; near the
+heap limit it stops and writes Source Status instead of a wrong number.
 
 ### Salesforce implementation
 
@@ -10412,8 +10441,16 @@ builder's module, never stored.
 | Baseline Value | `Baseline_Value__c` | Number(16, 2) |
 | Baseline Date | `Baseline_Date__c` | Date |
 | Description | `Description__c` | Long Text Area(32768) |
+| Source | `Source__c` | Picklist: Manual (default), Import, Computed; restricted |
+| Source Query | `Source_Query__c` | Lookup to `Saved_Query__c`, delete Set Null, relationship name Logic_Model_Indicators |
+| Source Definition | `Source_Definition__c` | Long Text Area(4000) |
+| Source Status | `Source_Status__c` | Text(255) |
+| Computed At | `Computed_At__c` | Date/Time |
 
 - **Validation rules:** `Output_Or_Outcome_Only` (R-IN1).
+- **Service:** `IndicatorSourceService` (R-IN3, R-IN4), `IndicatorResultsBatch` (without sharing,
+  R-IN5, R-IN6), `IndicatorResultsScheduler` with `LogicModelsNightlyJobProvider` (R-IN5).
+- **Import template:** `Import_Template_Default.Indicator_Results` (R-IN3).
 
 ---
 
@@ -10433,7 +10470,7 @@ An indicator's target and result for one stretch of time (L-02): "2026 Q1", "Sch
 | Start Date | date | yes | First day of the period. |
 | End Date | date | yes | Last day of the period. |
 | Target Value | number | no | What the organization aims for in the period. |
-| Result Value | number | no | What it reached. Typed by hand in 0.14; L-03 adds import and computed sources. |
+| Result Value | number | no | What it reached: typed, imported, or computed, as the indicator's Source says (R-IN3). |
 | Notes | long text | no | What explains the result. |
 
 ### Relationships
@@ -10777,6 +10814,7 @@ mirrors the primary member).
 | 0.14 | 2026-10-31 | Programs P-08. `Enrollment__c` (29ZA) and `Service_Delivery__c` (29ZB) change from Public Read/Write to Private, each shared with the new public group `Programs_Participants` through the Apex sharing reason `Programs_Participants__c` (R-EN7, R-SD6). New hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox, default unchecked): the Participant Privacy preset, Shared by default, which puts All Internal Users in the group, or Private, which takes them out. Programs Admin gains View All and Modify All on both objects. |
 | 0.14 | 2026-10-31 | Programs P-05. The Programs Dashboard (29ZA, "Program dashboard") and the person card's last service date and services attended. No object or field added. |
 | 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29ZA, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
+| 0.15 | 2026-11-02 | Logic Models L-03 indicator sources (ADR-NEXT `NEXT-indicator-sources.md`). `Indicator__c` (29ZF) gains Source (`Source__c`), Source Query (`Source_Query__c`, lookup to `Saved_Query__c`), Source Definition (`Source_Definition__c`), Source Status (`Source_Status__c`) and Computed At (`Computed_At__c`), with rules R-IN3 to R-IN6; the one-object import template Indicator Results loads Indicator Period results. |
 
 ---
 ## 32. Entity ownership by package

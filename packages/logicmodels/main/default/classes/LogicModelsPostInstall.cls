@@ -5,7 +5,8 @@
  * Each step is safe to run twice and none can abort an install, since every failure is written
  * to the Error Log instead:
  *
- * 1. Create the switch rows of the Automation page for the module's own automations (C-21).
+ * 1. Create the switch rows of the Automation page for the module's own automations (C-21),
+ *    and the module's Import template, Indicator Results (L-03, ADR-NEXT).
  * 2. Queue the job that gives the installer the Logic Models Admin permission set. Queued because a
  *    permission set assignment is a setup object write, and this transaction has already written
  *    ordinary records (mixed DML).
@@ -21,6 +22,7 @@ public with sharing class LogicModelsPostInstall implements InstallHandler, Modu
     /** The module's key in the module catalog and the setup marker. */
     private static final String MODULE_KEY = 'LogicModels';
     private static final String SWITCH_CONTEXT = 'LogicModelsPostInstall.ensureAutomationSwitches';
+    private static final String IMPORT_CONTEXT = 'LogicModelsPostInstall.materializeImportTemplates';
     @TestVisible
     private static final String ACCESS_CONTEXT = 'LogicModelsPostInstall.grantInstallerAccess';
 
@@ -51,6 +53,7 @@ public with sharing class LogicModelsPostInstall implements InstallHandler, Modu
     public void runSetup(Id installerId) {
         // Each entry point records its own failures and returns, so nothing here throws.
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
+        ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);
         ModuleSetups.markRan(MODULE_KEY);
         if (installerId == null) {
             new LogicModelsAccessSync().requestSync();

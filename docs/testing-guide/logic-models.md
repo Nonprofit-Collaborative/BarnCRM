@@ -1,6 +1,7 @@
 # Logic Models
 
-Scripts for the Logic Model Builder (L-01) and indicators (L-02). Setup detail:
+Scripts for the Logic Model Builder (L-01), indicators (L-02) and indicator sources (L-03). Setup
+detail:
 [Logic Models](../admin-guide/logic-models.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and Logic Models
@@ -100,3 +101,38 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 | 3 | Open the model in the Salesforce mobile app, or narrow the browser to phone width. | The columns stack, one above another, with no sideways scrolling. |
 
 **Cleanup:** None.
+
+## T-LM-07: Imported Results
+
+**Purpose:** confirm the results sheet round trip through Import updates periods and creates nothing.
+**Prerequisites:** admin, the model and `2026 Q1` period from T-LM-03.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On `Students reading daily` click **Source**, choose **Imported**, **Save**. | The line under it reads `Results: Imported.` |
+| 2 | Click **Download Results Sheet**. Open the file. | One row per period of every indicator not computed, headed `Period Id`, `Logic Model`, `Part`, `Indicator`, `Unit`, `Period`, `Start Date`, `End Date`, `Target`, `Result`, `Notes`. |
+| 3 | Set the `2026 Q1` row's **Result** to `25`, add a row with **Period Id** `a0Z000000000000AAA`, save as CSV. In **Import** choose the **Indicator Results** template and load it. | The dry run shows one update and one rejected row (no period found); nothing is created. Commit. |
+| 4 | Reload the model. | `2026 Q1` shows result `25` and its progress. |
+| 5 | In **Import**, undo the batch. | The result goes back to the value before. |
+
+**Cleanup:** None.
+
+## T-LM-08: Computed Results
+
+**Purpose:** confirm a computed indicator counts records per started period, is read only, and reports problems.
+**Prerequisites:** admin and staff, the model from T-LM-01. At least three contacts created this month.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, in **Find**, query **Contacts** with no filter and save it as `All people`. | Saved. |
+| 2 | On `Sessions held` add the indicator `People in our records`. Add a period `This year` from 1 January to 31 December of this year, and `Next year` for next year. | Two rows; no results. |
+| 3 | Click **Source**, choose **Computed**, **Saved Query** `All people`, **Date Field** `Created Date`, **Work Out** `Count`, **Save**. | Status `Working out the results. They appear in a few minutes: reload the page to see them.` The line reads `Results: computed from All people, count of records by Created Date.` |
+| 4 | Wait two minutes and reload. | `This year` shows the number of contacts created this year; `Next year` stays blank. The line under the indicator says when it was last worked out. |
+| 5 | Click **Edit** on `This year`. | **Result** is disabled, with help saying it is worked out from the source. Change the target and save: the result does not change. |
+| 6 | Click **Source**, change **Work Out** to **Count Unique** with **Field** `Account ID`, save, wait and reload. | `This year` shows how many different accounts the new contacts belong to. |
+| 7 | Choose **Sum** with **Date Field** `Created Date`: open **Field**. | Only number fields are offered. Cancel. |
+| 8 | As staff (Program Staff role, no Find access), open the model. | The indicator line reads `computed from a saved query`; there is no **Source** button; **Refresh Results** is there and works. |
+| 9 | As admin, delete `All people` in **Find**, then click **Refresh Results** and reload after a minute. | The indicator shows in red that the saved query can't be found; the results are unchanged. |
+| 10 | In **Health Check**, look at nightly jobs. | `Indicator Results, 3:30 AM` is listed; **Schedule all nightly jobs** schedules it. |
+
+**Cleanup:** Delete `People in our records`.

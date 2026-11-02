@@ -13,8 +13,10 @@ You can build one logic model for the whole organization and, if you like, one f
 Logic Models works on its own: you do not need the Programs module, and nothing here is about
 program records until you choose a program for a model.
 
-Results are typed in by hand for now. Loading them from a file or working them out from other
-records (L-03) and a logic model report that compares periods (L-04) come in a later release.
+Each indicator's results are typed in by hand, loaded from a spreadsheet with BarnCRM Import, or
+worked out every night from other records (for example service deliveries, volunteer hours or
+gifts) through a query you save in Find (L-03). A logic model report that compares periods (L-04)
+comes in the same release.
 
 ## How to Turn It On
 
@@ -27,11 +29,17 @@ records (L-03) and a logic model report that compares periods (L-04) come in a l
 ### Installing
 
 Install it from **Module Manager** (see [Module Manager](module-manager.md)). When the install
-finishes, BarnCRM does three things on its own:
+finishes, BarnCRM does four things on its own:
 
 1. Creates the switch row for the module's automation on the **Automation** page.
-2. Gives you, the person who installed it, the **Logic Models Admin** permission set.
-3. Gives everyone who already has a BarnCRM role their Logic Models permission set (see below).
+2. Adds the **Indicator Results** template to **Import** (see [Where Results Come
+   From](#where-results-come-from)).
+3. Gives you, the person who installed it, the **Logic Models Admin** permission set.
+4. Gives everyone who already has a BarnCRM role their Logic Models permission set (see below).
+
+Logic Models also has one nightly job, **Indicator Results** (3:30 AM), which works out computed
+indicators. **Health Check** lists it with BarnCRM's other nightly jobs, and its **Schedule all
+nightly jobs** fix schedules it.
 
 Then open the **BarnCRM Logic Models** app from the App Launcher. Its tab is **Logic Models**,
 which also joins the BarnCRM apps.
@@ -45,7 +53,7 @@ You never assign the Logic Models permission sets by hand. Give people their Bar
 
 | BarnCRM role | Logic Models set they get | What they can do |
 |---|---|---|
-| Admin (anyone holding BarnCRM Admin) | Logic Models Admin | Everything, including deleting a whole logic model |
+| Admin (anyone holding BarnCRM Admin) | Logic Models Admin | Everything, including deleting a whole logic model and choosing where an indicator's results come from |
 | Coordinator | Logic Models Staff | Create logic models and build them: add, change and remove parts, arrows, indicators and periods; never deletes a whole model |
 | Team Member | Logic Models Staff | The same as Coordinator |
 | Read Only | Logic Models Read Only | Look at logic models, indicators and results |
@@ -140,6 +148,67 @@ The same start and end dates twice for one indicator are refused: change the row
 A part with indicators cannot be moved to the Inputs, Activities or Impact column; delete or
 move its indicators first.
 
+## Where Results Come From
+
+Each indicator shows its **Source** under its name. There are three, and only a Logic Models
+Admin can change one: click **Source** under the indicator.
+
+| Source | Where its results come from | Who fills in the result |
+|---|---|---|
+| **Typed In** (the default) | Typed into each period in the builder | Anyone who builds the model |
+| **Imported** | A spreadsheet loaded with BarnCRM Import | Whoever loads the file (results can also be typed) |
+| **Computed** | Worked out from other records, every night and on **Refresh Results** | Nobody: the builder shows the results read only |
+
+### Imported Results
+
+1. Add the indicator's periods (name and dates, and the target if you have one) in the builder.
+2. At the top of the builder click **Download Results Sheet**. You get a spreadsheet with one row
+   per period of every indicator that is not computed: **Period Id**, the model, part, indicator,
+   unit, period and dates, then **Target**, **Result** and **Notes**.
+3. Fill in **Result** (and **Notes** if you like). Leave **Period Id** alone: it is how BarnCRM
+   finds the row's period. Delete rows you are not updating.
+4. Open **Import**, choose the **Indicator Results** template and load the file. The dry run shows
+   what will change; nothing is created, only the periods named are updated, and Import's
+   results, journal and undo work as for any import. A row whose Period Id is not a period you can
+   see is reported, not loaded.
+
+### Computed Results
+
+A computed indicator counts records you already keep. You describe which records in **Find**,
+then tell the indicator how to count them.
+
+1. In **Find**, build and save a query of the records to count, for example service deliveries of
+   the Reading service, or volunteer hours that were approved. Leave dates out of the filter: the
+   indicator adds each period's dates itself. Share the query if other admins should be able to
+   change it.
+2. In the builder, click **Source** under the indicator and choose **Computed**.
+3. Pick the **Saved Query**, then the **Date Field** that places a record in a period (for example
+   Delivery Date).
+4. Pick what to work out:
+   - **Count**: how many records fall in the period.
+   - **Sum**: the total of a number field, for example Hours.
+   - **Count Unique**: how many different values of a field, for example the person on a service
+     delivery, so a person served ten times counts once (an unduplicated count).
+5. Save. The results are worked out within a few minutes, then every night at 3:30 AM. Click
+   **Refresh Results** to work them out again now.
+
+Every period that has started gets a result, zero when no record falls in it; a period that has
+not started yet is left blank. A record counts in every period that holds its date, so a year and
+its quarters each get their own figure. Under the indicator the builder shows when the results
+were last worked out, or what stopped them (for example the saved query was deleted, or a field
+in it can no longer be read).
+
+**Who sees what.** BarnCRM checks the query as the admin who saves the source: they must be able
+to open the saved query and read its object and fields. The count itself includes every matching
+record in the organization, including records the person who presses **Refresh Results** cannot
+see (for example participants hidden by the participant privacy preset), so the result is the
+organization's figure rather than one person's share. Only numbers are written, never names or
+details, and only a Logic Models Admin can choose what is counted.
+
+**Changing the query.** The indicator uses the saved query as it is when the results are worked
+out, so editing the query in Find changes the next results, and deleting it stops them (the
+builder says so). Choose another query under **Source**.
+
 ## A Five-Minute Walkthrough
 
 Do this as Maria, who holds the Admin role.
@@ -162,6 +231,14 @@ Do this as Maria, who holds the Admin role.
 8. On **Logic Models** click **New** again and save a second model without changing **For**. It
    is refused: the organization already has a model.
 9. Select "Two tutors" and click **Delete**, then confirm. The part and its arrow are gone.
+10. Click **Download Results Sheet**. Type 25 in the 2026 Q1 row's **Result**, save the file,
+    and load it in **Import** with the **Indicator Results** template. Back in the builder the
+    period shows 25.
+11. In **Find**, save a query of Contacts named "All people". Select "Sessions held", add an
+    indicator "People in our records", click **Source**, choose **Computed**, pick "All
+    people", Date Field **Created Date**, **Count**, and save. Add a period covering this year:
+    within a few minutes its result shows how many contacts were created this year, and the
+    **Result** box is read only.
 
 ## Common Mistakes
 
@@ -173,5 +250,12 @@ Do this as Maria, who holds the Admin role.
   that is there, or delete it first if it was a test.
 - **Deleting a part to rename it.** Deleting removes its indicators and their results. Select the
   part and change its name instead.
+- **Putting dates in a computed indicator's Find query.** The indicator adds each period's dates
+  itself; a date filter in the query leaves later periods at zero.
+- **Typing a result into a computed indicator.** Its results are worked out every night, so the
+  builder does not offer the box. Change the **Source** to **Typed In** first if you mean to
+  type them.
+- **Editing Period Id in the results sheet.** It is how Import finds the period; a changed or
+  missing one is reported, not loaded.
 - **Looking for the program in the model's fields.** The program is chosen with **Change** in the
   builder. The model's Program field holds an identifier BarnCRM fills in for you.

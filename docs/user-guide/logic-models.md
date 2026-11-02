@@ -79,6 +79,30 @@ reaches the target, or how far it got from the baseline, for example 50%.
 To record a result later, click **Edit** on the period's row. Each indicator has one row for the
 same start and end dates.
 
+## To Fill In Results From a Spreadsheet
+
+Under each indicator a line says where its results come from: **Typed In**, **Imported** or
+**Computed**.
+
+1. At the top of the builder click **Download Results Sheet**. It has one row per period of every
+   indicator that is not computed.
+2. Type each **Result** (and **Notes** if useful). Leave **Period Id** as it is.
+3. Open **Import**, choose the **Indicator Results** template and load the file.
+
+You should see: back in the builder, each period shows its new result and progress.
+
+## To Refresh a Computed Indicator
+
+A computed indicator's results are worked out from other records every night, so its **Result**
+box cannot be typed in. Under the indicator the builder says when they were last worked out, or
+what stopped them.
+
+1. Click **Refresh Results** under the indicator.
+2. Wait a few minutes and reload the page.
+
+You should see: the periods that have started show new results. Only an admin can change what an
+indicator counts (its **Source**).
+
 ## To See What Needs Attention
 
 **Things to Look At**, at the bottom of the builder, lists columns with nothing in them, parts with

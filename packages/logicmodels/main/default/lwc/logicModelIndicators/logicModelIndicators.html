@@ -105,6 +105,41 @@
           <template lwc:if={indicator.description}>
             <p class="slds-text-body_small slds-text-color_weak">{indicator.description}</p>
           </template>
+          <p class="slds-text-body_small" data-id="source-line">{indicator.sourceLine}</p>
+          <template lwc:if={indicator.computed}>
+            <template lwc:if={indicator.status}>
+              <p class="slds-text-body_small slds-text-color_error" data-id="source-status">
+                {indicator.status}
+              </p>
+            </template>
+            <template lwc:else>
+              <p class="slds-text-body_small slds-text-color_weak" data-id="source-run">
+                {indicator.runLine}
+              </p>
+            </template>
+          </template>
+          <template lwc:if={canSetSource}>
+            <lightning-button
+              data-id="indicator-source"
+              data-record-id={indicator.id}
+              variant="base"
+              label={labels.source}
+              disabled={busy}
+              onclick={handleSource}
+              class="slds-var-m-right_small"
+            ></lightning-button>
+          </template>
+          <template lwc:if={indicator.showRefresh}>
+            <lightning-button
+              data-id="indicator-refresh"
+              data-record-id={indicator.id}
+              variant="base"
+              label={labels.refresh}
+              disabled={busy}
+              onclick={handleRefresh}
+              class="slds-var-m-right_small"
+            ></lightning-button>
+          </template>
           <template lwc:if={canEdit}>
             <lightning-button
               data-id="indicator-edit"
@@ -134,6 +169,90 @@
               disabled={busy}
               onclick={handleDeleteIndicator}
             ></lightning-button>
+          </template>
+          <template lwc:if={indicator.sourceFormOpen}>
+            <div class="slds-box slds-var-m-vertical_x-small" data-id="source-form">
+              <lightning-combobox
+                data-id="source-kind"
+                data-field="source"
+                label={labels.source}
+                value={sourceDraft.source}
+                options={sourceOptions}
+                onchange={handleSourceField}
+              ></lightning-combobox>
+              <template lwc:if={sourceDraftComputed}>
+                <template lwc:if={hasQueryOptions}>
+                  <lightning-combobox
+                    data-id="source-query"
+                    data-field="queryId"
+                    label={labels.savedQuery}
+                    field-level-help={labels.savedQueryHelp}
+                    value={sourceDraft.queryId}
+                    options={queryOptions}
+                    required
+                    onchange={handleSourceField}
+                  ></lightning-combobox>
+                </template>
+                <template lwc:else>
+                  <p class="slds-text-color_weak slds-var-m-vertical_x-small" data-id="no-queries">
+                    {labels.noQueries}
+                  </p>
+                </template>
+                <div class="slds-grid slds-wrap slds-gutters_x-small">
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-combobox
+                      data-id="source-date"
+                      data-field="dateField"
+                      label={labels.dateField}
+                      value={sourceDraft.dateField}
+                      options={dateFieldOptions}
+                      disabled={noFieldChoices}
+                      required
+                      onchange={handleSourceField}
+                    ></lightning-combobox>
+                  </div>
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-combobox
+                      data-id="source-function"
+                      data-field="function"
+                      label={labels.workOut}
+                      value={sourceDraft.function}
+                      options={functionOptions}
+                      onchange={handleSourceField}
+                    ></lightning-combobox>
+                  </div>
+                  <template lwc:if={needsField}>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                      <lightning-combobox
+                        data-id="source-field"
+                        data-field="field"
+                        label={labels.field}
+                        value={sourceDraft.field}
+                        options={measuredFieldOptions}
+                        disabled={noFieldChoices}
+                        required
+                        onchange={handleSourceField}
+                      ></lightning-combobox>
+                    </div>
+                  </template>
+                </div>
+              </template>
+              <div class="slds-var-m-top_small">
+                <lightning-button
+                  data-id="source-save"
+                  variant="brand"
+                  label={labels.save}
+                  disabled={sourceSaveDisabled}
+                  onclick={handleSourceSave}
+                  class="slds-var-m-right_x-small"
+                ></lightning-button>
+                <lightning-button
+                  data-id="source-cancel"
+                  label={labels.cancel}
+                  onclick={handleSourceCancel}
+                ></lightning-button>
+              </div>
+            </div>
           </template>
           <template lwc:if={indicator.confirming}>
             <div class="slds-var-m-vertical_x-small" data-id="indicator-delete-confirm">
@@ -278,6 +397,8 @@
                     step="0.01"
                     label={labels.result}
                     value={periodDraft.resultValue}
+                    disabled={periodResultLocked}
+                    field-level-help={periodResultHelp}
                     onchange={handlePeriodField}
                   ></lightning-input>
                 </div>

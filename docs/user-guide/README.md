@@ -47,7 +47,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Logic Models (Nonprofit Edition)
 
-- [Logic models](logic-models.md): building a logic model with arrows and assumptions, and measuring outputs and outcomes with indicators, targets and results.
+- [Logic models](logic-models.md): building a logic model with arrows and assumptions, and measuring outputs and outcomes with indicators, targets and results, filled in by hand, from a spreadsheet or worked out from your records.
 
 ### Reports
 

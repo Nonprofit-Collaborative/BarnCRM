@@ -4,6 +4,9 @@ import getModel from '@salesforce/apex/LogicModelBuilderController.getModel';
 import getPrograms from '@salesforce/apex/LogicModelBuilderController.getPrograms';
 import setProgram from '@salesforce/apex/LogicModelBuilderController.setProgram';
 import saveElement from '@salesforce/apex/LogicModelBuilderController.saveElement';
+import { downloadCsv } from 'c/findCsv';
+
+jest.mock('c/findCsv', () => ({ ...jest.requireActual('c/findCsv'), downloadCsv: jest.fn() }));
 
 jest.mock('@salesforce/apex/LogicModelBuilderController.getModel', () => ({ default: jest.fn() }), {
   virtual: true
@@ -174,6 +177,41 @@ describe('c-logic-model-builder', () => {
     expect(q(element, 'scope-name').textContent).toBe('c.LogicModels_Builder_ProgramMissing');
     expect(q(element, 'change-scope')).toBeNull();
     expect(qa(element, 'add')).toHaveLength(0);
+  });
+
+  it('downloads the results sheet, or says there is nothing to fill in', async () => {
+    const empty = await render();
+    q(empty, 'download-results').click();
+    await flush();
+    expect(downloadCsv).not.toHaveBeenCalled();
+    expect(q(empty, 'error-message').textContent.trim()).toBe('c.LogicModels_Results_None');
+    document.body.removeChild(empty);
+
+    const element = await render(
+      model({
+        elements: [{ id: 'o1', name: 'Sessions held', type: 'Output', sortOrder: 10 }],
+        indicators: [
+          {
+            id: 'i1',
+            elementId: 'o1',
+            name: 'Sessions',
+            source: 'Import',
+            periods: [{ id: 'p1', name: 'Q1', startDate: '2026-01-01', endDate: '2026-03-31' }]
+          }
+        ]
+      })
+    );
+    q(element, 'download-results').click();
+    expect(downloadCsv).toHaveBeenCalledTimes(1);
+    const [fileBase, columns, rows] = downloadCsv.mock.calls[0];
+    expect(fileBase).toBe('Indicator_Results');
+    expect(columns[0].label).toBe('Period Id');
+    expect(rows).toEqual([expect.objectContaining({ periodId: 'p1', model: 'Reading' })]);
+  });
+
+  it('offers no results sheet to a reader', async () => {
+    const element = await render(model({ canEdit: false }));
+    expect(q(element, 'download-results')).toBeNull();
   });
 
   it('shows a failed load', async () => {
