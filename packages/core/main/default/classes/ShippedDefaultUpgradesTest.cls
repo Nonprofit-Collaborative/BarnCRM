@@ -89,7 +89,9 @@ private class ShippedDefaultUpgradesTest {
     @IsTest
     static void aFailureIsLoggedNotThrown() {
         System.runAs(TestUsers.admin()) {
+            Test.startTest();
             ShippedDefaultUpgrades.apply(null, BarnCRM_Settings__c.SObjectType, ADDED);
+            Test.stopTest();
             Assert.areEqual(
                 1,
                 [

@@ -47,20 +47,24 @@ public with sharing class ProgramPersonRule {
         }
     }
 
+    /** Test seam: the accounts to read as person accounts, for an org without them. */
+    @TestVisible
+    private static Set<Id> personAccountIdsForTest;
+
     private static Set<Id> personAccountIds(Set<Id> accountIds) {
-        Set<Id> people = new Set<Id>();
+        if (personAccountIdsForTest != null) {
+            return personAccountIdsForTest;
+        }
         if (!HouseholdService.isPersonAccountOrg()) {
-            return people;
+            return new Set<Id>();
         }
-        for (
-            SObject account : Database.queryWithBinds(
-                PERSON_ACCOUNTS_QUERY,
-                new Map<String, Object>{ 'accountIds' => accountIds },
-                AccessLevel.SYSTEM_MODE
+        return new Map<Id, SObject>(
+                Database.queryWithBinds(
+                    PERSON_ACCOUNTS_QUERY,
+                    new Map<String, Object>{ 'accountIds' => accountIds },
+                    AccessLevel.SYSTEM_MODE
+                )
             )
-        ) {
-            people.add(account.Id);
-        }
-        return people;
+            .keySet();
     }
 }

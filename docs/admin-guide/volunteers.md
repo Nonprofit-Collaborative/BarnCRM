@@ -257,10 +257,11 @@ books at noon for a shift that evening. Tell such volunteers directly.
 person who turned reminders on or saved the schedule), and replies go to that user. BarnCRM has
 no separate from address setting for volunteer reminders.
 
-**Who is never emailed.** A person with **Email Opt Out** checked on their contact, a person
-with no email address, a sign-up that is Cancelled or marked No show or Attended, and any
-shift that is Cancelled or has already started. Sign-ups that name a person account instead of
-a contact are not reminded.
+**Who is never emailed.** A person with **Email Opt Out** checked on their contact (or person
+account), a person with no email address, a sign-up that is Cancelled or marked No show or
+Attended, and any shift that is Cancelled or has already started. Where your people are person
+accounts, a sign-up that names the person account (as the Sign-Ups panel books one) is reminded
+at the person account's own **Email**, greeted by its first name.
 
 **Email limits.** Reminders go out through your Salesforce org's own email, so your org's daily
 limit on emails sent by Apex applies, and the same limit is shared with every other BarnCRM email
@@ -436,7 +437,8 @@ Completed. There is nothing to switch on.
 **Who is offered.** People whose **Volunteer Status** is **Active** and who have no sign-up on
 that shift (a cancelled one counts: change it instead of adding another). Of an org with more
 than 500 active volunteers, the 500 with the most hours are ranked, and the card says so.
-People held only as person accounts are not offered.
+Where your people are person accounts, they are offered too, and **Sign Up** books the person
+account, as **Add Sign-Up** does; one already booked on the shift by the account is not offered.
 
 **How they are ranked.** Each person scores points for what the data already says. Nothing
 here is a setting: the weights are fixed and listed so you can predict the order.

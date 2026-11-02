@@ -118,7 +118,9 @@ what was recorded without the controls.
 For someone who is not enrolled, or a one-off:
 
 1. Open the **Service Deliveries** tab and click **New**.
-2. Pick the **Service**, then a **Contact** or an **Account** (not both), the **Delivery Date**,
+2. Pick the **Service**, then a **Contact** or an **Account** (not both; an Account must be a
+   person, or you see "Choose a person. An organization or household account cannot be enrolled
+   or receive a service."), the **Delivery Date**,
    the **Attendance** and the **Quantity**.
 3. Click **Save**.
 

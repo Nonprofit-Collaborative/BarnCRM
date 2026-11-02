@@ -126,3 +126,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 7 | Create an open ask with a Target Date 20 days out, then close it as **Declined** with the ask's **Next Ask Date** set to yesterday. Reload the person. | **Next Ask Date** is empty: a past ask-again date is not carried. |
 
 **Cleanup:** delete the test asks and clear the person's **Next Ask Date**.
+
+## T-ASK-11: A Person Account Is One Donor
+
+**Purpose:** confirm that in a person account org an ask saved on the contact behind a person account is saved on the account, so the person is one donor.
+**Prerequisites:** a person account org (not barn-sales); a user with Giving Staff; a person account, Eli.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Ask Pipeline**, click **New Ask**, and choose Eli's contact as **Donor Contact**. Fill **Ask Amount** and **Target Date** and save. | The ask saves. Its **Donor Account** is Eli's account and **Donor Contact** is empty. |
+| 2 | Open Eli's account. | The ask is in its **Asks** list, and its **Next Ask Date** is the ask's Target Date. |
+| 3 | Create an ask for an ordinary contact (not a person account). | It keeps that contact as **Donor Contact**. |
+| 4 | Read the new asks' record numbers. | Each reads `ASK-` and six digits. |
+
+**Cleanup:** delete the test asks and clear Eli's **Next Ask Date**.

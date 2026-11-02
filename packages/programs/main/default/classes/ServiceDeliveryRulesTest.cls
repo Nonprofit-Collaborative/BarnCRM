@@ -176,6 +176,17 @@ private class ServiceDeliveryRulesTest {
                 System.Label.Programs_Person_NotAPerson,
                 result.getErrors()[0].getMessage()
             );
+
+            // The same account read as a person account, which an org without them cannot hold.
+            ProgramPersonRule.personAccountIdsForTest = new Set<Id>{ business.Id };
+            Assert.isTrue(
+                Database.insert(
+                        new Service_Delivery__c(Service__c = meal.Id, Account__c = business.Id),
+                        false
+                    )
+                    .isSuccess(),
+                'A person account receives services.'
+            );
         }
     }
 }
