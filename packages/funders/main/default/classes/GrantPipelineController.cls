@@ -99,16 +99,15 @@ public with sharing class GrantPipelineController {
             board.canEdit = Schema.SObjectType.Grant__c.isUpdateable();
             board.canCreate = Schema.SObjectType.Grant__c.isCreateable();
 
-            for (
-                AggregateResult row : Database.queryWithBinds(
-                    'SELECT Stage__c stage, COUNT(Id) total, SUM(Amount_Requested__c) amount' +
-                        ' FROM Grant__c WHERE Stage__c IN :openStages' +
-                        mine +
-                        ' GROUP BY Stage__c',
-                    binds,
-                    AccessLevel.USER_MODE
-                )
-            ) {
+            List<AggregateResult> byStage = (List<AggregateResult>) Database.queryWithBinds(
+                'SELECT Stage__c stage, COUNT(Id) total, SUM(Amount_Requested__c) amount' +
+                    ' FROM Grant__c WHERE Stage__c IN :openStages' +
+                    mine +
+                    ' GROUP BY Stage__c',
+                binds,
+                AccessLevel.USER_MODE
+            );
+            for (AggregateResult row : byStage) {
                 Total total = new Total();
                 total.stage = (String) row.get('stage');
                 total.count = (Integer) row.get('total');
