@@ -5,7 +5,9 @@
  * covered as it behaves without NPSP (nothing available, nothing selected). Runs as a BarnCRM
  * Admin permission set user; verification reads use system mode.
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:NpspHouseholdAdoptionService, ApexClass:NpspHouseholdAdoptionBatch, ApexClass:NpspHouseholdAdoptionController, ApexClass:NpspHouseholdSource, ApexClass:HouseholdWriter'
+)
 private class NpspHouseholdAdoptionTest {
     private static final String PREFIX = 'Npsp Adopt Test ';
 
