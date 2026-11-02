@@ -262,7 +262,7 @@
     <language>en_US</language>
     <protected>true</protected>
     <shortDescription>Health Check: Gift Transaction mirror stale, title</shortDescription>
-    <value>The Gift Transaction mirror has not run</value>
+    <value>The Gift Transaction Mirror Has Not Run</value>
   </labels>
   <labels>
     <fullName>Mirror_HealthCheck_GiftTransactionMirrorNotRunDetail</fullName>

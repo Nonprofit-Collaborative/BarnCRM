@@ -5,7 +5,7 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Service Delivery Log: people counted without names</shortDescription>
+        <shortDescription>Service Delivery Log: people counted without names; {0} is the count</shortDescription>
         <value>People counted without names for this service and day: {0}</value>
     </labels>
     <labels>
@@ -29,7 +29,7 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Service Delivery Log: count added</shortDescription>
+        <shortDescription>Service Delivery Log: count added; {0} is the number added</shortDescription>
         <value>Added {0} to the count.</value>
     </labels>
     <labels>
@@ -53,7 +53,7 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Eligibility rules: rule not valid</shortDescription>
+        <shortDescription>Eligibility rules: rule not valid; {0} is the rule number</shortDescription>
         <value>Rule {0} is not a valid rule.</value>
     </labels>
     <labels>
@@ -69,7 +69,7 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Eligibility rules: too many rules</shortDescription>
+        <shortDescription>Eligibility rules: too many rules; {0} is the most allowed</shortDescription>
         <value>A program may have at most {0} rules.</value>
     </labels>
     <labels>
@@ -77,7 +77,7 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Eligibility rules: result not valid</shortDescription>
+        <shortDescription>Eligibility rules: result not valid; {0} is the rule number</shortDescription>
         <value>Rule {0}: the result must be Eligible, Not Eligible or Review.</value>
     </labels>
     <labels>
@@ -85,7 +85,7 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Eligibility rules: reason missing or long</shortDescription>
+        <shortDescription>Eligibility rules: reason missing or long; {0} is the rule number</shortDescription>
         <value>Rule {0}: give a reason of 255 characters or fewer.</value>
     </labels>
     <labels>
@@ -93,7 +93,7 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Eligibility rules: conditions missing or too many</shortDescription>
+        <shortDescription>Eligibility rules: conditions; {0} is the rule number, {1} the most allowed</shortDescription>
         <value>Rule {0}: give between one and {1} conditions.</value>
     </labels>
     <labels>
@@ -101,7 +101,7 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Eligibility rules: field not offered</shortDescription>
+        <shortDescription>Eligibility rules: field not offered; {0} is the rule number</shortDescription>
         <value>Rule {0}: a condition names a field that is not one of the enrollment fields offered.</value>
     </labels>
     <labels>
@@ -109,7 +109,7 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Eligibility rules: operator not valid</shortDescription>
+        <shortDescription>Eligibility rules: operator not valid; {0} is the rule number</shortDescription>
         <value>Rule {0}: a condition has an operator that is not offered.</value>
     </labels>
     <labels>
@@ -117,7 +117,7 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Eligibility rules: value missing</shortDescription>
+        <shortDescription>Eligibility rules: value missing; {0} is the rule number</shortDescription>
         <value>Rule {0}: a condition needs a value (at least one choice for is one of and is not one of).</value>
     </labels>
     <labels>
@@ -165,7 +165,7 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Eligibility rules panel: rule heading</shortDescription>
+        <shortDescription>Eligibility rules panel: rule heading; {0} is the rule number</shortDescription>
         <value>Rule {0}</value>
     </labels>
     <labels>
@@ -365,7 +365,7 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Eligibility rules panel: preview result</shortDescription>
+        <shortDescription>Eligibility preview: {0} is the result, {1} the reason</shortDescription>
         <value>These rules would give {0}: {1}</value>
     </labels>
     <labels>
@@ -397,7 +397,7 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Eligibility rules panel: screening summary</shortDescription>
+        <shortDescription>Screening counts: {0} Eligible, {1} Not Eligible, {2} Review, {3} left alone</shortDescription>
         <value>Screened: {0} Eligible, {1} Not Eligible, {2} Review, {3} left alone.</value>
     </labels>
     <labels>

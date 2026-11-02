@@ -462,7 +462,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Button: start a run</shortDescription>
-    <value>Run now</value>
+    <value>Run Now</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_ScheduleNightly</fullName>
@@ -470,7 +470,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Button: schedule the nightly run</shortDescription>
-    <value>Schedule nightly run</value>
+    <value>Schedule Nightly Run</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_StopSchedule</fullName>
@@ -478,7 +478,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Button: stop the nightly run</shortDescription>
-    <value>Stop nightly run</value>
+    <value>Stop Nightly Run</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_NextRun</fullName>
@@ -550,7 +550,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Button: copy a range again</shortDescription>
-    <value>Copy these gifts again</value>
+    <value>Copy These Gifts Again</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_GiftSide</fullName>

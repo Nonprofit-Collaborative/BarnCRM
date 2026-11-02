@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check: one open application past its deadline</shortDescription>
-        <value>1 grant application is past its deadline</value>
+        <value>1 Grant Application Is Past Its Deadline</value>
     </labels>
     <labels>
         <fullName>Funders_HealthCheck_PastDeadlineTitle</fullName>
@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check: open applications past deadline; {0} is how many</shortDescription>
-        <value>{0} grant applications are past their deadline</value>
+        <value>{0} Grant Applications Are Past Their Deadline</value>
     </labels>
     <labels>
         <fullName>Funders_HealthCheck_PastDeadlineDetail</fullName>
@@ -414,7 +414,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check: one overdue grant requirement</shortDescription>
-        <value>1 grant requirement is overdue</value>
+        <value>1 Grant Requirement Is Overdue</value>
     </labels>
     <labels>
         <fullName>Funders_HealthCheck_OverdueTitle</fullName>
@@ -422,7 +422,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check: overdue grant requirements; {0} is how many</shortDescription>
-        <value>{0} grant requirements are overdue</value>
+        <value>{0} Grant Requirements Are Overdue</value>
     </labels>
     <labels>
         <fullName>Funders_HealthCheck_OverdueDetail</fullName>

@@ -37,8 +37,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Where Used group heading for saved Super Transform step lists.</shortDescription>
-        <value>Super Transform Step Lists</value>
+        <shortDescription>Where Used group heading for saved Super Transformer step lists.</shortDescription>
+        <value>Super Transformer Step Lists</value>
     </labels>
     <labels>
         <fullName>Core_WhereUsed_KindImportMapping</fullName>
@@ -133,7 +133,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Where Used: a Super Transform change reads or writes the field.</shortDescription>
+        <shortDescription>Where Used: a Super Transformer change reads or writes the field.</shortDescription>
         <value>Changes</value>
     </labels>
     <labels>
@@ -197,7 +197,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>What breaks for a Super Transform step list when the field is deleted.</shortDescription>
+        <shortDescription>What breaks for a Super Transformer step list when the field is deleted.</shortDescription>
         <value>This step list can't be run until the step or filter that names the field is changed.</value>
     </labels>
     <labels>
