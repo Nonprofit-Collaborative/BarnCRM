@@ -383,6 +383,142 @@ public with sharing class FieldUtilizationController {
         }
     }
 
+    /** One value of one picklist field in the Picklist Value Usage table (R-FU9, R-FU10). */
+    public class PicklistValueRow {
+        @AuraEnabled
+        public String key;
+        @AuraEnabled
+        public String fieldName;
+        @AuraEnabled
+        public String fieldLabel;
+        @AuraEnabled
+        public String value;
+        @AuraEnabled
+        public String valueLabel;
+        /** Active, Inactive (in the data, not an active value), NeverUsed or NoValue. */
+        @AuraEnabled
+        public String status;
+        @AuraEnabled
+        public Integer records;
+        /** The newest LastModifiedDate (CreatedDate when the object has none) of the records. */
+        @AuraEnabled
+        public Datetime lastUsed;
+    }
+
+    /** The picklist fields of an object, and how many to ask for per call. */
+    public class PicklistPlan {
+        @AuraEnabled
+        public List<FieldInfo> fields = new List<FieldInfo>();
+        @AuraEnabled
+        public Integer chunkSize = PicklistUsageService.CHUNK_SIZE;
+        @AuraEnabled
+        public Boolean tooLarge = false;
+        @AuraEnabled
+        public Integer largeObjectLimit;
+    }
+
+    /** One chunk of picklist usage: rows, fields that failed, fields cut at the value limit. */
+    public class PicklistChunk {
+        @AuraEnabled
+        public List<PicklistValueRow> rows = new List<PicklistValueRow>();
+        @AuraEnabled
+        public List<String> failed = new List<String>();
+        @AuraEnabled
+        public List<String> truncated = new List<String>();
+    }
+
+    /** The object's single-select picklist fields, and whether the object is too large (R-FU9). */
+    @AuraEnabled
+    public static PicklistPlan getPicklistPlan(String objectName) {
+        try {
+            requirePermission();
+            Schema.DescribeSObjectResult described = requireObject(objectName);
+            PicklistPlan planned = new PicklistPlan();
+            planned.largeObjectLimit = FieldUtilizationService.largeObjectLimit();
+            planned.tooLarge = PicklistUsageService.total(described) > planned.largeObjectLimit;
+            if (!planned.tooLarge) {
+                for (
+                    Schema.DescribeFieldResult field : PicklistUsageService.picklistFields(
+                        described
+                    )
+                ) {
+                    FieldInfo info = new FieldInfo();
+                    info.fieldName = field.getName();
+                    info.fieldLabel = field.getLabel();
+                    planned.fields.add(info);
+                }
+            }
+            return planned;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Picklist usage plan');
+        }
+    }
+
+    /**
+     * Groups up to one chunk of the object's picklist fields by value (R-FU9): one aggregate
+     * query per field, in user mode. The size limit is enforced here too. Names that are not
+     * single-select picklist fields are ignored.
+     */
+    @AuraEnabled
+    public static PicklistChunk getPicklistUsage(String objectName, List<String> fieldNames) {
+        try {
+            requirePermission();
+            Schema.DescribeSObjectResult described = requireObject(objectName);
+            PicklistChunk result = new PicklistChunk();
+            if (fieldNames == null || fieldNames.isEmpty()) {
+                return result;
+            }
+            if (fieldNames.size() > PicklistUsageService.CHUNK_SIZE) {
+                throw new FieldUtilizationException(
+                    System.Label.Core_FieldUtilization_UnexpectedError
+                );
+            }
+            requireNotTooLarge(PicklistUsageService.total(described));
+            Map<String, Schema.DescribeFieldResult> fields = PicklistUsageService.picklistFieldsByName(
+                described
+            );
+            Exception firstFailure;
+            for (String fieldName : new Set<String>(fieldNames)) {
+                Schema.DescribeFieldResult field = fields.get(fieldName);
+                if (field == null) {
+                    continue;
+                }
+                try {
+                    PicklistUsageService.FieldResult usage = PicklistUsageService.usage(
+                        described,
+                        field
+                    );
+                    if (usage.truncated) {
+                        result.truncated.add(field.getLabel());
+                    }
+                    for (PicklistUsageService.Usage value : usage.values) {
+                        PicklistValueRow row = new PicklistValueRow();
+                        row.fieldName = field.getName();
+                        row.fieldLabel = field.getLabel();
+                        row.value = value.value;
+                        row.valueLabel = value.status == PicklistUsageService.NO_VALUE
+                            ? System.Label.Core_PicklistUsage_NoValue
+                            : value.valueLabel;
+                        row.key = row.fieldName + '|' + value.value;
+                        row.status = value.status;
+                        row.records = value.records;
+                        row.lastUsed = value.lastUsed;
+                        result.rows.add(row);
+                    }
+                } catch (Exception fieldFailure) {
+                    firstFailure = firstFailure == null ? fieldFailure : firstFailure;
+                    result.failed.add(field.getLabel());
+                }
+            }
+            if (firstFailure != null) {
+                ErrorLogger.log(firstFailure, 'Picklist usage: ' + described.getName());
+            }
+            return result;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Picklist usage count');
+        }
+    }
+
     /** Record type developer names to the labels the page shows, for one object. */
     private class RecordTypeLabels {
         private Boolean grouped;

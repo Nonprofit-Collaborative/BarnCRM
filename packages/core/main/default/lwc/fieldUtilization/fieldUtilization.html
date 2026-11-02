@@ -101,6 +101,10 @@
                 <p class="slds-var-m-top_small" data-id="not-counted">{notCountedMessage}</p>
             </template>
 
+            <template lwc:if={showPicklistUsage}>
+                <c-picklist-usage object-name={objectName} disabled={pickerDisabled}></c-picklist-usage>
+            </template>
+
             <template lwc:if={showHistory}>
                 <div class="slds-var-m-top_large" data-id="history">
                     <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">

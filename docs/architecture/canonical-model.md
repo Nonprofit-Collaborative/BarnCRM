@@ -8202,6 +8202,19 @@ Rows are never edited and no job deletes them; old rows are cleared with Bulk de
 standard delete.
 **R-FU8 Previous count shown.** The page shows the object's latest saved count next to the
 current one, with the change in percentage points.
+**R-FU9 Picklist value usage (C-57).** On request, for each single-select picklist field the
+person can read and group by, one aggregate query in user mode groups the object's records by the
+field's value and returns `COUNT(Id)` and `MAX(LastModifiedDate)` (`MAX(CreatedDate)` on an
+object with no Last Modified Date). Fields are read 20 per call, one query each; at most 500
+distinct values in the data are kept per field, the field is named on the page when more were cut;
+the 1,000,000-record guard of R-FU5 applies. Multi-select picklists are not included. Nothing is
+stored: no object or field is added.
+**R-FU10 Value status.** A value found in the data that is an active value of the picklist is
+Active; one that is not active (retired, or removed) is Inactive, Still in Data; an active value
+no record holds is Never Used (zero records, no date); records with no value are one No Value row.
+**R-FU11 What Last Used means.** The date is the newest Last Modified Date among the records that
+hold the value, so any later edit to such a record moves it: it is the latest time a record
+holding the value was touched, not the time the value was chosen. The page says so.
 
 ### Salesforce implementation
 
@@ -10797,6 +10810,7 @@ mirrors the primary member).
 | 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29ZA, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
 | 0.15 | 2026-11-02 | Ship-on settings added in an upgrade (QA-F2, D-166). New field `Shipped_Defaults_Applied__c` on BarnCRM Settings (Section 12, v0.8 keys): how many of each package's ship-on checkboxes added in an upgrade have been turned on once, so Send Weekly Admin Summary (C-54) and Ask Reminders (G-29) start on in orgs that saved settings before them. No object added. |
 | 0.15 | 2026-11-02 | Person account and text fixes (QA-F3 to QA-F6, D-166). No field added. Volunteer reminders reach bookings on a person account and suggestions return the Account (R-VU6, R-VU7); an ask on the contact behind a person account names the Donor Account (R-SO1); an enrollment or service delivery Account must be a person account (R-EN1, R-SD1); Programs Health Check reports Nonprofit Cloud Program Management, also listed as an Integration App Alternative; `Ask__c` record number display format six digits (`ASK-{000000}`). |
+| 0.17 | 2026-11-02 | C-57 picklist value usage (plan 6.1.5). Section 29F: rules R-FU9 to R-FU11 (records per picklist value and last use, value status, what Last Used means). No object or field added. |
 
 ---
 ## 32. Entity ownership by package

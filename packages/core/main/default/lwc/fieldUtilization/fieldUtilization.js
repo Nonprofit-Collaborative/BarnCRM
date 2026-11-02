@@ -209,6 +209,10 @@ export default class FieldUtilization extends LightningElement {
     return this.comparedAt || (this.plan ? this.plan.previousTakenAt : undefined);
   }
 
+  get showPicklistUsage() {
+    return !!this.plan && !this.plan.tooLarge && this.plan.total > 0;
+  }
+
   get showHistory() {
     return !!this.history;
   }
