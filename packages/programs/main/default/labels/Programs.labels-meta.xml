@@ -25,6 +25,14 @@
         <value>Enroll Someone</value>
     </labels>
     <labels>
+        <fullName>Programs_Roster_Person</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Person picker and column heading</shortDescription>
+        <value>Person</value>
+    </labels>
+    <labels>
         <fullName>Programs_Roster_ShowEnded</fullName>
         <categories>Programs</categories>
         <language>en_US</language>

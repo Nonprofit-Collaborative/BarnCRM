@@ -6,7 +6,7 @@ import setStage from '@salesforce/apex/ProgramRosterController.setStage';
 
 import TITLE from '@salesforce/label/c.Programs_Roster_Title';
 import ENROLL from '@salesforce/label/c.Programs_Roster_Enroll';
-import PERSON from '@salesforce/label/c.Core_Section_Person';
+import PERSON from '@salesforce/label/c.Programs_Roster_Person';
 import STAGE from '@salesforce/label/c.Core_Shared_Stage';
 import START_DATE from '@salesforce/label/c.Core_Shared_StartDate';
 import END_DATE from '@salesforce/label/c.Core_Shared_EndDate';
