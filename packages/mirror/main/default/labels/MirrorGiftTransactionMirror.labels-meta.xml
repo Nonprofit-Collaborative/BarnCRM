@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_LogOne</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: one gift not copied</shortDescription>
+    <value>The Gift Transaction mirror could not copy the gift {0}: {1}</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_LogMany</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: several gifts not copied</shortDescription>
+    <value>The Gift Transaction mirror could not copy {0} gifts ({1}): {2}</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_NoAccount</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: gift has no account donor</shortDescription>
+    <value>The gift has no Donor Account and no Household, and a Gift Transaction's donor must be an account. Give the donor a household, and the next run copies the gift.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_Missing</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: linked Gift Transaction gone</shortDescription>
+    <value>The Gift Transaction linked to the gift was deleted or is not visible to you. If it was deleted, clear the gift's Gift Transaction ID to have a new one made; if it still exists, give the person running the mirror access to it.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_InvalidGiftTransactionId</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: Gift Transaction ID format</shortDescription>
+    <value>Gift Transaction ID must be the record ID of a Nonprofit Cloud Gift Transaction (15 or 18 characters), or empty.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_LogOrphan</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: created record left unlinked</shortDescription>
+    <value>The Gift Transaction mirror created the Gift Transaction {0} for this gift, could not store its Gift Transaction ID on the gift, and could not delete the Gift Transaction again: {1} Delete that Gift Transaction, or paste its ID onto the gift once the gift can be saved.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_DesignationRefused</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: designation not created</shortDescription>
+    <value>The Gift Transaction was created, but a designation could not be: {0}</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_DeletedKept</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: deleted gift keeps its record</shortDescription>
+    <value>Its Gift Transaction is left in place. Delete it in Nonprofit Cloud yourself if it should go.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_LogDeletedOne</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: one linked gift deleted</shortDescription>
+    <value>The gift {0}, linked to a Gift Transaction, was deleted. {1}</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_LogDeletedMany</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: several linked gifts deleted</shortDescription>
+    <value>{0} gifts linked to Gift Transactions were deleted ({1}). {2}</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_UnknownStatus</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: paid status not active</shortDescription>
+    <value>The Gift Transaction mirror paid status, {0}, is not one of the active Status values of Gift Transactions in this org, so nothing is copied. Copy the value exactly, as its API name, from the Status field in Setup.</value>
+  </labels>
+  <labels>
+    <fullName>Mirror_GiftTransactionMirror_NoStartDate</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Gift Transaction mirror: no start date</shortDescription>
+    <value>Nothing is copied until you set Gift Transaction mirror start date in BarnCRM Settings, Giving. Only gifts dated on or after it are copied.</value>
+  </labels>
+</CustomLabels>
