@@ -36,6 +36,35 @@ private class ImportTemplateServiceTest {
         }
     }
 
+    /** QA-F6: a shipped name in an older casing takes the shipped one; a renamed one is kept. */
+    @IsTest
+    static void anUpgradeRecasesAShippedNameButKeepsARenamedOne() {
+        System.runAs(TestUsers.admin()) {
+            ImportTemplateService.materializeDefaults();
+            List<Import_Template__c> templates = [
+                SELECT Id, Name
+                FROM Import_Template__c
+                WHERE Is_Package_Default__c = TRUE
+                WITH SYSTEM_MODE
+                ORDER BY Name
+                LIMIT 2
+            ];
+            String shipped = templates[0].Name;
+            update new List<Import_Template__c>{
+                new Import_Template__c(Id = templates[0].Id, Name = shipped.toLowerCase()),
+                new Import_Template__c(Id = templates[1].Id, Name = 'Our own list')
+            };
+
+            ImportTemplateService.materializeDefaultsDuringInstall(null);
+
+            Map<Id, Import_Template__c> after = new Map<Id, Import_Template__c>(
+                [SELECT Name FROM Import_Template__c WHERE Id IN :templates WITH SYSTEM_MODE]
+            );
+            Assert.isTrue(after.get(templates[0].Id).Name.equals(shipped), 'Recased.');
+            Assert.areEqual('Our own list', after.get(templates[1].Id).Name, 'Kept.');
+        }
+    }
+
     @IsTest
     static void neverOverwritesAnEditedTemplate() {
         System.runAs(TestUsers.admin()) {

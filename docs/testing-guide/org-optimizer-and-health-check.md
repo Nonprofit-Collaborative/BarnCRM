@@ -259,3 +259,15 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 11 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **AI-Readiness Export** tile or tab. |
 
 **Cleanup:** Delete the downloaded zip files.
+
+## T-HC-16: Data Dictionary Labels Are Trimmed
+
+**Purpose:** confirm object labels in the Data Dictionary carry no leading or trailing spaces.
+**Prerequisites:** the admin user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Org Optimizer**, **Data Dictionary**, and open the kinds of record list. | Each label starts at the left edge, with no gap before it. |
+| 2 | Choose **Account** and download the CSV. | The object label column reads `Account` with no space before or after it. |
+
+**Cleanup:** Delete the downloaded file.

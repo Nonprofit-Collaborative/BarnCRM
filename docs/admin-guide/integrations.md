@@ -32,7 +32,9 @@ Products are grouped:
 - **Alternatives to BarnCRM Modules**: apps that overlap a BarnCRM module. They appear here only
   when installed in your org. If you have none, the heading does not appear at all. For each,
   use one or the other for the same records, not both. BarnCRM may offer a migration path to the
-  matching module in a future release, with no date promised.
+  matching module in a future release, with no date promised. In a Nonprofit Cloud org this
+  includes **Nonprofit Cloud Program Management**, found by its standard **Program** object,
+  beside BarnCRM Programs (see [Programs](programs.md)).
 
 Each product shows:
 

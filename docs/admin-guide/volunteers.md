@@ -257,10 +257,11 @@ books at noon for a shift that evening. Tell such volunteers directly.
 person who turned reminders on or saved the schedule), and replies go to that user. BarnCRM has
 no separate from address setting for volunteer reminders.
 
-**Who is never emailed.** A person with **Email Opt Out** checked on their contact, a person
-with no email address, a sign-up that is Cancelled or marked No show or Attended, and any
-shift that is Cancelled or has already started. Sign-ups that name a person account instead of
-a contact are not reminded.
+**Who is never emailed.** A person with **Email Opt Out** checked on their contact (or person
+account), a person with no email address, a sign-up that is Cancelled or marked No show or
+Attended, and any shift that is Cancelled or has already started. Where your people are person
+accounts, a sign-up that names the person account (as the Sign-Ups panel books one) is reminded
+at the person account's own **Email**, greeted by its first name.
 
 **Email limits.** Reminders go out through your Salesforce org's own email, so your org's daily
 limit on emails sent by Apex applies, and the same limit is shared with every other BarnCRM email
@@ -436,7 +437,8 @@ Completed. There is nothing to switch on.
 **Who is offered.** People whose **Volunteer Status** is **Active** and who have no sign-up on
 that shift (a cancelled one counts: change it instead of adding another). Of an org with more
 than 500 active volunteers, the 500 with the most hours are ranked, and the card says so.
-People held only as person accounts are not offered.
+Where your people are person accounts, they are offered too, and **Sign Up** books the person
+account, as **Add Sign-Up** does; one already booked on the shift by the account is not offered.
 
 **How they are ranked.** Each person scores points for what the data already says. Nothing
 here is a setting: the weights are fixed and listed so you can predict the order.
@@ -645,7 +647,7 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
 
 ## Importing Volunteer Hours
 
-To bring in hours kept in a spreadsheet, use the **Volunteer hours** template on the Import tab.
+To bring in hours kept in a spreadsheet, use the **Volunteer Hours** template on the Import tab.
 It is added when Volunteers is installed and appears only where Volunteers is. It loads one
 Volunteer Hours record per row, using the Core import's **One Kind of Record** (see
 [Importing](importing.md), section 9), so the preview, results, rejected rows download and undo
@@ -675,7 +677,7 @@ repeat; the hours still count toward the job.
 1. Make a file with the columns above, for example `volunteer@example.org, Food pantry,
    2026-03-14, 3, Sorted donations`. Every job named must already exist under **Volunteer
    Jobs**, and every email must belong to someone already in BarnCRM.
-2. Open the **Import** tab, select **Volunteer hours**, then **Next**, and upload the file.
+2. Open the **Import** tab, select **Volunteer Hours**, then **Next**, and upload the file.
 3. Check that each column is matched to its field, then select **Preview**. Nothing is written.
 4. Read the counts. A row whose email matches nobody, or whose job matches no job, is
    **rejected** and named in the table with the reason; select **Download Rejected Rows**, correct

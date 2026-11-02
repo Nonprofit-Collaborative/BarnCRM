@@ -6379,7 +6379,11 @@ it produced.
 **R-SO1 Exactly one donor.** An ask names a person or an organization, never both and never
 neither. The rule is checked when an ask is created and whenever its donor changes, not on every
 edit: deleting a donor clears the lookup (the ask is kept as a record of the work), and an ask
-left with no donor can still be moved, closed or edited.
+left with no donor can still be moved, closed or edited. In an org that stores people as accounts,
+an ask saved with the contact behind a person account as its Donor Contact names the account as
+Donor Account instead, before the rule is checked, so one person is one donor on the board and
+their Next Ask Date is carried to one record (Section 4; QA-F3). An ask saved before this keeps
+its donor.
 
 **R-SO2 Stages are the organization's own list.** The stages are one org-wide setting, Ask Stages
 (`Ask_Stages__c` on Giving Settings), an ordered list of names separated by semicolons; an empty
@@ -6438,7 +6442,8 @@ logged, and the ask's save is never refused for it.
 
 ### Salesforce implementation
 
-- **Object:** `Ask__c`, Giving package. Name is an auto number, `ASK-{00000000}`. Sharing is
+- **Object:** `Ask__c`, Giving package. Name is an auto number, `ASK-{000000}` (six digits, as Gift, Enrollment and most record
+  numbers; eight until QA-F6, so asks created before keep their eight digit numbers). Sharing is
   Public Read/Write (`ReadWrite`): a small development team works one shared pipeline, and an
   organization that wants each fundraiser to see only their own asks sets it to Private in Setup
   (ADR-0153). Field history is on for Stage, Outcome, Ask Amount and Target Date (R-SO4).
@@ -6545,7 +6550,7 @@ sort in package metadata, so the list opens unsorted and a click on the Next Ask
 - **Settings keys** (on `Giving_Settings__c`, Section 12): `Ask_Reminders_Enabled__c`,
   `Ask_Reminders_Last_Run__c`, `Ask_Reminders_Last_Run_Summary__c`.
 - **Nightly job:** `AskReminderSchedulable` and `AskReminderBatch`, scheduled by
-  `GivingScheduler` as the module's fourth job (`BarnCRM Giving: ask reminders`, 03:30) and
+  `GivingScheduler` as the module's fourth job (`BarnCRM Giving Ask Reminders`, 03:30) and
   listed by `GivingNightlyJobProvider` for Health Check.
 - **Service:** `AskReminderService`, `AskReminderSelector`, `AskReminderWriter`.
 
@@ -8757,9 +8762,11 @@ twice) and is listed in the Error Log as a Warning, and a booking whose email fa
 stamp cleared so the next morning's run tries again. A stamped booking is never emailed again.
 A booking made after that morning's run for a shift starting before the next morning's run gets
 no reminder. Nobody is emailed whose Contact has Email Opt Out
-checked or no email address; a booking named by a person account (no Contact) is not reminded
-in this version. The email goes through the platform's single email call to the Contact's own
-address, so the org's daily email limit applies: a message the platform refuses is not stamped,
+checked or no email address. In an org that stores people as accounts, a booking named by a
+person account with no Contact (as the Sign-ups panel books one) is reminded at the account's
+own email, under the same opt out and blank address rules, read by name so no packaged metadata
+names a person account field (QA-F3). The email goes through the platform's single email call to
+the person's own address, so the org's daily email limit applies: a message the platform refuses is not stamped,
 a Warning in the Error Log counts them, and the next morning's run tries them again while the
 shift is still ahead. Reminders ship off.
 
@@ -8777,7 +8784,9 @@ shift's is not one, hours on the job up to 20 (capped at 40), total hours up to 
 `rankSuggestions`; Apex only gathers facts, in user mode, so a user sees suggestions only from
 what they may read. Nothing is written: booking uses `VolunteerShiftSignupsController.addSignup`,
 so R-VU1 to R-VU4 apply. The card shows nothing to a user who cannot create sign-ups or for a
-shift that is not Open. A person held only as a person account is not suggested.
+shift that is not Open. In an org that stores people as accounts the Contacts read include the
+contact behind each person account; that person is suggested by the account, as the Sign-ups
+panel books them, and one already booked on the shift by the account is left out (QA-F3).
 
 ### Salesforce implementation
 
@@ -9868,7 +9877,12 @@ participant record; P-02 records what they attended and received.
 ### Rules
 
 **R-EN1 Exactly one person.** Contact or Account, never both, never neither (validation rule,
-checked only when the enrollment is new or its person changes, as R-VU1).
+checked only when the enrollment is new or its person changes, as R-VU1). The Account is a person
+account: an organization or household account is refused on every path (tab, import, API), not
+only by the pickers, when the enrollment is created or its Account changes, with the label
+`Programs_Person_NotAPerson` (`ProgramPersonRule`, in the always-running `Enrollment_Rules`
+handler; QA-F4). Whether the account is a person is read by name, so in an org without person
+accounts every Account is refused.
 
 **R-EN2 One open enrollment per person per program.** A second open enrollment (Applied or
 Enrolled) for the same person in the same program is refused, naming the program: change the one
@@ -10019,6 +10033,7 @@ while the module is turned off:
 | Key | Severity | Finds | Fix |
 |---|---|---|---|
 | `program_enrollments_open_after_end` | Info | Open enrollments (Applied or Enrolled) in a program that is Completed or whose End Date is past: they still count as open (R-EN2) and in the roster. | Links the first five enrollments. |
+| `nonprofit_cloud_program_management_present` | Info (category OrgShape) | The org has the Nonprofit Cloud `Program` and `ProgramEnrollment` objects, found by describe only (QA-F5). Programs never reads or writes them, so the two share no records. | None: choose one for each program. The Integrations page lists Nonprofit Cloud Program Management as an Alternative (Integration App row `Nonprofit_Cloud_Program_Management`, detected by `Program`, shown only when installed). |
 
 **Sample data.** `ProgramsSampleData` implements Core's `SampleDataModule` and is registered in
 `SampleDataModules.MODULE_CLASS_NAMES` after Volunteers. Its load, three stages, builds three
@@ -10136,7 +10151,9 @@ they received in the service's unit. Sessions and cohorts are P-11.
 ### Rules
 
 **R-SD1 Exactly one person.** Contact or Account, never both, never neither (validation rule,
-checked only when the delivery is new or its person changes, as R-EN1).
+checked only when the delivery is new or its person changes, as R-EN1). The Account is a person
+account, as R-EN1 (`ProgramPersonRule` in the always-running `Service_Delivery_Rules` handler;
+QA-F4).
 
 **R-SD2 An absence delivers nothing.** Quantity is never negative (validation rule). Saving a
 delivery with an absence (Excused or Unexcused) sets its Quantity to 0. Always runs (registry
@@ -10779,6 +10796,7 @@ mirrors the primary member).
 | 0.14 | 2026-10-31 | Programs P-05. The Programs Dashboard (29ZA, "Program dashboard") and the person card's last service date and services attended. No object or field added. |
 | 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29ZA, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
 | 0.15 | 2026-11-02 | Ship-on settings added in an upgrade (QA-F2, D-166). New field `Shipped_Defaults_Applied__c` on BarnCRM Settings (Section 12, v0.8 keys): how many of each package's ship-on checkboxes added in an upgrade have been turned on once, so Send Weekly Admin Summary (C-54) and Ask Reminders (G-29) start on in orgs that saved settings before them. No object added. |
+| 0.15 | 2026-11-02 | Person account and text fixes (QA-F3 to QA-F6, D-166). No field added. Volunteer reminders reach bookings on a person account and suggestions return the Account (R-VU6, R-VU7); an ask on the contact behind a person account names the Donor Account (R-SO1); an enrollment or service delivery Account must be a person account (R-EN1, R-SD1); Programs Health Check reports Nonprofit Cloud Program Management, also listed as an Integration App Alternative; `Ask__c` record number display format six digits (`ASK-{000000}`). |
 
 ---
 ## 32. Entity ownership by package

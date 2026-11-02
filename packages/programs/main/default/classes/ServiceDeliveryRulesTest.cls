@@ -154,4 +154,39 @@ private class ServiceDeliveryRulesTest {
             Assert.isFalse(removed.isSuccess(), 'A service with deliveries is kept.');
         }
     }
+
+    /** QA-F4: an organization account never receives a service, whatever path saves it. */
+    @IsTest
+    static void anOrganizationAccountIsRefused() {
+        System.runAs(TestUsers.adminWith(ADMIN)) {
+            contactMode();
+            Program__c pantry = new Program__c(Name = 'Pantry');
+            insert pantry;
+            Service__c meal = serviceIn(pantry);
+            Account business = new Account(Name = 'Acme Supply');
+            insert business;
+
+            Database.SaveResult result = Database.insert(
+                new Service_Delivery__c(Service__c = meal.Id, Account__c = business.Id),
+                false
+            );
+
+            Assert.isFalse(result.isSuccess(), 'An organization is not a person.');
+            Assert.areEqual(
+                System.Label.Programs_Person_NotAPerson,
+                result.getErrors()[0].getMessage()
+            );
+
+            // The same account read as a person account, which an org without them cannot hold.
+            ProgramPersonRule.personAccountIdsForTest = new Set<Id>{ business.Id };
+            Assert.isTrue(
+                Database.insert(
+                        new Service_Delivery__c(Service__c = meal.Id, Account__c = business.Id),
+                        false
+                    )
+                    .isSuccess(),
+                'A person account receives services.'
+            );
+        }
+    }
 }

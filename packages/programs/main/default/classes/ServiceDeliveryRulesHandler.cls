@@ -1,4 +1,5 @@
 /**
+ * R-SD1's person half (`ProgramPersonRule`, QA-F4: never an organization or household account),
  * R-SD2 and R-SD3 for Service_Delivery__c (canonical model 29ZB), run by the Core trigger
  * dispatcher through the registry row `Service_Delivery_Rules`, which always runs: totals count
  * the Quantity and roster figures count by enrollment, so neither may be switched off
@@ -18,10 +19,12 @@ public with sharing class ServiceDeliveryRulesHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
+        ProgramPersonRule.refuseNonPersonAccounts(Trigger.new, null);
         apply((List<Service_Delivery__c>) Trigger.new);
     }
 
     public override void beforeUpdate() {
+        ProgramPersonRule.refuseNonPersonAccounts(Trigger.new, Trigger.oldMap);
         apply((List<Service_Delivery__c>) Trigger.new);
     }
 

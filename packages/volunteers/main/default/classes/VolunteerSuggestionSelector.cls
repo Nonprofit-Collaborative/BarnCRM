@@ -52,6 +52,21 @@ public with sharing class VolunteerSuggestionSelector {
         ];
     }
 
+    /** Which of these person accounts already have a sign-up of any status on this shift. */
+    public static Set<Id> bookedAccountIds(Id shiftId, Set<Id> accountIds) {
+        Set<Id> booked = new Set<Id>();
+        for (Volunteer_Signup__c signup : [
+            SELECT Account__c
+            FROM Volunteer_Signup__c
+            WHERE Volunteer_Shift__c = :shiftId AND Account__c IN :accountIds
+            WITH USER_MODE
+            LIMIT 10000
+        ]) {
+            booked.add(signup.Account__c);
+        }
+        return booked;
+    }
+
     /** These people's rows for the given skills, as skills and as interests. */
     public static List<Volunteer_Skill__c> selectSkillRows(Set<Id> contactIds, Set<Id> skillIds) {
         return [

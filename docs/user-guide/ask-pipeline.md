@@ -7,7 +7,7 @@ Before you start: open the **BarnCRM Fundraising** app, **Ask Pipeline** tab. Yo
 ## To Add an Ask
 
 1. Open **Ask Pipeline** and click **New Ask**. Or open a person, household or organization and click **New** in its **Asks** list.
-2. Choose the donor: **Donor Contact** for a person, or **Donor Account** for an organization or household. Fill in one, never both.
+2. Choose the donor: **Donor Contact** for a person, or **Donor Account** for an organization or household. Fill in one, never both. If your organization stores people as person accounts, choosing the person's contact saves the ask on their account, so each person is one donor.
 3. Type the **Ask Amount** and **Target Date**. Add a **Next Step**, **Fund** and **Appeal** if they apply.
 4. Leave **Stage** empty to start at the first stage. **Assigned To** is the record owner.
 5. Click **Save**.

@@ -61,6 +61,33 @@ private class VolunteerSuggestionControllerTest {
         return null;
     }
 
+    /**
+     * QA-F3: in an org that stores people as accounts, a person account volunteer is suggested by
+     * the account, as the Sign-ups panel books one. The test stands an ordinary account in for
+     * the person account behind the contact, which an org without person accounts cannot hold.
+     */
+    @IsTest
+    static void aPersonAccountVolunteerIsSuggestedByTheAccount() {
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            Volunteer_Shift__c shift = theShift();
+            Contact person = volunteer('Person', 'Active', null);
+            Contact plain = volunteer('Plain', 'Active', null);
+            Account personAccount = new Account(Name = 'Person Account Stand In');
+            insert personAccount;
+            VolunteerSuggestionController.accountsBehindForTest = new Map<Id, Id>{
+                person.Id => personAccount.Id
+            };
+
+            VolunteerSuggestionController.Suggestions result = VolunteerSuggestionController.getSuggestions(
+                shift.Id
+            );
+
+            Assert.isNotNull(find(result, personAccount.Id), 'Suggested by the account.');
+            Assert.isNull(find(result, person.Id), 'Not by the contact behind it.');
+            Assert.isNotNull(find(result, plain.Id), 'A contact stays a contact.');
+        }
+    }
+
     @IsTest
     static void onlyActiveVolunteersNotYetSignedUpAreOffered() {
         System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {

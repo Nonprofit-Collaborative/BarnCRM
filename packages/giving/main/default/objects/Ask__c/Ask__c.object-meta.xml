@@ -17,7 +17,7 @@
   <enableStreamingApi>true</enableStreamingApi>
   <label>Ask</label>
   <nameField>
-    <displayFormat>ASK-{00000000}</displayFormat>
+    <displayFormat>ASK-{000000}</displayFormat>
     <label>Ask Number</label>
     <trackHistory>false</trackHistory>
     <type>AutoNumber</type>

@@ -1,7 +1,8 @@
 /**
  * The rules every ask follows however it is saved (canonical model Section 25R): the stage comes
  * from the organization's own list (R-SO2), Stage Changed Date follows the stage (R-SO4), and
- * Closed Date follows the outcome (R-SO3).
+ * Closed Date follows the outcome (R-SO3). A person stored as an account is always the ask's Donor
+ * Account, never the contact behind it (R-SO1, QA-F3).
  *
  * The stage list is one org-wide setting, `Ask_Stages__c` on Giving Settings: names in order,
  * separated by semicolons. An empty setting means the shipped list. Parsing lives here so the
@@ -76,6 +77,7 @@ public with sharing class AskRules {
         if (records == null || records.isEmpty()) {
             return;
         }
+        donorAsAccountForPersonAccounts(records);
         List<String> stages = null;
         Date today = System.today();
         for (SObject record : records) {
@@ -86,6 +88,41 @@ public with sharing class AskRules {
             }
             applyStage(ask, old, stages, today);
             applyOutcome(ask, today);
+        }
+    }
+
+    /** Test seam: the person account behind each contact, for an org without person accounts. */
+    @TestVisible
+    private static Map<Id, Id> accountsBehindForTest;
+
+    /**
+     * In an org that stores people as accounts, an ask whose Donor Contact is the contact behind
+     * a person account names the account instead (canonical model Section 4, R-SO1, QA-F3), so
+     * one person is one donor on the board and their Next Ask Date is written in one place.
+     */
+    private static void donorAsAccountForPersonAccounts(List<SObject> records) {
+        Set<Id> contactIds = new Set<Id>();
+        for (SObject record : records) {
+            Ask__c ask = (Ask__c) record;
+            if (ask.Donor_Contact__c != null && ask.Donor_Account__c == null) {
+                contactIds.add(ask.Donor_Contact__c);
+            }
+        }
+        if (contactIds.isEmpty()) {
+            return;
+        }
+        Map<Id, Id> accountByContact = accountsBehindForTest != null
+            ? accountsBehindForTest
+            : PersonRecordSelector.getAccountsBehindPersonContacts(contactIds);
+        for (SObject record : records) {
+            Ask__c ask = (Ask__c) record;
+            Id accountId = ask.Donor_Account__c == null
+                ? accountByContact.get(ask.Donor_Contact__c)
+                : null;
+            if (accountId != null) {
+                ask.Donor_Account__c = accountId;
+                ask.Donor_Contact__c = null;
+            }
         }
     }
 

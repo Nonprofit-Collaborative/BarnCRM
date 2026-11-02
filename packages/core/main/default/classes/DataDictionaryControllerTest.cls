@@ -155,6 +155,7 @@ private class DataDictionaryControllerTest {
             Map<String, DataDictionaryController.Option> byValue = new Map<String, DataDictionaryController.Option>();
             for (DataDictionaryController.Option option : options) {
                 byValue.put(option.value, option);
+                Assert.areEqual(option.label.trim(), option.label, 'Labels are trimmed (QA-F6).');
             }
             Assert.isTrue(byValue.get('Account').isDefault, 'Account is chosen to start.');
             Assert.isTrue(byValue.get('Contact').isDefault, 'Contact is chosen to start.');

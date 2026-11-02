@@ -18,6 +18,7 @@
  * (getPersonsForDisplay) is what a screen shows: object access is checked and every field
  * the running user cannot read is stripped before a person is built.
  */
+@NamespaceAccessible
 public with sharing class PersonRecordSelector {
     // detection-only: these field names exist on the account object only where the org
     // stores people as accounts, so they are held as text and never referenced statically.
@@ -277,6 +278,7 @@ public with sharing class PersonRecordSelector {
      * Read in system mode: the answer is only a mapping between two ids of the same person,
      * never shown, and a mapping the caller could not see would put the person in twice.
      */
+    @NamespaceAccessible
     public static Map<Id, Id> getAccountsBehindPersonContacts(Set<Id> contactIds) {
         Map<Id, Id> result = new Map<Id, Id>();
         if (contactIds == null || contactIds.isEmpty()) {

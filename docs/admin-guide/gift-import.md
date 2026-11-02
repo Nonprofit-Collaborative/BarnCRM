@@ -41,7 +41,7 @@ instead.
 Start with a small file: five gifts, each with a donor name, an email, an amount, a date
 (for example `2026-03-15`) and a fund name you already have.
 
-1. Open the **Import** tab, select **Generic gift list**, then **Next**, and upload the file.
+1. Open the **Import** tab, select **Generic Gift List**, then **Next**, and upload the file.
 2. Check the columns. The gift columns now read **Gift: amount**, **Gift: date**, **Gift:
    fund** and so on. Map a column of processor transaction numbers to **Gift: external ID**:
    it is what stops the same file loading twice.

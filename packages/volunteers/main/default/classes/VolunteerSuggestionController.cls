@@ -6,7 +6,9 @@
  * (plan 9.9). Read only and in user mode; booking goes through the Sign-ups panel's own
  * `VolunteerShiftSignupsController.addSignup`, so every sign-up rule applies.
  *
- * People are Contacts: a person held only as a person account is not suggested.
+ * People are read as Contacts, which in an org that stores people as accounts includes the
+ * contact behind each person account; such a person is suggested by the account, as the
+ * Sign-ups panel books them (QA-F3).
  */
 public with sharing class VolunteerSuggestionController {
     private static final String CONTEXT = 'Suggested volunteers';
@@ -92,6 +94,7 @@ public with sharing class VolunteerSuggestionController {
                 people.remove(people.size() - 1);
             }
             addFacts(result, people, shift, required);
+            suggestPersonAccountsAsAccounts(result, shiftId);
             return result;
         } catch (Exception failure) {
             ErrorLogger.log(failure, CONTEXT, shiftId);
@@ -104,6 +107,48 @@ public with sharing class VolunteerSuggestionController {
     }
 
     // ------------------------------------------------------------------------------ helpers
+
+    /**
+     * In an org that stores people as accounts, a person account volunteer is suggested by the
+     * account, as the Sign-ups panel books one (QA-F3), and one already booked on the shift by
+     * the account is left out. The facts stay keyed by the person's contact, where the skill,
+     * hours and onboarding rows point.
+     */
+    private static void suggestPersonAccountsAsAccounts(Suggestions result, Id shiftId) {
+        if (result.candidates.isEmpty()) {
+            return;
+        }
+        Set<Id> contactIds = new Set<Id>();
+        for (Candidate candidate : result.candidates) {
+            contactIds.add(candidate.personId);
+        }
+        Map<Id, Id> accountByContact = accountsBehindForTest != null
+            ? accountsBehindForTest
+            : PersonRecordSelector.getAccountsBehindPersonContacts(contactIds);
+        if (accountByContact.isEmpty()) {
+            return;
+        }
+        Set<Id> booked = VolunteerSuggestionSelector.bookedAccountIds(
+            shiftId,
+            new Set<Id>(accountByContact.values())
+        );
+        List<Candidate> kept = new List<Candidate>();
+        for (Candidate candidate : result.candidates) {
+            Id accountId = accountByContact.get(candidate.personId);
+            if (accountId != null && booked.contains(accountId)) {
+                continue;
+            }
+            if (accountId != null) {
+                candidate.personId = accountId;
+            }
+            kept.add(candidate);
+        }
+        result.candidates = kept;
+    }
+
+    /** Test seam: the person account behind each contact, for an org without person accounts. */
+    @TestVisible
+    private static Map<Id, Id> accountsBehindForTest;
 
     private static void addFacts(
         Suggestions result,

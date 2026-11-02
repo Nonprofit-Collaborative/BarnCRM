@@ -232,7 +232,7 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 |---|---|---|
 | 1 | Open the Import tab. | **What Are You Importing?** with an icon card for **People and Organizations**, **One Kind of Record**, **Several Objects in One File** and **Your Templates** (and **Gifts** and **Delete the Records a File Lists** where steps 3 and 5 say). Each card says what it creates. None is chosen and **Next** is not shown. |
 | 2 | In a Core-only org, look at the cards. | There is no **Gifts** card. |
-| 3 | In an org with Giving installed, look at the cards, then choose **Gifts**. | A **Gifts** card shows. It is marked as chosen and the cards stay on screen. Its **Template** picker lists only gift templates (for example **Generic gift list**), the first is chosen, and **Next** is enabled. |
+| 3 | In an org with Giving installed, look at the cards, then choose **Gifts**. | A **Gifts** card shows. It is marked as chosen and the cards stay on screen. Its **Template** picker lists only gift templates (for example **Generic Gift List**), the first is chosen, and **Next** is enabled. |
 | 3a | Tab to the cards and press the arrow keys. | The choice moves from card to card like radio buttons, and what shows below follows the chosen card. |
 | 4 | Choose **People and Organizations**. | The **Template** picker lists only people templates and the first is chosen for you. The line under it says what it creates. **Next** is enabled. |
 | 5 | Log in as an admin without **Bulk Delete Records** and open the Import tab. Then log in as one with it. | The first sees no **Delete the Records a File Lists** card. The second sees it, with a warning icon. |

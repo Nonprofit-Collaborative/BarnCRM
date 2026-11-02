@@ -1,5 +1,6 @@
 /**
- * R-EN2 for Enrollment__c, run by the Core trigger dispatcher through the registry row
+ * R-EN1's person half (`ProgramPersonRule`, QA-F4: never an organization or household account)
+ * and R-EN2 for Enrollment__c, run by the Core trigger dispatcher through the registry row
  * `Enrollment_Rules`, which always runs: it enforces a rule rather than doing work for anyone, so
  * no switch, pause or bypass reaches it (ADR-0024). A second open enrollment for the same person
  * in the same program is refused on insert, on undelete, and on an update that changes the
@@ -17,10 +18,12 @@ public with sharing class EnrollmentRulesHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
+        ProgramPersonRule.refuseNonPersonAccounts(Trigger.new, null);
         EnrollmentService.refuseSecondOpenEnrollments((List<Enrollment__c>) Trigger.new);
     }
 
     public override void beforeUpdate() {
+        ProgramPersonRule.refuseNonPersonAccounts(Trigger.new, Trigger.oldMap);
         Map<Id, Enrollment__c> previousById = (Map<Id, Enrollment__c>) Trigger.oldMap;
         List<Enrollment__c> changed = new List<Enrollment__c>();
         for (Enrollment__c enrollment : (List<Enrollment__c>) Trigger.new) {

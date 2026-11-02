@@ -431,6 +431,7 @@ public with sharing class ImportTemplateService {
     @NamespaceAccessible
     public static Integer materializeDefaultsDuringInstall(String context) {
         try {
+            recaseShippedNames();
             List<Import_Template__c> toCreate = missingDefaults(true);
             if (toCreate.isEmpty()) {
                 return 0;
@@ -440,6 +441,40 @@ public with sharing class ImportTemplateService {
         } catch (Exception failed) {
             ErrorLogger.log(failed, String.isBlank(context) ? INSTALL_CONTEXT : context);
             return 0;
+        }
+    }
+
+    /**
+     * The shipped template names were put in one casing, title casing (QA-F6). A shipped template
+     * whose name is still the shipped name in another casing takes the new one; a name the
+     * administrator changed in any other way is left exactly as it is. Finds nothing to do on a
+     * second run. System mode, as the insert above: the value comes from packaged metadata.
+     */
+    @TestVisible
+    private static void recaseShippedNames() {
+        Map<String, String> labelByKey = new Map<String, String>();
+        for (Import_Template_Default__mdt row : ImportTemplateSelector.selectShippedDefaults()) {
+            if (String.isNotBlank(row.Template_Key__c)) {
+                labelByKey.put(row.Template_Key__c, row.MasterLabel);
+            }
+        }
+        List<Import_Template__c> renamed = new List<Import_Template__c>();
+        for (
+            Import_Template__c template : ImportTemplateSelector.selectByKeys(labelByKey.keySet())
+                .values()
+        ) {
+            String shipped = labelByKey.get(template.Template_Key__c);
+            if (
+                template.Is_Package_Default__c == true &&
+                template.Name != null &&
+                template.Name.equalsIgnoreCase(shipped) &&
+                !template.Name.equals(shipped)
+            ) {
+                renamed.add(new Import_Template__c(Id = template.Id, Name = shipped));
+            }
+        }
+        if (!renamed.isEmpty()) {
+            Database.update(renamed, AccessLevel.SYSTEM_MODE);
         }
     }
 

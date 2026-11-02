@@ -268,7 +268,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-16: Integrations Page
 
 **Purpose:** confirm the Integrations roadmap page, that alternatives to a BarnCRM module appear only when installed, and the request links.
-**Prerequisites:** admin user. No Volunteers for Salesforce, Program Management Module or Outbound Funds Module installed in the test org (the usual case).
+**Prerequisites:** admin user. No Volunteers for Salesforce, Program Management Module or Outbound Funds Module installed in the test org, and not a Nonprofit Cloud org with Program Management (the usual case). In a Nonprofit Cloud org with the standard **Program** object, **Alternatives to BarnCRM Modules** shows **Nonprofit Cloud Program Management**, **Installed in this org**, in step 2: that is expected.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -284,7 +284,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 10 | As an admin, look below the **Request an Integration** section. | Change a setting in another section, then come back: no save bar shows on this page (other sections show it to an admin while anything is unsaved). |
 | 11 | As a read-only user, open **Integrations**. | The same page, with no setting to change. |
 
-**Cleanup:** make sure **Show Only When Installed** is on for the three alternatives.
+**Cleanup:** make sure **Show Only When Installed** is on for the four alternatives.
 
 ## T-SET-17: People and Households, and Boxes on Every Page
 
@@ -390,3 +390,17 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 3 | Switch both off and save. Run the upgrade or the source deploy again. | Both stay off. |
 
 **Cleanup:** set both back to what they were.
+
+## T-SET-22: Nightly Job Names, Template Names and Descriptions
+
+**Purpose:** confirm nightly jobs are named in one style and a job scheduled under its earlier name is still recognized, and that shipped names read in title casing.
+**Prerequisites:** the admin user; Giving and Programs installed; ideally an org whose Giving nightly jobs were scheduled before 0.15.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Nightly Jobs and Accounting Periods**, then **Nightly Jobs**. | Each job scheduled before the upgrade (such as "BarnCRM Giving: ask reminders") shows as scheduled; none is offered for scheduling again or shown twice. |
+| 2 | In an org where they were never scheduled, choose **Schedule**, then open Setup, **Scheduled Jobs**. | The names read "BarnCRM Giving Installment Top Up", "BarnCRM Giving Installments Overdue", "BarnCRM Giving Donor Levels" and "BarnCRM Giving Ask Reminders". When scheduled, the other two read "BarnCRM Giving Acknowledgments" and "BarnCRM Giving Pledge Reminders". |
+| 3 | Open **Data Manager**, select **Import a File**, and open the **Template** picker. | Template names are in title casing, for example "Generic Gift List" and "NPSP: Opportunities and Payments". A template you renamed keeps your name. |
+| 4 | Open the **Programs Admin** permission set in Setup. | Its description names case notes and service deliveries. |
+
+**Cleanup:** leave the jobs scheduled as they were.

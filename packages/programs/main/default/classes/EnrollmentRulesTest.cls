@@ -56,6 +56,58 @@ private class EnrollmentRulesTest {
         return new Enrollment__c(Program__c = programId, Contact__c = contactId, Stage__c = stage);
     }
 
+    /**
+     * QA-F4: an organization account is never enrolled, on insert or by changing the person; a
+     * person account is, in an org that has them.
+     */
+    @IsTest
+    static void onlyAPersonCanBeEnrolled() {
+        System.runAs(TestUsers.adminWith(ADMIN)) {
+            contactMode();
+            Program__c tutoring = program('Tutoring');
+            Account business = new Account(Name = 'Acme Supply');
+            insert business;
+
+            Database.SaveResult inserted = Database.insert(
+                new Enrollment__c(Program__c = tutoring.Id, Account__c = business.Id),
+                false
+            );
+            Enrollment__c contactEnrollment = newEnrollment(
+                tutoring.Id,
+                people(1)[0].Id,
+                'Enrolled'
+            );
+            insert contactEnrollment;
+            Database.SaveResult changed = Database.update(
+                new Enrollment__c(
+                    Id = contactEnrollment.Id,
+                    Contact__c = null,
+                    Account__c = business.Id
+                ),
+                false
+            );
+
+            Assert.isFalse(inserted.isSuccess(), 'An organization is not a person.');
+            Assert.areEqual(
+                System.Label.Programs_Person_NotAPerson,
+                inserted.getErrors()[0].getMessage()
+            );
+            Assert.isFalse(changed.isSuccess(), 'Nor by changing the person.');
+
+            if (
+                !OrgShapeDetector.hasPersonAccounts() ||
+                OrgShapeDetector.creatablePersonRecordTypeId() == null
+            ) {
+                return; // An org without person accounts has no such person.
+            }
+            Account person = new Account();
+            person.put('LastName', 'Lindqvist');
+            person.put('RecordTypeId', OrgShapeDetector.creatablePersonRecordTypeId());
+            insert person;
+            insert new Enrollment__c(Program__c = tutoring.Id, Account__c = person.Id);
+        }
+    }
+
     @IsTest
     static void aSecondOpenEnrollmentIsRefusedNamingTheProgramInBulk() {
         System.runAs(TestUsers.adminWith(ADMIN)) {

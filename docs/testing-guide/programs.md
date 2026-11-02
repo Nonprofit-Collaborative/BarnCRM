@@ -244,7 +244,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open BarnCRM's import and upload the CSV. | **Program roster** is offered as a template. |
+| 1 | Open BarnCRM's import and upload the CSV. | **Program Roster** is offered as a template. |
 | 2 | Choose it and preview. | Columns map to Program and the enrollment's fields with no manual mapping. |
 | 3 | Load it. | 2 loaded, 3 not loaded: no program "No Such Program", no person with nobody@example.org, and the repeated first email refused as an open enrollment already in Test Pantry. |
 | 4 | Open Test Pantry's **Program Roster** panel. | The first person Enrolled with your start date and Referral Source School; the second Enrolled from today. |
@@ -252,3 +252,18 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 6 | Undo the import. | Both enrollments are removed; the program stays. |
 
 **Cleanup:** none after the undo.
+
+## T-PRG-16: Only a Person Is Enrolled or Served
+
+**Purpose:** confirm an organization or household account is refused on every path, and that Health Check reports Nonprofit Cloud Program Management when the org has it.
+**Prerequisites:** the admin user; an Active program with a service; an organization account and a household account; for step 4, a person account org; for step 5, an org with Nonprofit Cloud Program Management (optional).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Enrollments** tab, click **New**, choose the program and the organization account as **Account**, and save. | The save is refused: "Choose a person. An organization or household account cannot be enrolled or receive a service." |
+| 2 | Open the **Service Deliveries** tab, click **New**, choose the service, the household account, a Delivery Date and Attendance, and save. | The same message. |
+| 3 | Enroll a contact, then edit the enrollment: clear **Contact** and choose the organization account. | The same message. |
+| 4 | In a person account org, enroll a person account. | It saves. |
+| 5 | In an org with Nonprofit Cloud Program Management, run **Health Check**. | An information finding says the org also has Nonprofit Cloud Program Management, with no fix. BarnCRM Settings, **Integrations** lists it under **Alternatives to BarnCRM Modules**. In barn-sales neither appears. |
+
+**Cleanup:** delete the test enrollments.

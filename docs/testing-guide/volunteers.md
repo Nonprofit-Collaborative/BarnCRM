@@ -242,3 +242,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 6 | Open a shift as a Read Only user. | No Suggested Volunteers card. |
 
 **Cleanup:** delete the test sign-ups and restore the shift's status.
+
+## T-VOL-16: Person Accounts Are Reminded and Suggested as Accounts
+
+**Purpose:** confirm that in an org that stores people as person accounts, a booking on the account gets its reminder and a suggested volunteer is signed up on the account, not the contact behind it.
+**Prerequisites:** a person account org (not barn-sales); admin; **Send Shift Reminders** on; Volunteers nightly jobs scheduled; an open shift that starts tomorrow in 3 hours' time or later; a person account, Dana, with your own email address, **Volunteer Status** Active and Email Opt Out unchecked.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the shift. Read **Suggested Volunteers**. | Dana is listed. |
+| 2 | Click **Sign Up** on Dana's row, then open the new sign-up. | The sign-up names Dana's **Account**, and **Contact** is empty. Dana leaves the suggestions. |
+| 3 | In the Developer Console, run `VolunteerReminderBatch.startMorning();` as the admin. Reopen the sign-up. | **Reminder Sent On** has a date and time; the mailbox received one reminder greeting Dana by first name. |
+| 4 | Check Email Opt Out on Dana's account, clear **Reminder Sent On** and run it again. | No email, and **Reminder Sent On** stays empty. |
+
+**Cleanup:** cancel the sign-up, uncheck Email Opt Out, and switch **Send Shift Reminders** off if it was off before.

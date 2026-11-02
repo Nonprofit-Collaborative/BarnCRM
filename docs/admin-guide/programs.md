@@ -25,6 +25,13 @@ everyone with a Programs permission set (the default), or only the people who ne
   **Integrations** page as an alternative. Use one or the other for the same programs, not both.
   BarnCRM's programs, services and enrollments are laid out so a later PMM migration template
   can move PMM's records across without new fields.
+- **Nonprofit Cloud Program Management.** A Nonprofit Cloud org has its own standard **Program**
+  and **Program Enrollment** objects. BarnCRM Programs keeps its own programs, enrollments and
+  service deliveries and never reads or writes those objects, so the two share no records and can
+  sit in the same org without conflict. Choose one for each program, so nobody counts the same
+  people twice. Where those objects are present, the **Integrations** page lists Nonprofit Cloud
+  Program Management as an alternative and Health Check notes it as information (see Health
+  Check below).
 
 ## Installing
 
@@ -163,7 +170,7 @@ related list on the program. The list views are **Open Enrollments** and **All E
 ### Importing a Roster
 
 To enroll many people at once, use BarnCRM's import (see [Importing](importing.md)) with the
-shipped **Program roster** template, which Programs adds at install. It is an upload of several
+shipped **Program Roster** template, which Programs adds at install. It is an upload of several
 objects: each row finds its program by name and enrolls the person found by email. Columns:
 
 | Column | Loads | Notes |
@@ -291,7 +298,11 @@ other BarnCRM apps the person page stays as it was. To show the card there too, 
 ## Enrollment Rules
 
 - **One person per enrollment.** An enrollment names a contact or, where people are person
-  accounts, an account: never both and never neither.
+  accounts, an account: never both and never neither. The account has to be a person account:
+  an organization or household account is refused with "Choose a person. An organization or
+  household account cannot be enrolled or receive a service.", however the enrollment is saved
+  (the **New** button on the Enrollments tab, an import, the API), not only in the roster
+  panel's picker. The same rule holds for a service delivery.
 - **One open enrollment per person per program.** Enrolling someone who already has an Applied
   or Enrolled enrollment in the same program is refused, with a message naming the program:
   change the one that is there instead. Once their enrollment is Completed or Withdrawn, they can
@@ -334,12 +345,13 @@ for example an **Awaiting Documents** list view to chase missing paperwork.
 
 ## Health Check
 
-With Programs installed, [Health Check](health-check.md) asks one more question, shown only to
+With Programs installed, [Health Check](health-check.md) asks two more questions, shown only to
 people who can manage BarnCRM Settings and not while Programs is turned off:
 
 | Finding | Severity | What it means | What to do |
 |---|---|---|---|
 | **Enrollments are still open in programs that have ended** | Information | Enrollments at Applied or Enrolled in a program whose Status is Completed or whose End Date is past. They still count as open, so the person cannot be enrolled again, and they stay on the roster. | Open each linked enrollment and set its Stage to Completed or Withdrawn. If the program is still running, set its Status back to Active or move its End Date. |
+| **Nonprofit Cloud Program Management is also in this org** | Information | The org has the Nonprofit Cloud **Program** and **Program Enrollment** objects. BarnCRM Programs does not read or write them, so the two share no records. | Nothing needs fixing. Choose one for each program (see Before You Install). |
 
 ## Sample Data
 
