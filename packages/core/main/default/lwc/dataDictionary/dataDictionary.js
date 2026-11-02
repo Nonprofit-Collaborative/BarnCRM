@@ -1,10 +1,14 @@
 import { LightningElement, wire } from 'lwc';
 import listObjects from '@salesforce/apex/DataDictionaryController.listObjects';
 import describeObject from '@salesforce/apex/DataDictionaryController.describeObject';
+import getAutomation from '@salesforce/apex/DataDictionaryController.getAutomation';
 import {
   readFillRates,
   toRow,
   dictionaryCsv,
+  toAutomationRow,
+  automationCsv,
+  AUTOMATION_COLUMNS,
   TABLE_COLUMNS,
   FILL_RATE_COLUMN
 } from 'c/dictionaryKit';
@@ -24,7 +28,17 @@ import PROGRESS from '@salesforce/label/c.Core_DataDictionary_Progress';
 import FILL_PROGRESS from '@salesforce/label/c.Core_DataDictionary_FillProgress';
 import NOT_COUNTED from '@salesforce/label/c.Core_DataDictionary_NotCounted';
 import EMPTY from '@salesforce/label/c.Core_DataDictionary_Empty';
+import INCLUDE_AUTOMATION from '@salesforce/label/c.Core_DataDictionary_IncludeAutomation';
+import INCLUDE_AUTOMATION_HELP from '@salesforce/label/c.Core_DataDictionary_IncludeAutomationHelp';
+import AUTOMATION_TITLE from '@salesforce/label/c.Core_DataDictionary_AutomationTitle';
+import AUTOMATION_NOTE from '@salesforce/label/c.Core_DataDictionary_AutomationNote';
+import AUTOMATION_EMPTY from '@salesforce/label/c.Core_DataDictionary_AutomationEmpty';
+import AUTOMATION_NOT_READ from '@salesforce/label/c.Core_DataDictionary_AutomationNotRead';
+import AUTOMATION_TRUNCATED from '@salesforce/label/c.Core_DataDictionary_AutomationTruncated';
+import DOWNLOAD_AUTOMATION from '@salesforce/label/c.Core_DataDictionary_DownloadAutomation';
+import DOWNLOADED_AUTOMATION from '@salesforce/label/c.Core_DataDictionary_DownloadedAutomation';
 const FILE_BASE = 'Data_Dictionary';
+const AUTOMATION_FILE_BASE = 'Automation_Inventory';
 
 /**
  * The Data Dictionary section of Org Optimizer (plan Section 6.1.1 item 13, D-154, admin guide
@@ -43,8 +57,21 @@ export default class DataDictionary extends LightningElement {
     includeFillRatesHelp: INCLUDE_FILL_RATES_HELP,
     build: BUILD,
     download: DOWNLOAD,
-    empty: EMPTY
+    empty: EMPTY,
+    includeAutomation: INCLUDE_AUTOMATION,
+    includeAutomationHelp: INCLUDE_AUTOMATION_HELP,
+    automationTitle: AUTOMATION_TITLE,
+    automationNote: AUTOMATION_NOTE,
+    automationEmpty: AUTOMATION_EMPTY,
+    downloadAutomation: DOWNLOAD_AUTOMATION
   };
+
+  automationColumns = AUTOMATION_COLUMNS;
+  includeAutomation = false;
+  builtWithAutomation = false;
+  automationRows = [];
+  automationNotRead = [];
+  automationTruncated = [];
 
   objectOptions = [];
   selected = [];
@@ -110,6 +137,34 @@ export default class DataDictionary extends LightningElement {
     return this.total ? Math.round((this.done / this.total) * 100) : 0;
   }
 
+  get showAutomation() {
+    return this.builtWithAutomation && !this.building;
+  }
+
+  get hasAutomationRows() {
+    return this.automationRows.length > 0;
+  }
+
+  get showAutomationEmpty() {
+    return this.showAutomation && !this.hasAutomationRows;
+  }
+
+  get downloadAutomationDisabled() {
+    return this.building || !this.hasAutomationRows;
+  }
+
+  get automationNotReadMessage() {
+    return this.automationNotRead.length
+      ? format(AUTOMATION_NOT_READ, this.automationNotRead.join(', '))
+      : undefined;
+  }
+
+  get automationTruncatedMessage() {
+    return this.automationTruncated.length
+      ? format(AUTOMATION_TRUNCATED, this.automationTruncated.join(', '))
+      : undefined;
+  }
+
   get notCountedMessage() {
     return this.skipped.length ? format(NOT_COUNTED, this.skipped.join(', ')) : undefined;
   }
@@ -122,10 +177,18 @@ export default class DataDictionary extends LightningElement {
     this.includeFillRates = event.target.checked;
   }
 
+  handleAutomation(event) {
+    this.includeAutomation = event.target.checked;
+  }
+
   async handleBuild() {
     const run = ++this.run;
     const names = [...this.selected];
     const withFillRates = this.includeFillRates;
+    this.builtWithAutomation = this.includeAutomation;
+    this.automationRows = [];
+    this.automationNotRead = [];
+    this.automationTruncated = [];
     this.rows = [];
     this.skipped = [];
     this.errorMessage = undefined;
@@ -162,7 +225,37 @@ export default class DataDictionary extends LightningElement {
     if (withFillRates) {
       await this.addFillRates(run, described);
     }
+    if (this.builtWithAutomation) {
+      await this.addAutomation(run, described);
+    }
     await this.describeNext(run, names, index + 1, withFillRates);
+  }
+
+  /** Adds one object's triggers and flows; a read that fails is named and the dictionary stays. */
+  async addAutomation(run, described) {
+    try {
+      const inventory = await getAutomation({ objectName: described.objectName });
+      if (run !== this.run) {
+        return;
+      }
+      this.automationRows = [...this.automationRows, ...inventory.rows.map(toAutomationRow)];
+      if (inventory.triggersFailed || inventory.flowsFailed) {
+        this.automationNotRead = [...this.automationNotRead, described.objectLabel];
+      }
+      if (inventory.truncated) {
+        this.automationTruncated = [...this.automationTruncated, described.objectLabel];
+      }
+    } catch {
+      this.automationNotRead = [...this.automationNotRead, described.objectLabel];
+    }
+  }
+
+  handleDownloadAutomation() {
+    saveBlob(
+      new Blob([automationCsv(this.automationRows)], { type: 'text/csv;charset=utf-8' }),
+      fileName(AUTOMATION_FILE_BASE)
+    );
+    this.noticeMessage = format(DOWNLOADED_AUTOMATION, String(this.automationRows.length));
   }
 
   /** Fills one object's rows from Field Utilization's plan and counts, within its limits. */

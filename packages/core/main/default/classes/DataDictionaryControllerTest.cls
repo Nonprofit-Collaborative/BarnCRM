@@ -200,6 +200,124 @@ private class DataDictionaryControllerTest {
         }
     }
 
+    private static Map<String, DataDictionaryController.AutomationRow> automationByKey(
+        DataDictionaryController.AutomationInventory inventory
+    ) {
+        Map<String, DataDictionaryController.AutomationRow> found = new Map<String, DataDictionaryController.AutomationRow>();
+        for (DataDictionaryController.AutomationRow row : inventory.rows) {
+            found.put(row.automationType + '|' + row.apiName, row);
+        }
+        return found;
+    }
+
+    @IsTest
+    static void anObjectListsItsApexTriggers() {
+        System.runAs(TestUsers.admin()) {
+            DataDictionaryController.AutomationInventory inventory;
+            System.runAs(maria()) {
+                inventory = DataDictionaryController.getAutomation('Account');
+            }
+
+            Assert.areEqual('Account', inventory.objectName, 'The object API name.');
+            Assert.isFalse(inventory.triggersFailed, 'Triggers are readable.');
+            Assert.isFalse(inventory.flowsFailed, 'Flows are readable.');
+            DataDictionaryController.AutomationRow accountTrigger = automationByKey(inventory)
+                .get('ApexTrigger|AccountTrigger');
+            Assert.isNotNull(accountTrigger, 'Core\'s Account trigger is listed.');
+            Assert.areEqual('Active', accountTrigger.status, 'It is active.');
+            Assert.isTrue(
+                accountTrigger.detail.contains('before insert'),
+                'With the events it runs on.'
+            );
+            Assert.isNotNull(accountTrigger.apiVersion, 'And its API version.');
+        }
+    }
+
+    @IsTest
+    static void aCustomObjectListsItsTriggersAndItsFlowsByTheObjectId() {
+        System.runAs(TestUsers.admin()) {
+            DataDictionaryController.AutomationInventory inventory;
+            System.runAs(maria()) {
+                inventory = DataDictionaryController.getAutomation(
+                    Affiliation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                        .getName()
+                );
+            }
+
+            Map<String, DataDictionaryController.AutomationRow> found = automationByKey(inventory);
+            Assert.isNotNull(found.get('ApexTrigger|AffiliationTrigger'), 'Its trigger is listed.');
+            DataDictionaryController.AutomationRow flow = found.get(
+                'Flow|Template_Affiliation_Primary'
+            );
+            Assert.isNotNull(flow, 'A flow that a record of the object triggers is listed.');
+            Assert.areEqual('After save', flow.detail, 'With the point in the save it runs at.');
+            Assert.areEqual(
+                'Inactive',
+                flow.status,
+                'A template flow ships inactive until an admin turns it on.'
+            );
+            Assert.isNull(
+                found.get('Flow|Template_Account_Address_Capture'),
+                'Another object\'s flow is not listed.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aPartThatCannotBeReadIsReportedAndTheOtherPartStillLists() {
+        System.runAs(TestUsers.admin()) {
+            DataDictionaryController.AutomationInventory inventory;
+            System.runAs(maria()) {
+                AutomationInventoryService.failType = AutomationInventoryService.TYPE_FLOW;
+                inventory = DataDictionaryController.getAutomation('Account');
+            }
+
+            Assert.isTrue(inventory.flowsFailed, 'The flows could not be read, and it says so.');
+            Assert.isFalse(inventory.triggersFailed, 'The triggers were.');
+            Assert.isNotNull(
+                automationByKey(inventory).get('ApexTrigger|AccountTrigger'),
+                'The triggers are still listed.'
+            );
+        }
+    }
+
+    @IsTest
+    static void theInventoryNeedsTheSettingsPermissionAndAKnownObject() {
+        System.runAs(TestUsers.admin()) {
+            String unknown;
+            System.runAs(maria()) {
+                try {
+                    DataDictionaryController.getAutomation('Nothing_Here__c');
+                } catch (AuraHandledException caught) {
+                    unknown = caught.getMessage();
+                }
+            }
+            Assert.areEqual(
+                String.format(
+                    System.Label.Core_DataDictionary_UnknownObject,
+                    new List<Object>{ 'Nothing_Here__c' }
+                ),
+                unknown,
+                'An unknown object is refused by name.'
+            );
+
+            User plain = TestDataFactory.createUser('Plain', new List<String>{ 'BarnCRM_Staff' });
+            String refusal;
+            System.runAs(plain) {
+                try {
+                    DataDictionaryController.getAutomation('Account');
+                } catch (AuraHandledException caught) {
+                    refusal = caught.getMessage();
+                }
+            }
+            Assert.areEqual(
+                System.Label.Core_DataDictionary_PermissionRequired,
+                refusal,
+                'Manage BarnCRM Settings is required.'
+            );
+        }
+    }
+
     @IsTest
     static void anUnknownOrBlankObjectIsRefusedByName() {
         System.runAs(TestUsers.admin()) {

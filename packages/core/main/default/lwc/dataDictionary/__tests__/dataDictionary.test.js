@@ -2,8 +2,25 @@ import { createElement } from 'lwc';
 import DataDictionary from 'c/dataDictionary';
 import listObjects from '@salesforce/apex/DataDictionaryController.listObjects';
 import describeObject from '@salesforce/apex/DataDictionaryController.describeObject';
+import getAutomation from '@salesforce/apex/DataDictionaryController.getAutomation';
 import getPlan from '@salesforce/apex/FieldUtilizationController.getPlan';
 import countFields from '@salesforce/apex/FieldUtilizationController.countFields';
+
+jest.mock(
+  '@salesforce/apex/DataDictionaryController.getAutomation',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_DataDictionary_AutomationNotRead',
+  () => ({ default: 'Could not read all automation for: {0}.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_DataDictionary_DownloadedAutomation',
+  () => ({ default: 'Downloaded {0} automation rows.' }),
+  { virtual: true }
+);
 
 jest.mock(
   '@salesforce/apex/DataDictionaryController.listObjects',
@@ -338,5 +355,136 @@ describe('c-data-dictionary', () => {
     expect(lines[0].endsWith(',Fill Rate')).toBe(true);
     expect(lines[1].endsWith(',33.3%')).toBe(true);
     expect(lines[2].endsWith(',')).toBe(true);
+  });
+
+  describe('automation inventory', () => {
+    const inventory = (objectName, rows, extra = {}) => ({
+      objectName,
+      objectLabel: objectName,
+      rows,
+      triggersFailed: false,
+      flowsFailed: false,
+      truncated: false,
+      ...extra
+    });
+    const automationRow = (objectName, automationType, apiName, extra = {}) => ({
+      key: `${objectName}|${automationType}|${apiName}`,
+      objectLabel: objectName,
+      objectName,
+      automationType,
+      name: apiName,
+      apiName,
+      status: 'Active',
+      detail: 'before insert',
+      apiVersion: 67,
+      ...extra
+    });
+    const tickAutomation = (element) => {
+      const box = find(element, 'automation');
+      box.checked = true;
+      box.dispatchEvent(new CustomEvent('change'));
+    };
+
+    it('reads no automation until the box is ticked', async () => {
+      describeObject.mockResolvedValue(dictionary('Account', [field('Name')]));
+      const element = render();
+      await build(element);
+
+      expect(getAutomation).not.toHaveBeenCalled();
+      expect(find(element, 'automation-section')).toBeNull();
+    });
+
+    it("lists each object's triggers and flows in a second table and says what is not covered", async () => {
+      describeObject
+        .mockResolvedValueOnce(dictionary('Account', [field('Name')]))
+        .mockResolvedValueOnce(dictionary('Contact', [field('LastName')]));
+      getAutomation
+        .mockResolvedValueOnce(
+          inventory('Account', [
+            automationRow('Account', 'ApexTrigger', 'AccountTrigger'),
+            automationRow('Account', 'Flow', 'Account_Flow', { detail: 'After save' })
+          ])
+        )
+        .mockResolvedValueOnce(inventory('Contact', []));
+      const element = render();
+      tickAutomation(element);
+      await flush();
+      await build(element);
+
+      expect(getAutomation).toHaveBeenNthCalledWith(1, { objectName: 'Account' });
+      expect(getAutomation).toHaveBeenNthCalledWith(2, { objectName: 'Contact' });
+      const table = find(element, 'automation-results');
+      expect(table.data.map((row) => row.key)).toEqual([
+        'Account|ApexTrigger|AccountTrigger',
+        'Account|Flow|Account_Flow'
+      ]);
+      expect(table.data[0].typeLabel).toBe('c.Core_DataDictionary_TypeApexTrigger');
+      expect(find(element, 'automation-note').textContent).toContain(
+        'c.Core_DataDictionary_AutomationNote'
+      );
+      expect(find(element, 'automation-empty')).toBeNull();
+      // The field table is not changed by the inventory.
+      expect(find(element, 'results').data).toHaveLength(2);
+    });
+
+    it('says so when nothing runs on the chosen objects, and names a part that could not be read', async () => {
+      describeObject
+        .mockResolvedValueOnce(dictionary('Account', [field('Name')]))
+        .mockResolvedValueOnce(dictionary('Contact', [field('LastName')]));
+      getAutomation
+        .mockResolvedValueOnce(inventory('Account', [], { flowsFailed: true }))
+        .mockRejectedValueOnce(new Error('nope'));
+      const element = render();
+      tickAutomation(element);
+      await flush();
+      await build(element);
+
+      expect(find(element, 'automation-empty')).not.toBeNull();
+      expect(find(element, 'automation-not-read').textContent).toBe(
+        'Could not read all automation for: Account, Contact.'
+      );
+      expect(find(element, 'download-automation').disabled).toBe(true);
+    });
+
+    it('downloads the inventory as its own CSV with the object API name', async () => {
+      describeObject.mockResolvedValue(dictionary('Account', [field('Name')]));
+      getAutomation
+        .mockResolvedValueOnce(
+          inventory('Account', [automationRow('Account', 'ApexTrigger', 'AccountTrigger')])
+        )
+        .mockResolvedValueOnce(inventory('Contact', []));
+      const element = render();
+      tickAutomation(element);
+      await flush();
+      await build(element);
+
+      let blob;
+      let name;
+      URL.createObjectURL = jest.fn((made) => {
+        blob = made;
+        return 'blob:test';
+      });
+      URL.revokeObjectURL = jest.fn();
+      const click = jest
+        .spyOn(HTMLAnchorElement.prototype, 'click')
+        .mockImplementation(function () {
+          name = this.download;
+        });
+      find(element, 'download-automation').click();
+      await flush();
+      click.mockRestore();
+      const text = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsText(blob);
+      });
+
+      expect(name).toContain('Automation_Inventory');
+      const lines = text.replace(/^﻿/, '').split('\r\n');
+      expect(lines[0].split(',')[1]).toBe('Object API Name');
+      expect(lines[1]).toContain('AccountTrigger');
+      expect(lines[1]).toContain('Account,Account');
+      expect(find(element, 'notice').textContent).toBe('Downloaded 1 automation rows.');
+    });
   });
 });
