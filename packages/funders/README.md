@@ -30,12 +30,12 @@ and a Giving fund by record identifier (text), resolved by describe only where a
   (canonical model Sections 29ZH to 29ZJ).
 - The **Grant Pipeline** tab (`grantPipeline`), with its framework-free module
   `grantPipelineModel` and the thin controller `GrantPipelineController`; the program picker
-  (`grantProgram`) on the Grant record page.
+  (`grantLinkedRecord`, kind Program, `GrantProgramController`) on the Grant record page.
 - The morning reminder job (`GrantReminderScheduler`, `GrantReminderBatch`).
 - `Grant_Payment__c` (29ZM), an award's schedule, with the Award Schedule card (`grantSchedule`,
   framework-free `grantScheduleModel`, `GrantScheduleController`) on the Grant record page.
 - `Grant_Fund_Entry__c` (29ZL), a restricted grant's ledger, kept in step with received payments
-  by `GrantPaymentService.syncLedger`; the Giving Fund card (`grantFund`, `GrantFundController`,
+  by `GrantPaymentService.syncLedger`; the Giving Fund card (`grantLinkedRecord`, kind Fund, `GrantFundController`,
   `GrantFundService`) on the Grant record page.
 - The **Grant Calendar** tab (`grantCalendar`, framework-free `grantCalendarModel`,
   `GrantCalendarController`), reading the same rows as Upcoming Deadlines through

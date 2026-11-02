@@ -1,5 +1,5 @@
 <template>
-  <lightning-card title={title} icon-name="custom:custom17">
+  <lightning-card title={title} icon-name={iconName}>
     <div class="slds-var-p-horizontal_medium">
       <template lwc:if={isLoading}>
         <lightning-spinner alternative-text={title} size="small"></lightning-spinner>
@@ -23,7 +23,7 @@
 
       <template lwc:if={canEdit}>
         <lightning-combobox
-          data-id="fund"
+          data-id={dataId}
           label={title}
           variant="label-hidden"
           options={options}
@@ -34,7 +34,7 @@
           data-id="save"
           class="slds-var-m-top_small"
           variant="brand"
-          label={labels.save}
+          label={saveLabel}
           disabled={saveDisabled}
           onclick={handleSave}
         ></lightning-button>
