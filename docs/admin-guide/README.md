@@ -226,6 +226,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | L-01 and L-02 Logic Models: install, roles, the Logic Model Builder, arrows and assumptions, indicators with baselines, targets and results by period | [logic-models.md](logic-models.md) | BarnCRM Logic Models |
 
+### Funders
+
+| Feature | Page | Package |
+|---|---|---|
+| F-01 Funders: install, roles, grants and their stages, the program a grant pays for, the Grant Pipeline tab | [funders.md](funders.md) | BarnCRM Funders |
+
 ### Moving From Another System
 
 | Feature | Page | Package |
