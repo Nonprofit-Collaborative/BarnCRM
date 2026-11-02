@@ -15,11 +15,11 @@ restricted fund tracking follows in 0.17.
 
 - BarnCRM Core
 - BarnCRM Rollup Builder
-- BarnCRM Giving
 
-Release 0.16 references no Giving object; F-03 and F-05 will. Nothing in this package references
-Programs: a grant may name a program by its record identifier (text), resolved by describe only
-where a `Program__c` object exists.
+Nothing in this package references Giving or Programs (ADR-NEXT
+`NEXT-funders-restricted-funds-schedules-calendar.md` decision 1): a grant may name a program
+and a Giving fund by record identifier (text), resolved by describe only where a `Program__c` or
+`Fund__c` object exists.
 
 ## Contents
 
@@ -31,4 +31,7 @@ where a `Program__c` object exists.
 - The morning reminder job (`GrantReminderScheduler`, `GrantReminderBatch`).
 - `Grant_Payment__c` (29ZM), an award's schedule, with the Award Schedule card (`grantSchedule`,
   framework-free `grantScheduleModel`, `GrantScheduleController`) on the Grant record page.
+- `Grant_Fund_Entry__c` (29ZL), a restricted grant's ledger, kept in step with received payments
+  by `GrantPaymentService.syncLedger`; the Giving Fund card (`grantFund`, `GrantFundController`,
+  `GrantFundService`) on the Grant record page.
 - Permission sets Funders Admin, Staff and Read Only, given by role through `FundersAccessSync`.

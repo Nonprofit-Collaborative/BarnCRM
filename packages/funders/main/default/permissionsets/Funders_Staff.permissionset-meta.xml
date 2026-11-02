@@ -11,6 +11,10 @@
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
+    <apexClass>GrantFundController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>GrantPipelineController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -22,6 +26,16 @@
     <apexClass>GrantScheduleController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Grant_Fund_Entry__c.Description__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Grant_Fund_Entry__c.Grant_Payment__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
     <field>Grant_Payment__c.Received_Date__c</field>
@@ -89,6 +103,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Grant__c.Fund_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Grant__c.Funder_Contact__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -114,6 +133,31 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Grant__c.Restricted_Balance__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Grant__c.Restricted_Received__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Grant__c.Restricted_Released__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Grant__c.Restricted_Spent__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Grant__c.Restricted__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Grant__c.Sample_Data__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -122,6 +166,15 @@
     <field>Grant__c.Submitted_Date__c</field>
     <readable>true</readable>
   </fieldPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Grant_Fund_Entry__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
     <allowDelete>true</allowDelete>

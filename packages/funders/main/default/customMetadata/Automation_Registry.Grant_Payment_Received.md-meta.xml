@@ -24,7 +24,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Fills in an empty Received Date with today when a grant payment becomes Received. A date already typed is kept. Switch it off while you load past payments whose dates you type yourself.</value>
+        <value xsi:type="xsd:string">Fills in an empty Received Date with today when a grant payment becomes Received, and keeps a restricted grant's Received ledger entry in step with each received payment. Entries typed by hand are never touched. Switch it off while you load past payments and entries yourself.</value>
     </values>
     <values>
         <field>Module__c</field>

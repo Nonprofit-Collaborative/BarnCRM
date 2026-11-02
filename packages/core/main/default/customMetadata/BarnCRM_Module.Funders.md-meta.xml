@@ -20,7 +20,7 @@
   </values>
   <values>
     <field>Requires__c</field>
-    <value xsi:type="xsd:string">Rollups;Giving</value>
+    <value xsi:type="xsd:string">Rollups</value>
   </values>
   <values>
     <field>App_Name__c</field>

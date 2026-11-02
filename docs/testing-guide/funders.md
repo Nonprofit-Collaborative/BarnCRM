@@ -1,9 +1,10 @@
 # Funders
 
-Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02) and award schedules (F-05). Setup detail: [Funders](../admin-guide/funders.md).
+Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), award schedules (F-05) and restricted funds (F-03). Setup detail: [Funders](../admin-guide/funders.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder,
-Giving and Funders deployed. Programs is optional; T-FUN-04 needs it for its second half. Funders
+Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder
+and Funders deployed. Programs and Giving are optional; T-FUN-04 needs Programs and T-FUN-10
+Giving for their second halves. Funders
 works on the platform-only shape. Give the testers their roles on the **Access** page: admin
 (Admin role), staff (Fundraising Staff role) and read-only (Read Only role). Each gets its Funders
 permission set from the role. Have one organization, `Lakeside Foundation`, with a contact,
@@ -159,3 +160,24 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 9 | As the admin, delete `Two Year Award`. | Its payments go with it. |
 
 **Cleanup:** Remove sample data; delete `Not Yet` as the admin.
+
+## T-FUN-10: Restricted Funds and the Giving Fund
+
+**Purpose:** confirm the restricted ledger, its totals, the entries written for received payments, and the Giving Fund card with and without Giving.
+**Prerequisites:** admin, staff and read-only; a grant `Restricted Award` to `Lakeside Foundation`, **Awarded**, **Amount Awarded** 10,000, award dates this year, with **Restricted** ticked and one **Expected** payment of 10,000.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff, open `Restricted Award` and click **Mark Received** on the payment. | A **Received** entry of 10,000 dated today appears in **Restricted Fund Entries**; **Restricted Received** and **Restricted Balance** are 10,000. Staff cannot edit the entry's **Payment**. |
+| 2 | Add a **Spent** entry of 12,000, description `Tutor salaries`. | **Restricted Spent** 12,000; **Restricted Balance** -2,000 (shown, not refused). |
+| 3 | Add a **Released** entry of 0. | Refused: the amount must be above zero. |
+| 4 | Change the payment's **Amount** to 9,000, then its **Received Date** to the first of the month. | The Received entry follows: 9,000, dated the first. |
+| 5 | Set the payment to **Expected**. | The Received entry is removed; the Spent entry stays. |
+| 6 | Untick **Restricted**, add a second payment of 500 as **Received**. | No entry is added. |
+| 7 | Without Giving: look at the **Giving Fund** card. | It says to install the Giving module. Typing text into **Giving Fund** on the grant is refused. |
+| 8 | With Giving: choose an active fund on the card and click **Save**. | `Saved.` and the fund's name; the grant's **Giving Fund** holds an 18-character ID. Choose **No fund** and save to clear it. |
+| 9 | As read-only, open the grant. | The entries and totals show; no **New** on the entries and the fund is shown by name. |
+| 10 | Load sample data and open **Youth Programs Award**. | **Restricted** is ticked: Received 17,500, Spent 6,000 (`Tutor stipends`), balance 11,500. |
+| 11 | As the admin, delete `Restricted Award`. | Its entries and payments go with it. |
+
+**Cleanup:** Remove sample data.

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Restricted_Balance__c</fullName>
+  <externalId>false</externalId>
+  <formula>BLANKVALUE(Restricted_Received__c, 0) - BLANKVALUE(Restricted_Spent__c, 0) - BLANKVALUE(Restricted_Released__c, 0)</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <precision>18</precision>
+  <scale>2</scale>
+  <inlineHelpText>Restricted Received minus Restricted Spent minus Restricted Released. Below zero when money was spent before it came in.</inlineHelpText>
+  <label>Restricted Balance</label>
+  <trackTrending>false</trackTrending>
+  <type>Currency</type>
+</CustomField>

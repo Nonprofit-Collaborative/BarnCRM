@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Type__c</fullName>
+  <externalId>false</externalId>
+  <required>true</required>
+  <inlineHelpText>Received: restricted money that came in. Spent: spent on the purpose. Released: the restriction was lifted or lapsed without the money being spent on it.</inlineHelpText>
+  <label>Type</label>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Received</fullName>
+        <default>true</default>
+        <label>Received</label>
+      </value>
+      <value>
+        <fullName>Spent</fullName>
+        <default>false</default>
+        <label>Spent</label>
+      </value>
+      <value>
+        <fullName>Released</fullName>
+        <default>false</default>
+        <label>Released</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

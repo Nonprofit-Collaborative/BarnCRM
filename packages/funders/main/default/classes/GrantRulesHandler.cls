@@ -1,7 +1,7 @@
 /**
- * R-GN4 for Grant__c, run by the Core trigger dispatcher through the registry row `Grant_Rules`,
- * which always runs (ADR-0024): a grant's program is a record identifier of a program, stored in
- * its 18-character form.
+ * R-GN4 and R-GN8 for Grant__c, run by the Core trigger dispatcher through the registry row
+ * `Grant_Rules`, which always runs (ADR-0024): a grant's program and Giving fund are record
+ * identifiers of a program and a fund, stored in their 18-character form.
  */
 @NamespaceAccessible
 public with sharing class GrantRulesHandler extends TriggerHandler {
@@ -16,16 +16,23 @@ public with sharing class GrantRulesHandler extends TriggerHandler {
 
     public override void beforeInsert() {
         GrantService.checkPrograms((List<Grant__c>) Trigger.new);
+        GrantFundService.checkFunds((List<Grant__c>) Trigger.new);
     }
 
     public override void beforeUpdate() {
-        List<Grant__c> changed = new List<Grant__c>();
+        List<Grant__c> programChanged = new List<Grant__c>();
+        List<Grant__c> fundChanged = new List<Grant__c>();
         Map<Id, Grant__c> oldById = (Map<Id, Grant__c>) Trigger.oldMap;
         for (Grant__c grant : (List<Grant__c>) Trigger.new) {
-            if (grant.Program_Id__c != oldById.get(grant.Id).Program_Id__c) {
-                changed.add(grant);
+            Grant__c old = oldById.get(grant.Id);
+            if (grant.Program_Id__c != old.Program_Id__c) {
+                programChanged.add(grant);
+            }
+            if (grant.Fund_Id__c != old.Fund_Id__c) {
+                fundChanged.add(grant);
             }
         }
-        GrantService.checkPrograms(changed);
+        GrantService.checkPrograms(programChanged);
+        GrantFundService.checkFunds(fundChanged);
     }
 }

@@ -1,8 +1,9 @@
 /**
  * R-GP3 for Grant_Payment__c, run by the Core trigger dispatcher through the registry row
  * `Grant_Payment_Received`, switchable from the Automation page (ADR-0017): it fills in an empty
- * Received Date when a payment becomes Received. It does work for the user rather than enforcing
- * a rule, so an import of past payments can turn it off.
+ * Received Date when a payment becomes Received, and keeps a restricted grant's Received ledger
+ * entry in step with each received payment. It does work for the user rather than enforcing a
+ * rule, so an import of past payments and entries can turn it off.
  */
 @NamespaceAccessible
 public with sharing class GrantPaymentReceivedHandler extends TriggerHandler {
@@ -24,5 +25,17 @@ public with sharing class GrantPaymentReceivedHandler extends TriggerHandler {
             (List<Grant_Payment__c>) Trigger.new,
             (Map<Id, Grant_Payment__c>) Trigger.oldMap
         );
+    }
+
+    public override void afterInsert() {
+        GrantPaymentService.syncLedger((List<Grant_Payment__c>) Trigger.new, false);
+    }
+
+    public override void afterUpdate() {
+        GrantPaymentService.syncLedger((List<Grant_Payment__c>) Trigger.new, false);
+    }
+
+    public override void beforeDelete() {
+        GrantPaymentService.syncLedger((List<Grant_Payment__c>) Trigger.old, true);
     }
 }

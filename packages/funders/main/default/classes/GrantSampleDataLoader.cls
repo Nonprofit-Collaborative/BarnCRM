@@ -68,11 +68,35 @@ public with sharing class GrantSampleDataLoader {
         awarded.Decision_Date__c = today.addDays(-60);
         awarded.Award_Start_Date__c = today.addDays(-30);
         awarded.Award_End_Date__c = today.addDays(334);
-        awarded.Purpose__c = 'General support for after-school programs for one year.';
+        awarded.Purpose__c = 'After-school tutoring for one year, restricted to tutor stipends.';
+        if (Schema.SObjectType.Grant__c.fields.Restricted__c.isCreateable()) {
+            awarded.Restricted__c = true;
+        }
 
         Database.insert(new List<Grant__c>{ prospect, applied, awarded }, AccessLevel.USER_MODE);
         loadRequirements(awarded.Id, today);
         loadPayments(awarded);
+        loadSpending(awarded.Id, today);
+    }
+
+    /**
+     * F-03: one Spent entry in the restricted award's ledger. Its Received entry comes from the
+     * received payment (R-GP3). It goes with its grant when the sample data is removed.
+     */
+    private static void loadSpending(Id grantId, Date today) {
+        if (!Schema.SObjectType.Grant_Fund_Entry__c.isCreateable()) {
+            return;
+        }
+        Database.insert(
+            new Grant_Fund_Entry__c(
+                Grant__c = grantId,
+                Type__c = 'Spent',
+                Amount__c = 6000,
+                Entry_Date__c = today.addDays(-5),
+                Description__c = 'Tutor stipends'
+            ),
+            AccessLevel.USER_MODE
+        );
     }
 
     /**

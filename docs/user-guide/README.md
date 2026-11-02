@@ -53,7 +53,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Funders (Nonprofit Edition)
 
-- [Grants and funders](funders.md): adding grants, moving them through the stages on the Grant Pipeline, the deadlines coming up, the program a grant pays for, and an award's payments.
+- [Grants and funders](funders.md): adding grants, moving them through the stages on the Grant Pipeline, the deadlines coming up, the program a grant pays for, an award's payments, and a restricted grant's ledger and Giving fund.
 
 ### Reports
 
