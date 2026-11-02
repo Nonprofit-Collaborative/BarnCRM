@@ -95,7 +95,8 @@ Pipeline** under **Upcoming Deadlines** once it is due within 60 days.
 ## Your Reminders
 
 When a requirement assigned to you is coming due (14 days ahead unless your admin changed it),
-you get a task on the grant, due on the due date, and an email with a link to the grant. If
+you get a task on the grant, due on the due date, and, if your admin turned email reminders on,
+an email with a link to the grant. If
 nobody is assigned, the grant's owner gets them. You are reminded once for each due date; if the
 date changes, you are reminded again.
 

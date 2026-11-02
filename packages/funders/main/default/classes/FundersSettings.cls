@@ -17,9 +17,9 @@ public with sharing class FundersSettings {
         return flag('Reminder_Tasks_Enabled__c', true);
     }
 
-    /** R-GQ3: whether the morning job also emails the person reminded. Ships on. */
+    /** R-GQ3: whether the morning job also emails the person reminded. Ships off. */
     public static Boolean reminderEmailsEnabled() {
-        return flag('Reminder_Emails_Enabled__c', true);
+        return flag('Reminder_Emails_Enabled__c', false);
     }
 
     /** R-FS1: how many days before a requirement is due its reminder goes out, 1 to 90. */

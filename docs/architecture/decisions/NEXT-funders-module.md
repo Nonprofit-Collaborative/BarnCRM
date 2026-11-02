@@ -70,9 +70,11 @@ a deadline, an award period, and obligations after the award.
    is off or both reminder settings are off. Emails go only to BarnCRM users, addressed by user
    record, so they do not count against the org's daily limit for outside addresses.
 8. **Three settings, in a Funders section of BarnCRM Settings.** `Funders_Settings__c` (hierarchy
-   custom setting, ADR-0017): Create Reminder Tasks (on), Email Reminders (on) and Days Before a
-   Deadline to Remind (14, from 1 to 90). Both checkboxes ship on: a missed funder report can cost
-   the next award, and the reminder reaches only the staff member who owns the work. Shown as
+   custom setting, ADR-0017): Create Reminder Tasks (on), Email Reminders (off) and Days Before a
+   Deadline to Remind (14, from 1 to 90). Tasks ship on: a missed funder report can cost the next
+   award, and a task reaches only the staff member who owns the work, inside Salesforce. Emails
+   ship off, as for shift reminders (V-10) and pledge reminders (G-30): outbound email is
+   something an admin turns on (integrator decision, 2026-11-02). Shown as
    Setting Definition rows in a new Core section, Funders, under Fundraising.
 9. **Three permission sets, given by role.** `Funders_Admin` (everything, including delete) to
    holders of `BarnCRM_Admin`; `Funders_Staff` to the Team Member (`Program_Staff`), Coordinator

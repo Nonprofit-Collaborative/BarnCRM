@@ -28,7 +28,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Whether the morning job also emails the same person about each grant requirement coming due. On by default. Emails go only to your own Salesforce users, through your org.</value>
+        <value xsi:type="xsd:string">Whether the morning job also emails the same person about each grant requirement coming due. Off by default, like every BarnCRM email to people: an admin turns it on. Emails go only to your own Salesforce users, through your org.</value>
     </values>
     <values>
         <field>Help_Path__c</field>

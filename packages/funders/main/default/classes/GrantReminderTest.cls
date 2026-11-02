@@ -77,6 +77,7 @@ private class GrantReminderTest {
     static void aRequirementComingDueGetsOneTaskAndOneEmailOnce() {
         Id staffId = staff().Id;
         System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
+            settings(true, true, 14);
             Date today = Date.today();
             RecordingEmailSender stub = new RecordingEmailSender();
             GrantReminderService.emailSender = stub;
@@ -235,6 +236,7 @@ private class GrantReminderTest {
     @IsTest
     static void aFailedEmailIsLoggedAndNotRepeated() {
         System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
+            settings(true, true, 14);
             Date today = Date.today();
             RecordingEmailSender refusing = new RecordingEmailSender();
             refusing.refuseWith = 'Email is off in this org.';
@@ -276,7 +278,7 @@ private class GrantReminderTest {
             Test.stopTest();
 
             Assert.isTrue(tasksShipped, 'Tasks ship on');
-            Assert.isTrue(emailsShipped, 'Emails ship on');
+            Assert.isFalse(emailsShipped, 'Emails ship off');
             Assert.areEqual(14, leadShipped, 'Fourteen days ships');
             Assert.areEqual(14, outOfRange, 'Out of range reads as the default');
             Assert.areEqual(30, saved, 'A saved value reads back');
