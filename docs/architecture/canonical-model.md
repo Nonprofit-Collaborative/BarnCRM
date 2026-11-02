@@ -11909,6 +11909,62 @@ on its due date, beside application deadlines and open requirements.
 
 ---
 
+## 29ZN. Grant Answer
+
+### Definition
+
+One reusable piece of application writing: the mission statement, the statement of need, how
+outcomes are measured, the budget narrative (F-14, Funders module). Staff keep them in the answer
+library, tagged by topic, and copy one into an application from the grant's page; the library
+shows when each was last used, so stale text is noticed. Answers belong to the organization, not
+to a grant.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Title | text | yes | What the answer is, for example "Mission statement (100 words)". |
+| Answer | long text | yes (R-GA1) | The text itself, as it is pasted into an application. |
+| Topics | text | no | The topics it answers, separated by commas, for example "Mission, Need" (R-GA2). |
+| Last Used Date | date | no (set by BarnCRM) | The last day someone copied it from the library (R-GA3). |
+
+### Relationships
+
+None. An answer is not tied to a grant or a funder; the same text serves many applications.
+
+### Rules
+
+**R-GA1 An answer has text.** Answer is required on the page layout and the library offers only
+answers with text.
+
+**R-GA2 Topics are free text.** The library splits Topics at commas and semicolons, trims each,
+and matches topics without regard to case, so "need" and "Need" are one topic. Topics are not a
+picklist: each organization names its own, in the app, without Setup.
+
+**R-GA3 Copying stamps the last used date.** Copying an answer from the library sets its Last Used
+Date to today, in the copier's own access; a person who cannot edit answers can still copy, and
+the date is then not stamped.
+
+### Salesforce implementation
+
+- **Object:** `Grant_Answer__c`, name field Text, label Answer Title, sharing Public Read/Write,
+  tab Grant Answers in the BarnCRM Funders app.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Answer | `Answer__c` | Long Text Area(32768), required on the layout |
+| Topics | `Topics__c` | Text(255) |
+| Last Used Date | `Last_Used_Date__c` | Date |
+
+- **Controller:** `GrantAnswerController` (thin: the answers as plain JSON shapes, up to 500 by
+  title, and the last used stamp, both in user mode). The search, the topic list and the word
+  counts run in the framework-free module `grantAnswerModel.js` (plan 9.9); the library is the
+  `grantAnswerLibrary` card on the Grant record page.
+- **Permission sets:** Funders Admin and Funders Staff create, edit and delete answers; Funders
+  Read Only reads and copies them.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -11922,6 +11978,7 @@ that builds it, before its metadata is created.
 | Donor Level | Giving | v0.4 (G-14) | Section 5.2 |
 | Funders entities still to come (government award fields F-04, answer library F-14) | Funders | releases 0.16 and 0.17 | Section 5.5 |
 | Funders entities still to come (fund ledger F-03, award schedules F-05, answer library F-14) | Funders | releases 0.16 and 0.17 | Section 5.5 |
+| Funders entities still to come (fund ledger F-03, award schedules F-05) | Funders | releases 0.16 and 0.17 | Section 5.5 |
 | Mirror adapter entities and mirror mappings | Mirror | v0.6 onward | Section 4.12 |
 
 Receipt left this table in v0.4 and is specified in Sections 25B to 25E, together with
@@ -12243,6 +12300,7 @@ mirrors the primary member).
 | 0.16 | 2026-11-02 | Funders F-01 and F-02 (ADR-NEXT `NEXT-funders-module.md`). New Sections 29ZH Grant (`Grant__c`), 29ZI Grant Requirement (`Grant_Requirement__c`, a detail of the grant) and 29ZJ Funders Settings (`Funders_Settings__c`), rules R-GN1 to R-GN7, R-GQ1 to R-GQ5 and R-FS1. Section 30's funder pipeline row narrows to the entities still to come. |
 | 0.17 | 2026-11-02 | Funders F-03 and F-08 (release 0.17) and F-05 (release 0.16) (ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md`). New Sections 29ZL Restricted Fund Entry (`Grant_Fund_Entry__c`) and 29ZM Grant Payment (`Grant_Payment__c`), both details of the grant, rules R-FE1, R-FE2 and R-GP1 to R-GP4. Grant (29ZH) gains Restricted, Giving Fund (a record identifier, R-GN8), Payment Frequency and six totals; R-GN6 covers the new details. Funders no longer depends on Giving. |
 | 0.16 | 2026-11-02 | Funders F-04. `Grant__c` (29ZH) gains Funding Source (`Funding_Source__c`), Assistance Listing Number (`Assistance_Listing_Number__c`), Award Number (`Award_Number__c`), Federal Agency (`Federal_Agency__c`), Indirect Cost Rate (`Indirect_Cost_Rate__c`) and Match Required (`Match_Required__c`), with rule R-GN8. The period of performance is the existing award period; drawdowns are F-03's. |
+| 0.16 | 2026-11-02 | Funders F-14. New Section 29ZN Grant Answer (`Grant_Answer__c`), the answer library, with rules R-GA1 to R-GA3. Section 30's Funders row drops the answer library. |
 
 ---
 ## 32. Entity ownership by package
@@ -12355,6 +12413,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Funders Settings (custom setting, reminder settings) | Funders | 0.16 (F-02) | 29ZJ |
 | Restricted Fund Entry | Funders | 0.17 (F-03) | 29ZL |
 | Grant Payment | Funders | 0.16 (F-05) | 29ZM |
+| Grant Answer | Funders | 0.16 (F-14) | 29ZN |
 | Funders entities still to come | Funders | 0.16 and 0.17 | 30 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |

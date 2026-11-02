@@ -22,6 +22,8 @@ shows every deadline and expected payment on a month calendar. Government award 
 report template and a board dashboard come in later releases.
 before each is due. A grant also carries the fields a government award needs (see [Government
 Awards](#government-awards)). Restricted fund tracking (F-03), multi-year award schedules, a funder report template, a board dashboard and a deadline calendar come in later
+Awards](#government-awards)), and the [Answer Library](#answer-library) keeps the application
+answers you reuse. Restricted fund tracking (F-03), multi-year award schedules, a funder report template, a board dashboard and a deadline calendar come in later
 
 ## Before You Install
 
@@ -41,6 +43,7 @@ finishes, BarnCRM does three things on its own:
 
 Then open the **BarnCRM Funders** app from the App Launcher. Its tabs are **Grant Pipeline**,
 **Grant Calendar**, **Grants**, **Grant Requirements**, **Reports** and **Error Log**; Grant Pipeline and Grants also
+**Grants**, **Grant Requirements**, **Grant Answers**, **Reports** and **Error Log**; Grant Pipeline and Grants also
 join the BarnCRM apps. Run Health Check's **Schedule all nightly jobs** fix once to start the
 morning reminder job (see [Reminders](#reminders)).
 
@@ -198,6 +201,30 @@ The job is called **BarnCRM Grant Reminders**. Health Check's **Schedule all nig
 schedules it with BarnCRM's other nightly jobs; it shows on the nightly jobs list as **Grant
 Requirement Reminders, 6:00 AM**. It does nothing while Funders is turned off or both reminder
 settings are off.
+
+## Answer Library
+
+Most applications ask the same questions: the mission, the need, the people served, how results
+are measured, the budget. Keep your best answers once, as **grant answers**, and copy them into
+each application instead of hunting through old proposals.
+
+On the **Grant Answers** tab click **New**:
+
+| Field | What to put |
+|---|---|
+| Answer Title | What it is and how long, for example "Mission statement (100 words)". |
+| Answer | The text, exactly as you would paste it into an application. Required. |
+| Topics | The topics it answers, separated by commas, for example "Mission, Need". Use the same words each time; capital letters do not matter. |
+| Last Used Date | Set by BarnCRM when someone copies the answer from the library. |
+
+Each grant's page has an **Answer Library** card: a search box, a **Topic** list built from the
+topics you typed, and each answer with its topics, word count and last used date. **Copy** puts
+the answer on the clipboard and sets its **Last Used Date** to today, so answers nobody has used
+for a year stand out for a refresh. The card lists up to 500 answers, by title.
+
+Funders Admin and Funders Staff add, edit and delete answers; Funders Read Only can search and
+copy them (their copies do not change the last used date). Answers are shared with everyone who
+has a Funders set. Topics are typed, not a picklist, so there is nothing to set up in Setup.
 
 ## Settings
 

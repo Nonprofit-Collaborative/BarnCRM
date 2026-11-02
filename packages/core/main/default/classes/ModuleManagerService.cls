@@ -107,6 +107,7 @@ public with sharing class ModuleManagerService {
         },
         'Funders' => new List<String>{
             'Grant__c',
+            'Grant_Answer__c',
             'Grant_Fund_Entry__c',
             'Grant_Payment__c',
             'Grant_Requirement__c'

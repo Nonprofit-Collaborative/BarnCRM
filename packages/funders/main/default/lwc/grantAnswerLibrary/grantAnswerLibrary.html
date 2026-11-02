@@ -1,0 +1,85 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom55">
+    <template lwc:if={canCreate}>
+      <lightning-button
+        slot="actions"
+        data-id="new"
+        label={labels.newAnswer}
+        onclick={handleNew}
+      ></lightning-button>
+    </template>
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
+      </template>
+
+      <template lwc:if={isEmpty}>
+        <p data-id="empty" class="slds-text-body_small">{labels.empty}</p>
+      </template>
+
+      <template lwc:if={hasAnswers}>
+        <div class="slds-grid slds-wrap slds-gutters_x-small">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+            <lightning-input
+              data-id="search"
+              type="search"
+              label={labels.search}
+              value={search}
+              onchange={handleSearch}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <lightning-combobox
+              data-id="topic"
+              label={labels.topic}
+              options={topicOptions}
+              value={topic}
+              onchange={handleTopic}
+            ></lightning-combobox>
+          </div>
+        </div>
+
+        <template lwc:if={noMatch}>
+          <p data-id="no-match" class="slds-var-m-top_small slds-text-body_small">{labels.noMatch}</p>
+        </template>
+
+        <ul class="slds-has-dividers_bottom-space slds-var-m-top_small">
+          <template for:each={rows} for:item="row">
+            <li key={row.id} data-id="answer" class="slds-item">
+              <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-start">
+                <div class="slds-col">
+                  <a href="#" data-id={row.id} onclick={handleOpen} class="slds-text-heading_small">{row.title}</a>
+                  <div class="slds-var-m-top_xx-small">
+                    <template for:each={row.topics} for:item="each">
+                      <lightning-badge key={each.key} label={each.topic}></lightning-badge>
+                    </template>
+                  </div>
+                  <p data-id="meta" class="slds-text-body_small slds-text-color_weak">{row.meta}</p>
+                </div>
+                <lightning-button
+                  data-id={row.id}
+                  label={row.copyLabel}
+                  icon-name="utility:copy"
+                  onclick={handleCopy}
+                ></lightning-button>
+              </div>
+              <p data-id="text" class="slds-var-m-top_x-small answer-text">{row.text}</p>
+              <template lwc:if={row.long}>
+                <lightning-button
+                  variant="base"
+                  data-id={row.id}
+                  label={row.toggleLabel}
+                  onclick={handleToggle}
+                ></lightning-button>
+              </template>
+            </li>
+          </template>
+        </ul>
+      </template>
+    </div>
+  </lightning-card>
+</template>

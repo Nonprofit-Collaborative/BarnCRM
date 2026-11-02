@@ -53,6 +53,12 @@
         <identifier>grantRelatedLists</identifier>
       </componentInstance>
     </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>grantAnswerLibrary</componentName>
+        <identifier>grantAnswerLibraryCard</identifier>
+      </componentInstance>
+    </itemInstances>
     <name>main</name>
     <type>Region</type>
   </flexiPageRegions>
