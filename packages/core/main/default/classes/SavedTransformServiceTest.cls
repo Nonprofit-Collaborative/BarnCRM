@@ -1,5 +1,5 @@
 /**
- * Saved Super Transform step lists (C-50f1, canonical model Section 29P): save, list, load,
+ * Saved Super Transformer step lists (C-50f1, canonical model Section 29P): save, list, load,
  * rename and delete as a person who holds BarnCRM Bulk Update, org-wide visibility between two
  * such people, and refusal of a document or a name that is not usable.
  */

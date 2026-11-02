@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check: title for the informational native households finding</shortDescription>
-        <value>Nonprofit Cloud households detected</value>
+        <value>Nonprofit Cloud Households Detected</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NativeHouseholdsDetail</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check title: households in both models; {0} is the count</shortDescription>
-        <value>{0} households carry both household models</value>
+        <value>{0} Households Carry Both Household Models</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NativeHouseholdCollisionDetail</fullName>
@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check title: one household in both models</shortDescription>
-        <value>1 household carries both household models</value>
+        <value>1 Household Carries Both Household Models</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NativeHouseholdCollisionDetailOne</fullName>

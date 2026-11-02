@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check: one enrollment open in an ended program</shortDescription>
-        <value>1 enrollment is still open in a program that has ended</value>
+        <value>1 Enrollment Is Still Open in a Program That Has Ended</value>
     </labels>
     <labels>
         <fullName>Programs_HealthCheck_OpenAfterEndTitle</fullName>
@@ -150,7 +150,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check: enrollments open in ended programs; {0} is how many</shortDescription>
-        <value>{0} enrollments are still open in programs that have ended</value>
+        <value>{0} Enrollments Are Still Open in Programs That Have Ended</value>
     </labels>
     <labels>
         <fullName>Programs_HealthCheck_OpenAfterEndDetail</fullName>

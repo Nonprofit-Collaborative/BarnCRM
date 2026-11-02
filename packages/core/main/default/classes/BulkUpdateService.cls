@@ -18,7 +18,7 @@ public with sharing class BulkUpdateService {
     public static final Integer MAX_CHANGES = 5;
     /** How many records the preview shows before and after. */
     public static final Integer SAMPLE_SIZE = 5;
-    /** The largest sample a preview shows: Super Transform's (C-50). */
+    /** The largest sample a preview shows: Super Transformer's (C-50). */
     public static final Integer MAX_SAMPLE_SIZE = 25;
     /** The run limit's default and highest value (R-BU2). */
     public static final Integer MAX_RUN_LIMIT = 48000;

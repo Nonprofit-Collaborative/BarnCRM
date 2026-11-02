@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: current mode cannot see some existing membership</shortDescription>
-        <value>Some household members cannot be seen</value>
+        <value>Some Household Members Cannot Be Seen</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipHiddenByContactDetail</fullName>
@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: simple mode, person accounts appeared; {0} people</shortDescription>
-        <value>{0} people are stored as accounts and cannot join a household</value>
+        <value>{0} People Are Stored As Accounts and Cannot Join a Household</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleAsAccountsDetail</fullName>
@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: simple mode, one person account appeared</shortDescription>
-        <value>1 person is stored as an account and cannot join a household</value>
+        <value>1 Person Is Stored As an Account and Cannot Join a Household</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleAsAccountsDetailOne</fullName>

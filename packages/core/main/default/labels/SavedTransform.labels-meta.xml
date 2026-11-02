@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Saved list: the document is not readable</shortDescription>
-        <value>This list could not be read as a Super Transform list.</value>
+        <value>This list could not be read as a Super Transformer list.</value>
     </labels>
     <labels>
         <fullName>Core_SavedTransform_ErrorObject</fullName>
@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Saved list: object cannot be changed; {0} is the API name</shortDescription>
-        <value>Super Transform cannot change records of {0}.</value>
+        <value>Super Transformer cannot change records of {0}.</value>
     </labels>
     <labels>
         <fullName>Core_SavedTransform_ErrorChanges</fullName>
@@ -69,7 +69,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: saved lists card heading</shortDescription>
+        <shortDescription>Super Transformer: saved lists card heading</shortDescription>
         <value>Saved Step Lists</value>
     </labels>
     <labels>
@@ -77,15 +77,15 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: saved lists card help</shortDescription>
-        <value>Save this page's object, conditions and changes as a named list that anyone using Super Transform can load. Loading fills in the page; nothing runs until you preview and run.</value>
+        <shortDescription>Super Transformer: saved lists card help</shortDescription>
+        <value>Save this page's object, conditions and changes as a named list that anyone using Super Transformer can load. Loading fills in the page; nothing runs until you preview and run.</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_SavedChoose</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: saved list picker label</shortDescription>
+        <shortDescription>Super Transformer: saved list picker label</shortDescription>
         <value>Saved List</value>
     </labels>
     <labels>
@@ -93,7 +93,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: saved list picker placeholder</shortDescription>
+        <shortDescription>Super Transformer: saved list picker placeholder</shortDescription>
         <value>Choose a saved list</value>
     </labels>
     <labels>
@@ -101,7 +101,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: no lists are saved</shortDescription>
+        <shortDescription>Super Transformer: no lists are saved</shortDescription>
         <value>No lists are saved yet.</value>
     </labels>
     <labels>
@@ -109,7 +109,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: load button</shortDescription>
+        <shortDescription>Super Transformer: load button</shortDescription>
         <value>Load List</value>
     </labels>
     <labels>
@@ -117,7 +117,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: list name input label</shortDescription>
+        <shortDescription>Super Transformer: list name input label</shortDescription>
         <value>List Name</value>
     </labels>
     <labels>
@@ -125,7 +125,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: save button</shortDescription>
+        <shortDescription>Super Transformer: save button</shortDescription>
         <value>Save as New List</value>
     </labels>
     <labels>
@@ -133,7 +133,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: rename button</shortDescription>
+        <shortDescription>Super Transformer: rename button</shortDescription>
         <value>Rename List</value>
     </labels>
     <labels>
@@ -141,7 +141,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: delete button</shortDescription>
+        <shortDescription>Super Transformer: delete button</shortDescription>
         <value>Delete List</value>
     </labels>
     <labels>
@@ -149,7 +149,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: delete confirmation; {0} list name</shortDescription>
+        <shortDescription>Super Transformer: delete confirmation; {0} list name</shortDescription>
         <value>Delete the saved list {0}?</value>
     </labels>
     <labels>
@@ -157,7 +157,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: delete confirmation detail</shortDescription>
+        <shortDescription>Super Transformer: delete confirmation detail</shortDescription>
         <value>Only the saved list is deleted. No records change.</value>
     </labels>
     <labels>
@@ -165,7 +165,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: saved notice; {0} list name</shortDescription>
+        <shortDescription>Super Transformer: saved notice; {0} list name</shortDescription>
         <value>Saved the list {0}.</value>
     </labels>
     <labels>
@@ -173,7 +173,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: loaded notice; {0} list name</shortDescription>
+        <shortDescription>Super Transformer: loaded notice; {0} list name</shortDescription>
         <value>Loaded the list {0}.</value>
     </labels>
     <labels>
@@ -181,7 +181,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: renamed notice; {0} new name</shortDescription>
+        <shortDescription>Super Transformer: renamed notice; {0} new name</shortDescription>
         <value>Renamed the list to {0}.</value>
     </labels>
     <labels>
@@ -189,7 +189,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: deleted notice; {0} list name</shortDescription>
+        <shortDescription>Super Transformer: deleted notice; {0} list name</shortDescription>
         <value>Deleted the list {0}.</value>
     </labels>
     <labels>
@@ -197,7 +197,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: loaded with changes left out; {0} list name, {1} how many</shortDescription>
+        <shortDescription>Super Transformer: loaded with changes left out; {0} list name, {1} how many</shortDescription>
         <value>Loaded the list {0}. {1} saved change(s) were left out because you cannot change that field on this object now.</value>
     </labels>
     <labels>
@@ -205,7 +205,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: list not loaded, {0} name, {1} missing filter fields</shortDescription>
+        <shortDescription>Super Transformer: list not loaded, {0} name, {1} missing filter fields</shortDescription>
         <value>The list {0} was not loaded because its conditions use fields that are gone or that you cannot read: {1}. Edit or delete the saved list.</value>
     </labels>
     <labels>
@@ -213,7 +213,7 @@
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Super Transform: action option, shipped steps for phone format</shortDescription>
+        <shortDescription>Super Transformer: action option, shipped steps for phone format</shortDescription>
         <value>Format Phone Number</value>
     </labels>
     <labels>

@@ -81,7 +81,7 @@ function agentforceReport(overrides = {}) {
       },
       {
         key: 'membership_mode_person_accounts',
-        title: 'Household membership does not fit Person Accounts',
+        title: 'Household Membership Does Not Fit Person Accounts',
         detail: 'Person Accounts are enabled.',
         severity: 'Error',
         category: 'OrgShape',
@@ -90,7 +90,7 @@ function agentforceReport(overrides = {}) {
       },
       {
         key: 'household_creation_disabled',
-        title: 'No new person is getting a household',
+        title: 'No New Person Is Getting a Household',
         detail: 'Household membership uses membership records and automatic creation is off.',
         severity: 'Error',
         category: 'Settings',
@@ -99,7 +99,7 @@ function agentforceReport(overrides = {}) {
       },
       {
         key: 'no_admin',
-        title: 'No one is assigned the BarnCRM Admin role',
+        title: 'No One Is Assigned the BarnCRM Admin Role',
         detail: 'Nobody has the role.',
         severity: 'Error',
         category: 'Access',
@@ -118,7 +118,7 @@ function agentforceReport(overrides = {}) {
       },
       {
         key: 'error_log_new',
-        title: '2 errors nobody has looked at',
+        title: '2 Errors Nobody Has Looked At',
         detail: 'The Error Log has 2 new entries.',
         severity: 'Warning',
         category: 'Settings',
@@ -294,7 +294,7 @@ describe('c-health-check-panel', () => {
   it('runs Finish Setup for the packages whose setup never ran, once confirmed (FS1)', async () => {
     const setupFinding = {
       key: 'module_setup_not_run',
-      title: 'Setup never ran for BarnCRM Giving',
+      title: 'Setup Never Ran for BarnCRM Giving',
       detail: 'BarnCRM Giving: installed, but the setup steps a package install runs never ran.',
       severity: 'Warning',
       category: 'Settings',
@@ -409,7 +409,7 @@ describe('c-health-check-panel', () => {
         findings: [
           {
             key: 'people_without_household',
-            title: '2 people are not in a household',
+            title: '2 People Are Not in a Household',
             detail: 'These contacts have no account. The first 2 are linked below.',
             severity: 'Warning',
             category: 'Settings',
@@ -461,7 +461,7 @@ describe('c-health-check-panel', () => {
         findings: [
           {
             key: 'people_without_household',
-            title: '1 person is not in a household',
+            title: '1 Person Is Not in a Household',
             severity: 'Warning',
             category: 'Settings',
             links: [{ label: 'Ann Lee', url: '/lightning/r/Contact/003000000000001AAA/view' }]

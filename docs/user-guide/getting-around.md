@@ -30,7 +30,7 @@ Manager**. **BarnCRM Console** has the same, plus **Addresses**, **Relationships
 **Affiliations** and **Household Members** just before **Data Manager**. The admin apps
 have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching** and
 **Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
-**Import** and **Super Transform** are not in the navigation: open them from their cards on
+**Import** and **Super Transformer** are not in the navigation: open them from their cards on
 the **Data Manager** tab. Administrators also find a **Data Dictionary** section inside **Org
 Optimizer**, which lists every field (and, when asked, the flows and Apex triggers that run on
 each kind of record) and downloads it as a CSV, an **AI-Readiness Export**
@@ -168,7 +168,7 @@ tool you may use, in short groups:
 | Group | Tile | Opens |
 |---|---|---|
 | **Find and Change** | **Find and Export Records** | The **Find** tab |
-| **Find and Change** | **Update Many Records** | **Super Transform**: choose the records and the changes, preview, then run (no file needed; see [Changing many records at once](super-transform.md)) |
+| **Find and Change** | **Update Many Records** | **Super Transformer**: choose the records and the changes, preview, then run (no file needed; see [Changing many records at once](super-transform.md)) |
 | **Check and Tidy** | **Org Optimizer** | The **Org Optimizer** tab |
 | **Careful** (last) | **Delete Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Delete** (no file needed) |
 

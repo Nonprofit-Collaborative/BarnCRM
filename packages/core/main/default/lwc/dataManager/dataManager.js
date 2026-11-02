@@ -52,7 +52,7 @@ import DATA_IMPORT_WIZARD_TEXT from '@salesforce/label/c.Core_DataManager_DataIm
 const TABS = {
   import: 'Import',
   find: 'Find',
-  // Super Transform (C-50) on the tab that kept the Bulk Update API name.
+  // Super Transformer (C-50) on the tab that kept the Bulk Update API name.
   update: 'Bulk_Update',
   optimizer: 'Data_Hygiene',
   delete: 'Find'

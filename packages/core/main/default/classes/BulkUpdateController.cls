@@ -12,7 +12,7 @@
 public with sharing class BulkUpdateController {
     public static final String PERMISSION = 'Bulk_Update_Records';
     private static final Integer RECENT_JOBS = 10;
-    /** Query rows left free for the reads around Super Transform's count. */
+    /** Query rows left free for the reads around Super Transformer's count. */
     private static final Integer COUNT_MARGIN = 100;
     private static final String JOB_FIELDS =
         'Id, Name, Status__c, Is_Dry_Run__c, Operation__c, Operation_JSON__c, Row_Count__c, ' +
@@ -130,7 +130,7 @@ public with sharing class BulkUpdateController {
         }
     }
 
-    /** How many records Super Transform's conditions match, against the run limit (C-50). */
+    /** How many records Super Transformer's conditions match, against the run limit (C-50). */
     public class MatchCount {
         /** The records that match; null when there are too many to count in one request. */
         @AuraEnabled
@@ -145,7 +145,7 @@ public with sharing class BulkUpdateController {
     }
 
     /**
-     * Super Transform's object picker (C-50): every object Find offers that a bulk update may
+     * Super Transformer's object picker (C-50): every object Find offers that a bulk update may
      * write, by label. Cached per user in the browser.
      */
     @AuraEnabled(cacheable=true)
@@ -160,12 +160,12 @@ public with sharing class BulkUpdateController {
             }
             return writable;
         } catch (Exception caught) {
-            throw asUserError(caught, 'Super Transform objects');
+            throw asUserError(caught, 'Super Transformer objects');
         }
     }
 
     /**
-     * Super Transform's live count (C-50): how many records the query document matches now,
+     * Super Transformer's live count (C-50): how many records the query document matches now,
      * counted as the person, at most one past the run limit. Zero is an answer, not a refusal.
      */
     @AuraEnabled
@@ -182,7 +182,7 @@ public with sharing class BulkUpdateController {
             result.objectLabel = type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
             return result;
         } catch (Exception caught) {
-            throw asUserError(caught, 'Super Transform count');
+            throw asUserError(caught, 'Super Transformer count');
         }
     }
 
@@ -193,7 +193,7 @@ public with sharing class BulkUpdateController {
             requirePermission();
             return SavedTransformService.listAll();
         } catch (Exception caught) {
-            throw asUserError(caught, 'Super Transform saved lists');
+            throw asUserError(caught, 'Super Transformer saved lists');
         }
     }
 
@@ -204,7 +204,7 @@ public with sharing class BulkUpdateController {
             requirePermission();
             return SavedTransformService.load(recordId);
         } catch (Exception caught) {
-            throw asUserError(caught, 'Super Transform load list');
+            throw asUserError(caught, 'Super Transformer load list');
         }
     }
 
@@ -218,7 +218,7 @@ public with sharing class BulkUpdateController {
             requirePermission();
             return SavedTransformService.save(name, definitionJson);
         } catch (Exception caught) {
-            throw asUserError(caught, 'Super Transform save list');
+            throw asUserError(caught, 'Super Transformer save list');
         }
     }
 
@@ -229,7 +229,7 @@ public with sharing class BulkUpdateController {
             requirePermission();
             return SavedTransformService.rename(recordId, name);
         } catch (Exception caught) {
-            throw asUserError(caught, 'Super Transform rename list');
+            throw asUserError(caught, 'Super Transformer rename list');
         }
     }
 
@@ -240,12 +240,12 @@ public with sharing class BulkUpdateController {
             requirePermission();
             SavedTransformService.remove(recordId);
         } catch (Exception caught) {
-            throw asUserError(caught, 'Super Transform delete list');
+            throw asUserError(caught, 'Super Transformer delete list');
         }
     }
 
     /**
-     * Super Transform's preview (C-50): the count and the first 25 records before and after,
+     * Super Transformer's preview (C-50): the count and the first 25 records before and after,
      * worked out by the code the run uses, each value it would leave alone marked unchanged.
      */
     @AuraEnabled
@@ -258,7 +258,7 @@ public with sharing class BulkUpdateController {
                 BulkUpdateService.MAX_SAMPLE_SIZE
             );
         } catch (Exception caught) {
-            throw asUserError(caught, 'Super Transform preview');
+            throw asUserError(caught, 'Super Transformer preview');
         }
     }
 
