@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_FieldAccess_NeedsSettings</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: refusal without settings permission</shortDescription>
+        <value>You need the BarnCRM Admin role (the Manage BarnCRM Settings permission) to change field access.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_NeedsManageProfiles</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: refusal without Manage Profiles</shortDescription>
+        <value>You need the Manage Profiles and Permission Sets permission to change field access.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_SetNotAllowed</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: set cannot be changed</shortDescription>
+        <value>A chosen permission set cannot be changed here. Choose permission sets your organization made. Profiles, groups and packaged permission sets are changed in Setup; BarnCRM keeps its own permission sets up to date itself.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_NoSets</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: no set chosen</shortDescription>
+        <value>Choose at least one permission set.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_TooManySets</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: too many sets ({0} = the most sets)</shortDescription>
+        <value>Choose at most {0} permission sets for one change.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_NoItems</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: nothing added</shortDescription>
+        <value>Add at least one field or kind of record to the change.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_TooManyItems</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: too many items ({0} = the most items)</shortDescription>
+        <value>One change holds at most {0} fields and kinds of record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_BadDocument</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: change unreadable</shortDescription>
+        <value>This change could not be read. Clear it and start again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_UnknownObject</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: unknown object ({0} = its name)</shortDescription>
+        <value>{0} is not a kind of record you can change access to.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_FieldNotAllowed</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: not permissionable ({0} = field name)</shortDescription>
+        <value>{0} cannot be given or taken: Salesforce decides who sees it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ReadOnlyField</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: read-only field ({0} = field label)</shortDescription>
+        <value>{0} can be read but never edited, so it can only be given Read.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_Conflict</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: object none with fields ({0} = object label)</shortDescription>
+        <value>{0} is set to No Access, so its fields cannot be given access in the same change.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_CountChanged</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: count changed ({0} = rows now, {1} = rows confirmed)</shortDescription>
+        <value>Access changed since the preview: {0} rows would change now, not {1}. Nothing was saved. Preview again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_TooManyRows</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: too many rows ({0} = rows, {1} = the most)</shortDescription>
+        <value>This change would write {0} rows; one change writes at most {1}. Split it by permission set or kind of record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_NothingToChange</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: nothing to change</shortDescription>
+        <value>Every chosen permission set already has this access. Nothing to change.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_RowRefused</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: refused row ({0} = set, {1} = target, {2} = reason)</shortDescription>
+        <value>{0}, {1}: {2}</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_LogApplied</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log apply ({0} by, {1} when, {2} rows, {3} sets, {4} refused)</shortDescription>
+        <value>{0} changed field access on {1}: {2} rows changed on {3} permission sets, {4} refused.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_LogUndone</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log undo ({0} by, {1} when, {2} back, {3} kept, {4} refused)</shortDescription>
+        <value>{0} undid this change on {1}: {2} rows put back, {3} kept because they changed since, {4} refused.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_UndoNotFound</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: change not found</shortDescription>
+        <value>This change cannot be found.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_UndoNotAllowed</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: cannot undo</shortDescription>
+        <value>This change cannot be undone: it was already undone, or it changed nothing.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_UndoWindowClosed</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: undo window closed ({0} = deadline)</shortDescription>
+        <value>This change could be undone until {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ChangedSince</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: undo kept a row</shortDescription>
+        <value>Changed since, kept as it is now.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_UnexpectedError</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: unexpected error</shortDescription>
+        <value>Field access could not be changed. The Error Log has the details.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_UndoErrorAccessChange</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import undo: field access change</shortDescription>
+        <value>This is a field access change. Undo it from Change Field Access in Access Explorer.</value>
+    </labels>
+</CustomLabels>

@@ -322,7 +322,8 @@ public with sharing class ImportBatchService {
             batch.Rows_Rejected__c > 0;
         Boolean dataJob =
             BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c) ||
-            BulkDeleteService.OPERATION_DELETE.equals(batch.Operation__c);
+            BulkDeleteService.OPERATION_DELETE.equals(batch.Operation__c) ||
+            FieldAccessService.OPERATION_ACCESS.equals(batch.Operation__c);
         if (dataJob || !(complete || open) || isRunning(batch)) {
             return Label.Core_Import_ErrorRetryNotOpen;
         }
