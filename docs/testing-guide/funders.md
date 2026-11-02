@@ -206,6 +206,6 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 4 | As the admin, add a template `Short` with body `<p>{GrantName} for {FunderName} {Unknown}</p>`. As staff, reload the grant, choose `Short` and download. | The file shows `Youth Grant for` the funder's name, and `{Unknown}` as typed. |
 | 5 | As the admin, rename the grant `Youth <Grant>` and download again as staff. | The name shows as typed, not as markup. |
 | 6 | As the admin, clear **Active** on both templates; reload the grant as staff. | The card says no active template is available. |
-| 7 | As read-only, open the **Funder Report Templates** tab. | The templates are listed; **New** is not offered. |
+| 7 | Make **Grant report** active again. As read-only, open the **BarnCRM Funders** app, then `Youth Grant`. | No **Funder Report Templates** tab; the **Funder Report** card still downloads the report. |
 
-**Cleanup:** make **Grant report** active again, delete `Short`, rename the grant `Youth Grant`.
+**Cleanup:** delete `Short`, rename the grant `Youth Grant`.
