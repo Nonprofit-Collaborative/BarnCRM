@@ -74,7 +74,7 @@ cleans up her data, and check what removing a module would cost.
    link; the link appears once a version exists. If it says "Install these
    first: BarnCRM Rollup Builder. This module needs them.", install the modules it names
    first: Salesforce refuses Giving, Volunteers, Funders and Mirror until BarnCRM Rollup Builder is
-   installed, and Funders and Mirror until Giving is too.
+   installed, and Mirror until Giving is too.
 3. On the **Giving** row, click **Turn Off**. The row says **Installed and off**. Giving's
    automation stops: new gifts are not added to totals and no acknowledgment is queued, until
    you turn it back on. Automation that protects your records, such as the lock on a posted

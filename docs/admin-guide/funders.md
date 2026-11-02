@@ -12,17 +12,21 @@ lists the deadlines coming up.
 If you also use the Programs module, a grant can name the program it pays for.
 
 An award's **requirements** (the reports and deliverables the funder expects) each have a due
-date and the staff member doing them, and BarnCRM reminds that person with a task and an email
-before each is due. Restricted fund tracking (F-03), government award fields, multi-year award
-schedules, a funder report template, a board dashboard and a deadline calendar come in later
-releases.
+date and the staff member doing them, and BarnCRM reminds that person with a task (and, if you
+turn it on, an email) before each is due.
+
+A multi-year award's **payments** form its schedule, built in one step and marked received as the
+money comes in. A **restricted** grant keeps a simple ledger of the money received, spent and
+released, with its balance; received payments enter it on their own. The **Grant Calendar** tab
+shows every deadline and expected payment on a month calendar. Government award fields, a funder
+report template and a board dashboard come in later releases.
 
 ## Before You Install
 
 - Funders is offered in the **Nonprofit Edition** only (see [Editions](editions.md)).
-- It needs BarnCRM Core, the Rollup Builder module and Giving installed first. Release 0.16 uses
-  nothing in Giving yet; restricted fund tracking (F-03) and award schedules (F-05) will.
-- It does not need the Programs module. With Programs installed, a grant can name a program.
+- It needs BarnCRM Core and the Rollup Builder module installed first.
+- It does not need the Programs or Giving modules. With Programs installed, a grant can name a
+  program; with Giving installed, it can name the Giving fund its money is booked to.
 
 ## Installing
 
@@ -34,7 +38,7 @@ finishes, BarnCRM does three things on its own:
 3. Gives everyone who already has a BarnCRM role their Funders permission set (see below).
 
 Then open the **BarnCRM Funders** app from the App Launcher. Its tabs are **Grant Pipeline**,
-**Grants**, **Grant Requirements**, **Reports** and **Error Log**; Grant Pipeline and Grants also
+**Grant Calendar**, **Grants**, **Grant Requirements**, **Reports** and **Error Log**; Grant Pipeline and Grants also
 join the BarnCRM apps. Run Health Check's **Schedule all nightly jobs** fix once to start the
 morning reminder job (see [Reminders](#reminders)).
 
@@ -46,10 +50,10 @@ You never assign the Funders permission sets by hand. Give people their BarnCRM 
 | BarnCRM role | Funders set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Funders Admin | Everything, including deleting a grant |
-| Fundraising Staff (Giving) | Funders Staff | Create and edit grants and move them through the stages; never delete a grant |
+| Fundraising Staff (Giving) | Funders Staff | Create and edit grants and move them through the stages; add, change and remove requirements, payments and restricted fund entries; never delete a grant |
 | Team Member | Funders Staff | The same as Fundraising Staff |
 | Coordinator | Funders Staff | The same as Fundraising Staff |
-| Read Only | Funders Read Only | Look at grants and the pipeline |
+| Read Only | Funders Read Only | Look at grants, the pipeline and the calendar |
 
 The sets are given at install, when you give a role on the Access page (within a minute), when
 you turn the module back on, and every hour with BarnCRM's access check, for roles given in
@@ -199,11 +203,75 @@ people who can manage BarnCRM Settings and not while Funders is turned off:
 | **Grant applications are past their deadline** | Information | Open grants at Prospect, Letter of Inquiry or Invited to Apply whose Application Deadline has passed. | Open each linked grant: move it to Applied if it went in, set Withdrawn if you did not apply, or move the deadline if the funder extended it. |
 | **Grant requirements are overdue** | Information | Requirements still Not Started or In Progress whose Due Date has passed. | Open each linked requirement: mark it Submitted if it went in, Waived if the funder excused it, or move the due date if the funder agreed a new one. |
 
+## Award Schedules
+
+An award paid over several years, or in parts, has **payments**: each with a **Due Date**, an
+**Amount**, a **Status** (Expected, Received or Cancelled) and a **Received Date**. The grant
+shows **Amount Scheduled** (every payment not Cancelled) and **Amount Received**.
+
+The grant's page has an **Award Schedule** card. Once the grant is **Awarded** with an **Amount
+Awarded**, an **Award Start Date** and an **Award End Date**, and has no expected or received
+payment yet, the card offers **Build Schedule**:
+
+1. Choose how often the funder pays: **Once**, **Annual**, **Semiannual**, **Quarterly** or
+   **Monthly**.
+2. The card shows the payments it will make: the amount awarded split evenly, the first on the
+   award start date and each later one a period apart, up to the award end date. The last payment
+   takes any cents left by rounding.
+3. Click **Save Schedule**.
+
+After that, change a payment's date or amount, add one, or cancel one in the grant's **Payments**
+list. **Mark Received** on the card sets a payment Received; its **Received Date** fills in with
+today unless you typed one.
+
+## Restricted Funds
+
+Money a funder limits to a purpose or a period is **restricted**, and you answer to the funder for
+it. Tick **Restricted** on the grant to keep its restricted ledger. Each **restricted fund entry**
+has a **Type**, an **Amount** (always above zero), an **Entry Date** and a **Description**:
+
+| Type | Use it for |
+|---|---|
+| Received | Restricted money that came in. |
+| Spent | Money spent on the purpose, for example "Q1 tutor salaries". |
+| Released | Restriction the funder lifted, or that lapsed, without the money being spent on it. |
+
+The grant shows **Restricted Received**, **Restricted Spent**, **Restricted Released** and the
+**Restricted Balance** (received minus spent minus released). The balance can go below zero: a
+reimbursement grant is spent before the funder pays. This is a ledger for reporting to the
+funder, not accounting; your books stay in your accounting system.
+
+On a restricted grant, marking a payment **Received** adds its **Received** entry for you, and the
+entry follows the payment: a changed amount or date changes it, and setting the payment back to
+Expected or Cancelled, or deleting it, removes it. Entries you type yourself are never changed.
+Ticking **Restricted** after payments came in adds no entries for them: add those yourself. The
+automation is **Payment received: fill the date and add a restricted fund entry** on the
+**Automation** page; switch it off while you import past payments and entries.
+
+### The Giving Fund a Grant Is Booked To
+
+With the Giving module installed, the grant's page has a **Giving Fund** card. Choose the fund the
+organization books this money to in Giving and click **Save**. Like the program, the grant stores
+the fund's record ID, so Funders works without Giving; without Giving the card says so. Funders
+reads only the fund's name: Giving's own fund totals count the gifts you record in Giving, and the
+grant's restricted ledger counts its entries, so nothing is counted twice.
+
+## The Grant Calendar Tab
+
+The **Grant Calendar** tab shows a month at a time: application deadlines of open grants not yet
+submitted, due dates of open requirements, and expected payments, each on its day and linked to
+its grant. Overdue items are marked. Use **Previous**, **Next** and **Today** to move between
+months, and **Everyone** or **Mine** as on the Grant Pipeline (Mine: grants you own and
+requirements assigned to you). It shows the same deadlines as the pipeline's **Upcoming
+Deadlines**, plus payments.
+
 ## Sample Data
 
 **Load Sample Data** in BarnCRM Settings also loads three sample grants to Core's sample
-organizations (one Applied, one Awarded, one Prospect) and three requirements on the award, and
-**Remove Sample Data** takes them away again. See [Sample data](sample-data.md).
+organizations (one Applied, one Awarded, one Prospect), three requirements on the award, a
+two-payment schedule with the first payment received, and a restricted ledger with that payment's
+Received entry and one Spent entry. **Remove Sample Data** takes them away again. See
+[Sample data](sample-data.md).
 
 ## Turning It Off
 
@@ -231,6 +299,13 @@ Do this as Maria, who holds the Admin role, with a second user, Dana, who has no
    email, if you turned **Email Reminders** on).
    Click **Mark Submitted**: the row leaves the list and the requirement's **Submitted Date** is
    today.
+10. On the grant, set **Award Start Date** to January 1 next year and **Award End Date** to
+    December 31 the year after, and tick **Restricted**. On the **Award Schedule** card choose
+    **Annual**: two payments of 12,500, a year apart. Click **Save Schedule**.
+11. Open **Grant Calendar** and move to January next year: the first payment is on January 1.
+12. Back on the grant, click **Mark Received** on the first payment. **Amount Received** and
+    **Restricted Received** show 12,500, and the **Restricted Fund Entries** list has its Received
+    entry. Add a Spent entry of 2,000: **Restricted Balance** shows 10,500.
 
 ## Common Mistakes
 

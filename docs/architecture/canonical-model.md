@@ -1495,7 +1495,7 @@ names the modules a module's package needs installed first (ADR-0125
 | App Name | `App_Name__c` | text (80) | Optional. The developer name of the module's own Lightning app, unprefixed (for example `Fundraising`), where its Settings tab lives. The Modules section links an installed module to it by the app's DurableId (`06m`, found once through `AppDefinition`, matching this name and the package namespace), or by `c__Name` (`namespace__Name` when namespaced) when the app is not found; empty means no link yet. The home page's Modules list and the Module Manager link to it. |
 | Staff Tabs | `Staff_Tabs__c` | text (255) | Optional. The module's tabs for everyday work, by tab API name unprefixed, separated by semicolons (for example `Gift__c;Commitment__c`), that belong in the BarnCRM and BarnCRM Console apps (ADR-0137). A page tab whose label is not its name with spaces is written `Name:Label` (for example `Donor_Levels:Donor Level Ladder`), so the Setup Assistant names it as App Manager does; an object tab is labelled from its object. A CI test holds both to the shipped tabs. Core cannot name a module tab in its own apps, so `scripts/org/deploy-packages.sh` adds them on a source deploy, and the Setup Assistant's modules step lists them for an installed package. Empty means none. |
 | Admin Tabs | `Admin_Tabs__c` | text (255) | Optional. The same for the module's admin tools and settings pages, which belong in the BarnCRM Admin and BarnCRM Admin Console apps (for example `Rollup_Builder`). Empty means none. |
-| Requires | `Requires__c` | text (255) | Optional. The modules this module's package needs installed first, as their DeveloperNames separated by semicolons, in install order (for example `Rollups` for Giving, `Rollups;Giving` for Funders and Mirror). While one of them is not installed, the module's row in the Modules section and the Setup Assistant says to install it first. Empty means none. |
+| Requires | `Requires__c` | text (255) | Optional. The modules this module's package needs installed first, as their DeveloperNames separated by semicolons, in install order (for example `Rollups` for Giving and Funders, `Rollups;Giving` for Mirror). While one of them is not installed, the module's row in the Modules section and the Setup Assistant says to install it first. Empty means none. |
 
 ### Integration App
 
@@ -10475,8 +10475,9 @@ dates for the same indicator. Periods of different lengths may overlap (a year a
 One request for money to one funder, from the first idea through the decision and, when awarded,
 the award period (F-01, Funders module, ADR-NEXT `NEXT-funders-module.md`). The funder is an
 organization; the grant's requirements (29ZI) are the reports and deliverables the award brings.
-Restricted fund tracking (F-03), government award fields (F-04) and multi-year schedules (F-05)
-add to this entity in release 0.17 and later (Section 30).
+Its restricted ledger (29ZL, F-03) and its payment schedule (29ZM, F-05) add the restricted and
+payment totals below (ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md`).
+Government award fields (F-04) add to this entity later (Section 30).
 
 ### Attributes
 
@@ -10497,6 +10498,14 @@ add to this entity in release 0.17 and later (Section 30).
 | Next Step | text | no | The next thing to do on this request. |
 | Program | record identifier (text) | no | The program the grant pays for, when the Programs module is installed. A record identifier, not a reference: Funders never depends on Programs (R-GN4). |
 | Owner | reference(User) | yes | The staff member responsible (the record owner). Reminders fall back to the owner (R-GQ3). |
+| Restricted | boolean | yes (defaults false) | The funder limited the money to a purpose or a period; its received payments are entered in the restricted ledger (R-GP3). |
+| Giving Fund | record identifier (text) | no | The Giving fund the money is booked to, when the Giving module is installed. A record identifier, not a reference: Funders never depends on Giving (R-GN8). |
+| Restricted Received | currency (derived) | no | Sum of the grant's Received entries (R-FE2). |
+| Restricted Spent | currency (derived) | no | Sum of its Spent entries (R-FE2). |
+| Restricted Released | currency (derived) | no | Sum of its Released entries (R-FE2). |
+| Restricted Balance | currency (derived) | no | Restricted Received minus Restricted Spent minus Restricted Released; may be below zero (R-FE2). |
+| Amount Scheduled | currency (derived) | no | Sum of the grant's payments that are not Cancelled (R-GP1). |
+| Amount Received | currency (derived) | no | Sum of its Received payments (R-GP1). |
 
 ### Relationships
 
@@ -10504,6 +10513,8 @@ add to this entity in release 0.17 and later (Section 30).
   Restrict (R-GN5).
 - **Grant to Contact** (Funder Contact), many to one, optional; deleting the contact empties it.
 - **Grant to Grant Requirement**, one to many; the requirement is a detail of the grant (R-GN6).
+- **Grant to Restricted Fund Entry** (29ZL) and **Grant to Grant Payment** (29ZM), one to many,
+  each a detail of the grant (R-GN6).
 
 ### Rules
 
@@ -10528,11 +10539,17 @@ object exists, read by describe, and shows a program it cannot find as missing.
 platform refuses to delete an organization with grants; a merge moves its grants to the record
 kept.
 
-**R-GN6 Deleting a grant deletes its requirements.**
+**R-GN6 Deleting a grant deletes its requirements, ledger entries and payments.**
 
 **R-GN7 Open applications past their deadline are found.** Health Check lists open grants in
 Prospect, Letter of Inquiry or Invited to Apply whose Application Deadline has passed, so each is
 moved on or closed.
+
+**R-GN8 The Giving fund is named, not looked up.** `Fund_Id__c` follows R-GN4 for Giving's Fund
+object (`Fund__c`): the `Grant_Rules` automation stores the 18-character form and refuses text
+that is not a record identifier, or, where that object exists, an identifier of another object.
+The record page offers the active funds only where it exists, read by describe in user mode, and
+shows a fund it cannot find as missing.
 
 ### Salesforce implementation
 
@@ -10555,6 +10572,14 @@ moved on or closed.
 | Next Step | `Next_Step__c` | Text(255) |
 | Program | `Program_Id__c` | Text(18) |
 | Sample Data | `Sample_Data__c` | Checkbox, default false |
+| Restricted | `Restricted__c` | Checkbox, default false |
+| Giving Fund | `Fund_Id__c` | Text(18) |
+| Restricted Received | `Restricted_Received__c` | Roll-up summary: SUM of `Grant_Fund_Entry__c.Amount__c` where Type is Received |
+| Restricted Spent | `Restricted_Spent__c` | Roll-up summary: SUM of `Grant_Fund_Entry__c.Amount__c` where Type is Spent |
+| Restricted Released | `Restricted_Released__c` | Roll-up summary: SUM of `Grant_Fund_Entry__c.Amount__c` where Type is Released |
+| Restricted Balance | `Restricted_Balance__c` | Formula (Currency): Received minus Spent minus Released, blanks as zero |
+| Amount Scheduled | `Amount_Scheduled__c` | Roll-up summary: SUM of `Grant_Payment__c.Amount__c` where Status is not Cancelled |
+| Amount Received | `Amount_Received__c` | Roll-up summary: SUM of `Grant_Payment__c.Amount__c` where Status is Received |
 
 - **Validation rules:** `Amounts_Not_Negative`, `Award_End_After_Start` (R-GN2).
 - **Trigger:** `GrantTrigger`, through the Core dispatcher; handlers `GrantRulesHandler` (R-GN4,
@@ -10562,6 +10587,11 @@ moved on or closed.
 - **Service:** `GrantService` (stages, the program rule, the stage dates), `GrantPipelineController`
   (thin, plain JSON shapes); the board's columns and the deadline rows run in the framework-free
   module `grantPipelineModel.js` (plan 9.9).
+- **Giving fund (R-GN8):** checked by `GrantRulesHandler` through `GrantFundService`; the Giving
+  Fund card is `grantFund` with `GrantFundController`.
+- **Deadlines:** `GrantDeadlineSelector` reads the deadline rows for the Grant Pipeline and for the
+  Grant Calendar tab (`grantCalendar`, `GrantCalendarController`, framework-free
+  `grantCalendarModel.js`), which also shows expected payments (R-GP4).
 - **Health Check:** `FundersHealthCheckExtension` (R-GN7, R-GQ5). **Sample data:**
   `FundersSampleData` (three grants to Core's sample organizations, flagged `Sample_Data__c`).
 
@@ -10680,6 +10710,132 @@ The Funders module's org-wide settings (F-02), edited in the Funders section of 
 
 ---
 
+## 29ZL. Restricted Fund Entry
+
+### Definition
+
+One movement of a grant's restricted money (F-03, ADR-NEXT
+`NEXT-funders-restricted-funds-schedules-calendar.md`): money received under the restriction,
+spent on its purpose, or released from it. The entries of a grant are its restricted ledger; the
+grant carries the totals and the balance. A ledger, not accounting: no accounts, periods or
+postings.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Entry Number | text (automatic) | yes | Numbered by the platform. |
+| Grant | reference(Grant) | yes | The grant whose restricted money this is. A detail of the grant. |
+| Type | picklist(Received, Spent, Released) | yes (defaults Received) | Received: restricted money that came in. Spent: spent on the purpose. Released: the funder lifted the restriction, or it lapsed, without the money being spent on it. |
+| Amount | currency | yes | How much, always above zero; the type gives the direction (R-FE1). |
+| Entry Date | date | yes (defaults today) | When it happened. |
+| Description | text | no | What it was, for example "Q1 tutor salaries". |
+| Payment | reference(Grant Payment) | no (set by BarnCRM) | The received payment this entry records (R-GP3). Empty on an entry typed by hand. |
+
+### Relationships
+
+- **Restricted Fund Entry to Grant**, many to one, master-detail (R-GN6).
+- **Restricted Fund Entry to Grant Payment**, many to one, optional; deleting the payment deletes
+  the entry through R-GP3, never through the lookup.
+
+### Rules
+
+**R-FE1 An amount is above zero.** A validation rule; the type says whether it adds to or takes
+from the balance.
+
+**R-FE2 The grant's totals are summaries.** Restricted Received, Spent and Released are the sums
+of the entries of each type, kept by the platform; the balance is Received minus Spent minus
+Released and may be below zero (a reimbursement grant is spent before it is paid).
+
+### Salesforce implementation
+
+- **Object:** `Grant_Fund_Entry__c`, label Restricted Fund Entry, name field Auto Number
+  `E-{000000}` (label Entry Number), sharing Controlled By Parent, no tab (the grant's related
+  list).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Grant | `Grant__c` | Master-Detail to `Grant__c`, relationship name Fund_Entries, not reparentable |
+| Type | `Type__c` | Picklist (restricted): Received (default), Spent, Released; required |
+| Amount | `Amount__c` | Currency(16, 2), required |
+| Entry Date | `Entry_Date__c` | Date, required, default today |
+| Description | `Description__c` | Text(255) |
+| Payment | `Grant_Payment__c` | Lookup to `Grant_Payment__c`, delete constraint SetNull, relationship name Fund_Entries; read only in every permission set but Funders Admin |
+
+- **Validation rule:** `Amount_Above_Zero` (R-FE1).
+
+---
+
+## 29ZM. Grant Payment
+
+### Definition
+
+One payment a funder is expected to make under an award, on a date (F-05, ADR-NEXT
+`NEXT-funders-restricted-funds-schedules-calendar.md`). A multi-year award's payments are its
+schedule; the grant carries the amounts scheduled and received.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Payment Number | text (automatic) | yes | Numbered by the platform. |
+| Grant | reference(Grant) | yes | The award it belongs to. A detail of the grant. |
+| Due Date | date | yes | When the funder is expected to pay it. |
+| Amount | currency | yes | How much, above zero (R-GP1). |
+| Status | picklist(Expected, Received, Cancelled) | yes (defaults Expected) | Expected until it comes in; Cancelled when the funder will not pay it. |
+| Received Date | date | no | When it came in (R-GP3). |
+
+### Relationships
+
+- **Grant Payment to Grant**, many to one, master-detail (R-GN6).
+- **Grant Payment to Restricted Fund Entry**, one to at most one entry made by BarnCRM (R-GP3).
+
+### Rules
+
+**R-GP1 Amounts.** An amount is above zero (validation rule). The grant's Amount Scheduled sums
+the payments not Cancelled and Amount Received the Received ones (platform summaries).
+
+**R-GP2 A schedule is built once, then edited as rows.** Build Schedule is offered for an Awarded
+grant with Amount Awarded, Award Start Date and Award End Date and no Expected or Received
+payment. It splits Amount Awarded evenly over payments at a frequency (Once, Annual, Semiannual,
+Quarterly, Monthly): the first on the award start date, each later one a period later while on or
+before the award end date, the last taking the cents left by rounding. The split runs in the
+framework-free module `grantScheduleModel.js`; the server checks every row (a date, an amount
+above zero, the grant still without Expected or Received payments) and inserts them as the user.
+
+**R-GP3 Received payments are dated and enter the restricted ledger.** A switchable automation
+(registry row `Grant_Payment_Received`): a payment becoming Received gets today as an empty
+Received Date; and for each payment saved or deleted, when it is Received and its grant is
+Restricted, exactly one Received entry (29ZL) names it with its amount and received date (or due
+date when there is none); otherwise no entry names it. Entries that name no payment are never
+touched.
+
+**R-GP4 Expected payments are on the calendar.** The Grant Calendar shows each Expected payment
+on its due date, beside application deadlines and open requirements.
+
+### Salesforce implementation
+
+- **Object:** `Grant_Payment__c`, label Grant Payment, name field Auto Number `P-{000000}`
+  (label Payment Number), sharing Controlled By Parent, no tab (the grant's related list and the
+  Award Schedule card).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Grant | `Grant__c` | Master-Detail to `Grant__c`, relationship name Payments, not reparentable |
+| Due Date | `Due_Date__c` | Date, required |
+| Amount | `Amount__c` | Currency(16, 2), required |
+| Status | `Status__c` | Picklist (restricted): Expected (default), Received, Cancelled; required |
+| Received Date | `Received_Date__c` | Date |
+
+- **Validation rule:** `Amount_Above_Zero` (R-GP1).
+- **Trigger:** `GrantPaymentTrigger`, through the Core dispatcher; handler
+  `GrantPaymentReceivedHandler` (R-GP3, registry row `Grant_Payment_Received`, switchable), the
+  rules in `GrantPaymentService`.
+- **Award Schedule card:** `grantSchedule` with `GrantScheduleController` (thin) and the
+  framework-free `grantScheduleModel.js` (R-GP2).
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -10691,7 +10847,7 @@ that builds it, before its metadata is created.
 |---|---|---|---|
 | Receipt | Giving | v0.4 (G-13) | Section 4.11, ADR-0010 |
 | Donor Level | Giving | v0.4 (G-14) | Section 5.2 |
-| Funders entities still to come (fund ledger F-03, government award fields F-04, award schedules F-05, answer library F-14) | Funders | releases 0.16 and 0.17 | Section 5.5 |
+| Funders entities still to come (government award fields F-04, answer library F-14) | Funders | releases 0.16 and 0.17 | Section 5.5 |
 | Mirror adapter entities and mirror mappings | Mirror | v0.6 onward | Section 4.12 |
 
 Receipt left this table in v0.4 and is specified in Sections 25B to 25E, together with
@@ -10738,7 +10894,10 @@ Logic Models package as L-02 (owner decision, 2026-09-23).
 
 Grant and Grant Requirement (F-01 and F-02, release 0.16, ADR-NEXT `NEXT-funders-module.md`) left
 the funder pipeline row and are specified in Sections 29ZH and 29ZI, with Funders Settings in
-29ZJ. The rest of the Funders entities stay in the table until their release.
+29ZJ. The restricted ledger (F-03) and award schedules (F-05) left it as Restricted Fund Entry
+(29ZL) and Grant Payment (29ZM), not on Giving's Fund, Commitment and Installment (ADR-NEXT
+`NEXT-funders-restricted-funds-schedules-calendar.md`). The rest of the Funders entities stay in
+the table until their release.
 
 Two v0.4 entities have attributes that already exist on `Gift__c` from v0.2, because the
 object is not worth altering later for fields this cheap: Acknowledgment Status,
@@ -10994,6 +11153,7 @@ mirrors the primary member).
 | 0.14 | 2026-10-31 | Programs P-05. The Programs Dashboard (29ZA, "Program dashboard") and the person card's last service date and services attended. No object or field added. |
 | 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29ZA, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
 | 0.16 | 2026-11-02 | Funders F-01 and F-02 (ADR-NEXT `NEXT-funders-module.md`). New Sections 29ZH Grant (`Grant__c`), 29ZI Grant Requirement (`Grant_Requirement__c`, a detail of the grant) and 29ZJ Funders Settings (`Funders_Settings__c`), rules R-GN1 to R-GN7, R-GQ1 to R-GQ5 and R-FS1. Section 30's funder pipeline row narrows to the entities still to come. |
+| 0.17 | 2026-11-02 | Funders F-03 and F-08 (release 0.17) and F-05 (release 0.16) (ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md`). New Sections 29ZL Restricted Fund Entry (`Grant_Fund_Entry__c`) and 29ZM Grant Payment (`Grant_Payment__c`), both details of the grant, rules R-FE1, R-FE2 and R-GP1 to R-GP4. Grant (29ZH) gains Restricted, Giving Fund (a record identifier, R-GN8) and six totals; R-GN6 covers the new details. Funders no longer depends on Giving. |
 
 ---
 ## 32. Entity ownership by package
@@ -11098,6 +11258,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Grant | Funders | 0.16 (F-01) | 29ZH |
 | Grant Requirement | Funders | 0.16 (F-02) | 29ZI |
 | Funders Settings (custom setting, reminder settings) | Funders | 0.16 (F-02) | 29ZJ |
+| Restricted Fund Entry | Funders | 0.17 (F-03) | 29ZL |
+| Grant Payment | Funders | 0.16 (F-05) | 29ZM |
 | Funders entities still to come | Funders | 0.16 and 0.17 | 30 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
@@ -11122,6 +11284,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
 | Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
 | Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and `FundersAccessSync` (ADR-NEXT `NEXT-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantProgram`) |
+| Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantFund`) and the Award Schedule card (`grantSchedule`) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror is v0.6, brought forward from
