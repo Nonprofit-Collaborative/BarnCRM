@@ -1,5 +1,5 @@
 /**
- * Super Transform's entry points on the bulk update controller (C-50): the object picker, the
+ * Super Transformer's entry points on the bulk update controller (C-50): the object picker, the
  * live count against the run limit, and the 25-record preview that marks values the run would
  * leave alone. Start, progress and undo are bulk update's own and tested in
  * BulkUpdateControllerTest.

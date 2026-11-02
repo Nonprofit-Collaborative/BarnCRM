@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: unposted gifts in a closed period. {0} count.</shortDescription>
-        <value>{0} gifts in a closed period are not posted to accounting</value>
+        <value>{0} Gifts in a Closed Period Are Not Posted to Accounting</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_UnpostedClosedPeriodDetail</fullName>
@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: someone holds the Override Receipt Lock permission</shortDescription>
-        <value>Someone can override the receipt lock</value>
+        <value>Someone Can Override the Receipt Lock</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_OverrideLockDetail</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the single receipt generation failure finding.</shortDescription>
-        <value>One receipt number was used by a run that failed</value>
+        <value>One Receipt Number Was Used by a Run That Failed</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_ReceiptFailedOneDetail</fullName>
@@ -102,7 +102,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the repeated receipt generation failure finding.</shortDescription>
-        <value>{0} receipts failed to generate</value>
+        <value>{0} Receipts Failed to Generate</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_ReceiptFailedManyDetail</fullName>

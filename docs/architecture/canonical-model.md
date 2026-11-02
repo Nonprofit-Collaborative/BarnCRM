@@ -2670,7 +2670,7 @@ column's value before it is matched or written (ADR-0081, `0081-data-transform-d
 The steps from `map` on were added by ADR-0112 (`0112-more-transform-steps.md`); a document
 whose steps may use them carries `"version": 2` (the mapping document of R-IT1 and the bulk
 update definition of R-BU1). `digits` was added by ADR-0150 (C-50f2, the phone format preset of
-Super Transform) and a document that may use it carries `"version": 3`. A reader that does not
+Super Transformer) and a document that may use it carries `"version": 3`. A reader that does not
 know an `op` skips that step, as below. `DataTransform.formatDigits` (Apex) and the framework-free
 module `transformFormat` (the `transformFormat` LWC bundle, plan 9.9) implement `digits` and are
 both tested against the one fixture `TransformFormatFixture.json`.
@@ -9672,10 +9672,10 @@ are until it is turned on.
 
 ### Definition
 
-A named, reusable Super Transform step list (plan feature C-50f1): the object, the conditions
+A named, reusable Super Transformer step list (plan feature C-50f1): the object, the conditions
 (a Find filter document) and up to five field changes, kept as one documented JSON document so
-that a person can load it on the Super Transform page later, rename it or delete it. It is
-org-wide: everyone who may use Super Transform sees and manages every list. It holds no
+that a person can load it on the Super Transformer page later, rename it or delete it. It is
+org-wide: everyone who may use Super Transformer sees and manages every list. It holds no
 records and grants access to none. Neutral: it names no nonprofit concept and is in Core.
 
 ### Attributes
@@ -9726,7 +9726,7 @@ mode. Rename changes only the name; a list is saved new, never overwritten.
 | Attribute | API name | Type | Notes |
 |---|---|---|---|
 | Object Name | `Object_Name__c` | Text(255) | |
-| Definition | `Definition_JSON__c` | Long Text Area(131072) | Written only by Super Transform. |
+| Definition | `Definition_JSON__c` | Long Text Area(131072) | Written only by Super Transformer. |
 
 - **Service:** `SavedTransformService` (list, load, save, rename, delete, document checks) and
   five `@AuraEnabled` methods on `BulkUpdateController` (`getSavedLists`, `loadSavedList`,
@@ -10762,7 +10762,7 @@ mirrors the primary member).
 | v0.13 | 2026-10-31 | Ask cadence reminders (G-29). New Section 25S. `Contact` and `Account` gain `Next_Ask_Date__c`, `Last_Touch_Date__c` and `Ask_Reminder_For_Date__c` (Giving). `Giving_Settings__c` gains `Ask_Reminders_Enabled__c` (default true), `Ask_Reminders_Last_Run__c` and `Ask_Reminders_Last_Run_Summary__c`. Rules R-AC1 to R-AC6: donor level dates only, one switch, one reminder Task per donor per date, a 30 day catch up window, the Task is the owner's, and a Who Is Due list view on each object. No object added. |
 | v0.11 | 2026-10-30 | Super Importer: import rows (C-49b, owner decisions of 2026-10-30, ADR-0149). `Import_Row__c` gains `Corrected_Values_JSON__c` (Corrected Values) and the formula `Batch_Status__c` (Data Job Status), for the row list views. R-IR4 reversed: a rejected row is corrected on screen beside its untouched raw values, then retried in place (new R-IB17a) by any user with the import permission and edit access to the rows; `Import_Batch__c` gains `Retried_By__c` (Rows Retried By) so undo covers their records. R-IR5: retention is the Delete Import Rows picklist `Import_Row_Deletion__c` (Once Complete, After 30 Days default, After 90 Days, Never), replacing `Import_Row_Retention_Days__c`, which is removed; only complete batches lose their rows, and an uncommitted preview keeps its rows at least 30 days. New R-IR8: undo never reads the rows and never recreates a record. |
 | 0.12 | 2026-10-31 | Setup Changes Log (C-56, plan D-156). Object `Setup_Change__c` added (Section 29W), rules R-SU1 to R-SU8 (prefix R-SU, since R-SC is soft credits); settings key `Setup_Change_Retention_Days__c` (Org Optimizer keys). A nightly job copies new Setup Audit Trail rows and deletes copies past the retention. |
-| v0.12 | 2026-10-31 | Super Transform follow-ups (C-50f1, C-50f2; ADR-0150). New object `Saved_Transform__c` (Section 29X: `Object_Name__c`, `Definition_JSON__c`), org-wide saved step lists, granted to `BarnCRM_Bulk_Update` and `BarnCRM_Admin`. R-IT15 gains the `digits` step (a document that may use it is version 3; Apex `DataTransform.formatDigits` and the JavaScript module `transformFormat` share one test fixture). R-BU7 applies it unchanged. |
+| v0.12 | 2026-10-31 | Super Transformer follow-ups (C-50f1, C-50f2; ADR-0150). New object `Saved_Transform__c` (Section 29X: `Object_Name__c`, `Definition_JSON__c`), org-wide saved step lists, granted to `BarnCRM_Bulk_Update` and `BarnCRM_Admin`. R-IT15 gains the `digits` step (a document that may use it is version 3; Apex `DataTransform.formatDigits` and the JavaScript module `transformFormat` share one test fixture). R-BU7 applies it unchanged. |
 | 0.12 | 2026-10-31 | Programs P-01 (ADR-0151 `0151-programs-module.md`). New in the Programs module: Program (`Program__c`, 29Y), Service (`Service__c`, 29Z) and Enrollment (`Enrollment__c`, 29ZA), with rules R-PG1 to R-PG3, R-SV1 and R-EN1 to R-EN5 and the PMM mapping. Section 30 keeps attendance and service delivery (P-02); Outcome left it for Logic Models (L-02). Specified ahead of the build. |
 | 0.12 | 2026-10-31 | Programs P-01 follow-up. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Program__c` (29Y), so the Programs sample load can be removed in one action; services and enrollments are found through their program. 29ZA gains the person card, the Programs Health Check finding and the sample data paragraph. No object added. |
 | 0.13 | 2026-10-31 | Programs P-02. New in the Programs module: Service Delivery (`Service_Delivery__c`, 29ZB), attendance and service delivery in one entity, with rules R-SD1 to R-SD5, the Service Delivery Log panel and the PMM mapping. Leaves Section 30. Specified ahead of the build. |

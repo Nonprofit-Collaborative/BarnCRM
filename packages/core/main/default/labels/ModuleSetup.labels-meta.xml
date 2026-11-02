@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title, several packages. {0} is the count.</shortDescription>
-        <value>Setup never ran for {0} BarnCRM packages</value>
+        <value>Setup Never Ran for {0} BarnCRM Packages</value>
     </labels>
     <labels>
         <fullName>Core_ModuleSetup_FindingTitleOne</fullName>
@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title, one package. {1} is its name.</shortDescription>
-        <value>Setup never ran for {1}</value>
+        <value>Setup Never Ran for {1}</value>
     </labels>
     <labels>
         <fullName>Core_ModuleSetup_FinishButton</fullName>

@@ -39,7 +39,7 @@ These are the places that depend on the edition.
 | Setup Assistant, module step | Core, BarnCRM Rollup Builder, plus any module that is already installed | Core, BarnCRM Rollup Builder and all five nonprofit modules, each Present or Not installed with its Install link |
 | BarnCRM Settings, Modules ([Module Manager](module-manager.md)) | The same list as the module step, Installed with an app link, or Not installed with Install | The same list as the module step, Installed with an app link, or Not installed with Install |
 | BarnCRM home page, Modules card | The same list | The same list |
-| Health Check, "The Gift Transaction mirror is in the Mirror module" (Nonprofit Cloud orgs only) | Not shown | Shown when BarnCRM Mirror is not installed |
+| Health Check, "The Gift Transaction Mirror Is in the Mirror Module" (Nonprofit Cloud orgs only) | Not shown | Shown when BarnCRM Mirror is not installed |
 | Setup Assistant, first step | Edition shown read-only | Edition shown read-only, with the BarnCRM Giving install link while it is not installed |
 
 Before anyone has chosen an edition, BarnCRM shows what the Standard Edition shows.

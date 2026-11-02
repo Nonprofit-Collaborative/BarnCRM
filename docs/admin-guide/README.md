@@ -146,7 +146,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-49b Super Importer rows: browse, correct and retry import rows | [import-rows.md](import-rows.md) | Core |
 | C-34, C-36 Find and export | [find.md](find.md) | Core |
 | C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core |
-| C-50 Super Transform (bulk change without a file or a Find query) | [super-transform.md](super-transform.md) | Core |
+| C-50 Super Transformer (bulk change without a file or a Find query) | [super-transform.md](super-transform.md) | Core |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
 | Org Optimizer (Data Quality, Field Utilization, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | Core |
 | C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | Core |

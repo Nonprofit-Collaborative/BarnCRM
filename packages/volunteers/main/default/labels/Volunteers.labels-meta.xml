@@ -1136,7 +1136,7 @@ When: {1}</value>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Hours waiting for approval title; {0} is the count, {1} the days</shortDescription>
-        <value>{0} volunteer hours entries have waited more than {1} days for approval</value>
+        <value>{0} Volunteer Hours Entries Have Waited More Than {1} Days for Approval</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_HoursWaitingTitleOne</fullName>
@@ -1144,7 +1144,7 @@ When: {1}</value>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Hours waiting for approval title, one entry; {0} is 1, {1} the days</shortDescription>
-        <value>{0} volunteer hours entry has waited more than {1} days for approval</value>
+        <value>{0} Volunteer Hours Entry Has Waited More Than {1} Days for Approval</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_HoursWaitingDetail</fullName>
@@ -1176,7 +1176,7 @@ When: {1}</value>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Past shifts still Open title; {0} is the count</shortDescription>
-        <value>{0} past shifts are still Open</value>
+        <value>{0} Past Shifts Are Still Open</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_PastShiftsTitleOne</fullName>
@@ -1184,7 +1184,7 @@ When: {1}</value>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Past shifts still Open title, one shift; {0} is 1</shortDescription>
-        <value>{0} past shift is still Open</value>
+        <value>{0} Past Shift Is Still Open</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_PastShiftsDetail</fullName>
@@ -1216,7 +1216,7 @@ When: {1}</value>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Schedule horizon not filled title; {0} is the count</shortDescription>
-        <value>{0} shift schedules have not created shifts far enough ahead</value>
+        <value>{0} Shift Schedules Have Not Created Shifts Far Enough Ahead</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_HorizonTitleOne</fullName>
@@ -1224,7 +1224,7 @@ When: {1}</value>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Schedule horizon not filled title, one schedule; {0} is 1</shortDescription>
-        <value>{0} shift schedule has not created shifts far enough ahead</value>
+        <value>{0} Shift Schedule Has Not Created Shifts Far Enough Ahead</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_HorizonDetail</fullName>
@@ -1248,7 +1248,7 @@ When: {1}</value>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Coordinators missing their set title; {0} is the count</shortDescription>
-        <value>{0} volunteer coordinators do not have the Volunteers Coordinator permission set</value>
+        <value>{0} Volunteer Coordinators Do Not Have the Volunteers Coordinator Permission Set</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_CoordinatorAccessTitleOne</fullName>
@@ -1256,7 +1256,7 @@ When: {1}</value>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>One coordinator missing their set title; {0} is 1</shortDescription>
-        <value>{0} volunteer coordinator does not have the Volunteers Coordinator permission set</value>
+        <value>{0} Volunteer Coordinator Does Not Have the Volunteers Coordinator Permission Set</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_CoordinatorAccessDetail</fullName>
@@ -1296,7 +1296,7 @@ When: {1}</value>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Volunteer totals turned off title; {0} is the count</shortDescription>
-        <value>{0} shipped volunteer totals are turned off</value>
+        <value>{0} Shipped Volunteer Totals Are Turned Off</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_RollupsOffTitleOne</fullName>
@@ -1304,7 +1304,7 @@ When: {1}</value>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>One volunteer total turned off title; {0} is 1</shortDescription>
-        <value>{0} shipped volunteer total is turned off</value>
+        <value>{0} Shipped Volunteer Total Is Turned Off</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_RollupsOffDetail</fullName>

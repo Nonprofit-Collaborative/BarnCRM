@@ -1,5 +1,5 @@
 /**
- * Saved Super Transform step lists (C-50f1, canonical model Section 29P): a named, org-wide
+ * Saved Super Transformer step lists (C-50f1, canonical model Section 29P): a named, org-wide
  * definition of an object, a filter and the changes, kept as one version 1 JSON document in
  * `Saved_Transform__c.Definition_JSON__c`.
  *

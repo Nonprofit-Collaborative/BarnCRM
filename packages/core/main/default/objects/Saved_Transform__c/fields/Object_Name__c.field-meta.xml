@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Object_Name__c</fullName>
-  <description>API name of the object the list changes, copied from the definition by Super Transform when it saves.</description>
+  <description>API name of the object the list changes, copied from the definition by Super Transformer when it saves.</description>
   <externalId>false</externalId>
-  <inlineHelpText>The object this list changes. Set by Super Transform.</inlineHelpText>
+  <inlineHelpText>The object this list changes. Set by Super Transformer.</inlineHelpText>
   <label>Object</label>
   <length>255</length>
   <required>false</required>

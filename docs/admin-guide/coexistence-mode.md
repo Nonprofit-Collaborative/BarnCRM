@@ -66,10 +66,10 @@ keeps households is installed.
    **Health** in the left navigation.
 2. Health Check runs. The first card is **What We Found in Your Org**.
 3. It says Person Accounts are enabled, and the recommended mode is **Standalone**.
-4. Below the card there is a finding titled **Coexistence mode is not confirmed yet**, with
+4. Below the card there is a finding titled **Coexistence Mode Is Not Confirmed Yet**, with
    the button **Use Recommended Mode**.
 5. Maria clicks **Use Recommended Mode**. The page saves Standalone, re-runs itself, and the
-   finding is replaced by **Coexistence mode matches your org**. Household membership is a
+   finding is replaced by **Coexistence Mode Matches Your Org**. Household membership is a
    separate setting: because her org has Person Accounts, BarnCRM proposes a membership
    record for each person, and never overwrites a membership choice already made.
 6. She chooses **General** in the left navigation and sees Coexistence mode set to

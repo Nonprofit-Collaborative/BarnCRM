@@ -187,7 +187,7 @@ describe('c-data-manager', () => {
     });
   });
 
-  it('opens Super Transform, with no Find note, from the Update Many Records tile', async () => {
+  it('opens Super Transformer, with no Find note, from the Update Many Records tile', async () => {
     const element = await render();
     findToolStateKey.emit('ns__tool');
 

@@ -3,11 +3,11 @@
 ## 1. What It Does
 
 **Bulk Update** changes up to five fields on every record a [Find](find.md) query returns, in
-one go. Most bulk changes start in [Super Transform](super-transform.md): the **Update Many
+one go. Most bulk changes start in [Super Transformer](super-transform.md): the **Update Many
 Records** tile on the Data Manager tab opens it, and it runs this same bulk update without a
 Find query. This page covers starting from Find instead, which suits a saved query: run it,
 then choose **Change Records**, **Bulk Update**. The **Open Find** button under **Data Jobs**
-on the Super Transform page (formerly **Bulk Update**) opens Find with a note. For each field
+on the Super Transformer page (formerly **Bulk Update**) opens Find with a note. For each field
 you choose one of:
 
 - **Set to a value**: every record gets the same value, for example Mailing City "Portland".
@@ -40,7 +40,7 @@ run log starting "Edited in Find", with the same undo.
 
 1. Bulk update needs two permissions: **Bulk Update Records**, and **Find and Export Records**,
    because every bulk update selects its records with a Find query, whether built in Find or
-   in Super Transform. The **BarnCRM Admin** role has both. To
+   in Super Transformer. The **BarnCRM Admin** role has both. To
    let a staff member bulk update without making them an admin, assign them the **BarnCRM Bulk
    Update** and **BarnCRM Find and Export** permission sets (BarnCRM Settings, Access,
    Extra Permissions). Neither grants access to any record or field.

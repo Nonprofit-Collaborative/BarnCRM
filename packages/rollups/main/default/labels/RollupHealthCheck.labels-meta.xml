@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: the nightly rollup run is not scheduled.</shortDescription>
-        <value>Nightly totals are not scheduled</value>
+        <value>Nightly Totals Are Not Scheduled</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RollupsMissingDetail</fullName>
@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: shipped rollups missing. {0} is the count.</shortDescription>
-        <value>{0} shipped totals are missing</value>
+        <value>{0} Shipped Totals Are Missing</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RollupsSkippedDetail</fullName>
@@ -102,7 +102,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: queued totals failed five times.</shortDescription>
-        <value>Some totals could not be saved</value>
+        <value>Some Totals Could Not Be Saved</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RollupQueueFailedDetail</fullName>
@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: queued totals have waited too long.</shortDescription>
-        <value>Totals are waiting longer than they should</value>
+        <value>Totals Are Waiting Longer Than They Should</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RollupQueueStuckDetail</fullName>

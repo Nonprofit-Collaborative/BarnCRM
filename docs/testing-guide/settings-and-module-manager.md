@@ -348,7 +348,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 2 | Imitate a module copied in by hand: in Setup, open **Custom Settings**, **BarnCRM Settings**, **Manage**, **Edit** the org default, remove `Giving` from **Modules Setup Run** (leave the rest, comma separated) and save. | Saved. |
 | 3 | Back in **Modules**, click **Check again**. | Only the **BarnCRM Giving** row says "Its setup steps never ran, which happens when source is copied in by hand. Finish Setup runs the steps a package install runs." and has a **Finish Setup** button. |
 | 4 | As the read-only user, open **Modules**. | The same sentence on **BarnCRM Giving**, with no **Finish Setup** button. |
-| 5 | As admin, open **BarnCRM Settings**, **Health** and run Health Check. | A warning **Setup never ran for BarnCRM Giving** names the module and has **Finish Setup**. |
+| 5 | As admin, open **BarnCRM Settings**, **Health** and run Health Check. | A warning **Setup Never Ran for BarnCRM Giving** names the module and has **Finish Setup**. |
 | 6 | Click **Finish Setup**, then **Confirm**. | **Done. Setup steps ran for: BarnCRM Giving.**, and the report re-runs without the warning. |
 | 7 | Open **Modules**. | No row says "Its setup steps never ran". |
 | 8 | Repeat step 2, then in **Modules** click **Finish Setup** on the **BarnCRM Giving** row. | The sentence and the button go away. No error shows, although Giving's steps had already run once: they only add what is missing, so the org has one General Fund and one of each receipt letter, not two. |

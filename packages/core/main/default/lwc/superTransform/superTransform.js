@@ -126,7 +126,7 @@ function shown(value) {
 }
 
 /**
- * Super Transform (C-50, admin guide super-transform.md): a bulk update built on one page, in
+ * Super Transformer (C-50, admin guide super-transform.md): a bulk update built on one page, in
  * five numbered cards (object, which records, what to change, preview, run), without a file or
  * a Find query.
  *
