@@ -1,10 +1,10 @@
-# ADR-NEXT: Funders reporting: outcomes linked to requirements, a funder report template merged in the browser, a board dashboard that reads Giving when it can
+# ADR-0163: Funders reporting: outcomes linked to requirements, a funder report template merged in the browser, a board dashboard that reads Giving when it can
 
 **Status:** Proposed (built for release 0.16, L-06, F-06 and F-07; awaits owner confirmation)
 **Date:** 2026-11-02
 **Source:** plan Section 5.5 (F-06, F-07), Section 5.7 (L-06: "no hard dependency in either
-direction"), Section 9.9 (portability); builds on ADR-0014, ADR-0016, ADR-0129, ADR-0154 and ADR-NEXT
-`NEXT-funders-module.md`.
+direction"), Section 9.9 (portability); builds on ADR-0014, ADR-0016, ADR-0129, ADR-0154 and ADR-0161
+`0161-funders-module.md`.
 
 ## Context
 
@@ -19,7 +19,7 @@ both Apex, both closed sets of `{Token}` names in an HTML body, both rendering P
 
 1. **The link lives in Funders, by record identifier.** A grant requirement's `Outcome_Id__c`
    (Text(18)) holds the identifier of a Logic Models element of type Outcome or Output, the pattern
-   Funders already uses for a program (ADR-NEXT `NEXT-funders-module.md` decision 6, ADR-0014).
+   Funders already uses for a program (ADR-0161 `0161-funders-module.md` decision 6, ADR-0014).
    Logic Models stays unaware of Funders. An always-run automation (`Grant_Requirement_Rules`)
    refuses text that is not an identifier, or, where Logic Models is installed, one of another
    object; the card offers only outcomes and outputs.
@@ -41,7 +41,7 @@ both Apex, both closed sets of `{Token}` names in an HTML body, both rendering P
    No PDF and no saved file: a funder report is edited before it is sent, and an HTML file opens in
    any word processor. This keeps the merge portable (plan 9.9) and costs no file storage.
 4. **The board dashboard reads Giving by describe too.** Funders lists Giving as a package
-   dependency (ADR-NEXT `NEXT-funders-module.md` decision 1), but release 0.16 still references no
+   dependency (ADR-0161 `0161-funders-module.md` decision 1), but release 0.16 still references no
    Giving object, so F-07 reads Giving's totals (`Fund__c` with `Restricted__c` and the year's
    raised amount, and the top accounts by `Giving_This_Year__c`) by describe, and shows the grant
    figures alone where Giving is absent or unreadable. The restricted balance per fund comes from

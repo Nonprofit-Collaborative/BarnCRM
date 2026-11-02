@@ -1,7 +1,7 @@
 # Where Used and Retire a Field
 
 **Package:** Core (the Rollup Builder and Giving modules add their own records when installed)
-**Feature:** C-59 (plan Section 6.0a release 0.16, decision D-156; ADR-NEXT)
+**Feature:** C-59 (plan Section 6.0a release 0.16, decision D-156; ADR-0159)
 
 ## What It Does
 

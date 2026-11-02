@@ -5,7 +5,7 @@
  * private ones other people own, so the reads ignore sharing and field security. Only
  * `WhereUsedController` calls this, after checking Manage BarnCRM Settings, and
  * `WhereUsedService` hides the name of a private query someone else owns
- * (ADR-NEXT, `NEXT-where-used-extension.md`). Nothing here writes.
+ * (ADR-0159, `0159-where-used-extension.md`). Nothing here writes.
  */
 public without sharing class WhereUsedSelector {
     /** The most records of one kind read in one request. */

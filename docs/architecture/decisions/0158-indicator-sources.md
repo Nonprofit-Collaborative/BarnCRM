@@ -1,4 +1,4 @@
-# ADR-NEXT: Indicator sources: hand entry, a Core Import template, or a Find saved query counted per period in system mode
+# ADR-0158: Indicator sources: hand entry, a Core Import template, or a Find saved query counted per period in system mode
 
 **Status:** Proposed (built as recommended for release 0.15, L-03; awaits owner confirmation)
 **Date:** 2026-11-02

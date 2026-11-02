@@ -929,7 +929,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(programs)
   # Logic Models depends on Core only (ADR-0154, logic models module).
   MODULES+=(logicmodels)
-  # Funders depends on Core, the Rollup Builder module and Giving (ADR-NEXT, funders module).
+  # Funders depends on Core, the Rollup Builder module and Giving (ADR-0161, funders module).
   MODULES+=(funders)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
@@ -1084,7 +1084,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "check syncs the access."
   fi
 
-  # The same gap for the Funders permission sets (ADR-NEXT, funders module, decision 9).
+  # The same gap for the Funders permission sets (ADR-0161, funders module, decision 9).
   echo ""
   echo "== Queueing the Funders access sync =="
   if ! printf '%s\n' 'new FundersAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then

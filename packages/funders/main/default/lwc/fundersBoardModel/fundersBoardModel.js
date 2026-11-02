@@ -1,6 +1,6 @@
 /**
- * Board dashboard logic, with no framework in it (F-07, canonical model 29ZH R-GN9, ADR-NEXT
- * `NEXT-funders-reporting-links.md` decision 5, plan Section 9.9). Plain JavaScript in and out, so
+ * Board dashboard logic, with no framework in it (F-07, canonical model 29ZH R-GN9, ADR-0163
+ * `0163-funders-reporting-links.md` decision 5, plan Section 9.9). Plain JavaScript in and out, so
  * a WordPress block or Node can use the same module.
  */
 

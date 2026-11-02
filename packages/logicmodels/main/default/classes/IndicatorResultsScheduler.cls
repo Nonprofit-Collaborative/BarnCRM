@@ -1,5 +1,5 @@
 /**
- * The Logic Models nightly job (L-03; ADR-NEXT `NEXT-indicator-sources.md`, canonical model
+ * The Logic Models nightly job (L-03; ADR-0158 `0158-indicator-sources.md`, canonical model
  * R-IN5): at 3:30 AM it starts `IndicatorResultsBatch` for every computed indicator. Health
  * Check's "Schedule all nightly jobs" fix schedules it through `LogicModelsNightlyJobProvider`.
  *

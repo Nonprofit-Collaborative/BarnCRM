@@ -1,5 +1,5 @@
 /**
- * Gives the Funders permission sets to BarnCRM's roles (ADR-NEXT `NEXT-funders-module.md`,
+ * Gives the Funders permission sets to BarnCRM's roles (ADR-0161 `0161-funders-module.md`,
  * decision 9): Funders Admin to everyone holding BarnCRM Admin, directly or through a role,
  * Funders Staff to the Team Member, Coordinator and Fundraising Staff roles (the last is Giving's,
  * which Funders depends on), and Funders Read Only to the Read Only role. The roles are permission set groups, followed through

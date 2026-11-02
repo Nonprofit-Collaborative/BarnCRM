@@ -1,6 +1,6 @@
 /**
- * The Grant Calendar tab's arithmetic, with no framework in it (F-08, ADR-NEXT
- * `NEXT-funders-restricted-funds-schedules-calendar.md` decision 8, plan Section 9.9): which days a
+ * The Grant Calendar tab's arithmetic, with no framework in it (F-08, ADR-0162
+ * `0162-funders-restricted-funds-schedules-calendar.md` decision 8, plan Section 9.9): which days a
  * month view shows, and the dated rows laid into its weeks. The rows are sorted and marked overdue
  * by the Grant Pipeline's own `deadlineRows`, so the two views agree.
  *

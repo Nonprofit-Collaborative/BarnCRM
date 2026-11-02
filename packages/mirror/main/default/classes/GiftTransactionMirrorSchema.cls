@@ -13,7 +13,7 @@
  *
  * All the names live in `names`, so tests can point the mirror at stand-in objects of the same
  * shape (`useStandIns`) and run its real queries and DML in an org without Nonprofit Cloud
- * (ADR-NEXT decision 9). The describe is read once per transaction.
+ * (ADR-0157 decision 9). The describe is read once per transaction.
  */
 public with sharing class GiftTransactionMirrorSchema {
     /** The object and field names the mirror uses. */

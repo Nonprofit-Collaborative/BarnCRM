@@ -1,15 +1,15 @@
-# ADR-NEXT: Funders restricted funds, award schedules and the deadline calendar, with no Giving dependency
+# ADR-0162: Funders restricted funds, award schedules and the deadline calendar, with no Giving dependency
 
 **Status:** Proposed (built as recommended for releases 0.16 and 0.17, F-03, F-05 and F-08; awaits
 owner confirmation)
 **Date:** 2026-11-02
 **Source:** plan Section 5.5 (F-03, F-05, F-08), Section 6.0a releases 0.16 and 0.17, Section 9.9
-(portability); amends ADR-NEXT `NEXT-funders-module.md` decision 1; builds on ADR-0013, ADR-0014,
+(portability); amends ADR-0161 `0161-funders-module.md` decision 1; builds on ADR-0013, ADR-0014,
 ADR-0017, ADR-0024 and ADR-0154.
 
 ## Context
 
-ADR-NEXT `NEXT-funders-module.md` built the grant and its requirements (F-01, F-02) and kept Giving
+ADR-0161 `0161-funders-module.md` built the grant and its requirements (F-01, F-02) and kept Giving
 as a package dependency because F-03 (a fund ledger on Giving's `Fund__c`) and F-05 (award
 schedules on Giving's `Commitment__c` and `Installment__c`, plan note "Reuses Commitment and
 Installment") were expected to need it. The integrator ruled (2026-11-02) that Funders must not
@@ -28,7 +28,7 @@ What the three features need:
 ## Decision
 
 1. **Funders depends on Core and Rollup Builder; Giving is dropped.** Amends decision 1 of
-   ADR-NEXT `NEXT-funders-module.md`. Nothing in Funders references a Giving object or class; a
+   ADR-0161 `0161-funders-module.md`. Nothing in Funders references a Giving object or class; a
    Giving fund is named by record identifier (decision 4). `sfdx-project.json` lists Core and
    Rollup Builder, and Core's catalog row `BarnCRM_Module.Funders` requires `Rollups` only, so an
    org can install Funders without Giving. A Fundraising Staff holder still gets Funders Staff
@@ -48,8 +48,8 @@ What the three features need:
    platform's own summaries are exact, immediate and need no Rollup Builder definition (the Logic
    Models precedent, `Indicator_Count__c`).
 4. **The Giving fund is named by record identifier, never looked up.** `Fund_Id__c` holds a Giving
-   fund's record identifier as text, exactly as `Program_Id__c` holds a program (ADR-NEXT
-   `NEXT-funders-module.md` decision 6): the always-running `Grant_Rules` automation stores its
+   fund's record identifier as text, exactly as `Program_Id__c` holds a program (ADR-0161
+   `0161-funders-module.md` decision 6): the always-running `Grant_Rules` automation stores its
    18-character form and refuses text that is not a record identifier, or one of another object
    where an object named `Fund__c` exists. A **Giving Fund** card on the grant's page lists the
    active funds where Giving is installed, read by describe in user mode, and says so where it is

@@ -1,6 +1,6 @@
 /**
  * The Logic Models outcome a grant requirement reports on (L-06, canonical model 29ZI R-GQ6,
- * ADR-NEXT `NEXT-funders-reporting-links.md`): the rule on the stored identifier, the outcomes to
+ * ADR-0163 `0163-funders-reporting-links.md`): the rule on the stored identifier, the outcomes to
  * choose from, and each linked outcome's indicators with their targets and results.
  *
  * Logic Models is found by describe only (`NamespaceUtil.packagedObjectType`), so Funders installs

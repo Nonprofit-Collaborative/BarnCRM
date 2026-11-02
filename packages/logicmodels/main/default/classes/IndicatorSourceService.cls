@@ -1,5 +1,5 @@
 /**
- * Where an indicator's results come from (L-03; ADR-NEXT `NEXT-indicator-sources.md`; canonical
+ * Where an indicator's results come from (L-03; ADR-0158 `0158-indicator-sources.md`; canonical
  * model R-IN3 and R-IN4): typed in, imported with the Indicator Results template, or computed
  * from a Find saved query by `IndicatorResultsBatch`.
  *

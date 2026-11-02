@@ -1,6 +1,6 @@
 /**
- * The Giving fund a grant's money is booked to (canonical model 29ZH R-GN8, ADR-NEXT
- * `NEXT-funders-restricted-funds-schedules-calendar.md` decision 4): named by record identifier,
+ * The Giving fund a grant's money is booked to (canonical model 29ZH R-GN8, ADR-0162
+ * `0162-funders-restricted-funds-schedules-calendar.md` decision 4): named by record identifier,
  * never looked up, so Funders installs without Giving.
  *
  * Giving's `Fund__c` is found by describe only. Every read of it runs in user mode, and only its

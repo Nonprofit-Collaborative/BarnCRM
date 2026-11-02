@@ -1,5 +1,5 @@
 /**
- * The Grant Pipeline tab (F-01, canonical model 29ZH, ADR-NEXT `NEXT-funders-module.md` decision
+ * The Grant Pipeline tab (F-01, canonical model 29ZH, ADR-0161 `0161-funders-module.md` decision
  * 11): the open grants by stage with their totals, the grants awarded this fiscal year, the
  * application deadlines coming up, and moving a grant to another stage.
  *

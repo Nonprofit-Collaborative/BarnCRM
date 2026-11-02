@@ -1,6 +1,6 @@
 /**
- * The Board Dashboard tab (F-07, canonical model 29ZH R-GN9, ADR-NEXT
- * `NEXT-funders-reporting-links.md` decisions 4 and 5): this fiscal year's awarded grants by
+ * The Board Dashboard tab (F-07, canonical model 29ZH R-GN9, ADR-0163
+ * `0163-funders-reporting-links.md` decisions 4 and 5): this fiscal year's awarded grants by
  * funding source and by funder, and, where Giving is installed and readable, the gifts designated
  * to funds, each organization's Giving This Year and the restricted funds. Thin: it returns plain
  * JSON shapes, and the shares and flags are worked out in the framework-free `fundersBoardModel`

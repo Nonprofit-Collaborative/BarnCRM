@@ -1,5 +1,5 @@
 /**
- * Giving's part of Where Used (C-59, ADR-NEXT `NEXT-where-used-extension.md`): the import mapping
+ * Giving's part of Where Used (C-59, ADR-0159 `0159-where-used-extension.md`): the import mapping
  * columns and default values that load gifts, allocations, soft credits and tributes. Core reads
  * a mapping's people, household and organization columns itself; only Giving knows which object
  * each of its row entities loads (R-IR1, R-IR6), so it passes them to Core's reader. Core finds

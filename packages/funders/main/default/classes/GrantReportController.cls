@@ -1,6 +1,6 @@
 /**
- * The Funder Report card on a grant's page (F-06, canonical model 29ZO, ADR-NEXT
- * `NEXT-funders-reporting-links.md` decision 3): the active templates and everything their tokens
+ * The Funder Report card on a grant's page (F-06, canonical model 29ZO, ADR-0163
+ * `0163-funders-reporting-links.md` decision 3): the active templates and everything their tokens
  * need, as plain JSON. The merge and the printable document are the framework-free
  * `grantReportModel`'s; nothing is saved. Everything runs as the person.
  */

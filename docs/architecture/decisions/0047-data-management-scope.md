@@ -1,6 +1,6 @@
 # ADR-0047: Data management runs in the org, compiles queries from a document, and is phased
 
-**Status:** Accepted; amended by ADR-NEXT (Field Access Manager, C-65, D-157)
+**Status:** Accepted; amended by ADR-0156 (Field Access Manager, C-65, D-157)
 **Date:** 2026-09-23
 **Source:** product owner decision (Brandon, 2026-09-23), plan Section 4.9, Section 6 and
 Section 12 decision D-13; amends the import framework scope of C-14 and C-19
@@ -38,7 +38,7 @@ and a self-callout to explain at security review. Plan Section 4.10 forbids SOQL
   the settings permission; `Find_And_Export_Records` and `Bulk_Update_Records` are new custom
   permissions that grant no record access.
 - **Never built.** Jetstream's metadata deploy, anonymous Apex, API explorer and
-  org-wide automation tools (its permission tool too, until ADR-NEXT: the Field Access
+  org-wide automation tools (its permission tool too, until ADR-0156: the Field Access
   Manager, C-65, D-157, changes Read and Edit on permission sets the admin chooses), and dataimporter.io's org-to-org migration and backup: Setup, Data
   Loader and Jetstream serve the rare technical user, and each would add security review risk for
   nothing Maria needs. Jetstream is Apache-2.0 with the Commons Clause, not an open source

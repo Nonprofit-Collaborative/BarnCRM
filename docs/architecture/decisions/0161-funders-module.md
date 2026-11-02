@@ -1,4 +1,4 @@
-# ADR-NEXT: The BarnCRM Funders module: a Grant and its requirements, the funder an organization, a program named by its record identifier
+# ADR-0161: The BarnCRM Funders module: a Grant and its requirements, the funder an organization, a program named by its record identifier
 
 **Status:** Proposed (built as recommended for release 0.16, F-01 and F-02; awaits owner confirmation)
 **Date:** 2026-11-02
@@ -25,7 +25,7 @@ a deadline, an award period, and obligations after the award.
 ## Decision
 
 1. **The package depends on Core and Rollup Builder.** Giving was listed too, for F-03 and F-05;
-   ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md` (decision 1) drops it and links
+   ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md` (decision 1) drops it and links
    a Giving fund by record identifier, as a program is linked (decision 6). The module key is
    `Funders`, so the classes Core finds by name are `FundersAccessSync`, `FundersPostInstall`, `FundersHealthCheckExtension`,
    `FundersNightlyJobProvider` and `FundersSampleData`.
@@ -97,7 +97,7 @@ a deadline, an award period, and obligations after the award.
 ## Room Left for Later Releases
 
 - F-03 adds a restricted ledger on the grant and names a Giving fund by record identifier
-  (ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md`); F-12 compares a budget with
+  (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`); F-12 compares a budget with
   the award and that ledger.
 - F-04 adds the government award fields to Grant (assistance listing number, award number,
   drawdowns); the award period is already there.

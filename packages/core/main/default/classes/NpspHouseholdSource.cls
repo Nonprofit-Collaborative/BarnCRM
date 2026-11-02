@@ -1,6 +1,6 @@
 /**
  * Reads the Nonprofit Success Pack's household Accounts, by describe only (X-05, canonical model
- * R-HA1, ADR-NEXT `NEXT-npsp-household-adoption-in-core.md`).
+ * R-HA1, ADR-0155 `0155-npsp-household-adoption-in-core.md`).
  *
  * Core never depends on NPSP: every NPSP name is built here at run time, so none appears in
  * source (scripts/ci/check-namespace.sh), a field the describe does not find is read as blank,

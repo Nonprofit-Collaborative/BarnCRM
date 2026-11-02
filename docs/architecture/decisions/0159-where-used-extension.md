@@ -1,4 +1,4 @@
-# ADR-NEXT: Where Used reads BarnCRM's own setup records, and modules add theirs through an extension seam
+# ADR-0159: Where Used reads BarnCRM's own setup records, and modules add theirs through an extension seam
 
 **Status:** Proposed (builder decision)
 **Date:** 2026-11-02

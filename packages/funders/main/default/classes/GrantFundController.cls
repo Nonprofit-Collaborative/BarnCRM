@@ -1,6 +1,6 @@
 /**
- * The Giving Fund card on a grant's page (F-03, canonical model 29ZH R-GN8, ADR-NEXT
- * `NEXT-funders-restricted-funds-schedules-calendar.md` decision 4): the Giving fund the grant's
+ * The Giving Fund card on a grant's page (F-03, canonical model 29ZH R-GN8, ADR-0162
+ * `0162-funders-restricted-funds-schedules-calendar.md` decision 4): the Giving fund the grant's
  * money is booked to, the active funds to choose from where Giving is installed, and saving the
  * choice. The card's restricted totals are the grant's own fields, read by the page.
  *

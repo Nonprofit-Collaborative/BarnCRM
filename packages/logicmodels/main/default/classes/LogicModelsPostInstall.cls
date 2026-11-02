@@ -6,7 +6,7 @@
  * to the Error Log instead:
  *
  * 1. Create the switch rows of the Automation page for the module's own automations (C-21),
- *    and the module's Import template, Indicator Results (L-03, ADR-NEXT).
+ *    and the module's Import template, Indicator Results (L-03, ADR-0158).
  * 2. Queue the job that gives the installer the Logic Models Admin permission set. Queued because a
  *    permission set assignment is a setup object write, and this transaction has already written
  *    ordinary records (mixed DML).

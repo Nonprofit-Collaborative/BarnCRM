@@ -1,4 +1,4 @@
-# ADR-NEXT: The Gift Transaction mirror copies gifts one way, in runs, with designations from each fund's link
+# ADR-0157: The Gift Transaction mirror copies gifts one way, in runs, with designations from each fund's link
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-02

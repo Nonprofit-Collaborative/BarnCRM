@@ -1,5 +1,5 @@
 /**
- * The Grant Calendar tab (F-08, ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md`
+ * The Grant Calendar tab (F-08, ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`
  * decision 8): the application deadlines, requirement due dates and expected payments between
  * two dates, for everyone or the person's own.
  *

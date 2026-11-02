@@ -4,7 +4,7 @@
 
 Funder pipeline (grants applied for and awarded), reporting requirements and deadlines with
 reminders, and later restricted fund tracking, government award fields, multi-year award
-schedules and grant management (plan Section 5.5, ADR-NEXT `NEXT-funders-module.md`).
+schedules and grant management (plan Section 5.5, ADR-0161 `0161-funders-module.md`).
 
 ## First ships in
 
@@ -16,8 +16,8 @@ restricted fund tracking follows in 0.17.
 - BarnCRM Core
 - BarnCRM Rollup Builder
 
-Nothing in this package references Giving or Programs (ADR-NEXT
-`NEXT-funders-restricted-funds-schedules-calendar.md` decision 1): a grant may name a program
+Nothing in this package references Giving or Programs (ADR-0162
+`0162-funders-restricted-funds-schedules-calendar.md` decision 1): a grant may name a program
 and a Giving fund by record identifier (text), resolved by describe only where a `Program__c` or
 `Fund__c` object exists.
 

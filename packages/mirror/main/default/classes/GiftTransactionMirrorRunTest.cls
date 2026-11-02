@@ -3,7 +3,7 @@
  * R-GT6, R-GT10), as Maria sees them.
  *
  * The test org has no Nonprofit Cloud, so the present path runs against the stand-ins of
- * `GiftTransactionMirrorSchema.useStandIns` (ADR-NEXT decision 9): Gift for Gift Transaction, and
+ * `GiftTransactionMirrorSchema.useStandIns` (ADR-0157 decision 9): Gift for Gift Transaction, and
  * so on. The paid status here is Pending, so the stand-in Gift Transactions, pending gifts, are
  * never themselves gifts the mirror copies. The absent path is forced with `absentForTest`.
  */

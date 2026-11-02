@@ -1,5 +1,5 @@
 /**
- * Works out computed indicators' results (L-03; ADR-NEXT `NEXT-indicator-sources.md`; canonical
+ * Works out computed indicators' results (L-03; ADR-0158 `0158-indicator-sources.md`; canonical
  * model R-IN5 and R-IN6), one indicator per run, then starts the run for the next.
  *
  * The indicator's Find saved query is compiled as the running user (`IndicatorSourceService`,
@@ -11,7 +11,7 @@
  *
  * Without sharing on purpose: the records are read in system mode so the result is the
  * organization's figure, not the share of records the person who pressed Refresh Results or
- * scheduled the nightly job can see (ADR-NEXT decision 6). Only numbers are written, and only
+ * scheduled the nightly job can see (ADR-0158 decision 6). Only numbers are written, and only
  * Logic Models Admin can define what is counted.
  */
 public without sharing class IndicatorResultsBatch implements Database.Batchable<SObject>, Database.Stateful {

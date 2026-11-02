@@ -1,7 +1,7 @@
 /**
  * What the Gift Transaction mirror reads from the org's describe (X-07, canonical model Section
  * 29C1, R-GT1, R-GT5). The test org has no Nonprofit Cloud, so the present path runs against the
- * stand-ins of `GiftTransactionMirrorSchema.useStandIns` (ADR-NEXT decision 9), and the absent
+ * stand-ins of `GiftTransactionMirrorSchema.useStandIns` (ADR-0157 decision 9), and the absent
  * path is forced with `absentForTest`, so both are proved on any org.
  */
 @IsTest(testFor='ApexClass:GiftTransactionMirrorSchema')

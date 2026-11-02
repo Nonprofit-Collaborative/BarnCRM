@@ -1,5 +1,5 @@
 /**
- * The rules of a grant (canonical model 29ZH, ADR-NEXT `NEXT-funders-module.md`): which stages
+ * The rules of a grant (canonical model 29ZH, ADR-0161 `0161-funders-module.md`): which stages
  * are open (R-GN1), the stage dates (R-GN3) and the program named by record identifier (R-GN4).
  *
  * The program is the Programs module's `Program__c`, found by describe only, so Funders installs

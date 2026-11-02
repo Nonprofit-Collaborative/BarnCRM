@@ -1,5 +1,5 @@
 /**
- * The Rollup Builder's part of Where Used (C-59, ADR-NEXT `NEXT-where-used-extension.md`): every
+ * The Rollup Builder's part of Where Used (C-59, ADR-0159 `0159-where-used-extension.md`): every
  * rollup definition that counts, filters, sorts on, travels through or writes to the target.
  * Core finds this class by name (`WhereUsedExtensions`) and adds its answer to the one list.
  *

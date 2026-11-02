@@ -1,6 +1,6 @@
 /**
- * The Award Schedule card on a grant's page (F-05, canonical model 29ZM, ADR-NEXT
- * `NEXT-funders-restricted-funds-schedules-calendar.md` decision 6): the grant's payments and
+ * The Award Schedule card on a grant's page (F-05, canonical model 29ZM, ADR-0162
+ * `0162-funders-restricted-funds-schedules-calendar.md` decision 6): the grant's payments and
  * totals, building a schedule, and marking a payment received.
  *
  * Thin by design (plan Section 9.9): plain shapes out, the split in the browser module

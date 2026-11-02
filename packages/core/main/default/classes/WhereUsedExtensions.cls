@@ -1,5 +1,5 @@
 /**
- * Finds the Where Used extensions dependent packages installed (C-59, ADR-NEXT), the pattern
+ * Finds the Where Used extensions dependent packages installed (C-59, ADR-0159), the pattern
  * `HealthCheckExtensions` uses (ADR-0057). A class that is not installed, cannot be built, or does
  * not implement the interface is treated as absent, and a failure is logged: Where Used must still
  * answer for Core when a module cannot.

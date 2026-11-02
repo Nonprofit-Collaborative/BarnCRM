@@ -1,6 +1,6 @@
 /**
  * The Gift Transaction mirror page's controller (X-07) as Maria and Ana use it. The present path
- * runs against the stand-ins of `GiftTransactionMirrorSchema.useStandIns` (ADR-NEXT decision 9),
+ * runs against the stand-ins of `GiftTransactionMirrorSchema.useStandIns` (ADR-0157 decision 9),
  * with Pending as the paid status so stand-in Gift Transactions are never copied themselves; the
  * absent path is forced with `absentForTest`.
  */

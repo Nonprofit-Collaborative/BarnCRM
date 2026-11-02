@@ -1,4 +1,4 @@
-# ADR-NEXT: NPSP Household Adoption Lives in Core, Converts Accounts in Place, and Is Undone From a Journal
+# ADR-0155: NPSP Household Adoption Lives in Core, Converts Accounts in Place, and Is Undone From a Journal
 
 **Status:** Proposed
 **Date:** 2026-11-02

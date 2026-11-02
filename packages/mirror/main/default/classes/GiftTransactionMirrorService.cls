@@ -1,5 +1,5 @@
 /**
- * The Gift Transaction mirror (feature X-07, canonical model Section 29C1, ADR-NEXT): its
+ * The Gift Transaction mirror (feature X-07, canonical model Section 29C1, ADR-0157): its
  * settings, the check of a typed link, and the copy of each received gift to a Nonprofit Cloud
  * Gift Transaction with its designations.
  *

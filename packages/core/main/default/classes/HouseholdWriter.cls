@@ -221,7 +221,7 @@ public with sharing class HouseholdWriter {
 
     /**
      * Saves an NPSP household adoption or its undo (X-05, canonical model R-HA3 and R-HA4,
-     * ADR-NEXT): the record type and the four household fields (Custom Name, the two greetings,
+     * ADR-0155): the record type and the four household fields (Custom Name, the two greetings,
      * Primary Contact) of Accounts the caller has checked the running user can edit. The one
      * place outside household creation that changes an Account's record type, which no user is
      * given (ADR-0141). Each Account is saved on its own, past the org's duplicate rules as a

@@ -1,4 +1,4 @@
-# ADR-NEXT: Programs depth: goals on the enrollment, cohorts through the enrollment, sessions under a service with attendance on Service Delivery
+# ADR-0160: Programs depth: goals on the enrollment, cohorts through the enrollment, sessions under a service with attendance on Service Delivery
 
 **Status:** Proposed (built as recommended for release 0.15, P-10 and P-11; awaits owner confirmation)
 **Date:** 2026-11-02

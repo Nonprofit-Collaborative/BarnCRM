@@ -1,7 +1,7 @@
 # Field Access Manager
 
 **Package:** Core
-**Feature:** C-65 (release 0.17, decision D-157, ADR-NEXT)
+**Feature:** C-65 (release 0.17, decision D-157, ADR-0156)
 
 ## What It Does
 

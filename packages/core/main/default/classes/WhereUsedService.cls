@@ -1,6 +1,6 @@
 /**
- * Where Used for BarnCRM setup (C-59, admin guide where-used.md, ADR-NEXT
- * `NEXT-where-used-extension.md`): for one field, or one whole object, every BarnCRM setup record
+ * Where Used for BarnCRM setup (C-59, admin guide where-used.md, ADR-0159
+ * `0159-where-used-extension.md`): for one field, or one whole object, every BarnCRM setup record
  * that names it, so an administrator can see what would break before retiring it.
  *
  * Core reads its own setup: saved Find queries (which Giving also lists as donor segments), Super

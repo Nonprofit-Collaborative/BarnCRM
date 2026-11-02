@@ -1,6 +1,6 @@
 /**
- * The Program card on a grant's page (F-01, canonical model 29ZH R-GN4, ADR-NEXT
- * `NEXT-funders-module.md` decision 6): which program the grant pays for, the programs to choose
+ * The Program card on a grant's page (F-01, canonical model 29ZH R-GN4, ADR-0161
+ * `0161-funders-module.md` decision 6): which program the grant pays for, the programs to choose
  * from where the Programs module is installed, and saving the choice.
  *
  * Thin by design (plan Section 9.9): plain shapes out, the rules in `GrantService`. Everything

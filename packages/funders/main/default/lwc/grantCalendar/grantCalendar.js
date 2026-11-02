@@ -36,7 +36,7 @@ const firstDay = () => {
 };
 
 /**
- * The Grant Calendar tab (F-08, ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md`
+ * The Grant Calendar tab (F-08, ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`
  * decision 8): a month at a time, the application deadlines of grants not yet submitted, the due
  * dates of open requirements and the expected payments, for everyone or the person's own. Each
  * entry opens its record.

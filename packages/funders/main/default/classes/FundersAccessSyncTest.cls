@@ -1,5 +1,5 @@
 /**
- * BarnCRM's roles get the Funders sets (ADR-NEXT decision 9): BarnCRM Admin holders Funders
+ * BarnCRM's roles get the Funders sets (ADR-0161 decision 9): BarnCRM Admin holders Funders
  * Admin, the Team Member, Coordinator and Fundraising Staff roles Funders Staff and the Read Only
  * role Funders Read Only, at install, at Turn on and with the hourly access check.
  */

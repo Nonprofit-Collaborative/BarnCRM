@@ -2,7 +2,7 @@
  * The Gift Transaction mirror (X-07, canonical model Section 29C1) as Maria sees it.
  *
  * The test org has no Nonprofit Cloud, so the present path runs against stand-ins of the same
- * shape (`GiftTransactionMirrorSchema.useStandIns`, ADR-NEXT decision 9): Gift for Gift
+ * shape (`GiftTransactionMirrorSchema.useStandIns`, ADR-0157 decision 9): Gift for Gift
  * Transaction, Gift Allocation for Gift Transaction Designation, Fund for Gift Designation, and
  * the paid status is Received. The mirror's real dynamic queries and DML run against them. The
  * absent path is forced with `absentForTest`, so it is proved on an org with Nonprofit Cloud too.

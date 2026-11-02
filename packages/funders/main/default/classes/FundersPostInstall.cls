@@ -1,6 +1,6 @@
 /**
- * What the BarnCRM Funders module does at install and at every upgrade (ADR-NEXT
- * `NEXT-funders-module.md`).
+ * What the BarnCRM Funders module does at install and at every upgrade (ADR-0161
+ * `0161-funders-module.md`).
  *
  * Each step is safe to run twice and none can abort an install, since every failure is written
  * to the Error Log instead:

@@ -7866,7 +7866,7 @@ only, because a gift is never edited from its Opportunity.
 ### Definition
 
 A one-way copy of gifts to Nonprofit Cloud (Agentforce Nonprofit) Gift Transaction records, with
-their designations (plan Sections 4.5 and 4.12, feature X-07, ADR-NEXT). Nonprofit Cloud's donor
+their designations (plan Sections 4.5 and 4.12, feature X-07, ADR-0157). Nonprofit Cloud's donor
 gift summaries, donor pages, giving levels, actionable lists and Agentforce actions read Gift
 Transactions only, so an organization that records its gifts in BarnCRM turns the mirror on to
 keep those features seeing its giving. A reconciliation page shows where the two sides disagree.
@@ -10301,7 +10301,7 @@ R-EN6 names two values.
 
 **R-EN8 A cohort of the same program (P-11).** An enrollment's Cohort, when set, is a cohort of
 the enrollment's program (validation rule). Moving a person into or out of a cohort changes this
-one field; there is no membership record (ADR-NEXT decision 10). R-EN2 already keeps a person in
+one field; there is no membership record (ADR-0160 decision 10). R-EN2 already keeps a person in
 one cohort of a program at a time. A cohort deleted later empties the field (SetNull).
 
 ### Salesforce implementation
@@ -10362,7 +10362,7 @@ repository and are checked against an org with PMM when MIG-09 is built.
 | Service: Name, Program, Description, Unit of Measure, Active | Service: Name, Program, Description, Unit of Measurement, Status | Status Active maps to Active checked |
 | Enrollment: Program, Contact, Stage, Start Date, End Date, Cohort | Program Engagement: Program, Contact, Stage, Start Date, End Date, Program Cohort | Stages: Applied to Applied; Enrolled and Active to Enrolled; Completed to Completed; Withdrawn to Withdrawn |
 | Cohort: Name, Program, Status, Start Date, End Date (29ZA4, P-11) | Program Cohort: Name, Program, Status, Start Date, End Date | Status values match (Planned, Active, Completed) |
-| Session: Name, Service, Session Date, Start Time, Status (29ZA5, P-11) | Service Session: Name, Service Schedule's Service, Session Start, Status | PMM keeps a Service Schedule above its sessions; BarnCRM has none (ADR-NEXT decision 14). Status: Pending to Scheduled, Complete to Held, Canceled to Cancelled |
+| Session: Name, Service, Session Date, Start Time, Status (29ZA5, P-11) | Service Session: Name, Service Schedule's Service, Session Start, Status | PMM keeps a Service Schedule above its sessions; BarnCRM has none (ADR-0160 decision 14). Status: Pending to Scheduled, Complete to Held, Canceled to Cancelled |
 
 ### On a person, Health Check and sample data
 
@@ -10580,9 +10580,9 @@ Deleting a person, not erasing them, keeps the referral, which no longer names t
 ### Definition
 
 Something a participant is working toward within their enrollment, with the steps to get there
-(P-10, release 0.15, ADR-NEXT `NEXT-programs-service-plans-cohorts-sessions.md`): find stable
+(P-10, release 0.15, ADR-0160 `0160-programs-service-plans-cohorts-sessions.md`): find stable
 housing, pass the high school equivalency test, open a bank account. A participant's service plan
-is the set of goals on their enrollment; there is no plan record (ADR-NEXT decision 1). Case
+is the set of goals on their enrollment; there is no plan record (ADR-0160 decision 1). Case
 management lite: who is responsible, by when, how it stands, and when it is next reviewed.
 
 ### Attributes
@@ -10723,8 +10723,8 @@ R-GL1, R-GL4 and R-GL6 apply to steps through their goal.
 
 ### Definition
 
-A group of participants who go through a program together (P-11, release 0.15, ADR-NEXT
-`NEXT-programs-service-plans-cohorts-sessions.md`): the spring class of a job readiness course,
+A group of participants who go through a program together (P-11, release 0.15, ADR-0160
+`0160-programs-service-plans-cohorts-sessions.md`): the spring class of a job readiness course,
 the Tuesday group of a tutoring program. Its members are the enrollments that name it (R-EN8);
 there is no membership record.
 
@@ -10785,7 +10785,7 @@ the enrollment's Cohort and keeps the enrollment. At most 200 people are added i
 
 One scheduled occurrence of a service (P-11): the 6 pm class on 3 March, Tuesday's tutoring hour.
 Attendance at a session is recorded as Service Delivery (29ZB), so a session has no attendance
-record of its own (ADR-NEXT decision 12).
+record of its own (ADR-0160 decision 12).
 
 ### Attributes
 
@@ -11229,7 +11229,7 @@ the target: met when the result is at or beyond the target in the indicator's di
 otherwise the share of the way from the baseline (or zero) to the target. Computed in the
 builder's module, never stored.
 
-**R-IN3 Sources (L-03, ADR-NEXT).** Manual results are typed in the builder. Import results are
+**R-IN3 Sources (L-03, ADR-0158).** Manual results are typed in the builder. Import results are
 loaded with the shipped one-object Import template Indicator Results (Indicator Period, Update by
 record Id; columns Period Id, Target, Result, Notes), filled in from the builder's Download
 Results Sheet, in the user's own access. Computed results are written only by the refresh
@@ -11342,7 +11342,7 @@ dates for the same indicator. Periods of different lengths may overlap (a year a
 ### Definition
 
 One change to who can read and edit fields and kinds of record, made by an administrator on the
-Field Access Manager (feature C-65, plan D-157, ADR-NEXT): Read and Edit given or removed on
+Field Access Manager (feature C-65, plan D-157, ADR-0156): Read and Edit given or removed on
 chosen fields and objects, across chosen permission sets, previewed row by row and undoable.
 It adds no object of its own: it is a data job (Section 16) with Operation Access, journaled in
 the import journal (Section 17A). The permission rows it changes are Salesforce's own
@@ -11440,8 +11440,8 @@ pages and any refusals straight after, as the same person.
 ### Definition
 
 One Account that BarnCRM adopted as a household from the Nonprofit Success Pack (NPSP), with
-what the Account held before, so the adoption can be undone (feature X-05, ADR-NEXT
-`NEXT-npsp-household-adoption-in-core.md`). Only orgs with NPSP ever have rows. NPSP is read
+what the Account held before, so the adoption can be undone (feature X-05, ADR-0155
+`0155-npsp-household-adoption-in-core.md`). Only orgs with NPSP ever have rows. NPSP is read
 only by describe; no NPSP name is part of this entity.
 
 ### Attributes
@@ -11466,7 +11466,7 @@ seam tests replace.
 **R-HA2 Preview first, counted and confirmed.** The preview, in the running user's access,
 counts the candidates and shows the first ten with their name, NPSP greetings, NPSP primary
 contact and number of contacts. Starting a run is refused when the count is zero, when more
-match than the person confirmed, while membership is Junction (ADR-NEXT decision 3), while the
+match than the person confirmed, while membership is Junction (ADR-0155 decision 3), while the
 Household record type is missing, or while another adoption or undo is running.
 
 **R-HA3 What adoption writes.** Per Account, in chunks of at most 100: record type to
@@ -11521,10 +11521,10 @@ adoption job in system mode (ADR-0021).
 ### Definition
 
 One request for money to one funder, from the first idea through the decision and, when awarded,
-the award period (F-01, Funders module, ADR-NEXT `NEXT-funders-module.md`). The funder is an
+the award period (F-01, Funders module, ADR-0161 `0161-funders-module.md`). The funder is an
 organization; the grant's requirements (29ZI) are the reports and deliverables the award brings.
 Its restricted ledger (29ZL, F-03) and its payment schedule (29ZM, F-05) add the restricted and
-payment totals below (ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md`).
+payment totals below (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`).
 Government award fields (F-04) add to this entity later (Section 30).
 
 ### Attributes
@@ -11620,7 +11620,7 @@ current fiscal year from records already kept, with no object of its own:
 - **Concentration:** each organization's share of that revenue, its awards plus, with Giving, its
   Giving This Year. One source above 25 percent, or the five largest together above 50 percent,
   is flagged as a risk to discuss. The thresholds are fixed board guidance, not settings
-  (ADR-NEXT `NEXT-funders-reporting-links.md` decision 5).
+  (ADR-0163 `0163-funders-reporting-links.md` decision 5).
 - **Restricted balances:** with Giving, each active restricted fund and what it raised this
   fiscal year; once the fund ledger (F-03) is installed, each restricted grant's Restricted
   Balance too, read by describe so the dashboard works before and after it.
@@ -11742,7 +11742,7 @@ off or both reminder settings are off.
 **R-GQ5 Overdue requirements are found.** Health Check lists open requirements whose Due Date has
 passed.
 
-**R-GQ6 The outcome is named, not looked up (L-06, ADR-NEXT `NEXT-funders-reporting-links.md`).**
+**R-GQ6 The outcome is named, not looked up (L-06, ADR-0163 `0163-funders-reporting-links.md`).**
 `Outcome_Id__c` holds a Logic Models element's record identifier as text. An automation that
 always runs (registry row `Grant_Requirement_Rules`) stores it in its 18-character form and refuses
 text that is not a record identifier, or, where Logic Models' element object exists, an identifier
@@ -11821,8 +11821,8 @@ The Funders module's org-wide settings (F-02), edited in the Funders section of 
 
 ### Definition
 
-One movement of a grant's restricted money (F-03, ADR-NEXT
-`NEXT-funders-restricted-funds-schedules-calendar.md`): money received under the restriction,
+One movement of a grant's restricted money (F-03, ADR-0162
+`0162-funders-restricted-funds-schedules-calendar.md`): money received under the restriction,
 spent on its purpose, or released from it. The entries of a grant are its restricted ledger; the
 grant carries the totals and the balance. A ledger, not accounting: no accounts, periods or
 postings.
@@ -11877,8 +11877,8 @@ Released and may be below zero (a reimbursement grant is spent before it is paid
 
 ### Definition
 
-One payment a funder is expected to make under an award, on a date (F-05, ADR-NEXT
-`NEXT-funders-restricted-funds-schedules-calendar.md`). A multi-year award's payments are its
+One payment a funder is expected to make under an award, on a date (F-05, ADR-0162
+`0162-funders-restricted-funds-schedules-calendar.md`). A multi-year award's payments are its
 schedule; the grant carries the amounts scheduled and received.
 
 ### Attributes
@@ -12005,7 +12005,7 @@ the date is then not stamped.
 
 ### Definition
 
-The HTML a funder report is merged from (F-06, ADR-NEXT `NEXT-funders-reporting-links.md`
+The HTML a funder report is merged from (F-06, ADR-0163 `0163-funders-reporting-links.md`
 decision 3): the organization's own wording with tokens for the grant, its requirements and,
 where Logic Models is installed, the results of the outcomes its requirements report on. Staff
 merge it from the grant's page into a printable HTML file they edit and send. BarnCRM ships one
@@ -12121,11 +12121,11 @@ L-02, release 0.14, ADR-0154 `0154-logic-models-module.md`) are specified in Sec
 29ZG. Indicator takes the place of the Outcome entity listed above for Programs: P-03 moved to the
 Logic Models package as L-02 (owner decision, 2026-09-23).
 
-Grant and Grant Requirement (F-01 and F-02, release 0.16, ADR-NEXT `NEXT-funders-module.md`) left
+Grant and Grant Requirement (F-01 and F-02, release 0.16, ADR-0161 `0161-funders-module.md`) left
 the funder pipeline row and are specified in Sections 29ZH and 29ZI, with Funders Settings in
 29ZJ. The restricted ledger (F-03) and award schedules (F-05) left it as Restricted Fund Entry
-(29ZL) and Grant Payment (29ZM), not on Giving's Fund, Commitment and Installment (ADR-NEXT
-`NEXT-funders-restricted-funds-schedules-calendar.md`). The rest of the Funders entities stay in
+(29ZL) and Grant Payment (29ZM), not on Giving's Fund, Commitment and Installment (ADR-0162
+`0162-funders-restricted-funds-schedules-calendar.md`). The rest of the Funders entities stay in
 the table until their release.
 
 Two v0.4 entities have attributes that already exist on `Gift__c` from v0.2, because the
@@ -12387,20 +12387,20 @@ mirrors the primary member).
 | 0.17 | 2026-11-02 | C-57 picklist value usage (plan 6.1.5). Section 29F: rules R-FU9 to R-FU11 (records per picklist value and last use, value status, what Last Used means). No object or field added. |
 | 0.17 | 2026-11-02 | C-58 technical debt checks in Org Optimizer (plan 6.1.5). `BarnCRM_Settings__c` gains `Old_Api_Version__c` (Org Optimizer keys, default 50); rules R-OO1 to R-OO3. No object added. |
 | 0.17 | 2026-11-02 | C-60 automation inventory in the Data Dictionary (plan 6.1.5). Section 29F: rules R-AI1 to R-AI4. No object or field added. |
-| 0.17 | 2026-11-02 | Field Access Manager (C-65, D-157, ADR-NEXT). New Section 29ZH, rules R-FA1 to R-FA7: a field access change is a data job; `Import_Batch__c.Operation__c` gains the value Access. No object or field added. |
-| 0.17 | 2026-11-02 | NPSP household adoption (X-05, ADR-NEXT `NEXT-npsp-household-adoption-in-core.md`). New Core object Household Adoption (`Household_Adoption__c`, 29ZH) with rules R-HA1 to R-HA5: NPSP household Accounts become BarnCRM households in place (record type, greetings, primary contact, custom name), journaled for undo. NPSP read by describe only. |
-| 0.15 | 2026-11-02 | Programs P-10 (ADR-NEXT `NEXT-programs-service-plans-cohorts-sessions.md`). New in the Programs module: Goal (`Goal__c`, 29ZA2), a detail of Enrollment, and Goal Step (`Goal_Step__c`, 29ZA3), a detail of Goal, with rules R-GL1 to R-GL6 and R-GS1; a goal names a Logic Models outcome by record identifier (`Outcome_Id__c`), never a lookup. `Case_Note__c` gains `Goal__c` (Lookup, SetNull) with rule R-CN5. Erasing a person now also deletes their goals. |
-| 0.15 | 2026-11-02 | Programs P-11 (same ADR-NEXT). New in the Programs module: Cohort (`Cohort__c`, 29ZA4) and Session (`Session__c`, 29ZA5), both Public Read/Write, with rules R-CO1 to R-CO3 and R-SE1 to R-SE5. `Enrollment__c` gains `Cohort__c` (Lookup, SetNull) with rule R-EN8; `Service_Delivery__c` gains `Session__c` (Lookup, Restrict) with rule R-SD7. Attendance per session is Service Delivery; there is no attendance or membership object. |
-| 0.15 | 2026-11-02 | Logic Models L-03 indicator sources (ADR-NEXT `NEXT-indicator-sources.md`). `Indicator__c` (29ZF) gains Source (`Source__c`), Source Query (`Source_Query__c`, lookup to `Saved_Query__c`), Source Definition (`Source_Definition__c`), Source Status (`Source_Status__c`) and Computed At (`Computed_At__c`), with rules R-IN3 to R-IN6; the one-object import template Indicator Results loads Indicator Period results. |
+| 0.17 | 2026-11-02 | Field Access Manager (C-65, D-157, ADR-0155). New Section 29ZH, rules R-FA1 to R-FA7: a field access change is a data job; `Import_Batch__c.Operation__c` gains the value Access. No object or field added. |
+| 0.17 | 2026-11-02 | NPSP household adoption (X-05, ADR-0155 `0155-npsp-household-adoption-in-core.md`). New Core object Household Adoption (`Household_Adoption__c`, 29ZH) with rules R-HA1 to R-HA5: NPSP household Accounts become BarnCRM households in place (record type, greetings, primary contact, custom name), journaled for undo. NPSP read by describe only. |
+| 0.15 | 2026-11-02 | Programs P-10 (ADR-0160 `0160-programs-service-plans-cohorts-sessions.md`). New in the Programs module: Goal (`Goal__c`, 29ZA2), a detail of Enrollment, and Goal Step (`Goal_Step__c`, 29ZA3), a detail of Goal, with rules R-GL1 to R-GL6 and R-GS1; a goal names a Logic Models outcome by record identifier (`Outcome_Id__c`), never a lookup. `Case_Note__c` gains `Goal__c` (Lookup, SetNull) with rule R-CN5. Erasing a person now also deletes their goals. |
+| 0.15 | 2026-11-02 | Programs P-11 (same ADR-0160). New in the Programs module: Cohort (`Cohort__c`, 29ZA4) and Session (`Session__c`, 29ZA5), both Public Read/Write, with rules R-CO1 to R-CO3 and R-SE1 to R-SE5. `Enrollment__c` gains `Cohort__c` (Lookup, SetNull) with rule R-EN8; `Service_Delivery__c` gains `Session__c` (Lookup, Restrict) with rule R-SD7. Attendance per session is Service Delivery; there is no attendance or membership object. |
+| 0.15 | 2026-11-02 | Logic Models L-03 indicator sources (ADR-0158 `0158-indicator-sources.md`). `Indicator__c` (29ZF) gains Source (`Source__c`), Source Query (`Source_Query__c`, lookup to `Saved_Query__c`), Source Definition (`Source_Definition__c`), Source Status (`Source_Status__c`) and Computed At (`Computed_At__c`), with rules R-IN3 to R-IN6; the one-object import template Indicator Results loads Indicator Period results. |
 | 0.15 | 2026-11-02 | Logic Models L-04 logic model report: rule R-IN7 on Indicator (29ZF); no new object or field. |
-| 0.17 | 2026-11-02 | Gift Transaction mirror (X-07, ADR-NEXT). New Section 29C1, rules R-GT1 to R-GT10, leaving Section 30. No object added. Mirror adds Gift Transaction ID (`Gift_Transaction_Id__c`, Text(18), unique) to `Gift__c`, Gift Designation ID (`Gift_Designation_Id__c`, Text(18)) to `Fund__c`, and five keys to `Mirror_Settings__c`. One way only, Gifts to Gift Transactions, with designations written from each fund's Gift Designation ID; the reverse direction waits on owner question O-7. Ported from the 2026-09-27 salvage design, which had both directions and no designations. |
-| 0.16 | 2026-11-02 | Funders F-01 and F-02 (ADR-NEXT `NEXT-funders-module.md`). New Sections 29ZH Grant (`Grant__c`), 29ZI Grant Requirement (`Grant_Requirement__c`, a detail of the grant) and 29ZJ Funders Settings (`Funders_Settings__c`), rules R-GN1 to R-GN7, R-GQ1 to R-GQ5 and R-FS1. Section 30's funder pipeline row narrows to the entities still to come. |
-| 0.17 | 2026-11-02 | Funders F-03 and F-08 (release 0.17) and F-05 (release 0.16) (ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md`). New Sections 29ZL Restricted Fund Entry (`Grant_Fund_Entry__c`) and 29ZM Grant Payment (`Grant_Payment__c`), both details of the grant, rules R-FE1, R-FE2 and R-GP1 to R-GP4. Grant (29ZH) gains Restricted, Giving Fund (a record identifier, R-GN8), Payment Frequency and six totals; R-GN6 covers the new details. Funders no longer depends on Giving. |
+| 0.17 | 2026-11-02 | Gift Transaction mirror (X-07, ADR-0161). New Section 29C1, rules R-GT1 to R-GT10, leaving Section 30. No object added. Mirror adds Gift Transaction ID (`Gift_Transaction_Id__c`, Text(18), unique) to `Gift__c`, Gift Designation ID (`Gift_Designation_Id__c`, Text(18)) to `Fund__c`, and five keys to `Mirror_Settings__c`. One way only, Gifts to Gift Transactions, with designations written from each fund's Gift Designation ID; the reverse direction waits on owner question O-7. Ported from the 2026-09-27 salvage design, which had both directions and no designations. |
+| 0.16 | 2026-11-02 | Funders F-01 and F-02 (ADR-0161 `0161-funders-module.md`). New Sections 29ZH Grant (`Grant__c`), 29ZI Grant Requirement (`Grant_Requirement__c`, a detail of the grant) and 29ZJ Funders Settings (`Funders_Settings__c`), rules R-GN1 to R-GN7, R-GQ1 to R-GQ5 and R-FS1. Section 30's funder pipeline row narrows to the entities still to come. |
+| 0.17 | 2026-11-02 | Funders F-03 and F-08 (release 0.17) and F-05 (release 0.16) (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). New Sections 29ZL Restricted Fund Entry (`Grant_Fund_Entry__c`) and 29ZM Grant Payment (`Grant_Payment__c`), both details of the grant, rules R-FE1, R-FE2 and R-GP1 to R-GP4. Grant (29ZH) gains Restricted, Giving Fund (a record identifier, R-GN8), Payment Frequency and six totals; R-GN6 covers the new details. Funders no longer depends on Giving. |
 | 0.16 | 2026-11-02 | Funders F-04. `Grant__c` (29ZH) gains Funding Source (`Funding_Source__c`), Assistance Listing Number (`Assistance_Listing_Number__c`), Award Number (`Award_Number__c`), Federal Agency (`Federal_Agency__c`), Indirect Cost Rate (`Indirect_Cost_Rate__c`) and Match Required (`Match_Required__c`), with rule R-GN8. The period of performance is the existing award period; drawdowns are F-03's. |
 | 0.16 | 2026-11-02 | Funders F-14. New Section 29ZN Grant Answer (`Grant_Answer__c`), the answer library, with rules R-GA1 to R-GA3. Section 30's Funders row drops the answer library. |
-| 0.16 | 2026-11-02 | Logic Models L-06 (ADR-NEXT `NEXT-funders-reporting-links.md`). `Grant_Requirement__c` (29ZI) gains Logic Model Outcome (`Outcome_Id__c`, Text(18)), a Logic Models element named by record identifier, with rule R-GQ6. Neither module references the other. |
-| 0.16 | 2026-11-02 | Funders F-06 (ADR-NEXT `NEXT-funders-reporting-links.md`). New Section 29ZO Funder Report Template (`Funder_Report_Template__c` and the shipped `Funder_Report_Template_Default__mdt`), rules R-FT1 to R-FT3. |
-| 0.16 | 2026-11-02 | Funders F-07 (ADR-NEXT `NEXT-funders-reporting-links.md`). Grant (29ZH) gains rule R-GN9, the board dashboard (revenue mix, concentration, restricted balances), read from grants and, by describe, Giving and the F-03 ledger; no new object or field. |
+| 0.16 | 2026-11-02 | Logic Models L-06 (ADR-0163 `0163-funders-reporting-links.md`). `Grant_Requirement__c` (29ZI) gains Logic Model Outcome (`Outcome_Id__c`, Text(18)), a Logic Models element named by record identifier, with rule R-GQ6. Neither module references the other. |
+| 0.16 | 2026-11-02 | Funders F-06 (ADR-0163 `0163-funders-reporting-links.md`). New Section 29ZO Funder Report Template (`Funder_Report_Template__c` and the shipped `Funder_Report_Template_Default__mdt`), rules R-FT1 to R-FT3. |
+| 0.16 | 2026-11-02 | Funders F-07 (ADR-0163 `0163-funders-reporting-links.md`). Grant (29ZH) gains rule R-GN9, the board dashboard (revenue mix, concentration, restricted balances), read from grants and, by describe, Giving and the F-03 ledger; no new object or field. |
 
 ---
 ## 32. Entity ownership by package
@@ -12539,8 +12539,8 @@ so nothing below that is nonprofit-specific ships in Core.
 | Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-0127). Dashboard `Volunteers` and four reports in public read only folders `BarnCRM_Volunteers`; report types Volunteer Hours with Job and Shift, Volunteer Shifts with Job, Volunteer Sign-ups, Volunteers (Contact); `standard-Dashboard` and `standard-report` tabs in the app; report and dashboard user permissions in the four permission sets (V-03) |
 | Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
 | Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
-| Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and `FundersAccessSync` (ADR-NEXT `NEXT-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantProgram`) |
-| Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-NEXT `NEXT-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantFund`) and the Award Schedule card (`grantSchedule`) |
+| Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and `FundersAccessSync` (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantProgram`) |
+| Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantFund`) and the Award Schedule card (`grantSchedule`) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror was brought forward from v0.9 to v0.6 and is built in release

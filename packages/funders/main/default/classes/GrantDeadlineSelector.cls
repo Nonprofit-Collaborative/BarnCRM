@@ -1,6 +1,6 @@
 /**
- * The dated rows the Grant Pipeline's Upcoming Deadlines and the Grant Calendar both draw (ADR-NEXT
- * `NEXT-funders-restricted-funds-schedules-calendar.md` decision 8): application deadlines of
+ * The dated rows the Grant Pipeline's Upcoming Deadlines and the Grant Calendar both draw (ADR-0162
+ * `0162-funders-restricted-funds-schedules-calendar.md` decision 8): application deadlines of
  * grants not yet submitted, due dates of open requirements, and expected payments. One reader, so
  * the two cannot disagree. Everything runs in user mode.
  *

@@ -30,7 +30,7 @@ its record identifier (text), resolved by describe only where a `Program__c` obj
   CSV and printable HTML worked out by `logicModelRules`; no Apex, nothing stored.
 - Permission sets Logic Models Admin, Staff and Read Only, given by role through
   `LogicModelsAccessSync`.
-- Indicator sources (L-03, ADR `NEXT-indicator-sources.md`): `IndicatorSourceService`, the
+- Indicator sources (L-03, ADR `0158-indicator-sources.md`): `IndicatorSourceService`, the
   batch `IndicatorResultsBatch` (system mode, `without sharing`), the nightly
   `IndicatorResultsScheduler` registered with Core through `LogicModelsNightlyJobProvider`, and
   the Core import template **Indicator Results** (`Import_Template_Default.Indicator_Results`),

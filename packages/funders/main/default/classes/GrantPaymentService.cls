@@ -1,6 +1,6 @@
 /**
- * The rules of a grant payment (canonical model 29ZM, ADR-NEXT
- * `NEXT-funders-restricted-funds-schedules-calendar.md`): the statuses (R-GP1), building a
+ * The rules of a grant payment (canonical model 29ZM, ADR-0162
+ * `0162-funders-restricted-funds-schedules-calendar.md`): the statuses (R-GP1), building a
  * schedule (R-GP2) and the received date (R-GP3).
  *
  * The split of a schedule is worked out in the browser (`grantScheduleModel`, plan 9.9); this

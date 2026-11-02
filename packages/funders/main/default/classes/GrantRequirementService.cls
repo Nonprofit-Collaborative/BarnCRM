@@ -1,5 +1,5 @@
 /**
- * The rules of a grant requirement (canonical model 29ZI, ADR-NEXT `NEXT-funders-module.md`):
+ * The rules of a grant requirement (canonical model 29ZI, ADR-0161 `0161-funders-module.md`):
  * which statuses are open (R-GQ1), the submitted date (R-GQ2), and marking one submitted from the
  * Grant Pipeline.
  */

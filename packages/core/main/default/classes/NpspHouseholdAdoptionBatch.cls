@@ -1,6 +1,6 @@
 /**
  * The chunks of an NPSP household adoption run, and of its undo (X-05, canonical model R-HA3
- * and R-HA4, ADR-NEXT). Started only by `NpspHouseholdAdoptionService`, which has counted,
+ * and R-HA4, ADR-0155). Started only by `NpspHouseholdAdoptionService`, which has counted,
  * confirmed and checked the permission.
  *
  * Adopt: the candidates are selected as the person who started the run (user mode), at most

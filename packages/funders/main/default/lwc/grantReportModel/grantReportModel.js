@@ -1,6 +1,6 @@
 /**
  * Funder reporting logic, with no framework in it (L-06 and F-06, canonical model 29ZI R-GQ6,
- * ADR-NEXT `NEXT-funders-reporting-links.md`, plan Section 9.9). Plain JavaScript in and out, so a
+ * ADR-0163 `0163-funders-reporting-links.md`, plan Section 9.9). Plain JavaScript in and out, so a
  * WordPress block or Node can use the same module. Dates arrive as ISO date strings.
  */
 
