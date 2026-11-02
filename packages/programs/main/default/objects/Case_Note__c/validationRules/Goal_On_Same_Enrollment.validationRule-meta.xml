@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Goal_On_Same_Enrollment</fullName>
+  <active>true</active>
+  <description>
+    R-CN5: a case note's goal is a goal of the note's own enrollment.
+  </description>
+  <errorConditionFormula>
+AND(
+  NOT(ISBLANK(Goal__c)),
+  Goal__r.Enrollment__c &lt;&gt; Enrollment__c
+)
+  </errorConditionFormula>
+  <errorDisplayField>Goal__c</errorDisplayField>
+  <errorMessage>
+    Choose a goal of this enrollment.
+  </errorMessage>
+</ValidationRule>

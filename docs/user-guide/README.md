@@ -43,7 +43,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Programs (Nonprofit Edition)
 
-- [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages.
+- [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages, and keeping a participant's service plan.
 
 ### Logic Models (Nonprofit Edition)
 

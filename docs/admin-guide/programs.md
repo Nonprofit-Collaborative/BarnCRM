@@ -11,7 +11,8 @@ Withdrawn) and its start and end dates. Each time a service is given, or a perso
 **service delivery**: attendance and what was received, in one record.
 
 Each enrollment also carries the person's **intake and eligibility**: when they were first seen,
-who referred them, and whether they qualify, and staff keep private **case notes** on it. A
+who referred them, and whether they qualify, and staff keep private **case notes** on it and a
+**service plan**: the person's goals, the steps toward each, and when each is next reviewed. A
 **program dashboard** counts enrollments, people served and attendance for a period. A roster
 import comes in a later release (P-06). Who sees enrollments
 and service deliveries is the **Participant Privacy** preset on the Programs settings page:
@@ -105,9 +106,9 @@ You never assign the Programs permission sets by hand. Give people their BarnCRM
 | BarnCRM role | Programs set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Programs Admin | Everything, including deleting a record entered by accident |
-| Coordinator | Programs Staff | Set up programs and services, enroll people and move them through the stages; never deletes |
+| Coordinator | Programs Staff | Set up programs and services, enroll people and move them through the stages, keep service plans; never deletes |
 | Team Member | Programs Staff | The same as Coordinator |
-| Read Only | Programs Read Only | Look at programs, services and enrollments |
+| Read Only | Programs Read Only | Look at programs, services, enrollments and service plans |
 
 When it happens:
 
@@ -244,7 +245,63 @@ The **Type** choices are yours to change on the field in Setup, as for the intak
 enrollment with case notes cannot be deleted: delete its notes first. The list views are **All
 Case Notes** (every note you can see) and **My Case Notes**.
 
-Case notes are light notes, not case management: service plans and goals come later (P-10).
+A note can be about one of the person's goals: pick it in the note's **Goal** field, or click
+**New Note** under the goal on the Service Plan panel, which fills in the enrollment and goal.
+Only a goal on the note's own enrollment can be picked. The note stays private to its author.
+
+## Service Plans and Goals
+
+A participant's **service plan** is the set of **goals** on their enrollment: find stable
+housing, pass the high school equivalency test, open a bank account. Each goal has **steps**, the
+actions that lead to it. Staff keep the plan on the **Service Plan** panel at the top of the
+enrollment page.
+
+A goal has:
+
+| Field | What it holds |
+|---|---|
+| **Goal** | The goal, in a line the participant would recognize |
+| **Description** | What success looks like and anything agreed about it |
+| **Status** | Not Started, In Progress, Achieved or Not Achieved. Achieved and Not Achieved close the goal |
+| **Target Date** | When it should be reached |
+| **Assigned To** | The staff member responsible for it |
+| **Last Reviewed**, **Next Review** | When it was last reviewed with the person, and when it is next due |
+| **Closed Date** | Filled in with today when the goal is Achieved or Not Achieved, emptied if it reopens |
+| **Outcome** | With Logic Models installed: the outcome the goal works toward (below) |
+
+A step has a name, a **Status** (Not Started, In Progress or Done), **Assigned To**, a **Target
+Date** and a **Completed Date**, filled in when it is Done.
+
+**On the panel**, staff can:
+
+- **Add Goal** and **Edit Goal**;
+- add a step under a goal, and tick a step to mark it Done (untick to reopen it);
+- **Mark Reviewed**: records today as Last Reviewed and asks for the next review date, offered
+  three months on (change it, or leave it blank for none);
+- **New Note**: a case note about the goal, with the enrollment and goal filled in. The goal lists
+  its three latest notes that you can see, and how many there are in all.
+
+A goal whose Next Review has passed shows **Review due**. The **Goals** tab lists every goal you
+can see; its **Reviews Due** list view is the week's review list, and **Open Goals** the open
+caseload. Add Assigned To as a filter to see one person's.
+
+**Who sees a plan.** Goals and steps belong to the enrollment: whoever can see the enrollment
+sees its goals, and whoever can edit it can change them, so **Participant Privacy** covers service
+plans too. Programs Staff add and change goals and steps but never delete them (set a goal to Not
+Achieved instead); Programs Admins also delete; Read Only users see plans and change nothing.
+Deleting an enrollment deletes its goals and steps.
+
+**Linking a goal to an outcome (Logic Models).** Where the [Logic Models](logic-models.md)
+module is installed, Edit Goal also offers **Outcome**: the outcomes of the logic model for the
+enrollment's program, then those of your organization's model. This says which change in your
+logic model the goal contributes to. Programs does not need Logic Models: without it the choice
+is not shown. If the outcome is later deleted from the logic model, the goal says so; edit it to
+choose another.
+
+**Turning off the dates.** The Closed Date and Completed Date are filled in by two automations,
+**Goal: fill in the closed date** and **Goal Step: fill in the completed date**, on the
+[Automation](automation.md) page. Switch them off while you load history whose dates you type
+yourself.
 
 ## Program Dashboard
 
@@ -327,7 +384,8 @@ for example an **Awaiting Documents** list view to chase missing paperwork.
   service deliveries, credited to the anonymous record. Neither holds typed notes, so there is
   nothing on them to empty. Their **case notes are deleted**, whoever wrote them. Only someone
   with Programs Admin can delete every note, so anyone else erasing a person who has case notes
-  is refused, with that reason, and nothing is erased. Erasing a person account also finds the
+  is refused, with that reason, and nothing is erased. Their **goals and steps are deleted** too,
+  for the same reason and with the same rule. Erasing a person account also finds the
   case notes, and counts the enrollments, recorded on that person account's own contact.
 - **Deleting a person** keeps their case notes on the enrollment, which no longer names anyone.
   To remove what was written about someone, erase them rather than delete them.

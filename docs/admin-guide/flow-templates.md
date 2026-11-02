@@ -64,6 +64,8 @@ offer it anywhere else.
 | Update rollups when hours change | None | Volunteer totals are worked out by the rollup engine, as every other total is. Switched off, they wait for the nightly run, or for **Recalculate All** on the Rollups page. |
 | Update rollups when a sign-up changes | None | The same, for Slots Filled on a shift. |
 | Enrollment: fill in the stage dates | None | It only fills an empty Start Date or End Date with today when an enrollment's stage moves, which a record-triggered flow with two assignments can copy if you want a different date. Switch it off while you load past enrollments whose dates you type yourself. |
+| Goal: fill in the closed date | None | It only fills an empty Closed Date with today when a goal is Achieved or Not Achieved, and empties it when the goal reopens, which a record-triggered flow with two assignments can copy. Switch it off while you load past goals whose dates you type yourself. |
+| Goal Step: fill in the completed date | None | The same for a step marked Done. Switch it off while you load past steps whose dates you type yourself. |
 
 With Giving, Giving's automations are listed on the same page. Their templates are not built
 yet, and this page lists them when they are.

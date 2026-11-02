@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Assigned_To__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The staff member responsible for this step.</inlineHelpText>
+  <label>Assigned To</label>
+  <referenceTo>User</referenceTo>
+  <relationshipLabel>Assigned Goal Steps</relationshipLabel>
+  <relationshipName>Assigned_Goal_Steps</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

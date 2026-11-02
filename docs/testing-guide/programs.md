@@ -252,3 +252,24 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 6 | Undo the import. | Both enrollments are removed; the program stays. |
 
 **Cleanup:** none after the undo.
+
+## T-PRG-16: Keep a Service Plan With Goals, Steps, Reviews and Notes
+
+**Purpose:** confirm staff keep a participant's goals and steps on the enrollment, that the dates fill in, that reviews and notes attach to a goal, that a plan is seen as its enrollment is, and that erasing the person deletes it.
+**Prerequisites:** the admin user; a staff user with a BarnCRM role of Team Member (Programs Staff); the Read Only user; a program with a test person enrolled ("Test Person"). For step 9, Logic Models installed with a logic model for that program holding an outcome.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, open Test Person's enrollment. | The **Service Plan** panel is at the top, saying there are no goals yet, with **Add Goal**. |
+| 2 | Click **Add Goal**, type "Find stable housing", Status In Progress, a Target Date next month, a Next Review date of yesterday. Save. | The goal is listed with "Target (the date)" and **Review due**. |
+| 3 | Under the goal add the steps "Apply" and "Visit". Tick "Apply". | "1 of 2 steps done"; opening the step record shows today as Completed Date. Untick it: the Completed Date empties. |
+| 4 | Click **Mark Reviewed**. | A date three months on is offered. Save Review: Last reviewed is today, Next review the date offered, **Review due** is gone. |
+| 5 | Click **New Note** under the goal, write a Subject, Save, and go back to the enrollment. | The new note opened with Enrollment and Goal filled in; the goal lists it under **Case Notes**. |
+| 6 | Create a case note on another of Test Person's enrollments and pick this goal. | Refused: choose a goal of this enrollment. |
+| 7 | **Edit Goal**, set Status to Achieved. Save. | The goal moves below open goals with "Closed (today)"; **Mark Reviewed** is no longer offered. |
+| 8 | As the staff user, try to delete the goal from its record page. | No Delete action. As the Read Only user, open the enrollment: the plan is shown with no Add Goal, Edit Goal, step boxes or New Note. |
+| 9 | With Logic Models: as the staff user, **Edit Goal** and open **Outcome**. | "No outcome", then the program's model's outcomes, then the organization model's. Pick one and save: "Works toward (the outcome)". Without Logic Models there is no Outcome field. |
+| 10 | Set Participant Privacy to **Private** and open the enrollment as a second staff user it is not shared with. | Neither the enrollment nor its goals are visible; the **Goals** tab does not list the goal. Set it back to Shared. |
+| 11 | As the admin, erase Test Person. | The summary lists Goals as deleted; the goal and its steps are gone, the enrollment stays. |
+
+**Cleanup:** delete the enrollments; remove the staff user's role.

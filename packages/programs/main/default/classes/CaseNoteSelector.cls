@@ -20,6 +20,21 @@ public without sharing class CaseNoteSelector {
         ];
     }
 
+    /**
+     * Every goal on any enrollment of this person (R-GL6), whoever can see it, found as
+     * `selectAllAbout` finds notes. Their steps are details and go with them.
+     */
+    public static List<Goal__c> selectGoalsAbout(Id personId) {
+        Set<Id> contactIds = contactsOf(personId);
+        return [
+            SELECT Id
+            FROM Goal__c
+            WHERE Enrollment__r.Contact__c IN :contactIds OR Enrollment__r.Account__c = :personId
+            WITH SYSTEM_MODE
+            LIMIT 10000
+        ];
+    }
+
     /** How many enrollments this person has, any stage, whoever can see them. */
     public static Integer countEnrollmentsOf(Id personId) {
         Set<Id> contactIds = contactsOf(personId);

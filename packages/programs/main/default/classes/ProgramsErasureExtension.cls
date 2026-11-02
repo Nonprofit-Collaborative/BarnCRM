@@ -5,8 +5,8 @@
  * so a refusal here takes the whole erasure back.
  *
  * The person's enrollments and service deliveries are kept, credited to the anonymized person,
- * so program counts stand; they hold no typed text. Their case notes are deleted: a case note is
- * typed text about the person and nothing else. Notes are read in system mode, so every note is
+ * so program counts stand; they hold no typed text. Their case notes and goals (with the goals'
+ * steps, R-GL6) are deleted: each is typed text about the person and nothing else. Notes are read in system mode, so every note is
  * found whoever wrote it, and deleted as the user (R-ER5): someone erasing who may not delete
  * them all (Programs Admin may) is refused with that reason rather than leaving notes behind.
  *
@@ -44,6 +44,28 @@ public with sharing class ProgramsErasureExtension implements PersonErasureExten
                     Case_Note__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
                         .getLabelPlural(),
                     ids,
+                    null
+                )
+            );
+        }
+        // Goals are typed text about the person too (R-GL6); their steps go with them.
+        List<Goal__c> goals = CaseNoteSelector.selectGoalsAbout(personId);
+        if (!goals.isEmpty()) {
+            List<Id> goalIds = new List<Id>();
+            for (Goal__c goal : goals) {
+                goalIds.add(goal.Id);
+            }
+            try {
+                Database.delete(goals, true, AccessLevel.USER_MODE);
+            } catch (Exception refused) {
+                throw new PersonErasure.ErasureException(Label.Programs_Erase_NeedProgramsAdmin);
+            }
+            changes.add(
+                new PersonErasure.Change(
+                    PersonErasure.DELETED,
+                    Goal__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                        .getLabelPlural(),
+                    goalIds,
                     null
                 )
             );
