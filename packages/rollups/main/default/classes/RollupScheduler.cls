@@ -150,7 +150,7 @@ public with sharing class RollupScheduler implements Schedulable {
     /** The nightly run as Health Check's nightly jobs list sees it (ADR-0075). */
     public static NightlyJob nightlyJob() {
         return new NamedNightlyJob(
-            System.Label.Core_HealthCheck_JobRollups,
+            System.Label.Core_JobNotice_Rollups,
             jobNameInUse,
             nightlyCron(),
             new RollupScheduler()

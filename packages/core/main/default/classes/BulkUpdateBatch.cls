@@ -198,7 +198,7 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
                 String.isBlank(stoppedBecause)
                     ? null
                     : String.format(
-                          System.Label.Core_BulkUpdate_LogStopped,
+                          System.Label.Core_BulkDelete_LogStopped,
                           new List<Object>{ stoppedBecause }
                       ),
                 String.format(

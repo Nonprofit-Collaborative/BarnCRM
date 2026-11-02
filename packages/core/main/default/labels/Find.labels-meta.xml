@@ -89,14 +89,6 @@
         <value>Choose an object, the columns and conditions, then run, save or export. Find shows only what your own access allows.</value>
     </labels>
     <labels>
-        <fullName>Core_Find_Object</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Label of the object picker on the Find page.</shortDescription>
-        <value>Object</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_ChooseObject</fullName>
         <categories>Find</categories>
         <language>en_US</language>
@@ -329,14 +321,6 @@
         <value>Show to everyone who uses Find</value>
     </labels>
     <labels>
-        <fullName>Core_Find_Save</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button that saves the query.</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_SaveAs</fullName>
         <categories>Find</categories>
         <language>en_US</language>
@@ -425,14 +409,6 @@
         <value>Choose at least one column.</value>
     </labels>
     <labels>
-        <fullName>Core_Find_Loading</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Assistive text while Find works.</shortDescription>
-        <value>Working</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_Purpose</fullName>
         <categories>Find</categories>
         <language>en_US</language>
@@ -487,14 +463,6 @@
         <protected>false</protected>
         <shortDescription>Heading over the Find results table.</shortDescription>
         <value>Results</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_ShowMore</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button under the results that shows the next rows.</shortDescription>
-        <value>Show More</value>
     </labels>
     <labels>
         <fullName>Core_Find_ShowingOf</fullName>

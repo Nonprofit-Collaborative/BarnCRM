@@ -22,15 +22,13 @@ jest.mock(
 jest.mock('@salesforce/label/c.Core_RollupFilter_OpEquals', () => ({ default: 'is' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_RollupFilter_OpIn', () => ({ default: 'is one of' }), {
+jest.mock('@salesforce/label/c.Core_Filter_OpIn', () => ({ default: 'is one of' }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_RollupFilter_OpGreaterThan',
-  () => ({ default: 'is greater than' }),
-  { virtual: true }
-);
-jest.mock('@salesforce/label/c.Core_RollupFilter_OpIsNull', () => ({ default: 'is blank' }), {
+jest.mock('@salesforce/label/c.Core_Filter_OpGreaterThan', () => ({ default: 'is greater than' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_Filter_OpIsNull', () => ({ default: 'is blank' }), {
   virtual: true
 });
 jest.mock(

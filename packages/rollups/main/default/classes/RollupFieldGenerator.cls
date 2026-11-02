@@ -21,13 +21,13 @@ public with sharing class RollupFieldGenerator {
     /** The field types a rollup can fill, as Setup names them. */
     @TestVisible
     private static final Map<String, String> KINDS = new Map<String, String>{
-        'NUMBER' => Label.Core_RollupEase_KindNumber,
-        'CURRENCY' => Label.Core_RollupEase_KindCurrency,
-        'DATE' => Label.Core_RollupEase_KindDate,
-        'DATETIME' => Label.Core_RollupEase_KindDateTime,
-        'TEXT' => Label.Core_RollupEase_KindText,
+        'NUMBER' => Label.Core_ImportNewField_TypeNumber,
+        'CURRENCY' => Label.Core_ImportNewField_TypeCurrency,
+        'DATE' => Label.Core_ImportNewField_TypeDate,
+        'DATETIME' => Label.Core_ImportNewField_TypeDateTime,
+        'TEXT' => Label.Core_ImportNewField_TypeText,
         'LONGTEXT' => Label.Core_RollupEase_KindLongText,
-        'CHECKBOX' => Label.Core_RollupEase_KindCheckbox
+        'CHECKBOX' => Label.Core_ImportNewField_TypeCheckbox
     };
 
     /** What the Create a Field panel shows. */

@@ -17,14 +17,6 @@
         <value>New Affiliation</value>
     </labels>
     <labels>
-        <fullName>Core_Affiliation_CancelButton</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Affiliation card: button that closes the form without saving</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_Affiliation_Empty</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>
@@ -63,14 +55,6 @@
         <protected>false</protected>
         <shortDescription>Affiliation card: what a screen reader hears while the card loads</shortDescription>
         <value>Loading affiliations</value>
-    </labels>
-    <labels>
-        <fullName>Core_Affiliation_MakePrimaryButton</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Affiliation card: button that makes one affiliation the primary one</shortDescription>
-        <value>Make Primary</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_MakePrimaryFailed</fullName>
@@ -129,14 +113,6 @@
         <value>Two affiliations in this save cover the same dates for the same person, organization, and role. Give them dates that do not overlap.</value>
     </labels>
     <labels>
-        <fullName>Core_Affiliation_PanelTitle</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Affiliation card: the card heading</shortDescription>
-        <value>Affiliations</value>
-    </labels>
-    <labels>
         <fullName>Core_Affiliation_PersonAmbiguous</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>
@@ -151,14 +127,6 @@
         <protected>false</protected>
         <shortDescription>Save refused: no person named</shortDescription>
         <value>An affiliation needs a person.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Affiliation_PrimaryBadge</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Affiliation card: badge on the person's chief organization</shortDescription>
-        <value>Primary</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_PrimaryFailed</fullName>

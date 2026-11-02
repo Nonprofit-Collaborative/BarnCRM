@@ -394,7 +394,7 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
     private static String counted(Integer howMany) {
         return howMany > countCap
             ? String.format(
-                  Label.Volunteers_HealthCheck_MoreThan,
+                  Label.Core_HealthCheck_OrphansMoreThan,
                   new List<Object>{ countCap.format() }
               )
             : howMany.format();
@@ -402,12 +402,12 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
 
     private static String withFirstListed(String detail, Integer howMany) {
         if (howMany == 1) {
-            return detail + ' ' + Label.Volunteers_HealthCheck_FirstListedOne;
+            return detail + ' ' + Label.Core_HealthCheck_OrphansLinkedOnly;
         }
         return detail +
             ' ' +
             String.format(
-                Label.Volunteers_HealthCheck_FirstListed,
+                Label.Core_HealthCheck_OrphansFirstListed,
                 new List<Object>{ String.valueOf(Math.min(howMany, LINKS_SHOWN)) }
             );
     }

@@ -140,7 +140,7 @@ private class AddressMoveControllerTest {
                         new List<Object>{ 'Omar Ortiz', omarBorn.Birthdate.format() }
                     ),
                     String.format(
-                        System.Label.Core_Address_SameNameEmail,
+                        System.Label.Core_Format_Parenthetical,
                         new List<Object>{ 'Omar Ortiz', 'omar.ortiz@example.org' }
                     )
                 },

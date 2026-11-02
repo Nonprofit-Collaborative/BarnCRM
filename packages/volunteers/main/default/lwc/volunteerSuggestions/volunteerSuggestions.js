@@ -7,9 +7,9 @@ import { rankSuggestions, REASON } from './rankSuggestions';
 import TITLE from '@salesforce/label/c.Volunteers_Suggestions_Title';
 import SUBTITLE from '@salesforce/label/c.Volunteers_Suggestions_Subtitle';
 import EMPTY from '@salesforce/label/c.Volunteers_Suggestions_Empty';
-import PERSON from '@salesforce/label/c.Volunteers_Suggestions_Person';
+import PERSON from '@salesforce/label/c.Core_Section_Person';
 import WHY from '@salesforce/label/c.Volunteers_Suggestions_Why';
-import ACTIONS from '@salesforce/label/c.Volunteers_Suggestions_Actions';
+import ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import SIGN_UP from '@salesforce/label/c.Volunteers_Suggestions_SignUp';
 import SIGN_UP_FOR from '@salesforce/label/c.Volunteers_Suggestions_SignUpFor';
 import BOOKED from '@salesforce/label/c.Volunteers_Suggestions_Booked';
@@ -24,7 +24,7 @@ import R_NO_AVAILABILITY from '@salesforce/label/c.Volunteers_Suggestions_Reason
 import R_HOURS from '@salesforce/label/c.Volunteers_Suggestions_ReasonHours';
 import R_CLEARED from '@salesforce/label/c.Volunteers_Suggestions_ReasonCleared';
 import R_OPEN from '@salesforce/label/c.Volunteers_Suggestions_ReasonOpen';
-import LOADING from '@salesforce/label/c.Volunteers_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { bodyMessage, format } from 'c/findCsv';
 
 /** How many suggestions the card shows. */

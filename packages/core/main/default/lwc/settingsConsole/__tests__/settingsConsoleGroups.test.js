@@ -20,7 +20,7 @@ jest.mock(
   { virtual: true }
 );
 jest.mock(
-  '@salesforce/label/c.Core_SettingsGroup_Relationships',
+  '@salesforce/label/c.Core_Feature_Relationships_Name',
   () => ({ default: 'Relationships' }),
   { virtual: true }
 );
@@ -356,11 +356,14 @@ describe('settingsGroups', () => {
 
   it('names every box heading in a custom label written in title case', () => {
     // Jest runs from the repository root (jest.config.js).
+    // A heading may reuse a Core label from another file, so read every Core label file.
     const fs = require('fs');
-    const xml = fs.readFileSync(
-      'packages/core/main/default/labels/SettingsGroups.labels-meta.xml',
-      'utf8'
-    );
+    const dir = 'packages/core/main/default/labels';
+    const xml = fs
+      .readdirSync(dir)
+      .filter((file) => file.endsWith('.labels-meta.xml'))
+      .map((file) => fs.readFileSync(`${dir}/${file}`, 'utf8'))
+      .join('\n');
     const source = fs.readFileSync(
       'packages/core/main/default/lwc/settingsConsole/settingsGroups.js',
       'utf8'

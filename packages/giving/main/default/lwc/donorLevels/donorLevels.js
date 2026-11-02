@@ -4,7 +4,7 @@ import { refreshApex } from '@salesforce/apex';
 import getLadder from '@salesforce/apex/DonorLevelController.getLadder';
 import recalculate from '@salesforce/apex/DonorLevelController.recalculate';
 
-import TITLE from '@salesforce/label/c.Giving_DonorLevels_Title';
+import TITLE from '@salesforce/label/c.Core_SettingsGroup_DonorLevels';
 import INTRO from '@salesforce/label/c.Giving_DonorLevels_Intro';
 import MEASURED_ON from '@salesforce/label/c.Giving_DonorLevels_MeasuredOn';
 import LAST_RECALCULATED from '@salesforce/label/c.Giving_DonorLevels_LastRecalculated';
@@ -18,9 +18,9 @@ import COLUMN_LEVEL from '@salesforce/label/c.Giving_DonorLevels_ColumnLevel';
 import COLUMN_FROM from '@salesforce/label/c.Giving_DonorLevels_ColumnFrom';
 import COLUMN_UP_TO from '@salesforce/label/c.Giving_DonorLevels_ColumnUpTo';
 import COLUMN_DONORS from '@salesforce/label/c.Giving_DonorLevels_ColumnDonors';
-import COLUMN_ACTIVE from '@salesforce/label/c.Giving_DonorLevels_ColumnActive';
+import COLUMN_ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
 import TOP_OF_LADDER from '@salesforce/label/c.Giving_DonorLevels_TopOfLadder';
-import INACTIVE from '@salesforce/label/c.Giving_DonorLevels_Inactive';
+import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
 import ACTION_FAILED from '@salesforce/label/c.Giving_DonorLevels_ActionFailed';
 import { bodyMessage } from 'c/findCsv';
 

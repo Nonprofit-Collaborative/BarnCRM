@@ -20,7 +20,7 @@ jest.mock(
     virtual: true
   }
 );
-jest.mock('@salesforce/label/c.Core_AccessModifyAll_ScopeCustom', () => ({ default: 'Custom' }), {
+jest.mock('@salesforce/label/c.Core_DataDictionary_ColCustom', () => ({ default: 'Custom' }), {
   virtual: true
 });
 jest.mock(

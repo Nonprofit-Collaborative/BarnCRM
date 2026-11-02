@@ -223,7 +223,7 @@ private class MatchSourceControllerTest {
             Assert.areEqual(1, found.records.size(), 'Only Ana holds it: ' + found.records);
             Assert.areEqual(people[0].Id, found.records[0].value);
             Assert.areEqual(
-                Label.Core_Duplicates_ObjectPerson + ': Ana Ruiz',
+                Label.Core_Section_Person + ': Ana Ruiz',
                 found.records[0].label,
                 'Named, and said to be a person'
             );

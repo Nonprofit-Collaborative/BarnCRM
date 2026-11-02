@@ -8,8 +8,8 @@ import voidAndReissue from '@salesforce/apex/ReceiptController.voidAndReissue';
 
 import TITLE from '@salesforce/label/c.Giving_Receipt_PanelTitle';
 import COLUMN_NUMBER from '@salesforce/label/c.Giving_Receipt_ColumnNumber';
-import COLUMN_STATUS from '@salesforce/label/c.Giving_Receipt_ColumnStatus';
-import COLUMN_AMOUNT from '@salesforce/label/c.Giving_Receipt_ColumnAmount';
+import COLUMN_STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
+import COLUMN_AMOUNT from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
 import COLUMN_ISSUED from '@salesforce/label/c.Giving_Receipt_ColumnIssued';
 import COLUMN_VOID_REASON from '@salesforce/label/c.Giving_Receipt_ColumnVoidReason';
 import COLUMN_FILE from '@salesforce/label/c.Giving_Receipt_ColumnFile';

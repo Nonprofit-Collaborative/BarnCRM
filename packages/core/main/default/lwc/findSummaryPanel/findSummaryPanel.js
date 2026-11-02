@@ -17,7 +17,7 @@ import GROUP from '@salesforce/label/c.Core_Find_Group';
 import RESULT from '@salesforce/label/c.Core_Find_Result';
 import BLANK from '@salesforce/label/c.Core_Find_Blank';
 import CAPPED from '@salesforce/label/c.Core_Find_SummaryCapped';
-import LOADING from '@salesforce/label/c.Core_Find_Loading';
+import LOADING from '@salesforce/label/c.Core_EraseAction_Working';
 import NOTHING_TO_SUMMARIZE from '@salesforce/label/c.Core_Find_SummaryNothing';
 
 const NUMBER_TYPES = new Set(['double', 'currency', 'percent', 'integer', 'long']);

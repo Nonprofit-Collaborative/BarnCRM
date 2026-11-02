@@ -74,7 +74,7 @@ describe('c-settings-setup-notes', () => {
     expect(link.getAttribute('target')).toBe('_blank');
     expect(link.getAttribute('rel')).toBe('noopener noreferrer');
     expect(link.textContent).toContain('c.Core_SetupNote_OpenInSetup');
-    expect(link.textContent).toContain('c.Core_SetupNote_NewTab');
+    expect(link.textContent).toContain('c.Core_Kit_NewTab');
   });
 
   it('numbers each step a module passes, split on |, and shows no link for an unknown key', async () => {

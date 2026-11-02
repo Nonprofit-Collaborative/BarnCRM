@@ -1779,7 +1779,7 @@ public with sharing class ImportObjectLoader {
             if (item.error != null && error == null) {
                 error = several && !step.everyRow
                     ? String.format(
-                          Label.Core_Import_ErrorOnObject,
+                          Label.Core_Format_Pair,
                           new List<String>{ step.label(), item.error }
                       )
                     : item.error;

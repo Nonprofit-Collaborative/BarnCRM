@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_AiExport_Title</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: section heading</shortDescription>
-        <value>AI-Readiness Export</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_Intro</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
@@ -161,14 +153,6 @@
         <value>Encrypted</value>
     </labels>
     <labels>
-        <fullName>Core_AiExport_ReasonName</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: flag reason, a person's name</shortDescription>
-        <value>Name</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_ReasonBirthDate</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
@@ -265,14 +249,6 @@
         <value>The Data Quality checks could not be read, so the pack leaves them out.</value>
     </labels>
     <labels>
-        <fullName>Core_AiExport_ReadmeTitle</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: title</shortDescription>
-        <value>AI-Readiness Export</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_ReadmeIntro</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
@@ -311,14 +287,6 @@
         <protected>false</protected>
         <shortDescription>AI-Readiness Export README: data folder line</shortDescription>
         <value>data/: one CSV file of records for each kind of record. The first row holds field API names, explained in schema.json. Id and lookup columns hold record Ids, so files can be joined.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeObjects</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: objects heading</shortDescription>
-        <value>Kinds of Record</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ReadmeObjectLine</fullName>
@@ -423,14 +391,6 @@
         <protected>false</protected>
         <shortDescription>README low fill: {0} is the percent, {1} is a list of fields</shortDescription>
         <value>Filled on fewer than {0}% of records: {1}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeQualityCheck</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>README check line: {0} is the check title, {1} is its count</shortDescription>
-        <value>{0}: {1}.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ReadmeQualityNone</fullName>

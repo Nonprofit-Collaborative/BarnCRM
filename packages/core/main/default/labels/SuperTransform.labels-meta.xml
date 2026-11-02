@@ -65,22 +65,6 @@
         <value>Search Objects</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_Object</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Object picker label</shortDescription>
-        <value>Object</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_ChooseObject</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Object picker placeholder</shortDescription>
-        <value>Choose an object</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_NoObjects</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
@@ -153,22 +137,6 @@
         <value>Finish the conditions above to count the records.</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_Field</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Field picker label in a change row</shortDescription>
-        <value>Field</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_ChooseField</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Field picker placeholder</shortDescription>
-        <value>Choose a field</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_Action</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
@@ -183,14 +151,6 @@
         <protected>false</protected>
         <shortDescription>Super Transform: Action option: set a value</shortDescription>
         <value>Set To</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_ActionClear</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Action option: empty the field</shortDescription>
-        <value>Clear</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_ActionCopy</fullName>
@@ -241,14 +201,6 @@
         <value>Up to {0} fields in one run.</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_Preview</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Button: work out the preview</shortDescription>
-        <value>Preview</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_PreviewHint</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
@@ -289,14 +241,6 @@
         <value>no change</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_Blank</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Shown for an empty value in the preview</shortDescription>
-        <value>(blank)</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_Run</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
@@ -327,22 +271,6 @@
         <protected>false</protected>
         <shortDescription>Super Transform: Confirmation detail line</shortDescription>
         <value>It runs in the background with your own access. You can undo it from Data Jobs for as long as an import can be undone.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_ConfirmButton</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Confirmation button: start</shortDescription>
-        <value>Run</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_Cancel</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: Confirmation button: do nothing</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_TypeToConfirm</fullName>

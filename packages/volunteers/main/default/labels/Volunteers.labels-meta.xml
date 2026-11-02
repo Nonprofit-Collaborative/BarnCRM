@@ -161,14 +161,6 @@
         <value>Your organization's legal name is blank in BarnCRM Settings, so the letter will print without it. Ask your BarnCRM admin to fill it in under Organization.</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Loading</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>What a screen reader hears while a Volunteers screen loads</shortDescription>
-        <value>Loading</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Signups_NoHoursWarning</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
@@ -249,52 +241,12 @@
         <value>Volunteer Letter</value>
     </labels>
     <labels>
-        <fullName>Volunteers_LetterAction_Template</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Volunteer letter action: template field</shortDescription>
-        <value>Template</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_LetterAction_From</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Volunteer letter action: start of the period</shortDescription>
-        <value>From</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_LetterAction_To</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Volunteer letter action: end of the period</shortDescription>
-        <value>To</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_LetterAction_Preview</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Volunteer letter action: preview button and region</shortDescription>
         <value>Preview</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_LetterAction_Generate</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Volunteer letter action: generate button</shortDescription>
-        <value>Generate</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_LetterAction_Cancel</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Volunteer letter action: cancel button</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Volunteers_LetterAction_Saved</fullName>
@@ -337,14 +289,6 @@
         <value>Approve Volunteer Hours</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Approve_Show</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Approve Hours status filter label</shortDescription>
-        <value>Show</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Approve_StatusSubmitted</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
@@ -361,44 +305,12 @@
         <value>Approved</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Approve_StatusRejected</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Status filter choice: rejected</shortDescription>
-        <value>Rejected</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Approve_Job</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Job filter label and column heading</shortDescription>
         <value>Job</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Approve_From</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Earliest date worked filter label</shortDescription>
-        <value>From</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Approve_To</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Latest date worked filter label</shortDescription>
-        <value>To</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Approve_Person</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Person column heading</shortDescription>
-        <value>Person</value>
     </labels>
     <labels>
         <fullName>Volunteers_Approve_Shift</fullName>
@@ -513,28 +425,12 @@
         <value>Reject Selected</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Approve_Cancel</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cancel button</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Approve_Previous</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Previous page button</shortDescription>
         <value>Previous</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Approve_Next</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Next page button</shortDescription>
-        <value>Next</value>
     </labels>
     <labels>
         <fullName>Volunteers_Approve_DateRange</fullName>
@@ -633,44 +529,12 @@
         <value>Add Sign-Up</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Signups_Person</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Person picker label and column heading</shortDescription>
-        <value>Person</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Signups_Status</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Status picker label and column heading</shortDescription>
-        <value>Status</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Signups_Actions</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Attendance buttons column heading</shortDescription>
         <value>Attendance</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Signups_Save</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Save button</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Signups_Cancel</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cancel button</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Volunteers_Signups_Caption</fullName>
@@ -735,14 +599,6 @@
         <protected>true</protected>
         <shortDescription>After adding a sign-up</shortDescription>
         <value>Sign-up added.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Signups_Changed</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>After a status change; {0} is the person, {1} the new status</shortDescription>
-        <value>{0}: {1}.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Signups_HoursWritten</fullName>
@@ -883,28 +739,12 @@ When: {1}</value>
         <value>No volunteers to suggest. Suggestions come from people whose Volunteer Status is Active and who are not already signed up for this shift.</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Suggestions_Person</fullName>
-        <categories>Volunteers, Suggestions</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Suggested Volunteers column heading: the person</shortDescription>
-        <value>Person</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Suggestions_Why</fullName>
         <categories>Volunteers, Suggestions</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Suggested Volunteers column heading: the reasons</shortDescription>
         <value>Why</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Suggestions_Actions</fullName>
-        <categories>Volunteers, Suggestions</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Suggested Volunteers column heading: the action</shortDescription>
-        <value>Actions</value>
     </labels>
     <labels>
         <fullName>Volunteers_Suggestions_SignUp</fullName>
@@ -1083,14 +923,6 @@ When: {1}</value>
         <value>Readiness could not be loaded. Click Refresh, or reload the page.</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Readiness_Refresh</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Refresh button on the readiness card</shortDescription>
-        <value>Refresh</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Erase_HoursKept</fullName>
         <categories>Erase</categories>
         <language>en_US</language>
@@ -1105,30 +937,6 @@ When: {1}</value>
         <protected>false</protected>
         <shortDescription>Erase a person: why shift sign-ups are kept</shortDescription>
         <value>Kept, so shift counts stay right. Bookings on shifts still to come are cancelled and notes are emptied.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_HealthCheck_MoreThan</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check count that stopped at its cap; {0} is the cap</shortDescription>
-        <value>More than {0}</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_HealthCheck_FirstListed</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check example records; {0} is how many are linked</shortDescription>
-        <value>The first {0} are linked below.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_HealthCheck_FirstListedOne</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check example record when there is only one</shortDescription>
-        <value>It is linked below.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_HoursWaitingTitle</fullName>

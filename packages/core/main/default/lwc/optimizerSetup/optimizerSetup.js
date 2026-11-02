@@ -13,8 +13,8 @@ import CHECK_JOBS from '@salesforce/label/c.Core_OrgOptimizer_CheckJobsOfInactiv
 import CHECK_FIELD_LIMIT from '@salesforce/label/c.Core_OrgOptimizer_CheckFieldLimit';
 import CHECK_RECORD_TYPES from '@salesforce/label/c.Core_OrgOptimizer_CheckRecordTypes';
 import COULD_NOT_CHECK from '@salesforce/label/c.Core_OrgOptimizer_CouldNotCheck';
-import OPEN_IN_SETUP from '@salesforce/label/c.Core_OrgOptimizer_OpenInSetup';
-import MORE_THAN from '@salesforce/label/c.Core_OrgOptimizer_MoreThan';
+import OPEN_IN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
+import MORE_THAN from '@salesforce/label/c.Core_HealthCheck_OrphansMoreThan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { format } from 'c/findCsv';

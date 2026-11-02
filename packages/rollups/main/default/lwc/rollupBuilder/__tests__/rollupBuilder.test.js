@@ -15,10 +15,14 @@ jest.mock(
 jest.mock('@salesforce/apex/RollupBuilderController.getDraft', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_RollupBuilder_CopyOf', () => ({ default: 'Copy of {0}' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
+jest.mock(
+  '@salesforce/label/c.Core_Import_CopyTemplateDefaultName',
+  () => ({ default: 'Copy of {0}' }),
+  {
+    virtual: true
+  }
+);
+jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }), {
   virtual: true
 });
 // The nested components are replaced by stubs so this test sees only the Builder's own work.
@@ -175,20 +179,20 @@ describe('c-rollup-builder', () => {
     const element = build();
     EnclosingTabId.emit('tab0');
     await flush();
-    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_RollupBuilder_Title');
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_SettingsGroup_RollupBuilder');
     expect(setTabIcon).toHaveBeenCalledWith('tab0', 'utility:builder', {
-      iconAlt: 'c.Core_RollupBuilder_Title'
+      iconAlt: 'c.Core_SettingsGroup_RollupBuilder'
     });
 
     list(element).dispatchEvent(new CustomEvent('edit', { detail: { recordId: 'a01' } }));
     await flush();
     expect(setTabLabel).toHaveBeenLastCalledWith(
       'tab0',
-      'c.Core_RollupBuilder_Title: Household total giving'
+      'c.Core_SettingsGroup_RollupBuilder: Household total giving'
     );
 
     wizard(element).dispatchEvent(new CustomEvent('saved', { detail: { notice: 'Saved.' } }));
     await flush();
-    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_RollupBuilder_Title');
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_SettingsGroup_RollupBuilder');
   });
 });

@@ -41,7 +41,7 @@ jest.mock(
   () => ({ default: 'Downloaded {0} fields.' }),
   { virtual: true }
 );
-jest.mock('@salesforce/label/c.Core_DataDictionary_Yes', () => ({ default: 'Yes' }), {
+jest.mock('@salesforce/label/c.Core_AccessExplorer_Yes', () => ({ default: 'Yes' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_DataDictionary_No', () => ({ default: 'No' }), {
@@ -50,13 +50,13 @@ jest.mock('@salesforce/label/c.Core_DataDictionary_No', () => ({ default: 'No' }
 jest.mock('@salesforce/label/c.Core_DataDictionary_ColFillRate', () => ({ default: 'Fill Rate' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_DataDictionary_ColField', () => ({ default: 'Field' }), {
+jest.mock('@salesforce/label/c.Core_AccessExplorer_Field', () => ({ default: 'Field' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_DataDictionary_ColHelpText', () => ({ default: 'Help Text' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_DataDictionary_ColObject', () => ({ default: 'Object' }), {
+jest.mock('@salesforce/label/c.Core_MatchLogic_Object', () => ({ default: 'Object' }), {
   virtual: true
 });
 jest.mock(

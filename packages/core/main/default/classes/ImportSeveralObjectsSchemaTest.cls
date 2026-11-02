@@ -207,7 +207,7 @@ private class ImportSeveralObjectsSchemaTest {
                 );
                 Assert.areEqual(
                     String.format(
-                        Label.Core_Import_ErrorOnObject,
+                        Label.Core_Format_Pair,
                         new List<String>{
                             labelOf(Account.SObjectType),
                             Label.Core_Import_ErrorMatchFieldRequired

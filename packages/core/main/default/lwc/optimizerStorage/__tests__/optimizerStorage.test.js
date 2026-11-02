@@ -14,9 +14,13 @@ jest.mock(
     virtual: true
   }
 );
-jest.mock('@salesforce/label/c.Core_OrgOptimizer_MoreThan', () => ({ default: 'More than {0}' }), {
-  virtual: true
-});
+jest.mock(
+  '@salesforce/label/c.Core_HealthCheck_OrphansMoreThan',
+  () => ({ default: 'More than {0}' }),
+  {
+    virtual: true
+  }
+);
 
 const STORAGE = {
   countCap: 10000,

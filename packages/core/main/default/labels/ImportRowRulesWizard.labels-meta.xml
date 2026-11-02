@@ -41,14 +41,6 @@
         <value>Remove Rule</value>
     </labels>
     <labels>
-        <fullName>Core_Import_RowRulesColumn</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: the column a rule reads</shortDescription>
-        <value>Column</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_RowRulesTest</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -63,22 +55,6 @@
         <protected>false</protected>
         <shortDescription>Import wizard: the text a skip rule compares</shortDescription>
         <value>Text</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_RowRulesTestEquals</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: skip when the cell equals the text</shortDescription>
-        <value>equals</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_RowRulesTestContains</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: skip when the cell contains the text</shortDescription>
-        <value>contains</value>
     </labels>
     <labels>
         <fullName>Core_Import_RowRulesTestBlank</fullName>

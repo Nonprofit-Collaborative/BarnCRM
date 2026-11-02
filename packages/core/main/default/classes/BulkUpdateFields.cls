@@ -90,7 +90,7 @@ public with sharing class BulkUpdateFields {
         if (reason != null) {
             throw new BulkUpdateException(
                 String.format(
-                    System.Label.Core_BulkUpdate_ErrorObject,
+                    System.Label.Core_BulkUpdate_ErrorField,
                     new List<Object>{ described.getLabelPlural(), reason }
                 )
             );

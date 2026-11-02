@@ -17,28 +17,12 @@
         <value>New Address</value>
     </labels>
     <labels>
-        <fullName>Core_Address_CancelButton</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: button that closes the new address form</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_Address_CannotUntickOnlyDefault</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address: refusal to untick the only address in use</shortDescription>
         <value>This is the address in use. To change that, make another address the primary, or delete this one.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_DefaultBadge</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: badge on the address currently in use</shortDescription>
-        <value>Primary</value>
     </labels>
     <labels>
         <fullName>Core_Address_Empty</fullName>
@@ -111,14 +95,6 @@
         <protected>false</protected>
         <shortDescription>Address panel: the household chosen is not one the person belongs to</shortDescription>
         <value>This person is not a current member of that household, so nothing was changed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_PanelTitle</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: card heading</shortDescription>
-        <value>Addresses</value>
     </labels>
     <labels>
         <fullName>Core_Address_PropagationFailed</fullName>
@@ -383,13 +359,5 @@
         <protected>false</protected>
         <shortDescription>Address moves: same-named person; {0} is the name, {1} the birthdate</shortDescription>
         <value>{0} (born {1})</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_SameNameEmail</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address moves: same-named person; {0} is the name, {1} the email</shortDescription>
-        <value>{0} ({1})</value>
     </labels>
 </CustomLabels>

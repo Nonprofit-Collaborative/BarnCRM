@@ -77,7 +77,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Integrations: badge on a product that is not in this org</shortDescription>
+        <shortDescription>Shared: badge on a product or module not in this org</shortDescription>
         <value>Not installed</value>
     </labels>
     <labels>
@@ -137,28 +137,12 @@
         <value>Migration: {0}</value>
     </labels>
     <labels>
-        <fullName>Core_Integrations_LearnMore</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Integrations: link to a product's own page</shortDescription>
-        <value>Learn More</value>
-    </labels>
-    <labels>
         <fullName>Core_Integrations_EmptyMessage</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Integrations: the catalog holds no products</shortDescription>
         <value>No other products are listed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Integrations_RequestHeading</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Integrations: heading of the request section at the bottom</shortDescription>
-        <value>Request an Integration</value>
     </labels>
     <labels>
         <fullName>Core_Integrations_RequestIntro</fullName>

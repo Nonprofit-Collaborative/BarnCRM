@@ -1,28 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_HouseholdMerge_Cancel</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cancel button</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdMerge_ComparisonTable</fullName>
         <categories>Households</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Accessible name of the household comparison table</shortDescription>
         <value>Household comparison</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_ColumnField</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Comparison column heading for the field name</shortDescription>
-        <value>Field</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_ColumnOther</fullName>
@@ -47,14 +31,6 @@
         <protected>true</protected>
         <shortDescription>Warning before a merge; {0} household merged away, {1} the survivor</shortDescription>
         <value>{0} will be combined into {1}. Everyone in it, and all its history, letters, files and notes, will move across. A merge cannot be undone. Check both households first.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_ConfirmButton</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Button that runs the merge from the confirmation</shortDescription>
-        <value>Merge Households</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_ConfirmHeading</fullName>
@@ -311,22 +287,6 @@
         <protected>true</protected>
         <shortDescription>A merge finished</shortDescription>
         <value>Merged. The household you kept now holds everyone from both.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_TabMerge</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Merge tab</shortDescription>
-        <value>Merge</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_TabSplit</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Split tab</shortDescription>
-        <value>Split</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_Title</fullName>

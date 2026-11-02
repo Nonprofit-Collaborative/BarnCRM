@@ -7,7 +7,7 @@ import retryAllFixed from '@salesforce/apex/ImportRowCorrectionController.retryA
 import TITLE from '@salesforce/label/c.Core_ImportRow_Title';
 import HELP from '@salesforce/label/c.Core_ImportRow_Help';
 import STATUS_LABEL from '@salesforce/label/c.Core_ImportRow_StatusLabel';
-import IMPORT_LABEL from '@salesforce/label/c.Core_ImportRow_ImportLabel';
+import IMPORT_LABEL from '@salesforce/label/c.Core_DataJobs_KindImport';
 import REASON_HEADING from '@salesforce/label/c.Core_ImportRow_ReasonHeading';
 import COLUMN_HEADER from '@salesforce/label/c.Core_ImportRow_ColumnHeader';
 import FILE_VALUE_HEADER from '@salesforce/label/c.Core_ImportRow_FileValueHeader';
@@ -16,11 +16,11 @@ import SAVE from '@salesforce/label/c.Core_ImportRow_Save';
 import RETRY_ROW from '@salesforce/label/c.Core_ImportRow_RetryRow';
 import RETRY_ALL from '@salesforce/label/c.Core_ImportRow_RetryAll';
 import FIXED_COUNT from '@salesforce/label/c.Core_ImportRow_FixedCount';
-import REFRESH from '@salesforce/label/c.Core_ImportRow_Refresh';
+import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import SAVED from '@salesforce/label/c.Core_ImportRow_Saved';
 import RETRY_STARTED from '@salesforce/label/c.Core_ImportRow_RetryStarted';
 import NO_VALUES from '@salesforce/label/c.Core_ImportRow_NoValues';
-import LOADING from '@salesforce/label/c.Core_ImportRow_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 
 // ImportRowProcessor.STATUS_REJECTED

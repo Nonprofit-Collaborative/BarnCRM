@@ -304,7 +304,7 @@ private class SettingsServiceTest {
                 refused = true;
                 Assert.areEqual(
                     String.format(
-                        System.Label.Core_Settings_ErrorForSetting,
+                        System.Label.Core_Format_Pair,
                         new List<Object>{
                             'Automation paused until',
                             System.Label.Core_Settings_InvalidValueError

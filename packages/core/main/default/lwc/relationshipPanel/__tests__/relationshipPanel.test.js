@@ -134,7 +134,7 @@ describe('c-relationship-panel', () => {
     );
     await flush();
 
-    expect(names(element)).toEqual(['Luis Garcia', 'c.Core_Relationship_UnnamedPerson']);
+    expect(names(element)).toEqual(['Luis Garcia', 'c.Core_Affiliation_UnnamedPerson']);
   });
 
   it('names the type from this side and badges the ones that have ended', async () => {

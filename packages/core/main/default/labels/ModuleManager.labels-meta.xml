@@ -57,14 +57,6 @@
         <value>Installed and off</value>
     </labels>
     <labels>
-        <fullName>Core_ModuleManager_StatusNotInstalled</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Module Manager: status of a module not in the org</shortDescription>
-        <value>Not installed</value>
-    </labels>
-    <labels>
         <fullName>Core_ModuleManager_NoInstallLink</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -92,7 +84,7 @@
         <fullName>Core_ModuleManager_TurnOnButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Module Manager: button that turns a module on</shortDescription>
         <value>Turn On</value>
     </labels>

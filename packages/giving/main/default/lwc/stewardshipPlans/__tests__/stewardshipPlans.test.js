@@ -55,19 +55,19 @@ jest.mock(
   { virtual: true }
 );
 
-jest.mock('@salesforce/label/c.Giving_Stewardship_Active', () => ({ default: 'On' }), {
+jest.mock('@salesforce/label/c.Core_Feature_On', () => ({ default: 'On' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Giving_Stewardship_Inactive', () => ({ default: 'Off' }), {
+jest.mock('@salesforce/label/c.Core_Feature_Off', () => ({ default: 'Off' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Giving_Stewardship_TurnOn', () => ({ default: 'Turn on' }), {
+jest.mock('@salesforce/label/c.Core_Feature_TurnOn', () => ({ default: 'Turn on' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Giving_Stewardship_TurnOff', () => ({ default: 'Turn off' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Giving_Stewardship_Saved', () => ({ default: 'Saved.' }), {
+jest.mock('@salesforce/label/c.Core_Shared_Saved', () => ({ default: 'Saved.' }), {
   virtual: true
 });
 
@@ -217,7 +217,7 @@ describe('c-stewardship-plans', () => {
 
     const rows = element.shadowRoot.querySelectorAll('[data-id="plan-row"]');
     const marker = rows[0].querySelector('[data-id="plan-selected"]');
-    expect(marker.textContent).toBe('c.Giving_Stewardship_Selected');
+    expect(marker.textContent).toBe('c.Core_DataDictionary_SelectedLabel');
     expect(rows[1].querySelector('[data-id="plan-selected"]')).toBeNull();
   });
 

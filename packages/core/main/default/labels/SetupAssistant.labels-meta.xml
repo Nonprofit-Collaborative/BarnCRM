@@ -17,14 +17,6 @@
         <value>Access given. Add another person, or continue.</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_AutomaticAccessLink</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: link to the guide for giving new users a role automatically</shortDescription>
-        <value>Set Up Automatic Access</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_CompleteHeading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -49,14 +41,6 @@
         <value>Confirm and Continue</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_CreateUserLink</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: link to the Setup page where a Salesforce user is created</shortDescription>
-        <value>Create a User in Setup</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_DoneBadge</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -76,17 +60,9 @@
         <fullName>Core_SetupAssistant_FinishButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Setup assistant: button that finishes the last step</shortDescription>
         <value>Finish</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_GiveAccessButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: button that gives the chosen person the chosen role</shortDescription>
-        <value>Give Access</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Heading</fullName>
@@ -95,14 +71,6 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: the checklist heading</shortDescription>
         <value>Setup Checklist</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_ImportButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: button that opens the Import tab</shortDescription>
-        <value>Import a Spreadsheet</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ImportMissingNotice</fullName>
@@ -145,44 +113,12 @@
         <value>Load the Sample Data</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_ModeNonprofitCloud</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the mode name offered when Salesforce gift objects are found</shortDescription>
-        <value>Nonprofit Cloud coexistence</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_ModeLabel</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the label of the coexistence mode chooser</shortDescription>
         <value>How BarnCRM fits this org</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_ModeNpsp</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the mode name offered when a household package is found</shortDescription>
-        <value>NPSP coexistence</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_ModeStandalone</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the name of the standalone coexistence mode</shortDescription>
-        <value>Standalone</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_ModuleAbsent</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: status of a module that is not in this org</shortDescription>
-        <value>Not installed</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ModuleLearnMore</fullName>
@@ -241,14 +177,6 @@
         <value>The household naming screen is not in this org yet, so there is nothing to confirm. Skip this step: BarnCRM names households with its shipped pattern until you change it.</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_NextButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: button that goes on to the next step</shortDescription>
-        <value>Next</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_NothingToSaveError</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -297,14 +225,6 @@
         <value>Reopen Setup</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_RoleLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the role chooser on the access step</shortDescription>
-        <value>Role</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_RuleAction</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -327,14 +247,6 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: notice when the sample data panel is not in this org</shortDescription>
         <value>The sample data loader is not in this org yet. Import your own spreadsheet instead, or skip this step and come back.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_SaveButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: button that saves a panel</shortDescription>
-        <value>Save</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_SaveErrorMessage</fullName>
@@ -527,14 +439,6 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: what happens to an uploaded logo or signature file</shortDescription>
         <value>Uploaded files stay attached to the uploader's user record, so upload from an account that will stay active.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_UserLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the person chooser on the access step</shortDescription>
-        <value>Person</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_WrongRecordTypeError</fullName>

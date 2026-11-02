@@ -4,7 +4,7 @@ import TITLE from '@salesforce/label/c.Core_RollupEase_ExplainTitle';
 import EMPTY from '@salesforce/label/c.Core_RollupEase_ExplainEmpty';
 import ADMIN from '@salesforce/label/c.Core_RollupEase_ExplainAdmin';
 import SEEN from '@salesforce/label/c.Core_RollupEase_ExplainSeen';
-import REFRESH from '@salesforce/label/c.Core_RollupEase_ExplainRefresh';
+import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import ROWS_HEADING from '@salesforce/label/c.Core_RollupEase_RowsHeading';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 

@@ -20,7 +20,7 @@ private class RollupsNightlyJobProviderTest {
             Assert.areEqual(1, jobs.size(), 'The module offers one nightly job.');
             NightlyJob job = jobs[0];
             Assert.areEqual(
-                System.Label.Core_HealthCheck_JobRollups,
+                System.Label.Core_JobNotice_Rollups,
                 job.label(),
                 'Named from a label.'
             );

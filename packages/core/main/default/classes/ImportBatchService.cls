@@ -1094,7 +1094,7 @@ public with sharing class ImportBatchService {
         }
         JobNotifier.aboutRecord(
             UserInfo.getUserId(),
-            dryRun == true ? Label.Core_JobNotice_ImportPreview : Label.Core_JobNotice_Import,
+            dryRun == true ? Label.Core_JobNotice_ImportPreview : Label.Core_DataJobs_KindImport,
             failed == true,
             String.format(
                 Label.Core_JobNotice_ImportBody,

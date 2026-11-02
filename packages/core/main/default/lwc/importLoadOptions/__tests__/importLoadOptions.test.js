@@ -176,7 +176,7 @@ describe('what each row of a one-object mapping does', () => {
     await flush();
     const related = element.shadowRoot.querySelector('[data-id="related"]');
     expect(related.options).toEqual([
-      { label: 'c.Core_Import_RelatedNone', value: '' },
+      { label: 'c.Core_AccessCompare_None', value: '' },
       { label: 'Session (Program)', value: 'Session__c.Program__c' }
     ]);
     related.dispatchEvent(

@@ -398,7 +398,7 @@ public with sharing class FieldUtilizationController {
                 return '';
             }
             if (String.isBlank(developerName)) {
-                return System.Label.Core_FieldUtilization_NoRecordType;
+                return System.Label.Core_Settings_NoRecordType;
             }
             Schema.RecordTypeInfo info = this.byName.get(developerName);
             return info == null ? developerName : info.getName();

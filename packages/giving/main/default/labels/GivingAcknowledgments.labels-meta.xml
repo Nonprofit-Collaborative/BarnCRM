@@ -9,14 +9,6 @@
     <value>Sending thank yous needs the Send Acknowledgments permission. Ask your BarnCRM admin for the Fundraising Staff role.</value>
   </labels>
   <labels>
-    <fullName>Giving_Acknowledgment_UnexpectedError</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments: an unexpected failure, with the log pointed at</shortDescription>
-    <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your BarnCRM admin to check it.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Acknowledgment_SendFailedUnknown</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
@@ -249,14 +241,6 @@
     <value>Not scheduled. Nothing goes out until you press Send.</value>
   </labels>
   <labels>
-    <fullName>Giving_Acknowledgments_LastRun</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: when the last send finished</shortDescription>
-    <value>Last run</value>
-  </labels>
-  <labels>
     <fullName>Giving_Acknowledgments_NeverRun</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
@@ -281,28 +265,12 @@
     <value>New Rule</value>
   </labels>
   <labels>
-    <fullName>Giving_Acknowledgments_EditRule</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: button, edit a rule</shortDescription>
-    <value>Edit</value>
-  </labels>
-  <labels>
     <fullName>Giving_Acknowledgments_EditRuleOf</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: edit button title, names the rule</shortDescription>
     <value>Edit the rule {0}</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_NewRuleHeading</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: heading of the form for a new rule</shortDescription>
-    <value>New Rule</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_EditRuleHeading</fullName>
@@ -345,36 +313,12 @@
     <value>An email rule needs an email template. Choose one from the list.</value>
   </labels>
   <labels>
-    <fullName>Giving_Acknowledgments_SaveRule</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: button, save the rule</shortDescription>
-    <value>Save</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_CancelRule</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: button, close the rule form</shortDescription>
-    <value>Cancel</value>
-  </labels>
-  <labels>
     <fullName>Giving_Acknowledgments_RuleSaved</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: a rule was saved</shortDescription>
     <value>The rule has been saved.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_RunsHeading</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: the runs section heading</shortDescription>
-    <value>Recent Runs</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_NoRuns</fullName>
@@ -391,22 +335,6 @@
     <protected>false</protected>
     <shortDescription>Acknowledgments page: a rule names a template the org does not have</shortDescription>
     <value>Template not found</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_Inactive</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: an inactive rule</shortDescription>
-    <value>Inactive</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_ActionFailed</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: an action failed</shortDescription>
-    <value>That did not work. Try again, and if it keeps happening, ask your BarnCRM admin to check the Error Log.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_ColumnRule</fullName>
@@ -433,14 +361,6 @@
     <value>Channel</value>
   </labels>
   <labels>
-    <fullName>Giving_Acknowledgments_ColumnTemplate</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: the template column</shortDescription>
-    <value>Template</value>
-  </labels>
-  <labels>
     <fullName>Giving_Acknowledgments_ColumnMatches</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
@@ -455,14 +375,6 @@
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the run column</shortDescription>
     <value>Run</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_ColumnStatus</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: the run status column</shortDescription>
-    <value>Status</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_ColumnSent</fullName>

@@ -12,7 +12,7 @@ import INSTALLED from '@salesforce/label/c.Core_Integrations_Installed';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Integrations_NotInstalled';
 import STATUS_IN_PROGRESS from '@salesforce/label/c.Core_Integrations_StatusInProgress';
 import STATUS_AVAILABLE from '@salesforce/label/c.Core_Integrations_StatusAvailable';
-import REQUEST_HEADING from '@salesforce/label/c.Core_Integrations_RequestHeading';
+import REQUEST_HEADING from '@salesforce/label/c.Core_Integrations_RequestLink';
 import REQUEST_INTRO from '@salesforce/label/c.Core_Integrations_RequestIntro';
 import REQUEST_LINK from '@salesforce/label/c.Core_Integrations_RequestLink';
 import REQUEST_URL from '@salesforce/label/c.Core_Integrations_RequestUrl';
@@ -26,10 +26,10 @@ import LICENSE_COST from '@salesforce/label/c.Core_Integrations_LicenseCost';
 import RELATED_MODULE from '@salesforce/label/c.Core_Integrations_RelatedModule';
 import COMPATIBILITY_HEADING from '@salesforce/label/c.Core_Integrations_CompatibilityHeading';
 import MIGRATION_PATH from '@salesforce/label/c.Core_Integrations_MigrationPath';
-import LEARN_MORE from '@salesforce/label/c.Core_Integrations_LearnMore';
+import LEARN_MORE from '@salesforce/label/c.Core_Kit_LearnMore';
 import EMPTY from '@salesforce/label/c.Core_Integrations_EmptyMessage';
 import LOAD_ERROR from '@salesforce/label/c.Core_Integrations_LoadErrorMessage';
-import NEW_TAB from '@salesforce/label/c.Core_SuiteChoice_NewTab';
+import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 
 /** The groups in the order the page shows them, by the category a catalog row stores. */

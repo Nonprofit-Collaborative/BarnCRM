@@ -3,14 +3,14 @@ import getConnection from '@salesforce/apex/ImportNewFieldController.getConnecti
 import setUpConnection from '@salesforce/apex/ImportNewFieldController.setUpConnection';
 
 import INTRO from '@salesforce/label/c.Core_ImportNewField_PanelIntro';
-import STATUS from '@salesforce/label/c.Core_ImportNewField_PanelStatus';
+import STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import CONNECTED from '@salesforce/label/c.Core_ImportNewField_PanelConnected';
 import NOT_CONNECTED from '@salesforce/label/c.Core_ImportNewField_PanelNotConnected';
 import SET_UP from '@salesforce/label/c.Core_ImportNewField_SetUpButton';
 import NEEDS_PERMISSION from '@salesforce/label/c.Core_ImportNewField_PanelNeedsPermission';
 import CALLOUTS_OFF from '@salesforce/label/c.Core_ImportNewField_PanelCalloutsOff';
 import ENABLE_STEPS from '@salesforce/label/c.Core_ImportNewField_PanelEnableSteps';
-import CHECK_AGAIN from '@salesforce/label/c.Core_ImportNewField_CheckAgainButton';
+import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import UNEXPECTED from '@salesforce/label/c.Core_UnexpectedError';
 
 /**

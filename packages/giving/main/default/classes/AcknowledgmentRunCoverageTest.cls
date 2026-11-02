@@ -540,7 +540,7 @@ private class AcknowledgmentRunCoverageTest {
             }
 
             Assert.areEqual(
-                Label.Giving_Acknowledgment_UnexpectedError,
+                Label.Giving_Stewardship_ErrorActionFailed,
                 message,
                 'A person who cannot read the rules gets the general message, never a query error'
             );

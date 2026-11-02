@@ -45,7 +45,7 @@ public with sharing class GivingSampleData implements SampleDataModule {
     }
 
     public String countLabel() {
-        return System.Label.Giving_SampleData_GiftsLabel;
+        return System.Label.Core_Import_KindGiftsTitle;
     }
 
     /**

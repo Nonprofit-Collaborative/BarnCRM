@@ -308,10 +308,7 @@ public with sharing class HealthCheckSettingsChecks {
                 HealthCheckService.SEVERITY_WARNING,
                 HealthCheckService.CATEGORY_SETTINGS
             )
-            .withFix(
-                System.Label.Core_HealthCheck_ErrorLogFix,
-                ErrorLogCountSelector.listViewUrl()
-            );
+            .withFix(System.Label.Core_ErrorLogTile_ViewAll, ErrorLogCountSelector.listViewUrl());
     }
 
     /** How long a scheduled daily digest may go without a run before it is a finding. */

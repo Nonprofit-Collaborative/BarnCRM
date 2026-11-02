@@ -128,7 +128,7 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
         }
         JobNotifier.aboutRecord(
             recipientId,
-            System.Label.Core_JobNotice_FindExport,
+            System.Label.Core_Find_ExportFiles,
             failed,
             String.format(
                 System.Label.Core_JobNotice_FindExportBody,

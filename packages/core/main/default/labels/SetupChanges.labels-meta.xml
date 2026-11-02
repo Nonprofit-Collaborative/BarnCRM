@@ -73,14 +73,6 @@
         <value>The copy has started and runs in the background. Press Refresh in a minute or two to see the new changes.</value>
     </labels>
     <labels>
-        <fullName>Core_SetupChanges_Refresh</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: button that reads the kept changes again</shortDescription>
-        <value>Refresh</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupChanges_From</fullName>
         <categories>SetupChanges</categories>
         <language>en_US</language>
@@ -95,14 +87,6 @@
         <protected>false</protected>
         <shortDescription>Setup Changes: last day filter</shortDescription>
         <value>To</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_Section</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: Setup area filter</shortDescription>
-        <value>Section</value>
     </labels>
     <labels>
         <fullName>Core_SetupChanges_AllSections</fullName>
@@ -135,14 +119,6 @@
         <protected>false</protected>
         <shortDescription>Setup Changes: button that applies the filters</shortDescription>
         <value>Search</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_Download</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: button that saves the matches as CSV</shortDescription>
-        <value>Download CSV</value>
     </labels>
     <labels>
         <fullName>Core_SetupChanges_Downloaded</fullName>
@@ -223,14 +199,6 @@
         <protected>false</protected>
         <shortDescription>Setup Changes: column for the Setup area</shortDescription>
         <value>Section</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_ColAction</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: CSV column for Salesforce's code for the change</shortDescription>
-        <value>Action</value>
     </labels>
     <labels>
         <fullName>Core_SetupChanges_ColWhatChanged</fullName>

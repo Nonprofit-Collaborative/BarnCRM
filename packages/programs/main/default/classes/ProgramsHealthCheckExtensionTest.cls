@@ -90,7 +90,10 @@ private class ProgramsHealthCheckExtensionTest {
                 String.format(
                     Label.Programs_HealthCheck_OpenAfterEndTitle,
                     new List<Object>{
-                        String.format(Label.Programs_HealthCheck_MoreThan, new List<Object>{ '1' })
+                        String.format(
+                            Label.Core_HealthCheck_OrphansMoreThan,
+                            new List<Object>{ '1' }
+                        )
                     }
                 ),
                 capped.get('title'),

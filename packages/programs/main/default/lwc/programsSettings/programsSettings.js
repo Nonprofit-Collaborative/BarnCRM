@@ -17,7 +17,7 @@ import PRIVACY_LEGEND from '@salesforce/label/c.Programs_Settings_PrivacyLegend'
 import PRIVACY_SHARED from '@salesforce/label/c.Programs_Settings_PrivacyShared';
 import PRIVACY_PRIVATE from '@salesforce/label/c.Programs_Settings_PrivacyPrivate';
 import PRIVACY_DEFAULT from '@salesforce/label/c.Programs_Settings_PrivacyDefault';
-import SAVE from '@salesforce/label/c.Programs_Settings_Save';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import SAVED from '@salesforce/label/c.Programs_Settings_Saved';
 import SAVE_FAILED from '@salesforce/label/c.Programs_Settings_SaveFailed';
 import LOADING from '@salesforce/label/c.Programs_Loading';

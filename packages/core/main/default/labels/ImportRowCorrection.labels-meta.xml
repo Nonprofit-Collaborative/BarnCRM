@@ -73,14 +73,6 @@
         <value>Status</value>
     </labels>
     <labels>
-        <fullName>Core_ImportRow_ImportLabel</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import row card: import label</shortDescription>
-        <value>Import</value>
-    </labels>
-    <labels>
         <fullName>Core_ImportRow_ReasonHeading</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -93,7 +85,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import row card: column header</shortDescription>
+        <shortDescription>Shared: column header, or a column of a grid</shortDescription>
         <value>Column</value>
     </labels>
     <labels>
@@ -145,14 +137,6 @@
         <value>{0} corrected rows in this import are ready to retry.</value>
     </labels>
     <labels>
-        <fullName>Core_ImportRow_Refresh</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import row card: refresh button</shortDescription>
-        <value>Refresh</value>
-    </labels>
-    <labels>
         <fullName>Core_ImportRow_Saved</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -175,13 +159,5 @@
         <protected>false</protected>
         <shortDescription>Import row card: the row has no values</shortDescription>
         <value>This row has no values to show.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ImportRow_Loading</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import row card: loading alternative text</shortDescription>
-        <value>Loading</value>
     </labels>
 </CustomLabels>

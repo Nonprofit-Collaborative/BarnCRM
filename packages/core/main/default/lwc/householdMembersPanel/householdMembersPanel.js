@@ -23,8 +23,8 @@ import MOVE_MEMBER from '@salesforce/label/c.Core_HouseholdMembersPanel_MoveMemb
 import MOVE_HELP from '@salesforce/label/c.Core_HouseholdMembersPanel_MoveHelp';
 import MOVE_SUCCESS from '@salesforce/label/c.Core_HouseholdMembersPanel_MoveSuccess';
 import ADD_SUCCESS from '@salesforce/label/c.Core_HouseholdMembersPanel_AddSuccess';
-import SAVE from '@salesforce/label/c.Core_HouseholdMembersPanel_Save';
-import CANCEL from '@salesforce/label/c.Core_HouseholdMembersPanel_Cancel';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import MAKE_PRIMARY from '@salesforce/label/c.Core_HouseholdPanel_MakePrimary';
 import MAKE_PRIMARY_SUCCESS from '@salesforce/label/c.Core_HouseholdPanel_MakePrimarySuccess';
 import MAKE_PRIMARY_FAILED from '@salesforce/label/c.Core_HouseholdPanel_MakePrimaryFailed';

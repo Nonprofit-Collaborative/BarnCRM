@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_FieldUtilization_NoRecordType</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: records that have no record type</shortDescription>
-        <value>No record type</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldUtilization_PermissionRequired</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>
@@ -159,22 +151,6 @@
         <protected>false</protected>
         <shortDescription>Field utilization: no saved count yet</shortDescription>
         <value>No counts have been saved for this kind of record yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_ColField</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: Field column</shortDescription>
-        <value>Field</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_ColApiName</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: API name column</shortDescription>
-        <value>API Name</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_ColRecordType</fullName>

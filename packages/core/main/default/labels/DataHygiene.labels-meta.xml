@@ -121,14 +121,6 @@
         <value>Data Quality: {0}</value>
     </labels>
     <labels>
-        <fullName>Core_DataHygiene_MoreThan</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Count past the cap, {0} is the cap.</shortDescription>
-        <value>More than {0}</value>
-    </labels>
-    <labels>
         <fullName>Core_DataHygiene_PeopleTitle</fullName>
         <categories>DataHygiene</categories>
         <language>en_US</language>

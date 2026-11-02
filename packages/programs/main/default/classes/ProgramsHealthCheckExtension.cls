@@ -70,7 +70,7 @@ public with sharing class ProgramsHealthCheckExtension implements HealthCheckExt
         Integer howMany = open.size();
         String counted = howMany > countCap
             ? String.format(
-                  Label.Programs_HealthCheck_MoreThan,
+                  Label.Core_HealthCheck_OrphansMoreThan,
                   new List<Object>{ countCap.format() }
               )
             : howMany.format();

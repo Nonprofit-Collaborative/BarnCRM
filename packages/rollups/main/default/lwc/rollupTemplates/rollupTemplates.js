@@ -5,7 +5,7 @@ import BUTTON from '@salesforce/label/c.Core_RollupEase_TplButton';
 import INTRO from '@salesforce/label/c.Core_RollupEase_TplIntro';
 import ADD from '@salesforce/label/c.Core_RollupEase_TplAdd';
 import OPEN from '@salesforce/label/c.Core_RollupEase_TplOpen';
-import CLOSE from '@salesforce/label/c.Core_RollupEase_TplClose';
+import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 
 /**

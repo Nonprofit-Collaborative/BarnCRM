@@ -25,14 +25,6 @@
         <value>Compare</value>
     </labels>
     <labels>
-        <fullName>Core_AccessCompare_People</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access compare: people choice</shortDescription>
-        <value>People</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessCompare_Sets</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>
@@ -85,7 +77,7 @@
         <categories>AccessExplorer</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Access compare: object table heading</shortDescription>
+        <shortDescription>Shared: heading over a list of objects</shortDescription>
         <value>Kinds of Record</value>
     </labels>
     <labels>
@@ -153,14 +145,6 @@
         <value>Data-Wide Access</value>
     </labels>
     <labels>
-        <fullName>Core_AccessModifyAll_ObjectsHeading</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Modify all report: object table heading</shortDescription>
-        <value>Kinds of Record</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessModifyAll_ColViewAllData</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>
@@ -207,14 +191,6 @@
         <protected>false</protected>
         <shortDescription>Modify all report: standard object</shortDescription>
         <value>Standard</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessModifyAll_ScopeCustom</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Modify all report: custom object</shortDescription>
-        <value>Custom</value>
     </labels>
     <labels>
         <fullName>Core_AccessModifyAll_Truncated</fullName>

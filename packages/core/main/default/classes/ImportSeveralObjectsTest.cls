@@ -145,10 +145,7 @@ private class ImportSeveralObjectsTest {
     }
 
     private static String onObject(String objectLabel, String reason) {
-        return String.format(
-            Label.Core_Import_ErrorOnObject,
-            new List<String>{ objectLabel, reason }
-        );
+        return String.format(Label.Core_Format_Pair, new List<String>{ objectLabel, reason });
     }
 
     @IsTest

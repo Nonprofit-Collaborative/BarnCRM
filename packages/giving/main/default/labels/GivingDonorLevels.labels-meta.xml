@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
   <labels>
-    <fullName>Giving_DonorLevels_Title</fullName>
-    <categories>Giving, Donor Levels</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Donor levels page: heading</shortDescription>
-    <value>Donor Levels</value>
-  </labels>
-  <labels>
     <fullName>Giving_DonorLevels_Intro</fullName>
     <categories>Giving, Donor Levels</categories>
     <language>en_US</language>
@@ -113,28 +105,12 @@
     <value>Donors</value>
   </labels>
   <labels>
-    <fullName>Giving_DonorLevels_ColumnActive</fullName>
-    <categories>Giving, Donor Levels</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Donor levels page: active column</shortDescription>
-    <value>Active</value>
-  </labels>
-  <labels>
     <fullName>Giving_DonorLevels_TopOfLadder</fullName>
     <categories>Giving, Donor Levels</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Donor levels page: no maximum on the top rung</shortDescription>
     <value>and above</value>
-  </labels>
-  <labels>
-    <fullName>Giving_DonorLevels_Inactive</fullName>
-    <categories>Giving, Donor Levels</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Donor levels page: an inactive rung</shortDescription>
-    <value>Inactive</value>
   </labels>
   <labels>
     <fullName>Giving_DonorLevels_NotPermitted</fullName>

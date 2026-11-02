@@ -121,9 +121,7 @@ describe('c-integrations-panel', () => {
     expect(learn.getAttribute('href')).toBe('https://example.invalid/one');
     expect(learn.target).toBe('_blank');
     expect(learn.rel).toContain('noopener');
-    expect(learn.querySelector('.slds-assistive-text').textContent).toContain(
-      'Core_SuiteChoice_NewTab'
-    );
+    expect(learn.querySelector('.slds-assistive-text').textContent).toContain('Core_Kit_NewTab');
     expect(learn.querySelector('.slds-assistive-text').textContent).toContain('Product one');
     expect(item.querySelector('[data-id="install"]')).toBeNull();
   });
@@ -166,15 +164,13 @@ describe('c-integrations-panel', () => {
 
     const request = element.shadowRoot.querySelector('[data-id="request"]');
     expect(request.querySelector('[data-id="request-heading"]').textContent).toBe(
-      'c.Core_Integrations_RequestHeading'
+      'c.Core_Integrations_RequestLink'
     );
     for (const id of ['request-link', 'partner-link', 'guide-link']) {
       const link = request.querySelector(`[data-id="${id}"]`);
       expect(link.target).toBe('_blank');
       expect(link.rel).toContain('noopener');
-      expect(link.querySelector('.slds-assistive-text').textContent).toContain(
-        'Core_SuiteChoice_NewTab'
-      );
+      expect(link.querySelector('.slds-assistive-text').textContent).toContain('Core_Kit_NewTab');
     }
     expect(request.querySelector('[data-id="request-link"]').getAttribute('href')).toBe(
       'c.Core_Integrations_RequestUrl'

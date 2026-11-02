@@ -33,46 +33,6 @@
         <value>Person</value>
     </labels>
     <labels>
-        <fullName>Programs_Roster_Stage</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Stage picker and column heading</shortDescription>
-        <value>Stage</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Roster_StartDate</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Start date column heading</shortDescription>
-        <value>Start Date</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Roster_EndDate</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>End date column heading</shortDescription>
-        <value>End Date</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Roster_Save</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Save button of the enroll form</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Roster_Cancel</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cancel button of the enroll form</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Programs_Roster_ShowEnded</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -153,44 +113,12 @@
         <value>Loading</value>
     </labels>
     <labels>
-        <fullName>Programs_Person_Title</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Title of the Programs card on a person</shortDescription>
-        <value>Programs</value>
-    </labels>
-    <labels>
         <fullName>Programs_Person_Empty</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Programs card when the person has no enrollment</shortDescription>
         <value>Not enrolled in any program.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Person_Started</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs card: before the start date</shortDescription>
-        <value>Started</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Person_Ended</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs card: before the end date</shortDescription>
-        <value>Ended</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Person_Refresh</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs card refresh button</shortDescription>
-        <value>Refresh</value>
     </labels>
     <labels>
         <fullName>Programs_Person_LoadFailed</fullName>
@@ -233,14 +161,6 @@
         <value>These enrollments are Applied or Enrolled in a program that is Completed or past its End Date. They still count as open, so the person cannot enroll again. Set each to Completed or Withdrawn, or, if the program is still running, set it Active or move its End Date. The first ones are linked below.</value>
     </labels>
     <labels>
-        <fullName>Programs_HealthCheck_MoreThan</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Health Check count that stopped at its cap; {0} is the cap</shortDescription>
-        <value>More than {0}</value>
-    </labels>
-    <labels>
         <fullName>Programs_SampleData_CountLabel</fullName>
         <categories>SampleData</categories>
         <language>en_US</language>
@@ -273,14 +193,6 @@
         <value>Service</value>
     </labels>
     <labels>
-        <fullName>Programs_Log_Date</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service Delivery Log: date picker</shortDescription>
-        <value>Date</value>
-    </labels>
-    <labels>
         <fullName>Programs_Log_Attendance</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -311,14 +223,6 @@
         <protected>true</protected>
         <shortDescription>Service Delivery Log: mark everyone not recorded as present</shortDescription>
         <value>Mark All Present</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Log_Save</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service Delivery Log: save button</shortDescription>
-        <value>Save</value>
     </labels>
     <labels>
         <fullName>Programs_Log_Saved</fullName>
@@ -529,14 +433,6 @@
         <value>Default: Shared</value>
     </labels>
     <labels>
-        <fullName>Programs_Settings_Save</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs settings: save button</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
         <fullName>Programs_Settings_Saved</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -583,14 +479,6 @@
         <protected>true</protected>
         <shortDescription>Programs dashboard: page introduction</shortDescription>
         <value>How your programs are doing in the period you pick. Figures count only the records you can see.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Dashboard_Period</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs dashboard: period picker label</shortDescription>
-        <value>Period</value>
     </labels>
     <labels>
         <fullName>Programs_Dashboard_ThisMonth</fullName>

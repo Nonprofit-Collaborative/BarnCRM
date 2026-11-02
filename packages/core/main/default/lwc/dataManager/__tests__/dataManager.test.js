@@ -150,7 +150,7 @@ describe('c-data-manager', () => {
       label: 'c.Core_DataManager_DeleteTitle',
       message: 'c.Core_DataManager_DeleteWarning',
       confirmLabel: 'c.Core_DataManager_DeleteContinue',
-      cancelLabel: 'c.Core_DataManager_DeleteCancel',
+      cancelLabel: 'c.Core_CmdtManager_CancelButton',
       confirmVariant: 'destructive'
     });
     expect(mockNavigate).toHaveBeenCalledWith({

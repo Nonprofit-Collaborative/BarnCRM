@@ -105,14 +105,6 @@
         <value>No lists are saved yet.</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_SavedOption</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transform: picker option; {0} list name, {1} object label</shortDescription>
-        <value>{0} ({1})</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_SavedLoad</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>

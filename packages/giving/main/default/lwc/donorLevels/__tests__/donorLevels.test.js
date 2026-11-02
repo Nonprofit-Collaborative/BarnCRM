@@ -24,7 +24,7 @@ jest.mock('@salesforce/label/c.Giving_DonorLevels_TopOfLadder', () => ({ default
   virtual: true
 });
 
-jest.mock('@salesforce/label/c.Giving_DonorLevels_Inactive', () => ({ default: 'Inactive' }), {
+jest.mock('@salesforce/label/c.Core_MatchLogic_Inactive', () => ({ default: 'Inactive' }), {
   virtual: true
 });
 
@@ -152,7 +152,7 @@ describe('c-donor-levels', () => {
       'c.Giving_DonorLevels_ColumnFrom',
       'c.Giving_DonorLevels_ColumnUpTo',
       'c.Giving_DonorLevels_ColumnDonors',
-      'c.Giving_DonorLevels_ColumnActive'
+      'c.Core_MatchLogic_Active'
     ]);
   });
 

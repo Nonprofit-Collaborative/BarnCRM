@@ -97,14 +97,6 @@
     <value>Add Credit</value>
   </labels>
   <labels>
-    <fullName>Giving_SoftCredits_AmountLabel</fullName>
-    <categories>Giving, Soft Credits</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Amount field label</shortDescription>
-    <value>Amount</value>
-  </labels>
-  <labels>
     <fullName>Giving_SoftCredits_AutomaticBadge</fullName>
     <categories>Giving, Soft Credits</categories>
     <language>en_US</language>
@@ -119,14 +111,6 @@
     <protected>false</protected>
     <shortDescription>Automatic credit explanation</shortDescription>
     <value>BarnCRM created this credit from the household and keeps it up to date. Change the gift, or who is in the household, and it follows.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_SoftCredits_Cancel</fullName>
-    <categories>Giving, Soft Credits</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Cancel button</shortDescription>
-    <value>Cancel</value>
   </labels>
   <labels>
     <fullName>Giving_SoftCredits_CustomRoleLabel</fullName>
@@ -153,28 +137,12 @@
     <value>Person to recognize</value>
   </labels>
   <labels>
-    <fullName>Giving_SoftCredits_Remove</fullName>
-    <categories>Giving, Soft Credits</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Remove credit button</shortDescription>
-    <value>Remove</value>
-  </labels>
-  <labels>
     <fullName>Giving_SoftCredits_RoleLabel</fullName>
     <categories>Giving, Soft Credits</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Role field label</shortDescription>
     <value>Why they are recognized</value>
-  </labels>
-  <labels>
-    <fullName>Giving_SoftCredits_Save</fullName>
-    <categories>Giving, Soft Credits</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Save credit button</shortDescription>
-    <value>Save</value>
   </labels>
   <labels>
     <fullName>Giving_SoftCredits_Title</fullName>
@@ -207,14 +175,6 @@
     <protected>false</protected>
     <shortDescription>One tribute per gift</shortDescription>
     <value>This gift already has a tribute. Edit the one that is there, or split the gift.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_TributeNotification_ActionFailed</fullName>
-    <categories>Giving, Tributes</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Tribute action failed</shortDescription>
-    <value>That did not work. Try again, and if it keeps happening, send the newest Error Log entry to whoever supports your Salesforce.</value>
   </labels>
   <labels>
     <fullName>Giving_TributeNotification_MarkSent</fullName>

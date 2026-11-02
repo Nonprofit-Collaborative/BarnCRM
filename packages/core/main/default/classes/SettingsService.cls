@@ -439,7 +439,7 @@ public with sharing class SettingsService {
                 : field.getLabel();
             throw new SettingsException(
                 String.format(
-                    System.Label.Core_Settings_ErrorForSetting,
+                    System.Label.Core_Format_Pair,
                     new List<Object>{ name, refused.getMessage() }
                 )
             );

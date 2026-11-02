@@ -1095,7 +1095,7 @@ public with sharing class ImportObjectSchema {
                 SObjectDescribeOptions.DEFERRED
             );
             String label = String.format(
-                Label.Core_Import_RelatedOptionLabel,
+                Label.Core_Format_Parenthetical,
                 new List<String>{ described.getLabel(), labelOf(child, field) }
             );
             String value = described.getName() + '.' + field;
@@ -1462,7 +1462,7 @@ public with sharing class ImportObjectSchema {
             String refused = refusal(step.template, step.mapping);
             if (refused != null) {
                 return String.format(
-                    Label.Core_Import_ErrorOnObject,
+                    Label.Core_Format_Pair,
                     new List<String>{ step.label(), refused }
                 );
             }

@@ -25,14 +25,6 @@
         <value>Inspect This Record</value>
     </labels>
     <labels>
-        <fullName>Core_RecordInspector_Refresh</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector button that reads the record again.</shortDescription>
-        <value>Refresh</value>
-    </labels>
-    <labels>
         <fullName>Core_RecordInspector_Loading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -49,60 +41,12 @@
         <value>Search Fields</value>
     </labels>
     <labels>
-        <fullName>Core_RecordInspector_ColumnField</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector column: field label.</shortDescription>
-        <value>Field</value>
-    </labels>
-    <labels>
-        <fullName>Core_RecordInspector_ColumnApiName</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector column: API name.</shortDescription>
-        <value>API Name</value>
-    </labels>
-    <labels>
-        <fullName>Core_RecordInspector_ColumnType</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector column: field type.</shortDescription>
-        <value>Type</value>
-    </labels>
-    <labels>
-        <fullName>Core_RecordInspector_ColumnValue</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector column: value.</shortDescription>
-        <value>Value</value>
-    </labels>
-    <labels>
         <fullName>Core_RecordInspector_Copy</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Record Inspector button that copies an API name.</shortDescription>
         <value>Copy</value>
-    </labels>
-    <labels>
-        <fullName>Core_RecordInspector_OpenFind</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector link that opens Find on this record's object.</shortDescription>
-        <value>Open in Find</value>
-    </labels>
-    <labels>
-        <fullName>Core_RecordInspector_OpenSetup</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector link that opens a field's page in Setup.</shortDescription>
-        <value>Open in Setup</value>
     </labels>
     <labels>
         <fullName>Core_RecordInspector_Copied</fullName>

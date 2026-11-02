@@ -28,7 +28,7 @@ describe('c-setup-step-modules', () => {
     const items = element.shadowRoot.querySelectorAll('li');
     expect(items).toHaveLength(2);
     expect(items[0].textContent).toContain('Core_SetupAssistant_ModulePresent');
-    expect(items[1].textContent).toContain('Core_SetupAssistant_ModuleAbsent');
+    expect(items[1].textContent).toContain('Core_Integrations_NotInstalled');
   });
 
   it('links each module to what it does', () => {

@@ -143,9 +143,7 @@ describe('c-module-manager', () => {
     const element = await build();
 
     expect(row(element, 'Core').textContent).toContain('Core_ModuleManager_StatusOn');
-    expect(row(element, 'Volunteers').textContent).toContain(
-      'Core_ModuleManager_StatusNotInstalled'
-    );
+    expect(row(element, 'Volunteers').textContent).toContain('Core_Integrations_NotInstalled');
     expect(row(element, 'Core').querySelector('[data-id="turn-off"]')).toBeNull();
   });
 

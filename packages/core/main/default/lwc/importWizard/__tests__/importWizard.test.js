@@ -32,7 +32,7 @@ import suggestSheetMapping from '@salesforce/apex/ImportController.suggestSheetM
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
 import { readSheetNames, readXlsx } from '../xlsx';
 
-jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
+jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }), {
   virtual: true
 });
 
@@ -162,7 +162,7 @@ jest.mock(
 jest.mock('@salesforce/label/c.Core_Import_SheetOption', () => ({ default: '{0} ({1} rows)' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_Import_SheetObject', () => ({ default: '{0}: {1}' }), {
+jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }), {
   virtual: true
 });
 jest.mock(
@@ -385,7 +385,7 @@ describe('the import wizard', () => {
       'c.Core_Import_StepColumns',
       'c.Core_Import_StepMatching',
       'c.Core_Import_StepPreview',
-      'c.Core_Import_StepResults'
+      'c.Core_Find_Results'
     ]);
     expect(flow.currentStep).toBe('1');
     expect(flow.canGoBack).toBe(false);
@@ -612,9 +612,9 @@ describe('the import wizard', () => {
     const element = render();
     EnclosingTabId.emit('tab0');
     await flush();
-    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Import_TabLabel');
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_DataJobs_KindImport');
     expect(setTabIcon).toHaveBeenCalledWith('tab0', 'standard:file', {
-      iconAlt: 'c.Core_Import_TabLabel'
+      iconAlt: 'c.Core_DataJobs_KindImport'
     });
 
     await chooseKind(element, 'people');
@@ -622,7 +622,7 @@ describe('the import wizard', () => {
     await flush();
     await chooseFile(element);
 
-    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Import_TabLabel: donors.csv');
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_DataJobs_KindImport: donors.csv');
   });
 
   it('shows example values of each column beside the choice, a blank one as such', async () => {
@@ -634,7 +634,7 @@ describe('the import wizard', () => {
       Array.from(row.querySelectorAll('[data-id="examples"] div')).map((each) => each.textContent);
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
     expect(examples(rows[0])).toEqual(['Ramirez', 'Okafor']);
-    expect(examples(rows[2])).toEqual(['vip', 'c.Core_Import_ExampleBlank']);
+    expect(examples(rows[2])).toEqual(['vip', 'c.Core_Find_Blank']);
     expect(suggestObject).not.toHaveBeenCalled();
   });
 
@@ -1258,7 +1258,7 @@ describe('the import wizard', () => {
     expect(element.shadowRoot.querySelector('[data-id="rule"]').options).toEqual([
       { label: 'c.Core_Import_RuleEmailExact', value: 'Email exact' },
       { label: 'c.Core_Import_RuleNamePostalCode', value: 'Name plus postal code' },
-      { label: 'c.Core_Import_RuleExternalId', value: 'External ID' }
+      { label: 'c.Core_DataDictionary_ColExternalId', value: 'External ID' }
     ]);
   });
 
@@ -1282,7 +1282,7 @@ describe('the import wizard', () => {
     expect(rule.value).toBe('Name exact');
     expect(rule.options.map((option) => option.label)).toEqual([
       'c.Core_Import_RuleNameExact',
-      'c.Core_Import_RuleExternalId'
+      'c.Core_DataDictionary_ColExternalId'
     ]);
     expect(element.shadowRoot.querySelector('[data-id="organization-rule-help"]').textContent).toBe(
       'c.Core_Import_OrganizationNameHelp'

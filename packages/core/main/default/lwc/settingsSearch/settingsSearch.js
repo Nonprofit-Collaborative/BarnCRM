@@ -1,7 +1,7 @@
 import { LightningElement } from 'lwc';
 import search from '@salesforce/apex/SettingsController.search';
 import INPUT_LABEL from '@salesforce/label/c.Core_SettingsSearch_InputLabel';
-import PLACEHOLDER from '@salesforce/label/c.Core_SettingsSearch_Placeholder';
+import PLACEHOLDER from '@salesforce/label/c.Core_SettingsSearch_InputLabel';
 import RESULTS_HEADING from '@salesforce/label/c.Core_SettingsSearch_ResultsHeading';
 import NO_RESULTS from '@salesforce/label/c.Core_SettingsSearch_NoResultsMessage';
 import SEARCH_ERROR from '@salesforce/label/c.Core_SettingsSearch_ErrorMessage';

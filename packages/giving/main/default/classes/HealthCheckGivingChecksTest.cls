@@ -408,7 +408,7 @@ private class HealthCheckGivingChecksTest {
                     'receipt_generation_failed'
                 );
                 String expected = String.format(
-                    Label.Giving_HealthCheck_ReceiptFailedMoreThan,
+                    Label.Core_HealthCheck_OrphansMoreThan,
                     new List<Object>{ (1000).format() }
                 );
                 System.assert(

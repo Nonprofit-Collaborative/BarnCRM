@@ -193,14 +193,6 @@
         <value>the gift entered the books dated {0}</value>
     </labels>
     <labels>
-        <fullName>Giving_Posting_OverrideDeleted</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Posting lock override: gift deleted</shortDescription>
-        <value>the gift was deleted</value>
-    </labels>
-    <labels>
         <fullName>Giving_Posting_OverrideDonorDeleted</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

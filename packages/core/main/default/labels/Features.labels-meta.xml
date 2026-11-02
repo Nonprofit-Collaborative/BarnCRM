@@ -17,14 +17,6 @@
         <value>Import, find, update and delete records in bulk, all from Data Manager.</value>
     </labels>
     <labels>
-        <fullName>Core_Feature_DuplicateReview_Name</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Name of the Duplicate Matching feature in Settings, General.</shortDescription>
-        <value>Duplicate Matching</value>
-    </labels>
-    <labels>
         <fullName>Core_Feature_DuplicateReview_Description</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -183,14 +175,6 @@
         <protected>false</protected>
         <shortDescription>Added to the confirmation before Household Upkeep is turned on.</shortDescription>
         <value>It adds the Households tab. Create households with New Household on BarnCRM Home, not the standard New button.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Feature_Cancel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Cancel button of the confirmation before a feature is turned on.</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Core_Feature_TurnedOn</fullName>

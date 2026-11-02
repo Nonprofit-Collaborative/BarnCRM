@@ -169,38 +169,6 @@
     <value>Start From a Template</value>
   </labels>
   <labels>
-    <fullName>Giving_Segments_TemplateField</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: label of the template choice</shortDescription>
-    <value>Template</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_RecordsField</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: label of the people or organizations choice</shortDescription>
-    <value>Records</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_People</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: the people choice</shortDescription>
-    <value>People</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_Organizations</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: the organizations choice</shortDescription>
-    <value>Organizations</value>
-  </labels>
-  <labels>
     <fullName>Giving_Segments_NameField</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>
@@ -247,14 +215,6 @@
     <protected>false</protected>
     <shortDescription>Segments: shown when there are no segments yet</shortDescription>
     <value>No segments yet. Save one from a template above, or save a Find query of people or organizations.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_OptionMine</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: a segment name; {0} is the name, {1} People or Organizations</shortDescription>
-    <value>{0} ({1})</value>
   </labels>
   <labels>
     <fullName>Giving_Segments_OptionShared</fullName>
@@ -329,28 +289,12 @@
     <value>All Columns</value>
   </labels>
   <labels>
-    <fullName>Giving_Segments_Export</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: button that exports the segment</shortDescription>
-    <value>Export</value>
-  </labels>
-  <labels>
     <fullName>Giving_Segments_Exporting</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Segments: progress; {0} is the rows read so far</shortDescription>
     <value>Exporting: {0} rows read.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_Exported</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: export done; {0} is the rows written</shortDescription>
-    <value>Exported {0} rows.</value>
   </labels>
   <labels>
     <fullName>Giving_Segments_ExportedDuplicates</fullName>

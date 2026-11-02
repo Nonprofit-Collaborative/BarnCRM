@@ -18,8 +18,8 @@ import COUNT_NONE from '@salesforce/label/c.Core_RollupBuilder_InstantCountNone'
 import TURN_ON from '@salesforce/label/c.Core_RollupBuilder_InstantTurnOn';
 import TURN_OFF from '@salesforce/label/c.Core_RollupBuilder_InstantTurnOff';
 import REMOVE from '@salesforce/label/c.Core_RollupBuilder_InstantRemove';
-import CLOSE from '@salesforce/label/c.Core_RollupBuilder_InstantClose';
-import COPY from '@salesforce/label/c.Core_RollupBuilder_InstantCopy';
+import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
+import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
 import COPIED from '@salesforce/label/c.Core_RollupBuilder_InstantCopied';
 import COPY_FAILED from '@salesforce/label/c.Core_RollupBuilder_InstantCopyFailed';
 import DOWNLOAD_DEPLOY from '@salesforce/label/c.Core_RollupBuilder_InstantDownloadDeploy';

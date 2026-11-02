@@ -265,36 +265,12 @@
     <value>Close Ask</value>
   </labels>
   <labels>
-    <fullName>Giving_AskPipeline_CardActions</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Ask Pipeline: card menu name for screen readers ({0} is the ask)</shortDescription>
-    <value>Actions for {0}</value>
-  </labels>
-  <labels>
     <fullName>Giving_AskPipeline_ColAsk</fullName>
     <categories>Giving, Asks</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Ask Pipeline list: ask number column</shortDescription>
     <value>Ask</value>
-  </labels>
-  <labels>
-    <fullName>Giving_AskPipeline_ColDonor</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Ask Pipeline list: donor column</shortDescription>
-    <value>Donor</value>
-  </labels>
-  <labels>
-    <fullName>Giving_AskPipeline_ColStage</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Ask Pipeline list: stage column</shortDescription>
-    <value>Stage</value>
   </labels>
   <labels>
     <fullName>Giving_AskPipeline_ColAmount</fullName>
@@ -413,7 +389,7 @@
     <categories>Giving, Asks</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Close Ask: gift amount field</shortDescription>
+    <shortDescription>Giving: gift amount field</shortDescription>
     <value>Amount</value>
   </labels>
   <labels>
@@ -465,14 +441,6 @@
     <value>Number of Payments</value>
   </labels>
   <labels>
-    <fullName>Giving_AskPipeline_FieldLinkGift</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Close Ask: gift picker</shortDescription>
-    <value>Gift</value>
-  </labels>
-  <labels>
     <fullName>Giving_AskPipeline_FieldLinkPledge</fullName>
     <categories>Giving, Asks</categories>
     <language>en_US</language>
@@ -503,22 +471,6 @@
     <protected>false</protected>
     <shortDescription>Close Ask: help for the next ask date</shortDescription>
     <value>When to ask this donor again. Optional.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_AskPipeline_Save</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Close Ask: save button</shortDescription>
-    <value>Save</value>
-  </labels>
-  <labels>
-    <fullName>Giving_AskPipeline_Cancel</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Close Ask: cancel button</shortDescription>
-    <value>Cancel</value>
   </labels>
   <labels>
     <fullName>Giving_AskPipeline_Closed</fullName>

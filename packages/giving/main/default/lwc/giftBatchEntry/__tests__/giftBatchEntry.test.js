@@ -107,8 +107,8 @@ describe('c-gift-batch-entry', () => {
     const element = await build(view({ lines: [line('a0C1', 100), line('a0C2', 25)] }));
 
     const amounts = field(element, 'amount');
-    expect(amounts[0].label).toBe('c.Giving_GiftBatch_ColumnAmount, line 1');
-    expect(amounts[1].label).toBe('c.Giving_GiftBatch_ColumnAmount, line 2');
+    expect(amounts[0].label).toBe('c.Giving_AskPipeline_FieldAmount, line 1');
+    expect(amounts[1].label).toBe('c.Giving_AskPipeline_FieldAmount, line 2');
     expect(field(element, 'fundId')[1].label).toBe('c.Giving_GiftBatch_ColumnFund, line 2');
     expect(all(element, 'donor')[1].label).toBe('c.Giving_GiftBatch_ColumnDonor, line 2');
     expect(all(element, 'kind')[0].label).toBe('c.Giving_GiftBatch_DonorKind, line 1');
@@ -123,7 +123,7 @@ describe('c-gift-batch-entry', () => {
     all(element, 'remove')[0].click();
     await settle();
 
-    expect(field(element, 'amount')[0].label).toBe('c.Giving_GiftBatch_ColumnAmount, line 1');
+    expect(field(element, 'amount')[0].label).toBe('c.Giving_AskPipeline_FieldAmount, line 1');
     expect(all(element, 'remove')[0].alternativeText).toBe('Remove line 1');
   });
 

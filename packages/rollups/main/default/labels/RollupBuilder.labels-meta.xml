@@ -185,44 +185,12 @@
         <value>Rollup saved. BarnCRM Rollup Builder is turned off on Modules, so it is calculated once you turn it on.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_AddCondition</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter builder button that adds a condition row.</shortDescription>
-        <value>Add Condition</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_Field</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter builder label for the field of a condition.</shortDescription>
-        <value>Field</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupFilter_Operator</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Filter builder label for the comparison of a condition.</shortDescription>
         <value>Comparison</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_Value</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter builder label for the value of a condition.</shortDescription>
-        <value>Value</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_Remove</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter builder remove button text. {0} is the condition number.</shortDescription>
-        <value>Remove condition {0}</value>
     </labels>
     <labels>
         <fullName>Core_RollupFilter_Logic</fullName>
@@ -289,22 +257,6 @@
         <value>not</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_True</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Checked value of a checkbox in a filter condition.</shortDescription>
-        <value>True</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_False</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Unchecked value of a checkbox in a filter condition.</shortDescription>
-        <value>False</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupFilter_ErrorIncomplete</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -335,86 +287,6 @@
         <protected>false</protected>
         <shortDescription>Filter comparison: not equals.</shortDescription>
         <value>is not</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpLessThan</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: less than.</shortDescription>
-        <value>is less than</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpLessOrEqual</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: less than or equal.</shortDescription>
-        <value>is at most</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpGreaterThan</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: greater than.</shortDescription>
-        <value>is greater than</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpGreaterOrEqual</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: greater than or equal.</shortDescription>
-        <value>is at least</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpContains</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: contains.</shortDescription>
-        <value>contains</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpDoesNotContain</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: does not contain.</shortDescription>
-        <value>does not contain</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpStartsWith</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: starts with.</shortDescription>
-        <value>starts with</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpIsNull</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: is null.</shortDescription>
-        <value>is blank</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpIsNotNull</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: is not null.</shortDescription>
-        <value>is not blank</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpIn</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: in a list.</shortDescription>
-        <value>is one of</value>
     </labels>
     <labels>
         <fullName>Core_RollupFilter_OpNotIn</fullName>
@@ -681,28 +553,12 @@
         <value>This field is a number, not a currency, so the total is shown in the corporate currency.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Filter</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 4 label: the conditions on the counted records.</shortDescription>
-        <value>Conditions</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_TargetFilter</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Step 4 label: the conditions on the records that show the total.</shortDescription>
         <value>Only for some records</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Name</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 5 label: the rollup's name.</shortDescription>
-        <value>Name</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Description</fullName>
@@ -737,52 +593,12 @@
         <value>{0} of {1}, shown in {2}.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Back</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup Builder button: previous step.</shortDescription>
-        <value>Back</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Next</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup Builder button: next step.</shortDescription>
-        <value>Next</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Cancel</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup Builder button: leave without saving.</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Save</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup Builder button: save.</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_SaveAndCalculate</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Rollup Builder button: save and start the recalculation.</shortDescription>
         <value>Save and Calculate Now</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Title</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Title of the Rollup Builder page.</shortDescription>
-        <value>Rollup Builder</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_New</fullName>
@@ -793,36 +609,12 @@
         <value>New Rollup</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Edit</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Row button: edit this rollup in the Builder.</shortDescription>
-        <value>Edit</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_Copy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Row button: copy this rollup in the Builder.</shortDescription>
         <value>Copy</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_CopyOf</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Name of a copied rollup. {0} is the original name.</shortDescription>
-        <value>Copy of {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Open</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Link from the Rollups settings page to the Builder.</shortDescription>
-        <value>Open the Rollup Builder</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_PreviewRecord</fullName>
@@ -921,14 +713,6 @@
         <value>One recalculation of every total is set for the next {0}.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_AttentionTitle</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: section title</shortDescription>
-        <value>Needs Attention</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_Waiting</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -959,14 +743,6 @@
         <protected>false</protected>
         <shortDescription>Needs attention: no failed records</shortDescription>
         <value>Every total was saved.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ColumnRecord</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: record column</shortDescription>
-        <value>Record</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ColumnError</fullName>
@@ -1057,30 +833,6 @@
         <value>Started. The waiting totals are recalculated in the background, usually within a minute. Refresh to see what is left.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Delete</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Row button: delete this rollup</shortDescription>
-        <value>Delete</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DeleteTitle</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Delete confirmation: heading</shortDescription>
-        <value>Delete Rollup</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DeleteConfirm</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Delete confirmation: what happens; {0} is the rollup name</shortDescription>
-        <value>Delete {0}? The values it already wrote stay on the records, but nothing updates them again. This cannot be undone.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_DeleteShipped</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -1129,14 +881,6 @@
         <value>Import from a file</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ImportColumn</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import table column: what happens to each rollup</shortDescription>
-        <value>What Happens</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_ImportApply</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -1167,22 +911,6 @@
         <protected>false</protected>
         <shortDescription>Import preview: the rollup replaces the one with the same key</shortDescription>
         <value>Will replace the rollup here with the same Definition Key</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ImportCreated</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import result: created</shortDescription>
-        <value>Created</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ImportUpdated</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import result: updated</shortDescription>
-        <value>Updated</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ImportRefused</fullName>

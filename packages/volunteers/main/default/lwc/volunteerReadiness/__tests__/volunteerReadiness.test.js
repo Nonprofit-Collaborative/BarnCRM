@@ -164,7 +164,7 @@ describe('c-volunteer-readiness', () => {
     await flush();
 
     const button = element.shadowRoot.querySelector('lightning-button-icon.refresh');
-    expect(button.alternativeText).toBe('c.Volunteers_Readiness_Refresh');
+    expect(button.alternativeText).toBe('c.Core_OrgOptimizer_Refresh');
     button.click();
 
     expect(refreshApex).toHaveBeenCalled();

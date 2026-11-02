@@ -384,11 +384,7 @@ public with sharing class DuplicateController {
             RecordView view = recordView(person.Id, person.Name, detail, false);
             addFields(view, person, personFields);
             view.fields.add(
-                fieldView(
-                    'Account.Name',
-                    System.Label.Core_Duplicates_ObjectHousehold,
-                    householdName
-                )
+                fieldView('Account.Name', System.Label.Core_Section_Household, householdName)
             );
             result.put(person.Id, view);
         }

@@ -185,14 +185,6 @@
         <value>How much is going back</value>
     </labels>
     <labels>
-        <fullName>Giving_RefundGift_Cancel</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Refund screen: cancel button</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Giving_RefundGift_Confirm</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

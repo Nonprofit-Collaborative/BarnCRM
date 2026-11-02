@@ -29,7 +29,7 @@
         <categories>Core, UX kit</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Step flow: button that returns to the previous step</shortDescription>
+        <shortDescription>Shared: button that returns to the previous step</shortDescription>
         <value>Back</value>
     </labels>
     <labels>
@@ -45,7 +45,7 @@
         <categories>Core, UX kit</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Save bar: button that saves the unsaved changes</shortDescription>
+        <shortDescription>Shared: button that saves a form or the unsaved changes</shortDescription>
         <value>Save</value>
     </labels>
     <labels>

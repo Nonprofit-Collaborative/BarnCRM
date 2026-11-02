@@ -12,9 +12,13 @@ jest.mock(
   () => ({ default: 'Active users who have not logged in for {0} days' }),
   { virtual: true }
 );
-jest.mock('@salesforce/label/c.Core_OrgOptimizer_MoreThan', () => ({ default: 'More than {0}' }), {
-  virtual: true
-});
+jest.mock(
+  '@salesforce/label/c.Core_HealthCheck_OrphansMoreThan',
+  () => ({ default: 'More than {0}' }),
+  {
+    virtual: true
+  }
+);
 jest.mock(
   '@salesforce/label/c.Core_OrgOptimizer_CouldNotCheck',
   () => ({ default: 'Could not check' }),

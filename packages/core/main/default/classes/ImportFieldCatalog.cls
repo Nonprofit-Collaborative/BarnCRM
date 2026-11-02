@@ -91,7 +91,7 @@ public with sharing class ImportFieldCatalog {
             target('Contact1.FirstName', person, Label.Core_Import_TargetAttributeFirstName),
             target('Contact1.LastName', person, Label.Core_Import_TargetAttributeLastName),
             target('Contact1.FullName', person, Label.Core_Import_TargetAttributeFullName),
-            target('Contact1.Email', person, Label.Core_Import_TargetAttributeEmail),
+            target('Contact1.Email', person, Label.Core_DuplicateManagement_SharedEmail),
             target('Contact1.Phone', person, Label.Core_Import_TargetAttributePhone),
             target('Contact1.Title', person, Label.Core_Import_TargetAttributeJobTitle),
             target('Contact1.MailingStreet', person, Label.Core_Import_TargetAttributeStreet),
@@ -100,13 +100,13 @@ public with sharing class ImportFieldCatalog {
             target(
                 'Contact1.MailingPostalCode',
                 person,
-                Label.Core_Import_TargetAttributePostalCode
+                Label.Core_DuplicateManagement_SharedPostalCode
             ),
             target('Contact1.MailingCountry', person, Label.Core_Import_TargetAttributeCountry),
             target('Contact2.FirstName', second, Label.Core_Import_TargetAttributeFirstName),
             target('Contact2.LastName', second, Label.Core_Import_TargetAttributeLastName),
             target('Contact2.FullName', second, Label.Core_Import_TargetAttributeFullName),
-            target('Contact2.Email', second, Label.Core_Import_TargetAttributeEmail),
+            target('Contact2.Email', second, Label.Core_DuplicateManagement_SharedEmail),
             target('Contact2.Phone', second, Label.Core_Import_TargetAttributePhone),
             target('Household.Name', household, Label.Core_Import_TargetAttributeName),
             target('Organization.Name', organization, Label.Core_Import_TargetAttributeName),
@@ -126,7 +126,7 @@ public with sharing class ImportFieldCatalog {
             target(
                 'Organization.BillingPostalCode',
                 organization,
-                Label.Core_Import_TargetAttributePostalCode
+                Label.Core_DuplicateManagement_SharedPostalCode
             ),
             target(
                 'Organization.BillingCountry',

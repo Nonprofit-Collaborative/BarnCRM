@@ -318,7 +318,7 @@ public with sharing class AcknowledgmentController {
             ours,
             context,
             recordId,
-            Label.Giving_Acknowledgment_UnexpectedError
+            Label.Giving_Stewardship_ErrorActionFailed
         );
     }
 }

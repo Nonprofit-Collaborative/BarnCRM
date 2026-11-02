@@ -97,14 +97,6 @@
         <value>not confirmed yet</value>
     </labels>
     <labels>
-        <fullName>Core_Console_TabLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Console tab name; {0} the page, {1} what it shows</shortDescription>
-        <value>{0}: {1}</value>
-    </labels>
-    <labels>
         <fullName>Core_ErrorLog_ActionFailed</fullName>
         <categories>Core, Error Log</categories>
         <language>en_US</language>
@@ -231,14 +223,6 @@
         <value>No settings match that search. Try a shorter word, for example greeting.</value>
     </labels>
     <labels>
-        <fullName>Core_SettingsSearch_Placeholder</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings search: the placeholder inside the search box</shortDescription>
-        <value>Search settings</value>
-    </labels>
-    <labels>
         <fullName>Core_UnexpectedError</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -253,5 +237,101 @@
         <protected>true</protected>
         <shortDescription>Settings search: heading above the result list</shortDescription>
         <value>Search Results</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Actions</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: column of buttons or actions</shortDescription>
+        <value>Actions</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Description</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: description field</shortDescription>
+        <value>Description</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_MoveDown</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: button that moves an item one place later</shortDescription>
+        <value>Move Down</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Saved</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: announced after a save</shortDescription>
+        <value>Saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_StartDate</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: start date field or column</shortDescription>
+        <value>Start Date</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_EndDate</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: end date field or column</shortDescription>
+        <value>End Date</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Period</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: a reporting period, picker or column</shortDescription>
+        <value>Period</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Stage</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: stage picker or column</shortDescription>
+        <value>Stage</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Generate</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: button that generates letters or statements</shortDescription>
+        <value>Generate</value>
+    </labels>
+    <labels>
+        <fullName>Core_Format_Parenthetical</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared format: {0} a value, {1} a detail shown in parentheses after it</shortDescription>
+        <value>{0} ({1})</value>
+    </labels>
+    <labels>
+        <fullName>Core_Format_Pair</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared format: {0} a name, {1} what belongs to it, after a colon</shortDescription>
+        <value>{0}: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Format_PairSentence</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared format: {0} a name, {1} what belongs to it, as a sentence</shortDescription>
+        <value>{0}: {1}.</value>
     </labels>
 </CustomLabels>

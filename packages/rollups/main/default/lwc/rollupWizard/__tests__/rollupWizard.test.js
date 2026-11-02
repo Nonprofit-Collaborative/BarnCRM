@@ -82,7 +82,7 @@ jest.mock('@salesforce/label/c.Core_RollupEase_EveryRecord', () => ({ default: '
 jest.mock('@salesforce/label/c.Core_RollupEase_SomeRecords', () => ({ default: '{0} rules' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_RollupEase_TargetPart', () => ({ default: '{0}: {1}' }), {
+jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }), {
   virtual: true
 });
 jest.mock(

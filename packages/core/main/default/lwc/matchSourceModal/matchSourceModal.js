@@ -9,7 +9,7 @@ import POSTAL_FIELD from '@salesforce/label/c.Core_MatchLogic_PostalField';
 import PARENT_FIELD from '@salesforce/label/c.Core_MatchLogic_ParentField';
 import COMPARE from '@salesforce/label/c.Core_MatchLogic_Compare';
 import FIND_FIELDS from '@salesforce/label/c.Core_MatchLogic_FindFields';
-import SAVE from '@salesforce/label/c.Core_CmdtManager_SaveButton';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
 import LOAD_ERROR from '@salesforce/label/c.Core_CmdtManager_LoadError';

@@ -254,7 +254,7 @@ public with sharing class AddressMoveController {
         }
         if (fields.containsKey('Email') && String.isNotBlank(detail.Email)) {
             return String.format(
-                System.Label.Core_Address_SameNameEmail,
+                System.Label.Core_Format_Parenthetical,
                 new List<Object>{ name, detail.Email }
             );
         }
