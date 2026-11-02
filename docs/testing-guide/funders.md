@@ -1,6 +1,6 @@
 # Funders
 
-Scripts for the funder pipeline (F-01) and reporting requirements with reminders (F-02). Setup detail: [Funders](../admin-guide/funders.md).
+Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02) and government award fields (F-04). Setup detail: [Funders](../admin-guide/funders.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder,
 Giving and Funders deployed. Programs is optional; T-FUN-04 needs it for its second half. Funders
@@ -140,3 +140,19 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 6 | Load sample data. | The **Youth Programs Award** has three requirements: Site visit (Accepted), Quarter 1 financial report (In Progress, due in 10 days), Interim narrative report (Not Started). |
 
 **Cleanup:** Remove sample data; delete the test grants as the admin.
+
+## T-FUN-12: Government Award Fields
+
+**Purpose:** confirm the government award fields and their checks (F-04, R-GN8).
+**Prerequisites:** staff and read-only; a grant `Youth Grant` to `Lakeside Foundation`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff, open `Youth Grant` and click **Edit**. | A **Government Award** section with Assistance Listing Number, Award Number, Federal Agency, Indirect Cost Rate and Match Required; **Funding Source** in the first section. |
+| 2 | Set **Funding Source** to `Federal Pass-Through`, **Assistance Listing Number** `84.287`, **Award Number** `S287C250001`, **Federal Agency** `Department of Education`, **Indirect Cost Rate** `15`, **Match Required** `5000`; **Save**. | Saved; the values show as typed, the rate as `15.00%`. |
+| 3 | Change **Assistance Listing Number** to `84287` and **Save**. | Refused: `Assistance Listing Number must be two digits, a point and three digits or capital letters, for example 84.287.` |
+| 4 | Set it back to `84.287`, set **Indirect Cost Rate** to `120` and **Save**. | Refused: `Indirect Cost Rate must be from 0 to 100.` |
+| 5 | Set the rate to `15` and **Match Required** to `-1`; **Save**. | Refused: `Match Required can't be negative.` |
+| 6 | As read-only, open `Youth Grant`. | The Government Award section shows the values; nothing can be edited. |
+
+**Cleanup:** none.

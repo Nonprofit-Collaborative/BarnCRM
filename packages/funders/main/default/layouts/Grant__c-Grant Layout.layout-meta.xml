@@ -41,6 +41,10 @@
         <behavior>Edit</behavior>
         <field>Amount_Awarded__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Funding_Source__c</field>
+      </layoutItems>
     </layoutColumns>
   </layoutSections>
   <layoutSections>
@@ -71,6 +75,37 @@
       <layoutItems>
         <behavior>Edit</behavior>
         <field>Award_End_Date__c</field>
+      </layoutItems>
+    </layoutColumns>
+  </layoutSections>
+  <layoutSections>
+    <customLabel>true</customLabel>
+    <detailHeading>true</detailHeading>
+    <editHeading>true</editHeading>
+    <label>Government Award</label>
+    <style>TwoColumnsTopToBottom</style>
+    <layoutColumns>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Assistance_Listing_Number__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Award_Number__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Federal_Agency__c</field>
+      </layoutItems>
+    </layoutColumns>
+    <layoutColumns>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Indirect_Cost_Rate__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Match_Required__c</field>
       </layoutItems>
     </layoutColumns>
   </layoutSections>

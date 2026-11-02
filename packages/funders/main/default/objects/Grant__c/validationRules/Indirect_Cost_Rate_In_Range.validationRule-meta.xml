@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Indirect_Cost_Rate_In_Range</fullName>
+  <active>true</active>
+  <description>R-GN8: Indirect Cost Rate is from 0 to 100.</description>
+  <errorConditionFormula>
+OR(
+  Indirect_Cost_Rate__c &lt; 0,
+  Indirect_Cost_Rate__c &gt; 1
+)
+  </errorConditionFormula>
+  <errorDisplayField>Indirect_Cost_Rate__c</errorDisplayField>
+  <errorMessage>Indirect Cost Rate must be from 0 to 100.</errorMessage>
+</ValidationRule>

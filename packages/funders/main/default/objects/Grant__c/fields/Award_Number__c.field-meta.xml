@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Award_Number__c</fullName>
+  <length>50</length>
+  <required>false</required>
+  <externalId>false</externalId>
+  <inlineHelpText>The funder's number for the award: the FAIN on a direct federal award, the subaward number from a pass-through.</inlineHelpText>
+  <label>Award Number</label>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+</CustomField>

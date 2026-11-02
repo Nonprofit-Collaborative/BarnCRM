@@ -55,7 +55,17 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Grant__c.Assistance_Listing_Number__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Grant__c.Award_End_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Grant__c.Award_Number__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -70,7 +80,27 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Grant__c.Federal_Agency__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Grant__c.Funder_Contact__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Grant__c.Funding_Source__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Grant__c.Indirect_Cost_Rate__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Grant__c.Match_Required__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

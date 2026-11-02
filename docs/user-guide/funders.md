@@ -109,6 +109,19 @@ You should see: `Marked submitted.` and the row leaves the list. The requirement
 **Status** yourself: **Accepted** when the funder approves it, **Waived** when the funder excuses
 it.
 
+## To Record a Government Award
+
+1. On the grant's page, click **Edit**.
+2. Set **Funding Source**, for example **Federal** or, for federal money passed on by a state
+   agency, **Federal Pass-Through** (the state agency is then the Funder).
+3. In the **Government Award** section, fill in what the award letter gives: **Assistance Listing
+   Number** (for example 84.287), **Award Number**, **Federal Agency**, **Indirect Cost Rate** and
+   **Match Required**. Leave any you do not have blank.
+4. Click **Save**.
+
+You should see: the values on the grant's page. An Assistance Listing Number not written like
+84.287, a rate above 100 or a negative match is refused with a message saying why.
+
 ## Tips
 
 - **Declined is history worth keeping.** Set Declined rather than deleting: it tells you whom to

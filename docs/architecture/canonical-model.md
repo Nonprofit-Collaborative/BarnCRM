@@ -10497,6 +10497,12 @@ add to this entity in release 0.17 and later (Section 30).
 | Next Step | text | no | The next thing to do on this request. |
 | Program | record identifier (text) | no | The program the grant pays for, when the Programs module is installed. A record identifier, not a reference: Funders never depends on Programs (R-GN4). |
 | Owner | reference(User) | yes | The staff member responsible (the record owner). Reminders fall back to the owner (R-GQ3). |
+| Funding Source | picklist(Foundation, Corporate, Federal, Federal Pass-Through, State, Local Government, Other) | no | What kind of funder it is (F-04). Federal Pass-Through: federal money passed on by another body, usually a state agency, which is then the Funder. The board dashboard's revenue mix groups awards by it (F-07). |
+| Assistance Listing Number | text | no | The federal Assistance Listing (formerly CFDA) number, two digits, a point and three characters, for example 84.287 (R-GN8). |
+| Award Number | text | no | The funder's number for the award: the Federal Award Identification Number (FAIN) for a direct federal award, the subaward number from a pass-through. |
+| Federal Agency | text | no | The federal agency the money comes from, also when it reaches the organization through a pass-through. |
+| Indirect Cost Rate | percent | no | The indirect (overhead) rate the award allows, from 0 to 100 (R-GN8). |
+| Match Required | currency | no | The cost share or match the award requires the organization to put in; blank when none (R-GN8). |
 
 ### Relationships
 
@@ -10534,6 +10540,12 @@ kept.
 Prospect, Letter of Inquiry or Invited to Apply whose Application Deadline has passed, so each is
 moved on or closed.
 
+**R-GN8 Government award values make sense (F-04).** An Assistance Listing Number is two digits, a
+point and three digits or capital letters; Indirect Cost Rate is from 0 to 100; Match Required is
+not negative (validation rules). The award fields apply to any grant: a state or foundation award
+can carry an award number and a match too. The period of performance is the award period (Award
+Start Date and Award End Date); drawdowns are received entries in the fund ledger (F-03).
+
 ### Salesforce implementation
 
 - **Object:** `Grant__c`, name field Text, label Grant Name, sharing Public Read/Write, field
@@ -10555,8 +10567,16 @@ moved on or closed.
 | Next Step | `Next_Step__c` | Text(255) |
 | Program | `Program_Id__c` | Text(18) |
 | Sample Data | `Sample_Data__c` | Checkbox, default false |
+| Funding Source | `Funding_Source__c` | Picklist (restricted): Foundation, Corporate, Federal, Federal Pass-Through, State, Local Government, Other; no default |
+| Assistance Listing Number | `Assistance_Listing_Number__c` | Text(6) |
+| Award Number | `Award_Number__c` | Text(50) |
+| Federal Agency | `Federal_Agency__c` | Text(255) |
+| Indirect Cost Rate | `Indirect_Cost_Rate__c` | Percent(5, 2) |
+| Match Required | `Match_Required__c` | Currency(16, 2) |
 
-- **Validation rules:** `Amounts_Not_Negative`, `Award_End_After_Start` (R-GN2).
+- **Validation rules:** `Amounts_Not_Negative`, `Award_End_After_Start` (R-GN2);
+  `Assistance_Listing_Format`, `Indirect_Cost_Rate_In_Range`, `Match_Not_Negative` (R-GN8). The
+  government award fields sit in a Government Award section of the page layout.
 - **Trigger:** `GrantTrigger`, through the Core dispatcher; handlers `GrantRulesHandler` (R-GN4,
   always runs) and `GrantDatesHandler` (R-GN3, switchable).
 - **Service:** `GrantService` (stages, the program rule, the stage dates), `GrantPipelineController`
@@ -10691,7 +10711,7 @@ that builds it, before its metadata is created.
 |---|---|---|---|
 | Receipt | Giving | v0.4 (G-13) | Section 4.11, ADR-0010 |
 | Donor Level | Giving | v0.4 (G-14) | Section 5.2 |
-| Funders entities still to come (fund ledger F-03, government award fields F-04, award schedules F-05, answer library F-14) | Funders | releases 0.16 and 0.17 | Section 5.5 |
+| Funders entities still to come (fund ledger F-03, award schedules F-05, answer library F-14) | Funders | releases 0.16 and 0.17 | Section 5.5 |
 | Mirror adapter entities and mirror mappings | Mirror | v0.6 onward | Section 4.12 |
 
 Receipt left this table in v0.4 and is specified in Sections 25B to 25E, together with
@@ -10994,6 +11014,7 @@ mirrors the primary member).
 | 0.14 | 2026-10-31 | Programs P-05. The Programs Dashboard (29ZA, "Program dashboard") and the person card's last service date and services attended. No object or field added. |
 | 0.14 | 2026-10-31 | Programs P-06. The `program_roster` import template (29ZA, "Roster import"), an upload of several objects (Enrollment inserted, Program found by name). The volunteer hours template (29V) moves to the same form, its job found by name as a Volunteer Job step. No object or field added. |
 | 0.16 | 2026-11-02 | Funders F-01 and F-02 (ADR-NEXT `NEXT-funders-module.md`). New Sections 29ZH Grant (`Grant__c`), 29ZI Grant Requirement (`Grant_Requirement__c`, a detail of the grant) and 29ZJ Funders Settings (`Funders_Settings__c`), rules R-GN1 to R-GN7, R-GQ1 to R-GQ5 and R-FS1. Section 30's funder pipeline row narrows to the entities still to come. |
+| 0.16 | 2026-11-02 | Funders F-04. `Grant__c` (29ZH) gains Funding Source (`Funding_Source__c`), Assistance Listing Number (`Assistance_Listing_Number__c`), Award Number (`Award_Number__c`), Federal Agency (`Federal_Agency__c`), Indirect Cost Rate (`Indirect_Cost_Rate__c`) and Match Required (`Match_Required__c`), with rule R-GN8. The period of performance is the existing award period; drawdowns are F-03's. |
 
 ---
 ## 32. Entity ownership by package
