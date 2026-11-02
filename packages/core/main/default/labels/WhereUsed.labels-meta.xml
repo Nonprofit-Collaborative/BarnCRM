@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_WhereUsed_ErrorNoPermission</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used error when the person lacks Manage BarnCRM Settings.</shortDescription>
+        <value>You need the Manage BarnCRM Settings permission to see where a field is used.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_ErrorNoObject</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used error. {0} is the object API name asked about.</shortDescription>
+        <value>BarnCRM can't find the object {0} in this org.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_ErrorNoField</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used error. {0} is the field API name, {1} the object label.</shortDescription>
+        <value>BarnCRM can't find the field {0} on {1}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_KindSavedQuery</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used group heading for saved Find queries.</shortDescription>
+        <value>Saved Find Queries</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_KindSavedTransform</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used group heading for saved Super Transform step lists.</shortDescription>
+        <value>Super Transform Step Lists</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_KindImportMapping</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used group heading for import mappings (templates).</shortDescription>
+        <value>Import Mappings</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_KindMergeRule</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used group heading for merge rules.</shortDescription>
+        <value>Merge Rules</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_KindMatchSource</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used group heading for duplicate matching sources.</shortDescription>
+        <value>Matching Sources</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_KindSetting</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used group heading for BarnCRM settings that name fields.</shortDescription>
+        <value>BarnCRM Settings</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartObject</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: the setup record works on this whole object.</shortDescription>
+        <value>Works on this object</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartColumns</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: a saved query shows the field as a column.</shortDescription>
+        <value>Columns</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartFilter</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: a filter condition names the field.</shortDescription>
+        <value>Filter</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartSort</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: a saved query sorts by the field.</shortDescription>
+        <value>Sort</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartRelated</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: a related-records condition of a saved query names it.</shortDescription>
+        <value>Related records condition</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartChildren</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: a related record column of a saved query names it.</shortDescription>
+        <value>Related record columns</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartSummary</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: a saved query's summary names the field.</shortDescription>
+        <value>Summary</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartChanges</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: a Super Transform change reads or writes the field.</shortDescription>
+        <value>Changes</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartMatchingField</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: an import mapping matches records on the field.</shortDescription>
+        <value>Matching field</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartRelatedParent</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: an import mapping links related records through the field.</shortDescription>
+        <value>Related records link</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartColumn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: an import column loads the field. {0} is the file column heading.</shortDescription>
+        <value>Column "{0}"</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartDefault</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: an import mapping sets a default value for the field.</shortDescription>
+        <value>Default value</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartField</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: the rule, source or setting names the field.</shortDescription>
+        <value>Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PrivateQuery</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name shown for a private saved query. {0} is the owner's name.</shortDescription>
+        <value>A private saved query owned by {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_BreaksSavedQuery</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What breaks for a saved query when the field is deleted.</shortDescription>
+        <value>Find refuses to run this query, and anything built on it, such as a segment, can't be counted or exported until it is edited.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_BreaksSavedTransform</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What breaks for a Super Transform step list when the field is deleted.</shortDescription>
+        <value>This step list can't be run until the step or filter that names the field is changed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_BreaksImportMapping</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What breaks for an import mapping when the field is deleted.</shortDescription>
+        <value>Imports that use this mapping fail on this column or matching field until the mapping is edited.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_BreaksMergeRule</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What breaks for a merge rule when the field is deleted.</shortDescription>
+        <value>Auto-merge can't apply this rule until the rule is deleted in Duplicate Matching.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_BreaksMatchSource</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What breaks for a matching source when the field is deleted.</shortDescription>
+        <value>Duplicate matching can't read this source until it is edited or turned off.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_BreaksSetting</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What breaks for a setting that lists the field when it is deleted.</shortDescription>
+        <value>The setting skips the missing field; remove it from the list to keep the setting tidy.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_Action</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Row action and button that opens Where Used for a field.</shortDescription>
+        <value>Where Used</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_ActionAlt</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used button text for a screen reader. {0} is the field label.</shortDescription>
+        <value>Where Used: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_Title</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used window title. {0} is the field and object, or the object.</shortDescription>
+        <value>Where Used: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_Loading</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used spinner text while it checks.</shortDescription>
+        <value>Checking BarnCRM setup</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_NotChecked</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used note on what it does not check; a Setup link follows.</shortDescription>
+        <value>BarnCRM checks its own setup only. Flows, Apex code, page layouts, reports, list views, validation rules and formula fields are not checked: in Setup, use Where is this used? on the field for those.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_OpenSetup</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Link to the field or object page in Setup.</shortDescription>
+        <value>Open in Setup</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_Incomplete</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used warning when a module's records could not be checked.</shortDescription>
+        <value>Some module setup could not be checked. The Error Log has the details; check that module's setup by hand before you delete the field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_None</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used result when nothing names the field.</shortDescription>
+        <value>No BarnCRM setup uses this field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_NoneObject</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used result when nothing works on the object.</shortDescription>
+        <value>No BarnCRM setup uses this object.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_Count</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used count. {0} is the number of setup records, more than one.</shortDescription>
+        <value>{0} BarnCRM setup records use it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_CountOne</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used count for exactly one setup record.</shortDescription>
+        <value>1 BarnCRM setup record uses it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_NamedIn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where in a setup record the field is named. {0} is a list of parts.</shortDescription>
+        <value>Named in: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_Breaks</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What stops working if the field is deleted. {0} is the explanation.</shortDescription>
+        <value>If deleted: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_ShowObject</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that switches Where Used to the whole object.</shortDescription>
+        <value>Show Uses of the Whole Object</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_ShowField</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that switches Where Used back to the one field.</shortDescription>
+        <value>Show Uses of This Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_RetireTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading of the Retire a Field checklist.</shortDescription>
+        <value>Retire a Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_RetireIntro</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Text above the Retire a Field checklist.</shortDescription>
+        <value>BarnCRM never deletes a field. Work down these steps to retire it safely; the ticks are only for you and are not saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_StepReferences</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Retire a Field step when BarnCRM setup uses the field.</shortDescription>
+        <value>Edit or remove each BarnCRM setup record listed above.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_StepNoReferences</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Retire a Field step when no BarnCRM setup uses the field.</shortDescription>
+        <value>No BarnCRM setup record needs changing.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_StepSalesforce</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Retire a Field step: check uses outside BarnCRM in Setup.</shortDescription>
+        <value>Check Salesforce's own uses: open the field in Setup and click Where is this used?</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_StepBackup</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Retire a Field step: export the field's values first.</shortDescription>
+        <value>Back up the values: open Find on this object, add the field as a column and export.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_StepHide</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Retire a Field step: hide the field for a while first.</shortDescription>
+        <value>Hide the field first: take it off page layouts and remove field access for a few weeks, to learn whether anyone misses it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_StepDelete</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Retire a Field step: delete the field in Setup.</shortDescription>
+        <value>Delete the field in Setup. Salesforce keeps it under Deleted Fields for 15 days.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_StepCannotDelete</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Retire a Field step for a field that cannot be deleted.</shortDescription>
+        <value>This field can't be deleted: it is a standard field or a managed package installed it. Keep it hidden instead.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_OpenFind</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Link that opens Find on the object.</shortDescription>
+        <value>Open in Find</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_Progress</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Retire a Field progress. {0} is steps ticked, {1} the number of steps.</shortDescription>
+        <value>{0} of {1} steps done</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_Close</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that closes the Where Used window.</shortDescription>
+        <value>Close</value>
+    </labels>
+</CustomLabels>
