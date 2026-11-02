@@ -78,6 +78,47 @@ public with sharing class ServiceDeliveryLogController {
         /** How many deliveries the last save wrote, 0 on a plain read. */
         @AuraEnabled
         public Integer saved = 0;
+        /** People counted without names for this service and day (P-12), all rows added up. */
+        @AuraEnabled
+        public Integer peopleCounted = 0;
+        /** Whether the user may add a count of people without names. */
+        @AuraEnabled
+        public Boolean canCount = false;
+        /** Whether the user may read counts at all. */
+        @AuraEnabled
+        public Boolean canSeeCounts = false;
+    }
+
+    /**
+     * Adds a count of people served without naming them (P-12) to this service and day, then
+     * returns the log as it now stands. Each call adds a row, so two counts in a day add up.
+     */
+    @AuraEnabled
+    public static Log addCount(Id programId, Id serviceId, Date deliveryDate, Integer people) {
+        if (
+            programId == null ||
+            serviceId == null ||
+            deliveryDate == null ||
+            people == null ||
+            people < 0
+        ) {
+            throw UserErrors.message(Label.Programs_Log_ActionFailed);
+        }
+        try {
+            Database.insert(
+                new Service_Count__c(
+                    Service__c = serviceId,
+                    Count_Date__c = deliveryDate,
+                    People_Served__c = people
+                ),
+                AccessLevel.USER_MODE
+            );
+            Log log = logFor(programId, serviceId, deliveryDate);
+            log.saved = 1;
+            return log;
+        } catch (Exception failure) {
+            throw report(failure, programId);
+        }
     }
 
     /**
@@ -235,6 +276,11 @@ public with sharing class ServiceDeliveryLogController {
         }
         if (log.serviceId == null) {
             return log;
+        }
+        log.canSeeCounts = Schema.SObjectType.Service_Count__c.isAccessible();
+        log.canCount = Schema.SObjectType.Service_Count__c.isCreateable();
+        if (log.canSeeCounts) {
+            log.peopleCounted = ServiceCountSelector.totalOn(log.serviceId, log.deliveryDate);
         }
 
         Map<Id, Service_Delivery__c> deliveryByPerson = new Map<Id, Service_Delivery__c>();

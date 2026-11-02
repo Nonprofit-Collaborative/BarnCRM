@@ -67,6 +67,8 @@
   <tabs>Enrollment__c</tabs>
   <tabs>Service_Delivery__c</tabs>
   <tabs>Case_Note__c</tabs>
+  <tabs>Referral__c</tabs>
+  <tabs>Service_Count__c</tabs>
   <tabs>standard-report</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
@@ -81,6 +83,12 @@
     </mappings>
     <mappings>
       <tab>Programs_Dashboard</tab>
+    </mappings>
+    <mappings>
+      <tab>Referral__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Service_Count__c</tab>
     </mappings>
     <mappings>
       <tab>Service_Delivery__c</tab>

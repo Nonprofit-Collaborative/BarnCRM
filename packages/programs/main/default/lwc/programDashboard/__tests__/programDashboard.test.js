@@ -18,6 +18,7 @@ const DASHBOARD = {
     newEnrollments: 3,
     completedEnrollments: 1,
     peopleServed: 9,
+    peopleCounted: 25,
     delivered: 30,
     deliveries: 40
   },
@@ -30,6 +31,7 @@ const DASHBOARD = {
       newEnrollments: 3,
       completedEnrollments: 1,
       peopleServed: 9,
+      peopleCounted: 25,
       delivered: 30,
       deliveries: 40
     },
@@ -92,11 +94,13 @@ describe('dashboardRows (framework free)', () => {
       'open',
       'new',
       'people',
+      'counted',
       'delivered',
       'rate'
     ]);
     expect(shown[0].value).toBe('2');
-    expect(shown[5].value).toBe('75%');
+    expect(shown[4].value).toBe('25');
+    expect(shown[6].value).toBe('75%');
     expect(tiles({ canSee: false }, labels)).toEqual([]);
 
     const rows = programRows(DASHBOARD, 'None');
@@ -121,8 +125,10 @@ describe('c-program-dashboard', () => {
 
     const args = getDashboard.mock.calls[0][0];
     expect(args.fromDate).toMatch(/^\d{4}-\d{2}-01$/);
-    expect(all(element, 'tile').length).toBe(6);
+    expect(all(element, 'tile').length).toBe(7);
     expect(one(element, 'rate').textContent).toBe('75%');
+    expect(one(element, 'counted').textContent).toBe('25');
+    expect(all(element, 'row-counted')[0].textContent).toBe('25');
     expect(all(element, 'program-row').length).toBe(2);
     expect(one(element, 'no-programs')).toBeNull();
   });

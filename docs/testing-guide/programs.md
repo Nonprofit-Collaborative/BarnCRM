@@ -227,7 +227,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As the admin, open the **BarnCRM Programs** app. | **Programs Dashboard** is the first tab. |
-| 2 | Open **Programs Dashboard**. | Period **This Month**; six tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Services Delivered, Attendance Rate) and a **By Program** table listing every Active program by name. |
+| 2 | Open **Programs Dashboard**. | Period **This Month**; seven tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Counted Without Names, Services Delivered, Attendance Rate) and a **By Program** table listing every Active program by name. |
 | 3 | Compare the program's row with its **Program Roster** panel and today's log. | Open Enrollments matches the roster's Applied plus Enrolled; Services Delivered counts the Present delivery only; Attendance Rate is 50%; People Served is 1. |
 | 4 | Pick **Last Year**. | The figures reload for last year; a program with no activity then shows 0 and "None yet" for the rate. |
 | 5 | Click a program's name. | The program opens. |
@@ -252,3 +252,61 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 6 | Undo the import. | Both enrollments are removed; the program stays. |
 
 **Cleanup:** none after the undo.
+
+## T-PRG-16: Count People Without Names
+
+**Purpose:** confirm a drop-in count is added from the Service Delivery Log, totals for the day, and shows on the dashboard apart from named people.
+**Prerequisites:** the admin user and the staff user; an Active program with an Active service and one enrolled test person with a Present delivery today (T-PRG-09).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, open the program. Under the log's rows, find **People counted without names for this service and day**. | It reads 0, with **People Served, Not Named** and a disabled **Add to the Count**. |
+| 2 | Enter 12 and click **Add to the Count**. | "Added 12 to the count." and the total reads 12. |
+| 3 | Enter 8 and click **Add to the Count**. | The total reads 20 (each click adds a row). |
+| 4 | Change the **Date** to yesterday. | The total reads 0. Change it back to today. |
+| 5 | Open the **Service Counts** tab. | Two rows for today (12 and 8) in **All Service Counts**; **This Week** lists them too. |
+| 6 | Edit one row to -3 and save. | Refused: People Served cannot be negative. |
+| 7 | Open the **Programs Dashboard**, period **This Month**. | **Counted Without Names** shows 20 (more if earlier counts exist this month); **People Served** is unchanged and counts only named people. The program's row shows the same 20 in its own column. |
+| 8 | As a Read Only user, open the program and the dashboard. | The log shows the total without the input and button; the dashboard shows the figure. |
+| 9 | As the admin, try to delete the service. | Refused: a service with counts is kept. |
+
+**Cleanup:** delete the two counts and the test delivery.
+
+## T-PRG-17: Referrals In and Out
+
+**Purpose:** confirm referrals record direction, status and outcome, are private, and are deleted when their person is erased.
+**Prerequisites:** the admin user and a staff user with the Programs Staff set; a test person enrolled in a program.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, open the enrollment and, in **Referrals**, click **New**. | The form shows **Direction** (Out by default), **Referral Date** (today), **Status** (Open) and **Outcome**. |
+| 2 | Save with neither **Contact** nor **Account**. | Refused: a referral is one person. |
+| 3 | Pick the test person's contact, **Other Organization** "Legal Aid Clinic", and save. | The referral is listed on the enrollment. |
+| 4 | Edit it: **Status** Closed, **Outcome** Service Received. | Saved. |
+| 5 | Open the **Referrals** tab, **Open Referrals**. | The closed referral is not listed; **All Referrals** lists it. |
+| 6 | Make a second referral as the admin, **Direction** In. As the staff user open **All Referrals**. | Only the staff user's own referral is listed. |
+| 7 | As a Read Only user, look for the **Referrals** tab. | Not available. |
+| 8 | As a staff user, try to delete a referral. | No Delete is offered. |
+| 9 | As the admin, erase the test person (see [Erase a Person](../admin-guide/erase-a-person.md)). | The erasure result lists the person's **Referrals** as deleted; the enrollment is kept. |
+
+**Cleanup:** delete the remaining test referrals and enrollment.
+
+## T-PRG-18: Eligibility Screening Rules
+
+**Purpose:** confirm rules are built and checked, the preview matches what screening saves, and a decision made by hand is not overwritten.
+**Prerequisites:** the admin user and a staff user; a program with three open enrollments whose **Referral Source** is Self, School and Other.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open the program. Find the **Eligibility Rules** panel. | It says there are no rules yet; **Add a Rule** is offered. |
+| 2 | Click **Add a Rule**. Condition: **Referral Source** equal to Self. **Result** Not Eligible, **Reason** "Self referral is not accepted", **Eligibility Basis** Referral. Add a second rule: **Referral Source** one of "School, Another Agency", **Result** Eligible, **Reason** "Referred by a partner". Leave **Default Result** at Review. | **Unsaved changes** shows; **Save Rules** is enabled. |
+| 3 | Under **Preview and Screen**, pick each person in turn. | Self: "These rules would give Not Eligible: Self referral is not accepted"; School: Eligible with its reason; Other: Review with "No rule applied." |
+| 4 | Click **Screen Open Enrollments** before saving. | "Save the rules first". Nothing changes. |
+| 5 | Click **Save Rules**, then **Screen Open Enrollments**. | "Screened: 1 Eligible, 1 Not Eligible, 1 Review, 0 left alone." |
+| 6 | Open each enrollment. | Self: **Not Eligible**, Basis Referral, the reason, **Eligibility Date** today. School: **Eligible** with its date. Other: **Review**, reason "No rule applied.", no date. |
+| 7 | Set Other to **Eligible** by hand, then screen again. | "... 1 left alone." and Other is still Eligible. Tick **Also screen enrollments already Eligible or Not Eligible** and screen again: Other returns to Review. |
+| 8 | Add a rule whose condition field is blank, or clear a rule's **Reason**, and **Save Rules**. | Refused with a sentence naming the rule; the saved rules are unchanged. |
+| 9 | Move rule 2 above rule 1, save, and preview Self. | Unchanged result (the rules do not overlap); with a rule 1 of **Referral Source** not blank, moving it first decides every row. |
+| 10 | As the staff user, open the program. | The rules show but cannot be changed; **Screen Open Enrollments** works. |
+
+**Cleanup:** clear the rules (remove each rule and **Save Rules**) and reset the enrollments' eligibility.

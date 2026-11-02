@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customObject>true</customObject>
+  <description>
+    Referrals out to other organizations and in from them, with status and outcome.
+  </description>
+  <motif>Custom5: Pennant</motif>
+</CustomTab>

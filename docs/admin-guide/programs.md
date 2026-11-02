@@ -54,7 +54,7 @@ offers now and its default. They ship with:
 | Picklist | Choices it ships with | Default |
 |---|---|---|
 | Referral Source | Self, Family or Friend, Another Agency, School, Health Care Provider, Faith Community, Other | None |
-| Eligibility Status | Not Screened, Awaiting Documents, Eligible, Not Eligible | Not Screened |
+| Eligibility Status | Not Screened, Awaiting Documents, Eligible, Not Eligible, Review | Not Screened |
 | Eligibility Basis | Income, Age, Residence, Referral, Other | None |
 
 To make them your own, click **Change in Setup** beside a picklist: it opens the enrollment's
@@ -220,6 +220,26 @@ Rules:
 Both run as the automation **Service Delivery: absences, enrollment** on the Automation
 page. It always runs (it keeps totals right), so it cannot be switched off.
 
+### Counting People Without Names
+
+A drop-in service, such as a walk-in meal or a pantry line, often serves people nobody records
+by name. For those, record a **service count**: how many people a service served on a day,
+with no person attached. Counts are kept apart from named deliveries, so the dashboard shows
+them in their own tile and column and never adds them to **People Served**.
+
+Under the log's rows, the **Service Delivery Log** panel shows **People counted without names
+for this service and day**. Type a number in **People Served, Not Named** and click **Add to
+the Count**. Each click adds a row, so two counts in one day add up. Counts can also be
+entered, corrected or deleted on the **Service Counts** tab (list views **All Service Counts**
+and **This Week**) and from the **Service Counts** list on a service. Each has a **Service**,
+a **Count Date** (today to start with), **People Served** (a whole number, never negative; 0
+is allowed) and a **Note**.
+
+Counts follow the same permission sets as deliveries: Programs Admin and Programs Staff add
+and change them, Read Only sees them (Staff cannot delete one). A count carries no person, so
+it is Public Read/Write inside the module and erasing a person never touches it. A service with
+counts cannot be deleted, as with deliveries: clear its **Active** box instead.
+
 ## Case Notes
 
 A **case note** is a dated, typed note about a participant, written on their enrollment: a
@@ -258,10 +278,12 @@ default, **Last Month**, **This Year**, **Last Year** or **Last 12 Months**). Ti
 | Open Enrollments | Enrollments at Applied or Enrolled, now. |
 | New Enrollments | Enrollments whose Start Date falls in the period. |
 | People Served | Different people (contacts plus accounts) with a Present delivery in the period, counted as people rather than by scanning every delivery. |
+| Counted Without Names | People counted without names (service counts, above) in the period. Kept apart from People Served. |
 | Services Delivered | Service deliveries marked Present in the period. |
 | Attendance Rate | Present deliveries as a share of all deliveries in the period, absences included. |
 
-Below the tiles, a table gives the same figures for each program, plus **Completed** (enrollments
+Below the tiles, a table gives the same figures for each program (including **Counted Without
+Names**), plus **Completed** (enrollments
 completed in the period); click a program's name to open it. It lists every Active program and
 any other program with activity in the period.
 
@@ -315,6 +337,82 @@ only, never typed notes, so erasing a person leaves nothing on the enrollment to
 notes about a person in case notes. Add the fields to list views and reports as you need them,
 for example an **Awaiting Documents** list view to chase missing paperwork.
 
+## Eligibility Screening
+
+Instead of setting **Eligibility Status** by hand, give a program **eligibility rules** and let
+BarnCRM screen its enrollments. Screening reads the enrollment's intake fields and sets the
+**Eligibility Status** to **Eligible**, **Not Eligible** or **Review** (a person who needs a
+human look), with the **Reason**, and the **Eligibility Basis** when a rule names one. It also
+sets the **Eligibility Date** when the status becomes a decision (Eligible or Not Eligible), and
+clears it when the result is Review. Screening only suggests: staff can still change any
+enrollment by hand.
+
+Rules live in the **Eligibility Rules** panel on the program page (under the Service Delivery
+Log). Only Programs Admin can change them; Programs Staff see them and can screen.
+
+1. Click **Add a Rule**. A rule says: **when all** of its conditions are true, the **Result** is
+   Eligible, Not Eligible or Review, with a **Reason** (up to 255 characters, shown on the
+   enrollment) and optionally an **Eligibility Basis**.
+2. Each condition picks an **Enrollment Field**, a comparison (**equal to**, **not equal to**,
+   **one of**, **not one of**, **greater than**, **greater than or equal to**, **less than**,
+   **less than or equal to**, **blank**, **not blank**) and a **Value**. For **one of** and
+   **not one of**, separate the choices with commas.
+3. Rules are checked top to bottom and **the first rule whose conditions all hold decides**; use
+   **Move Up** and **Move Down** to order them. Put the narrowest rules first.
+4. Under **When No Rule Applies**, choose the **Default Result** (Review to start with) and an
+   optional **Default Reason**.
+5. Click **Save Rules**. The panel refuses rules it cannot use and says why (for example a
+   field that is not offered, or a rule with no reason). A program may have up to 50 rules of up
+   to 10 conditions each.
+
+The fields offered are the enrollment's own intake fields: the custom fields on an enrollment
+that hold text, a choice, a number, a date or a checkbox, such as **Referral Source**, **Intake
+Date** or any field you add to Enrollment in Setup (for example household size or income band).
+The Eligibility fields themselves and links to people are not offered. Comparisons ignore
+capitals; two numbers compare as numbers (4 equals 4.0); dates compare as dates; a blank value
+never satisfies greater or less than.
+
+**Preview, then screen.** Under **Preview and Screen**, choose an open enrollment to see what
+the rules, as you have them on screen (saved or not), would decide for it and why. Nothing
+changes until you screen:
+
+- **Screen This Enrollment** applies the saved rules to the enrollment chosen above.
+- **Screen Open Enrollments** applies them to the program's open enrollments (Applied or
+  Enrolled), up to 200 at a time. An enrollment already **Eligible** or **Not Eligible** is
+  left alone unless you tick **Also screen enrollments already Eligible or Not Eligible**, so a
+  decision a person made by hand is not overwritten.
+
+Save the rules before screening: screening uses the saved rules, and the panel says so if you
+have unsaved changes. The summary says how many came out Eligible, Not Eligible and Review and
+how many were left alone. Rules are stored as JSON in the program's **Eligibility Rules** field
+(`Eligibility_Rules__c`), a documented format any tool can read, so another interface can show
+the same rules; edit them in the panel rather than the field. **Review** is added to the
+Eligibility Status choices; if you removed it, screening that needs it fails with a clear
+message, so add it back in Setup.
+
+## Referrals
+
+A **referral** records a person sent to another organization (**Out**) or sent to yours (**In**),
+where it stands and how it turned out. Open the **Referrals** tab (list views **All Referrals**
+and **Open Referrals**) or the **Referrals** list on an enrollment, and click **New**. Fill in:
+
+| Field | Meaning |
+|---|---|
+| Direction | **Out** (you sent the person) or **In** (another organization sent them). |
+| Contact or Account | The person, one of the two, as for enrollments. |
+| Enrollment | The person's enrollment the referral belongs to, optional. |
+| Other Organization | Where the person was sent, or who sent them. |
+| Referral Date | The day it was made or received (today to start with). |
+| Status | **Open**, **Accepted** or **Closed**. |
+| Outcome | How it ended once closed: Service Received, Declined by Organization, Declined by Person, Unable to Reach, No Capacity or Other. |
+| Notes | What was agreed and what comes next. |
+
+The Status and Outcome choices are yours to change in Setup. The fields are generic, so a later
+partner portal (PB-05) can show the same records. A referral is **private**, as a case note is:
+its owner, people above the owner in the role hierarchy and Programs Admin see it, whatever the
+Participant Privacy preset says. Programs Staff create and edit their own and never delete;
+Read Only has no access. Erasing a person **deletes** their referrals (see below).
+
 ## People: Merging, Deleting and Erasing
 
 - **Merging two people** moves their enrollments to the person kept. If both had an open
@@ -327,7 +425,9 @@ for example an **Awaiting Documents** list view to chase missing paperwork.
   service deliveries, credited to the anonymous record. Neither holds typed notes, so there is
   nothing on them to empty. Their **case notes are deleted**, whoever wrote them. Only someone
   with Programs Admin can delete every note, so anyone else erasing a person who has case notes
-  is refused, with that reason, and nothing is erased. Erasing a person account also finds the
+  is refused, with that reason, and nothing is erased. Their **referrals are deleted** the same
+  way: a referral is typed text about the person, so Programs Admin is needed for it too.
+  Service counts name no one and are never touched. Erasing a person account also finds the
   case notes, and counts the enrollments, recorded on that person account's own contact.
 - **Deleting a person** keeps their case notes on the enrollment, which no longer names anyone.
   To remove what was written about someone, erase them rather than delete them.

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>People_Not_Negative</fullName>
+  <active>true</active>
+  <description>R-SC1: a count of people is never negative.</description>
+  <errorConditionFormula>People_Served__c &lt; 0</errorConditionFormula>
+  <errorDisplayField>People_Served__c</errorDisplayField>
+  <errorMessage>People Served cannot be negative.</errorMessage>
+</ValidationRule>

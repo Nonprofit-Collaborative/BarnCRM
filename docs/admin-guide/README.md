@@ -1,6 +1,6 @@
 # Admin Guide
 
-Applies to: BarnCRM main as of 2026-10-31 (commit 78e64110, landing batch A). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
+Applies to: BarnCRM main as of 2026-11-02 (commit 6c0d82877, landing batch A, plus P-12 to P-14). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
 
 > **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
 
@@ -94,7 +94,7 @@ these pages, so that everyone is talking about the same person.
 
 ## Index
 
-Applies to: BarnCRM main as of 2026-10-31 (commit 78e64110, landing batch A). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-11-02 (commit 6c0d82877, landing batch A, plus P-12 to P-14). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 Every page in this folder is listed once, below, grouped by what you are trying to do. A feature that adds a page adds its row here in the same pull request, and the version line is refreshed with it. For a short description of what BarnCRM is and which modules exist, read the [Overview](../overview.md). Staff who use BarnCRM daily (and are not administrators) have the [User Guide](../user-guide/README.md); someone checking a build step by step has the [Testing Guide](../testing-guide/README.md).
 
@@ -218,7 +218,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 
 | Feature | Page | Package |
 |---|---|---|
-| P-01 Programs: install, roles, programs, services, enrollments, the Program Roster panel | [programs.md](programs.md) | BarnCRM Programs |
+| P-01 Programs: install, roles, programs, services, enrollments, the Program Roster panel; P-12 service counts without names, P-13 referrals, P-14 eligibility screening rules | [programs.md](programs.md) | BarnCRM Programs |
 
 ### Logic Models
 

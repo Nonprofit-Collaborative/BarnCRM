@@ -48,6 +48,27 @@ public with sharing class ProgramsErasureExtension implements PersonErasureExten
                 )
             );
         }
+        List<Referral__c> referrals = ReferralSelector.selectAllAbout(personId);
+        if (!referrals.isEmpty()) {
+            List<Id> referralIds = new List<Id>();
+            for (Referral__c referral : referrals) {
+                referralIds.add(referral.Id);
+            }
+            try {
+                Database.delete(referrals, true, AccessLevel.USER_MODE);
+            } catch (Exception refused) {
+                throw new PersonErasure.ErasureException(Label.Programs_Erase_NeedProgramsAdmin);
+            }
+            changes.add(
+                new PersonErasure.Change(
+                    PersonErasure.DELETED,
+                    Referral__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                        .getLabelPlural(),
+                    referralIds,
+                    null
+                )
+            );
+        }
         Integer enrollments = CaseNoteSelector.countEnrollmentsOf(personId);
         if (enrollments > 0) {
             changes.add(

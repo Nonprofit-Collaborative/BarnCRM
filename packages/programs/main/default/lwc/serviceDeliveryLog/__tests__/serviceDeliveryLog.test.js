@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import ServiceDeliveryLog from 'c/serviceDeliveryLog';
 import getLog from '@salesforce/apex/ServiceDeliveryLogController.getLog';
 import save from '@salesforce/apex/ServiceDeliveryLogController.save';
+import addCount from '@salesforce/apex/ServiceDeliveryLogController.addCount';
 import {
   entriesToSave,
   format,
@@ -16,6 +17,17 @@ jest.mock('@salesforce/apex/ServiceDeliveryLogController.getLog', () => ({ defau
   virtual: true
 });
 jest.mock('@salesforce/apex/ServiceDeliveryLogController.save', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/apex/ServiceDeliveryLogController.addCount',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock('@salesforce/label/c.Programs_Log_Counted', () => ({ default: 'Counted: {0}' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Programs_Log_CountAdded', () => ({ default: 'Added {0}.' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Programs_Log_Saved', () => ({ default: '{0} saved.' }), {
@@ -273,6 +285,47 @@ describe('c-service-delivery-log', () => {
     expect(entries[0].quantity).toBe(3);
     expect(entries[1].quantity).toBe(0);
     expect(find(element, 'result').textContent).toBe('2 saved.');
+  });
+
+  it('adds a count of people without names (P-12), apart from the named rows', async () => {
+    getLog.mockResolvedValue(
+      logOf([ANA], { canSeeCounts: true, canCount: true, peopleCounted: 12 })
+    );
+    addCount.mockResolvedValue(
+      logOf([ANA], { canSeeCounts: true, canCount: true, peopleCounted: 20 })
+    );
+    const element = await render();
+    expect(find(element, 'counted').textContent).toContain('12');
+    expect(find(element, 'add-count').disabled).toBe(true);
+
+    const input = find(element, 'count-input');
+    input.value = '8';
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    find(element, 'add-count').click();
+    await flush();
+
+    expect(addCount).toHaveBeenCalledWith({
+      programId: PROGRAM_ID,
+      serviceId: SERVICE_ID,
+      deliveryDate: '2026-10-31',
+      people: 8
+    });
+    expect(find(element, 'counted').textContent).toContain('20');
+    expect(find(element, 'result').textContent).toContain('8');
+  });
+
+  it('shows the count but no way to add one without permission, and nothing without access', async () => {
+    getLog.mockResolvedValue(
+      logOf([ANA], { canSeeCounts: true, canCount: false, peopleCounted: 5 })
+    );
+    const element = await render();
+    expect(find(element, 'counted').textContent).toContain('5');
+    expect(find(element, 'add-count')).toBeNull();
+
+    getLog.mockResolvedValue(logOf([ANA], { canSeeCounts: false }));
+    const second = await render();
+    expect(find(second, 'counts')).toBeNull();
   });
 
   it('says when there is nothing to save', async () => {

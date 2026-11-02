@@ -1,6 +1,11 @@
 import { LightningElement, api } from 'lwc';
 import getLog from '@salesforce/apex/ServiceDeliveryLogController.getLog';
 import save from '@salesforce/apex/ServiceDeliveryLogController.save';
+import addCount from '@salesforce/apex/ServiceDeliveryLogController.addCount';
+import COUNTED from '@salesforce/label/c.Programs_Log_Counted';
+import COUNT_INPUT from '@salesforce/label/c.Programs_Log_CountInput';
+import ADD_COUNT from '@salesforce/label/c.Programs_Log_AddCount';
+import COUNT_ADDED from '@salesforce/label/c.Programs_Log_CountAdded';
 
 import TITLE from '@salesforce/label/c.Programs_Log_Title';
 import SERVICE from '@salesforce/label/c.Programs_Log_Service';
@@ -49,9 +54,12 @@ export default class ServiceDeliveryLog extends LightningElement {
     noServices: NO_SERVICES,
     empty: EMPTY,
     moreThanShown: MORE_THAN_SHOWN,
+    countInput: COUNT_INPUT,
+    addCount: ADD_COUNT,
     loading: LOADING
   };
 
+  countDraft = '';
   log;
   drafts = {};
   busy = false;
@@ -128,6 +136,50 @@ export default class ServiceDeliveryLog extends LightningElement {
 
   get controlsDisabled() {
     return this.busy || this.loading;
+  }
+
+  get showCounts() {
+    return !!(this.log && this.log.canSeeCounts);
+  }
+
+  get canCount() {
+    return !!(this.log && this.log.canCount);
+  }
+
+  get countedText() {
+    return format(COUNTED, this.log ? this.log.peopleCounted || 0 : 0);
+  }
+
+  get addCountDisabled() {
+    return this.controlsDisabled || this.countDraft === '' || Number(this.countDraft) < 0;
+  }
+
+  handleCountChange(event) {
+    this.resultMessage = undefined;
+    this.countDraft = event.target.value;
+  }
+
+  handleAddCount() {
+    const people = Math.floor(Number(this.countDraft));
+    this.errorMessage = undefined;
+    this.busy = true;
+    return addCount({
+      programId: this.recordId,
+      serviceId: this.log.serviceId,
+      deliveryDate: this.log.deliveryDate,
+      people
+    })
+      .then((log) => {
+        this.log = log;
+        this.countDraft = '';
+        this.resultMessage = format(COUNT_ADDED, people);
+      })
+      .catch((error) => {
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+      })
+      .finally(() => {
+        this.busy = false;
+      });
   }
 
   get moreThanShown() {

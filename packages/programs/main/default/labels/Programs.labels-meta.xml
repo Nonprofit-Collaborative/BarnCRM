@@ -469,8 +469,8 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Erasure refused: case notes need Programs Admin</shortDescription>
-        <value>This person has case notes that only Programs Admin can delete. Ask someone with Programs Admin to erase them.</value>
+        <shortDescription>Erasure refused: case notes and referrals need Programs Admin</shortDescription>
+        <value>This person has case notes or referrals that only Programs Admin can delete. Ask someone with Programs Admin to erase them.</value>
     </labels>
     <labels>
         <fullName>Programs_Erase_EnrollmentsKept</fullName>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Service_Count_Compact</fullName>
+  <fields>NAME</fields>
+  <fields>Service__c</fields>
+  <fields>Count_Date__c</fields>
+  <fields>People_Served__c</fields>
+  <label>Service Count Compact Layout</label>
+</CompactLayout>

@@ -23,6 +23,10 @@
     <apexClass>ServiceDeliveryLogController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>EligibilityController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>false</editable>
     <field>Enrollment__c.Account__c</field>
@@ -123,6 +127,21 @@
     <field>Service_Delivery__c.Enrollment__c</field>
     <readable>true</readable>
   </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Enrollment__c.Eligibility_Reason__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Program__c.Eligibility_Rules__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Service_Count__c.Note__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <objectPermissions>
     <allowCreate>false</allowCreate>
     <allowDelete>false</allowDelete>
@@ -159,6 +178,15 @@
     <object>Service_Delivery__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Service_Count__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
   <tabSettings>
     <tab>Enrollment__c</tab>
     <visibility>Visible</visibility>
@@ -173,6 +201,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Service_Delivery__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Service_Count__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

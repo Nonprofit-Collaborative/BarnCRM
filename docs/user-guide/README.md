@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM main as of 2026-10-31 (commit 78e64110, landing batch A). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main as of 2026-11-02 (commit 6c0d82877, landing batch A, plus P-12 to P-14). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 
@@ -43,7 +43,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Programs (Nonprofit Edition)
 
-- [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages.
+- [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages, taking attendance, counting drop-in visitors without names, recording referrals and screening for eligibility.
 
 ### Logic Models (Nonprofit Edition)
 
