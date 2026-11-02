@@ -195,7 +195,7 @@ describe('c-field-access-manager', () => {
     const items = byId(element, 'items').data;
     expect(items.map((item) => [item.fieldText, item.accessText])).toEqual([
       ['Email', 'c.Core_FieldAccess_ReadEdit'],
-      ['Age', 'c.Core_FieldAccess_Read']
+      ['Age', 'c.Core_AccessExplorer_ColRead']
     ]);
 
     byId(element, 'preview').click();

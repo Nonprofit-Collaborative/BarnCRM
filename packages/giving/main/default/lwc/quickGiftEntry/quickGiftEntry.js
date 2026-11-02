@@ -13,10 +13,10 @@ import getPaymentChoices from '@salesforce/apex/QuickGiftEntryController.getPaym
 import heading from '@salesforce/label/c.Giving_QuickGiftEntry_Heading';
 import donorKindLabel from '@salesforce/label/c.Giving_QuickGiftEntry_DonorKindLabel';
 import donorKindPerson from '@salesforce/label/c.Core_Section_Person';
-import donorKindOrganization from '@salesforce/label/c.Giving_QuickGiftEntry_DonorKindOrganization';
+import donorKindOrganization from '@salesforce/label/c.Core_Settings_NavGroup_Organization';
 import personLabel from '@salesforce/label/c.Giving_GiftBatch_ColumnDonor';
 import newPerson from '@salesforce/label/c.Giving_QuickGiftEntry_NewPerson';
-import organizationLabel from '@salesforce/label/c.Giving_QuickGiftEntry_DonorKindOrganization';
+import organizationLabel from '@salesforce/label/c.Core_Settings_NavGroup_Organization';
 import donorPlaceholder from '@salesforce/label/c.Core_HouseholdPanel_AddExistingPlaceholder';
 import amountLabel from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
 import dateLabel from '@salesforce/label/c.Giving_QuickGiftEntry_DateLabel';

@@ -33,14 +33,6 @@
         <value>All topics</value>
     </labels>
     <labels>
-        <fullName>Funders_Answers_Copy</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Answer Library copy button</shortDescription>
-        <value>Copy</value>
-    </labels>
-    <labels>
         <fullName>Funders_Answers_Copied</fullName>
         <categories>Funders</categories>
         <language>en_US</language>

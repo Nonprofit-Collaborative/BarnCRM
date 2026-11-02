@@ -6,8 +6,8 @@ import setFund from '@salesforce/apex/GrantFundController.setFund';
 import NONE from '@salesforce/label/c.Funders_Fund_None';
 import NOT_INSTALLED from '@salesforce/label/c.Funders_Fund_NotInstalled';
 import MISSING from '@salesforce/label/c.Funders_Fund_Missing';
-import SAVE from '@salesforce/label/c.Funders_Program_Save';
-import SAVED from '@salesforce/label/c.Funders_Schedule_Saved';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
+import SAVED from '@salesforce/label/c.Core_Shared_Saved';
 import ERROR_ACTION from '@salesforce/label/c.Funders_Pipeline_ErrorUnexpected';
 
 const NONE_VALUE = '';

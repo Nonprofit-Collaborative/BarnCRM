@@ -1041,7 +1041,7 @@ private class SettingsControllerTest {
                 'None reads as No features'
             );
             Assert.areEqual(
-                System.Label.Core_Feature_DataManager_Name +
+                System.Label.Core_DataManager_Title +
                     ', ' +
                     System.Label.Core_Feature_HouseholdUpkeep_Name,
                 changes[0].newValue,

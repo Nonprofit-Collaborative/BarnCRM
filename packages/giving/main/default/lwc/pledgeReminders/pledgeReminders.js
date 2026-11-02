@@ -47,7 +47,7 @@ import TEMPLATE_MISSING from '@salesforce/label/c.Giving_Acknowledgments_Templat
 import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
 import ACTION_FAILED from '@salesforce/label/c.Giving_PledgeReminders_ActionFailed';
 import COLUMN_STEP from '@salesforce/label/c.Giving_PledgeReminders_ColumnStep';
-import COLUMN_TIMING from '@salesforce/label/c.Giving_PledgeReminders_ColumnTiming';
+import COLUMN_TIMING from '@salesforce/label/c.Core_FieldAccess_ColWhen';
 import COLUMN_CHANNEL from '@salesforce/label/c.Giving_Acknowledgments_ColumnChannel';
 import COLUMN_TEMPLATE from '@salesforce/label/c.Core_Import_StepTemplate';
 import COLUMN_PLEDGE from '@salesforce/label/c.Giving_PledgeReminders_ColumnPledge';

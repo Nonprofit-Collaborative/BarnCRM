@@ -251,7 +251,6 @@ describe('c-data-manager', () => {
       'FindTitle',
       'UpdateTitle',
       'DeleteTitle',
-      'OptimizerTitle',
       'MappingsHeading',
       'MappingsEmpty',
       'CreateTemplate',

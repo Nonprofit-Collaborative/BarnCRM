@@ -11,7 +11,7 @@ import REMAINING from '@salesforce/label/c.Volunteers_Signups_Remaining';
 import ADD from '@salesforce/label/c.Volunteers_Signups_Add';
 import PERSON from '@salesforce/label/c.Core_Section_Person';
 import STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
-import ACTIONS from '@salesforce/label/c.Volunteers_Signups_Actions';
+import ACTIONS from '@salesforce/label/c.Core_Shared_Attendance';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CAPTION from '@salesforce/label/c.Volunteers_Signups_Caption';

@@ -52,7 +52,7 @@
         <fullName>Core_Settings_NotSet</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Settings console: default shown in a blank organization detail box</shortDescription>
         <value>Not set</value>
     </labels>
@@ -332,7 +332,7 @@
         <fullName>Core_Settings_NavGroup_Organization</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Settings console: section list group heading</shortDescription>
         <value>Organization</value>
     </labels>

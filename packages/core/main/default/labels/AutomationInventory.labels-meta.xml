@@ -73,30 +73,6 @@
         <value>Downloaded {0} automation rows.</value>
     </labels>
     <labels>
-        <fullName>Core_DataDictionary_ColAutomationType</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Dictionary: automation column</shortDescription>
-        <value>Type</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_ColAutomationName</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Dictionary: automation column</shortDescription>
-        <value>Name</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_ColAutomationStatus</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Dictionary: automation column</shortDescription>
-        <value>Status</value>
-    </labels>
-    <labels>
         <fullName>Core_DataDictionary_ColAutomationRuns</fullName>
         <categories>DataDictionary</categories>
         <language>en_US</language>

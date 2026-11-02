@@ -4,11 +4,11 @@ import { fileName, saveBlob } from 'c/findCsv';
 import { mergeReport, reportDocument } from 'c/grantReportModel';
 
 import TITLE from '@salesforce/label/c.Funders_Report_Title';
-import TEMPLATE from '@salesforce/label/c.Funders_Report_Template';
+import TEMPLATE from '@salesforce/label/c.Core_Import_StepTemplate';
 import DOWNLOAD from '@salesforce/label/c.Funders_Report_Download';
 import HELP from '@salesforce/label/c.Funders_Report_Help';
 import NO_TEMPLATES from '@salesforce/label/c.Funders_Report_NoTemplates';
-import DOWNLOADED from '@salesforce/label/c.Funders_Report_Downloaded';
+import DOWNLOADED from '@salesforce/label/c.Core_Shared_ReportDownloaded';
 import ERROR_LOAD from '@salesforce/label/c.Funders_Report_ErrorLoad';
 import PERIOD_LINE from '@salesforce/label/c.Funders_Outcomes_PeriodLine';
 import NOT_SET from '@salesforce/label/c.Funders_Outcomes_NotSet';

@@ -18,7 +18,7 @@ import SESSION_CANCELLED from '@salesforce/label/c.Programs_Log_SessionCancelled
 import TITLE from '@salesforce/label/c.Programs_Log_Title';
 import SERVICE from '@salesforce/label/c.Programs_Log_Service';
 import DATE from '@salesforce/label/c.Core_ImportNewField_TypeDate';
-import ATTENDANCE from '@salesforce/label/c.Programs_Log_Attendance';
+import ATTENDANCE from '@salesforce/label/c.Core_Shared_Attendance';
 import QUANTITY from '@salesforce/label/c.Programs_Log_Quantity';
 import NOT_RECORDED from '@salesforce/label/c.Programs_Log_NotRecorded';
 import MARK_ALL_PRESENT from '@salesforce/label/c.Programs_Log_MarkAllPresent';
@@ -32,7 +32,7 @@ import ATTENDANCE_FOR from '@salesforce/label/c.Programs_Log_AttendanceFor';
 import QUANTITY_FOR from '@salesforce/label/c.Programs_Log_QuantityFor';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Log_MoreThanShown';
 import ACTION_FAILED from '@salesforce/label/c.Programs_Log_ActionFailed';
-import LOADING from '@salesforce/label/c.Programs_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import {
   entriesToSave,

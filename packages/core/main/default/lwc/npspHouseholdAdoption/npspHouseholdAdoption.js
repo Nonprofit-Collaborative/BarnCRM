@@ -13,27 +13,27 @@ import CANDIDATE_COUNT from '@salesforce/label/c.Core_NpspAdoption_CandidateCoun
 import MORE_THAN_LIMIT from '@salesforce/label/c.Core_NpspAdoption_MoreThanLimit';
 import NONE_LEFT from '@salesforce/label/c.Core_NpspAdoption_NoneLeft';
 import SAMPLE_CAPTION from '@salesforce/label/c.Core_NpspAdoption_SampleCaption';
-import COLUMN_NAME from '@salesforce/label/c.Core_NpspAdoption_ColumnName';
-import COLUMN_FORMAL from '@salesforce/label/c.Core_NpspAdoption_ColumnFormal';
-import COLUMN_INFORMAL from '@salesforce/label/c.Core_NpspAdoption_ColumnInformal';
+import COLUMN_NAME from '@salesforce/label/c.Core_Households_NameSuffix';
+import COLUMN_FORMAL from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnFormal';
+import COLUMN_INFORMAL from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnInformal';
 import COLUMN_PRIMARY from '@salesforce/label/c.Core_NpspAdoption_ColumnPrimary';
-import COLUMN_CONTACTS from '@salesforce/label/c.Core_NpspAdoption_ColumnContacts';
+import COLUMN_CONTACTS from '@salesforce/label/c.Core_SampleData_ContactsLabel';
 import KEEP_NAMES from '@salesforce/label/c.Core_NpspAdoption_KeepNames';
 import KEEP_NAMES_HELP from '@salesforce/label/c.Core_NpspAdoption_KeepNamesHelp';
 import ADOPT_BUTTON from '@salesforce/label/c.Core_NpspAdoption_AdoptButton';
 import CONFIRM_MESSAGE from '@salesforce/label/c.Core_NpspAdoption_ConfirmMessage';
 import TYPE_TO_ADOPT from '@salesforce/label/c.Core_NpspAdoption_TypeToAdopt';
 import CONFIRM_ADOPT from '@salesforce/label/c.Core_NpspAdoption_ConfirmAdopt';
-import CANCEL from '@salesforce/label/c.Core_NpspAdoption_Cancel';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import RUNNING from '@salesforce/label/c.Core_NpspAdoption_Running';
 import LAST_RUN from '@salesforce/label/c.Core_NpspAdoption_LastRun';
 import LAST_RUN_COUNTS from '@salesforce/label/c.Core_NpspAdoption_LastRunCounts';
 import UNDO_BUTTON from '@salesforce/label/c.Core_NpspAdoption_UndoButton';
 import UNDO_MESSAGE from '@salesforce/label/c.Core_NpspAdoption_UndoMessage';
 import TYPE_TO_UNDO from '@salesforce/label/c.Core_NpspAdoption_TypeToUndo';
-import CONFIRM_UNDO from '@salesforce/label/c.Core_NpspAdoption_ConfirmUndo';
+import CONFIRM_UNDO from '@salesforce/label/c.Core_AutoMerge_Undo';
 import STARTED from '@salesforce/label/c.Core_NpspAdoption_Started';
-import REFRESH from '@salesforce/label/c.Core_NpspAdoption_Refresh';
+import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 
 /**
  * Adopt NPSP Households, on the General page of BarnCRM Settings (X-05, admin guide

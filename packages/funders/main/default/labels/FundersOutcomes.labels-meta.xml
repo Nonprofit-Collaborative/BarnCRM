@@ -25,14 +25,6 @@
         <value>This grant has no requirements yet. Add one under Requirements, then link it to an outcome here.</value>
     </labels>
     <labels>
-        <fullName>Funders_Outcomes_None</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Outcomes card choice: no outcome</shortDescription>
-        <value>No outcome</value>
-    </labels>
-    <labels>
         <fullName>Funders_Outcomes_Missing</fullName>
         <categories>Funders</categories>
         <language>en_US</language>

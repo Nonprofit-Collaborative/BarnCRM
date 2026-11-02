@@ -3,11 +3,11 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getProgram from '@salesforce/apex/GrantProgramController.getProgram';
 import setProgram from '@salesforce/apex/GrantProgramController.setProgram';
 
-import TITLE from '@salesforce/label/c.Funders_Program_Title';
+import TITLE from '@salesforce/label/c.Core_Shared_Program';
 import NONE from '@salesforce/label/c.Funders_Program_None';
 import NOT_INSTALLED from '@salesforce/label/c.Funders_Program_NotInstalled';
 import MISSING from '@salesforce/label/c.Funders_Program_Missing';
-import SAVE from '@salesforce/label/c.Funders_Program_Save';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import SAVED from '@salesforce/label/c.Funders_Program_Saved';
 import ERROR_ACTION from '@salesforce/label/c.Funders_Pipeline_ErrorUnexpected';
 

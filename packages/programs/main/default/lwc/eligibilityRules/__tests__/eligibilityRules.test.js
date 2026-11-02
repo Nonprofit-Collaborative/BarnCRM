@@ -37,7 +37,7 @@ jest.mock('@salesforce/label/c.Programs_Elig_Rule', () => ({ default: 'Rule {0}'
 jest.mock('@salesforce/label/c.Programs_Elig_Saved', () => ({ default: 'Saved.' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Programs_Elig_Value', () => ({ default: 'Value' }), {
+jest.mock('@salesforce/label/c.Core_Filter_Value', () => ({ default: 'Value' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Programs_Elig_ValueList', () => ({ default: 'commas' }), {

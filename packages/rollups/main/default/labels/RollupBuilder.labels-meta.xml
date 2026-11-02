@@ -609,14 +609,6 @@
         <value>New Rollup</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Copy</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Row button: copy this rollup in the Builder.</shortDescription>
-        <value>Copy</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_PreviewRecord</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -751,14 +743,6 @@
         <protected>false</protected>
         <shortDescription>Needs attention: what went wrong column</shortDescription>
         <value>What Went Wrong</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ColumnWhen</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: when it failed column</shortDescription>
-        <value>When</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ColumnTries</fullName>

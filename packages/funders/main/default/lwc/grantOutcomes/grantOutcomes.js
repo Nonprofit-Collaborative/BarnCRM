@@ -7,14 +7,14 @@ import { indicatorLines } from 'c/grantReportModel';
 import TITLE from '@salesforce/label/c.Funders_Outcomes_Title';
 import NOT_INSTALLED from '@salesforce/label/c.Funders_Outcomes_NotInstalled';
 import NO_REQUIREMENTS from '@salesforce/label/c.Funders_Outcomes_NoRequirements';
-import NONE from '@salesforce/label/c.Funders_Outcomes_None';
+import NONE from '@salesforce/label/c.Core_Shared_NoOutcome';
 import MISSING from '@salesforce/label/c.Funders_Outcomes_Missing';
 import SAVED from '@salesforce/label/c.Funders_Outcomes_Saved';
 import NO_INDICATORS from '@salesforce/label/c.Funders_Outcomes_NoIndicators';
 import PERIOD_LINE from '@salesforce/label/c.Funders_Outcomes_PeriodLine';
 import NOT_SET from '@salesforce/label/c.Funders_Outcomes_NotSet';
 import ERROR_LOAD from '@salesforce/label/c.Funders_Outcomes_ErrorLoad';
-import SAVE from '@salesforce/label/c.Funders_Program_Save';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
 
 const NONE_VALUE = '';
 

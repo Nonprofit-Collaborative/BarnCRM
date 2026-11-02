@@ -68,10 +68,10 @@ public with sharing class GiftTransactionMirrorController {
     public static Status copyRangeAgain(Date fromDate, Date toDate) {
         Status current = checked(false);
         if (fromDate == null || toDate == null) {
-            throw UserErrors.message(Label.Mirror_GiftTransactionMirror_ErrorDatesRequired);
+            throw UserErrors.message(Label.Mirror_OpportunityMirror_ErrorDatesRequired);
         }
         if (fromDate > toDate) {
-            throw UserErrors.message(Label.Mirror_GiftTransactionMirror_ErrorDateOrder);
+            throw UserErrors.message(Label.Mirror_OpportunityMirror_ErrorDateOrder);
         }
         try {
             GiftTransactionMirrorBatch.runRange(fromDate, toDate);

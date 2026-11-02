@@ -7,7 +7,7 @@ import getPersonName from '@salesforce/apex/CohortController.getPersonName';
 import TITLE from '@salesforce/label/c.Programs_Cohort_Title';
 import MEMBERS_EMPTY from '@salesforce/label/c.Programs_Cohort_MembersEmpty';
 import MEMBER_COUNT from '@salesforce/label/c.Programs_Cohort_MemberCount';
-import REMOVE from '@salesforce/label/c.Programs_Cohort_Remove';
+import REMOVE from '@salesforce/label/c.Core_Find_Remove';
 import REMOVE_FOR from '@salesforce/label/c.Programs_Cohort_RemoveFor';
 import ADD_PEOPLE from '@salesforce/label/c.Programs_Cohort_AddPeople';
 import CANDIDATES from '@salesforce/label/c.Programs_Cohort_Candidates';
@@ -15,7 +15,7 @@ import NO_CANDIDATES from '@salesforce/label/c.Programs_Cohort_NoCandidates';
 import SELECT_ALL from '@salesforce/label/c.Programs_Cohort_SelectAll';
 import TICK_FOR from '@salesforce/label/c.Programs_Cohort_TickFor';
 import SOMEONE_ELSE from '@salesforce/label/c.Programs_Cohort_SomeoneElse';
-import PERSON from '@salesforce/label/c.Programs_Roster_Person';
+import PERSON from '@salesforce/label/c.Core_Section_Person';
 import ADD_TO_LIST from '@salesforce/label/c.Programs_Cohort_AddToList';
 import TAKE_OFF_LIST from '@salesforce/label/c.Programs_Cohort_TakeOffList';
 import ADD_TO_COHORT from '@salesforce/label/c.Programs_Cohort_AddToCohort';
@@ -28,7 +28,7 @@ import REMOVED from '@salesforce/label/c.Programs_Cohort_Removed';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Cohort_MoreThanShown';
 import TOO_MANY from '@salesforce/label/c.Programs_Cohort_TooMany';
 import ACTION_FAILED from '@salesforce/label/c.Programs_Cohort_ActionFailed';
-import LOADING from '@salesforce/label/c.Programs_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import {
   addPayload,

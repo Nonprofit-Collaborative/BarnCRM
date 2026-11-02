@@ -334,4 +334,108 @@
         <shortDescription>Shared format: {0} a name, {1} what belongs to it, as a sentence</shortDescription>
         <value>{0}: {1}.</value>
     </labels>
+    <labels>
+        <fullName>Core_Shared_AddStep</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: button that adds a step</shortDescription>
+        <value>Add Step</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_AssignedTo</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: assigned to, as a field label or column</shortDescription>
+        <value>Assigned To</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_MoveTo</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: pipeline card menu item; {0} is the stage</shortDescription>
+        <value>Move to {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_MovedTo</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: message after a pipeline move; {0} is the stage</shortDescription>
+        <value>Moved to {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Open</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: menu item that opens the record</shortDescription>
+        <value>Open</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_UnsavedChanges</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: notice that the panel has unsaved changes</shortDescription>
+        <value>Unsaved changes</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_TargetDate</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: target date, as a field label or column</shortDescription>
+        <value>Target Date</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_NoOutcome</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: the choice for no logic model outcome</shortDescription>
+        <value>No outcome</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_ReportDownloaded</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: message after a report file is downloaded</shortDescription>
+        <value>Report downloaded.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_MoveUp</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: button that moves an item up</shortDescription>
+        <value>Move Up</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Program</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: a program, as a card title or column</shortDescription>
+        <value>Program</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Attendance</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: attendance column heading</shortDescription>
+        <value>Attendance</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Completed</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: completed, as a status or column</shortDescription>
+        <value>Completed</value>
+    </labels>
 </CustomLabels>

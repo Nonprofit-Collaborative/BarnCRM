@@ -20,7 +20,7 @@ jest.mock(
 jest.mock('@salesforce/apex/GrantPipelineController.moveStage', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Funders_Pipeline_MoveTo', () => ({ default: 'Move to {0}' }), {
+jest.mock('@salesforce/label/c.Core_Shared_MoveTo', () => ({ default: 'Move to {0}' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Funders_Pipeline_DaysLeft', () => ({ default: '{0} days left' }), {

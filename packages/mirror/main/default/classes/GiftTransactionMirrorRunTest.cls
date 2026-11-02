@@ -251,7 +251,7 @@ private class GiftTransactionMirrorRunTest {
                 reasonByKey.put(difference.key, difference.reason);
             }
             Assert.areEqual(
-                Label.Mirror_GiftTransactionMirror_DiffAmount,
+                Label.Mirror_OpportunityMirror_DiffAmount,
                 reasonByKey.get(String.valueOf(changed.Id))
             );
             Assert.areEqual(
@@ -269,11 +269,11 @@ private class GiftTransactionMirrorRunTest {
     static void theReconciliationRefusesWhatItCannotCompare() {
         System.runAs(maria()) {
             GiftTransactionMirrorSchema.useStandIns();
-            assertRefused(null, GIFT_DATE, Label.Mirror_GiftTransactionMirror_ErrorDatesRequired);
+            assertRefused(null, GIFT_DATE, Label.Mirror_OpportunityMirror_ErrorDatesRequired);
             assertRefused(
                 GIFT_DATE.addDays(1),
                 GIFT_DATE,
-                Label.Mirror_GiftTransactionMirror_ErrorDateOrder
+                Label.Mirror_OpportunityMirror_ErrorDateOrder
             );
             GiftTransactionMirrorSchema.absentForTest = true;
             assertRefused(GIFT_DATE, GIFT_DATE, Label.Mirror_GiftTransactionMirror_Unavailable);

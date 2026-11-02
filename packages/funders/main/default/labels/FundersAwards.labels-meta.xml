@@ -105,14 +105,6 @@
         <value>Mark Received</value>
     </labels>
     <labels>
-        <fullName>Funders_Schedule_Saved</fullName>
-        <categories>AwardSchedule</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Toast after building a schedule or marking a payment received</shortDescription>
-        <value>Saved.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Schedule_Title</fullName>
         <categories>AwardSchedule</categories>
         <language>en_US</language>

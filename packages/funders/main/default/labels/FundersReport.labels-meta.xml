@@ -9,14 +9,6 @@
         <value>Funder Report</value>
     </labels>
     <labels>
-        <fullName>Funders_Report_Template</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Funder Report card template choice label</shortDescription>
-        <value>Template</value>
-    </labels>
-    <labels>
         <fullName>Funders_Report_Download</fullName>
         <categories>Funders</categories>
         <language>en_US</language>
@@ -39,14 +31,6 @@
         <protected>true</protected>
         <shortDescription>Funder Report card with no active template</shortDescription>
         <value>No active report template. A Funders admin adds one on the Funder Report Templates tab.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Report_Downloaded</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Funder report file downloaded</shortDescription>
-        <value>Report downloaded.</value>
     </labels>
     <labels>
         <fullName>Funders_Report_ErrorLoad</fullName>

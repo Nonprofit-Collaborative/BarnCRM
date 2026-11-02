@@ -122,7 +122,7 @@ public with sharing class FundersHealthCheckExtension implements HealthCheckExte
         Integer howMany = records.size();
         String counted = howMany > countCap
             ? String.format(
-                  Label.Funders_HealthCheck_MoreThan,
+                  Label.Core_HealthCheck_OrphansMoreThan,
                   new List<Object>{ countCap.format() }
               )
             : howMany.format();

@@ -49,14 +49,6 @@
     <value>No run has completed yet.</value>
   </labels>
   <labels>
-    <fullName>Mirror_OpportunityMirror_Loading</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Page: loading</shortDescription>
-    <value>Loading</value>
-  </labels>
-  <labels>
     <fullName>Mirror_OpportunityMirror_NoOpportunityRead</fullName>
     <categories>Mirror, Opportunity Mirror</categories>
     <language>en_US</language>
@@ -457,30 +449,6 @@
     <value>Direction: Opportunities to Gifts, but no start date is set, so no Opportunity becomes a gift. Set Opportunity mirror start date in BarnCRM Settings.</value>
   </labels>
   <labels>
-    <fullName>Mirror_OpportunityMirror_RunNow</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Button: start a run</shortDescription>
-    <value>Run Now</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_ScheduleNightly</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Button: schedule the nightly run</shortDescription>
-    <value>Schedule Nightly Run</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_StopSchedule</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Button: stop the nightly run</shortDescription>
-    <value>Stop Nightly Run</value>
-  </labels>
-  <labels>
     <fullName>Mirror_OpportunityMirror_NextRun</fullName>
     <categories>Mirror, Opportunity Mirror</categories>
     <language>en_US</language>
@@ -537,14 +505,6 @@
     <value>To</value>
   </labels>
   <labels>
-    <fullName>Mirror_OpportunityMirror_Compare</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Button: compare a range</shortDescription>
-    <value>Compare</value>
-  </labels>
-  <labels>
     <fullName>Mirror_OpportunityMirror_CopyAgain</fullName>
     <categories>Mirror, Opportunity Mirror</categories>
     <language>en_US</language>
@@ -569,14 +529,6 @@
     <value>Won Opportunities: {0}, total {1}</value>
   </labels>
   <labels>
-    <fullName>Mirror_OpportunityMirror_NoDifferences</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Reconciliation: nothing differs</shortDescription>
-    <value>No differences.</value>
-  </labels>
-  <labels>
     <fullName>Mirror_OpportunityMirror_DifferenceCount</fullName>
     <categories>Mirror, Opportunity Mirror</categories>
     <language>en_US</language>
@@ -585,28 +537,12 @@
     <value>Differences found: {0}. The first {1} are listed.</value>
   </labels>
   <labels>
-    <fullName>Mirror_OpportunityMirror_ColumnGift</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Column: gift</shortDescription>
-    <value>Gift</value>
-  </labels>
-  <labels>
     <fullName>Mirror_OpportunityMirror_ColumnGiftAmount</fullName>
     <categories>Mirror, Opportunity Mirror</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Column: gift amount</shortDescription>
     <value>Gift Amount</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_ColumnGiftDate</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Column: gift date</shortDescription>
-    <value>Gift Date</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_ColumnOpportunity</fullName>
@@ -631,13 +567,5 @@
     <protected>false</protected>
     <shortDescription>Column: close date</shortDescription>
     <value>Close Date</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_ColumnDifference</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Column: difference</shortDescription>
-    <value>Difference</value>
   </labels>
 </CustomLabels>

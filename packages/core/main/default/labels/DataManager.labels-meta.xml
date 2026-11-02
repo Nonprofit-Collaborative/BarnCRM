@@ -97,14 +97,6 @@
         <value>Continue</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_OptimizerTitle</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: card that opens Org Optimizer</shortDescription>
-        <value>Org Optimizer</value>
-    </labels>
-    <labels>
         <fullName>Core_DataManager_OptimizerText</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>

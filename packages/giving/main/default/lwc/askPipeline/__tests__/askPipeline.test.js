@@ -13,7 +13,7 @@ jest.mock('@salesforce/apex/AskPipelineController.moveStage', () => ({ default: 
 jest.mock('@salesforce/apex/AskPipelineController.closeAsk', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Giving_AskPipeline_MoveTo', () => ({ default: 'Move to {0}' }), {
+jest.mock('@salesforce/label/c.Core_Shared_MoveTo', () => ({ default: 'Move to {0}' }), {
   virtual: true
 });
 jest.mock(

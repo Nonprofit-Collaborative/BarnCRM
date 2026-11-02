@@ -305,14 +305,6 @@
     <value>Lines</value>
   </labels>
   <labels>
-    <fullName>Giving_GiftBatch_Unsaved</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: unsaved changes</shortDescription>
-    <value>Unsaved changes</value>
-  </labels>
-  <labels>
     <fullName>Giving_GiftBatch_UseComputer</fullName>
     <categories>Giving, Gift Batch</categories>
     <language>en_US</language>

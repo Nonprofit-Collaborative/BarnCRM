@@ -230,7 +230,7 @@ private class AccountingExportServiceTest {
                     notAFund,
                     null
                 },
-                Label.Mirror_AccountingExport_ErrorPaymentMethod => new List<Object>{
+                Label.Giving_QuickGiftEntry_ErrorTypeInvalid => new List<Object>{
                     AUGUST_FIRST,
                     AUGUST_LAST,
                     null,

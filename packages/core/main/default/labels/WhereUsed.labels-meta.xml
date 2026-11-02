@@ -49,14 +49,6 @@
         <value>Import Mappings</value>
     </labels>
     <labels>
-        <fullName>Core_WhereUsed_KindMergeRule</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Where Used group heading for merge rules.</shortDescription>
-        <value>Merge Rules</value>
-    </labels>
-    <labels>
         <fullName>Core_WhereUsed_KindMatchSource</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -65,28 +57,12 @@
         <value>Matching Sources</value>
     </labels>
     <labels>
-        <fullName>Core_WhereUsed_KindSetting</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Where Used group heading for BarnCRM settings that name fields.</shortDescription>
-        <value>BarnCRM Settings</value>
-    </labels>
-    <labels>
         <fullName>Core_WhereUsed_PartObject</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Where Used: the setup record works on this whole object.</shortDescription>
         <value>Works on this object</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhereUsed_PartColumns</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Where Used: a saved query shows the field as a column.</shortDescription>
-        <value>Columns</value>
     </labels>
     <labels>
         <fullName>Core_WhereUsed_PartFilter</fullName>
@@ -121,22 +97,6 @@
         <value>Related record columns</value>
     </labels>
     <labels>
-        <fullName>Core_WhereUsed_PartSummary</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Where Used: a saved query's summary names the field.</shortDescription>
-        <value>Summary</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhereUsed_PartChanges</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Where Used: a Super Transformer change reads or writes the field.</shortDescription>
-        <value>Changes</value>
-    </labels>
-    <labels>
         <fullName>Core_WhereUsed_PartMatchingField</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -167,14 +127,6 @@
         <protected>false</protected>
         <shortDescription>Where Used: an import mapping sets a default value for the field.</shortDescription>
         <value>Default value</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhereUsed_PartField</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Where Used: the rule, source or setting names the field.</shortDescription>
-        <value>Field</value>
     </labels>
     <labels>
         <fullName>Core_WhereUsed_PrivateQuery</fullName>
@@ -257,14 +209,6 @@
         <value>Where Used</value>
     </labels>
     <labels>
-        <fullName>Core_WhereUsed_ActionAlt</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Where Used button text for a screen reader. {0} is the field label.</shortDescription>
-        <value>Where Used: {0}</value>
-    </labels>
-    <labels>
         <fullName>Core_WhereUsed_Title</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -287,14 +231,6 @@
         <protected>false</protected>
         <shortDescription>Where Used note on what it does not check; a Setup link follows.</shortDescription>
         <value>BarnCRM checks its own setup only. Flows, Apex code, page layouts, reports, list views, validation rules and formula fields are not checked: in Setup, use Where is this used? on the field for those.</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhereUsed_OpenSetup</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Link to the field or object page in Setup.</shortDescription>
-        <value>Open in Setup</value>
     </labels>
     <labels>
         <fullName>Core_WhereUsed_Incomplete</fullName>
@@ -439,29 +375,5 @@
         <protected>false</protected>
         <shortDescription>Retire a Field step for a field that cannot be deleted.</shortDescription>
         <value>This field can't be deleted: it is a standard field or a managed package installed it. Keep it hidden instead.</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhereUsed_OpenFind</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Link that opens Find on the object.</shortDescription>
-        <value>Open in Find</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhereUsed_Progress</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Retire a Field progress. {0} is steps ticked, {1} the number of steps.</shortDescription>
-        <value>{0} of {1} steps done</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhereUsed_Close</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button that closes the Where Used window.</shortDescription>
-        <value>Close</value>
     </labels>
 </CustomLabels>

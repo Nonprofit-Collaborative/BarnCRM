@@ -161,22 +161,6 @@
     <value>No designations were written: the person running the mirror cannot create Gift Transaction Designations, or this org's designation objects differ from what this version of BarnCRM expects.</value>
   </labels>
   <labels>
-    <fullName>Mirror_GiftTransactionMirror_ErrorDatesRequired</fullName>
-    <categories>Mirror</categories>
-    <language>en_US</language>
-    <protected>true</protected>
-    <shortDescription>Gift Transaction mirror: compare needs both dates</shortDescription>
-    <value>Choose a start date and an end date.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_GiftTransactionMirror_ErrorDateOrder</fullName>
-    <categories>Mirror</categories>
-    <language>en_US</language>
-    <protected>true</protected>
-    <shortDescription>Gift Transaction mirror: compare dates out of order</shortDescription>
-    <value>The start date must be on or before the end date.</value>
-  </labels>
-  <labels>
     <fullName>Mirror_GiftTransactionMirror_ErrorTooMany</fullName>
     <categories>Mirror</categories>
     <language>en_US</language>
@@ -215,22 +199,6 @@
     <protected>true</protected>
     <shortDescription>Gift Transaction mirror: difference, link gone</shortDescription>
     <value>Gift Transaction deleted or not visible to you</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_GiftTransactionMirror_DiffAmount</fullName>
-    <categories>Mirror</categories>
-    <language>en_US</language>
-    <protected>true</protected>
-    <shortDescription>Gift Transaction mirror: difference, amount</shortDescription>
-    <value>Amount differs</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_GiftTransactionMirror_DiffDate</fullName>
-    <categories>Mirror</categories>
-    <language>en_US</language>
-    <protected>true</protected>
-    <shortDescription>Gift Transaction mirror: difference, date</shortDescription>
-    <value>Date differs</value>
   </labels>
   <labels>
     <fullName>Mirror_GiftTransactionMirror_DiffStatus</fullName>
@@ -313,44 +281,12 @@
     <value>The Gift Transaction mirror page needs the Gift Transaction Mirror permission set. Ask your BarnCRM admin for it.</value>
   </labels>
   <labels>
-    <fullName>Mirror_GiftTransactionMirror_RunNow</fullName>
-    <categories>Mirror</categories>
-    <language>en_US</language>
-    <protected>true</protected>
-    <shortDescription>Gift Transaction mirror page: Run Now button</shortDescription>
-    <value>Run Now</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_GiftTransactionMirror_ScheduleNightly</fullName>
-    <categories>Mirror</categories>
-    <language>en_US</language>
-    <protected>true</protected>
-    <shortDescription>Gift Transaction mirror page: schedule button</shortDescription>
-    <value>Schedule Nightly Run</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_GiftTransactionMirror_StopSchedule</fullName>
-    <categories>Mirror</categories>
-    <language>en_US</language>
-    <protected>true</protected>
-    <shortDescription>Gift Transaction mirror page: stop button</shortDescription>
-    <value>Stop Nightly Run</value>
-  </labels>
-  <labels>
     <fullName>Mirror_GiftTransactionMirror_ReconciliationIntro</fullName>
     <categories>Mirror</categories>
     <language>en_US</language>
     <protected>true</protected>
     <shortDescription>Gift Transaction mirror page: reconciliation intro</shortDescription>
     <value>Compare the received gifts dated in a range with the Gift Transactions of the paid status dated in it, as you can see them.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_GiftTransactionMirror_CopyAgain</fullName>
-    <categories>Mirror</categories>
-    <language>en_US</language>
-    <protected>true</protected>
-    <shortDescription>Gift Transaction mirror page: copy range button</shortDescription>
-    <value>Copy These Gifts Again</value>
   </labels>
   <labels>
     <fullName>Mirror_GiftTransactionMirror_GiftTransactionSide</fullName>

@@ -11,7 +11,7 @@ jest.mock('c/findCsv', () => ({
   fileName: jest.fn(() => 'Funder_Report.html')
 }));
 jest.mock(
-  '@salesforce/label/c.Funders_Report_Downloaded',
+  '@salesforce/label/c.Core_Shared_ReportDownloaded',
   () => ({ default: 'Report downloaded.' }),
   {
     virtual: true

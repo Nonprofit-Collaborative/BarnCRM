@@ -98,7 +98,7 @@ private class GiftTransactionMirrorControllerTest {
                     .differenceCount
             );
             Assert.areEqual(
-                Label.Mirror_GiftTransactionMirror_ErrorDateOrder,
+                Label.Mirror_OpportunityMirror_ErrorDateOrder,
                 refusalOf(new Action('compare'))
             );
             Assert.areEqual(
@@ -123,7 +123,7 @@ private class GiftTransactionMirrorControllerTest {
             GiftTransactionMirrorSchema.absentForTest = false;
             GiftTransactionMirrorSchema.useStandIns();
             Assert.areEqual(
-                Label.Mirror_GiftTransactionMirror_ErrorDatesRequired,
+                Label.Mirror_OpportunityMirror_ErrorDatesRequired,
                 refusalOf(new Action('copyNoDates'))
             );
             Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();

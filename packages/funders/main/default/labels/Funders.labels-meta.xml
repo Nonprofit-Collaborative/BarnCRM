@@ -33,14 +33,6 @@
         <value>These grants are still at Prospect, Letter of Inquiry or Invited to Apply, but their Application Deadline has passed. Move each to Applied if it went in, set it to Withdrawn if you did not apply, or change the deadline if the funder extended it. The first ones are linked below.</value>
     </labels>
     <labels>
-        <fullName>Funders_HealthCheck_MoreThan</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Health Check count that stopped at its cap; {0} is the cap</shortDescription>
-        <value>More than {0}</value>
-    </labels>
-    <labels>
         <fullName>Funders_SampleData_CountLabel</fullName>
         <categories>SampleData</categories>
         <language>en_US</language>
@@ -161,30 +153,6 @@
         <value>Funder not shown</value>
     </labels>
     <labels>
-        <fullName>Funders_Pipeline_MoveTo</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Card menu item; {0} is a stage</shortDescription>
-        <value>Move to {0}</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Pipeline_Open</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Card menu item: open the grant</shortDescription>
-        <value>Open</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Pipeline_CardActions</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Card menu alternative text; {0} is the grant name</shortDescription>
-        <value>Actions for {0}</value>
-    </labels>
-    <labels>
         <fullName>Funders_Pipeline_Deadlines</fullName>
         <categories>GrantPipeline</categories>
         <language>en_US</language>
@@ -241,30 +209,6 @@
         <value>Amount Awarded</value>
     </labels>
     <labels>
-        <fullName>Funders_Pipeline_Save</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Award dialog save button</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Pipeline_Cancel</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Award dialog cancel button</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Pipeline_Moved</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Toast after a move; {0} is the stage</shortDescription>
-        <value>Moved to {0}.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Pipeline_ErrorLoad</fullName>
         <categories>GrantPipeline</categories>
         <language>en_US</language>
@@ -297,14 +241,6 @@
         <value>Something went wrong and the change was not saved. Try again, or ask your admin to look at the Error Log.</value>
     </labels>
     <labels>
-        <fullName>Funders_Program_Title</fullName>
-        <categories>GrantProgram</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Program card title</shortDescription>
-        <value>Program</value>
-    </labels>
-    <labels>
         <fullName>Funders_Program_None</fullName>
         <categories>GrantProgram</categories>
         <language>en_US</language>
@@ -327,14 +263,6 @@
         <protected>true</protected>
         <shortDescription>The named program cannot be found</shortDescription>
         <value>The program this grant named has been deleted or you cannot see it. Choose another, or No program.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Program_Save</fullName>
-        <categories>GrantProgram</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Program card save button</shortDescription>
-        <value>Save</value>
     </labels>
     <labels>
         <fullName>Funders_Program_Saved</fullName>

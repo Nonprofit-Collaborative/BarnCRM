@@ -407,7 +407,7 @@ public with sharing class LogicModelService {
             if (outOfStep) {
                 backward.add(
                     String.format(
-                        Label.LogicModels_Builder_ArrowPair,
+                        Label.Core_Address_DateRange,
                         new List<String>{ link.From_Element__r.Name, link.To_Element__r.Name }
                     )
                 );

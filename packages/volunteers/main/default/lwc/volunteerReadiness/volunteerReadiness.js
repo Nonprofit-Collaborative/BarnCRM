@@ -9,7 +9,7 @@ import TITLE from '@salesforce/label/c.Volunteers_Readiness_Title';
 import NOT_STARTED from '@salesforce/label/c.Volunteers_Readiness_NotStarted';
 import CURRENT from '@salesforce/label/c.Volunteers_Readiness_Current';
 import NOT_CURRENT from '@salesforce/label/c.Volunteers_Readiness_NotCurrent';
-import COMPLETED from '@salesforce/label/c.Volunteers_Readiness_Completed';
+import COMPLETED from '@salesforce/label/c.Core_Shared_Completed';
 import EXPIRES from '@salesforce/label/c.Volunteers_Readiness_Expires';
 import LOAD_FAILED from '@salesforce/label/c.Volunteers_Readiness_LoadFailed';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';

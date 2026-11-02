@@ -25,28 +25,12 @@
     <value>The file holds the gifts you can see. If gifts in your organization are private, the person who runs the export needs to see all of them.</value>
   </labels>
   <labels>
-    <fullName>Mirror_AccountingExport_Fund</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Accounting export page: fund field</shortDescription>
-    <value>Fund</value>
-  </labels>
-  <labels>
     <fullName>Mirror_AccountingExport_AllFunds</fullName>
     <categories>Mirror, Accounting Export</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Accounting export page: fund left empty</shortDescription>
     <value>All funds</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_AccountingExport_PaymentMethod</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Accounting export page: payment method field</shortDescription>
-    <value>Payment method</value>
   </labels>
   <labels>
     <fullName>Mirror_AccountingExport_AllMethods</fullName>
@@ -111,14 +95,6 @@
     <protected>false</protected>
     <shortDescription>Accounting export: the fund is not a fund</shortDescription>
     <value>Choose a fund from the list.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_AccountingExport_ErrorPaymentMethod</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Accounting export: the method is not allowed</shortDescription>
-    <value>Choose a payment method from the list.</value>
   </labels>
   <labels>
     <fullName>Mirror_AccountingExport_NoExportPermission</fullName>

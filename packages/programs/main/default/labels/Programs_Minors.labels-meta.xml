@@ -193,14 +193,6 @@
         <value>Is</value>
     </labels>
     <labels>
-        <fullName>Programs_Elig_Value</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: value</shortDescription>
-        <value>Value</value>
-    </labels>
-    <labels>
         <fullName>Programs_Elig_ValueList</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -225,22 +217,6 @@
         <value>Remove Condition</value>
     </labels>
     <labels>
-        <fullName>Programs_Elig_Result</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: result</shortDescription>
-        <value>Result</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_Reason</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: reason</shortDescription>
-        <value>Reason</value>
-    </labels>
-    <labels>
         <fullName>Programs_Elig_Basis</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -255,38 +231,6 @@
         <protected>true</protected>
         <shortDescription>Eligibility rules panel: no basis</shortDescription>
         <value>Leave the Basis Alone</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_AddRule</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: add rule</shortDescription>
-        <value>Add a Rule</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_RemoveRule</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: remove rule</shortDescription>
-        <value>Remove Rule</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_MoveUp</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: move up</shortDescription>
-        <value>Move Up</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_MoveDown</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: move down</shortDescription>
-        <value>Move Down</value>
     </labels>
     <labels>
         <fullName>Programs_Elig_DefaultTitle</fullName>
@@ -327,14 +271,6 @@
         <protected>true</protected>
         <shortDescription>Eligibility rules panel: saved</shortDescription>
         <value>The rules are saved.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_Unsaved</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: unsaved changes</shortDescription>
-        <value>Unsaved changes</value>
     </labels>
     <labels>
         <fullName>Programs_Elig_PreviewTitle</fullName>

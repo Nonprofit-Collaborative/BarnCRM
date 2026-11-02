@@ -29,7 +29,7 @@ import OUTCOMES from '@salesforce/label/c.LogicModels_Builder_Outcomes';
 import SAVED from '@salesforce/label/c.Core_Shared_Saved';
 import DELETED from '@salesforce/label/c.LogicModels_Builder_Deleted';
 import ACTION_FAILED from '@salesforce/label/c.LogicModels_Builder_ActionFailed';
-import ARROW_PAIR from '@salesforce/label/c.LogicModels_Builder_ArrowPair';
+import ARROW_PAIR from '@salesforce/label/c.Core_Address_DateRange';
 import BACKWARD_ARROWS from '@salesforce/label/c.LogicModels_Builder_BackwardArrows';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import STAGE_INPUT from '@salesforce/label/c.LogicModels_Stage_Input';
@@ -40,7 +40,7 @@ import STAGE_INTERMEDIATE from '@salesforce/label/c.LogicModels_Stage_OutcomeInt
 import STAGE_LONG from '@salesforce/label/c.LogicModels_Stage_OutcomeLong';
 import STAGE_IMPACT from '@salesforce/label/c.LogicModels_Stage_Impact';
 import SELECTED_PART from '@salesforce/label/c.LogicModels_Part_Title';
-import MOVE_UP from '@salesforce/label/c.LogicModels_Part_MoveUp';
+import MOVE_UP from '@salesforce/label/c.Core_Shared_MoveUp';
 import MOVE_DOWN from '@salesforce/label/c.Core_Shared_MoveDown';
 import DELETE_PART_CONFIRM from '@salesforce/label/c.LogicModels_Part_DeleteConfirm';
 import LEADS_TO from '@salesforce/label/c.LogicModels_Part_LeadsTo';
@@ -95,7 +95,7 @@ import WORK_OUT from '@salesforce/label/c.LogicModels_Source_Function';
 import COUNT from '@salesforce/label/c.LogicModels_Source_Count';
 import SUM from '@salesforce/label/c.LogicModels_Source_Sum';
 import UNIQUE from '@salesforce/label/c.LogicModels_Source_Unique';
-import FIELD from '@salesforce/label/c.LogicModels_Source_FieldLabel';
+import FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import REFRESH from '@salesforce/label/c.LogicModels_Source_Refresh';
 import REFRESHING from '@salesforce/label/c.LogicModels_Source_Refreshing';
 import RESULT_COMPUTED from '@salesforce/label/c.LogicModels_Source_ResultComputed';
@@ -109,14 +109,14 @@ import REPORT_PERIODS from '@salesforce/label/c.LogicModels_Report_Periods';
 import REPORT_NO_PERIODS from '@salesforce/label/c.LogicModels_Report_NoPeriods';
 import REPORT_NO_INDICATORS from '@salesforce/label/c.LogicModels_Report_NoIndicators';
 import REPORT_CHOOSE_ONE from '@salesforce/label/c.LogicModels_Report_ChooseOne';
-import REPORT_DOWNLOAD_CSV from '@salesforce/label/c.LogicModels_Report_DownloadCsv';
+import REPORT_DOWNLOAD_CSV from '@salesforce/label/c.Core_AccessExplorer_Download';
 import REPORT_PRINTABLE from '@salesforce/label/c.LogicModels_Report_Printable';
 import REPORT_PRINT_HELP from '@salesforce/label/c.LogicModels_Report_PrintHelp';
 import REPORT_PART from '@salesforce/label/c.LogicModels_Report_Part';
 import REPORT_INDICATOR from '@salesforce/label/c.LogicModels_Report_Indicator';
 import REPORT_META from '@salesforce/label/c.LogicModels_Report_Meta';
-import REPORT_PERIOD_DATES from '@salesforce/label/c.LogicModels_Report_PeriodDates';
-import REPORT_DOWNLOADED from '@salesforce/label/c.LogicModels_Report_Downloaded';
+import REPORT_PERIOD_DATES from '@salesforce/label/c.Core_Address_DateRange';
+import REPORT_DOWNLOADED from '@salesforce/label/c.Core_Shared_ReportDownloaded';
 
 export const LABELS = Object.freeze({
   title: TITLE,

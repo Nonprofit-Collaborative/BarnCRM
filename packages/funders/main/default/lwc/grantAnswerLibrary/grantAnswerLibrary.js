@@ -9,7 +9,7 @@ import TITLE from '@salesforce/label/c.Funders_Answers_Title';
 import SEARCH from '@salesforce/label/c.Funders_Answers_Search';
 import TOPIC from '@salesforce/label/c.Funders_Answers_Topic';
 import ALL_TOPICS from '@salesforce/label/c.Funders_Answers_AllTopics';
-import COPY from '@salesforce/label/c.Funders_Answers_Copy';
+import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
 import COPIED from '@salesforce/label/c.Funders_Answers_Copied';
 import COPY_FAILED from '@salesforce/label/c.Funders_Answers_CopyFailed';
 import SHOW_ALL from '@salesforce/label/c.Funders_Answers_ShowAll';

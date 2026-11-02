@@ -17,7 +17,7 @@ import OPEN_IN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
 import MORE_THAN from '@salesforce/label/c.Core_HealthCheck_OrphansMoreThan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
-import UNUSED_HEADING from '@salesforce/label/c.Core_TechDebt_UnusedHeading';
+import UNUSED_HEADING from '@salesforce/label/c.Core_OrgOptimizer_Setup';
 import DEBT_HEADING from '@salesforce/label/c.Core_TechDebt_DebtHeading';
 import DEBT_INTRO from '@salesforce/label/c.Core_TechDebt_DebtIntro';
 import CHECK_APEX from '@salesforce/label/c.Core_TechDebt_CheckApex';

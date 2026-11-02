@@ -185,7 +185,7 @@ private class LogicModelBuilderControllerTest {
                     Label.LogicModels_Builder_BackwardArrows,
                     new List<String>{
                         String.format(
-                            Label.LogicModels_Builder_ArrowPair,
+                            Label.Core_Address_DateRange,
                             new List<String>{ 'Two tutors', 'Weekly sessions' }
                         )
                     }

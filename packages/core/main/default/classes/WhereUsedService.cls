@@ -530,7 +530,7 @@ public with sharing class WhereUsedService {
     ) {
         for (Object path : listOf(document.get('fields'))) {
             if (target.matchesPath(base, stringOf(path))) {
-                reference.addPart(System.Label.Core_WhereUsed_PartColumns);
+                reference.addPart(System.Label.Core_Find_Columns);
             }
         }
         if (target.matchesFilter(base, document.get('filter'))) {
@@ -560,7 +560,7 @@ public with sharing class WhereUsedService {
                 target.matchesPath(base, stringOf(summary.get('field'))) ||
                 target.matchesPath(base, stringOf(summary.get('groupBy')))
             ) {
-                reference.addPart(System.Label.Core_WhereUsed_PartSummary);
+                reference.addPart(System.Label.Core_Find_SummaryFunction);
             }
         }
     }
@@ -617,7 +617,7 @@ public with sharing class WhereUsedService {
                     reference.addPart(System.Label.Core_WhereUsed_PartFilter);
                 }
                 if (namesFieldAnywhere(target, base, document.get('changes'))) {
-                    reference.addPart(System.Label.Core_WhereUsed_PartChanges);
+                    reference.addPart(System.Label.Core_BulkUpdate_Changes);
                 }
             }
             if (!reference.parts.isEmpty()) {
@@ -783,11 +783,11 @@ public with sharing class WhereUsedService {
                 found.add(
                     new Reference(
                             KIND_MERGE_RULE,
-                            System.Label.Core_WhereUsed_KindMergeRule,
+                            System.Label.Core_DuplicateManagement_MergeRules,
                             rule.MasterLabel,
                             null
                         )
-                        .addPart(System.Label.Core_WhereUsed_PartField)
+                        .addPart(System.Label.Core_AccessExplorer_Field)
                         .withBreaks(System.Label.Core_WhereUsed_BreaksMergeRule)
                         .withEdit('Duplicate_Matching', null)
                 );
@@ -817,7 +817,7 @@ public with sharing class WhereUsedService {
                 }
             ) {
                 if (!target.isObject() && target.matchesField(source.Object_Name__c, name)) {
-                    reference.addPart(System.Label.Core_WhereUsed_PartField);
+                    reference.addPart(System.Label.Core_AccessExplorer_Field);
                 }
             }
             if (!reference.parts.isEmpty()) {
@@ -880,11 +880,11 @@ public with sharing class WhereUsedService {
     public static Reference settingReference(String settingLabel, String breaks, String section) {
         return new Reference(
                 KIND_SETTING,
-                System.Label.Core_WhereUsed_KindSetting,
+                System.Label.Core_Settings_Title,
                 settingLabel,
                 null
             )
-            .addPart(System.Label.Core_WhereUsed_PartField)
+            .addPart(System.Label.Core_AccessExplorer_Field)
             .withBreaks(breaks)
             .withEdit('BarnCRM_Settings', new Map<String, String>{ 'section' => section });
     }

@@ -177,14 +177,6 @@
     <value>Choose a plan to see and edit its steps.</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_AddStep</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, add a step</shortDescription>
-    <value>Add Step</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_MoveUp</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>

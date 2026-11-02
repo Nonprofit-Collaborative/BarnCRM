@@ -8,7 +8,7 @@ import { groupReferences, retireSteps, doneCount } from './whereUsedModel';
 import TITLE from '@salesforce/label/c.Core_WhereUsed_Title';
 import LOADING from '@salesforce/label/c.Core_WhereUsed_Loading';
 import NOT_CHECKED from '@salesforce/label/c.Core_WhereUsed_NotChecked';
-import OPEN_SETUP from '@salesforce/label/c.Core_WhereUsed_OpenSetup';
+import OPEN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
 import INCOMPLETE from '@salesforce/label/c.Core_WhereUsed_Incomplete';
 import NONE from '@salesforce/label/c.Core_WhereUsed_None';
 import NONE_OBJECT from '@salesforce/label/c.Core_WhereUsed_NoneObject';
@@ -27,9 +27,9 @@ import STEP_BACKUP from '@salesforce/label/c.Core_WhereUsed_StepBackup';
 import STEP_HIDE from '@salesforce/label/c.Core_WhereUsed_StepHide';
 import STEP_DELETE from '@salesforce/label/c.Core_WhereUsed_StepDelete';
 import STEP_CANNOT_DELETE from '@salesforce/label/c.Core_WhereUsed_StepCannotDelete';
-import OPEN_FIND from '@salesforce/label/c.Core_WhereUsed_OpenFind';
-import PROGRESS from '@salesforce/label/c.Core_WhereUsed_Progress';
-import CLOSE from '@salesforce/label/c.Core_WhereUsed_Close';
+import OPEN_FIND from '@salesforce/label/c.Core_DataHygiene_OpenInFind';
+import PROGRESS from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
+import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 
 const STEP_TEXT = {
   references: STEP_REFERENCES,

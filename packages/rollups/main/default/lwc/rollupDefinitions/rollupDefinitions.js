@@ -42,7 +42,7 @@ import READ_ONLY from '@salesforce/label/c.Core_Rollups_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import NEW_ROLLUP from '@salesforce/label/c.Core_RollupBuilder_New';
 import EDIT from '@salesforce/label/c.Core_CmdtManager_EditAction';
-import COPY from '@salesforce/label/c.Core_RollupBuilder_Copy';
+import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
 import OPEN_BUILDER from '@salesforce/label/c.Core_HealthCheck_TwoToolsFix';
 import WORKING_HOURS from '@salesforce/label/c.Core_RollupBuilder_EstimateWorkingHours';
 import START_NOW from '@salesforce/label/c.Core_RollupBuilder_StartNow';

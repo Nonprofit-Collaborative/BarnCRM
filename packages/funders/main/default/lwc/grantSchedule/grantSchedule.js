@@ -9,7 +9,7 @@ import { buildPayments } from 'c/grantScheduleModel';
 import TITLE from '@salesforce/label/c.Funders_Schedule_Title';
 import CANNOT_BUILD from '@salesforce/label/c.Funders_Schedule_CannotBuild';
 import BUILD from '@salesforce/label/c.Funders_Schedule_Build';
-import SAVED from '@salesforce/label/c.Funders_Schedule_Saved';
+import SAVED from '@salesforce/label/c.Core_Shared_Saved';
 import MARK_RECEIVED from '@salesforce/label/c.Funders_Schedule_MarkReceived';
 import ERROR_ACTION from '@salesforce/label/c.Funders_Pipeline_ErrorUnexpected';
 

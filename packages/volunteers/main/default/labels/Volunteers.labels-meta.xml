@@ -241,14 +241,6 @@
         <value>Volunteer Letter</value>
     </labels>
     <labels>
-        <fullName>Volunteers_LetterAction_Preview</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Volunteer letter action: preview button and region</shortDescription>
-        <value>Preview</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_LetterAction_Saved</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
@@ -529,14 +521,6 @@
         <value>Add Sign-Up</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Signups_Actions</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Attendance buttons column heading</shortDescription>
-        <value>Attendance</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Signups_Caption</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
@@ -739,14 +723,6 @@ When: {1}</value>
         <value>No volunteers to suggest. Suggestions come from people whose Volunteer Status is Active and who are not already signed up for this shift.</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Suggestions_Why</fullName>
-        <categories>Volunteers, Suggestions</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Suggested Volunteers column heading: the reasons</shortDescription>
-        <value>Why</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Suggestions_SignUp</fullName>
         <categories>Volunteers, Suggestions</categories>
         <language>en_US</language>
@@ -897,14 +873,6 @@ When: {1}</value>
         <protected>true</protected>
         <shortDescription>Badge: the step is not completed, or has expired</shortDescription>
         <value>Not current</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Readiness_Completed</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Before the date a step was completed</shortDescription>
-        <value>Completed</value>
     </labels>
     <labels>
         <fullName>Volunteers_Readiness_Expires</fullName>

@@ -161,44 +161,12 @@
         <value>The first households, as NPSP has them</value>
     </labels>
     <labels>
-        <fullName>Core_NpspAdoption_ColumnName</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Sample table column: household name.</shortDescription>
-        <value>Household</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_ColumnFormal</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Sample table column: formal greeting.</shortDescription>
-        <value>Formal Greeting</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_ColumnInformal</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Sample table column: informal greeting.</shortDescription>
-        <value>Informal Greeting</value>
-    </labels>
-    <labels>
         <fullName>Core_NpspAdoption_ColumnPrimary</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Sample table column: primary contact.</shortDescription>
         <value>Primary Contact</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_ColumnContacts</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Sample table column: number of contacts.</shortDescription>
-        <value>Contacts</value>
     </labels>
     <labels>
         <fullName>Core_NpspAdoption_KeepNames</fullName>
@@ -249,14 +217,6 @@
         <value>Adopt</value>
     </labels>
     <labels>
-        <fullName>Core_NpspAdoption_Cancel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Cancel button in the adopt and undo windows.</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_NpspAdoption_Running</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -305,27 +265,11 @@
         <value>Type {0} to undo</value>
     </labels>
     <labels>
-        <fullName>Core_NpspAdoption_ConfirmUndo</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Confirm button in the undo window.</shortDescription>
-        <value>Undo</value>
-    </labels>
-    <labels>
         <fullName>Core_NpspAdoption_Started</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown after a run or undo starts.</shortDescription>
         <value>Started. This section updates as it runs.</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_Refresh</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button that reloads the panel.</shortDescription>
-        <value>Refresh</value>
     </labels>
 </CustomLabels>

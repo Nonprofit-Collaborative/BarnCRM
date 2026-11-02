@@ -25,14 +25,6 @@
         <value>Enroll Someone</value>
     </labels>
     <labels>
-        <fullName>Programs_Roster_Person</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Person picker and column heading</shortDescription>
-        <value>Person</value>
-    </labels>
-    <labels>
         <fullName>Programs_Roster_ShowEnded</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -103,14 +95,6 @@
         <protected>true</protected>
         <shortDescription>Unexpected roster failure, logged</shortDescription>
         <value>The roster could not be updated. The details are in the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Loading</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Spinner text while loading</shortDescription>
-        <value>Loading</value>
     </labels>
     <labels>
         <fullName>Programs_Person_Empty</fullName>
@@ -191,14 +175,6 @@
         <protected>true</protected>
         <shortDescription>Service Delivery Log: service picker</shortDescription>
         <value>Service</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Log_Attendance</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service Delivery Log: attendance column</shortDescription>
-        <value>Attendance</value>
     </labels>
     <labels>
         <fullName>Programs_Log_Quantity</fullName>
@@ -545,14 +521,6 @@
         <value>New Enrollments</value>
     </labels>
     <labels>
-        <fullName>Programs_Dashboard_Completed</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs dashboard: column</shortDescription>
-        <value>Completed</value>
-    </labels>
-    <labels>
         <fullName>Programs_Dashboard_PeopleServed</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -575,14 +543,6 @@
         <protected>true</protected>
         <shortDescription>Programs dashboard: tile and column</shortDescription>
         <value>Attendance Rate</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Dashboard_Program</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs dashboard: column</shortDescription>
-        <value>Program</value>
     </labels>
     <labels>
         <fullName>Programs_Dashboard_ByProgram</fullName>
@@ -705,14 +665,6 @@
         <value>Something went wrong with the service plan. Try again, or ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
-        <fullName>Programs_Plan_OutcomeOption</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Outcome choice; {0} is the outcome, {1} is its logic model</shortDescription>
-        <value>{0} ({1})</value>
-    </labels>
-    <labels>
         <fullName>Programs_Plan_Title</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -753,76 +705,12 @@
         <value>Goal</value>
     </labels>
     <labels>
-        <fullName>Programs_Plan_Description</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service plan: goal description field label</shortDescription>
-        <value>Description</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Plan_Status</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service plan: status field label</shortDescription>
-        <value>Status</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Plan_TargetDate</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service plan: target date field label</shortDescription>
-        <value>Target Date</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Plan_AssignedTo</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service plan: assigned to field label</shortDescription>
-        <value>Assigned To</value>
-    </labels>
-    <labels>
         <fullName>Programs_Plan_NextReview</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Service plan: next review field label</shortDescription>
         <value>Next Review</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Plan_Outcome</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service plan: outcome field label</shortDescription>
-        <value>Outcome</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Plan_NoOutcome</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service plan: the no outcome choice</shortDescription>
-        <value>No outcome</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Plan_Save</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service plan: save button</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Plan_Cancel</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service plan: cancel button</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Programs_Plan_Target</fullName>
@@ -889,14 +777,6 @@
         <value>Its outcome is no longer in Logic Models. Edit the goal to choose another.</value>
     </labels>
     <labels>
-        <fullName>Programs_Plan_StepsDone</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Step progress; {0} is the steps done, {1} is all steps</shortDescription>
-        <value>{0} of {1} steps done</value>
-    </labels>
-    <labels>
         <fullName>Programs_Plan_NewStep</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -911,14 +791,6 @@
         <protected>true</protected>
         <shortDescription>New step input label; {0} is the goal</shortDescription>
         <value>New step for {0}</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Plan_AddStep</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service plan: add a step button</shortDescription>
-        <value>Add Step</value>
     </labels>
     <labels>
         <fullName>Programs_Plan_MarkReviewed</fullName>
@@ -967,14 +839,6 @@
         <protected>true</protected>
         <shortDescription>Service plan: new case note button</shortDescription>
         <value>New Note</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Plan_Saved</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service plan: saved message</shortDescription>
-        <value>Saved.</value>
     </labels>
     <labels>
         <fullName>Programs_Cohort_ActionFailed</fullName>
@@ -1111,14 +975,6 @@
         <protected>true</protected>
         <shortDescription>Cohort members: enrollment not open in this program</shortDescription>
         <value>Only an open enrollment in this cohort's program can be added.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Cohort_Remove</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cohort members: remove button</shortDescription>
-        <value>Remove</value>
     </labels>
     <labels>
         <fullName>Programs_Cohort_RemoveFor</fullName>
@@ -1273,14 +1129,6 @@
         <value>1 session scheduled.</value>
     </labels>
     <labels>
-        <fullName>Programs_Schedule_From</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Schedule sessions: first date</shortDescription>
-        <value>From</value>
-    </labels>
-    <labels>
         <fullName>Programs_Schedule_IntroCohort</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -1367,14 +1215,6 @@
         <protected>true</protected>
         <shortDescription>Schedule sessions: panel title</shortDescription>
         <value>Schedule Sessions</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Schedule_To</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Schedule sessions: last date</shortDescription>
-        <value>To</value>
     </labels>
     <labels>
         <fullName>Programs_Schedule_TooMany</fullName>

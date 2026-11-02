@@ -144,7 +144,7 @@ private class WhereUsedServiceTest {
                 'Every query naming Email.'
             );
             Assert.areEqual(
-                new List<String>{ System.Label.Core_WhereUsed_PartColumns },
+                new List<String>{ System.Label.Core_Find_Columns },
                 named(result, 'Columns').parts
             );
             Assert.areEqual(
@@ -154,12 +154,12 @@ private class WhereUsedServiceTest {
             Assert.areEqual(
                 new List<String>{
                     System.Label.Core_WhereUsed_PartSort,
-                    System.Label.Core_WhereUsed_PartSummary
+                    System.Label.Core_Find_SummaryFunction
                 },
                 named(result, 'Sort And Summary').parts
             );
             Assert.areEqual(
-                new List<String>{ System.Label.Core_WhereUsed_PartColumns },
+                new List<String>{ System.Label.Core_Find_Columns },
                 named(result, 'Parent Path').parts,
                 'A path through a lookup reaches the field.'
             );
@@ -291,7 +291,7 @@ private class WhereUsedServiceTest {
             WhereUsedService.Result result = WhereUsedService.find('Contact', 'Department');
 
             Assert.areEqual(
-                new List<String>{ System.Label.Core_WhereUsed_PartChanges },
+                new List<String>{ System.Label.Core_BulkUpdate_Changes },
                 named(result, 'Tidy Titles').parts,
                 'A copy source names the field.'
             );

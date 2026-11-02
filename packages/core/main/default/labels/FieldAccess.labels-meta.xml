@@ -209,14 +209,6 @@
         <value>Give or remove Read and Edit on fields and kinds of record for permission sets your organization made. Nothing is saved until you preview the change and apply it, and every change can be undone.</value>
     </labels>
     <labels>
-        <fullName>Core_FieldAccess_Sets</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: permission set search label</shortDescription>
-        <value>Permission Sets</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldAccess_SetsPlaceholder</fullName>
         <categories>FieldAccess</categories>
         <language>en_US</language>
@@ -249,14 +241,6 @@
         <value>No Change</value>
     </labels>
     <labels>
-        <fullName>Core_FieldAccess_Read</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: access level</shortDescription>
-        <value>Read</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldAccess_ReadEdit</fullName>
         <categories>FieldAccess</categories>
         <language>en_US</language>
@@ -271,14 +255,6 @@
         <protected>false</protected>
         <shortDescription>Field access: access level</shortDescription>
         <value>No Access</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldAccess_FieldsHeading</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: fields table heading</shortDescription>
-        <value>Fields</value>
     </labels>
     <labels>
         <fullName>Core_FieldAccess_FilterFields</fullName>
@@ -313,14 +289,6 @@
         <value>Now</value>
     </labels>
     <labels>
-        <fullName>Core_FieldAccess_ColNote</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: column</shortDescription>
-        <value>Note</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldAccess_NowText</fullName>
         <categories>FieldAccess</categories>
         <language>en_US</language>
@@ -337,44 +305,12 @@
         <value>Read only</value>
     </labels>
     <labels>
-        <fullName>Core_FieldAccess_ChangesHeading</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: change list heading</shortDescription>
-        <value>Changes</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldAccess_ColAccess</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: column</shortDescription>
-        <value>Access</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldAccess_WholeRecord</fullName>
         <categories>FieldAccess</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field access: the kind of record itself</shortDescription>
         <value>(The kind of record)</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldAccess_Remove</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: remove button</shortDescription>
-        <value>Remove</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldAccess_Clear</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: clear button</shortDescription>
-        <value>Clear</value>
     </labels>
     <labels>
         <fullName>Core_FieldAccess_NoChanges</fullName>
@@ -385,36 +321,12 @@
         <value>Nothing added yet. Choose a kind of record, then its access or some fields, and press Add to Changes.</value>
     </labels>
     <labels>
-        <fullName>Core_FieldAccess_Preview</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: preview button and heading</shortDescription>
-        <value>Preview</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldAccess_PreviewSummary</fullName>
         <categories>FieldAccess</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Preview summary ({0} = rows, {1} = sets, {2} = unchanged)</shortDescription>
         <value>{0} rows change on {1} permission sets; {2} are already right.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldAccess_ColSet</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: column</shortDescription>
-        <value>Permission Set</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldAccess_ColAfter</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: column</shortDescription>
-        <value>After</value>
     </labels>
     <labels>
         <fullName>Core_FieldAccess_ColWhy</fullName>
@@ -481,28 +393,12 @@
         <value>Apply</value>
     </labels>
     <labels>
-        <fullName>Core_FieldAccess_Cancel</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: cancel button</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldAccess_Applied</fullName>
         <categories>FieldAccess</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field access: applied ({0} = changed, {1} = refused)</shortDescription>
         <value>Changed {0} rows; {1} refused. You can undo this change under Recent Changes.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldAccess_RecentHeading</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: recent changes heading</shortDescription>
-        <value>Recent Changes</value>
     </labels>
     <labels>
         <fullName>Core_FieldAccess_ColWhen</fullName>
@@ -537,28 +433,12 @@
         <value>Refused</value>
     </labels>
     <labels>
-        <fullName>Core_FieldAccess_ColStatus</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: column</shortDescription>
-        <value>Status</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldAccess_ColUndoUntil</fullName>
         <categories>FieldAccess</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field access: column</shortDescription>
         <value>Undo Until</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldAccess_Undo</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: undo button</shortDescription>
-        <value>Undo</value>
     </labels>
     <labels>
         <fullName>Core_FieldAccess_UndoConfirmTitle</fullName>
@@ -591,13 +471,5 @@
         <protected>false</protected>
         <shortDescription>Field access: no recent changes</shortDescription>
         <value>No field access changes yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldAccess_Refresh</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: refresh button</shortDescription>
-        <value>Refresh</value>
     </labels>
 </CustomLabels>

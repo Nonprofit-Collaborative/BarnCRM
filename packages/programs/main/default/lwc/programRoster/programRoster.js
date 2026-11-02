@@ -6,7 +6,7 @@ import setStage from '@salesforce/apex/ProgramRosterController.setStage';
 
 import TITLE from '@salesforce/label/c.Programs_Roster_Title';
 import ENROLL from '@salesforce/label/c.Programs_Roster_Enroll';
-import PERSON from '@salesforce/label/c.Programs_Roster_Person';
+import PERSON from '@salesforce/label/c.Core_Section_Person';
 import STAGE from '@salesforce/label/c.Core_Shared_Stage';
 import START_DATE from '@salesforce/label/c.Core_Shared_StartDate';
 import END_DATE from '@salesforce/label/c.Core_Shared_EndDate';
@@ -20,7 +20,7 @@ import ADDED from '@salesforce/label/c.Programs_Roster_Added';
 import CHANGED from '@salesforce/label/c.Programs_Roster_Changed';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Roster_MoreThanShown';
 import ACTION_FAILED from '@salesforce/label/c.Programs_Roster_ActionFailed';
-import LOADING from '@salesforce/label/c.Programs_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import { format, rosterRows, stageFigures, stageLabel, stageOptions } from './roster';
 import { bodyMessage } from 'c/findCsv';

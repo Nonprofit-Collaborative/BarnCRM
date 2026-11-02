@@ -33,14 +33,6 @@
         <value>Gifts to funds</value>
     </labels>
     <labels>
-        <fullName>Funders_Board_NotSet</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Board Dashboard line for grants with no funding source</shortDescription>
-        <value>Not set</value>
-    </labels>
-    <labels>
         <fullName>Funders_Board_Total</fullName>
         <categories>Funders</categories>
         <language>en_US</language>

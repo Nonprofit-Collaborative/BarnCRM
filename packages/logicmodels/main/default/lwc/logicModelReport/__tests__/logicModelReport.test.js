@@ -104,7 +104,7 @@ describe('c-logic-model-report', () => {
     expect(blob.type).toBe('text/html;charset=utf-8');
     expect(name).toMatch(/^Logic_Model_Report-.*\.html$/);
     await flush();
-    expect(q(element, 'report-result').textContent.trim()).toBe('c.LogicModels_Report_Downloaded');
+    expect(q(element, 'report-result').textContent.trim()).toBe('c.Core_Shared_ReportDownloaded');
   });
 
   it('keeps the choice when the model is saved and drops periods that are gone', async () => {

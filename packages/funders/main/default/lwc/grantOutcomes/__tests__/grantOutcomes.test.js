@@ -9,7 +9,7 @@ jest.mock('@salesforce/apex/GrantOutcomeController.getOutcomes', () => ({ defaul
 jest.mock('@salesforce/apex/GrantOutcomeController.setOutcome', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Funders_Outcomes_None', () => ({ default: 'No outcome' }), {
+jest.mock('@salesforce/label/c.Core_Shared_NoOutcome', () => ({ default: 'No outcome' }), {
   virtual: true
 });
 jest.mock(

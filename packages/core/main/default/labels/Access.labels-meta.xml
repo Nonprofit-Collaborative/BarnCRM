@@ -425,14 +425,6 @@
         <value>That Did Not Work</value>
     </labels>
     <labels>
-        <fullName>Core_Access_ToastSuccessTitle</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: heading of the message shown when a change succeeds</shortDescription>
-        <value>Done</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_UsersInRole</fullName>
         <categories>Access</categories>
         <language>en_US</language>

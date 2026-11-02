@@ -39,7 +39,7 @@ public with sharing class RollupsWhereUsedExtension implements WhereUsedExtensio
         ]) {
             WhereUsedService.Reference reference = new WhereUsedService.Reference(
                 KIND,
-                System.Label.Core_RollupBuilder_WhereUsedKind,
+                System.Label.Core_Rollups_PageTitle,
                 definition.Name,
                 definition.Id
             );

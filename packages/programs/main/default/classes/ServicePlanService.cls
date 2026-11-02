@@ -315,7 +315,7 @@ public with sharing class ServicePlanService {
             Map<String, String> option = new Map<String, String>{
                 'value' => (String) row.Id,
                 'label' => String.format(
-                    Label.Programs_Plan_OutcomeOption,
+                    Label.Core_Format_Parenthetical,
                     new List<Object>{ (String) row.get('Name'), modelName }
                 )
             };

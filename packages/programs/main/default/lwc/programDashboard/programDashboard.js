@@ -13,19 +13,19 @@ import LAST_12_MONTHS from '@salesforce/label/c.Programs_Dashboard_Last12Months'
 import ACTIVE_PROGRAMS from '@salesforce/label/c.Programs_Dashboard_ActivePrograms';
 import OPEN_ENROLLMENTS from '@salesforce/label/c.Programs_Dashboard_OpenEnrollments';
 import NEW_ENROLLMENTS from '@salesforce/label/c.Programs_Dashboard_NewEnrollments';
-import COMPLETED from '@salesforce/label/c.Programs_Dashboard_Completed';
+import COMPLETED from '@salesforce/label/c.Core_Shared_Completed';
 import PEOPLE_SERVED from '@salesforce/label/c.Programs_Dashboard_PeopleServed';
 import PEOPLE_COUNTED from '@salesforce/label/c.Programs_Dashboard_PeopleCounted';
 import DELIVERED from '@salesforce/label/c.Programs_Dashboard_Delivered';
 import ATTENDANCE_RATE from '@salesforce/label/c.Programs_Dashboard_AttendanceRate';
-import PROGRAM from '@salesforce/label/c.Programs_Dashboard_Program';
+import PROGRAM from '@salesforce/label/c.Core_Shared_Program';
 import BY_PROGRAM from '@salesforce/label/c.Programs_Dashboard_ByProgram';
 import NO_RATE from '@salesforce/label/c.Programs_Dashboard_NoRate';
 import NO_PROGRAMS from '@salesforce/label/c.Programs_Dashboard_NoPrograms';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Dashboard_MoreThanShown';
 import LOAD_FAILED from '@salesforce/label/c.Programs_Dashboard_LoadFailed';
 import NO_ACCESS from '@salesforce/label/c.Programs_Dashboard_NoAccess';
-import LOADING from '@salesforce/label/c.Programs_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import { DEFAULT_PERIOD, periodRange, programRows, tiles } from './dashboardRows';
 

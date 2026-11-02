@@ -173,11 +173,11 @@ public with sharing class GiftTransactionMirrorReconciliation {
     private static void checkReady(Date fromDate, Date toDate) {
         if (fromDate == null || toDate == null) {
             throw new ReconciliationException(
-                Label.Mirror_GiftTransactionMirror_ErrorDatesRequired
+                Label.Mirror_OpportunityMirror_ErrorDatesRequired
             );
         }
         if (fromDate > toDate) {
-            throw new ReconciliationException(Label.Mirror_GiftTransactionMirror_ErrorDateOrder);
+            throw new ReconciliationException(Label.Mirror_OpportunityMirror_ErrorDateOrder);
         }
         if (!GiftTransactionMirrorService.isAvailable()) {
             throw new ReconciliationException(Label.Mirror_GiftTransactionMirror_Unavailable);
@@ -217,10 +217,10 @@ public with sharing class GiftTransactionMirrorReconciliation {
         List<String> reasons = new List<String>();
         Decimal giftAmount = gift.Amount__c == null ? 0 : gift.Amount__c;
         if (giftAmount != amountOf(giftTransaction)) {
-            reasons.add(Label.Mirror_GiftTransactionMirror_DiffAmount);
+            reasons.add(Label.Mirror_OpportunityMirror_DiffAmount);
         }
         if (gift.Gift_Date__c != (Date) giftTransaction.get(names.dateField)) {
-            reasons.add(Label.Mirror_GiftTransactionMirror_DiffDate);
+            reasons.add(Label.Mirror_OpportunityMirror_DiffDate);
         }
         if (!MirrorSync.same(status, giftTransaction.get(names.statusField))) {
             reasons.add(Label.Mirror_GiftTransactionMirror_DiffStatus);

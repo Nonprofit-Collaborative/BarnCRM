@@ -7,7 +7,7 @@ import TITLE from '@salesforce/label/c.Funders_Board_Title';
 import HELP from '@salesforce/label/c.Funders_Board_Help';
 import MIX from '@salesforce/label/c.Funders_Board_Mix';
 import GIFTS from '@salesforce/label/c.Funders_Board_Gifts';
-import NOT_SET from '@salesforce/label/c.Funders_Board_NotSet';
+import NOT_SET from '@salesforce/label/c.Core_Settings_NotSet';
 import TOTAL from '@salesforce/label/c.Funders_Board_Total';
 import CONCENTRATION from '@salesforce/label/c.Funders_Board_Concentration';
 import SINGLE_RISK from '@salesforce/label/c.Funders_Board_SingleRisk';

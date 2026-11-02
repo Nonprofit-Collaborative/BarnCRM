@@ -17,14 +17,6 @@
         <value>Who gave this gift</value>
     </labels>
     <labels>
-        <fullName>Giving_QuickGiftEntry_DonorKindOrganization</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: donor kind, an organization</shortDescription>
-        <value>Organization</value>
-    </labels>
-    <labels>
         <fullName>Giving_QuickGiftEntry_NewPerson</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

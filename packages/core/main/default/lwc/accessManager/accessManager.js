@@ -52,7 +52,7 @@ import SEARCH_PLACEHOLDER from '@salesforce/label/c.Core_Access_SearchPlaceholde
 import SELF_REMOVAL_WARNING from '@salesforce/label/c.Core_Access_SelfRemovalWarning';
 import REMOVE_PERSON from '@salesforce/label/c.Core_Access_RemovePerson';
 import TOAST_ERROR_TITLE from '@salesforce/label/c.Core_Access_ToastErrorTitle';
-import TOAST_SUCCESS_TITLE from '@salesforce/label/c.Core_Access_ToastSuccessTitle';
+import TOAST_SUCCESS_TITLE from '@salesforce/label/c.Core_SetupAssistant_DoneBadge';
 import USERS_IN_ROLE from '@salesforce/label/c.Core_Access_UsersInRole';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupPath } from 'c/setupLinks';

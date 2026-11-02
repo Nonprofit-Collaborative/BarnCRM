@@ -31,7 +31,7 @@ import OPEN_FIND from '@salesforce/label/c.Core_DataHygiene_OpenInFind';
 import OPEN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
 import { bodyMessage, format } from 'c/findCsv';
 import WhereUsedModal from 'c/whereUsedModal';
-import WHERE_USED_ALT from '@salesforce/label/c.Core_WhereUsed_ActionAlt';
+import WHERE_USED_ALT from '@salesforce/label/c.Core_WhereUsed_Title';
 
 /**
  * The Record Inspector (C-55): a record page component that lists every field the viewer may

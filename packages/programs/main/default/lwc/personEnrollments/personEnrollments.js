@@ -9,7 +9,7 @@ import ENDED from '@salesforce/label/c.Core_EraseAction_Ended';
 import LOAD_FAILED from '@salesforce/label/c.Programs_Person_LoadFailed';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Person_MoreThanShown';
-import LOADING from '@salesforce/label/c.Programs_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import LAST_SERVICE from '@salesforce/label/c.Programs_Person_LastService';
 import SERVICES_ATTENDED from '@salesforce/label/c.Programs_Person_ServicesAttended';
 

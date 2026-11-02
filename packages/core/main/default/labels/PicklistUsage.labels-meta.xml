@@ -73,52 +73,12 @@
         <value>Only the 500 most used values in the data are shown for: {0}.</value>
     </labels>
     <labels>
-        <fullName>Core_PicklistUsage_ColField</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Picklist usage: column</shortDescription>
-        <value>Field</value>
-    </labels>
-    <labels>
-        <fullName>Core_PicklistUsage_ColValue</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Picklist usage: column</shortDescription>
-        <value>Value</value>
-    </labels>
-    <labels>
-        <fullName>Core_PicklistUsage_ColStatus</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Picklist usage: column</shortDescription>
-        <value>Status</value>
-    </labels>
-    <labels>
-        <fullName>Core_PicklistUsage_ColRecords</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Picklist usage: column</shortDescription>
-        <value>Records</value>
-    </labels>
-    <labels>
         <fullName>Core_PicklistUsage_ColLastUsed</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Picklist usage: column</shortDescription>
         <value>Last Used</value>
-    </labels>
-    <labels>
-        <fullName>Core_PicklistUsage_StatusActive</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Picklist usage: status</shortDescription>
-        <value>Active</value>
     </labels>
     <labels>
         <fullName>Core_PicklistUsage_StatusInactive</fullName>

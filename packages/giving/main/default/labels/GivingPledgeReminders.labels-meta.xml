@@ -329,14 +329,6 @@
     <value>Step</value>
   </labels>
   <labels>
-    <fullName>Giving_PledgeReminders_ColumnTiming</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: column timing</shortDescription>
-    <value>When</value>
-  </labels>
-  <labels>
     <fullName>Giving_PledgeReminders_ColumnPledge</fullName>
     <categories>Giving, Pledge Reminders</categories>
     <language>en_US</language>

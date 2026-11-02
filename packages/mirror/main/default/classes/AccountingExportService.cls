@@ -105,7 +105,7 @@ public with sharing class AccountingExportService {
         Set<String> methods = new Set<String>(paymentMethods());
         if (String.isNotBlank(paymentMethod)) {
             if (!methods.contains(paymentMethod)) {
-                throw new ExportException(Label.Mirror_AccountingExport_ErrorPaymentMethod);
+                throw new ExportException(Label.Giving_QuickGiftEntry_ErrorTypeInvalid);
             }
             methods = new Set<String>{ paymentMethod };
         }

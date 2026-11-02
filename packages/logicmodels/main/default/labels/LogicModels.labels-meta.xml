@@ -177,14 +177,6 @@
         <value>That arrow is already there. Change its assumption instead.</value>
     </labels>
     <labels>
-        <fullName>LogicModels_Builder_ArrowPair</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>One arrow named: {0} its start, {1} its end</shortDescription>
-        <value>{0} to {1}</value>
-    </labels>
-    <labels>
         <fullName>LogicModels_Builder_BackwardArrows</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>
@@ -263,14 +255,6 @@
         <protected>true</protected>
         <shortDescription>Before the selected part's column name</shortDescription>
         <value>Selected Part</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Part_MoveUp</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Move a part up its column</shortDescription>
-        <value>Move Up</value>
     </labels>
     <labels>
         <fullName>LogicModels_Part_DeleteConfirm</fullName>
@@ -745,14 +729,6 @@
         <value>Count Unique</value>
     </labels>
     <labels>
-        <fullName>LogicModels_Source_FieldLabel</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Field to sum or count once</shortDescription>
-        <value>Field</value>
-    </labels>
-    <labels>
         <fullName>LogicModels_Source_Refresh</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>
@@ -857,14 +833,6 @@
         <value>Choose at least one period to compare.</value>
     </labels>
     <labels>
-        <fullName>LogicModels_Report_DownloadCsv</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Download report as CSV</shortDescription>
-        <value>Download CSV</value>
-    </labels>
-    <labels>
         <fullName>LogicModels_Report_Printable</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>
@@ -903,21 +871,5 @@
         <protected>true</protected>
         <shortDescription>Report line; {0} model, {1} whose, {2} date</shortDescription>
         <value>{0}. For: {1}. Prepared {2}.</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Report_PeriodDates</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Period dates; {0} start, {1} end</shortDescription>
-        <value>{0} to {1}</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Report_Downloaded</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Report file saved</shortDescription>
-        <value>Report downloaded.</value>
     </labels>
 </CustomLabels>

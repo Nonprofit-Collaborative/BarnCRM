@@ -8,7 +8,7 @@ jest.mock('@salesforce/apex/WhereUsedController.findReferences', () => ({ defaul
 });
 
 jest.mock(
-  '@salesforce/label/c.Core_WhereUsed_Progress',
+  '@salesforce/label/c.Core_SetupAssistant_ProgressFormat',
   () => ({ default: '{0} of {1} steps done' }),
   {
     virtual: true

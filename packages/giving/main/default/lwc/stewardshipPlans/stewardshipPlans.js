@@ -31,7 +31,7 @@ import FIELD_DESCRIPTION from '@salesforce/label/c.Core_Shared_Description';
 import STEPS_HEADING from '@salesforce/label/c.Giving_Stewardship_StepsHeading';
 import NO_STEPS from '@salesforce/label/c.Giving_Stewardship_NoSteps';
 import SELECT_PLAN from '@salesforce/label/c.Giving_Stewardship_SelectPlan';
-import ADD_STEP from '@salesforce/label/c.Giving_Stewardship_AddStep';
+import ADD_STEP from '@salesforce/label/c.Core_Shared_AddStep';
 import MOVE_UP from '@salesforce/label/c.Giving_Stewardship_MoveUp';
 import MOVE_DOWN from '@salesforce/label/c.Core_Shared_MoveDown';
 import REMOVE_STEP from '@salesforce/label/c.Core_Find_Remove';

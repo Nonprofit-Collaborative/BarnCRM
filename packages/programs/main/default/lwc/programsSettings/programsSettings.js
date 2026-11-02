@@ -20,7 +20,7 @@ import PRIVACY_DEFAULT from '@salesforce/label/c.Programs_Settings_PrivacyDefaul
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import SAVED from '@salesforce/label/c.Programs_Settings_Saved';
 import SAVE_FAILED from '@salesforce/label/c.Programs_Settings_SaveFailed';
-import LOADING from '@salesforce/label/c.Programs_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import { PRIVATE, picklistRows, privacyOptions, storedPrivacy } from './settingsRows';
 

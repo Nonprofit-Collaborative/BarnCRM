@@ -241,22 +241,6 @@
     <value>{0} days in this stage</value>
   </labels>
   <labels>
-    <fullName>Giving_AskPipeline_MoveTo</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Ask Pipeline: card menu item ({0} is the stage)</shortDescription>
-    <value>Move to {0}</value>
-  </labels>
-  <labels>
-    <fullName>Giving_AskPipeline_Open</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Ask Pipeline: card menu item opening the ask</shortDescription>
-    <value>Open</value>
-  </labels>
-  <labels>
     <fullName>Giving_AskPipeline_CloseAsk</fullName>
     <categories>Giving, Asks</categories>
     <language>en_US</language>
@@ -281,28 +265,12 @@
     <value>Ask Amount</value>
   </labels>
   <labels>
-    <fullName>Giving_AskPipeline_ColTarget</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Ask Pipeline list: target date column</shortDescription>
-    <value>Target Date</value>
-  </labels>
-  <labels>
     <fullName>Giving_AskPipeline_ColNextStep</fullName>
     <categories>Giving, Asks</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Ask Pipeline list: next step column</shortDescription>
     <value>Next Step</value>
-  </labels>
-  <labels>
-    <fullName>Giving_AskPipeline_ColAssigned</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Ask Pipeline list: assigned to column</shortDescription>
-    <value>Assigned To</value>
   </labels>
   <labels>
     <fullName>Giving_AskPipeline_ColDays</fullName>
@@ -479,14 +447,6 @@
     <protected>false</protected>
     <shortDescription>Ask Pipeline: toast after closing an ask</shortDescription>
     <value>Ask closed.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_AskPipeline_Moved</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Ask Pipeline: toast after a move ({0} is the stage)</shortDescription>
-    <value>Moved to {0}.</value>
   </labels>
   <labels>
     <fullName>Giving_AskPipeline_ErrorAction</fullName>
