@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Gift_Transaction_Mirror_Last_Run__c</fullName>
+  <description>
+    Written by the Gift Transaction mirror's runs, not by an administrator: when the last completed
+    run started. The next run rechecks linked gifts changed since then.
+  </description>
+  <externalId>false</externalId>
+  <label>Gift Transaction Mirror Last Run</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>DateTime</type>
+</CustomField>

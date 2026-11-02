@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Gift_Transaction_Id__c</fullName>
+  <caseSensitive>true</caseSensitive>
+  <description>
+    The record ID of the Nonprofit Cloud Gift Transaction this gift is mirrored to by the Gift
+    Transaction mirror (BarnCRM Mirror). Text, not a lookup, so Mirror installs where Nonprofit
+    Cloud does not exist (ADR-0013).
+  </description>
+  <externalId>true</externalId>
+  <inlineHelpText>
+    The Nonprofit Cloud Gift Transaction this gift is mirrored to. Filled in by the Gift
+    Transaction mirror. Paste an existing Gift Transaction's record ID to link to it, or clear it
+    to have a new one made.
+  </inlineHelpText>
+  <label>Gift Transaction ID</label>
+  <length>18</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>true</unique>
+</CustomField>

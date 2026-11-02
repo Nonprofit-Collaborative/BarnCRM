@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Gift_Designation_Id__c</fullName>
+  <caseSensitive>false</caseSensitive>
+  <description>
+    The record ID of the Nonprofit Cloud Gift Designation this fund stands for, typed by an
+    administrator. The Gift Transaction mirror (BarnCRM Mirror) designates each new Gift
+    Transaction's share of this fund to it. Text, not a lookup, so Mirror installs where Nonprofit
+    Cloud does not exist (ADR-0013).
+  </description>
+  <externalId>false</externalId>
+  <inlineHelpText>
+    Paste the record ID of the Nonprofit Cloud Gift Designation this fund stands for. Gifts to
+    this fund are then designated to it when the Gift Transaction mirror copies them. Empty means
+    no designation.
+  </inlineHelpText>
+  <label>Gift Designation ID</label>
+  <length>18</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>
