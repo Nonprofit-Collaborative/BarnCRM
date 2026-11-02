@@ -122,6 +122,30 @@ it.
 You should see: the values on the grant's page. An Assistance Listing Number not written like
 84.287, a rate above 100 or a negative match is refused with a message saying why.
 
+## To Save an Answer You Reuse
+
+1. Click the **Grant Answers** tab, then **New**. Or click **New Answer** in the **Answer Library**
+   card on any grant's page.
+2. Type an **Answer Title** that says what it is and how long, for example "Mission statement
+   (100 words)".
+3. Paste the text into **Answer**.
+4. In **Topics**, type the topics it answers, separated by commas, for example "Mission, Need".
+5. Click **Save**.
+
+You should see: the answer in the **Answer Library** card on every grant's page.
+
+## To Copy an Answer Into an Application
+
+1. On the grant's page, scroll to the **Answer Library** card.
+2. Type words in **Search Answers**, or choose a **Topic**, to narrow the list. Each answer shows
+   its topics, word count and when it was last used.
+3. Click **Show All** to read a long answer in full, then **Copy**.
+4. Paste it into the funder's form or your proposal document.
+
+You should see: `Copied. Paste it into the application.`, and the answer's **Last used** date
+becomes today. If your browser does not allow copying, click **Show All**, select the text and
+copy it yourself.
+
 ## Tips
 
 - **Declined is history worth keeping.** Set Declined rather than deleting: it tells you whom to

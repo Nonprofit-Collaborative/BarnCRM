@@ -11,6 +11,10 @@
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
+    <apexClass>GrantAnswerController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>GrantPipelineController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -18,6 +22,21 @@
     <apexClass>GrantProgramController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Grant_Answer__c.Answer__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Grant_Answer__c.Last_Used_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Grant_Answer__c.Topics__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
     <field>Grant_Requirement__c.Assigned_To__c</field>
@@ -134,6 +153,15 @@
     <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
+    <object>Grant_Answer__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
     <object>Grant_Requirement__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
@@ -146,6 +174,10 @@
     <object>Grant__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <tabSettings>
+    <tab>Grant_Answer__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
   <tabSettings>
     <tab>Grant_Pipeline</tab>
     <visibility>Visible</visibility>

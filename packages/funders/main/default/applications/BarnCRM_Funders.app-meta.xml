@@ -33,12 +33,16 @@
   <tabs>Grant_Pipeline</tabs>
   <tabs>Grant__c</tabs>
   <tabs>Grant_Requirement__c</tabs>
+  <tabs>Grant_Answer__c</tabs>
   <tabs>standard-report</tabs>
   <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
     <mappings>
       <tab>Error_Log__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Grant_Answer__c</tab>
     </mappings>
     <mappings>
       <tab>Grant_Pipeline</tab>

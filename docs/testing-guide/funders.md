@@ -1,6 +1,6 @@
 # Funders
 
-Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02) and government award fields (F-04). Setup detail: [Funders](../admin-guide/funders.md).
+Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02) government award fields (F-04) and the answer library (F-14). Setup detail: [Funders](../admin-guide/funders.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder,
 Giving and Funders deployed. Programs is optional; T-FUN-04 needs it for its second half. Funders
@@ -156,3 +156,22 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 6 | As read-only, open `Youth Grant`. | The Government Award section shows the values; nothing can be edited. |
 
 **Cleanup:** none.
+
+## T-FUN-13: Answer Library
+
+**Purpose:** confirm the answer library: topics, search, copying and the last used date (F-14, R-GA1 to R-GA3).
+**Prerequisites:** staff and read-only; a grant `Youth Grant`; no grant answers yet.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff, open `Youth Grant`. | An **Answer Library** card: `No answers yet. Keep the application answers you reuse on the Grant Answers tab.` and a **New Answer** button. |
+| 2 | Click **New Answer**: **Answer Title** `Mission (50 words)`, **Topics** `Mission, Organization`, **Answer** `We teach children to read.`; **Save**. Add `Need statement`, **Topics** `need`, with a paragraph of over 60 words. | Both saved; **Last Used Date** is blank. |
+| 3 | Back on `Youth Grant`, open the **Topic** list. | `All topics`, `Mission`, `need`, `Organization`. |
+| 4 | Choose `Mission`. | Only `Mission (50 words)`, with badges `Mission` and `Organization` and `6 words | Never used`. |
+| 5 | Choose `All topics` and search `CHILDREN teach`. | Only `Mission (50 words)`: every word must appear, in any case. Search `zebra`: `No answer matches. Try other words or another topic.` |
+| 6 | Clear the search. On `Need statement` click **Show All**, then **Show Less**. | The whole text, then the start with `...`. |
+| 7 | Click **Copy** on `Mission (50 words)` and paste into a text editor. | `Copied. Paste it into the application.`; the text pastes exactly; the card shows `Last used` with today's date; the record's **Last Used Date** is today. |
+| 8 | As read-only, open `Youth Grant`, click **Copy** on `Need statement`. | The text is copied; no **New Answer** button; its **Last Used Date** stays blank. |
+| 9 | As read-only, open the **Grant Answers** tab. | The answers are listed; **New** is not offered. |
+
+**Cleanup:** delete the two answers as staff.

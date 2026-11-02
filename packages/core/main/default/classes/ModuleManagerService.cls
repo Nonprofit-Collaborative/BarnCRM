@@ -101,7 +101,7 @@ public with sharing class ModuleManagerService {
             'Logic_Model_Element__c',
             'Logic_Model_Link__c'
         },
-        'Funders' => new List<String>{ 'Grant__c', 'Grant_Requirement__c' }
+        'Funders' => new List<String>{ 'Grant__c', 'Grant_Answer__c', 'Grant_Requirement__c' }
     };
 
     /** The permission set Turn on gives the person who turned the module on. */
