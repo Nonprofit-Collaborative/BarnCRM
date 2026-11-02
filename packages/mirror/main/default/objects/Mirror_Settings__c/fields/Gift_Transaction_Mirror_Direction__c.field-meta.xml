@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Gift_Transaction_Mirror_Direction__c</fullName>
+  <defaultValue>"Off"</defaultValue>
+  <description>
+    Whether the Gift Transaction mirror copies gifts to Nonprofit Cloud Gift Transactions: Off or
+    GiftsToGiftTransactions. Empty reads as Off. Set in the Giving section of BarnCRM Settings.
+  </description>
+  <externalId>false</externalId>
+  <inlineHelpText>
+    Whether received gifts are copied to Nonprofit Cloud Gift Transactions. Off until you choose.
+  </inlineHelpText>
+  <label>Gift Transaction Mirror Direction</label>
+  <length>40</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

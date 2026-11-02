@@ -17,6 +17,14 @@
     <value>Edit a gift's Opportunity ID and open the Opportunity mirror page. Creating Opportunities also needs Opportunity access.</value>
   </labels>
   <labels>
+    <fullName>Mirror_Access_AddOnGiftTransactionMirror</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>true</protected>
+    <shortDescription>Access page: what Gift Transaction Mirror grants</shortDescription>
+    <value>Edit a gift's Gift Transaction ID and a fund's Gift Designation ID, and open the Gift Transaction mirror page. Creating Gift Transactions also needs the Nonprofit Cloud Fundraising User permission.</value>
+  </labels>
+  <labels>
     <fullName>Mirror_Access_AddOnAccountingExport</fullName>
     <categories>Mirror</categories>
     <language>en_US</language>

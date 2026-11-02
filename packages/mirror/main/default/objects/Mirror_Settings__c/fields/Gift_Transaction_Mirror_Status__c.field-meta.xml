@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Gift_Transaction_Mirror_Status__c</fullName>
+  <defaultValue>"Paid"</defaultValue>
+  <description>
+    The API value of the Gift Transaction Status that means paid in this org, written on each Gift
+    Transaction the Gift Transaction mirror creates. Empty reads as Paid. A value the org's Status
+    list does not have active stops the mirror until it is corrected.
+  </description>
+  <externalId>false</externalId>
+  <inlineHelpText>
+    The Status your paid Gift Transactions have, exactly as its API name. Nothing is copied while it
+    is not one of your org's active Status values.
+  </inlineHelpText>
+  <label>Gift Transaction Mirror Status</label>
+  <length>255</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

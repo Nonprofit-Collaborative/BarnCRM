@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>Gift Transaction Mirror</label>
+  <description>
+    For whoever runs the Gift Transaction mirror: edits a gift's Gift Transaction ID and a fund's
+    Gift Designation ID, and opens the mirror page. Gift Transactions themselves also need
+    Nonprofit Cloud's Fundraising User permission.
+  </description>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Use_Gift_Transaction_Mirror</name>
+  </customPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Fund__c.Gift_Designation_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Gift__c.Gift_Transaction_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+</PermissionSet>

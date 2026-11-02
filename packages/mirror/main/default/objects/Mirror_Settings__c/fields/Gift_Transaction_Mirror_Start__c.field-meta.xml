@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Gift_Transaction_Mirror_Start__c</fullName>
+  <description>
+    The Gift Transaction mirror copies only gifts dated on or after this date, read as a date in
+    the org's time zone. Empty means nothing is copied.
+  </description>
+  <externalId>false</externalId>
+  <inlineHelpText>
+    Only gifts dated on or after this date are copied. Until it is set, none are.
+  </inlineHelpText>
+  <label>Gift Transaction Mirror Start</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>DateTime</type>
+</CustomField>
