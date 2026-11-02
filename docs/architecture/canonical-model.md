@@ -10547,13 +10547,18 @@ Changes copies (Section 29W).
 **R-FA7 Undo.** Within the Undo Deadline, an undo puts each journaled row back to its before
 access (deleting a created row, recreating a deleted one, in the reverse of R-FA6's order) when
 the row's access now is still its after access; a row changed since is kept and recorded as a
-`NotRestored` entry in the Undo phase. Status becomes Undone, or Undo failed when nothing could
-be put back. A change is undone once.
+`NotRestored` entry in the Undo phase. Status becomes Undone, or Undo failed when the platform
+refused every row the undo tried and none was put back; an Undo failed change can be undone
+again, an Undone one cannot. The permission rows are setup records, which cannot share a
+transaction with the data job, its journal or the Error Log (mixed DML), so the apply and the
+undo write the rows and a queued job (`FieldAccessRecordJob`) writes the data job, the journal
+pages and any refusals straight after, as the same person.
 
 ### Salesforce implementation
 
 - **No new object or field.** `Import_Batch__c.Operation__c` gains the value Access (Section 16).
-- **Service:** `FieldAccessService` (eligibility, preview, apply, undo), `FieldAccessController`
+- **Service:** `FieldAccessService` (eligibility, preview, apply, undo), `FieldAccessRecordJob`
+  (the data job, journal and Error Log entries, in their own transaction), `FieldAccessController`
   (thin, plain JSON shapes, the R-FA2 check); the change document, its checks and the preview's
   grouping and counts run in the framework-free module `fieldAccessPlan.js` (plan 9.9).
 
