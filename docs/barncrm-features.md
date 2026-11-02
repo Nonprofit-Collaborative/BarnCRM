@@ -59,6 +59,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Households follow person changes | Minor | Renaming, deleting or restoring a person recounts and renames their households in both membership models. | Shipped | C-01 |
 | Member count | Minor | Keeps each household's member count correct as people join, move or leave. | Shipped | C-01 |
 | Nonprofit Cloud household guards | Minor | Detects households Nonprofit Cloud already manages and never renames, readdresses, deletes or duplicates them. | Shipped | X-09 (in Core) |
+| Adopt NPSP households | Minor | In an org with NPSP, turns NPSP's household accounts into BarnCRM households in place (same records, members and Opportunities), carrying over greetings, primary contact and hand-typed names, with a preview, a typed-count confirmation and undo per run. Shown only where NPSP is detected. | Built, not merged (`feature/x-05-npsp-household-adoption`) | X-05 (in Core, ADR-NEXT) |
 | Interaction notes | Minor | A "Log an Interaction" action on person and organization pages records a meeting or contact report as a completed activity, for major-gift work. | Shipped | C-39 |
 
 ### 1.2 Relationships and Affiliations
@@ -565,7 +566,6 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Inbound gift API | Major | A versioned web address and a "Record Inbound Gift" Flow action let a giving page or processor record gifts directly. | Shipped | X-03, ADR-0051 |
 | Accounting export | Major | Downloads gifts in a date range as a CSV with one row per fund, accounting codes and refunds as negative rows, ready for QuickBooks or Xero. | Shipped | X-04, ADR-0051 |
 | Gift Transaction mirror | Major | Mirrors gifts one way to Nonprofit Cloud's Gift Transaction so native donor summaries still see them. | Planned (v0.6 per plan 6.3; next roadmap item) | X-07 |
-| NPSP coexistence adoption | Major | Adopts existing NPSP household accounts and maps record types. | Planned (v0.10) | X-05 |
 | Mirror reconciliation page | Minor | Compares gifts and won Opportunities for any date range, lists differences, and fixes the gift side in one click. | Shipped | X-01 |
 | Mirror nightly catch-up | Minor | A scheduled run catches up anything a save could not mirror; Health Check flags a stalled run. | Shipped | X-01 |
 | Mirror record type filter and start date | Minor | Limits which won Opportunities become gifts. | Shipped | X-01 |

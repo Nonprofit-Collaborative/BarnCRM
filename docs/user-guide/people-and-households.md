@@ -149,6 +149,9 @@ Erasing a person on request is admin work. See [Erase a person](../admin-guide/e
 - Problem: "The primary contact could not be changed. Check that you can edit this household
   and try again." Ask your admin for edit access.
 - Problem: the household name will not update. **Custom Name** is ticked. Untick it.
+- Problem: in an org that also has NPSP, a household's name and greetings are the ones NPSP
+  had, and **Custom Name** is ticked. Your admin adopted NPSP's households and kept their
+  wording. Untick **Custom Name** if you want BarnCRM to name it from its members.
 - Problem: there is no **Households** tab. Your organization has not turned households on
   yet. Ask your admin.
 - Problem: **Household** is not offered when you click **New**. That is expected: use **New

@@ -311,3 +311,22 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 7 | If step 3 chose another record type: move any accounts still on **Organization** to it, then in Setup, Object Manager, Account, Record Types, deactivate **Organization**. Reopen **BarnCRM Settings**, **General**. | **Record type for organizations** still shows your choice, and Organization is no longer among its choices. The Organizations tab lists the same records as in step 1. |
 
 **Cleanup:** none.
+
+## T-HH-21: Adopt NPSP Households
+
+**Purpose:** NPSP's household accounts become BarnCRM households in place, keep their wording, and can be put back ([Adopting Your NPSP Households](../admin-guide/npsp-households.md)).
+**Prerequisites:** admin; **an org with NPSP installed** and at least two NPSP households (one couple with greetings typed by hand, one single person); NPSP's **Automatic Household Naming** off; BarnCRM **Household membership** set to **Contact**. Steps 1 and 9 also run in an org without NPSP. Only an NPSP org proves steps 2 to 8: BarnCRM's own tests use a stand-in for NPSP's fields.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In an org without NPSP, open **BarnCRM Settings**, **General**. | No **Adopt NPSP Households** section, and no mention of NPSP. |
+| 2 | In the NPSP org, open **BarnCRM Settings**, **General**. | **Adopt NPSP Households** shows below Coexistence mode, with **N NPSP households can be adopted** (N is your number of NPSP households) and up to ten rows: name, NPSP formal and informal greetings, primary contact, number of contacts. |
+| 3 | Set **Household membership** to membership records, save, and return. | The section says to set Household membership to Contact first, and **Adopt Households** is disabled. Set it back to **Contact**. |
+| 4 | Leave **Keep NPSP's names and greetings** ticked, select **Adopt Households**, type a number other than N and confirm. | The confirm button stays disabled until the typed number is N. |
+| 5 | Type N and select **Adopt**. | The section says the adoption is running, then **Last adoption: N adopted**. The Error Log has one Info entry with the counts. |
+| 6 | Open the couple's household. | Same record and Opportunities as before; the BarnCRM household page with **Name and Greetings** and **Members**; record type **Household**; name and greetings exactly as NPSP had them; **Custom Name** ticked; Primary Contact is NPSP's primary contact; Member Count **2**. |
+| 7 | Edit one member's first name and save. Refresh the household. | BarnCRM does not rename it (Custom Name). NPSP does not rename it either; if NPSP does, record it as a defect with the NPSP version. |
+| 8 | Select **Undo This Adoption**, type N and select **Undo**. | **Last adoption** shows N undone. The couple's household has its NPSP record type again, Custom Name unticked, BarnCRM greetings and Primary Contact blank as before. |
+| 9 | As a user without **Manage BarnCRM Settings**, open **BarnCRM Settings**, **General**. | No **Adopt NPSP Households** section. |
+
+**Cleanup:** none after step 8.

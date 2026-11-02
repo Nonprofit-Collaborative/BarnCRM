@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Previous_Values__c</fullName>
+  <description>JSON of Custom Name, the two household greetings and Primary Contact as they were before adoption, put back by undo.</description>
+  <label>Previous Values</label>
+  <length>32768</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

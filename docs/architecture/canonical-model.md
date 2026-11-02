@@ -10633,6 +10633,87 @@ pages and any refusals straight after, as the same person.
 
 ---
 
+## 29ZH. Household Adoption
+
+### Definition
+
+One Account that BarnCRM adopted as a household from the Nonprofit Success Pack (NPSP), with
+what the Account held before, so the adoption can be undone (feature X-05, ADR-NEXT
+`NEXT-npsp-household-adoption-in-core.md`). Only orgs with NPSP ever have rows. NPSP is read
+only by describe; no NPSP name is part of this entity.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Account ID | text(18) | yes | The adopted Account, now a Household. |
+| Run ID | text(36) | yes | The adoption run that adopted it; undo works on one run. |
+| Previous Record Type ID | text(18) | no | The Account's record type before adoption (NPSP's household record type in most orgs); blank when it had none. |
+| Previous Values | long text(32768) | yes | JSON of the four BarnCRM fields before adoption: `{"Custom_Name__c": false, "Household_Formal_Greeting__c": null, "Household_Informal_Greeting__c": null, "Primary_Contact__c": null}`. |
+| Status | picklist(Adopted, Undone, Not Restored) | yes | Adopted until an undo puts the Account back (Undone) or cannot (Not Restored). |
+| Note | text(255) | no | Why an undo did not put the Account back. |
+
+### Rules
+
+**R-HA1 What is an NPSP household.** An Account whose `npe01__SYSTEM_AccountType__c` is
+`Household Account`, or whose record type's developer name is `HH_Account`, and whose record
+type is not already BarnCRM's Household. Both names are built at run time and read through
+describe; when neither exists the org has nothing to adopt. Read by `NpspHouseholdSource`, the
+seam tests replace.
+
+**R-HA2 Preview first, counted and confirmed.** The preview, in the running user's access,
+counts the candidates and shows the first ten with their name, NPSP greetings, NPSP primary
+contact and number of contacts. Starting a run is refused when the count is zero, when more
+match than the person confirmed, while membership is Junction (ADR-NEXT decision 3), while the
+Household record type is missing, or while another adoption or undo is running.
+
+**R-HA3 What adoption writes.** Per Account, in chunks of at most 100: record type to
+Household; `Household_Formal_Greeting__c` and `Household_Informal_Greeting__c` from
+`npo02__Formal_Greeting__c` and `npo02__Informal_Greeting__c`; `Primary_Contact__c` from
+`npe01__One2OneContact__c` only when that contact's Account is this household (R-H10), else
+blank; `Custom_Name__c` true when the run keeps names (the default) or when
+`npo02__SYSTEM_CUSTOM_NAMING__c` has any value. An Account the person cannot edit
+(`UserRecordAccess`) is skipped and counted. The write is system mode through
+`HouseholdWriter.adoptHouseholds` (ADR-0141); one Household Adoption row is written per Account
+saved, in the same savepoint, so an Account is never adopted without its undo row. Then
+household upkeep runs on the adopted households (R-H4, R-H8, R-H11), never tidying one away.
+No NPSP field is written.
+
+**R-HA4 Undo.** Per run, counted and confirmed: for each Adopted row whose Account still exists,
+is still a Household and the person can edit, the previous record type and the four previous
+values are put back in system mode and the row becomes Undone; otherwise it becomes Not
+Restored with the reason in Note. Member Count is left as written.
+
+**R-HA5 Administrators only.** Preview, start and undo require Manage BarnCRM Settings. Only
+`BarnCRM_Admin` is granted the object, Read and View All. Rows are written only by the
+adoption job in system mode (ADR-0021).
+
+### Salesforce implementation
+
+- **Object** `Household_Adoption__c`, auto number Name `HA-{000000}`, sharing Private, reports
+  on, no activities, feeds, history or search.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Account ID | `Account_Id__c` | Text(18), External ID, not unique. Text, not a lookup, so the journal adds no child relationship to Account and never keeps a household from the tidy-up (R-H12a) or a delete. |
+| Run ID | `Run_Id__c` | Text(36), External ID, not unique |
+| Previous Record Type ID | `Previous_Record_Type_Id__c` | Text(18) |
+| Previous Values | `Previous_Values__c` | Long Text Area(32768) |
+| Status | `Status__c` | Picklist, restricted |
+| Note | `Note__c` | Text(255) |
+
+- **NPSP fields read, never written** (names built at run time, read only when describe finds
+  them and the user may read them): `npe01__SYSTEM_AccountType__c`, `npo02__Formal_Greeting__c`,
+  `npo02__Informal_Greeting__c`, `npe01__One2OneContact__c`, `npo02__SYSTEM_CUSTOM_NAMING__c`,
+  and the Account record type `HH_Account`.
+- **Classes:** `NpspHouseholdSource` (describe-only reads of NPSP, the test seam),
+  `NpspHouseholdAdoptionService` (preview, start, undo, status), `NpspHouseholdAdoptionBatch`
+  (adopt and undo chunks), `NpspHouseholdAdoptionController` (thin, plain JSON shapes). The
+  panel is `npspHouseholdAdoption`, shown on the General page of BarnCRM Settings only when
+  NPSP is detected, the coexistence mode is NPSP, or rows exist.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -10948,6 +11029,7 @@ mirrors the primary member).
 | 0.17 | 2026-11-02 | C-58 technical debt checks in Org Optimizer (plan 6.1.5). `BarnCRM_Settings__c` gains `Old_Api_Version__c` (Org Optimizer keys, default 50); rules R-OO1 to R-OO3. No object added. |
 | 0.17 | 2026-11-02 | C-60 automation inventory in the Data Dictionary (plan 6.1.5). Section 29F: rules R-AI1 to R-AI4. No object or field added. |
 | 0.17 | 2026-11-02 | Field Access Manager (C-65, D-157, ADR-NEXT). New Section 29ZH, rules R-FA1 to R-FA7: a field access change is a data job; `Import_Batch__c.Operation__c` gains the value Access. No object or field added. |
+| 0.17 | 2026-11-02 | NPSP household adoption (X-05, ADR-NEXT `NEXT-npsp-household-adoption-in-core.md`). New Core object Household Adoption (`Household_Adoption__c`, 29ZH) with rules R-HA1 to R-HA5: NPSP household Accounts become BarnCRM households in place (record type, greetings, primary contact, custom name), journaled for undo. NPSP read by describe only. |
 
 ---
 ## 32. Entity ownership by package
@@ -11049,6 +11131,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Logic Model Link | Logic Models | 0.14 (L-01) | 29ZE |
 | Indicator | Logic Models | 0.14 (L-02) | 29ZF |
 | Indicator Period | Logic Models | 0.14 (L-02) | 29ZG |
+| Household Adoption | Core | 0.17 (X-05) | 29ZH |
 | Funders entities | Funders | v0.9 | 30 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |

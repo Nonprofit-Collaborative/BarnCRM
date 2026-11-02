@@ -774,6 +774,36 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Household_Adoption__c.Account_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Household_Adoption__c.Note__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Household_Adoption__c.Previous_Record_Type_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Household_Adoption__c.Previous_Values__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Household_Adoption__c.Run_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Household_Adoption__c.Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Household_Member__c.Account__c</field>
     <readable>true</readable>
@@ -1443,6 +1473,15 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>true</modifyAllRecords>
     <object>Field_Utilization_Snapshot__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Household_Adoption__c</object>
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
