@@ -10002,6 +10002,7 @@ participant record; P-02 records what they attended and received.
 | Eligibility Basis | picklist(Income, Age, Residence, Referral, Other) | no | The main reason the person qualifies or not (P-07). The values are the organization's to change. |
 | Eligibility Date | date | no | When eligibility was decided (R-EN6). |
 | Eligibility Reason | text(255) | no | Why screening gave its result: the reason of the rule that decided it (P-14, R-EN8). Set by screening. |
+| Cohort | reference(Cohort) | no | The group of the program the person takes part with (P-11, R-EN8). |
 
 ### Relationships
 
@@ -10009,6 +10010,8 @@ participant record; P-02 records what they attended and received.
   enrollment has sharing of its own (participant privacy, P-08; ADR-0151 decision 3).
 - **Enrollment to a person**, through the Contact and Account pair (Section 4).
 - **Enrollment to Goal**, one to many, master-detail: the participant's service plan (29ZA2, P-10).
+- **Enrollment to Cohort**, many to one, optional, delete SetNull: the enrollment is the cohort
+  membership (29ZA4, P-11).
 
 ### Rules
 
@@ -10083,6 +10086,11 @@ organization's: an admin adds, renames or deactivates them on the field in Setup
 Enrollment), which the Programs settings page links to; BarnCRM reads them by value, and only
 R-EN6 names two values.
 
+**R-EN8 A cohort of the same program (P-11).** An enrollment's Cohort, when set, is a cohort of
+the enrollment's program (validation rule). Moving a person into or out of a cohort changes this
+one field; there is no membership record (ADR-NEXT decision 10). R-EN2 already keeps a person in
+one cohort of a program at a time. A cohort deleted later empties the field (SetNull).
+
 ### Salesforce implementation
 
 - **Object:** `Enrollment__c`, name field AutoNumber `EN-{000000}`, sharing Private (Public
@@ -10102,6 +10110,7 @@ R-EN6 names two values.
 | Eligibility Basis | `Eligibility_Basis__c` | Picklist, restricted, not required, no default |
 | Eligibility Date | `Eligibility_Date__c` | Date |
 | Eligibility Reason | `Eligibility_Reason__c` | Text(255) (P-14, release 0.15) |
+| Cohort | `Cohort__c` | Lookup to `Cohort__c`, delete constraint SetNull, relationship name Enrollments |
 
 - **Eligibility screening (R-EN8):** `EligibilityRules` (validation and evaluation of the JSON
   rules, no query or save), `EligibilityController` (state, saving rules, screening) and the
@@ -10120,7 +10129,8 @@ R-EN6 names two values.
   always run), sets the group's All Internal Users member (queued, as a group member is a setup
   object), and shares records that have no share yet (`ProgramsSharingBatch`, run at install
   and when the preset is saved). `ProgramsAccessSync` sets the member hourly.
-- **Validation rules:** `Exactly_One_Person` (R-EN1), `End_After_Start` (R-EN4).
+- **Validation rules:** `Exactly_One_Person` (R-EN1), `End_After_Start` (R-EN4),
+  `Cohort_In_Program` (R-EN8).
 - **Service:** `EnrollmentService` (the stage values and the roster panel's reads and writes),
   `EnrollmentRulesHandler` (R-EN2), `EnrollmentDatesHandler` (R-EN3), `EnrollmentSelector`
   (the R-EN2 check reads every enrollment in the org, without sharing, so one the user cannot see
@@ -10137,7 +10147,9 @@ repository and are checked against an org with PMM when MIG-09 is built.
 |---|---|---|
 | Program: Name, Status, Description, Target Population, Start Date, End Date | Program: Name, Status, Description, Target Population, Start Date, End Date | Status values match (Planned, Active, Completed) |
 | Service: Name, Program, Description, Unit of Measure, Active | Service: Name, Program, Description, Unit of Measurement, Status | Status Active maps to Active checked |
-| Enrollment: Program, Contact, Stage, Start Date, End Date | Program Engagement: Program, Contact, Stage, Start Date, End Date | Stages: Applied to Applied; Enrolled and Active to Enrolled; Completed to Completed; Withdrawn to Withdrawn |
+| Enrollment: Program, Contact, Stage, Start Date, End Date, Cohort | Program Engagement: Program, Contact, Stage, Start Date, End Date, Program Cohort | Stages: Applied to Applied; Enrolled and Active to Enrolled; Completed to Completed; Withdrawn to Withdrawn |
+| Cohort: Name, Program, Status, Start Date, End Date (29ZA4, P-11) | Program Cohort: Name, Program, Status, Start Date, End Date | Status values match (Planned, Active, Completed) |
+| Session: Name, Service, Session Date, Start Time, Status (29ZA5, P-11) | Service Session: Name, Service Schedule's Service, Session Start, Status | PMM keeps a Service Schedule above its sessions; BarnCRM has none (ADR-NEXT decision 14). Status: Pending to Scheduled, Complete to Held, Canceled to Cancelled |
 
 ### On a person, Health Check and sample data
 
@@ -10494,6 +10506,135 @@ R-GL1, R-GL4 and R-GL6 apply to steps through their goal.
 
 ---
 
+## 29ZA4. Cohort
+
+### Definition
+
+A group of participants who go through a program together (P-11, release 0.15, ADR-NEXT
+`NEXT-programs-service-plans-cohorts-sessions.md`): the spring class of a job readiness course,
+the Tuesday group of a tutoring program. Its members are the enrollments that name it (R-EN8);
+there is no membership record.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text(80) | yes | What the cohort is called. |
+| Program | reference(Program) | yes | The program the cohort belongs to. |
+| Status | picklist(Planned, Active, Completed) | yes (defaults Active) | Where the cohort stands. |
+| Start Date | date | no | When the cohort starts. |
+| End Date | date | no | When the cohort ends. |
+
+### Relationships
+
+- **Cohort to Program**, many to one, through a required lookup with delete Restrict: a program
+  with cohorts cannot be deleted until they are.
+- **Cohort to Enrollment**, one to many, through the enrollment's Cohort (R-EN8): the members.
+- **Cohort to Session**, one to many, through the session's Cohort (29ZA5).
+
+### Rules
+
+**R-CO1 A cohort holds no participant data.** It names a group, so it is shared as Program is
+(Public Read/Write); who is in it is seen through the enrollments, under the Participant Privacy
+preset (R-EN7). Programs Admin creates, edits and deletes cohorts; Programs Staff create and edit
+them; Programs Read Only reads them.
+
+**R-CO2 End after start.** End Date, when set, is not before Start Date (validation rule).
+
+**R-CO3 Mass enrollment.** The Cohort Members panel adds many people at once: each person picked
+and each open enrollment of the program not yet in a cohort that is ticked. A person with an open
+enrollment in the program is moved into the cohort (its Cohort is set); a person without one is
+enrolled at stage Enrolled, in the cohort, through the enrollment rules (R-EN1 to R-EN3). Each
+person succeeds or fails alone, and the panel lists who failed and why. Removing a member empties
+the enrollment's Cohort and keeps the enrollment. At most 200 people are added in one action.
+
+### Salesforce implementation
+
+- **Object:** `Cohort__c`, name field Text(80) labelled Cohort Name, sharing Public Read/Write.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Program | `Program__c` | Lookup to `Program__c`, required, delete constraint Restrict, relationship name Cohorts |
+| Status | `Status__c` | Picklist, restricted, required, default Active |
+| Start Date | `Start_Date__c` | Date |
+| End Date | `End_Date__c` | Date |
+
+- **Validation rule:** `End_After_Start` (R-CO2).
+- **Cohort page:** `Cohort_Record_Page` with the `cohortMembers` panel (R-CO3) and the
+  `sessionScheduler` panel (R-SE4), through `CohortController` (thin, plain JSON, user mode).
+- **PMM mapping:** Program Cohort (29ZA, PMM mapping).
+
+---
+
+## 29ZA5. Session
+
+### Definition
+
+One scheduled occurrence of a service (P-11): the 6 pm class on 3 March, Tuesday's tutoring hour.
+Attendance at a session is recorded as Service Delivery (29ZB), so a session has no attendance
+record of its own (ADR-NEXT decision 12).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text(80) | yes | What the session is called; scheduling names it after its service and date. |
+| Service | reference(Service) | yes | The service given at the session, and through it the program. |
+| Cohort | reference(Cohort) | no | The cohort the session is for, a cohort of the service's program (R-SE1). Empty: for everyone enrolled in the program. |
+| Session Date | date | yes | The day of the session. |
+| Start Time | time | no | When the session starts. |
+| Status | picklist(Scheduled, Held, Cancelled) | yes (defaults Scheduled) | Whether the session is still to come, took place or was called off. |
+
+### Relationships
+
+- **Session to Service**, many to one, through a required lookup with delete Restrict, not a
+  detail, so a service keeps its sessions' history: a service with sessions cannot be deleted;
+  clear its Active box instead.
+- **Session to Cohort**, many to one, optional, delete SetNull.
+- **Session to Service Delivery**, one to many, through the delivery's Session (R-SD7).
+
+### Rules
+
+**R-SE1 A cohort of the same program.** A session's Cohort, when set, is a cohort of its
+service's program (validation rule).
+
+**R-SE2 Attendance is taken on the session.** The Service Delivery Log on the session page lists
+the cohort's open enrollments (the program's when the session has no cohort) and saves their
+deliveries with the session named (R-SD7). Saving attendance on a Scheduled session marks it Held.
+
+**R-SE3 A cancelled session takes no attendance.** The log on a Cancelled session shows what was
+recorded and saves nothing.
+
+**R-SE4 Sessions are scheduled in a batch, not by a rule.** The Schedule Sessions panel (on a
+cohort, and on a program for sessions with no cohort) creates one Scheduled session for each
+chosen weekday between two dates, with a start time, at most 200 at a time. The dates are worked
+out in a framework-free module (plan 9.9); the server checks again that the service is the
+program's, the cohort is the program's, and the count. No schedule record is kept: each session
+is edited or cancelled on its own, and scheduling again adds more.
+
+**R-SE5 Who.** As R-CO1: sessions hold no participant data and are shared as Program is. A
+session with deliveries cannot be deleted (Restrict on the delivery's Session); cancel it instead.
+
+### Salesforce implementation
+
+- **Object:** `Session__c`, name field Text(80) labelled Session Name, sharing Public Read/Write.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Service | `Service__c` | Lookup to `Service__c`, required, delete constraint Restrict, relationship name Sessions |
+| Cohort | `Cohort__c` | Lookup to `Cohort__c`, delete constraint SetNull, relationship name Sessions |
+| Session Date | `Session_Date__c` | Date, required |
+| Start Time | `Start_Time__c` | Time |
+| Status | `Status__c` | Picklist, restricted, required, default Scheduled |
+
+- **Validation rule:** `Cohort_In_Program` (R-SE1).
+- **List views:** All Sessions, Upcoming Sessions (Scheduled, from today).
+- **Session page:** `Session_Record_Page` with the `serviceDeliveryLog` panel in its session
+  form (R-SE2, R-SE3), through `ServiceDeliveryLogController.getSessionLog` and `saveSession`.
+- **PMM mapping:** Service Session (29ZA, PMM mapping).
+
+---
+
 ## 29ZB. Service Delivery
 
 ### Definition
@@ -10501,7 +10642,8 @@ R-GL1, R-GL4 and R-GL6 apply to steps through their goal.
 One service given to one person on one day, or their absence from it (P-02, Programs module):
 a hot meal, two tutoring hours, a missed session. It is both attendance and service delivery, as
 PMM's Service Delivery is: the attendance says whether the person came, the quantity counts what
-they received in the service's unit. Sessions and cohorts are P-11.
+they received in the service's unit. A delivery may name the session it was given at (P-11,
+R-SD7): attendance at a session is a delivery, not a record of its own.
 
 ### Attributes
 
@@ -10515,6 +10657,7 @@ they received in the service's unit. Sessions and cohorts are P-11.
 | Delivery Date | date | yes (defaults today) | The day the service was given, or missed. |
 | Attendance | picklist(Present, Excused Absence, Unexcused Absence) | yes (defaults Present) | Whether the person came. |
 | Quantity | number | yes (defaults 1) | How much was given, in the service's unit of measure. 0 for an absence. |
+| Session | reference(Session) | no | The session of the same service the delivery was given at (P-11, R-SD7). |
 
 ### Relationships
 
@@ -10523,6 +10666,8 @@ they received in the service's unit. Sessions and cohorts are P-11.
   enrollments. A service with deliveries cannot be deleted; clear its Active box instead.
 - **Service Delivery to Enrollment**, many to one, optional, delete SetNull.
 - **Service Delivery to a person**, through the Contact and Account pair (Section 4).
+- **Service Delivery to Session**, many to one, optional, delete Restrict: a session with
+  attendance cannot be deleted (29ZA5).
 
 ### Rules
 
@@ -10557,6 +10702,14 @@ deliveries as it does enrollments.
 **R-SD5 Erasing or deleting the person keeps the delivery.** As R-EN5: erasure credits it to the
 anonymous record; deleting the person empties the person (SetNull) and keeps the counts.
 
+**R-SD7 Attendance at a session (P-11).** A delivery's Session, when set, is a session of the
+delivery's service (validation rule). The Service Delivery Log on a session page keeps one
+delivery per person per session, with the session's service and date: a new row for a person who
+already has a delivery of that session changes it instead, and a person's delivery for the same
+service and day that names no session is adopted by the session (its Session is set) rather than
+a second row being added. A hidden delivery is changed as in R-SD4, its Session included. The
+program's log still keeps one row per person, service and day, whichever session it names.
+
 ### Salesforce implementation
 
 - **Object:** `Service_Delivery__c`, name field AutoNumber `SD-{000000}`, sharing Private
@@ -10571,20 +10724,25 @@ anonymous record; deleting the person empties the person (SetNull) and keeps the
 | Delivery Date | `Delivery_Date__c` | Date, required, default `TODAY()` |
 | Attendance | `Attendance__c` | Picklist: Present, Excused Absence, Unexcused Absence; required, default Present |
 | Quantity | `Quantity__c` | Number(10, 2), required, default 1 |
+| Session | `Session__c` | Lookup to `Session__c`, delete constraint Restrict, relationship name Service_Deliveries |
 
-- **Validation rules:** `Exactly_One_Person` (R-SD1), `Quantity_Not_Negative` (R-SD2).
+- **Validation rules:** `Exactly_One_Person` (R-SD1), `Quantity_Not_Negative` (R-SD2),
+  `Session_Matches_Service` (R-SD7).
 - **Service:** `ServiceDeliveryRulesHandler` (R-SD2, R-SD3) with `ServiceDeliveryService` and
   `ServiceDeliverySelector`, trigger `ServiceDeliveryTrigger` through `TriggerDispatcher`.
 - **Service Delivery Log:** the `serviceDeliveryLog` panel on the program page
   (`ServiceDeliveryLogController`): pick an active service and a day, and every open
   enrollment (Applied or Enrolled) is listed with its attendance and quantity for that day, saved
-  in one go (R-SD4). It works the same on a phone.
+  in one go (R-SD4). It works the same on a phone. On a session page the same panel takes the
+  service and day from the session and lists the cohort (R-SE2, R-SD7), through
+  `getSessionLog` and `saveSession`; `ServiceDeliveryIntegrity` finds and changes a hidden
+  delivery of the session or of its service and day.
 
 ### PMM mapping
 
 | BarnCRM | PMM | Note |
 |---|---|---|
-| Service Delivery: Service, Enrollment, Contact, Delivery Date, Attendance, Quantity | Service Delivery: Service, Program Engagement, Contact, Delivery Date, Attendance Status, Quantity | Attendance values match PMM's Present, Excused Absence and Unexcused Absence. Checked against an org with PMM with MIG-09. |
+| Service Delivery: Service, Enrollment, Contact, Delivery Date, Attendance, Quantity, Session | Service Delivery: Service, Program Engagement, Contact, Delivery Date, Attendance Status, Quantity, Service Session | Attendance values match PMM's Present, Excused Absence and Unexcused Absence. Checked against an org with PMM with MIG-09. |
 
 ---
 
@@ -11418,6 +11576,7 @@ mirrors the primary member).
 | 0.17 | 2026-11-02 | Field Access Manager (C-65, D-157, ADR-NEXT). New Section 29ZH, rules R-FA1 to R-FA7: a field access change is a data job; `Import_Batch__c.Operation__c` gains the value Access. No object or field added. |
 | 0.17 | 2026-11-02 | NPSP household adoption (X-05, ADR-NEXT `NEXT-npsp-household-adoption-in-core.md`). New Core object Household Adoption (`Household_Adoption__c`, 29ZH) with rules R-HA1 to R-HA5: NPSP household Accounts become BarnCRM households in place (record type, greetings, primary contact, custom name), journaled for undo. NPSP read by describe only. |
 | 0.15 | 2026-11-02 | Programs P-10 (ADR-NEXT `NEXT-programs-service-plans-cohorts-sessions.md`). New in the Programs module: Goal (`Goal__c`, 29ZA2), a detail of Enrollment, and Goal Step (`Goal_Step__c`, 29ZA3), a detail of Goal, with rules R-GL1 to R-GL6 and R-GS1; a goal names a Logic Models outcome by record identifier (`Outcome_Id__c`), never a lookup. `Case_Note__c` gains `Goal__c` (Lookup, SetNull) with rule R-CN5. Erasing a person now also deletes their goals. |
+| 0.15 | 2026-11-02 | Programs P-11 (same ADR-NEXT). New in the Programs module: Cohort (`Cohort__c`, 29ZA4) and Session (`Session__c`, 29ZA5), both Public Read/Write, with rules R-CO1 to R-CO3 and R-SE1 to R-SE5. `Enrollment__c` gains `Cohort__c` (Lookup, SetNull) with rule R-EN8; `Service_Delivery__c` gains `Session__c` (Lookup, Restrict) with rule R-SD7. Attendance per session is Service Delivery; there is no attendance or membership object. |
 
 ---
 ## 32. Entity ownership by package
@@ -11513,6 +11672,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Case Note | Programs | 0.14 (P-04) | 29ZA1 |
 | Goal | Programs | 0.15 (P-10) | 29ZA2 |
 | Goal Step | Programs | 0.15 (P-10) | 29ZA3 |
+| Cohort | Programs | 0.15 (P-11) | 29ZA4 |
+| Session | Programs | 0.15 (P-11) | 29ZA5 |
 | Programs Settings (custom setting, Participant Privacy preset) | Programs | 0.14 (P-08) | 29ZA |
 | Service Delivery | Programs | 0.13 (P-02) | 29ZB |
 | Programs entities | Programs | v0.9 | 30 |

@@ -164,16 +164,17 @@ private class ImportMappingTest {
     static void aSeveralObjectMappingReadsAsEachObjectsOwnRecordColumns() {
         ImportMapping mapping = ImportMapping.parse(
             '{"objects":[{"entity":"Course__c","operation":"Insert"},' +
-                '{"entity":"Session__c","operation":"Upsert by external ID","keyField":"Code__c"}],' +
+                '{"entity":"Meeting__c","operation":"Upsert by external ID","keyField":"Code__c"}],' +
                 '"columns":[' +
                 '{"source":"Course","target":"Course__c.Name","transforms":[{"op":"trim"}]},' +
-                '{"source":"Code","target":"Session__c.Code__c","blankClears":true},' +
-                '{"source":"Leader","target":"session__c.Leader__c","lookupField":"Email"},' +
+                '{"source":"Code","target":"Meeting__c.Code__c","blankClears":true},' +
+                '{"source":"Leader","target":"meeting__c.Leader__c","lookupField":"Email"},' +
                 '{"source":"Skip","target":"Ignore"}],' +
-                '"defaults":[{"target":"Session__c.Status__c","value":"Planned"}]}'
+                '"defaults":[{"target":"Meeting__c.Status__c","value":"Planned"}]}'
         );
 
-        ImportMapping sessions = mapping.forEntity('Session__c');
+        // Meeting__c is a made-up object, not the Programs module's Session.
+        ImportMapping sessions = mapping.forEntity('Meeting__c');
 
         Assert.isTrue(mapping.loadsSeveralObjects(), 'The objects are read.');
         Assert.areEqual('Code__c', mapping.objects[1].keyField, 'With their keys.');
