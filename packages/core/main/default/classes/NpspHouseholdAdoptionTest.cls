@@ -6,7 +6,7 @@
  * Admin permission set user; verification reads use system mode.
  */
 @IsTest(
-    testFor='ApexClass:NpspHouseholdAdoptionService, ApexClass:NpspHouseholdAdoptionBatch, ApexClass:NpspHouseholdAdoptionController, ApexClass:NpspHouseholdSource, ApexClass:HouseholdWriter'
+    testFor='ApexClass:NpspHouseholdAdoptionService, ApexClass:NpspHouseholdAdoptionBatch, ApexClass:NpspHouseholdAdoptionController, ApexClass:NpspHouseholdSource, ApexClass:HouseholdWriter, ApexClass:SettingsController'
 )
 private class NpspHouseholdAdoptionTest {
     private static final String PREFIX = 'Npsp Adopt Test ';
@@ -329,6 +329,15 @@ private class NpspHouseholdAdoptionTest {
         }
     }
 
+    private static Boolean adoptionRowShown() {
+        for (SettingsController.SearchHit hit : SettingsController.search('adopt npsp')) {
+            if (hit.label == 'Adopt NPSP Households') {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @IsTest
     static void offeredOnlyWhereNpspApplies() {
         System.runAs(TestUsers.admin()) {
@@ -336,7 +345,13 @@ private class NpspHouseholdAdoptionTest {
             shape.hasNpsp = true;
             OrgShapeDetector.overrideShape = shape;
             Assert.isTrue(NpspHouseholdAdoptionService.isOffered(), 'NPSP detected');
+            Assert.isTrue(adoptionRowShown(), 'the settings row shows where NPSP is');
             OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+            Assert.areEqual(
+                NpspHouseholdAdoptionService.isOffered(),
+                adoptionRowShown(),
+                'the settings row follows isOffered'
+            );
             Assert.areEqual(
                 CoexistenceService.MODE_NPSP.equals(CoexistenceService.getCurrentMode()),
                 NpspHouseholdAdoptionService.isOffered(),

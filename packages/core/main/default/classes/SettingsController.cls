@@ -670,8 +670,21 @@ public with sharing class SettingsController {
         return hiddenByFeature.contains(definition.DeveloperName);
     }
 
+    /** The row that adopts NPSP households (X-05), shown only where NPSP applies (ADR-0062). */
+    @TestVisible
+    private static final String NPSP_ADOPTION_ROW = 'NPSP_Household_Adoption';
+
+    private static Boolean isHiddenByProduct(Setting_Definition__mdt definition) {
+        return NPSP_ADOPTION_ROW.equals(definition.DeveloperName) &&
+            !NpspHouseholdAdoptionService.isOffered();
+    }
+
     private static SettingModel toSetting(Setting_Definition__mdt definition) {
-        if (!isVisible(definition) || isHiddenByFeature(definition)) {
+        if (
+            !isVisible(definition) ||
+            isHiddenByFeature(definition) ||
+            isHiddenByProduct(definition)
+        ) {
             return null;
         }
         Boolean isComponent = TYPE_COMPONENT.equalsIgnoreCase(definition.Data_Type__c);
