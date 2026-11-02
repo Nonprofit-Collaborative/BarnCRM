@@ -222,6 +222,7 @@ Donor portal and online giving; email marketing beyond export; grantmaking as a 
 - Sample households with custom names get greetings at load only (#728); R-H8 is unchanged. Pending Brandon: should normal upkeep fill blank greetings on custom-named households (never touching the name or entered greetings)? Recommended yes.
 - The Home install count includes ModuleSetups (#728).
 - `mwdbdevsb` Organization record type: validation cancelled 2026-10-29 (see changelog); awaiting Brandon's choice.
+- Batch B landing notes (2026-11-02): Where Used (C-59) has extension classes for Rollups and Giving only; Programs and Logic Models references are not yet shown. The NPSP path of household adoption (T-HH-21) is untested offline; verify X-07 on `barn-npc`. Funders declares a Rollup Builder dependency it does not yet use (drop or keep: open). The grant program and grant fund cards could merge into one (simplification candidate). The Funders board can double-count a grant shown in two stages (warning, not fixed). Some same-word labels with different senses were left separate (homonyms kept by #840).
 
 ## Working agreements (owner instructions)
 

@@ -2,7 +2,7 @@
 
 Purpose: planned work with status, by release. Mirrors Section 6 (6.0a release plan, 6.1.5 competitive research) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Feature status detail lives in `docs/barncrm-features.md`.
 
-Status as of 2026-10-31: landing batch A (releases 0.12 to 0.14) landed in `main` (status Landed until the batch's release gate, deploys and QA are done); last shipped version 0.11; release plan adopted (D-155); competitive research added 48 features (D-156); the eleven research proposals approved and placed, v1.0 after Brandon's initial QA (D-157). History: `changelog.md` (newest first) and this file's earlier versions in git (`git log -p -- roadmap.md`; the last iteration-based version is at ef92381b).
+Status as of 2026-11-02: every v1.0 item (releases 0.15 to 0.17, batch B) built and integrated on `landing/batch-b`, not yet in `main` (status Built until the landing gate passes and it is squash-merged; D-167: all of v1.0 built before any testing cycle). Landing batch A (releases 0.12 to 0.14) landed in `main` (status Landed until the batch's release gate, deploys and QA are done); last shipped version 0.11; release plan adopted (D-155); competitive research added 48 features (D-156); the eleven research proposals approved and placed, v1.0 after Brandon's initial QA (D-157). History: `changelog.md` (newest first) and this file's earlier versions in git (`git log -p -- roadmap.md`; the last iteration-based version is at ef92381b).
 
 ## Rules (D-155 to D-157, plan 9.7 to 9.9)
 
@@ -11,7 +11,7 @@ Status as of 2026-10-31: landing batch A (releases 0.12 to 0.14) landed in `main
 - Upkeep is automatic: new approvals are placed in a release; a move up or back that Brandon asks for is re-slotted and the affected releases rebalanced; statuses update as batches land.
 - New features consistent with the vision may be added without Brandon's approval (D-156); new modules or editions, reversals of settled decisions or non-goals, and not-approved items go to him as proposals.
 - New work follows the portability preferences toward BarnCRM for WordPress (plan 9.9) where they cost little.
-- Status values: Planned, In progress, Landed (in `main`), Shipped (batch gate, deploys and QA done).
+- Status values: Planned, In progress, Built (PRs open, integrated on a landing branch), Landed (in `main`), Shipped (batch gate, deploys and QA done).
 - Release 0.17 is the v1.0 candidate. v1.0 is tagged once Brandon's initial QA is complete, expected around or after 0.17 and before AppExchange approval (M-1, D-157). Later releases are 1.1 onward.
 
 ## Batches
@@ -36,7 +36,7 @@ Status as of 2026-10-31: landing batch A (releases 0.12 to 0.14) landed in `main
 | C-53 | Access Explorer | Major | Landed (batch A) | D-154 |
 | C-56 | Setup Changes Log | Major | Landed (batch A) | D-156 |
 | P-01 | Program, Service, Enrollment | Major | Landed (batch A) | v0.9 |
-| C-50f1 | Super Transform saved step lists | Minor | Landed (batch A) | D-154 |
+| C-50f1 | Super Transformer saved step lists | Minor | Landed (batch A) | D-154 |
 | C-50f2 | Phone format preset with a digit-format step | Minor | Landed (batch A) | D-154 |
 | C-54 | Weekly Admin Digest | Minor | Landed (batch A) | D-156 |
 | C-55 | Record Inspector | Minor | Landed (batch A) | D-156 |
@@ -75,47 +75,47 @@ Status as of 2026-10-31: landing batch A (releases 0.12 to 0.14) landed in `main
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| L-03 | Indicator sources | Major | Planned | v0.9 |
-| P-10 | Participant service plans and goals | Major | Planned | D-156 |
-| P-11 | Cohorts, sessions and mass enrollment | Major | Planned | D-156 |
-| L-04 | Logic model report | Minor | Planned | v0.9 |
-| G-19 | Donor scoring (RFM) as rollups | Minor | Planned | v0.9 |
-| P-12 | Anonymous and aggregate service counts | Minor | Planned | D-156 |
-| P-13 | Referrals in and out | Minor | Planned | D-156 |
-| P-14 | Eligibility screening results | Minor | Planned | D-156 |
-| UX-F3 | Module tab motifs | Minor | Planned | D-144 |
-| QA-F2 | Ship-on checkbox settings added in an upgrade start on (Include Admin Summary, Ask Reminders) | Minor | Planned | D-166 |
-| QA-F3 | Person account orgs: shift reminders, suggested volunteers, one ask donor field | Minor | Planned | D-166 |
-| QA-F4 | Enrollments and service deliveries require a person account on every path | Minor | Planned | D-166 |
-| QA-F5 | Nonprofit Cloud Program Management coexistence: Integrations, admin guide, Health Check info | Minor | Planned | D-166 |
-| QA-F6 | Batch A QA text fixes | Minor | Planned | D-166 |
+| L-03 | Indicator sources | Major | Built (#820); landing B | v0.9 |
+| P-10 | Participant service plans and goals | Major | Built (#828, #829); landing B | D-156 |
+| P-11 | Cohorts, sessions and mass enrollment | Major | Built (#842, #843); landing B | D-156 |
+| L-04 | Logic model report | Minor | Built (#827); landing B | v0.9 |
+| G-19 | Donor scoring (RFM) as rollups | Minor | Built (#814); landing B | v0.9 |
+| P-12 | Anonymous and aggregate service counts | Minor | Built (#811); landing B | D-156 |
+| P-13 | Referrals in and out | Minor | Built (#811); landing B | D-156 |
+| P-14 | Eligibility screening results | Minor | Built (#811); landing B | D-156 |
+| UX-F3 | Module tab motifs | Minor | Built (#808); landing B | D-144 |
+| QA-F2 | Ship-on checkbox settings added in an upgrade start on (Include Admin Summary, Ask Reminders) | Minor | Built (#831); landing B | D-166 |
+| QA-F3 | Person account orgs: shift reminders, suggested volunteers, one ask donor field | Minor | Built (#832); landing B | D-166 |
+| QA-F4 | Enrollments and service deliveries require a person account on every path | Minor | Built (#832); landing B | D-166 |
+| QA-F5 | Nonprofit Cloud Program Management coexistence: Integrations, admin guide, Health Check info | Minor | Built (#832); landing B | D-166 |
+| QA-F6 | Batch A QA text fixes | Minor | Built (#832); landing B | D-166 |
 
 ### 0.16 (Batch B): Funders start, Where Used
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| F-01 | Funder pipeline | Major | Planned | v0.10 |
-| F-02 | Reporting requirements and deadlines | Major | Planned | v0.10 |
-| C-59 | Where Used for BarnCRM setup | Major | Planned | D-156 |
-| F-04 | Government award fields | Minor | Planned | v0.10 |
-| F-05 | Multi-year award schedules | Minor | Planned | v0.10 |
-| F-06 | Funder report merge template | Minor | Planned | v0.10 |
-| F-07 | Board dashboard | Minor | Planned | v0.10 |
-| F-14 | Answer and boilerplate library | Minor | Planned | D-156 |
+| F-01 | Funder pipeline | Major | Built (#833 to #836); landing B | v0.10 |
+| F-02 | Reporting requirements and deadlines | Major | Built (#837); landing B | v0.10 |
+| C-59 | Where Used for BarnCRM setup | Major | Built (#823 to #825); landing B | D-156 |
+| F-04 | Government award fields | Minor | Built (#839); landing B | v0.10 |
+| F-05 | Multi-year award schedules | Minor | Built (#844, #845); landing B | v0.10 |
+| F-06 | Funder report merge template | Minor | Built (#848); landing B | v0.10 |
+| F-07 | Board dashboard | Minor | Built (#850); landing B | v0.10 |
+| F-14 | Answer and boilerplate library | Minor | Built (#841); landing B | D-156 |
 
 ### 0.17 (Batch B): Funders complete, Nonprofit Cloud mirror, Field Access Manager (v1.0 candidate)
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| F-03 | Restricted fund tracking | Major | Planned | v0.10 |
-| X-07 | Gift Transaction mirror | Major | Planned | Plan 6.3 |
-| C-65 | Field Access Manager (reverses the D-13 permission-management non-goal; ADR first) | Major | Planned | D-157 |
-| F-08 | Deadline calendar view | Minor | Planned | v0.10 |
-| L-06 | Link outcomes to grant deliverables | Minor | Planned | v0.10 |
-| X-05 | NPSP coexistence: adopt household accounts | Minor | Planned | Plan 6.3 |
-| C-57 | Picklist value usage | Minor | Planned | D-156 |
-| C-58 | Technical debt checks | Minor | Planned | D-156 |
-| C-60 | Automation inventory in the Data Dictionary | Minor | Planned | D-156 |
+| F-03 | Restricted fund tracking | Major | Built (#844, #847); landing B | v0.10 |
+| X-07 | Gift Transaction mirror | Major | Built (#818, #822, #826, #830, #838); landing B | Plan 6.3 |
+| C-65 | Field Access Manager (reverses the D-13 permission-management non-goal; ADR first) | Major | Built (#815 to #817); landing B | D-157 |
+| F-08 | Deadline calendar view | Minor | Built (#849); landing B | v0.10 |
+| L-06 | Link outcomes to grant deliverables | Minor | Built (#846); landing B | v0.10 |
+| X-05 | NPSP coexistence: adopt household accounts | Minor | Built (#812, #813, #819); landing B | Plan 6.3 |
+| C-57 | Picklist value usage | Minor | Built (#809); landing B | D-156 |
+| C-58 | Technical debt checks | Minor | Built (#810); landing B | D-156 |
+| C-60 | Automation inventory in the Data Dictionary | Minor | Built (#821); landing B | D-156 |
 
 ### 1.1 (Batch C): Forms engine, Contact Point Sync
 
