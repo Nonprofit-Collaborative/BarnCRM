@@ -4,7 +4,7 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     One action toward a participant's goal (P-10). A detail of the goal, so it is seen as the
-    enrollment is (canonical model Section 29ZA3).
+    enrollment is (canonical model Section 29ZA4).
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

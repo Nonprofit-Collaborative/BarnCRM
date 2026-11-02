@@ -5,7 +5,7 @@
   <description>
     A group of participants who go through a program together (P-11). Its members are the
     enrollments that name it; it holds no participant data, so it is shared as Program is
-    (canonical model Section 29ZA4).
+    (canonical model Section 29ZA5).
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

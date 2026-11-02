@@ -1,5 +1,5 @@
 /**
- * The Field Access Manager (C-65, plan D-157, ADR-0156, canonical model Section 29ZH, admin
+ * The Field Access Manager (C-65, plan D-157, ADR-0156, canonical model Section 29ZP, admin
  * guide field-access-manager.md): gives or removes Read and Edit on fields and kinds of record,
  * for permission sets the organization made, previewed row by row and undoable.
  *

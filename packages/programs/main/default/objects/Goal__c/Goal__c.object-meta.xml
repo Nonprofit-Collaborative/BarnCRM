@@ -5,7 +5,7 @@
   <description>
     Something a participant is working toward within their enrollment, with the steps to get
     there (P-10). A detail of the enrollment, so it is seen as the enrollment is (canonical model
-    Section 29ZA2).
+    Section 29ZA3).
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

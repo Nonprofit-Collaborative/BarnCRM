@@ -1,5 +1,5 @@
 /**
- * Sessions (P-11, canonical model 29ZA5): scheduling them in a batch (R-SE4), the rule that a
+ * Sessions (P-11, canonical model 29ZA6): scheduling them in a batch (R-SE4), the rule that a
  * session's cohort is of its service's program (R-SE1), and attendance taken on a session as
  * Service Delivery (R-SE2, R-SE3, R-SD7), including adopting a delivery with no session and one
  * the user cannot see.

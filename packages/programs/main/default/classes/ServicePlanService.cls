@@ -1,5 +1,5 @@
 /**
- * Participant service plans (P-10; canonical model Sections 29ZA2 and 29ZA3; ADR-0160
+ * Participant service plans (P-10; canonical model Sections 29ZA3 and 29ZA4; ADR-0160
  * `0160-programs-service-plans-cohorts-sessions.md`): the goals on an enrollment, their steps,
  * reviews and the case notes about them, as plain JSON shapes so the same panel could call a
  * WordPress endpoint (plan 9.9). Every read and write runs in user mode: Goal and Goal Step are

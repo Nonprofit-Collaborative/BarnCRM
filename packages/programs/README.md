@@ -16,7 +16,7 @@ and attendance per session (P-11).
 - ADR-0151 `docs/architecture/decisions/0151-programs-module.md`
 - ADR-0160 `docs/architecture/decisions/0160-programs-service-plans-cohorts-sessions.md`
 - Canonical model Sections 29Y (Program), 29Z (Service), 29ZA (Enrollment), 29ZA1 (Case Note),
-  29ZA2 (Goal), 29ZA3 (Goal Step), 29ZA4 (Cohort), 29ZA5 (Session) and 29ZB (Service Delivery)
+  29ZA3 (Goal), 29ZA4 (Goal Step), 29ZA5 (Cohort), 29ZA6 (Session) and 29ZB (Service Delivery)
 - Admin guide `docs/admin-guide/programs.md`
 
 ## First ships in

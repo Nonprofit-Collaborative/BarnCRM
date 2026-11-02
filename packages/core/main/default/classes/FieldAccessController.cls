@@ -1,6 +1,6 @@
 /**
  * The Field Access Manager: Access Explorer's Change Field Access view (C-65, ADR-0156,
- * canonical model Section 29ZH, admin guide field-access-manager.md).
+ * canonical model Section 29ZP, admin guide field-access-manager.md).
  *
  * Thin: every method checks Manage BarnCRM Settings and Manage Profiles and Permission Sets
  * (R-FA2), calls `FieldAccessService`, and returns plain JSON shapes (plan Section 9.9).

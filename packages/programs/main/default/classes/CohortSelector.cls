@@ -1,6 +1,6 @@
 /**
  * The reads cohorts and sessions make for the person using them, in user mode (P-11, canonical
- * model 29ZA4 and 29ZA5).
+ * model 29ZA5 and 29ZA6).
  */
 public with sharing class CohortSelector {
     /** The cohort with its program, or null when the user cannot see it. */

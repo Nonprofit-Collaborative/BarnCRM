@@ -1,5 +1,5 @@
 /**
- * What the Schedule Sessions panel on a cohort or a program calls (P-11, canonical model 29ZA5,
+ * What the Schedule Sessions panel on a cohort or a program calls (P-11, canonical model 29ZA6,
  * R-SE4). The panel works out the dates (one per chosen weekday between two dates) in its
  * framework-free module; this class checks again that the service is an active service of the
  * program, that there are at most 200 dates, and creates one Scheduled session per date, for the

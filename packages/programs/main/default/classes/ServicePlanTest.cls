@@ -1,5 +1,5 @@
 /**
- * Participant service plans (P-10, canonical model 29ZA2 and 29ZA3): the Service Plan panel's
+ * Participant service plans (P-10, canonical model 29ZA3 and 29ZA4): the Service Plan panel's
  * reads and writes, the closed and completed dates (R-GL2, R-GS1), reviews (R-GL3), who may write
  * (R-GL4), goals seen as their enrollment is (R-GL1), notes about a goal (R-CN5), the optional
  * Logic Models outcome (R-GL5) and erasure (R-GL6).

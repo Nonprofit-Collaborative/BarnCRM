@@ -1,5 +1,5 @@
 /**
- * What the Cohort Members panel on a cohort calls (P-11, canonical model 29ZA4, R-CO3).
+ * What the Cohort Members panel on a cohort calls (P-11, canonical model 29ZA5, R-CO3).
  *
  * Lists the cohort's members (the enrollments that name it) and the program's open enrollments
  * in no cohort, and adds many people in one action: a person with an open enrollment in the

@@ -3,7 +3,7 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     One Account adopted as a household from NPSP, with its record type and household fields as
-    they were before, so the adoption can be undone (X-05, canonical model Section 29ZH).
+    they were before, so the adoption can be undone (X-05, canonical model Section 29ZQ).
     Written only by the adoption job. Private: BarnCRM Admin sees all rows.
   </description>
   <enableActivities>false</enableActivities>

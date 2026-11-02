@@ -81,7 +81,7 @@ Three questions were open:
 
 - An NPSP org gets BarnCRM households without a duplicate per family and keeps NPSP's
   Opportunities and rollups on the same Account.
-- One new Core object (`Household_Adoption__c`, canonical model Section 29ZH) and one
+- One new Core object (`Household_Adoption__c`, canonical model Section 29ZQ) and one
   `HouseholdWriter` method (`adoptHouseholds`) that may change an Account's record type, the
   only place outside creation that does.
 - The NPSP path is tested in a scratch-free way through a seam (`NpspHouseholdSource`) that

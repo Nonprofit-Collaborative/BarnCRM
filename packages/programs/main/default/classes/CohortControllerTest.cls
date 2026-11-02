@@ -1,5 +1,5 @@
 /**
- * Cohorts (P-11, canonical model 29ZA4): the Cohort Members panel's server side, mass enrollment
+ * Cohorts (P-11, canonical model 29ZA5): the Cohort Members panel's server side, mass enrollment
  * where each person succeeds or fails alone (R-CO3), removing a member, the rule that an
  * enrollment's cohort is of its program (R-EN8) and the cohort's dates (R-CO2).
  */

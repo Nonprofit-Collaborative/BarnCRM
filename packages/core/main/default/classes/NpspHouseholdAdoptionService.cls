@@ -1,6 +1,6 @@
 /**
  * Adopts the Nonprofit Success Pack's household Accounts as BarnCRM households, in place, and
- * undoes an adoption (X-05, canonical model Section 29ZH, ADR-0155
+ * undoes an adoption (X-05, canonical model Section 29ZQ, ADR-0155
  * `0155-npsp-household-adoption-in-core.md`, admin guide npsp-households.md).
  *
  * Preview first (R-HA2): what would be adopted is counted and sampled as the running user.

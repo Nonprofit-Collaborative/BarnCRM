@@ -10222,9 +10222,9 @@ participant record; P-02 records what they attended and received.
 - **Enrollment to Program**, many to one, through a required lookup, not a detail, so the
   enrollment has sharing of its own (participant privacy, P-08; ADR-0151 decision 3).
 - **Enrollment to a person**, through the Contact and Account pair (Section 4).
-- **Enrollment to Goal**, one to many, master-detail: the participant's service plan (29ZA2, P-10).
+- **Enrollment to Goal**, one to many, master-detail: the participant's service plan (29ZA3, P-10).
 - **Enrollment to Cohort**, many to one, optional, delete SetNull: the enrollment is the cohort
-  membership (29ZA4, P-11).
+  membership (29ZA5, P-11).
 
 ### Rules
 
@@ -10361,8 +10361,8 @@ repository and are checked against an org with PMM when MIG-09 is built.
 | Program: Name, Status, Description, Target Population, Start Date, End Date | Program: Name, Status, Description, Target Population, Start Date, End Date | Status values match (Planned, Active, Completed) |
 | Service: Name, Program, Description, Unit of Measure, Active | Service: Name, Program, Description, Unit of Measurement, Status | Status Active maps to Active checked |
 | Enrollment: Program, Contact, Stage, Start Date, End Date, Cohort | Program Engagement: Program, Contact, Stage, Start Date, End Date, Program Cohort | Stages: Applied to Applied; Enrolled and Active to Enrolled; Completed to Completed; Withdrawn to Withdrawn |
-| Cohort: Name, Program, Status, Start Date, End Date (29ZA4, P-11) | Program Cohort: Name, Program, Status, Start Date, End Date | Status values match (Planned, Active, Completed) |
-| Session: Name, Service, Session Date, Start Time, Status (29ZA5, P-11) | Service Session: Name, Service Schedule's Service, Session Start, Status | PMM keeps a Service Schedule above its sessions; BarnCRM has none (ADR-0160 decision 14). Status: Pending to Scheduled, Complete to Held, Canceled to Cancelled |
+| Cohort: Name, Program, Status, Start Date, End Date (29ZA5, P-11) | Program Cohort: Name, Program, Status, Start Date, End Date | Status values match (Planned, Active, Completed) |
+| Session: Name, Service, Session Date, Start Time, Status (29ZA6, P-11) | Service Session: Name, Service Schedule's Service, Session Start, Status | PMM keeps a Service Schedule above its sessions; BarnCRM has none (ADR-0160 decision 14). Status: Pending to Scheduled, Complete to Held, Canceled to Cancelled |
 
 ### On a person, Health Check and sample data
 
@@ -10474,10 +10474,10 @@ enrollments, read in system mode and deleted as the user; someone who may not de
 refused with that reason (only Programs Admin may). Erasing a person account also finds notes
 and counts enrollments recorded on that person account's own contact. The enrollments are kept (R-EN5). Deleting a
 person, not erasing them, keeps the notes on the enrollment, which no longer names the person;
-erase a person to remove what was written about them. Their goals (29ZA2) go too (R-GL6).
+erase a person to remove what was written about them. Their goals (29ZA3) go too (R-GL6).
 
 **R-CN5 A note may be about a goal (P-10).** A note may name one goal of its own enrollment
-(29ZA2); a goal of another enrollment is refused (validation rule). The note stays private to its
+(29ZA3); a goal of another enrollment is refused (validation rule). The note stays private to its
 author (R-CN2): a goal shows only the notes its viewer may see. Deleting the goal empties the
 note's Goal and keeps the note.
 
@@ -10575,7 +10575,7 @@ Deleting a person, not erasing them, keeps the referral, which no longer names t
 
 ---
 
-## 29ZA2. Goal
+## 29ZA3. Goal
 
 ### Definition
 
@@ -10604,7 +10604,7 @@ management lite: who is responsible, by when, how it stands, and when it is next
 
 - **Goal to Enrollment**, many to one, master-detail: the goal's visibility is the enrollment's
   (R-GL1).
-- **Goal to Goal Step**, one to many (29ZA3).
+- **Goal to Goal Step**, one to many (29ZA4).
 - **Goal to Case Note**, one to many, through the note's optional lookup (R-CN5).
 - **Goal to a Logic Models outcome**, by record identifier only, never a lookup (R-GL5).
 
@@ -10670,7 +10670,7 @@ can erase a person who has goals.
 
 ---
 
-## 29ZA3. Goal Step
+## 29ZA4. Goal Step
 
 ### Definition
 
@@ -10719,7 +10719,7 @@ R-GL1, R-GL4 and R-GL6 apply to steps through their goal.
 
 ---
 
-## 29ZA4. Cohort
+## 29ZA5. Cohort
 
 ### Definition
 
@@ -10743,7 +10743,7 @@ there is no membership record.
 - **Cohort to Program**, many to one, through a required lookup with delete Restrict: a program
   with cohorts cannot be deleted until they are.
 - **Cohort to Enrollment**, one to many, through the enrollment's Cohort (R-EN8): the members.
-- **Cohort to Session**, one to many, through the session's Cohort (29ZA5).
+- **Cohort to Session**, one to many, through the session's Cohort (29ZA6).
 
 ### Rules
 
@@ -10779,7 +10779,7 @@ the enrollment's Cohort and keeps the enrollment. At most 200 people are added i
 
 ---
 
-## 29ZA5. Session
+## 29ZA6. Session
 
 ### Definition
 
@@ -10880,7 +10880,7 @@ R-SD7): attendance at a session is a delivery, not a record of its own.
 - **Service Delivery to Enrollment**, many to one, optional, delete SetNull.
 - **Service Delivery to a person**, through the Contact and Account pair (Section 4).
 - **Service Delivery to Session**, many to one, optional, delete Restrict: a session with
-  attendance cannot be deleted (29ZA5).
+  attendance cannot be deleted (29ZA6).
 
 ### Rules
 
@@ -11334,185 +11334,6 @@ dates for the same indicator. Periods of different lengths may overlap (a year a
   `LogicModelBuilderController` (thin, plain JSON shapes); the builder's rules and progress
   (R-LL2, R-IN2) run in the framework-free module `logicModel.js` with the rank table as JSON
   (plan 9.9).
-
----
-
-## 29ZH. Field access change
-
-### Definition
-
-One change to who can read and edit fields and kinds of record, made by an administrator on the
-Field Access Manager (feature C-65, plan D-157, ADR-0156): Read and Edit given or removed on
-chosen fields and objects, across chosen permission sets, previewed row by row and undoable.
-It adds no object of its own: it is a data job (Section 16) with Operation Access, journaled in
-the import journal (Section 17A). The permission rows it changes are Salesforce's own
-`ObjectPermissions` and `FieldPermissions`, which the model does not own.
-
-### Rules
-
-**R-FA1 A data job with Operation Access.** A field access change is an `Import_Batch__c` with
-Operation Access, no template, no file and no staged rows. Its Bulk Update Definition holds the
-change document and the confirmed count: `{ "version": 1, "change": { ... }, "confirmedCount":
-42 }`. Committed By is the administrator; the Undo Deadline is stamped from the import undo
-window (R-IB7). Rows Updated counts the permission rows changed and Rows Rejected the rows the
-platform refused. Status is Complete when any row changed, Failed when none did. The import
-history and the import undo leave Access jobs out: they are listed and undone only on
-the Field Access Manager.
-
-**R-FA2 Who, and on what.** Every read and write requires Manage BarnCRM Settings and the
-system permission Manage Profiles and Permission Sets. A permission set can be chosen only when
-it is custom, not owned by a profile, of type Regular (not a group's calculated set, not a
-muting set), has no namespace and is not one BarnCRM ships (by name, from the generated
-`BarnCRMShippedPermissionSets`, kept complete by `check-shipped-permission-sets.py`, since the
-access syncs manage those); at most 10 per change. Permission rows are read and written
-only for the Ids of the sets chosen and checked, so rows held by a user license or permission
-set license are never touched. Profiles and permission set groups are never changed.
-
-**R-FA3 The change document.** Plain JSON, built in the browser and checked again in Apex:
-
-```
-{
-  "version": 1,
-  "setIds": ["0PS..."],
-  "items": [
-    { "object": "Contact", "field": "Contact.Email", "access": "edit" },
-    { "object": "Volunteer_Job__c", "field": null, "access": "read" }
-  ]
-}
-```
-
-`access` is `read`, `edit` or `none`. A blank `field` means the kind of record itself. Object
-and field names come only from describe results; a field that is not permissionable (required
-and system fields, fields everyone who reads the record sees) is refused, and a formula, roll-up
-summary or auto number field takes `read` or `none` only. At most 500 items.
-
-**R-FA4 Dependencies are added, not left to fail.** Field Read or Edit adds object Read where
-the set lacks it. Edit gives Read, on a field and on a kind of record. Removing object Edit also
-removes Delete and Modify All. Removing object Read removes every object permission (Read,
-Create, Edit, Delete, View All, Modify All) and the set's access to every field of that kind of
-record. Each added change names its reason in the preview.
-
-**R-FA5 Preview, confirmed count, ceiling.** The preview lists every permission row the change
-would write, with its set, kind of record, field, access now, access after and reason; rows
-already at the asked access are counted as unchanged and not written. Apply works the rows out
-again and refuses when their number differs from the count the administrator confirmed. One
-change writes at most 2,000 rows.
-
-**R-FA6 Written as the administrator, in order, journaled.** Rows are written in user mode with
-partial success: object grants first, then field grants, then field removals, then object
-removals. A row with no access left is deleted rather than saved empty. Every row written is a
-journal entry in the Commit phase; every row refused is a Failed entry with the platform's
-reason and goes to the Error Log:
-
-```
-{ "action": "Updated", "object": "FieldPermissions", "id": "01k...", "set": "0PS...",
-  "target": "Contact.Email", "before": { "read": true, "edit": false },
-  "after": { "read": true, "edit": true } }
-```
-
-`action` is `Created` (no row before), `Updated` or `Deleted` (no row after). An
-`ObjectPermissions` entry's before and after hold `read`, `create`, `edit`, `del`, `viewAll`
-and `modifyAll`. Salesforce also records each row change in its Setup Audit Trail, which Setup
-Changes copies (Section 29W).
-
-**R-FA7 Undo.** Within the Undo Deadline, an undo puts each journaled row back to its before
-access (deleting a created row, recreating a deleted one, in the reverse of R-FA6's order) when
-the row's access now is still its after access; a row changed since is kept and recorded as a
-`NotRestored` entry in the Undo phase. Status becomes Undone, or Undo failed when the platform
-refused every row the undo tried and none was put back; an Undo failed change can be undone
-again, an Undone one cannot. The permission rows are setup records, which cannot share a
-transaction with the data job, its journal or the Error Log (mixed DML), so the apply and the
-undo write the rows and a queued job (`FieldAccessRecordJob`) writes the data job, the journal
-pages and any refusals straight after, as the same person.
-
-### Salesforce implementation
-
-- **No new object or field.** `Import_Batch__c.Operation__c` gains the value Access (Section 16).
-- **Service:** `FieldAccessService` (eligibility, preview, apply, undo), `FieldAccessRecordJob`
-  (the data job, journal and Error Log entries, in their own transaction), `FieldAccessController`
-  (thin, plain JSON shapes, the R-FA2 check); the change document, its checks and the preview's
-  grouping and counts run in the framework-free module `fieldAccessPlan.js` (plan 9.9).
-
----
-
-## 29ZH. Household Adoption
-
-### Definition
-
-One Account that BarnCRM adopted as a household from the Nonprofit Success Pack (NPSP), with
-what the Account held before, so the adoption can be undone (feature X-05, ADR-0155
-`0155-npsp-household-adoption-in-core.md`). Only orgs with NPSP ever have rows. NPSP is read
-only by describe; no NPSP name is part of this entity.
-
-### Attributes
-
-| Attribute | Type | Required | Definition |
-|---|---|---|---|
-| Account ID | text(18) | yes | The adopted Account, now a Household. |
-| Run ID | text(36) | yes | The adoption run that adopted it; undo works on one run. |
-| Previous Record Type ID | text(18) | no | The Account's record type before adoption (NPSP's household record type in most orgs); blank when it had none. |
-| Previous Values | long text(32768) | yes | JSON of the four BarnCRM fields before adoption: `{"Custom_Name__c": false, "Household_Formal_Greeting__c": null, "Household_Informal_Greeting__c": null, "Primary_Contact__c": null}`. |
-| Status | picklist(Adopted, Undone, Not Restored) | yes | Adopted until an undo puts the Account back (Undone) or cannot (Not Restored). |
-| Note | text(255) | no | Why an undo did not put the Account back. |
-
-### Rules
-
-**R-HA1 What is an NPSP household.** An Account whose `npe01__SYSTEM_AccountType__c` is
-`Household Account`, or whose record type's developer name is `HH_Account`, and whose record
-type is not already BarnCRM's Household. Both names are built at run time and read through
-describe; when neither exists the org has nothing to adopt. Read by `NpspHouseholdSource`, the
-seam tests replace.
-
-**R-HA2 Preview first, counted and confirmed.** The preview, in the running user's access,
-counts the candidates and shows the first ten with their name, NPSP greetings, NPSP primary
-contact and number of contacts. Starting a run is refused when the count is zero, when more
-match than the person confirmed, while membership is Junction (ADR-0155 decision 3), while the
-Household record type is missing, or while another adoption or undo is running.
-
-**R-HA3 What adoption writes.** Per Account, in chunks of at most 100: record type to
-Household; `Household_Formal_Greeting__c` and `Household_Informal_Greeting__c` from
-`npo02__Formal_Greeting__c` and `npo02__Informal_Greeting__c`; `Primary_Contact__c` from
-`npe01__One2OneContact__c` only when that contact's Account is this household (R-H10), else
-blank; `Custom_Name__c` true when the run keeps names (the default) or when
-`npo02__SYSTEM_CUSTOM_NAMING__c` has any value. An Account the person cannot edit
-(`UserRecordAccess`) is skipped and counted. The write is system mode through
-`HouseholdWriter.adoptHouseholds` (ADR-0141); one Household Adoption row is written per Account
-saved, in the same savepoint, so an Account is never adopted without its undo row. Then
-household upkeep runs on the adopted households (R-H4, R-H8, R-H11), never tidying one away.
-No NPSP field is written.
-
-**R-HA4 Undo.** Per run, counted and confirmed: for each Adopted row whose Account still exists,
-is still a Household and the person can edit, the previous record type and the four previous
-values are put back in system mode and the row becomes Undone; otherwise it becomes Not
-Restored with the reason in Note. Member Count is left as written.
-
-**R-HA5 Administrators only.** Preview, start and undo require Manage BarnCRM Settings. Only
-`BarnCRM_Admin` is granted the object, Read and View All. Rows are written only by the
-adoption job in system mode (ADR-0021).
-
-### Salesforce implementation
-
-- **Object** `Household_Adoption__c`, auto number Name `HA-{000000}`, sharing Private, reports
-  on, no activities, feeds, history or search.
-
-| Attribute | API name | Type |
-|---|---|---|
-| Account ID | `Account_Id__c` | Text(18), External ID, not unique. Text, not a lookup, so the journal adds no child relationship to Account and never keeps a household from the tidy-up (R-H12a) or a delete. |
-| Run ID | `Run_Id__c` | Text(36), External ID, not unique |
-| Previous Record Type ID | `Previous_Record_Type_Id__c` | Text(18) |
-| Previous Values | `Previous_Values__c` | Long Text Area(32768) |
-| Status | `Status__c` | Picklist, restricted |
-| Note | `Note__c` | Text(255) |
-
-- **NPSP fields read, never written** (names built at run time, read only when describe finds
-  them and the user may read them): `npe01__SYSTEM_AccountType__c`, `npo02__Formal_Greeting__c`,
-  `npo02__Informal_Greeting__c`, `npe01__One2OneContact__c`, `npo02__SYSTEM_CUSTOM_NAMING__c`,
-  and the Account record type `HH_Account`.
-- **Classes:** `NpspHouseholdSource` (describe-only reads of NPSP, the test seam),
-  `NpspHouseholdAdoptionService` (preview, start, undo, status), `NpspHouseholdAdoptionBatch`
-  (adopt and undo chunks), `NpspHouseholdAdoptionController` (thin, plain JSON shapes). The
-  panel is `npspHouseholdAdoption`, shown on the General page of BarnCRM Settings only when
-  NPSP is detected, the coexistence mode is NPSP, or rows exist.
 
 ---
 
@@ -12062,6 +11883,185 @@ template is never changed by an upgrade (plan Section 4.8), so an edited one is 
 
 ---
 
+## 29ZP. Field access change
+
+### Definition
+
+One change to who can read and edit fields and kinds of record, made by an administrator on the
+Field Access Manager (feature C-65, plan D-157, ADR-0156): Read and Edit given or removed on
+chosen fields and objects, across chosen permission sets, previewed row by row and undoable.
+It adds no object of its own: it is a data job (Section 16) with Operation Access, journaled in
+the import journal (Section 17A). The permission rows it changes are Salesforce's own
+`ObjectPermissions` and `FieldPermissions`, which the model does not own.
+
+### Rules
+
+**R-FA1 A data job with Operation Access.** A field access change is an `Import_Batch__c` with
+Operation Access, no template, no file and no staged rows. Its Bulk Update Definition holds the
+change document and the confirmed count: `{ "version": 1, "change": { ... }, "confirmedCount":
+42 }`. Committed By is the administrator; the Undo Deadline is stamped from the import undo
+window (R-IB7). Rows Updated counts the permission rows changed and Rows Rejected the rows the
+platform refused. Status is Complete when any row changed, Failed when none did. The import
+history and the import undo leave Access jobs out: they are listed and undone only on
+the Field Access Manager.
+
+**R-FA2 Who, and on what.** Every read and write requires Manage BarnCRM Settings and the
+system permission Manage Profiles and Permission Sets. A permission set can be chosen only when
+it is custom, not owned by a profile, of type Regular (not a group's calculated set, not a
+muting set), has no namespace and is not one BarnCRM ships (by name, from the generated
+`BarnCRMShippedPermissionSets`, kept complete by `check-shipped-permission-sets.py`, since the
+access syncs manage those); at most 10 per change. Permission rows are read and written
+only for the Ids of the sets chosen and checked, so rows held by a user license or permission
+set license are never touched. Profiles and permission set groups are never changed.
+
+**R-FA3 The change document.** Plain JSON, built in the browser and checked again in Apex:
+
+```
+{
+  "version": 1,
+  "setIds": ["0PS..."],
+  "items": [
+    { "object": "Contact", "field": "Contact.Email", "access": "edit" },
+    { "object": "Volunteer_Job__c", "field": null, "access": "read" }
+  ]
+}
+```
+
+`access` is `read`, `edit` or `none`. A blank `field` means the kind of record itself. Object
+and field names come only from describe results; a field that is not permissionable (required
+and system fields, fields everyone who reads the record sees) is refused, and a formula, roll-up
+summary or auto number field takes `read` or `none` only. At most 500 items.
+
+**R-FA4 Dependencies are added, not left to fail.** Field Read or Edit adds object Read where
+the set lacks it. Edit gives Read, on a field and on a kind of record. Removing object Edit also
+removes Delete and Modify All. Removing object Read removes every object permission (Read,
+Create, Edit, Delete, View All, Modify All) and the set's access to every field of that kind of
+record. Each added change names its reason in the preview.
+
+**R-FA5 Preview, confirmed count, ceiling.** The preview lists every permission row the change
+would write, with its set, kind of record, field, access now, access after and reason; rows
+already at the asked access are counted as unchanged and not written. Apply works the rows out
+again and refuses when their number differs from the count the administrator confirmed. One
+change writes at most 2,000 rows.
+
+**R-FA6 Written as the administrator, in order, journaled.** Rows are written in user mode with
+partial success: object grants first, then field grants, then field removals, then object
+removals. A row with no access left is deleted rather than saved empty. Every row written is a
+journal entry in the Commit phase; every row refused is a Failed entry with the platform's
+reason and goes to the Error Log:
+
+```
+{ "action": "Updated", "object": "FieldPermissions", "id": "01k...", "set": "0PS...",
+  "target": "Contact.Email", "before": { "read": true, "edit": false },
+  "after": { "read": true, "edit": true } }
+```
+
+`action` is `Created` (no row before), `Updated` or `Deleted` (no row after). An
+`ObjectPermissions` entry's before and after hold `read`, `create`, `edit`, `del`, `viewAll`
+and `modifyAll`. Salesforce also records each row change in its Setup Audit Trail, which Setup
+Changes copies (Section 29W).
+
+**R-FA7 Undo.** Within the Undo Deadline, an undo puts each journaled row back to its before
+access (deleting a created row, recreating a deleted one, in the reverse of R-FA6's order) when
+the row's access now is still its after access; a row changed since is kept and recorded as a
+`NotRestored` entry in the Undo phase. Status becomes Undone, or Undo failed when the platform
+refused every row the undo tried and none was put back; an Undo failed change can be undone
+again, an Undone one cannot. The permission rows are setup records, which cannot share a
+transaction with the data job, its journal or the Error Log (mixed DML), so the apply and the
+undo write the rows and a queued job (`FieldAccessRecordJob`) writes the data job, the journal
+pages and any refusals straight after, as the same person.
+
+### Salesforce implementation
+
+- **No new object or field.** `Import_Batch__c.Operation__c` gains the value Access (Section 16).
+- **Service:** `FieldAccessService` (eligibility, preview, apply, undo), `FieldAccessRecordJob`
+  (the data job, journal and Error Log entries, in their own transaction), `FieldAccessController`
+  (thin, plain JSON shapes, the R-FA2 check); the change document, its checks and the preview's
+  grouping and counts run in the framework-free module `fieldAccessPlan.js` (plan 9.9).
+
+---
+
+## 29ZQ. Household Adoption
+
+### Definition
+
+One Account that BarnCRM adopted as a household from the Nonprofit Success Pack (NPSP), with
+what the Account held before, so the adoption can be undone (feature X-05, ADR-0155
+`0155-npsp-household-adoption-in-core.md`). Only orgs with NPSP ever have rows. NPSP is read
+only by describe; no NPSP name is part of this entity.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Account ID | text(18) | yes | The adopted Account, now a Household. |
+| Run ID | text(36) | yes | The adoption run that adopted it; undo works on one run. |
+| Previous Record Type ID | text(18) | no | The Account's record type before adoption (NPSP's household record type in most orgs); blank when it had none. |
+| Previous Values | long text(32768) | yes | JSON of the four BarnCRM fields before adoption: `{"Custom_Name__c": false, "Household_Formal_Greeting__c": null, "Household_Informal_Greeting__c": null, "Primary_Contact__c": null}`. |
+| Status | picklist(Adopted, Undone, Not Restored) | yes | Adopted until an undo puts the Account back (Undone) or cannot (Not Restored). |
+| Note | text(255) | no | Why an undo did not put the Account back. |
+
+### Rules
+
+**R-HA1 What is an NPSP household.** An Account whose `npe01__SYSTEM_AccountType__c` is
+`Household Account`, or whose record type's developer name is `HH_Account`, and whose record
+type is not already BarnCRM's Household. Both names are built at run time and read through
+describe; when neither exists the org has nothing to adopt. Read by `NpspHouseholdSource`, the
+seam tests replace.
+
+**R-HA2 Preview first, counted and confirmed.** The preview, in the running user's access,
+counts the candidates and shows the first ten with their name, NPSP greetings, NPSP primary
+contact and number of contacts. Starting a run is refused when the count is zero, when more
+match than the person confirmed, while membership is Junction (ADR-0155 decision 3), while the
+Household record type is missing, or while another adoption or undo is running.
+
+**R-HA3 What adoption writes.** Per Account, in chunks of at most 100: record type to
+Household; `Household_Formal_Greeting__c` and `Household_Informal_Greeting__c` from
+`npo02__Formal_Greeting__c` and `npo02__Informal_Greeting__c`; `Primary_Contact__c` from
+`npe01__One2OneContact__c` only when that contact's Account is this household (R-H10), else
+blank; `Custom_Name__c` true when the run keeps names (the default) or when
+`npo02__SYSTEM_CUSTOM_NAMING__c` has any value. An Account the person cannot edit
+(`UserRecordAccess`) is skipped and counted. The write is system mode through
+`HouseholdWriter.adoptHouseholds` (ADR-0141); one Household Adoption row is written per Account
+saved, in the same savepoint, so an Account is never adopted without its undo row. Then
+household upkeep runs on the adopted households (R-H4, R-H8, R-H11), never tidying one away.
+No NPSP field is written.
+
+**R-HA4 Undo.** Per run, counted and confirmed: for each Adopted row whose Account still exists,
+is still a Household and the person can edit, the previous record type and the four previous
+values are put back in system mode and the row becomes Undone; otherwise it becomes Not
+Restored with the reason in Note. Member Count is left as written.
+
+**R-HA5 Administrators only.** Preview, start and undo require Manage BarnCRM Settings. Only
+`BarnCRM_Admin` is granted the object, Read and View All. Rows are written only by the
+adoption job in system mode (ADR-0021).
+
+### Salesforce implementation
+
+- **Object** `Household_Adoption__c`, auto number Name `HA-{000000}`, sharing Private, reports
+  on, no activities, feeds, history or search.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Account ID | `Account_Id__c` | Text(18), External ID, not unique. Text, not a lookup, so the journal adds no child relationship to Account and never keeps a household from the tidy-up (R-H12a) or a delete. |
+| Run ID | `Run_Id__c` | Text(36), External ID, not unique |
+| Previous Record Type ID | `Previous_Record_Type_Id__c` | Text(18) |
+| Previous Values | `Previous_Values__c` | Long Text Area(32768) |
+| Status | `Status__c` | Picklist, restricted |
+| Note | `Note__c` | Text(255) |
+
+- **NPSP fields read, never written** (names built at run time, read only when describe finds
+  them and the user may read them): `npe01__SYSTEM_AccountType__c`, `npo02__Formal_Greeting__c`,
+  `npo02__Informal_Greeting__c`, `npe01__One2OneContact__c`, `npo02__SYSTEM_CUSTOM_NAMING__c`,
+  and the Account record type `HH_Account`.
+- **Classes:** `NpspHouseholdSource` (describe-only reads of NPSP, the test seam),
+  `NpspHouseholdAdoptionService` (preview, start, undo, status), `NpspHouseholdAdoptionBatch`
+  (adopt and undo chunks), `NpspHouseholdAdoptionController` (thin, plain JSON shapes). The
+  panel is `npspHouseholdAdoption`, shown on the General page of BarnCRM Settings only when
+  NPSP is detected, the coexistence mode is NPSP, or rows exist.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -12387,13 +12387,13 @@ mirrors the primary member).
 | 0.17 | 2026-11-02 | C-57 picklist value usage (plan 6.1.5). Section 29F: rules R-FU9 to R-FU11 (records per picklist value and last use, value status, what Last Used means). No object or field added. |
 | 0.17 | 2026-11-02 | C-58 technical debt checks in Org Optimizer (plan 6.1.5). `BarnCRM_Settings__c` gains `Old_Api_Version__c` (Org Optimizer keys, default 50); rules R-OO1 to R-OO3. No object added. |
 | 0.17 | 2026-11-02 | C-60 automation inventory in the Data Dictionary (plan 6.1.5). Section 29F: rules R-AI1 to R-AI4. No object or field added. |
-| 0.17 | 2026-11-02 | Field Access Manager (C-65, D-157, ADR-0155). New Section 29ZH, rules R-FA1 to R-FA7: a field access change is a data job; `Import_Batch__c.Operation__c` gains the value Access. No object or field added. |
-| 0.17 | 2026-11-02 | NPSP household adoption (X-05, ADR-0155 `0155-npsp-household-adoption-in-core.md`). New Core object Household Adoption (`Household_Adoption__c`, 29ZH) with rules R-HA1 to R-HA5: NPSP household Accounts become BarnCRM households in place (record type, greetings, primary contact, custom name), journaled for undo. NPSP read by describe only. |
-| 0.15 | 2026-11-02 | Programs P-10 (ADR-0160 `0160-programs-service-plans-cohorts-sessions.md`). New in the Programs module: Goal (`Goal__c`, 29ZA2), a detail of Enrollment, and Goal Step (`Goal_Step__c`, 29ZA3), a detail of Goal, with rules R-GL1 to R-GL6 and R-GS1; a goal names a Logic Models outcome by record identifier (`Outcome_Id__c`), never a lookup. `Case_Note__c` gains `Goal__c` (Lookup, SetNull) with rule R-CN5. Erasing a person now also deletes their goals. |
-| 0.15 | 2026-11-02 | Programs P-11 (same ADR-0160). New in the Programs module: Cohort (`Cohort__c`, 29ZA4) and Session (`Session__c`, 29ZA5), both Public Read/Write, with rules R-CO1 to R-CO3 and R-SE1 to R-SE5. `Enrollment__c` gains `Cohort__c` (Lookup, SetNull) with rule R-EN8; `Service_Delivery__c` gains `Session__c` (Lookup, Restrict) with rule R-SD7. Attendance per session is Service Delivery; there is no attendance or membership object. |
+| 0.17 | 2026-11-02 | Field Access Manager (C-65, D-157, ADR-0156). New Section 29ZP, rules R-FA1 to R-FA7: a field access change is a data job; `Import_Batch__c.Operation__c` gains the value Access. No object or field added. |
+| 0.17 | 2026-11-02 | NPSP household adoption (X-05, ADR-0155 `0155-npsp-household-adoption-in-core.md`). New Core object Household Adoption (`Household_Adoption__c`, 29ZQ) with rules R-HA1 to R-HA5: NPSP household Accounts become BarnCRM households in place (record type, greetings, primary contact, custom name), journaled for undo. NPSP read by describe only. |
+| 0.15 | 2026-11-02 | Programs P-10 (ADR-0160 `0160-programs-service-plans-cohorts-sessions.md`). New in the Programs module: Goal (`Goal__c`, 29ZA3), a detail of Enrollment, and Goal Step (`Goal_Step__c`, 29ZA4), a detail of Goal, with rules R-GL1 to R-GL6 and R-GS1; a goal names a Logic Models outcome by record identifier (`Outcome_Id__c`), never a lookup. `Case_Note__c` gains `Goal__c` (Lookup, SetNull) with rule R-CN5. Erasing a person now also deletes their goals. |
+| 0.15 | 2026-11-02 | Programs P-11 (same ADR-0160). New in the Programs module: Cohort (`Cohort__c`, 29ZA5) and Session (`Session__c`, 29ZA6), both Public Read/Write, with rules R-CO1 to R-CO3 and R-SE1 to R-SE5. `Enrollment__c` gains `Cohort__c` (Lookup, SetNull) with rule R-EN8; `Service_Delivery__c` gains `Session__c` (Lookup, Restrict) with rule R-SD7. Attendance per session is Service Delivery; there is no attendance or membership object. |
 | 0.15 | 2026-11-02 | Logic Models L-03 indicator sources (ADR-0158 `0158-indicator-sources.md`). `Indicator__c` (29ZF) gains Source (`Source__c`), Source Query (`Source_Query__c`, lookup to `Saved_Query__c`), Source Definition (`Source_Definition__c`), Source Status (`Source_Status__c`) and Computed At (`Computed_At__c`), with rules R-IN3 to R-IN6; the one-object import template Indicator Results loads Indicator Period results. |
 | 0.15 | 2026-11-02 | Logic Models L-04 logic model report: rule R-IN7 on Indicator (29ZF); no new object or field. |
-| 0.17 | 2026-11-02 | Gift Transaction mirror (X-07, ADR-0161). New Section 29C1, rules R-GT1 to R-GT10, leaving Section 30. No object added. Mirror adds Gift Transaction ID (`Gift_Transaction_Id__c`, Text(18), unique) to `Gift__c`, Gift Designation ID (`Gift_Designation_Id__c`, Text(18)) to `Fund__c`, and five keys to `Mirror_Settings__c`. One way only, Gifts to Gift Transactions, with designations written from each fund's Gift Designation ID; the reverse direction waits on owner question O-7. Ported from the 2026-09-27 salvage design, which had both directions and no designations. |
+| 0.17 | 2026-11-02 | Gift Transaction mirror (X-07, ADR-0157). New Section 29C1, rules R-GT1 to R-GT10, leaving Section 30. No object added. Mirror adds Gift Transaction ID (`Gift_Transaction_Id__c`, Text(18), unique) to `Gift__c`, Gift Designation ID (`Gift_Designation_Id__c`, Text(18)) to `Fund__c`, and five keys to `Mirror_Settings__c`. One way only, Gifts to Gift Transactions, with designations written from each fund's Gift Designation ID; the reverse direction waits on owner question O-7. Ported from the 2026-09-27 salvage design, which had both directions and no designations. |
 | 0.16 | 2026-11-02 | Funders F-01 and F-02 (ADR-0161 `0161-funders-module.md`). New Sections 29ZH Grant (`Grant__c`), 29ZI Grant Requirement (`Grant_Requirement__c`, a detail of the grant) and 29ZJ Funders Settings (`Funders_Settings__c`), rules R-GN1 to R-GN7, R-GQ1 to R-GQ5 and R-FS1. Section 30's funder pipeline row narrows to the entities still to come. |
 | 0.17 | 2026-11-02 | Funders F-03 and F-08 (release 0.17) and F-05 (release 0.16) (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). New Sections 29ZL Restricted Fund Entry (`Grant_Fund_Entry__c`) and 29ZM Grant Payment (`Grant_Payment__c`), both details of the grant, rules R-FE1, R-FE2 and R-GP1 to R-GP4. Grant (29ZH) gains Restricted, Giving Fund (a record identifier, R-GN8), Payment Frequency and six totals; R-GN6 covers the new details. Funders no longer depends on Giving. |
 | 0.16 | 2026-11-02 | Funders F-04. `Grant__c` (29ZH) gains Funding Source (`Funding_Source__c`), Assistance Listing Number (`Assistance_Listing_Number__c`), Award Number (`Award_Number__c`), Federal Agency (`Federal_Agency__c`), Indirect Cost Rate (`Indirect_Cost_Rate__c`) and Match Required (`Match_Required__c`), with rule R-GN8. The period of performance is the existing award period; drawdowns are F-03's. |
@@ -12494,10 +12494,10 @@ included; standard objects the packages extend are named by the entity that gove
 | Service | Programs | 0.12 (P-01) | 29Z |
 | Enrollment | Programs | 0.12 (P-01) | 29ZA |
 | Case Note | Programs | 0.14 (P-04) | 29ZA1 |
-| Goal | Programs | 0.15 (P-10) | 29ZA2 |
-| Goal Step | Programs | 0.15 (P-10) | 29ZA3 |
-| Cohort | Programs | 0.15 (P-11) | 29ZA4 |
-| Session | Programs | 0.15 (P-11) | 29ZA5 |
+| Goal | Programs | 0.15 (P-10) | 29ZA3 |
+| Goal Step | Programs | 0.15 (P-10) | 29ZA4 |
+| Cohort | Programs | 0.15 (P-11) | 29ZA5 |
+| Session | Programs | 0.15 (P-11) | 29ZA6 |
 | Programs Settings (custom setting, Participant Privacy preset) | Programs | 0.14 (P-08) | 29ZA |
 | Service Delivery | Programs | 0.13 (P-02) | 29ZB |
 | Programs entities | Programs | v0.9 | 30 |
@@ -12506,7 +12506,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Logic Model Link | Logic Models | 0.14 (L-01) | 29ZE |
 | Indicator | Logic Models | 0.14 (L-02) | 29ZF |
 | Indicator Period | Logic Models | 0.14 (L-02) | 29ZG |
-| Household Adoption | Core | 0.17 (X-05) | 29ZH |
+| Household Adoption | Core | 0.17 (X-05) | 29ZQ |
 | Funders entities | Funders | v0.9 | 30 |
 | Grant | Funders | 0.16 (F-01) | 29ZH |
 | Grant Requirement | Funders | 0.16 (F-02) | 29ZI |

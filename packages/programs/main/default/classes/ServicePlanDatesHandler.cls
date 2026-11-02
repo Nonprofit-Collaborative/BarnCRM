@@ -1,5 +1,5 @@
 /**
- * R-GL2 and R-GS1 (canonical model Sections 29ZA2 and 29ZA3), run by the Core trigger dispatcher
+ * R-GL2 and R-GS1 (canonical model Sections 29ZA3 and 29ZA4), run by the Core trigger dispatcher
  * through the registry rows `Goal_Dates` (Goal__c) and `Goal_Step_Dates` (Goal_Step__c), each
  * switchable from the Automation page (ADR-0017). Closing a goal (Achieved or Not Achieved) fills
  * an empty Closed Date with today and reopening it empties it; a step's Completed Date follows

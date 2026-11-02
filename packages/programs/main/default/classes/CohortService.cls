@@ -1,5 +1,5 @@
 /**
- * Cohort membership and session scheduling (P-11, canonical model 29ZA4 and 29ZA5). Membership
+ * Cohort membership and session scheduling (P-11, canonical model 29ZA5 and 29ZA6). Membership
  * is the enrollment's Cohort (R-EN8), so adding a person changes or creates an enrollment, in
  * user mode, through the enrollment rules (R-EN1 to R-EN3). Each person succeeds or fails alone
  * (R-CO3). Scheduling creates one session per date it is given (R-SE4).

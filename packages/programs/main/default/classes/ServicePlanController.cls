@@ -1,5 +1,5 @@
 /**
- * The Service Plan panel's server side (P-10; canonical model Sections 29ZA2 and 29ZA3). Thin:
+ * The Service Plan panel's server side (P-10; canonical model Sections 29ZA3 and 29ZA4). Thin:
  * each method parses the panel's JSON, asks `ServicePlanService`, and returns the whole plan again
  * as plain JSON, so the panel redraws from one shape (plan 9.9). A refused save comes back in its
  * own words; anything unexpected is recorded in the Error Log first (plan Section 7.2).

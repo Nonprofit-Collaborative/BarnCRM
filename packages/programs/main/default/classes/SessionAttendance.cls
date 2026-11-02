@@ -1,5 +1,5 @@
 /**
- * Attendance taken on a session (P-11, canonical model 29ZA5 and 29ZB, R-SE2, R-SE3, R-SD7), for
+ * Attendance taken on a session (P-11, canonical model 29ZA6 and 29ZB, R-SE2, R-SE3, R-SD7), for
  * the Service Delivery Log panel on a session page through `ServiceDeliveryLogController`.
  *
  * The session gives the service and the day; the roster is the cohort's open enrollments (the

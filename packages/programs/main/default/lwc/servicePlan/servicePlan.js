@@ -62,7 +62,7 @@ import {
 import { bodyMessage } from 'c/findCsv';
 
 /**
- * The Service Plan panel on an enrollment (P-10, canonical model 29ZA2): the participant's goals,
+ * The Service Plan panel on an enrollment (P-10, canonical model 29ZA3): the participant's goals,
  * the steps toward each, reviews and the case notes about each goal. Every save goes through the
  * server in user mode and returns the whole plan, which the framework-free `plan.js` orders and
  * labels. Works the same on a phone.
