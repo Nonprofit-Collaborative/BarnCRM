@@ -377,3 +377,16 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 10 | Open **Giving**, **Opportunity Mirror**, then **Open in Setup**; then open **Accounting Export**. | **Permission Sets** opens. **Accounting Export** shows no **Needs a Change in Setup** note. |
 
 **Cleanup:** None, if Deliverability is back to **All email**.
+
+## T-SET-21: An Upgrade Turns On New Settings Once
+
+**Purpose:** confirm that an upgrade turns on a setting that ships on (Send Weekly Admin Summary, Ask Reminders) in an org that saved its settings before the setting existed, once, and never overrides the admin's choice after.
+**Prerequisites:** an org upgraded or deployed from a version before 0.15 whose BarnCRM Settings and Giving settings had been saved.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | After the upgrade, open **BarnCRM Settings** and find **Send Weekly Admin Summary**. | It is on, and its description starts "On by default." |
+| 2 | Choose the **Giving** section and find **Ask Reminders**. | It is on. |
+| 3 | Switch both off and save. Run the upgrade or the source deploy again. | Both stay off. |
+
+**Cleanup:** set both back to what they were.

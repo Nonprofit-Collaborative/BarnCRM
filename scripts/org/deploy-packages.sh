@@ -1008,7 +1008,8 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # The same gap for every module's own post-install steps (Giving's starting fund, receipt
   # letters and import templates, each module's automation switches, its admin permission set
   # for the person deploying): a deployment runs no post-install. Each module's runSetup is
-  # exactly what its install runs, safe on an org that already has them, and it records the
+  # exactly what its install runs (including turning on, once, a ship-on setting added in an
+  # upgrade: ShippedDefaultUpgrades, QA-F2), safe on an org that already has them, and it records the
   # module in the setup marker so Health Check does not offer Finish Setup here (FS1). Skipped
   # with SOURCE_POST_INSTALL=0, because the Apex tests assume an org with no funds and no saved
   # BarnCRM Settings.
