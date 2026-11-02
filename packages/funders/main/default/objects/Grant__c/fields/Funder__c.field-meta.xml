@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Funder__c</fullName>
+  <deleteConstraint>Restrict</deleteConstraint>
+  <referenceTo>Account</referenceTo>
+  <relationshipLabel>Grants</relationshipLabel>
+  <relationshipName>Grants</relationshipName>
+  <required>true</required>
+  <externalId>false</externalId>
+  <inlineHelpText>The foundation, company or government body you are asking. An organization with grants can't be deleted.</inlineHelpText>
+  <label>Funder</label>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

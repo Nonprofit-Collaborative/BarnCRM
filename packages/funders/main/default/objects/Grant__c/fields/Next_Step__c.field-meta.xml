@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Next_Step__c</fullName>
+  <length>255</length>
+  <required>false</required>
+  <externalId>false</externalId>
+  <inlineHelpText>The next thing to do on this request.</inlineHelpText>
+  <label>Next Step</label>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+</CustomField>
