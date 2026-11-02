@@ -69,6 +69,13 @@ or the requirement's type and grant.
 Each row says how many days are left, `Due today`, or how many days overdue (in red). Click a
 grant's name to open it.
 
+## To See a Month of Deadlines
+
+Open the **Grant Calendar** tab. Each day shows its application deadlines, requirements due and
+payments expected; overdue ones are in red. Click one to open it. Use **Previous Month** and
+**Next Month** to move, and **Mine** to see only your grants and the requirements assigned to
+you.
+
 ## To Name the Program a Grant Pays For
 
 Only when your organization uses Programs.

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Grant Calendar tab's arithmetic in plain JavaScript: the days a month view shows and the
+    deadline rows laid into its weeks, sorted by grantPipelineModel.deadlineRows (F-08). Imported
+    by grantCalendar.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
