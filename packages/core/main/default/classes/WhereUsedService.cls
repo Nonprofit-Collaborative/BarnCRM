@@ -878,7 +878,12 @@ public with sharing class WhereUsedService {
      */
     @NamespaceAccessible
     public static Reference settingReference(String settingLabel, String breaks, String section) {
-        return new Reference(KIND_SETTING, System.Label.Core_WhereUsed_KindSetting, settingLabel, null)
+        return new Reference(
+                KIND_SETTING,
+                System.Label.Core_WhereUsed_KindSetting,
+                settingLabel,
+                null
+            )
             .addPart(System.Label.Core_WhereUsed_PartField)
             .withBreaks(breaks)
             .withEdit('BarnCRM_Settings', new Map<String, String>{ 'section' => section });
