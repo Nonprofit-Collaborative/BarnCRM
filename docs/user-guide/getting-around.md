@@ -34,6 +34,8 @@ have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matc
 the **Data Manager** tab. Administrators also find a **Data Dictionary** section inside **Org
 Optimizer**, which lists every field (and, when asked, the flows and Apex triggers that run on
 each kind of record) and downloads it as a CSV, an **AI-Readiness Export**
+the **Data Manager** tab. Every tab, including those Giving, Volunteers and Programs add,
+has its own icon, so a tab is easy to spot in the menu. Administrators also find a **Data Dictionary** section inside **Org
 section, which downloads a zip that explains your data to an AI tool of their choice, a
 **Setup Changes** section that shows who changed what in Setup, and when, and an **Access
 Explorer** section that shows who can see or change what, and why, compares two people side by

@@ -5,5 +5,5 @@
     The steps of the pledge reminder ladder, in the order they fire around an installment due date.
   </description>
   <label>Pledge Reminder Steps</label>
-  <motif>Custom20: Bell</motif>
+  <motif>Custom79: MeasuringTape</motif>
 </CustomTab>

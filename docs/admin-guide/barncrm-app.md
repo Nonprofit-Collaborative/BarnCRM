@@ -28,6 +28,12 @@ one: a gear for **BarnCRM Settings**, building blocks for **Data Manager**, a st
 **Addresses** a map. On Data Manager, Org Optimizer, Duplicate Matching, Find and Import the
 page name appears once, in the page header, and the tool below it starts with what it is for.
 
+Module tabs follow the same rule: every Giving, Volunteers, Programs, Logic Models, Rollup
+Builder and Mirror tab has its own icon, never one shared with another BarnCRM tab (for
+example a stack of cash for **Gifts**, a trophy for **Donor Levels**, a chalkboard for **Logic
+Models**, a sailboat for **Programs**). The full list is in the contributor guide's
+[Tab Icons](../contributor-guide/tab-icons.md).
+
 If you have ever installed something in Salesforce and then wondered where to start, this
 is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**).
 

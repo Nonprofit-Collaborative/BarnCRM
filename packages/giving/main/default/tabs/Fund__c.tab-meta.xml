@@ -2,5 +2,5 @@
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
   <customObject>true</customObject>
   <description>The designations and restrictions that gifts are allocated to.</description>
-  <motif>Custom17: Sack</motif>
+  <motif>Custom42: Treasurechest</motif>
 </CustomTab>
