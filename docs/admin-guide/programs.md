@@ -335,7 +335,7 @@ choose another.
 
 **Turning off the dates.** The Closed Date and Completed Date are filled in by two automations,
 **Goal: fill in the closed date** and **Goal Step: fill in the completed date**, on the
-[Automation](automation.md) page. Switch them off while you load history whose dates you type
+[Automation Control](automation-control.md) page. Switch them off while you load history whose dates you type
 yourself.
 
 ## Cohorts and Sessions

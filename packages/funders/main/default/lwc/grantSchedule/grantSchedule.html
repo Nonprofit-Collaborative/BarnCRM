@@ -47,46 +47,48 @@
         </dl>
 
         <template lwc:if={hasPayments}>
-          <table class="slds-table slds-table_cell-buffer slds-table_bordered" data-id="payments">
-            <thead>
-              <tr class="slds-line-height_reset">
-                <th scope="col">{heading.dueDate}</th>
-                <th scope="col">{heading.amount}</th>
-                <th scope="col">{heading.status}</th>
-                <th scope="col"><span class="slds-assistive-text">{labels.markReceived}</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              <template for:each={payments} for:item="payment">
-                <tr key={payment.id} data-id="payment">
-                  <td>
-                    <lightning-formatted-date-time
-                      value={payment.dueDate}
-                      time-zone="UTC"
-                    ></lightning-formatted-date-time>
-                  </td>
-                  <td>
-                    <lightning-formatted-number
-                      value={payment.amount}
-                      format-style="currency"
-                    ></lightning-formatted-number>
-                  </td>
-                  <td>{payment.status}</td>
-                  <td>
-                    <template lwc:if={payment.canMarkReceived}>
-                      <lightning-button
-                        data-id="mark-received"
-                        data-payment-id={payment.id}
-                        label={labels.markReceived}
-                        disabled={isSaving}
-                        onclick={handleMarkReceived}
-                      ></lightning-button>
-                    </template>
-                  </td>
+          <div class="slds-scrollable_x">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered" data-id="payments">
+              <thead>
+                <tr class="slds-line-height_reset">
+                  <th scope="col">{heading.dueDate}</th>
+                  <th scope="col">{heading.amount}</th>
+                  <th scope="col">{heading.status}</th>
+                  <th scope="col"><span class="slds-assistive-text">{labels.markReceived}</span></th>
                 </tr>
-              </template>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                <template for:each={payments} for:item="payment">
+                  <tr key={payment.id} data-id="payment">
+                    <td>
+                      <lightning-formatted-date-time
+                        value={payment.dueDate}
+                        time-zone="UTC"
+                      ></lightning-formatted-date-time>
+                    </td>
+                    <td>
+                      <lightning-formatted-number
+                        value={payment.amount}
+                        format-style="currency"
+                      ></lightning-formatted-number>
+                    </td>
+                    <td>{payment.status}</td>
+                    <td>
+                      <template lwc:if={payment.canMarkReceived}>
+                        <lightning-button
+                          data-id="mark-received"
+                          data-payment-id={payment.id}
+                          label={labels.markReceived}
+                          disabled={isSaving}
+                          onclick={handleMarkReceived}
+                        ></lightning-button>
+                      </template>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
         </template>
 
         <template lwc:if={showCannotBuild}>
