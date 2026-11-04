@@ -5,7 +5,6 @@ packages/core/main/default/lwc/automationControl/automationControl.html solid-bo
 packages/core/main/default/lwc/bulkDelete/bulkDelete.html solid-box 3
 packages/core/main/default/lwc/bulkUpdate/bulkUpdate.html solid-box 2
 packages/core/main/default/lwc/bulkUpdate/bulkUpdate.html table-stacked 1
-packages/core/main/default/lwc/dataJobHistory/dataJobHistory.html solid-box 2
 packages/core/main/default/lwc/errorLogTile/errorLogTile.html solid-box 1
 packages/core/main/default/lwc/filterBuilder/filterBuilder.html solid-box 2
 packages/core/main/default/lwc/findRecords/findRecords.html solid-box 2

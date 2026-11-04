@@ -13,14 +13,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In the BarnCRM app, open the **Data Manager** tab. | The page name **Data Manager** shows once, in the page header with the tab icon, and no other icon or title repeats it. The line **Start a data task, or see and undo what changed.** is under it, then **About This Tool** (open on your first visit) with two short lines on which tool to use and a **Learn More** link. |
-| 2 | Look at the tiles. | Four groups in this order: **Bring Data In** (**Import a File**), **Find and Change** (**Find and Export Records**, **Super Transformer**), **Check and Tidy** (**Org Optimizer**), **Careful** (**Delete Many Records**, alone and last). Each tile has an icon, its name and one line of 12 words or fewer; there are no **Open** buttons. **Super Transformer** reads "Change fields on many records at once, no file needed." |
+| 2 | Look at the tiles. | Four groups in this order: **Bring Data In** (**Super Importer**), **Find and Change** (**Find**, **Super Transformer**), **Check and Tidy** (**Org Optimizer**, **Duplicate Matching**), **Careful** (**Delete Many Records**, alone and last). Each tile has an icon, its name and one line of 12 words or fewer; there are no **Open** buttons. **Super Importer** reads "Add or update records from a spreadsheet.", **Find** reads "Find records, then save or export them." and **Super Transformer** reads "Change fields on many records at once, no file needed." The **Super Importer**, **Find**, **Super Transformer**, **Org Optimizer** and **Duplicate Matching** tiles show the same icon as their tabs. |
 | 3 | Look around the tiles. | There is no warning box anywhere on the page. |
 | 4 | Look under **Import Templates**. | The line "A template remembers how a file's columns match fields." with a **Learn More** link, then a table with the columns **Template**, **Loads**, **Arrives Regularly As**, **Last Loaded**, listing the shipped import templates. **Loads** reads **People and organizations** for the people templates, **Gifts** for a gift template, and a plural object name (for example **Accounts**) for a one-object template; never an API name such as `Account`. With no template at all it shows an illustration, **No Import Templates Yet**, and a **Create a Template** button that opens **Import**. |
 | 5 | Look at the job list card. | It is headed **Data Jobs**, with a **Refresh** button, a **Show** list and a **Show everyone's jobs** checkbox. With no jobs run yet it shows an illustration, the heading **No Data Jobs Yet** and the line "Each import, Super Transformer run and bulk delete is listed here, with its undo." |
 | 6 | Look under **Salesforce's Own Tools**. | Three tiles: **Weekly Data Export**, **Recycle Bin**, **Data Import Wizard**, each with a small new-window icon after its name. |
 | 7 | Click the **Recycle Bin** tile. | A new browser tab opens Salesforce's Recycle Bin. Close it. |
 | 8 | Close **About This Tool** and reload the page. | It stays closed. |
-| 9 | Check the app's navigation bar, in **BarnCRM** and in **BarnCRM Admin**. | **Data Manager** is there in both. **Find**, **Import** and **Super Transformer** are in neither. |
+| 9 | Check the app's navigation bar, in **BarnCRM** and in **BarnCRM Admin**. | **Data Manager** is there in both. **Find**, **Super Importer**, **Super Transformer** and **Import Rows** are in neither. In **BarnCRM Admin** the tabs are **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching** and **Error Log**, last. |
 | 10 | With Giving and Volunteers installed, look at the module tabs in the navigation (for example **Gifts**, **Donor Levels**, **Volunteer Hours**). | Each tab has its own icon, and no two BarnCRM tabs show the same one. |
 
 **Cleanup:** None.
@@ -32,14 +32,32 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Data Manager**, click **Import a File**. | The **Import** tab opens. |
-| 2 | Go back to **Data Manager**. Press Tab until **Find and Export Records** has the focus ring, and press Enter. | The **Find** tab opens. |
+| 1 | On **Data Manager**, click **Super Importer**. | The **Super Importer** tab opens. |
+| 2 | Go back to **Data Manager**. Press Tab until **Find** has the focus ring, and press Enter. | The **Find** tab opens. |
 | 3 | Go back. Click **Super Transformer**. | The **Super Transformer** tab opens, with its five steps above **Data Jobs**. |
 | 4 | Go back. Click **Org Optimizer**. | The **Org Optimizer** tab opens on **Overview**. |
+| 4a | Go back. Click **Duplicate Matching**. | The **Duplicate Matching** tab opens on **Review**. |
 | 5 | Go back. Click **Delete Many Records**. | A box titled **Delete Many Records** opens, reading "Deleted records go to the Recycle Bin. You can undo a bulk delete from Data Jobs, on this page, for up to 15 days.", with **Cancel** and a red **Continue** button. Nothing else has opened yet. |
 | 6 | Click **Cancel**. | The box closes and **Data Manager** stays open. No tab opens. |
 | 7 | Click **Delete Many Records** again, and press Escape. | The box closes and nothing opens. |
 | 8 | Click **Delete Many Records** again, and click **Continue**. | The **Find** tab opens. |
+
+**Cleanup:** None.
+
+## T-DM-13: What Do You Want to Do? Finds the Tool for a Task
+
+**Purpose:** Confirm the task search above the tiles lists the tools for a typed task, opens them, and offers only tools the person may use.
+**Prerequisites:** admin; staff with the **BarnCRM Find and Export** permission set only.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open **Data Manager**. | Above the tiles is a search box labelled **What Do You Want to Do?**, reading "For example, merge two households" while empty. |
+| 2 | Type `merge two households`. | Under the box, **Merge two households** is first, with **Duplicate Matching** beside it in grey. A screen reader announces the list. |
+| 3 | Click **Merge two households**. | The **Duplicate Matching** tab opens. |
+| 4 | Back on **Data Manager**, type in turn: `fix capital letters in names`, `import donors`, `find people without email`. | The first result is, in turn: **Fix capital letters in names** (**Super Transformer**), **Import donors and their gifts** (**Super Importer**), **Find people without email** (**Find**). At most five results show. |
+| 5 | Type `delete test records`, then press Tab to **Delete test records** and press Enter. | The **Delete Many Records** box opens, as from the tile. Press **Cancel**: nothing opens. |
+| 6 | Type `zebra`. | No results; the line "No tool matches those words. Try other words, or choose a tile below." |
+| 7 | As staff, open **Data Manager** and type `delete test records`. | No **Delete Many Records** task is listed (staff cannot bulk delete); only tasks for **Find** or **Org Optimizer** can show. |
 
 **Cleanup:** None.
 
@@ -50,11 +68,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open **BarnCRM**, **BarnCRM Console**, **BarnCRM Admin** and **BarnCRM Admin Console** in turn, and check each navigation bar or menu. | **Data Manager** is in all four. **Find**, **Import** and **Super Transformer** are in none. |
-| 2 | In **BarnCRM**, open **Data Manager** and click **Find and Export Records**. | The **Find** tab opens and works: choose **Contact** and run a query. |
-| 3 | In **BarnCRM Admin**, open **Data Manager** and click **Import a File**. | The **Import** tab opens on its first step. |
+| 1 | As admin, open **BarnCRM**, **BarnCRM Console**, **BarnCRM Admin** and **BarnCRM Admin Console** in turn, and check each navigation bar or menu. | **Data Manager** is in all four. **Find**, **Super Importer**, **Super Transformer** and **Import Rows** are in none. |
+| 2 | In **BarnCRM**, open **Data Manager** and click **Find**. | The **Find** tab opens and works: choose **Contact** and run a query. |
+| 3 | In **BarnCRM Admin**, open **Data Manager** and click **Super Importer**. | The **Super Importer** tab opens on its first step. |
 | 4 | Open **Org Optimizer**, and press **Open in Find** next to any check. | The **Find** tab opens with that check's query. |
-| 5 | As staff, open **BarnCRM**. | **Data Manager** is in the navigation; **Find** is not. On **Data Manager**, the **Find and Export Records** tile opens Find. |
+| 5 | As staff, open **BarnCRM**. | **Data Manager** is in the navigation; **Find** is not. On **Data Manager**, the **Find** tile opens Find. |
 
 **Cleanup:** None.
 
@@ -117,9 +135,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | As staff, open the BarnCRM app. | No **Data Manager** and no **Org Optimizer** tab. |
 | 2 | As admin, open **BarnCRM Settings**, **Access**. Under **Extra Permissions**, give the staff user **BarnCRM Find and Export** with **Give Permission**, and confirm. | A message says the staff user now has the permission. |
-| 3 | As staff, wait a minute and reload. Open **Data Manager**. | The tab is there. Only two tiles: **Find and Export Records** under **Find and Change** and **Org Optimizer** under **Check and Tidy**. There is no **Bring Data In** or **Careful** group. |
+| 3 | As staff, wait a minute and reload. Open **Data Manager**. | The tab is there. Only two tiles: **Find** under **Find and Change** and **Org Optimizer** under **Check and Tidy**. There is no **Bring Data In** or **Careful** group. |
 | 4 | Look for **Import Templates**, **Data Jobs** and **Salesforce's Own Tools**. | None of them is shown. |
-| 5 | As admin, also give the staff user **BarnCRM Bulk Update**. As staff, reload **Data Manager**. | A third tile, **Super Transformer**, appears after **Find and Export Records**, and **Data Jobs** appears with the line **Start a change with Super Transformer above, or from a saved query in Find (Change Records, Super Transformer). Recent Super Transformer runs and their undo are listed here.** There is no **Show** list (one kind of job only) and no **Show everyone's jobs**. |
+| 5 | As admin, also give the staff user **BarnCRM Bulk Update**. As staff, reload **Data Manager**. | A third tile, **Super Transformer**, appears after **Find**, and **Data Jobs** appears with the line **Start a change with Super Transformer above, or from a saved query in Find (Change Records, Super Transformer). Recent Super Transformer runs and their undo are listed here.** There is no **Show** list (one kind of job only) and no **Show everyone's jobs**. |
 | 6 | As staff, check whether the admin's Super Transformer run from T-DM-03 is listed. | It is not: staff see their own jobs only. |
 
 **Cleanup:** As admin, remove both extra permissions from the staff user on the **Access** page.
