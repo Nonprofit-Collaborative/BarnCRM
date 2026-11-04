@@ -1,94 +1,100 @@
 <template>
-    <template lwc:if={helpReady}>
-  <lightning-card title={labels.title} icon-name="standard:document">
-    <div class="slds-p-horizontal_medium">
-      <template lwc:if={loadError}>
-        <p role="alert" data-id="load-error" class="slds-text-color_error">{loadError}</p>
-      </template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name={icons.receipt}>
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={loadError}>
+          <div class="slds-var-m-bottom_small">
+            <c-barn-notice variant="error" message={loadError} data-id="load-error"></c-barn-notice>
+          </div>
+        </template>
 
-      <template lwc:if={hasReceipts}>
-        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
-          <thead>
-            <tr class="slds-line-height_reset">
-              <th scope="col">{labels.columnNumber}</th>
-              <th scope="col">{labels.columnStatus}</th>
-              <th scope="col">{labels.columnAmount}</th>
-              <th scope="col">{labels.columnIssued}</th>
-              <th scope="col">{labels.columnVoidReason}</th>
-              <th scope="col">{labels.columnFile}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <template for:each={rows} for:item="receipt">
-              <tr key={receipt.id} data-id="receipt-row">
-                <td>{receipt.receiptNumber}</td>
-                <td>{receipt.status}</td>
-                <td>
-                  <lightning-formatted-number
-                    value={receipt.amount}
-                    format-style="currency"
-                  ></lightning-formatted-number>
-                </td>
-                <td>
-                  <lightning-formatted-date-time
-                    value={receipt.issueDate}
-                  ></lightning-formatted-date-time>
-                </td>
-                <td>{receipt.voidReason}</td>
-                <td>
-                  <template lwc:if={receipt.contentDocumentId}>
-                    <lightning-button
-                      data-id="view-pdf"
-                      data-document-id={receipt.contentDocumentId}
-                      variant="base"
-                      label={labels.viewPdf}
-                      title={receipt.viewPdfTitle}
-                      onclick={handleViewPdf}
-                    ></lightning-button>
-                  </template>
-                </td>
+        <template lwc:if={hasReceipts}>
+          <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+            <thead>
+              <tr class="slds-line-height_reset">
+                <th scope="col" data-label={labels.columnNumber}>{labels.columnNumber}</th>
+                <th scope="col" data-label={labels.columnStatus}>{labels.columnStatus}</th>
+                <th scope="col" data-label={labels.columnAmount}>{labels.columnAmount}</th>
+                <th scope="col" data-label={labels.columnIssued}>{labels.columnIssued}</th>
+                <th scope="col" data-label={columnVoidReason}>{columnVoidReason}</th>
+                <th scope="col" data-label={labels.columnFile}>{labels.columnFile}</th>
               </tr>
-            </template>
-          </tbody>
-        </table>
-      </template>
-      <template lwc:else>
-        <p data-id="none-yet" class="slds-text-body_regular">{labels.noneYet}</p>
-      </template>
+            </thead>
+            <tbody>
+              <template for:each={rows} for:item="receipt">
+                <tr key={receipt.id} data-id="receipt-row">
+                  <td data-label={labels.columnNumber}>{receipt.receiptNumber}</td>
+                  <td data-label={labels.columnStatus}>
+                    <c-barn-status-badge status={receipt.statusWord} label={receipt.status}></c-barn-status-badge>
+                  </td>
+                  <td data-label={labels.columnAmount}>
+                    <lightning-formatted-number
+                      value={receipt.amount}
+                      format-style="currency"
+                    ></lightning-formatted-number>
+                  </td>
+                  <td data-label={labels.columnIssued}>
+                    <lightning-formatted-date-time
+                      value={receipt.issueDate}
+                    ></lightning-formatted-date-time>
+                  </td>
+                  <td data-label={columnVoidReason}>
+                    <div class="slds-truncate" title={receipt.voidReason}>{receipt.voidReason}</div>
+                  </td>
+                  <td data-label={labels.columnFile}>
+                    <template lwc:if={receipt.contentDocumentId}>
+                      <lightning-button
+                        data-id="view-pdf"
+                        data-document-id={receipt.contentDocumentId}
+                        variant="base"
+                        label={labels.viewPdf}
+                        title={receipt.viewPdfTitle}
+                        onclick={handleViewPdf}
+                      ></lightning-button>
+                    </template>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </template>
+        <template lwc:else>
+          <c-barn-empty-state size="compact" heading={labels.noneYet} data-id="none-yet"></c-barn-empty-state>
+        </template>
 
-      <template lwc:if={canIssue}>
-        <div class="slds-m-top_medium">
-          <lightning-button
-            data-id="issue"
-            label={labels.issue}
-            variant="brand"
-            disabled={busy}
-            onclick={handleIssue}
-          ></lightning-button>
-        </div>
-      </template>
-
-      <template lwc:if={canReissue}>
-        <div class="slds-m-top_medium">
-          <lightning-input
-            data-id="void-reason"
-            label={labels.voidReason}
-            value={reason}
-            onchange={handleReasonChange}
-          ></lightning-input>
-          <div class="slds-m-top_small">
+        <template lwc:if={canIssue}>
+          <div class="slds-var-m-top_medium">
             <lightning-button
-              data-id="void-and-reissue"
-              label={labels.voidAndReissue}
-              variant="destructive-text"
+              data-id="issue"
+              label={labels.issue}
+              variant="brand"
               disabled={busy}
-              onclick={handleVoidAndReissue}
+              onclick={handleIssue}
             ></lightning-button>
           </div>
-          <p class="slds-text-body_small slds-m-top_x-small">{labels.voidNote}</p>
-        </div>
-      </template>
-    </div>
-  </lightning-card>
-    </template>
+        </template>
+
+        <template lwc:if={canReissue}>
+          <div class="slds-var-m-top_medium">
+            <lightning-input
+              data-id="void-reason"
+              label={labels.voidReason}
+              value={reason}
+              onchange={handleReasonChange}
+            ></lightning-input>
+            <div class="slds-var-m-top_small">
+              <lightning-button
+                data-id="void-and-reissue"
+                label={labels.voidAndReissue}
+                variant="destructive-text"
+                disabled={busy}
+                onclick={handleVoidAndReissue}
+              ></lightning-button>
+            </div>
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small">{labels.voidNote}</p>
+          </div>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
 </template>

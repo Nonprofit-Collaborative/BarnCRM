@@ -50,11 +50,10 @@ public with sharing class HouseholdSoftCreditRecompute implements Queueable {
             // touches would chain a job per household for as long as the load ran, so past this
             // point the work is left to the next save of each gift and the fact is recorded.
             ErrorLogger.logMessage(
-                String.format(
-                    Label.Giving_SoftCredits_RecomputeDeferred,
-                    new List<String>{
-                        String.valueOf(pending.size() - HOUSEHOLDS_PER_TRANSACTION_CAP)
-                    }
+                BarnHelp.text(
+                    'Giving',
+                    'Giving_SoftCredits_RecomputeDeferred',
+                    new List<Object>{ pending.size() - HOUSEHOLDS_PER_TRANSACTION_CAP }
                 ),
                 CONTEXT,
                 'Warning'
@@ -68,9 +67,10 @@ public with sharing class HouseholdSoftCreditRecompute implements Queueable {
         if (System.isFuture() || Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
             // No async slot to take. The credits are corrected the next time each gift is saved.
             ErrorLogger.logMessage(
-                String.format(
-                    Label.Giving_SoftCredits_RecomputeDeferred,
-                    new List<String>{ String.valueOf(pending.size()) }
+                BarnHelp.text(
+                    'Giving',
+                    'Giving_SoftCredits_RecomputeDeferred',
+                    new List<Object>{ pending.size() }
                 ),
                 CONTEXT,
                 'Warning'

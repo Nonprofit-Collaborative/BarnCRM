@@ -63,7 +63,7 @@ describe('c-gift-refund', () => {
     getGiftSummary.emit({ remainingAmount: 150, fullyReversed: false, canRefund: false });
     await flush();
 
-    expect(find(element, 'no-access').textContent).toBe('c.Giving_RefundGift_NoPermission');
+    expect(find(element, 'no-access').message).toBe('c.Giving_RefundGift_NoPermission');
     expect(find(element, 'confirm')).toBeNull();
     expect(find(element, 'reason')).toBeNull();
     expect(find(element, 'cancel')).not.toBeNull();
@@ -154,6 +154,6 @@ describe('c-gift-refund', () => {
     getGiftSummary.error({ message: 'That gift could not be found.' });
     await flush();
 
-    expect(find(element, 'load-error').textContent).toContain('could not be found');
+    expect(find(element, 'load-error').message).toContain('could not be found');
   });
 });

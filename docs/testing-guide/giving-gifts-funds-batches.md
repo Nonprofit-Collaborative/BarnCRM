@@ -264,3 +264,25 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 5 | Open **All Funds**. | **General Fund** is still there and still the default. The seven sample funds and the sample gifts are gone. |
 
 **Cleanup:** none.
+
+## T-GIFT-16: Split a Gift Across Funds with Edit Funds
+
+**Purpose:** the gift page's **Edit Funds** splits a gift in one save, keeps the split adding up, and respects the posting lock.
+**Prerequisites:** T-GIFT-01; an active fund **Building Fund**; the **Gift Allocations** card on the Gift record page; a test user with **Giving Staff** and one with **Giving Admin**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the Giving Staff user, enter a 200.00 gift with no fund and open it. | **Gift Allocations** shows one row: General Fund, 200.00, 100%, and an **Edit Funds** button. |
+| 2 | Click **Edit Funds**. | One row (General Fund, 200.00, 100%), **Add a Fund**, a green "Left to assign: $0.00" badge, **Save** and **Cancel**. |
+| 3 | Set the row's **Percent** to `50`. | **Amount** becomes 100.00; the badge turns amber, "Left to assign: $100.00"; **Save** is off. |
+| 4 | Click **Add a Fund**. | A second row with **Amount** 100.00 and no fund; a bar with one divider appears under the rows. |
+| 5 | Choose **Building Fund** in the second row. | The badge reads "Left to assign: $0.00" and turns green; **Save** is on. |
+| 6 | Select the divider on the bar and press the Right arrow three times. | General Fund 106.00 (53%), Building Fund 94.00 (47%); a screen reader announces "General Fund 53%, Building Fund 47%". |
+| 7 | Drag the divider back to the middle with the mouse or a finger. | The split returns to about 50% each and the totals still leave 0.00 to assign. |
+| 8 | Choose **General Fund** in the second row too. | A warning: "Each fund can be chosen once. Put all of its amount on one row." **Save** is off. Choose **Building Fund** again. |
+| 9 | Click **Save**. | "Funds saved. The gift's allocations now match the split." Two rows, General Fund and Building Fund, adding up to 200.00. Building Fund's **Total Raised** includes its share after the next rollup. |
+| 10 | Click **Edit Funds**, delete the Building Fund row, set General Fund to 200.00, click **Save**. | Refused: "Taking a fund off a gift deletes its allocation, and you do not have delete access to Gift Allocations. Ask your BarnCRM admin to make this change." Nothing changes. |
+| 11 | Repeat step 10 as the Giving Admin user. | Saved: one row, General Fund 200.00. |
+| 12 | Mark the gift posted on the **Accounting Export** page and reopen it. | **Edit Funds** is gone; an info notice reads "This gift is in the books (posted to accounting, or dated in a closed period), so its funds and amounts to each cannot change. Record a refund instead." |
+
+**Cleanup:** unpost the gift from its **Posting** card, then delete it.

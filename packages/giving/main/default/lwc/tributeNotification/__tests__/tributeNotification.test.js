@@ -101,9 +101,9 @@ describe('c-tribute-notification', () => {
     getTribute.emit(TRIBUTE);
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="status"]').textContent).toContain(
-      'Not sent yet'
-    );
+    const badge = element.shadowRoot.querySelector('c-barn-status-badge');
+    expect(badge.label).toContain('Not sent yet');
+    expect(badge.status).toBe('pending');
     expect(element.shadowRoot.querySelector('[data-id="mark-sent"]')).not.toBeNull();
   });
 
@@ -122,9 +122,9 @@ describe('c-tribute-notification', () => {
     await flush();
 
     expect(markNotificationSent).toHaveBeenCalledWith({ tributeId: TRIBUTE.recordId });
-    expect(element.shadowRoot.querySelector('[data-id="status"]').textContent).toContain(
-      'Notification sent'
-    );
+    const badge = element.shadowRoot.querySelector('c-barn-status-badge');
+    expect(badge.label).toContain('Notification sent');
+    expect(badge.status).toBe('done');
     expect(element.shadowRoot.querySelector('[data-id="mark-sent"]')).toBeNull();
   });
 
@@ -139,7 +139,7 @@ describe('c-tribute-notification', () => {
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="mark-sent"]')).toBeNull();
-    expect(element.shadowRoot.querySelector('[data-id="blocked-reason"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="blocked-reason"]').message).toContain(
       'Nobody is recorded as the person to notify'
     );
     expect(element.shadowRoot.querySelector('[data-id="summary"]').textContent).toContain(
@@ -152,7 +152,9 @@ describe('c-tribute-notification', () => {
     getTribute.emit(null);
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="empty-state"]')).not.toBeNull();
+    const empty = element.shadowRoot.querySelector('[data-id="empty-state"]');
+    expect(empty.size).toBe('compact');
+    expect(empty.message).toBe('c.Giving_TributeNotification_Empty');
     expect(element.shadowRoot.querySelector('[data-id="summary"]')).toBeNull();
   });
 
@@ -167,7 +169,7 @@ describe('c-tribute-notification', () => {
     element.shadowRoot.querySelector('[data-id="mark-sent"]').click();
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent.trim()).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="error-message"]').message).toBe(
       'That tribute is no longer here, or you do not have access to it.'
     );
   });

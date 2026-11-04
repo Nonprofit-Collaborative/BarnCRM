@@ -16,6 +16,19 @@ public with sharing class GiftAllocationSelector {
     }
 
     /**
+     * One gift's allocations with their fund names, largest first, for the Gift Allocations card.
+     */
+    public static List<Gift_Allocation__c> selectWithFundNames(Id giftId) {
+        return [
+            SELECT Id, Gift__c, Fund__c, Fund__r.Name, Amount__c, Percent__c
+            FROM Gift_Allocation__c
+            WHERE Gift__c = :giftId
+            WITH USER_MODE
+            ORDER BY Amount__c DESC NULLS LAST
+        ];
+    }
+
+    /**
      * The allocations with the given identifiers.
      */
     public static List<Gift_Allocation__c> selectById(Set<Id> allocationIds) {

@@ -386,6 +386,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 |---|---|---|---|---|
 | Gifts | Major | Records each transaction (money, stock or goods) from one donor on one date, credited to the right household automatically. | Shipped | G-01 |
 | Funds and allocations | Major | Designates each gift to one or more funds, by amount or percent, totalling the gift exactly. | Shipped | G-01 |
+| Edit Funds on a gift | Minor | The gift page's Gift Allocations card lists the gift's funds and opens a fund split editor: rows of fund plus amount or percent, Left to assign, and a stacked bar whose dividers move money between two funds by drag or keyboard. The whole split saves in one transaction; a gift posted to accounting or in a closed period keeps its funds and says why. The same editor serves Quick Gift Entry. | In review (v1.0) | people-giving-16, DnD-4 |
 | Quick Gift Entry | Major | A one-screen, phone-friendly form for entering a gift the moment it arrives, with defaults filled in. | Shipped | G-03 |
 | Gift batches | Major | Types a stack of checks against the deposit slip total and posts them as ordinary gifts, all or none, only when they balance. | Shipped | G-17, ADR-0045 |
 | Refunds and write-offs | Major | Records money that went back as a linked negative gift with a reason, never editing the original. | Shipped | G-04 |

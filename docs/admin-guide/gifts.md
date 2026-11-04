@@ -84,6 +84,32 @@ Gift page layout alone does not put it on this page: the layout is what Salesfor
 when a gift is opened outside the BarnCRM Fundraising app, or on a record page your organization
 built that still uses the related list component.
 
+## Splitting a Gift Across Funds
+
+The **Gift Allocations** card (Lightning component `giftAllocations`, for Gift record pages)
+lists the funds a gift went to, with the amount and percent of each, and carries **Edit
+Funds**. **Edit Funds** opens the fund split editor: one row per fund, each with an
+**Amount** and a **Percent** (type either; BarnCRM works out the other), **Add a Fund**, a
+delete button per row, and a "Left to assign" badge that turns green at 0.00. With two or
+more funds a bar shows the split; drag a divider on it, or select a divider and press the
+arrow keys (Page Up and Page Down move ten percent), to move money between the two funds
+beside it. **Save** stays off until every row has its own fund and an amount and nothing is
+left to assign.
+
+The save replaces the gift's allocations in one transaction. A fund already on the gift
+keeps its allocation, a new fund takes over the allocation of a fund that left, and only
+what is left over is inserted or deleted. The allocation rules still apply: the split must
+total the gift, and a gift posted to accounting or dated in a closed period keeps its funds.
+On such a gift the card shows the lock's own message, "This gift is in the books ... Record a
+refund instead", in place of **Edit Funds**.
+
+Access: the person needs create and edit on Gift Allocations (**Giving Staff** and **Giving
+Admin** have both) and the `GiftAllocationController` class (both, and **Giving Read Only**
+to see the card). Taking a fund off a gift deletes an allocation, which needs delete on Gift
+Allocations: **Giving Admin** has it, **Giving Staff** does not, so staff can move money
+between funds and add funds but are told to ask an admin to remove one. Quick Gift Entry
+offers the same editor as **Split Across Funds** for a new gift.
+
 ## Lifting the Receipt Lock
 
 Sooner or later an organization holds a receipted gift that is wrong in a way that voiding

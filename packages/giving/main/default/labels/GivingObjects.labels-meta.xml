@@ -201,6 +201,14 @@
         <value>Add a Fund</value>
     </labels>
     <labels>
+        <fullName>Giving_FundSplit_EditFunds</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Gift Allocations card: open the fund split editor</shortDescription>
+        <value>Edit Funds</value>
+    </labels>
+    <labels>
         <fullName>Giving_RefundGift_Heading</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

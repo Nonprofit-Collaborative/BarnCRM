@@ -27,6 +27,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In **Soft Credits** click **Add Credit**. | A form: **Person to recognize**, **Why they are recognized** (Solicitor chosen), **Amount**, **Save** (disabled until a person is chosen) and **Cancel**. |
+| 1a | Type `Whit` in **Person to recognize**. | Each match shows its email and mailing city under the name. |
 | 2 | Pick **Maria Whitfield**, leave **Amount** empty, click **Save**. | Refused: "Enter an amount or a percent for this recognition. BarnCRM works out the other one from the gift." |
 | 3 | Choose **Why they are recognized** `Other` and enter **Amount** `500`, leave **Your own wording** empty, click **Save**. | Refused: "Type your own wording in Custom Role, or choose one of the roles in the list." |
 | 4 | Choose `Solicitor` again, **Amount** `500`, click **Save**. | Maria Whitfield, Solicitor, 500.00, with no **Automatic** badge and a **Remove** button. |

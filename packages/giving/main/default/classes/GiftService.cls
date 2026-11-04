@@ -16,6 +16,15 @@ public with sharing class GiftService {
     public static Boolean suppressDefaultAllocations = false;
 
     /**
+     * Set by GiftAllocationController while it replaces a gift's allocations in more than one
+     * statement (update, insert, delete): the total rule (R-GA1) is then checked once, on the
+     * finished split, rather than after each statement, where a half-saved split would be
+     * refused. The caller checks the total itself before the transaction ends. Reset it in a
+     * finally block: it is transaction state, not configuration.
+     */
+    public static Boolean deferAllocationTotalCheck = false;
+
+    /**
      * The gifts whose allocations the package itself is saving right now (a new gift's default
      * allocation, a single allocation moved with its gift's amount), as the Gift trigger holds
      * them, by Id. The allocation handlers of that one save read the gift from here instead of
