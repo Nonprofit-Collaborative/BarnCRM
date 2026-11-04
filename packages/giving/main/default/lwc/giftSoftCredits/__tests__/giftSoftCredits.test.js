@@ -3,6 +3,11 @@ import GiftSoftCredits from 'c/giftSoftCredits';
 import getCredits from '@salesforce/apex/SoftCreditController.getCredits';
 import addCredit from '@salesforce/apex/SoftCreditController.addCredit';
 import removeCredit from '@salesforce/apex/SoftCreditController.removeCredit';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Giving_SoftCredits_Empty: 'Nobody yet.'
+});
 
 jest.mock(
   '@salesforce/apex/SoftCreditController.getCredits',
@@ -22,10 +27,6 @@ jest.mock('@salesforce/apex/SoftCreditController.removeCredit', () => ({ default
 });
 
 jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
-  virtual: true
-});
-
-jest.mock('@salesforce/label/c.Giving_SoftCredits_Empty', () => ({ default: 'Nobody yet.' }), {
   virtual: true
 });
 

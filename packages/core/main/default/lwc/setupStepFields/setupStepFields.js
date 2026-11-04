@@ -1,8 +1,8 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import USER_ID from '@salesforce/user/Id';
-import UPLOAD_HELP from '@salesforce/label/c.Core_SetupAssistant_UploadHelp';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_URL = '/sfc/servlet.shepherd/document/download/';
 const TEXT = 'Text';
@@ -22,13 +22,28 @@ const ADDRESS = 'Address';
  * identifier is kept in settings. The admin guide records that limitation.
  */
 export default class SetupStepFields extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api canEdit = false;
 
   userId = USER_ID;
   draft = {};
   declared = [];
 
-  labels = { uploadHelp: UPLOAD_HELP, save: SAVE };
+  labels = {
+    get uploadHelp() {
+      return helpText('Core', 'Core_SetupAssistant_UploadHelp');
+    },
+    save: SAVE
+  };
 
   @api
   get fields() {

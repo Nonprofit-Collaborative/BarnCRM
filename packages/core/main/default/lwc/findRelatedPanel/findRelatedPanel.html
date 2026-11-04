@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <template lwc:if={hasError}>
         <div class="slds-text-color_error slds-var-m-bottom_x-small" role="alert" data-id="related-error">
             {errorMessage}
@@ -128,4 +129,5 @@
         disabled={addColumnDisabled}
         onclick={handleAddColumn}
     ></lightning-button>
+    </template>
 </template>

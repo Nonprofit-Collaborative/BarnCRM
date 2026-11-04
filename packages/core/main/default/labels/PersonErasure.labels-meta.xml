@@ -273,14 +273,6 @@
         <value>Request reference</value>
     </labels>
     <labels>
-        <fullName>Core_EraseAction_ReferenceHelp</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase person action: request reference help</shortDescription>
-        <value>Your own reference for the request, for example a ticket number. It is kept, so never type a name or an email address.</value>
-    </labels>
-    <labels>
         <fullName>Core_EraseAction_Confirm</fullName>
         <categories>Erase</categories>
         <language>en_US</language>

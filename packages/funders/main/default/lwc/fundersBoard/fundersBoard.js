@@ -5,7 +5,6 @@ import { showMoney } from 'c/grantReportModel';
 import { messageFrom as messageOf } from 'c/findCsv';
 
 import TITLE from '@salesforce/label/c.Funders_Board_Title';
-import HELP from '@salesforce/label/c.Funders_Board_Help';
 import MIX from '@salesforce/label/c.Funders_Board_Mix';
 import GIFTS from '@salesforce/label/c.Funders_Board_Gifts';
 import NOT_SET from '@salesforce/label/c.Core_Settings_NotSet';
@@ -17,8 +16,8 @@ import NO_RISK from '@salesforce/label/c.Funders_Board_NoRisk';
 import RESTRICTED from '@salesforce/label/c.Funders_Board_Restricted';
 import FUNDS from '@salesforce/label/c.Funders_Board_Funds';
 import GRANTS from '@salesforce/label/c.Funders_Board_Grants';
-import EMPTY from '@salesforce/label/c.Funders_Board_Empty';
 import ERROR_LOAD from '@salesforce/label/c.Funders_Board_ErrorLoad';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Board Dashboard tab (F-07, canonical model 29ZH R-GN9): this fiscal year's revenue mix,
@@ -26,14 +25,36 @@ import ERROR_LOAD from '@salesforce/label/c.Funders_Board_ErrorLoad';
  * `fundersBoardModel`'s; this component only lays them out. It reads and stores nothing else.
  */
 export default class FundersBoard extends LightningElement {
-  labels = { title: TITLE, help: HELP, mix: MIX, total: TOTAL, concentration: CONCENTRATION };
-  labelsRestricted = { title: RESTRICTED, funds: FUNDS, grants: GRANTS, empty: EMPTY };
+  helpReady = isHelpLoaded('Funders');
+
+  labels = {
+    title: TITLE,
+    get help() {
+      return helpText('Funders', 'Funders_Board_Help');
+    },
+    mix: MIX,
+    total: TOTAL,
+    concentration: CONCENTRATION
+  };
+  labelsRestricted = {
+    title: RESTRICTED,
+    funds: FUNDS,
+    grants: GRANTS,
+    get empty() {
+      return helpText('Funders', 'Funders_Board_Empty');
+    }
+  };
 
   board;
   errorMessage;
   isLoading = true;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Funders').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

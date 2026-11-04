@@ -513,14 +513,6 @@
         <value>Upload file</value>
     </labels>
     <labels>
-        <fullName>Core_Import_UploadHint</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what kind of file to upload</shortDescription>
-        <value>A text file (CSV) or Excel workbook with column headings in the first row. Choose options next.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_ColumnHeader</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -559,30 +551,6 @@
         <protected>false</protected>
         <shortDescription>Import wizard: the matching rule picker label</shortDescription>
         <value>Match a row to someone you already have by</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_MatchingEmailHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the email rule does and risks</shortDescription>
-        <value>Matches only when the email in your file is exactly the email on the record. The safest rule, and the one to start with.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_MatchingNamePostalHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the name and postal code rule does and risks</shortDescription>
-        <value>Matches on last name and postal code together. This will treat two different people who share a name at one address as the same person.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_MatchingExternalIdHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the external id rule does and risks</shortDescription>
-        <value>Matches on the external ID from your other system: the most reliable rule for repeat files.</value>
     </labels>
     <labels>
         <fullName>Core_Import_PreviewWouldCreate</fullName>
@@ -977,14 +945,6 @@
         <value>This file arrives regularly</value>
     </labels>
     <labels>
-        <fullName>Core_Import_RecurringHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what marking a file recurring does</shortDescription>
-        <value>The BarnCRM home page lists regular files with the date each was last imported. Nothing is loaded automatically.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_SourceNameLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -1089,14 +1049,6 @@
         <value>Control Totals (Optional)</value>
     </labels>
     <labels>
-        <fullName>Core_Import_ControlTotalsHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what control totals do</shortDescription>
-        <value>From your deposit slip or your processor's report. The preview checks the file against them, and the import waits until they agree. Leave them empty to skip the check.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_ExpectedCountLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -1135,14 +1087,6 @@
         <protected>false</protected>
         <shortDescription>Import wizard: payment matching heading</shortDescription>
         <value>Scheduled Payments</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_PaymentMatchingHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: payment matching help</shortDescription>
-        <value>When a gift pays a pledge or a recurring gift the donor already has, BarnCRM can link the two. Leave the numbers empty to use BarnCRM Settings.</value>
     </labels>
     <labels>
         <fullName>Core_Import_PaymentMatchingLabel</fullName>
@@ -1281,22 +1225,6 @@
         <value>Match a row to an organization you already have by</value>
     </labels>
     <labels>
-        <fullName>Core_Import_OrganizationNameHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the organization name rule does and risks</shortDescription>
-        <value>Matches an organization with exactly the same name, ignoring capitals and extra spaces. Two organizations that share a name, such as two branches, are taken as one.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_OrganizationExternalIdHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the organization ID rule does and risks</shortDescription>
-        <value>Matches on an ID your other system gave the organization. Only as good as the IDs: a value typed into the wrong record matches the wrong organization.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_OrganizationMatchFieldLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -1337,36 +1265,12 @@
         <value>Use the most recently changed record</value>
     </labels>
     <labels>
-        <fullName>Core_Import_SeveralRejectHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what rejecting several matches does</shortDescription>
-        <value>The row is rejected with the reason and nothing is written for it. The safe choice: a row loaded into the wrong duplicate is hard to notice.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_SeveralRecentHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what using the most recent of several does and risks</shortDescription>
-        <value>The row is loaded into whichever record was changed last. Use it only when you know your duplicates and the newest is the one you keep.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_FileValuesHeading</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: values for every row heading</shortDescription>
         <value>Values for Every Row</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_FileValuesHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what values for every row do</shortDescription>
-        <value>A value here is used on each row of this file whose own cell is empty, and only for this file. It cannot be a person's name, email or ID.</value>
     </labels>
     <labels>
         <fullName>Core_Import_AddFileValueButton</fullName>
@@ -1463,13 +1367,5 @@
         <protected>false</protected>
         <shortDescription>Import wizard: the match-only checkbox</shortDescription>
         <value>Match only: update records you already have, add none</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_MatchOnlyHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the match-only checkbox does</shortDescription>
-        <value>A row whose person or organization matches no record is rejected instead of creating one. The dry run lists those rows first. This choice is for this file only.</value>
     </labels>
 </CustomLabels>

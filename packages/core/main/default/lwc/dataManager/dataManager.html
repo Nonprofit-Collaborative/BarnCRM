@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <c-barn-page-shell
         title={labels.title}
         purpose={labels.intro}
@@ -60,4 +61,5 @@
             </div>
         </template>
     </c-barn-page-shell>
+    </template>
 </template>

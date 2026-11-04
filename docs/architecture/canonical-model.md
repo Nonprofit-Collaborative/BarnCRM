@@ -6152,7 +6152,8 @@ and `filter` are the R-SQ1 and R-R2 parts, and names carry no namespace prefix: 
 segment qualifies each custom name for the org. The built document adds `Email` after `Name`
 for people, a limit of 200 rows, and one more condition joined by AND to the template's logic:
 `Deceased__c` equals false for people, `Is_Organization__c` equals true for organizations
-(households are accounts too). A template's name and description are custom labels. The five
+(households are accounts too). A template's name is a custom label and its description is help
+text in the Giving help catalog (`BarnHelp_Giving`, ADR-NEXT help-text-json). The five
 templates:
 
 | Key | Name | Filter |

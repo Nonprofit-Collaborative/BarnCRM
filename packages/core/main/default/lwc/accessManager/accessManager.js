@@ -18,25 +18,21 @@ import ADD_ON_CONFIRM_REMOVE from '@salesforce/label/c.Core_Access_AddOnConfirmR
 import ADD_ON_LABEL from '@salesforce/label/c.Core_Access_AddOnLabel';
 import ADD_ON_PICKER_PLACEHOLDER from '@salesforce/label/c.Core_Access_AddOnPickerPlaceholder';
 import ADD_ON_REMOVE_SUCCESS from '@salesforce/label/c.Core_Access_AddOnRemoveSuccess';
-import ADD_ONS_DESCRIPTION from '@salesforce/label/c.Core_Access_AddOnsDescription';
 import ADD_ONS_HEADING from '@salesforce/label/c.Core_Access_AddOnsHeading';
 import CHANGE_READ_ONLY_NOTICE from '@salesforce/label/c.Core_Access_ErrorNeedsAccessManager';
 import NO_ONE_HAS_ADD_ON from '@salesforce/label/c.Core_Access_NoOneHasAddOn';
 import ASSIGN_SUCCESS from '@salesforce/label/c.Core_Access_AssignSuccess';
-import AUTOMATIC_ACCESS_HELP from '@salesforce/label/c.Core_Access_AutomaticAccessHelp';
 import AUTOMATIC_ACCESS_LINK from '@salesforce/label/c.Core_Access_AutomaticAccessLink';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CONFIRM_ADD_MESSAGE from '@salesforce/label/c.Core_Access_ConfirmAddMessage';
 import CONFIRM_ADD_TITLE from '@salesforce/label/c.Core_Access_AddButton';
 import CONFIRM_REMOVE_MESSAGE from '@salesforce/label/c.Core_Access_ConfirmRemoveMessage';
 import CONFIRM_REMOVE_TITLE from '@salesforce/label/c.Core_Access_ConfirmRemoveTitle';
-import CREATE_USER_HELP from '@salesforce/label/c.Core_Access_CreateUserHelp';
 import CREATE_USER_LINK from '@salesforce/label/c.Core_Access_CreateUserLink';
 import ERROR_INVALID_INPUT from '@salesforce/label/c.Core_Access_ErrorInvalidInput';
 import ERROR_UNEXPECTED from '@salesforce/label/c.Core_Access_ErrorUnexpected';
 import LOADING_ROLES from '@salesforce/label/c.Core_Access_LoadingRoles';
 import NO_ONE_IN_ROLE from '@salesforce/label/c.Core_Access_NoOneInRole';
-import PAGE_DESCRIPTION from '@salesforce/label/c.Core_Access_PageDescription';
 import PAGE_TITLE from '@salesforce/label/c.Core_Access_PageTitle';
 import OPEN_ACCESS_EXPLORER from '@salesforce/label/c.Core_Access_OpenAccessExplorer';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
@@ -56,6 +52,7 @@ import TOAST_SUCCESS_TITLE from '@salesforce/label/c.Core_SetupAssistant_DoneBad
 import USERS_IN_ROLE from '@salesforce/label/c.Core_Access_UsersInRole';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupPath } from 'c/setupLinks';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ADMIN_ROLE = 'BarnCRM_Admin_Group';
 const SETUP_USERS_PAGE = setupPath('users');
@@ -92,26 +89,44 @@ function format(template, values) {
 }
 
 export default class AccessManager extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     newTab: NEW_TAB,
     addButton: ADD_BUTTON,
     addOnAddButton: ADD_ON_ADD_BUTTON,
     addOnLabel: ADD_ON_LABEL,
     addOnPickerPlaceholder: ADD_ON_PICKER_PLACEHOLDER,
-    addOnsDescription: ADD_ONS_DESCRIPTION,
+    get addOnsDescription() {
+      return helpText('Core', 'Core_Access_AddOnsDescription');
+    },
     addOnsHeading: ADD_ONS_HEADING,
     changeReadOnlyNotice: CHANGE_READ_ONLY_NOTICE,
     noOneHasAddOn: NO_ONE_HAS_ADD_ON,
-    automaticAccessHelp: AUTOMATIC_ACCESS_HELP,
+    get automaticAccessHelp() {
+      return helpText('Core', 'Core_Access_AutomaticAccessHelp');
+    },
     automaticAccessLink: AUTOMATIC_ACCESS_LINK,
     cancelButton: CANCEL_BUTTON,
     confirmAddTitle: CONFIRM_ADD_TITLE,
     confirmRemoveTitle: CONFIRM_REMOVE_TITLE,
-    createUserHelp: CREATE_USER_HELP,
+    get createUserHelp() {
+      return helpText('Core', 'Core_Access_CreateUserHelp');
+    },
     createUserLink: CREATE_USER_LINK,
     loadingRoles: LOADING_ROLES,
     noOneInRole: NO_ONE_IN_ROLE,
-    pageDescription: PAGE_DESCRIPTION,
+    get pageDescription() {
+      return helpText('Core', 'Core_Access_PageDescription');
+    },
     pageTitle: PAGE_TITLE,
     openAccessExplorer: OPEN_ACCESS_EXPLORER,
     readOnlyNotice: READ_ONLY_NOTICE,

@@ -81,14 +81,6 @@
         <value>Find</value>
     </labels>
     <labels>
-        <fullName>Core_Find_Intro</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Intro line on the Find page.</shortDescription>
-        <value>Choose an object, the columns and conditions, then run, save or export. Find shows only what your own access allows.</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_ChooseObject</fullName>
         <categories>Find</categories>
         <language>en_US</language>
@@ -199,14 +191,6 @@
         <protected>false</protected>
         <shortDescription>Label of the read only SOQL box on the Find page.</shortDescription>
         <value>Query (read only)</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_SoqlHelp</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Help text of the read only SOQL box.</shortDescription>
-        <value>The query Find runs, in SOQL, for anyone who wants to check it or copy it. To type or paste a query instead, use Type a query.</value>
     </labels>
     <labels>
         <fullName>Core_Find_Run</fullName>
@@ -409,14 +393,6 @@
         <value>Choose at least one column.</value>
     </labels>
     <labels>
-        <fullName>Core_Find_Purpose</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>One-line purpose under the Find page header.</shortDescription>
-        <value>Find records, then export them, save the query, or change them all at once.</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_GuideUrl</fullName>
         <categories>Find</categories>
         <language>en_US</language>
@@ -503,21 +479,5 @@
         <protected>false</protected>
         <shortDescription>Screen reader name of the menu next to Save (Save As, Delete).</shortDescription>
         <value>More Query Actions</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_StartUpdate</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Note when Find opens from the Update Many Records card.</shortDescription>
-        <value>Super Transformer can start here: find the records, press Run, then choose Change Records, Super Transformer.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_StartDelete</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Note when Find opens from the Delete Many Records card.</shortDescription>
-        <value>Bulk Delete starts here: find the records, press Run, then choose Change Records, Bulk Delete.</value>
     </labels>
 </CustomLabels>

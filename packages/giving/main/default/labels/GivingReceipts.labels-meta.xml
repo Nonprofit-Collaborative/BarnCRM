@@ -217,14 +217,6 @@
     <value>Void and Reissue</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_VoidNote</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts panel: what a void does and does not change</shortDescription>
-    <value>The receipt the donor already has is never changed or deleted. Voiding records why, and the replacement takes the next number.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_ViewPdf</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>

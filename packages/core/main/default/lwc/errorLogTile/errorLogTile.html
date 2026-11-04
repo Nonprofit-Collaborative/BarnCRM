@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <lightning-card title={labels.title} icon-name="custom:custom53">
         <span slot="actions">
             <lightning-badge data-id="new-count" label={newCountLabel}></lightning-badge>
@@ -72,4 +73,5 @@
             ></lightning-button>
         </div>
     </lightning-card>
+    </template>
 </template>

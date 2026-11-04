@@ -65,14 +65,6 @@
         <value>Field Utilization</value>
     </labels>
     <labels>
-        <fullName>Core_FieldUtilization_PageIntro</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: page introduction</shortDescription>
-        <value>Choose a kind of record to see how many records fill each field, by record type. Counts change nothing.</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldUtilization_ChooseLabel</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>
@@ -111,14 +103,6 @@
         <protected>false</protected>
         <shortDescription>Field utilization: save button</shortDescription>
         <value>Save Utilization Snapshot</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_SaveHelp</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: help text under the save button</shortDescription>
-        <value>Keeps this count so your next count shows what changed.</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_Saved</fullName>

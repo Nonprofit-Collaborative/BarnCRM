@@ -19,7 +19,6 @@ import exportDefinitions from '@salesforce/apex/RollupDefinitionTransfer.exportD
 import importDefinitions from '@salesforce/apex/RollupDefinitionTransfer.importDefinitions';
 
 import TITLE from '@salesforce/label/c.Core_Rollups_PageTitle';
-import INTRO from '@salesforce/label/c.Core_Rollups_PageIntro';
 import COLUMN_ROLLUP from '@salesforce/label/c.Core_Rollups_ColumnRollup';
 import COLUMN_COUNTS from '@salesforce/label/c.Core_Rollups_ColumnCounts';
 import COUNTS_SEPARATED_BY from '@salesforce/label/c.Core_Rollups_CountsSeparatedBy';
@@ -34,7 +33,6 @@ import SCHEDULE_ACTIVE from '@salesforce/label/c.Core_Rollups_ScheduleActive';
 import SCHEDULE_MISSING from '@salesforce/label/c.Core_Rollups_ScheduleMissing';
 import STOP_SCHEDULE from '@salesforce/label/c.Core_Rollups_StopSchedule';
 import RESTORE_DEFAULTS from '@salesforce/label/c.Core_Rollups_RestoreDefaults';
-import EMPTY_LIST from '@salesforce/label/c.Core_Rollups_EmptyList';
 import NEVER_CALCULATED from '@salesforce/label/c.Core_Rollups_NeverCalculated';
 import FRESHNESS_TITLE from '@salesforce/label/c.Core_Rollups_FreshnessTitle';
 import FRESHNESS_STALE from '@salesforce/label/c.Core_Rollups_FreshnessStale';
@@ -44,7 +42,6 @@ import NEW_ROLLUP from '@salesforce/label/c.Core_RollupBuilder_New';
 import EDIT from '@salesforce/label/c.Core_CmdtManager_EditAction';
 import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
 import OPEN_BUILDER from '@salesforce/label/c.Core_HealthCheck_TwoToolsFix';
-import WORKING_HOURS from '@salesforce/label/c.Core_RollupBuilder_EstimateWorkingHours';
 import START_NOW from '@salesforce/label/c.Core_RollupBuilder_StartNow';
 import RUN_TONIGHT from '@salesforce/label/c.Core_RollupBuilder_RunTonight';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
@@ -68,7 +65,6 @@ import DLRS_CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfi
 import DLRS_CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
 import COLUMN_STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import SEARCH from '@salesforce/label/c.Core_RollupEase_Search';
-import SEARCH_HELP from '@salesforce/label/c.Core_RollupEase_SearchHelp';
 import GROUP from '@salesforce/label/c.Core_Format_Parenthetical';
 import NO_MATCHES from '@salesforce/label/c.Core_RollupEase_NoMatches';
 import DELETE_HEADING from '@salesforce/label/c.Core_RollupEase_DeleteHeading';
@@ -78,6 +74,7 @@ import DELETE_KEEP from '@salesforce/label/c.Core_RollupEase_DeleteKeep';
 import DELETE_CLEAR from '@salesforce/label/c.Core_RollupEase_DeleteClear';
 import DELETED_CLEARED from '@salesforce/label/c.Core_RollupEase_DeletedCleared';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** How each recalculation state is styled in the Status column (U6). */
 const STATUS_CLASS = {
@@ -123,6 +120,16 @@ function readText(file) {
  * shows the vendored engine's own configuration, which is the whole point of ADR-0015.
  */
 export default class RollupDefinitions extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Rollups');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Rollups').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   /**
    * True inside the Rollup Builder, which adds New, Edit, Copy and Delete and listens for `new`,
    * `edit` and `copy` (with `detail.recordId`). On the settings page the list links to the Builder.
@@ -134,7 +141,9 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     edit: EDIT,
     copy: COPY,
     openBuilder: OPEN_BUILDER,
-    workingHours: WORKING_HOURS,
+    get workingHours() {
+      return helpText('Rollups', 'Core_RollupBuilder_EstimateWorkingHours');
+    },
     startNow: START_NOW,
     runTonight: RUN_TONIGHT,
     cancel: CANCEL,
@@ -147,7 +156,9 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     importColumn: IMPORT_COLUMN,
     importApply: IMPORT_APPLY,
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Rollups', 'Core_Rollups_PageIntro');
+    },
     columnRollup: COLUMN_ROLLUP,
     columnCounts: COLUMN_COUNTS,
     countsSeparatedBy: COUNTS_SEPARATED_BY,
@@ -162,14 +173,18 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     scheduleMissing: SCHEDULE_MISSING,
     stopSchedule: STOP_SCHEDULE,
     restoreDefaults: RESTORE_DEFAULTS,
-    emptyList: EMPTY_LIST,
+    get emptyList() {
+      return helpText('Rollups', 'Core_Rollups_EmptyList');
+    },
     neverCalculated: NEVER_CALCULATED,
     freshnessTitle: FRESHNESS_TITLE,
     freshnessStale: FRESHNESS_STALE,
     readOnly: READ_ONLY,
     columnStatus: COLUMN_STATUS,
     search: SEARCH,
-    searchHelp: SEARCH_HELP,
+    get searchHelp() {
+      return helpText('Rollups', 'Core_RollupEase_SearchHelp');
+    },
     noMatches: NO_MATCHES,
     deleteHeading: DELETE_HEADING,
     deleteChoice: DELETE_CHOICE

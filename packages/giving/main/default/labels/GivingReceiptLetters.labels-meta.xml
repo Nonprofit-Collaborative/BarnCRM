@@ -57,14 +57,6 @@
     <value>The letter donors read</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_LetterheadNote</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: the letterhead is not in the letter</shortDescription>
-    <value>Your organization's name, address and logo print above this letter on every document. To change them, change your organization and receipt settings, not the letter.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_UseLetterButton</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
@@ -79,14 +71,6 @@
     <protected>false</protected>
     <shortDescription>Receipts page: heading of the preview</shortDescription>
     <value>Preview for a Sample Gift</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_PreviewNote</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: what the preview shows</shortDescription>
-    <value>This shows the wording with the sentences BarnCRM adds. To check the printed page, issue a receipt for a test gift.</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_PreviewDonor</fullName>
@@ -111,22 +95,6 @@
     <protected>false</protected>
     <shortDescription>Receipts page: toast title, preview failed</shortDescription>
     <value>No Preview</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_TaxNote</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: the tax wording cannot be edited</shortDescription>
-    <value>The tax wording is not in this letter and cannot be edited. Whatever you write here, BarnCRM adds the sentences a valid receipt must carry: whether goods or services were provided, the quid pro quo disclosure with its good faith estimate and deductible amount, and the intangible religious benefits sentence.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_TokensIntro</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: list of tokens follows</shortDescription>
-    <value>Tokens you can use. Type each one exactly as shown, with both pairs of braces:</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_StatementYear</fullName>

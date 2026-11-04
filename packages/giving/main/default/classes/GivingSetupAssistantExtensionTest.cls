@@ -102,7 +102,7 @@ private class GivingSetupAssistantExtensionTest {
                 'The fields, in the order the step always showed them, the address in six parts'
             );
             System.assertEquals(
-                Label.Giving_SetupAssistant_IdentityDescription,
+                BarnHelp.text('Giving', 'Giving_SetupAssistant_IdentityDescription'),
                 identity.get('description'),
                 'With Giving the step says what a receipt needs'
             );

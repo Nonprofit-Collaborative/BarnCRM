@@ -13,7 +13,6 @@ import saveStep from '@salesforce/apex/ServicePlanController.saveStep';
 import markReviewed from '@salesforce/apex/ServicePlanController.markReviewed';
 
 import TITLE from '@salesforce/label/c.Programs_Plan_Title';
-import EMPTY from '@salesforce/label/c.Programs_Plan_Empty';
 import ADD_GOAL from '@salesforce/label/c.Programs_Plan_AddGoal';
 import EDIT_GOAL from '@salesforce/label/c.Programs_Plan_EditGoal';
 import GOAL from '@salesforce/label/c.Programs_Plan_Goal';
@@ -40,7 +39,6 @@ import NEW_STEP_FOR from '@salesforce/label/c.Programs_Plan_NewStepFor';
 import ADD_STEP from '@salesforce/label/c.Core_Shared_AddStep';
 import MARK_REVIEWED from '@salesforce/label/c.Programs_Plan_MarkReviewed';
 import SAVE_REVIEW from '@salesforce/label/c.Programs_Plan_SaveReview';
-import REVIEW_INTRO from '@salesforce/label/c.Programs_Plan_ReviewIntro';
 import NOTES from '@salesforce/label/c.Programs_Plan_Notes';
 import MORE_NOTES from '@salesforce/label/c.Programs_Plan_MoreNotes';
 import NEW_NOTE from '@salesforce/label/c.Programs_Plan_NewNote';
@@ -60,6 +58,7 @@ import {
   todayIn
 } from './plan';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Service Plan panel on an enrollment (P-10, canonical model 29ZA3): the participant's goals,
@@ -68,11 +67,15 @@ import { bodyMessage } from 'c/findCsv';
  * labels. Works the same on a phone.
  */
 export default class ServicePlan extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Programs');
+
   @api recordId;
 
   labels = {
     title: TITLE,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Programs', 'Programs_Plan_Empty');
+    },
     addGoal: ADD_GOAL,
     editGoal: EDIT_GOAL,
     goal: GOAL,
@@ -89,7 +92,9 @@ export default class ServicePlan extends NavigationMixin(LightningElement) {
     addStep: ADD_STEP,
     markReviewed: MARK_REVIEWED,
     saveReview: SAVE_REVIEW,
-    reviewIntro: REVIEW_INTRO,
+    get reviewIntro() {
+      return helpText('Programs', 'Programs_Plan_ReviewIntro');
+    },
     notes: NOTES,
     newNote: NEW_NOTE,
     newStep: NEW_STEP,
@@ -112,6 +117,11 @@ export default class ServicePlan extends NavigationMixin(LightningElement) {
   resultMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Programs').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

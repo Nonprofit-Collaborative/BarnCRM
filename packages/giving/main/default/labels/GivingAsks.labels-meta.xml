@@ -97,14 +97,6 @@
     <value>Ask Pipeline</value>
   </labels>
   <labels>
-    <fullName>Giving_AskPipeline_Intro</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Ask Pipeline: one line under the title</shortDescription>
-    <value>Every open ask by stage. Drag a card to another stage, or use its menu to move or close it.</value>
-  </labels>
-  <labels>
     <fullName>Giving_AskPipeline_ViewBoard</fullName>
     <categories>Giving, Asks</categories>
     <language>en_US</language>
@@ -199,14 +191,6 @@
     <protected>false</protected>
     <shortDescription>Ask Pipeline: a stage with no asks</shortDescription>
     <value>No asks at this stage.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_AskPipeline_Empty</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Ask Pipeline: no open asks at all</shortDescription>
-    <value>No open asks yet. Choose New Ask, or add one from a person's or organization's page.</value>
   </labels>
   <labels>
     <fullName>Giving_AskPipeline_Truncated</fullName>
@@ -417,28 +401,12 @@
     <value>Or a Pledge</value>
   </labels>
   <labels>
-    <fullName>Giving_AskPipeline_LinkHelp</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Close Ask: help beside the gift and pledge pickers</shortDescription>
-    <value>Choose a gift or a pledge from this ask's donor.</value>
-  </labels>
-  <labels>
     <fullName>Giving_AskPipeline_FieldNextAsk</fullName>
     <categories>Giving, Asks</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Close Ask: next ask date field</shortDescription>
     <value>Next Ask Date</value>
-  </labels>
-  <labels>
-    <fullName>Giving_AskPipeline_NextAskHelp</fullName>
-    <categories>Giving, Asks</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Close Ask: help for the next ask date</shortDescription>
-    <value>When to ask this donor again. Optional.</value>
   </labels>
   <labels>
     <fullName>Giving_AskPipeline_Closed</fullName>

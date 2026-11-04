@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
   <c-barn-page-shell title={labels.title} purpose={labels.intro} title-hidden data-id="shell">
     <div>
       <template lwc:if={hasAnyArea}>
@@ -36,4 +37,5 @@
       </template>
     </div>
   </c-barn-page-shell>
+    </template>
 </template>

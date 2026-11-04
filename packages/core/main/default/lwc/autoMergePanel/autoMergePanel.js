@@ -5,7 +5,6 @@ import preview from '@salesforce/apex/AutoMergeController.preview';
 import startRun from '@salesforce/apex/AutoMergeController.startRun';
 import undoRun from '@salesforce/apex/AutoMergeController.undoRun';
 
-import INTRO from '@salesforce/label/c.Core_AutoMerge_Intro';
 import RULE from '@salesforce/label/c.Core_AutoMerge_Rule';
 import PREVIEW from '@salesforce/label/c.Core_AutoMerge_Preview';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
@@ -29,10 +28,10 @@ import NO_RUNS from '@salesforce/label/c.Core_AutoMerge_NoRuns';
 import RUN_SUMMARY from '@salesforce/label/c.Core_AutoMerge_RunSummary';
 import UNDO from '@salesforce/label/c.Core_AutoMerge_Undo';
 import UNDO_HEADING from '@salesforce/label/c.Core_AutoMerge_UndoHeading';
-import UNDO_BODY from '@salesforce/label/c.Core_AutoMerge_UndoBody';
 import UNDO_STARTED from '@salesforce/label/c.Core_AutoMerge_UndoStarted';
 import NO_ACCESS from '@salesforce/label/c.Core_AutoMerge_NoAccess';
 import UNEXPECTED from '@salesforce/label/c.Core_Duplicates_ErrorUnexpected';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 function format(label, ...values) {
   return values.reduce((text, value, index) => text.replace(`{${index}}`, value), label);
@@ -44,8 +43,12 @@ function format(label, ...values) {
  * background run after a confirm, and undo a recent run. The server checks every permission.
  */
 export default class AutoMergePanel extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_AutoMerge_Intro');
+    },
     preview: PREVIEW,
     refresh: REFRESH,
     loading: LOADING,
@@ -67,6 +70,11 @@ export default class AutoMergePanel extends LightningElement {
   message;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -193,7 +201,7 @@ export default class AutoMergePanel extends LightningElement {
     const runId = event.target.dataset.run;
     const confirmed = await BarnConfirmModal.open({
       label: UNDO_HEADING,
-      message: UNDO_BODY,
+      message: helpText('Core', 'Core_AutoMerge_UndoBody'),
       confirmLabel: UNDO,
       cancelLabel: CANCEL,
       confirmVariant: 'destructive',

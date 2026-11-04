@@ -33,14 +33,6 @@
         <value>Retry Fixed Rows</value>
     </labels>
     <labels>
-        <fullName>Core_Import_RetryHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import retry: help under the retry heading</shortDescription>
-        <value>Fix the rejected rows in the downloaded file and upload it here. The fixed rows are previewed, then committed into this import, so one undo removes both.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_RetryFileLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>

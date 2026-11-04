@@ -9,14 +9,6 @@
         <value>Setup Changes</value>
     </labels>
     <labels>
-        <fullName>Core_SetupChanges_Intro</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: line under the heading</shortDescription>
-        <value>Who changed what in Setup, and when, from the Salesforce Setup Audit Trail. Salesforce keeps it 180 days; BarnCRM copies it nightly and keeps it longer. Nothing in Setup changes here.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupChanges_Kept</fullName>
         <categories>SetupChanges</categories>
         <language>en_US</language>
@@ -105,14 +97,6 @@
         <value>Search</value>
     </labels>
     <labels>
-        <fullName>Core_SetupChanges_SearchHelp</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: help text of the search box</shortDescription>
-        <value>Words that must all appear in What Changed, Section, Changed By, Logged In As or Action, ignoring capitals. Try a field or object name, a user, or a permission set.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupChanges_Downloaded</fullName>
         <categories>SetupChanges</categories>
         <language>en_US</language>
@@ -135,14 +119,6 @@
         <protected>false</protected>
         <shortDescription>Setup Changes: search stopped early; {0} is the rows looked at</shortDescription>
         <value>This search looked at the newest {0} kept changes and stopped. Narrow the dates or the section to search older ones.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_Empty</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: no kept change matches the filters</shortDescription>
-        <value>No kept change matches these filters.</value>
     </labels>
     <labels>
         <fullName>Core_SetupChanges_DatesReversed</fullName>

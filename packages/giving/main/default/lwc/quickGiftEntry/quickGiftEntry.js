@@ -26,9 +26,7 @@ import appealLabel from '@salesforce/label/c.Giving_QuickGiftEntry_AppealLabel';
 import fundLabel from '@salesforce/label/c.Giving_GiftBatch_ColumnFund';
 import paymentReferenceLabel from '@salesforce/label/c.Giving_QuickGiftEntry_PaymentReferenceLabel';
 import inKindDescriptionLabel from '@salesforce/label/c.Giving_QuickGiftEntry_InKindDescriptionLabel';
-import inKindDescriptionHelp from '@salesforce/label/c.Giving_QuickGiftEntry_InKindDescriptionHelp';
 import fairMarketValueLabel from '@salesforce/label/c.Giving_QuickGiftEntry_FairMarketValueLabel';
-import fairMarketValueHelp from '@salesforce/label/c.Giving_QuickGiftEntry_FairMarketValueHelp';
 import saveButton from '@salesforce/label/c.Core_Kit_Save';
 import saveAndNewButton from '@salesforce/label/c.Giving_QuickGiftEntry_SaveAndNewButton';
 import savingMessage from '@salesforce/label/c.Giving_QuickGiftEntry_SavingMessage';
@@ -40,12 +38,12 @@ import errorLoadDefaults from '@salesforce/label/c.Giving_QuickGiftEntry_ErrorLo
 import errorUnexpected from '@salesforce/label/c.Giving_QuickGiftEntry_ErrorUnexpected';
 import fundNotApplied from '@salesforce/label/c.Giving_QuickGiftEntry_FundNotApplied';
 import paysLabel from '@salesforce/label/c.Giving_GiftEntryPays_Label';
-import paysHelp from '@salesforce/label/c.Giving_GiftEntryPays_Help';
 import paysNone from '@salesforce/label/c.Giving_GiftEntryPays_None';
 import paysOneSuggested from '@salesforce/label/c.Giving_GiftEntryPays_OneSuggested';
 import paysSeveralSuggested from '@salesforce/label/c.Giving_GiftEntryPays_SeveralSuggested';
 import paysErrorLoad from '@salesforce/label/c.Giving_GiftEntryPays_ErrorLoad';
 import { messageFrom } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const IN_KIND = 'In-kind';
 /** How long typing has to pause before the donor's payments are looked up again. */
@@ -75,6 +73,8 @@ const FIELD_ORDER = [
  * validity, so each message is announced and tied to its field.
  */
 export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Giving');
+
   /** Set when the component sits on a record page, so the donor can be filled in. */
   @api recordId;
   /** The object of the record page the component sits on, when it sits on one. */
@@ -95,16 +95,22 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     fundLabel,
     paymentReferenceLabel,
     inKindDescriptionLabel,
-    inKindDescriptionHelp,
+    get inKindDescriptionHelp() {
+      return helpText('Giving', 'Giving_QuickGiftEntry_InKindDescriptionHelp');
+    },
     fairMarketValueLabel,
-    fairMarketValueHelp,
+    get fairMarketValueHelp() {
+      return helpText('Giving', 'Giving_QuickGiftEntry_FairMarketValueHelp');
+    },
     saveButton,
     saveAndNewButton,
     savingMessage,
     errorTitle,
     openGiftLink,
     paysLabel,
-    paysHelp,
+    get paysHelp() {
+      return helpText('Giving', 'Giving_GiftEntryPays_Help');
+    },
     paysErrorLoad
   };
 
@@ -148,6 +154,11 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
   prefilledDonorKind;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.prefillFromRecordPage();
     this.loadDefaults();
   }

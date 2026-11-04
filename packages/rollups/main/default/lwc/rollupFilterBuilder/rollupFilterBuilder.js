@@ -6,7 +6,6 @@ import OPERATOR from '@salesforce/label/c.Core_RollupFilter_Operator';
 import VALUE from '@salesforce/label/c.Core_Filter_Value';
 import REMOVE from '@salesforce/label/c.Core_Filter_RemoveCondition';
 import LOGIC from '@salesforce/label/c.Core_RollupFilter_Logic';
-import LOGIC_HELP from '@salesforce/label/c.Core_RollupFilter_LogicHelp';
 import LIST_HELP from '@salesforce/label/c.Core_RollupFilter_ListHelp';
 import EVERY_RECORD from '@salesforce/label/c.Core_RollupFilter_EveryRecord';
 import WHOSE from '@salesforce/label/c.Core_RollupFilter_Whose';
@@ -32,6 +31,7 @@ import OP_IN from '@salesforce/label/c.Core_Filter_OpIn';
 import OP_NOT_IN from '@salesforce/label/c.Core_RollupFilter_OpNotIn';
 import PHRASE from '@salesforce/label/c.Core_RollupFilter_Phrase';
 import PHRASE_NO_VALUE from '@salesforce/label/c.Core_RollupFilter_PhraseNoValue';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The operators of canonical model R-R2, in the order they are offered, with their words. */
 const OPERATOR_WORDS = {
@@ -98,6 +98,16 @@ function format(label, ...values) {
  * conditions. `validate()` answers what is missing, in words, or null.
  */
 export default class RollupFilterBuilder extends LightningElement {
+  helpReady = isHelpLoaded('Rollups');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Rollups').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   /** The fields to choose from: { value, label, type, picklistValues }. */
   @api fields = [];
   /** The plural name of the records filtered, for the sentence: "Gifts". */
@@ -111,7 +121,9 @@ export default class RollupFilterBuilder extends LightningElement {
     operator: OPERATOR,
     value: VALUE,
     logic: LOGIC,
-    logicHelp: LOGIC_HELP,
+    get logicHelp() {
+      return helpText('Rollups', 'Core_RollupFilter_LogicHelp');
+    },
     listHelp: LIST_HELP
   };
 

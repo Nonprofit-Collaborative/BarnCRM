@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
   <template lwc:if={visible}>
     <lightning-card title={labels.title} icon-name="standard:people">
       <div class="slds-var-p-horizontal_medium slds-is-relative">
@@ -64,4 +65,5 @@
       </div>
     </lightning-card>
   </template>
+    </template>
 </template>

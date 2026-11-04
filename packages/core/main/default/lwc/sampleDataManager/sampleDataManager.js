@@ -32,7 +32,7 @@ import removeError from '@salesforce/label/c.Core_SampleData_RemoveError';
 import statusError from '@salesforce/label/c.Core_SampleData_StatusError';
 import cancelButtonLabel from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import confirmButtonLabel from '@salesforce/label/c.Core_HealthCheck_ConfirmButton';
-import junctionModeNote from '@salesforce/label/c.Core_SampleData_JunctionModeNote';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** How often the status card polls while a load is running (C-10). */
 const POLL_INTERVAL_MS = 3000;
@@ -44,6 +44,8 @@ const POLL_INTERVAL_MS = 3000;
  * See docs/admin-guide/sample-data.md.
  */
 export default class SampleDataManager extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     cardTitle,
     loadButtonLabel,
@@ -66,7 +68,9 @@ export default class SampleDataManager extends LightningElement {
     readOnlyMessage,
     cancelButtonLabel,
     confirmButtonLabel,
-    junctionModeNote,
+    get junctionModeNote() {
+      return helpText('Core', 'Core_SampleData_JunctionModeNote');
+    },
     loadSuccess,
     removeSuccess,
     loadError,
@@ -97,6 +101,11 @@ export default class SampleDataManager extends LightningElement {
   pollTimer;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.checkPermission();
     this.refreshStatus();
   }

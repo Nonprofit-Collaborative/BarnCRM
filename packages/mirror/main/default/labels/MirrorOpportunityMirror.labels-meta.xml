@@ -417,22 +417,6 @@
     <value>Opportunity Mirror</value>
   </labels>
   <labels>
-    <fullName>Mirror_OpportunityMirror_Intro</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Page introduction</shortDescription>
-    <value>Keeps gifts and Salesforce Opportunities in step, in the direction set in BarnCRM Settings. Run now copies what is waiting. The nightly run catches up at 1:30 AM, your organization's time zone.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_DirectionGifts</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Page: Gifts to Opportunities is on</shortDescription>
-    <value>Direction: Gifts to Opportunities. Every gift in the totals gets a matching Opportunity.</value>
-  </labels>
-  <labels>
     <fullName>Mirror_OpportunityMirror_DirectionOpportunities</fullName>
     <categories>Mirror, Opportunity Mirror</categories>
     <language>en_US</language>
@@ -479,14 +463,6 @@
     <protected>false</protected>
     <shortDescription>Section title: reconciliation</shortDescription>
     <value>Reconciliation</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_ReconciliationIntro</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Section introduction: reconciliation</shortDescription>
-    <value>Compare the gifts in the totals dated in a range with the won Opportunities closed in it, as you can see them.</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_FromDate</fullName>

@@ -73,14 +73,6 @@
         <value>Saved Step Lists</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_SavedHelp</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: saved lists card help</shortDescription>
-        <value>Save this page's object, conditions and changes as a named list that anyone using Super Transformer can load. Loading fills in the page; nothing runs until you preview and run.</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_SavedChoose</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>

@@ -3,15 +3,14 @@ import getPeriod from '@salesforce/apex/AccountingPeriodController.getPeriod';
 import closeThrough from '@salesforce/apex/AccountingPeriodController.closeThrough';
 
 import TITLE from '@salesforce/label/c.Giving_Periods_Title';
-import INTRO from '@salesforce/label/c.Giving_Periods_Intro';
 import CLOSED_THROUGH_HEADING from '@salesforce/label/c.Giving_Periods_ClosedThroughHeading';
 import NOT_CLOSED from '@salesforce/label/c.Giving_Periods_NotClosed';
 import SAVE_BUTTON from '@salesforce/label/c.Core_Kit_Save';
 import SAVED from '@salesforce/label/c.Giving_Periods_Saved';
-import REOPEN_NOTE from '@salesforce/label/c.Giving_Periods_ReopenNote';
 import READ_ONLY from '@salesforce/label/c.Giving_Periods_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Periods_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Accounting Periods page (G-20, ADR-0053), reached from the Giving section of the Nonprofit
@@ -23,13 +22,19 @@ import { bodyMessage } from 'c/findCsv';
  * says when it refuses.
  */
 export default class AccountingPeriods extends LightningElement {
+  helpReady = isHelpLoaded('Giving');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Giving', 'Giving_Periods_Intro');
+    },
     closedThroughHeading: CLOSED_THROUGH_HEADING,
     notClosed: NOT_CLOSED,
     save: SAVE_BUTTON,
-    reopenNote: REOPEN_NOTE,
+    get reopenNote() {
+      return helpText('Giving', 'Giving_Periods_ReopenNote');
+    },
     readOnly: READ_ONLY
   };
 
@@ -40,6 +45,11 @@ export default class AccountingPeriods extends LightningElement {
   busy = false;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

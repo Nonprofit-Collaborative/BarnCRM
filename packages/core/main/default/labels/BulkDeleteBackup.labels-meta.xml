@@ -9,14 +9,6 @@
         <value>Download a Backup First</value>
     </labels>
     <labels>
-        <fullName>Core_BulkDelete_BackupHelp</fullName>
-        <categories>BulkDelete</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Bulk delete: what the download holds</shortDescription>
-        <value>Saves the records this delete would remove as a CSV, without related records.</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkDelete_BackingUp</fullName>
         <categories>BulkDelete</categories>
         <language>en_US</language>

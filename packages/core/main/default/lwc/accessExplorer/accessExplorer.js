@@ -12,7 +12,6 @@ import { format, messageFrom, downloadCsv } from 'c/findCsv';
 import { withFlags as toFlagRow, withDetails } from 'c/accessExplorerRows';
 
 import TITLE from '@salesforce/label/c.Core_AccessExplorer_Title';
-import INTRO from '@salesforce/label/c.Core_AccessExplorer_Intro';
 import SHOW from '@salesforce/label/c.Core_DataJobs_Show';
 import VIEW_SUBJECT from '@salesforce/label/c.Core_AccessExplorer_ViewSubject';
 import VIEW_OBJECT from '@salesforce/label/c.Core_AccessExplorer_ViewObject';
@@ -34,16 +33,12 @@ import SOURCES_HEADING from '@salesforce/label/c.Core_AccessExplorer_SourcesHead
 import OBJECTS_HEADING from '@salesforce/label/c.Core_AccessCompare_KindsHeading';
 import FIELD_ACCESS_FOR from '@salesforce/label/c.Core_AccessExplorer_FieldAccessFor';
 import FIELDS_HEADING from '@salesforce/label/c.Core_AccessCompare_FieldsHeading';
-import VIEW_ALL_DATA_NOTE from '@salesforce/label/c.Core_AccessExplorer_ViewAllDataNote';
-import MODIFY_ALL_DATA_NOTE from '@salesforce/label/c.Core_AccessExplorer_ModifyAllDataNote';
 import KIND_OF_RECORD from '@salesforce/label/c.Core_AccessExplorer_KindOfRecord';
 import FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import FIELD_NONE from '@salesforce/label/c.Core_AccessExplorer_FieldNone';
-import CHOOSE_OBJECT from '@salesforce/label/c.Core_AccessExplorer_ChooseObject';
 import GRANTS_HEADING from '@salesforce/label/c.Core_AccessExplorer_GrantsHeading';
 import PEOPLE_HEADING from '@salesforce/label/c.Core_AccessExplorer_PeopleHeading';
 import SHOW_MORE from '@salesforce/label/c.Core_AccessExplorer_ShowMore';
-import ALWAYS_FIELD from '@salesforce/label/c.Core_AccessExplorer_AlwaysField';
 import TRUNCATED from '@salesforce/label/c.Core_AccessExplorer_Truncated';
 import TAB_CHECK_SCHEDULED from '@salesforce/label/c.Core_AccessExplorer_TabCheckScheduled';
 import TAB_CHECK_NOT_SCHEDULED from '@salesforce/label/c.Core_AccessExplorer_TabCheckNotScheduled';
@@ -64,9 +59,9 @@ import COL_DELETE from '@salesforce/label/c.Core_AccessExplorer_ColDelete';
 import COL_VIEW_ALL from '@salesforce/label/c.Core_AccessExplorer_ColViewAll';
 import COL_MODIFY_ALL from '@salesforce/label/c.Core_AccessExplorer_ColModifyAll';
 import COL_GRANTED_BY from '@salesforce/label/c.Core_AccessExplorer_ColGrantedBy';
-import MAY_MISS_PEOPLE from '@salesforce/label/c.Core_AccessExplorer_MayMissPeople';
 import COL_ACTIVE_PEOPLE from '@salesforce/label/c.Core_AccessExplorer_ColActivePeople';
 import COL_PERSON from '@salesforce/label/c.Core_Section_Person';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_BASE = 'Access_Explorer';
 const SEARCH_DELAY = 300;
@@ -102,9 +97,21 @@ const withFlags = (row) => toFlagRow(row, WORDS);
  * BarnCRM Settings, and Org Optimizer shows the section only to people who hold it.
  */
 export default class AccessExplorer extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_AccessExplorer_Intro');
+    },
     show: SHOW,
     lookUp: LOOK_UP,
     searchPlaceholder: SEARCH_PLACEHOLDER,
@@ -117,12 +124,18 @@ export default class AccessExplorer extends LightningElement {
     fieldsHeading: FIELDS_HEADING,
     kindOfRecord: KIND_OF_RECORD,
     field: FIELD,
-    chooseObject: CHOOSE_OBJECT,
+    get chooseObject() {
+      return helpText('Core', 'Core_AccessExplorer_ChooseObject');
+    },
     grantsHeading: GRANTS_HEADING,
     peopleHeading: PEOPLE_HEADING,
-    mayMissPeople: MAY_MISS_PEOPLE,
+    get mayMissPeople() {
+      return helpText('Core', 'Core_AccessExplorer_MayMissPeople');
+    },
     showMore: SHOW_MORE,
-    alwaysField: ALWAYS_FIELD,
+    get alwaysField() {
+      return helpText('Core', 'Core_AccessExplorer_AlwaysField');
+    },
     tabCheckScheduled: TAB_CHECK_SCHEDULED,
     tabCheckNotScheduled: TAB_CHECK_NOT_SCHEDULED,
     download: DOWNLOAD,
@@ -227,9 +240,15 @@ export default class AccessExplorer extends LightningElement {
     const notes = [];
     for (const source of this.subject ? this.subject.sources : []) {
       if (source.modifyAllData) {
-        notes.push({ key: source.id, text: format(MODIFY_ALL_DATA_NOTE, source.label) });
+        notes.push({
+          key: source.id,
+          text: format(helpText('Core', 'Core_AccessExplorer_ModifyAllDataNote'), source.label)
+        });
       } else if (source.viewAllData) {
-        notes.push({ key: source.id, text: format(VIEW_ALL_DATA_NOTE, source.label) });
+        notes.push({
+          key: source.id,
+          text: format(helpText('Core', 'Core_AccessExplorer_ViewAllDataNote'), source.label)
+        });
       }
     }
     return notes;

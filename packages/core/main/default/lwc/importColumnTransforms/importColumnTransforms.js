@@ -3,7 +3,6 @@ import previewChanges from '@salesforce/apex/ImportController.previewChanges';
 
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import heading from '@salesforce/label/c.Core_Import_ChangesHeading';
-import help from '@salesforce/label/c.Core_Import_ChangesHelp';
 import addLabel from '@salesforce/label/c.Core_BulkUpdate_AddChange';
 import kindLabel from '@salesforce/label/c.Core_Import_ChangesKind';
 import removeLabel from '@salesforce/label/c.Core_Import_ChangesRemove';
@@ -64,6 +63,7 @@ import whenBlankLabel from '@salesforce/label/c.Core_Import_StepsWhenBlank';
 import opDigits from '@salesforce/label/c.Core_Import_StepsOpDigits';
 import patternLabel from '@salesforce/label/c.Core_Import_StepsPattern';
 import countryLabel from '@salesforce/label/c.Core_Import_StepsCountry';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The most changes one column may have, as DataTransform.MAX_STEPS says. */
 const MAX_STEPS = 10;
@@ -84,6 +84,8 @@ const NUMBER_PARAMETERS = ['position', 'count', 'amount'];
  * because the bulk update preview shows each record before and after.
  */
 export default class ImportColumnTransforms extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   /** The column whose values are changed; another column is previewed afresh. */
   @api
   get source() {
@@ -114,7 +116,9 @@ export default class ImportColumnTransforms extends LightningElement {
   problems = [];
 
   labels = {
-    help,
+    get help() {
+      return helpText('Core', 'Core_Import_ChangesHelp');
+    },
     addLabel,
     kindLabel,
     removeLabel,
@@ -167,6 +171,11 @@ export default class ImportColumnTransforms extends LightningElement {
   }
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.refreshPreview();
   }
 

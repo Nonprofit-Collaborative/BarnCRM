@@ -32,8 +32,6 @@ import TRUE_LABEL from '@salesforce/label/c.Core_BulkUpdate_True';
 import FALSE_LABEL from '@salesforce/label/c.Core_BulkUpdate_False';
 import USE_LOGIC from '@salesforce/label/c.Core_Filter_UseLogic';
 import LOGIC from '@salesforce/label/c.Core_Filter_Logic';
-import LOGIC_HELP from '@salesforce/label/c.Core_Filter_LogicHelp';
-import EMPTY from '@salesforce/label/c.Core_Filter_Empty';
 import LOADING from '@salesforce/label/c.Core_Filter_Loading';
 import ERROR_CHOOSE_FIELD from '@salesforce/label/c.Core_Filter_ErrorChooseField';
 import ERROR_CHOOSE_OPERATOR from '@salesforce/label/c.Core_Filter_ErrorChooseOperator';
@@ -68,6 +66,7 @@ import OP_LAST_YEAR from '@salesforce/label/c.Core_Filter_OpLastYear';
 import OP_LAST_N_DAYS from '@salesforce/label/c.Core_Filter_OpLastNDays';
 import LAST_N_DAYS_VALUE from '@salesforce/label/c.Core_Filter_LastNDaysValue';
 import { messageFrom, format } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const OPERATOR_LABELS = {
   [OPERATORS.EQUALS]: OP_EQUALS,
@@ -122,6 +121,8 @@ const PARENT_PREFIX = 'r:';
  * whether it is valid, and a plain sentence describing it.
  */
 export default class FilterBuilder extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   /** API name of the object the conditions test. */
   @api
   get objectApiName() {
@@ -164,8 +165,12 @@ export default class FilterBuilder extends LightningElement {
     addCondition: ADD_CONDITION,
     useLogic: USE_LOGIC,
     logic: LOGIC,
-    logicHelp: LOGIC_HELP,
-    empty: EMPTY,
+    get logicHelp() {
+      return helpText('Core', 'Core_Filter_LogicHelp');
+    },
+    get empty() {
+      return helpText('Core', 'Core_Filter_Empty');
+    },
     loading: LOADING,
     errorSummary: ERROR_SUMMARY,
     operator: OPERATOR,
@@ -192,6 +197,11 @@ export default class FilterBuilder extends LightningElement {
   infoByObject = new Map();
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.connected = true;
     this.rebuild();
   }
@@ -559,7 +569,7 @@ export default class FilterBuilder extends LightningElement {
       return this.logicEnabled ? `${index + 1}. ${condition}` : condition;
     });
     if (parts.length === 0) {
-      return EMPTY;
+      return helpText('Core', 'Core_Filter_Empty');
     }
     return this.logicEnabled
       ? format(SUMMARY_LOGIC, parts.join('; '), this.logicText)

@@ -1,0 +1,12 @@
+{
+  "languages": ["en"],
+  "texts": {
+    "Funders_Answers_Empty": "No answers yet. Keep the application answers you reuse on the Grant Answers tab.",
+    "Funders_Board_Empty": "Nothing to show for this fiscal year yet.",
+    "Funders_Board_Help": "This fiscal year: grants awarded and, with Giving, gifts designated to funds. Each person sees totals of what they can read.",
+    "Funders_Pipeline_DeadlinesEmpty": "No application deadlines or grant requirements due in the next 60 days.",
+    "Funders_Pipeline_Empty": "No open grants yet. Click New Grant to add the first one.",
+    "Funders_Pipeline_Intro": "Every open grant by stage, and the application deadlines coming up. Use a card's menu to open a grant or move it to another stage.",
+    "Funders_Report_Help": "Open the file in a browser to print it or save it as a PDF, or in a word processor to edit it before you send it."
+  }
+}

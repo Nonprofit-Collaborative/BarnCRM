@@ -6,13 +6,13 @@ import TITLE from '@salesforce/label/c.Giving_PostingCard_Title';
 import POSTED_BY from '@salesforce/label/c.Giving_PostingCard_PostedBy';
 import NOT_POSTED from '@salesforce/label/c.Giving_PostingCard_NotPosted';
 import NOT_IN_BOOKS from '@salesforce/label/c.Giving_PostingCard_NotInBooks';
-import CLOSED_PERIOD from '@salesforce/label/c.Giving_PostingCard_ClosedPeriod';
 import REASON_LABEL from '@salesforce/label/c.Giving_PostingCard_ReasonLabel';
 import UNPOST_BUTTON from '@salesforce/label/c.Giving_PostingCard_UnpostButton';
 import UNPOSTED from '@salesforce/label/c.Giving_PostingCard_Unposted';
 import REASON_REQUIRED from '@salesforce/label/c.Giving_Posting_ReasonRequired';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Periods_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Posting card on a gift's page (G-20, ADR-0053).
@@ -22,6 +22,8 @@ import { bodyMessage } from 'c/findCsv';
  * nobody can explain is the change an auditor cannot use.
  */
 export default class GiftPosting extends LightningElement {
+  helpReady = isHelpLoaded('Giving');
+
   @api recordId;
 
   labels = {
@@ -29,7 +31,9 @@ export default class GiftPosting extends LightningElement {
     postedBy: POSTED_BY,
     notPosted: NOT_POSTED,
     notInBooks: NOT_IN_BOOKS,
-    closedPeriod: CLOSED_PERIOD,
+    get closedPeriod() {
+      return helpText('Giving', 'Giving_PostingCard_ClosedPeriod');
+    },
     reasonLabel: REASON_LABEL,
     unpost: UNPOST_BUTTON
   };
@@ -41,6 +45,11 @@ export default class GiftPosting extends LightningElement {
   noticeMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

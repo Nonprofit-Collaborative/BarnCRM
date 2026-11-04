@@ -9,14 +9,6 @@
         <value>Super Transformer</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_Intro</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Line under the heading</shortDescription>
-        <value>Change many records at once, without a file, and undo it if needed.</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_StepObject</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
@@ -201,14 +193,6 @@
         <value>Up to {0} fields in one run.</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_PreviewHint</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Empty state of step 4</shortDescription>
-        <value>Press Preview to see the first 25 records before and after. Nothing changes yet.</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_PreviewCount</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
@@ -249,14 +233,6 @@
         <value>Run Super Transformer</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_RunHint</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Empty state of step 5</shortDescription>
-        <value>Preview first, then run. You confirm before anything changes.</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_ConfirmMessage</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
@@ -281,28 +257,12 @@
         <value>Type {0} to confirm</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_UndoHint</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Line after a finished run</shortDescription>
-        <value>To undo this run, press Undo on it under Data Jobs below. Reload the page if it is not listed yet.</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_StartAnother</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Super Transformer: Button after a run: keep the object and start again</shortDescription>
         <value>Start Another</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_Help</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: About This Tool text</shortDescription>
-        <value>Work through five steps: choose the object, add conditions (the count updates as you type), choose up to five fields and their new values, preview the first 25 records, then run. It uses your own access, so validation rules and automation apply. Every run is listed under Data Jobs with its Undo.</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_NoPermissionHeading</fullName>

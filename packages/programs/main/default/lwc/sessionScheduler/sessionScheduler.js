@@ -7,7 +7,6 @@ import scheduleSessions from '@salesforce/apex/SessionScheduleController.schedul
 
 import TITLE from '@salesforce/label/c.Programs_Schedule_Title';
 import INTRO_COHORT from '@salesforce/label/c.Programs_Schedule_IntroCohort';
-import INTRO_PROGRAM from '@salesforce/label/c.Programs_Schedule_IntroProgram';
 import SERVICE from '@salesforce/label/c.Programs_Log_Service';
 import FROM_DATE from '@salesforce/label/c.Core_SetupChanges_From';
 import TO_DATE from '@salesforce/label/c.Core_SetupChanges_To';
@@ -36,6 +35,7 @@ import {
   weekdayOptions
 } from './schedule';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Schedule Sessions panel on a cohort or a program (P-11, R-SE4): one Scheduled session of a
@@ -44,6 +44,8 @@ import { bodyMessage } from 'c/findCsv';
  * service for the same cohort are read from the server, counted in the preview and skipped.
  */
 export default class SessionScheduler extends LightningElement {
+  helpReady = isHelpLoaded('Programs');
+
   @api recordId;
 
   labels = {
@@ -75,6 +77,11 @@ export default class SessionScheduler extends LightningElement {
   weekdayOptions = weekdayOptions(LOCALE);
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Programs').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -140,7 +147,9 @@ export default class SessionScheduler extends LightningElement {
     if (!this.schedule) {
       return '';
     }
-    return this.schedule.cohortId ? format(INTRO_COHORT, this.schedule.cohortName) : INTRO_PROGRAM;
+    return this.schedule.cohortId
+      ? format(INTRO_COHORT, this.schedule.cohortName)
+      : helpText('Programs', 'Programs_Schedule_IntroProgram');
   }
 
   get serviceOptions() {

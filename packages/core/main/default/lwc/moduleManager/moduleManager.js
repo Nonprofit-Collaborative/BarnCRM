@@ -19,8 +19,6 @@ import NO_INSTALL_LINK from '@salesforce/label/c.Core_ModuleManager_NoInstallLin
 import TURN_OFF from '@salesforce/label/c.Core_ModuleManager_TurnOffButton';
 import TURN_ON from '@salesforce/label/c.Core_ModuleManager_TurnOnButton';
 import REPORT from '@salesforce/label/c.Core_ModuleManager_ReportButton';
-import REPORT_INTRO from '@salesforce/label/c.Core_ModuleManager_ReportIntro';
-import REPORT_EMPTY from '@salesforce/label/c.Core_ModuleManager_ReportEmpty';
 import INSTALLED_PACKAGES from '@salesforce/label/c.Core_ModuleManager_InstalledPackagesLink';
 import TABS_NOTICE from '@salesforce/label/c.Core_ModuleManager_TabsNotice';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
@@ -34,6 +32,7 @@ import NONPROFIT_HIDDEN from '@salesforce/label/c.Core_ModuleManager_NonprofitHi
 import OTHER_ROLLUP_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
 import { setupPath } from 'c/setupLinks';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const STATUS_TEXT = { On: STATUS_ON, Off: STATUS_OFF, NotInstalled: STATUS_NOT_INSTALLED };
 const INSTALLED_PACKAGES_URL = setupPath('installedPackages');
@@ -51,6 +50,8 @@ const INSTALLED_PACKAGES_URL = setupPath('installedPackages');
  * ones it hides so none disappears without a cue.
  */
 export default class ModuleManager extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   state;
   showNonprofit = true;
   reports = {};
@@ -65,8 +66,12 @@ export default class ModuleManager extends LightningElement {
     turnOff: TURN_OFF,
     turnOn: TURN_ON,
     report: REPORT,
-    reportIntro: REPORT_INTRO,
-    reportEmpty: REPORT_EMPTY,
+    get reportIntro() {
+      return helpText('Core', 'Core_ModuleManager_ReportIntro');
+    },
+    get reportEmpty() {
+      return helpText('Core', 'Core_ModuleManager_ReportEmpty');
+    },
     installedPackages: INSTALLED_PACKAGES,
     tabsNotice: TABS_NOTICE,
     checkAgain: CHECK_AGAIN,
@@ -80,6 +85,11 @@ export default class ModuleManager extends LightningElement {
   };
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

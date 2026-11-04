@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <fieldset class="slds-form-element">
         <template lwc:if={titled}>
             <legend class="slds-form-element__legend slds-form-element__label">
@@ -77,4 +78,5 @@
             <p class="slds-form-element__help slds-text-color_weak">{labels.hint}</p>
         </template>
     </fieldset>
+    </template>
 </template>

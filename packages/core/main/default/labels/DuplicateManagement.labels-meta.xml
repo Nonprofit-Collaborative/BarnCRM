@@ -57,14 +57,6 @@
         <value>Merge Rules</value>
     </labels>
     <labels>
-        <fullName>Core_DuplicateManagement_MergeRulesHelp</fullName>
-        <categories>DuplicateManagement</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Custom metadata page: what merge rules are</shortDescription>
-        <value>Which value wins for one person field when auto-merge merges two people. Field Name is the field's API name, or MailingAddress or OtherAddress to move a whole address. A field with no rule follows Merge Rule For Other Fields in the Duplicate Matching settings.</value>
-    </labels>
-    <labels>
         <fullName>Core_DuplicateManagement_RuleUnknown</fullName>
         <categories>DuplicateManagement</categories>
         <language>en_US</language>
@@ -207,14 +199,6 @@
         <protected>false</protected>
         <shortDescription>Duplicate Matching: name of the auto-merge tab</shortDescription>
         <value>Auto-Merge</value>
-    </labels>
-    <labels>
-        <fullName>Core_AutoMerge_Intro</fullName>
-        <categories>DuplicateManagement</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Auto-Merge: one line under the tab</shortDescription>
-        <value>Merge the exact matches waiting in the review list in one go. You see every pair first, and you can undo a run for 15 days.</value>
     </labels>
     <labels>
         <fullName>Core_AutoMerge_Rule</fullName>
@@ -367,14 +351,6 @@
         <protected>false</protected>
         <shortDescription>Undo confirm window heading</shortDescription>
         <value>Undo This Run</value>
-    </labels>
-    <labels>
-        <fullName>Core_AutoMerge_UndoBody</fullName>
-        <categories>DuplicateManagement</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Undo confirm text</shortDescription>
-        <value>Restore every person this run merged away from the Recycle Bin, put back the values it changed, and move their related records back? What cannot be restored is listed under the run.</value>
     </labels>
     <labels>
         <fullName>Core_AutoMerge_UndoStarted</fullName>

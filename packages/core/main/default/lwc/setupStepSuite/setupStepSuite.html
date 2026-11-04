@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <template lwc:if={savedName}>
         <p class="slds-text-body_regular" data-id="suite-saved">
             {labels.edition}: <strong>{savedName}</strong>
@@ -61,5 +62,6 @@
                 ></lightning-button>
             </template>
         </div>
+    </template>
     </template>
 </template>

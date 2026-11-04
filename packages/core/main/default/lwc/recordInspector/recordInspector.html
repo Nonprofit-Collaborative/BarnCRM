@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <template lwc:if={canUse}>
         <lightning-card title={labels.title} icon-name="standard:search">
             <span slot="actions">
@@ -140,5 +141,6 @@
                 </template>
             </div>
         </lightning-card>
+    </template>
     </template>
 </template>

@@ -10,30 +10,20 @@ import BarnConfirmModal from 'c/barnConfirmModal';
 
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import TITLE from '@salesforce/label/c.Core_DataManager_Title';
-import INTRO from '@salesforce/label/c.Core_DataManager_Intro';
-import HELP_CHANGE from '@salesforce/label/c.Core_DataManager_HelpChange';
-import HELP_DELETE from '@salesforce/label/c.Core_DataManager_HelpDelete';
 import GROUP_BRING_IN from '@salesforce/label/c.Core_DataManager_GroupBringIn';
 import GROUP_FIND_CHANGE from '@salesforce/label/c.Core_DataManager_GroupFindChange';
 import GROUP_CHECK from '@salesforce/label/c.Core_DataManager_GroupCheck';
 import GROUP_CAREFUL from '@salesforce/label/c.Core_DataManager_GroupCareful';
 import IMPORT_TITLE from '@salesforce/label/c.Core_DataManager_ImportTitle';
-import IMPORT_TEXT from '@salesforce/label/c.Core_DataManager_ImportText';
 import FIND_TITLE from '@salesforce/label/c.Core_DataManager_FindTitle';
-import FIND_TEXT from '@salesforce/label/c.Core_DataManager_FindText';
 import UPDATE_TITLE from '@salesforce/label/c.Core_SuperTransform_Title';
-import UPDATE_TEXT from '@salesforce/label/c.Core_DataManager_UpdateText';
 import DELETE_TITLE from '@salesforce/label/c.Core_DataManager_DeleteTitle';
-import DELETE_TEXT from '@salesforce/label/c.Core_DataManager_DeleteText';
 import DELETE_WARNING from '@salesforce/label/c.Core_DataManager_DeleteWarning';
 import DELETE_CONTINUE from '@salesforce/label/c.Core_DataManager_DeleteContinue';
 import DELETE_CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import OPTIMIZER_TITLE from '@salesforce/label/c.Core_OrgOptimizer_Title';
-import OPTIMIZER_TEXT from '@salesforce/label/c.Core_DataManager_OptimizerText';
 import MAPPINGS_HEADING from '@salesforce/label/c.Core_DataManager_MappingsHeading';
-import MAPPINGS_INTRO from '@salesforce/label/c.Core_DataManager_MappingsIntro';
 import MAPPINGS_EMPTY from '@salesforce/label/c.Core_DataManager_MappingsEmpty';
-import MAPPINGS_EMPTY_HINT from '@salesforce/label/c.Core_DataManager_MappingsEmptyHint';
 import CREATE_TEMPLATE from '@salesforce/label/c.Core_DataManager_CreateTemplate';
 import COLUMN_NAME from '@salesforce/label/c.Core_Import_StepTemplate';
 import COLUMN_LOADS from '@salesforce/label/c.Core_DataManager_ColumnLoads';
@@ -42,11 +32,9 @@ import COLUMN_LAST_LOADED from '@salesforce/label/c.Core_DataManager_ColumnLastL
 import LOADS_PEOPLE from '@salesforce/label/c.Core_DataManager_LoadsPeople';
 import SALESFORCE_HEADING from '@salesforce/label/c.Core_DataManager_SalesforceHeading';
 import WEEKLY_EXPORT from '@salesforce/label/c.Core_DataManager_WeeklyExport';
-import WEEKLY_EXPORT_TEXT from '@salesforce/label/c.Core_DataManager_WeeklyExportText';
 import RECYCLE_BIN from '@salesforce/label/c.Core_DataManager_RecycleBin';
-import RECYCLE_BIN_TEXT from '@salesforce/label/c.Core_DataManager_RecycleBinText';
 import DATA_IMPORT_WIZARD from '@salesforce/label/c.Core_DataManager_DataImportWizard';
-import DATA_IMPORT_WIZARD_TEXT from '@salesforce/label/c.Core_DataManager_DataImportWizardText';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The tabs the tiles open, by API name (ADR-0103 org-optimizer-and-data-manager-pages). */
 const TABS = {
@@ -68,7 +56,9 @@ const SALESFORCE_TILES = [
   {
     name: 'export',
     label: WEEKLY_EXPORT,
-    description: WEEKLY_EXPORT_TEXT,
+    get description() {
+      return helpText('Core', 'Core_DataManager_WeeklyExportText');
+    },
     iconName: 'standard:dataset',
     href: '/lightning/setup/DataManagementExport/home',
     newTab: true
@@ -76,7 +66,9 @@ const SALESFORCE_TILES = [
   {
     name: 'recycle',
     label: RECYCLE_BIN,
-    description: RECYCLE_BIN_TEXT,
+    get description() {
+      return helpText('Core', 'Core_DataManager_RecycleBinText');
+    },
     iconName: 'standard:recycle_bin',
     href: '/lightning/o/DeleteEvent/home',
     newTab: true
@@ -84,7 +76,9 @@ const SALESFORCE_TILES = [
   {
     name: 'wizard',
     label: DATA_IMPORT_WIZARD,
-    description: DATA_IMPORT_WIZARD_TEXT,
+    get description() {
+      return helpText('Core', 'Core_DataManager_DataImportWizardText');
+    },
     iconName: 'standard:data_mapping',
     href: '/lightning/setup/DataManagementDataImporter/home',
     newTab: true
@@ -101,15 +95,35 @@ const SALESFORCE_TILES = [
  * Update are in no app's navigation, so these tiles are how they are reached.
  */
 export default class DataManager extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
-    helpChange: HELP_CHANGE,
-    helpDelete: HELP_DELETE,
+    get intro() {
+      return helpText('Core', 'Core_DataManager_Intro');
+    },
+    get helpChange() {
+      return helpText('Core', 'Core_DataManager_HelpChange');
+    },
+    get helpDelete() {
+      return helpText('Core', 'Core_DataManager_HelpDelete');
+    },
     mappingsHeading: MAPPINGS_HEADING,
-    mappingsIntro: MAPPINGS_INTRO,
+    get mappingsIntro() {
+      return helpText('Core', 'Core_DataManager_MappingsIntro');
+    },
     mappingsEmpty: MAPPINGS_EMPTY,
-    mappingsEmptyHint: MAPPINGS_EMPTY_HINT,
+    get mappingsEmptyHint() {
+      return helpText('Core', 'Core_DataManager_MappingsEmptyHint');
+    },
     createTemplate: CREATE_TEMPLATE
   };
 
@@ -164,25 +178,53 @@ export default class DataManager extends NavigationMixin(LightningElement) {
   get toolGroups() {
     const bringIn = [];
     if (canManageSettings) {
-      bringIn.push(tile('import', IMPORT_TITLE, IMPORT_TEXT, 'standard:data_streams'));
+      bringIn.push(
+        tile(
+          'import',
+          IMPORT_TITLE,
+          helpText('Core', 'Core_DataManager_ImportText'),
+          'standard:data_streams'
+        )
+      );
     }
     const findChange = [];
     if (canFind) {
-      findChange.push(tile('find', FIND_TITLE, FIND_TEXT, 'standard:search'));
+      findChange.push(
+        tile('find', FIND_TITLE, helpText('Core', 'Core_DataManager_FindText'), 'standard:search')
+      );
     }
     if (canBulkUpdate) {
-      findChange.push(tile('update', UPDATE_TITLE, UPDATE_TEXT, 'standard:record_update'));
+      findChange.push(
+        tile(
+          'update',
+          UPDATE_TITLE,
+          helpText('Core', 'Core_DataManager_UpdateText'),
+          'standard:record_update'
+        )
+      );
     }
     const check = [];
     if (canFind || canManageSettings) {
       check.push(
-        tile('optimizer', OPTIMIZER_TITLE, OPTIMIZER_TEXT, 'standard:data_integration_hub')
+        tile(
+          'optimizer',
+          OPTIMIZER_TITLE,
+          helpText('Core', 'Core_DataManager_OptimizerText'),
+          'standard:data_integration_hub'
+        )
       );
     }
     // Always last: the one destructive tool.
     const careful = [];
     if (canBulkDelete) {
-      careful.push(tile('delete', DELETE_TITLE, DELETE_TEXT, 'standard:record_delete'));
+      careful.push(
+        tile(
+          'delete',
+          DELETE_TITLE,
+          helpText('Core', 'Core_DataManager_DeleteText'),
+          'standard:record_delete'
+        )
+      );
     }
     return [
       { name: 'bringIn', label: GROUP_BRING_IN, tiles: bringIn },

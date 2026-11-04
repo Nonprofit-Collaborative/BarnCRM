@@ -137,14 +137,6 @@
         <value>Mark Acknowledged</value>
     </labels>
     <labels>
-        <fullName>Core_ErrorLogTile_Empty</fullName>
-        <categories>Core, Error Log</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error log tile empty state</shortDescription>
-        <value>Nothing has gone wrong. There is nothing to read here.</value>
-    </labels>
-    <labels>
         <fullName>Core_ErrorLogTile_NewCount</fullName>
         <categories>Core, Error Log</categories>
         <language>en_US</language>

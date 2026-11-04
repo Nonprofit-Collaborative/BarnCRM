@@ -8,7 +8,6 @@ import setSchedule from '@salesforce/apex/GivingJobsController.setSchedule';
 import runNow from '@salesforce/apex/GivingJobsController.runNow';
 
 import TITLE from '@salesforce/label/c.Giving_NightlyJobs_Title';
-import INTRO from '@salesforce/label/c.Giving_NightlyJobs_Intro';
 import LAST_RUN_HEADING from '@salesforce/label/c.Core_ErrorDigest_LastRunTitle';
 import NEXT_RUN_HEADING from '@salesforce/label/c.Giving_NightlyJobs_NextRunHeading';
 import NEVER_RUN from '@salesforce/label/c.Giving_NightlyJobs_NeverRun';
@@ -22,6 +21,7 @@ import STALE from '@salesforce/label/c.Giving_NightlyJobs_Stale';
 import READ_ONLY from '@salesforce/label/c.Giving_NightlyJobs_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Periods_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Nightly Jobs page for the Giving module, reached from the Giving section of the Nonprofit
@@ -33,9 +33,21 @@ import { bodyMessage } from 'c/findCsv';
  * carries the buttons that switch all three on and off.
  */
 export default class GivingNightlyJobs extends LightningElement {
+  helpReady = isHelpLoaded('Giving');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Giving', 'Giving_NightlyJobs_Intro');
+    },
     lastRunHeading: LAST_RUN_HEADING,
     nextRunHeading: NEXT_RUN_HEADING,
     neverRun: NEVER_RUN,

@@ -15,6 +15,7 @@ import {
   takesIndicators
 } from 'c/logicModelRules';
 import { LABELS, format, messageFrom, stageLabel } from 'c/logicModelText';
+import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The selected part of a logic model (L-01): its name, description and column, its place in the
@@ -23,6 +24,16 @@ import { LABELS, format, messageFrom, stageLabel } from 'c/logicModelText';
  * builder in a `modelchange` event; a refusal goes up as `failure`.
  */
 export default class LogicModelPart extends LightningElement {
+  helpReady = isHelpLoaded('LogicModels');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('LogicModels').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api model;
   @api elementId;
   @api canEdit = false;

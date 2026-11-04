@@ -9,13 +9,11 @@ import deleteSnapshotRows from '@salesforce/apex/FieldUtilizationController.dele
 import BarnConfirmModal from 'c/barnConfirmModal';
 
 import TITLE from '@salesforce/label/c.Core_FieldUtilization_PageTitle';
-import INTRO from '@salesforce/label/c.Core_FieldUtilization_PageIntro';
 import CHOOSE_LABEL from '@salesforce/label/c.Core_FieldUtilization_ChooseLabel';
 import CHOOSE_PLACEHOLDER from '@salesforce/label/c.Core_FieldUtilization_ChoosePlaceholder';
 import PROGRESS from '@salesforce/label/c.Core_FieldUtilization_Progress';
 import COUNT_AGAIN from '@salesforce/label/c.Core_FieldUtilization_CountAgain';
 import SAVE from '@salesforce/label/c.Core_FieldUtilization_Save';
-import SAVE_HELP from '@salesforce/label/c.Core_FieldUtilization_SaveHelp';
 import SAVED from '@salesforce/label/c.Core_FieldUtilization_Saved';
 import TOO_LARGE from '@salesforce/label/c.Core_FieldUtilization_TooLarge';
 import NO_RECORDS from '@salesforce/label/c.Core_FieldUtilization_NoRecords';
@@ -34,8 +32,6 @@ import COL_CHANGE from '@salesforce/label/c.Core_FieldUtilization_ColChange';
 import COL_SAMPLED from '@salesforce/label/c.Core_FieldUtilization_ColSampled';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_FieldUtilization_UnexpectedError';
 import HISTORY_TITLE from '@salesforce/label/c.Core_FieldUtilization_HistoryTitle';
-import HISTORY_INTRO from '@salesforce/label/c.Core_FieldUtilization_HistoryIntro';
-import HISTORY_EMPTY from '@salesforce/label/c.Core_FieldUtilization_HistoryEmpty';
 import HISTORY_LIMIT from '@salesforce/label/c.Core_FieldUtilization_HistoryLimit';
 import HISTORY_COL_TAKEN_AT from '@salesforce/label/c.Core_FieldUtilization_HistoryColTakenAt';
 import HISTORY_COL_SAVED_BY from '@salesforce/label/c.Core_FieldUtilization_HistoryColSavedBy';
@@ -56,6 +52,7 @@ import DELETED from '@salesforce/label/c.Core_FieldUtilization_Deleted';
 import { bodyMessage } from 'c/findCsv';
 import WhereUsedModal from 'c/whereUsedModal';
 import WHERE_USED from '@salesforce/label/c.Core_WhereUsed_Action';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const PERCENT = { maximumFractionDigits: 1 };
 
@@ -94,8 +91,12 @@ const isBlank = (value) => value === null || value === undefined;
 
 const HISTORY_LABELS = {
   title: HISTORY_TITLE,
-  intro: HISTORY_INTRO,
-  empty: HISTORY_EMPTY,
+  get intro() {
+    return helpText('Core', 'Core_FieldUtilization_HistoryIntro');
+  },
+  get empty() {
+    return helpText('Core', 'Core_FieldUtilization_HistoryEmpty');
+  },
   viewClose: VIEW_CLOSE
 };
 
@@ -123,14 +124,28 @@ const formatWhen = (value) => new Date(value).toLocaleString(undefined, WHEN);
  * BarnCRM Settings on every call.
  */
 export default class FieldUtilization extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_FieldUtilization_PageIntro');
+    },
     chooseLabel: CHOOSE_LABEL,
     choosePlaceholder: CHOOSE_PLACEHOLDER,
     countAgain: COUNT_AGAIN,
     save: SAVE,
-    saveHelp: SAVE_HELP,
+    get saveHelp() {
+      return helpText('Core', 'Core_FieldUtilization_SaveHelp');
+    },
     comparedWith: COMPARED_WITH,
     neverSaved: NEVER_SAVED,
     noRecords: NO_RECORDS,

@@ -201,14 +201,6 @@
         <value>Change Field Access</value>
     </labels>
     <labels>
-        <fullName>Core_FieldAccess_Intro</fullName>
-        <categories>FieldAccess</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field access: view introduction</shortDescription>
-        <value>Give or remove Read and Edit on fields and kinds of record for permission sets your organization made. Nothing is saved until you preview the change and apply it, and every change can be undone.</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldAccess_SetsPlaceholder</fullName>
         <categories>FieldAccess</categories>
         <language>en_US</language>

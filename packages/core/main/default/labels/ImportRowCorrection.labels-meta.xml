@@ -57,14 +57,6 @@
         <value>Super Importer Row</value>
     </labels>
     <labels>
-        <fullName>Core_ImportRow_Help</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import row card: help text</shortDescription>
-        <value>Correct the values that caused the rejection, save, then retry. The file&apos;s own values are never changed.</value>
-    </labels>
-    <labels>
         <fullName>Core_ImportRow_StatusLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>

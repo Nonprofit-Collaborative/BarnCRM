@@ -73,28 +73,12 @@
     <value>Lapsed Donors</value>
   </labels>
   <labels>
-    <fullName>Giving_Segments_LapsedDescription</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: what the lapsed donors template finds</shortDescription>
-    <value>Gave last year and nothing yet this year.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Segments_NewName</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Segments: name of the new donors template</shortDescription>
     <value>New Donors</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_NewDescription</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: what the new donors template finds</shortDescription>
-    <value>Made a first gift in the last 365 days.</value>
   </labels>
   <labels>
     <fullName>Giving_Segments_UpgradersName</fullName>
@@ -105,28 +89,12 @@
     <value>Upgraders</value>
   </labels>
   <labels>
-    <fullName>Giving_Segments_UpgradersDescription</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: what the upgraders template finds</shortDescription>
-    <value>Gave last year and has already given more this year than all of last year.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Segments_LevelMoversName</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Segments: name of the level movers template</shortDescription>
     <value>Level Movers</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_LevelMoversDescription</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: what the level movers template finds</shortDescription>
-    <value>Moved from one donor level to another in the last 90 days.</value>
   </labels>
   <labels>
     <fullName>Giving_Segments_MajorProspectsName</fullName>
@@ -137,28 +105,12 @@
     <value>Major Gift Prospects</value>
   </labels>
   <labels>
-    <fullName>Giving_Segments_MajorProspectsDescription</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: what the major gift prospects template finds</shortDescription>
-    <value>A largest gift of 1,000 or more or total giving of 5,000 or more, and a gift in the last two years.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Segments_ChampionsName</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Segments: name of the champions template</shortDescription>
     <value>Champions</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_ChampionsDescription</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: what the champions template finds</shortDescription>
-    <value>Donors whose RFM segment is Champion: they gave recently, often and generously.</value>
   </labels>
   <labels>
     <fullName>Giving_Segments_SlippingName</fullName>
@@ -169,28 +121,12 @@
     <value>Slipping Donors</value>
   </labels>
   <labels>
-    <fullName>Giving_Segments_SlippingDescription</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: what the slipping donors template finds</shortDescription>
-    <value>Donors whose RFM segment is At Risk: they gave often or generously before, but not recently.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Segments_Title</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Segments: page title</shortDescription>
     <value>Donor Segments</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_Intro</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: what the page is for</shortDescription>
-    <value>Named lists of donors chosen by their giving. Count them, see who is in them, and export a file to import into Mailchimp or Constant Contact. BarnCRM sends nothing.</value>
   </labels>
   <labels>
     <fullName>Giving_Segments_TemplatesHeading</fullName>
@@ -239,14 +175,6 @@
     <protected>false</protected>
     <shortDescription>Segments: label of the segment choice</shortDescription>
     <value>Segment</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_Empty</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: shown when there are no segments yet</shortDescription>
-    <value>No segments yet. Save one from a template above, or save a Find query of people or organizations.</value>
   </labels>
   <labels>
     <fullName>Giving_Segments_OptionShared</fullName>

@@ -8,9 +8,7 @@ import markLettersSent from '@salesforce/apex/PledgeReminderController.markLette
 import setSchedule from '@salesforce/apex/PledgeReminderController.setSchedule';
 
 import TITLE from '@salesforce/label/c.Giving_PledgeReminders_Title';
-import INTRO from '@salesforce/label/c.Giving_PledgeReminders_Intro';
 import OFF from '@salesforce/label/c.Giving_PledgeReminders_Off';
-import NO_STEPS from '@salesforce/label/c.Giving_PledgeReminders_NoSteps';
 import QUEUE_HEADING from '@salesforce/label/c.Giving_PledgeReminders_QueueHeading';
 import EMAILS_DUE from '@salesforce/label/c.Giving_PledgeReminders_EmailsDue';
 import LETTERS_DUE from '@salesforce/label/c.Giving_PledgeReminders_LettersDue';
@@ -35,7 +33,6 @@ import EDIT_STEP_OF from '@salesforce/label/c.Giving_PledgeReminders_EditStepOf'
 import NEW_STEP_HEADING from '@salesforce/label/c.Giving_PledgeReminders_NewStep';
 import EDIT_STEP_HEADING from '@salesforce/label/c.Giving_PledgeReminders_EditStepHeading';
 import TEMPLATE_FIELD from '@salesforce/label/c.Giving_PledgeReminders_TemplateField';
-import TEMPLATE_FIELD_HELP from '@salesforce/label/c.Giving_PledgeReminders_TemplateFieldHelp';
 import TEMPLATE_PLACEHOLDER from '@salesforce/label/c.Giving_PledgeReminders_TemplatePlaceholder';
 import TEMPLATE_REQUIRED from '@salesforce/label/c.Giving_PledgeReminders_TemplateRequired';
 import SAVE_STEP from '@salesforce/label/c.Giving_PledgeReminders_SaveStep';
@@ -59,6 +56,7 @@ import DAYS_BEFORE from '@salesforce/label/c.Giving_PledgeReminders_DaysBefore';
 import ON_DUE_DATE from '@salesforce/label/c.Giving_PledgeReminders_OnDueDate';
 import DAYS_AFTER from '@salesforce/label/c.Giving_PledgeReminders_DaysAfter';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_DOWNLOAD_PATH = '/sfc/servlet.shepherd/document/download/';
 const CHANNEL_EMAIL = 'Email';
@@ -75,11 +73,25 @@ const CHANNEL_EMAIL = 'Email';
  * says so when it is off rather than offering a second switch.
  */
 export default class PledgeReminders extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Giving');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Giving', 'Giving_PledgeReminders_Intro');
+    },
     off: OFF,
-    noSteps: NO_STEPS,
+    get noSteps() {
+      return helpText('Giving', 'Giving_PledgeReminders_NoSteps');
+    },
     queueHeading: QUEUE_HEADING,
     emailsDue: EMAILS_DUE,
     lettersDue: LETTERS_DUE,
@@ -96,7 +108,9 @@ export default class PledgeReminders extends NavigationMixin(LightningElement) {
     newStep: NEW_STEP,
     editStep: EDIT_STEP,
     templateField: TEMPLATE_FIELD,
-    templateFieldHelp: TEMPLATE_FIELD_HELP,
+    get templateFieldHelp() {
+      return helpText('Giving', 'Giving_PledgeReminders_TemplateFieldHelp');
+    },
     templatePlaceholder: TEMPLATE_PLACEHOLDER,
     templateRequired: TEMPLATE_REQUIRED,
     saveStep: SAVE_STEP,

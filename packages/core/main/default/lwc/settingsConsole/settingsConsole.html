@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <c-first-run-setup onsetupfinished={handleSetupFinished}></c-first-run-setup>
     <!-- The App Page prints the name above this component, so the shell's title is for screen readers only. -->
     <c-barn-page-shell
@@ -351,4 +352,5 @@
             >
         </p>
     </c-barn-page-shell>
+    </template>
 </template>

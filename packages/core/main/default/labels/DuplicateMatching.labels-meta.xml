@@ -9,14 +9,6 @@
         <value>Duplicate Matching</value>
     </labels>
     <labels>
-        <fullName>Core_DuplicateMatching_Intro</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicate Matching: one line under the title</shortDescription>
-        <value>Review possible duplicate people and households, and choose what pairs them.</value>
-    </labels>
-    <labels>
         <fullName>Core_DuplicateMatching_Review</fullName>
         <categories>DuplicateMatching</categories>
         <language>en_US</language>
@@ -55,22 +47,6 @@
         <protected>false</protected>
         <shortDescription>Matching Logic: heading of the window that adds a source</shortDescription>
         <value>New Match Source</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchLogic_Intro</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: what match sources are</shortDescription>
-        <value>Match sources pair people or households that share a value kept on a related record.</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchLogic_Help</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: help popover beside the intro line</shortDescription>
-        <value>Match sources see an email, phone or address on a related record, which duplicate rules cannot.</value>
     </labels>
     <labels>
         <fullName>Core_MatchLogic_HelpAlt</fullName>
@@ -113,28 +89,12 @@
         <value>Active: {0}</value>
     </labels>
     <labels>
-        <fullName>Core_MatchLogic_RulesNote</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: where the duplicate rules are</shortDescription>
-        <value>Match sources work alongside your Salesforce duplicate rules. The rules are listed, read only, in Review, with a link to change them in Setup.</value>
-    </labels>
-    <labels>
         <fullName>Core_MatchLogic_ReadOnly</fullName>
         <categories>DuplicateMatching</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Matching Logic: shown to someone who may read but not change</shortDescription>
         <value>You can see the match sources. Adding or changing one needs the BarnCRM Metadata Admin permission set.</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchLogic_ShippedNote</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: what can be done to a shipped source</shortDescription>
-        <value>A source shipped with BarnCRM can be deactivated and activated again, but not changed. Saving takes about a minute, because Salesforce applies it in the background.</value>
     </labels>
     <labels>
         <fullName>Core_MatchLogic_Active</fullName>

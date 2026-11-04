@@ -7,7 +7,6 @@ import STANDARD_NAME from '@salesforce/label/c.Core_SuiteChoice_StandardName';
 import NONPROFIT_NAME from '@salesforce/label/c.Core_SuiteChoice_NonprofitName';
 import NOT_CHOSEN from '@salesforce/label/c.Core_Edition_NotChosen';
 import CHANGE_TOGGLE from '@salesforce/label/c.Core_Edition_ChangeToggle';
-import CHANGE_INTRO from '@salesforce/label/c.Core_Edition_ChangeIntro';
 import TO_STANDARD from '@salesforce/label/c.Core_Edition_SwitchToStandard';
 import TO_NONPROFIT from '@salesforce/label/c.Core_Edition_SwitchToNonprofit';
 import CONFIRM_TITLE from '@salesforce/label/c.Core_Edition_ConfirmTitle';
@@ -16,6 +15,7 @@ import CONFIRM_TO_STANDARD from '@salesforce/label/c.Core_Edition_ConfirmToStand
 import CONFIRM_BUTTON from '@salesforce/label/c.Core_Edition_ChangeToggle';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import SAVED from '@salesforce/label/c.Core_Edition_Saved';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const STANDARD = 'Standard';
 const NONPROFIT = 'Nonprofit';
@@ -26,10 +26,14 @@ const NONPROFIT = 'Nonprofit';
  * Each switch asks for confirmation first, saying what changes.
  */
 export default class EditionSetting extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     notChosen: NOT_CHOSEN,
     changeToggle: CHANGE_TOGGLE,
-    changeIntro: CHANGE_INTRO,
+    get changeIntro() {
+      return helpText('Core', 'Core_Edition_ChangeIntro');
+    },
     saved: SAVED
   };
 
@@ -41,6 +45,11 @@ export default class EditionSetting extends LightningElement {
   isSaving = false;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

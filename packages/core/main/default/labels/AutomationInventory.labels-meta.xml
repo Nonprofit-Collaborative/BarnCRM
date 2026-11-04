@@ -9,36 +9,12 @@
         <value>Include Flows and Apex Triggers</value>
     </labels>
     <labels>
-        <fullName>Core_DataDictionary_IncludeAutomationHelp</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Dictionary: help under the automation checkbox</shortDescription>
-        <value>Adds a second table of the Apex triggers and record-triggered flows that run on each chosen kind of record. Validation rules are not covered.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataDictionary_AutomationTitle</fullName>
         <categories>DataDictionary</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Dictionary: automation inventory heading</shortDescription>
         <value>Automation Inventory</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_AutomationNote</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Dictionary: automation inventory scope note</shortDescription>
-        <value>Covers Apex triggers and record-triggered flows, read as you. Not covered: validation rules, workflow rules and process builder criteria (reading them needs the Tooling API). Flows that no record triggers, such as screen and scheduled flows, belong to no object and are not listed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_AutomationEmpty</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Dictionary: no triggers or flows found</shortDescription>
-        <value>No Apex triggers or record-triggered flows run on these kinds of record.</value>
     </labels>
     <labels>
         <fullName>Core_DataDictionary_AutomationNotRead</fullName>

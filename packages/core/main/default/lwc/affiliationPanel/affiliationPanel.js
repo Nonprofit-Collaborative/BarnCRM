@@ -13,7 +13,6 @@ import PANEL_TITLE from '@salesforce/label/c.Core_Feature_Affiliations_Name';
 import ADD_BUTTON from '@salesforce/label/c.Core_Affiliation_AddButton';
 import ADD_FORM_TITLE from '@salesforce/label/c.Core_Affiliation_AddFormTitle';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import EMPTY_MESSAGE from '@salesforce/label/c.Core_Affiliation_Empty';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Affiliation_EmptyHeading';
 import FORMER_BADGE from '@salesforce/label/c.Core_Affiliation_FormerBadge';
 import LOAD_FAILED from '@salesforce/label/c.Core_Affiliation_LoadFailed';
@@ -25,6 +24,7 @@ import PRIMARY_BADGE from '@salesforce/label/c.Core_HouseholdMembersPanel_Primar
 import SAVE_FAILED from '@salesforce/label/c.Core_Affiliation_SaveFailed';
 import SAVE_SUCCESS from '@salesforce/label/c.Core_Affiliation_SaveSuccess';
 import UNNAMED_PERSON from '@salesforce/label/c.Core_Affiliation_UnnamedPerson';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const AFFILIATION_OBJECT = 'Affiliation__c';
 const FORM_FIELDS = [
@@ -159,6 +159,16 @@ function byCardOrder(a, b) {
  * another.
  */
 export default class AffiliationPanel extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
   @api objectApiName;
 
@@ -167,7 +177,9 @@ export default class AffiliationPanel extends LightningElement {
     addButton: ADD_BUTTON,
     addFormTitle: ADD_FORM_TITLE,
     cancelButton: CANCEL_BUTTON,
-    emptyMessage: EMPTY_MESSAGE,
+    get emptyMessage() {
+      return helpText('Core', 'Core_Affiliation_Empty');
+    },
     emptyHeading: EMPTY_HEADING,
     formerBadge: FORMER_BADGE,
     loading: LOADING,

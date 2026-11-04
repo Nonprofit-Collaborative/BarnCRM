@@ -33,14 +33,6 @@
         <value>Data Dictionary</value>
     </labels>
     <labels>
-        <fullName>Core_DataDictionary_PageIntro</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: what the section does</shortDescription>
-        <value>Lists every field you can see on the kinds of record you choose, with its type, rules, picklist values, help text and formula. Read only: nothing is changed.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataDictionary_SelectedLabel</fullName>
         <categories>DataDictionary</categories>
         <language>en_US</language>
@@ -55,14 +47,6 @@
         <protected>false</protected>
         <shortDescription>Data dictionary: fill rates checkbox</shortDescription>
         <value>Include Fill Rates</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_IncludeFillRatesHelp</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: fill rates help text</shortDescription>
-        <value>Counts how many records have each field filled in, the same way Field Utilization does, with the same size limit. It takes longer.</value>
     </labels>
     <labels>
         <fullName>Core_DataDictionary_Build</fullName>
@@ -103,14 +87,6 @@
         <protected>false</protected>
         <shortDescription>Data dictionary: fill rates skipped, {0} is a list of labels</shortDescription>
         <value>Fill rates not counted for: {0}. Each is too large or could not be counted.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_Empty</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: nothing built yet</shortDescription>
-        <value>Choose kinds of record and press Build Dictionary.</value>
     </labels>
     <labels>
         <fullName>Core_DataDictionary_No</fullName>

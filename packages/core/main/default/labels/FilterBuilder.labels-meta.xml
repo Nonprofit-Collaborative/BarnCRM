@@ -129,22 +129,6 @@
         <value>Condition logic</value>
     </labels>
     <labels>
-        <fullName>Core_Filter_LogicHelp</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Help text of the condition logic input.</shortDescription>
-        <value>Use condition numbers with AND, OR, NOT and brackets, for example 1 AND (2 OR 3).</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_Empty</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when a filter has no conditions.</shortDescription>
-        <value>No conditions yet, so every record matches.</value>
-    </labels>
-    <labels>
         <fullName>Core_Filter_Loading</fullName>
         <categories>Filter</categories>
         <language>en_US</language>

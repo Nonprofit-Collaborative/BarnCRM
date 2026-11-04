@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
   <section class="slds-box slds-var-m-bottom_small" data-id="part">
     <p class="slds-text-title">{labels.selectedPart}: {columnName}</p>
     <template lwc:if={editing}>
@@ -225,4 +226,5 @@
       ></c-logic-model-indicators>
     </template>
   </section>
+    </template>
 </template>

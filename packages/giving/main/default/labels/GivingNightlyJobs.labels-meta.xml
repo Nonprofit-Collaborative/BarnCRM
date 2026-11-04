@@ -9,28 +9,12 @@
     <value>Nightly Jobs</value>
   </labels>
   <labels>
-    <fullName>Giving_NightlyJobs_Intro</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: what the page is for</shortDescription>
-    <value>Four jobs keep giving moving overnight: they extend recurring schedules, mark payments overdue, place donors on their giving level, and remind owners when a donor's next ask arrives. None runs until you schedule it here.</value>
-  </labels>
-  <labels>
     <fullName>Giving_NightlyJobs_TopUpName</fullName>
     <categories>Giving, Nightly Jobs</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: the top up job and when it runs</shortDescription>
     <value>Installment Top Up, 1:15 AM</value>
-  </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_TopUpDescription</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: what the top up job does</shortDescription>
-    <value>Extends every active recurring commitment up to the generation horizon.</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_OverdueName</fullName>
@@ -41,28 +25,12 @@
     <value>Overdue Pass, 1:45 AM</value>
   </labels>
   <labels>
-    <fullName>Giving_NightlyJobs_OverdueDescription</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: what the overdue pass does</shortDescription>
-    <value>Marks an unpaid payment Overdue once it is further past its due date than the grace period.</value>
-  </labels>
-  <labels>
     <fullName>Giving_NightlyJobs_LevelsName</fullName>
     <categories>Giving, Nightly Jobs</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: the donor level pass and when it runs</shortDescription>
     <value>Donor Levels, 3:00 AM</value>
-  </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_LevelsDescription</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: what the donor level pass does</shortDescription>
-    <value>Places every donor on the rung their giving now reaches. Runs after the rollups have settled.</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_TopUpSummaryFormat</fullName>

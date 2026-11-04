@@ -65,14 +65,6 @@
     <value>Campaign Sync</value>
   </labels>
   <labels>
-    <fullName>Mirror_CampaignSync_Intro</fullName>
-    <categories>Mirror, Campaign Sync</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Campaign sync page: what it does</shortDescription>
-    <value>Each appeal gets a matching Salesforce Campaign, kept current as the appeal changes, so Campaign Members and marketing tools work. Nothing is copied back, and no Campaign is ever deleted.</value>
-  </labels>
-  <labels>
     <fullName>Mirror_CampaignSync_Unavailable</fullName>
     <categories>Mirror, Campaign Sync</categories>
     <language>en_US</language>

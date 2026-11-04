@@ -1,0 +1,8 @@
+{
+  "languages": ["en"],
+  "texts": {
+    "LogicModels_Builder_SelectHint": "Select a part to change it, link it or measure it.",
+    "LogicModels_Report_PrintHelp": "Open the printable report in your browser to print it or save it as a PDF.",
+    "LogicModels_Source_QueryHelp": "Build and save the query in Find. Leave dates out of it: each period adds its own."
+  }
+}

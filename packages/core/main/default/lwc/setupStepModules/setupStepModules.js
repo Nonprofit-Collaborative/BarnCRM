@@ -8,7 +8,7 @@ import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import INSTALL_FIRST from '@salesforce/label/c.Core_ModuleManager_InstallFirst';
 import STAFF_TABS from '@salesforce/label/c.Core_SetupAssistant_ModuleStaffTabs';
 import ADMIN_TABS from '@salesforce/label/c.Core_SetupAssistant_ModuleAdminTabs';
-import TABS_HOW from '@salesforce/label/c.Core_SetupAssistant_ModuleTabsHow';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The modules step: the BarnCRM packages this org is offered, by their "BarnCRM X" names
@@ -20,6 +20,16 @@ import TABS_HOW from '@salesforce/label/c.Core_SetupAssistant_ModuleTabsHow';
  * a module's tab (ADR-0137).
  */
 export default class SetupStepModules extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api modules = [];
 
   labels = {
@@ -27,7 +37,9 @@ export default class SetupStepModules extends LightningElement {
     managerNotice: MANAGER_NOTICE,
     install: INSTALL,
     newTab: NEW_TAB,
-    tabsHow: TABS_HOW
+    get tabsHow() {
+      return helpText('Core', 'Core_SetupAssistant_ModuleTabsHow');
+    }
   };
 
   get hasTabsToAdd() {

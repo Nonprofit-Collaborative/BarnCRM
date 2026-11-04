@@ -47,12 +47,30 @@ public with sharing class AccessService {
 
     /** One plain sentence per add-on, and a warning flag on the two that remove data. */
     private static final Map<String, AddOnText> ADD_ON_TEXT = new Map<String, AddOnText>{
-        'BarnCRM_Find_And_Export' => new AddOnText(Label.Core_Access_AddOnFindAndExport, false),
-        'BarnCRM_Bulk_Update' => new AddOnText(Label.Core_Access_AddOnBulkUpdate, false),
-        'BarnCRM_Bulk_Delete' => new AddOnText(Label.Core_Access_AddOnBulkDelete, true),
-        'BarnCRM_Erase_People' => new AddOnText(Label.Core_Access_AddOnErasePeople, true),
-        'BarnCRM_Duplicate_Review' => new AddOnText(Label.Core_Access_AddOnDuplicateReview, false),
-        'BarnCRM_Metadata_Admin' => new AddOnText(Label.Core_Access_AddOnMetadataAdmin, false)
+        'BarnCRM_Find_And_Export' => new AddOnText(
+            BarnHelp.text('Core', 'Core_Access_AddOnFindAndExport'),
+            false
+        ),
+        'BarnCRM_Bulk_Update' => new AddOnText(
+            BarnHelp.text('Core', 'Core_Access_AddOnBulkUpdate'),
+            false
+        ),
+        'BarnCRM_Bulk_Delete' => new AddOnText(
+            BarnHelp.text('Core', 'Core_Access_AddOnBulkDelete'),
+            true
+        ),
+        'BarnCRM_Erase_People' => new AddOnText(
+            BarnHelp.text('Core', 'Core_Access_AddOnErasePeople'),
+            true
+        ),
+        'BarnCRM_Duplicate_Review' => new AddOnText(
+            BarnHelp.text('Core', 'Core_Access_AddOnDuplicateReview'),
+            false
+        ),
+        'BarnCRM_Metadata_Admin' => new AddOnText(
+            BarnHelp.text('Core', 'Core_Access_AddOnMetadataAdmin'),
+            false
+        )
     };
 
     /**

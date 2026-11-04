@@ -1,0 +1,16 @@
+{
+  "languages": ["en"],
+  "texts": {
+    "Programs_Cohort_MembersEmpty": "Nobody is in this cohort yet.",
+    "Programs_Dashboard_Intro": "How your programs are doing in the period you pick. Figures count only the records you can see.",
+    "Programs_Elig_Intro": "Rules are checked in order, and the first whose conditions all hold decides. Screening sets each open enrollment's Eligibility Status, Basis and Reason.",
+    "Programs_Log_Empty": "Nobody has an open enrollment in this program yet.",
+    "Programs_Plan_Empty": "No goals yet. Add the first goal this person is working toward.",
+    "Programs_Plan_ReviewIntro": "Reviewed today. When is the next review? Leave it blank for none.",
+    "Programs_Roster_Empty": "No one to list. Click Enroll Someone to add a person, or turn on Show Ended to see past enrollments.",
+    "Programs_Schedule_IntroProgram": "Sessions scheduled here are for everyone enrolled in the program. To schedule for one cohort, use the panel on the cohort.",
+    "Programs_Settings_Intro": "The choices your organization makes for the Programs module. Changes apply to everyone.",
+    "Programs_Settings_PicklistsIntro": "The choices staff pick from on an enrollment. Add, rename or deactivate a choice on the field in Setup; a deactivated choice stays on the enrollments that have it.",
+    "Programs_Settings_PrivacyIntro": "Who can see enrollments and service deliveries. Every case note stays private whichever you choose."
+  }
+}

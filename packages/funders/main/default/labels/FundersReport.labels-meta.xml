@@ -17,14 +17,6 @@
         <value>Download Printable</value>
     </labels>
     <labels>
-        <fullName>Funders_Report_Help</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Funder Report card help text</shortDescription>
-        <value>Open the file in a browser to print it or save it as a PDF, or in a word processor to edit it before you send it.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Report_NoTemplates</fullName>
         <categories>Funders</categories>
         <language>en_US</language>

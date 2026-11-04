@@ -9,14 +9,6 @@
         <value>Record Inspector</value>
     </labels>
     <labels>
-        <fullName>Core_RecordInspector_Intro</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector text before it has read the record.</shortDescription>
-        <value>See every field you can read on this record, including fields that are not on the page, with API names and values.</value>
-    </labels>
-    <labels>
         <fullName>Core_RecordInspector_Inspect</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -103,14 +95,6 @@
         <protected>false</protected>
         <shortDescription>Record Inspector marker for a value that was cut.</shortDescription>
         <value>Shortened</value>
-    </labels>
-    <labels>
-        <fullName>Core_RecordInspector_FieldsCut</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector notice when the object has too many readable fields to show.</shortDescription>
-        <value>This kind of record has more readable fields than one read can carry, so only part of them are shown.</value>
     </labels>
     <labels>
         <fullName>Core_RecordInspector_ErrorNoPermission</fullName>

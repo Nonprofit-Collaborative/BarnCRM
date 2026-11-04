@@ -7,7 +7,6 @@ import adopt from '@salesforce/apex/NpspHouseholdAdoptionController.adopt';
 import undo from '@salesforce/apex/NpspHouseholdAdoptionController.undo';
 
 import TITLE from '@salesforce/label/c.Core_NpspAdoption_Title';
-import INTRO from '@salesforce/label/c.Core_NpspAdoption_Intro';
 import NOT_AVAILABLE from '@salesforce/label/c.Core_NpspAdoption_NotAvailable';
 import CANDIDATE_COUNT from '@salesforce/label/c.Core_NpspAdoption_CandidateCount';
 import MORE_THAN_LIMIT from '@salesforce/label/c.Core_NpspAdoption_MoreThanLimit';
@@ -19,7 +18,6 @@ import COLUMN_INFORMAL from '@salesforce/label/c.Core_HouseholdNamingSettings_Co
 import COLUMN_PRIMARY from '@salesforce/label/c.Core_NpspAdoption_ColumnPrimary';
 import COLUMN_CONTACTS from '@salesforce/label/c.Core_SampleData_ContactsLabel';
 import KEEP_NAMES from '@salesforce/label/c.Core_NpspAdoption_KeepNames';
-import KEEP_NAMES_HELP from '@salesforce/label/c.Core_NpspAdoption_KeepNamesHelp';
 import ADOPT_BUTTON from '@salesforce/label/c.Core_NpspAdoption_AdoptButton';
 import CONFIRM_MESSAGE from '@salesforce/label/c.Core_NpspAdoption_ConfirmMessage';
 import TYPE_TO_ADOPT from '@salesforce/label/c.Core_NpspAdoption_TypeToAdopt';
@@ -34,6 +32,7 @@ import TYPE_TO_UNDO from '@salesforce/label/c.Core_NpspAdoption_TypeToUndo';
 import CONFIRM_UNDO from '@salesforce/label/c.Core_AutoMerge_Undo';
 import STARTED from '@salesforce/label/c.Core_NpspAdoption_Started';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * Adopt NPSP Households, on the General page of BarnCRM Settings (X-05, admin guide
@@ -44,9 +43,13 @@ import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
  * run or an undo is going, and offers the undo of the newest run. Every rule lives in Apex.
  */
 export default class NpspHouseholdAdoption extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_NpspAdoption_Intro');
+    },
     notAvailable: NOT_AVAILABLE,
     noneLeft: NONE_LEFT,
     sampleCaption: SAMPLE_CAPTION,
@@ -56,7 +59,9 @@ export default class NpspHouseholdAdoption extends LightningElement {
     columnPrimary: COLUMN_PRIMARY,
     columnContacts: COLUMN_CONTACTS,
     keepNames: KEEP_NAMES,
-    keepNamesHelp: KEEP_NAMES_HELP,
+    get keepNamesHelp() {
+      return helpText('Core', 'Core_NpspAdoption_KeepNamesHelp');
+    },
     adoptButton: ADOPT_BUTTON,
     running: RUNNING,
     lastRun: LAST_RUN,
@@ -72,6 +77,11 @@ export default class NpspHouseholdAdoption extends LightningElement {
   stopPolling;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

@@ -1,0 +1,26 @@
+{
+  "languages": ["en"],
+  "texts": {
+    "Mirror_AccountingExport_Intro": "Download the gifts in a date range as a spreadsheet for your accounting system: one row for each fund a gift went to, and refunds as negative rows on the day the money went back.",
+    "Mirror_AccountingExport_MarkPostedHelp": "Once this file is in your accounting system, mark its gifts posted. A posted gift cannot be changed or deleted.",
+    "Mirror_AccountingExport_Visibility": "The file holds the gifts you can see. If gifts in your organization are private, the person who runs the export needs to see all of them.",
+    "Mirror_CampaignSync_Intro": "Each appeal gets a matching Salesforce Campaign, kept current as the appeal changes, so Campaign Members and marketing tools work. Nothing is copied back, and no Campaign is ever deleted.",
+    "Mirror_GiftTransactionMirror_Intro": "Gives each received gift a matching Nonprofit Cloud Gift Transaction, with its designations, so Nonprofit Cloud's donor summaries count the gifts you enter in BarnCRM. Run Now copies what is waiting. The nightly run catches up at 1:35 AM, your organization's time zone.",
+    "Mirror_GiftTransactionMirror_ReconciliationIntro": "Compare the received gifts dated in a range with the Gift Transactions of the paid status dated in it, as you can see them.",
+    "Mirror_OpportunityMirror_DirectionGifts": "Direction: Gifts to Opportunities. Every gift in the totals gets a matching Opportunity.",
+    "Mirror_OpportunityMirror_Intro": "Keeps gifts and Salesforce Opportunities in step, in the direction set in BarnCRM Settings. Run now copies what is waiting. The nightly run catches up at 1:30 AM, your organization's time zone.",
+    "Mirror_OpportunityMirror_ReconciliationIntro": "Compare the gifts in the totals dated in a range with the won Opportunities closed in it, as you can see them.",
+    "Mirror_SetupNote_CampaignSync_Steps": "Click the permission set those people have (or open Profiles for their profile).|Click Object Settings, then Campaigns, then Edit.|Tick Read, Create and Edit, then click Save.",
+    "Mirror_SetupNote_CampaignSync_What": "Let the people who create appeals create and edit Campaigns, through their profile or a permission set. Give yourself Campaign Sync on the Access page, under Extra Permissions.",
+    "Mirror_SetupNote_CampaignSync_Why": "A Campaign is created with the access of the person saving the appeal; without it the appeal still saves, and Sync all appeals catches it up.",
+    "Mirror_SetupNote_GiftTransactionMirror_Steps": "Click Fundraising User (or the permission set your org uses for Nonprofit Cloud fundraising).|Click Manage Assignments, then Add Assignment.|Tick the people who run the mirror, then click Assign.",
+    "Mirror_SetupNote_GiftTransactionMirror_What": "Whoever runs or schedules the Gift Transaction mirror needs Nonprofit Cloud's Fundraising User permission set, so they can create and edit Gift Transactions and their designations. Give yourself Gift Transaction Mirror on the Access page.",
+    "Mirror_SetupNote_GiftTransactionMirror_Why": "Each run writes with the access of the person who started or scheduled it; without it the run copies nothing and says why in the Error Log.",
+    "Mirror_SetupNote_MarketingUser_Steps": "Click Edit next to the person.|Tick Marketing User.|Click Save.",
+    "Mirror_SetupNote_MarketingUser_What": "Tick Marketing User on the user of each person who creates appeals.",
+    "Mirror_SetupNote_MarketingUser_Why": "Salesforce lets only a Marketing User create Campaigns, and that box is on the user in Setup.",
+    "Mirror_SetupNote_Mirror_Steps": "Click the permission set your fundraising staff have (or open Profiles for their profile).|Click Object Settings, then Opportunities, then Edit.|Tick Read, Create and Edit, then click Save.",
+    "Mirror_SetupNote_Mirror_What": "To give each gift its Opportunity at once, let fundraising staff create and edit Opportunities through their profile or a permission set. Give yourself Opportunity Mirror on the Access page.",
+    "Mirror_SetupNote_Mirror_Why": "Opportunities are written with the access of the person saving the gift; without it the nightly run catches them up instead."
+  }
+}

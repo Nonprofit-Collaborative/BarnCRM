@@ -9,22 +9,6 @@
         <value>Snapshot History</value>
     </labels>
     <labels>
-        <fullName>Core_FieldUtilization_HistoryIntro</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: history section intro</shortDescription>
-        <value>Each saved count is a snapshot. Compare the count above with any of them, look at its fields, or delete it.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_HistoryEmpty</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: history empty state</shortDescription>
-        <value>No snapshots have been saved for this kind of record yet.</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldUtilization_HistoryLimit</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>

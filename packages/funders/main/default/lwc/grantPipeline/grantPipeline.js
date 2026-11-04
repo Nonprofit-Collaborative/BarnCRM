@@ -8,7 +8,6 @@ import { buildColumns, deadlineRows, moveTargets } from 'c/grantPipelineModel';
 import { format, messageFrom } from 'c/findCsv';
 
 import TITLE from '@salesforce/label/c.Funders_Pipeline_Title';
-import INTRO from '@salesforce/label/c.Funders_Pipeline_Intro';
 import SCOPE_EVERYONE from '@salesforce/label/c.Funders_Pipeline_ScopeEveryone';
 import SCOPE_MINE from '@salesforce/label/c.Funders_Pipeline_ScopeMine';
 import NEW_GRANT from '@salesforce/label/c.Funders_Pipeline_NewGrant';
@@ -17,7 +16,6 @@ import TILE_REQUESTED from '@salesforce/label/c.Funders_Pipeline_TileRequested';
 import TILE_AWARDED from '@salesforce/label/c.Funders_Pipeline_TileAwarded';
 import AWARDED_DETAIL from '@salesforce/label/c.Funders_Pipeline_AwardedDetail';
 import COLUMN_EMPTY from '@salesforce/label/c.Funders_Pipeline_ColumnEmpty';
-import EMPTY from '@salesforce/label/c.Funders_Pipeline_Empty';
 import TRUNCATED from '@salesforce/label/c.Funders_Pipeline_Truncated';
 import READ_ONLY from '@salesforce/label/c.Funders_Pipeline_ReadOnly';
 import NO_FUNDER from '@salesforce/label/c.Funders_Pipeline_NoFunder';
@@ -25,7 +23,6 @@ import MOVE_TO from '@salesforce/label/c.Core_Shared_MoveTo';
 import OPEN from '@salesforce/label/c.Core_Shared_Open';
 import CARD_ACTIONS from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
 import DEADLINES from '@salesforce/label/c.Funders_Pipeline_Deadlines';
-import DEADLINES_EMPTY from '@salesforce/label/c.Funders_Pipeline_DeadlinesEmpty';
 import DAYS_LEFT from '@salesforce/label/c.Funders_Pipeline_DaysLeft';
 import DUE_TODAY from '@salesforce/label/c.Funders_Pipeline_DueToday';
 import OVERDUE from '@salesforce/label/c.Funders_Pipeline_Overdue';
@@ -38,6 +35,7 @@ import ERROR_ACTION from '@salesforce/label/c.Funders_Pipeline_ErrorUnexpected';
 import MARK_SUBMITTED from '@salesforce/label/c.Funders_Pipeline_MarkSubmitted';
 import MARKED_SUBMITTED from '@salesforce/label/c.Funders_Pipeline_MarkedSubmitted';
 import KIND_APPLICATION_LABEL from '@salesforce/label/c.Funders_Pipeline_KindApplication';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ACTION_OPEN = 'open';
 const KIND_REQUIREMENT = 'requirement';
@@ -56,19 +54,27 @@ const messageOf = (error) => messageFrom(error, ERROR_ACTION);
  * person who may edit grants.
  */
 export default class GrantPipeline extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Funders');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Funders', 'Funders_Pipeline_Intro');
+    },
     scopeEveryone: SCOPE_EVERYONE,
     newGrant: NEW_GRANT,
     tileOpen: TILE_OPEN,
     tileRequested: TILE_REQUESTED,
     tileAwarded: TILE_AWARDED,
     columnEmpty: COLUMN_EMPTY,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Funders', 'Funders_Pipeline_Empty');
+    },
     readOnly: READ_ONLY,
     deadlines: DEADLINES,
-    deadlinesEmpty: DEADLINES_EMPTY,
+    get deadlinesEmpty() {
+      return helpText('Funders', 'Funders_Pipeline_DeadlinesEmpty');
+    },
     awardAmount: AWARD_AMOUNT,
     markSubmitted: MARK_SUBMITTED,
     save: SAVE,
@@ -92,6 +98,11 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
   isSaving = false;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Funders').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <template lwc:if={showLoading}>
         <lightning-card title={label.title} icon-name="standard:approval">
             <div class="slds-var-p-horizontal_medium slds-is-relative slds-var-p-vertical_large loading">
@@ -67,5 +68,6 @@
                 </ul>
             </div>
         </lightning-card>
+    </template>
     </template>
 </template>

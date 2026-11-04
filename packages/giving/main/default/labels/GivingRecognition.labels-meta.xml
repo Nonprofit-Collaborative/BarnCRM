@@ -105,28 +105,12 @@
     <value>Automatic</value>
   </labels>
   <labels>
-    <fullName>Giving_SoftCredits_AutomaticHelp</fullName>
-    <categories>Giving, Soft Credits</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Automatic credit explanation</shortDescription>
-    <value>BarnCRM created this credit from the household and keeps it up to date. Change the gift, or who is in the household, and it follows.</value>
-  </labels>
-  <labels>
     <fullName>Giving_SoftCredits_CustomRoleLabel</fullName>
     <categories>Giving, Soft Credits</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Custom role field label</shortDescription>
     <value>Your own wording</value>
-  </labels>
-  <labels>
-    <fullName>Giving_SoftCredits_Empty</fullName>
-    <categories>Giving, Soft Credits</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>No soft credits yet</shortDescription>
-    <value>Nobody else is recognized for this gift yet.</value>
   </labels>
   <labels>
     <fullName>Giving_SoftCredits_PersonLabel</fullName>

@@ -41,14 +41,6 @@
         <value>The same relationship is in this save twice. Remove one of them and save again.</value>
     </labels>
     <labels>
-        <fullName>Core_Relationship_Empty</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Relationship card: shown when the person has no relationships yet</shortDescription>
-        <value>Link this person to family, friends and colleagues.</value>
-    </labels>
-    <labels>
         <fullName>Core_Relationship_EmptyHeading</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>

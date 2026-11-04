@@ -81,14 +81,6 @@
         <value>Nothing here yet.</value>
     </labels>
     <labels>
-        <fullName>LogicModels_Builder_SelectHint</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when no part is selected</shortDescription>
-        <value>Select a part to change it, link it or measure it.</value>
-    </labels>
-    <labels>
         <fullName>LogicModels_Builder_LookAt</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>
@@ -673,14 +665,6 @@
         <value>Saved Query</value>
     </labels>
     <labels>
-        <fullName>LogicModels_Source_QueryHelp</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Saved query help</shortDescription>
-        <value>Build and save the query in Find. Leave dates out of it: each period adds its own.</value>
-    </labels>
-    <labels>
         <fullName>LogicModels_Source_NoQueries</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>
@@ -839,14 +823,6 @@
         <protected>true</protected>
         <shortDescription>Download printable page</shortDescription>
         <value>Download Printable Report</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Report_PrintHelp</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>How to print the report</shortDescription>
-        <value>Open the printable report in your browser to print it or save it as a PDF.</value>
     </labels>
     <labels>
         <fullName>LogicModels_Report_Part</fullName>

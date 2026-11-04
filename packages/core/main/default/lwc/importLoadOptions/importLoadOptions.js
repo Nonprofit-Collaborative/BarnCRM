@@ -4,25 +4,17 @@ import operationLabel from '@salesforce/label/c.Core_Import_LoadOperationLabel';
 import insertOption from '@salesforce/label/c.Core_Import_OperationInsert';
 import updateOption from '@salesforce/label/c.Core_Import_OperationUpdate';
 import upsertOption from '@salesforce/label/c.Core_Import_OperationUpsert';
-import insertHelp from '@salesforce/label/c.Core_Import_LoadInsertHelp';
-import updateHelp from '@salesforce/label/c.Core_Import_LoadUpdateHelp';
-import upsertHelp from '@salesforce/label/c.Core_Import_LoadUpsertHelp';
 import updateByFieldOption from '@salesforce/label/c.Core_Import_OperationUpdateByField';
-import updateByFieldHelp from '@salesforce/label/c.Core_Import_LoadUpdateByFieldHelp';
 import noMatchFields from '@salesforce/label/c.Core_Import_LoadNoMatchFields';
 import deleteOption from '@salesforce/label/c.Core_Import_OperationDelete';
-import deleteHelp from '@salesforce/label/c.Core_Import_LoadDeleteHelp';
 import matchFieldLabel from '@salesforce/label/c.Core_Import_LoadMatchFieldLabel';
 import noKeyFields from '@salesforce/label/c.Core_Import_LoadNoKeyFields';
 import notFoundLabel from '@salesforce/label/c.Core_Import_LookupNotFoundLabel';
 import rejectOption from '@salesforce/label/c.Core_Import_LookupRejectOption';
 import leaveEmptyOption from '@salesforce/label/c.Core_Import_LookupLeaveEmptyOption';
-import rejectHelp from '@salesforce/label/c.Core_Import_LookupRejectHelp';
-import leaveEmptyHelp from '@salesforce/label/c.Core_Import_LookupLeaveEmptyHelp';
 import relatedLabel from '@salesforce/label/c.Core_Import_RelatedLabel';
 import relatedNone from '@salesforce/label/c.Core_AccessCompare_None';
-import relatedHelp from '@salesforce/label/c.Core_Import_RelatedHelp';
-import relatedInsertHelp from '@salesforce/label/c.Core_Import_RelatedInsertHelp';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The values Import_Template__c.Load_Operation__c and Lookup_Not_Found__c hold. */
 export const INSERT = 'Insert';
@@ -34,11 +26,41 @@ export const LOOKUP_REJECT = 'Reject the row';
 export const LOOKUP_LEAVE_EMPTY = 'Leave it empty';
 
 const OPERATIONS = [
-  { value: INSERT, label: insertOption, help: insertHelp },
-  { value: UPDATE, label: updateOption, help: updateHelp },
-  { value: UPDATE_BY_FIELD, label: updateByFieldOption, help: updateByFieldHelp },
-  { value: UPSERT, label: upsertOption, help: upsertHelp },
-  { value: DELETE, label: deleteOption, help: deleteHelp }
+  {
+    value: INSERT,
+    label: insertOption,
+    get help() {
+      return helpText('Core', 'Core_Import_LoadInsertHelp');
+    }
+  },
+  {
+    value: UPDATE,
+    label: updateOption,
+    get help() {
+      return helpText('Core', 'Core_Import_LoadUpdateHelp');
+    }
+  },
+  {
+    value: UPDATE_BY_FIELD,
+    label: updateByFieldOption,
+    get help() {
+      return helpText('Core', 'Core_Import_LoadUpdateByFieldHelp');
+    }
+  },
+  {
+    value: UPSERT,
+    label: upsertOption,
+    get help() {
+      return helpText('Core', 'Core_Import_LoadUpsertHelp');
+    }
+  },
+  {
+    value: DELETE,
+    label: deleteOption,
+    get help() {
+      return helpText('Core', 'Core_Import_LoadDeleteHelp');
+    }
+  }
 ];
 
 /** What a row does when a lookup finds no record, for the wizard to ask once for several. */
@@ -51,7 +73,9 @@ export function notFoundChoices() {
 
 /** What the lookup choice risks. */
 export function notFoundHelpOf(choice) {
-  return choice === LOOKUP_LEAVE_EMPTY ? leaveEmptyHelp : rejectHelp;
+  return choice === LOOKUP_LEAVE_EMPTY
+    ? helpText('Core', 'Core_Import_LookupLeaveEmptyHelp')
+    : helpText('Core', 'Core_Import_LookupRejectHelp');
 }
 
 /** The lookup choice's label. */
@@ -71,6 +95,16 @@ export const NOT_FOUND_LABEL = notFoundLabel;
  * See docs/admin-guide/importing.md, section 9.
  */
 export default class ImportLoadOptions extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api operation = INSERT;
   @api matchField = '';
   @api lookupNotFound = LOOKUP_REJECT;
@@ -95,8 +129,12 @@ export default class ImportLoadOptions extends LightningElement {
     matchFieldLabel,
     notFoundLabel,
     relatedLabel,
-    relatedHelp,
-    relatedInsertHelp
+    get relatedHelp() {
+      return helpText('Core', 'Core_Import_RelatedHelp');
+    },
+    get relatedInsertHelp() {
+      return helpText('Core', 'Core_Import_RelatedInsertHelp');
+    }
   };
 
   /**

@@ -8,7 +8,6 @@ import setSchedule from '@salesforce/apex/ErrorDigestController.setSchedule';
 import sendNow from '@salesforce/apex/ErrorDigestController.sendNow';
 
 import TITLE from '@salesforce/label/c.Core_ErrorDigest_PageTitle';
-import INTRO from '@salesforce/label/c.Core_ErrorDigest_PageIntro';
 import LAST_RUN_TITLE from '@salesforce/label/c.Core_ErrorDigest_LastRunTitle';
 import NEVER_RUN from '@salesforce/label/c.Core_ErrorDigest_NeverRun';
 import NOT_SCHEDULED from '@salesforce/label/c.Core_ErrorDigest_NotScheduled';
@@ -22,6 +21,7 @@ import NO_RECIPIENTS from '@salesforce/label/c.Core_ErrorDigest_NoRecipients';
 import READ_ONLY from '@salesforce/label/c.Core_ErrorDigest_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_ErrorDigest_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The error digest panel on the Error Log page of the BarnCRM Settings console (C-23).
@@ -32,9 +32,21 @@ import { bodyMessage } from 'c/findCsv';
  * same page, so they are saved and audited like every other setting.
  */
 export default class ErrorDigestJob extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_ErrorDigest_PageIntro');
+    },
     lastRunTitle: LAST_RUN_TITLE,
     neverRun: NEVER_RUN,
     sendNow: SEND_NOW,

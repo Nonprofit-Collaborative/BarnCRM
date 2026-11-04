@@ -1,7 +1,6 @@
 import { LightningElement, api } from 'lwc';
 
 import heading from '@salesforce/label/c.Core_Import_RowRulesHeading';
-import help from '@salesforce/label/c.Core_Import_RowRulesHelp';
 import skipHeading from '@salesforce/label/c.Core_Import_RowRulesSkipHeading';
 import addRule from '@salesforce/label/c.Core_Import_RowRulesAddRule';
 import removeRule from '@salesforce/label/c.Core_Import_RowRulesRemoveRule';
@@ -12,7 +11,7 @@ import testEquals from '@salesforce/label/c.Core_Filter_OpEquals';
 import testContains from '@salesforce/label/c.Core_Filter_OpContains';
 import testBlank from '@salesforce/label/c.Core_Import_RowRulesTestBlank';
 import uniqueLabel from '@salesforce/label/c.Core_Import_RowRulesUniqueBy';
-import uniqueHelp from '@salesforce/label/c.Core_Import_RowRulesUniqueHelp';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The most rules and key columns, as ImportRowFilter.MAX_RULES says. */
 const MAX_RULES = 5;
@@ -23,6 +22,16 @@ const MAX_RULES = 5;
  * row as the file is staged. See docs/admin-guide/importing.md, section 11.
  */
 export default class ImportRowRules extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   /** Every column of the file. */
   @api columnNames = [];
 
@@ -32,7 +41,9 @@ export default class ImportRowRules extends LightningElement {
 
   labels = {
     heading,
-    help,
+    get help() {
+      return helpText('Core', 'Core_Import_RowRulesHelp');
+    },
     skipHeading,
     addRule,
     removeRule,
@@ -40,7 +51,9 @@ export default class ImportRowRules extends LightningElement {
     testLabel,
     textLabel,
     uniqueLabel,
-    uniqueHelp
+    get uniqueHelp() {
+      return helpText('Core', 'Core_Import_RowRulesUniqueHelp');
+    }
   };
 
   /** The Skip rows rules, as the mapping document holds them. */

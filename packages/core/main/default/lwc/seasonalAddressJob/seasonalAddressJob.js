@@ -7,7 +7,6 @@ import getSwap from '@salesforce/apex/SeasonalAddressController.getSwap';
 import runNow from '@salesforce/apex/SeasonalAddressController.runNow';
 
 import TITLE from '@salesforce/label/c.Core_SeasonalAddress_PageTitle';
-import INTRO from '@salesforce/label/c.Core_SeasonalAddress_PageIntro';
 import HUB_TITLE from '@salesforce/label/c.Core_SeasonalAddress_HubTitle';
 import NEVER_RUN from '@salesforce/label/c.Core_SeasonalAddress_NeverRun';
 import NOT_SCHEDULED from '@salesforce/label/c.Core_SeasonalAddress_NotScheduled';
@@ -19,6 +18,7 @@ import STALE from '@salesforce/label/c.Core_SeasonalAddress_Stale';
 import READ_ONLY from '@salesforce/label/c.Core_SeasonalAddress_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_SeasonalAddress_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The seasonal address swap panel on the Addresses page of the BarnCRM Settings console.
@@ -30,9 +30,21 @@ import { bodyMessage } from 'c/findCsv';
  * is never a Setup task, which is the thing this product does not ask an administrator to do.
  */
 export default class SeasonalAddressJob extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_SeasonalAddress_PageIntro');
+    },
     lastRunTitle: HUB_TITLE,
     neverRun: NEVER_RUN,
     notScheduled: NOT_SCHEDULED,

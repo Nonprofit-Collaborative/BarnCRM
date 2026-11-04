@@ -13,14 +13,14 @@ Amends Section 4.14 "All labels in Custom Labels from day one" for help prose on
 Salesforce allows 5,000 custom labels per org. Labels from an installed managed package do not
 count toward that limit, but BarnCRM ships as source and unlocked or unmanaged installs for a
 long time before a managed listing, and every label of such an install uses the org's own room.
-On 2026-11-04 the packages held 4,501 labels (Core 2,603; Rollup Builder 407; Giving 718;
-Mirror 191; Programs 211; Volunteers 155; Logic Models 109; Funders 107), against a CI cap of
+On 2026-11-04 the packages held 4,501 labels (Core 2,600; Rollup Builder 407; Giving 718;
+Mirror 191; Programs 214; Volunteers 155; Logic Models 109; Funders 107), against a CI cap of
 4,500. An org that already uses a couple of thousand labels could not install the suite.
 
-Classifying every label (analysis kept with the build notes): 2,384 are UI strings (titles,
-buttons, column headers, field-like labels, status words), 1,589 are messages (errors, toasts,
-validation, log lines, run results, notices), 118 are content BarnCRM writes into records,
-emails, letters, receipts and files, 16 are help named by metadata, and 394 are help and
+Classifying every label (analysis kept with the build notes): 2,395 are UI strings (titles,
+buttons, column headers, field-like labels, status words), 1,597 are messages (errors, toasts,
+validation, log lines, run results, notices), 112 are content BarnCRM writes into records,
+emails, letters, receipts and files, 16 are help named by metadata, and 381 are help and
 guidance prose (intros, descriptions, explanations, empty-state explanations, setup notes,
 tooltips). Help prose is the text a translator and a contributor edit most, the longest, and
 the only kind whose wording never needs to be a platform label: nothing in Setup shows it.
@@ -90,24 +90,25 @@ the only kind whose wording never needs to be a platform label: nothing in Setup
 
 - **Shorten long help to one sentence plus a Learn More link (D-168 fallback).** Rejected as the
   main lever: it loses guidance on the screen, and still costs a label per sentence.
-- **Move only prose over 120 or 200 characters.** Rejected: it frees 132 or 20 labels, and leaves
+- **Move only prose over 120 or 200 characters.** Rejected: it frees 140 or 22 labels, and leaves
   two places for the same kind of text.
 - **Ship the catalogs as JavaScript modules** (synchronous import, no gating). Rejected: Apex
   cannot read them, a module per language would be loaded whatever the user's language, and the
   static resource is the plain JSON a WordPress port can read as is.
 - **A zipped resource per package with `en.json` inside.** Rejected: Apex would need to unzip it
   to read help, and a single JSON file per language is as easy to translate.
-- **Move messages too.** Not decided here: messages are 1,589 labels and the bigger lever (see
+- **Move messages too.** Not decided here: messages are 1,597 labels and the bigger lever (see
   Consequences), but the owner asked to keep them as labels. This design reads any key, so it
   would serve them unchanged if that is decided.
 
 ## Consequences
 
-- Moving the 394 help prose labels leaves 4,107 labels for the full suite, 2,345 for Core alone
-  (the Standard Edition) and 2,727 for Core with Rollup Builder. Core alone, or with Rollup
+- Moving the 381 help prose labels leaves 4,120 labels for the full suite, 2,354 for Core alone
+  (the Standard Edition) and 2,734 for Core with Rollup Builder. Core alone, or with Rollup
   Builder, installs beside an org's own 2,000 labels; the full suite still needs the org to use
-  fewer than about 900. The remaining room is in messages (1,589); moving all sentences would
-  leave 2,402 for the full suite.
+  fewer than about 880. The remaining room is in messages (1,597); moving all sentences would
+  leave 2,411 for the full suite.
+- The CI label cap drops from 4,500 to 4,150.
 - A component with help renders once its package's catalog is in (one request per package per
   page, then the browser cache); with the catalog missing it renders without the help.
 - Translators get help prose as JSON beside labels as Translation Workbench strings, both keyed

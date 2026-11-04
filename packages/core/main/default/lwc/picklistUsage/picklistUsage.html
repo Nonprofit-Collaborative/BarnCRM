@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <div class="slds-var-m-top_large" data-id="picklist-usage">
         <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.title}</h3>
         <p class="slds-var-m-bottom_x-small" data-id="intro">{labels.intro}</p>
@@ -71,4 +72,5 @@
             <p class="slds-var-m-top_x-small" data-id="not-checked">{notCheckedMessage}</p>
         </template>
     </div>
+    </template>
 </template>

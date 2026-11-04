@@ -19,10 +19,10 @@ import SHOW_LESS from '@salesforce/label/c.Funders_Answers_ShowLess';
 import WORDS from '@salesforce/label/c.Funders_Answers_Words';
 import LAST_USED from '@salesforce/label/c.Funders_Answers_LastUsed';
 import NEVER_USED from '@salesforce/label/c.Funders_Answers_NeverUsed';
-import EMPTY from '@salesforce/label/c.Funders_Answers_Empty';
 import NO_MATCH from '@salesforce/label/c.Funders_Answers_NoMatch';
 import NEW_ANSWER from '@salesforce/label/c.Funders_Answers_New';
 import ERROR_LOAD from '@salesforce/label/c.Funders_Answers_ErrorLoad';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const PREVIEW_LENGTH = 240;
 
@@ -33,6 +33,8 @@ const PREVIEW_LENGTH = 240;
  * `grantAnswerModel`'s.
  */
 export default class GrantAnswerLibrary extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Funders');
+
   @api recordId;
 
   labels = {
@@ -40,7 +42,9 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
     search: SEARCH,
     topic: TOPIC,
     newAnswer: NEW_ANSWER,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Funders', 'Funders_Answers_Empty');
+    },
     noMatch: NO_MATCH
   };
 
@@ -52,6 +56,11 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
   isLoading = true;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Funders').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

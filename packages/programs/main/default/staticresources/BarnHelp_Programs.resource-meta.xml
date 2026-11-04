@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
+  <cacheControl>Public</cacheControl>
+  <contentType>application/json</contentType>
+  <description>
+    Programs help and guidance text in English, keyed by the former custom label name (ADR-NEXT
+    help-text-json). Read by c/barnHelpText and the BarnHelp Apex class. Checked by
+    scripts/ci/check-help-text.py.
+  </description>
+</StaticResource>

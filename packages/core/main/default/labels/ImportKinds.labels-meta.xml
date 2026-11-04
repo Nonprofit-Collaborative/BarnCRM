@@ -17,28 +17,12 @@
         <value>People and Organizations</value>
     </labels>
     <labels>
-        <fullName>Core_Import_KindPeopleText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the people and organizations card loads</shortDescription>
-        <value>People, a second person on the same row, households, organizations and the links between people and organizations, with their mailing addresses. A list of organizations only works too.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_KindGiftsTitle</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: title of the gifts card</shortDescription>
         <value>Gifts</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_KindGiftsText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the gifts card loads</shortDescription>
-        <value>Gifts, with the people and organizations who gave them.</value>
     </labels>
     <labels>
         <fullName>Core_Import_KindObjectTitle</fullName>
@@ -49,14 +33,6 @@
         <value>One Kind of Record</value>
     </labels>
     <labels>
-        <fullName>Core_Import_KindObjectText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the one kind of record card loads</shortDescription>
-        <value>Create, update or upsert the records of any one object, such as program sessions or one of your own objects.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_KindDeleteTitle</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -65,28 +41,12 @@
         <value>Delete the Records a File Lists</value>
     </labels>
     <labels>
-        <fullName>Core_Import_KindDeleteText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the delete by file card does, with its warning</shortDescription>
-        <value>Sends the records whose IDs a file lists to the Recycle Bin. You see a preview and confirm the count before anything is deleted.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_KindTemplatesTitle</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: title of the your templates card</shortDescription>
         <value>Your Templates</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_KindTemplatesText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the your templates card lists</shortDescription>
-        <value>Every template in your org: the ones BarnCRM and your modules ship, and the ones you made.</value>
     </labels>
     <labels>
         <fullName>Core_Import_UseTemplate</fullName>

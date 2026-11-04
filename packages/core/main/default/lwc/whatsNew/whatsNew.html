@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <template lwc:if={hasReleases}>
         <lightning-card title={labels.title} icon-name="standard:announcement">
             <lightning-button
@@ -42,5 +43,6 @@
                 </template>
             </div>
         </lightning-card>
+    </template>
     </template>
 </template>

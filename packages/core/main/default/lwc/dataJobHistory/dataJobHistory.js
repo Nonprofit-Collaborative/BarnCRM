@@ -14,7 +14,6 @@ import { startPolling } from 'c/jobPoller';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import HEADING from '@salesforce/label/c.Core_DataJobs_Heading';
 import EMPTY from '@salesforce/label/c.Core_DataJobs_Empty';
-import EMPTY_HINT from '@salesforce/label/c.Core_DataJobs_EmptyHint';
 import SHOW from '@salesforce/label/c.Core_DataJobs_Show';
 import SHOW_ALL from '@salesforce/label/c.Core_DataJobs_ShowAll';
 import SHOW_IMPORTS from '@salesforce/label/c.Core_DataJobs_ShowImports';
@@ -35,7 +34,6 @@ import IMPORT_CONFIRM_ORGANIZATIONS from '@salesforce/label/c.Core_Import_UndoCo
 import IMPORT_CONFIRM_UPDATES from '@salesforce/label/c.Core_Import_UndoConfirmUpdates';
 import IMPORT_CONFIRM_BUTTON from '@salesforce/label/c.Core_Import_UndoConfirmButton';
 import IMPORT_UNDO_STARTED from '@salesforce/label/c.Core_Import_UndoStarted';
-import UPDATE_INTRO from '@salesforce/label/c.Core_BulkUpdate_TabIntro';
 import UPDATE_SUMMARY from '@salesforce/label/c.Core_BulkUpdate_Summary';
 import UPDATE_UNDO_CONFIRM from '@salesforce/label/c.Core_BulkUpdate_UndoConfirm';
 import UPDATE_UNDO_BUTTON from '@salesforce/label/c.Core_BulkUpdate_UndoButton';
@@ -54,6 +52,7 @@ import OPEN_FIND from '@salesforce/label/c.Core_BulkUpdate_OpenFind';
 import { NavigationMixin } from 'lightning/navigation';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 import { format } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FIND_TAB = 'Find';
 
@@ -158,13 +157,17 @@ function newestFirst(left, right) {
  * number it acts on (R-BU5, R-BD5).
  */
 export default class DataJobHistory extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
   /** Which kinds this placement lists, comma separated (Import, Update, Delete); blank is all. */
   @api kinds;
 
   labels = {
     show: SHOW,
     empty: EMPTY,
-    emptyHint: EMPTY_HINT,
+    get emptyHint() {
+      return helpText('Core', 'Core_DataJobs_EmptyHint');
+    },
     refresh: REFRESH,
     undo: UNDO,
     undoUntil: UNDO_UNTIL,
@@ -214,6 +217,11 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
   stopTimer;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -328,7 +336,7 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
   }
 
   get introText() {
-    return UPDATE_INTRO;
+    return helpText('Core', 'Core_BulkUpdate_TabIntro');
   }
 
   get showFilter() {

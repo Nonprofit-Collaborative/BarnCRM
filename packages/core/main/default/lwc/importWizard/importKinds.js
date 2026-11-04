@@ -1,15 +1,9 @@
 import kindPeopleTitle from '@salesforce/label/c.Core_Import_KindPeopleTitle';
-import kindPeopleText from '@salesforce/label/c.Core_Import_KindPeopleText';
 import kindGiftsTitle from '@salesforce/label/c.Core_Import_KindGiftsTitle';
-import kindGiftsText from '@salesforce/label/c.Core_Import_KindGiftsText';
 import kindObjectTitle from '@salesforce/label/c.Core_Import_KindObjectTitle';
-import kindObjectText from '@salesforce/label/c.Core_Import_KindObjectText';
 import kindSeveralTitle from '@salesforce/label/c.Core_Import_KindSeveralTitle';
-import kindSeveralText from '@salesforce/label/c.Core_Import_KindSeveralText';
 import kindDeleteTitle from '@salesforce/label/c.Core_Import_KindDeleteTitle';
-import kindDeleteText from '@salesforce/label/c.Core_Import_KindDeleteText';
 import kindTemplatesTitle from '@salesforce/label/c.Core_Import_KindTemplatesTitle';
-import kindTemplatesText from '@salesforce/label/c.Core_Import_KindTemplatesText';
 import createsSummary from '@salesforce/label/c.Core_Import_CreatesSummary';
 import loadsSummary from '@salesforce/label/c.Core_Import_LoadsSummary';
 import loadsRelatedSummary from '@salesforce/label/c.Core_Import_LoadsRelatedSummary';
@@ -24,6 +18,7 @@ import createsAllocations from '@salesforce/label/c.Core_Import_CreatesAllocatio
 import createsSoftCredits from '@salesforce/label/c.Core_Import_CreatesSoftCredits';
 import createsTributes from '@salesforce/label/c.Core_Import_CreatesTributes';
 import { DELETE } from 'c/importLoadOptions';
+import { helpText } from 'c/barnHelpText';
 
 /**
  * The choices of the import wizard's first step, "What Are You Importing?" (D-136), and what a
@@ -108,19 +103,59 @@ export function firstTemplateOfKind(templates, kind) {
  */
 export function kindCards(templates, canDelete) {
   const card = (key, title, text, iconName) => ({ key, title, text, iconName });
-  const cards = [card(KIND_PEOPLE, kindPeopleTitle, kindPeopleText, 'standard:household')];
+  const cards = [
+    card(
+      KIND_PEOPLE,
+      kindPeopleTitle,
+      helpText('Core', 'Core_Import_KindPeopleText'),
+      'standard:household'
+    )
+  ];
   if (templates.some(isGiftTemplate)) {
-    cards.push(card(KIND_GIFTS, kindGiftsTitle, kindGiftsText, 'standard:currency'));
+    cards.push(
+      card(
+        KIND_GIFTS,
+        kindGiftsTitle,
+        helpText('Core', 'Core_Import_KindGiftsText'),
+        'standard:currency'
+      )
+    );
   }
-  cards.push(card(KIND_OBJECT, kindObjectTitle, kindObjectText, 'standard:record'));
-  cards.push(card(KIND_SEVERAL, kindSeveralTitle, kindSeveralText, 'standard:related_list'));
+  cards.push(
+    card(
+      KIND_OBJECT,
+      kindObjectTitle,
+      helpText('Core', 'Core_Import_KindObjectText'),
+      'standard:record'
+    )
+  );
+  cards.push(
+    card(
+      KIND_SEVERAL,
+      kindSeveralTitle,
+      helpText('Core', 'Core_Import_KindSeveralText'),
+      'standard:related_list'
+    )
+  );
   if (canDelete) {
     cards.push({
-      ...card(KIND_DELETE, kindDeleteTitle, kindDeleteText, 'utility:delete'),
+      ...card(
+        KIND_DELETE,
+        kindDeleteTitle,
+        helpText('Core', 'Core_Import_KindDeleteText'),
+        'utility:delete'
+      ),
       warning: true
     });
   }
-  cards.push(card(KIND_TEMPLATES, kindTemplatesTitle, kindTemplatesText, 'standard:template'));
+  cards.push(
+    card(
+      KIND_TEMPLATES,
+      kindTemplatesTitle,
+      helpText('Core', 'Core_Import_KindTemplatesText'),
+      'standard:template'
+    )
+  );
   return cards;
 }
 

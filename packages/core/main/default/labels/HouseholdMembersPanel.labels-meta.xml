@@ -33,28 +33,12 @@
         <value>Deceased</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdMembersPanel_Empty</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The household has no members yet</shortDescription>
-        <value>Add the people who belong to this household.</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdMembersPanel_EmptyHeading</fullName>
         <categories>Households</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Heading when the household has no members yet</shortDescription>
         <value>No Members Yet</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMembersPanel_MoveHelp</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>How to move a person to another household</shortDescription>
-        <value>Choose the household to move this person to.</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMembersPanel_MoveMember</fullName>

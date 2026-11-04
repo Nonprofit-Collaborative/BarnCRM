@@ -3,16 +3,13 @@ import getSettings from '@salesforce/apex/ProgramsSettingsController.getSettings
 import savePrivacy from '@salesforce/apex/ProgramsSettingsController.savePrivacy';
 
 import TITLE from '@salesforce/label/c.Programs_Settings_Title';
-import INTRO from '@salesforce/label/c.Programs_Settings_Intro';
 import PICKLISTS_TITLE from '@salesforce/label/c.Programs_Settings_PicklistsTitle';
-import PICKLISTS_INTRO from '@salesforce/label/c.Programs_Settings_PicklistsIntro';
 import DEFAULT_VALUE from '@salesforce/label/c.Programs_Settings_Default';
 import CHANGE_IN_SETUP from '@salesforce/label/c.Programs_Settings_ChangeInSetup';
 import CHANGE_FOR from '@salesforce/label/c.Programs_Settings_ChangeFor';
 import NO_ACCESS from '@salesforce/label/c.Programs_Settings_NoAccess';
 import LOAD_FAILED from '@salesforce/label/c.Programs_Settings_LoadFailed';
 import PRIVACY_TITLE from '@salesforce/label/c.Programs_Settings_PrivacyTitle';
-import PRIVACY_INTRO from '@salesforce/label/c.Programs_Settings_PrivacyIntro';
 import PRIVACY_LEGEND from '@salesforce/label/c.Programs_Settings_PrivacyLegend';
 import PRIVACY_SHARED from '@salesforce/label/c.Programs_Settings_PrivacyShared';
 import PRIVACY_PRIVATE from '@salesforce/label/c.Programs_Settings_PrivacyPrivate';
@@ -23,6 +20,7 @@ import SAVE_FAILED from '@salesforce/label/c.Programs_Settings_SaveFailed';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import { PRIVATE, picklistRows, privacyOptions, storedPrivacy } from './settingsRows';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Programs module's settings page, reached from the Programs section of BarnCRM Settings:
@@ -30,16 +28,24 @@ import { PRIVATE, picklistRows, privacyOptions, storedPrivacy } from './settings
  * the Participant Privacy preset (P-08).
  */
 export default class ProgramsSettings extends LightningElement {
+  helpReady = isHelpLoaded('Programs');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Programs', 'Programs_Settings_Intro');
+    },
     picklistsTitle: PICKLISTS_TITLE,
-    picklistsIntro: PICKLISTS_INTRO,
+    get picklistsIntro() {
+      return helpText('Programs', 'Programs_Settings_PicklistsIntro');
+    },
     changeInSetup: CHANGE_IN_SETUP,
     noAccess: NO_ACCESS,
     loading: LOADING,
     privacyTitle: PRIVACY_TITLE,
-    privacyIntro: PRIVACY_INTRO,
+    get privacyIntro() {
+      return helpText('Programs', 'Programs_Settings_PrivacyIntro');
+    },
     privacyLegend: PRIVACY_LEGEND,
     privacyDefault: PRIVACY_DEFAULT,
     save: SAVE
@@ -55,6 +61,11 @@ export default class ProgramsSettings extends LightningElement {
   savedMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Programs').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

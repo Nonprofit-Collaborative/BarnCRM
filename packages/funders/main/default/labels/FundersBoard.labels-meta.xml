@@ -9,14 +9,6 @@
         <value>Board Dashboard</value>
     </labels>
     <labels>
-        <fullName>Funders_Board_Help</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Board Dashboard explanation under the title</shortDescription>
-        <value>This fiscal year: grants awarded and, with Giving, gifts designated to funds. Each person sees totals of what they can read.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Board_Mix</fullName>
         <categories>Funders</categories>
         <language>en_US</language>
@@ -95,14 +87,6 @@
         <protected>true</protected>
         <shortDescription>Board Dashboard restricted grants heading</shortDescription>
         <value>Restricted Grants: Balance</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Board_Empty</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Board Dashboard section with nothing to show</shortDescription>
-        <value>Nothing to show for this fiscal year yet.</value>
     </labels>
     <labels>
         <fullName>Funders_Board_ErrorLoad</fullName>

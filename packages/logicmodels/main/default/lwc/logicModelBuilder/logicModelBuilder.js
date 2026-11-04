@@ -14,6 +14,7 @@ import {
   stageByKey
 } from 'c/logicModelRules';
 import { LABELS, format, messageFrom, stageLabel } from 'c/logicModelText';
+import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ORGANIZATION = '';
 
@@ -24,6 +25,8 @@ const ORGANIZATION = '';
  * Every save returns the whole model, which the panel redraws.
  */
 export default class LogicModelBuilder extends LightningElement {
+  helpReady = isHelpLoaded('LogicModels');
+
   @api recordId;
 
   labels = LABELS;
@@ -41,6 +44,11 @@ export default class LogicModelBuilder extends LightningElement {
   focusTarget;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('LogicModels').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

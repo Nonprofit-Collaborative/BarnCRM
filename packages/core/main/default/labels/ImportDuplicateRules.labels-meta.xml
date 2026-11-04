@@ -65,14 +65,6 @@
         <value>Your duplicate rules matched this row to a record an earlier row already loads. Combine the rows, or untick Also match with my duplicate rules, and import the row again.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_DuplicateRulesObjectHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what matching one object with duplicate rules does</shortDescription>
-        <value>Your org&apos;s duplicate rules can match an existing record, which is then updated. Check the dry run.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_ErrorDuplicateRulesUnavailable</fullName>
         <categories>Import</categories>
         <language>en_US</language>

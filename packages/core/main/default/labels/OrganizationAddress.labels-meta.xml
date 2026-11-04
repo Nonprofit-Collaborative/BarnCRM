@@ -33,14 +33,6 @@
         <value>Organization Address</value>
     </labels>
     <labels>
-        <fullName>Core_OrganizationAddress_Hint</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Organization address: what may be left blank</shortDescription>
-        <value>Leave the whole address blank, or fill in Street, City, State and Zip Code. Street 2 and Country are optional.</value>
-    </labels>
-    <labels>
         <fullName>Core_OrganizationAddress_CompanySuggestion</fullName>
         <categories>Core</categories>
         <language>en_US</language>

@@ -26,7 +26,6 @@ import balanced from '@salesforce/label/c.Giving_GiftBatch_Balanced';
 import shortBy from '@salesforce/label/c.Giving_GiftBatch_ErrorShortOfControlTotal';
 import overBy from '@salesforce/label/c.Giving_GiftBatch_ErrorOverControlTotal';
 import noControlTotal from '@salesforce/label/c.Giving_GiftBatch_ErrorNoControlTotal';
-import postedNote from '@salesforce/label/c.Giving_GiftBatch_PostedNote';
 import columnLine from '@salesforce/label/c.Giving_GiftBatch_ColumnLine';
 import columnDonor from '@salesforce/label/c.Giving_GiftBatch_ColumnDonor';
 import columnAmount from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
@@ -37,14 +36,12 @@ import columnFund from '@salesforce/label/c.Giving_GiftBatch_ColumnFund';
 import columnAppeal from '@salesforce/label/c.Giving_QuickGiftEntry_AppealLabel';
 import columnGift from '@salesforce/label/c.Giving_Section_Gift';
 import fromBatch from '@salesforce/label/c.Giving_GiftBatch_FromBatch';
-import fromBatchHelp from '@salesforce/label/c.Giving_GiftBatch_FromBatchHelp';
 import person from '@salesforce/label/c.Core_Section_Person';
 import organization from '@salesforce/label/c.Core_Settings_NavGroup_Organization';
 import donorPlaceholder from '@salesforce/label/c.Core_HouseholdPanel_AddExistingPlaceholder';
 import removeLine from '@salesforce/label/c.Giving_GiftBatch_RemoveLine';
 import cellLabel from '@salesforce/label/c.Giving_GiftBatch_CellLabel';
 import donorKind from '@salesforce/label/c.Giving_GiftBatch_DonorKind';
-import useComputer from '@salesforce/label/c.Giving_GiftBatch_UseComputer';
 import addLine from '@salesforce/label/c.Giving_GiftBatch_AddLine';
 import saveButton from '@salesforce/label/c.Core_Kit_Save';
 import postButton from '@salesforce/label/c.Giving_GiftBatch_Post';
@@ -57,6 +54,7 @@ import errorLoadBatch from '@salesforce/label/c.Giving_GiftBatch_ErrorLoadBatch'
 import noAccess from '@salesforce/label/c.Giving_GiftBatch_ErrorNoAccess';
 import errorSaveRows from '@salesforce/label/c.Giving_GiftBatch_ErrorSaveRows';
 import errorPostFailed from '@salesforce/label/c.Giving_GiftBatch_ErrorPostFailed';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FIELDS = [CONTROL_TOTAL, STATUS];
 const PERSON = 'person';
@@ -73,13 +71,25 @@ let nextKey = 0;
  * control total the page shows.
  */
 export default class GiftBatchEntry extends LightningElement {
+  helpReady = isHelpLoaded('Giving');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
 
   labels = {
     title,
     controlTotalLabel,
     enteredLabel,
-    postedNote,
+    get postedNote() {
+      return helpText('Giving', 'Giving_GiftBatch_PostedNote');
+    },
     noAccess,
     columnLine,
     columnDonor,
@@ -91,7 +101,9 @@ export default class GiftBatchEntry extends LightningElement {
     columnAppeal,
     columnPays,
     columnGift,
-    fromBatchHelp,
+    get fromBatchHelp() {
+      return helpText('Giving', 'Giving_GiftBatch_FromBatchHelp');
+    },
     paysErrorLoad,
     donorPlaceholder,
     addLine,
@@ -100,7 +112,9 @@ export default class GiftBatchEntry extends LightningElement {
     working,
     noLines,
     unsaved,
-    useComputer
+    get useComputer() {
+      return helpText('Giving', 'Giving_GiftBatch_UseComputer');
+    }
   };
 
   fundObject = FUND_OBJECT.objectApiName;

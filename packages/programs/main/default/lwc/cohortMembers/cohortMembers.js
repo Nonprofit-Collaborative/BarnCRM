@@ -5,7 +5,6 @@ import removeMember from '@salesforce/apex/CohortController.removeMember';
 import getPersonName from '@salesforce/apex/CohortController.getPersonName';
 
 import TITLE from '@salesforce/label/c.Programs_Cohort_Title';
-import MEMBERS_EMPTY from '@salesforce/label/c.Programs_Cohort_MembersEmpty';
 import MEMBER_COUNT from '@salesforce/label/c.Programs_Cohort_MemberCount';
 import REMOVE from '@salesforce/label/c.Core_Find_Remove';
 import REMOVE_FOR from '@salesforce/label/c.Programs_Cohort_RemoveFor';
@@ -43,6 +42,7 @@ import {
   withoutPerson
 } from './members';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Cohort Members panel on a cohort (P-11, R-CO3): the cohort's members, and many people
@@ -50,11 +50,15 @@ import { bodyMessage } from 'c/findCsv';
  * one. Each person is added or refused on their own; the refused are listed with the reason.
  */
 export default class CohortMembers extends LightningElement {
+  helpReady = isHelpLoaded('Programs');
+
   @api recordId;
 
   labels = {
     title: TITLE,
-    membersEmpty: MEMBERS_EMPTY,
+    get membersEmpty() {
+      return helpText('Programs', 'Programs_Cohort_MembersEmpty');
+    },
     remove: REMOVE,
     addPeople: ADD_PEOPLE,
     candidates: CANDIDATES,
@@ -80,6 +84,11 @@ export default class CohortMembers extends LightningElement {
   resultMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Programs').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

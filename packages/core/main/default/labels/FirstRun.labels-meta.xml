@@ -9,14 +9,6 @@
         <value>Set Up BarnCRM</value>
     </labels>
     <labels>
-        <fullName>Core_FirstRun_Intro</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>First-run setup: the line under the heading</shortDescription>
-        <value>Two questions before BarnCRM is ready. You are asked them once.</value>
-    </labels>
-    <labels>
         <fullName>Core_FirstRun_EditionQuestion</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -47,38 +39,6 @@
         <protected>false</protected>
         <shortDescription>First-run setup: pick the features one by one</shortDescription>
         <value>Let me choose features</value>
-    </labels>
-    <labels>
-        <fullName>Core_FirstRun_ChooseHelp</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>First-run setup: help above the feature checkboxes</shortDescription>
-        <value>Untick what you do not want yet. You can turn it on later in BarnCRM Settings, General. Turning a feature on cannot be undone.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FirstRun_ModulesNote</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>First-run setup: no module is installed here</shortDescription>
-        <value>No module is installed now. Install modules later from BarnCRM Settings, Modules.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FirstRun_StandardLine</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>First-run setup: the line on the Standard Edition card</shortDescription>
-        <value>The full core suite of BarnCRM tools.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FirstRun_NonprofitLine</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>First-run setup: the line on the Nonprofit Edition card</shortDescription>
-        <value>The core suite plus the nonprofit tools, starting with Giving.</value>
     </labels>
     <labels>
         <fullName>Core_FirstRun_AdminNeeded</fullName>

@@ -4,7 +4,6 @@ import generateNow from '@salesforce/apex/CommitmentController.generateNow';
 import changeStatus from '@salesforce/apex/CommitmentController.changeStatus';
 
 import TITLE from '@salesforce/label/c.Giving_SchedulePreview_Title';
-import EMPTY from '@salesforce/label/c.Giving_SchedulePreview_Empty';
 import GENERATE_NOW from '@salesforce/label/c.Giving_SchedulePreview_GenerateNow';
 import GENERATED from '@salesforce/label/c.Giving_SchedulePreview_Generated';
 import GENERATE_ERROR from '@salesforce/label/c.Giving_SchedulePreview_GenerateError';
@@ -21,6 +20,7 @@ import ACTION_CANCEL from '@salesforce/label/c.Giving_Commitment_ActionCancel';
 import ACTION_COMPLETE from '@salesforce/label/c.Giving_Commitment_ActionComplete';
 import STATUS_CHANGED from '@salesforce/label/c.Giving_Commitment_StatusChanged';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const BADGE_BY_STATUS = {
   Paid: 'slds-theme_success',
@@ -35,6 +35,8 @@ const BADGE_BY_STATUS = {
  * schedule yet, it offers to generate one.
  */
 export default class CommitmentSchedulePreview extends LightningElement {
+  helpReady = isHelpLoaded('Giving');
+
   @api recordId;
 
   installments = [];
@@ -48,7 +50,9 @@ export default class CommitmentSchedulePreview extends LightningElement {
 
   labels = {
     title: TITLE,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Giving', 'Giving_SchedulePreview_Empty');
+    },
     generateNow: GENERATE_NOW,
     sequence: COLUMN_SEQUENCE,
     dueDate: COLUMN_DUE_DATE,
@@ -63,6 +67,11 @@ export default class CommitmentSchedulePreview extends LightningElement {
   };
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

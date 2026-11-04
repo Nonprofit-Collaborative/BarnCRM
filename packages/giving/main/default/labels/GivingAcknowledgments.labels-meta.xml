@@ -89,14 +89,6 @@
     <value>Acknowledgments</value>
   </labels>
   <labels>
-    <fullName>Giving_Acknowledgments_Intro</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: what the page is for</shortDescription>
-    <value>Your thank you rules and what is waiting to go out. Emails send from here or overnight. Letters come out as a spreadsheet you merge with your own letter and print.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Acknowledgments_Off</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
@@ -287,14 +279,6 @@
     <protected>false</protected>
     <shortDescription>Acknowledgments page: field, the email template a rule sends</shortDescription>
     <value>Email template</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_TemplateFieldHelp</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: help for the email template picker</shortDescription>
-    <value>The email this rule sends. The list shows every active email template in your org. To add a template or change its wording, use Setup, under Email Templates.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_TemplatePlaceholder</fullName>

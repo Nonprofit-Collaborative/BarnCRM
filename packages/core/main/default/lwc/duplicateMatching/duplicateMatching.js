@@ -4,12 +4,12 @@ import canReviewDuplicates from '@salesforce/customPermission/Review_Duplicate_S
 import canManageMetadata from '@salesforce/customPermission/Manage_BarnCRM_Metadata';
 
 import TITLE from '@salesforce/label/c.Core_DuplicateMatching_Title';
-import INTRO from '@salesforce/label/c.Core_DuplicateMatching_Intro';
 import REVIEW from '@salesforce/label/c.Core_DuplicateMatching_Review';
 import REVIEW_COUNT from '@salesforce/label/c.Core_DuplicateMatching_ReviewCount';
 import MATCHING_LOGIC from '@salesforce/label/c.Core_DuplicateMatching_MatchingLogic';
 import NO_ACCESS from '@salesforce/label/c.Core_DuplicateMatching_NoAccess';
 import AUTO_MERGE from '@salesforce/label/c.Core_AutoMerge_Tab';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const REVIEW_AREA = 'review';
 const MATCHING_LOGIC_AREA = 'matchingLogic';
@@ -23,9 +23,13 @@ const AUTO_MERGE_AREA = 'autoMerge';
  * latter may change a source. Each embedded component keeps its own server check.
  */
 export default class DuplicateMatching extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_DuplicateMatching_Intro');
+    },
     review: REVIEW,
     matchingLogic: MATCHING_LOGIC,
     autoMerge: AUTO_MERGE,
@@ -48,6 +52,11 @@ export default class DuplicateMatching extends LightningElement {
   }
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     const first = this.areas[0];
     if (first) {
       this.activeArea = first;

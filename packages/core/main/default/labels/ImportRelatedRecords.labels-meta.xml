@@ -72,20 +72,4 @@
         <shortDescription>Import wizard: the related records picker</shortDescription>
         <value>Related records</value>
     </labels>
-    <labels>
-        <fullName>Core_Import_RelatedHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what related records do</shortDescription>
-        <value>Each row can also create a parent-linked record, such as a program session. Map its columns next.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_RelatedInsertHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: why Insert offers no related records</shortDescription>
-        <value>To load related records, choose update or create matched by external ID, or one of the updates, so rows can name their parent by a key.</value>
-    </labels>
 </CustomLabels>

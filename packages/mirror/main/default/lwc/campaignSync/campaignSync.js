@@ -2,7 +2,6 @@ import { LightningElement } from 'lwc';
 import getStatus from '@salesforce/apex/CampaignSyncController.getStatus';
 import syncAll from '@salesforce/apex/CampaignSyncController.syncAll';
 import title from '@salesforce/label/c.Mirror_CampaignSync_Title';
-import intro from '@salesforce/label/c.Mirror_CampaignSync_Intro';
 import unavailable from '@salesforce/label/c.Mirror_CampaignSync_Unavailable';
 import switchedOff from '@salesforce/label/c.Mirror_CampaignSync_SwitchedOff';
 import switchedOn from '@salesforce/label/c.Mirror_CampaignSync_SwitchedOn';
@@ -12,18 +11,15 @@ import noManagePermission from '@salesforce/label/c.Mirror_CampaignSync_NoManage
 import syncAllLabel from '@salesforce/label/c.Mirror_CampaignSync_SyncAll';
 import running from '@salesforce/label/c.Mirror_CampaignSync_Running';
 import errorFailed from '@salesforce/label/c.Mirror_CampaignSync_ErrorFailed';
-import noteWhat from '@salesforce/label/c.Mirror_SetupNote_CampaignSync_What';
-import noteWhy from '@salesforce/label/c.Mirror_SetupNote_CampaignSync_Why';
-import noteSteps from '@salesforce/label/c.Mirror_SetupNote_CampaignSync_Steps';
-import marketingWhat from '@salesforce/label/c.Mirror_SetupNote_MarketingUser_What';
-import marketingWhy from '@salesforce/label/c.Mirror_SetupNote_MarketingUser_Why';
-import marketingSteps from '@salesforce/label/c.Mirror_SetupNote_MarketingUser_Steps';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Campaign sync page (feature X-02). The controller decides what the org and the person
  * allow and refuses in words; the page shows the state, the counts, and the one button.
  */
 export default class CampaignSync extends LightningElement {
+  helpReady = isHelpLoaded('Mirror');
+
   /**
    * What this page needs from Setup, shown by Core's settingsSetupNotes with its Open in Setup
    * link (a c/setupLinks key). Campaign Sync itself is given on the Access page.
@@ -31,23 +27,37 @@ export default class CampaignSync extends LightningElement {
   setupNotes = [
     {
       key: 'campaignAccess',
-      what: noteWhat,
-      why: noteWhy,
-      steps: noteSteps,
+      get what() {
+        return helpText('Mirror', 'Mirror_SetupNote_CampaignSync_What');
+      },
+      get why() {
+        return helpText('Mirror', 'Mirror_SetupNote_CampaignSync_Why');
+      },
+      get steps() {
+        return helpText('Mirror', 'Mirror_SetupNote_CampaignSync_Steps');
+      },
       link: 'permissionSets'
     },
     {
       key: 'marketingUser',
-      what: marketingWhat,
-      why: marketingWhy,
-      steps: marketingSteps,
+      get what() {
+        return helpText('Mirror', 'Mirror_SetupNote_MarketingUser_What');
+      },
+      get why() {
+        return helpText('Mirror', 'Mirror_SetupNote_MarketingUser_Why');
+      },
+      get steps() {
+        return helpText('Mirror', 'Mirror_SetupNote_MarketingUser_Steps');
+      },
       link: 'users'
     }
   ];
 
   labels = {
     title,
-    intro,
+    get intro() {
+      return helpText('Mirror', 'Mirror_CampaignSync_Intro');
+    },
     unavailable,
     switchedOff,
     switchedOn,
@@ -62,6 +72,11 @@ export default class CampaignSync extends LightningElement {
   error;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Mirror').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

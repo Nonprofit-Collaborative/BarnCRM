@@ -565,7 +565,7 @@ private class AccessServiceTest {
             AccessService.AddOn moduleAddOn = addOns[addOns.size() - 1];
             Assert.areEqual(MODULE_SET, moduleAddOn.developerName, 'It should come after Core.');
             Assert.areEqual(
-                Label.Core_Access_AddOnBulkUpdate,
+                BarnHelp.text('Core', 'Core_Access_AddOnBulkUpdate'),
                 moduleAddOn.description,
                 'Its sentence should be the label its row names.'
             );
@@ -619,7 +619,7 @@ private class AccessServiceTest {
                 'A row from another namespace should never be listed.'
             );
             Assert.areEqual(
-                Label.Core_Access_AddOnBulkUpdate,
+                BarnHelp.text('Core', 'Core_Access_AddOnBulkUpdate'),
                 byName.get(BULK_UPDATE).description,
                 'A row repeating a Core add-on should not change it.'
             );

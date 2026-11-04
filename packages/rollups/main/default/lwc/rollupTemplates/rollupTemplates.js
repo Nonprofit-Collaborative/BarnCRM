@@ -2,11 +2,11 @@ import { LightningElement, api } from 'lwc';
 import getTemplates from '@salesforce/apex/RollupTemplates.getTemplates';
 import addRollups from '@salesforce/apex/RollupTemplates.addRollups';
 import BUTTON from '@salesforce/label/c.Core_RollupEase_TplButton';
-import INTRO from '@salesforce/label/c.Core_RollupEase_TplIntro';
 import ADD from '@salesforce/label/c.Core_RollupEase_TplAdd';
 import OPEN from '@salesforce/label/c.Core_RollupEase_TplOpen';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * Starter Templates in the Rollup Builder (ease of use U2, ADR-0136). Opt-in only: nothing is
@@ -17,10 +17,28 @@ import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
  * Fires `open` with `detail.draft` (and the field to create), and `added` after an add.
  */
 export default class RollupTemplates extends LightningElement {
+  helpReady = isHelpLoaded('Rollups');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Rollups').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   /** Only someone with Manage BarnCRM Settings sees the button. */
   @api canManage = false;
 
-  labels = { button: BUTTON, intro: INTRO, add: ADD, open: OPEN, close: CLOSE };
+  labels = {
+    button: BUTTON,
+    get intro() {
+      return helpText('Rollups', 'Core_RollupEase_TplIntro');
+    },
+    add: ADD,
+    open: OPEN,
+    close: CLOSE
+  };
 
   showing = false;
   templates;

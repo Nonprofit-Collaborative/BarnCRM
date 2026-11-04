@@ -25,14 +25,6 @@
         <value>Match source {0} was skipped because this run had used most of its database queries or rows, so some duplicates may be missed. Run the duplicate scan or import again with fewer records at a time.</value>
     </labels>
     <labels>
-        <fullName>Core_Duplicates_DismissBody</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: dismiss dialog explanation</shortDescription>
-        <value>The records stay as they are and this suggestion does not come back. Say why, for the next person who wonders.</value>
-    </labels>
-    <labels>
         <fullName>Core_Duplicates_DismissButton</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
@@ -55,14 +47,6 @@
         <protected>false</protected>
         <shortDescription>Duplicates panel: dismissed suggestion count label</shortDescription>
         <value>Dismissed suggestions</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_Empty</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: no suggestions</shortDescription>
-        <value>No possible duplicates are waiting. Scan again after a large import.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_ErrorNoActiveRule</fullName>
@@ -137,14 +121,6 @@
         <value>Last scan finished</value>
     </labels>
     <labels>
-        <fullName>Core_Duplicates_MergeBody</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: merge dialog explanation</shortDescription>
-        <value>Members, related records, files and activities of the other household move to the one you keep, totals are recalculated, and the other household is deleted. This cannot be undone.</value>
-    </labels>
-    <labels>
         <fullName>Core_Duplicates_MergeButton</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
@@ -167,14 +143,6 @@
         <protected>false</protected>
         <shortDescription>Duplicates panel: value dropped in a merge</shortDescription>
         <value>dropping</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_MergeFullScreen</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: link to the full merge screen</shortDescription>
-        <value>To choose field by field, use Merge or split on the household record instead.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_MergeHeading</fullName>

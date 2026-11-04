@@ -9,14 +9,6 @@
         <value>Choose Your Default Fund and Appeal</value>
     </labels>
     <labels>
-        <fullName>Giving_SetupAssistant_FundAppealStepDescription</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what step three is for</shortDescription>
-        <value>Pick where a gift goes when nobody says otherwise.</value>
-    </labels>
-    <labels>
         <fullName>Giving_SetupAssistant_FundLabel</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
@@ -103,21 +95,5 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: button that opens the Giving package's gift entry screen</shortDescription>
         <value>Enter Your First Gift</value>
-    </labels>
-    <labels>
-        <fullName>Giving_SetupAssistant_IdentityDescription</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what step five is for</shortDescription>
-        <value>Record the name, tax identification number, address, logo, and signature that appear on your receipts and letters.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_SetupAssistant_VerifyDescription</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what step eight is for</shortDescription>
-        <value>Follow the short walkthrough that adds a person, a household, and a first gift, so you know the setup is right.</value>
     </labels>
 </CustomLabels>

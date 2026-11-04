@@ -8,35 +8,48 @@ import addCredit from '@salesforce/apex/SoftCreditController.addCredit';
 import removeCredit from '@salesforce/apex/SoftCreditController.removeCredit';
 
 import TITLE from '@salesforce/label/c.Giving_SoftCredits_Title';
-import EMPTY from '@salesforce/label/c.Giving_SoftCredits_Empty';
 import ADD from '@salesforce/label/c.Giving_SoftCredits_Add';
 import REMOVE from '@salesforce/label/c.Core_Find_Remove';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import AUTOMATIC_BADGE from '@salesforce/label/c.Giving_SoftCredits_AutomaticBadge';
-import AUTOMATIC_HELP from '@salesforce/label/c.Giving_SoftCredits_AutomaticHelp';
 import PERSON_LABEL from '@salesforce/label/c.Giving_SoftCredits_PersonLabel';
 import ROLE_LABEL from '@salesforce/label/c.Giving_SoftCredits_RoleLabel';
 import CUSTOM_ROLE_LABEL from '@salesforce/label/c.Giving_SoftCredits_CustomRoleLabel';
 import AMOUNT_LABEL from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
 import ACTION_FAILED from '@salesforce/label/c.Giving_SoftCredits_ActionFailed';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ROLE_OTHER = 'Other';
 const DEFAULT_ROLE = 'Solicitor';
 
 export default class GiftSoftCredits extends LightningElement {
+  helpReady = isHelpLoaded('Giving');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
 
   labels = {
     title: TITLE,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Giving', 'Giving_SoftCredits_Empty');
+    },
     add: ADD,
     remove: REMOVE,
     save: SAVE,
     cancel: CANCEL,
     automaticBadge: AUTOMATIC_BADGE,
-    automaticHelp: AUTOMATIC_HELP,
+    get automaticHelp() {
+      return helpText('Giving', 'Giving_SoftCredits_AutomaticHelp');
+    },
     personLabel: PERSON_LABEL,
     roleLabel: ROLE_LABEL,
     customRoleLabel: CUSTOM_ROLE_LABEL,

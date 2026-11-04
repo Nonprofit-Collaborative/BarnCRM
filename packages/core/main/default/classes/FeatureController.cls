@@ -64,7 +64,7 @@ public with sharing class FeatureController {
             row.description = descriptionOf(item.key);
             row.isOn = turnedOn.contains(item.key.toLowerCase());
             row.confirmNote = item.key == FeatureSwitchService.HOUSEHOLD_UPKEEP
-                ? System.Label.Core_Feature_HouseholdUpkeep_ConfirmNote
+                ? BarnHelp.text('Core', 'Core_Feature_HouseholdUpkeep_ConfirmNote')
                 : null;
             rows.add(row);
         }
@@ -114,28 +114,28 @@ public with sharing class FeatureController {
     private static String descriptionOf(String key) {
         switch on key {
             when 'DataManager' {
-                return System.Label.Core_Feature_DataManager_Description;
+                return BarnHelp.text('Core', 'Core_Feature_DataManager_Description');
             }
             when 'DuplicateReview' {
-                return System.Label.Core_Feature_DuplicateReview_Description;
+                return BarnHelp.text('Core', 'Core_Feature_DuplicateReview_Description');
             }
             when 'OrgOptimizer' {
-                return System.Label.Core_Feature_OrgOptimizer_Description;
+                return BarnHelp.text('Core', 'Core_Feature_OrgOptimizer_Description');
             }
             when 'HouseholdUpkeep' {
-                return System.Label.Core_Feature_HouseholdUpkeep_Description;
+                return BarnHelp.text('Core', 'Core_Feature_HouseholdUpkeep_Description');
             }
             when 'Addresses' {
-                return System.Label.Core_Feature_Addresses_Description;
+                return BarnHelp.text('Core', 'Core_Feature_Addresses_Description');
             }
             when 'Relationships' {
-                return System.Label.Core_Feature_Relationships_Description;
+                return BarnHelp.text('Core', 'Core_Feature_Relationships_Description');
             }
             when 'Affiliations' {
-                return System.Label.Core_Feature_Affiliations_Description;
+                return BarnHelp.text('Core', 'Core_Feature_Affiliations_Description');
             }
             when 'PreferredEmail' {
-                return System.Label.Core_Feature_PreferredEmail_Description;
+                return BarnHelp.text('Core', 'Core_Feature_PreferredEmail_Description');
             }
             when else {
                 return null;

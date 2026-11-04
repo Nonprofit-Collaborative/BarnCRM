@@ -17,14 +17,6 @@
         <value>New Affiliation</value>
     </labels>
     <labels>
-        <fullName>Core_Affiliation_Empty</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Affiliation card: shown when there are no affiliations yet</shortDescription>
-        <value>Connect people with the organizations they work or volunteer with.</value>
-    </labels>
-    <labels>
         <fullName>Core_Affiliation_EmptyHeading</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>

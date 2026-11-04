@@ -22,7 +22,6 @@ import {
   filterFields
 } from 'c/fieldAccessPlan';
 
-import INTRO from '@salesforce/label/c.Core_FieldAccess_Intro';
 import SETS from '@salesforce/label/c.Core_AccessCompare_Sets';
 import SETS_PLACEHOLDER from '@salesforce/label/c.Core_FieldAccess_SetsPlaceholder';
 import CHOOSE_SETS from '@salesforce/label/c.Core_FieldAccess_ChooseSets';
@@ -79,6 +78,7 @@ import UNDONE from '@salesforce/label/c.Core_FieldAccess_Undone';
 import NO_RECENT from '@salesforce/label/c.Core_FieldAccess_NoRecent';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const SEARCH_DELAY = 300;
 /** The change is recorded by a queued job just after an apply: list it again after this. */
@@ -106,8 +106,12 @@ const text = (fieldName, label, extra = {}) => ({ label, fieldName, ...extra });
  * its words are c/fieldAccessPlan (framework free); every check and write is FieldAccessController.
  */
 export default class FieldAccessManager extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_FieldAccess_Intro');
+    },
     sets: SETS,
     setsPlaceholder: SETS_PLACEHOLDER,
     noMatches: NO_MATCHES,
@@ -203,6 +207,11 @@ export default class FieldAccessManager extends LightningElement {
   recordTimer;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.loadStatus();
   }
 

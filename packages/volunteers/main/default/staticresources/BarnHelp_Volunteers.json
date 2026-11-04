@@ -1,0 +1,9 @@
+{
+  "languages": ["en"],
+  "texts": {
+    "Volunteers_Readiness_Empty": "No requirement types are set up yet, so there is nothing to track. Ask your BarnCRM admin to add types to Volunteer Requirement.",
+    "Volunteers_Signups_Empty": "Nobody is signed up for this shift yet.",
+    "Volunteers_Suggestions_Empty": "No volunteers to suggest. Suggestions come from people whose Volunteer Status is Active and who are not already signed up for this shift.",
+    "Volunteers_Suggestions_Subtitle": "Active volunteers not yet signed up, best match first by skills, availability, hours on this job and onboarding."
+  }
+}

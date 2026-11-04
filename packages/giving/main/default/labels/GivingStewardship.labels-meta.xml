@@ -49,14 +49,6 @@
     <value>Stewardship Plans</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_Intro</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: what the page is for</shortDescription>
-    <value>The follow-up your organization repeats. Write a plan down once here, and BarnCRM lays its tasks out every time the plan applies.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_RunningNotice</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
@@ -71,14 +63,6 @@
     <protected>false</protected>
     <shortDescription>Stewardship: this user may read but not change plans</shortDescription>
     <value>You can read the plans here. Changing them needs the Manage BarnCRM Settings permission.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_Empty</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: no templates exist yet</shortDescription>
-    <value>You have not written a plan down yet. Choose New plan to write the first one.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_NewPlan</fullName>
@@ -145,36 +129,12 @@
     <value>Smallest gift that starts it</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_FieldMinimumHelp</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: help, the minimum is for gift events only</shortDescription>
-    <value>Only for the two gift events. Leave it empty to start on any gift.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_StepsHeading</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: heading above the steps of a plan</shortDescription>
     <value>Steps</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_NoSteps</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: the template has no steps</shortDescription>
-    <value>This plan has no steps yet, so it would start and lay nothing out. Add the first step.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_SelectPlan</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: nothing is selected</shortDescription>
-    <value>Choose a plan to see and edit its steps.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_MoveUp</fullName>
@@ -191,14 +151,6 @@
     <protected>false</protected>
     <shortDescription>Stewardship: field, the task subject</shortDescription>
     <value>Subject</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_StepSubjectHelp</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: help, write the subject as an instruction</shortDescription>
-    <value>What the assignee reads in their task list. Write it as an instruction: Call to say thank you, not Thank you.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_StepDays</fullName>

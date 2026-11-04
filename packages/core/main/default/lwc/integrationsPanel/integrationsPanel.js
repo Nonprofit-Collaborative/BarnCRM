@@ -1,22 +1,16 @@
 import { LightningElement, api } from 'lwc';
 import getApps from '@salesforce/apex/IntegrationController.getApps';
 
-import INTRO from '@salesforce/label/c.Core_Integrations_Intro';
 import GROUP_COMPLEMENT from '@salesforce/label/c.Core_Integrations_GroupComplement';
-import GROUP_COMPLEMENT_INTRO from '@salesforce/label/c.Core_Integrations_GroupComplementIntro';
 import GROUP_IN_DEVELOPMENT from '@salesforce/label/c.Core_Integrations_GroupInDevelopment';
-import GROUP_IN_DEVELOPMENT_INTRO from '@salesforce/label/c.Core_Integrations_GroupInDevelopmentIntro';
 import GROUP_ALTERNATIVE from '@salesforce/label/c.Core_Integrations_GroupAlternative';
-import GROUP_ALTERNATIVE_INTRO from '@salesforce/label/c.Core_Integrations_GroupAlternativeIntro';
 import INSTALLED from '@salesforce/label/c.Core_Integrations_Installed';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Integrations_NotInstalled';
 import STATUS_IN_PROGRESS from '@salesforce/label/c.Core_Integrations_StatusInProgress';
 import STATUS_AVAILABLE from '@salesforce/label/c.Core_Integrations_StatusAvailable';
 import REQUEST_HEADING from '@salesforce/label/c.Core_Integrations_RequestLink';
-import REQUEST_INTRO from '@salesforce/label/c.Core_Integrations_RequestIntro';
 import REQUEST_LINK from '@salesforce/label/c.Core_Integrations_RequestLink';
 import REQUEST_URL from '@salesforce/label/c.Core_Integrations_RequestUrl';
-import PARTNER_INTRO from '@salesforce/label/c.Core_Integrations_PartnerIntro';
 import PARTNER_LINK from '@salesforce/label/c.Core_Integrations_PartnerLink';
 import PARTNER_URL from '@salesforce/label/c.Core_Integrations_PartnerUrl';
 import GUIDE_LINK from '@salesforce/label/c.Core_Integrations_GuideLink';
@@ -31,16 +25,31 @@ import EMPTY from '@salesforce/label/c.Core_Integrations_EmptyMessage';
 import LOAD_ERROR from '@salesforce/label/c.Core_Integrations_LoadErrorMessage';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The groups in the order the page shows them, by the category a catalog row stores. */
 const GROUPS = [
-  { category: 'Complement', heading: GROUP_COMPLEMENT, intro: GROUP_COMPLEMENT_INTRO },
+  {
+    category: 'Complement',
+    heading: GROUP_COMPLEMENT,
+    get intro() {
+      return helpText('Core', 'Core_Integrations_GroupComplementIntro');
+    }
+  },
   {
     category: 'InDevelopment',
     heading: GROUP_IN_DEVELOPMENT,
-    intro: GROUP_IN_DEVELOPMENT_INTRO
+    get intro() {
+      return helpText('Core', 'Core_Integrations_GroupInDevelopmentIntro');
+    }
   },
-  { category: 'Alternative', heading: GROUP_ALTERNATIVE, intro: GROUP_ALTERNATIVE_INTRO }
+  {
+    category: 'Alternative',
+    heading: GROUP_ALTERNATIVE,
+    get intro() {
+      return helpText('Core', 'Core_Integrations_GroupAlternativeIntro');
+    }
+  }
 ];
 
 /** The group a product is drawn in: its category, or the first group for one nobody named. */
@@ -63,11 +72,15 @@ function fill(label, value) {
  * that matches a BarnCRM module sees no heading for it.
  */
 export default class IntegrationsPanel extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   apps;
   errorMessage;
 
   labels = {
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_Integrations_Intro');
+    },
     compatibility: COMPATIBILITY_HEADING,
     empty: EMPTY,
     checkAgain: CHECK_AGAIN,
@@ -77,10 +90,14 @@ export default class IntegrationsPanel extends LightningElement {
   /** The request section at the bottom: one path for organizations, one for providers. */
   request = {
     heading: REQUEST_HEADING,
-    intro: REQUEST_INTRO,
+    get intro() {
+      return helpText('Core', 'Core_Integrations_RequestIntro');
+    },
     requestLink: REQUEST_LINK,
     requestUrl: REQUEST_URL,
-    partnerIntro: PARTNER_INTRO,
+    get partnerIntro() {
+      return helpText('Core', 'Core_Integrations_PartnerIntro');
+    },
     partnerLink: PARTNER_LINK,
     partnerUrl: PARTNER_URL,
     guideLink: GUIDE_LINK,
@@ -88,6 +105,11 @@ export default class IntegrationsPanel extends LightningElement {
   };
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

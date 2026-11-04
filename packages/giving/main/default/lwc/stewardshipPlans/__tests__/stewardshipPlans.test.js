@@ -6,6 +6,11 @@ import setActive from '@salesforce/apex/StewardshipPlanController.setActive';
 import saveStep from '@salesforce/apex/StewardshipPlanController.saveStep';
 import deleteStep from '@salesforce/apex/StewardshipPlanController.deleteStep';
 import reorderSteps from '@salesforce/apex/StewardshipPlanController.reorderSteps';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Giving_Stewardship_Empty: 'You have not written a plan down yet.'
+});
 
 jest.mock(
   '@salesforce/apex/StewardshipPlanController.getPage',
@@ -46,12 +51,6 @@ jest.mock(
     default:
       'Editing a plan changes what starts next. Plans already running keep the tasks they laid out.'
   }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Giving_Stewardship_Empty',
-  () => ({ default: 'You have not written a plan down yet.' }),
   { virtual: true }
 );
 

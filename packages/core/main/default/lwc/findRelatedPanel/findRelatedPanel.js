@@ -4,7 +4,6 @@ import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
 import { messageFrom } from 'c/findCsv';
 
 import RELATED_RECORDS from '@salesforce/label/c.Core_Find_RelatedRecords';
-import RELATED_HELP from '@salesforce/label/c.Core_Find_RelatedHelp';
 import ADD_RELATED from '@salesforce/label/c.Core_Find_AddRelated';
 import HAS from '@salesforce/label/c.Core_Find_Has';
 import HAS_NO from '@salesforce/label/c.Core_Find_HasNo';
@@ -19,6 +18,7 @@ import RELATED_ROWS from '@salesforce/label/c.Core_Find_RelatedRows';
 import REMOVE from '@salesforce/label/c.Core_Find_Remove';
 import AVAILABLE_FIELDS from '@salesforce/label/c.Core_Find_AvailableFields';
 import CHOSEN_FIELDS from '@salesforce/label/c.Core_Find_ChosenFields';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const MAX_ENTRIES = 2;
 const NOT_SHOWN = new Set(['address', 'location', 'base64']);
@@ -30,9 +30,21 @@ const NOT_SHOWN = new Set(['address', 'location', 'base64']);
  * the document's `related` and `children` keys in a `change` event; the server checks them.
  */
 export default class FindRelatedPanel extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     relatedRecords: RELATED_RECORDS,
-    relatedHelp: RELATED_HELP,
+    get relatedHelp() {
+      return helpText('Core', 'Core_Find_RelatedHelp');
+    },
     addRelated: ADD_RELATED,
     which: WHICH,
     relatedKind: RELATED_KIND,

@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
   <lightning-card title={labels.title} icon-name="custom:custom62">
     <template lwc:if={canEdit}>
       <lightning-button
@@ -187,4 +188,5 @@
       </template>
     </div>
   </lightning-card>
+    </template>
 </template>

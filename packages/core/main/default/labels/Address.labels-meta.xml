@@ -25,14 +25,6 @@
         <value>This is the address in use. To change that, make another address the primary, or delete this one.</value>
     </labels>
     <labels>
-        <fullName>Core_Address_Empty</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: message shown when there are no addresses yet</shortDescription>
-        <value>Add one so mail reaches the right place.</value>
-    </labels>
-    <labels>
         <fullName>Core_Address_EmptyHeading</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
@@ -185,14 +177,6 @@
         <value>Everyone in this household has an address of their own, so only the people you tick will get this address.</value>
     </labels>
     <labels>
-        <fullName>Core_Address_UpdateEveryoneOwn</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: heads the people with an address of their own</shortDescription>
-        <value>These people have an address of their own and stay where they are unless you tick them:</value>
-    </labels>
-    <labels>
         <fullName>Core_Address_UpdateEveryoneSuccess</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
@@ -215,14 +199,6 @@
         <protected>false</protected>
         <shortDescription>Address panel: button on a person's own address</shortDescription>
         <value>Use for Whole Household</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_UseForHouseholdHelp</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: what Use for Whole Household does</shortDescription>
-        <value>The household uses this as its primary address, and members without an address of their own move to it.</value>
     </labels>
     <labels>
         <fullName>Core_Address_UseForHouseholdDetail</fullName>
