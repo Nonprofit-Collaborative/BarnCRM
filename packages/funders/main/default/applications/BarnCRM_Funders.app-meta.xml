@@ -18,6 +18,8 @@
   </actionOverrides>
   <brand>
     <headerColor>#007A9E</headerColor>
+    <logo>BarnCRM_Funders_Logo</logo>
+    <logoVersion>1</logoVersion>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
   </brand>
   <description>
