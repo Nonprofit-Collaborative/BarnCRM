@@ -77,7 +77,7 @@ earlier release keeps every feature on and is not held.
   The window is a standard Salesforce dialog: focus stays inside it, and neither Escape nor
   its close button closes it (the close button is shown greyed out). Click **Finish Setup**. What you left ticked is turned on fully: its tabs, its settings and
   its automations. Finishing also gives the tool tabs (Data Manager, Import, Find, Org
-  Optimizer, Bulk Update) of every feature that is on to everyone holding a BarnCRM role, within
+  Optimizer, Super Transformer) of every feature that is on to everyone holding a BarnCRM role, within
   a few minutes, and starts the hourly tab access check if it is not already scheduled. What
   you unticked stays off, and you can turn it on later in **General**.
   You land on **General** in BarnCRM Settings, and the setup window never shows again on
@@ -118,7 +118,7 @@ to the people who should see them, shows its settings, and starts its automation
 
 | Feature | What it covers | Hidden or stopped while off |
 |---|---|---|
-| Data Manager | Data Manager, Import, Find and Bulk Update | Those four tabs and the Import section |
+| Data Manager | Data Manager, Import, Find and Super Transformer | Those four tabs and the Import section |
 | Duplicate Matching | Duplicate suggestions, review and matching logic | The Duplicate Matching tab and the Duplicate Matching section |
 | Org Optimizer and Health Check | The Org Optimizer tab and Health Check | The Org Optimizer tab, the Health section and the Org Optimizer section (its three thresholds) |
 | Household upkeep | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
@@ -136,7 +136,7 @@ grants it, and an app cannot hide a tab any other way. So each feature tab has i
 packaged permission set (for example **BarnCRM Tab: Find**) that grants only that tab, and
 BarnCRM gives it, once the feature is on, to the people who should see the tab: whoever holds
 a role or extra permission that used to include the tab (BarnCRM Admin for all five, Find and
-Export for Find, Data Manager and Org Optimizer, Bulk Update or Bulk Delete for Bulk Update and
+Export for Find, Data Manager and Org Optimizer, Bulk Update or Bulk Delete for Super Transformer and
 Data Manager). BarnCRM keeps these in step when a feature is turned on, when a role or extra
 permission is given or removed on the Access page, after every upgrade, and every hour (for
 roles given in Setup or by user access policies). A large org may take a few minutes to catch
@@ -256,7 +256,7 @@ section's name.
 | Rollups | Rollup Processing (the rest); Rollup Builder |
 | Volunteers | Hours and Shifts |
 | Error Log | Error Digest (the rest); Error Log Retention |
-| Import | Importing (the rest); Gift Matching on Import; Find, Bulk Update and Bulk Delete |
+| Import | Importing (the rest); Gift Matching on Import; Find, Super Transformer and Bulk Delete |
 
 ### People and Households
 

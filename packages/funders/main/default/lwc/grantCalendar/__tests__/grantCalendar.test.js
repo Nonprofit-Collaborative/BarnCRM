@@ -35,6 +35,7 @@ jest.mock(
 const CALENDAR = {
   today: '2026-11-05',
   paymentLabel: 'Grant Payment',
+  requirementLabel: 'Grant Requirement',
   rows: [
     { id: 'g1', name: 'Literacy', kind: 'application', deadline: '2026-11-10' },
     {
@@ -103,8 +104,20 @@ describe('c-grant-calendar', () => {
       'Application: Literacy',
       'Grant Payment: Youth Award 17,500'
     ]);
-    expect(items[0].className).toContain('slds-text-color_error');
-    expect(items[1].className).not.toContain('slds-text-color_error');
+    // Overdue is said with an icon and words, not red text alone (vis-modules-9).
+    expect(items[0].className).toContain('barn-item_overdue');
+    expect(items[0].className).not.toContain('slds-text-color_error');
+    expect(items[0].querySelector('[data-id="overdue"]').alternativeText).toContain(
+      'Core_HubHome_BadgeOverdue'
+    );
+    expect(items[0].title).toContain('Core_HubHome_BadgeOverdue');
+    expect(items[1].className).not.toContain('barn-item_overdue');
+    expect(items[1].querySelector('[data-id="overdue"]')).toBeNull();
+    // The legend names each border colour, then the overdue mark.
+    expect(
+      all(element, '[data-id="legend-entry"]').map((entry) => entry.textContent.trim())
+    ).toEqual(['Application', 'Grant Requirement', 'Grant Payment']);
+    expect(one(element, '[data-id="legend-overdue"]')).not.toBeNull();
   });
 
   it('moves a month at a time and switches to Mine', async () => {

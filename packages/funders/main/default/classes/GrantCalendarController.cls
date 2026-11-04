@@ -26,6 +26,9 @@ public with sharing class GrantCalendarController {
         /** The payment object's label, read by describe, for the payment rows. */
         @AuraEnabled
         public String paymentLabel;
+        /** The requirement object's label, read by describe, for the colour legend. */
+        @AuraEnabled
+        public String requirementLabel;
     }
 
     /**
@@ -47,6 +50,7 @@ public with sharing class GrantCalendarController {
             Calendar calendar = new Calendar();
             calendar.today = Date.today();
             calendar.paymentLabel = Schema.SObjectType.Grant_Payment__c.getLabel();
+            calendar.requirementLabel = Schema.SObjectType.Grant_Requirement__c.getLabel();
 
             List<Grant__c> applications = GrantDeadlineSelector.applications(
                 fromDate,

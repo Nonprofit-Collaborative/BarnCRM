@@ -57,6 +57,69 @@ class CoreTabMotifs(unittest.TestCase):
             seen[number] = name
 
 
+def tab_numbers():
+    numbers = {}
+    pattern = os.path.join(ROOT, "packages", "*", "main", "default", "tabs", "*.tab-meta.xml")
+    for path in glob.glob(pattern):
+        motif = ET.parse(path).getroot().findtext("m:motif", namespaces=NS) or ""
+        match = re.match(r"Custom(\d+):", motif.strip())
+        if match:
+            numbers[os.path.basename(path).replace(".tab-meta.xml", "")] = int(match.group(1))
+    return numbers
+
+
+def card_icon_rows():
+    """The Card Icons table of docs/contributor-guide/tab-icons.md: (package, component, icon) to tab."""
+    path = os.path.join(ROOT, "docs", "contributor-guide", "tab-icons.md")
+    section = open(path, encoding="utf-8").read().split("## Card Icons", 1)[-1]
+    rows = {}
+    for line in section.splitlines():
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) == 4 and cells[2].startswith("custom:"):
+            rows[(cells[0], cells[1], cells[2])] = cells[3]
+    return rows
+
+
+class CardIcons(unittest.TestCase):
+    """A card's header icon is its own tab's motif (vis-core-4, extends D-144)."""
+
+    def test_each_card_uses_its_own_tabs_icon_and_no_utility_glyph(self):
+        numbers, rows = tab_numbers(), card_icon_rows()
+        self.assertTrue(rows, "tab-icons.md has no Card Icons table")
+        pattern = os.path.join(ROOT, "packages", "*", "main", "default", "lwc", "*", "*.html")
+        for path in sorted(glob.glob(pattern)):
+            parts = path.split(os.sep)
+            package, component = parts[-6], parts[-2]
+            text = open(path, encoding="utf-8").read()
+            for icon in re.findall(r"<lightning-card\b[^>]*?icon-name=\"([^\"]+)\"", text, re.S):
+                self.assertFalse(icon.startswith("utility:"), f"{component}: card header uses {icon}")
+                if icon.startswith("custom:"):
+                    self.assertIn(
+                        (package, component, icon), rows, f"{component}: {icon} not in Card Icons"
+                    )
+        for (package, component, icon), tab in rows.items():
+            self.assertIn(tab, numbers, f"{component}: no tab {tab}")
+            self.assertEqual(
+                icon, f"custom:custom{numbers[tab]}", f"{component}: {tab} is Custom{numbers[tab]}"
+            )
+            folder = os.path.join(ROOT, "packages", package, "main", "default", "lwc", component)
+            source = "".join(
+                open(os.path.join(folder, name), encoding="utf-8").read()
+                for name in os.listdir(folder)
+                if name.endswith((".html", ".js"))
+            )
+            self.assertRegex(source, rf"['\"]{icon}['\"]", f"{component} does not use {icon}")
+
+
+class AppHeaderColor(unittest.TestCase):
+    def test_every_app_uses_the_barncrm_header_colors(self):
+        # D-58: everyday apps #007A9E, admin apps #032D60, so switching apps stays in BarnCRM.
+        pattern = os.path.join(ROOT, "packages", "*", "main", "default", "applications", "*.app-meta.xml")
+        for path in sorted(glob.glob(pattern)):
+            color = ET.parse(path).getroot().findtext("m:brand/m:headerColor", namespaces=NS)
+            self.assertIn(color, ("#007A9E", "#032D60"), os.path.basename(path))
+
+
 class CoreAppOrder(unittest.TestCase):
     def test_everyday_apps_list_records_then_data_manager(self):
         standard, console = tabs("BarnCRM_Standard"), tabs("BarnCRM")

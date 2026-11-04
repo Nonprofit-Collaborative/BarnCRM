@@ -510,7 +510,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Note when Find opens from the Update Many Records card.</shortDescription>
-        <value>Bulk Update starts here: find the records, press Run, then choose Change Records, Bulk Update.</value>
+        <value>Super Transformer can start here: find the records, press Run, then choose Change Records, Super Transformer.</value>
     </labels>
     <labels>
         <fullName>Core_Find_StartDelete</fullName>

@@ -69,6 +69,36 @@
   border-left-color: var(--slds-g-color-success-base-50, #2e844a);
 }
 
+/* Overdue keeps the item's own text colour (contrast) and adds weight beside its warning icon. */
+.barn-item_overdue {
+  font-weight: var(--slds-g-font-weight-7, 700);
+}
+
+/* The legend under the month: one swatch per border colour, then the overdue mark. */
+.barn-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.barn-legend-entry {
+  display: inline-flex;
+  align-items: center;
+}
+
+.barn-swatch {
+  display: inline-block;
+  width: var(--slds-g-sizing-5, 0.75rem);
+  height: var(--slds-g-sizing-5, 0.75rem);
+  margin-right: var(--slds-g-spacing-1, 0.25rem);
+  border-left-style: solid;
+  border-left-width: var(--slds-g-sizing-border-3, 3px);
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
+}
+
 /* At phone width the grid becomes a list of the days that have something on them. */
 @media (max-width: 48em) {
   .barn-calendar thead {

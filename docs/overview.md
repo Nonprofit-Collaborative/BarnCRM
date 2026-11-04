@@ -20,7 +20,7 @@ BarnCRM is in development. No package version exists yet and nothing is installa
 
 ## Two Editions
 
-Both editions include the full core suite of tools: people, households, relationships, addresses, importing with undo (an admin can create a new field for a column), Find, bulk update and bulk delete, duplicate review, Org Optimizer, Health Check, settings and the Setup Assistant.
+Both editions include the full core suite of tools: people, households, relationships, addresses, importing with undo (an admin can create a new field for a column), Find, Super Transformer and bulk delete, duplicate review, Org Optimizer, Health Check, settings and the Setup Assistant.
 
 | Edition | For | What you get |
 |---|---|---|
@@ -33,7 +33,7 @@ You choose the edition once, in the first-run setup window; the Setup Assistant 
 
 | Package | What it holds | State on main |
 |---|---|---|
-| **Core** | Households and people, relationships, affiliations, addresses, the BarnCRM apps (everyday and admin, each with standard or console navigation), Settings console, Setup Assistant, Module Manager, access roles, Import, Data Manager, Find, bulk update and delete, Super Transformer (bulk changes without a file, with saved step lists and a phone format), Org Optimizer, Duplicates, Health Check, Error Log, erase a person | Built |
+| **Core** | Households and people, relationships, affiliations, addresses, the BarnCRM apps (everyday and admin, each with standard or console navigation), Settings console, Setup Assistant, Module Manager, access roles, Import, Data Manager, Find, bulk delete, Super Transformer (bulk changes without a file, with saved step lists and a phone format), Org Optimizer, Duplicates, Health Check, Error Log, erase a person | Built |
 | **Rollup Builder** | The rollup engine and the Rollup Builder page where you manage totals | Built (offered in both editions; Giving depends on it) |
 | **Giving** | Gifts, funds, Quick Gift Entry, gift batches, refunds, in-kind gifts, commitments, pledge reminders, soft credits, tributes, matching gifts, appeals, acknowledgments, receipts and year-end statements, donor levels, donor scores (recency, frequency, monetary), stewardship plans, the Ask Pipeline, retention reports, donor segments with export for email tools, posting and closed periods, gift import, the Giving dashboard, the BarnCRM Fundraising app | Built |
 | **Mirror** | Opportunity mirror, Campaign sync, inbound gift API, accounting export, Gift Transaction mirror for Nonprofit Cloud (gifts and their designations, one way) | Built (Gift Transaction mirror in review for release 0.17, X-07) |

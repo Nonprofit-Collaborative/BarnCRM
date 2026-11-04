@@ -1,5 +1,5 @@
 <template>
-  <lightning-card title={labels.title} icon-name="standard:dashboard">
+  <lightning-card title={labels.title} icon-name="custom:custom100">
     <div class="slds-var-p-horizontal_medium">
       <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small">{labels.help}</p>
 
@@ -72,7 +72,7 @@
           <section class="slds-col slds-size_1-of-1 slds-var-m-bottom_medium">
             <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labelsRestricted.title}</h2>
             <template lwc:if={hasFunds}>
-              <h3 class="slds-text-title_caps slds-var-m-vertical_x-small">{labelsRestricted.funds}</h3>
+              <h3 class="slds-text-title_bold slds-var-m-vertical_x-small">{labelsRestricted.funds}</h3>
               <table class="slds-table slds-table_cell-buffer slds-table_bordered" data-id="funds">
                 <tbody>
                   <template for:each={fundRows} for:item="row">
@@ -85,7 +85,7 @@
               </table>
             </template>
             <template lwc:if={hasGrants}>
-              <h3 class="slds-text-title_caps slds-var-m-vertical_x-small">{labelsRestricted.grants}</h3>
+              <h3 class="slds-text-title_bold slds-var-m-vertical_x-small">{labelsRestricted.grants}</h3>
               <table class="slds-table slds-table_cell-buffer slds-table_bordered" data-id="grants">
                 <tbody>
                   <template for:each={grantRows} for:item="row">

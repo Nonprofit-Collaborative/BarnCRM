@@ -52,7 +52,7 @@ Do this as David, on a phone, starting from the sample data.
    `1042`. This is the field Jen uses when she reconciles with the bank, so it is worth
    the two seconds.
 8. Confirm **Appeal** says Spring Appeal. If it does not, tap it and pick Spring Appeal.
-9. Tap **Save and New**. A message says **Gift G-000123 saved**, with the gift's name as
+9. Tap **Save and New**. A light notice with a green check icon says **Gift G-000123 saved**, with the gift's name as
    a link, and the form clears itself for the next gift while keeping today's date, the
    appeal, and the fund. You are ready for the next check with one tap.
 10. Enter a second gift the same way: a different donor, `25`, Cash, no check number.

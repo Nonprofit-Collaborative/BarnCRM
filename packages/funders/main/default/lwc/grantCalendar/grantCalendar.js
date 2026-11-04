@@ -13,6 +13,7 @@ import ERROR_LOAD from '@salesforce/label/c.Funders_Calendar_ErrorLoad';
 import SCOPE_EVERYONE from '@salesforce/label/c.Funders_Pipeline_ScopeEveryone';
 import SCOPE_MINE from '@salesforce/label/c.Funders_Pipeline_ScopeMine';
 import KIND_APPLICATION_LABEL from '@salesforce/label/c.Funders_Pipeline_KindApplication';
+import OVERDUE from '@salesforce/label/c.Core_HubHome_BadgeOverdue';
 
 const KIND_REQUIREMENT = 'requirement';
 const KIND_PAYMENT = 'payment';
@@ -45,7 +46,15 @@ const firstDay = () => {
  * overdue rows with the Grant Pipeline's own `deadlineRows`; this component only draws them.
  */
 export default class GrantCalendar extends NavigationMixin(LightningElement) {
-  labels = { title: TITLE, previous: PREVIOUS, next: NEXT, scope: SCOPE_EVERYONE };
+  labels = {
+    title: TITLE,
+    previous: PREVIOUS,
+    next: NEXT,
+    scope: SCOPE_EVERYONE,
+    overdue: OVERDUE
+  };
+
+  kindLabels = { requirement: '', payment: '' };
 
   scopeOptions = [
     { label: SCOPE_EVERYONE, value: 'all' },
@@ -74,6 +83,17 @@ export default class GrantCalendar extends NavigationMixin(LightningElement) {
     }).format(new Date(Date.UTC(this.year, this.month - 1, 1)));
   }
 
+  /** What each border colour means, and the overdue mark (vis-modules-9). */
+  get legend() {
+    return [
+      { key: 'application', text: KIND_APPLICATION_LABEL },
+      { key: 'requirement', text: this.kindLabels.requirement },
+      { key: 'payment', text: this.kindLabels.payment }
+    ]
+      .filter((entry) => entry.text)
+      .map((entry) => ({ ...entry, swatchClass: `barn-swatch barn-item_${entry.key}` }));
+  }
+
   get weekdays() {
     const format = new Intl.DateTimeFormat(LOCALE, { weekday: 'short', timeZone: 'UTC' });
     // 2023-01-01 was a Sunday, so day n of the week is January 1 + n.
@@ -93,6 +113,10 @@ export default class GrantCalendar extends NavigationMixin(LightningElement) {
         mineOnly: this.scope === 'mine'
       });
       this.errorMessage = undefined;
+      this.kindLabels = {
+        requirement: calendar.requirementLabel || '',
+        payment: calendar.paymentLabel || ''
+      };
       this.weeks = this.decorate(
         monthWeeks(this.year, this.month, calendar.rows, calendar.today, firstDay()),
         calendar.paymentLabel
@@ -121,10 +145,15 @@ export default class GrantCalendar extends NavigationMixin(LightningElement) {
         items: day.items.map((item) => ({
           ...item,
           objectApiName: OBJECT_BY_KIND[item.kind] || 'Grant__c',
+          // Overdue is an icon and words, never colour alone (vis-modules-9): red text on the
+          // item's grey failed contrast.
           itemClass: `${CLASS_BY_KIND[item.kind] || CLASS_BY_KIND.application}${
-            item.overdue ? ' slds-text-color_error' : ''
+            item.overdue ? ' barn-item_overdue' : ''
           }`,
-          text: this.textOf(item, paymentLabel)
+          text: this.textOf(item, paymentLabel),
+          title: item.overdue
+            ? `${OVERDUE}: ${this.textOf(item, paymentLabel)}`
+            : this.textOf(item, paymentLabel)
         }))
       }))
     }));

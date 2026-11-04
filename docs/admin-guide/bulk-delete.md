@@ -139,4 +139,4 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
 | Data Job | Rows Deleted | How many records the bulk delete deleted. |
 | Data Job | Rows Rejected | How many records the platform refused, each with its reason in the journal. |
 | BarnCRM Settings, Import | Bulk delete run limit | The most records one bulk delete may delete. Default 10,000, at most 48,000. |
-| BarnCRM Settings, Import | Bulk chunk size | Records each chunk of a bulk update or bulk delete handles. Default and highest 200, lowest 10. |
+| BarnCRM Settings, Import | Bulk chunk size | Records each chunk of a Super Transformer run or bulk delete handles. Default and highest 200, lowest 10. |

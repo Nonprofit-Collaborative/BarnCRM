@@ -24,7 +24,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Records each chunk of a bulk update or bulk delete handles. Lowest 10, highest and default 200; a value outside that range is read as the nearest end. Lower it when a job stops because your org's automation runs out of limits on 200 records at a time. A job keeps the size it started with.</value>
+    <value xsi:type="xsd:string">Records each chunk of a Super Transformer run or bulk delete handles. Lowest 10, highest and default 200; a value outside that range is read as the nearest end. Lower it when a job stops because your org's automation runs out of limits on 200 records at a time. A job keeps the size it started with.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

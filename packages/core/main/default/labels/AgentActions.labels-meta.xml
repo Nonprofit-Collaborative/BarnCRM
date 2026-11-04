@@ -70,6 +70,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Get Data Job Status action: no data job with this id</shortDescription>
-        <value>No import, bulk update or bulk delete you can see has this id.</value>
+        <value>No import, Super Transformer run or bulk delete you can see has this id.</value>
     </labels>
 </CustomLabels>

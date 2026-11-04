@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console, Import page: box heading for Find and bulk job limits</shortDescription>
-        <value>Find, Bulk Update and Bulk Delete</value>
+        <value>Find, Super Transformer and Bulk Delete</value>
     </labels>
     <labels>
         <fullName>Core_SettingsGroup_GiftDefaults</fullName>

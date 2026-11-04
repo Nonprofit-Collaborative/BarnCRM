@@ -1,6 +1,6 @@
-# Bulk Update and Delete
+# Super Transformer and Bulk Delete
 
-Scripts for changing and deleting the records a Find query returns, editing in Find's table, deleting by file, undo, and the permissions behind them. Setup detail: [Bulk update](../admin-guide/bulk-update.md) and [Bulk delete](../admin-guide/bulk-delete.md).
+Scripts for changing and deleting the records a Find query returns, editing in Find's table, deleting by file, undo, and the permissions behind them. Setup detail: [Super Transformer runs and undo](../admin-guide/bulk-update.md) and [Bulk delete](../admin-guide/bulk-delete.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest, so every query names only fixture contacts. Check the preview count before you confirm any bulk step: 3 for Zztest, 3 for Bulkdeltest. If it is higher, cancel. The **Data Manager** feature must be on (BarnCRM Settings, **General**). These scripts assume people are stored as contacts.
 
@@ -10,49 +10,49 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 ## T-BULK-01: Set a Field on Every Record a Query Returns
 
-**Purpose:** confirm the main bulk update path: preview with before and after, typed count, run and summary.
+**Purpose:** confirm the main Super Transformer path from Find: preview with before and after, typed count, run and summary.
 **Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); the Garcia contacts have an empty **Title**.
 **Smoke:** yes
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **Find**. Choose **Contact**, add **First Name**, **Last Name** and **Title**, add the condition **Last Name** **equals** `Garcia`, and select **Run**. | The Garcia contacts are listed. Note the count N from "N rows found." |
-| 2 | Open **Change Records** and choose **Bulk Update**. | A panel **Bulk Update** opens under the buttons, with the path **Choose Changes**, **Confirm**, **Run**: "Change up to five fields on every record this query returns, with your own access. Nothing changes until you confirm." |
+| 2 | Open **Change Records** and choose **Super Transformer**. | A panel **Super Transformer** opens under the buttons, with the path **Choose Changes**, **Confirm**, **Run**: "Change up to five fields on every record this query returns, with your own access. Nothing changes until you confirm." |
 | 3 | Under **Changes**, choose **Title** in **Field**, **Set to a value** in **What to do**, and type `test title` in **New Value**. | The change is complete. **Add a Change** is enabled. |
 | 4 | Select **Preview**. | "N records match. The first ones, before and after:" and a table with **Record**, **Before** (empty) and **After** (`test title`) for up to five records. The four columns are equal width, and a long value wraps onto more lines inside its cell instead of stretching the table past the panel. |
 | 5 | Type a number other than N in **Type the number of records to confirm**. | The **Update N records** button stays disabled. |
 | 6 | Type N. | **Update N records** is enabled. |
-| 7 | Select **Update N records**. | "The bulk update started. It keeps running if you leave this page." then "Updating: X of Y chunks done." |
+| 7 | Select **Update N records**. | "Super Transformer started. It keeps running if you leave this page." then "Updating: X of Y chunks done." |
 | 8 | Wait for it to finish. | "N matched: N updated, 0 already held the new values, 0 failed." and "To undo it, open Data Jobs on the Data Manager tab." |
 | 9 | Select **Run** in Find again. | Every Garcia contact's **Title** reads `test title`. |
 
 **Cleanup:** keep the job for T-BULK-02, which undoes it.
 
-## T-BULK-02: Undo a Bulk Update
+## T-BULK-02: Undo a Super Transformer Run
 
 **Purpose:** confirm undo puts back every value nobody changed since, and keeps a value somebody did change.
-**Prerequisites:** admin; the bulk update from T-BULK-01, not yet undone.
+**Prerequisites:** admin; the Super Transformer run from T-BULK-01, not yet undone.
 **Smoke:** yes
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open Harper Garcia and change **Title** to `Changed by hand`. Save. | Saved. |
-| 2 | Open the **Data Manager** tab. In **Data Jobs**, choose **Bulk updates** in **Show**. | The bulk update is listed first with "N matched: N updated, 0 already held the new values, 0 failed.", **Started**, **Can be undone until**, and **Undo**. |
-| 3 | Select **Undo**. | "Undo puts back the values on N records, except any somebody changed since. Type N to confirm." with **Cancel** and **Undo Bulk Update** (disabled). |
-| 4 | Type N and select **Undo Bulk Update**. | "The undo started. Press Refresh to see when it has finished." |
+| 2 | Open the **Data Manager** tab. In **Data Jobs**, choose **Super Transformer runs** in **Show**. | The Super Transformer run is listed first with "N matched: N updated, 0 already held the new values, 0 failed.", **Started**, **Can be undone until**, and **Undo**. |
+| 3 | Select **Undo**. | "Undo puts back the values on N records, except any somebody changed since. Type N to confirm." with **Cancel** and **Undo Super Transformer Run** (disabled). |
+| 4 | Type N and select **Undo Super Transformer Run**. | "The undo started. Press Refresh to see when it has finished." |
 | 5 | Select **Refresh** until the job's status reads **Undone**. | **Undone**; **Undo** is no longer offered. |
 | 6 | Run the Find query from T-BULK-01 again. | Every Garcia **Title** is empty again, except Harper Garcia's, which still reads `Changed by hand`. |
 
 **Cleanup:** clear Harper Garcia's **Title**.
 
-## T-BULK-03: Bulk Update Refusals
+## T-BULK-03: Super Transformer Refusals
 
 **Purpose:** confirm bad changes and a stale count are refused before anything changes.
 **Prerequisites:** admin; Find open on the Garcia query from T-BULK-01.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Select **Bulk Update**. Choose **Last Name**, **Clear**, and select **Preview**. | Refused: "Last Name is required, so it cannot be cleared." Nothing changes. |
+| 1 | Select **Super Transformer**. Choose **Last Name**, **Clear**, and select **Preview**. | Refused: "Last Name is required, so it cannot be cleared." Nothing changes. |
 | 2 | Change the action to **Set to a value**, `Garcia-Test`, and select **Preview**. Note N. | The preview shows N records. |
 | 3 | In another browser tab, create a contact `Extra Garcia` (last name `Garcia`). | Saved. |
 | 4 | Back in the panel, type N and select **Update N records**. | "More records match now than the N you confirmed. Nothing was changed. Preview again and confirm the new number." |
@@ -68,12 +68,12 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Set **Title** to `assistant coach` on Harper Garcia and Luis Garcia. In Find, query Contact where **Title** **equals** `assistant coach` and **Run**. | Two rows. |
-| 2 | Select **Bulk Update**. Choose **Title**, **Change with steps**, select **Add a Change** and choose **Capitalize each word**. Select **Preview**. | "2 records match..." with **Before** `assistant coach` and **After** `Assistant Coach`. |
+| 2 | Select **Super Transformer**. Choose **Title**, **Change with steps**, select **Add a Change** and choose **Capitalize each word**. Select **Preview**. | "2 records match..." with **Before** `assistant coach` and **After** `Assistant Coach`. |
 | 3 | Type `2` and select **Update 2 records**. | "2 matched: 2 updated, 0 already held the new values, 0 failed." Both titles read `Assistant Coach`. |
-| 4 | In Find, query **Account** where **Account Name** **equals** `The Garcia Family` and **Run**. Select **Bulk Update**, choose **Account Name**, **Set to a value**, `Renamed Household`, **Preview**, type `1`, and select **Update 1 records**. | The summary counts 1 failed, listed under **Records that failed, and why** with "This is a household, and household naming keeps its name, so it was left as it was. To name it yourself, check Custom name on the household." |
+| 4 | In Find, query **Account** where **Account Name** **equals** `The Garcia Family` and **Run**. Select **Super Transformer**, choose **Account Name**, **Set to a value**, `Renamed Household`, **Preview**, type `1`, and select **Update 1 records**. | The summary counts 1 failed, listed under **Records that failed, and why** with "This is a household, and household naming keeps its name, so it was left as it was. To name it yourself, check Custom name on the household." |
 | 5 | Open The Garcia Family. | The name is unchanged. |
 
-**Cleanup:** undo the title bulk update from **Data Jobs** (or clear both titles by hand).
+**Cleanup:** undo the title Super Transformer run from **Data Jobs** (or clear both titles by hand).
 
 ## T-BULK-05: Edit in Find's Table, and Undo
 
@@ -84,8 +84,8 @@ Test contacts for the delete scripts: create three contacts with first names `De
 |---|---|---|
 | 1 | In Find, run the Garcia Contact query with the **Title** column. | Editable cells show a pencil. |
 | 2 | Double-click Luis Garcia's **Title**, type `Inline edit`, and select **Save** at the foot of the table. | "Saved 1 records. 0 already held the values. Undo from Data Jobs on the Data Manager tab." |
-| 3 | Open the **Data Manager** tab, **Data Jobs**. | A bulk update job is listed first; its run log on the Data Job record starts "Edited in Find". |
-| 4 | Select **Undo**, type `1`, and select **Undo Bulk Update**. **Refresh** until **Undone**. | Luis Garcia's **Title** is empty again. |
+| 3 | Open the **Data Manager** tab, **Data Jobs**. | A Super Transformer run is listed first; its run log on the Data Job record starts "Edited in Find". |
+| 4 | Select **Undo**, type `1`, and select **Undo Super Transformer Run**. **Refresh** until **Undone**. | Luis Garcia's **Title** is empty again. |
 
 **Cleanup:** none.
 
@@ -140,16 +140,16 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 ## T-BULK-09: Permissions and Tabs
 
-**Purpose:** confirm the Bulk Update and Bulk Delete permission sets, and that the BarnCRM Tab sets follow them.
+**Purpose:** confirm the **BarnCRM Bulk Update** and **BarnCRM Bulk Delete** permission sets, and that the BarnCRM Tab sets follow them.
 **Prerequisites:** admin; staff and read-only with no extra permissions.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin (without **BarnCRM Bulk Delete**), run any Find query. | **Bulk Update** is offered; **Bulk Delete** is not. |
-| 2 | Log in as read-only. Search the App Launcher for "Find", "Bulk Update" and "Data Manager". | None of these BarnCRM tabs is found. |
-| 3 | As admin, on **Access**, give staff **BarnCRM Find and Export** only. Log in as staff and run a Find query. | Neither **Bulk Update** nor **Bulk Delete** is offered. No **Super Transformer** tab in the App Launcher. |
-| 4 | As admin, give staff **BarnCRM Bulk Update** as well. Log in as staff and run a Find query. | **Bulk Update** is offered, and the **Super Transformer** tab is available. |
-| 5 | As staff, open the **Super Transformer** tab. | The five Super Transformer steps, then **Data Jobs** with "Start a bulk update with Super Transformer above, or from a saved query in Find (Change Records, Bulk Update). Recent bulk updates and their undo are listed here." and **Open Find**. Only staff's own jobs are listed; **Show everyone's jobs** is not offered. |
+| 1 | As admin (without **BarnCRM Bulk Delete**), run any Find query. | **Super Transformer** is offered; **Bulk Delete** is not. |
+| 2 | Log in as read-only. Search the App Launcher for "Find", "Super Transformer" and "Data Manager". | None of these BarnCRM tabs is found. |
+| 3 | As admin, on **Access**, give staff **BarnCRM Find and Export** only. Log in as staff and run a Find query. | Neither **Super Transformer** nor **Bulk Delete** is offered. No **Super Transformer** tab in the App Launcher. |
+| 4 | As admin, give staff **BarnCRM Bulk Update** as well. Log in as staff and run a Find query. | **Super Transformer** is offered in the **Change Records** menu, and the **Super Transformer** tab is available. |
+| 5 | As staff, open the **Super Transformer** tab. | The five Super Transformer steps, then **Data Jobs** with "Start a change with Super Transformer above, or from a saved query in Find (Change Records, Super Transformer). Recent Super Transformer runs and their undo are listed here." and **Open Find**. Only staff's own jobs are listed; **Show everyone's jobs** is not offered. |
 | 6 | As admin, open the **Super Transformer** tab. | **Show everyone's jobs** is offered; ticking it lists other people's jobs too. |
 | 7 | As admin, give staff **BarnCRM Bulk Delete**. Log in as staff and run a Find query. | **Bulk Delete** is offered. On **Access**, the Bulk Delete give step showed the warning "This permission lets the person remove data. Give it only to someone you trust to do that." |
 | 8 | As admin, in Setup, open staff's user and check **Permission Set Assignments**. | **BarnCRM Tab: Bulk Update**, **BarnCRM Tab: Find** and **BarnCRM Tab: Data Manager** are assigned (given by BarnCRM, not by hand). |
@@ -159,17 +159,17 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 ## T-BULK-10: The Bulk Path from Data Manager
 
-**Purpose:** confirm the way into Bulk Update and Bulk Delete is obvious, and each panel shows its steps.
+**Purpose:** confirm the way into Super Transformer and Bulk Delete is obvious, and each panel shows its steps.
 **Prerequisites:** admin with **BarnCRM Bulk Delete**; sample data loaded.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Data Manager** and choose the **Update Many Records** tile. | The **Super Transformer** tab opens on **1. Object**, with no Find note. On a first visit a tip "Bulk Changes Start Here" says to start from Find only for a saved query. Go back. |
-| 2 | Open **Find**. Choose **Contact**, add **Title**, add the condition **Last Name** **equals** `Garcia`, select **Run**, then **Change Records**, **Bulk Update**. | The **Bulk Update** panel shows a path **Choose Changes**, **Confirm**, **Run**, on **Choose Changes**, and **Add a Change**. |
+| 1 | Open **Data Manager** and choose the **Super Transformer** tile. | The **Super Transformer** tab opens on **1. Object**, with no Find note. On a first visit a tip "Bulk Changes Start Here" says to start from Find only for a saved query. Go back. |
+| 2 | Open **Find**. Choose **Contact**, add **Title**, add the condition **Last Name** **equals** `Garcia`, select **Run**, then **Change Records**, **Super Transformer**. | The **Super Transformer** panel shows a path **Choose Changes**, **Confirm**, **Run**, on **Choose Changes**, and **Add a Change**. |
 | 3 | Choose **Title**, **Set to a value**, type `x`, and select **Preview**. | The path moves to **Confirm**. Select **Close**; nothing changed. |
 | 4 | Choose **Change Records**, **Bulk Delete**, then **Preview**. | The **Bulk Delete** panel's path **Preview**, **Confirm**, **Run** is on **Confirm**. Any related records deleted with them show as badges. **Download a Backup First** has an info icon whose popover says what the file holds. Select **Close** without typing the count. |
 | 5 | Open **Data Manager**, choose the **Delete Many Records** tile, then **Continue**. | **Find** opens with "Bulk Delete starts here: find the records, press Run, then choose Change Records, Bulk Delete." |
-| 6 | On **Data Manager**, under **Data Jobs**, select **Open Find**. | **Find** opens with a note: "Bulk Update starts here: find the records, press Run, then choose Change Records, Bulk Update." (the way to start from a saved query) |
+| 6 | On **Data Manager**, under **Data Jobs**, select **Open Find**. | **Find** opens with a note: "Super Transformer can start here: find the records, press Run, then choose Change Records, Super Transformer." (the way to start from a saved query) |
 
 **Cleanup:** none (nothing was changed or deleted).
 
@@ -189,8 +189,8 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 6 | Press **Preview**. | "N records match. The first N, before and after:" and a table with **Record** and **Title**. Every **Title** cell is shaded and reads "(blank)", an arrow, then `st test` in bold. "0 of the N records shown already have these values and will not be saved." |
 | 7 | Change **New Value** to `st test2`. | The preview table disappears and **Run Super Transformer** is disabled until you press **Preview** again. Press **Preview**. |
 | 8 | Press **Run Super Transformer**, then **Cancel**. | The confirmation read "Change Title on N Contacts." Nothing changed. |
-| 9 | Press **Run Super Transformer**, then **Run**. | "The bulk update started." then a progress bar, then "N matched: N updated, 0 already held the new values, 0 failed." and "To undo this run, press Undo on it under Data Jobs below." |
-| 10 | Reload the page. Under **Data Jobs**, press **Undo** on the newest bulk update, type the number and confirm. | When the undo finishes, every Garcia contact's **Title** is empty again. |
+| 9 | Press **Run Super Transformer**, then **Run**. | "Super Transformer started. It keeps running if you leave this page." then a progress bar, then "N matched: N updated, 0 already held the new values, 0 failed." and "To undo this run, press Undo on it under Data Jobs below." |
+| 10 | Reload the page. Under **Data Jobs**, press **Undo** on the newest Super Transformer run, type the number and confirm. | When the undo finishes, every Garcia contact's **Title** is empty again. |
 
 **Cleanup:** none (the undo put the titles back).
 
@@ -201,12 +201,12 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In BarnCRM Settings, **Import**, set **Bulk update run limit** to `10`. Open **Super Transformer**, choose **Contact**, with no condition. | **Matching Records** shows 11 with an **Over the Limit** badge and a warning that more records match than the 10 one run may change. **Preview** is disabled. |
-| 2 | Set **Bulk update run limit** back to `48000` and reload **Super Transformer**. Choose **Contact**, choose **Title**, **Set To**, type `x`, and press **Preview**. | The table lists 25 contacts. |
+| 1 | In BarnCRM Settings, **Import**, set **Super Transformer run limit** to `10`. Open **Super Transformer**, choose **Contact**, with no condition. | **Matching Records** shows 11 with an **Over the Limit** badge and a warning that more records match than the 10 one run may change. **Preview** is disabled. |
+| 2 | Set **Super Transformer run limit** back to `48000` and reload **Super Transformer**. Choose **Contact**, choose **Title**, **Set To**, type `x`, and press **Preview**. | The table lists 25 contacts. |
 | 3 | Press **Run Super Transformer**. | The confirmation has a field "Type N to confirm" (N is the count), and **Run** stays disabled until N is typed. Press **Cancel**. |
 | 4 | Add the condition **Last Name** **equals** `Garcia`, choose **Title** **Clear**, and press **Preview**. | Every **Title** cell that is already empty is not shaded and shows only "(blank)"; the line under the table counts them. |
 
-**Cleanup:** check **Bulk update run limit** reads 48,000.
+**Cleanup:** check **Super Transformer run limit** reads 48,000.
 
 ## T-BULK-13: Super Transformer Steps and Permissions
 

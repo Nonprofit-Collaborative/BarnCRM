@@ -72,7 +72,7 @@ grant's name to open it.
 ## To See a Month of Deadlines
 
 Open the **Grant Calendar** tab. Each day shows its application deadlines, requirements due and
-payments expected; overdue ones are in red. Click one to open it. Use **Previous Month** and
+payments expected. An overdue item shows a warning icon, the word **Overdue** and bold text (not red alone). A key under the month heading names the border colours: **Application** (blue), **Grant Requirement** (orange) and **Grant Payment** (green), plus the **Overdue** mark. Click one to open it. Use **Previous Month** and
 **Next Month** to move, and **Mine** to see only your grants and the requirements assigned to
 you.
 

@@ -3,7 +3,8 @@
  * R-SE4). The panel works out the dates (one per chosen weekday between two dates) in its
  * framework-free module; this class checks again that the service is an active service of the
  * program, that there are at most 200 dates, and creates one Scheduled session per date, for the
- * cohort when called from one. User mode throughout; plain wrappers (plan Section 9.9); anything
+ * cohort when called from one. A day that already has a session of the service for the same
+ * cohort (none on a program), other than a cancelled one, is skipped and counted. User mode throughout; plain wrappers (plan Section 9.9); anything
  * unexpected is recorded in the Error Log before it is reported (plan Section 7.2).
  */
 public with sharing class SessionScheduleController {
@@ -40,12 +41,36 @@ public with sharing class SessionScheduleController {
         /** After scheduling: how many sessions were created. */
         @AuraEnabled
         public Integer created = 0;
+        /** After scheduling: how many chosen days were skipped because they had a session. */
+        @AuraEnabled
+        public Integer skipped = 0;
     }
 
     @AuraEnabled
     public static Schedule getSchedule(Id recordId) {
         try {
             return scheduleFor(recordId);
+        } catch (Exception failure) {
+            throw report(failure, recordId);
+        }
+    }
+
+    /**
+     * The days from `fromDate` to `toDate` that already have a session of the service for this
+     * cohort (on a program, a program-wide session), so the panel can say they will be skipped.
+     */
+    @AuraEnabled
+    public static List<Date> getTakenDays(Id recordId, Id serviceId, Date fromDate, Date toDate) {
+        if (serviceId == null || fromDate == null || toDate == null || toDate < fromDate) {
+            return new List<Date>();
+        }
+        try {
+            Schedule schedule = scheduleFor(recordId);
+            List<Date> days = new List<Date>(
+                CohortSelector.selectSessionDays(serviceId, schedule.cohortId, fromDate, toDate)
+            );
+            days.sort();
+            return days;
         } catch (Exception failure) {
             throw report(failure, recordId);
         }
@@ -89,8 +114,20 @@ public with sharing class SessionScheduleController {
             }
             List<Date> sorted = new List<Date>(unique);
             sorted.sort();
+            // Running it twice must not double the sessions: a day that already has one of this
+            // service for this cohort is skipped, and the count says so.
+            Set<Date> taken = CohortSelector.selectSessionDays(
+                serviceId,
+                schedule.cohortId,
+                sorted[0],
+                sorted[sorted.size() - 1]
+            );
             List<Session__c> sessions = new List<Session__c>();
             for (Date day : sorted) {
+                if (taken.contains(day)) {
+                    schedule.skipped++;
+                    continue;
+                }
                 sessions.add(
                     new Session__c(
                         Name = sessionName(service.label, day),
@@ -102,7 +139,9 @@ public with sharing class SessionScheduleController {
                     )
                 );
             }
-            Database.insert(sessions, true, AccessLevel.USER_MODE);
+            if (!sessions.isEmpty()) {
+                Database.insert(sessions, true, AccessLevel.USER_MODE);
+            }
             schedule.created = sessions.size();
             return schedule;
         } catch (Exception failure) {

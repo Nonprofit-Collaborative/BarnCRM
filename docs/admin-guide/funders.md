@@ -394,7 +394,7 @@ grant's restricted ledger counts its entries, so nothing is counted twice.
 
 The **Grant Calendar** tab shows a month at a time: application deadlines of open grants not yet
 submitted, due dates of open requirements, and expected payments, each on its day and linked to
-its grant. Overdue items are marked. Use **Previous**, **Next** and **Today** to move between
+its grant. An overdue item shows a warning icon, the word Overdue (in its hover text and for screen readers) and bold text, not red alone. A key under the month heading names the border colours: Application (blue), Grant Requirement (orange), Grant Payment (green), plus the Overdue mark. Use **Previous**, **Next** and **Today** to move between
 months, and **Everyone** or **Mine** as on the Grant Pipeline (Mine: grants you own and
 requirements assigned to you). It shows the same deadlines as the pipeline's **Upcoming
 Deadlines**, plus payments.

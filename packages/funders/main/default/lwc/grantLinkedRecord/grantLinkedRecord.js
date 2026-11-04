@@ -30,7 +30,7 @@ const messageOf = (error) => messageFrom(error, ERROR_ACTION);
  */
 const KINDS = {
   Program: {
-    icon: 'custom:custom8',
+    icon: 'custom:custom88',
     dataId: 'program',
     title: () => PROGRAM_TITLE,
     load: (grantId) => getProgram({ grantId }),
@@ -45,7 +45,7 @@ const KINDS = {
     }
   },
   Fund: {
-    icon: 'custom:custom17',
+    icon: 'custom:custom42',
     dataId: 'fund',
     title: (card) => (card && card.title) || '',
     load: (grantId) => getFund({ grantId }),

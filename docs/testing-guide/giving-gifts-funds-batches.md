@@ -74,6 +74,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 5 | Change the amount to `30`. | **Save** and **Save and New** are enabled again. Do not save. |
 | 6 | Click **Open This Gift**. | The gift shows **Donor Account** Founders Consulting Group, 25.00, Cash, appeal Annual Fund, one allocation to General Fund. |
 | 7 | Open the utility bar at the bottom of any BarnCRM Fundraising page. | **Quick Gift Entry** opens there over the page. |
+| 8 | Save another gift and look at the saved message. | A light notice with a green success icon, not a solid green box: "Gift G-... saved" and the **Open This Gift** link are dark text on a light background, easy to read, and the link opens the gift. |
 
 **Cleanup:** set **Default appeal** back to empty if later scripts expect none.
 

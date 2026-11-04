@@ -169,6 +169,22 @@
         <value>Service Delivery Log</value>
     </labels>
     <labels>
+        <fullName>Programs_Log_UnsavedTitle</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: heading of the unsaved attendance question</shortDescription>
+        <value>Save Attendance First?</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_UnsavedAsk</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Unsaved attendance question; {0} is the service, {1} the date</shortDescription>
+        <value>You have unsaved attendance for {0} on {1}. Changing the service or date reloads the list, so save it first or discard it.</value>
+    </labels>
+    <labels>
         <fullName>Programs_Log_Service</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -1119,6 +1135,14 @@
         <protected>true</protected>
         <shortDescription>Schedule sessions: many created; {0} is the count</shortDescription>
         <value>{0} sessions scheduled.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_Skipped</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: days skipped as they have a session; {0} is the count</shortDescription>
+        <value>Days that already have a session are skipped: {0}.</value>
     </labels>
     <labels>
         <fullName>Programs_Schedule_CreatedOne</fullName>
