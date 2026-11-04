@@ -8,10 +8,8 @@
 )
 private class LogicModelPeriodServiceTest {
     private static final String ADMIN = 'Logic_Models_Admin';
-    private static final String Q1 =
-        '{"name": "2026 Q1", "startDate": "2026-01-01", "endDate": "2026-03-31"}';
-    private static final String Q2 =
-        '{"name": "2026 Q2", "startDate": "2026-04-01", "endDate": "2026-06-30"}';
+    private static final String Q1 = '{"name": "2026 Q1", "startDate": "2026-01-01", "endDate": "2026-03-31"}';
+    private static final String Q2 = '{"name": "2026 Q2", "startDate": "2026-04-01", "endDate": "2026-06-30"}';
 
     @TestSetup
     static void createTestUsers() {
@@ -108,7 +106,9 @@ private class LogicModelPeriodServiceTest {
             );
             String twice = refusal(
                 fixture.modelId,
-                '[' + Q1 + ', {"name": "Again", "startDate": "2026-01-01", "endDate": "2026-03-31"}]'
+                '[' +
+                    Q1 +
+                    ', {"name": "Again", "startDate": "2026-01-01", "endDate": "2026-03-31"}]'
             );
             String notAList = refusal(fixture.modelId, '{"name": "x"}');
             String unreadable = refusal(fixture.modelId, '[{"name": "x", "startDate": "soon"}]');
@@ -209,7 +209,11 @@ private class LogicModelPeriodServiceTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(Label.LogicModels_Builder_NotFound, unknownPeriod, 'Not a model period');
+            Assert.areEqual(
+                Label.LogicModels_Builder_NotFound,
+                unknownPeriod,
+                'Not a model period'
+            );
             Assert.areEqual(Label.LogicModels_Builder_NotFound, goneIndicator, 'Not found');
         }
     }

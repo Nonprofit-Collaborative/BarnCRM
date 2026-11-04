@@ -163,7 +163,9 @@ public with sharing class LogicModelPeriodService {
             Id = modelId,
             Periods__c = periods.isEmpty()
                 ? null
-                : JSON.serialize(new Map<String, Object>{ 'version' => VERSION, 'periods' => stored })
+                : JSON.serialize(
+                      new Map<String, Object>{ 'version' => VERSION, 'periods' => stored }
+                  )
         );
     }
 

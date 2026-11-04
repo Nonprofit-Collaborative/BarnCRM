@@ -10,7 +10,7 @@ import getModel from '@salesforce/apex/LogicModelBuilderController.getModel';
 import getSourceStarters from '@salesforce/apex/LogicModelBuilderController.getSourceStarters';
 import getStarterChoices from '@salesforce/apex/LogicModelBuilderController.getStarterChoices';
 import saveStarterSource from '@salesforce/apex/LogicModelBuilderController.saveStarterSource';
-import useModelPeriods from '@salesforce/apex/LogicModelBuilderController.useModelPeriods';
+import applyModelPeriods from '@salesforce/apex/LogicModelBuilderController.useModelPeriods';
 
 import { FUNCTIONS, SOURCES, isComputed, progress, sourceReady } from 'c/logicModelRules';
 import { LABELS, format, messageFrom, starterLabel } from 'c/logicModelText';
@@ -712,7 +712,7 @@ export default class LogicModelIndicators extends LightningElement {
   /** Use the Model's Periods: every shared period the indicator lacks (R-LM4). */
   handleUseModelPeriods(event) {
     const indicatorId = event.currentTarget.dataset.recordId;
-    return this.run(useModelPeriods({ modelId: this.model.id, indicatorId }), null, (model) =>
+    return this.run(applyModelPeriods({ modelId: this.model.id, indicatorId }), null, (model) =>
       format(LABELS.periodsUsedAdded, (model && model.added) || 0)
     );
   }

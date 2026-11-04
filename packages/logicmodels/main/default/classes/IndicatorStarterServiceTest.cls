@@ -19,7 +19,12 @@ private class IndicatorStarterServiceTest {
     /** Periods named Session, by start date, for the indicator chosen. */
     private static void useTestStarters() {
         IndicatorStarterService.starters = new List<IndicatorStarterService.Starter>{
-            new IndicatorStarterService.Starter('sessions', 'Indicator_Period__c', 'Start_Date__c', 'count')
+            new IndicatorStarterService.Starter(
+                    'sessions',
+                    'Indicator_Period__c',
+                    'Start_Date__c',
+                    'count'
+                )
                 .filtered(
                     new List<Object>{
                         new Map<String, Object>{
@@ -31,7 +36,12 @@ private class IndicatorStarterServiceTest {
                 )
                 .asking('Indicator__c', 'Indicator__c', true),
             new IndicatorStarterService.Starter('missing', 'No_Such_Object__c', 'Date__c', 'count'),
-            new IndicatorStarterService.Starter('targets', 'Indicator_Period__c', 'Start_Date__c', 'sum')
+            new IndicatorStarterService.Starter(
+                    'targets',
+                    'Indicator_Period__c',
+                    'Start_Date__c',
+                    'sum'
+                )
                 .measuring('Target_Value__c')
                 .asking('No_Such_Object__c', 'Notes__c', false)
         };
@@ -99,7 +109,7 @@ private class IndicatorStarterServiceTest {
             Assert.areEqual(2, offered.size(), 'The starter on a missing object is left out');
             Assert.areEqual('sessions', offered[0].get('value'), 'In order');
             Assert.areEqual(
-                Indicator__c.SObjectType.getDescribe().getLabel(),
+                Indicator__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel(),
                 offered[0].get('choiceLabel'),
                 'Named by the chosen object'
             );

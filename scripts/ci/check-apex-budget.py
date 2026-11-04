@@ -39,7 +39,7 @@ CAPS = {
     "giving": 730_000,
     "volunteers": 210_000,
     "programs": 190_000,
-    "logicmodels": 62_000,
+    "logicmodels": 83_000,
     "funders": 122_000,
     "mirror": 230_000,
 }
