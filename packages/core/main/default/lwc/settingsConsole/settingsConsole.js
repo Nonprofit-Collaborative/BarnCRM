@@ -4,6 +4,7 @@ import getConsoleModel from '@salesforce/apex/SettingsController.getConsoleModel
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
 import getRecentChanges from '@salesforce/apex/SettingsController.getRecentChanges';
 import TITLE from '@salesforce/label/c.Core_Settings_Title';
+import NOT_SET from '@salesforce/label/c.Core_Settings_NotSet';
 import SECTIONS_HEADING from '@salesforce/label/c.Core_Settings_SectionsHeading';
 import PURPOSE from '@salesforce/label/c.Core_Settings_Purpose';
 import SAVED_MESSAGE from '@salesforce/label/c.Core_Settings_SavedMessage';
@@ -354,6 +355,11 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       // A Record Type row is one choice from a list, so it is the same dropdown (ADR-0141).
       isPicklist: setting.dataType === 'Picklist' || setting.dataType === 'RecordType',
       isDateTime: setting.dataType === 'DateTime',
+      // A blank date and time is never an empty box with nothing said: it reads "Not set", and
+      // the row's description says what that means for it.
+      blankDateTime:
+        setting.dataType === 'DateTime' && !(hasPending ? pendingValue : setting.value),
+      blankText: setting.defaultText || NOT_SET,
       isRecord: setting.dataType === 'Record',
       // A Field List is the same checkbox list, of an object's fields (R-AD10).
       isRecordTypeList: setting.dataType === 'RecordTypeList' || setting.dataType === 'FieldList',

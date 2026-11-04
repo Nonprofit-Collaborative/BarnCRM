@@ -223,7 +223,7 @@ If step 1 answers `donor_not_found`, the API user cannot see contacts: see [Inbo
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, give yourself the **Gift Transaction Mirror** permission set, then open **BarnCRM Settings**, **Giving**. | **Gift Transaction mirror direction** shows **Off**, **Gift Transaction mirror paid status** shows `Paid`, and **Gift Transaction mirror start date** is empty. |
+| 1 | As admin, give yourself the **Gift Transaction Mirror** permission set, then open **BarnCRM Settings**, **Giving**. | **Gift Transaction mirror direction** shows **Off**, **Gift Transaction mirror paid status** shows `Paid`, and **Gift Transaction mirror start date** is empty with `Not set` under it. |
 | 2 | Open **Gift Transaction Mirror** from **Giving**. | `This org has no Nonprofit Cloud Gift Transactions you can use, so there is nothing to mirror. ...` No run buttons and no **Reconciliation** section. |
 | 3 | Set the direction to **Gifts to Gift Transactions**, the start date to today, and save. Record a gift of 25 from Luis Garcia on **Quick Gift Entry**. | The gift saves as usual. The page still says the mirror is not available, and the **Error Log** has no Gift Transaction mirror entry. |
 | 4 | On the **Gifts** tab, choose **Gifts and Their Gift Transactions**, type `abc` into a gift's **Gift Transaction ID** and save. | Saved: without Gift Transactions nothing is checked. Clear the value again. |

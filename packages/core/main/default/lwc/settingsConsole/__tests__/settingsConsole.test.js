@@ -1418,6 +1418,41 @@ describe('c-settings-console', () => {
       expect(keepButton(element, 'Error_Digest_Frequency__c')).toBeNull();
     });
 
+    it('says Not set under a blank date and time, and nothing once it has a value', async () => {
+      const dateTime = (key, value) => ({
+        key,
+        label: key,
+        description: null,
+        dataType: 'DateTime',
+        section: 'Giving',
+        component: null,
+        helpUrl: null,
+        value,
+        checked: false,
+        options: []
+      });
+      getConsoleModel.mockResolvedValue({
+        canEdit: true,
+        sections: [
+          {
+            name: 'Giving',
+            settings: [
+              dateTime('Gift_Transaction_Mirror_Start__c', null),
+              dateTime('Opportunity_Mirror_Start__c', '2026-01-01T00:00:00.000Z')
+            ]
+          }
+        ]
+      });
+      const element = build();
+      await settle();
+
+      const blank = (key) => element.shadowRoot.querySelector(`[data-blank="${key}"]`);
+      expect(blank('Gift_Transaction_Mirror_Start__c').textContent.trim()).toBe(
+        'c.Core_Settings_NotSet'
+      );
+      expect(blank('Opportunity_Mirror_Start__c')).toBeNull();
+    });
+
     it('says what a blank text row means, keeps nothing, and fills in Company Information', async () => {
       const text = (key, defaultText, suggestedValue) => ({
         key,

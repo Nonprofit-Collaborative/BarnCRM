@@ -65,7 +65,8 @@ Transaction Mirror page says the mirror is not available, and nothing else happe
    setting starts as `Paid`.
 3. Open **BarnCRM Settings**, choose **Giving**, and set:
    - **Gift Transaction mirror paid status**, if your paid value is not `Paid`;
-   - **Gift Transaction mirror start date**: only gifts dated on or after it are copied. If you
+   - **Gift Transaction mirror start date**: only gifts dated on or after it are copied; while it
+     says **Not set**, nothing is copied. If you
      loaded your Nonprofit Cloud gifts into BarnCRM, choose the day after the last load, so those
      gifts are not copied back as second Gift Transactions;
    - **Gift Transaction mirror direction** to **Gifts to Gift Transactions**.

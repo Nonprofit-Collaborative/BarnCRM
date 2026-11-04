@@ -67,7 +67,7 @@ Opportunity mirror page says so.
 1. Give yourself the **Opportunity Mirror** permission set on the Access page, under Extra
    Permissions: the roles there do not include it.
 2. Open **BarnCRM Settings**, choose **Giving**, and set **Opportunity mirror direction**.
-   For **Opportunities to Gifts**, also set **Opportunity mirror start date**: only won Opportunities closed on or after it become gifts.
+   For **Opportunities to Gifts**, also set **Opportunity mirror start date**: only won Opportunities closed on or after it become gifts; while it says **Not set**, none do.
    Until it is set, no Opportunity becomes a gift, so that a switch in an org with years of
    Opportunities does not create, and thank donors for, a gift for every one of them.
 3. Still in **Giving**, open **Opportunity Mirror** (the row shows only to someone with the

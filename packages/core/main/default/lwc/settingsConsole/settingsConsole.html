@@ -166,6 +166,14 @@
                                     data-kind="DateTime"
                                     onchange={handleChange}
                                 ></lightning-input>
+                                <template lwc:if={row.blankDateTime}>
+                                    <p
+                                        class="slds-text-body_small slds-var-m-top_xx-small"
+                                        data-blank={row.key}
+                                    >
+                                        {row.blankText}
+                                    </p>
+                                </template>
                             </template>
 
                             <template lwc:elseif={row.isPicklist}>
