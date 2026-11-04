@@ -1,4 +1,4 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import getStatus from '@salesforce/apex/FieldAccessController.getStatus';
 import searchSets from '@salesforce/apex/FieldAccessController.searchSets';
 import getFields from '@salesforce/apex/FieldAccessController.getFields';
@@ -21,6 +21,7 @@ import {
   previewRows,
   filterFields
 } from 'c/fieldAccessPlan';
+import { shownColumns, nameOptions } from 'c/accessExplorerRows';
 
 import SETS from '@salesforce/label/c.Core_AccessCompare_Sets';
 import SETS_PLACEHOLDER from '@salesforce/label/c.Core_FieldAccess_SetsPlaceholder';
@@ -106,6 +107,9 @@ const text = (fieldName, label, extra = {}) => ({ label, fieldName, ...extra });
  * its words are c/fieldAccessPlan (framework free); every check and write is FieldAccessController.
  */
 export default class FieldAccessManager extends LightningElement {
+  /** Show the API Name column and API names in the picker (Access Explorer's toggle). */
+  @api showTechnicalNames = false;
+
   helpReady = isHelpLoaded('Core');
 
   labels = {
@@ -143,12 +147,21 @@ export default class FieldAccessManager extends LightningElement {
     { label: WORD_EDIT, value: EDIT },
     { label: WORD_NONE, value: NONE }
   ];
-  fieldColumns = [
-    text('label', COL_FIELD),
-    text('name', COL_API_NAME),
-    text('nowText', COL_NOW),
-    text('noteText', COL_NOTE, { initialWidth: 110 })
-  ];
+  get fieldColumns() {
+    return shownColumns(
+      [
+        text('label', COL_FIELD),
+        text('name', COL_API_NAME, { technical: true }),
+        text('nowText', COL_NOW),
+        text('noteText', COL_NOTE, { initialWidth: 110 })
+      ],
+      this.showTechnicalNames
+    );
+  }
+
+  get objectOptions() {
+    return nameOptions(this.objectChoices, this.showTechnicalNames);
+  }
   itemColumns = [
     text('objectLabel', KIND_OF_RECORD),
     text('fieldText', COL_FIELD),
@@ -187,7 +200,7 @@ export default class FieldAccessManager extends LightningElement {
   ];
 
   status;
-  objectOptions = [];
+  objectChoices = [];
   term = '';
   results;
   sets = [];
@@ -223,10 +236,7 @@ export default class FieldAccessManager extends LightningElement {
   @wire(listObjects)
   wiredObjects({ data, error }) {
     if (data) {
-      this.objectOptions = data.map((option) => ({
-        value: option.value,
-        label: `${option.label} (${option.value})`
-      }));
+      this.objectChoices = data;
     } else if (error) {
       this.errorMessage = messageFrom(error);
     }

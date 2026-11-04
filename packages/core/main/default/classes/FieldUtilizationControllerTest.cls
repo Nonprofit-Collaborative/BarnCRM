@@ -340,7 +340,7 @@ private class FieldUtilizationControllerTest {
                 'An object describe does not offer is refused by name (R-FU1).'
             );
             Assert.areEqual(
-                System.Label.Core_FieldUtilization_UnexpectedError,
+                BarnHelp.text('Core', 'Core_FieldUtilization_UnexpectedError'),
                 oversized,
                 'More fields than one chunk is refused.'
             );
