@@ -38,9 +38,12 @@ into a household.
 1. Open the household. Find the **Members** card.
 2. Click **Add Member**. The **Add Member** dialog opens.
 3. Either search under **Add Someone Already in Salesforce** (type in **Search by name** and
-   choose the person), or fill in **Salutation**, **First name** and **Last name** under **Or
-   add someone new**.
-4. Click **Save**.
+   choose the person), or fill in **Salutation**, **First Name** and **Last Name** under **Or
+   Add Someone New**.
+4. If a note appears under the name, such as "Already in BarnCRM: Ana Garcia, Tampa (Garcia
+   Household). Use this person instead?", the person may already exist. Click **Use this
+   person instead?** to add them rather than a duplicate; otherwise carry on.
+5. Click **Save**.
 
 You should see: "Added. The household name and greetings have been brought up to date." The
 dialog closes. Each member shows as a tile with their initials, a **Primary** badge on the primary contact and a **Deceased** badge on

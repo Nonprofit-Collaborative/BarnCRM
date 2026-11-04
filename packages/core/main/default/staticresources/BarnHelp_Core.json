@@ -187,6 +187,8 @@
     "Core_OrgOptimizer_SetupText": "Users, permission sets, reports, flows and jobs nobody seems to use.",
     "Core_OrgOptimizer_StorageText": "Storage and daily limits used, and what BarnCRM adds.",
     "Core_OrganizationAddress_Hint": "Leave the whole address blank, or fill in Street, City, State and Zip Code. Street 2 and Country are optional.",
+    "Core_PersonSameName_Hint": "Already in BarnCRM: {0}.",
+    "Core_PersonSameName_Use": "Use this person instead?",
     "Core_PicklistUsage_Intro": "For each picklist field of this kind of record, how many records hold each value and when the newest of those records was last changed. Use it to find values that are retired but still in your data (Inactive) or that no record holds (Never Used).",
     "Core_PicklistUsage_LastUsedNote": "Last Used is the newest Last Modified Date among the records that hold the value (Created Date on a kind of record that has no Last Modified Date). Any later edit to a record moves it, so it is the latest time a record holding the value was touched, not the time the value was chosen. Multi-select picklists are not included.",
     "Core_RecordInspector_FieldsCut": "This kind of record has more readable fields than one read can carry, so only part of them are shown.",

@@ -49,6 +49,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Open **Add Member** again, search `Diego`, and select **Diego Garcia**. | Diego joins The Testwell Family and stays in The Garcia Family. His **Household** panel lists both households. |
 | 6 | Open the **Household Members** tab, open Diego's new membership, set **End Date** to yesterday, and save. | Diego disappears from The Testwell Family's panel and its Member Count drops by one. The Garcia Family is unchanged. |
 | 7 | Create a second current membership for Ben in The Testwell Family from the **Household Members** tab. | Refused: **This person is already a current member of this household. Edit their existing membership instead of adding another.** |
+| 8 | Open **Add Member** on The Testwell Family and, under **Or Add Someone New**, type First Name `Diego` and Last Name `Garcia`. Wait a moment. | A note under the name reads **Already in BarnCRM: Diego Garcia**, his city if known and **(The Garcia Family)**, then **Use this person instead?** Typing `Ben` `Testwell` offers nobody, because Ben is already a member. |
+| 9 | Select **Use this person instead?** on Diego. | The dialog closes; Diego is listed as a member, and Contacts still holds one Diego Garcia. Remove this membership afterwards. |
 
 **Cleanup:** delete Diego's ended membership record.
 
