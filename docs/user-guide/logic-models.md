@@ -84,6 +84,19 @@ result reaches the target, or how far it got from the baseline, for example 50%.
 To record a result later, click **Edit** on the period's row. Each indicator has one row for the
 same start and end dates.
 
+## To Use the Same Periods for Every Indicator
+
+1. Under the columns, in **Reporting Periods**, click **Add Period**. Fill in **Period**, **Start
+   Date** and **End Date**, and click **Save**. Repeat for each period (for example four quarters).
+2. On a period's row, click **Add Period to Every Indicator**.
+3. For an indicator added later, select its part and click **Use the Model's Periods** under the
+   indicator.
+
+You should see: a note saying how many indicators or periods were added, and the periods in each
+indicator's table, ready for targets and results. An indicator that already had a period with the
+same dates keeps its own. Removing a period from **Reporting Periods** leaves the indicators'
+periods in place.
+
 ## To Fill In Results From a Spreadsheet
 
 Under each indicator a line says where its results come from: **Typed In**, **Imported** or
@@ -107,8 +120,9 @@ what stopped them.
    takes longer, click **Check Again**.
 
 You should see: the periods that have started show new results, and a note that they are worked
-out. Only an admin can change what an
-indicator counts (its **Source**).
+out. Only an admin can change what an indicator counts (its **Source**). An admin can start a
+computed indicator from a template such as **Services Delivered** or **Approved Volunteer Hours**
+and the record it is about; BarnCRM builds the saved query in Find for them.
 
 ## To Compare Periods for a Funder
 

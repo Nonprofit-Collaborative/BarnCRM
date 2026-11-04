@@ -180,6 +180,17 @@
               onclick={handleAddPeriod}
               class="slds-var-m-right_small"
             ></lightning-button>
+            <template lwc:if={hasModelPeriods}>
+              <lightning-button
+                data-id="use-model-periods"
+                data-record-id={indicator.id}
+                variant="base"
+                label={labels.useModelPeriods}
+                disabled={busy}
+                onclick={handleUseModelPeriods}
+                class="slds-var-m-right_small"
+              ></lightning-button>
+            </template>
           </template>
           <template lwc:if={canDelete}>
             <lightning-button
@@ -202,6 +213,30 @@
                 onchange={handleSourceField}
               ></lightning-combobox>
               <template lwc:if={sourceDraftComputed}>
+                <template lwc:if={hasStarters}>
+                  <lightning-combobox
+                    data-id="source-template"
+                    label={labels.template}
+                    field-level-help={labels.starterHelp}
+                    value={template}
+                    options={templateOptions}
+                    onchange={handleTemplate}
+                  ></lightning-combobox>
+                </template>
+              </template>
+              <template lwc:if={usingStarter}>
+                <template lwc:if={starterAsks}>
+                  <lightning-combobox
+                    data-id="starter-choice"
+                    label={starterChoiceLabel}
+                    value={starterChoiceId}
+                    options={starterChoiceOptions}
+                    required={starterChoiceRequired}
+                    onchange={handleStarterChoice}
+                  ></lightning-combobox>
+                </template>
+              </template>
+              <template lwc:if={usingSavedQuery}>
                 <template lwc:if={hasQueryOptions}>
                   <lightning-combobox
                     data-id="source-query"

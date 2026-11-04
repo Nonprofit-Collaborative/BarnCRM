@@ -7,6 +7,14 @@
     "LogicModels_Part_NoTargets": "No later part to link to yet. Add one in a column to the right.",
     "LogicModels_Part_RemoveArrowConfirm": "Remove the arrow from {0} to {1}? Its assumption is deleted too.",
     "LogicModels_Period_DeleteConfirm": "Delete the period {0} with its target and result?",
+    "LogicModels_Periods_Added": "Indicators given this period: {0}. Indicators that already had these dates keep their own.",
+    "LogicModels_Periods_DeleteConfirm": "Remove {0} from the model's reporting periods? Periods already on indicators stay, with their targets and results.",
+    "LogicModels_Periods_EndBeforeStart": "{0} ends before it starts. Check its dates.",
+    "LogicModels_Periods_Intro": "Periods every indicator can share. Add one to every indicator at once, or give one indicator all of them with Use the Model's Periods. Indicators keep their own periods too.",
+    "LogicModels_Periods_Invalid": "Give each reporting period a name, a start date and an end date.",
+    "LogicModels_Periods_SameDates": "{0} has the same dates as another reporting period. Change its dates or remove one.",
+    "LogicModels_Periods_TooMany": "A model can have at most {0} reporting periods. Remove some before adding more.",
+    "LogicModels_Periods_UsedAdded": "Periods added to this indicator: {0}. Periods it already had stay as they are.",
     "LogicModels_Report_NoIndicators": "This model has no indicators yet. Add them to outputs and outcomes in the builder.",
     "LogicModels_Report_NoPeriods": "No indicator has a period yet. Add periods to compare them here.",
     "LogicModels_Report_PrintHelp": "Open the printable report in your browser to print it or save it as a PDF.",
@@ -14,6 +22,10 @@
     "LogicModels_Source_RefreshFailed": "The results were not worked out. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "LogicModels_Source_StillWorking": "The results are still being worked out. Select Check Again in a minute.",
     "LogicModels_Source_WorkedOut": "The results are worked out.",
-    "LogicModels_Source_Working": "Working out results. This takes a few minutes; this panel updates when it is done."
+    "LogicModels_Source_Working": "Working out results. This takes a few minutes; this panel updates when it is done.",
+    "LogicModels_Starter_ChooseRecord": "Choose one of the records listed. The one chosen can no longer be found, or is not of the right kind.",
+    "LogicModels_Starter_Help": "Pick what to count and BarnCRM builds the saved query in Find for you, as your own private query. Choose Saved Query to use one you built.",
+    "LogicModels_Starter_NoFind": "You can't save queries in Find, so this indicator can't be built for you. Ask your BarnCRM admin, or choose Saved Query.",
+    "LogicModels_Starter_Unavailable": "That choice is not available in this org. Choose another, or choose Saved Query."
   }
 }

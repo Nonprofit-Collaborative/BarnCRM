@@ -1,7 +1,7 @@
 # Logic Models
 
-Scripts for the Logic Model Builder (L-01), indicators (L-02), indicator sources (L-03) and the
-Logic Model Report (L-04). Setup
+Scripts for the Logic Model Builder (L-01), indicators (L-02), indicator sources (L-03), the
+Logic Model Report (L-04), reporting periods and computed indicator starters (v1.0). Setup
 detail:
 [Logic Models](../admin-guide/logic-models.md).
 
@@ -160,3 +160,37 @@ periods `2026 Q2` (1 April to 30 June 2026, target 30, result 25), `2026 Q3`, `2
 | 8 | As read-only, open the model. | The report shows and both downloads work. |
 
 **Cleanup:** None.
+
+## T-LM-10: Reporting Periods
+
+**Purpose:** confirm the model's shared periods are kept as a list, copied onto indicators without duplicates, and leave indicators' own periods alone.
+**Prerequisites:** admin, staff and read-only, the model from T-LM-03 (`Students reading daily` has its own `Q1`, 1 January to 31 March 2026). Add a second indicator `Books finished` with no periods.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff, under the columns in **Reporting Periods**, click **Add Period**: `2026 Q2`, 1 April to 30 June 2026. **Save**. Then add `2026 Q1`, 1 January to 31 March 2026. | Both rows listed, `2026 Q1` first. The empty state is gone. |
+| 2 | Add `Again` with 1 January to 31 March 2026. | Refused: it has the same dates as another reporting period. Then try an end before the start: refused, naming the period. |
+| 3 | On `2026 Q1`, click **Add Period to Every Indicator**. | A note says one indicator was given the period: `Books finished` now has `2026 Q1` (no target or result); `Students reading daily` keeps its own `Q1` with its target and result. |
+| 4 | Click it again. | The note says zero; nothing changes. |
+| 5 | Add an indicator `Families reached`, then click **Use the Model's Periods** under it. | A note says two periods were added; it shows `2026 Q1` and `2026 Q2`. |
+| 6 | Click **Remove** on `2026 Q2` and confirm in the dialog with the red button. | The row leaves the list; `Families reached` still has its `2026 Q2`. |
+| 7 | Open the **Logic Model Report**. | `2026 Q1` lines up across all three indicators. |
+| 8 | As read-only, open the model. | The list shows with no **Add Period**, **Remove**, **Add Period to Every Indicator** or **Use the Model's Periods**. |
+
+**Cleanup:** Delete `Families reached` and the shared periods.
+
+## T-LM-11: Computed Indicator Starters
+
+**Purpose:** confirm the starters write the Find saved query and compute the indicator, and are offered only where their module is installed.
+**Prerequisites:** admin. Programs installed with a service `Tutoring` and at least two service deliveries of it this year (one marked Excused Absence); Volunteers installed. A model indicator `Tutoring sessions` with a period for this year.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Click **Source** under `Tutoring sessions` and choose **Computed**. | **Template** shows **People Served by a Service** first, then **Services Delivered**, **Approved Volunteer Hours**, and **Saved Query** last (**Grants Awarded** too where Funders is installed). A **Service** box is required; **Save** is disabled until one is chosen. |
+| 2 | Choose **Services Delivered**, **Service** `Tutoring`, **Save**. | `Working out results` shows, then this year's result: the deliveries of Tutoring that are not absences. The source line names the query `Services Delivered: Tutoring`. |
+| 3 | Open **Find**. | A private saved query `Services Delivered: Tutoring` on Service Deliveries, filtered to Tutoring and leaving out both absence values, with no date filter. |
+| 4 | Back on the indicator, click **Source**. | **Template** shows **Saved Query** with the new query picked. |
+| 5 | Choose **Approved Volunteer Hours** and look at **Volunteer Job**. | **All** is first; **Save** is enabled without a choice. Cancel. |
+| 6 | In an org with Core and Logic Models only, open **Source**, choose **Computed**. | No **Template** box: only the saved query form. |
+
+**Cleanup:** Delete the indicator and the saved query.

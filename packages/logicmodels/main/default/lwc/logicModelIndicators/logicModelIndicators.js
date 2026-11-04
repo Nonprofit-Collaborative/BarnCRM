@@ -7,15 +7,21 @@ import getSourceFields from '@salesforce/apex/LogicModelBuilderController.getSou
 import saveSource from '@salesforce/apex/LogicModelBuilderController.saveSource';
 import refreshResults from '@salesforce/apex/LogicModelBuilderController.refreshResults';
 import getModel from '@salesforce/apex/LogicModelBuilderController.getModel';
+import getSourceStarters from '@salesforce/apex/LogicModelBuilderController.getSourceStarters';
+import getStarterChoices from '@salesforce/apex/LogicModelBuilderController.getStarterChoices';
+import saveStarterSource from '@salesforce/apex/LogicModelBuilderController.saveStarterSource';
+import useModelPeriods from '@salesforce/apex/LogicModelBuilderController.useModelPeriods';
 
 import { FUNCTIONS, SOURCES, isComputed, progress, sourceReady } from 'c/logicModelRules';
-import { LABELS, format, messageFrom } from 'c/logicModelText';
+import { LABELS, format, messageFrom, starterLabel } from 'c/logicModelText';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import BarnConfirmModal from 'c/barnConfirmModal';
 
 /** How often, and how many times, the panel looks for a refresh's results (modules-19). */
 const POLL_MS = 10000;
 const POLL_TRIES = 18;
+/** The Template choice for a saved query built in Find, beside the starters (R-IN8). */
+const SAVED_QUERY = 'savedQuery';
 
 const HIGHER = 'Higher';
 const EMPTY_INDICATOR = Object.freeze({
@@ -146,6 +152,13 @@ export default class LogicModelIndicators extends LightningElement {
   queryOptions;
   /** The chosen query's fields: dateFields, numberFields, uniqueFields. */
   fieldChoices = { dateFields: [], numberFields: [], uniqueFields: [] };
+  /** The starters this org can use (R-IN8): value, choiceLabel, choiceRequired. */
+  starters;
+  /** The Template chosen: a starter's key or SAVED_QUERY. */
+  template = SAVED_QUERY;
+  /** The record the starter is about, and the records to choose from. */
+  starterChoiceId = '';
+  starterChoices = [];
 
   get canSetSource() {
     return !!(this.model && this.model.canSetSource);
@@ -198,7 +211,105 @@ export default class LogicModelIndicators extends LightningElement {
   }
 
   get sourceSaveDisabled() {
-    return this.busy || !sourceReady(this.sourceDraft);
+    if (this.busy) {
+      return true;
+    }
+    if (this.usingStarter) {
+      return this.starter.choiceRequired && !this.starterChoiceId;
+    }
+    return !sourceReady(this.sourceDraft);
+  }
+
+  // ------------------------------------------------------------ starters (R-IN8)
+
+  get hasStarters() {
+    return !!(this.starters && this.starters.length);
+  }
+
+  get templateOptions() {
+    return [
+      ...(this.starters || []).map((starter) => ({
+        value: starter.value,
+        label: starterLabel(starter.value)
+      })),
+      { value: SAVED_QUERY, label: LABELS.savedQuery }
+    ];
+  }
+
+  get starter() {
+    return (this.starters || []).find((item) => item.value === this.template);
+  }
+
+  /** A computed source built from a starter rather than a saved query. */
+  get usingStarter() {
+    return this.sourceDraftComputed && !!this.starter;
+  }
+
+  get usingSavedQuery() {
+    return this.sourceDraftComputed && !this.usingStarter;
+  }
+
+  get starterAsks() {
+    return !!(this.starter && this.starter.choiceLabel);
+  }
+
+  get starterChoiceLabel() {
+    return this.starter ? this.starter.choiceLabel : '';
+  }
+
+  get starterChoiceRequired() {
+    return !!(this.starter && this.starter.choiceRequired);
+  }
+
+  get starterChoiceOptions() {
+    const options = this.starterChoices || [];
+    return this.starterChoiceRequired ? options : [{ value: '', label: LABELS.all }, ...options];
+  }
+
+  loadStarters() {
+    if (this.starters) {
+      return Promise.resolve();
+    }
+    return getSourceStarters()
+      .then((starters) => {
+        this.starters = starters || [];
+      })
+      .catch((error) => {
+        this.starters = [];
+        this.fail(error);
+      });
+  }
+
+  /** Picks a Template; a starter that asks for a record loads the records to choose from. */
+  pickTemplate(value) {
+    this.template = value;
+    this.starterChoiceId = '';
+    this.starterChoices = [];
+    if (!this.starterAsks) {
+      return Promise.resolve();
+    }
+    return getStarterChoices({ starterKey: value })
+      .then((choices) => {
+        if (this.template === value) {
+          this.starterChoices = choices || [];
+        }
+      })
+      .catch((error) => this.fail(error));
+  }
+
+  handleTemplate(event) {
+    return this.pickTemplate(event.detail.value);
+  }
+
+  handleStarterChoice(event) {
+    this.starterChoiceId = event.detail.value;
+  }
+
+  /** The saved query's name: the starter and, when chosen, the record it is about. */
+  starterQueryName() {
+    const choice = (this.starterChoices || []).find((item) => item.value === this.starterChoiceId);
+    const name = starterLabel(this.template);
+    return choice ? `${name}: ${choice.label}` : name;
   }
 
   /** The period form's indicator is computed: its result is never typed (R-IN3). */
@@ -356,7 +467,21 @@ export default class LogicModelIndicators extends LightningElement {
       field: definition.field || null
     };
     this.fieldChoices = { dateFields: [], numberFields: [], uniqueFields: [] };
-    return Promise.all([this.loadQueries(), this.loadFields(this.sourceDraft.queryId)]);
+    this.template = SAVED_QUERY;
+    this.starterChoiceId = '';
+    this.starterChoices = [];
+    const hasQuery = !!indicator.queryId;
+    return Promise.all([
+      this.loadQueries(),
+      this.loadFields(this.sourceDraft.queryId),
+      this.loadStarters().then(() => {
+        // A new computed source starts from the first starter; one already built keeps its query.
+        if (!hasQuery && this.hasStarters && this.sourceFormId === id) {
+          return this.pickTemplate(this.starters[0].value);
+        }
+        return undefined;
+      })
+    ]);
   }
 
   loadQueries() {
@@ -412,8 +537,19 @@ export default class LogicModelIndicators extends LightningElement {
     const source = { ...this.sourceDraft, id: this.sourceFormId };
     const computed = source.source === SOURCES.COMPUTED;
     const stamp = this.stampOf(source.id);
+    const call = this.usingStarter
+      ? saveStarterSource({
+          modelId: this.model.id,
+          starterJson: JSON.stringify({
+            id: source.id,
+            starter: this.template,
+            choiceId: this.starterChoiceId || null,
+            queryName: this.starterQueryName()
+          })
+        })
+      : saveSource({ modelId: this.model.id, sourceJson: JSON.stringify(source) });
     return this.run(
-      saveSource({ modelId: this.model.id, sourceJson: JSON.stringify(source) }),
+      call,
       () => {
         this.sourceFormId = undefined;
         if (computed) {
@@ -573,6 +709,18 @@ export default class LogicModelIndicators extends LightningElement {
     });
   }
 
+  /** Use the Model's Periods: every shared period the indicator lacks (R-LM4). */
+  handleUseModelPeriods(event) {
+    const indicatorId = event.currentTarget.dataset.recordId;
+    return this.run(useModelPeriods({ modelId: this.model.id, indicatorId }), null, (model) =>
+      format(LABELS.periodsUsedAdded, (model && model.added) || 0)
+    );
+  }
+
+  get hasModelPeriods() {
+    return !!(this.model && this.model.periods && this.model.periods.length);
+  }
+
   async handleDeletePeriod(event) {
     const id = event.currentTarget.dataset.recordId;
     const period = ((this.model && this.model.indicators) || [])
@@ -589,6 +737,7 @@ export default class LogicModelIndicators extends LightningElement {
 
   // ---------------------------------------------------------------------------- saving
 
+  /** Runs a save; `message` is a string or a function of the returned model. */
   run(call, after, message) {
     this.busy = true;
     return call
@@ -596,8 +745,9 @@ export default class LogicModelIndicators extends LightningElement {
         if (after) {
           after();
         }
+        const text = typeof message === 'function' ? message(model) : message;
         this.dispatchEvent(
-          new CustomEvent('modelchange', { detail: { model, message: message || LABELS.saved } })
+          new CustomEvent('modelchange', { detail: { model, message: text || LABELS.saved } })
         );
       })
       .catch((error) => this.fail(error))

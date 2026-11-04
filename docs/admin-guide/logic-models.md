@@ -163,6 +163,28 @@ The same start and end dates twice for one indicator are refused: change the row
 A part with indicators cannot be moved to the Inputs, Activities or Impact column; delete or
 move its indicators first.
 
+### Reporting Periods
+
+Most models report on the same stretches of time for every indicator (four quarters, a school
+year). **Reporting Periods**, under the columns of the builder, keeps that list once for the
+model so you do not type it into every indicator:
+
+- **Add Period** adds a period to the list: a name and its start and end dates. The list is kept
+  in start date order; a period with the same dates as another, or an end before its start, is
+  refused, and a model has at most 60.
+- **Add Period to Every Indicator** on a row gives that period (name and dates, no target or
+  result) to every indicator in the model that does not already have one with the same dates.
+  The note says how many indicators got it.
+- **Use the Model's Periods**, under an indicator, gives that one indicator every period on the
+  list it does not already have. Use it for an indicator added after the periods were shared.
+- **Remove** takes a period off the list after a confirm. Periods already given to indicators
+  stay, with their targets and results.
+
+The list is a template, not a link: each indicator gets its own ordinary periods, which you then
+fill in, change or delete one by one, and an indicator can still have periods of its own that are
+not on the list. Shared dates are what line indicators up in the **Logic Model Report**. A Logic
+Models Admin or Staff user changes the list; Read Only users see it.
+
 ## Where Results Come From
 
 Each indicator shows its **Source** under its name. There are three, and only a Logic Models
@@ -189,14 +211,35 @@ Admin can change one: click **Source** under the indicator.
 
 ### Computed Results
 
-A computed indicator counts records you already keep. You describe which records in **Find**,
-then tell the indicator how to count them.
+A computed indicator counts records you already keep. The quickest way is a starter; for anything
+else you describe the records in **Find** and tell the indicator how to count them.
+
+**Starters.** Click **Source** under the indicator and choose **Computed**. The **Template** box
+offers the starters your org can use, then **Saved Query**:
+
+| Template | Counts | Asks for | Offered when |
+|---|---|---|---|
+| **People Served by a Service** | Each person once (Count Unique of Contact), by Delivery Date, leaving out absences | The service (required) | Programs is installed |
+| **Services Delivered** | Service deliveries, by Delivery Date, leaving out absences | The service (required) | Programs is installed |
+| **Approved Volunteer Hours** | The total of Hours on approved volunteer hours, by Date Worked | A volunteer job, or **All** | Volunteers is installed |
+| **Grants Awarded** | Grants at the Awarded stage, by Decision Date | A program, or **All** (where Programs is installed) | Funders is installed |
+
+Pick the template and the record it is about, then **Save**. BarnCRM writes the saved query in
+**Find** for you, named after the template and the record (for example "Services Delivered:
+Tutoring"), as your own private query, then makes the indicator computed from it and works out its
+results as below. The query is an ordinary saved query: open it in Find to read, share or change
+it. A starter needs you to be able to save queries in Find and read its object and fields; if you
+cannot, the builder says so and **Saved Query** still works.
+
+**Your own query.** Choose **Saved Query** under **Template** (it is the only choice where no
+starter's module is installed, and the one shown for an indicator already built from a query):
 
 1. In **Find**, build and save a query of the records to count, for example service deliveries of
    the Reading service, or volunteer hours that were approved. Leave dates out of the filter: the
    indicator adds each period's dates itself. Share the query if other admins should be able to
    change it.
-2. In the builder, click **Source** under the indicator and choose **Computed**.
+2. In the builder, click **Source** under the indicator, choose **Computed**, then **Saved Query**
+   under **Template**.
 3. Pick the **Saved Query**, then the **Date Field** that places a record in a period (for example
    Delivery Date).
 4. Pick what to work out:

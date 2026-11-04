@@ -8,7 +8,32 @@ import getSourceFields from '@salesforce/apex/LogicModelBuilderController.getSou
 import saveSource from '@salesforce/apex/LogicModelBuilderController.saveSource';
 import refreshResults from '@salesforce/apex/LogicModelBuilderController.refreshResults';
 import getModel from '@salesforce/apex/LogicModelBuilderController.getModel';
+import getSourceStarters from '@salesforce/apex/LogicModelBuilderController.getSourceStarters';
+import getStarterChoices from '@salesforce/apex/LogicModelBuilderController.getStarterChoices';
+import saveStarterSource from '@salesforce/apex/LogicModelBuilderController.saveStarterSource';
+import useModelPeriods from '@salesforce/apex/LogicModelBuilderController.useModelPeriods';
 import BarnConfirmModal from 'c/barnConfirmModal';
+
+jest.mock(
+  '@salesforce/apex/LogicModelBuilderController.getSourceStarters',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/LogicModelBuilderController.getStarterChoices',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/LogicModelBuilderController.saveStarterSource',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/LogicModelBuilderController.useModelPeriods',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 
 // The component looks every ten seconds, eighteen times (three minutes).
 const POLL_MS = 10000;
@@ -131,6 +156,10 @@ function change(target, value) {
 }
 
 describe('c-logic-model-indicators', () => {
+  beforeEach(() => {
+    getSourceStarters.mockResolvedValue([]);
+  });
+
   afterEach(() => {
     while (document.body.firstChild) {
       document.body.removeChild(document.body.firstChild);
@@ -235,6 +264,30 @@ describe('c-logic-model-indicators', () => {
     await flush();
     expect(remove).toHaveBeenCalledWith({ recordId: 'i1' });
     expect(changes).toHaveBeenCalledTimes(1);
+  });
+
+  it("gives an indicator the model's periods (modules-23)", async () => {
+    const element = createElement('c-logic-model-indicators', { is: LogicModelIndicators });
+    element.model = {
+      ...MODEL,
+      periods: [{ name: '2026 Q3', startDate: '2026-07-01', endDate: '2026-09-30' }]
+    };
+    element.elementId = 'c1';
+    element.canEdit = true;
+    const changes = jest.fn();
+    element.addEventListener('modelchange', changes);
+    document.body.appendChild(element);
+    await flush();
+    useModelPeriods.mockResolvedValue({ ...MODEL, added: 1 });
+    q(element, 'use-model-periods').click();
+    await flush();
+    expect(useModelPeriods).toHaveBeenCalledWith({ modelId: 'm1', indicatorId: 'i1' });
+    expect(changes.mock.calls[0][0].detail.message).toBe('c.LogicModels_Periods_UsedAdded');
+  });
+
+  it("offers Use the Model's Periods only when the model has periods", async () => {
+    const { element } = await render();
+    expect(q(element, 'use-model-periods')).toBeNull();
   });
 
   it('offers no changes to a reader', async () => {
@@ -434,6 +487,113 @@ describe('c-logic-model-indicators', () => {
       });
       expect(changes).toHaveBeenCalledTimes(1);
       expect(q(element, 'source-form')).toBeNull();
+    });
+
+    describe('starters (modules-22)', () => {
+      const STARTERS = [
+        { value: 'peopleServed', choiceLabel: 'Service', choiceRequired: true },
+        { value: 'volunteerHours', choiceLabel: 'Volunteer Job', choiceRequired: false },
+        { value: 'grantsAwarded', choiceLabel: null, choiceRequired: false }
+      ];
+      const MANUAL = Object.freeze({
+        ...MODEL,
+        canSetSource: true,
+        indicators: [{ ...MODEL.indicators[0], source: 'Manual' }]
+      });
+
+      beforeEach(() => {
+        getSourceQueries.mockResolvedValue([{ value: 'q2', label: 'Volunteer hours' }]);
+        getSourceStarters.mockResolvedValue(STARTERS);
+        getStarterChoices.mockResolvedValue([{ value: 's1', label: 'Tutoring' }]);
+      });
+
+      async function openComputed(model = MANUAL) {
+        const rendered = await renderComputed(model);
+        q(rendered.element, 'indicator-source').click();
+        await flush();
+        change(q(rendered.element, 'source-kind'), 'Computed');
+        await flush();
+        return rendered;
+      }
+
+      it('starts from the first starter, asks for its record, then saves it', async () => {
+        saveStarterSource.mockResolvedValue(COMPUTED);
+        const { element, changes } = await openComputed();
+        const template = q(element, 'source-template');
+        expect(template.value).toBe('peopleServed');
+        expect(template.options.map((option) => option.value)).toEqual([
+          'peopleServed',
+          'volunteerHours',
+          'grantsAwarded',
+          'savedQuery'
+        ]);
+        expect(getStarterChoices).toHaveBeenCalledWith({ starterKey: 'peopleServed' });
+        expect(q(element, 'source-query')).toBeNull();
+        const choice = q(element, 'starter-choice');
+        expect(choice.label).toBe('Service');
+        expect(choice.options).toEqual([{ value: 's1', label: 'Tutoring' }]);
+        expect(q(element, 'source-save').disabled).toBe(true);
+        change(choice, 's1');
+        await flush();
+        expect(q(element, 'source-save').disabled).toBe(false);
+        q(element, 'source-save').click();
+        await flush();
+        expect(saveSource).not.toHaveBeenCalled();
+        expect(saveStarterSource.mock.calls[0][0].modelId).toBe('m1');
+        expect(JSON.parse(saveStarterSource.mock.calls[0][0].starterJson)).toEqual({
+          id: 'i1',
+          starter: 'peopleServed',
+          choiceId: 's1',
+          queryName: 'c.LogicModels_Starter_PeopleServed: Tutoring'
+        });
+        expect(changes.mock.calls[0][0].detail.message).toBe('c.LogicModels_Source_Working');
+        expect(q(element, 'source-form')).toBeNull();
+      });
+
+      it('offers All for an optional record and none where nothing is asked', async () => {
+        saveStarterSource.mockResolvedValue(COMPUTED);
+        const { element } = await openComputed();
+        change(q(element, 'source-template'), 'volunteerHours');
+        await flush();
+        expect(q(element, 'starter-choice').options[0]).toEqual({
+          value: '',
+          label: 'c.Core_DataJobs_ShowAll'
+        });
+        expect(q(element, 'source-save').disabled).toBe(false);
+        change(q(element, 'source-template'), 'grantsAwarded');
+        await flush();
+        expect(q(element, 'starter-choice')).toBeNull();
+        q(element, 'source-save').click();
+        await flush();
+        expect(JSON.parse(saveStarterSource.mock.calls[0][0].starterJson)).toMatchObject({
+          starter: 'grantsAwarded',
+          choiceId: null,
+          queryName: 'c.LogicModels_Starter_GrantsAwarded'
+        });
+      });
+
+      it('keeps Saved Query for a source built from one, and on request', async () => {
+        const { element } = await renderComputed();
+        q(element, 'indicator-source').click();
+        await flush();
+        expect(q(element, 'source-template').value).toBe('savedQuery');
+        expect(q(element, 'source-query')).not.toBeNull();
+        expect(q(element, 'starter-choice')).toBeNull();
+        q(element, 'source-cancel').click();
+        await flush();
+        const manual = await openComputed();
+        change(q(manual.element, 'source-template'), 'savedQuery');
+        await flush();
+        expect(q(manual.element, 'source-query')).not.toBeNull();
+      });
+
+      it('passes a failed starter load up and falls back to Saved Query', async () => {
+        getSourceStarters.mockRejectedValue({ body: { message: 'No access.' } });
+        const { element, failures } = await openComputed();
+        expect(failures).toHaveBeenCalledTimes(1);
+        expect(q(element, 'source-template')).toBeNull();
+        expect(q(element, 'source-query')).not.toBeNull();
+      });
     });
 
     it('says when there is no saved query and passes a failed load up', async () => {

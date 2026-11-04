@@ -800,4 +800,60 @@
         <shortDescription>Report line; {0} model, {1} whose, {2} date</shortDescription>
         <value>{0}. For: {1}. Prepared {2}.</value>
     </labels>
+    <labels>
+        <fullName>LogicModels_Periods_Title</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading of the model's shared periods</shortDescription>
+        <value>Reporting Periods</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Periods_AddToEvery</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button: put a model period on every indicator</shortDescription>
+        <value>Add Period to Every Indicator</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Periods_UseModel</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button: give an indicator every model period</shortDescription>
+        <value>Use the Model's Periods</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Starter_PeopleServed</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Computed indicator starter option</shortDescription>
+        <value>People Served by a Service</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Starter_ServicesDelivered</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Computed indicator starter option</shortDescription>
+        <value>Services Delivered</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Starter_VolunteerHours</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Computed indicator starter option</shortDescription>
+        <value>Approved Volunteer Hours</value>
+    </labels>
+    <labels>
+        <fullName>LogicModels_Starter_GrantsAwarded</fullName>
+        <categories>LogicModels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Computed indicator starter option</shortDescription>
+        <value>Grants Awarded</value>
+    </labels>
 </CustomLabels>

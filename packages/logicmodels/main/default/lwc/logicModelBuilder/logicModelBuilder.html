@@ -186,6 +186,14 @@
             </p>
           </template>
 
+          <c-logic-model-periods
+            data-id="model-periods"
+            model={model}
+            can-edit={canEdit}
+            onmodelchange={handleModelChange}
+            onfailure={handleChildError}
+          ></c-logic-model-periods>
+
           <h3 class="slds-text-heading_small slds-var-m-vertical_small">{labels.lookAt}</h3>
           <template lwc:if={hasFindings}>
             <ul class="slds-list_dotted slds-var-m-bottom_small" data-id="findings">

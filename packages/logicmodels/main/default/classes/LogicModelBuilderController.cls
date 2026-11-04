@@ -165,6 +165,126 @@ public with sharing class LogicModelBuilderController {
     }
 
     /**
+     * The computed indicator starters this org can use (R-IN8).
+     *
+     * @return value, choiceLabel and choiceRequired
+     */
+    @AuraEnabled
+    public static List<Map<String, Object>> getSourceStarters() {
+        try {
+            return IndicatorStarterService.available();
+        } catch (Exception e) {
+            throw handled(e);
+        }
+    }
+
+    /**
+     * The records a starter can be about: services, volunteer jobs or programs.
+     *
+     * @param starterKey the starter
+     * @return value and label pairs
+     */
+    @AuraEnabled
+    public static List<Map<String, String>> getStarterChoices(String starterKey) {
+        try {
+            return IndicatorStarterService.choices(starterKey);
+        } catch (Exception e) {
+            throw handled(e);
+        }
+    }
+
+    /**
+     * Writes a starter's saved query and makes the indicator computed from it, then starts
+     * working out its results (R-IN8, R-IN4).
+     *
+     * @param modelId the logic model
+     * @param starterJson id (the indicator), starter, choiceId, queryName
+     * @return the model
+     */
+    @AuraEnabled
+    public static Map<String, Object> saveStarterSource(Id modelId, String starterJson) {
+        try {
+            Map<String, Object> fields = parse(starterJson);
+            Map<String, Object> source = IndicatorStarterService.createQuery(
+                (String) fields.get('starter'),
+                (String) fields.get('choiceId'),
+                (String) fields.get('queryName')
+            );
+            source.put('id', fields.get('id'));
+            IndicatorSourceService.save(source);
+            IndicatorSourceService.refresh(Id.valueOf(String.valueOf(fields.get('id'))));
+            return LogicModelService.read(modelId);
+        } catch (Exception e) {
+            throw handled(e);
+        }
+    }
+
+    /**
+     * Saves the model's shared reporting periods (R-LM4).
+     *
+     * @param modelId the logic model
+     * @param periodsJson a list of {name, startDate, endDate}
+     * @return the model
+     */
+    @AuraEnabled
+    public static Map<String, Object> savePeriods(Id modelId, String periodsJson) {
+        try {
+            Object rows = String.isBlank(periodsJson) ? null : JSON.deserializeUntyped(periodsJson);
+            if (!(rows instanceof List<Object>)) {
+                throw new LogicModelService.BuilderException(actionFailed());
+            }
+            LogicModelPeriodService.save(modelId, (List<Object>) rows);
+            return LogicModelService.read(modelId);
+        } catch (Exception e) {
+            throw handled(e);
+        }
+    }
+
+    /**
+     * Add Period to Every Indicator: the model period with these dates on every indicator that
+     * lacks it (R-LM4).
+     *
+     * @param modelId the logic model
+     * @param startDate the period's start (ISO date)
+     * @param endDate the period's end (ISO date)
+     * @return the model, with `added`: how many indicators got the period
+     */
+    @AuraEnabled
+    public static Map<String, Object> addPeriodToEveryIndicator(
+        Id modelId,
+        String startDate,
+        String endDate
+    ) {
+        try {
+            Integer added = LogicModelPeriodService.addToEvery(modelId, startDate, endDate);
+            Map<String, Object> model = LogicModelService.read(modelId);
+            model.put('added', added);
+            return model;
+        } catch (Exception e) {
+            throw handled(e);
+        }
+    }
+
+    /**
+     * Use the Model's Periods: every model period the indicator lacks (R-LM4).
+     *
+     * @param modelId the logic model
+     * @param indicatorId the indicator
+     * @return the model, with `added`: how many periods were added
+     */
+    @AuraEnabled
+    public static Map<String, Object> useModelPeriods(Id modelId, Id indicatorId) {
+        try {
+            Integer added = LogicModelPeriodService.useForIndicator(modelId, indicatorId);
+            Map<String, Object> model = LogicModelService.read(modelId);
+            model.put('added', added);
+            return model;
+        } catch (Exception e) {
+            throw handled(e);
+        }
+    }
+
+    /**
      * Starts working out a computed indicator's results now.
      *
      * @param modelId the logic model

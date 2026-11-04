@@ -110,6 +110,15 @@ import REPORT_PERIOD_DATES from '@salesforce/label/c.Core_Address_DateRange';
 import REPORT_DOWNLOADED from '@salesforce/label/c.Core_Shared_ReportDownloaded';
 import BACK_TO_MODEL from '@salesforce/label/c.LogicModels_Builder_BackToModel';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
+import PERIODS_TITLE from '@salesforce/label/c.LogicModels_Periods_Title';
+import ADD_TO_EVERY from '@salesforce/label/c.LogicModels_Periods_AddToEvery';
+import USE_MODEL_PERIODS from '@salesforce/label/c.LogicModels_Periods_UseModel';
+import TEMPLATE from '@salesforce/label/c.Core_Import_StepTemplate';
+import ALL from '@salesforce/label/c.Core_DataJobs_ShowAll';
+import STARTER_PEOPLE_SERVED from '@salesforce/label/c.LogicModels_Starter_PeopleServed';
+import STARTER_SERVICES_DELIVERED from '@salesforce/label/c.LogicModels_Starter_ServicesDelivered';
+import STARTER_VOLUNTEER_HOURS from '@salesforce/label/c.LogicModels_Starter_VolunteerHours';
+import STARTER_GRANTS_AWARDED from '@salesforce/label/c.LogicModels_Starter_GrantsAwarded';
 import { helpText } from 'c/barnHelpText';
 
 export const LABELS = Object.freeze({
@@ -252,8 +261,40 @@ export const LABELS = Object.freeze({
   reportIndicator: REPORT_INDICATOR,
   reportMeta: REPORT_META,
   reportPeriodDates: REPORT_PERIOD_DATES,
-  reportDownloaded: REPORT_DOWNLOADED
+  reportDownloaded: REPORT_DOWNLOADED,
+  periodsTitle: PERIODS_TITLE,
+  addToEvery: ADD_TO_EVERY,
+  useModelPeriods: USE_MODEL_PERIODS,
+  get periodsIntro() {
+    return helpText('LogicModels', 'LogicModels_Periods_Intro');
+  },
+  get periodsAdded() {
+    return helpText('LogicModels', 'LogicModels_Periods_Added');
+  },
+  get periodsUsedAdded() {
+    return helpText('LogicModels', 'LogicModels_Periods_UsedAdded');
+  },
+  get periodsDeleteConfirm() {
+    return helpText('LogicModels', 'LogicModels_Periods_DeleteConfirm');
+  },
+  template: TEMPLATE,
+  all: ALL,
+  get starterHelp() {
+    return helpText('LogicModels', 'LogicModels_Starter_Help');
+  }
 });
+
+/** A computed indicator starter's name, by its key (R-IN8). */
+const STARTER_LABELS = Object.freeze({
+  peopleServed: STARTER_PEOPLE_SERVED,
+  servicesDelivered: STARTER_SERVICES_DELIVERED,
+  volunteerHours: STARTER_VOLUNTEER_HOURS,
+  grantsAwarded: STARTER_GRANTS_AWARDED
+});
+
+export function starterLabel(key) {
+  return STARTER_LABELS[key] || key;
+}
 
 const STAGE_LABELS = Object.freeze({
   Input: STAGE_INPUT,
