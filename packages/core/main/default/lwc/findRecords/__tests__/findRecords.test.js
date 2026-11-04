@@ -307,6 +307,58 @@ describe('c-find-records', () => {
     expect(one(element, 'result-line').textContent.trim()).toBe('1 rows shown.');
   });
 
+  describe('putting the columns in order (drag and drop item 2)', () => {
+    async function withTwoColumns() {
+      const element = await render();
+      await choose(one(element, 'object'), 'Gift__c');
+      await choose(one(element, 'related'), 'Donor_Contact__r');
+      await choose(one(element, 'columns'), ['Name', 'Donor_Contact__r.LastName']);
+      return element;
+    }
+
+    const orderOf = (element) =>
+      Array.from(element.shadowRoot.querySelectorAll('[data-id="column-drag"]')).map(
+        (handle) => handle.dataset.dragId
+      );
+
+    it('lists the chosen columns for ordering only when there are two or more', async () => {
+      const element = await render();
+      await choose(one(element, 'object'), 'Gift__c');
+      await choose(one(element, 'columns'), ['Name']);
+      expect(element.shadowRoot.querySelector('[data-id="column-zone"]')).toBeNull();
+
+      const two = await withTwoColumns();
+      expect(orderOf(two)).toEqual(['Name', 'Donor_Contact__r.LastName']);
+      const handle = two.shadowRoot.querySelector('[data-id="column-drag"]');
+      expect(handle.getAttribute('role')).toBe('button');
+      expect(handle.getAttribute('tabindex')).toBe('0');
+      expect(handle.dataset.dragLabel).toBe('Gift Name');
+    });
+
+    it('moves a column down, announces it and keeps the new order', async () => {
+      const element = await withTwoColumns();
+      const down = element.shadowRoot.querySelectorAll('[data-id="column-down"]');
+      expect(down[1].disabled).toBe(true);
+      expect(down[0].alternativeText).toBe('c.Core_Shared_MoveDown: Gift Name');
+
+      down[0].click();
+      await flush();
+
+      expect(orderOf(element)).toEqual(['Donor_Contact__r.LastName', 'Name']);
+      expect(one(element, 'columns').value).toEqual(['Donor_Contact__r.LastName', 'Name']);
+      expect(one(element, 'column-live').textContent).toBe('c.Core_Drag_Position');
+    });
+
+    it('moves a column up and disables the first one', async () => {
+      const element = await withTwoColumns();
+      const up = element.shadowRoot.querySelectorAll('[data-id="column-up"]');
+      expect(up[0].disabled).toBe(true);
+      up[1].click();
+      await flush();
+      expect(orderOf(element)).toEqual(['Donor_Contact__r.LastName', 'Name']);
+    });
+  });
+
   it('refuses to run with no columns and says why', async () => {
     const element = await render();
     await choose(one(element, 'object'), 'Gift__c');

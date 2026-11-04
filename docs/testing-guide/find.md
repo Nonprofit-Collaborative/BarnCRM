@@ -36,6 +36,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Change the condition to **Last Name**, **equals**, `Garcia`. Add a second condition **First Name**, **equals**, `Harper`. Tick **Use custom condition logic** and type `1` in **Condition logic**. | "The condition logic must use every condition. Add condition 2 to it, or remove the condition." |
 | 6 | Change the logic to `1 AND 3`. | "The condition logic names condition 3, which does not exist." |
 | 7 | Change the logic to `1 AND 2` and select **Run**. | One row: Harper Garcia. |
+| 8 | Add a third condition **Email**, **is not blank**, and set the logic to `1 AND (2 OR 3)`. Select Move Up on condition 3 twice. | The conditions read Email, Last Name, First Name, and the logic reads `2 AND (3 OR 1)`. Each move is announced ("..., position 2 of 3."). |
+| 9 | Drag condition 1 by its handle below condition 3 (or focus the handle, press Space, Down twice, Space). | The order and the logic update the same way; the first condition's Move Up and the last one's Move Down are disabled. |
+| 10 | With **Last Name** and **First Name** chosen under **Columns**, use Move Down on **Last Name** in the column order list, then select **Run**. | The result columns show First Name before Last Name. |
 
 **Cleanup:** none.
 

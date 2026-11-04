@@ -36,10 +36,15 @@ You should see: the **Households** list with the household name, **Member Count*
    The **Find** tab opens.
 2. In **Kind of record**, choose what to look for, for example **Contact** or **Account**.
 3. In **Columns**, move the fields you want from **Available fields** to **Columns, in
-   order**. To add a field from a related record, choose it in **Add fields from**.
+   order**. To add a field from a related record, choose it in **Add fields from**. With two or
+   more columns, a list under the picker lets you put them in order: drag a column by its
+   handle (touch: press and hold), or use its Move Up and Move Down buttons. The results follow
+   the new order.
 4. Under **Conditions**, press **Add Condition**. Choose a **Field**, an **Operator** (such as
    **equals**, **contains**, **is blank**, **is one of** or **is in the last N days**) and a
-   **Value**. Add more conditions the same way.
+   **Value**. Add more conditions the same way. With two or more conditions, drag one by its
+   handle or use Move Up and Move Down to reorder them; custom condition logic follows, so
+   `1 AND (2 OR 3)` still names the same conditions.
 5. Optional: with two or more conditions, tick **Use custom condition logic** and type, for
    example, `1 AND (2 OR 3)` in **Condition logic**.
 6. Choose **Sort by**, **Direction** and **Rows to show** (up to 2,000).

@@ -165,7 +165,7 @@ describe('c-filter-builder', () => {
 
     expect(element.reportValidity()).toBe(false);
     await flush();
-    expect(one(element, 'row-error').textContent).toBe('c.Core_Filter_ErrorDays');
+    expect(one(element, 'row-error').message).toBe('c.Core_Filter_ErrorDays');
     expect(one(element, 'error-summary')).not.toBeNull();
 
     await choose(one(element, 'value'), '30');
@@ -239,7 +239,7 @@ describe('c-filter-builder', () => {
     });
     const { element } = await render({ value: saved });
 
-    expect(one(element, 'row-error').textContent).toBe('c.Core_Filter_ErrorFieldUnavailable');
+    expect(one(element, 'row-error').message).toBe('c.Core_Filter_ErrorFieldUnavailable');
     expect(element.validate().valid).toBe(false);
     expect(JSON.parse(element.value).conditions[0].field).toBe('Secret__c');
   });
@@ -263,7 +263,7 @@ describe('c-filter-builder', () => {
     element.reportValidity();
     await flush();
     // Both rows still need a field, which is reported first; the logic says its own problem.
-    expect(one(element, 'logic-error').textContent.trim()).toBe('c.Core_Filter_ErrorLogicUnknown');
+    expect(one(element, 'logic-error').message).toBe('c.Core_Filter_ErrorLogicUnknown');
   });
 
   it('renumbers the conditions when one is removed', async () => {
@@ -280,7 +280,7 @@ describe('c-filter-builder', () => {
 
   it('says so when a saved filter cannot be read', async () => {
     const { element } = await render({ value: '{"version": 9}' });
-    expect(one(element, 'load-error').textContent).toBe('c.Core_Filter_ErrorInvalidDocument');
+    expect(one(element, 'load-error').message).toBe('c.Core_Filter_ErrorInvalidDocument');
     expect(element.validate().valid).toBe(false);
   });
 
@@ -289,9 +289,88 @@ describe('c-filter-builder', () => {
       Promise.reject({ body: { message: 'This object is not available to you: Secret__c.' } })
     );
     const { element } = await render({ objectApiName: 'Secret__c' });
-    expect(one(element, 'load-error').textContent).toBe(
+    expect(one(element, 'load-error').message).toBe(
       'This object is not available to you: Secret__c.'
     );
     expect(one(element, 'add').disabled).toBe(true);
+  });
+
+  describe('putting conditions in order (drag and drop item 5)', () => {
+    async function addCondition(element, status) {
+      one(element, 'add').click();
+      await flush();
+      const rows = all(element, 'condition');
+      const row = rows[rows.length - 1];
+      await choose(row.querySelector('[data-id="field"]'), 'f:Status__c');
+      await choose(row.querySelector('[data-id="operator"]'), 'equals');
+      await choose(row.querySelector('[data-id="value"]'), status);
+    }
+
+    async function threeConditions() {
+      const { element, changes } = await render();
+      await addCondition(element, 'Received');
+      await addCondition(element, 'Pledged');
+      await addCondition(element, 'Other');
+      return { element, changes };
+    }
+
+    const values = (changes) =>
+      JSON.parse(changes[changes.length - 1].value).conditions.map((entry) => entry.value);
+
+    it('offers no handle or move buttons for a single condition', async () => {
+      const { element } = await render();
+      one(element, 'add').click();
+      await flush();
+      expect(all(element, 'drag')).toHaveLength(0);
+      expect(all(element, 'move-up')).toHaveLength(0);
+    });
+
+    it('moves a condition up or down with buttons that name it, and says where it went', async () => {
+      const { element, changes } = await threeConditions();
+      expect(all(element, 'move-up')[0].disabled).toBe(true);
+      expect(all(element, 'move-down')[2].disabled).toBe(true);
+      expect(all(element, 'move-down')[0].alternativeText).toBe(
+        'c.Core_Shared_MoveDown: c.Core_Filter_ConditionLegend'
+      );
+
+      all(element, 'move-down')[0].click();
+      await flush();
+
+      expect(values(changes)).toEqual(['Pledged', 'Received', 'Other']);
+      expect(one(element, 'drag-live').textContent).toBe('c.Core_Drag_Position');
+    });
+
+    it('keeps the condition logic naming the same conditions after a move', async () => {
+      const { element, changes } = await threeConditions();
+      const toggle = one(element, 'logic-toggle');
+      toggle.checked = true;
+      toggle.dispatchEvent(new CustomEvent('change'));
+      await flush();
+      const logic = one(element, 'logic');
+      logic.value = '1 AND (2 OR 3)';
+      logic.dispatchEvent(new CustomEvent('change'));
+      await flush();
+
+      // Condition 3 moves to the top: the logic reads 2 AND (3 OR 1).
+      all(element, 'move-up')[2].click();
+      await flush();
+      all(element, 'move-up')[1].click();
+      await flush();
+
+      expect(values(changes)).toEqual(['Other', 'Received', 'Pledged']);
+      expect(one(element, 'logic').value).toBe('2 AND (3 OR 1)');
+      expect(JSON.parse(changes[changes.length - 1].value).logic).toBe('2 AND (3 OR 1)');
+    });
+
+    it('gives each condition a keyboard reachable handle that names it', async () => {
+      const { element } = await threeConditions();
+      const handles = all(element, 'drag');
+      expect(handles).toHaveLength(3);
+      expect(handles[0].getAttribute('role')).toBe('button');
+      expect(handles[0].getAttribute('tabindex')).toBe('0');
+      expect(handles[0].dataset.dragId).toBeTruthy();
+      expect(handles[0].getAttribute('aria-describedby')).toMatch(/^drag-help/);
+      expect(element.shadowRoot.querySelector('[data-drop-zone="conditions"]')).not.toBeNull();
+    });
   });
 });

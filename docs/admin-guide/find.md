@@ -56,7 +56,9 @@ to send them a letter.
 2. In **Columns**, move **Account Name**, **Billing City** and **Billing Postal Code** to the
    right. To add a field from a related record, choose the lookup in **Add fields from** (for
    example **Primary Contact**) and its fields appear in the list as "Primary Contact > Email".
-   Add **Primary Contact > Email**.
+   Add **Primary Contact > Email**. The chosen columns also appear in a list you can put in
+   order: drag by the handle (touch: press and hold) or use Move Up and Move Down; the preview
+   and results follow the order.
 3. Under **Conditions**, press **Add Condition**. Choose **Billing City**, **equals**, and type
    **Springfield**. Add a second condition: **Primary Contact: more fields**, then **Email**,
    **is blank**.
@@ -97,6 +99,10 @@ a value; the operators offered depend on the field:
 - **Condition logic.** With two or more conditions, tick **Use custom condition logic** to
   combine them with AND, OR, NOT and brackets, for example `1 AND (2 OR 3)`. Every condition
   must appear in the logic.
+- **Condition order.** With two or more conditions, drag a condition by its handle (touch:
+  press and hold) or use its Move Up and Move Down buttons. Each move is announced to screen
+  readers. The condition logic is renumbered so every number still names the same condition:
+  moving condition 3 to the top turns `1 AND (2 OR 3)` into `2 AND (3 OR 1)`.
 - A condition that is incomplete, or a value that does not fit the field, is marked in place
   and the query does not run until it is fixed.
 

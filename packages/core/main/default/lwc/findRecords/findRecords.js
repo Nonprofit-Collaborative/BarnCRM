@@ -80,7 +80,11 @@ import EXPORT_MENU from '@salesforce/label/c.Core_Find_ExportMenu';
 import CHANGE_RECORDS from '@salesforce/label/c.Core_Find_ChangeRecords';
 import SAVE_HEADING from '@salesforce/label/c.Core_Find_SaveHeading';
 import MORE_QUERY_ACTIONS from '@salesforce/label/c.Core_Find_MoreQueryActions';
+import MOVE_UP from '@salesforce/label/c.Core_Shared_MoveUp';
+import MOVE_DOWN from '@salesforce/label/c.Core_Shared_MoveDown';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { createDragController, moveItem, targetIndex } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
 
 const XLSX_TYPES = {
   currency: CELL_TYPES.NUMBER,
@@ -328,10 +332,115 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
       });
     }
     this.loadPage();
+    // Put the chosen columns in order: drag a column by its handle (mouse, pen, or touch after a
+    // press and hold) or by keyboard; Move Up and Move Down stay as the plain path.
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'list',
+      messages: dragMessages(),
+      announce: (text) => {
+        this.columnAnnouncement = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      onDrop: ({ itemId, toIndex }) => {
+        const from = this.columns.indexOf(itemId);
+        if (from < 0 || from === toIndex) {
+          return false;
+        }
+        this.moveColumn(from, toIndex);
+        return true;
+      }
+    });
   }
 
   disconnectedCallback() {
     clearTimeout(this.previewTimer);
+    if (this.drag) {
+      this.drag.destroy();
+    }
+  }
+
+  /** The last column move, read out by the aria-live region. */
+  columnAnnouncement = '';
+  /** c/barnDrag's state while a column is dragged: which one, and where it would land. */
+  dragState;
+
+  get dragHelp() {
+    return dragInstructions();
+  }
+
+  /** Two or more chosen columns can be put in order. */
+  get canOrderColumns() {
+    return this.columns.length > 1;
+  }
+
+  get columnViews() {
+    const drag = this.dragState && this.dragState.active ? this.dragState : null;
+    const others = drag ? this.columns.filter((path) => path !== drag.itemId) : [];
+    const before = drag && drag.overIndex >= 0 ? others[drag.overIndex] : null;
+    const after =
+      drag && drag.overIndex >= 0 && drag.overIndex === others.length && others.length
+        ? others[others.length - 1]
+        : null;
+    const last = this.columns.length - 1;
+    return this.columns.map((path, index) => {
+      const label = this.columnLabel(path);
+      return {
+        key: path,
+        label,
+        itemClass: [
+          'slds-grid slds-grid_vertical-align-center slds-var-p-vertical_xx-small slds-border_bottom',
+          drag && drag.itemId === path ? 'column-dragging' : '',
+          before === path ? 'column-over-before' : '',
+          after === path ? 'column-over-after' : ''
+        ]
+          .filter(Boolean)
+          .join(' '),
+        moveUpLabel: `${MOVE_UP}: ${label}`,
+        moveDownLabel: `${MOVE_DOWN}: ${label}`,
+        moveUpDisabled: index === 0,
+        moveDownDisabled: index === last
+      };
+    });
+  }
+
+  moveColumn(from, to) {
+    this.columns = moveItem(this.columns, from, to);
+    this.refreshPreview();
+  }
+
+  handleColumnPointerDown(event) {
+    this.drag.pointerDown(event);
+  }
+
+  handleColumnDragKey(event) {
+    this.drag.keyDown(event);
+  }
+
+  handleColumnMoveUp(event) {
+    this.moveColumnBy(event.currentTarget.dataset.key, -1);
+  }
+
+  handleColumnMoveDown(event) {
+    this.moveColumnBy(event.currentTarget.dataset.key, 1);
+  }
+
+  moveColumnBy(path, delta) {
+    const from = this.columns.indexOf(path);
+    const to = targetIndex(from, delta, this.columns.length);
+    if (to < 0) {
+      return;
+    }
+    this.moveColumn(from, to);
+    this.columnAnnouncement = helpText(
+      'Core',
+      'Core_Drag_Position',
+      this.columnLabel(path),
+      to + 1,
+      this.columns.length
+    );
   }
 
   async loadPage() {
