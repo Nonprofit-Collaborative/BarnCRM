@@ -416,9 +416,10 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 2 | Tick **Delete empty households** (do not save). | The save bar reads "1 unsaved change in this section". |
 | 3 | Open **General** without saving. | The save bar reads "0 unsaved changes in this section and 1 in other sections". Click **Discard**. |
 | 4 | Open **Import**. | **Records per batch in imports** (Importing) and **Records per batch in background jobs** (Find, Super Transformer and Bulk Delete) each read 200; each description says to lower it only after a limit error. The first row's button reads **Open Super Importer**. |
-| 5 | Open **Health** and click **Open Health Check**. | The Org Optimizer tab opens on its **Health Check** section. |
+| 5 | Open **Health** and click **Open Health Check**. | The Org Optimizer tab opens on its **Health Check** section, showing the last run (it does not start a new one). |
 | 6 | Open **BarnCRM Settings**, **Error Log**. | The first box has **Open the Error Log**; below it the digest and retention settings only. Click it: Org Optimizer opens on **Errors**. |
 | 7 | Narrow the browser window to phone width (or open on a phone) and reopen **BarnCRM Settings**. | The section list is replaced by a **Section** box under the search. Choose **Addresses**: the Addresses section shows and focus moves to its first box heading. |
+| 8 | Log in as a user who can open BarnCRM Settings but has neither Find and Export nor Manage BarnCRM Settings, and open **Health**, then **Error Log**. | Health shows the Health Check report itself, with no **Open Health Check** button; Error Log has no **Open the Error Log** button. |
 
 **Cleanup:** none.
 

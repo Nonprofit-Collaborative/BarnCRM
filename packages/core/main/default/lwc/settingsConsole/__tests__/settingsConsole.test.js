@@ -1764,7 +1764,7 @@ describe('c-settings-console', () => {
             name: 'Health',
             settings: [
               {
-                key: 'Health_Check',
+                key: 'Health_Check_Optimizer_Link',
                 label: 'Health Check',
                 description: null,
                 dataType: 'Component',

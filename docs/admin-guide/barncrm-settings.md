@@ -271,11 +271,14 @@ section's name.
 
 ### Health and Error Log
 
-Health Check and the Errors list each have one home, Org Optimizer. The **Health** section
-holds an **Open Health Check** button that opens Org Optimizer on its **Health Check**
-section, where you run it and act on what it finds. The **Error Log** section keeps only the
-error settings (the digest and how long entries are kept) and starts with an **Open the Error
-Log** button that opens Org Optimizer on its **Errors** section.
+Health Check and the Errors list each have one home, Org Optimizer. For someone who can open
+Org Optimizer (Find and Export, or Manage BarnCRM Settings), the **Health** section holds an
+**Open Health Check** button that opens Org Optimizer on its **Health Check** section, with
+the last run and a way to run it again, and the **Error Log** section starts with an **Open
+the Error Log** button that opens Org Optimizer on its **Errors** section; the rest of the
+Error Log section is the error settings (the digest and how long entries are kept). Someone
+who cannot open Org Optimizer still sees the Health Check report itself in the **Health**
+section, and no Error Log button.
 
 ### Setting Names
 

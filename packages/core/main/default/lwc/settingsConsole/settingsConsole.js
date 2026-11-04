@@ -94,7 +94,7 @@ const TAB_ICON = 'standard:settings';
  * the Org Optimizer tab each opens, passed as page state.
  */
 const OPTIMIZER_SECTIONS = {
-  Health_Check: 'healthCheck',
+  Health_Check_Optimizer_Link: 'healthCheck',
   Error_Log_Optimizer_Link: 'errors'
 };
 

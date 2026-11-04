@@ -119,6 +119,7 @@ public with sharing class FeatureSwitchService {
                 .rows(
                     new List<String>{
                         'Health_Check',
+                        'Health_Check_Optimizer_Link',
                         'Error_Log_Optimizer_Link',
                         'Stale_Record_Years',
                         'Unused_Login_Days',
