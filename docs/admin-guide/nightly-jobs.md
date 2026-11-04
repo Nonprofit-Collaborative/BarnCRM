@@ -17,6 +17,7 @@ The jobs in the run, by time of night:
 |---|---|---|---|
 | 0:30 | Seasonal address swap | Core | **Turn On Seasonal Addresses**, Addresses section |
 | 1:15 | Import row cleanup | Core | **Delete Import Rows**, Import section |
+| 1:20 | Record Cleanup | Core | Always on; how long each kind of history is kept is set as below |
 | 1:30 | Setup changes copy | Core | Org Optimizer on or off |
 | 1:45 | Empty household tidy-up | Core | **Delete Empty Households**, People and Households section |
 | 7:00 | Error Log digest and cleanup | Core | **Schedule Daily Run** and **Stop Daily Run**, Error Log section |
@@ -55,6 +56,22 @@ run should belong to. Only people who can manage BarnCRM Settings see the button
 
 Each job keeps the switch it always had, on its own page. Switching a job off leaves it out of
 tonight's run; the run itself stays scheduled for the others.
+
+## How Long History Is Kept
+
+The **Record Cleanup** job deletes history BarnCRM keeps for you once it is older than your
+organization's choice. Each choice is a number of days on BarnCRM Settings, shows its default,
+and applies to the whole organization:
+
+| Setting | Section | Default | Accepted | What is deleted |
+|---|---|---|---|---|
+| **Days to Keep Merge History** | Duplicate Matching | 365 | 30 to 3650 | Merge Journal entries (undo is offered for 15 days, so this does not shorten it) |
+| **Days to Keep Settings Changes** | General | 730 | 180 to 3650 | The record of who changed which setting |
+| **Days to Keep Import History** | Import | 365 | 30 to 3650 | Finished imports and bulk jobs, with their rows and journal, once they can no longer be undone |
+| **Days to Keep Field Use Counts** | Org Optimizer | 730 | 90 to 3650 | Saved Field Utilization counts |
+
+A value outside the accepted range is read as the nearest end. An import that is still running,
+or that can still be undone, is never deleted.
 
 ## How Long a Job May Take
 

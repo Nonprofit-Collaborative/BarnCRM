@@ -935,7 +935,9 @@ what. Required by the C-03 acceptance criterion that every settings change is lo
 **R-S1** Every write through the settings service produces exactly one Setting Change
 record per setting actually changed. Saving a page without changing anything writes
 nothing.
-**R-S2** Setting Change records are never edited or deleted by packaged code.
+**R-S2** Setting Change records are never edited by packaged code. The nightly run's Record
+Cleanup step deletes those changed more than `Setting_Change_Retention_Days__c` days ago (default
+730, from 180 to 3,650; architect review L-08).
 **R-S3** Values are stored as text so that any setting type can be audited uniformly.
 **R-S4** A value that is not set is recorded as nothing, never as empty text. Unset and
 cleared are the same state on a hierarchy custom setting, the platform stores empty text
@@ -1185,6 +1187,18 @@ default; the two choices are stored as text (ADR-0019).
 | `Fuzzy_Match_Threshold__c` | integer | 90 | How alike two names must be, in percent, before the scan pairs two people by name (R-DP7). From 80 to 100; out of range reads as the nearest end. |
 | `Merge_Default_Rule__c` | picklist(Keep master, Not blank, Most recent, Oldest record, Most complete) | Not blank | The merge rule of every person field with no active Merge Rule row (R-DP8). |
 | `Auto_Merge_Exact_Match__c` | picklist(Name and email, Name and phone, Name, email and phone, Name and birthdate) | Name and email | What two people must share exactly before auto-merge takes them (R-DP9). |
+| `Merge_Journal_Retention_Days__c` | integer | 365 | Days a Merge Journal row is kept before the nightly Record Cleanup step deletes it (architect review L-08); an older merge can no longer be undone. From 30 to 3,650; empty reads as 365, out of range as the nearest end. |
+
+### Record retention keys
+
+Added by architect review L-08. Each is read by the nightly run's Record Cleanup step (Section
+29ZR); empty reads as the default, out of range as the nearest end.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Setting_Change_Retention_Days__c` | integer | 730 | Days a Setting Change row is kept (R-S2). From 180 to 3,650. General section. |
+| `Import_History_Retention_Days__c` | integer | 365 | Days a finished import or bulk job (`Import_Batch__c`, with its rows and journal) is kept once its undo window has closed. From 30 to 3,650. Import section. |
+| `Field_Utilization_Retention_Days__c` | integer | 730 | Days a saved Field Utilization Snapshot row is kept (R-FU7). From 90 to 3,650. Org Optimizer section. |
 
 ### Health Check keys
 
@@ -8500,8 +8514,9 @@ says so.
 call (10 when the object holds more than 100,000 records); each call reads the record totals
 again. Nothing is stored until the person chooses "Save Utilization Snapshot"; the save checks each
 row's object, field and record type against describe and caps Filled Count at Record Count.
-Rows are never edited and no job deletes them; old rows are cleared with Bulk delete or any
-standard delete.
+Rows are never edited. The nightly run's Record Cleanup step deletes rows taken more than
+`Field_Utilization_Retention_Days__c` days ago (default 730, from 90 to 3,650; architect review
+L-08); Bulk delete or any standard delete clears them sooner.
 **R-FU8 Previous count shown.** The page shows the object's latest saved count next to the
 current one, with the change in percentage points.
 **R-FU9 Picklist value usage (C-57).** On request, for each single-select picklist field the
@@ -12129,6 +12144,11 @@ the start of each nightly run, by Health Check's fix, and when an old job fires.
 **R-NJ6 A run still going at midnight.** The new run supersedes it: the old run stops at its
 next check, and the new run's first step waits for the work the old step started.
 
+**R-NJ8 Record Cleanup.** A Core step at 1:20 deletes, oldest first and in system mode, the
+history rows past their retention (architect review L-08): Setting Change (R-S2), Merge Journal,
+finished imports and bulk jobs whose undo window has closed (journal and rows first, then the
+batch), and Field Utilization Snapshot (R-FU7), each by its key in Section 12 ("Record retention
+keys" and `Merge_Journal_Retention_Days__c`). A pass that fails is logged and the next pass runs.
 **R-NJ7 Administrators only.** Only `BarnCRM_Admin` is granted the object, Read and View All.
 Rows are written only by BarnCRM code in system mode (ADR-0021); switches change through the
 pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
@@ -12496,6 +12516,7 @@ mirrors the primary member).
 | 0.16 | 2026-11-02 | Funders F-06 (ADR-0163 `0163-funders-reporting-links.md`). New Section 29ZO Funder Report Template (`Funder_Report_Template__c` and the shipped `Funder_Report_Template_Default__mdt`), rules R-FT1 to R-FT3. |
 | 0.16 | 2026-11-02 | Funders F-07 (ADR-0163 `0163-funders-reporting-links.md`). Grant (29ZH) gains rule R-GN9, the board dashboard (revenue mix, concentration, restricted balances), read from grants and, by describe, Giving and the F-03 ledger; no new object or field. |
 | v1.0 | 2026-11-04 | One nightly job dispatcher (architect review RT-10, L-10, ADR-NEXT nightly-job-dispatcher). New Core object Nightly Job (`Nightly_Job__c`, 29ZR) with rules R-NJ1 to R-NJ7: one nightly schedule runs every step in sequence, each step keeping its switch and last result; about 19 separate scheduled jobs are replaced and adopted on upgrade. R-SU2 and R-IN5 read the nightly run instead of their own jobs. |
+| v1.0 | 2026-11-04 | Record retention (architect review L-08). `BarnCRM_Settings__c` gains `Merge_Journal_Retention_Days__c` (365), `Setting_Change_Retention_Days__c` (730), `Import_History_Retention_Days__c` (365) and `Field_Utilization_Retention_Days__c` (730). New rule R-NJ8 (the Record Cleanup step); R-S2 and R-FU7 amended. No object added. |
 
 ---
 ## 32. Entity ownership by package

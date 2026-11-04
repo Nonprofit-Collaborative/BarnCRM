@@ -419,5 +419,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 5 | On the **Error Log** section, press **Stop Daily Run**; back on **Nightly Jobs**. | The Error Log digest reads Off; the run stays scheduled. |
 | 6 | The next morning, read the panel. | Each job shows a last run and a result (Done, Done With Errors, Skipped for jobs that are off). |
 | 7 | Sign in as a user without Manage BarnCRM Settings and open the panel. | The list shows; there is no Schedule button. |
+| 8 | As the admin, open **General**, then **Duplicate Matching**, **Import** and **Org Optimizer**. | Each shows its Days to Keep setting with its default (730, 365, 365, 730); the panel lists **Record Cleanup** at 1:20, On. |
+| 9 | Set **Days to Keep Merge History** to 5 and save. | A value below 30 is not accepted (the range is 30 to 3650). Set it back to 365. |
 
 **Cleanup:** press **Schedule Daily Run** on the Error Log section again.

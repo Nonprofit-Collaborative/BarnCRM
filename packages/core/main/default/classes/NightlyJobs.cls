@@ -132,6 +132,7 @@ public with sharing class NightlyJobs {
         return new List<NightlyStep>{
             SeasonalAddressScheduler.step(),
             ImportRowPurgeScheduler.step(),
+            RecordRetentionBatch.step(),
             SetupChangeCopyJob.step(),
             EmptyHouseholdTidyScheduler.step(),
             ErrorDigestScheduler.step()

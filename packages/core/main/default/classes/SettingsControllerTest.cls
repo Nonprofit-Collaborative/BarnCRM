@@ -171,6 +171,7 @@ private class SettingsControllerTest {
                     'Unused_Login_Days__c',
                     'Unused_Report_Days__c',
                     'Setup_Change_Retention_Days__c',
+                    'Field_Utilization_Retention_Days__c',
                     'Old_Api_Version__c'
                 },
                 after.get(SettingSections.ORG_OPTIMIZER),
