@@ -100,7 +100,7 @@ again, and the payment is Paid and the balance has gone down.
 ## Entering a Gift from a Donor's Page
 
 The **Enter a Gift** button on a person's, household's or organization's page (the
-`Contact.New_Gift` and `Account.New_Gift` actions, renamed from New Gift) opens this same
+`Contact.Enter_Gift` and `Account.Enter_Gift` actions, which replace New Gift) opens this same
 form in a window, with that record already chosen as the donor. Save closes the window and
 refreshes the page; Save and New keeps it open for the next gift from the same donor. Staff
 on a donor's page therefore get every part of the form: gifts of goods, Pays a scheduled
