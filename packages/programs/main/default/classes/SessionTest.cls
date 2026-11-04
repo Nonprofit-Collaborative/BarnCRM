@@ -175,6 +175,67 @@ private class SessionTest {
     }
 
     @IsTest
+    static void schedulingTwiceSkipsDaysThatAlreadyHaveASessionForTheSameCohort() {
+        System.runAs(admin()) {
+            Service__c service = tutoring();
+            Cohort__c spring = cohortOf(service.Program__c, 'Spring');
+            Date first = Date.newInstance(2027, 3, 2);
+            Date second = Date.newInstance(2027, 3, 9);
+            Date third = Date.newInstance(2027, 3, 16);
+            // Another cohort's session and a program-wide one on the first day do not count; a
+            // cancelled session of this cohort on the third day does not either.
+            Cohort__c fall = cohortOf(service.Program__c, 'Fall');
+            sessionOf(service, fall.Id, first);
+            sessionOf(service, null, first);
+            Session__c cancelled = sessionOf(service, spring.Id, third);
+            cancelled.Status__c = SessionAttendance.CANCELLED;
+            update cancelled;
+
+            Test.startTest();
+            SessionScheduleController.Schedule once = SessionScheduleController.scheduleSessions(
+                spring.Id,
+                service.Id,
+                new List<Date>{ first, second },
+                null
+            );
+            List<Date> taken = SessionScheduleController.getTakenDays(
+                spring.Id,
+                service.Id,
+                first,
+                third
+            );
+            SessionScheduleController.Schedule twice = SessionScheduleController.scheduleSessions(
+                spring.Id,
+                service.Id,
+                new List<Date>{ first, second, third },
+                null
+            );
+            Test.stopTest();
+
+            Assert.areEqual(2, once.created, 'The other cohort and program-wide sessions differ.');
+            Assert.areEqual(0, once.skipped);
+            Assert.areEqual(new List<Date>{ first, second }, taken, 'Cancelled days are free.');
+            Assert.areEqual(1, twice.created, 'Only the day with no session of the cohort.');
+            Assert.areEqual(2, twice.skipped, 'Both days scheduled the first time.');
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Session__c
+                    WHERE Cohort__c = :spring.Id AND Session_Date__c = :second
+                    WITH SYSTEM_MODE
+                ],
+                'No duplicate session.'
+            );
+            Assert.areEqual(
+                0,
+                SessionScheduleController.getTakenDays(spring.Id, service.Id, third, first).size(),
+                'A range ending before it starts has no days.'
+            );
+        }
+    }
+
+    @IsTest
     static void schedulingIsRefusedForAnotherServiceTooManyDatesOrABadTime() {
         System.runAs(admin()) {
             Service__c service = tutoring();

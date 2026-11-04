@@ -1095,7 +1095,7 @@ Section 29E, R-BD2). Shown in the console's Import section.
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Find_Export_Row_Limit__c` | integer | 50000 | The most rows one Find export writes (R-SQ3). From 1 to 500,000; empty reads as 50,000. |
-| `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one bulk update may change (R-BU2). From 1 to 48,000; empty or out of range reads as the nearest end. |
+| `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one Super Transformer run may change (R-BU2); its label is **Super Transformer run limit**. From 1 to 48,000; empty or out of range reads as the nearest end. |
 | `Bulk_Delete_Run_Limit__c` | integer | 10000 | The most records one bulk delete may delete (R-BD2). From 1 to 48,000; empty reads as 10,000, out of range as the nearest end. |
 | `Import_Row_Deletion__c` | picklist(Once_Complete, After_30_Days, After_90_Days, Never) | After_30_Days | Delete Import Rows: when the nightly Import row cleanup deletes the staged rows of a complete import (R-IR5, ADR-0149). Stored as text (ADR-0019); a blank or unknown value reads as After_30_Days. Replaces `Import_Row_Retention_Days__c` (a number of days, D-40), which is removed. |
 | `Bulk_Chunk_Size__c` | integer | 200 | Records each chunk of a bulk update or bulk delete handles (R-BU2, R-BD2). From 10 to 200; empty reads as 200, out of range as the nearest end. Stamped on the job when it starts. |
@@ -3392,7 +3392,7 @@ them (R-IB8, R-IB9).
   `ImportUndoService` and `ImportUndoBatch` (R-IB7 to R-IB9), `ImportController` (the one
   Aura-enabled entry point the import screens call), LWC `importWizard`, `importResults`,
   `dataJobHistory` (recent data jobs and their undo; on the Import page it lists imports only,
-  and bulk updates and deletes are listed on the Bulk Update page, Section 29E).
+  and Super Transformer runs and bulk deletes are listed on the Super Transformer page, Section 29E).
 
 ---
 
@@ -8437,7 +8437,7 @@ platform deletes with a parent are not in it.
   keys).
 - **Bulk delete services:** `BulkDeleteService` (check, preview, start, undo),
   `BulkDeleteBatch` (the job), `BulkDeleteUndoBatch` (the undelete), `BulkDeleteController`;
-  component `bulkDelete`, opened from Find's results, and `dataJobHistory` on the Bulk Update
+  component `bulkDelete`, opened from Find's results, and `dataJobHistory` on the Super Transformer
   tab. Custom permission `Bulk_Delete_Records`, permission set `BarnCRM_Bulk_Delete`.
 - **Services:** `BulkUpdateFields` (which fields and objects can be written, from the shared
   `DataProtectedFields` list, and how a value or a copy is typed), `BulkUpdateService` (check, preview, start, recent jobs),
@@ -8445,8 +8445,8 @@ platform deletes with a parent are not in it.
   chunk read; `ImportUndoService` and `ImportUndoBatch` handle the Update operation.
 - **Permission:** custom permission `Bulk_Update_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Bulk_Update`, assigned beside `BarnCRM_Find_And_Export`.
-- **UI:** component `bulkUpdate`, opened from Find's results with the query, and on the Bulk
-  Update tab (app page `Bulk_Update`) listing recent bulk updates with their progress and undo.
+- **UI:** component `bulkUpdate`, opened from Find's results with the query, and on the Super
+  Transformer tab (app page `Bulk_Update`) listing recent Super Transformer runs with their progress and undo.
 
 ---
 

@@ -7,10 +7,10 @@
 
 **Data Manager** is the one place to start any data task and to answer "what changed last
 week, and can I undo it?" It has a tile for each data tool you may use, your import templates,
-and one list of every data job: imports, bulk updates and bulk deletes, newest first, each with
+and one list of every data job: imports, Super Transformer runs and bulk deletes, newest first, each with
 its counts and its **Undo**.
 
-The tools themselves are unchanged. Import, Find, Bulk update and Bulk delete work exactly as
+The tools themselves are unchanged. Import, Find, Super Transformer and Bulk delete work exactly as
 their own pages in this guide describe; Data Manager is how you reach them.
 
 ## 2. How to Turn It On
@@ -33,11 +33,11 @@ section and kind of job is shown only to people who may use it:
 |---|---|---|---|---|
 | **Bring Data In** | **Import a File** | Yes | The **Import** tab: people and organizations, gifts with Giving, any one object, records with their related records, or deleting the records a file lists, with a dry run first | Administrators |
 | **Find and Change** | **Find and Export Records** | No | The **Find** tab: find records, save the query, export them to a file | Anyone with **Find and Export Records** |
-| **Find and Change** | **Update Many Records** | No | The **Super Transformer** tab: choose the object and the records, then change up to five fields on every record that matches ([Super Transformer](super-transform.md)). To start from a saved query, use Find's **Bulk Update** instead | Anyone with **Bulk Update Records** |
+| **Find and Change** | **Super Transformer** | No | The **Super Transformer** tab ("Change fields on many records at once, no file needed."): choose the object and the records, then change up to five fields on every record that matches ([Super Transformer](super-transform.md)). To start from a saved query, use Find's **Change Records**, **Super Transformer** instead | Anyone with **Bulk Update Records** |
 | **Check and Tidy** | **Org Optimizer** | No | The **Org Optimizer** tab | Anyone with **Find and Export Records**, and administrators |
 | **Careful** | **Delete Many Records** | No | The **Find** tab, after a confirmation: run a query, then **Bulk Delete** | Anyone with **Bulk Delete Records** |
 | | **Import Templates** section | | The templates you import with, and when each recurring file was last loaded | Administrators |
-| | **Data Jobs** section | | Imports (administrators), bulk updates (**Bulk Update Records**), bulk deletes (**Bulk Delete Records**) | As shown |
+| | **Data Jobs** section | | Imports (administrators), Super Transformer runs (**Bulk Update Records**), bulk deletes (**Bulk Delete Records**) | As shown |
 | **Salesforce's Own Tools** | **Weekly Data Export** (your backup), **Recycle Bin**, **Data Import Wizard** (records BarnCRM does not load) | | Salesforce's own page, in a new browser tab | Administrators |
 
 A group with no tile you may use is left out.
@@ -46,7 +46,7 @@ A group with no tile you may use is left out.
 **BarnCRM Admin** role carries.
 
 **Which tool changes many records?** To change the same fields on many records without a file,
-use **Update Many Records** (Super Transformer; or a saved Find query, then **Bulk Update**). To change records from a
+use **Super Transformer** (or a saved Find query, then **Change Records**, **Super Transformer**). To change records from a
 spreadsheet, each row with its own values, use **Import a File**. To delete records, use
 **Delete Many Records** (a Find query, then **Bulk Delete**); to delete the records a
 spreadsheet lists by record ID, an administrator who also has **Bulk Delete Records** uses
@@ -77,10 +77,10 @@ On the page the section shows one line and a **Learn More** link to this guide;
 with no template yet it shows **No Import Templates Yet** and a **Create a Template** button,
 which opens **Import a File**.
 
-The **Import**, **Find** and **Super Transformer** (formerly **Bulk Update**) tabs are not in
+The **Import**, **Find** and **Super Transformer** tabs are not in
 the apps' navigation: open them from here or the App Launcher (the **Super Transformer** tab
 changes many records without a file, see [Super Transformer](super-transform.md), and lists
-recent bulk updates, which **Data Jobs** below shows too). Bookmarks to them still work, and so do the links that open Find from elsewhere
+recent Super Transformer runs, which **Data Jobs** below shows too). Bookmarks to them still work, and so do the links that open Find from elsewhere
 (**Open in Find** on the Org Optimizer page, for example).
 
 ## 3. A Five-Minute Walkthrough (as Maria)
@@ -92,12 +92,12 @@ Start from the sample data (see [Sample data](sample-data.md)).
    [Importing](importing.md) describes, then come back to **Data Manager**.
 3. Under **Data Jobs** your import is first, with its file name, **Complete**, how many people
    it created, and the date it can be undone until.
-4. Choose **Find and Export Records**, run a query for five people, and use **Bulk Update** to
-   set a field on them (see [Bulk update](bulk-update.md)). Back on **Data Manager**, press
-   **Refresh**: the bulk update is now first.
+4. Choose **Find and Export Records**, run a query for five people, and use **Change Records**, **Super Transformer** to
+   set a field on them (see [Super Transformer runs and undo](bulk-update.md)). Back on **Data Manager**, press
+   **Refresh**: the Super Transformer run is now first.
 5. In **Show**, choose **Imports**. Only your import is listed. Choose **All** again.
-6. Press **Undo** beside the bulk update. The box says how many values the undo puts back. Type
-   that number and press **Undo Bulk Update**. The job reads **Undoing**, then **Undone**; the
+6. Press **Undo** beside the Super Transformer run. The box says how many values the undo puts back. Type
+   that number and press **Undo Super Transformer Run**. The job reads **Undoing**, then **Undone**; the
    list updates by itself while a job is running, so you do not need to press **Refresh**.
 
 ## 4. Undo From the Job List
@@ -108,7 +108,7 @@ first, so nothing is undone by a stray click:
 | Job | What Undo does | How you confirm |
 |---|---|---|
 | Import | Removes the people, households, organizations (and gifts, with Giving) it created and puts back the values it changed, keeping anything that has since gained a life of its own ([Importing](importing.md), section 5) | The box counts what it would remove and put back, by kind; press **Undo This Import** |
-| Bulk update | Puts back the values it changed ([Bulk update](bulk-update.md)) | Type the number of values it puts back |
+| Super Transformer run | Puts back the values it changed ([Super Transformer runs and undo](bulk-update.md)) | Type the number of values it puts back |
 | Bulk delete | Brings the records back from the Recycle Bin ([Bulk delete](bulk-delete.md)) | Type the number of records it brings back |
 
 **Undo** is shown only while a job can still be undone: before its **Undo until** date, and
@@ -119,7 +119,7 @@ only once. A job that can no longer be undone is still listed, with its counts.
 - **Looking for the Import or Find tab in the navigation.** They moved into Data Manager:
   choose **Import a File** or **Find and Export Records**.
 - **A job is missing from the list.** Each person sees the kinds of jobs they may run: imports
-  need the BarnCRM Admin role, bulk updates and bulk deletes their own permission sets. The list
+  need the BarnCRM Admin role, Super Transformer runs and bulk deletes their own permission sets. The list
   shows the ten most recent jobs of each kind; report on **Data Jobs** for older ones.
 - **Undo is not offered.** The undo window has passed, the job was already undone, or it is
   still running. The job's status says which.
@@ -130,4 +130,4 @@ only once. A job that can no longer be undone is still listed, with its counts.
 
 Data Manager adds no object and no field. Every data job is a **Data Job** record
 (`Import_Batch__c`), with **Operation** Import, Update or Delete; see the field reference of
-[Importing](importing.md), [Bulk update](bulk-update.md) and [Bulk delete](bulk-delete.md).
+[Importing](importing.md), [Super Transformer runs and undo](bulk-update.md) and [Bulk delete](bulk-delete.md).

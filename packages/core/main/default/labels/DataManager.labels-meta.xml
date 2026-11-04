@@ -49,20 +49,12 @@
         <value>Find records, save the query, and export them to a file.</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_UpdateTitle</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: card for bulk update</shortDescription>
-        <value>Update Many Records</value>
-    </labels>
-    <labels>
         <fullName>Core_DataManager_UpdateText</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: one line on the bulk update tile</shortDescription>
-        <value>Super Transformer: change fields on many records, no file needed.</value>
+        <value>Change fields on many records at once, no file needed.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_DeleteTitle</fullName>
@@ -198,7 +190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: About This Tool, which tool changes many records</shortDescription>
-        <value>To change records from a spreadsheet, use Import a File. To change the same fields on many records, use Update Many Records.</value>
+        <value>To change records from a spreadsheet, use Import a File. To change the same fields on many records, use Super Transformer.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_HelpDelete</fullName>

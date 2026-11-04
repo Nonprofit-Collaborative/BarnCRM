@@ -76,7 +76,7 @@ paused for the load. She wants to know what the load left behind.
 | **Primary Addresses That Failed Verification** | Primary addresses whose **Verification Status** is **Failed**. BarnCRM never sets this field; an address verification app does. | The verification app could not confirm the address. | Check the address with the person, then correct it. Without a verification app this check always says 0. |
 | **Primary Addresses Marked Undeliverable** | Primary addresses whose **Status** is **Undeliverable**. Only a person sets it, from the address card's status menu or the address record (see [Addresses](addresses.md), "Address History"). | Mail sent there comes back, so every letter and receipt to that household, organization or person is wasted. | Find the new address and add it on the card with **Primary** ticked (the old one becomes **Former**), or choose **Set as Primary** on another address they have. |
 | **People with No Way to Reach Them** | Contacts (people) not marked **Deceased** with no **Email**, **Phone** or **Mobile**, and no **Mailing City** or **Mailing Postal Code**. The mailing fields are where the primary address is copied. | Nothing you send reaches them, and they still count in your totals. | Find a way to reach them, or decide whether to keep them. Another email field (personal, work) is not looked at. |
-| **Deceased People Who Can Still Be Emailed** | People marked **Deceased** who have an **Email** and do not have **Email Opt Out** ticked. | A message to someone who has died hurts the family and your organization. | Tick **Email Opt Out** (Bulk update can do it from the Find query). |
+| **Deceased People Who Can Still Be Emailed** | People marked **Deceased** who have an **Email** and do not have **Email Opt Out** ticked. | A message to someone who has died hurts the family and your organization. | Tick **Email Opt Out** (Super Transformer can do it from the Find query). |
 | **People Not Changed in N Years** | People whose **Last Modified Date** is older than the years in **Years before a person is not changed** (5 unless set). | Old records nobody looks at may be out of date, or may be candidates for archiving. | Review them in Find. Nothing is archived or deleted for you. |
 
 In an org that uses membership records, **Open in Find** for **People with No Household** lists
@@ -120,7 +120,7 @@ They answer different questions:
 | Asks | Is BarnCRM set up the way it should be? | Which records need tidying up? |
 | Looks at | Settings, access, automation, schedules, what is installed, plus two headline data findings (people with no household, empty households). | Your records only, with more checks, including addresses and membership records. |
 | Shows | A finding with a severity, what to do, and up to five links. | A count per check, and every matching record in Find. |
-| Fixes | Some findings have a fix button for a setup problem with one right answer. | Never changes anything. You work through the records in Find, by export, or with Bulk update. |
+| Fixes | Some findings have a fix button for a setup problem with one right answer. | Never changes anything. You work through the records in Find, by export, or with Super Transformer. |
 
 The two counts for people with no household are the same question asked the same way, but
 Health Check reports it only while **Create Households Automatically** is on, and Data
@@ -156,7 +156,7 @@ Checking whether a household's name still matches the naming rule needs every na
 again, which is not a question a query can ask; it is not offered. Checks on related records
 ("households with no gifts") are built in Find with **Has no related records** (section 7.1 of
 [Find](find.md)); only the one above is a ready-made check. Changing many records at once is
-**Bulk Update** (C-35), which starts from a Find query.
+**Super Transformer** (C-35), which starts from a Find query.
 
 ## Field Reference
 

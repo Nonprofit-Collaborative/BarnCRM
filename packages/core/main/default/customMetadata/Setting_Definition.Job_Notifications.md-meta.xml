@@ -10,7 +10,7 @@
     <field>Description__c</field>
     <value
       xsi:type="xsd:string"
-    >When someone starts a long job by hand, such as an import, a bulk update or delete, an undo, the sample data load or a rollup recalculation, BarnCRM sends them a notification under the bell when it finishes or stops, with the counts and a link to the job. Scheduled nightly and weekly runs never send one. Clear this to stop the notifications for everyone; the jobs run and record their results exactly as before.</value>
+    >When someone starts a long job by hand, such as an import, a Super Transformer run, a bulk delete, an undo, the sample data load or a rollup recalculation, BarnCRM sends them a notification under the bell when it finishes or stops, with the counts and a link to the job. Scheduled nightly and weekly runs never send one. Clear this to stop the notifications for everyone; the jobs run and record their results exactly as before.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

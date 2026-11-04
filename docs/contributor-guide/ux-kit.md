@@ -33,7 +33,7 @@ Notes:
 
 | Component | Use it for | Main properties |
 |---|---|---|
-| `c-barn-step-flow` | A wizard: the SLDS path, the step body, and one footer with Back left and the step's actions right (Import, Bulk Update, Bulk Delete) | `steps` (each `value`, `label`), `current-step`, `can-go-back`; slot `actions` and the default body; fires `back` |
+| `c-barn-step-flow` | A wizard: the SLDS path, the step body, and one footer with Back left and the step's actions right (Import, Super Transformer, Bulk Delete) | `steps` (each `value`, `label`), `current-step`, `can-go-back`; slot `actions` and the default body; fires `back` |
 | `c-barn-visual-picker` | One choice from a few as icon cards (Import's What Are You Importing?, the first-run edition) | `label` (the legend), `options` (each `value`, `label`, `description`, `iconName`, `warning`), `value`; fires `change` with `detail.value` |
 | `c-barn-stat-tile` | One figure as a big value over a label (import preview and results, Org Optimizer counts, pipeline totals, dashboards) | `label`, `value` (a number is formatted; text is shown as given), `format-style` (`decimal`, `currency`, `percent`; percent takes a fraction, 0.25 is 25%), `currency-code`, `icon-name`, `badge-label`, `badge-variant` (a status word, drawn by `c-barn-status-badge`), `align` (`center` default, `start`), `bordered`, `href` (the tile is one link), `clickable` with `name` (the tile is one button; fires `select` with `detail.name`) |
 | `c-barn-save-bar` | The save footer of a settings form, docked to the bottom while anything is unsaved | `dirty-count`, `saving`; fires `save` and `discard` |
@@ -109,8 +109,8 @@ One part per job. A reviewer checks a screen against this list, not against tast
 ### Icons: `c/barnIcons`
 
 - Rule: a link to a tab, and a card about a tab's object, uses that tab's icon: `icon-name={icons.gift}` with `icons = { gift: iconFor('Gift__c') }`. A tab icon is never borrowed by another object's card.
-- Card headers use `custom:` or `standard:` icons only, never `utility:` (a grey glyph beside colored tiles).
-- A new tab gets its registry entry in the same PR ([Tab Icons](tab-icons.md)); `scripts/ci/tests/test_core_navigation.py` checks the registry against every tab and fails a card wearing another package's tab icon.
+- Card headers use `custom:` or `standard:` icons only, never `utility:` (a grey glyph beside colored tiles). Every card with a `custom:` icon is a row in the Card Icons table of [Tab Icons](tab-icons.md#card-icons).
+- A new tab gets its registry entry in the same PR. `scripts/ci/tests/test_core_navigation.py` checks the registry against every tab, and checks each card against the Card Icons table (the icon as a literal or as `iconFor('<tab>')`).
 
 ### Empty states: `c-barn-empty-state`
 
@@ -152,4 +152,4 @@ The recipe for a hand-built table:
 
 ### Check
 
-`scripts/ci/check-visual-standard.py` (run by `run-offline-checks.sh` and CI) fails a component that adds `slds-text-title_caps`, a solid `slds-box slds-theme_*` message, a non-stacking `slds-table` without `data-wide-table`, `slds-badge_inverse`, or a `utility:` card icon. Screens built earlier are counted in `scripts/ci/visual-standard-baseline.txt`; when a screen adopts the kit, lower or delete its lines (`--write-baseline` rewrites the file from the code). A count never goes up.
+`scripts/ci/check-visual-standard.py` (run by `run-offline-checks.sh` and CI) fails a component that adds `slds-text-title_caps`, a solid `slds-box slds-theme_*` message, a non-stacking `slds-table` without `data-wide-table`, or `slds-badge_inverse`. Screens built earlier are counted in `scripts/ci/visual-standard-baseline.txt`; when a screen adopts the kit, lower or delete its lines (`--write-baseline` rewrites the file from the code). A count never goes up.

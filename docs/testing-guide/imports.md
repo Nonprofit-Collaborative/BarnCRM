@@ -226,7 +226,7 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 ## T-IMP-12: What Are You Importing?
 
 **Purpose:** confirm each card on the first step opens what it should, the Gifts and Delete cards show only where they apply, and the line under a template says what it creates.
-**Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); a Core-only org for step 2 and an org with Giving installed for step 3; for step 5, a second admin without **Bulk Delete Records** and one with it (see [Bulk Update and Delete](bulk-update-and-delete.md)).
+**Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); a Core-only org for step 2 and an org with Giving installed for step 3; for step 5, a second admin without **Bulk Delete Records** and one with it (see [Super Transformer and Bulk Delete](bulk-update-and-delete.md)).
 
 | Step | Action | Expected result |
 |---|---|---|

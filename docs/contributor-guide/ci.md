@@ -172,7 +172,7 @@ Salesforce org is needed for this job. Steps:
 13. `scripts/ci/check-visual-standard.py`, failing the build if a Lightning web component
    adds a look the suite visual standard replaced: `slds-text-title_caps`, a solid
    `slds-box slds-theme_*` message, a `slds-table` that does not stack on a phone (unless it
-   carries `data-wide-table`), an inverse badge, or a `utility:` icon on a card header. Screens
+   carries `data-wide-table`), or an inverse badge. Screens
    built earlier are counted in `scripts/ci/visual-standard-baseline.txt`; a count may only go
    down. See [UX kit](ux-kit.md#visual-standard).
    `scripts/ci/check-components-reachable.py`, failing the build if a Lightning web

@@ -11,8 +11,8 @@ This check flags the old one-offs in component markup and JavaScript (Jest tests
                  `slds-scrollable_x` (an import preview) carries the `data-wide-table` attribute.
 - badge-inverse  `slds-badge_inverse`; the status vocabulary never uses a black badge
                  (`c-barn-status-badge status="neutral"`).
-- card-utility   a `lightning-card` header icon from the `utility:` set; card headers use the
-                 page's tab icon (`custom:` or `standard:`, c/barnIcons).
+
+Card header icons are checked by scripts/ci/tests/test_core_navigation.py (Card Icons).
 
 Screens built before the standard are listed in visual-standard-baseline.txt with a count per
 rule. A count above the baseline (or a file not in it) fails; a count below it passes and is
@@ -51,8 +51,6 @@ def html_hits(text):
                 hits.append("table-stacked")
         if "slds-badge_inverse" in found:
             hits.append("badge-inverse")
-        if name == "lightning-card" and re.search(r'\bicon-name\s*=\s*"utility:', attrs):
-            hits.append("card-utility")
     return hits
 
 

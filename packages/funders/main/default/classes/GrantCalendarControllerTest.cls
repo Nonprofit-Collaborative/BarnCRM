@@ -85,6 +85,11 @@ private class GrantCalendarControllerTest {
                 calendar.paymentLabel,
                 'Payments are named by the object label'
             );
+            Assert.areEqual(
+                Schema.SObjectType.Grant_Requirement__c.getLabel(),
+                calendar.requirementLabel,
+                'The legend names requirements by the object label'
+            );
             for (GrantPipelineController.Card row : calendar.rows) {
                 if (row.kind == GrantCalendarController.KIND_PAYMENT) {
                     Assert.areEqual(5000, row.amount, 'The amount expected');

@@ -8,7 +8,8 @@ Rules:
 - No two BarnCRM tabs share a number, so each tab is recognizable in the navigation, the page header and a console tab.
 - A new tab takes a number no other BarnCRM tab uses. Add it to the table below; `scripts/ci/tests/test_core_navigation.py` fails if it is invalid or reused.
 - Add the tab to the icon registry, `packages/core/main/default/lwc/barnIcons/barnIcons.js`, keyed by the tab's API name, in the same PR. The same test fails when a tab is missing from the registry or listed with another number.
-- Navigation icon equals tab icon: a link or tile that opens a tab, and a card about a tab's object, takes its icon from `iconFor('<tab API name>')`. A card never wears another package's tab icon; the test fails it (cards built earlier are listed in `BORROWED_CARD_ICONS` until the rollout fixes them). See the [Visual Standard](ux-kit.md#visual-standard).
+- Navigation icon equals tab icon: a link or tile that opens a tab takes its icon from `iconFor('<tab API name>')` (c/barnIcons). See the [Visual Standard](ux-kit.md#visual-standard).
+- A card's header icon is its own page's or object's tab icon (`custom:customN` with that tab's number), never another tab's. See Card Icons below.
 
 | Package | Tab | Motif |
 |---|---|---|
@@ -90,3 +91,54 @@ Rules:
 | volunteers | Volunteer_Requirement__c | Custom86: RedCross |
 | volunteers | Volunteer_Shift__c | Custom74: HotAirBalloon |
 | volunteers | Volunteer_Signup__c | Custom2: Fan |
+
+## Card Icons
+
+A `lightning-card` header shows the icon of the page or object the card belongs to, so a card reads as part of its tab (vis-core-4, extends D-144). Rules:
+
+- A card on a tab's own page, or about one object, uses that tab's `custom:customN`, with N the tab's motif number.
+- A card never uses another tab's number: a borrowed motif tells people the card is about something else.
+- Card headers use `standard:*` or `custom:*` icons only; a `utility:*` glyph renders small and grey beside colored icon tiles.
+- A card with no tab of its own (such as household or address panels) keeps a `standard:*` icon.
+
+Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_navigation.py` fails when a card uses a `custom:*` icon that is not listed, when the listed tab's motif number differs, when the component names neither the icon nor `iconFor('<Tab>')` (c/barnIcons), or when a card header uses a `utility:*` icon.
+
+| Package | Component | Card icon | Tab |
+|---|---|---|---|
+| core | automationControl | custom:custom67 | BarnCRM_Settings |
+| core | errorLogTile | custom:custom53 | Error_Log__c |
+| funders | fundersBoard | custom:custom100 | Funders_Board |
+| funders | grantAnswerLibrary | custom:custom87 | Grant_Answer__c |
+| funders | grantCalendar | custom:custom82 | Grant_Calendar |
+| funders | grantLinkedRecord | custom:custom88 | Program__c |
+| funders | grantLinkedRecord | custom:custom42 | Fund__c |
+| funders | grantOutcomes | custom:custom62 | Logic_Model__c |
+| funders | grantPipeline | custom:custom92 | Grant_Pipeline |
+| funders | grantReport | custom:custom99 | Funder_Report_Template__c |
+| giving | acknowledgments | custom:custom71 | Acknowledgments |
+| giving | askPipeline | custom:custom54 | Ask_Pipeline |
+| giving | donorLevels | custom:custom65 | Donor_Levels |
+| giving | donorSegments | custom:custom68 | Donor_Segments |
+| giving | giftBatchEntry | custom:custom13 | Gift_Batch__c |
+| giving | giftSoftCredits | custom:custom26 | Soft_Credit__c |
+| giving | pledgeReminders | custom:custom95 | Pledge_Reminders |
+| giving | quickGiftEntry | custom:custom40 | Quick_Gift_Entry |
+| giving | stewardshipPlans | custom:custom4 | Stewardship_Plans |
+| giving | tributeNotification | custom:custom5 | Tribute__c |
+| logicmodels | logicModelBuilder | custom:custom62 | Logic_Model__c |
+| mirror | accountingExport | custom:custom21 | Accounting_Export |
+| mirror | campaignSync | custom:custom35 | Campaign_Sync |
+| mirror | giftTransactionMirror | custom:custom31 | Gift_Transaction_Mirror |
+| mirror | opportunityMirror | custom:custom30 | Opportunity_Mirror |
+| programs | cohortMembers | custom:custom50 | Cohort__c |
+| programs | personEnrollments | custom:custom60 | Enrollment__c |
+| programs | programDashboard | custom:custom9 | Programs_Dashboard |
+| programs | programRoster | custom:custom60 | Enrollment__c |
+| programs | programsSettings | custom:custom73 | Programs_Settings |
+| programs | serviceDeliveryLog | custom:custom16 | Service_Delivery__c |
+| programs | servicePlan | custom:custom96 | Goal__c |
+| programs | sessionScheduler | custom:custom20 | Session__c |
+| rollups | rollupBuilder | custom:custom63 | Rollup_Builder |
+| rollups | rollupDefinitions | custom:custom63 | Rollup_Builder |
+| volunteers | shiftSignups | custom:custom2 | Volunteer_Signup__c |
+| volunteers | volunteerHoursApproval | custom:custom91 | Volunteer_Approve_Hours |

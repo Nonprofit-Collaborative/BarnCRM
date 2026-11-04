@@ -1,5 +1,5 @@
 <template>
-  <lightning-card title={labels.title} icon-name="custom:custom11">
+  <lightning-card title={labels.title} icon-name="custom:custom96">
     <div slot="actions">
       <template lwc:if={showAddGoal}>
         <lightning-button
@@ -209,7 +209,7 @@
             </template>
 
             <template lwc:if={goal.hasNotes}>
-              <p class="slds-text-title_caps slds-var-m-top_small">{labels.notes}</p>
+              <p class="slds-text-title_bold slds-var-m-top_small">{labels.notes}</p>
               <ul>
                 <template for:each={goal.notes} for:item="note">
                   <li key={note.id} class="slds-text-body_small" data-id="note">

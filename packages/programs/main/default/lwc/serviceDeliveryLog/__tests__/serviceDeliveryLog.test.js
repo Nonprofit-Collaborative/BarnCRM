@@ -5,6 +5,7 @@ import save from '@salesforce/apex/ServiceDeliveryLogController.save';
 import addCount from '@salesforce/apex/ServiceDeliveryLogController.addCount';
 import getSessionLog from '@salesforce/apex/ServiceDeliveryLogController.getSessionLog';
 import saveSession from '@salesforce/apex/ServiceDeliveryLogController.saveSession';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import {
   entriesToSave,
   format,
@@ -267,6 +268,61 @@ describe('c-service-delivery-log', () => {
     date.dispatchEvent(new CustomEvent('change'));
     await flush();
     expect(getLog.mock.calls).toHaveLength(calls);
+  });
+
+  it('asks before a change of service or day throws away unsaved attendance', async () => {
+    getLog.mockResolvedValue(logOf([ANA, BEN]));
+    save.mockResolvedValue(logOf([ANA, BEN], { saved: 1 }));
+    const element = await render();
+    expect(find(element, 'unsaved')).toBeNull();
+    find(element, 'mark-all-present').click();
+    await flush();
+    expect(find(element, 'unsaved').textContent).toContain('Core_Kit_UnsavedOne');
+
+    // Cancel: nothing reloads and the service stays.
+    BarnConfirmModal.open.mockResolvedValueOnce(undefined);
+    const service = find(element, 'service');
+    service.dispatchEvent(new CustomEvent('change', { detail: { value: 'a0A000000000002AAA' } }));
+    await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({
+        label: expect.stringContaining('Programs_Log_UnsavedTitle'),
+        choice: 'save',
+        choices: [
+          expect.objectContaining({ value: 'save' }),
+          expect.objectContaining({ value: 'discard' })
+        ]
+      })
+    );
+    expect(getLog).toHaveBeenCalledTimes(1);
+    expect(service.value).toBe(SERVICE_ID);
+
+    // Save first: the marks are saved, then the other day loads.
+    BarnConfirmModal.open.mockResolvedValueOnce({ choice: 'save', checked: [] });
+    const date = find(element, 'date');
+    date.value = '2026-10-30';
+    date.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(save).toHaveBeenCalledTimes(1);
+    expect(getLog).toHaveBeenLastCalledWith({
+      programId: PROGRAM_ID,
+      serviceId: SERVICE_ID,
+      deliveryDate: '2026-10-30'
+    });
+    expect(find(element, 'result').textContent).toBe('One saved.');
+
+    // Discard: the marks are dropped and the other service loads without saving.
+    find(element, 'mark-all-present').click();
+    await flush();
+    BarnConfirmModal.open.mockResolvedValueOnce({ choice: 'discard', checked: [] });
+    find(element, 'service').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'a0A000000000002AAA' } })
+    );
+    await flush();
+    expect(save).toHaveBeenCalledTimes(1);
+    expect(getLog).toHaveBeenLastCalledWith(
+      expect.objectContaining({ serviceId: 'a0A000000000002AAA' })
+    );
   });
 
   it('marks everyone present and saves', async () => {

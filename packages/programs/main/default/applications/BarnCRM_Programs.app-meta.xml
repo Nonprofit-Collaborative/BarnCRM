@@ -97,7 +97,7 @@
     <pageOrSobjectType>Session__c</pageOrSobjectType>
   </actionOverrides>
   <brand>
-    <headerColor>#0B5CAB</headerColor>
+    <headerColor>#007A9E</headerColor>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
   </brand>
   <description>

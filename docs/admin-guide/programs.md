@@ -214,6 +214,10 @@ panel under the roster:
    day already exists but you cannot see it (under Private, one another staff member logged),
    saving changes its Attendance and Quantity instead of adding a second row, and it is still
    not shown to you. This needs update access to Service Delivery Attendance and Quantity.
+   While marks are unsaved, a hint beside **Save** reads "1 unsaved change" or "N unsaved
+   changes". If staff change the **Service** or **Date** first, **Save Attendance First?**
+   asks them to **Save** (the default) or **Discard** the marks, then **Continue**; **Cancel**
+   keeps the marks and the old service and date.
 
 People left at **Not Recorded** get no delivery. The same panel sits on each **session** page,
 for attendance at one scheduled session (see [Cohorts and Sessions](#cohorts-and-sessions)). The
@@ -401,7 +405,11 @@ page (sessions with no cohort), creates many sessions at once:
    created for each chosen weekday between the two dates, named after the service and the date.
 
 At most 200 sessions are created at a time. Nothing keeps the pattern: each session is then
-edited or cancelled on its own, and scheduling again adds more.
+edited or cancelled on its own. Running it again does not duplicate: days that already have a
+session of the same service for the same cohort (on the program page, sessions with no cohort),
+other than Cancelled sessions, are skipped, and the preview and the result say how many ("Days
+that already have a session are skipped: 2."). **Schedule** is disabled when every chosen day
+already has one.
 
 ### Taking Attendance on a Session
 

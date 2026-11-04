@@ -78,8 +78,24 @@ export function sessionDates(from, to, weekdays, max = MAX_SESSIONS) {
   return { dates: tooMany ? dates.slice(0, max) : dates, tooMany, problem: null };
 }
 
+/**
+ * How many of the planned dates get a new session and how many are skipped because they already
+ * have one (`taken`, ISO dates the server listed); the server skips the same days again.
+ */
+export function newAndSkipped(dates, taken) {
+  const busy = new Set(taken || []);
+  const skipped = (dates || []).filter((date) => busy.has(date)).length;
+  return { toCreate: (dates || []).length - skipped, skipped };
+}
+
+/** "N sessions scheduled." or "N sessions will be scheduled.", then the skipped days if any. */
+export function countMessage(count, skipped, labels) {
+  const main = count === 1 ? labels.one : format(labels.many, count);
+  return skipped > 0 ? `${main} ${format(labels.skipped, skipped)}` : main;
+}
+
 /** The line under the form: how many sessions, or what is missing. */
-export function previewMessage(result, labels) {
+export function previewMessage(result, labels, taken) {
   if (result.problem === 'dates') {
     return labels.chooseDates;
   }
@@ -92,5 +108,6 @@ export function previewMessage(result, labels) {
   if (result.dates.length === 0) {
     return labels.none;
   }
-  return result.dates.length === 1 ? labels.one : format(labels.many, result.dates.length);
+  const { toCreate, skipped } = newAndSkipped(result.dates, taken);
+  return countMessage(toCreate, skipped, labels);
 }

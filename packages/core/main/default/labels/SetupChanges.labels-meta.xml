@@ -113,14 +113,6 @@
         <value>Words that must all appear in What Changed, Section, Changed By, Logged In As or Action, ignoring capitals. Try a field or object name, a user, or a permission set.</value>
     </labels>
     <labels>
-        <fullName>Core_SetupChanges_RunSearch</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: button that applies the filters</shortDescription>
-        <value>Search</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupChanges_Downloaded</fullName>
         <categories>SetupChanges</categories>
         <language>en_US</language>

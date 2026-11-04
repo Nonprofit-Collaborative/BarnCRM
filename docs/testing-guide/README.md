@@ -47,7 +47,7 @@ page, even if that puts it out of reading order.
 | [Imports](imports.md) | IMP | 22 | Import wizard, templates, row rules, matching (including match sources), several sheets, two-part headings, best guesses for near spellings, several objects in one file, new fields from a column, undo, row retention, correcting and retrying rows |
 | [Find](find.md) | FIND | 10 | Query builder, typed queries, export, saved queries, summaries, Show More |
 | [Data Manager and job history](data-manager-and-job-history.md) | DM | 13 | Data Manager, data jobs and undo, data quality checks, field utilization, picklist value usage and its snapshot history |
-| [Bulk update and delete](bulk-update-and-delete.md) | BULK | 15 | Bulk update, bulk delete, edit in Find, undo, the bulk path, Super Transformer, saved step lists, phone format |
+| [Super Transformer and bulk delete](bulk-update-and-delete.md) | BULK | 15 | Super Transformer runs from Find, bulk delete, edit in Find, undo, the bulk path, Super Transformer, saved step lists, phone format |
 | [Duplicates](duplicates.md) | DUP | 17 | Duplicate scan, review and merge, match sources, similar names, merge rules, auto-merge and its undo |
 | [Record Inspector](record-inspector.md) | RI | 2 | Inspect a record, search fields, copy an API name, field security and permission |
 | [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 20 | Health Check findings and fixes, Org Optimizer sections, technical debt checks, storage and limits, Data Dictionary and its automation inventory, Access Explorer, Access compare and Modify All report, Field Access Manager, weekly admin summary, Setup Changes, AI-Readiness Export, Where Used and Retire a Field |
@@ -63,7 +63,7 @@ page, even if that puts it out of reading order.
 | [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 8 | Giving totals, recalculation, dashboards and reports, donor segments |
 | [Mirror](mirror.md) | MIR | 15 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API, Gift Transaction mirror |
 | [Volunteers](volunteers.md) | VOL | 16 | Jobs, shifts, sign-ups, hours and approval, skills, shift reminders, suggested volunteers, person accounts |
-| [Programs](programs.md) | PRG | 21 | Programs, services, enrollments, roster import, the Program Roster panel, a person's Programs card and last service, Programs access, Health Check, sample data, the Service Delivery Log and the delivery rules, intake and eligibility, the Programs Settings page, case notes, participant privacy, the Programs Dashboard, only a person enrolled or served, counts without names, referrals, eligibility screening rules, service plans and goals, cohorts, sessions and attendance per session |
+| [Programs](programs.md) | PRG | 23 | Programs, services, enrollments, roster import, the Program Roster panel, a person's Programs card and last service, Programs access, Health Check, sample data, the Service Delivery Log and the delivery rules, intake and eligibility, the Programs Settings page, case notes, participant privacy, the Programs Dashboard, only a person enrolled or served, counts without names, referrals, eligibility screening rules, service plans and goals, cohorts, sessions and attendance per session, no duplicate sessions, the unsaved attendance question |
 | [Logic Models](logic-models.md) | LM | 9 | The Logic Model Builder: parts, arrows and assumptions, whose model it is, indicators and periods with progress, staff and read-only access, imported and computed results, the Logic Model Report |
 | [Funders](funders.md) | FUN | 16 | Grants and their stage dates, the Grant Pipeline board, totals and deadlines, the Grant Calendar, moving and awarding a grant, the program a grant pays for, Funders access, Health Check and sample data, grant requirements, reminder tasks and emails and their settings, Mark Submitted, overdue requirements, award schedules, restricted funds and the Giving fund, government award fields, the answer library, requirements linked to Logic Models outcomes, funder reports from a template, the Board Dashboard |
 | [Rollup Builder](rollup-builder.md) | RB | 39 | Building, recalculating and switching rollups, standard objects, parity options, export and import, instant totals on other objects |
@@ -96,8 +96,8 @@ steps 1 and 2 need a staff user, so run steps 3 to 8 only.
 | 8 | [T-IMP-01](imports.md) | Import a contact list |
 | 9 | [T-IMP-03](imports.md) | Undo an import |
 | 10 | [T-FIND-01](find.md) | Build and run a query |
-| 11 | [T-BULK-01](bulk-update-and-delete.md) | Bulk update |
-| 12 | [T-BULK-02](bulk-update-and-delete.md) | Undo a bulk update |
+| 11 | [T-BULK-01](bulk-update-and-delete.md) | Super Transformer run from Find |
+| 12 | [T-BULK-02](bulk-update-and-delete.md) | Undo a Super Transformer run |
 | 13 | [T-DUP-01](duplicates.md) | Duplicate scan |
 | 14 | [T-HC-03](org-optimizer-and-health-check.md) | Health Check report (skipped install steps add findings: see the script) |
 | 15 | [T-ERASE-02](erase-a-person.md) | Erase a person (in a real-org sandbox: only Luis Zztest, with **BarnCRM Erase People** given for this script only) |

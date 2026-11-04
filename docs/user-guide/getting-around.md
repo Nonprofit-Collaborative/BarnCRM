@@ -147,7 +147,7 @@ icon and tell screen readers "(opens in a new tab)".
 
 ## To Check a Job Notification
 
-When you start a long job yourself (an export to Files from **Find**, a bulk update, an
+When you start a long job yourself (an export to Files from **Find**, a Super Transformer run, an
 undo), BarnCRM tells you when it is done.
 
 1. Look at the bell at the top of any Salesforce page. A number shows on it when something
@@ -166,7 +166,7 @@ tool you may use, in short groups:
 | Group | Tile | Opens |
 |---|---|---|
 | **Find and Change** | **Find and Export Records** | The **Find** tab |
-| **Find and Change** | **Update Many Records** | **Super Transformer**: choose the records and the changes, preview, then run (no file needed; see [Changing many records at once](super-transform.md)) |
+| **Find and Change** | **Super Transformer** | Change fields on many records at once, no file needed: choose the records and the changes, preview, then run (see [Changing many records at once](super-transform.md)) |
 | **Check and Tidy** | **Org Optimizer** | The **Org Optimizer** tab |
 | **Careful** (last) | **Delete Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Delete** (no file needed) |
 
@@ -175,7 +175,7 @@ first shows a box that says so. Choose **Continue** to go on to Find, or **Cance
 Data Manager. You can undo a bulk delete from **Data Jobs** for up to 15 days.
 
 1. Choose the tile you want: anywhere on it works.
-2. Under **Data Jobs**, use **Show** to filter to **All**, **Bulk updates** or **Bulk
+2. Under **Data Jobs**, use **Show** to filter to **All**, **Super Transformer runs** or **Bulk
    deletes**, and press **Refresh** to see the latest.
 
 You should see: your recent jobs, newest first, each with its counts and an **Undo** while

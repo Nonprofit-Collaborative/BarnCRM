@@ -190,7 +190,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As staff, open the **Grant Calendar** tab in **BarnCRM Funders**. | This month, today in bold. `Application: Calendar Test` on its day; the sample requirements and the sample award's expected payment on theirs if they fall this month. The tab is next to **Grant Pipeline**. |
-| 2 | Open **Grant Pipeline**. | Every application and requirement under **Upcoming Deadlines** that falls this month is on the calendar too, and red on both when overdue. |
+| 2 | Open **Grant Pipeline**. | Every application and requirement under **Upcoming Deadlines** that falls this month is on the calendar too; when overdue it is red on the pipeline and marked with the warning icon and **Overdue** on the calendar (see step 10). |
 | 3 | Click **Next Month** until the sample award's second payment shows. | `Grant Payment: Youth Programs Award 17,500` on its due date. |
 | 4 | Click the payment, then go back and click `Calendar Test`. | Each opens its record. |
 | 5 | Mark the payment **Received** and return to the calendar. | It is gone: only expected payments show. |
@@ -198,6 +198,8 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 7 | As read-only, open **Grant Calendar**. | The same entries for **Everyone**; nothing to change. |
 | 8 | Narrow the window to phone width (or use the Salesforce mobile app). | Only days with entries are listed, one under another, with no sideways scrolling. |
 | 9 | With a screen reader, step through the calendar. | The month is announced; each entry is a button that says what it is. |
+| 10 | Set `Calendar Test`'s **Application Deadline** to 3 days ago and reload **Grant Calendar** on this month. | The entry shows a warning icon, the word **Overdue** (in its hover text and read out by a screen reader) and bold text, not red text alone. |
+| 11 | Look under the month heading. | A legend names the border colours: **Application** (blue), **Grant Requirement** (orange), **Grant Payment** (green), plus the **Overdue** mark. Each entry's border matches its legend colour. |
 
 **Cleanup:** Remove sample data; delete `Calendar Test` as the admin.
 

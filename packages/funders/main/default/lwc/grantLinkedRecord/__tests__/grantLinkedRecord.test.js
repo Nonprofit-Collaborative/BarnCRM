@@ -43,7 +43,7 @@ const KINDS = [
     none: 'No program',
     saved: 'Program saved',
     title: 'c.Core_Shared_Program',
-    icon: 'custom:custom8',
+    icon: 'custom:custom88',
     recordId: 'a02000000000001AAA',
     recordName: 'After School',
     card: {}
@@ -58,7 +58,7 @@ const KINDS = [
     none: 'No fund',
     saved: 'Saved',
     title: 'Giving Fund',
-    icon: 'custom:custom17',
+    icon: 'custom:custom42',
     recordId: 'a03000000000001AAA',
     recordName: 'Literacy Fund',
     card: { title: 'Giving Fund' }

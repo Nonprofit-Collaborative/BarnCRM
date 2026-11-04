@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal: field cannot be bulk updated; {0} field, {1} reason</shortDescription>
-        <value>{0} cannot be bulk updated: {1}</value>
+        <value>{0} cannot be changed with Super Transformer: {1}</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_ErrorUnknownField</fullName>
@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal: more than five changes.</shortDescription>
-        <value>A bulk update changes at most five fields. Remove a change.</value>
+        <value>Super Transformer changes at most five fields in one run. Remove a change.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_ErrorDuplicateField</fullName>
@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal: more records match than the run limit; {0} is the limit</shortDescription>
-        <value>More than {0} records match, the run limit for one bulk update. Narrow the query, or run it in parts.</value>
+        <value>More than {0} records match, the limit for one Super Transformer run. Narrow the query, or run it in parts.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_ErrorTooManyToCount</fullName>
@@ -166,7 +166,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal: the job named is not a bulk update.</shortDescription>
-        <value>This bulk update could not be found. Refresh the page.</value>
+        <value>This Super Transformer run could not be found. Refresh the page.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_ErrorNoPermission</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Refusal: the person lacks the bulk update permissions.</shortDescription>
-        <value>Bulk update needs the Bulk Update Records and Find and Export Records permissions. Ask your BarnCRM admin.</value>
+        <value>Super Transformer needs the Bulk Update Records and Find and Export Records permissions. Ask your BarnCRM admin.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_LogStarted</fullName>
@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk update log: {0} person, {1} time, {2} count, {3} object, {4} confirmed</shortDescription>
-        <value>{0} started a bulk update on {1}: {2} {3} matched; {4} confirmed.</value>
+        <value>{0} started a Super Transformer run on {1}: {2} {3} matched; {4} confirmed.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_LogFinished</fullName>
@@ -201,20 +201,12 @@
         <value>Part of the journal could not be written, so some changes cannot be undone. See the Error Log.</value>
     </labels>
     <labels>
-        <fullName>Core_BulkUpdate_Title</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Card title and Find's button: Bulk update.</shortDescription>
-        <value>Bulk Update</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkUpdate_TabIntro</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk Update tab: what the page is for.</shortDescription>
-        <value>Start a bulk update with Super Transformer above, or from a saved query in Find (Change Records, Bulk Update). Recent bulk updates and their undo are listed here.</value>
+        <value>Start a change with Super Transformer above, or from a saved query in Find (Change Records, Super Transformer). Recent Super Transformer runs and their undo are listed here.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_PanelIntro</fullName>
@@ -350,7 +342,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Notice: the bulk update started.</shortDescription>
-        <value>The bulk update started. It keeps running if you leave this page.</value>
+        <value>Super Transformer started. It keeps running if you leave this page.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_Progress</fullName>
@@ -398,7 +390,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button: confirm the undo.</shortDescription>
-        <value>Undo Bulk Update</value>
+        <value>Undo Super Transformer Run</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_UndoStarted</fullName>

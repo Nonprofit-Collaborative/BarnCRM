@@ -34,7 +34,7 @@ import SECTION from '@salesforce/label/c.Core_SetupChanges_ColSection';
 import ALL_SECTIONS from '@salesforce/label/c.Core_SetupChanges_AllSections';
 import SEARCH from '@salesforce/label/c.Core_SetupChanges_Search';
 import SEARCH_HELP from '@salesforce/label/c.Core_SetupChanges_SearchHelp';
-import RUN_SEARCH from '@salesforce/label/c.Core_SetupChanges_RunSearch';
+import RUN_SEARCH from '@salesforce/label/c.Core_SetupChanges_Search';
 import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';
 import DOWNLOADED from '@salesforce/label/c.Core_SetupChanges_Downloaded';
 import MORE from '@salesforce/label/c.Core_SetupChanges_More';
