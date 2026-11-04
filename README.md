@@ -52,6 +52,16 @@ Supported org shapes. Today CI's Apex gate runs on one long-lived test org (Pers
 - An org with NPSP installed (coexistence mode: adopt existing NPSP household accounts, optionally mirror gifts to Opportunities).
 - Agentforce Nonprofit (Person Accounts likely enabled; household junction mode; the Gift Transaction mirror, X-07, is planned and not built).
 
+## Install
+
+Until BarnCRM is on AppExchange it installs from this source with the Salesforce CLI. The full steps are in the Admin Guide, [Installing BarnCRM](docs/admin-guide/installing.md).
+
+- **Supported:** Enterprise, Unlimited and Developer Edition orgs, including Nonprofit Cloud and Power of Us orgs, and staff on Salesforce Platform or Lightning Platform Plus licenses. **Professional Edition and Platform Starter are not supported** (Professional Edition runs Apex only from a security-reviewed managed package; a Starter user can use only 10 custom objects).
+- **Run the pre-check first:** `python3 scripts/org/install-precheck.py <alias> --modules core,giving`. It is read-only and reports PASS, WARN or FAIL for the edition, Apex code room against BarnCRM's size for the modules you chose, custom label and custom object room, names BarnCRM shares with items already in the org, and validation rules or required fields on Account and Contact that its tests can trip.
+- **Production installs run BarnCRM's tests only:** validate with `--test-level RunSpecifiedTests --tests $(python3 scripts/org/list-package-tests.py core giving)`, then quick deploy, so the org's own failing tests cannot block the install.
+- **Not enough Apex room:** the full suite is about 4.3M of an org's 6M Apex characters. Install fewer modules, or ask Salesforce Support for a higher Apex code character limit.
+- **One way until the managed packages:** a source install cannot be upgraded in place to the AppExchange packages; moving later means copying BarnCRM's records off and back ([Moving a Pilot to the Managed Packages](docs/admin-guide/moving-to-managed-packages.md)). Later source releases install over it, with a destructive manifest for removed items (`scripts/org/build-destructive-manifest.py`); a release replaces every shipped component, so clone rather than edit them.
+
 ## For contributors
 
 ```bash

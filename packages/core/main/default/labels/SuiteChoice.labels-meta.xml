@@ -68,7 +68,7 @@
         <fullName>Core_SuiteChoice_CheckAgain</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Shared: button that checks again</shortDescription>
         <value>Check Again</value>
     </labels>

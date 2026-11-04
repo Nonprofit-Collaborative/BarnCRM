@@ -16,16 +16,13 @@ import RULES_HEADING from '@salesforce/label/c.Core_Duplicates_RulesHeading';
 import RULE_ACTIVE from '@salesforce/label/c.Core_Feature_On';
 import RULE_INACTIVE from '@salesforce/label/c.Core_Feature_Off';
 import ACTIVATE_LINK from '@salesforce/label/c.Core_Duplicates_ActivateLink';
-import NO_RULES_NOTICE from '@salesforce/label/c.Core_Duplicates_NoRulesNotice';
 import SCAN_BUTTON from '@salesforce/label/c.Core_Duplicates_ScanButton';
-import SCAN_STARTED from '@salesforce/label/c.Core_Duplicates_ScanStarted';
-import SCAN_RUNNING from '@salesforce/label/c.Core_Duplicates_ScanRunning';
 import LAST_SCAN from '@salesforce/label/c.Core_Duplicates_LastScan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import SUGGESTIONS_HEADING from '@salesforce/label/c.Core_Duplicates_SuggestionsHeading';
 import OBJECT_PERSON from '@salesforce/label/c.Core_Section_Person';
 import OBJECT_HOUSEHOLD from '@salesforce/label/c.Core_Section_Household';
-import PEOPLE_MERGE_NOTICE from '@salesforce/label/c.Core_Duplicates_PeopleMergeNotice';
+import COMPARE_MERGE from '@salesforce/label/c.Core_Duplicates_CompareMerge';
 import MERGE_BUTTON from '@salesforce/label/c.Core_Duplicates_MergeButton';
 import MERGE_HEADING from '@salesforce/label/c.Core_Duplicates_MergeHeading';
 import MERGE_KEEP_LABEL from '@salesforce/label/c.Core_Duplicates_MergeKeepLabel';
@@ -42,7 +39,6 @@ import VIEW_DISMISSED from '@salesforce/label/c.Core_FieldUtilization_HistoryVie
 import READ_ONLY from '@salesforce/label/c.Core_Duplicates_ReadOnlyNotice';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Duplicates_ErrorUnexpected';
-import NO_ACCESS from '@salesforce/label/c.Core_Duplicates_NoSuggestionAccessNotice';
 import SHOWING_COUNT from '@salesforce/label/c.Core_Duplicates_ShowingCount';
 import SHOWING_COUNT_MORE from '@salesforce/label/c.Core_Duplicates_ShowingCountMore';
 import SHOW_MORE from '@salesforce/label/c.Core_AccessExplorer_ShowMore';
@@ -77,16 +73,20 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     title: TITLE,
     rulesHeading: RULES_HEADING,
     activateLink: ACTIVATE_LINK,
-    noRulesNotice: NO_RULES_NOTICE,
+    get noRulesNotice() {
+      return helpText('Core', 'Core_Duplicates_NoRulesNotice');
+    },
     scanButton: SCAN_BUTTON,
-    scanRunning: SCAN_RUNNING,
+    get scanRunning() {
+      return helpText('Core', 'Core_Duplicates_ScanRunning');
+    },
     lastScan: LAST_SCAN,
     refresh: REFRESH,
     suggestionsHeading: SUGGESTIONS_HEADING,
     get empty() {
       return helpText('Core', 'Core_Duplicates_Empty');
     },
-    peopleMergeNotice: PEOPLE_MERGE_NOTICE,
+    compareMerge: COMPARE_MERGE,
     merge: MERGE_BUTTON,
     mergeHeading: MERGE_HEADING,
     get mergeBody() {
@@ -106,7 +106,9 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     dismissedCount: DISMISSED_COUNT,
     viewDismissed: VIEW_DISMISSED,
     readOnly: READ_ONLY,
-    noAccess: NO_ACCESS,
+    get noAccess() {
+      return helpText('Core', 'Core_Duplicates_NoAccessNotice');
+    },
     cancel: CANCEL,
     showMore: SHOW_MORE,
     emptyHeading: EMPTY_HEADING,
@@ -225,9 +227,9 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     return this.view ? this.view.lastScanSummary : undefined;
   }
 
-  get lastScanSummaryClass() {
-    const failed = !!(this.view && this.view.lastScanHadFailures);
-    return `slds-text-body_small slds-var-m-top_x-small${failed ? ' slds-text-color_error' : ''}`;
+  /** A scan that could not check some records says so in a warning notice, not red text. */
+  get lastScanHadFailures() {
+    return !!(this.view && this.view.lastScanHadFailures);
   }
 
   /** False when the viewer's license gives no access to duplicate record sets. */
@@ -304,6 +306,9 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
         setId: suggestion.setId,
         reason: suggestion.reason,
         canMerge: suggestion.canMerge === true,
+        // Two people merge with Salesforce's own Compare and merge, on the first one's page.
+        isPeople: suggestion.canMerge !== true && records.length > 0 && !records[0].isHousehold,
+        firstRecordId: records.length ? records[0].recordId : undefined,
         dismissOpen: this.dismissing === suggestion.setId,
         mergeOpen: !!this.merging && this.merging.setId === suggestion.setId,
         // A suggestion can hold three or more records: each is compared with the first.
@@ -376,11 +381,6 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     return this.suggestions.length > this.visibleCount;
   }
 
-  /** The note on merging two people, shown once above the list when a shown pair is people. */
-  get showAnyPeopleNotice() {
-    return this.visibleSuggestions.some((suggestion) => !suggestion.canMerge);
-  }
-
   handleShowMore() {
     this.focusFrom = this.visibleCount;
     this.visibleCount += PAGE_SIZE;
@@ -407,7 +407,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
   // ------------------------------------------------------------------ scan and refresh
 
   handleScan() {
-    this.runAction(startScan(), SCAN_STARTED);
+    this.runAction(startScan(), helpText('Core', 'Core_Duplicates_ScanStarted'));
   }
 
   handleRefresh() {
@@ -424,6 +424,24 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
         attributes: { recordId, actionName: 'view' }
       })
     );
+  }
+
+  /**
+   * Compare and Merge on a person pair (admin-17): opens the first person's record page, where
+   * the Potential Duplicates card runs Salesforce's own compare and merge (Salesforce gives no
+   * supported link to its compare screen). In a console it opens as a subtab.
+   */
+  handleCompareClick(event) {
+    const recordId = event.target.dataset.recordId;
+    const navigate = () =>
+      this[NavigationMixin.Navigate]({
+        type: 'standard__recordPage',
+        attributes: { recordId, actionName: 'view' }
+      });
+    // A button has no link to fall back on, so outside a console it navigates itself.
+    if (!followLinkInWorkspace(this, event, { recordId }, navigate)) {
+      navigate();
+    }
   }
 
   handleViewDismissed() {

@@ -138,7 +138,7 @@ describe('c-auto-merge-panel', () => {
     getView.mockRejectedValue({ body: { message: 'You need permission.' } });
     const element = await build();
 
-    expect(find(element, 'error').textContent).toBe('You need permission.');
+    expect(find(element, 'error').message).toBe('You need permission.');
   });
 
   it('turns the preview off without the run permission', async () => {

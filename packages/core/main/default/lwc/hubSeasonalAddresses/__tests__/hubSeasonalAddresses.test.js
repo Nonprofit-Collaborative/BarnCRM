@@ -119,10 +119,9 @@ describe('c-hub-seasonal-addresses', () => {
 
     expect(byId(element, 'seasonal-overdue').label).toBe('c.Core_HubHome_BadgeOverdue');
     const warning = byId(element, 'seasonal-stale');
-    expect(warning.getAttribute('aria-live')).toBe('polite');
-    expect(warning.querySelector('lightning-icon').alternativeText).toBe(
-      'c.Core_HubHome_WarningAltText'
-    );
+    // A warning notice: its own icon and role, never color alone.
+    expect(warning.variant).toBe('warning');
+    expect(warning.message).toBe('c.Core_SeasonalAddress_Stale');
     // One message at a time: an overdue run is the fault worth reading, not the schedule.
     expect(byId(element, 'seasonal-not-scheduled')).toBeNull();
   });
