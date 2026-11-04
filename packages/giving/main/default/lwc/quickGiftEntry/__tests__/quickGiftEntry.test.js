@@ -1,7 +1,10 @@
 import { createElement } from 'lwc';
 import Toast from 'lightning/toast';
-import QuickGiftEntry from 'c/quickGiftEntry';
+import { CurrentPageReference } from 'lightning/navigation';
+import QuickGiftEntry, { matchChoiceLabel } from 'c/quickGiftEntry';
 import getDefaults from '@salesforce/apex/QuickGiftEntryController.getDefaults';
+import getDonorKind from '@salesforce/apex/QuickGiftEntryController.getDonorKind';
+import getMatchableGifts from '@salesforce/apex/QuickGiftEntryController.getMatchableGifts';
 import saveGift from '@salesforce/apex/QuickGiftEntryController.saveGift';
 import getPaymentChoices from '@salesforce/apex/QuickGiftEntryController.getPaymentChoices';
 
@@ -9,6 +12,7 @@ const mockNavigate = jest.fn();
 jest.mock(
   'lightning/navigation',
   () => {
+    const { createTestWireAdapter } = require('@salesforce/wire-service-jest-util');
     const Navigate = Symbol('Navigate');
     const NavigationMixin = (Base) =>
       class extends Base {
@@ -17,7 +21,7 @@ jest.mock(
         }
       };
     NavigationMixin.Navigate = Navigate;
-    return { NavigationMixin, __esModule: true };
+    return { NavigationMixin, CurrentPageReference: createTestWireAdapter(), __esModule: true };
   },
   { virtual: true }
 );
@@ -25,6 +29,18 @@ jest.mock(
 jest.mock('@salesforce/apex/QuickGiftEntryController.getDefaults', () => ({ default: jest.fn() }), {
   virtual: true
 });
+
+jest.mock(
+  '@salesforce/apex/QuickGiftEntryController.getDonorKind',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+
+jest.mock(
+  '@salesforce/apex/QuickGiftEntryController.getMatchableGifts',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 
 jest.mock('@salesforce/apex/QuickGiftEntryController.saveGift', () => ({ default: jest.fn() }), {
   virtual: true
@@ -47,13 +63,29 @@ const DEFAULTS = {
     { label: 'Cash', value: 'Cash' },
     { label: 'Check', value: 'Check' },
     { label: 'In-kind', value: 'In-kind' }
-  ]
+  ],
+  tributeTypes: [
+    { label: 'In honor of', value: 'In honor of' },
+    { label: 'In memory of', value: 'In memory of' }
+  ],
+  fieldLabels: {
+    tributeType: 'Type',
+    honoreeContact: 'Honoree Contact',
+    honoreeAccount: 'Honoree Account',
+    honoreeName: 'Honoree Name',
+    notifyContact: 'Notification Recipient Contact',
+    notifyAccount: 'Notification Recipient Account',
+    notifyName: 'Notification Recipient Name',
+    matchedGift: 'Matched Gift'
+  }
 };
 
 const CONTACT_ID = '003000000000000AAA';
+const ACCOUNT_ID = '001000000000000BBB';
 
-function build() {
+function build(props = {}) {
   const element = createElement('c-quick-gift-entry', { is: QuickGiftEntry });
+  Object.assign(element, props);
   document.body.appendChild(element);
   return element;
 }
@@ -98,6 +130,8 @@ async function enterAGift(element) {
 describe('c-quick-gift-entry', () => {
   beforeEach(() => {
     getDefaults.mockResolvedValue({ ...DEFAULTS });
+    getDonorKind.mockResolvedValue('organization');
+    getMatchableGifts.mockResolvedValue([]);
     saveGift.mockResolvedValue({
       success: true,
       giftId: '004000000000000AAA',
@@ -140,7 +174,8 @@ describe('c-quick-gift-entry', () => {
     const element = build();
     await settle();
 
-    expect(pick(element, 'form-error').textContent).toContain('Settings are unavailable.');
+    expect(pick(element, 'form-error').message).toContain('Settings are unavailable.');
+    expect(pick(element, 'form-error').variant).toBe('error');
   });
 
   it('shows the controller validation messages beside their fields', async () => {
@@ -241,11 +276,18 @@ describe('c-quick-gift-entry', () => {
         paymentReference: null,
         inKindDescription: null,
         fairMarketValue: null,
-        installmentId: null
+        installmentId: null,
+        tributeType: null,
+        honoreeId: null,
+        honoreeName: null,
+        notifyId: null,
+        notifyName: null,
+        matchedGiftId: null
       }
     });
     expect(pick(element, 'saved')).not.toBeNull();
-    expect(pick(element, 'saved-link').href).toContain('/lightning/r/Gift__c/');
+    expect(pick(element, 'saved').variant).toBe('success');
+    expect(pick(element, 'saved').actionHref).toContain('/lightning/r/Gift__c/');
     expect(toast).toHaveBeenCalled();
     expect(toast.mock.calls[0][0].messageLinks[0].label).toBe('G-000123');
     expect(toast.mock.calls[0][0].messageLinks[0].url).toContain('004000000000000AAA');
@@ -274,7 +316,7 @@ describe('c-quick-gift-entry', () => {
     pick(element, 'save').click();
     await settle();
 
-    expect(pick(element, 'form-error').textContent).toContain('Insufficient access on Gift.');
+    expect(pick(element, 'form-error').message).toContain('Insufficient access on Gift.');
     expect(pick(element, 'saved')).toBeNull();
   });
 
@@ -439,6 +481,136 @@ describe('c-quick-gift-entry', () => {
 
     expect(pick(element, 'saved')).not.toBeNull();
     expect(pick(element, 'save-warning')).not.toBeNull();
+  });
+
+  it('starts with the person whose page it sits on as the donor', async () => {
+    const element = build({ recordId: CONTACT_ID, objectApiName: 'Contact' });
+    await settle();
+
+    expect(pick(element, 'donor-kind').value).toBe('person');
+    expect(pick(element, 'donor-person').value).toBe(CONTACT_ID);
+    expect(pick(element, 'donor-person').displayInfo).toEqual({
+      additionalFields: ['Email', 'MailingCity']
+    });
+    expect(getDonorKind).not.toHaveBeenCalled();
+  });
+
+  it('asks whether an account is a person or an organization, and offers its matches', async () => {
+    getMatchableGifts.mockResolvedValue([
+      {
+        id: 'a05000000000001AAA',
+        name: 'G-000042',
+        donorName: 'Ana Garcia',
+        amount: 100,
+        giftDate: '2026-10-01'
+      }
+    ]);
+    const element = build({ recordId: ACCOUNT_ID, objectApiName: 'Account' });
+    await settle();
+
+    expect(getDonorKind).toHaveBeenCalledWith({ donorId: ACCOUNT_ID });
+    expect(pick(element, 'donor-organization').value).toBe(ACCOUNT_ID);
+    expect(pick(element, 'donor-organization').displayInfo).toEqual({
+      additionalFields: ['BillingCity']
+    });
+    expect(getMatchableGifts).toHaveBeenCalledWith({ organizationId: ACCOUNT_ID });
+    const matched = pick(element, 'matched-gift');
+    expect(matched.options.map((option) => option.value)).toEqual(['', 'a05000000000001AAA']);
+
+    change(pick(element, 'amount'), { value: '100' });
+    change(pick(element, 'gift-type'), { value: 'Check' });
+    change(matched, { value: 'a05000000000001AAA' });
+    pick(element, 'save').click();
+    await settle();
+
+    const sent = saveGift.mock.calls[0][0].input;
+    expect(sent.donorAccountId).toBe(ACCOUNT_ID);
+    expect(sent.matchedGiftId).toBe('a05000000000001AAA');
+  });
+
+  it('treats a person account as a person and offers no match', async () => {
+    getDonorKind.mockResolvedValue('person');
+    getDefaults.mockResolvedValue({ ...DEFAULTS, hasPersonAccounts: true });
+    const element = build({ recordId: ACCOUNT_ID, objectApiName: 'Account' });
+    await settle();
+
+    expect(pick(element, 'donor-kind').value).toBe('person');
+    expect(pick(element, 'donor-person').value).toBe(ACCOUNT_ID);
+    expect(pick(element, 'match-section')).toBeNull();
+  });
+
+  it('starts with the donor named in the page state on the Quick Gift Entry tab', async () => {
+    const element = build();
+    await settle();
+
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+    CurrentPageReference.emit({ type: 'standard__navItemPage', state: { c__donorId: CONTACT_ID } });
+    await settle();
+
+    expect(pick(element, 'donor-person').value).toBe(CONTACT_ID);
+  });
+
+  it('sends the tribute typed in the honors section, and says when the gift saved', async () => {
+    const element = build();
+    const saved = jest.fn();
+    element.addEventListener('giftsaved', saved);
+    await settle();
+    expect(pick(element, 'tribute-type').options.map((option) => option.value)).toEqual([
+      'In honor of',
+      'In memory of'
+    ]);
+    expect(pick(element, 'honoree').label).toBe('Honoree Contact');
+
+    await enterAGift(element);
+    change(pick(element, 'tribute-type'), { value: 'In memory of' });
+    change(pick(element, 'honoree-name'), { value: 'Rosa Garcia' });
+    change(pick(element, 'notify'), { recordId: '003000000000000CCC' });
+    pick(element, 'save').click();
+    await settle();
+
+    const sent = saveGift.mock.calls[0][0].input;
+    expect(sent.tributeType).toBe('In memory of');
+    expect(sent.honoreeName).toBe('Rosa Garcia');
+    expect(sent.honoreeId).toBeNull();
+    expect(sent.notifyId).toBe('003000000000000CCC');
+    expect(sent.matchedGiftId).toBeNull();
+    expect(saved).toHaveBeenCalled();
+    expect(saved.mock.calls[0][0].detail).toEqual({
+      giftId: '004000000000000AAA',
+      startAnother: false
+    });
+  });
+
+  it('opens the honors section when a message is about one of its fields', async () => {
+    saveGift.mockResolvedValue({
+      success: false,
+      fieldErrors: [{ field: 'honoree', message: 'Say who this gift honors.' }]
+    });
+    const element = build();
+    await settle();
+    expect(pick(element, 'more').activeSectionName).toEqual([]);
+
+    await enterAGift(element);
+    change(pick(element, 'tribute-type'), { value: 'In honor of' });
+    pick(element, 'save').click();
+    await settle();
+
+    expect(pick(element, 'more').activeSectionName).toEqual(['tribute']);
+  });
+
+  it('writes a match choice as donor, amount and date, then the gift name', () => {
+    const label = matchChoiceLabel(
+      { name: 'G-000042', donorName: 'Ana Garcia', amount: 100, giftDate: '2026-10-01' },
+      'en-US',
+      'USD'
+    );
+    expect(label).toBe('Ana Garcia, $100.00, Oct 1, 2026 (G-000042)');
+  });
+
+  it('drops the card title inside the Enter a Gift action, whose window has one', async () => {
+    const element = build({ inAction: true });
+    await settle();
+    expect(element.shadowRoot.querySelector('lightning-card').title).toBeUndefined();
   });
 
   describe('pays a scheduled payment', () => {

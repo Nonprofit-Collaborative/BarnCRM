@@ -137,14 +137,6 @@
         <value>Choose the person or organization who gave this gift.</value>
     </labels>
     <labels>
-        <fullName>Giving_QuickGiftEntry_ErrorDonorBoth</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: two donors chosen</shortDescription>
-        <value>A gift has one donor: choose a person or an organization, not both.</value>
-    </labels>
-    <labels>
         <fullName>Giving_QuickGiftEntry_ErrorAmountRequired</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
@@ -239,5 +231,21 @@
         <protected>false</protected>
         <shortDescription>Quick gift entry: the gift saved but the chosen fund was not applied</shortDescription>
         <value>The gift was saved, but it is already split across more than one fund, so the fund you chose was not applied. Open the gift to change its allocations.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_QuickGiftEntry_MatchSection</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Quick gift entry: matching gift section</shortDescription>
+        <value>Matches an Employee&apos;s Gift</value>
+    </labels>
+    <labels>
+        <fullName>Giving_QuickGiftEntry_TributeSection</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Quick gift entry: tribute section</shortDescription>
+        <value>This Gift Honors Someone</value>
     </labels>
 </CustomLabels>

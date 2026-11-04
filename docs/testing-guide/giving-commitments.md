@@ -63,9 +63,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | **Gift Batches**, **New**: **Description** `Pledge checks`, **Control Total** the payment's amount, **Default Gift Date** the payment's due date. Save. | The **Lines** card opens. |
-| 2 | **Add line**, pick the pledge's donor, **Amount** the payment's amount. | The **Pays** cell chooses that payment, marked "(suggested)". |
+| 2 | **Add Line**, pick the pledge's donor, **Amount** the payment's amount. | The **Pays** cell chooses that payment, marked "(suggested)". |
 | 3 | Set **Pays** to **None: a new gift on its own**, then choose the payment again. | Your choice stays as you set it. |
-| 4 | Click **Save**, then **Post batch**. | "Batch posted: 1 gifts created." |
+| 4 | Click **Save**, then **Create Gifts**. | "Gifts created: 1 from this batch." |
 | 5 | Open the pledge. | That payment is Paid; **Paid To Date** rose and **Balance** fell by the amount. |
 | 6 | Open the gift the batch made. | **Commitment** names the pledge and **Installment** the payment. |
 | 7 | Note the pledge's next Scheduled payment. On the **Gifts** tab click **New**: the pledge's donor, **Amount** that payment's amount, **Payment Method** `Check`, **Commitment** the pledge, **Installment** that payment. Save, then open the pledge. | That payment is Paid and **Balance** fell by its amount. |

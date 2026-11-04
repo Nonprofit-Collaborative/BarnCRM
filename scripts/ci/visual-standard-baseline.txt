@@ -3,6 +3,4 @@
 packages/funders/main/default/lwc/fundersBoard/fundersBoard.html table-stacked 4
 packages/funders/main/default/lwc/grantSchedule/grantSchedule.html table-stacked 2
 packages/giving/main/default/lwc/commitmentSchedulePreview/commitmentSchedulePreview.html table-stacked 1
-packages/giving/main/default/lwc/giftBatchEntry/giftBatchEntry.html table-stacked 1
-packages/giving/main/default/lwc/quickGiftEntry/quickGiftEntry.html solid-box 2
 packages/giving/main/default/lwc/receiptSettings/receiptSettings.html table-stacked 1
