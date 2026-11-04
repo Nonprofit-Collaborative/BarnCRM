@@ -172,6 +172,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0161](0161-funders-module.md) | The BarnCRM Funders module: a Grant and its requirements, the funder an organization, a program named by its record identifier | Proposed |
 | [0162](0162-funders-restricted-funds-schedules-calendar.md) | Funders restricted funds, award schedules and the deadline calendar, with no Giving dependency | Proposed |
 | [0163](0163-funders-reporting-links.md) | Funders reporting: outcomes linked to requirements, a funder report template merged in the browser, a board dashboard that reads Giving when it can | Proposed |
+| [NEXT](NEXT-help-text-json.md) | Help and guidance prose in packaged JSON catalogs, not custom labels | Proposed |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
