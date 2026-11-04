@@ -234,10 +234,13 @@ describe('c-gift-fund-split', () => {
 
   it('lets a single row follow the gift amount', async () => {
     const element = render({ total: 100 });
+    const handler = jest.fn();
+    element.addEventListener('change', handler);
     await flush();
     element.total = 125;
     await flush();
     expect(element.allocations).toEqual([{ fundId: null, amount: 125 }]);
+    expect(handler.mock.calls[0][0].detail.allocations).toEqual([{ fundId: null, amount: 125 }]);
     element.allocations = [{ fundId: null, amount: 125 }];
     await flush();
     expect(all(element, 'amount')).toHaveLength(1);
