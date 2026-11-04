@@ -9,8 +9,6 @@ import markPosted from '@salesforce/apex/AccountingExportController.markPosted';
 // prefix while the namespace is deferred.
 import canPostGifts from '@salesforce/customPermission/Post_Gifts';
 import title from '@salesforce/label/c.Mirror_AccountingExport_Title';
-import intro from '@salesforce/label/c.Mirror_AccountingExport_Intro';
-import visibility from '@salesforce/label/c.Mirror_AccountingExport_Visibility';
 import from from '@salesforce/label/c.Core_SetupChanges_From';
 import to from '@salesforce/label/c.Core_SetupChanges_To';
 import fund from '@salesforce/label/c.Giving_GiftBatch_ColumnFund';
@@ -24,10 +22,10 @@ import errorDatesRequired from '@salesforce/label/c.Mirror_AccountingExport_Erro
 import errorFailed from '@salesforce/label/c.Mirror_AccountingExport_ErrorFailed';
 import onlyUnposted from '@salesforce/label/c.Mirror_AccountingExport_OnlyUnposted';
 import markPostedLabel from '@salesforce/label/c.Mirror_AccountingExport_MarkPosted';
-import markPostedHelp from '@salesforce/label/c.Mirror_AccountingExport_MarkPostedHelp';
 import marked from '@salesforce/label/c.Mirror_AccountingExport_Marked';
 import markNeedsAllFunds from '@salesforce/label/c.Mirror_AccountingExport_MarkNeedsAllFunds';
 import { BYTE_ORDER_MARK, bodyMessage, saveBlob } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const REVOKE_DELAY_MS = 1000;
 
@@ -41,10 +39,24 @@ const REVOKE_DELAY_MS = 1000;
  * always marks the file on screen, and the server builds it again and compares its digest.
  */
 export default class AccountingExport extends LightningElement {
+  helpReady = isHelpLoaded('Mirror');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Mirror').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title,
-    intro,
-    visibility,
+    get intro() {
+      return helpText('Mirror', 'Mirror_AccountingExport_Intro');
+    },
+    get visibility() {
+      return helpText('Mirror', 'Mirror_AccountingExport_Visibility');
+    },
     from,
     to,
     fund,
@@ -54,7 +66,9 @@ export default class AccountingExport extends LightningElement {
     download,
     onlyUnposted,
     markPosted: markPostedLabel,
-    markPostedHelp,
+    get markPostedHelp() {
+      return helpText('Mirror', 'Mirror_AccountingExport_MarkPostedHelp');
+    },
     markNeedsAllFunds
   };
 

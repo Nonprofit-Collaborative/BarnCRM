@@ -5,8 +5,6 @@ import getChecks from '@salesforce/apex/DataHygieneController.getChecks';
 import openInFind from '@salesforce/apex/DataHygieneController.openInFind';
 
 import PAGE_TITLE from '@salesforce/label/c.Core_DataHygiene_PageTitle';
-import INTRO from '@salesforce/label/c.Core_DataHygiene_Intro';
-import HEALTH_CHECK_NOTE from '@salesforce/label/c.Core_DataHygiene_HealthCheckNote';
 import RECOUNT from '@salesforce/label/c.Core_DataHygiene_Recount';
 import LOADING from '@salesforce/label/c.Core_DataHygiene_Loading';
 import OPEN_IN_FIND from '@salesforce/label/c.Core_DataHygiene_OpenInFind';
@@ -16,6 +14,7 @@ import CHECK_FAILED from '@salesforce/label/c.Core_DataHygiene_CheckFailed';
 import NEEDS_ATTENTION from '@salesforce/label/c.Core_DataHygiene_NeedsAttention';
 import ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * Org Optimizer's Data Quality section (C-28, admin guide data-hygiene.md): every check with
@@ -26,10 +25,16 @@ import { bodyMessage } from 'c/findCsv';
  * checks that found records, for the Overview tile. Nothing here changes a record.
  */
 export default class DataHygieneConsole extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     pageTitle: PAGE_TITLE,
-    intro: INTRO,
-    healthCheckNote: HEALTH_CHECK_NOTE,
+    get intro() {
+      return helpText('Core', 'Core_DataHygiene_Intro');
+    },
+    get healthCheckNote() {
+      return helpText('Core', 'Core_DataHygiene_HealthCheckNote');
+    },
     recount: RECOUNT,
     loading: LOADING,
     openInFind: OPEN_IN_FIND,
@@ -41,6 +46,11 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
   errorMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

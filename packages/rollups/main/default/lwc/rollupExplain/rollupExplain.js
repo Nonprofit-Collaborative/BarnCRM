@@ -1,12 +1,11 @@
 import { LightningElement, api } from 'lwc';
 import explain from '@salesforce/apex/RollupExplainController.explain';
 import TITLE from '@salesforce/label/c.Core_RollupEase_ExplainTitle';
-import EMPTY from '@salesforce/label/c.Core_RollupEase_ExplainEmpty';
 import ADMIN from '@salesforce/label/c.Core_RollupEase_ExplainAdmin';
-import SEEN from '@salesforce/label/c.Core_RollupEase_ExplainSeen';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import ROWS_HEADING from '@salesforce/label/c.Core_RollupEase_RowsHeading';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * Explain These Totals (Rollup Builder ease of use U5, ADR-0136): on a record page, each total a
@@ -14,15 +13,32 @@ import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
  * why, when it was last calculated, and links to the records read. Reads only; writes nothing.
  */
 export default class RollupExplain extends LightningElement {
+  helpReady = isHelpLoaded('Rollups');
+
   @api recordId;
 
-  labels = { title: TITLE, empty: EMPTY, seen: SEEN, refresh: REFRESH, rowsHeading: ROWS_HEADING };
+  labels = {
+    title: TITLE,
+    get empty() {
+      return helpText('Rollups', 'Core_RollupEase_ExplainEmpty');
+    },
+    get seen() {
+      return helpText('Rollups', 'Core_RollupEase_ExplainSeen');
+    },
+    refresh: REFRESH,
+    rowsHeading: ROWS_HEADING
+  };
 
   explanations;
   error;
   loading = false;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Rollups').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

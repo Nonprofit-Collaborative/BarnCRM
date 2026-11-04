@@ -17,11 +17,8 @@ import getSeveralObjects from '@salesforce/apex/ImportController.getSeveralObjec
 import suggestSheetMapping from '@salesforce/apex/ImportController.suggestSheetMapping';
 import severalObjectsLabel from '@salesforce/label/c.Core_Import_SeveralObjectsLabel';
 import severalObjectsAvailable from '@salesforce/label/c.Core_Import_SeveralObjectsAvailable';
-import severalObjectsHelp from '@salesforce/label/c.Core_Import_SeveralObjectsHelp';
 import sheetObjectLabel from '@salesforce/label/c.Core_Import_SheetObjectLabel';
 import fileObjectLabel from '@salesforce/label/c.Core_Import_FileObjectLabel';
-import sheetObjectHelp from '@salesforce/label/c.Core_Import_SheetObjectHelp';
-import severalMatchingHelp from '@salesforce/label/c.Core_Import_SeveralMatchingHelp';
 import sheetOption from '@salesforce/label/c.Core_Import_SheetOption';
 import sheetConflict from '@salesforce/label/c.Core_Import_SheetConflict';
 import sheetObject from '@salesforce/label/c.Core_Format_Pair';
@@ -29,16 +26,13 @@ import exampleBlank from '@salesforce/label/c.Core_Find_Blank';
 import detectFileLabel from '@salesforce/label/c.Core_Import_DetectFileLabel';
 import detectSuggested from '@salesforce/label/c.Core_Import_DetectSuggested';
 import detectNone from '@salesforce/label/c.Core_Import_DetectNone';
-import detectSheetsDiffer from '@salesforce/label/c.Core_Import_DetectSheetsDiffer';
 import suggestObject from '@salesforce/apex/ImportController.suggestObject';
 import delimiterLabel from '@salesforce/label/c.Core_Import_DelimiterLabel';
-import delimiterHelp from '@salesforce/label/c.Core_Import_DelimiterHelp';
 import delimiterComma from '@salesforce/label/c.Core_Import_DelimiterComma';
 import delimiterSemicolon from '@salesforce/label/c.Core_Import_DelimiterSemicolon';
 import delimiterTab from '@salesforce/label/c.Core_Import_DelimiterTab';
 import delimiterPipe from '@salesforce/label/c.Core_Import_DelimiterPipe';
 import sheetLabel from '@salesforce/label/c.Core_Import_SheetLabel';
-import sheetHelp from '@salesforce/label/c.Core_Import_SheetHelp';
 // C-49d: Create New Field in the column picker.
 import ImportNewFieldModal from 'c/importNewFieldModal';
 import getFieldConnection from '@salesforce/apex/ImportNewFieldController.getConnection';
@@ -56,7 +50,6 @@ import startDryRun from '@salesforce/apex/ImportController.startDryRun';
 import startCommit from '@salesforce/apex/ImportController.startCommit';
 import startTrial from '@salesforce/apex/ImportController.startTrial';
 import trialHeading from '@salesforce/label/c.Core_Import_TrialHeading';
-import trialHelp from '@salesforce/label/c.Core_Import_TrialHelp';
 import trialRowsLabel from '@salesforce/label/c.Core_Import_TrialRowsLabel';
 import trialButton from '@salesforce/label/c.Core_Import_TrialButton';
 import remainingButton from '@salesforce/label/c.Core_Import_RemainingButton';
@@ -101,15 +94,11 @@ import resultsHouseholdId from '@salesforce/label/c.Core_Import_ResultsHousehold
 import resultsOrganizationId from '@salesforce/label/c.Core_Import_ResultsOrganizationId';
 import resultsModuleRecordId from '@salesforce/label/c.Core_Import_ResultsModuleRecordId';
 import uploadLabel from '@salesforce/label/c.Core_Import_UploadLabel';
-import uploadHint from '@salesforce/label/c.Core_Import_UploadHint';
 import columnHeader from '@salesforce/label/c.Core_Import_ColumnHeader';
 import targetHeader from '@salesforce/label/c.Core_Import_TargetHeader';
 import sampleHeader from '@salesforce/label/c.Core_Import_SampleHeader';
 import doNotLoad from '@salesforce/label/c.Core_Import_DoNotLoad';
 import matchingRuleLabel from '@salesforce/label/c.Core_Import_MatchingRuleLabel';
-import matchingEmailHelp from '@salesforce/label/c.Core_Import_MatchingEmailHelp';
-import matchingNamePostalHelp from '@salesforce/label/c.Core_Import_MatchingNamePostalHelp';
-import matchingExternalIdHelp from '@salesforce/label/c.Core_Import_MatchingExternalIdHelp';
 import readOnlyMessage from '@salesforce/label/c.Core_Import_ErrorNoPermission';
 import loadingAltText from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import parsingMessage from '@salesforce/label/c.Core_Import_ParsingMessage';
@@ -120,14 +109,11 @@ import xlsxTooLarge from '@salesforce/label/c.Core_Import_XlsxTooLarge';
 import originalTooLargeToKeep from '@salesforce/label/c.Core_Import_OriginalTooLargeToKeep';
 import originalNotKept from '@salesforce/label/c.Core_Import_OriginalNotKept';
 import recurringLabel from '@salesforce/label/c.Core_Import_RecurringLabel';
-import recurringHelp from '@salesforce/label/c.Core_Import_RecurringHelp';
 import sourceNameLabel from '@salesforce/label/c.Core_Import_SourceNameLabel';
 import controlTotalsHeading from '@salesforce/label/c.Core_Import_ControlTotalsHeading';
-import controlTotalsHelp from '@salesforce/label/c.Core_Import_ControlTotalsHelp';
 import expectedCountLabel from '@salesforce/label/c.Core_Import_ExpectedCountLabel';
 import expectedAmountLabel from '@salesforce/label/c.Core_Import_ExpectedAmountLabel';
 import paymentMatchingHeading from '@salesforce/label/c.Core_Import_PaymentMatchingHeading';
-import paymentMatchingHelp from '@salesforce/label/c.Core_Import_PaymentMatchingHelp';
 import paymentMatchingLabel from '@salesforce/label/c.Core_Import_PaymentMatchingLabel';
 import paymentMatchOrCreate from '@salesforce/label/c.Core_Import_PaymentMatchingMatchOrCreate';
 import paymentAlwaysCreate from '@salesforce/label/c.Core_Import_PaymentMatchingAlwaysCreate';
@@ -137,18 +123,13 @@ import matchWindowLabel from '@salesforce/label/c.Core_Import_MatchWindowLabel';
 import matchToleranceLabel from '@salesforce/label/c.Core_Import_MatchToleranceLabel';
 import personMatchFieldLabel from '@salesforce/label/c.Core_Import_PersonMatchFieldLabel';
 import organizationRuleLabel from '@salesforce/label/c.Core_Import_OrganizationRuleLabel';
-import organizationNameHelp from '@salesforce/label/c.Core_Import_OrganizationNameHelp';
-import organizationExternalIdHelp from '@salesforce/label/c.Core_Import_OrganizationExternalIdHelp';
 import organizationMatchFieldLabel from '@salesforce/label/c.Core_Import_OrganizationMatchFieldLabel';
 import noMatchFields from '@salesforce/label/c.Core_Import_NoMatchFields';
 import matchFieldNotMapped from '@salesforce/label/c.Core_Import_MatchFieldNotMapped';
 import severalMatchesLabel from '@salesforce/label/c.Core_Import_SeveralMatchesLabel';
 import severalRejectOption from '@salesforce/label/c.Core_Import_LookupRejectOption';
 import severalRecentOption from '@salesforce/label/c.Core_Import_SeveralRecentOption';
-import severalRejectHelp from '@salesforce/label/c.Core_Import_SeveralRejectHelp';
-import severalRecentHelp from '@salesforce/label/c.Core_Import_SeveralRecentHelp';
 import fileValuesHeading from '@salesforce/label/c.Core_Import_FileValuesHeading';
-import fileValuesHelp from '@salesforce/label/c.Core_Import_FileValuesHelp';
 import addFileValueButton from '@salesforce/label/c.Core_Import_AddFileValueButton';
 import removeFileValueLabel from '@salesforce/label/c.Core_Import_RemoveFileValueLabel';
 import fileValueTargetLabel from '@salesforce/label/c.Core_Import_FileValueTargetLabel';
@@ -158,7 +139,6 @@ import targetSecondPersonField from '@salesforce/label/c.Core_Import_TargetSecon
 import targetOrganizationField from '@salesforce/label/c.Core_Import_TargetOrganizationField';
 import recordIdFieldName from '@salesforce/label/c.Core_Import_RecordIdOption';
 import matchOnlyLabel from '@salesforce/label/c.Core_Import_MatchOnlyLabel';
-import matchOnlyHelp from '@salesforce/label/c.Core_Import_MatchOnlyHelp';
 import stepKind from '@salesforce/label/c.Core_Import_StepKind';
 import stepFileType from '@salesforce/label/c.Core_Import_StepFileType';
 import moreOptions from '@salesforce/label/c.Core_Import_MoreOptions';
@@ -192,9 +172,7 @@ import changesButton from '@salesforce/label/c.Core_Import_ChangesButton';
 import changesButtonCount from '@salesforce/label/c.Core_Import_ChangesButtonCount';
 import blankClearsLabel from '@salesforce/label/c.Core_Import_BlankClearsLabel';
 import duplicateRulesLabel from '@salesforce/label/c.Core_Import_DuplicateRulesLabel';
-import duplicateRulesHelp from '@salesforce/label/c.Core_Import_DuplicateRulesHelp';
 import duplicateRulesNone from '@salesforce/label/c.Core_Import_DuplicateRulesNone';
-import duplicateRulesObjectHelp from '@salesforce/label/c.Core_Import_DuplicateRulesObjectHelp';
 import ruleEmailExact from '@salesforce/label/c.Core_Import_RuleEmailExact';
 import ruleNamePostalCode from '@salesforce/label/c.Core_Import_RuleNamePostalCode';
 import ruleExternalId from '@salesforce/label/c.Core_DataDictionary_ColExternalId';
@@ -202,11 +180,9 @@ import ruleNameExact from '@salesforce/label/c.Core_Import_RuleNameExact';
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
 import openRetry from '@salesforce/apex/ImportController.openRetry';
 import retryHeading from '@salesforce/label/c.Core_Import_RetryHeading';
-import retryHelp from '@salesforce/label/c.Core_Import_RetryHelp';
 import retryFileLabel from '@salesforce/label/c.Core_Import_RetryFileLabel';
 import retryColumnsMissing from '@salesforce/label/c.Core_Import_RetryColumnsMissing';
 import guessBadge from '@salesforce/label/c.Core_Import_GuessBadge';
-import guessBadgeHelp from '@salesforce/label/c.Core_Import_GuessBadgeHelp';
 import guessAccept from '@salesforce/label/c.Core_Import_GuessAccept';
 import guessAcceptColumn from '@salesforce/label/c.Core_Import_GuessAcceptColumn';
 import guessAcceptAll from '@salesforce/label/c.Core_Import_GuessAcceptAll';
@@ -222,6 +198,7 @@ import {
   notFoundChoices,
   notFoundHelpOf
 } from 'c/importLoadOptions';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** How many of the file's rows the column changes are previewed on (R-IT15). */
 const CHANGE_SAMPLE_ROWS = 5;
@@ -279,22 +256,64 @@ const EXTERNAL_ID = 'External ID';
 
 /** The value is the stored rule name the server reads; the label is what the person sees. */
 const RULES = [
-  { value: 'Email exact', label: ruleEmailExact, help: matchingEmailHelp },
-  { value: 'Name plus postal code', label: ruleNamePostalCode, help: matchingNamePostalHelp },
-  { value: EXTERNAL_ID, label: ruleExternalId, help: matchingExternalIdHelp }
+  {
+    value: 'Email exact',
+    label: ruleEmailExact,
+    get help() {
+      return helpText('Core', 'Core_Import_MatchingEmailHelp');
+    }
+  },
+  {
+    value: 'Name plus postal code',
+    label: ruleNamePostalCode,
+    get help() {
+      return helpText('Core', 'Core_Import_MatchingNamePostalHelp');
+    }
+  },
+  {
+    value: EXTERNAL_ID,
+    label: ruleExternalId,
+    get help() {
+      return helpText('Core', 'Core_Import_MatchingExternalIdHelp');
+    }
+  }
 ];
 
 /** How organizations are matched (R-IT2); each says what it risks. */
 const ORGANIZATION_RULES = [
-  { value: 'Name exact', label: ruleNameExact, help: organizationNameHelp },
-  { value: EXTERNAL_ID, label: ruleExternalId, help: organizationExternalIdHelp }
+  {
+    value: 'Name exact',
+    label: ruleNameExact,
+    get help() {
+      return helpText('Core', 'Core_Import_OrganizationNameHelp');
+    }
+  },
+  {
+    value: EXTERNAL_ID,
+    label: ruleExternalId,
+    get help() {
+      return helpText('Core', 'Core_Import_OrganizationExternalIdHelp');
+    }
+  }
 ];
 
 /** What happens when several records match a row (R-IT9); rejecting is the default. */
 const SEVERAL_REJECT = 'Reject the row';
 const SEVERAL_CHOICES = [
-  { value: SEVERAL_REJECT, label: severalRejectOption, help: severalRejectHelp },
-  { value: 'Use the most recently changed', label: severalRecentOption, help: severalRecentHelp }
+  {
+    value: SEVERAL_REJECT,
+    label: severalRejectOption,
+    get help() {
+      return helpText('Core', 'Core_Import_SeveralRejectHelp');
+    }
+  },
+  {
+    value: 'Use the most recently changed',
+    label: severalRecentOption,
+    get help() {
+      return helpText('Core', 'Core_Import_SeveralRecentHelp');
+    }
+  }
 ];
 
 /** A person's attributes a value for every row may not set: every row would be one person. */
@@ -323,6 +342,8 @@ const LOOKUP_BY_ID = 'Id';
  * around. See docs/admin-guide/importing.md.
  */
 export default class ImportWizard extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   step = 1;
   loading = true;
   parsing = false;
@@ -446,7 +467,9 @@ export default class ImportWizard extends LightningElement {
   labels = {
     blankClearsLabel,
     guessBadge,
-    guessBadgeHelp,
+    get guessBadgeHelp() {
+      return helpText('Core', 'Core_Import_GuessBadgeHelp');
+    },
     guessAccept,
     guessAcceptAll,
     cardTitle,
@@ -464,7 +487,9 @@ export default class ImportWizard extends LightningElement {
     downloadExceptionsButton,
     downloadResultsButton,
     uploadLabel,
-    uploadHint,
+    get uploadHint() {
+      return helpText('Core', 'Core_Import_UploadHint');
+    },
     columnHeader,
     targetHeader,
     sampleHeader,
@@ -473,14 +498,20 @@ export default class ImportWizard extends LightningElement {
     loadingAltText,
     parsingMessage,
     recurringLabel,
-    recurringHelp,
+    get recurringHelp() {
+      return helpText('Core', 'Core_Import_RecurringHelp');
+    },
     sourceNameLabel,
     controlTotalsHeading,
-    controlTotalsHelp,
+    get controlTotalsHelp() {
+      return helpText('Core', 'Core_Import_ControlTotalsHelp');
+    },
     expectedCountLabel,
     expectedAmountLabel,
     paymentMatchingHeading,
-    paymentMatchingHelp,
+    get paymentMatchingHelp() {
+      return helpText('Core', 'Core_Import_PaymentMatchingHelp');
+    },
     paymentMatchingLabel,
     matchWindowLabel,
     matchToleranceLabel,
@@ -490,13 +521,17 @@ export default class ImportWizard extends LightningElement {
     noMatchFields,
     severalMatchesLabel,
     fileValuesHeading,
-    fileValuesHelp,
+    get fileValuesHelp() {
+      return helpText('Core', 'Core_Import_FileValuesHelp');
+    },
     addFileValueButton,
     removeFileValueLabel,
     fileValueTargetLabel,
     fileValueLabel,
     matchOnlyLabel,
-    matchOnlyHelp,
+    get matchOnlyHelp() {
+      return helpText('Core', 'Core_Import_MatchOnlyHelp');
+    },
     stepKind,
     moreOptions,
     downloadMenu,
@@ -510,33 +545,58 @@ export default class ImportWizard extends LightningElement {
     loadObjectCreateButton,
     lookupFieldLabel,
     duplicateRulesLabel,
-    duplicateRulesHelp,
+    get duplicateRulesHelp() {
+      return helpText('Core', 'Core_Import_DuplicateRulesHelp');
+    },
     duplicateRulesNone,
-    duplicateRulesObjectHelp,
+    get duplicateRulesObjectHelp() {
+      return helpText('Core', 'Core_Import_DuplicateRulesObjectHelp');
+    },
     delimiterLabel,
-    delimiterHelp,
+    get delimiterHelp() {
+      return helpText('Core', 'Core_Import_DelimiterHelp');
+    },
     sheetLabel,
-    sheetHelp,
+    get sheetHelp() {
+      return helpText('Core', 'Core_Import_SheetHelp');
+    },
     sheetConflict,
     detectFileLabel,
-    detectSheetsDiffer,
+    get detectSheetsDiffer() {
+      return helpText('Core', 'Core_Import_DetectSheetsDiffer');
+    },
     trialHeading,
-    trialHelp,
+    get trialHelp() {
+      return helpText('Core', 'Core_Import_TrialHelp');
+    },
     trialRowsLabel,
     trialButton,
     remainingButton,
     retryHeading,
-    retryHelp,
+    get retryHelp() {
+      return helpText('Core', 'Core_Import_RetryHelp');
+    },
     retryFileLabel,
     severalObjectsLabel,
     severalObjectsAvailable,
-    severalObjectsHelp,
-    sheetObjectHelp,
-    severalMatchingHelp,
+    get severalObjectsHelp() {
+      return helpText('Core', 'Core_Import_SeveralObjectsHelp');
+    },
+    get sheetObjectHelp() {
+      return helpText('Core', 'Core_Import_SheetObjectHelp');
+    },
+    get severalMatchingHelp() {
+      return helpText('Core', 'Core_Import_SeveralMatchingHelp');
+    },
     notFoundLabel: NOT_FOUND_LABEL
   };
 
   async connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     try {
       this.permitted = await canImport();
       if (this.permitted) {

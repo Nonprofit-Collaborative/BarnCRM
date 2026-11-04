@@ -9,14 +9,6 @@
         <value>Update by a field you choose</value>
     </labels>
     <labels>
-        <fullName>Core_Import_LoadUpdateByFieldHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what Update by a matching field does and risks</shortDescription>
-        <value>Finds the record whose field you choose (for example Email) holds the row's value and changes it. Nothing is created. Risk: a value several records hold follows the several-matches choice.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_LoadNoMatchFields</fullName>
         <categories>Import</categories>
         <language>en_US</language>

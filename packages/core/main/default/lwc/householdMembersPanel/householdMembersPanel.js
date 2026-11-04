@@ -12,7 +12,6 @@ import moveContact from '@salesforce/apex/HouseholdController.moveContact';
 import makePrimaryMembership from '@salesforce/apex/HouseholdOfPersonController.makePrimary';
 
 import TITLE from '@salesforce/label/c.Core_HouseholdMembersPanel_Title';
-import EMPTY from '@salesforce/label/c.Core_HouseholdMembersPanel_Empty';
 import EMPTY_HEADING from '@salesforce/label/c.Core_HouseholdMembersPanel_EmptyHeading';
 import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
 import NOT_A_HOUSEHOLD from '@salesforce/label/c.Core_HouseholdMembersPanel_NotAHousehold';
@@ -20,7 +19,6 @@ import PRIMARY from '@salesforce/label/c.Core_HouseholdMembersPanel_Primary';
 import DECEASED from '@salesforce/label/c.Core_HouseholdMembersPanel_Deceased';
 import ADD_MEMBER from '@salesforce/label/c.Core_HouseholdMembersPanel_AddMember';
 import MOVE_MEMBER from '@salesforce/label/c.Core_HouseholdMembersPanel_MoveMember';
-import MOVE_HELP from '@salesforce/label/c.Core_HouseholdMembersPanel_MoveHelp';
 import MOVE_SUCCESS from '@salesforce/label/c.Core_HouseholdMembersPanel_MoveSuccess';
 import ADD_SUCCESS from '@salesforce/label/c.Core_HouseholdMembersPanel_AddSuccess';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
@@ -29,6 +27,7 @@ import MAKE_PRIMARY from '@salesforce/label/c.Core_HouseholdPanel_MakePrimary';
 import MAKE_PRIMARY_SUCCESS from '@salesforce/label/c.Core_HouseholdPanel_MakePrimarySuccess';
 import MAKE_PRIMARY_FAILED from '@salesforce/label/c.Core_HouseholdPanel_MakePrimaryFailed';
 import LOADING from '@salesforce/label/c.Core_HouseholdPanel_Loading';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const RECORD_TYPE_FIELD = 'Account.RecordType.DeveloperName';
 const PRIMARY_CONTACT_FIELD = 'Account.Primary_Contact__c';
@@ -52,18 +51,32 @@ function initialsOf(name) {
 }
 
 export default class HouseholdMembersPanel extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
 
   label = {
     title: TITLE,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Core', 'Core_HouseholdMembersPanel_Empty');
+    },
     emptyHeading: EMPTY_HEADING,
     notAHousehold: NOT_A_HOUSEHOLD,
     primary: PRIMARY,
     deceased: DECEASED,
     addMember: ADD_MEMBER,
     moveMember: MOVE_MEMBER,
-    moveHelp: MOVE_HELP,
+    get moveHelp() {
+      return helpText('Core', 'Core_HouseholdMembersPanel_MoveHelp');
+    },
     save: SAVE,
     cancel: CANCEL,
     makePrimary: MAKE_PRIMARY,

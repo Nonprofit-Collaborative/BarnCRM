@@ -121,14 +121,6 @@
         <value>Before This Fix Runs</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_ConfirmIntro</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Text above the finding in the box that asks before a fix runs.</shortDescription>
-        <value>This is what the fix will do. Nothing changes until you confirm.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_ConfirmModeDetail</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -311,14 +303,6 @@
         <protected>false</protected>
         <shortDescription>Shown when Salesforce gift objects are detected in the org.</shortDescription>
         <value>Nonprofit Cloud objects detected</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_Intro</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Sentence under the Health Check heading.</shortDescription>
-        <value>What BarnCRM found in your org, and what to do about it.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_JobErrorDigest</fullName>

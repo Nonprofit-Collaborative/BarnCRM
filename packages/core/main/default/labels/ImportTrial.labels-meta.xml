@@ -9,14 +9,6 @@
         <value>Try the First Rows</value>
     </labels>
     <labels>
-        <fullName>Core_Import_TrialHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import preview: what a trial import does and why</shortDescription>
-        <value>The preview saves nothing. Import a few rows first to meet your rules and flows, then the rest.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_TrialRowsLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>

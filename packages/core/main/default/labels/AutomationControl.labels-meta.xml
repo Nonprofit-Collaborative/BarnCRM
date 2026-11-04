@@ -9,14 +9,6 @@
         <value>8 hours</value>
     </labels>
     <labels>
-        <fullName>Core_AutomationControl_Empty</fullName>
-        <categories>Core, Automation</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Automation page empty state</shortDescription>
-        <value>BarnCRM has not added any automation to this org yet.</value>
-    </labels>
-    <labels>
         <fullName>Core_AutomationControl_ErrorPrefix</fullName>
         <categories>Core, Automation</categories>
         <language>en_US</language>
@@ -31,14 +23,6 @@
         <protected>false</protected>
         <shortDescription>Four hours option</shortDescription>
         <value>4 hours</value>
-    </labels>
-    <labels>
-        <fullName>Core_AutomationControl_Intro</fullName>
-        <categories>Core, Automation</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Automation page introduction</shortDescription>
-        <value>Everything BarnCRM does for you in the background. Switch one off if it is getting in your way, or pause all of it while you load a spreadsheet.</value>
     </labels>
     <labels>
         <fullName>Core_AutomationControl_OneHour</fullName>
@@ -135,13 +119,5 @@
         <protected>false</protected>
         <shortDescription>Automation page: who paused; {0} is the name.</shortDescription>
         <value>Paused by {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AutomationControl_ResumesItself</fullName>
-        <categories>Core, Automation</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Automation page: the pause ends by itself.</shortDescription>
-        <value>It turns itself back on then.</value>
     </labels>
 </CustomLabels>

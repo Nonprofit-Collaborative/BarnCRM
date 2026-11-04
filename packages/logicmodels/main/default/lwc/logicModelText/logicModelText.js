@@ -18,7 +18,6 @@ import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
 import DESCRIPTION from '@salesforce/label/c.Core_Shared_Description';
 import COLUMN from '@salesforce/label/c.Core_ImportRow_ColumnHeader';
 import EMPTY_COLUMN from '@salesforce/label/c.LogicModels_Builder_EmptyColumn';
-import SELECT_HINT from '@salesforce/label/c.LogicModels_Builder_SelectHint';
 import LOOK_AT from '@salesforce/label/c.LogicModels_Builder_LookAt';
 import LOOK_AT_NONE from '@salesforce/label/c.LogicModels_Builder_LookAtNone';
 import FINDING_EMPTY from '@salesforce/label/c.LogicModels_Builder_FindingEmptyStage';
@@ -88,7 +87,6 @@ import SOME_QUERY from '@salesforce/label/c.LogicModels_Source_SomeQuery';
 import LAST_RUN from '@salesforce/label/c.LogicModels_Source_LastRun';
 import NOT_RUN_YET from '@salesforce/label/c.LogicModels_Source_NotRunYet';
 import SAVED_QUERY from '@salesforce/label/c.LogicModels_Source_Query';
-import SAVED_QUERY_HELP from '@salesforce/label/c.LogicModels_Source_QueryHelp';
 import NO_QUERIES from '@salesforce/label/c.LogicModels_Source_NoQueries';
 import DATE_FIELD from '@salesforce/label/c.LogicModels_Source_DateFieldLabel';
 import WORK_OUT from '@salesforce/label/c.LogicModels_Source_Function';
@@ -111,12 +109,12 @@ import REPORT_NO_INDICATORS from '@salesforce/label/c.LogicModels_Report_NoIndic
 import REPORT_CHOOSE_ONE from '@salesforce/label/c.LogicModels_Report_ChooseOne';
 import REPORT_DOWNLOAD_CSV from '@salesforce/label/c.Core_AccessExplorer_Download';
 import REPORT_PRINTABLE from '@salesforce/label/c.LogicModels_Report_Printable';
-import REPORT_PRINT_HELP from '@salesforce/label/c.LogicModels_Report_PrintHelp';
 import REPORT_PART from '@salesforce/label/c.LogicModels_Report_Part';
 import REPORT_INDICATOR from '@salesforce/label/c.LogicModels_Report_Indicator';
 import REPORT_META from '@salesforce/label/c.LogicModels_Report_Meta';
 import REPORT_PERIOD_DATES from '@salesforce/label/c.Core_Address_DateRange';
 import REPORT_DOWNLOADED from '@salesforce/label/c.Core_Shared_ReportDownloaded';
+import { helpText } from 'c/barnHelpText';
 
 export const LABELS = Object.freeze({
   title: TITLE,
@@ -135,7 +133,9 @@ export const LABELS = Object.freeze({
   description: DESCRIPTION,
   column: COLUMN,
   emptyColumn: EMPTY_COLUMN,
-  selectHint: SELECT_HINT,
+  get selectHint() {
+    return helpText('LogicModels', 'LogicModels_Builder_SelectHint');
+  },
   lookAt: LOOK_AT,
   lookAtNone: LOOK_AT_NONE,
   findingEmpty: FINDING_EMPTY,
@@ -198,7 +198,9 @@ export const LABELS = Object.freeze({
   lastRun: LAST_RUN,
   notRunYet: NOT_RUN_YET,
   savedQuery: SAVED_QUERY,
-  savedQueryHelp: SAVED_QUERY_HELP,
+  get savedQueryHelp() {
+    return helpText('LogicModels', 'LogicModels_Source_QueryHelp');
+  },
   noQueries: NO_QUERIES,
   dateField: DATE_FIELD,
   workOut: WORK_OUT,
@@ -221,7 +223,9 @@ export const LABELS = Object.freeze({
   reportChooseOne: REPORT_CHOOSE_ONE,
   reportDownloadCsv: REPORT_DOWNLOAD_CSV,
   reportPrintable: REPORT_PRINTABLE,
-  reportPrintHelp: REPORT_PRINT_HELP,
+  get reportPrintHelp() {
+    return helpText('LogicModels', 'LogicModels_Report_PrintHelp');
+  },
   reportPart: REPORT_PART,
   reportIndicator: REPORT_INDICATOR,
   reportMeta: REPORT_META,

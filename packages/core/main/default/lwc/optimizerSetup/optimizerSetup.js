@@ -3,7 +3,6 @@ import getFindings from '@salesforce/apex/OrgOptimizerSetupController.getFinding
 
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import SETUP from '@salesforce/label/c.Core_OrgOptimizer_Setup';
-import SETUP_INTRO from '@salesforce/label/c.Core_OrgOptimizer_SetupIntro';
 import CHECK_USERS from '@salesforce/label/c.Core_OrgOptimizer_CheckInactiveUsers';
 import CHECK_SETS from '@salesforce/label/c.Core_OrgOptimizer_CheckUnassignedPermissionSets';
 import CHECK_REPORTS from '@salesforce/label/c.Core_OrgOptimizer_CheckStaleReports';
@@ -19,12 +18,12 @@ import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import UNUSED_HEADING from '@salesforce/label/c.Core_OrgOptimizer_Setup';
 import DEBT_HEADING from '@salesforce/label/c.Core_TechDebt_DebtHeading';
-import DEBT_INTRO from '@salesforce/label/c.Core_TechDebt_DebtIntro';
 import CHECK_APEX from '@salesforce/label/c.Core_TechDebt_CheckApex';
 import CHECK_TRIGGERS from '@salesforce/label/c.Core_TechDebt_CheckTriggers';
 import CHECK_FLOWS_API from '@salesforce/label/c.Core_TechDebt_CheckFlowsApi';
 import CHECK_FLOWS_NO_DESCRIPTION from '@salesforce/label/c.Core_TechDebt_CheckFlowsNoDescription';
 import { format } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * Org Optimizer's Unused Setup section (admin guide org-optimizer.md): one line per check with
@@ -33,9 +32,13 @@ import { format } from 'c/findCsv';
  * and the controller checks again.
  */
 export default class OptimizerSetup extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     title: SETUP,
-    intro: SETUP_INTRO,
+    get intro() {
+      return helpText('Core', 'Core_OrgOptimizer_SetupIntro');
+    },
     openInSetup: OPEN_IN_SETUP,
     refresh: REFRESH,
     newTab: NEW_TAB
@@ -46,6 +49,11 @@ export default class OptimizerSetup extends LightningElement {
   loading = false;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -140,7 +148,7 @@ export default class OptimizerSetup extends LightningElement {
         listId: 'debt-findings',
         heading: DEBT_HEADING,
         showHeading: true,
-        intro: DEBT_INTRO,
+        intro: helpText('Core', 'Core_TechDebt_DebtIntro'),
         findings: debt
       });
     }

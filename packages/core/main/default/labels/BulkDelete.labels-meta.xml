@@ -129,28 +129,12 @@
         <value>Bulk Delete</value>
     </labels>
     <labels>
-        <fullName>Core_BulkDelete_PanelIntro</fullName>
-        <categories>BulkDelete</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Bulk delete panel: what it does.</shortDescription>
-        <value>Delete every record this query returns, with your own access. They go to the Recycle Bin, and Data Jobs in the Data Manager can undo it.</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkDelete_PreviewCount</fullName>
         <categories>BulkDelete</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk delete preview: {0} is the count, {1} the object plural</shortDescription>
         <value>{0} {1} match. The first ones:</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkDelete_Cascades</fullName>
-        <categories>BulkDelete</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Bulk delete preview: warning that related records are deleted too.</shortDescription>
-        <value>Salesforce also deletes these related records with them, and brings them back with an undo:</value>
     </labels>
     <labels>
         <fullName>Core_BulkDelete_DeleteButton</fullName>
@@ -183,14 +167,6 @@
         <protected>false</protected>
         <shortDescription>Bulk delete result: {0} matched, {1} deleted, {2} refused</shortDescription>
         <value>{0} matched: {1} deleted, {2} refused.</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkDelete_UndoFromTab</fullName>
-        <categories>BulkDelete</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Bulk delete: where to undo a finished job.</shortDescription>
-        <value>To bring these records back, use Undo next to the job under Data Jobs on the Data Manager tab.</value>
     </labels>
     <labels>
         <fullName>Core_BulkDelete_UndoConfirm</fullName>

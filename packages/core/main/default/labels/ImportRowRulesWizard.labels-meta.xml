@@ -9,14 +9,6 @@
         <value>Rows to Load</value>
     </labels>
     <labels>
-        <fullName>Core_Import_RowRulesHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the row rules do</shortDescription>
-        <value>Skip unwanted rows, or load only the first row per key. Skipped rows are listed with a reason.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_RowRulesSkipHeading</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -71,14 +63,6 @@
         <protected>false</protected>
         <shortDescription>Import wizard: the key columns for one row per key</shortDescription>
         <value>One Row Per</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_RowRulesUniqueHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what one row per does</shortDescription>
-        <value>Only the first row with each combination of these columns&apos; values loads. Later rows with the same values are skipped. Up to five columns.</value>
     </labels>
     <labels>
         <fullName>Core_Import_BlankClearsLabel</fullName>

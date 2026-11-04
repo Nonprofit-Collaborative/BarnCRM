@@ -97,22 +97,6 @@
         <value>What an Uninstall Deletes</value>
     </labels>
     <labels>
-        <fullName>Core_ModuleManager_ReportIntro</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Module Manager: what the uninstall report lists</shortDescription>
-        <value>Uninstalling this module deletes these records, and the fields it added to people, households and organizations. Export what you need first.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ModuleManager_ReportEmpty</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Module Manager: the module owns no records</shortDescription>
-        <value>This module keeps no records of its own. Uninstalling it removes its settings and the fields it added.</value>
-    </labels>
-    <labels>
         <fullName>Core_ModuleManager_InstalledPackagesLink</fullName>
         <categories>Core</categories>
         <language>en_US</language>

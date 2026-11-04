@@ -9,22 +9,6 @@
     <value>Accounting Export</value>
   </labels>
   <labels>
-    <fullName>Mirror_AccountingExport_Intro</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Accounting export page: what it does</shortDescription>
-    <value>Download the gifts in a date range as a spreadsheet for your accounting system: one row for each fund a gift went to, and refunds as negative rows on the day the money went back.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_AccountingExport_Visibility</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Accounting export page: the file holds visible gifts</shortDescription>
-    <value>The file holds the gifts you can see. If gifts in your organization are private, the person who runs the export needs to see all of them.</value>
-  </labels>
-  <labels>
     <fullName>Mirror_AccountingExport_AllFunds</fullName>
     <categories>Mirror, Accounting Export</categories>
     <language>en_US</language>
@@ -127,14 +111,6 @@
         <protected>false</protected>
         <shortDescription>Mark posted button</shortDescription>
         <value>Mark these gifts posted</value>
-    </labels>
-    <labels>
-        <fullName>Mirror_AccountingExport_MarkPostedHelp</fullName>
-        <categories>Mirror, Accounting Export</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Mark posted help</shortDescription>
-        <value>Once this file is in your accounting system, mark its gifts posted. A posted gift cannot be changed or deleted.</value>
     </labels>
     <labels>
         <fullName>Mirror_AccountingExport_Marked</fullName>

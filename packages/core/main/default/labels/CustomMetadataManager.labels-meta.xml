@@ -121,14 +121,6 @@
         <value>Relationship types</value>
     </labels>
     <labels>
-        <fullName>Core_CmdtManager_RelationshipTypesHelp</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Custom metadata page: what the relationship types list is for</shortDescription>
-        <value>What the other side of a relationship becomes. Add a choice to the Type list on a relationship in Setup first, and add both sides of a pair.</value>
-    </labels>
-    <labels>
         <fullName>Core_CmdtManager_PermissionRequired</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -271,14 +263,6 @@
         <protected>true</protected>
         <shortDescription>Custom metadata page: heading of the match sources list</shortDescription>
         <value>Match sources</value>
-    </labels>
-    <labels>
-        <fullName>Core_CmdtManager_MatchSourcesHelp</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Custom metadata page: what the match sources list is for</shortDescription>
-        <value>Related records that pair people or households as likely duplicates, in scans and imports.</value>
     </labels>
     <labels>
         <fullName>Core_MatchSource_NoSuchObject</fullName>

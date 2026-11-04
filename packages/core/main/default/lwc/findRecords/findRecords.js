@@ -20,7 +20,6 @@ import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
 
 import TITLE from '@salesforce/label/c.Core_Find_Title';
 import TAB_LABEL from '@salesforce/label/c.Core_Format_Pair';
-import INTRO from '@salesforce/label/c.Core_Find_Intro';
 import OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
 import CHOOSE_OBJECT from '@salesforce/label/c.Core_Find_ChooseObject';
 import COLUMNS from '@salesforce/label/c.Core_Find_Columns';
@@ -36,7 +35,6 @@ import ASCENDING from '@salesforce/label/c.Core_Find_Ascending';
 import DESCENDING from '@salesforce/label/c.Core_Find_Descending';
 import ROWS_TO_SHOW from '@salesforce/label/c.Core_Find_RowsToShow';
 import SOQL from '@salesforce/label/c.Core_Find_Soql';
-import SOQL_HELP from '@salesforce/label/c.Core_Find_SoqlHelp';
 import RUN from '@salesforce/label/c.Core_Find_Run';
 import EXPORT from '@salesforce/label/c.Core_Find_Export';
 import EXPORTING from '@salesforce/label/c.Core_Find_Exporting';
@@ -71,7 +69,6 @@ import SUMMARIZE from '@salesforce/label/c.Core_Find_Summarize';
 import EDIT_SAVED from '@salesforce/label/c.Core_Find_EditSaved';
 import EDIT_FAILED from '@salesforce/label/c.Core_Find_EditFailed';
 import HIDDEN_COLUMNS from '@salesforce/label/c.Core_Find_HiddenColumns';
-import PURPOSE from '@salesforce/label/c.Core_Find_Purpose';
 import GUIDE_URL from '@salesforce/label/c.Core_Find_GuideUrl';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Find_EmptyHeading';
 import EMPTY_MESSAGE from '@salesforce/label/c.Core_Find_EmptyMessage';
@@ -84,8 +81,7 @@ import EXPORT_MENU from '@salesforce/label/c.Core_Find_ExportMenu';
 import CHANGE_RECORDS from '@salesforce/label/c.Core_Find_ChangeRecords';
 import SAVE_HEADING from '@salesforce/label/c.Core_Find_SaveHeading';
 import MORE_QUERY_ACTIONS from '@salesforce/label/c.Core_Find_MoreQueryActions';
-import START_UPDATE from '@salesforce/label/c.Core_Find_StartUpdate';
-import START_DELETE from '@salesforce/label/c.Core_Find_StartDelete';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const XLSX_TYPES = {
   currency: CELL_TYPES.NUMBER,
@@ -117,7 +113,14 @@ const SAVED_QUERY_STATE = '__savedQueryId';
 const TOOL_STATE = '__tool';
 /** The state key the Record Inspector (C-55) uses to open Find on one object: `c__object`. */
 const OBJECT_STATE = '__object';
-const START_NOTES = { update: START_UPDATE, delete: START_DELETE };
+const START_NOTES = {
+  get update() {
+    return helpText('Core', 'Core_Find_StartUpdate');
+  },
+  get delete() {
+    return helpText('Core', 'Core_Find_StartDelete');
+  }
+};
 
 const DEFAULT_ROWS = 200;
 /** Rows the table shows at first and adds on each Show More; exports never use it. */
@@ -158,9 +161,13 @@ const DATETIME_ATTRIBUTES = {
  * filterBuilder; CSV export reads pages in Id order and writes the file in the browser (R-SQ3).
  */
 export default class FindRecords extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_Find_Intro');
+    },
     object: OBJECT,
     chooseObject: CHOOSE_OBJECT,
     columns: COLUMNS,
@@ -173,7 +180,9 @@ export default class FindRecords extends LightningElement {
     direction: DIRECTION,
     rowsToShow: ROWS_TO_SHOW,
     soql: SOQL,
-    soqlHelp: SOQL_HELP,
+    get soqlHelp() {
+      return helpText('Core', 'Core_Find_SoqlHelp');
+    },
     run: RUN,
     export: EXPORT,
     exportExcel: EXPORT_EXCEL,
@@ -191,7 +200,9 @@ export default class FindRecords extends LightningElement {
     delete: DELETE_LABEL,
     newQuery: NEW_QUERY,
     loading: LOADING,
-    purpose: PURPOSE,
+    get purpose() {
+      return helpText('Core', 'Core_Find_Purpose');
+    },
     guideUrl: GUIDE_URL,
     emptyHeading: EMPTY_HEADING,
     emptyMessage: EMPTY_MESSAGE,
@@ -311,6 +322,11 @@ export default class FindRecords extends LightningElement {
   }
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.loadPage();
   }
 

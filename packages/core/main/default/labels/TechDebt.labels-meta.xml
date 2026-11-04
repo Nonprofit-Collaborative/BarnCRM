@@ -9,14 +9,6 @@
         <value>Technical Debt</value>
     </labels>
     <labels>
-        <fullName>Core_TechDebt_DebtIntro</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: what the technical debt checks cover and do not cover</shortDescription>
-        <value>Covers Apex classes, Apex triggers and flows, read without the Tooling API. Not covered: validation rules, workflow rules, process builders, Lightning and Visualforce components, and anything in a managed package. The version limit is the Old API Version setting.</value>
-    </labels>
-    <labels>
         <fullName>Core_TechDebt_CheckApex</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>

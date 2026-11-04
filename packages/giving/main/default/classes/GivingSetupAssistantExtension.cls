@@ -38,7 +38,7 @@ public with sharing class GivingSetupAssistantExtension implements SetupAssistan
                 'funddefaults',
                 30,
                 Label.Giving_SetupAssistant_FundAppealStepLabel,
-                Label.Giving_SetupAssistant_FundAppealStepDescription
+                BarnHelp.text('Giving', 'Giving_SetupAssistant_FundAppealStepDescription')
             )
             .withTarget(SettingSections.GIVING)
             .completedBy(DEFAULTS_OBJECT, 'Default_Fund__c')
@@ -75,7 +75,7 @@ public with sharing class GivingSetupAssistantExtension implements SetupAssistan
                 'identity',
                 null,
                 null,
-                Label.Giving_SetupAssistant_IdentityDescription
+                BarnHelp.text('Giving', 'Giving_SetupAssistant_IdentityDescription')
             )
             .withField(
                 new SetupAssistantService.StepField(
@@ -135,7 +135,7 @@ public with sharing class GivingSetupAssistantExtension implements SetupAssistan
                 'verify',
                 null,
                 null,
-                Label.Giving_SetupAssistant_VerifyDescription
+                BarnHelp.text('Giving', 'Giving_SetupAssistant_VerifyDescription')
             )
             .withField(
                 new SetupAssistantService.StepField(

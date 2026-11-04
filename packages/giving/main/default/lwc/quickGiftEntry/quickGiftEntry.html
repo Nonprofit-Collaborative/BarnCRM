@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <lightning-card icon-name="custom:custom40" title={labels.heading}>
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
             <template lwc:if={formError}>
@@ -225,4 +226,5 @@
             </div>
         </div>
     </lightning-card>
+    </template>
 </template>

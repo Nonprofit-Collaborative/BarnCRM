@@ -41,14 +41,6 @@
         <value>The nightly swap is not scheduled, so seasonal addresses will not move on their own.</value>
     </labels>
     <labels>
-        <fullName>Core_SeasonalAddress_PageIntro</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Settings console: what the seasonal swap panel is for</shortDescription>
-        <value>A seasonal address takes over when its season starts and gives way when it ends.</value>
-    </labels>
-    <labels>
         <fullName>Core_SeasonalAddress_PageTitle</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>

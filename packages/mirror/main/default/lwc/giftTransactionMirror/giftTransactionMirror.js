@@ -9,7 +9,6 @@ import stop from '@salesforce/apex/GiftTransactionMirrorController.stop';
 import compare from '@salesforce/apex/GiftTransactionMirrorController.compare';
 import copyRangeAgain from '@salesforce/apex/GiftTransactionMirrorController.copyRangeAgain';
 import title from '@salesforce/label/c.Mirror_GiftTransactionMirror_Title';
-import intro from '@salesforce/label/c.Mirror_GiftTransactionMirror_Intro';
 import unavailable from '@salesforce/label/c.Mirror_GiftTransactionMirror_Unavailable';
 import switchedOff from '@salesforce/label/c.Mirror_GiftTransactionMirror_SwitchedOff';
 import directionGifts from '@salesforce/label/c.Mirror_GiftTransactionMirror_DirectionGifts';
@@ -17,7 +16,6 @@ import noAccess from '@salesforce/label/c.Mirror_GiftTransactionMirror_NoAccess'
 import runNowLabel from '@salesforce/label/c.Core_HealthCheck_RunNowButton';
 import scheduleNightly from '@salesforce/label/c.Giving_NightlyJobs_ScheduleButton';
 import stopSchedule from '@salesforce/label/c.Giving_NightlyJobs_StopButton';
-import reconciliationIntro from '@salesforce/label/c.Mirror_GiftTransactionMirror_ReconciliationIntro';
 import copyAgain from '@salesforce/label/c.Mirror_OpportunityMirror_CopyAgain';
 import giftTransactionSide from '@salesforce/label/c.Mirror_GiftTransactionMirror_GiftTransactionSide';
 import columnGiftTransaction from '@salesforce/label/c.Mirror_GiftTransactionMirror_ColumnGiftTransaction';
@@ -45,10 +43,8 @@ import columnGiftAmount from '@salesforce/label/c.Mirror_OpportunityMirror_Colum
 import columnGiftDate from '@salesforce/label/c.Giving_AskPipeline_FieldGiftDate';
 import columnDifference from '@salesforce/label/c.Core_AccessCompare_ColDifference';
 import errorFailed from '@salesforce/label/c.Mirror_OpportunityMirror_ErrorFailed';
-import noteWhat from '@salesforce/label/c.Mirror_SetupNote_GiftTransactionMirror_What';
-import noteWhy from '@salesforce/label/c.Mirror_SetupNote_GiftTransactionMirror_Why';
-import noteSteps from '@salesforce/label/c.Mirror_SetupNote_GiftTransactionMirror_Steps';
 import { differenceTextOf, fill, isoDate, rowsOf, viewOf } from './mirrorView';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** How often the page asks whether a run it shows as running has finished. */
 const POLL_MS = 10000;
@@ -59,13 +55,21 @@ const POLL_MS = 10000;
  * and the reconciliation of a date range. What shows is worked out in `mirrorView`.
  */
 export default class GiftTransactionMirror extends LightningElement {
+  helpReady = isHelpLoaded('Mirror');
+
   /** What this page needs from Setup, shown by Core's settingsSetupNotes. */
   setupNotes = [
     {
       key: 'fundraisingUser',
-      what: noteWhat,
-      why: noteWhy,
-      steps: noteSteps,
+      get what() {
+        return helpText('Mirror', 'Mirror_SetupNote_GiftTransactionMirror_What');
+      },
+      get why() {
+        return helpText('Mirror', 'Mirror_SetupNote_GiftTransactionMirror_Why');
+      },
+      get steps() {
+        return helpText('Mirror', 'Mirror_SetupNote_GiftTransactionMirror_Steps');
+      },
       link: 'permissionSets'
     }
   ];
@@ -73,7 +77,9 @@ export default class GiftTransactionMirror extends LightningElement {
   labels = {
     loading,
     title,
-    intro,
+    get intro() {
+      return helpText('Mirror', 'Mirror_GiftTransactionMirror_Intro');
+    },
     unavailable,
     switchedOff,
     noManagePermission,
@@ -82,7 +88,9 @@ export default class GiftTransactionMirror extends LightningElement {
     scheduleNightly,
     stopSchedule,
     reconciliationTitle,
-    reconciliationIntro,
+    get reconciliationIntro() {
+      return helpText('Mirror', 'Mirror_GiftTransactionMirror_ReconciliationIntro');
+    },
     fromDate,
     toDate,
     compare: compareLabel,
@@ -131,6 +139,11 @@ export default class GiftTransactionMirror extends LightningElement {
   pollTimer;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Mirror').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.refresh();
   }
 

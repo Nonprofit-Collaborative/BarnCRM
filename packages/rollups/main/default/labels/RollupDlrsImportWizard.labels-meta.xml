@@ -9,14 +9,6 @@
         <value>Import From DLRS</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportIntro</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS wizard introduction</shortDescription>
-        <value>Copy DLRS rollups into BarnCRM. Each copy starts off: compare its values with DLRS, then turn it on and switch the DLRS rollup off in DLRS. BarnCRM never changes DLRS.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_DlrsImportStepChoose</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -183,14 +175,6 @@
         <protected>false</protected>
         <shortDescription>Import from DLRS compare with no target records</shortDescription>
         <value>No records to compare yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DlrsImportFinishHint</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS: why Finish waits</shortDescription>
-        <value>Finish is available once every copy is turned on. Close keeps the copies switched off; you can turn them on later in the rollup list.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_DlrsImportFinished</fullName>

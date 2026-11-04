@@ -169,14 +169,6 @@
         <value>{0} is marked Attended, but no hours entry was created. A shift needs a start and end time for automatic hours. Otherwise enter the hours by hand.</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Readiness_Empty</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The readiness card when no requirement types exist</shortDescription>
-        <value>No requirement types are set up yet, so there is nothing to track. Ask your BarnCRM admin to add types to Volunteer Requirement.</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Letter_BadPeriod</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
@@ -569,14 +561,6 @@
         <value>Mark {0} as a no show</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Signups_Empty</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Nobody is signed up</shortDescription>
-        <value>Nobody is signed up for this shift yet.</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Signups_Added</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
@@ -705,22 +689,6 @@ When: {1}</value>
         <protected>true</protected>
         <shortDescription>Suggested Volunteers card title</shortDescription>
         <value>Suggested Volunteers</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Suggestions_Subtitle</fullName>
-        <categories>Volunteers, Suggestions</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Suggested Volunteers: what the ranking uses</shortDescription>
-        <value>Active volunteers not yet signed up, best match first by skills, availability, hours on this job and onboarding.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Suggestions_Empty</fullName>
-        <categories>Volunteers, Suggestions</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Suggested Volunteers: nobody to suggest</shortDescription>
-        <value>No volunteers to suggest. Suggestions come from people whose Volunteer Status is Active and who are not already signed up for this shift.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Suggestions_SignUp</fullName>

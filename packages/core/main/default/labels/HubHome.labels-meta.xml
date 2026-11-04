@@ -120,12 +120,4 @@
         <shortDescription>Hub home: the line on the Organizations quick link tile</shortDescription>
         <value>Every organization and its affiliations.</value>
     </labels>
-    <labels>
-        <fullName>Core_HubHome_QuickLinkSettingsLine</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: the line on the BarnCRM Settings quick link tile</shortDescription>
-        <value>Every BarnCRM setting in one place.</value>
-    </labels>
 </CustomLabels>

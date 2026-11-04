@@ -249,14 +249,6 @@
         <value>Search rollups</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_SearchHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup list search box help text.</shortDescription>
-        <value>Finds rollups by name, description, what they count, or the object and field that show the total.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_NoMatches</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -271,14 +263,6 @@
         <protected>false</protected>
         <shortDescription>Builder sentence: {0} calculation, {1} records, {2} which, {3} field, {4} mode</shortDescription>
         <value>Show {0} from {1}, counting {2}, in {3}. Updated: {4}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_SentenceHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder sentence help: its parts open the step that sets them.</shortDescription>
-        <value>Click a part of the sentence to change it.</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_NotChosen</fullName>
@@ -399,14 +383,6 @@
         <protected>false</protected>
         <shortDescription>Builder preview: button that picks sample records.</shortDescription>
         <value>Pick Sample Records</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_PickSamplesHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder preview: what picking sample records does.</shortDescription>
-        <value>Calculates this rollup on up to five records it would fill, chosen for you. Nothing is saved.</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_SamplesHeading</fullName>
@@ -577,14 +553,6 @@
         <value>Create a Field</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CreateFieldWhy</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder step 1: why the field is written, not created.</shortDescription>
-        <value>BarnCRM cannot add a field to your org itself: that takes a Metadata API deploy. It writes the field for you to create in Setup, or to download and deploy.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_NewFieldLabel</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -599,14 +567,6 @@
         <protected>false</protected>
         <shortDescription>Builder step 1: label of the new field's type box.</shortDescription>
         <value>Field type</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_KindHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder step 1: which field type suits which calculation.</shortDescription>
-        <value>Number for counts and totals, Currency for amounts, Date or Date/Time for first and last dates, Text for a copied value, Text Area (Long) for a text list, Checkbox for Any and None.</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_KindLongText</fullName>
@@ -713,14 +673,6 @@
         <value>Explain These Totals</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_ExplainEmpty</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Explain These Totals: no rollup fills this record.</shortDescription>
-        <value>No BarnCRM rollup you can see fills a field on this record.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_ExplainCounts</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -753,28 +705,12 @@
         <value>For admins, recalculated now without saving: {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_ExplainSeen</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Explain These Totals: counts cover only what the viewer can see.</shortDescription>
-        <value>The counts and the list include only records you can open; the total includes them all.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_TplButton</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Rollup Builder: button and heading of the starter templates.</shortDescription>
         <value>Starter Templates</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_TplIntro</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Starter Templates: nothing is added until chosen.</shortDescription>
-        <value>Nothing is added until you tick rollups and click Add the Chosen Rollups. Each is added switched off: switch it on once its field shows what you expect.</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_TplAdd</fullName>
@@ -799,14 +735,6 @@
         <protected>false</protected>
         <shortDescription>Name of the nonprofit starter template.</shortDescription>
         <value>Nonprofit Starter</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_TplStarterHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>What the nonprofit starter template holds.</shortDescription>
-        <value>Giving totals BarnCRM does not ship, from received gifts: for each person, and for each appeal. Needs Giving.</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_TplAverageGift</fullName>

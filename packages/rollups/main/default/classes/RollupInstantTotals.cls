@@ -215,7 +215,7 @@ public with sharing class RollupInstantTotals {
                 ),
                 name,
                 String.format(
-                    Label.Core_RollupBuilder_InstantSwitchDescription,
+                    BarnHelp.text('Rollups', 'Core_RollupBuilder_InstantSwitchDescription'),
                     new List<Object>{ automationName }
                 )
             );

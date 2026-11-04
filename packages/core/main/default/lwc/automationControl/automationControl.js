@@ -9,13 +9,11 @@ import resumeAll from '@salesforce/apex/AutomationControlController.resumeAll';
 import setEnabled from '@salesforce/apex/AutomationControlController.setEnabled';
 
 import TITLE from '@salesforce/label/c.Core_AutomationControl_Title';
-import INTRO from '@salesforce/label/c.Core_AutomationControl_Intro';
 import PAUSE_BUTTON from '@salesforce/label/c.Core_AutomationControl_PauseButton';
 import RESUME_BUTTON from '@salesforce/label/c.Core_AutomationControl_ResumeButton';
 import PAUSE_LENGTH from '@salesforce/label/c.Core_AutomationControl_PauseLength';
 import PAUSED_BANNER from '@salesforce/label/c.Core_AutomationControl_PausedBanner';
 import READ_ONLY from '@salesforce/label/c.Core_AutomationControl_ReadOnly';
-import EMPTY from '@salesforce/label/c.Core_AutomationControl_Empty';
 import RUNS_ON from '@salesforce/label/c.Core_AutomationControl_RunsOn';
 import ONE_HOUR from '@salesforce/label/c.Core_AutomationControl_OneHour';
 import TWO_HOURS from '@salesforce/label/c.Core_AutomationControl_TwoHours';
@@ -25,10 +23,10 @@ import TWENTY_FOUR_HOURS from '@salesforce/label/c.Core_AutomationControl_Twenty
 import ERROR_PREFIX from '@salesforce/label/c.Core_AutomationControl_ErrorPrefix';
 import PAUSED_PREFIX from '@salesforce/label/c.Core_AutomationControl_PausedPrefix';
 import PAUSED_BY from '@salesforce/label/c.Core_AutomationControl_PausedBy';
-import RESUMES_ITSELF from '@salesforce/label/c.Core_AutomationControl_ResumesItself';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Automation_UnexpectedError';
 import ALWAYS_RUNS from '@salesforce/label/c.Core_Automation_AlwaysRuns';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const HOUR_OPTIONS = [
   { label: ONE_HOUR, value: '1' },
@@ -41,19 +39,35 @@ const HOUR_OPTIONS = [
 const DEFAULT_HOURS = '2';
 
 export default class AutomationControl extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_AutomationControl_Intro');
+    },
     pauseButton: PAUSE_BUTTON,
     resumeButton: RESUME_BUTTON,
     pauseLength: PAUSE_LENGTH,
     pausedBanner: PAUSED_BANNER,
     readOnly: READ_ONLY,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Core', 'Core_AutomationControl_Empty');
+    },
     runsOn: RUNS_ON,
     errorPrefix: ERROR_PREFIX,
     pausedPrefix: PAUSED_PREFIX,
-    resumesItself: RESUMES_ITSELF,
+    get resumesItself() {
+      return helpText('Core', 'Core_AutomationControl_ResumesItself');
+    },
     alwaysRuns: ALWAYS_RUNS
   };
 

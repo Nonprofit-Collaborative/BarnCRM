@@ -265,30 +265,6 @@
         <value>Update or create, matched by external ID</value>
     </labels>
     <labels>
-        <fullName>Core_Import_LoadInsertHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what Insert does and risks</shortDescription>
-        <value>Creates a new record for every row. Risk: loading the same file twice creates every record twice.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_LoadUpdateHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what Update by record ID does and risks</shortDescription>
-        <value>Changes the record whose Salesforce record ID is in the row; map that column to Salesforce record ID. Nothing is created. Risk: a wrong ID changes the wrong record.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_LoadUpsertHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what Upsert by external ID does and risks</shortDescription>
-        <value>Updates the record matching the chosen ID field, or creates one. Risk: a wrong value changes the wrong record.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_LoadMatchFieldLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -327,21 +303,5 @@
         <protected>false</protected>
         <shortDescription>Import wizard: option to load a row with the lookup left empty</shortDescription>
         <value>Leave it empty</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_LookupRejectHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what rejecting a row with a missing lookup risks</shortDescription>
-        <value>The row is rejected and listed with the reason. Risk: you fix those rows and load them again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_LookupLeaveEmptyHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what leaving a missing lookup empty risks</shortDescription>
-        <value>The row loads without that lookup, and the run log says so. Risk: records arrive without the link you meant them to have.</value>
     </labels>
 </CustomLabels>

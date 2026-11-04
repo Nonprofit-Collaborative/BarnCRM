@@ -7,7 +7,6 @@ import closeAsk from '@salesforce/apex/AskPipelineController.closeAsk';
 import { buildColumns, listRows } from 'c/askPipelineModel';
 
 import TITLE from '@salesforce/label/c.Giving_AskPipeline_Title';
-import INTRO from '@salesforce/label/c.Giving_AskPipeline_Intro';
 import VIEW_BOARD from '@salesforce/label/c.Giving_AskPipeline_ViewBoard';
 import VIEW_LIST from '@salesforce/label/c.Giving_AskPipeline_ViewList';
 import SCOPE_EVERYONE from '@salesforce/label/c.Giving_AskPipeline_ScopeEveryone';
@@ -20,7 +19,6 @@ import TILE_DECLINED from '@salesforce/label/c.Giving_AskPipeline_TileDeclined';
 import WON_DETAIL from '@salesforce/label/c.Giving_AskPipeline_WonDetail';
 import OTHER_COLUMN_LABEL from '@salesforce/label/c.Giving_AskPipeline_OtherColumn';
 import COLUMN_EMPTY from '@salesforce/label/c.Giving_AskPipeline_ColumnEmpty';
-import EMPTY from '@salesforce/label/c.Giving_AskPipeline_Empty';
 import TRUNCATED from '@salesforce/label/c.Giving_AskPipeline_Truncated';
 import READ_ONLY from '@salesforce/label/c.Giving_AskPipeline_ReadOnly';
 import NO_DONOR from '@salesforce/label/c.Giving_AskPipeline_NoDonor';
@@ -55,14 +53,13 @@ import FIELD_FREQUENCY from '@salesforce/label/c.Giving_AskPipeline_FieldFrequen
 import FIELD_PAYMENTS from '@salesforce/label/c.Giving_AskPipeline_FieldPayments';
 import FIELD_LINK_GIFT from '@salesforce/label/c.Giving_Section_Gift';
 import FIELD_LINK_PLEDGE from '@salesforce/label/c.Giving_AskPipeline_FieldLinkPledge';
-import LINK_HELP from '@salesforce/label/c.Giving_AskPipeline_LinkHelp';
 import FIELD_NEXT_ASK from '@salesforce/label/c.Giving_AskPipeline_FieldNextAsk';
-import NEXT_ASK_HELP from '@salesforce/label/c.Giving_AskPipeline_NextAskHelp';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CLOSED from '@salesforce/label/c.Giving_AskPipeline_Closed';
 import MOVED from '@salesforce/label/c.Core_Shared_MovedTo';
 import ERROR_ACTION from '@salesforce/label/c.Giving_AskPipeline_ErrorAction';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ACTION_OPEN = 'open';
 const ACTION_CLOSE = 'close';
@@ -85,9 +82,13 @@ const messageOf = (error) =>
  * may edit asks.
  */
 export default class AskPipeline extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Giving');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Giving', 'Giving_AskPipeline_Intro');
+    },
     viewBoard: VIEW_BOARD,
     viewList: VIEW_LIST,
     scopeEveryone: SCOPE_EVERYONE,
@@ -98,7 +99,9 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
     tileWon: TILE_WON,
     tileDeclined: TILE_DECLINED,
     columnEmpty: COLUMN_EMPTY,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Giving', 'Giving_AskPipeline_Empty');
+    },
     readOnly: READ_ONLY,
     closeAsk: CLOSE_ASK,
     outcomeLabel: OUTCOME_LABEL,
@@ -112,9 +115,13 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
     fieldPayments: FIELD_PAYMENTS,
     fieldLinkGift: FIELD_LINK_GIFT,
     fieldLinkPledge: FIELD_LINK_PLEDGE,
-    linkHelp: LINK_HELP,
+    get linkHelp() {
+      return helpText('Giving', 'Giving_AskPipeline_LinkHelp');
+    },
     fieldNextAsk: FIELD_NEXT_ASK,
-    nextAskHelp: NEXT_ASK_HELP,
+    get nextAskHelp() {
+      return helpText('Giving', 'Giving_AskPipeline_NextAskHelp');
+    },
     save: SAVE,
     cancel: CANCEL
   };
@@ -171,6 +178,11 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
   isSaving = false;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

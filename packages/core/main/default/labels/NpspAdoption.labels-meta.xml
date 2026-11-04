@@ -113,14 +113,6 @@
         <value>Adopt NPSP Households</value>
     </labels>
     <labels>
-        <fullName>Core_NpspAdoption_Intro</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Introduction under the panel heading.</shortDescription>
-        <value>Turn NPSP&apos;s household accounts into BarnCRM households, in place: the same records, people and Opportunities. See what changes first, confirm the number, and undo it later if you need to.</value>
-    </labels>
-    <labels>
         <fullName>Core_NpspAdoption_NotAvailable</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -175,14 +167,6 @@
         <protected>false</protected>
         <shortDescription>Checkbox: keep NPSP names and greetings.</shortDescription>
         <value>Keep NPSP&apos;s names and greetings</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_KeepNamesHelp</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Help under the keep names checkbox.</shortDescription>
-        <value>Marks each adopted household Custom Name, so its name and greetings stay as NPSP had them. Clear it to let BarnCRM name them from your naming settings. Names typed by hand in NPSP are kept either way.</value>
     </labels>
     <labels>
         <fullName>Core_NpspAdoption_AdoptButton</fullName>

@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <div class="slds-box slds-var-m-top_small" data-id="changes">
         <template lwc:if={standalone}>
             <h3 class="slds-text-heading_x-small">{heading}</h3>
@@ -132,4 +133,5 @@
             ></lightning-button>
         </template>
     </div>
+    </template>
 </template>

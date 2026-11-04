@@ -4,7 +4,6 @@ import saveRules from '@salesforce/apex/EligibilityController.saveRules';
 import screen from '@salesforce/apex/EligibilityController.screen';
 
 import TITLE from '@salesforce/label/c.Programs_Elig_Title';
-import INTRO from '@salesforce/label/c.Programs_Elig_Intro';
 import NO_RULES from '@salesforce/label/c.Programs_Elig_NoRules';
 import RULE from '@salesforce/label/c.Programs_Elig_Rule';
 import FIELD from '@salesforce/label/c.Programs_Elig_Field';
@@ -66,6 +65,7 @@ import {
   serializeRules
 } from './eligibilityEngine';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const OPERATOR_LABELS = {
   equals: OP_EQUALS,
@@ -87,11 +87,15 @@ const OPERATOR_LABELS = {
  * and Reason.
  */
 export default class EligibilityRules extends LightningElement {
+  helpReady = isHelpLoaded('Programs');
+
   @api recordId;
 
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Programs', 'Programs_Elig_Intro');
+    },
     noRules: NO_RULES,
     field: FIELD,
     operator: OPERATOR,
@@ -133,6 +137,11 @@ export default class EligibilityRules extends LightningElement {
   resultMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Programs').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

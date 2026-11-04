@@ -9,22 +9,6 @@
         <value>Choose Your Edition</value>
     </labels>
     <labels>
-        <fullName>Core_SuiteChoice_ChooseInFirstRun</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: where the edition is asked, while none is saved</shortDescription>
-        <value>Choose the edition in the Set Up BarnCRM window, or in BarnCRM Settings, General.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuiteChoice_StepDescription</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what the edition choice step asks</shortDescription>
-        <value>Nonprofit Edition adds Giving to the full core suite. You choose once; it decides which modules show.</value>
-    </labels>
-    <labels>
         <fullName>Core_SuiteChoice_UnknownSuiteError</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -63,14 +47,6 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: the link to the Giving installer</shortDescription>
         <value>Open the Giving Installer</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuiteChoice_InstallHelp</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: how to finish installing Giving</shortDescription>
-        <value>Follow Salesforce's install screens in the new tab. When the install has finished, come back here and click Check Again.</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_NoInstallLink</fullName>
@@ -151,14 +127,6 @@
         <protected>true</protected>
         <shortDescription>Settings Edition row: the collapsed control that opens the change</shortDescription>
         <value>Change Edition</value>
-    </labels>
-    <labels>
-        <fullName>Core_Edition_ChangeIntro</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings Edition row: what changing the edition does</shortDescription>
-        <value>The edition decides which modules BarnCRM shows and offers to everyone. Changing it installs, removes and turns off nothing, and changes no records.</value>
     </labels>
     <labels>
         <fullName>Core_Edition_SwitchToStandard</fullName>

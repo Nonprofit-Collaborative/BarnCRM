@@ -5,9 +5,9 @@ import HEADING from '@salesforce/label/c.Core_HubHome_QuickLinksHeading';
 import SETTINGS from '@salesforce/label/c.Core_Settings_Title';
 import HOUSEHOLDS from '@salesforce/label/c.Core_SettingsGroup_Households';
 import ORGANIZATIONS from '@salesforce/label/c.Core_HubHome_QuickLinkOrganizations';
-import SETTINGS_LINE from '@salesforce/label/c.Core_HubHome_QuickLinkSettingsLine';
 import HOUSEHOLDS_LINE from '@salesforce/label/c.Core_HubHome_QuickLinkHouseholdsLine';
 import ORGANIZATIONS_LINE from '@salesforce/label/c.Core_HubHome_QuickLinkOrganizationsLine';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const HOUSEHOLDS_TAB = 'Households';
 /** The Account list view the Households tab shows (objects/Account/listViews). */
@@ -18,6 +18,16 @@ const HOUSEHOLDS_LIST_VIEW = 'Households';
  * opened by page reference rather than by URL.
  */
 export default class HubQuickLinks extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = { heading: HEADING };
 
   links = [
@@ -36,7 +46,9 @@ export default class HubQuickLinks extends NavigationMixin(LightningElement) {
     {
       tab: 'BarnCRM_Settings',
       label: SETTINGS,
-      line: SETTINGS_LINE,
+      get line() {
+        return helpText('Core', 'Core_HubHome_QuickLinkSettingsLine');
+      },
       iconName: iconFor('BarnCRM_Settings')
     }
   ];

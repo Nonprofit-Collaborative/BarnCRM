@@ -9,6 +9,11 @@ import getPeopleWithAccess from '@salesforce/apex/AccessExplorerController.getPe
 import getOverview from '@salesforce/apex/AccessExplorerController.getOverview';
 import listObjects from '@salesforce/apex/DataDictionaryController.listObjects';
 import describeObject from '@salesforce/apex/DataDictionaryController.describeObject';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_AccessExplorer_ModifyAllDataNote: '{0} gives Modify All Data.'
+});
 
 jest.mock(
   '@salesforce/apex/AccessExplorerController.searchPeople',
@@ -65,11 +70,6 @@ jest.mock('@salesforce/label/c.Core_AccessExplorer_Always', () => ({ default: 'A
 jest.mock(
   '@salesforce/label/c.Core_AccessExplorer_Downloaded',
   () => ({ default: 'Downloaded {0} rows.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_AccessExplorer_ModifyAllDataNote',
-  () => ({ default: '{0} gives Modify All Data.' }),
   { virtual: true }
 );
 jest.mock(

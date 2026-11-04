@@ -17,14 +17,6 @@
         <value>No Data Jobs Yet</value>
     </labels>
     <labels>
-        <fullName>Core_DataJobs_EmptyHint</fullName>
-        <categories>DataJobs</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data job history: empty state line under the heading</shortDescription>
-        <value>Each import, Super Transformer run and bulk delete is listed here, with its undo.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataJobs_Show</fullName>
         <categories>DataJobs</categories>
         <language>en_US</language>

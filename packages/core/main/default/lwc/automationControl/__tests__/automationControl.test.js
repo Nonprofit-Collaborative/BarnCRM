@@ -4,6 +4,11 @@ import getPage from '@salesforce/apex/AutomationControlController.getPage';
 import pauseAll from '@salesforce/apex/AutomationControlController.pauseAll';
 import resumeAll from '@salesforce/apex/AutomationControlController.resumeAll';
 import setEnabled from '@salesforce/apex/AutomationControlController.setEnabled';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_AutomationControl_ResumesItself: 'It turns itself back on then.'
+});
 
 jest.mock(
   '@salesforce/apex/AutomationControlController.getPage',
@@ -43,12 +48,6 @@ jest.mock(
 jest.mock(
   '@salesforce/label/c.Core_AutomationControl_PausedBy',
   () => ({ default: 'Paused by {0}.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Core_AutomationControl_ResumesItself',
-  () => ({ default: 'It turns itself back on then.' }),
   { virtual: true }
 );
 

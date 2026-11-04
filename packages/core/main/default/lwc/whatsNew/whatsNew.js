@@ -3,19 +3,32 @@ import getWhatsNew from '@salesforce/apex/WhatsNewController.getWhatsNew';
 import dismiss from '@salesforce/apex/WhatsNewController.dismiss';
 
 import TITLE from '@salesforce/label/c.Core_WhatsNew_Title';
-import INTRO from '@salesforce/label/c.Core_WhatsNew_Intro';
 import VERSION from '@salesforce/label/c.Core_WhatsNew_Version';
 import DISMISS from '@salesforce/label/c.Core_WhatsNew_Dismiss';
 import FAILED from '@salesforce/label/c.Core_WhatsNew_Failed';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 export default class WhatsNew extends LightningElement {
-  labels = { title: TITLE, intro: INTRO, dismiss: DISMISS };
+  helpReady = isHelpLoaded('Core');
+
+  labels = {
+    title: TITLE,
+    get intro() {
+      return helpText('Core', 'Core_WhatsNew_Intro');
+    },
+    dismiss: DISMISS
+  };
 
   releases = [];
   errorMessage;
   busy = false;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     // A card that cannot load shows nothing: the controller has already logged why.
     return getWhatsNew()
       .then((releases) => {

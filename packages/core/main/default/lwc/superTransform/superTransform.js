@@ -27,7 +27,6 @@ import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import TRUE_LABEL from '@salesforce/label/c.Core_BulkUpdate_True';
 import FALSE_LABEL from '@salesforce/label/c.Core_BulkUpdate_False';
 import TITLE from '@salesforce/label/c.Core_SuperTransform_Title';
-import INTRO from '@salesforce/label/c.Core_SuperTransform_Intro';
 import STEP_OBJECT from '@salesforce/label/c.Core_SuperTransform_StepObject';
 import STEP_RECORDS from '@salesforce/label/c.Core_SuperTransform_StepRecords';
 import STEP_CHANGES from '@salesforce/label/c.Core_SuperTransform_StepChanges';
@@ -57,22 +56,18 @@ import COPY_FROM from '@salesforce/label/c.Core_SuperTransform_CopyFrom';
 import ADD_FIELD from '@salesforce/label/c.Core_SuperTransform_AddField';
 import FIELD_LIMIT from '@salesforce/label/c.Core_SuperTransform_FieldLimit';
 import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
-import PREVIEW_HINT from '@salesforce/label/c.Core_SuperTransform_PreviewHint';
 import PREVIEW_COUNT from '@salesforce/label/c.Core_SuperTransform_PreviewCount';
 import ALREADY_HELD from '@salesforce/label/c.Core_SuperTransform_AlreadyHeld';
 import CHANGES_TO from '@salesforce/label/c.Core_SuperTransform_ChangesTo';
 import NO_CHANGE from '@salesforce/label/c.Core_SuperTransform_NoChange';
 import BLANK from '@salesforce/label/c.Core_Find_Blank';
 import RUN from '@salesforce/label/c.Core_SuperTransform_Run';
-import RUN_HINT from '@salesforce/label/c.Core_SuperTransform_RunHint';
 import CONFIRM_MESSAGE from '@salesforce/label/c.Core_SuperTransform_ConfirmMessage';
 import CONFIRM_DETAIL from '@salesforce/label/c.Core_SuperTransform_ConfirmDetail';
 import CONFIRM_BUTTON from '@salesforce/label/c.Core_Find_Run';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import TYPE_TO_CONFIRM from '@salesforce/label/c.Core_SuperTransform_TypeToConfirm';
-import UNDO_HINT from '@salesforce/label/c.Core_SuperTransform_UndoHint';
 import START_ANOTHER from '@salesforce/label/c.Core_SuperTransform_StartAnother';
-import HELP from '@salesforce/label/c.Core_SuperTransform_Help';
 import NO_PERMISSION_HEADING from '@salesforce/label/c.Core_SuperTransform_NoPermissionHeading';
 import NO_OBJECTS_HEADING from '@salesforce/label/c.Core_SuperTransform_NoObjectsHeading';
 import MATCHING from '@salesforce/label/c.Core_SuperTransform_Matching';
@@ -81,7 +76,6 @@ import BADGE_OVER from '@salesforce/label/c.Core_SuperTransform_BadgeOver';
 import ACTION_NAME_CASE from '@salesforce/label/c.Core_SuperTransform_ActionNameCase';
 import ACTION_PHONE_FORMAT from '@salesforce/label/c.Core_SuperTransform_ActionPhoneFormat';
 import SAVED_HEADING from '@salesforce/label/c.Core_SuperTransform_SavedHeading';
-import SAVED_HELP from '@salesforce/label/c.Core_SuperTransform_SavedHelp';
 import SAVED_CHOOSE from '@salesforce/label/c.Core_SuperTransform_SavedChoose';
 import SAVED_PLACEHOLDER from '@salesforce/label/c.Core_SuperTransform_SavedPlaceholder';
 import SAVED_NONE from '@salesforce/label/c.Core_SuperTransform_SavedNone';
@@ -100,6 +94,7 @@ import SAVED_DELETED from '@salesforce/label/c.Core_SuperTransform_SavedDeleted'
 import SAVED_MISSING from '@salesforce/label/c.Core_SuperTransform_SavedMissingFields';
 import SAVED_SKIPPED from '@salesforce/label/c.Core_SuperTransform_SavedSkipped';
 import { messageFrom, format } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** A shipped step list: tidy spaces, then capitalize each word (for names). */
 const NAME_CASE_STEPS = [{ op: 'trim' }, { op: 'proper' }];
@@ -135,10 +130,16 @@ function shown(value) {
  * own code and runs as a journaled, undoable job. Undo is on the Data Jobs list below it.
  */
 export default class SuperTransform extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
-    help: HELP,
+    get intro() {
+      return helpText('Core', 'Core_SuperTransform_Intro');
+    },
+    get help() {
+      return helpText('Core', 'Core_SuperTransform_Help');
+    },
     noPermission: NO_PERMISSION,
     noPermissionHeading: NO_PERMISSION_HEADING,
     noObjectsHeading: NO_OBJECTS_HEADING,
@@ -162,18 +163,26 @@ export default class SuperTransform extends LightningElement {
     remove: REMOVE,
     addField: ADD_FIELD,
     preview: PREVIEW,
-    previewHint: PREVIEW_HINT,
+    get previewHint() {
+      return helpText('Core', 'Core_SuperTransform_PreviewHint');
+    },
     record: RECORD,
     changesTo: CHANGES_TO,
     noChange: NO_CHANGE,
     run: RUN,
-    runHint: RUN_HINT,
+    get runHint() {
+      return helpText('Core', 'Core_SuperTransform_RunHint');
+    },
     failures: FAILURES,
-    undoHint: UNDO_HINT,
+    get undoHint() {
+      return helpText('Core', 'Core_SuperTransform_UndoHint');
+    },
     startAnother: START_ANOTHER,
     loading: LOADING,
     savedHeading: SAVED_HEADING,
-    savedHelp: SAVED_HELP,
+    get savedHelp() {
+      return helpText('Core', 'Core_SuperTransform_SavedHelp');
+    },
     savedChoose: SAVED_CHOOSE,
     savedPlaceholder: SAVED_PLACEHOLDER,
     savedNone: SAVED_NONE,
@@ -210,6 +219,11 @@ export default class SuperTransform extends LightningElement {
   savedNameText = '';
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

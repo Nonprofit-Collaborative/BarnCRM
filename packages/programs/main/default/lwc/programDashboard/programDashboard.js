@@ -3,7 +3,6 @@ import { NavigationMixin } from 'lightning/navigation';
 import getDashboard from '@salesforce/apex/ProgramDashboardController.getDashboard';
 
 import TITLE from '@salesforce/label/c.Programs_Dashboard_Title';
-import INTRO from '@salesforce/label/c.Programs_Dashboard_Intro';
 import PERIOD from '@salesforce/label/c.Core_Shared_Period';
 import THIS_MONTH from '@salesforce/label/c.Programs_Dashboard_ThisMonth';
 import LAST_MONTH from '@salesforce/label/c.Programs_Dashboard_LastMonth';
@@ -28,6 +27,7 @@ import NO_ACCESS from '@salesforce/label/c.Programs_Dashboard_NoAccess';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import { DEFAULT_PERIOD, periodRange, programRows, tiles } from './dashboardRows';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Programs Dashboard (P-05): for the period picked, tiles for the whole organization and a
@@ -35,9 +35,13 @@ import { DEFAULT_PERIOD, periodRange, programRows, tiles } from './dashboardRows
  * are worked out in `dashboardRows`.
  */
 export default class ProgramDashboard extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Programs');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Programs', 'Programs_Dashboard_Intro');
+    },
     period: PERIOD,
     program: PROGRAM,
     openEnrollments: OPEN_ENROLLMENTS,
@@ -68,6 +72,11 @@ export default class ProgramDashboard extends NavigationMixin(LightningElement) 
   errorMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Programs').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

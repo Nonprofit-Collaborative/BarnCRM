@@ -19,10 +19,8 @@ import CATEGORY_SETTINGS from '@salesforce/label/c.Core_HealthCheck_CategorySett
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CONFIRM from '@salesforce/label/c.Core_HealthCheck_ConfirmButton';
 import CONFIRM_HEADING from '@salesforce/label/c.Core_HealthCheck_ConfirmHeading';
-import CONFIRM_INTRO from '@salesforce/label/c.Core_HealthCheck_ConfirmIntro';
 import CONFIRM_MODE_DETAIL from '@salesforce/label/c.Core_HealthCheck_ConfirmModeDetail';
 import CURRENT_MODE from '@salesforce/label/c.Core_HealthCheck_CurrentModeLabel';
-import INTRO from '@salesforce/label/c.Core_HealthCheck_Intro';
 import LAST_RUN from '@salesforce/label/c.Core_HealthCheck_LastRunLabel';
 import NEVER_RUN from '@salesforce/label/c.Core_HealthCheck_NeverRun';
 import RUN_NOW from '@salesforce/label/c.Core_HealthCheck_RunNowButton';
@@ -39,6 +37,7 @@ import SEVERITY_WARNING from '@salesforce/label/c.Core_HealthCheck_SeverityWarni
 import TITLE from '@salesforce/label/c.Core_HealthCheck_Title';
 import USE_RECOMMENDED from '@salesforce/label/c.Core_HealthCheck_UseRecommendedButton';
 import { messageFrom } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ACTION_PREFIX = 'action:';
 const ACTION_RECOMMENDED_MODE = 'action:applyRecommendedMode';
@@ -82,6 +81,8 @@ const BADGE_THEMES = {
  * button reads Run now (ADMIN-7). Any page that wants that behavior sets the same property.
  */
 export default class HealthCheckPanel extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
   /** Show the last stored result and Run now, instead of running every check on open. */
   @api lastResultFirst = false;
 
@@ -95,7 +96,9 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
 
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_HealthCheck_Intro');
+    },
     rerun: RERUN,
     useRecommended: USE_RECOMMENDED,
     orgShapeCard: ORG_SHAPE_CARD,
@@ -109,6 +112,11 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
   };
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     if (this.lastResultFirst) {
       this.loadLastRun();
     } else {
@@ -303,7 +311,7 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: CONFIRM_HEADING,
-      message: CONFIRM_INTRO,
+      message: helpText('Core', 'Core_HealthCheck_ConfirmIntro'),
       details: [pending.title, pending.detail],
       confirmLabel: CONFIRM,
       cancelLabel: CANCEL

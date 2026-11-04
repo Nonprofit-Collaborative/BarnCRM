@@ -8,7 +8,6 @@ import markLettersSent from '@salesforce/apex/AcknowledgmentController.markLette
 import setSchedule from '@salesforce/apex/AcknowledgmentController.setSchedule';
 
 import TITLE from '@salesforce/label/c.Giving_Acknowledgments_Title';
-import INTRO from '@salesforce/label/c.Giving_Acknowledgments_Intro';
 import OFF from '@salesforce/label/c.Giving_Acknowledgments_Off';
 import NO_RULES from '@salesforce/label/c.Giving_Acknowledgments_NoRules';
 import QUEUE_HEADING from '@salesforce/label/c.Giving_Acknowledgments_QueueHeading';
@@ -39,7 +38,6 @@ import MATCH_FIRST_GIFT_ONLY from '@salesforce/label/c.Giving_Acknowledgments_Ma
 import NEW_RULE_HEADING from '@salesforce/label/c.Giving_Acknowledgments_NewRule';
 import EDIT_RULE_HEADING from '@salesforce/label/c.Giving_Acknowledgments_EditRuleHeading';
 import TEMPLATE_FIELD from '@salesforce/label/c.Giving_Acknowledgments_TemplateField';
-import TEMPLATE_FIELD_HELP from '@salesforce/label/c.Giving_Acknowledgments_TemplateFieldHelp';
 import TEMPLATE_PLACEHOLDER from '@salesforce/label/c.Giving_Acknowledgments_TemplatePlaceholder';
 import TEMPLATE_REQUIRED from '@salesforce/label/c.Giving_Acknowledgments_TemplateRequired';
 import SAVE_RULE from '@salesforce/label/c.Core_Kit_Save';
@@ -62,16 +60,8 @@ import COLUMN_ERRORS from '@salesforce/label/c.Giving_Acknowledgments_ColumnErro
 import COLUMN_FINISHED from '@salesforce/label/c.Giving_Acknowledgments_ColumnFinished';
 import DOWNLOAD_FILE from '@salesforce/label/c.Giving_Acknowledgments_DownloadFile';
 import ANY_AMOUNT from '@salesforce/label/c.Giving_Acknowledgments_AnyAmount';
-import FROM_WHAT from '@salesforce/label/c.Giving_SetupNote_FromAddress_What';
-import FROM_WHY from '@salesforce/label/c.Giving_SetupNote_FromAddress_Why';
-import FROM_STEPS from '@salesforce/label/c.Giving_SetupNote_FromAddress_Steps';
-import EMAIL_WHAT from '@salesforce/label/c.Giving_SetupNote_Email_What';
-import EMAIL_WHY from '@salesforce/label/c.Giving_SetupNote_Email_Why';
-import EMAIL_STEPS from '@salesforce/label/c.Core_SetupNote_Email_Steps';
-import TEMPLATES_WHAT from '@salesforce/label/c.Giving_SetupNote_Templates_What';
-import TEMPLATES_WHY from '@salesforce/label/c.Giving_SetupNote_Templates_Why';
-import TEMPLATES_STEPS from '@salesforce/label/c.Giving_SetupNote_Templates_Steps';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_DOWNLOAD_PATH = '/sfc/servlet.shepherd/document/download/';
 const CHANNEL_EMAIL = 'Email';
@@ -88,35 +78,65 @@ const CHANNEL_EMAIL = 'Email';
  * `0066-acknowledgment-rule-template-picker-and-generated-plan-keys.md`).
  */
 export default class Acknowledgments extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded(['Core', 'Giving']);
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp(['Core', 'Giving']).then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   /** What this page needs from Setup, shown by Core's settingsSetupNotes. */
   setupNotes = [
     {
       key: 'fromAddress',
-      what: FROM_WHAT,
-      why: FROM_WHY,
-      steps: FROM_STEPS,
+      get what() {
+        return helpText('Giving', 'Giving_SetupNote_FromAddress_What');
+      },
+      get why() {
+        return helpText('Giving', 'Giving_SetupNote_FromAddress_Why');
+      },
+      get steps() {
+        return helpText('Giving', 'Giving_SetupNote_FromAddress_Steps');
+      },
       link: 'orgWideAddresses'
     },
     {
       key: 'emailDeliverability',
-      what: EMAIL_WHAT,
-      why: EMAIL_WHY,
-      steps: EMAIL_STEPS,
+      get what() {
+        return helpText('Giving', 'Giving_SetupNote_Email_What');
+      },
+      get why() {
+        return helpText('Giving', 'Giving_SetupNote_Email_Why');
+      },
+      get steps() {
+        return helpText('Core', 'Core_SetupNote_Email_Steps');
+      },
       link: 'deliverability',
       check: 'emailDeliverability'
     },
     {
       key: 'templates',
-      what: TEMPLATES_WHAT,
-      why: TEMPLATES_WHY,
-      steps: TEMPLATES_STEPS,
+      get what() {
+        return helpText('Giving', 'Giving_SetupNote_Templates_What');
+      },
+      get why() {
+        return helpText('Giving', 'Giving_SetupNote_Templates_Why');
+      },
+      get steps() {
+        return helpText('Giving', 'Giving_SetupNote_Templates_Steps');
+      },
       link: 'emailTemplates'
     }
   ];
 
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Giving', 'Giving_Acknowledgments_Intro');
+    },
     off: OFF,
     noRules: NO_RULES,
     queueHeading: QUEUE_HEADING,
@@ -138,7 +158,9 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
     newRule: NEW_RULE,
     editRule: EDIT_RULE,
     templateField: TEMPLATE_FIELD,
-    templateFieldHelp: TEMPLATE_FIELD_HELP,
+    get templateFieldHelp() {
+      return helpText('Giving', 'Giving_Acknowledgments_TemplateFieldHelp');
+    },
     templatePlaceholder: TEMPLATE_PLACEHOLDER,
     templateRequired: TEMPLATE_REQUIRED,
     saveRule: SAVE_RULE,

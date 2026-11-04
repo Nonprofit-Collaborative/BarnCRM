@@ -9,14 +9,6 @@
         <value>Best Guess, Check It</value>
     </labels>
     <labels>
-        <fullName>Core_Import_GuessBadgeHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what a best-guess badge means, for screen readers</shortDescription>
-        <value>BarnCRM guessed this field from a similar name. Accept it or choose another field.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_GuessAccept</fullName>
         <categories>Import</categories>
         <language>en_US</language>

@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <p class="slds-text-body_regular slds-var-m-bottom_small" data-id="shape">{shapeText}</p>
 
     <template lwc:if={hasOtherRollupTools}>
@@ -31,5 +32,6 @@
             label={labels.confirm}
             onclick={handleConfirm}
         ></lightning-button>
+    </template>
     </template>
 </template>

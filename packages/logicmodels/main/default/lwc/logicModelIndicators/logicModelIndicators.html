@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
   <div data-id="indicators" class="slds-var-m-top_medium">
     <h4 class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.indicators}</h4>
 
@@ -434,4 +435,5 @@
       <p class="slds-text-color_weak" data-id="no-indicators">{labels.noIndicators}</p>
     </template>
   </div>
+    </template>
 </template>

@@ -217,14 +217,6 @@
         <value>Type part of a household name</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdMerge_SelectOther</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Prompt to pick a household before comparing</shortDescription>
-        <value>Pick a household to see the two side by side.</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdMerge_SplitButton</fullName>
         <categories>Households</categories>
         <language>en_US</language>

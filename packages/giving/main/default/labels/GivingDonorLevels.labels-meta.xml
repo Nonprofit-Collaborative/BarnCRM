@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
   <labels>
-    <fullName>Giving_DonorLevels_Intro</fullName>
-    <categories>Giving, Donor Levels</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Donor levels page: what the page is for</shortDescription>
-    <value>Your giving ladder. Each rung is a name for a group of donors and the amount that reaches it. Donors move onto it automatically as their giving changes.</value>
-  </labels>
-  <labels>
     <fullName>Giving_DonorLevels_MeasuredOn</fullName>
     <categories>Giving, Donor Levels</categories>
     <language>en_US</language>
@@ -39,14 +31,6 @@
     <protected>false</protected>
     <shortDescription>Donor levels page: the feature is switched off</shortDescription>
     <value>Donor levels are off. Build your ladder here, then turn Donor levels on in BarnCRM Settings under Giving.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_DonorLevels_Empty</fullName>
-    <categories>Giving, Donor Levels</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Donor levels page: no rungs yet</shortDescription>
-    <value>You have not created any levels yet. Choose New level to add the first rung of your ladder.</value>
   </labels>
   <labels>
     <fullName>Giving_DonorLevels_NewLevel</fullName>

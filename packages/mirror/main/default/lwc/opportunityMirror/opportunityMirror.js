@@ -10,10 +10,8 @@ import compare from '@salesforce/apex/OpportunityMirrorController.compare';
 import copyRangeAgain from '@salesforce/apex/OpportunityMirrorController.copyRangeAgain';
 import { localIsoDate } from 'c/findCsv';
 import title from '@salesforce/label/c.Mirror_OpportunityMirror_Title';
-import intro from '@salesforce/label/c.Mirror_OpportunityMirror_Intro';
 import unavailable from '@salesforce/label/c.Mirror_OpportunityMirror_Unavailable';
 import switchedOff from '@salesforce/label/c.Mirror_OpportunityMirror_SwitchedOff';
-import directionGifts from '@salesforce/label/c.Mirror_OpportunityMirror_DirectionGifts';
 import directionOpportunities from '@salesforce/label/c.Mirror_OpportunityMirror_DirectionOpportunities';
 import noStartDate from '@salesforce/label/c.Mirror_OpportunityMirror_NoStartDate';
 import noManagePermission from '@salesforce/label/c.Mirror_OpportunityMirror_NoManagePermission';
@@ -26,7 +24,6 @@ import notScheduled from '@salesforce/label/c.Mirror_OpportunityMirror_NotSchedu
 import running from '@salesforce/label/c.Mirror_OpportunityMirror_Running';
 import started from '@salesforce/label/c.Mirror_OpportunityMirror_Started';
 import reconciliationTitle from '@salesforce/label/c.Mirror_OpportunityMirror_ReconciliationTitle';
-import reconciliationIntro from '@salesforce/label/c.Mirror_OpportunityMirror_ReconciliationIntro';
 import fromDate from '@salesforce/label/c.Mirror_OpportunityMirror_FromDate';
 import toDate from '@salesforce/label/c.Mirror_OpportunityMirror_ToDate';
 import compareLabel from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCompare';
@@ -47,9 +44,7 @@ import differenceCountAll from '@salesforce/label/c.Mirror_OpportunityMirror_Dif
 import lastRun from '@salesforce/label/c.Mirror_OpportunityMirror_LastRun';
 import noLastRun from '@salesforce/label/c.Mirror_OpportunityMirror_NoLastRun';
 import loading from '@salesforce/label/c.Core_AccessExplorer_Loading';
-import noteWhat from '@salesforce/label/c.Mirror_SetupNote_Mirror_What';
-import noteWhy from '@salesforce/label/c.Mirror_SetupNote_Mirror_Why';
-import noteSteps from '@salesforce/label/c.Mirror_SetupNote_Mirror_Steps';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const GIFTS_TO_OPPORTUNITIES = 'GiftsToOpportunities';
 const OFF = 'Off';
@@ -68,13 +63,21 @@ const isoDate = localIsoDate;
  * the reconciliation of a date range.
  */
 export default class OpportunityMirror extends LightningElement {
+  helpReady = isHelpLoaded('Mirror');
+
   /** What this page needs from Setup, shown by Core's settingsSetupNotes. */
   setupNotes = [
     {
       key: 'opportunityAccess',
-      what: noteWhat,
-      why: noteWhy,
-      steps: noteSteps,
+      get what() {
+        return helpText('Mirror', 'Mirror_SetupNote_Mirror_What');
+      },
+      get why() {
+        return helpText('Mirror', 'Mirror_SetupNote_Mirror_Why');
+      },
+      get steps() {
+        return helpText('Mirror', 'Mirror_SetupNote_Mirror_Steps');
+      },
       link: 'permissionSets'
     }
   ];
@@ -82,7 +85,9 @@ export default class OpportunityMirror extends LightningElement {
   labels = {
     loading,
     title,
-    intro,
+    get intro() {
+      return helpText('Mirror', 'Mirror_OpportunityMirror_Intro');
+    },
     unavailable,
     switchedOff,
     noManagePermission,
@@ -91,7 +96,9 @@ export default class OpportunityMirror extends LightningElement {
     scheduleNightly,
     stopSchedule,
     reconciliationTitle,
-    reconciliationIntro,
+    get reconciliationIntro() {
+      return helpText('Mirror', 'Mirror_OpportunityMirror_ReconciliationIntro');
+    },
     fromDate,
     toDate,
     compare: compareLabel,
@@ -140,6 +147,11 @@ export default class OpportunityMirror extends LightningElement {
   pollTimer;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Mirror').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -223,7 +235,7 @@ export default class OpportunityMirror extends LightningElement {
 
   get directionText() {
     if (this.status.direction === GIFTS_TO_OPPORTUNITIES) {
-      return directionGifts;
+      return helpText('Mirror', 'Mirror_OpportunityMirror_DirectionGifts');
     }
     return this.status.startDate
       ? fill(directionOpportunities, this.day(this.status.startDate))

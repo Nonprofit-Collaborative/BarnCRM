@@ -2,16 +2,15 @@ import { LightningElement, api } from 'lwc';
 import getConnection from '@salesforce/apex/ImportNewFieldController.getConnection';
 import setUpConnection from '@salesforce/apex/ImportNewFieldController.setUpConnection';
 
-import INTRO from '@salesforce/label/c.Core_ImportNewField_PanelIntro';
 import STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import CONNECTED from '@salesforce/label/c.Core_ImportNewField_PanelConnected';
 import NOT_CONNECTED from '@salesforce/label/c.Core_ImportNewField_PanelNotConnected';
 import SET_UP from '@salesforce/label/c.Core_ImportNewField_SetUpButton';
 import NEEDS_PERMISSION from '@salesforce/label/c.Core_ImportNewField_PanelNeedsPermission';
 import CALLOUTS_OFF from '@salesforce/label/c.Core_ImportNewField_PanelCalloutsOff';
-import ENABLE_STEPS from '@salesforce/label/c.Core_ImportNewField_PanelEnableSteps';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import UNEXPECTED from '@salesforce/label/c.Core_UnexpectedError';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The org connection that lets an import create a field (C-49d), on BarnCRM Settings, Import
@@ -20,12 +19,18 @@ import UNEXPECTED from '@salesforce/label/c.Core_UnexpectedError';
  * Enabled for Callouts in Setup the panel shows the steps and Check Again (ADR-0148 A1).
  */
 export default class ImportFieldConnection extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_ImportNewField_PanelIntro');
+    },
     status: STATUS,
     setUp: SET_UP,
     needsPermission: NEEDS_PERMISSION,
-    enableSteps: ENABLE_STEPS,
+    get enableSteps() {
+      return helpText('Core', 'Core_ImportNewField_PanelEnableSteps');
+    },
     checkAgain: CHECK_AGAIN
   };
   connection;
@@ -33,6 +38,11 @@ export default class ImportFieldConnection extends LightningElement {
   errorMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.refresh();
   }
 

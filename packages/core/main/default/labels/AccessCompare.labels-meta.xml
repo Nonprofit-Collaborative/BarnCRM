@@ -200,12 +200,4 @@
         <shortDescription>Modify all report: {0} is the row limit</shortDescription>
         <value>The list is cut at {0} rows.</value>
     </labels>
-    <labels>
-        <fullName>Core_AccessModifyAll_Intro</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Modify all report: intro</shortDescription>
-        <value>Who holds Modify All Data, View All Data, and Modify All or View All on a kind of record, and through what.</value>
-    </labels>
 </CustomLabels>

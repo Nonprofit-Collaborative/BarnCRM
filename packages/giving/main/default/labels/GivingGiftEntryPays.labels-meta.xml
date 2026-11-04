@@ -41,14 +41,6 @@
     <value>Pays a scheduled payment</value>
   </labels>
   <labels>
-    <fullName>Giving_GiftEntryPays_Help</fullName>
-    <categories>Giving, Gift Entry</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift entry: help for the scheduled payment list</shortDescription>
-    <value>Payments this donor still owes on active or paused pledges and recurring gifts. Choose one to link the gift to it, or None for a gift on its own.</value>
-  </labels>
-  <labels>
     <fullName>Giving_GiftEntryPays_NoLongerOpen</fullName>
     <categories>Giving, Gift Entry</categories>
     <language>en_US</language>

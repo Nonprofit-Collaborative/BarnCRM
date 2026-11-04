@@ -5,7 +5,6 @@ import retryRow from '@salesforce/apex/ImportRowCorrectionController.retryRow';
 import retryAllFixed from '@salesforce/apex/ImportRowCorrectionController.retryAllFixed';
 
 import TITLE from '@salesforce/label/c.Core_ImportRow_Title';
-import HELP from '@salesforce/label/c.Core_ImportRow_Help';
 import STATUS_LABEL from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import IMPORT_LABEL from '@salesforce/label/c.Core_DataJobs_KindImport';
 import REASON_HEADING from '@salesforce/label/c.Core_ImportRow_ReasonHeading';
@@ -22,6 +21,7 @@ import RETRY_STARTED from '@salesforce/label/c.Core_ImportRow_RetryStarted';
 import NO_VALUES from '@salesforce/label/c.Core_ImportRow_NoValues';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 // ImportRowProcessor.STATUS_REJECTED
 const REJECTED = 'Rejected';
@@ -41,6 +41,8 @@ function errorText(error) {
  * See docs/admin-guide/import-rows.md.
  */
 export default class ImportRowCorrection extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   @api recordId;
 
   row;
@@ -53,7 +55,9 @@ export default class ImportRowCorrection extends LightningElement {
 
   labels = {
     TITLE,
-    HELP,
+    get HELP() {
+      return helpText('Core', 'Core_ImportRow_Help');
+    },
     STATUS_LABEL,
     IMPORT_LABEL,
     REASON_HEADING,
@@ -69,6 +73,11 @@ export default class ImportRowCorrection extends LightningElement {
   };
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

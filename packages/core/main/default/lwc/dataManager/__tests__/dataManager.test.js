@@ -275,9 +275,9 @@ describe('c-data-manager', () => {
 
   it('keeps each tile line to 12 words or fewer', () => {
     const fs = require('fs');
-    const xml = fs.readFileSync(
-      'packages/core/main/default/labels/DataManager.labels-meta.xml',
-      'utf8'
+    // The tile lines are help text: Core's help catalog holds them (ADR-NEXT help-text-json).
+    const { texts } = JSON.parse(
+      fs.readFileSync('packages/core/main/default/staticresources/BarnHelp_Core.json', 'utf8')
     );
     const lines = [
       'ImportText',
@@ -290,10 +290,8 @@ describe('c-data-manager', () => {
       'DataImportWizardText'
     ];
     lines.forEach((key) => {
-      const match = xml.match(
-        new RegExp(`<fullName>Core_DataManager_${key}</fullName>[\\s\\S]*?<value>([^<]*)</value>`)
-      );
-      expect(`${key}: ${match[1].split(' ').length <= 12}`).toBe(`${key}: true`);
+      const line = texts[`Core_DataManager_${key}`];
+      expect(`${key}: ${line.split(' ').length <= 12}`).toBe(`${key}: true`);
     });
   });
 

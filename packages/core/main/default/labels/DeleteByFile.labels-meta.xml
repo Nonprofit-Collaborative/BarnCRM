@@ -40,20 +40,4 @@
         <shortDescription>Load operation option: delete by record ID</shortDescription>
         <value>Delete by record ID</value>
     </labels>
-    <labels>
-        <fullName>Core_Import_LoadDeleteHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Load operation help: delete by record ID</shortDescription>
-        <value>Deletes the record for each ID in the file, after a dry run and a typed count. Undo within 15 days.</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkDelete_FileIntro</fullName>
-        <categories>BulkDelete</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Delete by file panel: what it does.</shortDescription>
-        <value>Deletes every record the dry run found. Nothing is deleted until you preview and confirm the count.</value>
-    </labels>
 </CustomLabels>

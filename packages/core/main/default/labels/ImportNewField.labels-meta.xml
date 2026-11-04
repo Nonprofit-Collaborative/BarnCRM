@@ -161,14 +161,6 @@
         <value>Field Label</value>
     </labels>
     <labels>
-        <fullName>Core_ImportNewField_ApiNameHelp</fullName>
-        <categories>Import New Field</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>New field form: API name help</shortDescription>
-        <value>Letters, digits and single underscores, starting with a letter. Salesforce adds __c.</value>
-    </labels>
-    <labels>
         <fullName>Core_ImportNewField_TypeField</fullName>
         <categories>Import New Field</categories>
         <language>en_US</language>
@@ -209,14 +201,6 @@
         <value>No other permission set</value>
     </labels>
     <labels>
-        <fullName>Core_ImportNewField_AccessNote</fullName>
-        <categories>Import New Field</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>New field form: who gets access</shortDescription>
-        <value>BarnCRM Admin and BarnCRM Staff get read and edit access, and BarnCRM Read Only gets read access.</value>
-    </labels>
-    <labels>
         <fullName>Core_ImportNewField_CreateButton</fullName>
         <categories>Import New Field</categories>
         <language>en_US</language>
@@ -255,14 +239,6 @@
         <protected>false</protected>
         <shortDescription>New field dialog: guidance intro</shortDescription>
         <value>BarnCRM cannot create this field here. Create it in Setup with the details below, then select Refresh Fields. An administrator can set up the connection on the BarnCRM Settings Import page.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ImportNewField_SetupSteps</fullName>
-        <categories>Import New Field</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>New field dialog: Setup steps</shortDescription>
-        <value>In Setup, open Object Manager, choose the object, then Fields and Relationships and New. Enter the details below, give BarnCRM Admin and BarnCRM Staff read and edit access, then save.</value>
     </labels>
     <labels>
         <fullName>Core_ImportNewField_DetailsField</fullName>
@@ -377,14 +353,6 @@
         <value>Picklist</value>
     </labels>
     <labels>
-        <fullName>Core_ImportNewField_PanelIntro</fullName>
-        <categories>Import New Field</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Connection panel: what it is</shortDescription>
-        <value>Lets an administrator create a new field from an import column. BarnCRM calls your org's own Metadata API through a Named Credential it creates once, which an administrator then turns on in Setup. No password is stored.</value>
-    </labels>
-    <labels>
         <fullName>Core_ImportNewField_PanelConnected</fullName>
         <categories>Import New Field</categories>
         <language>en_US</language>
@@ -439,13 +407,5 @@
         <protected>false</protected>
         <shortDescription>Connection panel: callouts off</shortDescription>
         <value>Set up, one step left</value>
-    </labels>
-    <labels>
-        <fullName>Core_ImportNewField_PanelEnableSteps</fullName>
-        <categories>Import New Field</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Connection panel: turn on callouts steps</shortDescription>
-        <value>Salesforce creates the connection with callouts off, and only an administrator can turn them on. In Setup, open Named Credentials from Quick Find, select BarnCRM: this org, then Edit. Turn on Enabled for Callouts and select Save. Then select Check Again here.</value>
     </labels>
 </CustomLabels>

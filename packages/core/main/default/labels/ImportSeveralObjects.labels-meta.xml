@@ -73,14 +73,6 @@
         <value>Several Objects in One File</value>
     </labels>
     <labels>
-        <fullName>Core_Import_KindSeveralText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the several objects card loads</shortDescription>
-        <value>Load several kinds of record from one file, a sheet for each or several on one row, each linked to the records it points at.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_SeveralObjectsLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -97,14 +89,6 @@
         <value>Available objects</value>
     </labels>
     <labels>
-        <fullName>Core_Import_SeveralObjectsHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: help for choosing several objects</shortDescription>
-        <value>Choose every object the file loads. A file read above suggests them. Records load parents first, whatever the order here.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_SheetObjectLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -119,21 +103,5 @@
         <protected>false</protected>
         <shortDescription>Import wizard: the object a text file loads</shortDescription>
         <value>Object for this file</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_SheetObjectHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: help for the object of each sheet</shortDescription>
-        <value>A heading of the sheet's object maps to its field. A two-part heading, such as Contact.LastName, maps to that object's field on any sheet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_SeveralMatchingHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: help for the several objects matching step</shortDescription>
-        <value>Choose how each object's rows find their records. Records on one row are linked where one points at another. A record on another sheet is linked by a column that names its parent by ID or by a field you choose.</value>
     </labels>
 </CustomLabels>

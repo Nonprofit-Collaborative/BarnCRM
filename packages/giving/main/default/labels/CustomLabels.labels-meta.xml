@@ -33,28 +33,12 @@
         <value>What was given</value>
     </labels>
     <labels>
-        <fullName>Giving_QuickGiftEntry_InKindDescriptionHelp</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: in-kind description help</shortDescription>
-        <value>This is printed on the donor&apos;s receipt word for word. Write what a stranger would recognize a year from now.</value>
-    </labels>
-    <labels>
         <fullName>Giving_QuickGiftEntry_FairMarketValueLabel</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: fair market value</shortDescription>
         <value>Fair market value</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_FairMarketValueHelp</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: fair market value help</shortDescription>
-        <value>For your reporting only. It is never printed on the receipt and never added into a giving total. Leave it empty if you do not have a figure yet.</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_DateLabel</fullName>

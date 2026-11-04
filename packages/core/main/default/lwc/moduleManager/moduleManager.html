@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <template lwc:if={errorMessage}>
         <p class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">{errorMessage}</p>
     </template>
@@ -152,4 +153,5 @@
             ><span class="slds-assistive-text">{labels.newTab}</span></a
         >
     </div>
+    </template>
 </template>

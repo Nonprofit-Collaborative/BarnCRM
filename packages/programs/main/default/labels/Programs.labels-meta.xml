@@ -49,14 +49,6 @@
         <value>Stage for {0}</value>
     </labels>
     <labels>
-        <fullName>Programs_Roster_Empty</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Roster has no enrollments to list</shortDescription>
-        <value>No one to list. Click Enroll Someone to add a person, or turn on Show Ended to see past enrollments.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Roster_Added</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -249,14 +241,6 @@
         <value>This program has no active service. Add one in the Services list to record attendance.</value>
     </labels>
     <labels>
-        <fullName>Programs_Log_Empty</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service Delivery Log: nobody enrolled</shortDescription>
-        <value>Nobody has an open enrollment in this program yet.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Log_AttendanceFor</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -297,28 +281,12 @@
         <value>Programs Settings</value>
     </labels>
     <labels>
-        <fullName>Programs_Settings_Intro</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs settings page introduction</shortDescription>
-        <value>The choices your organization makes for the Programs module. Changes apply to everyone.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Settings_PicklistsTitle</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Intake picklists card title</shortDescription>
         <value>Intake and Eligibility Picklists</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Settings_PicklistsIntro</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Intake picklists card introduction</shortDescription>
-        <value>The choices staff pick from on an enrollment. Add, rename or deactivate a choice on the field in Setup; a deactivated choice stays on the enrollments that have it.</value>
     </labels>
     <labels>
         <fullName>Programs_Settings_Default</fullName>
@@ -383,14 +351,6 @@
         <protected>true</protected>
         <shortDescription>Programs settings: privacy card title</shortDescription>
         <value>Participant Privacy</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Settings_PrivacyIntro</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs settings: privacy card introduction</shortDescription>
-        <value>Who can see enrollments and service deliveries. Every case note stays private whichever you choose.</value>
     </labels>
     <labels>
         <fullName>Programs_Settings_PrivacyLegend</fullName>
@@ -463,14 +423,6 @@
         <protected>true</protected>
         <shortDescription>Programs dashboard: page title</shortDescription>
         <value>Programs Dashboard</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Dashboard_Intro</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs dashboard: page introduction</shortDescription>
-        <value>How your programs are doing in the period you pick. Figures count only the records you can see.</value>
     </labels>
     <labels>
         <fullName>Programs_Dashboard_ThisMonth</fullName>
@@ -689,14 +641,6 @@
         <value>Service Plan</value>
     </labels>
     <labels>
-        <fullName>Programs_Plan_Empty</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service plan: no goals yet</shortDescription>
-        <value>No goals yet. Add the first goal this person is working toward.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Plan_AddGoal</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -825,14 +769,6 @@
         <value>Save Review</value>
     </labels>
     <labels>
-        <fullName>Programs_Plan_ReviewIntro</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service plan: asks for the next review date</shortDescription>
-        <value>Reviewed today. When is the next review? Leave it blank for none.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Plan_Notes</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -927,14 +863,6 @@
         <protected>true</protected>
         <shortDescription>Cohort members: member count; {0} is the count</shortDescription>
         <value>Members ({0})</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Cohort_MembersEmpty</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cohort members: no members yet</shortDescription>
-        <value>Nobody is in this cohort yet.</value>
     </labels>
     <labels>
         <fullName>Programs_Cohort_MoreThanShown</fullName>
@@ -1159,14 +1087,6 @@
         <protected>true</protected>
         <shortDescription>Schedule sessions: on a cohort; {0} is the cohort</shortDescription>
         <value>Sessions scheduled here are for {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Schedule_IntroProgram</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Schedule sessions: on a program</shortDescription>
-        <value>Sessions scheduled here are for everyone enrolled in the program. To schedule for one cohort, use the panel on the cohort.</value>
     </labels>
     <labels>
         <fullName>Programs_Schedule_NoDates</fullName>

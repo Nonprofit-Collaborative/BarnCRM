@@ -19,7 +19,6 @@ import {
 } from './setupChangeModel';
 
 import TITLE from '@salesforce/label/c.Core_SetupChanges_Title';
-import INTRO from '@salesforce/label/c.Core_SetupChanges_Intro';
 import KEPT from '@salesforce/label/c.Core_SetupChanges_Kept';
 import NOTHING_KEPT from '@salesforce/label/c.Core_SetupChanges_NothingKept';
 import SCHEDULED from '@salesforce/label/c.Core_SetupChanges_Scheduled';
@@ -33,13 +32,11 @@ import TO_DATE from '@salesforce/label/c.Core_SetupChanges_To';
 import SECTION from '@salesforce/label/c.Core_SetupChanges_ColSection';
 import ALL_SECTIONS from '@salesforce/label/c.Core_SetupChanges_AllSections';
 import SEARCH from '@salesforce/label/c.Core_SetupChanges_Search';
-import SEARCH_HELP from '@salesforce/label/c.Core_SetupChanges_SearchHelp';
 import RUN_SEARCH from '@salesforce/label/c.Core_SetupChanges_Search';
 import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';
 import DOWNLOADED from '@salesforce/label/c.Core_SetupChanges_Downloaded';
 import MORE from '@salesforce/label/c.Core_SetupChanges_More';
 import SCAN_STOPPED from '@salesforce/label/c.Core_SetupChanges_ScanStopped';
-import EMPTY from '@salesforce/label/c.Core_SetupChanges_Empty';
 import DATES_REVERSED from '@salesforce/label/c.Core_SetupChanges_DatesReversed';
 import CHANGED_AT from '@salesforce/label/c.Core_SetupChanges_ColChangedAt';
 import CHANGED_BY from '@salesforce/label/c.Core_SetupChanges_ColChangedBy';
@@ -47,6 +44,7 @@ import LOGGED_IN_AS from '@salesforce/label/c.Core_SetupChanges_ColLoggedInAs';
 import SECTION_COL from '@salesforce/label/c.Core_SetupChanges_ColSection';
 import ACTION_COL from '@salesforce/label/c.Core_SuperTransform_Action';
 import WHAT_CHANGED from '@salesforce/label/c.Core_SetupChanges_ColWhatChanged';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_BASE = 'Setup_Changes';
 const COLUMN_LABELS = {
@@ -64,19 +62,27 @@ const COLUMN_LABELS = {
  * toward Setup; the controller checks Manage BarnCRM Settings on every call.
  */
 export default class SetupChangeLog extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_SetupChanges_Intro');
+    },
     copyNow: COPY_NOW,
     refresh: REFRESH,
     fromDate: FROM_DATE,
     toDate: TO_DATE,
     section: SECTION,
     search: SEARCH,
-    searchHelp: SEARCH_HELP,
+    get searchHelp() {
+      return helpText('Core', 'Core_SetupChanges_SearchHelp');
+    },
     runSearch: RUN_SEARCH,
     download: DOWNLOAD,
-    empty: EMPTY
+    get empty() {
+      return helpText('Core', 'Core_SetupChanges_Empty');
+    }
   };
 
   columns = tableColumns(COLUMN_LABELS);
@@ -94,6 +100,11 @@ export default class SetupChangeLog extends LightningElement {
   noticeMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

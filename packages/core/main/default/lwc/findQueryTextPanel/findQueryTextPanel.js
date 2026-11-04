@@ -3,7 +3,6 @@ import { parseQueryText, PROBLEMS } from 'c/findQueryText';
 
 import TYPE_QUERY from '@salesforce/label/c.Core_Find_TypeQuery';
 import QUERY_TEXT from '@salesforce/label/c.Core_Find_QueryText';
-import QUERY_TEXT_HELP from '@salesforce/label/c.Core_Find_QueryTextHelp';
 import USE_QUERY from '@salesforce/label/c.Core_Find_UseQuery';
 import TEXT_SYNTAX from '@salesforce/label/c.Core_Find_TextSyntax';
 import TEXT_MIXED from '@salesforce/label/c.Core_Find_TextMixed';
@@ -12,6 +11,7 @@ import TEXT_RELATED from '@salesforce/label/c.Core_Find_TextRelated';
 import TEXT_UNSUPPORTED from '@salesforce/label/c.Core_Find_TextUnsupported';
 import TEXT_ONE_SORT from '@salesforce/label/c.Core_Find_TextOneSort';
 import TEXT_EMPTY from '@salesforce/label/c.Core_Find_TextEmpty';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const MESSAGE_BY_PROBLEM = {
   [PROBLEMS.SYNTAX]: TEXT_SYNTAX,
@@ -29,6 +29,16 @@ const MESSAGE_BY_PROBLEM = {
  * event, which loads it into the builder. The text is never sent to the server.
  */
 export default class FindQueryTextPanel extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   /** The SOQL Find shows for the current query; the text box starts with it. */
   @api soql = '';
   @api disabled = false;
@@ -36,7 +46,9 @@ export default class FindQueryTextPanel extends LightningElement {
   labels = {
     typeQuery: TYPE_QUERY,
     queryText: QUERY_TEXT,
-    queryTextHelp: QUERY_TEXT_HELP,
+    get queryTextHelp() {
+      return helpText('Core', 'Core_Find_QueryTextHelp');
+    },
     useQuery: USE_QUERY
   };
 

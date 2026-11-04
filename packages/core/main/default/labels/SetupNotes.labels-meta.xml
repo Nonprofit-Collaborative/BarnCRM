@@ -9,84 +9,12 @@
         <value>Show Steps</value>
     </labels>
     <labels>
-        <fullName>Core_SetupNote_Duplicates_Steps</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, Duplicate Matching: clicks in Setup, separated by |</shortDescription>
-        <value>Click Standard Contact Duplicate Rule.|If it says Inactive, click Activate.|Do the same for Standard Account Duplicate Rule.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_Duplicates_What</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, Duplicate Matching: what to change for duplicates</shortDescription>
-        <value>To review duplicates, keep the standard duplicate rules active. Give the people who will review them Duplicate Review on the Access page, under Extra Permissions.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_Duplicates_Why</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, Duplicate Matching: why duplicates need Setup</shortDescription>
-        <value>A scan applies only active duplicate rules, and Salesforce shows possible duplicates only to users with a Sales Cloud or Service Cloud license.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_Email_Steps</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup note, Error Log: clicks in Setup, separated by |</shortDescription>
-        <value>Under Access to Send Email, set Access level to All email.|Click Save.|Come back here and click Check Again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_Email_What</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, Error Log: what to change for email</shortDescription>
-        <value>Let this org send email, so the error digest can be delivered.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_Email_Why</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, Error Log: why email needs Setup</shortDescription>
-        <value>Salesforce sends no digest unless Deliverability is set to All email, and only Setup can change it.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupNote_Heading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings setup note: heading above what to change in Setup</shortDescription>
         <value>Needs a Change in Setup</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_Metadata_Steps</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, General: clicks in Setup, separated by |</shortDescription>
-        <value>Tick Deploy Metadata from Non-Certified Package Versions via Apex.|Click Save.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_Metadata_What</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, General: what to change for Custom Metadata</shortDescription>
-        <value>To save Custom Metadata entries here, turn on Deploy Metadata from Non-Certified Package Versions via Apex. Give yourself Metadata Admin on the Access page, under Extra Permissions.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_Metadata_Why</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, General: why Custom Metadata needs Setup</shortDescription>
-        <value>Salesforce lets an installed package change the org's metadata only with this switch on, and only Setup can turn it on.</value>
     </labels>
     <labels>
         <fullName>Core_SetupNote_Metadata_Unconfirmed</fullName>
@@ -111,53 +39,5 @@
         <protected>true</protected>
         <shortDescription>Shared: button that opens the Setup page</shortDescription>
         <value>Open in Setup</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_RollupField_Steps</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, Rollups: clicks in Setup, separated by |</shortDescription>
-        <value>Click the object the rollup totals onto, such as Contact or Account.|Click Fields &amp; Relationships, then New.|Choose Number, Currency or Date to match the rollup, then follow the steps to Save.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_RollupField_What</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, Rollups: what to change for a new rollup</shortDescription>
-        <value>Create the field a new rollup writes its total to before you build the rollup.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_RollupField_Why</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, Rollups: why rollup fields need Setup</shortDescription>
-        <value>The Rollup Builder picks a field that already exists, and only Setup creates fields.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_Users_Steps</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, Access: clicks in Setup, separated by |</shortDescription>
-        <value>Click the module's permission set.|Click Manage Assignments, then Add Assignment.|Tick the people, then click Next and Assign.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_Users_What</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, Access: what to change for module access</shortDescription>
-        <value>Assign an installed module's permission set that this page does not list under Extra Permissions to the people who need it.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupNote_Users_Why</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup note, Access: why module permission sets need Setup</shortDescription>
-        <value>Core's extra permissions and every permission set a module lists here are given on this page; any other is assigned in Setup.</value>
     </labels>
 </CustomLabels>

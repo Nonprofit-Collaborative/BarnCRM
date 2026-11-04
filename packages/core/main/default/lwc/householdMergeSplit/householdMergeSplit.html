@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <lightning-card title={label.title} icon-name="standard:merge">
         <div class="slds-var-m-around_medium">
             <template if:false={isHousehold}>
@@ -228,4 +229,5 @@
             </template>
         </div>
     </lightning-card>
+    </template>
 </template>

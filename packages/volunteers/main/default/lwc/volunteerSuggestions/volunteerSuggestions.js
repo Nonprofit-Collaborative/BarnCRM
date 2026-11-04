@@ -5,8 +5,6 @@ import addSignup from '@salesforce/apex/VolunteerShiftSignupsController.addSignu
 import { rankSuggestions, REASON } from './rankSuggestions';
 
 import TITLE from '@salesforce/label/c.Volunteers_Suggestions_Title';
-import SUBTITLE from '@salesforce/label/c.Volunteers_Suggestions_Subtitle';
-import EMPTY from '@salesforce/label/c.Volunteers_Suggestions_Empty';
 import PERSON from '@salesforce/label/c.Core_Section_Person';
 import WHY from '@salesforce/label/c.Core_FieldAccess_ColWhy';
 import ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
@@ -26,6 +24,7 @@ import R_CLEARED from '@salesforce/label/c.Volunteers_Suggestions_ReasonCleared'
 import R_OPEN from '@salesforce/label/c.Volunteers_Suggestions_ReasonOpen';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { bodyMessage, format } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** How many suggestions the card shows. */
 const MAX_SHOWN = 10;
@@ -38,12 +37,18 @@ const SIGNUPS_CHANGED = 'barnshiftsignupschanged';
  * The ranking is the framework-free `rankSuggestions` module; Apex only gathers the facts.
  */
 export default class VolunteerSuggestions extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Volunteers');
+
   @api recordId;
 
   labels = {
     title: TITLE,
-    subtitle: SUBTITLE,
-    empty: EMPTY,
+    get subtitle() {
+      return helpText('Volunteers', 'Volunteers_Suggestions_Subtitle');
+    },
+    get empty() {
+      return helpText('Volunteers', 'Volunteers_Suggestions_Empty');
+    },
     person: PERSON,
     why: WHY,
     actions: ACTIONS,
@@ -58,6 +63,11 @@ export default class VolunteerSuggestions extends NavigationMixin(LightningEleme
   resultMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Volunteers').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

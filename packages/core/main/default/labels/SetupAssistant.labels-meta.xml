@@ -153,14 +153,6 @@
         <value>Add to BarnCRM Admin and BarnCRM Admin Console: {0}</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_ModuleTabsHow</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: how to add an installed module's tabs to the BarnCRM apps</shortDescription>
-        <value>In App Manager, edit an app and add the pages to its Navigation Items.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_ModulePresent</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -225,22 +217,6 @@
         <value>Reopen Setup</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_RuleAction</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: how a step that has no setting behind it finishes</shortDescription>
-        <value>This step finishes when you finish it here.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_RuleSetting</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: how a step backed by a setting finishes</shortDescription>
-        <value>This step finishes by itself once the setting it fills in has a value.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_SampleDataUnavailableNotice</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -255,30 +231,6 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: error when a panel cannot be saved</shortDescription>
         <value>That could not be saved just now, so nothing changed. Try again, and if it keeps happening look at the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_ShapeFresh</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what detection found in an org with nothing else installed</shortDescription>
-        <value>This looks like a fresh org, with no other household model and no Person Accounts. BarnCRM can run on its own.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_ShapeNpsp</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what detection found when a household package is installed</shortDescription>
-        <value>NPSP is installed in this org. BarnCRM builds its own households and leaves NPSP's alone.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_ShapePersonAccounts</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what detection found in an org with Person Accounts</shortDescription>
-        <value>Your org uses Person Accounts. Household membership is tracked with one record per person, so a person can be in more than one household and everything you have keeps working.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_SkipButton</fullName>
@@ -305,14 +257,6 @@
         <value>Start Setup Again</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_Step1Description</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what step one is for</shortDescription>
-        <value>If you use Person Accounts, membership uses one flexible record per person. Confirm it, or choose another fit.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_Step1Label</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -321,28 +265,12 @@
         <value>Confirm How BarnCRM Fits Your Org</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_Step2Description</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what step two is for</shortDescription>
-        <value>Choose how households are named and greeted, and preview five real households before you commit.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_Step2Label</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the name of step two</shortDescription>
         <value>Confirm How Households Are Named</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_Step4Description</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what step four is for</shortDescription>
-        <value>Pick a person and a role, and BarnCRM gives them the right access. People who have never signed in have to be created in Salesforce Setup first.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step4Label</fullName>
@@ -361,28 +289,12 @@
         <value>Set Your Organization's Identity</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_Step6Description</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what step six is for</shortDescription>
-        <value>Turn on only what you use. A module that is off leaves nothing behind in your org.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_Step6Label</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the name of step six</shortDescription>
         <value>Choose Which Modules to Turn On</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_Step7Description</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what step seven is for</shortDescription>
-        <value>Import your first spreadsheet, or load the sample data to practice on before your real records arrive.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step7Label</fullName>
@@ -433,35 +345,11 @@
         <value>That setup step is not one BarnCRM knows about, so nothing was recorded. Refresh the page and try again.</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_UploadHelp</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what happens to an uploaded logo or signature file</shortDescription>
-        <value>Uploaded files stay attached to the uploader's user record, so upload from an account that will stay active.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_WrongRecordTypeError</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: chosen record is not the kind the step asks for</shortDescription>
         <value>That is not the kind of record this step is choosing, so nothing was saved. Pick again from the list.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_Step5Description</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what the organization identity step asks for</shortDescription>
-        <value>Record your organization's legal name and the address you want printed on letters and documents.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_Step8Description</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what the last step, the check that setup works, asks for</shortDescription>
-        <value>Follow the short walkthrough that adds a person and a household, so you know the setup is right.</value>
     </labels>
 </CustomLabels>

@@ -217,14 +217,6 @@
         <value>Query (SOQL)</value>
     </labels>
     <labels>
-        <fullName>Core_Find_QueryTextHelp</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Help: what a typed query is and what happens to it.</shortDescription>
-        <value>SELECT, FROM, WHERE, ORDER BY and LIMIT. Find reads the text into the builder and checks it like any built query; the text itself is never run.</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_UseQuery</fullName>
         <categories>Find</categories>
         <language>en_US</language>
@@ -295,14 +287,6 @@
         <protected>false</protected>
         <shortDescription>Heading: related records conditions.</shortDescription>
         <value>Related Records</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_RelatedHelp</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Help under the related records heading.</shortDescription>
-        <value>Keep only the records that have, or have no, related records matching conditions of their own.</value>
     </labels>
     <labels>
         <fullName>Core_Find_AddRelated</fullName>

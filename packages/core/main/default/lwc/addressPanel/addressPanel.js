@@ -26,7 +26,6 @@ import ADD_BUTTON from '@salesforce/label/c.Core_Address_AddButton';
 import ADD_FORM_TITLE from '@salesforce/label/c.Core_Address_AddFormTitle';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import DEFAULT_BADGE from '@salesforce/label/c.Core_HouseholdMembersPanel_Primary';
-import EMPTY_MESSAGE from '@salesforce/label/c.Core_Address_Empty';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Address_EmptyHeading';
 import LOAD_FAILED from '@salesforce/label/c.Core_Address_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_Address_Loading';
@@ -41,11 +40,9 @@ import SET_DEFAULT_SUCCESS from '@salesforce/label/c.Core_Address_SetDefaultSucc
 import UPDATE_EVERYONE_BUTTON from '@salesforce/label/c.Core_Address_UpdateEveryoneButton';
 import UPDATE_EVERYONE_MOVING from '@salesforce/label/c.Core_Address_UpdateEveryoneMoving';
 import UPDATE_EVERYONE_NOBODY from '@salesforce/label/c.Core_Address_UpdateEveryoneNobody';
-import UPDATE_EVERYONE_OWN from '@salesforce/label/c.Core_Address_UpdateEveryoneOwn';
 import UPDATE_EVERYONE_SUCCESS from '@salesforce/label/c.Core_Address_UpdateEveryoneSuccess';
 import UPDATE_EVERYONE_TITLE from '@salesforce/label/c.Core_Address_UpdateEveryoneTitle';
 import USE_FOR_HOUSEHOLD_BUTTON from '@salesforce/label/c.Core_Address_UseForHouseholdButton';
-import USE_FOR_HOUSEHOLD_HELP from '@salesforce/label/c.Core_Address_UseForHouseholdHelp';
 import USE_FOR_HOUSEHOLD_DETAIL from '@salesforce/label/c.Core_Address_UseForHouseholdDetail';
 import USE_FOR_HOUSEHOLD_PICK from '@salesforce/label/c.Core_Address_UseForHouseholdPick';
 import USE_FOR_HOUSEHOLD_SUCCESS from '@salesforce/label/c.Core_Address_UseForHouseholdSuccess';
@@ -62,6 +59,7 @@ import MARK_FORMER from '@salesforce/label/c.Core_Address_MarkFormer';
 import MARK_UNDELIVERABLE from '@salesforce/label/c.Core_Address_MarkUndeliverable';
 import STATUS_SAVED from '@salesforce/label/c.Core_Address_StatusSaved';
 import STATUS_FAILED from '@salesforce/label/c.Core_Address_StatusFailed';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ADDRESS_OBJECT = 'Address__c';
 const FORM_FIELDS = [
@@ -267,6 +265,16 @@ function messageOf(error) {
  * on a household's primary address.
  */
 export default class AddressPanel extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
   @api objectApiName;
 
@@ -276,7 +284,9 @@ export default class AddressPanel extends LightningElement {
     addFormTitle: ADD_FORM_TITLE,
     cancelButton: CANCEL_BUTTON,
     defaultBadge: DEFAULT_BADGE,
-    emptyMessage: EMPTY_MESSAGE,
+    get emptyMessage() {
+      return helpText('Core', 'Core_Address_Empty');
+    },
     emptyHeading: EMPTY_HEADING,
     loading: LOADING,
     setDefaultButton: SET_DEFAULT_BUTTON,
@@ -560,7 +570,7 @@ export default class AddressPanel extends LightningElement {
     const answer = await BarnConfirmModal.open({
       size: 'small',
       label: USE_FOR_HOUSEHOLD_TITLE,
-      message: USE_FOR_HOUSEHOLD_HELP,
+      message: helpText('Core', 'Core_Address_UseForHouseholdHelp'),
       details: [USE_FOR_HOUSEHOLD_DETAIL],
       choices: several ? options : undefined,
       choicesLabel: USE_FOR_HOUSEHOLD_PICK,
@@ -592,7 +602,7 @@ export default class AddressPanel extends LightningElement {
       message: moving.length ? UPDATE_EVERYONE_MOVING : UPDATE_EVERYONE_NOBODY,
       items: moving.map((person) => person.name),
       checks: withTheirOwn.map((person) => ({ label: person.name, value: person.id })),
-      checksLabel: UPDATE_EVERYONE_OWN,
+      checksLabel: helpText('Core', 'Core_Address_UpdateEveryoneOwn'),
       confirmLabel: UPDATE_EVERYONE_BUTTON,
       cancelLabel: CANCEL_BUTTON
     });

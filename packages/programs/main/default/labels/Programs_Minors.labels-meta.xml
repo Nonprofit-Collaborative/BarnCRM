@@ -145,14 +145,6 @@
         <value>Eligibility Rules</value>
     </labels>
     <labels>
-        <fullName>Programs_Elig_Intro</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: intro</shortDescription>
-        <value>Rules are checked in order, and the first whose conditions all hold decides. Screening sets each open enrollment's Eligibility Status, Basis and Reason.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Elig_NoRules</fullName>
         <categories>Programs</categories>
         <language>en_US</language>

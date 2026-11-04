@@ -41,14 +41,6 @@
         <value>The sample data file is missing information the loader needs, so nothing was loaded. Reinstall the package or restore the Sample Data resource, then try again.</value>
     </labels>
     <labels>
-        <fullName>Core_SampleData_JunctionModeNote</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>How sample data arrives in the flexible membership mode</shortDescription>
-        <value>This org uses the flexible way of belonging to a household, so each sample person is joined to a household by a household member record, like your own people. Sample people are loaded as contacts: BarnCRM never creates person accounts, so an org that stores people as accounts sees households of contacts.</value>
-    </labels>
-    <labels>
         <fullName>Core_SampleData_LoadButton</fullName>
         <categories>Sample Data</categories>
         <language>en_US</language>

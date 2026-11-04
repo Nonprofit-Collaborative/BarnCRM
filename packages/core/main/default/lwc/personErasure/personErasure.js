@@ -22,13 +22,13 @@ import ACTION_DELETED from '@salesforce/label/c.Core_EraseAction_Deleted';
 import ACTION_KEPT from '@salesforce/label/c.Core_EraseAction_Kept';
 import ACTION_UPDATED from '@salesforce/label/c.Core_EraseAction_Updated';
 import REFERENCE from '@salesforce/label/c.Core_EraseAction_Reference';
-import REFERENCE_HELP from '@salesforce/label/c.Core_EraseAction_ReferenceHelp';
 import CONFIRM from '@salesforce/label/c.Core_EraseAction_Confirm';
 import ERASE from '@salesforce/label/c.Core_EraseAction_Erase';
 import DONE from '@salesforce/label/c.Core_EraseAction_Done';
 import OPEN_AUDIT from '@salesforce/label/c.Core_EraseAction_OpenAudit';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import NO_PERMISSION from '@salesforce/label/c.Core_Erase_NoPermission';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ACTION_LABELS = {
   Cleared: ACTION_CLEARED,
@@ -44,6 +44,16 @@ function normalized(value) {
 }
 
 export default class PersonErasure extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
 
   label = {
@@ -53,7 +63,9 @@ export default class PersonErasure extends NavigationMixin(LightningElement) {
     working: WORKING,
     changesTable: CHANGES_TABLE,
     reference: REFERENCE,
-    referenceHelp: REFERENCE_HELP,
+    get referenceHelp() {
+      return helpText('Core', 'Core_EraseAction_ReferenceHelp');
+    },
     erase: ERASE,
     done: DONE,
     openAudit: OPEN_AUDIT,

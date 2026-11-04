@@ -57,14 +57,6 @@
         <value>Access Explorer</value>
     </labels>
     <labels>
-        <fullName>Core_AccessExplorer_Intro</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: section introduction</shortDescription>
-        <value>Who can see or change what, and why. Every view only reads, except Change Field Access, which shows each change before it is made.</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessExplorer_ViewSubject</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>
@@ -161,22 +153,6 @@
         <value>Field Access For</value>
     </labels>
     <labels>
-        <fullName>Core_AccessExplorer_ViewAllDataNote</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: {0} is the profile or set name</shortDescription>
-        <value>{0} gives View All Data: its holders can see every record of every kind, whatever the table says.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_ModifyAllDataNote</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: {0} is the profile or set name</shortDescription>
-        <value>{0} gives Modify All Data: its holders can see and change every record of every kind, whatever the table says.</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessExplorer_KindOfRecord</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>
@@ -201,14 +177,6 @@
         <value>None: the kind of record itself</value>
     </labels>
     <labels>
-        <fullName>Core_AccessExplorer_ChooseObject</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: empty state before a choice</shortDescription>
-        <value>Choose a kind of record to see who has access.</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessExplorer_GrantsHeading</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>
@@ -231,14 +199,6 @@
         <protected>false</protected>
         <shortDescription>Shared: button that loads the next page of results</shortDescription>
         <value>Show More</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_AlwaysField</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: field that cannot be restricted</shortDescription>
-        <value>Anyone who can read this kind of record can see this field. Salesforce does not let it be restricted.</value>
     </labels>
     <labels>
         <fullName>Core_AccessExplorer_Truncated</fullName>
@@ -399,13 +359,5 @@
         <protected>false</protected>
         <shortDescription>Access explorer: column</shortDescription>
         <value>Active People</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_MayMissPeople</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: viewer lacks View All Users</shortDescription>
-        <value>You may not see everyone: without View All Users, this list shows only the people Salesforce lets you see.</value>
     </labels>
 </CustomLabels>

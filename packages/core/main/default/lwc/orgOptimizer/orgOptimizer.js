@@ -8,38 +8,26 @@ import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
 import { healthCheckBadge } from 'c/healthCheckBadge';
 
 import TITLE from '@salesforce/label/c.Core_OrgOptimizer_Title';
-import INTRO from '@salesforce/label/c.Core_OrgOptimizer_Intro';
-import HELP_TEXT from '@salesforce/label/c.Core_OrgOptimizer_HelpText';
 import OVERVIEW from '@salesforce/label/c.Core_OrgOptimizer_Overview';
 import GROUP_DATA from '@salesforce/label/c.Core_OrgOptimizer_GroupData';
 import GROUP_SETUP from '@salesforce/label/c.Core_OrgOptimizer_GroupSetup';
 import QUALITY from '@salesforce/label/c.Core_DataHygiene_PageTitle';
-import QUALITY_TEXT from '@salesforce/label/c.Core_OrgOptimizer_QualityText';
 import FIELD_UTILIZATION from '@salesforce/label/c.Core_FieldUtilization_PageTitle';
-import FIELD_UTILIZATION_TEXT from '@salesforce/label/c.Core_OrgOptimizer_FieldUtilizationText';
 import DATA_DICTIONARY from '@salesforce/label/c.Core_DataDictionary_PageTitle';
-import DATA_DICTIONARY_TEXT from '@salesforce/label/c.Core_OrgOptimizer_DataDictionaryText';
 import ACCESS_EXPLORER from '@salesforce/label/c.Core_AccessExplorer_Title';
-import ACCESS_EXPLORER_TEXT from '@salesforce/label/c.Core_OrgOptimizer_AccessExplorerText';
 import AI_EXPORT from '@salesforce/label/c.Core_OrgOptimizer_AiExport';
-import AI_EXPORT_TEXT from '@salesforce/label/c.Core_OrgOptimizer_AiExportText';
 import HEALTH_CHECK from '@salesforce/label/c.Core_HealthCheck_Title';
-import HEALTH_CHECK_TEXT from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckText';
 import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
-import ERRORS_TEXT from '@salesforce/label/c.Core_OrgOptimizer_ErrorsText';
 import STORAGE from '@salesforce/label/c.Core_OrgOptimizer_Storage';
-import STORAGE_TEXT from '@salesforce/label/c.Core_OrgOptimizer_StorageText';
 import SETUP from '@salesforce/label/c.Core_OrgOptimizer_Setup';
-import SETUP_TEXT from '@salesforce/label/c.Core_OrgOptimizer_SetupText';
 import SETUP_CHANGES from '@salesforce/label/c.Core_SetupChanges_Title';
-import SETUP_CHANGES_TEXT from '@salesforce/label/c.Core_OrgOptimizer_SetupChangesText';
 import RUN_HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_RunHealthCheck';
-import HEALTH_CHECK_INTRO from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckIntro';
 import HEALTH_CHECK_NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckNotRunHeading';
 import BADGE_ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
 import BADGE_NEW from '@salesforce/label/c.Core_OrgOptimizer_BadgeNew';
 import BADGE_NEED_ATTENTION from '@salesforce/label/c.Core_OrgOptimizer_BadgeNeedAttention';
 import BADGE_DATA_STORAGE from '@salesforce/label/c.Core_OrgOptimizer_BadgeDataStorage';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const OVERVIEW_TAB = 'overview';
 const LEARN_MORE_URL =
@@ -66,10 +54,16 @@ function badge(label, variant) {
  * check. Duplicates moved to the Duplicate Matching tab (ADR-0139).
  */
 export default class OrgOptimizer extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
-    helpText: HELP_TEXT,
+    get intro() {
+      return helpText('Core', 'Core_OrgOptimizer_Intro');
+    },
+    get helpText() {
+      return helpText('Core', 'Core_OrgOptimizer_HelpText');
+    },
     overview: OVERVIEW,
     quality: QUALITY,
     fieldUtilization: FIELD_UTILIZATION,
@@ -82,7 +76,9 @@ export default class OrgOptimizer extends LightningElement {
     setup: SETUP,
     setupChanges: SETUP_CHANGES,
     runHealthCheck: RUN_HEALTH_CHECK,
-    healthCheckIntro: HEALTH_CHECK_INTRO,
+    get healthCheckIntro() {
+      return helpText('Core', 'Core_OrgOptimizer_HealthCheckIntro');
+    },
     healthCheckNotRun: HEALTH_CHECK_NOT_RUN
   };
 
@@ -97,6 +93,11 @@ export default class OrgOptimizer extends LightningElement {
   badges = {};
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     if (canManageSettings) {
       this.readErrorBadge();
       this.readHealthCheckBadge();
@@ -115,24 +116,78 @@ export default class OrgOptimizer extends LightningElement {
   get overviewGroups() {
     const dataTiles = [];
     if (canFind) {
-      dataTiles.push(this.tile('quality', QUALITY, QUALITY_TEXT, 'standard:data_integration_hub'));
+      dataTiles.push(
+        this.tile(
+          'quality',
+          QUALITY,
+          helpText('Core', 'Core_OrgOptimizer_QualityText'),
+          'standard:data_integration_hub'
+        )
+      );
     }
     const setupTiles = [];
     if (canManageSettings) {
       dataTiles.push(
-        this.tile('fieldUtilization', FIELD_UTILIZATION, FIELD_UTILIZATION_TEXT, 'standard:metrics')
+        this.tile(
+          'fieldUtilization',
+          FIELD_UTILIZATION,
+          helpText('Core', 'Core_OrgOptimizer_FieldUtilizationText'),
+          'standard:metrics'
+        )
       );
       dataTiles.push(
-        this.tile('dataDictionary', DATA_DICTIONARY, DATA_DICTIONARY_TEXT, 'standard:article')
+        this.tile(
+          'dataDictionary',
+          DATA_DICTIONARY,
+          helpText('Core', 'Core_OrgOptimizer_DataDictionaryText'),
+          'standard:article'
+        )
       );
-      dataTiles.push(this.tile('aiExport', AI_EXPORT, AI_EXPORT_TEXT, 'standard:data_mapping'));
+      dataTiles.push(
+        this.tile(
+          'aiExport',
+          AI_EXPORT,
+          helpText('Core', 'Core_OrgOptimizer_AiExportText'),
+          'standard:data_mapping'
+        )
+      );
       setupTiles.push(
-        this.tile('healthCheck', HEALTH_CHECK, HEALTH_CHECK_TEXT, 'standard:approval'),
-        this.tile('errors', ERRORS, ERRORS_TEXT, 'standard:incident'),
-        this.tile('storage', STORAGE, STORAGE_TEXT, 'standard:data_model'),
-        this.tile('setup', SETUP, SETUP_TEXT, 'standard:settings'),
-        this.tile('setupChanges', SETUP_CHANGES, SETUP_CHANGES_TEXT, 'standard:timeslot'),
-        this.tile('accessExplorer', ACCESS_EXPLORER, ACCESS_EXPLORER_TEXT, 'standard:user_role')
+        this.tile(
+          'healthCheck',
+          HEALTH_CHECK,
+          helpText('Core', 'Core_OrgOptimizer_HealthCheckText'),
+          'standard:approval'
+        ),
+        this.tile(
+          'errors',
+          ERRORS,
+          helpText('Core', 'Core_OrgOptimizer_ErrorsText'),
+          'standard:incident'
+        ),
+        this.tile(
+          'storage',
+          STORAGE,
+          helpText('Core', 'Core_OrgOptimizer_StorageText'),
+          'standard:data_model'
+        ),
+        this.tile(
+          'setup',
+          SETUP,
+          helpText('Core', 'Core_OrgOptimizer_SetupText'),
+          'standard:settings'
+        ),
+        this.tile(
+          'setupChanges',
+          SETUP_CHANGES,
+          helpText('Core', 'Core_OrgOptimizer_SetupChangesText'),
+          'standard:timeslot'
+        ),
+        this.tile(
+          'accessExplorer',
+          ACCESS_EXPLORER,
+          helpText('Core', 'Core_OrgOptimizer_AccessExplorerText'),
+          'standard:user_role'
+        )
       );
     }
     return [

@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <lightning-card title={labels.cardTitle} icon-name="standard:dataset">
         <span slot="actions">
             <span class={statusBadgeClass}>{statusLabel}</span>
@@ -65,4 +66,5 @@
             </template>
         </div>
     </lightning-card>
+    </template>
 </template>

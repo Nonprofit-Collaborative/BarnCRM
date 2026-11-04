@@ -113,7 +113,9 @@ public with sharing class SoftCreditController {
             }
             Soft_Credit__c credit = found[0];
             if (credit.Is_Automatic__c == true) {
-                throw UserErrors.message(Label.Giving_SoftCredits_AutomaticHelp);
+                throw UserErrors.message(
+                    BarnHelp.text('Giving', 'Giving_SoftCredits_AutomaticHelp')
+                );
             }
             Id giftId = credit.Gift__c;
             Database.delete(new List<Soft_Credit__c>{ credit }, true, AccessLevel.USER_MODE);

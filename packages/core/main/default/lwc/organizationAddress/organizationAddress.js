@@ -1,12 +1,12 @@
 import { LightningElement, api } from 'lwc';
 import HEADING from '@salesforce/label/c.Core_OrganizationAddress_Heading';
-import HINT from '@salesforce/label/c.Core_OrganizationAddress_Hint';
 import STREET from '@salesforce/label/c.Core_OrganizationAddress_Street';
 import STREET_2 from '@salesforce/label/c.Core_OrganizationAddress_Street2';
 import CITY from '@salesforce/label/c.Core_OrganizationAddress_City';
 import STATE from '@salesforce/label/c.Core_OrganizationAddress_State';
 import POSTAL_CODE from '@salesforce/label/c.Core_OrganizationAddress_PostalCode';
 import COUNTRY from '@salesforce/label/c.Core_OrganizationAddress_Country';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The settings field each part is saved to, which is also the key of `values`. */
 const PART_KEYS = [
@@ -28,6 +28,16 @@ const PART_KEYS = [
  * `partchange` reports, and the server enforces the same rule on every save.
  */
 export default class OrganizationAddress extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   /** Show the group heading and the line saying what may be left blank. */
   @api titled = false;
   @api disabled = false;
@@ -37,7 +47,9 @@ export default class OrganizationAddress extends LightningElement {
 
   labels = {
     heading: HEADING,
-    hint: HINT,
+    get hint() {
+      return helpText('Core', 'Core_OrganizationAddress_Hint');
+    },
     street: STREET,
     street2: STREET_2,
     city: CITY,

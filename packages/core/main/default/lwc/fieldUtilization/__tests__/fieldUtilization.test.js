@@ -9,6 +9,11 @@ import getHistory from '@salesforce/apex/FieldUtilizationController.getHistory';
 import getSnapshotRows from '@salesforce/apex/FieldUtilizationController.getSnapshotRows';
 import deleteSnapshot from '@salesforce/apex/FieldUtilizationController.deleteSnapshot';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_FieldUtilization_SaveHelp: 'Keeps this count so your next count shows what changed.'
+});
 
 jest.mock(
   '@salesforce/label/c.Core_FieldUtilization_HistoryLimit',
@@ -64,11 +69,6 @@ jest.mock(
 jest.mock(
   '@salesforce/label/c.Core_FieldUtilization_Save',
   () => ({ default: 'Save Utilization Snapshot' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_FieldUtilization_SaveHelp',
-  () => ({ default: 'Keeps this count so your next count shows what changed.' }),
   { virtual: true }
 );
 jest.mock(

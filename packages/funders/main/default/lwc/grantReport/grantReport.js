@@ -6,12 +6,12 @@ import { mergeReport, reportDocument } from 'c/grantReportModel';
 import TITLE from '@salesforce/label/c.Funders_Report_Title';
 import TEMPLATE from '@salesforce/label/c.Core_Import_StepTemplate';
 import DOWNLOAD from '@salesforce/label/c.Funders_Report_Download';
-import HELP from '@salesforce/label/c.Funders_Report_Help';
 import NO_TEMPLATES from '@salesforce/label/c.Funders_Report_NoTemplates';
 import DOWNLOADED from '@salesforce/label/c.Core_Shared_ReportDownloaded';
 import ERROR_LOAD from '@salesforce/label/c.Funders_Report_ErrorLoad';
 import PERIOD_LINE from '@salesforce/label/c.Funders_Outcomes_PeriodLine';
 import NOT_SET from '@salesforce/label/c.Funders_Outcomes_NotSet';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_BASE = 'Funder_Report';
 
@@ -21,13 +21,17 @@ const FILE_BASE = 'Funder_Report';
  * `grantReportModel`'s (R-FT2); nothing is saved in the org.
  */
 export default class GrantReport extends LightningElement {
+  helpReady = isHelpLoaded('Funders');
+
   @api recordId;
 
   labels = {
     title: TITLE,
     template: TEMPLATE,
     download: DOWNLOAD,
-    help: HELP,
+    get help() {
+      return helpText('Funders', 'Funders_Report_Help');
+    },
     noTemplates: NO_TEMPLATES
   };
 
@@ -38,6 +42,11 @@ export default class GrantReport extends LightningElement {
   isLoading = true;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Funders').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

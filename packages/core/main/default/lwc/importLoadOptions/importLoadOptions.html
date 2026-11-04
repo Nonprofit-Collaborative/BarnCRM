@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <lightning-combobox
         data-id="operation"
         label={labels.operationLabel}
@@ -49,5 +50,6 @@
     </template>
     <template lwc:if={explainsRelatedInsert}>
         <p class="slds-text-body_small slds-var-m-top_small" data-id="related-insert-help">{labels.relatedInsertHelp}</p>
+    </template>
     </template>
 </template>

@@ -6,7 +6,6 @@ import compare from '@salesforce/apex/RollupDlrsImport.compare';
 import turnOn from '@salesforce/apex/RollupDlrsImport.turnOn';
 
 import TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportTitle';
-import INTRO from '@salesforce/label/c.Core_RollupBuilder_DlrsImportIntro';
 import STEP_CHOOSE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStepChoose';
 import STEP_REVIEW from '@salesforce/label/c.Core_DuplicateMatching_Review';
 import STEP_COMPARE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStepCompare';
@@ -36,11 +35,11 @@ import VALUE_BARN from '@salesforce/label/c.Core_RollupBuilder_DlrsImportValueBa
 import RESULT from '@salesforce/label/c.Core_Find_Result';
 import SAME from '@salesforce/label/c.Core_RollupBuilder_DlrsImportSame';
 import NO_RECORDS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportNoRecords';
-import FINISH_HINT from '@salesforce/label/c.Core_RollupBuilder_DlrsImportFinishHint';
 import FINISHED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportFinished';
 import CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
 import CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const CHOOSE_STEP = 'choose';
 const REVIEW_STEP = 'review';
@@ -65,12 +64,16 @@ const format = (template, ...values) =>
  * every copy is on; Close leaves the copies switched off. DLRS itself is never changed.
  */
 export default class RollupDlrsImport extends LightningElement {
+  helpReady = isHelpLoaded('Rollups');
+
   /** The Builder's model, for the names of the totals. */
   @api model;
 
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Rollups', 'Core_RollupBuilder_DlrsImportIntro');
+    },
     canCopy: CAN_COPY,
     stays: STAYS,
     noneActive: NONE_ACTIVE,
@@ -88,7 +91,9 @@ export default class RollupDlrsImport extends LightningElement {
     valueBarn: VALUE_BARN,
     result: RESULT,
     noRecords: NO_RECORDS,
-    finishHint: FINISH_HINT
+    get finishHint() {
+      return helpText('Rollups', 'Core_RollupBuilder_DlrsImportFinishHint');
+    }
   };
 
   steps = [
@@ -108,6 +113,11 @@ export default class RollupDlrsImport extends LightningElement {
   error;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Rollups').then(() => {
+        this.helpReady = true;
+      });
+    }
     getCandidates()
       .then((candidates) => {
         this.candidates = candidates || [];

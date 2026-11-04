@@ -101,28 +101,28 @@ public with sharing class GivingJobsController {
             jobView(
                 statuses.get(GivingScheduler.TOP_UP_JOB_NAME),
                 System.Label.Giving_NightlyJobs_TopUpName,
-                System.Label.Giving_NightlyJobs_TopUpDescription,
+                BarnHelp.text('Giving', 'Giving_NightlyJobs_TopUpDescription'),
                 settings.Installment_Top_Up_Last_Run__c,
                 settings.Installment_Top_Up_Last_Run_Summary__c
             ),
             jobView(
                 statuses.get(GivingScheduler.OVERDUE_JOB_NAME),
                 System.Label.Giving_NightlyJobs_OverdueName,
-                System.Label.Giving_NightlyJobs_OverdueDescription,
+                BarnHelp.text('Giving', 'Giving_NightlyJobs_OverdueDescription'),
                 settings.Installment_Overdue_Last_Run__c,
                 settings.Installment_Overdue_Last_Run_Summary__c
             ),
             jobView(
                 statuses.get(GivingScheduler.LEVELS_JOB_NAME),
                 System.Label.Giving_NightlyJobs_LevelsName,
-                System.Label.Giving_NightlyJobs_LevelsDescription,
+                BarnHelp.text('Giving', 'Giving_NightlyJobs_LevelsDescription'),
                 settings.Donor_Levels_Last_Recalculated__c,
                 null
             ),
             jobView(
                 statuses.get(GivingScheduler.ASK_JOB_NAME),
                 System.Label.Giving_NightlyJobs_AskRemindersName,
-                System.Label.Giving_NightlyJobs_AskRemindersDescription,
+                BarnHelp.text('Giving', 'Giving_NightlyJobs_AskRemindersDescription'),
                 settings.Ask_Reminders_Last_Run__c,
                 settings.Ask_Reminders_Last_Run_Summary__c
             )

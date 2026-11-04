@@ -104,12 +104,4 @@
         <shortDescription>The patterns were saved</shortDescription>
         <value>Saved. New households use these patterns straight away.</value>
     </labels>
-    <labels>
-        <fullName>Core_HouseholdNamingSettings_TokenHelp</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>How to write a pattern</shortDescription>
-        <value>Use {FirstName}, {LastName} and {Salutation} where you want a person's details to appear.</value>
-    </labels>
 </CustomLabels>

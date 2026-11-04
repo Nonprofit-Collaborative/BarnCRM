@@ -9,7 +9,6 @@ import inspect from '@salesforce/apex/RecordInspectorController.inspect';
 import { filterRows } from './inspectorRows';
 
 import TITLE from '@salesforce/label/c.Core_RecordInspector_Title';
-import INTRO from '@salesforce/label/c.Core_RecordInspector_Intro';
 import INSPECT from '@salesforce/label/c.Core_RecordInspector_Inspect';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import LOADING from '@salesforce/label/c.Core_RecordInspector_Loading';
@@ -26,12 +25,12 @@ import COUNT_FILTERED from '@salesforce/label/c.Core_RecordInspector_CountFilter
 import NO_MATCH from '@salesforce/label/c.Core_RecordInspector_NoMatch';
 import EMPTY from '@salesforce/label/c.Core_RecordInspector_Empty';
 import SHORTENED from '@salesforce/label/c.Core_RecordInspector_Shortened';
-import FIELDS_CUT from '@salesforce/label/c.Core_RecordInspector_FieldsCut';
 import OPEN_FIND from '@salesforce/label/c.Core_DataHygiene_OpenInFind';
 import OPEN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
 import { bodyMessage, format } from 'c/findCsv';
 import WhereUsedModal from 'c/whereUsedModal';
 import WHERE_USED_ALT from '@salesforce/label/c.Core_WhereUsed_Title';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Record Inspector (C-55): a record page component that lists every field the viewer may
@@ -48,6 +47,16 @@ const FIND_TAB = 'Find';
 const TOOL_STATE_SUFFIX = 'tool';
 
 export default class RecordInspector extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
 
   /** The page state key Find reads its tool from, e.g. `c__tool`; the object key is its sibling. */
@@ -62,7 +71,9 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
 
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_RecordInspector_Intro');
+    },
     inspect: INSPECT,
     refresh: REFRESH,
     loading: LOADING,
@@ -75,7 +86,9 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
     openFind: OPEN_FIND,
     noMatch: NO_MATCH,
     shortened: SHORTENED,
-    fieldsCut: FIELDS_CUT
+    get fieldsCut() {
+      return helpText('Core', 'Core_RecordInspector_FieldsCut');
+    }
   };
 
   inspection;

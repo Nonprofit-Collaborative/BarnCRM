@@ -27,7 +27,6 @@ import SAVED from '@salesforce/label/c.Programs_Log_Saved';
 import SAVED_ONE from '@salesforce/label/c.Programs_Log_SavedOne';
 import NOTHING_TO_SAVE from '@salesforce/label/c.Programs_Log_NothingToSave';
 import NO_SERVICES from '@salesforce/label/c.Programs_Log_NoServices';
-import EMPTY from '@salesforce/label/c.Programs_Log_Empty';
 import ATTENDANCE_FOR from '@salesforce/label/c.Programs_Log_AttendanceFor';
 import QUANTITY_FOR from '@salesforce/label/c.Programs_Log_QuantityFor';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Log_MoreThanShown';
@@ -55,6 +54,7 @@ import {
 } from './logRows';
 import { bodyMessage } from 'c/findCsv';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const SAVE_FIRST = 'save';
 const DISCARD_CHANGES = 'discard';
@@ -67,6 +67,8 @@ const DISCARD_CHANGES = 'discard';
  * and a Cancelled session shows what was recorded without the controls (R-SE3).
  */
 export default class ServiceDeliveryLog extends LightningElement {
+  helpReady = isHelpLoaded('Programs');
+
   @api recordId;
   @api objectApiName;
 
@@ -78,7 +80,9 @@ export default class ServiceDeliveryLog extends LightningElement {
     markAllPresent: MARK_ALL_PRESENT,
     save: SAVE,
     noServices: NO_SERVICES,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Programs', 'Programs_Log_Empty');
+    },
     moreThanShown: MORE_THAN_SHOWN,
     countInput: COUNT_INPUT,
     addCount: ADD_COUNT,
@@ -95,6 +99,11 @@ export default class ServiceDeliveryLog extends LightningElement {
   resultMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Programs').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

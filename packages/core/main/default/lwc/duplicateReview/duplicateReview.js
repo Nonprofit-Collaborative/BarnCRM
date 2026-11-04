@@ -23,22 +23,18 @@ import SCAN_RUNNING from '@salesforce/label/c.Core_Duplicates_ScanRunning';
 import LAST_SCAN from '@salesforce/label/c.Core_Duplicates_LastScan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import SUGGESTIONS_HEADING from '@salesforce/label/c.Core_Duplicates_SuggestionsHeading';
-import EMPTY from '@salesforce/label/c.Core_Duplicates_Empty';
 import OBJECT_PERSON from '@salesforce/label/c.Core_Section_Person';
 import OBJECT_HOUSEHOLD from '@salesforce/label/c.Core_Section_Household';
 import PEOPLE_MERGE_NOTICE from '@salesforce/label/c.Core_Duplicates_PeopleMergeNotice';
 import MERGE_BUTTON from '@salesforce/label/c.Core_Duplicates_MergeButton';
 import MERGE_HEADING from '@salesforce/label/c.Core_Duplicates_MergeHeading';
-import MERGE_BODY from '@salesforce/label/c.Core_Duplicates_MergeBody';
 import MERGE_KEEP_LABEL from '@salesforce/label/c.Core_Duplicates_MergeKeepLabel';
 import MERGE_KEEPING from '@salesforce/label/c.Core_Duplicates_MergeKeeping';
 import MERGE_DROPPING from '@salesforce/label/c.Core_Duplicates_MergeDropping';
-import MERGE_FULL_SCREEN from '@salesforce/label/c.Core_Duplicates_MergeFullScreen';
 import MERGE_CONFIRM from '@salesforce/label/c.Core_Duplicates_MergeConfirm';
 import MERGE_SUCCESS from '@salesforce/label/c.Core_Duplicates_MergeSuccess';
 import DISMISS_BUTTON from '@salesforce/label/c.Core_Duplicates_DismissButton';
 import DISMISS_HEADING from '@salesforce/label/c.Core_Duplicates_DismissButton';
-import DISMISS_BODY from '@salesforce/label/c.Core_Duplicates_DismissBody';
 import DISMISS_REASON_LABEL from '@salesforce/label/c.Core_Import_ResultsReason';
 import DISMISS_SUCCESS from '@salesforce/label/c.Core_Duplicates_DismissSuccess';
 import DISMISSED_COUNT from '@salesforce/label/c.Core_Duplicates_DismissedCount';
@@ -59,6 +55,7 @@ import BLANK from '@salesforce/label/c.Core_Duplicates_Blank';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupPath } from 'c/setupLinks';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const SETUP_DUPLICATE_RULES = setupPath('duplicateRules');
 const PAGE_SIZE = 10;
@@ -73,6 +70,8 @@ const PAGE_SIZE = 10;
  * Two people are merged with the platform's merge, from the person's record page.
  */
 export default class DuplicateReview extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     newTab: NEW_TAB,
     title: TITLE,
@@ -84,17 +83,25 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     lastScan: LAST_SCAN,
     refresh: REFRESH,
     suggestionsHeading: SUGGESTIONS_HEADING,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Core', 'Core_Duplicates_Empty');
+    },
     peopleMergeNotice: PEOPLE_MERGE_NOTICE,
     merge: MERGE_BUTTON,
     mergeHeading: MERGE_HEADING,
-    mergeBody: MERGE_BODY,
+    get mergeBody() {
+      return helpText('Core', 'Core_Duplicates_MergeBody');
+    },
     mergeKeepLabel: MERGE_KEEP_LABEL,
-    mergeFullScreen: MERGE_FULL_SCREEN,
+    get mergeFullScreen() {
+      return helpText('Core', 'Core_Duplicates_MergeFullScreen');
+    },
     mergeConfirm: MERGE_CONFIRM,
     dismiss: DISMISS_BUTTON,
     dismissHeading: DISMISS_HEADING,
-    dismissBody: DISMISS_BODY,
+    get dismissBody() {
+      return helpText('Core', 'Core_Duplicates_DismissBody');
+    },
     dismissReasonLabel: DISMISS_REASON_LABEL,
     dismissedCount: DISMISSED_COUNT,
     viewDismissed: VIEW_DISMISSED,
@@ -132,6 +139,11 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
   @wire(EnclosingTabId) enclosingTabId;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

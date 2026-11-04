@@ -6,7 +6,6 @@ import getRecentChanges from '@salesforce/apex/SettingsController.getRecentChang
 import TITLE from '@salesforce/label/c.Core_Settings_Title';
 import NOT_SET from '@salesforce/label/c.Core_Settings_NotSet';
 import SECTIONS_HEADING from '@salesforce/label/c.Core_Settings_SectionsHeading';
-import PURPOSE from '@salesforce/label/c.Core_Settings_Purpose';
 import SAVED_MESSAGE from '@salesforce/label/c.Core_Settings_SavedMessage';
 import SAVE_ERROR from '@salesforce/label/c.Core_Settings_SaveErrorMessage';
 import OUT_OF_RANGE from '@salesforce/label/c.Core_Settings_NumberOutOfRangeOnPage';
@@ -15,14 +14,12 @@ import READ_ONLY_NOTICE from '@salesforce/label/c.Core_Settings_ReadOnlyNotice';
 import HELP_ARIA from '@salesforce/label/c.Core_Settings_HelpAria';
 import EMPTY_SECTION from '@salesforce/label/c.Core_Settings_EmptySectionMessage';
 import RECENT_HEADING from '@salesforce/label/c.Core_Settings_RecentChangesHeading';
-import RECENT_EMPTY from '@salesforce/label/c.Core_Settings_RecentChangesEmpty';
 import COLUMN_SETTING from '@salesforce/label/c.Core_Settings_ColumnSetting';
 import COLUMN_OLD from '@salesforce/label/c.Core_Settings_ColumnOldValue';
 import COLUMN_NEW from '@salesforce/label/c.Core_SuperTransform_NewValue';
 import COLUMN_BY from '@salesforce/label/c.Core_SetupChanges_ColChangedBy';
 import COLUMN_AT from '@salesforce/label/c.Core_SetupChanges_ColChangedAt';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Settings_ComponentNotInstalled';
-import FROM_SETUP_HELP from '@salesforce/label/c.Core_Settings_FromSetupHelp';
 import OPEN_IN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupValuePath } from 'c/setupLinks';
@@ -33,7 +30,6 @@ import FEEDBACK_ARIA from '@salesforce/label/c.Core_Settings_FeedbackAria';
 import FEEDBACK_URL from '@salesforce/label/c.Core_Settings_FeedbackUrl';
 import DEFAULT_BADGE from '@salesforce/label/c.Core_Settings_DefaultBadge';
 import DEFAULTS_TITLE from '@salesforce/label/c.Core_Settings_DefaultsBannerTitle';
-import DEFAULTS_TEXT from '@salesforce/label/c.Core_Settings_DefaultsBannerText';
 import KEEP_ALL_DEFAULTS from '@salesforce/label/c.Core_Settings_KeepAllDefaults';
 import KEEP_DEFAULT from '@salesforce/label/c.Core_Settings_KeepDefaultButton';
 import KEEP_DEFAULT_ARIA from '@salesforce/label/c.Core_Settings_KeepDefaultAria';
@@ -45,6 +41,7 @@ import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
 import { groupRows, findBox } from './settingsGroups';
 import { navigationGroups } from './settingsNavigation';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The page state key a link to a section uses: `c__section`, or the namespace's. */
 const SECTION_STATE = '__section';
@@ -145,10 +142,14 @@ function importCoreComponent(name) {
 }
 
 export default class SettingsConsole extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     title: TITLE,
     sectionsHeading: SECTIONS_HEADING,
-    purpose: PURPOSE,
+    get purpose() {
+      return helpText('Core', 'Core_Settings_Purpose');
+    },
     saved: SAVED_MESSAGE,
     saveError: SAVE_ERROR,
     outOfRange: OUT_OF_RANGE,
@@ -156,9 +157,13 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     readOnly: READ_ONLY_NOTICE,
     emptySection: EMPTY_SECTION,
     recentHeading: RECENT_HEADING,
-    recentEmpty: RECENT_EMPTY,
+    get recentEmpty() {
+      return helpText('Core', 'Core_Settings_RecentChangesEmpty');
+    },
     notInstalled: NOT_INSTALLED,
-    fromSetupHelp: FROM_SETUP_HELP,
+    get fromSetupHelp() {
+      return helpText('Core', 'Core_Settings_FromSetupHelp');
+    },
     openInSetup: OPEN_IN_SETUP,
     newTab: NEW_TAB,
     feedbackLink: FEEDBACK_LINK,
@@ -166,7 +171,9 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     feedbackUrl: FEEDBACK_URL,
     defaultBadge: DEFAULT_BADGE,
     defaultsTitle: DEFAULTS_TITLE,
-    defaultsText: DEFAULTS_TEXT,
+    get defaultsText() {
+      return helpText('Core', 'Core_Settings_DefaultsBannerText');
+    },
     keepAllDefaults: KEEP_ALL_DEFAULTS,
     keepDefault: KEEP_DEFAULT,
     useSuggestion: USE_SUGGESTION
@@ -237,6 +244,11 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   }
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

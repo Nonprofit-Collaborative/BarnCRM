@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <ul class="slds-has-dividers_bottom-space">
         <template for:each={rows} for:item="module">
             <li key={module.name} class="slds-item slds-var-p-vertical_xx-small">
@@ -49,4 +50,5 @@
     <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small">
         {labels.managerNotice}
     </p>
+    </template>
 </template>

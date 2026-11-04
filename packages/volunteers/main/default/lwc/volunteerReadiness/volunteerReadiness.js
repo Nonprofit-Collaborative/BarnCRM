@@ -13,8 +13,8 @@ import COMPLETED from '@salesforce/label/c.Core_Shared_Completed';
 import EXPIRES from '@salesforce/label/c.Volunteers_Readiness_Expires';
 import LOAD_FAILED from '@salesforce/label/c.Volunteers_Readiness_LoadFailed';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
-import EMPTY from '@salesforce/label/c.Volunteers_Readiness_Empty';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * Volunteer readiness on a person (canonical model R-VQ3): each requirement type's most recently
@@ -22,6 +22,16 @@ import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
  * hours. A user who cannot see requirements, or a household or organization, gets no card.
  */
 export default class VolunteerReadiness extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Volunteers');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Volunteers').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
 
   label = {
@@ -29,7 +39,9 @@ export default class VolunteerReadiness extends NavigationMixin(LightningElement
     completed: COMPLETED,
     expires: EXPIRES,
     refresh: REFRESH,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Volunteers', 'Volunteers_Readiness_Empty');
+    },
     loading: LOADING
   };
 

@@ -18,8 +18,6 @@ import NEXT from '@salesforce/label/c.Core_Import_NextButton';
 import SKIP from '@salesforce/label/c.Core_SetupAssistant_SkipButton';
 import FINISH from '@salesforce/label/c.Core_SetupAssistant_FinishButton';
 import READ_ONLY from '@salesforce/label/c.Core_SetupAssistant_ReadOnlyNotice';
-import RULE_SETTING from '@salesforce/label/c.Core_SetupAssistant_RuleSetting';
-import RULE_ACTION from '@salesforce/label/c.Core_SetupAssistant_RuleAction';
 import LOAD_ERROR from '@salesforce/label/c.Core_SetupAssistant_LoadErrorMessage';
 import COMPLETE_HEADING from '@salesforce/label/c.Core_SetupAssistant_CompleteHeading';
 import ELAPSED from '@salesforce/label/c.Core_SetupAssistant_ElapsedLabel';
@@ -41,6 +39,7 @@ import PROGRESS_FORMAT from '@salesforce/label/c.Core_SetupAssistant_ProgressFor
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupPath } from 'c/setupLinks';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const CREATE_USER_URL = setupPath('users');
 // User access policies are created in Setup, not by a package (ADR-0095), so the step links to the guide.
@@ -60,6 +59,8 @@ const IMPORT_TAB = 'Import';
  * Apex and are shown by one field panel (ADR-0059, C-29).
  */
 export default class SetupAssistant extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
   /** Set by the Hub home page when Maria asked to reopen a finished setup. */
   @api reopened = false;
 
@@ -109,6 +110,11 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
   automaticAccessUrl = AUTOMATIC_ACCESS_GUIDE;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.refreshHandlerId = registerRefreshHandler(this, this.refreshHandler);
     this.load();
   }
@@ -208,7 +214,9 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     if (!this.activeStep) {
       return '';
     }
-    return this.activeStep.completionRule === 'Setting' ? RULE_SETTING : RULE_ACTION;
+    return this.activeStep.completionRule === 'Setting'
+      ? helpText('Core', 'Core_SetupAssistant_RuleSetting')
+      : helpText('Core', 'Core_SetupAssistant_RuleAction');
   }
 
   // "{0} of {1}" is a translatable sentence, not punctuation, so the wording is a label.

@@ -11,7 +11,6 @@ import TITLE from '@salesforce/label/c.Core_SettingsGroup_HouseholdNames';
 import NAME_LABEL from '@salesforce/label/c.Core_HouseholdNamingSettings_NameLabel';
 import FORMAL_LABEL from '@salesforce/label/c.Core_HouseholdNamingSettings_FormalLabel';
 import INFORMAL_LABEL from '@salesforce/label/c.Core_HouseholdNamingSettings_InformalLabel';
-import TOKEN_HELP from '@salesforce/label/c.Core_HouseholdNamingSettings_TokenHelp';
 import PREVIEW_HEADING from '@salesforce/label/c.Core_HouseholdNamingSettings_PreviewHeading';
 import COLUMN_MEMBERS from '@salesforce/label/c.Core_SettingsGroup_People';
 import COLUMN_NAME from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnName';
@@ -26,6 +25,7 @@ import READ_ONLY from '@salesforce/label/c.Core_HouseholdNamingSettings_ReadOnly
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CONFIRM from '@salesforce/label/c.Core_HouseholdNamingSettings_Confirm';
 import SAVING from '@salesforce/label/c.Core_HouseholdScreens_Saving';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const DEBOUNCE_MILLISECONDS = 300;
 // What the package ships. Used only until this org's own saved patterns arrive, and where
@@ -38,12 +38,16 @@ const FORMAL_KEY = 'Formal_Greeting_Pattern__c';
 const INFORMAL_KEY = 'Informal_Greeting_Pattern__c';
 
 export default class HouseholdNamingSettings extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   label = {
     title: TITLE,
     nameLabel: NAME_LABEL,
     formalLabel: FORMAL_LABEL,
     informalLabel: INFORMAL_LABEL,
-    tokenHelp: TOKEN_HELP,
+    get tokenHelp() {
+      return helpText('Core', 'Core_HouseholdNamingSettings_TokenHelp');
+    },
     previewHeading: PREVIEW_HEADING,
     columnMembers: COLUMN_MEMBERS,
     columnName: COLUMN_NAME,
@@ -84,6 +88,11 @@ export default class HouseholdNamingSettings extends LightningElement {
   }
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     // The page opens on this org's own wording, not on what the package ships, so that
     // saving again never writes the shipped patterns over what an admin chose before.
     return getNamingSettings()

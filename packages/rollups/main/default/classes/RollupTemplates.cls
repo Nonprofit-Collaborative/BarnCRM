@@ -94,7 +94,7 @@ public with sharing class RollupTemplates {
             Template starter = new Template();
             starter.key = NONPROFIT_STARTER;
             starter.name = Label.Core_RollupEase_TplStarter;
-            starter.description = Label.Core_RollupEase_TplStarterHelp;
+            starter.description = BarnHelp.text('Rollups', 'Core_RollupEase_TplStarterHelp');
             starter.items = new List<Item>();
             for (Spec spec : nonprofitStarter()) {
                 starter.items.add(itemOf(spec, filledBy));

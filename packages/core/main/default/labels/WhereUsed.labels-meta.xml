@@ -321,60 +321,12 @@
         <value>Retire a Field</value>
     </labels>
     <labels>
-        <fullName>Core_WhereUsed_RetireIntro</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Text above the Retire a Field checklist.</shortDescription>
-        <value>BarnCRM never deletes a field. Work down these steps to retire it safely; the ticks are only for you and are not saved.</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhereUsed_StepReferences</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Retire a Field step when BarnCRM setup uses the field.</shortDescription>
-        <value>Edit or remove each BarnCRM setup record listed above.</value>
-    </labels>
-    <labels>
         <fullName>Core_WhereUsed_StepNoReferences</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Retire a Field step when no BarnCRM setup uses the field.</shortDescription>
         <value>No BarnCRM setup record needs changing.</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhereUsed_StepSalesforce</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Retire a Field step: check uses outside BarnCRM in Setup.</shortDescription>
-        <value>Check Salesforce's own uses: open the field in Setup and click Where is this used?</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhereUsed_StepBackup</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Retire a Field step: export the field's values first.</shortDescription>
-        <value>Back up the values: open Find on this object, add the field as a column and export.</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhereUsed_StepHide</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Retire a Field step: hide the field for a while first.</shortDescription>
-        <value>Hide the field first: take it off page layouts and remove field access for a few weeks, to learn whether anyone misses it.</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhereUsed_StepDelete</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Retire a Field step: delete the field in Setup.</shortDescription>
-        <value>Delete the field in Setup. Salesforce keeps it under Deleted Fields for 15 days.</value>
     </labels>
     <labels>
         <fullName>Core_WhereUsed_StepCannotDelete</fullName>

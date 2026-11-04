@@ -49,14 +49,6 @@
         <value>Grant Pipeline</value>
     </labels>
     <labels>
-        <fullName>Funders_Pipeline_Intro</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Grant Pipeline intro</shortDescription>
-        <value>Every open grant by stage, and the application deadlines coming up. Use a card's menu to open a grant or move it to another stage.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Pipeline_ScopeEveryone</fullName>
         <categories>GrantPipeline</categories>
         <language>en_US</language>
@@ -121,14 +113,6 @@
         <value>No grants at this stage.</value>
     </labels>
     <labels>
-        <fullName>Funders_Pipeline_Empty</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>No open grants at all</shortDescription>
-        <value>No open grants yet. Click New Grant to add the first one.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Pipeline_Truncated</fullName>
         <categories>GrantPipeline</categories>
         <language>en_US</language>
@@ -159,14 +143,6 @@
         <protected>true</protected>
         <shortDescription>Upcoming deadlines heading</shortDescription>
         <value>Upcoming Deadlines</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Pipeline_DeadlinesEmpty</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>No deadlines coming up</shortDescription>
-        <value>No application deadlines or grant requirements due in the next 60 days.</value>
     </labels>
     <labels>
         <fullName>Funders_Pipeline_DaysLeft</fullName>

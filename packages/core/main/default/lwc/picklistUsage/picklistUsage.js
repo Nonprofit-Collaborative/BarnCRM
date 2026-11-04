@@ -6,13 +6,11 @@ import { bodyMessage } from 'c/findCsv';
 import { groupsOf, mergeDates, applyDates, scanProgress } from 'c/picklistUsageDates';
 
 import TITLE from '@salesforce/label/c.Core_PicklistUsage_Title';
-import INTRO from '@salesforce/label/c.Core_PicklistUsage_Intro';
 import SHOW from '@salesforce/label/c.Core_PicklistUsage_Show';
 import PROGRESS from '@salesforce/label/c.Core_PicklistUsage_Progress';
 import DATES_PROGRESS from '@salesforce/label/c.Core_PicklistUsage_DatesProgress';
 import DATES_STOPPED from '@salesforce/label/c.Core_PicklistUsage_DatesStopped';
 import NO_FIELDS from '@salesforce/label/c.Core_PicklistUsage_NoFields';
-import LAST_USED_NOTE from '@salesforce/label/c.Core_PicklistUsage_LastUsedNote';
 import NOT_CHECKED from '@salesforce/label/c.Core_PicklistUsage_NotChecked';
 import TRUNCATED from '@salesforce/label/c.Core_PicklistUsage_Truncated';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
@@ -27,6 +25,7 @@ import STATUS_INACTIVE from '@salesforce/label/c.Core_PicklistUsage_StatusInacti
 import STATUS_NEVER_USED from '@salesforce/label/c.Core_PicklistUsage_StatusNeverUsed';
 import STATUS_NO_VALUE from '@salesforce/label/c.Core_PicklistUsage_StatusNoValue';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_FieldUtilization_UnexpectedError';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const STATUS_LABELS = {
   Active: STATUS_ACTIVE,
@@ -60,12 +59,26 @@ const COLUMNS = [
  * records at a time (R-FU12), with progress, Cancel, and Continue from where a chunk stopped.
  */
 export default class PicklistUsage extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_PicklistUsage_Intro');
+    },
     show: SHOW,
     noFields: NO_FIELDS,
-    note: LAST_USED_NOTE,
+    get note() {
+      return helpText('Core', 'Core_PicklistUsage_LastUsedNote');
+    },
     cancel: CANCEL,
     retry: CONTINUE
   };

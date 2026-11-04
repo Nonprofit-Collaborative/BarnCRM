@@ -8,10 +8,8 @@ import deleteStep from '@salesforce/apex/StewardshipPlanController.deleteStep';
 import reorderSteps from '@salesforce/apex/StewardshipPlanController.reorderSteps';
 
 import TITLE from '@salesforce/label/c.Giving_Stewardship_Title';
-import INTRO from '@salesforce/label/c.Giving_Stewardship_Intro';
 import RUNNING_NOTICE from '@salesforce/label/c.Giving_Stewardship_RunningNotice';
 import READ_ONLY_NOTICE from '@salesforce/label/c.Giving_Stewardship_ReadOnlyNotice';
-import EMPTY from '@salesforce/label/c.Giving_Stewardship_Empty';
 import NEW_PLAN from '@salesforce/label/c.Giving_Stewardship_NewPlan';
 import EDIT_PLAN from '@salesforce/label/c.Core_CmdtManager_EditAction';
 import TURN_ON from '@salesforce/label/c.Core_Feature_TurnOn';
@@ -26,17 +24,13 @@ import INACTIVE from '@salesforce/label/c.Core_Feature_Off';
 import FIELD_NAME from '@salesforce/label/c.Giving_Stewardship_FieldName';
 import FIELD_EVENT from '@salesforce/label/c.Giving_Stewardship_FieldEvent';
 import FIELD_MINIMUM from '@salesforce/label/c.Giving_Stewardship_FieldMinimum';
-import FIELD_MINIMUM_HELP from '@salesforce/label/c.Giving_Stewardship_FieldMinimumHelp';
 import FIELD_DESCRIPTION from '@salesforce/label/c.Core_Shared_Description';
 import STEPS_HEADING from '@salesforce/label/c.Giving_Stewardship_StepsHeading';
-import NO_STEPS from '@salesforce/label/c.Giving_Stewardship_NoSteps';
-import SELECT_PLAN from '@salesforce/label/c.Giving_Stewardship_SelectPlan';
 import ADD_STEP from '@salesforce/label/c.Core_Shared_AddStep';
 import MOVE_UP from '@salesforce/label/c.Giving_Stewardship_MoveUp';
 import MOVE_DOWN from '@salesforce/label/c.Core_Shared_MoveDown';
 import REMOVE_STEP from '@salesforce/label/c.Core_Find_Remove';
 import STEP_SUBJECT from '@salesforce/label/c.Giving_Stewardship_StepSubject';
-import STEP_SUBJECT_HELP from '@salesforce/label/c.Giving_Stewardship_StepSubjectHelp';
 import STEP_DAYS from '@salesforce/label/c.Giving_Stewardship_StepDays';
 import STEP_ASSIGN from '@salesforce/label/c.Giving_Stewardship_StepAssign';
 import STEP_USER from '@salesforce/label/c.Giving_Stewardship_StepUser';
@@ -49,6 +43,7 @@ import ACTION_FAILED from '@salesforce/label/c.Giving_Stewardship_ErrorActionFai
 import SELECTED from '@salesforce/label/c.Core_DataDictionary_SelectedLabel';
 import COLUMN_ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const EMPTY_TEMPLATE = {
   recordId: null,
@@ -79,12 +74,26 @@ const EMPTY_STEP = {
  * the question an administrator asks the moment she changes a step.
  */
 export default class StewardshipPlans extends LightningElement {
+  helpReady = isHelpLoaded('Giving');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Giving', 'Giving_Stewardship_Intro');
+    },
     runningNotice: RUNNING_NOTICE,
     readOnlyNotice: READ_ONLY_NOTICE,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Giving', 'Giving_Stewardship_Empty');
+    },
     newPlan: NEW_PLAN,
     editPlan: EDIT_PLAN,
     turnOn: TURN_ON,
@@ -101,17 +110,25 @@ export default class StewardshipPlans extends LightningElement {
     fieldName: FIELD_NAME,
     fieldEvent: FIELD_EVENT,
     fieldMinimum: FIELD_MINIMUM,
-    fieldMinimumHelp: FIELD_MINIMUM_HELP,
+    get fieldMinimumHelp() {
+      return helpText('Giving', 'Giving_Stewardship_FieldMinimumHelp');
+    },
     fieldDescription: FIELD_DESCRIPTION,
     stepsHeading: STEPS_HEADING,
-    noSteps: NO_STEPS,
-    selectPlan: SELECT_PLAN,
+    get noSteps() {
+      return helpText('Giving', 'Giving_Stewardship_NoSteps');
+    },
+    get selectPlan() {
+      return helpText('Giving', 'Giving_Stewardship_SelectPlan');
+    },
     addStep: ADD_STEP,
     moveUp: MOVE_UP,
     moveDown: MOVE_DOWN,
     removeStep: REMOVE_STEP,
     stepSubject: STEP_SUBJECT,
-    stepSubjectHelp: STEP_SUBJECT_HELP,
+    get stepSubjectHelp() {
+      return helpText('Giving', 'Giving_Stewardship_StepSubjectHelp');
+    },
     stepDays: STEP_DAYS,
     stepAssign: STEP_ASSIGN,
     stepUser: STEP_USER,

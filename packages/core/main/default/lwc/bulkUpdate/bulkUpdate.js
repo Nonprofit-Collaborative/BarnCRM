@@ -7,7 +7,6 @@ import getJob from '@salesforce/apex/BulkUpdateController.getJob';
 import { startPolling } from 'c/jobPoller';
 
 import TITLE from '@salesforce/label/c.Core_SuperTransform_Title';
-import PANEL_INTRO from '@salesforce/label/c.Core_BulkUpdate_PanelIntro';
 import CHANGES from '@salesforce/label/c.Core_BulkUpdate_Changes';
 import FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import CHOOSE_FIELD from '@salesforce/label/c.Core_BulkUpdate_ChooseField';
@@ -31,7 +30,6 @@ import STARTED from '@salesforce/label/c.Core_BulkUpdate_Started';
 import PROGRESS from '@salesforce/label/c.Core_BulkUpdate_Progress';
 import SUMMARY from '@salesforce/label/c.Core_BulkUpdate_Summary';
 import FAILURES from '@salesforce/label/c.Core_BulkUpdate_Failures';
-import UNDO_FROM_TAB from '@salesforce/label/c.Core_BulkUpdate_UndoFromTab';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import TRUE_LABEL from '@salesforce/label/c.Core_BulkUpdate_True';
@@ -40,6 +38,7 @@ import PATH_CHANGES from '@salesforce/label/c.Core_BulkUpdate_PathChanges';
 import PATH_CONFIRM from '@salesforce/label/c.Core_BulkUpdate_PathConfirm';
 import PATH_RUN from '@salesforce/label/c.Core_BulkUpdate_PathRun';
 import { messageFrom, format } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const STEPS = [
   { value: 'changes', label: PATH_CHANGES },
@@ -72,11 +71,15 @@ function shown(value) {
  * SOQL (canonical model R-BU1, R-BU4). Undo is in Data jobs on the Data Manager tab (dataJobHistory).
  */
 export default class BulkUpdate extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   @api queryJson;
 
   labels = {
     title: TITLE,
-    panelIntro: PANEL_INTRO,
+    get panelIntro() {
+      return helpText('Core', 'Core_BulkUpdate_PanelIntro');
+    },
     changes: CHANGES,
     field: FIELD,
     chooseField: CHOOSE_FIELD,
@@ -91,7 +94,9 @@ export default class BulkUpdate extends LightningElement {
     after: AFTER,
     confirm: CONFIRM,
     failures: FAILURES,
-    undoFromTab: UNDO_FROM_TAB,
+    get undoFromTab() {
+      return helpText('Core', 'Core_BulkUpdate_UndoFromTab');
+    },
     close: CLOSE,
     loading: LOADING
   };
@@ -108,6 +113,11 @@ export default class BulkUpdate extends LightningElement {
   stopTimer;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

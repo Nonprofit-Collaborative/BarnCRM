@@ -20,15 +20,11 @@ import LETTER_PICKER from '@salesforce/label/c.Giving_Receipt_LetterPicker';
 import LETTER_OPTION from '@salesforce/label/c.Core_Format_Parenthetical';
 import LETTER_OPTION_OFF from '@salesforce/label/c.Giving_Receipt_LetterOptionOff';
 import EDITOR from '@salesforce/label/c.Giving_Receipt_EditorLabel';
-import LETTERHEAD_NOTE from '@salesforce/label/c.Giving_Receipt_LetterheadNote';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import USE_LETTER from '@salesforce/label/c.Giving_Receipt_UseLetterButton';
 import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import PREVIEW_HEADING from '@salesforce/label/c.Giving_Receipt_PreviewHeading';
-import PREVIEW_NOTE from '@salesforce/label/c.Giving_Receipt_PreviewNote';
 import NO_PREVIEW_TITLE from '@salesforce/label/c.Giving_Receipt_NoPreviewTitle';
-import TAX_NOTE from '@salesforce/label/c.Giving_Receipt_TaxNote';
-import TOKENS_INTRO from '@salesforce/label/c.Giving_Receipt_TokensIntro';
 import STATEMENT_YEAR from '@salesforce/label/c.Giving_Receipt_StatementYear';
 import GENERATE from '@salesforce/label/c.Core_Shared_Generate';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
@@ -52,9 +48,7 @@ import STARTED_TITLE from '@salesforce/label/c.Giving_Receipt_StartedTitle';
 import STARTED_MESSAGE from '@salesforce/label/c.Giving_Receipt_StartedMessage';
 import NOT_STARTED_TITLE from '@salesforce/label/c.Giving_Receipt_NotStartedTitle';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Receipt_UnexpectedError';
-import PAGES_WHAT from '@salesforce/label/c.Giving_SetupNote_RecordPages_What';
-import PAGES_WHY from '@salesforce/label/c.Giving_SetupNote_RecordPages_Why';
-import PAGES_STEPS from '@salesforce/label/c.Giving_SetupNote_RecordPages_Steps';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const TOKENS = [
   '{{OrganizationName}}',
@@ -91,6 +85,16 @@ const FORMATS = ['bold', 'italic', 'underline', 'list', 'indent', 'align', 'link
  * looking rather than typing them in twice.
  */
 export default class ReceiptSettings extends LightningElement {
+  helpReady = isHelpLoaded('Giving');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   /**
    * What Giving needs from Setup, shown by Core's settingsSetupNotes with its Open in Setup
    * link. Giving's permission sets are given on the Access page, so they need no note here.
@@ -98,9 +102,15 @@ export default class ReceiptSettings extends LightningElement {
   setupNotes = [
     {
       key: 'recordPages',
-      what: PAGES_WHAT,
-      why: PAGES_WHY,
-      steps: PAGES_STEPS,
+      get what() {
+        return helpText('Giving', 'Giving_SetupNote_RecordPages_What');
+      },
+      get why() {
+        return helpText('Giving', 'Giving_SetupNote_RecordPages_Why');
+      },
+      get steps() {
+        return helpText('Giving', 'Giving_SetupNote_RecordPages_Steps');
+      },
       link: 'lightningPages'
     }
   ];
@@ -113,14 +123,22 @@ export default class ReceiptSettings extends LightningElement {
     readOnly: READ_ONLY,
     letterPicker: LETTER_PICKER,
     editor: EDITOR,
-    letterheadNote: LETTERHEAD_NOTE,
+    get letterheadNote() {
+      return helpText('Giving', 'Giving_Receipt_LetterheadNote');
+    },
     save: SAVE,
     useLetter: USE_LETTER,
     preview: PREVIEW,
     previewHeading: PREVIEW_HEADING,
-    previewNote: PREVIEW_NOTE,
-    taxNote: TAX_NOTE,
-    tokensIntro: TOKENS_INTRO,
+    get previewNote() {
+      return helpText('Giving', 'Giving_Receipt_PreviewNote');
+    },
+    get taxNote() {
+      return helpText('Giving', 'Giving_Receipt_TaxNote');
+    },
+    get tokensIntro() {
+      return helpText('Giving', 'Giving_Receipt_TokensIntro');
+    },
     statementYear: STATEMENT_YEAR,
     generate: GENERATE,
     refresh: REFRESH,

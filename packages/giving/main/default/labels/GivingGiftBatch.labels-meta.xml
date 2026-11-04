@@ -241,14 +241,6 @@
     <value>As the batch</value>
   </labels>
   <labels>
-    <fullName>Giving_GiftBatch_FromBatchHelp</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: empty cells follow the batch</shortDescription>
-    <value>Leave date, payment method, fund or appeal empty and the line uses the batch's.</value>
-  </labels>
-  <labels>
     <fullName>Giving_GiftBatch_NoLines</fullName>
     <categories>Giving, Gift Batch</categories>
     <language>en_US</language>
@@ -263,14 +255,6 @@
     <protected>false</protected>
     <shortDescription>Gift batch: post the batch</shortDescription>
     <value>Post batch</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_PostedNote</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: batch is posted</shortDescription>
-    <value>This batch is posted. Each line links to the gift it became. To correct a gift, refund or write off that gift.</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_PostedToast</fullName>
@@ -303,13 +287,5 @@
     <protected>false</protected>
     <shortDescription>Gift batch: grid card title</shortDescription>
     <value>Lines</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_UseComputer</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: note shown on a phone</shortDescription>
-    <value>Batches are easier on a computer. On a phone, scroll the lines sideways to reach every column, or use Quick Gift Entry for a single gift.</value>
   </labels>
 </CustomLabels>

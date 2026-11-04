@@ -3,20 +3,16 @@ import { api } from 'lwc';
 import finish from '@salesforce/apex/FirstRunController.finish';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import TITLE from '@salesforce/label/c.Core_FirstRun_Title';
-import INTRO from '@salesforce/label/c.Core_FirstRun_Intro';
 import EDITION_QUESTION from '@salesforce/label/c.Core_FirstRun_EditionQuestion';
 import FEATURES_QUESTION from '@salesforce/label/c.Core_FirstRun_FeaturesQuestion';
 import ALL_OPTION from '@salesforce/label/c.Core_FirstRun_AllOption';
 import CHOOSE_OPTION from '@salesforce/label/c.Core_FirstRun_ChooseOption';
-import CHOOSE_HELP from '@salesforce/label/c.Core_FirstRun_ChooseHelp';
-import MODULES_NOTE from '@salesforce/label/c.Core_FirstRun_ModulesNote';
 import FINISH from '@salesforce/label/c.Core_ModuleSetup_FinishButton';
 import ADMIN_NEEDED from '@salesforce/label/c.Core_FirstRun_AdminNeeded';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import STANDARD_NAME from '@salesforce/label/c.Core_SuiteChoice_StandardName';
 import NONPROFIT_NAME from '@salesforce/label/c.Core_SuiteChoice_NonprofitName';
-import STANDARD_LINE from '@salesforce/label/c.Core_FirstRun_StandardLine';
-import NONPROFIT_LINE from '@salesforce/label/c.Core_FirstRun_NonprofitLine';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ALL = 'all';
 const CHOOSE = 'choose';
@@ -29,16 +25,24 @@ const CHOOSE = 'choose';
  * Opened by c/firstRunSetup with the state it read.
  */
 export default class FirstRunModal extends LightningModal {
+  helpReady = isHelpLoaded('Core');
+
   /** FirstRunController.getState's answer. */
   @api state;
 
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_FirstRun_Intro');
+    },
     editionQuestion: EDITION_QUESTION,
     featuresQuestion: FEATURES_QUESTION,
-    chooseHelp: CHOOSE_HELP,
-    modulesNote: MODULES_NOTE,
+    get chooseHelp() {
+      return helpText('Core', 'Core_FirstRun_ChooseHelp');
+    },
+    get modulesNote() {
+      return helpText('Core', 'Core_FirstRun_ModulesNote');
+    },
     finish: FINISH,
     adminNeeded: ADMIN_NEEDED,
     close: CLOSE
@@ -48,13 +52,17 @@ export default class FirstRunModal extends LightningModal {
     {
       value: 'Standard',
       label: STANDARD_NAME,
-      description: STANDARD_LINE,
+      get description() {
+        return helpText('Core', 'Core_FirstRun_StandardLine');
+      },
       iconName: 'standard:household'
     },
     {
       value: 'Nonprofit',
       label: NONPROFIT_NAME,
-      description: NONPROFIT_LINE,
+      get description() {
+        return helpText('Core', 'Core_FirstRun_NonprofitLine');
+      },
       iconName: 'standard:currency'
     }
   ];
@@ -71,6 +79,11 @@ export default class FirstRunModal extends LightningModal {
   errorMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     // Setup is not optional for an administrator: neither Escape nor the close button
     // dismisses the window (c/firstRunSetup also opens it with disableClose, which is what
     // makes the platform's close button disabled rather than merely inert). Someone who

@@ -9,6 +9,7 @@ import refreshResults from '@salesforce/apex/LogicModelBuilderController.refresh
 
 import { FUNCTIONS, SOURCES, isComputed, progress, sourceReady } from 'c/logicModelRules';
 import { LABELS, format, messageFrom } from 'c/logicModelText';
+import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const HIGHER = 'Higher';
 const EMPTY_INDICATOR = Object.freeze({
@@ -97,6 +98,16 @@ const EMPTY_SOURCE = Object.freeze({
  * in a `modelchange` event; a refusal goes up as `failure`.
  */
 export default class LogicModelIndicators extends LightningElement {
+  helpReady = isHelpLoaded('LogicModels');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('LogicModels').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api model;
   @api elementId;
   @api canEdit = false;

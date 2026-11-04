@@ -17,28 +17,23 @@ import WhereUsedModal from 'c/whereUsedModal';
 import WHERE_USED from '@salesforce/label/c.Core_WhereUsed_Action';
 
 import TITLE from '@salesforce/label/c.Core_DataDictionary_PageTitle';
-import INTRO from '@salesforce/label/c.Core_DataDictionary_PageIntro';
 import CHOOSE_LABEL from '@salesforce/label/c.Core_AccessCompare_KindsHeading';
 import SOURCE_LABEL from '@salesforce/label/c.Core_Filter_AvailableValues';
 import SELECTED_LABEL from '@salesforce/label/c.Core_DataDictionary_SelectedLabel';
 import INCLUDE_FILL_RATES from '@salesforce/label/c.Core_DataDictionary_IncludeFillRates';
-import INCLUDE_FILL_RATES_HELP from '@salesforce/label/c.Core_DataDictionary_IncludeFillRatesHelp';
 import BUILD from '@salesforce/label/c.Core_DataDictionary_Build';
 import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';
 import DOWNLOADED from '@salesforce/label/c.Core_DataDictionary_Downloaded';
 import PROGRESS from '@salesforce/label/c.Core_DataDictionary_Progress';
 import FILL_PROGRESS from '@salesforce/label/c.Core_DataDictionary_FillProgress';
 import NOT_COUNTED from '@salesforce/label/c.Core_DataDictionary_NotCounted';
-import EMPTY from '@salesforce/label/c.Core_DataDictionary_Empty';
 import INCLUDE_AUTOMATION from '@salesforce/label/c.Core_DataDictionary_IncludeAutomation';
-import INCLUDE_AUTOMATION_HELP from '@salesforce/label/c.Core_DataDictionary_IncludeAutomationHelp';
 import AUTOMATION_TITLE from '@salesforce/label/c.Core_DataDictionary_AutomationTitle';
-import AUTOMATION_NOTE from '@salesforce/label/c.Core_DataDictionary_AutomationNote';
-import AUTOMATION_EMPTY from '@salesforce/label/c.Core_DataDictionary_AutomationEmpty';
 import AUTOMATION_NOT_READ from '@salesforce/label/c.Core_DataDictionary_AutomationNotRead';
 import AUTOMATION_TRUNCATED from '@salesforce/label/c.Core_DataDictionary_AutomationTruncated';
 import DOWNLOAD_AUTOMATION from '@salesforce/label/c.Core_DataDictionary_DownloadAutomation';
 import DOWNLOADED_AUTOMATION from '@salesforce/label/c.Core_DataDictionary_DownloadedAutomation';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 const FILE_BASE = 'Data_Dictionary';
 const AUTOMATION_FILE_BASE = 'Automation_Inventory';
 /** Each row's Where Used action (C-59); the table only, never the CSV. */
@@ -54,22 +49,44 @@ const WHERE_USED_COLUMN = {
  * rows can be downloaded as CSV. Describe only; the controllers check Manage BarnCRM Settings.
  */
 export default class DataDictionary extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_DataDictionary_PageIntro');
+    },
     chooseLabel: CHOOSE_LABEL,
     sourceLabel: SOURCE_LABEL,
     selectedLabel: SELECTED_LABEL,
     includeFillRates: INCLUDE_FILL_RATES,
-    includeFillRatesHelp: INCLUDE_FILL_RATES_HELP,
+    get includeFillRatesHelp() {
+      return helpText('Core', 'Core_DataDictionary_IncludeFillRatesHelp');
+    },
     build: BUILD,
     download: DOWNLOAD,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Core', 'Core_DataDictionary_Empty');
+    },
     includeAutomation: INCLUDE_AUTOMATION,
-    includeAutomationHelp: INCLUDE_AUTOMATION_HELP,
+    get includeAutomationHelp() {
+      return helpText('Core', 'Core_DataDictionary_IncludeAutomationHelp');
+    },
     automationTitle: AUTOMATION_TITLE,
-    automationNote: AUTOMATION_NOTE,
-    automationEmpty: AUTOMATION_EMPTY,
+    get automationNote() {
+      return helpText('Core', 'Core_DataDictionary_AutomationNote');
+    },
+    get automationEmpty() {
+      return helpText('Core', 'Core_DataDictionary_AutomationEmpty');
+    },
     downloadAutomation: DOWNLOAD_AUTOMATION
   };
 

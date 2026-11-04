@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <lightning-card title={labels.TITLE} icon-name="standard:data_streams">
         <lightning-button
             slot="actions"
@@ -112,4 +113,5 @@
             </template>
         </div>
     </lightning-card>
+    </template>
 </template>

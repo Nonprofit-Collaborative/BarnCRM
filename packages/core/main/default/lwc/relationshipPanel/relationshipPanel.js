@@ -10,7 +10,6 @@ import PANEL_TITLE from '@salesforce/label/c.Core_Feature_Relationships_Name';
 import ADD_BUTTON from '@salesforce/label/c.Core_Relationship_AddButton';
 import ADD_FORM_TITLE from '@salesforce/label/c.Core_Relationship_AddFormTitle';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import EMPTY_MESSAGE from '@salesforce/label/c.Core_Relationship_Empty';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Relationship_EmptyHeading';
 import FORMER_BADGE from '@salesforce/label/c.Core_Affiliation_FormerBadge';
 import LOAD_FAILED from '@salesforce/label/c.Core_Relationship_LoadFailed';
@@ -21,6 +20,7 @@ import REMOVE_SUCCESS from '@salesforce/label/c.Core_Relationship_RemoveSuccess'
 import SAVE_FAILED from '@salesforce/label/c.Core_Relationship_SaveFailed';
 import SAVE_SUCCESS from '@salesforce/label/c.Core_Relationship_SaveSuccess';
 import UNNAMED_PERSON from '@salesforce/label/c.Core_Affiliation_UnnamedPerson';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const RELATIONSHIP_OBJECT = 'Relationship__c';
 const FORM_FIELDS = ['Type__c', 'Status__c', 'Start_Date__c', 'End_Date__c', 'Description__c'];
@@ -103,6 +103,16 @@ function toView(node) {
  * relationship should fill in; the query reads both lookups.
  */
 export default class RelationshipPanel extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
   @api objectApiName;
 
@@ -111,7 +121,9 @@ export default class RelationshipPanel extends LightningElement {
     addButton: ADD_BUTTON,
     addFormTitle: ADD_FORM_TITLE,
     cancelButton: CANCEL_BUTTON,
-    emptyMessage: EMPTY_MESSAGE,
+    get emptyMessage() {
+      return helpText('Core', 'Core_Relationship_Empty');
+    },
     emptyHeading: EMPTY_HEADING,
     formerBadge: FORMER_BADGE,
     loading: LOADING,

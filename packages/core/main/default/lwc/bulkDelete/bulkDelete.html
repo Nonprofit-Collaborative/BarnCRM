@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <section class="slds-box slds-is-relative" aria-labelledby="bulk-delete-title" data-id="panel">
         <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
             <lightning-icon icon-name="utility:delete" size="small" class="slds-var-m-right_x-small"></lightning-icon>
@@ -138,4 +139,5 @@
             </template>
         </div>
     </section>
+    </template>
 </template>

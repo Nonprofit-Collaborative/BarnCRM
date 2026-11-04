@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_AiExport_Intro</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: what the section does</shortDescription>
-        <value>Download your data model, and optionally your records, as files an AI tool of your choice can read. BarnCRM never sends anything to an AI service: you choose the tool and upload the files yourself.</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_IncludeRecords</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
@@ -17,28 +9,12 @@
         <value>Include Records</value>
     </labels>
     <labels>
-        <fullName>Core_AiExport_IncludeRecordsHelp</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: include records help text</shortDescription>
-        <value>Adds one CSV file of records for each kind of record through Find's export, up to the Find export row limit each, with the fields below left out or masked as you choose.</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_IncludeChecks</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>AI-Readiness Export: include checks checkbox</shortDescription>
         <value>Include Data Quality Checks</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_IncludeChecksHelp</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: include checks help text</shortDescription>
-        <value>Adds each Data Quality check and its count, such as people without an email address.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_NeedsFind</fullName>
@@ -57,28 +33,12 @@
         <value>Review Sensitive Fields</value>
     </labels>
     <labels>
-        <fullName>Core_AiExport_ReviewFirst</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: hint before review</shortDescription>
-        <value>Press Review Sensitive Fields to read the fields and choose what the pack does with sensitive ones. Download Pack is ready after that.</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_SensitiveHeading</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>AI-Readiness Export: sensitive fields heading</shortDescription>
         <value>Sensitive Fields</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_SensitiveIntro</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: sensitive fields explanation</shortDescription>
-        <value>These fields may identify a person or hold private details. Leave Out drops the field from the record files. Mask replaces each value with a code (the same value gets the same code in this pack). Keep exports it as it is.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_NoSensitive</fullName>

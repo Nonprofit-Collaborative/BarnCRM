@@ -33,22 +33,6 @@
         <value>{0} now has the {1} permission.</value>
     </labels>
     <labels>
-        <fullName>Core_Access_AddOnBulkDelete</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: what BarnCRM Bulk Delete grants</shortDescription>
-        <value>Delete many records at once from a Find query, with undo from the Recycle Bin. Give it together with Find and Export.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnBulkUpdate</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: what BarnCRM Bulk Update grants</shortDescription>
-        <value>Set, clear or copy fields on many records at once from a Find query, with undo. Give it together with Find and Export.</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_AddOnConfirmAddMessage</fullName>
         <categories>Access</categories>
         <language>en_US</language>
@@ -73,44 +57,12 @@
         <value>This permission lets the person remove data. Give it only to someone you trust to do that.</value>
     </labels>
     <labels>
-        <fullName>Core_Access_AddOnDuplicateReview</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: what BarnCRM Duplicate Review grants</shortDescription>
-        <value>Review suggested duplicate people and households. Works only for people with a Sales Cloud or Service Cloud license.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnErasePeople</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: what BarnCRM Erase People grants</shortDescription>
-        <value>Erase a person on their request (the right to be forgotten), which cannot be undone.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnFindAndExport</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: what BarnCRM Find and Export grants</shortDescription>
-        <value>Build, run, save and export Find queries and use Org Optimizer's Data Quality checks, seeing only the records the person can already see.</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_AddOnLabel</fullName>
         <categories>Access</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: label of the extra permission picker</shortDescription>
         <value>Extra permission</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnMetadataAdmin</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: what BarnCRM Metadata Admin grants</shortDescription>
-        <value>Save changes on the Custom metadata page of BarnCRM Settings, which changes the org's configuration. For people who already administer the org.</value>
     </labels>
     <labels>
         <fullName>Core_Access_AddOnPickerPlaceholder</fullName>
@@ -127,14 +79,6 @@
         <protected>true</protected>
         <shortDescription>Access page: extra permission removed; {0} person, {1} permission</shortDescription>
         <value>{0} no longer has the {1} permission.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnsDescription</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: text under the Extra permissions heading</shortDescription>
-        <value>Some features are in no role. Give them to a person here, alongside their role. Only permissions given here are listed: one that comes with a role is not.</value>
     </labels>
     <labels>
         <fullName>Core_Access_AddOnsHeading</fullName>
@@ -193,14 +137,6 @@
         <value>{0} now has the {1} role.</value>
     </labels>
     <labels>
-        <fullName>Core_Access_AutomaticAccessHelp</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: text before the link to the automatic access guide</shortDescription>
-        <value>Add people often? A user access policy, created once in Setup, can give each new user a role for you.</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_AutomaticAccessLink</fullName>
         <categories>Access</categories>
         <language>en_US</language>
@@ -231,14 +167,6 @@
         <protected>true</protected>
         <shortDescription>Access page: heading of the confirmation shown before a role is removed</shortDescription>
         <value>Remove Access</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_CreateUserHelp</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: explains why creating a user happens in Setup</shortDescription>
-        <value>BarnCRM cannot create a person or hand out a Salesforce license. Create the user in Setup first, then come back here and give them a role.</value>
     </labels>
     <labels>
         <fullName>Core_Access_CreateUserLink</fullName>
@@ -327,14 +255,6 @@
         <protected>true</protected>
         <shortDescription>Access page: shown on a role card that nobody holds</shortDescription>
         <value>No one holds this role yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_PageDescription</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: one line explaining what the page is for</shortDescription>
-        <value>Give a colleague access by picking their name and a role, and see who holds each role today.</value>
     </labels>
     <labels>
         <fullName>Core_Access_PageTitle</fullName>

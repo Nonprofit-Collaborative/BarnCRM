@@ -5,12 +5,8 @@ import setArchived from '@salesforce/apex/CustomMetadataManagerController.setArc
 import getOutcome from '@salesforce/apex/CustomMetadataManagerController.getOutcome';
 import MatchSourceModal from 'c/matchSourceModal';
 
-import INTRO from '@salesforce/label/c.Core_MatchLogic_Intro';
-import HELP from '@salesforce/label/c.Core_MatchLogic_Help';
 import HELP_ALT from '@salesforce/label/c.Core_MatchLogic_HelpAlt';
-import RULES_NOTE from '@salesforce/label/c.Core_MatchLogic_RulesNote';
 import READ_ONLY from '@salesforce/label/c.Core_MatchLogic_ReadOnly';
-import SHIPPED_NOTE from '@salesforce/label/c.Core_MatchLogic_ShippedNote';
 import ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
 import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
 import SHIPPED from '@salesforce/label/c.Core_CmdtManager_ShippedHeading';
@@ -44,6 +40,7 @@ import STILL_SAVING from '@salesforce/label/c.Core_CmdtManager_StillSaving';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import LOAD_ERROR from '@salesforce/label/c.Core_CmdtManager_LoadError';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const TYPE_NAME = 'Match_Source__mdt';
 const ADDRESS = 'Address';
@@ -58,8 +55,12 @@ const POLL_ATTEMPTS = 20;
  * needs Manage BarnCRM Metadata, so the page waits on the deployment as that page does.
  */
 export default class MatchSourceManager extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_MatchLogic_Intro');
+    },
     helpAlt: HELP_ALT,
     readOnly: READ_ONLY,
     shipped: SHIPPED,
@@ -82,7 +83,9 @@ export default class MatchSourceManager extends LightningElement {
     checkAgain: CHECK_AGAIN
   };
 
-  helpText = `${HELP} ${RULES_NOTE} ${SHIPPED_NOTE}`;
+  get helpText() {
+    return `${helpText('Core', 'Core_MatchLogic_Help')} ${helpText('Core', 'Core_MatchLogic_RulesNote')} ${helpText('Core', 'Core_MatchLogic_ShippedNote')}`;
+  }
 
   view;
   /** The developer names of the cards whose details are shown. */
@@ -97,6 +100,11 @@ export default class MatchSourceManager extends LightningElement {
   pollTimer;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

@@ -9,6 +9,7 @@ import {
   reportPeriods
 } from 'c/logicModelRules';
 import { LABELS, format, stageLabel } from 'c/logicModelText';
+import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_BASE = 'Logic_Model_Report';
 
@@ -18,6 +19,16 @@ const FILE_BASE = 'Logic_Model_Report';
  * reads the builder's model, so it changes as the model is saved, and stores nothing.
  */
 export default class LogicModelReport extends LightningElement {
+  helpReady = isHelpLoaded('LogicModels');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('LogicModels').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api scopeName;
 
   labels = LABELS;

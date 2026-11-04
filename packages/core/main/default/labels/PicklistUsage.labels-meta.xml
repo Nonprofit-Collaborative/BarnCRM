@@ -25,14 +25,6 @@
         <value>Picklist Value Usage</value>
     </labels>
     <labels>
-        <fullName>Core_PicklistUsage_Intro</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Picklist usage: what the section shows</shortDescription>
-        <value>For each picklist field of this kind of record, how many records hold each value and when the newest of those records was last changed. Use it to find values that are retired but still in your data (Inactive) or that no record holds (Never Used).</value>
-    </labels>
-    <labels>
         <fullName>Core_PicklistUsage_Show</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>
@@ -55,14 +47,6 @@
         <protected>false</protected>
         <shortDescription>Picklist usage: no picklist fields</shortDescription>
         <value>This kind of record has no picklist fields you can read.</value>
-    </labels>
-    <labels>
-        <fullName>Core_PicklistUsage_LastUsedNote</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Picklist usage: what Last Used means</shortDescription>
-        <value>Last Used is the newest Last Modified Date among the records that hold the value (Created Date on a kind of record that has no Last Modified Date). Any later edit to a record moves it, so it is the latest time a record holding the value was touched, not the time the value was chosen. Multi-select picklists are not included.</value>
     </labels>
     <labels>
         <fullName>Core_PicklistUsage_NotChecked</fullName>

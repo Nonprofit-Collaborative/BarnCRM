@@ -25,14 +25,6 @@
         <value>This part of the settings comes with a module that is not installed here yet. Turn that module on and it appears in this section.</value>
     </labels>
     <labels>
-        <fullName>Core_Settings_FromSetupHelp</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: help on a read-only value that Salesforce Setup holds</shortDescription>
-        <value>Read only. This comes from Salesforce Setup and is changed there; BarnCRM shows it and keeps no copy.</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_KeepDefaultButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -225,14 +217,6 @@
         <value>You can read these settings but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
-        <fullName>Core_Settings_RecentChangesEmpty</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: message shown when no setting has been changed yet</shortDescription>
-        <value>No settings have been changed yet. Every change you make is listed here.</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_RecentChangesHeading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -281,14 +265,6 @@
         <value>That setting does not exist in this org, so nothing was saved. Refresh the page and try again.</value>
     </labels>
     <labels>
-        <fullName>Core_Settings_Purpose</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: one-line purpose under the page header</shortDescription>
-        <value>Choose how BarnCRM works for your whole organization.</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_HelpAria</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -311,14 +287,6 @@
         <protected>true</protected>
         <shortDescription>Settings console: title of the banner on a section with unsaved defaults</shortDescription>
         <value>These Are Defaults</value>
-    </labels>
-    <labels>
-        <fullName>Core_Settings_DefaultsBannerText</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: line of the banner on a section with unsaved defaults</shortDescription>
-        <value>Settings marked Default show the value BarnCRM already uses. Keep them all, or change any.</value>
     </labels>
     <labels>
         <fullName>Core_Settings_KeepAllDefaults</fullName>

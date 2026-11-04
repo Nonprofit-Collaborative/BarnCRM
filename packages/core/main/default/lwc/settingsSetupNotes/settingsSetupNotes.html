@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <template for:each={shownNotes} for:item="note">
         <div
             key={note.key}
@@ -68,5 +69,6 @@
                 </div>
             </div>
         </div>
+    </template>
     </template>
 </template>

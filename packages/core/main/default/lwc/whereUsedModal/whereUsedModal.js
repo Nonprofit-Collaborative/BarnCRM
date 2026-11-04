@@ -19,25 +19,30 @@ import BREAKS from '@salesforce/label/c.Core_WhereUsed_Breaks';
 import SHOW_OBJECT from '@salesforce/label/c.Core_WhereUsed_ShowObject';
 import SHOW_FIELD from '@salesforce/label/c.Core_WhereUsed_ShowField';
 import RETIRE_TITLE from '@salesforce/label/c.Core_WhereUsed_RetireTitle';
-import RETIRE_INTRO from '@salesforce/label/c.Core_WhereUsed_RetireIntro';
-import STEP_REFERENCES from '@salesforce/label/c.Core_WhereUsed_StepReferences';
 import STEP_NO_REFERENCES from '@salesforce/label/c.Core_WhereUsed_StepNoReferences';
-import STEP_SALESFORCE from '@salesforce/label/c.Core_WhereUsed_StepSalesforce';
-import STEP_BACKUP from '@salesforce/label/c.Core_WhereUsed_StepBackup';
-import STEP_HIDE from '@salesforce/label/c.Core_WhereUsed_StepHide';
-import STEP_DELETE from '@salesforce/label/c.Core_WhereUsed_StepDelete';
 import STEP_CANNOT_DELETE from '@salesforce/label/c.Core_WhereUsed_StepCannotDelete';
 import OPEN_FIND from '@salesforce/label/c.Core_DataHygiene_OpenInFind';
 import PROGRESS from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const STEP_TEXT = {
-  references: STEP_REFERENCES,
+  get references() {
+    return helpText('Core', 'Core_WhereUsed_StepReferences');
+  },
   noReferences: STEP_NO_REFERENCES,
-  salesforce: STEP_SALESFORCE,
-  backup: STEP_BACKUP,
-  hide: STEP_HIDE,
-  delete: STEP_DELETE,
+  get salesforce() {
+    return helpText('Core', 'Core_WhereUsed_StepSalesforce');
+  },
+  get backup() {
+    return helpText('Core', 'Core_WhereUsed_StepBackup');
+  },
+  get hide() {
+    return helpText('Core', 'Core_WhereUsed_StepHide');
+  },
+  get delete() {
+    return helpText('Core', 'Core_WhereUsed_StepDelete');
+  },
   cannotDelete: STEP_CANNOT_DELETE
 };
 
@@ -49,6 +54,8 @@ const STEP_TEXT = {
  * from any field list a BarnCRM Admin sees (Data Dictionary, Field Utilization, Record Inspector).
  */
 export default class WhereUsedModal extends LightningModal {
+  helpReady = isHelpLoaded('Core');
+
   @api objectName;
   @api objectLabel;
   @api fieldName;
@@ -60,7 +67,9 @@ export default class WhereUsedModal extends LightningModal {
     openSetup: OPEN_SETUP,
     incomplete: INCOMPLETE,
     retireTitle: RETIRE_TITLE,
-    retireIntro: RETIRE_INTRO,
+    get retireIntro() {
+      return helpText('Core', 'Core_WhereUsed_RetireIntro');
+    },
     openFind: OPEN_FIND,
     close: CLOSE
   };
@@ -74,6 +83,11 @@ export default class WhereUsedModal extends LightningModal {
   run = 0;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.wholeObject = !this.fieldName;
     this.load();
   }

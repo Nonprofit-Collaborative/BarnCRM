@@ -126,7 +126,7 @@ public with sharing class CustomMetadataManagerService {
         EditableType relationshipTypes = new EditableType();
         relationshipTypes.type = Relationship_Type__mdt.SObjectType;
         relationshipTypes.label = System.Label.Core_CmdtManager_RelationshipTypes;
-        relationshipTypes.help = System.Label.Core_CmdtManager_RelationshipTypesHelp;
+        relationshipTypes.help = BarnHelp.text('Core', 'Core_CmdtManager_RelationshipTypesHelp');
         relationshipTypes.fields = new List<Schema.SObjectField>{
             Relationship_Type__mdt.Type__c,
             Relationship_Type__mdt.Reciprocal_Type__c,
@@ -147,7 +147,7 @@ public with sharing class CustomMetadataManagerService {
         EditableType matchSources = new EditableType();
         matchSources.type = Match_Source__mdt.SObjectType;
         matchSources.label = System.Label.Core_CmdtManager_MatchSources;
-        matchSources.help = System.Label.Core_CmdtManager_MatchSourcesHelp;
+        matchSources.help = BarnHelp.text('Core', 'Core_CmdtManager_MatchSourcesHelp');
         matchSources.fields = new List<Schema.SObjectField>{
             Match_Source__mdt.Object_Name__c,
             Match_Source__mdt.Value_Field__c,
@@ -174,7 +174,7 @@ public with sharing class CustomMetadataManagerService {
         EditableType mergeRules = new EditableType();
         mergeRules.type = Merge_Rule__mdt.SObjectType;
         mergeRules.label = System.Label.Core_DuplicateManagement_MergeRules;
-        mergeRules.help = System.Label.Core_DuplicateManagement_MergeRulesHelp;
+        mergeRules.help = BarnHelp.text('Core', 'Core_DuplicateManagement_MergeRulesHelp');
         mergeRules.fields = new List<Schema.SObjectField>{
             Merge_Rule__mdt.Field_Name__c,
             Merge_Rule__mdt.Rule__c

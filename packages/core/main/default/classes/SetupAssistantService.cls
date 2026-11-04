@@ -559,7 +559,7 @@ public with sharing class SetupAssistantService {
                     'suite',
                     5,
                     System.Label.Core_SuiteChoice_StepLabel,
-                    System.Label.Core_SuiteChoice_StepDescription
+                    BarnHelp.text('Core', 'Core_SuiteChoice_StepDescription')
                 )
                 .withTarget(SettingSections.GENERAL)
                 .completedBy(null, 'Suite__c')
@@ -569,7 +569,7 @@ public with sharing class SetupAssistantService {
                     'coexistence',
                     10,
                     System.Label.Core_SetupAssistant_Step1Label,
-                    System.Label.Core_SetupAssistant_Step1Description
+                    BarnHelp.text('Core', 'Core_SetupAssistant_Step1Description')
                 )
                 .withTarget(SettingSections.GENERAL)
                 .completedBy(null, 'Coexistence_Mode__c')
@@ -579,7 +579,7 @@ public with sharing class SetupAssistantService {
                     'naming',
                     20,
                     System.Label.Core_SetupAssistant_Step2Label,
-                    System.Label.Core_SetupAssistant_Step2Description
+                    BarnHelp.text('Core', 'Core_SetupAssistant_Step2Description')
                 )
                 // The naming box of People and Households, which the console scrolls to (P1).
                 .withTarget(SettingSections.HOUSEHOLD_NAMES)
@@ -589,7 +589,7 @@ public with sharing class SetupAssistantService {
                 'access',
                 40,
                 System.Label.Core_SetupAssistant_Step4Label,
-                System.Label.Core_SetupAssistant_Step4Description
+                BarnHelp.text('Core', 'Core_SetupAssistant_Step4Description')
             )
             .withTarget(SettingSections.ACCESS);
         access.setupPath = '/lightning/setup/ManageUsers/home';
@@ -598,7 +598,7 @@ public with sharing class SetupAssistantService {
                 'identity',
                 50,
                 System.Label.Core_SetupAssistant_Step5Label,
-                System.Label.Core_SetupAssistant_Step5Description
+                BarnHelp.text('Core', 'Core_SetupAssistant_Step5Description')
             )
             .withTarget(SettingSections.ORGANIZATION)
             .completedBy(null, 'Organization_Legal_Name__c')
@@ -633,7 +633,7 @@ public with sharing class SetupAssistantService {
                     'modules',
                     60,
                     System.Label.Core_SetupAssistant_Step6Label,
-                    System.Label.Core_SetupAssistant_Step6Description
+                    BarnHelp.text('Core', 'Core_SetupAssistant_Step6Description')
                 )
                 .withTarget(SettingSections.MODULES)
         );
@@ -642,7 +642,7 @@ public with sharing class SetupAssistantService {
                     'data',
                     70,
                     System.Label.Core_SetupAssistant_Step7Label,
-                    System.Label.Core_SetupAssistant_Step7Description
+                    BarnHelp.text('Core', 'Core_SetupAssistant_Step7Description')
                 )
                 .withTarget(SettingSections.IMPORTING)
         );
@@ -651,7 +651,7 @@ public with sharing class SetupAssistantService {
                     'verify',
                     80,
                     System.Label.Core_SetupAssistant_Step8Label,
-                    System.Label.Core_SetupAssistant_Step8Description
+                    BarnHelp.text('Core', 'Core_SetupAssistant_Step8Description')
                 )
                 .withTarget(SettingSections.HEALTH)
         );

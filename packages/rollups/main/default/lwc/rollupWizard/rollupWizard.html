@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <lightning-progress-indicator current-step={stepValue} type="path" variant="base">
         <template for:each={steps} for:item="item">
             <lightning-progress-step key={item.value} label={item.label} value={item.value}></lightning-progress-step>
@@ -370,4 +371,5 @@
             </template>
         </div>
     </div>
+    </template>
 </template>

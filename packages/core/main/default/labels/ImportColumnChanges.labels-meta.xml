@@ -25,14 +25,6 @@
         <value>Change values: {0}</value>
     </labels>
     <labels>
-        <fullName>Core_Import_ChangesHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what a column&apos;s changes do</shortDescription>
-        <value>Changes run in order, before the values are matched or saved, and are saved with the template.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_ChangesKind</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -239,14 +231,6 @@
         <protected>false</protected>
         <shortDescription>Import wizard: also match with the org&apos;s duplicate rules</shortDescription>
         <value>Also match with my duplicate rules</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_DuplicateRulesHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what matching with duplicate rules risks</shortDescription>
-        <value>Your org&apos;s looser duplicate rules check rows the rule above misses. Check ticked rows in the dry run.</value>
     </labels>
     <labels>
         <fullName>Core_Import_DuplicateRulesNone</fullName>

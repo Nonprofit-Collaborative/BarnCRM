@@ -175,43 +175,43 @@ public with sharing class DonorSegmentTemplates {
             when 'lapsed' {
                 return new List<String>{
                     System.Label.Giving_Segments_LapsedName,
-                    System.Label.Giving_Segments_LapsedDescription
+                    BarnHelp.text('Giving', 'Giving_Segments_LapsedDescription')
                 };
             }
             when 'new' {
                 return new List<String>{
                     System.Label.Giving_Segments_NewName,
-                    System.Label.Giving_Segments_NewDescription
+                    BarnHelp.text('Giving', 'Giving_Segments_NewDescription')
                 };
             }
             when 'upgraders' {
                 return new List<String>{
                     System.Label.Giving_Segments_UpgradersName,
-                    System.Label.Giving_Segments_UpgradersDescription
+                    BarnHelp.text('Giving', 'Giving_Segments_UpgradersDescription')
                 };
             }
             when 'levelMovers' {
                 return new List<String>{
                     System.Label.Giving_Segments_LevelMoversName,
-                    System.Label.Giving_Segments_LevelMoversDescription
+                    BarnHelp.text('Giving', 'Giving_Segments_LevelMoversDescription')
                 };
             }
             when 'champions' {
                 return new List<String>{
                     System.Label.Giving_Segments_ChampionsName,
-                    System.Label.Giving_Segments_ChampionsDescription
+                    BarnHelp.text('Giving', 'Giving_Segments_ChampionsDescription')
                 };
             }
             when 'slipping' {
                 return new List<String>{
                     System.Label.Giving_Segments_SlippingName,
-                    System.Label.Giving_Segments_SlippingDescription
+                    BarnHelp.text('Giving', 'Giving_Segments_SlippingDescription')
                 };
             }
             when else {
                 return new List<String>{
                     System.Label.Giving_Segments_MajorProspectsName,
-                    System.Label.Giving_Segments_MajorProspectsDescription
+                    BarnHelp.text('Giving', 'Giving_Segments_MajorProspectsDescription')
                 };
             }
         }

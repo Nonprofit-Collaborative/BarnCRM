@@ -4,24 +4,19 @@ import startDelete from '@salesforce/apex/BulkDeleteController.start';
 import getJob from '@salesforce/apex/BulkDeleteController.getJob';
 import previewFile from '@salesforce/apex/BulkDeleteController.previewFile';
 import startFile from '@salesforce/apex/BulkDeleteController.startFile';
-import FILE_INTRO from '@salesforce/label/c.Core_BulkDelete_FileIntro';
 import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
 import { messageFrom, format, downloadCsv } from 'c/findCsv';
 import { startPolling } from 'c/jobPoller';
 import BACKUP from '@salesforce/label/c.Core_BulkDelete_Backup';
-import BACKUP_HELP from '@salesforce/label/c.Core_BulkDelete_BackupHelp';
 import BACKING_UP from '@salesforce/label/c.Core_BulkDelete_BackingUp';
 import BACKUP_DONE from '@salesforce/label/c.Core_BulkDelete_BackupDone';
 
 import TITLE from '@salesforce/label/c.Core_BulkDelete_Title';
-import PANEL_INTRO from '@salesforce/label/c.Core_BulkDelete_PanelIntro';
 import PREVIEW_COUNT from '@salesforce/label/c.Core_BulkDelete_PreviewCount';
-import CASCADES from '@salesforce/label/c.Core_BulkDelete_Cascades';
 import DELETE_BUTTON from '@salesforce/label/c.Core_BulkDelete_DeleteButton';
 import STARTED from '@salesforce/label/c.Core_BulkDelete_Started';
 import PROGRESS from '@salesforce/label/c.Core_BulkDelete_Progress';
 import SUMMARY from '@salesforce/label/c.Core_BulkDelete_Summary';
-import UNDO_FROM_TAB from '@salesforce/label/c.Core_BulkDelete_UndoFromTab';
 import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import CONFIRM from '@salesforce/label/c.Core_BulkUpdate_Confirm';
 import UNDO_UNTIL from '@salesforce/label/c.Core_BulkUpdate_UndoUntil';
@@ -31,6 +26,7 @@ import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import PATH_PREVIEW from '@salesforce/label/c.Core_Import_StepPreview';
 import PATH_CONFIRM from '@salesforce/label/c.Core_BulkUpdate_PathConfirm';
 import PATH_RUN from '@salesforce/label/c.Core_BulkUpdate_PathRun';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const STEPS = [
   { value: 'preview', label: PATH_PREVIEW },
@@ -54,22 +50,38 @@ const STEPS = [
  * delete, every field the person may read, page by page, and saves them as CSV (R-BD8, R-SQ3).
  */
 export default class BulkDelete extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api queryJson;
   /** A delete by file's import batch, in place of a query (R-BD7). */
   @api batchId;
 
   labels = {
     title: TITLE,
-    cascades: CASCADES,
+    get cascades() {
+      return helpText('Core', 'Core_BulkDelete_Cascades');
+    },
     preview: PREVIEW,
     confirm: CONFIRM,
     undoUntil: UNDO_UNTIL,
     failures: FAILURES,
-    undoFromTab: UNDO_FROM_TAB,
+    get undoFromTab() {
+      return helpText('Core', 'Core_BulkDelete_UndoFromTab');
+    },
     close: CLOSE,
     loading: LOADING,
     backup: BACKUP,
-    backupHelp: BACKUP_HELP
+    get backupHelp() {
+      return helpText('Core', 'Core_BulkDelete_BackupHelp');
+    }
   };
 
   preview;
@@ -95,7 +107,9 @@ export default class BulkDelete extends LightningElement {
   }
 
   get intro() {
-    return this.batchId ? FILE_INTRO : PANEL_INTRO;
+    return this.batchId
+      ? helpText('Core', 'Core_BulkDelete_FileIntro')
+      : helpText('Core', 'Core_BulkDelete_PanelIntro');
   }
 
   get hasError() {

@@ -73,28 +73,12 @@
     <value>Pledge Reminders</value>
   </labels>
   <labels>
-    <fullName>Giving_PledgeReminders_Intro</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: introduction</shortDescription>
-    <value>Reminders for pledge installments that are coming due or overdue. Each step fires a set number of days before or after an installment's due date, by email or letter. Only the latest step due for an installment is sent, and every reminder is logged below.</value>
-  </labels>
-  <labels>
     <fullName>Giving_PledgeReminders_Off</fullName>
     <categories>Giving, Pledge Reminders</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Pledge reminders page: notice that reminders are off</shortDescription>
     <value>Pledge reminders are off, so nothing is sent, by hand or by the nightly run. Turn them on in BarnCRM Settings, under Giving, when your steps and templates are ready.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_PledgeReminders_NoSteps</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: no steps yet</shortDescription>
-    <value>No steps yet. Add the first step, for example an email 7 days before the due date and another 14 days after.</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_QueueHeading</fullName>
@@ -255,14 +239,6 @@
     <protected>false</protected>
     <shortDescription>Pledge reminders page: template picker label</shortDescription>
     <value>Email Template</value>
-  </labels>
-  <labels>
-    <fullName>Giving_PledgeReminders_TemplateFieldHelp</fullName>
-    <categories>Giving, Pledge Reminders</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pledge reminders page: template picker help</shortDescription>
-    <value>The email template this step sends. Use merge fields from the pledge installment, such as the due date and the amount, so each donor sees their own.</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_TemplatePlaceholder</fullName>

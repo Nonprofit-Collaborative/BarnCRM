@@ -20,7 +20,6 @@ import TAB_SPLIT from '@salesforce/label/c.Core_HouseholdMerge_SplitButton';
 import SEARCH_LABEL from '@salesforce/label/c.Core_HouseholdMerge_SearchLabel';
 import SEARCH_PLACEHOLDER from '@salesforce/label/c.Core_HouseholdMerge_SearchPlaceholder';
 import NO_RESULTS from '@salesforce/label/c.Core_HouseholdMerge_NoResults';
-import SELECT_OTHER from '@salesforce/label/c.Core_HouseholdMerge_SelectOther';
 import COMPARISON_TABLE from '@salesforce/label/c.Core_HouseholdMerge_ComparisonTable';
 import COLUMN_FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import COLUMN_THIS from '@salesforce/label/c.Core_HouseholdMerge_ColumnThis';
@@ -48,6 +47,7 @@ import SPLIT_CONFIRM_HEADING from '@salesforce/label/c.Core_HouseholdMerge_Split
 import SPLIT_SUCCESS from '@salesforce/label/c.Core_HouseholdMerge_SplitSuccess';
 import RESULT_ACCESSIBLE_NAME from '@salesforce/label/c.Core_HouseholdScreens_ResultAccessibleName';
 import LOADING_COMPARISON from '@salesforce/label/c.Core_HouseholdScreens_LoadingComparison';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const RECORD_TYPE_FIELD = 'Account.RecordType.DeveloperName';
 const HOUSEHOLD = 'Household';
@@ -57,6 +57,16 @@ const NEW_HOUSEHOLD = 'New';
 const EXISTING_HOUSEHOLD = 'Existing';
 
 export default class HouseholdMergeSplit extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
 
   label = {
@@ -66,7 +76,9 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
     searchLabel: SEARCH_LABEL,
     searchPlaceholder: SEARCH_PLACEHOLDER,
     noResults: NO_RESULTS,
-    selectOther: SELECT_OTHER,
+    get selectOther() {
+      return helpText('Core', 'Core_HouseholdMerge_SelectOther');
+    },
     comparisonTable: COMPARISON_TABLE,
     columnField: COLUMN_FIELD,
     columnThis: COLUMN_THIS,

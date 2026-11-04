@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
   <lightning-card title={labels.title} icon-name="custom:custom16">
     <div class="slds-var-p-horizontal_medium slds-is-relative">
       <template lwc:if={showSpinner}>
@@ -170,4 +171,5 @@
       </template>
     </div>
   </lightning-card>
+    </template>
 </template>

@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
   <section data-id="report" class="slds-var-m-vertical_medium">
     <h3 class="slds-text-heading_small slds-var-m-bottom_small">{labels.reportTitle}</h3>
     <p role="status" tabindex="-1" data-id="report-result" class="slds-assistive-text">
@@ -102,4 +103,5 @@
       </p>
     </template>
   </section>
+    </template>
 </template>

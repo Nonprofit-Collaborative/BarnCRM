@@ -89,14 +89,6 @@
         <value>Never used</value>
     </labels>
     <labels>
-        <fullName>Funders_Answers_Empty</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Answer Library with no answers yet</shortDescription>
-        <value>No answers yet. Keep the application answers you reuse on the Grant Answers tab.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Answers_NoMatch</fullName>
         <categories>Funders</categories>
         <language>en_US</language>

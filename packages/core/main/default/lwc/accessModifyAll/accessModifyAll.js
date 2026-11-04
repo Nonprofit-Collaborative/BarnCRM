@@ -2,7 +2,6 @@ import { LightningElement } from 'lwc';
 import getModifyAllReport from '@salesforce/apex/AccessExplorerController.getModifyAllReport';
 import { format, messageFrom, downloadCsv } from 'c/findCsv';
 
-import INTRO from '@salesforce/label/c.Core_AccessModifyAll_Intro';
 import DATA_HEADING from '@salesforce/label/c.Core_AccessModifyAll_DataHeading';
 import OBJECTS_HEADING from '@salesforce/label/c.Core_AccessCompare_KindsHeading';
 import COL_VIEW_ALL_DATA from '@salesforce/label/c.Core_AccessModifyAll_ColViewAllData';
@@ -28,6 +27,7 @@ import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';
 import DOWNLOADED from '@salesforce/label/c.Core_AccessExplorer_Downloaded';
 import YES from '@salesforce/label/c.Core_AccessExplorer_Yes';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_BASE = 'Access_Explorer_Modify_All';
 /** The most rows the server lists (AccessExplorerController). */
@@ -45,8 +45,12 @@ const yes = (value) => (value ? YES : '');
  * Read only; shown inside Access Explorer, which only administrators reach.
  */
 export default class AccessModifyAll extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_AccessModifyAll_Intro');
+    },
     dataHeading: DATA_HEADING,
     objectsHeading: OBJECTS_HEADING,
     nothingToShow: NOTHING_TO_SHOW,
@@ -60,6 +64,11 @@ export default class AccessModifyAll extends LightningElement {
   noticeMessage;
 
   async connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     try {
       this.report = await getModifyAllReport();
     } catch (error) {
