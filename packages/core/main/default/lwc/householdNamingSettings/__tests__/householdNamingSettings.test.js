@@ -69,6 +69,12 @@ function flush() {
     .then(() => {});
 }
 
+/** Types into a pattern box the way a browser reports it. */
+function type(input, value) {
+  input.value = value;
+  input.dispatchEvent(new CustomEvent('input'));
+}
+
 function build() {
   const element = createElement('c-household-naming-settings', { is: HouseholdNamingSettings });
   document.body.appendChild(element);
@@ -125,8 +131,8 @@ describe('c-household-naming-settings', () => {
     await flush();
     preview.mockClear();
 
-    const input = element.shadowRoot.querySelectorAll('lightning-input')[0];
-    input.dispatchEvent(new CustomEvent('change', { detail: { value: '{LastName} Household' } }));
+    const input = element.shadowRoot.querySelectorAll('input[data-pattern]')[0];
+    type(input, '{LastName} Household');
 
     jest.advanceTimersByTime(299);
     expect(preview).not.toHaveBeenCalled();
@@ -242,7 +248,7 @@ describe('c-household-naming-settings', () => {
     const element = build();
     await flush();
 
-    const inputs = element.shadowRoot.querySelectorAll('lightning-input');
+    const inputs = element.shadowRoot.querySelectorAll('input[data-pattern]');
     expect(inputs.length).toBe(3);
     inputs.forEach((input) => expect(input.disabled).toBe(false));
   });
@@ -253,7 +259,7 @@ describe('c-household-naming-settings', () => {
     await flush();
     await flush();
 
-    const inputs = element.shadowRoot.querySelectorAll('lightning-input');
+    const inputs = element.shadowRoot.querySelectorAll('input[data-pattern]');
     expect(getNamingSettings).toHaveBeenCalled();
     expect(inputs[0].value).toBe('{LastName} Household');
     expect(inputs[1].value).toBe('{Salutation} {LastName}');
@@ -270,7 +276,7 @@ describe('c-household-naming-settings', () => {
     await flush();
     await flush();
 
-    const inputs = element.shadowRoot.querySelectorAll('lightning-input');
+    const inputs = element.shadowRoot.querySelectorAll('input[data-pattern]');
     expect(inputs[0].value).toBe('The {LastName} Family');
     expect(inputs[1].value).toBe('{Salutation} {FirstName} {LastName}');
   });
@@ -287,10 +293,10 @@ describe('c-household-naming-settings', () => {
     );
     preview.mockResolvedValueOnce([{ members: 'M', name: 'Newest Household' }]);
 
-    const input = element.shadowRoot.querySelectorAll('lightning-input')[0];
-    input.dispatchEvent(new CustomEvent('change', { detail: { value: 'a' } }));
+    const input = element.shadowRoot.querySelectorAll('input[data-pattern]')[0];
+    type(input, 'a');
     jest.advanceTimersByTime(300);
-    input.dispatchEvent(new CustomEvent('change', { detail: { value: 'ab' } }));
+    type(input, 'ab');
     jest.advanceTimersByTime(300);
     await flush();
     answerSlow([{ members: 'M', name: 'Stale Household' }]);

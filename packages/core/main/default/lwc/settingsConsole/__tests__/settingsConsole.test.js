@@ -547,7 +547,7 @@ describe('c-settings-console', () => {
     );
     await settle();
 
-    const combobox = element.shadowRoot.querySelector('lightning-combobox');
+    const combobox = element.shadowRoot.querySelector('lightning-combobox[data-kind]');
     expect(combobox).not.toBeNull();
     expect(combobox.value).toBe('Standalone');
   });
@@ -610,7 +610,7 @@ describe('c-settings-console', () => {
     openSection('General');
     await settle();
 
-    const combobox = element.shadowRoot.querySelector('lightning-combobox');
+    const combobox = element.shadowRoot.querySelector('lightning-combobox[data-kind]');
     expect(combobox).not.toBeNull();
     expect(combobox.value).toBe('Standalone');
   });
@@ -620,7 +620,7 @@ describe('c-settings-console', () => {
     openSection('General', 'barn__section');
     await settle();
 
-    const combobox = element.shadowRoot.querySelector('lightning-combobox');
+    const combobox = element.shadowRoot.querySelector('lightning-combobox[data-kind]');
     expect(combobox).not.toBeNull();
     expect(combobox.value).toBe('Standalone');
   });
@@ -963,7 +963,7 @@ describe('c-settings-console', () => {
     await settle();
 
     expect(element.shadowRoot.querySelector('lightning-checkbox-group')).toBeNull();
-    const choice = element.shadowRoot.querySelector('lightning-combobox');
+    const choice = element.shadowRoot.querySelector('lightning-combobox[data-kind]');
     expect(choice.value).toBe('Business_Account');
     expect(choice.options.map((option) => option.label)).toEqual([
       'Business Account',
@@ -1120,7 +1120,7 @@ describe('c-settings-console', () => {
 
       const panel = element.shadowRoot.querySelector(
         'h3[data-key="Feature_List"]'
-      ).nextElementSibling;
+      ).parentElement.nextElementSibling;
       panel.dispatchEvent(new CustomEvent('featureturnedon', { detail: { key: 'Addresses' } }));
       await settle();
 
@@ -1355,7 +1355,7 @@ describe('c-settings-console', () => {
 
       const panel = element.shadowRoot.querySelector(
         'h3[data-key="Core_Organization_Address"]'
-      ).nextElementSibling;
+      ).parentElement.nextElementSibling;
       panel.dispatchEvent(new CustomEvent('settingssaved'));
       await settle();
 
@@ -1719,6 +1719,87 @@ describe('c-settings-console', () => {
         groups[0].querySelectorAll('lightning-vertical-navigation-item-icon')
       ).map((item) => item.name);
       expect(dataItems).toEqual(['Import', 'Rollups']);
+    });
+  });
+
+  describe('v1.0 usability (admin-14, admin-18, admin-19)', () => {
+    it('offers a Section box for narrow screens that opens a section and focuses its heading', async () => {
+      const element = build();
+      await settle();
+
+      const picker = element.shadowRoot.querySelector(
+        'lightning-combobox[data-id="section-picker"]'
+      );
+      expect(picker.classList.contains('slds-hide_medium')).toBe(true);
+      expect(picker.options.map((option) => option.value)).toContain('Giving');
+      const focus = jest.spyOn(HTMLElement.prototype, 'focus');
+      try {
+        picker.dispatchEvent(new CustomEvent('change', { detail: { value: 'Giving' } }));
+        await settle();
+        expect(picker.value).toBe('Giving');
+        expect(focus.mock.instances.some((node) => node.tagName === 'H2')).toBe(true);
+      } finally {
+        focus.mockRestore();
+      }
+    });
+
+    it('says the save bar covers this section, and counts changes left in others', async () => {
+      const element = build();
+      await settle();
+
+      const input = element.shadowRoot.querySelector('lightning-input');
+      input.value = 'The {LastName} Household';
+      input.dispatchEvent(new CustomEvent('change'));
+      await settle();
+      expect(saveBar(element).message).toBe('c.Core_Settings_UnsavedOneInSection');
+
+      openSection('Giving');
+      await settle();
+      expect(saveBar(element).message).toBe('c.Core_Settings_UnsavedInSections');
+    });
+
+    it('marks a panel that saves on its own, and opens Org Optimizer at a tool section', async () => {
+      getConsoleModel.mockResolvedValue({
+        canEdit: true,
+        sections: [
+          {
+            name: 'Health',
+            settings: [
+              {
+                key: 'Health_Check',
+                label: 'Health Check',
+                description: null,
+                dataType: 'Component',
+                section: 'Health',
+                component: null,
+                navigationTarget: 'Data_Hygiene',
+                navigationLabel: 'Health Check',
+                helpUrl: null,
+                value: null,
+                checked: false,
+                options: []
+              }
+            ]
+          },
+          ...householdsWithPanelModel().sections
+        ]
+      });
+      const element = build();
+      await settle();
+
+      const button = element.shadowRoot.querySelector('lightning-button[data-target]');
+      expect(button.dataset.target).toBe('Data_Hygiene');
+      expect(button.dataset.section).toBe('healthCheck');
+      expect(button.label).toBe('Open Health Check');
+      expect(element.shadowRoot.querySelector('[data-saves-alone]')).toBeNull();
+
+      openSection('Households');
+      await settle();
+      await settle();
+      const cue = element.shadowRoot.querySelector(
+        '[data-saves-alone="Household_Naming_Preview"]'
+      );
+      expect(cue.textContent).toContain('c.Core_Settings_SavesOnItsOwn');
     });
   });
 });

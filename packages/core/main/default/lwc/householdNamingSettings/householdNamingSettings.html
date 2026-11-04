@@ -1,6 +1,15 @@
 <template>
     <template lwc:if={helpReady}>
     <lightning-card title={label.title} icon-name="standard:household">
+        <!-- The panel saves on its own, so its Save sits in its header (admin-18). -->
+        <lightning-button
+            slot="actions"
+            variant="brand"
+            label={label.save}
+            disabled={isSaveDisabled}
+            onclick={handleSave}
+            class="save-button"
+        ></lightning-button>
         <div class="slds-var-m-around_medium">
             <template if:true={isReadOnly}>
                 <div class="slds-box slds-box_x-small slds-text-color_weak slds-var-m-bottom_small">
@@ -18,24 +27,50 @@
 
             <p class="slds-text-body_small slds-var-m-bottom_small">{label.tokenHelp}</p>
 
-            <lightning-input
-                label={label.nameLabel}
-                value={namePattern}
-                disabled={isReadOnly}
-                onchange={handleNameChange}
-            ></lightning-input>
-            <lightning-input
-                label={label.formalLabel}
-                value={formalPattern}
-                disabled={isReadOnly}
-                onchange={handleFormalChange}
-            ></lightning-input>
-            <lightning-input
-                label={label.informalLabel}
-                value={informalPattern}
-                disabled={isReadOnly}
-                onchange={handleInformalChange}
-            ></lightning-input>
+            <!-- Each part added by a click or a drop is announced here (drag and drop item 4). -->
+            <p class="slds-assistive-text" aria-live="polite" data-id="announcer">{announcement}</p>
+
+            <template for:each={patterns} for:item="pattern">
+                <div key={pattern.key} class="slds-form-element slds-var-m-bottom_small">
+                    <label class="slds-form-element__label" for={pattern.inputId}>{pattern.label}</label>
+                    <div class="slds-form-element__control">
+                        <input
+                            type="text"
+                            class={pattern.inputClass}
+                            id={pattern.inputId}
+                            value={pattern.value}
+                            disabled={isReadOnly}
+                            data-pattern={pattern.key}
+                            oninput={handlePatternInput}
+                        />
+                    </div>
+                    <template lwc:if={canEdit}>
+                        <div
+                            class="slds-var-m-top_xx-small"
+                            role="group"
+                            aria-label={pattern.partsLabel}
+                            data-parts={pattern.key}
+                        >
+                            <template for:each={parts} for:item="part">
+                                <button
+                                    key={part}
+                                    type="button"
+                                    class="slds-button slds-button_neutral part slds-var-m-right_xx-small slds-var-m-bottom_xx-small"
+                                    data-part={part}
+                                    data-pattern={pattern.key}
+                                    onclick={handlePartClick}
+                                    onpointerdown={handlePartPointerDown}
+                                    onpointermove={handlePartPointerMove}
+                                    onpointerup={handlePartPointerUp}
+                                    onpointercancel={handlePartPointerCancel}
+                                >
+                                    {part}
+                                </button>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </template>
 
             <h2 class="slds-text-heading_small slds-var-m-top_medium">{label.previewHeading}</h2>
             <template if:true={hasSamples}>
@@ -69,13 +104,6 @@
             </template>
 
             <div class="slds-var-m-top_medium">
-                <lightning-button
-                    variant="brand"
-                    label={label.save}
-                    disabled={isSaveDisabled}
-                    onclick={handleSave}
-                    class="slds-var-m-right_x-small save-button"
-                ></lightning-button>
                 <lightning-button
                     label={label.recompute}
                     disabled={isReadOnly}

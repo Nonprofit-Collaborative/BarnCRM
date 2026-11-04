@@ -29,8 +29,9 @@ import ACCESS_GRANTED from '@salesforce/label/c.Core_SetupAssistant_AccessGrante
 import CREATE_USER from '@salesforce/label/c.Core_Access_CreateUserLink';
 import AUTOMATIC_ACCESS from '@salesforce/label/c.Core_Access_AutomaticAccessLink';
 import LOAD_SAMPLE from '@salesforce/label/c.Core_SetupAssistant_LoadSampleButton';
-import IMPORT_BUTTON from '@salesforce/label/c.Core_Import_CardTitle';
-import IMPORT_MISSING from '@salesforce/label/c.Core_SetupAssistant_ImportMissingNotice';
+import IMPORT_BUTTON from '@salesforce/label/c.Core_HubHome_RecurringLink';
+import BarnConfirmModal from 'c/barnConfirmModal';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import NAMING_UNAVAILABLE from '@salesforce/label/c.Core_SetupAssistant_NamingUnavailableNotice';
 import SAMPLE_UNAVAILABLE from '@salesforce/label/c.Core_SetupAssistant_SampleDataUnavailableNotice';
 import START_AGAIN from '@salesforce/label/c.Core_SetupAssistant_StartAgainButton';
@@ -99,7 +100,6 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     automaticAccess: AUTOMATIC_ACCESS,
     loadSample: LOAD_SAMPLE,
     importButton: IMPORT_BUTTON,
-    importMissing: IMPORT_MISSING,
     namingUnavailable: NAMING_UNAVAILABLE,
     sampleUnavailable: SAMPLE_UNAVAILABLE,
     startAgain: START_AGAIN,
@@ -317,6 +317,15 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     return Boolean(this.state && this.state.importAvailable);
   }
 
+  get importMissing() {
+    return helpText('Core', 'Core_SetupAssistant_ImportMissing');
+  }
+
+  /** Start Setup Again sits in a reopened, finished checklist, for editors only (admin-16). */
+  get canStartAgain() {
+    return this.canEdit && Boolean(this.state && this.state.isComplete);
+  }
+
   get roleOptions() {
     return ((this.state && this.state.roles) || []).map((role) => ({
       label: role.label || role.developerName || role,
@@ -417,10 +426,23 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     this.finishedHere = false;
   }
 
-  /** Start setup again: the recorded progress is forgotten, the settings are not. */
-  handleReset() {
+  /**
+   * Start setup again: the recorded progress is forgotten, the settings are not. It asks first
+   * (admin-16), since every Done and Skipped mark goes.
+   */
+  async handleReset() {
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: START_AGAIN,
+      message: helpText('Core', 'Core_SetupAssistant_StartAgainConfirm'),
+      confirmLabel: START_AGAIN,
+      cancelLabel: CANCEL
+    });
+    if (!confirmed) {
+      return;
+    }
     this.reopenedHere = true;
-    this.call(resetSetup, {}, true);
+    await this.call(resetSetup, {}, true);
   }
 
   handleReopen() {

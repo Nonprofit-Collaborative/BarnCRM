@@ -24,8 +24,18 @@
             <div class="slds-grid slds-wrap slds-gutters">
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
                     <c-settings-search onsettingselect={handleSearchSelect}></c-settings-search>
+                    <!-- Below medium width the long section list becomes one Section box at the
+                         top (admin-19), so the chosen section is not pushed below the fold. -->
+                    <lightning-combobox
+                        class="slds-hide_medium slds-var-p-top_small"
+                        label={labels.section}
+                        value={selectedSection}
+                        options={sectionOptions}
+                        data-id="section-picker"
+                        onchange={handleSectionPick}
+                    ></lightning-combobox>
                     <lightning-vertical-navigation
-                        class="slds-var-p-top_small"
+                        class="slds-show_medium slds-var-p-top_small"
                         selected-item={selectedSection}
                         onselect={handleSectionSelect}
                         aria-label={labels.sectionsHeading}
@@ -244,13 +254,29 @@
                             </template>
 
                             <template lwc:elseif={row.isComponent}>
-                                <h3
-                                    class={row.headingClass}
-                                    data-key={row.key}
-                                    tabindex="-1"
-                                >
-                                    {row.label}
-                                </h3>
+                                <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                                    <h3
+                                        class={row.headingClass}
+                                        data-key={row.key}
+                                        tabindex="-1"
+                                    >
+                                        {row.label}
+                                    </h3>
+                                    <!-- A panel saves by itself, never through the save bar (admin-18). -->
+                                    <template lwc:if={row.savesOnItsOwn}>
+                                        <span
+                                            class="slds-text-body_small slds-text-color_weak slds-var-m-left_x-small slds-var-m-bottom_x-small"
+                                            data-saves-alone={row.key}
+                                        >
+                                            <lightning-icon
+                                                icon-name="utility:save"
+                                                size="xx-small"
+                                                class="slds-var-m-right_xx-small"
+                                            ></lightning-icon>
+                                            {labels.savesOnItsOwn}
+                                        </span>
+                                    </template>
+                                </div>
                                 <template lwc:if={row.ctor}>
                                     <lwc:component
                                         lwc:is={row.ctor}
@@ -263,6 +289,7 @@
                                     <lightning-button
                                         label={row.openLabel}
                                         data-target={row.navigationTarget}
+                                        data-section={row.navigationSection}
                                         onclick={handleOpenSection}
                                     ></lightning-button>
                                 </template>
@@ -315,6 +342,7 @@
                     <template lwc:if={showSaveBar}>
                         <c-barn-save-bar
                             dirty-count={dirtyCount}
+                            message={saveBarText}
                             saving={saving}
                             onsave={handleSave}
                             ondiscard={handleDiscard}

@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import ModuleManager from 'c/moduleManager';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import getState from '@salesforce/apex/ModuleManagerController.getState';
 import turnOff from '@salesforce/apex/ModuleManagerController.turnOff';
 import turnOn from '@salesforce/apex/ModuleManagerController.turnOn';
@@ -107,6 +108,7 @@ function row(element, name) {
 
 describe('c-module-manager', () => {
   beforeEach(() => {
+    BarnConfirmModal.open.mockResolvedValue(true);
     getState.mockResolvedValue(state());
     turnOff.mockResolvedValue(state('Off'));
     turnOn.mockResolvedValue(state('On'));
@@ -194,6 +196,23 @@ describe('c-module-manager', () => {
     expect(turnOff).toHaveBeenCalledWith({ moduleName: 'Giving' });
     expect(row(element, 'Giving').textContent).toContain('Core_ModuleManager_StatusOff');
     expect(row(element, 'Giving').querySelector('[data-id="turn-on"]')).not.toBeNull();
+  });
+
+  it('asks before turning a module off, and leaves it on when Maria cancels (admin-11)', async () => {
+    BarnConfirmModal.open.mockResolvedValue(false);
+    const element = await build();
+
+    row(element, 'Giving').querySelector('[data-id="turn-off"]').click();
+    await settle();
+
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'c.Core_ModuleManager_TurnOffMessage',
+        confirmLabel: 'c.Core_ModuleManager_TurnOffButton'
+      })
+    );
+    expect(BarnConfirmModal.open.mock.calls[0][0].label).toContain('Core_ModuleManager_TurnOffTitle');
+    expect(turnOff).not.toHaveBeenCalled();
   });
 
   it('turns a module on, then gives its admin access in a second call', async () => {

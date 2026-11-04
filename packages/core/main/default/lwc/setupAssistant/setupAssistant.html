@@ -26,20 +26,14 @@
                 </li>
             </template>
         </ul>
+        <!-- Reopen Setup is the only button here (admin-16); Start Setup Again is in the
+             reopened checklist, behind a confirmation. -->
         <lightning-button
             class="slds-var-m-top_small"
             label={labels.reopen}
             data-id="reopen"
             onclick={handleReopen}
         ></lightning-button>
-        <template lwc:if={canEdit}>
-            <lightning-button
-                class="slds-var-m-top_small slds-var-m-left_x-small"
-                label={labels.startAgain}
-                data-id="start-again"
-                onclick={handleReset}
-            ></lightning-button>
-        </template>
     </template>
 
     <template lwc:if={showPanels}>
@@ -194,7 +188,7 @@
                                     </template>
                                     <template lwc:else>
                                         <p class="slds-text-body_small slds-var-m-top_x-small" data-id="import-missing">
-                                            {labels.importMissing}
+                                            {importMissing}
                                         </p>
                                     </template>
                                     <template lwc:if={showSampleDataPanel}>
@@ -252,6 +246,15 @@
                 </li>
             </template>
         </ol>
+        <template lwc:if={canStartAgain}>
+            <lightning-button
+                class="slds-var-m-top_small"
+                variant="base"
+                label={labels.startAgain}
+                data-id="start-again"
+                onclick={handleReset}
+            ></lightning-button>
+        </template>
     </template>
     </template>
 </template>

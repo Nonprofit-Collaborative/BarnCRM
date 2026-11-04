@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import SetupAssistant from 'c/setupAssistant';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import getState from '@salesforce/apex/SetupAssistantController.getState';
 import completeStep from '@salesforce/apex/SetupAssistantController.completeStep';
 import skipStep from '@salesforce/apex/SetupAssistantController.skipStep';
@@ -571,13 +572,23 @@ describe('c-setup-assistant', () => {
   });
 
   it('starts setup again when Maria asks, and forgets the progress it recorded', async () => {
+    BarnConfirmModal.open.mockResolvedValue(true);
     getState.mockResolvedValue(state({ completedKeys: STEP_DEFINITIONS.map(([key]) => key) }));
     const element = build();
     await settle();
 
+    // Reopen Setup is the completion screen's only button (admin-16).
+    expect(element.shadowRoot.querySelector('[data-id="start-again"]')).toBeNull();
+    click(element, 'reopen');
+    await settle();
+    expect(element.shadowRoot.querySelector('[data-id="start-again"]').variant).toBe('base');
+
     click(element, 'start-again');
     await settle();
 
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'c.Core_SetupAssistant_StartAgainConfirm' })
+    );
     expect(resetSetup).toHaveBeenCalled();
     expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Confirm how BarnCRM fits your existing org'
