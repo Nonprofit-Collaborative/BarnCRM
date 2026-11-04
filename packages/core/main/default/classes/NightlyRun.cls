@@ -18,7 +18,7 @@
  *
  * The state lives in the instance, which the platform serializes between links.
  */
-public with sharing class NightlyRun implements Schedulable, Queueable {
+public with sharing class NightlyRun implements Schedulable {
     @TestVisible
     private static final String PLAN = 'plan';
     @TestVisible
@@ -86,8 +86,19 @@ public with sharing class NightlyRun implements Schedulable, Queueable {
         }
     }
 
-    public void execute(QueueableContext context) {
-        advance();
+    /**
+     * One link of the run as a queueable. A class may not be both Schedulable and Queueable when
+     * enqueued, so the link carries the run.
+     */
+    @TestVisible
+    private class Link implements Queueable {
+        private final NightlyRun run;
+        Link(NightlyRun run) {
+            this.run = run;
+        }
+        public void execute(QueueableContext context) {
+            run.advance();
+        }
     }
 
     // -------------------------------------------------------------------------------------
@@ -324,7 +335,7 @@ public with sharing class NightlyRun implements Schedulable, Queueable {
             return;
         }
         try {
-            System.enqueueJob(this, minutes);
+            System.enqueueJob(new Link(this), minutes);
         } catch (AsyncException refused) {
             // The platform will not chain deeper (Developer Edition): resume from a trigger.
             resumeAt(Datetime.now().addMinutes(Math.max(minutes, 1)));
