@@ -1,5 +1,5 @@
 import { LightningElement, wire } from 'lwc';
-import { CurrentPageReference } from 'lightning/navigation';
+import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
 import BarnConfirmModal from 'c/barnConfirmModal';
@@ -20,7 +20,7 @@ import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
 
 import TITLE from '@salesforce/label/c.Core_Find_Title';
 import TAB_LABEL from '@salesforce/label/c.Core_Format_Pair';
-import OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
+import OBJECT from '@salesforce/label/c.Core_FieldUtilization_ChooseLabel';
 import CHOOSE_OBJECT from '@salesforce/label/c.Core_Find_ChooseObject';
 import COLUMNS from '@salesforce/label/c.Core_Find_Columns';
 import AVAILABLE_FIELDS from '@salesforce/label/c.Core_Find_AvailableFields';
@@ -71,7 +71,6 @@ import EDIT_FAILED from '@salesforce/label/c.Core_Find_EditFailed';
 import HIDDEN_COLUMNS from '@salesforce/label/c.Core_Find_HiddenColumns';
 import GUIDE_URL from '@salesforce/label/c.Core_Find_GuideUrl';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Find_EmptyHeading';
-import EMPTY_MESSAGE from '@salesforce/label/c.Core_Find_EmptyMessage';
 import NO_RESULTS_HEADING from '@salesforce/label/c.Core_Find_NoResultsHeading';
 import SHOW_QUERY from '@salesforce/label/c.Core_Find_ShowQuery';
 import RESULTS from '@salesforce/label/c.Core_Find_Results';
@@ -81,7 +80,11 @@ import EXPORT_MENU from '@salesforce/label/c.Core_Find_ExportMenu';
 import CHANGE_RECORDS from '@salesforce/label/c.Core_Find_ChangeRecords';
 import SAVE_HEADING from '@salesforce/label/c.Core_Find_SaveHeading';
 import MORE_QUERY_ACTIONS from '@salesforce/label/c.Core_Find_MoreQueryActions';
+import MOVE_UP from '@salesforce/label/c.Core_Shared_MoveUp';
+import MOVE_DOWN from '@salesforce/label/c.Core_Shared_MoveDown';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { createDragController, moveItem, targetIndex } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
 
 const XLSX_TYPES = {
   currency: CELL_TYPES.NUMBER,
@@ -160,7 +163,7 @@ const DATETIME_ATTRIBUTES = {
  * it in user mode. The SOQL shown is the server's display rendering. Conditions are the shared
  * filterBuilder; CSV export reads pages in Id order and writes the file in the browser (R-SQ3).
  */
-export default class FindRecords extends LightningElement {
+export default class FindRecords extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
 
   labels = {
@@ -205,7 +208,9 @@ export default class FindRecords extends LightningElement {
     },
     guideUrl: GUIDE_URL,
     emptyHeading: EMPTY_HEADING,
-    emptyMessage: EMPTY_MESSAGE,
+    get emptyMessage() {
+      return helpText('Core', 'Core_Find_EmptyMessage');
+    },
     noResultsHeading: NO_RESULTS_HEADING,
     showQuery: SHOW_QUERY,
     results: RESULTS,
@@ -238,7 +243,6 @@ export default class FindRecords extends LightningElement {
   queryName = '';
   shared = false;
   openQueryId;
-  bulkQueryJson;
   deleteQueryJson;
   busy = false;
   errorMessage;
@@ -328,10 +332,115 @@ export default class FindRecords extends LightningElement {
       });
     }
     this.loadPage();
+    // Put the chosen columns in order: drag a column by its handle (mouse, pen, or touch after a
+    // press and hold) or by keyboard; Move Up and Move Down stay as the plain path.
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'list',
+      messages: dragMessages(),
+      announce: (text) => {
+        this.columnAnnouncement = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      onDrop: ({ itemId, toIndex }) => {
+        const from = this.columns.indexOf(itemId);
+        if (from < 0 || from === toIndex) {
+          return false;
+        }
+        this.moveColumn(from, toIndex);
+        return true;
+      }
+    });
   }
 
   disconnectedCallback() {
     clearTimeout(this.previewTimer);
+    if (this.drag) {
+      this.drag.destroy();
+    }
+  }
+
+  /** The last column move, read out by the aria-live region. */
+  columnAnnouncement = '';
+  /** c/barnDrag's state while a column is dragged: which one, and where it would land. */
+  dragState;
+
+  get dragHelp() {
+    return dragInstructions();
+  }
+
+  /** Two or more chosen columns can be put in order. */
+  get canOrderColumns() {
+    return this.columns.length > 1;
+  }
+
+  get columnViews() {
+    const drag = this.dragState && this.dragState.active ? this.dragState : null;
+    const others = drag ? this.columns.filter((path) => path !== drag.itemId) : [];
+    const before = drag && drag.overIndex >= 0 ? others[drag.overIndex] : null;
+    const after =
+      drag && drag.overIndex >= 0 && drag.overIndex === others.length && others.length
+        ? others[others.length - 1]
+        : null;
+    const last = this.columns.length - 1;
+    return this.columns.map((path, index) => {
+      const label = this.columnLabel(path);
+      return {
+        key: path,
+        label,
+        itemClass: [
+          'slds-grid slds-grid_vertical-align-center slds-var-p-vertical_xx-small slds-border_bottom',
+          drag && drag.itemId === path ? 'column-dragging' : '',
+          before === path ? 'column-over-before' : '',
+          after === path ? 'column-over-after' : ''
+        ]
+          .filter(Boolean)
+          .join(' '),
+        moveUpLabel: `${MOVE_UP}: ${label}`,
+        moveDownLabel: `${MOVE_DOWN}: ${label}`,
+        moveUpDisabled: index === 0,
+        moveDownDisabled: index === last
+      };
+    });
+  }
+
+  moveColumn(from, to) {
+    this.columns = moveItem(this.columns, from, to);
+    this.refreshPreview();
+  }
+
+  handleColumnPointerDown(event) {
+    this.drag.pointerDown(event);
+  }
+
+  handleColumnDragKey(event) {
+    this.drag.keyDown(event);
+  }
+
+  handleColumnMoveUp(event) {
+    this.moveColumnBy(event.currentTarget.dataset.key, -1);
+  }
+
+  handleColumnMoveDown(event) {
+    this.moveColumnBy(event.currentTarget.dataset.key, 1);
+  }
+
+  moveColumnBy(path, delta) {
+    const from = this.columns.indexOf(path);
+    const to = targetIndex(from, delta, this.columns.length);
+    if (to < 0) {
+      return;
+    }
+    this.moveColumn(from, to);
+    this.columnAnnouncement = helpText(
+      'Core',
+      'Core_Drag_Position',
+      this.columnLabel(path),
+      to + 1,
+      this.columns.length
+    );
   }
 
   async loadPage() {
@@ -575,10 +684,6 @@ export default class FindRecords extends LightningElement {
     return Boolean(this.page && this.page.canBulkUpdate);
   }
 
-  get showBulkUpdate() {
-    return Boolean(this.bulkQueryJson);
-  }
-
   get canBulkDelete() {
     return Boolean(this.page && this.page.canBulkDelete);
   }
@@ -647,7 +752,6 @@ export default class FindRecords extends LightningElement {
    * not eleven. The bulk panels close at once: the query they were opened with has changed.
    */
   schedulePreview() {
-    this.bulkQueryJson = undefined;
     this.deleteQueryJson = undefined;
     clearTimeout(this.previewTimer);
     // eslint-disable-next-line @lwc/lwc/no-async-operation
@@ -657,7 +761,6 @@ export default class FindRecords extends LightningElement {
   async refreshPreview() {
     clearTimeout(this.previewTimer);
     // A bulk panel acts on the query it was opened with; an edited query closes it.
-    this.bulkQueryJson = undefined;
     this.deleteQueryJson = undefined;
     if (
       !this.objectApiName ||
@@ -1019,19 +1122,32 @@ export default class FindRecords extends LightningElement {
     });
   }
 
-  /** Opens bulk update over the query as it is now (C-35); the panel keeps that query. */
+  /**
+   * Opens Super Transformer with this query's kind of record and conditions (admin-14): the one
+   * place a bulk change is built. The conditions on related records go too, so the records it
+   * counts are the ones Find found; the columns, sort and row count do not matter to a change.
+   */
   handleBulkUpdate() {
     this.noticeMessage = undefined;
     this.errorMessage = undefined;
     if (!this.checkReady()) {
       return;
     }
+    const document = JSON.parse(this.queryDocument());
+    // `at` makes each hand-over new, so a second one with the same conditions still applies.
+    const start = { object: document.object, at: Date.now() };
+    if (document.filter) {
+      start.filter = document.filter;
+    }
+    if (document.related) {
+      start.related = document.related;
+    }
     this.deleteQueryJson = undefined;
-    this.bulkQueryJson = this.queryDocument();
-  }
-
-  handleBulkClose() {
-    this.bulkQueryJson = undefined;
+    this[NavigationMixin.Navigate]({
+      type: 'standard__navItemPage',
+      attributes: { apiName: this.page.superTransformerTab },
+      state: { [this.page.superTransformerStateKey]: JSON.stringify(start) }
+    });
   }
 
   /** Opens bulk delete over the query as it is now (C-37); one bulk panel is open at a time. */
@@ -1041,7 +1157,6 @@ export default class FindRecords extends LightningElement {
     if (!this.checkReady()) {
       return;
     }
-    this.bulkQueryJson = undefined;
     this.deleteQueryJson = this.queryDocument();
   }
 
@@ -1125,7 +1240,6 @@ export default class FindRecords extends LightningElement {
     this.openQueryId = undefined;
     this.queryName = '';
     this.shared = false;
-    this.bulkQueryJson = undefined;
     this.deleteQueryJson = undefined;
     this.related = [];
     this.children = [];

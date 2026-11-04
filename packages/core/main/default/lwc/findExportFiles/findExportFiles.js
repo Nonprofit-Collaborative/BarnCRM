@@ -3,12 +3,13 @@ import startServerExport from '@salesforce/apex/FindController.startServerExport
 import serverExportStatus from '@salesforce/apex/FindController.serverExportStatus';
 
 import STARTED from '@salesforce/label/c.Core_Find_ExportFilesStarted';
-import PROGRESS from '@salesforce/label/c.Core_Find_ExportFilesProgress';
+import METER_LABEL from '@salesforce/label/c.Core_Find_ExportMenu';
 import DONE from '@salesforce/label/c.Core_Find_ExportFilesDone';
 import FAILED from '@salesforce/label/c.Core_Find_ExportFilesFailed';
 import FILES from '@salesforce/label/c.Core_Find_ExportFilesList';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { messageFrom, format } from 'c/findCsv';
+import { helpText } from 'c/barnHelpText';
 
 const POLL_MILLISECONDS = 5000;
 
@@ -22,7 +23,7 @@ export default class FindExportFiles extends LightningElement {
   errorMessage;
   timer;
 
-  labels = { files: FILES, newTab: NEW_TAB };
+  labels = { files: FILES, newTab: NEW_TAB, meterLabel: METER_LABEL };
 
   disconnectedCallback() {
     this.stopPolling();
@@ -49,21 +50,34 @@ export default class FindExportFiles extends LightningElement {
     return Boolean(this.errorMessage);
   }
 
+  /** Percent of the export written, from the job's parts done of parts total. */
+  get progressValue() {
+    const total = (this.job && this.job.chunksTotal) || 0;
+    return total ? Math.round(((this.job.chunksDone || 0) * 100) / total) : 0;
+  }
+
+  /** The bar shows while the export runs and its size is known; before that, the started notice. */
+  get showMeter() {
+    return Boolean(this.job && !this.job.done && this.job.chunksTotal);
+  }
+
   get statusLine() {
     if (!this.job) {
       return '';
     }
     if (!this.job.done) {
       return this.job.chunksTotal
-        ? format(PROGRESS, this.job.chunksDone || 0, this.job.chunksTotal)
+        ? helpText('Core', 'Core_Find_ExportFilesProgress', this.progressValue)
         : STARTED;
     }
     return this.job.failed ? FAILED : format(DONE, (this.job.files || []).length);
   }
 
-  get statusClass() {
-    const theme = this.job && this.job.failed ? 'slds-theme_warning' : 'slds-theme_info';
-    return `slds-box slds-box_x-small slds-var-m-vertical_small ${theme}`;
+  get noticeVariant() {
+    if (this.job && this.job.failed) {
+      return 'warning';
+    }
+    return this.job && this.job.done ? 'success' : 'info';
   }
 
   get files() {

@@ -7,13 +7,19 @@ import {
   logicProblem,
   operatorsFor,
   parseDocument,
+  renumberLogic,
   serializeDocument,
   toDocumentValue,
   toInputValue,
   valueKindFor,
   valueProblem
 } from 'c/filterDocument';
+import { createDragController, moveItem, targetIndex } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
 
+import MOVE_UP from '@salesforce/label/c.Core_Shared_MoveUp';
+import MOVE_DOWN from '@salesforce/label/c.Core_Shared_MoveDown';
+import CONDITIONS from '@salesforce/label/c.Core_Find_Conditions';
 import ADD_CONDITION from '@salesforce/label/c.Core_Filter_AddCondition';
 import REMOVE_CONDITION from '@salesforce/label/c.Core_Filter_RemoveCondition';
 import CONDITION_LEGEND from '@salesforce/label/c.Core_Filter_ConditionLegend';
@@ -162,6 +168,7 @@ export default class FilterBuilder extends LightningElement {
   @api disabled = false;
 
   labels = {
+    conditionsZone: CONDITIONS,
     addCondition: ADD_CONDITION,
     useLogic: USE_LOGIC,
     logic: LOGIC,
@@ -204,10 +211,91 @@ export default class FilterBuilder extends LightningElement {
     }
     this.connected = true;
     this.rebuild();
+    // Drag a condition by its handle (mouse, pen, or touch after a press and hold) or by
+    // keyboard (Space, the arrow keys, Space again); Move Up and Move Down stay as the plain
+    // path. The condition logic's numbers follow their conditions.
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'list',
+      messages: dragMessages(),
+      announce: (text) => {
+        this.announcement = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      onDrop: ({ itemId, toIndex }) => {
+        const from = this.rows.findIndex((row) => row.key === itemId);
+        if (from < 0 || from === toIndex) {
+          return false;
+        }
+        this.moveCondition(from, toIndex);
+        return true;
+      }
+    });
   }
 
   disconnectedCallback() {
     this.connected = false;
+    if (this.drag) {
+      this.drag.destroy();
+    }
+  }
+
+  /** The last move, read out by the aria-live region. */
+  announcement = '';
+  /** c/barnDrag's state while a condition is dragged: which one, and where it would land. */
+  dragState;
+
+  get dragHelp() {
+    return dragInstructions();
+  }
+
+  /** Two or more conditions can be put in order; a read only builder cannot. */
+  get canReorder() {
+    return this.rows.length > 1 && !this.disabled;
+  }
+
+  /** Moves a condition and renumbers the logic so each number still names the same condition. */
+  moveCondition(from, to) {
+    const logic = this.logicText;
+    this.rows = moveItem(this.rows, from, to);
+    if (logic) {
+      this.logicText = renumberLogic(logic, from, to, this.rows.length);
+    }
+    this.emitChange();
+  }
+
+  handlePointerDown(event) {
+    this.drag.pointerDown(event);
+  }
+
+  handleDragKey(event) {
+    this.drag.keyDown(event);
+  }
+
+  handleMoveUp(event) {
+    this.moveBy(event.currentTarget.dataset.key, -1);
+  }
+
+  handleMoveDown(event) {
+    this.moveBy(event.currentTarget.dataset.key, 1);
+  }
+
+  moveBy(key, delta) {
+    const from = this.rows.findIndex((row) => row.key === key);
+    const to = targetIndex(from, delta, this.rows.length);
+    if (to < 0) {
+      return;
+    }
+    this.moveCondition(from, to);
+    this.announcement = helpText(
+      'Core',
+      'Core_Drag_Position',
+      format(CONDITION_LEGEND, String(to + 1)),
+      to + 1,
+      this.rows.length
+    );
   }
 
   /** Checks every condition and the logic; returns { valid, message }. Shows nothing. */
@@ -264,6 +352,15 @@ export default class FilterBuilder extends LightningElement {
 
   /** One view per condition, with everything the markup needs worked out here. */
   get rowViews() {
+    const drag = this.dragState && this.dragState.active ? this.dragState : null;
+    // While dragging, the condition the dragged one would land before (or after, at the end).
+    const others = drag ? this.rows.filter((row) => row.key !== drag.itemId) : [];
+    const before = drag && drag.overIndex >= 0 ? others[drag.overIndex] : null;
+    const after =
+      drag && drag.overIndex >= 0 && drag.overIndex === others.length && others.length
+        ? others[others.length - 1]
+        : null;
+    const last = this.rows.length - 1;
     return this.rows.map((row, index) => {
       const number = String(index + 1);
       const field = this.leafField(row);
@@ -274,6 +371,18 @@ export default class FilterBuilder extends LightningElement {
         number,
         legend: format(CONDITION_LEGEND, number),
         removeLabel: format(REMOVE_CONDITION, number),
+        rowClass: [
+          'slds-form-element slds-var-m-bottom_small slds-var-p-bottom_x-small slds-border_bottom',
+          drag && drag.itemId === row.key ? 'condition-dragging' : '',
+          before && before.key === row.key ? 'condition-over-before' : '',
+          after && after.key === row.key ? 'condition-over-after' : ''
+        ]
+          .filter(Boolean)
+          .join(' '),
+        moveUpLabel: `${MOVE_UP}: ${format(CONDITION_LEGEND, number)}`,
+        moveDownLabel: `${MOVE_DOWN}: ${format(CONDITION_LEGEND, number)}`,
+        moveUpDisabled: index === 0,
+        moveDownDisabled: index === last,
         segments: this.segmentViews(row),
         operatorOptions: operatorsFor(field, !this.hideRelativeDates).map((operator) => ({
           label: operatorLabel(field, operator),

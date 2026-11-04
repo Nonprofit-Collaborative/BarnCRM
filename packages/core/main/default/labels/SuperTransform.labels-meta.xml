@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Super Transformer: Card heading, step 1</shortDescription>
-        <value>1. Object</value>
+        <value>1. Kind of Record</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_StepRecords</fullName>
@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Super Transformer: Search box label over the object list</shortDescription>
-        <value>Search Objects</value>
+        <value>Search Kinds of Record</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_NoObjects</fullName>
@@ -278,7 +278,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Super Transformer: empty state heading, no object to change</shortDescription>
-        <value>No Objects to Change</value>
+        <value>No Kinds of Record to Change</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_Matching</fullName>

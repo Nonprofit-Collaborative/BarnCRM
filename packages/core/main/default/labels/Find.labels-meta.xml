@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Placeholder of the object picker on the Find page.</shortDescription>
-        <value>Choose an object</value>
+        <value>Choose a kind of record</value>
     </labels>
     <labels>
         <fullName>Core_Find_Columns</fullName>
@@ -166,7 +166,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Sort direction option: ascending.</shortDescription>
-        <value>Ascending</value>
+        <value>A to Z or Oldest First</value>
     </labels>
     <labels>
         <fullName>Core_Find_Descending</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Sort direction option: descending.</shortDescription>
-        <value>Descending</value>
+        <value>Z to A or Newest First</value>
     </labels>
     <labels>
         <fullName>Core_Find_RowsToShow</fullName>
@@ -190,7 +190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Label of the read only SOQL box on the Find page.</shortDescription>
-        <value>Query (read only)</value>
+        <value>Technical query (SOQL), read only</value>
     </labels>
     <labels>
         <fullName>Core_Find_Run</fullName>
@@ -270,7 +270,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Label of the saved query picker.</shortDescription>
-        <value>Saved queries</value>
+        <value>Saved searches</value>
     </labels>
     <labels>
         <fullName>Core_Find_ChooseSaved</fullName>
@@ -278,7 +278,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Placeholder of the saved query picker.</shortDescription>
-        <value>Open a saved query</value>
+        <value>Open a saved search</value>
     </labels>
     <labels>
         <fullName>Core_Find_SharedBy</fullName>
@@ -294,7 +294,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Label of the saved query name input.</shortDescription>
-        <value>Query name</value>
+        <value>Search name</value>
     </labels>
     <labels>
         <fullName>Core_Find_Share</fullName>
@@ -325,8 +325,8 @@
         <categories>Find</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Button that clears Find to start a new query.</shortDescription>
-        <value>New Query</value>
+        <shortDescription>Button that clears Find to start a new search.</shortDescription>
+        <value>New Search</value>
     </labels>
     <labels>
         <fullName>Core_Find_SavedNotice</fullName>
@@ -342,7 +342,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading of the dialog that confirms deleting a saved query.</shortDescription>
-        <value>Delete This Saved Query?</value>
+        <value>Delete This Saved Search?</value>
     </labels>
     <labels>
         <fullName>Core_Find_DeleteConfirmBody</fullName>
@@ -409,14 +409,6 @@
         <value>Choose What to Find</value>
     </labels>
     <labels>
-        <fullName>Core_Find_EmptyMessage</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Empty state line before an object is chosen.</shortDescription>
-        <value>Pick an object, or open a saved query, to start.</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_NoResultsHeading</fullName>
         <categories>Find</categories>
         <language>en_US</language>
@@ -470,7 +462,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading over the save query fields.</shortDescription>
-        <value>Save This Query</value>
+        <value>Save This Search</value>
     </labels>
     <labels>
         <fullName>Core_Find_MoreQueryActions</fullName>
@@ -478,6 +470,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Screen reader name of the menu next to Save (Save As, Delete).</shortDescription>
-        <value>More Query Actions</value>
+        <value>More Search Actions</value>
     </labels>
 </CustomLabels>

@@ -71,7 +71,7 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
    after the Recycle Bin has emptied. Related records deleted with them are not in it.
 5. Type `112` into **Type the number of records to confirm**, then press **Delete 112
    records**.
-6. The progress bar shows the chunks done. It checks every 3 seconds for the first minute and
+6. The progress bar shows the percent done. It checks every 3 seconds for the first minute and
    every 10 seconds after that, and tries once more if a check fails before it shows an
    error. When it finishes, the panel says how many records
    matched, how many were deleted and how many were refused, with the reason for each
