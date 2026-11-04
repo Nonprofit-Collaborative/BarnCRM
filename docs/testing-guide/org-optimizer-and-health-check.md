@@ -119,7 +119,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Org Optimizer**, choose **Storage and Limits**. | **Your Org's Limits** lists **Data Storage (MB)**, **File Storage (MB)**, **API Requests in the Last 24 Hours**, **Background Jobs (Asynchronous Apex) in the Last 24 Hours**, **Single Emails Sent Today**, each as **N of N (N%)** with a bar, and a **Near Limit** badge on any at 80% or more. |
+| 1 | Open **Org Optimizer**, choose **Storage and Limits**. | **Your Org's Limits** lists **Data Storage (MB)**, **File Storage (MB)**, **API Requests in the Last 24 Hours**, **Background Jobs (Asynchronous Apex) in the Last 24 Hours**, **Single Emails Sent Today**, each with a bar and **N of N (N%)** beside it, and an amber **Near Limit** badge with a warning icon under any at 80% or more. |
 | 2 | Read **What BarnCRM Stores**. | **Records BarnCRM keeps for imports, undo and errors. Salesforce counts most records as 2 KB.** and a table with **Kind of Record**, **Records** and **About (MB)**. |
 | 3 | Look for anything that changes data. | Only **Refresh**. Click it: the numbers reload. |
 

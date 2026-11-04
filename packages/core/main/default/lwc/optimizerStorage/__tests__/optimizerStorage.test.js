@@ -61,8 +61,9 @@ describe('c-optimizer-storage', () => {
     const element = await render();
 
     const limit = element.shadowRoot.querySelector('[data-id="DataStorageMB"]');
-    expect(limit.textContent).toContain('150 of 200 (75%)');
-    expect(limit.querySelector('lightning-progress-bar').value).toBe(75);
+    const meter = limit.querySelector('[data-id="meter"]');
+    expect(meter.valueText).toContain('150 of 200 (75%)');
+    expect(meter.value).toBe(75);
     const table = element.shadowRoot.querySelector('[data-id="own"]');
     expect(table.data[0].recordsText).toBe('More than 10000');
     expect(table.data[1].recordsText).toBe('12');

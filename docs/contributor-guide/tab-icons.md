@@ -7,6 +7,8 @@ Rules:
 - Write the motif as `CustomN: Name`, with the name the documented list gives for N.
 - No two BarnCRM tabs share a number, so each tab is recognizable in the navigation, the page header and a console tab.
 - A new tab takes a number no other BarnCRM tab uses. Add it to the table below; `scripts/ci/tests/test_core_navigation.py` fails if it is invalid or reused.
+- Add the tab to the icon registry, `packages/core/main/default/lwc/barnIcons/barnIcons.js`, keyed by the tab's API name, in the same PR. The same test fails when a tab is missing from the registry or listed with another number.
+- Navigation icon equals tab icon: a link or tile that opens a tab, and a card about a tab's object, takes its icon from `iconFor('<tab API name>')`. A card never wears another package's tab icon; the test fails it (cards built earlier are listed in `BORROWED_CARD_ICONS` until the rollout fixes them). See the [Visual Standard](ux-kit.md#visual-standard).
 
 | Package | Tab | Motif |
 |---|---|---|

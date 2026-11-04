@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+.meter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--slds-g-spacing-3, 0.75rem);
+  row-gap: var(--slds-g-spacing-1, 0.25rem);
+}
+
+.meter__label {
+  flex: 1 1 10rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.meter__bar {
+  flex: 2 1 8rem;
+}
+
+.meter__value {
+  flex: none;
+  color: var(--slds-g-color-on-surface-2, #2e2e2e);
+}

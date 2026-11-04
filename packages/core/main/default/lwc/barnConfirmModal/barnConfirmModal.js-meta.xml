@@ -5,5 +5,5 @@
     A yes or no confirmation in a platform modal with the caller's own button labels, used by
     household merge and split, access, household naming, sample data and Health Check fixes.
   </description>
-  <isExposed>false</isExposed>
+  <isExposed>true</isExposed>
 </LightningComponentBundle>

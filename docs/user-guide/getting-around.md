@@ -105,7 +105,8 @@ Open the **BarnCRM** app and choose **Home**. As a staff member you see:
   replaced automatically once you add a member. You see this button only if you can create
   and edit accounts.
 - **Quick Links**: icon tiles for **Households**, **Organizations** and **BarnCRM Settings**,
-  each with a one-line description, opened without going back to the App Launcher.
+  each with a one-line description and the same icon as its tab, opened without going back to
+  the App Launcher.
   **Households** opens the households list even on your first day, before the **Households**
   tab has been added for you.
 - **Files That Arrive Regularly**: shown only if you can read import templates and a file is

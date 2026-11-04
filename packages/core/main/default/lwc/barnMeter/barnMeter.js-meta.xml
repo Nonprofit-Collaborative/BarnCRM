@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    UX kit: a progress bar with its label and value beside it, so color is never the only
+    signal. Exposed (no targets) so every package can nest it.
+  </description>
+  <isExposed>true</isExposed>
+</LightningComponentBundle>

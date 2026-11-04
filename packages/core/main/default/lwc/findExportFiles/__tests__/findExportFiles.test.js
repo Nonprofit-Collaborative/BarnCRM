@@ -99,7 +99,8 @@ describe('c-find-export-files', () => {
     document.body.appendChild(element);
     await element.start('{}', {});
     await flush();
-    expect(one(element, 'error-message').textContent).toBe('This object is not available.');
+    expect(one(element, 'error-message').message).toBe('This object is not available.');
+    expect(one(element, 'error-message').variant).toBe('error');
     expect(one(element, 'export-files-status')).toBeNull();
   });
 });

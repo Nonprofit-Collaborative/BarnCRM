@@ -57,6 +57,72 @@ class CoreTabMotifs(unittest.TestCase):
             seen[number] = name
 
 
+def tab_motifs():
+    """{tab name: (package, motif number)} for every BarnCRM tab."""
+    found = {}
+    for path in glob.glob(os.path.join(ROOT, "packages", "*", "main", "default", "tabs", "*.tab-meta.xml")):
+        package = os.path.relpath(path, os.path.join(ROOT, "packages")).split(os.sep)[0]
+        motif = ET.parse(path).getroot().findtext("m:motif", namespaces=NS) or ""
+        match = re.match(r"Custom(\d+):", motif.strip())
+        if match:
+            found[os.path.basename(path).replace(".tab-meta.xml", "")] = (package, int(match.group(1)))
+    return found
+
+
+# Cards built before the icon rule that still borrow another package's tab motif (vis-modules-6,
+# vis-core-4). The rollout removes each entry as the card takes its own tab's icon; never add one.
+BORROWED_CARD_ICONS = {
+    "grantAnswerLibrary",
+    "grantOutcomes",
+    "grantReport",
+    "donorLevels",
+    "donorSegments",
+    "giftBatchEntry",
+    "giftSoftCredits",
+    "cohortMembers",
+    "programRoster",
+    "serviceDeliveryLog",
+    "servicePlan",
+    "shiftSignups",
+    "volunteerHoursApproval",
+    "volunteerSuggestions",
+}
+
+
+class IconRegistry(unittest.TestCase):
+    """c/barnIcons maps every tab to its own motif, and a card never wears another package's."""
+
+    def test_registry_lists_every_tab_with_its_motif(self):
+        path = os.path.join(CORE, "lwc", "barnIcons", "barnIcons.js")
+        with open(path, encoding="utf-8") as handle:
+            entries = dict(re.findall(r"^\s+(\w+): '(\w+:\w+)',?$", handle.read(), re.M))
+        tabs = tab_motifs()
+        for name, (_, number) in tabs.items():
+            self.assertEqual(entries.get(name), f"custom:custom{number}", f"barnIcons.js: {name}")
+        for name, icon in entries.items():
+            if icon.startswith("custom:"):
+                self.assertIn(name, tabs, f"barnIcons.js: {name} names no tab")
+
+    def test_card_icons_are_their_own_packages_tab_motifs(self):
+        owner = {number: package for package, number in tab_motifs().values()}
+        pattern = os.path.join(ROOT, "packages", "*", "main", "default", "lwc", "*", "*.html")
+        for path in sorted(glob.glob(pattern)):
+            package = os.path.relpath(path, os.path.join(ROOT, "packages")).split(os.sep)[0]
+            component = os.path.basename(os.path.dirname(path))
+            with open(path, encoding="utf-8") as handle:
+                text = handle.read()
+            for tag in re.finditer(r"<(lightning-card|c-barn-page-shell)\b([^>]*)>", text, re.S):
+                icon = re.search(r'icon-name\s*=\s*"custom:custom(\d+)"', tag.group(2))
+                if not icon or component in BORROWED_CARD_ICONS:
+                    continue
+                number = int(icon.group(1))
+                self.assertEqual(
+                    owner.get(number),
+                    package,
+                    f"{component}: Custom{number} is not a {package} tab's icon; use c/barnIcons",
+                )
+
+
 class CoreAppOrder(unittest.TestCase):
     def test_everyday_apps_list_records_then_data_manager(self):
         standard, console = tabs("BarnCRM_Standard"), tabs("BarnCRM")

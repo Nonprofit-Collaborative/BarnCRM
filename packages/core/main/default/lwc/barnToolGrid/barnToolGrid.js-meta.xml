@@ -5,5 +5,5 @@
     UX kit: tool tiles in groups under short headings, three across on desktop and one on a
     phone, for hub pages.
   </description>
-  <isExposed>false</isExposed>
+  <isExposed>true</isExposed>
 </LightningComponentBundle>

@@ -20,20 +20,20 @@
             <ul class="slds-var-m-bottom_medium" data-id="limits">
                 <template for:each={limits} for:item="use">
                     <li key={use.name} class="slds-var-p-bottom_small" data-id={use.name}>
-                        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
-                            <span>{use.label}</span>
-                            <span class="slds-text-body_small">
-                                <template lwc:if={use.nearLimit}>
-                                    <lightning-badge
-                                        class="slds-theme_warning slds-var-m-right_x-small"
-                                        label={labels.nearLimit}
-                                        data-id="near-limit"
-                                    ></lightning-badge>
-                                </template>
-                                {use.usage}
-                            </span>
-                        </div>
-                        <lightning-progress-bar value={use.percent} size="small"></lightning-progress-bar>
+                        <c-barn-meter
+                            label={use.label}
+                            value={use.percent}
+                            value-text={use.usage}
+                            size="small"
+                            data-id="meter"
+                        ></c-barn-meter>
+                        <template lwc:if={use.nearLimit}>
+                            <c-barn-status-badge
+                                status="warning"
+                                label={labels.nearLimit}
+                                data-id="near-limit"
+                            ></c-barn-status-badge>
+                        </template>
                     </li>
                 </template>
             </ul>

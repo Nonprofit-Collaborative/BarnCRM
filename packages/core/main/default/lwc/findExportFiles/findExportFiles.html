@@ -1,8 +1,11 @@
 <template>
     <template lwc:if={hasError}>
-        <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-vertical_small" role="alert">
-            <span data-id="error-message">{errorMessage}</span>
-        </div>
+        <c-barn-notice
+            class="slds-var-m-vertical_small"
+            variant="error"
+            message={errorMessage}
+            data-id="error-message"
+        ></c-barn-notice>
     </template>
     <template lwc:if={job}>
         <div class={statusClass} role="status" aria-live="polite" data-id="export-files-status">
