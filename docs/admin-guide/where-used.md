@@ -58,7 +58,7 @@ BarnCRM Settings permission). Nothing to schedule, and no setting to change. It 
 these field lists are:
 
 - **Org Optimizer, Data Dictionary:** each field row's action menu has **Where Used**.
-- **Org Optimizer, Field Utilization:** each field row's action menu has **Where Used**, handy for a
+- **Org Optimizer, Field Use:** each field row's action menu has **Where Used**, handy for a
   field that is almost never filled in.
 - **Record Inspector:** each field row has a **Where Used** button.
 
@@ -68,7 +68,7 @@ these field lists are:
 2. Choose **Where Used** on its row. A window opens and lists the BarnCRM records that use it, or
    says that none do.
 3. Click a record's name to open the page that edits it, in a new tab.
-4. To see everything that uses the whole kind of record, click **Show Uses of the Whole Object**.
+4. To see everything that uses the whole kind of record, click **Show Uses of the Whole Kind of Record**.
    Click **Show Uses of This Field** to go back.
 5. To retire the field, work down the **Retire a Field** checklist, ticking each step as you go.
 6. Click **Close** when you are done.

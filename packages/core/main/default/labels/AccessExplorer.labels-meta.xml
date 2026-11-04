@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Access explorer: view name</shortDescription>
-        <value>BarnCRM Permission Sets</value>
+        <value>BarnCRM Roles and Extra Permissions</value>
     </labels>
     <labels>
         <fullName>Core_AccessExplorer_LookUp</fullName>

@@ -309,17 +309,34 @@ private class AccessExplorerControllerTest {
                 overview = AccessExplorerController.getOverview();
             }
             AccessExplorerController.Grant admin;
+            AccessExplorerController.Grant bulkUpdate;
             for (AccessExplorerController.Grant row : overview.sets) {
                 Assert.isTrue(
                     row.kind == AccessExplorerController.KIND_GROUP ||
                     row.name.startsWith('BarnCRM_'),
                     'Only BarnCRM sets and roles: ' + row.name
                 );
+                if (row.kind == AccessExplorerController.KIND_GROUP) {
+                    Assert.areEqual(
+                        AccessExplorerController.BARN_ROLE,
+                        row.barnKind,
+                        'A packaged role is named as a BarnCRM role: ' + row.label
+                    );
+                }
                 if (row.name == 'BarnCRM_Admin') {
                     admin = row;
+                } else if (row.name == 'BarnCRM_Bulk_Update') {
+                    bulkUpdate = row;
                 }
             }
             Assert.isNotNull(admin, 'BarnCRM Admin is listed.');
+            Assert.isNull(admin.barnKind, 'A set inside a role is neither a role nor an extra.');
+            Assert.isNotNull(bulkUpdate, 'BarnCRM Bulk Update is listed.');
+            Assert.areEqual(
+                AccessExplorerController.BARN_EXTRA_PERMISSION,
+                bulkUpdate.barnKind,
+                'An add-on is named as an extra permission (admin-9).'
+            );
             Assert.isTrue(admin.activePeople >= 1, 'Maria holds it.');
             Assert.areEqual(
                 AccessExplorerController.KIND_GROUP,

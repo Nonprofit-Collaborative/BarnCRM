@@ -104,6 +104,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 
 | Feature | Page | Package |
 |---|---|---|
+| Installing BarnCRM: supported editions, room needed, install pre-check, production install, upgrades | [installing.md](installing.md) | Every package |
 | C-03 BarnCRM Apps, Navigation and Setup Checklist | [barncrm-app.md](barncrm-app.md) | Core |
 | C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving |
 | C-30 Editions | [editions.md](editions.md) | Core |
@@ -149,16 +150,16 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-35 Super Transformer runs and undo | [bulk-update.md](bulk-update.md) | Core |
 | C-50 Super Transformer (bulk change without a file or a Find query) | [super-transform.md](super-transform.md) | Core |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
-| Org Optimizer (Data Quality, Field Utilization, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | Core |
+| Org Optimizer (Data Quality, Field Use, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | Core |
 | C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | Core |
 | C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |
-| Field utilization | [field-utilization.md](field-utilization.md) | Core |
+| Field Use (formerly Field Utilization) | [field-utilization.md](field-utilization.md) | Core |
 | C-52 Data Dictionary (the Data Dictionary section of Org Optimizer) | [data-dictionary.md](data-dictionary.md) | Core |
 | C-53 and C-53b Access Explorer, with Compare Two and the Modify All Report (a section of Org Optimizer) | [access-explorer.md](access-explorer.md) | Core |
 | C-65 Field Access Manager (give or remove Read and Edit across permission sets, with a preview and undo; Access Explorer's Change Field Access view) | [field-access-manager.md](field-access-manager.md) | Core |
 | C-56 Setup Changes (who changed what in Setup, kept beyond 180 days; the Setup Changes section of Org Optimizer) | [setup-changes.md](setup-changes.md) | Core |
 | C-55 Record Inspector (every readable field of one record, on record pages) | [record-inspector.md](record-inspector.md) | Core |
-| C-59 Where Used and Retire a Field (which BarnCRM setup uses a field or object; from the Data Dictionary, Field Utilization and the Record Inspector) | [where-used.md](where-used.md) | Core |
+| C-59 Where Used and Retire a Field (which BarnCRM setup uses a field or object; from the Data Dictionary, Field Use and the Record Inspector) | [where-used.md](where-used.md) | Core |
 | AIR-01 AI-Readiness Export (the AI-Readiness Export section of Org Optimizer) | [ai-readiness-export.md](ai-readiness-export.md) | Core |
 
 ### Automation, Totals and Health

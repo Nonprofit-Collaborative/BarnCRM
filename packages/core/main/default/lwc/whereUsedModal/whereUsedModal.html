@@ -31,19 +31,31 @@
         </template>
 
         <template lwc:if={errorMessage}>
-            <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
-                {errorMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-bottom_small"
+                data-id="error"
+                variant="error"
+                message={errorMessage}
+            ></c-barn-notice>
         </template>
 
         <template lwc:if={incomplete}>
-            <p class="slds-text-color_error slds-var-m-bottom_small" data-id="incomplete" role="status">
-                {labels.incomplete}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-bottom_small"
+                data-id="incomplete"
+                variant="warning"
+                message={labels.incomplete}
+            ></c-barn-notice>
         </template>
 
         <template lwc:if={showEmpty}>
-            <p class="slds-var-m-bottom_small" data-id="none" role="status">{noneText}</p>
+            <c-barn-empty-state
+                class="slds-var-m-bottom_small"
+                data-id="none"
+                size="compact"
+                illustration="all-clear"
+                heading={noneText}
+            ></c-barn-empty-state>
         </template>
 
         <template lwc:if={hasReferences}>
