@@ -462,12 +462,16 @@ public with sharing class TriggerDispatcher {
                 if (!narrowing) {
                     continue;
                 }
+                String note = BarnHelp.text(
+                    'Core',
+                    'Core_Automation_RecordRefused',
+                    new List<Object>{ String.valueOf(row + 1) }
+                );
+                // A help catalog that cannot be read must not cost the entry its place in the log.
                 refusedMessages.add(
-                    BarnHelp.text(
-                        'Core',
-                        'Core_Automation_RecordRefused',
-                        new List<Object>{ String.valueOf(row + 1) }
-                    )
+                    String.isBlank(note)
+                        ? Label.Core_Automation_UnexpectedError + ' (' + (row + 1) + ')'
+                        : note
                 );
                 refusedIds.add(record.Id);
             }
