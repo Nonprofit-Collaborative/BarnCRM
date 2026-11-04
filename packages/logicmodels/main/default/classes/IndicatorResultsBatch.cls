@@ -73,7 +73,7 @@ public without sharing class IndicatorResultsBatch implements Database.Batchable
             problem = refused.getMessage();
         } catch (Exception failed) {
             ErrorLogger.log(failed, ERROR_CONTEXT);
-            problem = Label.LogicModels_Source_RefreshFailed;
+            problem = BarnHelp.text('LogicModels', 'LogicModels_Source_RefreshFailed');
         }
         return Database.getQueryLocatorWithBinds(
             'SELECT Id FROM Indicator__c WHERE Id = :nothing',

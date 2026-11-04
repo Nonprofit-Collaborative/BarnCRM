@@ -25,8 +25,6 @@ packages/giving/main/default/lwc/giftBatchEntry/giftBatchEntry.html table-stacke
 packages/giving/main/default/lwc/quickGiftEntry/quickGiftEntry.html solid-box 2
 packages/giving/main/default/lwc/receiptActions/receiptActions.html table-stacked 1
 packages/giving/main/default/lwc/receiptSettings/receiptSettings.html table-stacked 1
-packages/logicmodels/main/default/lwc/logicModelIndicators/logicModelIndicators.html table-stacked 1
-packages/logicmodels/main/default/lwc/logicModelReport/logicModelReport.html table-stacked 1
 packages/rollups/main/default/lwc/rollupBuilder/rollupBuilder.html solid-box 2
 packages/rollups/main/default/lwc/rollupDefinitions/rollupDefinitions.html solid-box 3
 packages/rollups/main/default/lwc/rollupDefinitions/rollupDefinitions.html table-stacked 2
