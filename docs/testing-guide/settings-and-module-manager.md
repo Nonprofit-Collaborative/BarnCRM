@@ -127,7 +127,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 3 | Choose **1 hour** and click **Pause All Automation**. | A yellow box: "Automation is paused until" a date and time one hour from now, then "Paused by" your name and "It turns itself back on then.", with a **Resume Automation** button inside it. **How long** and **Pause All Automation** are gone, and there is no other **Resume Automation** button. Every switch stays where it was. |
 | 4 | Open the **Home** tab. | Under **Welcome to BarnCRM**: "BarnCRM automation is paused. Households and greetings are not being updated until it resumes." in a yellow warning box with a **Resume Automation** link. Click the link: **BarnCRM Settings** opens on **Automation**. |
 | 5 | Back in **Automation**, click **Resume Automation** in the yellow box. | The yellow box disappears, and **How long** with **Pause All Automation** is back; no **Resume Automation** button shows. On **Home** the banner is gone after a reload. |
-| 6 | Switch off **Keep Both Sides of Relationships in Step**. | Next to the switch, for a few seconds: "Keep Both Sides of Relationships in Step is off. Turn it back on here." A screen reader announces it. Reload the page: the switch is still off. |
+| 6 | Switch off **Keep both sides of relationships in step**. | Next to the switch, for a few seconds: "Keep both sides of relationships in step is off. Turn it back on here." A screen reader announces it. Reload the page: the switch is still off. |
 | 7 | Switch it back on, open **General** and scroll to **Recent Changes**. | Rows for **Automation Paused Until** record the pause and the resume, and rows record both switch changes, each with your name. |
 
 **Cleanup:** leave every switch on and automation not paused.
@@ -316,20 +316,20 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-17: People and Households, and Boxes on Every Page
 
 **Purpose:** confirm Households and Relationships are one **People and Households** section, every section groups its settings into headed boxes, and links to the old sections land in the right box.
-**Prerequisites:** admin user. The **Household Upkeep** and **Relationships** features on, and **Send Long Job Notifications** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update All Household Names** in step 4.
+**Prerequisites:** admin user. The **Household Upkeep** and **Relationships** features on, and **Send long job notifications** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update All Household Names** in step 4.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings** and read the **Sections** list. | **People and Households** is the first item under **People**, right after **Organization**, then **Addresses**. There is no **Households** and no **Relationships** section. |
-| 2 | Click **People and Households**. | Four bordered boxes, in order, each with a Title Case heading: **People** (**How people belong to a household**, **Create Households Automatically**), **Households** (**Delete Empty Households**, **Keep Households of Deleted People**), **Household Names and Greetings** (the **Preview and Recompute** panel, **Include People Who Have Died in Names**) and **Relationships** (**Keep Both Sides of Relationships in Step**). Every setting shows its value; none is blank. There is no duplicates row and no note about duplicate rules: those are on **Duplicate Matching**. |
-| 3 | Tick **Keep Households of Deleted People**, click **Save**, then untick it and save again. | Both saves say the settings were saved. **General**, **Recent Changes** lists both changes. |
+| 2 | Click **People and Households**. | Four bordered boxes, in order, each with a Title Case heading: **People** (**How people belong to a household**, **Create households automatically**), **Households** (**Delete empty households**, **Keep households of deleted people**), **Household Names and Greetings** (the **Preview and Recompute** panel, **Include people who have died in names**) and **Relationships** (**Keep both sides of relationships in step**). Every setting shows its value; none is blank. There is no duplicates row and no note about duplicate rules: those are on **Duplicate Matching**. |
+| 3 | Tick **Keep households of deleted people**, click **Save**, then untick it and save again. | Both saves say the settings were saved. **General**, **Recent Changes** lists both changes. |
 | 4 | Back on **People and Households**, click **Update All Household Names** and confirm. Wait for the bell, then open its **Household name recompute finished** notification. | The console opens on **People and Households**, scrolled to the **Household Names and Greetings** box, with focus on its heading. |
 | 5 | Open each other section in turn: **General**, **Organization**, **Duplicate Matching**, **Addresses**, **Giving**, **Receipts**, **Rollups**, **Volunteers**, **Error Log**, **Import**, **Modules**, **Automation**, **Access**, **Org Optimizer**, **Integrations**, **Health**. | Every setting is inside a bordered box with a Title Case heading, as listed in the admin guide's "Sections and their boxes". A section with no list, such as **Access**, shows one box headed with its own name. No setting that showed before is missing. |
 | 6 | In the browser address bar, change the end of the console's address to `?c__section=Relationships` and press Enter. | **People and Households** opens, scrolled to the **Relationships** box. |
 | 7 | Do the same with `?c__section=Households`. | **People and Households** opens, scrolled to the **Households** box. |
 | 8 | Open **Setup Assistant** on the Home page, go to **Confirm how households are named** and click **Where This Lives in Settings**. | **People and Households** opens at the **Household Names and Greetings** box. |
 
-**Cleanup:** leave **Keep Households of Deleted People** unticked (the default).
+**Cleanup:** leave **Keep households of deleted people** unticked (the default).
 
 ## T-SET-18: Keep a Shown Default as a Saved Choice
 
@@ -412,7 +412,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | After the upgrade, open **BarnCRM Settings** and find **Send Weekly Admin Summary**. | It is on, and its description starts "On by default." |
+| 1 | After the upgrade, open **BarnCRM Settings** and find **Send weekly admin summary**. | It is on, and its description starts "On by default." |
 | 2 | Choose the **Giving** section and find **Ask Reminders**. | It is on. |
 | 3 | Switch both off and save. Run the upgrade or the source deploy again. | Both stay off. |
 
@@ -431,3 +431,37 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 4 | Open the **Programs Admin** permission set in Setup. | Its description names case notes and service deliveries. |
 
 **Cleanup:** leave the jobs scheduled as they were.
+
+## T-SET-23: Settings Save Cues, Setting Names, Health and Error Log Links, Narrow Screens
+
+**Purpose:** confirm a panel says it saves on its own, the save bar says what it covers, setting names read as form labels, Health and Error Log open Org Optimizer, and a narrow screen gets a Section box.
+**Prerequisites:** admin user; the Org Optimizer and Household Upkeep features on.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **People and Households**. | Setting names are in sentence case (**Create households automatically**, **Delete empty households**); box titles stay in Title Case. The household naming panel shows **Saves on its own** by its heading and its **Save** button at the top of the panel. |
+| 2 | Tick **Delete empty households** (do not save). | The save bar reads "1 unsaved change in this section". |
+| 3 | Open **General** without saving. | The save bar reads "0 unsaved changes in this section and 1 in other sections". Click **Discard**. |
+| 4 | Open **Import**. | **Records per batch in imports** (Importing) and **Records per batch in background jobs** (Find, Super Transformer and Bulk Delete) each read 200; each description says to lower it only after a limit error. The first row's button reads **Open Super Importer**. |
+| 5 | Open **Health** and click **Open Health Check**. | The Org Optimizer tab opens on its **Health Check** section, showing the last run (it does not start a new one). |
+| 6 | Open **BarnCRM Settings**, **Error Log**. | The first box has **Open the Error Log**; below it the digest and retention settings only. Click it: Org Optimizer opens on **Errors**. |
+| 7 | Narrow the browser window to phone width (or open on a phone) and reopen **BarnCRM Settings**. | The section list is replaced by a **Section** box under the search. Choose **Addresses**: the Addresses section shows and focus moves to its first box heading. |
+| 8 | Log in as a user who can open BarnCRM Settings but has neither Find and Export nor Manage BarnCRM Settings, and open **Health**, then **Error Log**. | Health shows the Health Check report itself, with no **Open Health Check** button; Error Log has no **Open the Error Log** button. |
+
+**Cleanup:** none.
+
+## T-SET-24: Module Turn Off Confirmation, First-Run Feature List and Household Name Parts
+
+**Purpose:** confirm Turn Off asks first, the first-run window names the default features, and the name pattern parts insert by click and by drag.
+**Prerequisites:** admin user; an installed module that is on (Giving); for step 3, a fresh org where first-run setup has not run (or read the window in a scratch org).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Modules**, on **BarnCRM Giving** click **Turn Off**, then **Cancel**. | A window titled "Turn Off BarnCRM Giving?" says its automation stops, its records stay, and its tabs stay visible (change a role on the Access page to hide them). After **Cancel** Giving is still on. |
+| 2 | Click **Turn Off** again and confirm with **Turn Off**. Then **Turn On**. | The row reads **Installed and off**, then back on. |
+| 3 | In the first-run window, leave **Turn on all the default core features** chosen. | Each default feature is listed by name with one plain line, and a warning reads "You can turn more features on later in BarnCRM Settings, General. A feature you turn on stays on, so if you are unsure, leave it off for now." |
+| 4 | **People and Households**, household naming panel: click in **Household name pattern** before `Family`, then click the `{FirstName}` part under it. | `{FirstName}` is added at the cursor with spaces around it, the preview updates, and a screen reader hears "Added {FirstName} to Household name pattern." |
+| 5 | Drag the `and` part (on a touch screen, press and hold, then drag) onto the formal greeting box and let go between two words. | `and` is added where you let go and the preview updates. Do not save. |
+| 6 | Reload the page. | The patterns are back to their saved values. |
+
+**Cleanup:** turn Giving back on if step 2 left it off.

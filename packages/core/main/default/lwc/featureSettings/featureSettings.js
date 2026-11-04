@@ -51,7 +51,7 @@ export default class FeatureSettings extends LightningElement {
     this.features = ((model && model.features) || []).map((feature) => ({
       ...feature,
       stateLabel: feature.isOn ? ON : OFF,
-      stateClass: feature.isOn ? 'slds-badge slds-theme_success' : 'slds-badge',
+      stateStatus: feature.isOn ? 'on' : 'off',
       showTurnOn: this.canEdit && !feature.isOn,
       buttonLabel: `${TURN_ON}: ${feature.name}`
     }));

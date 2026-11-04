@@ -1,4 +1,18 @@
 <template>
+    <!-- The panel saves on its own, so its Save sits at its top, by the panel heading the
+         console shows with "Saves on its own" (admin-18), never at the bottom. -->
+    <template lwc:if={canEdit}>
+        <div class="slds-grid slds-grid_align-end slds-var-m-bottom_x-small">
+            <lightning-button
+                variant="brand"
+                label={labels.save}
+                data-id="save-address"
+                disabled={saveDisabled}
+                onclick={handleSave}
+            ></lightning-button>
+        </div>
+    </template>
+
     <template lwc:if={showsCompanyAddress}>
         <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id="company-address">
             {companyAddressText}
@@ -21,16 +35,5 @@
 
     <template lwc:if={message}>
         <p class={messageClass} role="status" aria-live="polite">{message}</p>
-    </template>
-
-    <template lwc:if={canEdit}>
-        <lightning-button
-            class="slds-var-m-top_small"
-            variant="brand"
-            label={labels.save}
-            data-id="save-address"
-            disabled={saveDisabled}
-            onclick={handleSave}
-        ></lightning-button>
     </template>
 </template>

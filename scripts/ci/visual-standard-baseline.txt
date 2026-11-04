@@ -6,14 +6,10 @@ packages/core/main/default/lwc/bulkUpdate/bulkUpdate.html solid-box 2
 packages/core/main/default/lwc/bulkUpdate/bulkUpdate.html table-stacked 1
 packages/core/main/default/lwc/filterBuilder/filterBuilder.html solid-box 2
 packages/core/main/default/lwc/findRecords/findRecords.html solid-box 2
-packages/core/main/default/lwc/householdNamingSettings/householdNamingSettings.html table-stacked 1
 packages/core/main/default/lwc/importResults/importResults.html table-stacked 2
 packages/core/main/default/lwc/importRowCorrection/importRowCorrection.html table-stacked 1
 packages/core/main/default/lwc/importWizard/importWizard.html solid-box 1
 packages/core/main/default/lwc/importWizard/importWizard.html table-stacked 1
-packages/core/main/default/lwc/npspHouseholdAdoption/npspHouseholdAdoption.html table-stacked 1
-packages/core/main/default/lwc/sampleDataManager/sampleDataManager.html solid-box 1
-packages/core/main/default/lwc/setupStepModules/setupStepModules.js badge-inverse 1
 packages/core/main/default/lwc/superTransform/superTransform.html solid-box 1
 packages/core/main/default/lwc/superTransform/superTransform.html table-stacked 1
 packages/funders/main/default/lwc/fundersBoard/fundersBoard.html table-stacked 4

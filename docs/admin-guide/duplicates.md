@@ -95,12 +95,12 @@ the **Duplicate Matching** row, whose **Open This Page** button opens the tab. T
 checks every person and household with your active duplicate rules, your active match sources
 and similar names. Two settings sit beside the row, each with a default you can change:
 
-- **Fuzzy Name Match** (default 90): how alike two names must be, in percent, before the scan
+- **Fuzzy name match** (default 90): how alike two names must be, in percent, before the scan
   pairs two people by name. From 80 to 100; 100 pairs only names that are the same once case,
   spacing and punctuation are ignored.
-- **Merge Rule For Other Fields** (default **Not blank**): which value a field keeps when two
+- **Merge rule for other fields** (default **Not blank**): which value a field keeps when two
   people are merged and the field has no [merge rule](#merge-rules) of its own.
-- **Exact Match For Auto-Merge** (default **Name and email**): what two people must share
+- **Exact match for auto-merge** (default **Name and email**): what two people must share
   exactly before [auto-merge](#auto-merge) takes them: **Name and email**, **Name and phone**,
   **Name, email and phone** or **Name and birthdate**.
 
@@ -108,7 +108,7 @@ and similar names. Two settings sit beside the row, each with a default you can 
 
 In each pass over people, the scan scores the names of people who share a last name or an email,
 from 0 to 100 percent alike (case, spacing and punctuation do not count). Two people at or above
-**Fuzzy Name Match** are listed when they also:
+**Fuzzy name match** are listed when they also:
 
 - share an email or a phone number (digits only, so "(555) 010-2000" and "555.010.2000" are
   the same), or
@@ -137,7 +137,7 @@ Except under **Keep master**, a blank never replaces a value. Add rules in **Bar
 **Custom Metadata**, **Merge Rules**: **Field Name** is the field's API name (for example
 `Email` or `Title`), or `MailingAddress` or `OtherAddress` to take a whole address from one
 person, so a street never lands with the other person's city. A field with no rule follows
-**Merge Rule For Other Fields**. The household and the record owner always stay the kept
+**Merge rule for other fields**. The household and the record owner always stay the kept
 person's. Saving a rule needs BarnCRM Metadata Admin.
 
 ### Auto-Merge
@@ -147,7 +147,7 @@ go, so you stop merging them one pair at a time. It needs Manage BarnCRM Setting
 Admin) and BarnCRM Duplicate Review, like the review list it works from.
 
 1. Click **Preview Exact Matches**. BarnCRM reads the people pairs waiting in the review list
-   and keeps only those that meet **Exact Match For Auto-Merge**: the same first and last name
+   and keeps only those that meet **Exact match for auto-merge**: the same first and last name
    (ignoring case, spacing and punctuation) and the same email, phone (digits) or birthdate,
    filled in on both. Households are never auto-merged.
 2. Read the list. Each row shows the person kept, the person merged away, and the values the

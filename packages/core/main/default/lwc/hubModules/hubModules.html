@@ -9,7 +9,17 @@
                     <template for:each={rows} for:item="row">
                         <li key={row.name} class="slds-item" data-id="module-row">
                             <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-wrap">
-                                <span class="slds-text-title_bold" data-id="module-name">{row.displayName}</span>
+                                <span class="slds-grid slds-grid_vertical-align-center">
+                                    <lightning-avatar
+                                        class="slds-var-m-right_x-small"
+                                        size="small"
+                                        src={row.logoUrl}
+                                        fallback-icon-name="standard:apps"
+                                        alternative-text=""
+                                        data-id="module-logo"
+                                    ></lightning-avatar>
+                                    <span class="slds-text-title_bold" data-id="module-name">{row.displayName}</span>
+                                </span>
                                 <span class="slds-grid slds-grid_vertical-align-center">
                                     <c-barn-status-badge
                                         status={row.status}

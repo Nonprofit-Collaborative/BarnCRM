@@ -76,7 +76,7 @@ describe('c-first-run-setup', () => {
     const element = await build();
 
     expect(FirstRunModal.open).not.toHaveBeenCalled();
-    expect(element.shadowRoot.querySelector('[data-id="load-error"]').textContent).toBe('nope');
+    expect(element.shadowRoot.querySelector('[data-id="load-error"]').message).toBe('nope');
   });
 
   it('opens the setup window with the state it read, closable only by finishing', async () => {
