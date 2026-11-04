@@ -29,7 +29,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Hub home: Quick Links tile for Giving's Quick Gift Entry tab, shown only when Giving is installed</shortDescription>
+        <shortDescription>Hub home: Quick Links tile for the Giving Quick Gift Entry tab</shortDescription>
         <value>Quick Gift Entry</value>
     </labels>
     <labels>
