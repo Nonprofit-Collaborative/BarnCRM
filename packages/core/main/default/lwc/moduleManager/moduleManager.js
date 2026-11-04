@@ -130,10 +130,7 @@ export default class ModuleManager extends LightningElement {
         ...module,
         displayName: module.label || module.name,
         statusText: STATUS_TEXT[module.status] || module.status,
-        badgeClass:
-          module.status === 'On'
-            ? 'slds-badge slds-theme_success slds-var-m-left_x-small'
-            : 'slds-badge slds-var-m-left_x-small',
+        badgeStatus: module.status === 'On' ? 'on' : 'off',
         isOn: module.canSwitch && module.status === 'On',
         isOff: module.canSwitch && module.status === 'Off',
         setupPending: module.status !== 'NotInstalled' && module.setupPending === true,

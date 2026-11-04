@@ -16,9 +16,7 @@
             </template>
 
             <template lwc:if={showReadOnlyNotice}>
-                <div class="slds-box slds-theme_shade slds-var-m-bottom_small" role="status">
-                    {labels.readOnly}
-                </div>
+                <c-barn-notice class="slds-var-m-bottom_small" message={labels.readOnly} data-id="read-only"></c-barn-notice>
             </template>
 
             <div class="slds-grid slds-wrap slds-gutters">

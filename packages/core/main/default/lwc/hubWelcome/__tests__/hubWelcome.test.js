@@ -91,9 +91,9 @@ describe('c-hub-welcome', () => {
     getHomeModel.emit(model());
     await settle();
 
-    expect(element.shadowRoot.querySelector('h1').textContent).toContain(
-      'Core_HubHome_WelcomeHeading'
-    );
+    const card = element.shadowRoot.querySelector('[data-id="welcome-card"]');
+    expect(card.title).toContain('Core_HubHome_WelcomeHeading');
+    expect(card.iconName).toBe('custom:custom1');
     expect(message(element)).toContain('Core_HubHome_WelcomeMessage');
     expect(message(element)).not.toContain('Ready');
   });
@@ -120,8 +120,8 @@ describe('c-hub-welcome', () => {
     await settle();
 
     const banner = element.shadowRoot.querySelector('[data-id="paused-banner"]');
-    expect(banner.textContent).toContain('Core_HubHome_AutomationPausedBanner');
-    expect(banner.classList).toContain('slds-alert_warning');
+    expect(banner.message).toContain('Core_HubHome_AutomationPausedBanner');
+    expect(banner.variant).toBe('warning');
   });
 
   it('offers administrators Resume Automation, opening the Automation section', async () => {
@@ -153,7 +153,7 @@ describe('c-hub-welcome', () => {
     getHomeModel.error();
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="load-error"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="load-error"]').message).toContain(
       'Core_HubHome_LoadErrorMessage'
     );
   });
@@ -200,7 +200,7 @@ describe('c-hub-welcome', () => {
     await settle();
 
     expect(mockNavigate).not.toHaveBeenCalled();
-    expect(element.shadowRoot.querySelector('[data-id="create-error"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="create-error"]').message).toContain(
       'You need permission'
     );
     expect(button(element).disabled).toBe(false);
@@ -215,7 +215,7 @@ describe('c-hub-welcome', () => {
     button(element).click();
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="create-error"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="create-error"]').message).toContain(
       'Core_HubHomeActions_NewHouseholdFailed'
     );
   });

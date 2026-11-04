@@ -1,7 +1,7 @@
 <template>
     <template lwc:if={helpReady}>
     <template lwc:if={errorMessage}>
-        <p class="slds-text-color_error slds-var-m-bottom_small" role="alert">{errorMessage}</p>
+        <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
     </template>
 
     <template lwc:if={isReadOnly}>
@@ -21,7 +21,7 @@
         <ul class="slds-has-dividers_bottom-space">
             <template for:each={stepRows} for:item="step">
                 <li key={step.key} class="slds-item slds-var-p-vertical_xx-small" data-id="summary-row">
-                    <lightning-badge class={step.badgeClass} label={step.badge}></lightning-badge>
+                    <c-barn-status-badge status={step.badgeStatus} label={step.badge}></c-barn-status-badge>
                     <span class="slds-var-m-left_x-small">{step.position}. {step.label}</span>
                 </li>
             </template>
@@ -69,11 +69,11 @@
                                             {step.position}. {step.label}
                                         </button>
                                     </h3>
-                                    <lightning-badge
-                                        class={step.badgeClass}
+                                    <c-barn-status-badge
+                                        status={step.badgeStatus}
                                         label={step.badge}
                                         data-id="badge"
-                                    ></lightning-badge>
+                                    ></c-barn-status-badge>
                                 </div>
                             </div>
                         </div>

@@ -314,9 +314,10 @@ describe('c-household-naming-settings', () => {
     await flush();
     await flush();
 
-    const alert = element.shadowRoot.querySelector('[role="alert"]');
+    const alert = element.shadowRoot.querySelector('[data-id="error"]');
     expect(alert).not.toBeNull();
-    expect(alert.textContent).toContain('Naming is not set up yet');
+    expect(alert.variant).toBe('error');
+    expect(alert.message).toContain('Naming is not set up yet');
   });
 
   describe('pattern parts (drag and drop item 4)', () => {

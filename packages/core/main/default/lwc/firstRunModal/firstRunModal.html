@@ -62,9 +62,12 @@
             <p role="status" data-id="admin-needed">{labels.adminNeeded}</p>
         </template>
         <template lwc:if={errorMessage}>
-            <p class="slds-text-color_error slds-var-m-top_small" role="alert" data-id="error">
-                {errorMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-top_small"
+                variant="error"
+                message={errorMessage}
+                data-id="error"
+            ></c-barn-notice>
         </template>
     </lightning-modal-body>
     <template lwc:if={canFinish}>

@@ -511,8 +511,8 @@ describe('c-settings-console', () => {
     const element = build();
     await settle();
 
-    const notice = element.shadowRoot.querySelector('div[role="status"]');
-    expect(notice.textContent).toContain('Core_Settings_ReadOnlyNotice');
+    const notice = element.shadowRoot.querySelector('[data-id="read-only"]');
+    expect(notice.message).toContain('Core_Settings_ReadOnlyNotice');
     expect(element.shadowRoot.querySelectorAll('lightning-button')).toHaveLength(0);
     element.shadowRoot.querySelectorAll('lightning-input').forEach((input) => {
       expect(input.disabled).toBe(true);

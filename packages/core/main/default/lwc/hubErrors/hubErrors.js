@@ -8,6 +8,7 @@ import INSTALL_PROBLEMS from '@salesforce/label/c.Core_HubHome_InstallProblems';
 import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
 import WARNING from '@salesforce/label/c.Core_HubHome_WarningAltText';
 import ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
+import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
 
 /**
  * Errors to review on the BarnCRM home page: how many new errors are waiting (capped, so a
@@ -15,7 +16,7 @@ import ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
  * itself logged any problems.
  */
 export default class HubErrors extends NavigationMixin(LightningElement) {
-  labels = { heading: HEADING, link: LINK, warning: WARNING, allClear: ALL_CLEAR };
+  labels = { heading: HEADING, link: LINK, warning: WARNING, errors: ERRORS };
   loaded = false;
 
   newErrorCount = 0;
@@ -43,6 +44,11 @@ export default class HubErrors extends NavigationMixin(LightningElement) {
   /** Nothing new to review, once the count has arrived. */
   get allClear() {
     return this.loaded && this.newErrorCount === 0;
+  }
+
+  /** The tile's All Clear badge, shown only at none. */
+  get allClearLabel() {
+    return this.allClear ? ALL_CLEAR : undefined;
   }
 
   get errorCountText() {

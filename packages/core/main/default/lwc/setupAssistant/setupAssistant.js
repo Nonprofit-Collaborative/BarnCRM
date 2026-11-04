@@ -253,15 +253,15 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     return this.steps.map((step, index) => {
       const isActive = index === this.activeIndex;
       let badge = TODO_BADGE;
-      let badgeClass = '';
+      let badgeStatus = 'neutral';
       let ringVariant = 'base';
       if (step.completed) {
         badge = DONE_BADGE;
-        badgeClass = 'slds-theme_success';
+        badgeStatus = 'done';
         ringVariant = 'base-autocomplete';
       } else if (step.skipped) {
         badge = SKIPPED_BADGE;
-        badgeClass = 'slds-theme_warning';
+        badgeStatus = 'skipped';
         ringVariant = 'warning';
       }
       return {
@@ -270,7 +270,7 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
         isActive,
         expanded: isActive ? 'true' : 'false',
         badge,
-        badgeClass,
+        badgeStatus,
         ringVariant,
         ringValue: step.completed ? 100 : 0
       };

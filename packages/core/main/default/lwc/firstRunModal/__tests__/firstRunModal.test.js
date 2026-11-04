@@ -173,6 +173,6 @@ describe('c-first-run-modal', () => {
 
     expect(closed).not.toHaveBeenCalled();
     expect(element.disableClose).toBe(true);
-    expect(byId(element, 'error').textContent.trim()).toBe('Setup could not be finished.');
+    expect(byId(element, 'error').message).toBe('Setup could not be finished.');
   });
 });

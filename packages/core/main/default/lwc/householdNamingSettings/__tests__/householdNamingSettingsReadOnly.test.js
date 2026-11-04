@@ -65,6 +65,8 @@ describe('c-household-naming-settings without the settings permission', () => {
     inputs.forEach((input) => expect(input.disabled).toBe(true));
     expect(element.shadowRoot.querySelector('button[data-part]')).toBeNull();
     expect(element.shadowRoot.querySelector('.save-button').disabled).toBe(true);
-    expect(element.shadowRoot.textContent).toContain('c.Core_HouseholdNamingSettings_ReadOnly');
+    expect(element.shadowRoot.querySelector('[data-id="read-only"]').message).toBe(
+      'c.Core_HouseholdNamingSettings_ReadOnly'
+    );
   });
 });

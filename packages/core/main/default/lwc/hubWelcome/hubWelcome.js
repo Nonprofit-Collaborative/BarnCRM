@@ -11,6 +11,7 @@ import NEW_HOUSEHOLD from '@salesforce/label/c.Core_HubHomeActions_NewHousehold'
 import NEW_HOUSEHOLD_FAILED from '@salesforce/label/c.Core_HubHomeActions_NewHouseholdFailed';
 import RESUME from '@salesforce/label/c.Core_AutomationControl_ResumeButton';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
+import { iconFor } from 'c/barnIcons';
 
 const AUTOMATION_SECTION = 'Automation';
 
@@ -29,6 +30,9 @@ export default class HubWelcome extends NavigationMixin(LightningElement) {
     newHousehold: NEW_HOUSEHOLD,
     resume: RESUME
   };
+
+  // The Home tab's own icon, so the card matches the tab (vis-core-11).
+  iconName = iconFor('BarnCRM_Home');
 
   model;
   errorMessage;

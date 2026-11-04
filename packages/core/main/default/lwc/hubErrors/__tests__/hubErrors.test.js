@@ -56,7 +56,7 @@ describe('c-hub-errors', () => {
     getHomeModel.emit({ newErrorCount: 3 });
     await settle();
 
-    expect(byId(element, 'error-count').textContent).toBe('3');
+    expect(byId(element, 'error-count').value).toBe('3');
     byId(element, 'open-error-log').click();
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__objectPage',
@@ -70,7 +70,7 @@ describe('c-hub-errors', () => {
     getHomeModel.emit({ newErrorCount: 999, newErrorCountCapped: true });
     await settle();
 
-    expect(byId(element, 'error-count').textContent).toBe('999+');
+    expect(byId(element, 'error-count').value).toBe('999+');
   });
 
   it('says the tile could not load rather than showing zero', async () => {
@@ -79,21 +79,22 @@ describe('c-hub-errors', () => {
     await settle();
 
     expect(byId(element, 'error-count')).toBeNull();
-    expect(byId(element, 'load-error').textContent).toContain('Core_HubHome_LoadErrorMessage');
+    expect(byId(element, 'load-error').message).toContain('Core_HubHome_LoadErrorMessage');
   });
 
   it('badges All Clear at no new errors, and only once the count has arrived', async () => {
     const element = build();
     await settle();
-    expect(byId(element, 'all-clear')).toBeNull();
+    expect(byId(element, 'error-count').badgeLabel).toBeUndefined();
 
     getHomeModel.emit({ newErrorCount: 0 });
     await settle();
-    expect(byId(element, 'all-clear').label).toBe('c.Core_OrgOptimizer_BadgeAllClear');
+    expect(byId(element, 'error-count').badgeLabel).toBe('c.Core_OrgOptimizer_BadgeAllClear');
+    expect(byId(element, 'error-count').badgeVariant).toBe('success');
 
     getHomeModel.emit({ newErrorCount: 4 });
     await settle();
-    expect(byId(element, 'all-clear')).toBeNull();
+    expect(byId(element, 'error-count').badgeLabel).toBeUndefined();
   });
 
   it('says setup completed when the install logged nothing', async () => {
@@ -103,7 +104,7 @@ describe('c-hub-errors', () => {
 
     const status = byId(element, 'install-status');
     expect(status.textContent).toContain('Core_HubHome_InstallCompleted');
-    expect(status.querySelector('lightning-icon')).toBeNull();
+    expect(status.tagName).toBe('P');
   });
 
   it('says setup had problems when the install logged some, and not by color alone', async () => {
@@ -112,10 +113,9 @@ describe('c-hub-errors', () => {
     await settle();
 
     const status = byId(element, 'install-status');
-    expect(status.textContent).toContain('Core_HubHome_InstallProblems');
-    expect(status.getAttribute('aria-live')).toBe('polite');
-    const icon = status.querySelector('lightning-icon');
-    expect(icon.alternativeText).toBe('c.Core_HubHome_WarningAltText');
+    expect(status.message).toContain('Core_HubHome_InstallProblems');
+    expect(status.variant).toBe('warning');
+    expect(status.alternativeText).toBe('c.Core_HubHome_WarningAltText');
   });
 
   it('says nothing about the install to someone who cannot read the Error Log', async () => {
@@ -132,6 +132,6 @@ describe('c-hub-errors', () => {
     await settle();
 
     expect(byId(element, 'install-status')).toBeNull();
-    expect(byId(element, 'error-count').textContent).toBe('0');
+    expect(byId(element, 'error-count').value).toBe('0');
   });
 });

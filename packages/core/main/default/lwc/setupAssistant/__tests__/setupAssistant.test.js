@@ -456,7 +456,9 @@ describe('c-setup-assistant', () => {
       .dispatchEvent(new CustomEvent('save', { detail: { values: { Default_Contact__c: 'x' } } }));
     await settle();
 
-    expect(element.shadowRoot.textContent).toContain('That record is not a contact.');
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toContain(
+      'That record is not a contact.'
+    );
     expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Choose a default contact'
     );
@@ -618,7 +620,9 @@ describe('c-setup-assistant', () => {
     const element = build();
     await settle();
 
-    expect(element.shadowRoot.textContent).toContain('No luck today.');
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toContain(
+      'No luck today.'
+    );
   });
 
   it('reloads when the page refreshes, so the first-run edition shows as done', async () => {
