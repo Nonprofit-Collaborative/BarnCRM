@@ -125,6 +125,22 @@ describe('c-first-run-modal', () => {
     expect(element.disableClose).toBe(false);
   });
 
+  it('names the default features under the first choice, and says a feature stays on (admin-15)', async () => {
+    const element = await build(ADMIN_STATE);
+
+    const listed = all(element, 'all-feature');
+    expect(listed).toHaveLength(3);
+    expect(listed[0].textContent).toContain('Data Manager');
+    expect(listed[0].textContent).toContain('Bulk tools.');
+    expect(byId(element, 'stays-on').message).toBe('c.Core_FirstRun_StaysOnWarning');
+    expect(byId(element, 'stays-on').variant).toBe('warning');
+
+    choose(element, 'mode', 'choose');
+    await settle();
+    expect(all(element, 'all-feature')).toHaveLength(0);
+    expect(byId(element, 'stays-on')).not.toBeNull();
+  });
+
   it('lists every feature ticked when choosing, and leaves an unticked one off', async () => {
     const element = await build(ADMIN_STATE);
 

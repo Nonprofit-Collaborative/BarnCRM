@@ -1118,9 +1118,8 @@ describe('c-settings-console', () => {
       await settle();
       expect(getConsoleModel).toHaveBeenCalledTimes(1);
 
-      const panel = element.shadowRoot.querySelector(
-        'h3[data-key="Feature_List"]'
-      ).parentElement.nextElementSibling;
+      const panel = element.shadowRoot.querySelector('h3[data-key="Feature_List"]').parentElement
+        .nextElementSibling;
       panel.dispatchEvent(new CustomEvent('featureturnedon', { detail: { key: 'Addresses' } }));
       await settle();
 
@@ -1353,9 +1352,8 @@ describe('c-settings-console', () => {
       await settle();
       getRecentChanges.mockClear();
 
-      const panel = element.shadowRoot.querySelector(
-        'h3[data-key="Core_Organization_Address"]'
-      ).parentElement.nextElementSibling;
+      const panel = element.shadowRoot.querySelector('h3[data-key="Core_Organization_Address"]')
+        .parentElement.nextElementSibling;
       panel.dispatchEvent(new CustomEvent('settingssaved'));
       await settle();
 
@@ -1796,9 +1794,7 @@ describe('c-settings-console', () => {
       openSection('Households');
       await settle();
       await settle();
-      const cue = element.shadowRoot.querySelector(
-        '[data-saves-alone="Household_Naming_Preview"]'
-      );
+      const cue = element.shadowRoot.querySelector('[data-saves-alone="Household_Naming_Preview"]');
       expect(cue.textContent).toContain('c.Core_Settings_SavesOnItsOwn');
     });
   });

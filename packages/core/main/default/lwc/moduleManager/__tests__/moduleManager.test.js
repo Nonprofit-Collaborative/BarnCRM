@@ -211,7 +211,9 @@ describe('c-module-manager', () => {
         confirmLabel: 'c.Core_ModuleManager_TurnOffButton'
       })
     );
-    expect(BarnConfirmModal.open.mock.calls[0][0].label).toContain('Core_ModuleManager_TurnOffTitle');
+    expect(BarnConfirmModal.open.mock.calls[0][0].label).toContain(
+      'Core_ModuleManager_TurnOffTitle'
+    );
     expect(turnOff).not.toHaveBeenCalled();
   });
 

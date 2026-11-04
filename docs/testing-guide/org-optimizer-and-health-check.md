@@ -67,7 +67,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | Press Escape. | The dialog closes and focus returns to the button. Nothing is scheduled. |
 | 4 | Click **Schedule All Nightly Jobs**, then **Confirm**. | **Done. Scheduled: ...** naming each job, and the report re-runs. **Nightly Jobs Are Not Scheduled** is gone. |
 | 5 | In **BarnCRM Settings**, open **General** and scroll to **Recent Changes**. | The top entry starts **Health Check:** with the button's name, your name and the time. |
-| 6 | Open **BarnCRM Settings**, **Error Log**. | The **Error Digest** panel shows as scheduled, so the job can be stopped on its own page. The seasonal address swap is not on the list unless **Turn On Seasonal Addresses** is ticked on the **Addresses** page, and then it is scheduled already. |
+| 6 | Open **BarnCRM Settings**, **Error Log**. | The **Error Digest** panel shows as scheduled, so the job can be stopped on its own page. The seasonal address swap is not on the list unless **Turn on seasonal addresses** is ticked on the **Addresses** page, and then it is scheduled already. |
 
 **Cleanup:** None. Leave the jobs scheduled.
 
@@ -239,15 +239,15 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Error Log**. Set **Digest frequency** to **Once a week**. | **Send Weekly Admin Summary** is shown ticked with a **Default** badge. |
+| 1 | Open **BarnCRM Settings**, **Error Log**. Set **Digest frequency** to **Once a week**. | **Send weekly admin summary** is shown ticked with a **Default** badge. |
 | 2 | In **Error Digest**, click **Send Now** in an org with no new entries, no failed jobs, no duplicates waiting, no limit at 80 percent and no Setup change kept since the last digest. | The panel says there was nothing new and no email goes out. |
 | 3 | Make a Contact Import fail (load a file, then break the job) and, if the org has an active duplicate rule, save a duplicate Contact past the alert. Click **Send Now**. | An email arrives titled **BarnCRM: Weekly Admin Summary**. Under **Admin Summary** it lists **Failed BarnCRM jobs** with a link to each and **Duplicates waiting for review**. No record content is in it. |
 | 4 | Add a New Error Log entry (for example by running a failing action), then **Send Now**. | The email is titled **BarnCRM: 1 new Error Log entries** and carries the error counts first, then the **Admin Summary**. |
-| 5 | Untick **Send Weekly Admin Summary**, save, and **Send Now** again after step 3's problems are still present. | No summary section is sent; with no new entries, no email. |
+| 5 | Untick **Send weekly admin summary**, save, and **Send Now** again after step 3's problems are still present. | No summary section is sent; with no new entries, no email. |
 | 6 | Set **Digest frequency** back to **Every day** and **Send Now** with a New entry. | The email has the error counts only, with no **Admin Summary**. |
-| 7 | Set **Digest frequency** to **Once a week** and tick **Send Weekly Admin Summary**. In Setup, change the help text of any Contact field. Open **Org Optimizer**, **Setup Changes**, click **Copy New Changes Now**, wait a minute, then **Send Now** in **Error Digest**. | Under **Admin Summary**: **Setup changes since the last digest: {n} (see Org Optimizer, Setup Changes)**, counting your change (counted once, by when it was kept: a second **Send Now** after the next digest does not count it again). |
+| 7 | Set **Digest frequency** to **Once a week** and tick **Send weekly admin summary**. In Setup, change the help text of any Contact field. Open **Org Optimizer**, **Setup Changes**, click **Copy New Changes Now**, wait a minute, then **Send Now** in **Error Digest**. | Under **Admin Summary**: **Setup changes since the last digest: {n} (see Org Optimizer, Setup Changes)**, counting your change (counted once, by when it was kept: a second **Send Now** after the next digest does not count it again). |
 
-**Cleanup:** Restore **Digest frequency** and **Send Weekly Admin Summary** to their earlier values, and change the help text from step 7 back.
+**Cleanup:** Restore **Digest frequency** and **Send weekly admin summary** to their earlier values, and change the help text from step 7 back.
 
 ## T-HC-14: Setup Changes Keeps Who Changed What
 
@@ -264,11 +264,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 6 | Type the field's label in **Search** and click **Search**. | Only changes that mention it. Add a second word that is not in any of them: **No kept change matches these filters.** |
 | 7 | Clear **Search**. Choose a **Section**, and set **From** to today. | Only today's changes in that section. Set **To** to yesterday and click **Search**: **From is after To.** and nothing is asked of the server. |
 | 8 | Clear the filters and click **Download CSV**. | A file named **Setup_Changes-** and today's date ending .csv downloads, and **Saved {n} changes as CSV.** shows. Its header row is **Changed At**, **Changed By**, **Logged In As**, **Section**, **Action**, **What Changed**. |
-| 9 | In **BarnCRM Settings**, **Org Optimizer**, find **Days to Keep Setup Changes**. Set it to `100` and click **Save**. | Shows **730** before you change it. Nothing is saved; the value is marked as outside its range (180 to 3,650). |
+| 9 | In **BarnCRM Settings**, **Org Optimizer**, find **Days to keep setup changes**. Set it to `100` and click **Save**. | Shows **730** before you change it. Nothing is saved; the value is marked as outside its range (180 to 3,650). |
 | 10 | Open **Org Optimizer**, **Health Check**, and run it. | If the nightly jobs finding lists jobs, **Setup changes copy** is one of them unless step 3 already scheduled it. |
 | 11 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **Setup Changes** tile or tab. |
 
-**Cleanup:** Change the help text from step 5 back. The copied **Setup Change** records stay until the nightly copy deletes them after **Days to Keep Setup Changes**; nobody edits or deletes them by hand.
+**Cleanup:** Change the help text from step 5 back. The copied **Setup Change** records stay until the nightly copy deletes them after **Days to keep setup changes**; nobody edits or deletes them by hand.
 
 ## T-HC-15: AI-Readiness Export Downloads a Pack With Sensitive Fields Handled
 

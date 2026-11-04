@@ -318,4 +318,48 @@ describe('c-household-naming-settings', () => {
     expect(alert).not.toBeNull();
     expect(alert.textContent).toContain('Naming is not set up yet');
   });
+
+  describe('pattern parts (drag and drop item 4)', () => {
+    it('adds a clicked part where the cursor is, announces it and previews', async () => {
+      const element = build();
+      await flush();
+      await flush();
+      await flush();
+      preview.mockClear();
+
+      const input = element.shadowRoot.querySelectorAll('input[data-pattern]')[0];
+      expect(input.value).toBe('{LastName} Household');
+      input.setSelectionRange(0, 0);
+      const chip = element.shadowRoot.querySelector(
+        'button[data-pattern="name"][data-part="{FirstName}"]'
+      );
+      expect(chip.dataset.dragId).toBe('name:{FirstName}');
+      chip.click();
+      await flush();
+
+      expect(input.value).toBe('{FirstName} {LastName} Household');
+      expect(element.shadowRoot.querySelector('[data-id="announcer"]').textContent).toBe(
+        'c.Core_HouseholdNamingSettings_PartAdded'
+      );
+      jest.advanceTimersByTime(300);
+      expect(preview).toHaveBeenCalledWith(
+        expect.objectContaining({ namePattern: '{FirstName} {LastName} Household' })
+      );
+    });
+
+    it('offers every part under each of the three patterns', async () => {
+      const element = build();
+      await flush();
+
+      ['name', 'formal', 'informal'].forEach((key) => {
+        const parts = Array.from(
+          element.shadowRoot.querySelectorAll(`button[data-pattern="${key}"]`)
+        ).map((chip) => chip.dataset.part);
+        expect(parts).toEqual(['{FirstName}', '{LastName}', '{Salutation}', 'and', 'Family']);
+      });
+      expect(
+        element.shadowRoot.querySelector('[data-drop-zone="name"] input[data-pattern="name"]')
+      ).not.toBeNull();
+    });
+  });
 });

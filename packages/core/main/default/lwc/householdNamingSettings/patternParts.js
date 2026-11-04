@@ -21,7 +21,10 @@ export function insertPart(pattern, part, start, end) {
   const lead = before === '' || /\s$/.test(before) ? '' : ' ';
   const trail = after === '' || /^\s/.test(after) ? '' : ' ';
   const inserted = `${lead}${part}${trail}`;
-  return { value: `${before}${inserted}${after}`, caret: before.length + lead.length + part.length };
+  return {
+    value: `${before}${inserted}${after}`,
+    caret: before.length + lead.length + part.length
+  };
 }
 
 /**

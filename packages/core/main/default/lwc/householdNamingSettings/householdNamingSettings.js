@@ -26,6 +26,8 @@ import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CONFIRM from '@salesforce/label/c.Core_HouseholdNamingSettings_Confirm';
 import SAVING from '@salesforce/label/c.Core_HouseholdScreens_Saving';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { createDragController } from 'c/barnDrag';
+import { dragMessages } from 'c/barnDragText';
 import { PARTS, insertPart, positionAtOffset } from './patternParts';
 
 const DEBOUNCE_MILLISECONDS = 300;
@@ -37,10 +39,12 @@ const SHIPPED_INFORMAL_PATTERN = '{FirstName}';
 const NAME_KEY = 'Household_Name_Pattern__c';
 const FORMAL_KEY = 'Formal_Greeting_Pattern__c';
 const INFORMAL_KEY = 'Informal_Greeting_Pattern__c';
-/** How far a pointer moves before a press on a part becomes a drag, in pixels. */
-const DRAG_THRESHOLD = 5;
 const INPUT_CLASS = 'slds-input';
 const DROP_TARGET_CLASS = 'slds-input pattern_drop-target';
+const PART_CLASS =
+  'slds-button slds-button_neutral part slds-var-m-right_xx-small slds-var-m-bottom_xx-small';
+/** The parts row of each pattern is a drop zone too (where a drag starts), never a target. */
+const PARTS_ZONE = 'parts-';
 
 /** The three patterns, in the order they show, by the property that holds each. */
 const PATTERN_FIELDS = [
@@ -84,8 +88,6 @@ export default class HouseholdNamingSettings extends LightningElement {
     saving: SAVING
   };
 
-  parts = PARTS;
-
   namePattern = SHIPPED_NAME_PATTERN;
   formalPattern = SHIPPED_FORMAL_PATTERN;
   informalPattern = SHIPPED_INFORMAL_PATTERN;
@@ -95,16 +97,14 @@ export default class HouseholdNamingSettings extends LightningElement {
   isSaving = false;
   /** The last part added, said by the aria-live region. */
   announcement = '';
-  /** The pattern a dragged part is over, outlined while it is. */
-  dropTarget;
+  /** The drag the kit's controller reports (c/barnDrag): which part, and the box it is over. */
+  dragState = {};
 
   debounceTimer;
   /** Counts previews, so a slow answer for earlier patterns cannot replace a newer one. */
   previewSequence = 0;
-  /** A press on a part: `{ part, pointerId, x, y, dragging }` until it is released. */
-  press;
-  /** Set when a drag ended, so the click the browser fires after it adds nothing. */
-  suppressClick = false;
+  /** The kit's drag controller, made on the first press on a part. */
+  drag;
 
   get canEdit() {
     return hasManageSettings === true;
@@ -124,13 +124,23 @@ export default class HouseholdNamingSettings extends LightningElement {
 
   /** The three pattern boxes, each with its parts row. */
   get patterns() {
+    const drag = this.dragState || {};
     return PATTERN_FIELDS.map((field) => ({
       key: field.key,
       label: field.label,
       value: this[field.property],
       inputId: `pattern-${field.key}`,
-      inputClass: this.dropTarget === field.key ? DROP_TARGET_CLASS : INPUT_CLASS,
-      partsLabel: helpText('Core', 'Core_HouseholdNamingSettings_PartsHelp')
+      inputClass: drag.active && drag.overZone === field.key ? DROP_TARGET_CLASS : INPUT_CLASS,
+      partsZone: `${PARTS_ZONE}${field.key}`,
+      partsLabel: helpText('Core', 'Core_HouseholdNamingSettings_PartsHelp'),
+      parts: PARTS.map((part) => {
+        const id = `${field.key}:${part}`;
+        return {
+          id,
+          value: part,
+          className: drag.active && drag.itemId === id ? `${PART_CLASS} part_dragging` : PART_CLASS
+        };
+      })
     }));
   }
 
@@ -159,6 +169,10 @@ export default class HouseholdNamingSettings extends LightningElement {
 
   disconnectedCallback() {
     clearTimeout(this.debounceTimer);
+    if (this.drag) {
+      this.drag.destroy();
+      this.drag = undefined;
+    }
   }
 
   fieldFor(key) {
@@ -181,10 +195,6 @@ export default class HouseholdNamingSettings extends LightningElement {
 
   /** A part clicked, or chosen with Enter or Space: it goes where the cursor is in that box. */
   handlePartClick(event) {
-    if (this.suppressClick) {
-      this.suppressClick = false;
-      return;
-    }
     const { part, pattern } = event.currentTarget.dataset;
     const input = this.inputFor(pattern);
     const start = input ? input.selectionStart : undefined;
@@ -221,73 +231,45 @@ export default class HouseholdNamingSettings extends LightningElement {
 
   // Dragging uses pointer events, so a mouse, a pen and a finger all work. Clicking stays the
   // keyboard and phone path; a press that moves less than a few pixels is a click.
+  // The press goes to the kit's drag controller (c/barnDrag): a mouse or pen drags after a few
+  // pixels, a finger after a short press and hold, and the click that ends a drag is swallowed.
   handlePartPointerDown(event) {
-    if (this.isReadOnly || (event.button !== undefined && event.button !== 0)) {
+    if (this.isReadOnly) {
       return;
     }
-    this.press = {
-      part: event.currentTarget.dataset.part,
-      pointerId: event.pointerId,
-      x: event.clientX,
-      y: event.clientY,
-      dragging: false
-    };
+    this.dragController().pointerDown(event);
   }
 
-  handlePartPointerMove(event) {
-    const press = this.press;
-    if (!press || press.pointerId !== event.pointerId) {
-      return;
+  dragController() {
+    if (!this.drag) {
+      this.drag = createDragController({
+        root: this.template,
+        layout: 'list',
+        messages: dragMessages(),
+        announce: (text) => {
+          this.announcement = text;
+        },
+        onChange: (state) => {
+          this.dragState = state;
+        },
+        canDrop: (itemId, fromZone, toZone) => !String(toZone).startsWith(PARTS_ZONE),
+        onDrop: (drop) => this.handlePartDrop(drop)
+      });
     }
-    if (!press.dragging) {
-      const moved = Math.hypot(event.clientX - press.x, event.clientY - press.y);
-      if (moved < DRAG_THRESHOLD) {
-        return;
-      }
-      press.dragging = true;
-      const button = event.currentTarget;
-      button.classList.add('part_dragging');
-      if (typeof button.setPointerCapture === 'function' && event.pointerId !== undefined) {
-        try {
-          button.setPointerCapture(event.pointerId);
-        } catch {
-          // A pointer that cannot be captured still drags while it stays over the page.
-        }
-      }
-    }
-    const target = this.inputAt(event.clientX, event.clientY);
-    this.dropTarget = target ? target.dataset.pattern : undefined;
+    return this.drag;
   }
 
-  handlePartPointerUp(event) {
-    const press = this.press;
-    this.press = undefined;
-    event.currentTarget.classList.remove('part_dragging');
-    this.dropTarget = undefined;
-    if (!press || !press.dragging) {
-      return;
+  /** A part dropped on a pattern box: it goes into the text where the pointer let go. */
+  handlePartDrop({ itemId, toZone }) {
+    const input = this.inputFor(toZone);
+    if (!input || String(toZone).startsWith(PARTS_ZONE)) {
+      return false;
     }
-    this.suppressClick = true;
-    const input = this.inputAt(event.clientX, event.clientY);
-    if (!input) {
-      return;
-    }
-    const position = this.positionIn(input, event.clientX);
-    this.addPart(input.dataset.pattern, press.part, position, position);
-  }
-
-  handlePartPointerCancel(event) {
-    this.press = undefined;
-    this.dropTarget = undefined;
-    event.currentTarget.classList.remove('part_dragging');
-  }
-
-  /** The pattern box under a point on the screen, if any. */
-  inputAt(x, y) {
-    return Array.from(this.template.querySelectorAll('input[data-pattern]')).find((input) => {
-      const box = input.getBoundingClientRect();
-      return x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
-    });
+    const part = String(itemId).slice(String(itemId).indexOf(':') + 1);
+    const x = this.dragState && this.dragState.x;
+    const position = x ? this.positionIn(input, x) : input.value.length;
+    this.addPart(toZone, part, position, position);
+    return true;
   }
 
   /** Where in a box's text a drop at this point lands: the nearest gap between characters. */

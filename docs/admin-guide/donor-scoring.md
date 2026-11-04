@@ -48,9 +48,9 @@ Everything is in the app. You never open Setup.
 1. Open **BarnCRM Settings**, then **Giving**.
 2. Open **Donor Levels and Scores**.
 3. Change any of the three cutoff settings. Each is four numbers separated by commas:
-   - **Donor Score Recency Days**, default `90,180,365,730`. Numbers rise.
-   - **Donor Score Frequency Gifts**, default `6,4,2,1`. Numbers fall.
-   - **Donor Score Monetary Amount**, default `5000,1000,250,50`. Numbers fall.
+   - **Donor score recency days**, default `90,180,365,730`. Numbers rise.
+   - **Donor score frequency gifts**, default `6,4,2,1`. Numbers fall.
+   - **Donor score monetary amount**, default `5000,1000,250,50`. Numbers fall.
 4. Save. Scores update as each donor next changes, and every night.
 
 These settings apply to your whole organization. If a value is not four numbers in the right

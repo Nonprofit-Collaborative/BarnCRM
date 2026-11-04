@@ -33,7 +33,11 @@
             <template for:each={patterns} for:item="pattern">
                 <div key={pattern.key} class="slds-form-element slds-var-m-bottom_small">
                     <label class="slds-form-element__label" for={pattern.inputId}>{pattern.label}</label>
-                    <div class="slds-form-element__control">
+                    <div
+                        class="slds-form-element__control"
+                        data-drop-zone={pattern.key}
+                        data-drop-label={pattern.label}
+                    >
                         <input
                             type="text"
                             class={pattern.inputClass}
@@ -50,21 +54,22 @@
                             role="group"
                             aria-label={pattern.partsLabel}
                             data-parts={pattern.key}
+                            data-drop-zone={pattern.partsZone}
+                            data-drop-label={pattern.partsLabel}
                         >
-                            <template for:each={parts} for:item="part">
+                            <template for:each={pattern.parts} for:item="part">
                                 <button
-                                    key={part}
+                                    key={part.id}
                                     type="button"
-                                    class="slds-button slds-button_neutral part slds-var-m-right_xx-small slds-var-m-bottom_xx-small"
-                                    data-part={part}
+                                    class={part.className}
+                                    data-part={part.value}
                                     data-pattern={pattern.key}
+                                    data-drag-id={part.id}
+                                    data-drag-label={part.value}
                                     onclick={handlePartClick}
                                     onpointerdown={handlePartPointerDown}
-                                    onpointermove={handlePartPointerMove}
-                                    onpointerup={handlePartPointerUp}
-                                    onpointercancel={handlePartPointerCancel}
                                 >
-                                    {part}
+                                    {part.value}
                                 </button>
                             </template>
                         </div>

@@ -205,7 +205,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 ## T-DUP-14: Similar Names, Household Aware
 
 **Purpose:** Confirm the scan pairs similar names only with something else in common, and treats one household as family.
-**Prerequisites:** admin. In **BarnCRM Settings**, **Duplicate Matching**, **Fuzzy Name Match** reads **90**.
+**Prerequisites:** admin. In **BarnCRM Settings**, **Duplicate Matching**, **Fuzzy name match** reads **90**.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -223,7 +223,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, open **Duplicate Matching**. | **Fuzzy Name Match** reads **90** and **Merge Rule For Other Fields** reads **Not blank**, each with a description. Change **Merge Rule For Other Fields** to **Most recent** and save: **Saved.** Change it back to **Not blank** and save. |
+| 1 | In **BarnCRM Settings**, open **Duplicate Matching**. | **Fuzzy name match** reads **90** and **Merge rule for other fields** reads **Not blank**, each with a description. Change **Merge rule for other fields** to **Most recent** and save: **Saved.** Change it back to **Not blank** and save. |
 | 2 | Open **Custom Metadata**. | Two lists: **Relationship types** and **Merge Rules**, the second empty with a line explaining it. |
 | 3 | Under **Merge Rules**, add a row: **Field Name** `AccountId`, **Rule** **Most recent**, and save. | Refused: **AccountId is not a person field a merge can change.** and the rest of the sentence. |
 | 4 | Change **Field Name** to `Email` and save. | **Saved** once Salesforce applies it. The row lists **Email**, **Most recent**. |
@@ -238,7 +238,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, open **Duplicate Matching**. | **Exact Match For Auto-Merge** reads **Name and email**, with a description. |
+| 1 | In **BarnCRM Settings**, open **Duplicate Matching**. | **Exact match for auto-merge** reads **Name and email**, with a description. |
 | 2 | Open the **Duplicate Matching** tab, then **Auto-Merge**. | The intro, **Exact match: Name and email.**, **Preview Exact Matches**, and **Recent Runs** reading **No auto-merge in the last 15 days.** |
 | 3 | Click **Preview Exact Matches**. | **Pairs To Merge (1)**: the Ann pair only, with **Keep:**, **Merge away:** and the values that will change (for example **Phone: (blank) becomes ...**), or **No values change.** The Ben pair is not listed. |
 | 4 | Click **Merge 1 Pairs**, then **Cancel**. | Nothing is merged; the preview stays. |
