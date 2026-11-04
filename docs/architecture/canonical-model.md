@@ -915,6 +915,16 @@ answers an organization's own flow the same way, adding the timed pause and the 
 flow listed as `Flow:` plus its API name. Resuming the timed pause queues the household
 catch-up and the waiting rollups; skipped saves are not replayed (ADR-NEXT dispatcher errors
 and Automation Control).
+**R-A8 The Automation page manages Automation Control, own flows and the catch-up.** Writes
+require Manage BarnCRM Settings and are logged as setting changes. The org default row is always
+shown (both boxes false until saved) and is never deleted; a profile or user row is added with
+Bypass true, saved per box, and deleted by Remove. A setting row is written and read in system
+mode (`AutomationSettingsWriter`, ADR-0021), its owner checked to be this org, a Profile or a
+User. An org's own flow is listed only when `FlowDefinitionView` has its API name, as an
+Automation Setting with `Automation_Name__c` `Flow:` plus the API name, Enabled true,
+Always Runs false and Is Package Default false; only such rows can be removed, and listing or
+removing never changes the flow. Catch Up Now queues the household catch-up, the household
+names recompute and the waiting rollups.
 
 ### Salesforce implementation
 
@@ -12474,6 +12484,7 @@ mirrors the primary member).
 | 0.16 | 2026-11-02 | Funders F-07 (ADR-0163 `0163-funders-reporting-links.md`). Grant (29ZH) gains rule R-GN9, the board dashboard (revenue mix, concentration, restricted balances), read from grants and, by describe, Giving and the F-03 ledger; no new object or field. |
 | 0.17 | 2026-11-04 | Dispatcher error contract (RT-05, ADR-NEXT dispatcher errors and Automation Control). Section 10 gains rule R-A6: a failure refuses only its own records, the rest of the save goes ahead. No object or field added. |
 | 0.17 | 2026-11-04 | BarnCRM Automation Control (RT-13, same ADR). New hierarchy custom setting `BarnCRM_Automation_Control__c` with `Pause_All__c` and `Bypass__c` (Section 10, rule R-A7), read by the dispatcher, every shipped flow template and the Check BarnCRM Automation action. |
+| 0.17 | 2026-11-04 | Automation page manages Automation Control (RT-13, same ADR, decisions 2.6 to 2.8). Section 10 gains rule R-A8: org, profile and user rows edited in the console, an org's own flows listed as `Flow:` switch rows, and Catch Up Now. No object or field added. |
 
 ---
 ## 32. Entity ownership by package
