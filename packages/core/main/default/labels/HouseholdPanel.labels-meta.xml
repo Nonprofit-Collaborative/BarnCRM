@@ -150,7 +150,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Members panel: first name field on the new person form</shortDescription>
-        <value>First name</value>
+        <value>First Name</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdPanel_LastName</fullName>
@@ -158,7 +158,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Members panel: last name field on the new person form</shortDescription>
-        <value>Last name</value>
+        <value>Last Name</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdPanel_AddMemberMissingPerson</fullName>

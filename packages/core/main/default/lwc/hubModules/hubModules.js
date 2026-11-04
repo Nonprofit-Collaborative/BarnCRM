@@ -34,10 +34,7 @@ export default class HubModules extends NavigationMixin(LightningElement) {
           displayName: module.label || module.name,
           appUrl: module.appUrl,
           statusText: module.status === 'Off' ? STATUS_OFF : STATUS_ON,
-          badgeClass:
-            module.status === 'Off'
-              ? 'slds-badge slds-var-m-left_x-small'
-              : 'slds-badge slds-theme_success slds-var-m-left_x-small'
+          status: module.status === 'Off' ? 'off' : 'on'
         }));
       this.errorMessage = undefined;
     } catch {
