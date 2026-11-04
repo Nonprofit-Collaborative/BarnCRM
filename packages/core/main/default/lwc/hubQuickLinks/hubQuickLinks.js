@@ -1,5 +1,6 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { iconFor } from 'c/barnIcons';
 import HEADING from '@salesforce/label/c.Core_HubHome_QuickLinksHeading';
 import SETTINGS from '@salesforce/label/c.Core_Settings_Title';
 import HOUSEHOLDS from '@salesforce/label/c.Core_SettingsGroup_Households';
@@ -24,15 +25,20 @@ export default class HubQuickLinks extends NavigationMixin(LightningElement) {
       tab: HOUSEHOLDS_TAB,
       label: HOUSEHOLDS,
       line: HOUSEHOLDS_LINE,
-      iconName: 'standard:household'
+      iconName: iconFor(HOUSEHOLDS_TAB)
     },
     {
       tab: 'Organizations',
       label: ORGANIZATIONS,
       line: ORGANIZATIONS_LINE,
-      iconName: 'standard:account'
+      iconName: iconFor('Organizations')
     },
-    { tab: 'BarnCRM_Settings', label: SETTINGS, line: SETTINGS_LINE, iconName: 'standard:settings' }
+    {
+      tab: 'BarnCRM_Settings',
+      label: SETTINGS,
+      line: SETTINGS_LINE,
+      iconName: iconFor('BarnCRM_Settings')
+    }
   ];
 
   handleOpen(event) {

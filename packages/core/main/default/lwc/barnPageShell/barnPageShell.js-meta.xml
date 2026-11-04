@@ -5,5 +5,5 @@
     UX kit: the standard admin tool page (header with icon, title, purpose line and actions,
     collapsible About This Tool help, body, footer), one card level deep.
   </description>
-  <isExposed>false</isExposed>
+  <isExposed>true</isExposed>
 </LightningComponentBundle>

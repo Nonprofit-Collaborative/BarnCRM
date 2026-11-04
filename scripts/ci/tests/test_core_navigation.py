@@ -108,7 +108,25 @@ class CardIcons(unittest.TestCase):
                 for name in os.listdir(folder)
                 if name.endswith((".html", ".js"))
             )
-            self.assertRegex(source, rf"['\"]{icon}['\"]", f"{component} does not use {icon}")
+            # The icon as a literal, or from the registry by its tab (iconFor('Gift__c')).
+            self.assertRegex(
+                source, rf"['\"]({icon}|{tab})['\"]", f"{component} does not use {icon}"
+            )
+
+
+class IconRegistry(unittest.TestCase):
+    """c/barnIcons (the Visual Standard's icon registry) maps every tab to its own motif."""
+
+    def test_registry_lists_every_tab_with_its_motif(self):
+        path = os.path.join(CORE, "lwc", "barnIcons", "barnIcons.js")
+        with open(path, encoding="utf-8") as handle:
+            entries = dict(re.findall(r"^\s+(\w+): '(\w+:\w+)',?$", handle.read(), re.M))
+        numbers = tab_numbers()
+        for name, number in numbers.items():
+            self.assertEqual(entries.get(name), f"custom:custom{number}", f"barnIcons.js: {name}")
+        for name, icon in entries.items():
+            if icon.startswith("custom:"):
+                self.assertIn(name, numbers, f"barnIcons.js: {name} names no tab")
 
 
 class AppHeaderColor(unittest.TestCase):

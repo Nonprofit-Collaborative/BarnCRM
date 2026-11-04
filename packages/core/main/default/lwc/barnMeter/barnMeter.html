@@ -1,0 +1,12 @@
+<template>
+    <div class="meter" data-id="meter">
+        <span class="meter__label" data-id="label">{label}</span>
+        <lightning-progress-bar class="meter__bar" value={percent} size={size} data-id="bar"></lightning-progress-bar>
+        <span class="meter__value slds-text-body_small" data-id="value">
+            <template lwc:if={hasValueText}>{valueText}</template>
+            <template lwc:else>
+                <lightning-formatted-number value={fraction} format-style="percent"></lightning-formatted-number>
+            </template>
+        </span>
+    </div>
+</template>
