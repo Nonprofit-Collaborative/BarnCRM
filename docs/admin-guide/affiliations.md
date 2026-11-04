@@ -41,7 +41,9 @@ affiliation, or finds the one they already have (see [Importing](importing.md), 
 To let your team see and manage affiliations, make sure they have one of the packaged access
 levels (BarnCRM Admin, Team Member, Coordinator, or, with Giving installed, Fundraising Staff) on the **Access** page in
 BarnCRM Settings. Read Only users see affiliations and cannot change them: the Affiliations
-card shows them no **Add Affiliation** or **Make Primary** button.
+card shows them no **Add Affiliation** button and no row menu. A line's menu offers **Edit**
+to people who can edit affiliations, **Make Primary** to people who can also edit **Primary**,
+and **End It** to people who can also edit **End Date**.
 
 The upkeep does not depend on what the person saving can see or edit. Someone who may add an
 affiliation but cannot edit the person it belongs to, or cannot see that person's other
@@ -90,12 +92,13 @@ among your contacts works where. Start from the sample data.
    longer primary. **Primary Affiliation** at the top of the record now reads Heritage
    Rotary Club. Only one organization can be primary at a time, and you never have to clear
    the old one.
-7. The card has no Edit action, so change an affiliation on its own record: open the App
-   Launcher, search for **Affiliations**, open Harper's Heritage Rotary Club affiliation,
-   and choose **Edit**. Set **End date** to last month and save. Back on Harper's record,
-   the line carries a **Former** badge, the **Primary** badge disappears, and **Primary Affiliation** at the top of
+7. Open the menu at the right of the Heritage Rotary Club line and choose **End It**, then
+   **End It** in the confirmation. Its **End date** becomes today. The line carries a
+   **Former** badge on a shaded row, the **Primary** badge disappears, and **Primary Affiliation** at the top of
    Harper's record is empty, because a connection that has ended is not the one Harper is
-   chiefly associated with. Mark the Bayview Hardware line primary to fill it again.
+   chiefly associated with. Choose **Make Primary** from the Bayview Hardware line's menu to
+   fill it again. (**Edit** in the same menu opens the standard edit form; the name opens the
+   affiliation record.)
 8. Check the Households tab. Harper is still in The Garcia Family, exactly where she was.
    Nothing about an affiliation moves a person.
 
