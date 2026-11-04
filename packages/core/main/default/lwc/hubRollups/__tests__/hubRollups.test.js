@@ -98,11 +98,9 @@ describe('c-hub-rollups', () => {
 
     expect(byId(element, 'rollups-overdue').label).toBe('c.Core_HubHome_BadgeOverdue');
     const warning = byId(element, 'rollups-stale');
-    expect(warning.getAttribute('aria-live')).toBe('polite');
-    // A screen reader hears "Warning", not the tile's own heading.
-    expect(warning.querySelector('lightning-icon').alternativeText).toBe(
-      'c.Core_HubHome_WarningAltText'
-    );
+    // A warning notice: its own icon and role, never color alone.
+    expect(warning.variant).toBe('warning');
+    expect(warning.message).toBe('c.Core_Rollups_FreshnessStale');
   });
 
   it('claims nothing about the rollups while the model is still loading', async () => {

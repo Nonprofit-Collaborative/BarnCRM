@@ -4,6 +4,7 @@ import saveElement from '@salesforce/apex/LogicModelBuilderController.saveElemen
 import saveOrder from '@salesforce/apex/LogicModelBuilderController.saveOrder';
 import saveLink from '@salesforce/apex/LogicModelBuilderController.saveLink';
 import remove from '@salesforce/apex/LogicModelBuilderController.remove';
+import BarnConfirmModal from 'c/barnConfirmModal';
 
 jest.mock(
   '@salesforce/apex/LogicModelBuilderController.saveElement',
@@ -164,21 +165,43 @@ describe('c-logic-model-part', () => {
       id: 'l1',
       assumption: 'Most kids come.'
     });
+    BarnConfirmModal.open.mockResolvedValue(true);
     q(element, 'link-remove').click();
     await flush();
+    expect(BarnConfirmModal.open.mock.calls[0][0]).toMatchObject({
+      confirmVariant: 'destructive',
+      message: 'c.LogicModels_Part_RemoveArrowConfirm'
+    });
     expect(remove).toHaveBeenCalledWith({ recordId: 'l1' });
     expect(changes).toHaveBeenCalledTimes(2);
   });
 
-  it('deletes the part after a confirm', async () => {
+  it('deletes the part after a confirm in a modal, and not without one', async () => {
     const { element, changes } = await render();
     remove.mockResolvedValue(MODEL);
+    BarnConfirmModal.open.mockResolvedValue(false);
     q(element, 'delete').click();
     await flush();
-    q(element, 'delete-confirm-button').click();
+    expect(remove).not.toHaveBeenCalled();
+    BarnConfirmModal.open.mockResolvedValue(true);
+    q(element, 'delete').click();
     await flush();
+    expect(BarnConfirmModal.open.mock.calls[1][0]).toMatchObject({
+      confirmVariant: 'destructive',
+      message: 'c.LogicModels_Part_DeleteConfirm'
+    });
     expect(remove).toHaveBeenCalledWith({ recordId: 'a1' });
     expect(changes.mock.calls[0][0].detail.message).toBe('c.LogicModels_Builder_Deleted');
+  });
+
+  it('goes back to the model, and focuses its heading when asked', async () => {
+    const { element } = await render();
+    const back = jest.fn();
+    element.addEventListener('back', back);
+    q(element, 'back').click();
+    expect(back).toHaveBeenCalledTimes(1);
+    element.focusHeading();
+    expect(element.shadowRoot.activeElement).toBe(q(element, 'part-heading'));
   });
 
   it('shows indicators for an output and passes their saves up', async () => {

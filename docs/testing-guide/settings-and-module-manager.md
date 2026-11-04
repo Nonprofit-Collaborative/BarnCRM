@@ -124,10 +124,10 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Automation**. | A card titled **Automation** lists each automation with a description, "Runs on" and its object, and a switch. **How long** shows **2 hours**. |
 | 2 | Open **How long**. | Options **1 hour**, **2 hours**, **4 hours**, **8 hours**, **24 hours**. |
-| 3 | Choose **1 hour** and click **Pause All Automation**. | A yellow box: "Automation is paused until" a date and time one hour from now, then "Paused by" your name and "It turns itself back on then." Every switch stays where it was. |
+| 3 | Choose **1 hour** and click **Pause All Automation**. | A yellow box: "Automation is paused until" a date and time one hour from now, then "Paused by" your name and "It turns itself back on then.", with a **Resume Automation** button inside it. **How long** and **Pause All Automation** are gone, and there is no other **Resume Automation** button. Every switch stays where it was. |
 | 4 | Open the **Home** tab. | Under **Welcome to BarnCRM**: "BarnCRM automation is paused. Households and greetings are not being updated until it resumes." in a yellow warning box with a **Resume Automation** link. Click the link: **BarnCRM Settings** opens on **Automation**. |
-| 5 | Back in **Automation**, click **Resume Automation**. | The yellow box disappears. On **Home** the banner is gone after a reload. |
-| 6 | Switch off **Keep both sides of relationships in step**. Reload the page. | The switch is still off. |
+| 5 | Back in **Automation**, click **Resume Automation** in the yellow box. | The yellow box disappears, and **How long** with **Pause All Automation** is back; no **Resume Automation** button shows. On **Home** the banner is gone after a reload. |
+| 6 | Switch off **Keep both sides of relationships in step**. | Next to the switch, for a few seconds: "Keep both sides of relationships in step is off. Turn it back on here." A screen reader announces it. Reload the page: the switch is still off. |
 | 7 | Switch it back on, open **General** and scroll to **Recent Changes**. | Rows for **Automation Paused Until** record the pause and the resume, and rows record both switch changes, each with your name. |
 
 **Cleanup:** leave every switch on and automation not paused.
@@ -223,7 +223,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 1 | As read-only, open **BarnCRM Settings**, **General**. | A notice: "You can read these settings but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." Every control is greyed out and no save bar appears. **Edition** shows with no **Change Edition** link. **Features** shows **On** and no **Turn On** buttons. |
 | 2 | Open **Access**. | "You can see this page but you cannot change roles. Ask someone with the BarnCRM Admin role to make the change, or to give you that role." No **Find a person**, **Role**, **Give Access** or **Remove**. Role cards list holders, or say "You can see this page but you cannot see who holds each role." |
 | 3 | Open **Modules**. | "You can see the modules but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." No **Turn Off**, **Turn On** or **What an Uninstall Deletes**. **Show Nonprofit Modules** is greyed out. |
-| 4 | Open **Automation**. | "You can read this page but not change it. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." **Pause All Automation**, **Resume Automation**, **How long** and every switch are disabled. |
+| 4 | Open **Automation**. | "You can read this page but not change it. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." **Pause All Automation**, **How long** and every switch are disabled (with automation running, **Resume Automation** is not shown). |
 | 5 | Open **General** and look for **Custom Metadata**. | It is not shown (it needs BarnCRM Metadata Admin). |
 | 6 | Repeat step 1 as staff. | The same read-only notice and greyed-out controls. |
 
@@ -272,7 +272,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Integrations**. | An introduction says the page is a roadmap, In Progress means planned and not built, and nothing listed is integrated with BarnCRM yet. |
+| 1 | Open **BarnCRM Settings**, **Integrations**. | The introduction reads "Other free apps that work alongside BarnCRM, and alternatives to BarnCRM modules already in your org. None is integrated with BarnCRM yet, and BarnCRM depends on none of them." Each product's status and installed state are badges with icons (In Progress amber with a clock, Installed in this org green, Not installed grey). |
 | 2 | Read the headings. | **Complementary Apps** and **In Development**. There is no **Alternatives to BarnCRM Modules** heading, and no empty group. |
 | 3 | Read one product's row. | Its name, **In Progress**, **Not installed**, a description, who maintains it, **Cost and license**, **Compatibility with BarnCRM** with a note, and **Learn More**. No row has an **Install** link. The Summit Events App note says it is not yet tested and mentions the Salesforce Site and guest user. |
 | 4 | Click **Learn More** on any row. | The product's page opens in a new tab. A screen reader reads "(Opens in a New Tab)" after the link name. |

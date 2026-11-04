@@ -48,6 +48,7 @@ Rules:
 | giving | Donor_Levels | Custom65: Cup |
 | giving | Donor_Segments | Custom68: Globe |
 | giving | Fund__c | Custom42: Treasurechest |
+| giving | Fundraising_Home | Custom61: Castle |
 | giving | Gift_Allocation__c | Custom17: Sack |
 | giving | Gift_Batch__c | Custom13: Box |
 | giving | Gift__c | Custom41: Cash |
@@ -111,6 +112,8 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | core | errorLogTile | custom:custom53 | Error_Log__c |
 | core | householdMembersPanel | custom:custom15 | Households |
 | core | householdOfPerson | custom:custom15 | Households |
+| core | hubErrors | custom:custom53 | Error_Log__c |
+| core | hubWelcome | custom:custom1 | BarnCRM_Home |
 | core | relationshipPanel | custom:custom37 | Relationship__c |
 | funders | fundersBoard | custom:custom100 | Funders_Board |
 | funders | grantAnswerLibrary | custom:custom87 | Grant_Answer__c |

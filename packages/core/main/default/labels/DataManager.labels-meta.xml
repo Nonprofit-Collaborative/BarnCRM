@@ -13,16 +13,16 @@
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: card that opens the Import tab</shortDescription>
-        <value>Import a File</value>
+        <shortDescription>Data Manager: card that opens the Super Importer tab</shortDescription>
+        <value>Super Importer</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_FindTitle</fullName>
+        <fullName>Core_DataManager_TaskSearch</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: card that opens Find</shortDescription>
-        <value>Find and Export Records</value>
+        <shortDescription>Data Manager: label of the task search box above the tiles</shortDescription>
+        <value>What Do You Want to Do?</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_DeleteTitle</fullName>

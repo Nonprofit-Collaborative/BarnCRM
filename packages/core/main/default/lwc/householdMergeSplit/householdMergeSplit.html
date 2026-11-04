@@ -1,16 +1,17 @@
 <template>
     <template lwc:if={helpReady}>
     <lightning-card title={label.title} icon-name="standard:merge">
-        <div class="slds-var-m-around_medium">
-            <template if:false={isHousehold}>
-                <p class="slds-text-color_weak not-a-household">{label.notAHousehold}</p>
+        <div class="slds-var-p-horizontal_medium">
+            <template lwc:if={isHousehold}>
+                <template lwc:if={showReadOnlyNotice}>
+                    <c-barn-notice message={label.readOnly} class="read-only-notice"></c-barn-notice>
+                </template>
+            </template>
+            <template lwc:else>
+                <c-barn-notice message={label.notAHousehold} class="not-a-household"></c-barn-notice>
             </template>
 
-            <template if:true={showReadOnlyNotice}>
-                <p class="slds-text-color_weak read-only-notice" role="status">{label.readOnly}</p>
-            </template>
-
-            <template if:true={busy}>
+            <template lwc:if={busy}>
                 <lightning-spinner
                     alternative-text={label.loadingComparison}
                     size="small"
@@ -18,94 +19,66 @@
                 ></lightning-spinner>
             </template>
 
-            <template if:true={isUsable}>
+            <template lwc:if={isUsable}>
                 <lightning-tabset>
                     <lightning-tab label={label.tabMerge} value="merge" class="merge-tab">
-                        <div class="slds-var-m-top_small">
-                            <lightning-input
-                                type="search"
-                                label={label.searchLabel}
-                                placeholder={label.searchPlaceholder}
-                                value={searchTerm}
-                                onchange={handleSearchChange}
-                                onkeyup={handleSearchChange}
-                                class="search-input"
-                            ></lightning-input>
-                            <lightning-button
-                                label={label.searchLabel}
-                                onclick={handleSearch}
-                                class="slds-var-m-top_x-small search-button"
-                            ></lightning-button>
-                        </div>
+                        <lightning-record-picker
+                            label={label.searchLabel}
+                            object-api-name="Account"
+                            filter={householdFilter}
+                            display-info={householdDisplayInfo}
+                            matching-info={householdMatchingInfo}
+                            onchange={handleOtherHouseholdChange}
+                            class="slds-var-m-top_small merge-picker"
+                        ></lightning-record-picker>
 
-                        <template if:true={showNoResults}>
-                            <p role="status" class="slds-text-color_weak slds-var-m-top_small no-results">
-                                {label.noResults}
-                            </p>
-                        </template>
-
-                        <template if:true={hasSearchResults}>
-                            <ul class="slds-has-dividers_bottom-space slds-var-m-top_small search-results">
-                                <template for:each={searchResults} for:item="option">
-                                    <li key={option.id} class="slds-item search-result">
-                                        <lightning-button
-                                            variant="base"
-                                            label={option.name}
-                                            aria-label={option.accessibleName}
-                                            data-household-id={option.id}
-                                            onclick={handlePickHousehold}
-                                            class="pick-button"
-                                        ></lightning-button>
-                                        <span class="slds-text-body_small slds-var-m-left_x-small">
-                                            {option.location}
-                                        </span>
-                                    </li>
-                                </template>
-                            </ul>
-                        </template>
-
-                        <template if:false={hasComparison}>
-                            <p class="slds-text-color_weak slds-var-m-top_small select-other">
-                                {label.selectOther}
-                            </p>
-                        </template>
-
-                        <template if:true={hasComparison}>
-                            <div class="slds-scrollable_x slds-var-m-top_medium">
-                                <table class="slds-table slds-table_bordered comparison-table" aria-label={label.comparisonTable}>
-                                    <thead>
-                                        <tr class="slds-line-height_reset">
-                                            <th scope="col">{label.columnField}</th>
-                                            <th scope="col">{label.columnThis}</th>
-                                            <th scope="col">{label.columnOther}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <template for:each={comparison} for:item="field">
-                                            <tr key={field.fieldName} class="comparison-row">
-                                                <th scope="row">{field.label}</th>
-                                                <td>{field.survivorValue}</td>
-                                                <td>
-                                                    {field.victimValue}
-                                                    <template if:true={field.inConflict}>
-                                                        <lightning-radio-group
-                                                            name={field.fieldName}
-                                                            data-field-name={field.fieldName}
-                                                            label={field.label}
-                                                            variant="label-hidden"
-                                                            type="button"
-                                                            options={field.options}
-                                                            value={field.selected}
-                                                            onchange={handleChoiceChange}
-                                                            class="field-choice"
-                                                        ></lightning-radio-group>
-                                                    </template>
-                                                </td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
-                                </table>
+                        <template lwc:if={hasComparison}>
+                            <div class="slds-var-m-top_small">
+                                <lightning-button
+                                    variant="base"
+                                    label={swapLabel}
+                                    icon-name="utility:change_record_type"
+                                    disabled={busy}
+                                    onclick={handleSwap}
+                                    class="swap-button"
+                                ></lightning-button>
                             </div>
+                            <table
+                                class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked slds-var-m-top_small comparison-table"
+                                aria-label={label.comparisonTable}
+                            >
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col">{label.columnField}</th>
+                                        <th scope="col">{label.columnThis}</th>
+                                        <th scope="col">{label.columnOther}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={comparison} for:item="field">
+                                        <tr key={field.fieldName} class="comparison-row">
+                                            <th scope="row" data-label={label.columnField}>{field.label}</th>
+                                            <td data-label={label.columnThis} class="this-value">{field.thisValue}</td>
+                                            <td data-label={label.columnOther}>
+                                                <span class="other-value">{field.otherValue}</span>
+                                                <template lwc:if={field.inConflict}>
+                                                    <lightning-radio-group
+                                                        name={field.fieldName}
+                                                        data-field-name={field.fieldName}
+                                                        label={field.label}
+                                                        variant="label-hidden"
+                                                        type="button"
+                                                        options={field.options}
+                                                        value={field.selected}
+                                                        onchange={handleChoiceChange}
+                                                        class="field-choice"
+                                                    ></lightning-radio-group>
+                                                </template>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
 
                             <h3 class="slds-text-heading_small slds-var-m-top_medium members-heading">
                                 {label.membersHeading}
@@ -113,13 +86,17 @@
                             <ul class="slds-has-dividers_bottom-space merge-members">
                                 <template for:each={mergeMembers} for:item="member">
                                     <li key={member.personId} class="slds-item merge-member">
-                                        <span>{member.name}</span>
-                                        <lightning-badge label={member.origin}></lightning-badge>
+                                        <span class="slds-var-m-right_x-small">{member.name}</span>
+                                        <c-barn-status-badge
+                                            status={member.originStatus}
+                                            label={member.origin}
+                                            hide-icon
+                                        ></c-barn-status-badge>
                                     </li>
                                 </template>
                             </ul>
 
-                            <div class="slds-var-m-top_medium">
+                            <div class="slds-var-m-top_medium slds-var-m-bottom_small">
                                 <lightning-button
                                     variant="brand"
                                     label={label.mergeButton}
@@ -129,27 +106,17 @@
                                 ></lightning-button>
                             </div>
                         </template>
+                        <template lwc:else>
+                            <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_small select-other">
+                                {label.selectOther}
+                            </p>
+                        </template>
                     </lightning-tab>
 
                     <lightning-tab label={label.tabSplit} value="split" class="split-tab">
                         <h3 class="slds-text-heading_small slds-var-m-top_small split-heading">
                             {label.splitHeading}
                         </h3>
-                        <ul class="slds-has-dividers_bottom-space split-members">
-                            <template for:each={splitMembers} for:item="member">
-                                <li key={member.personId} class="slds-item split-member">
-                                    <lightning-input
-                                        type="checkbox"
-                                        label={member.name}
-                                        checked={member.selected}
-                                        data-person-id={member.personId}
-                                        onchange={handleMemberToggle}
-                                        class="member-checkbox"
-                                    ></lightning-input>
-                                </li>
-                            </template>
-                        </ul>
-
                         <lightning-radio-group
                             name="splitDestination"
                             label={label.splitHeading}
@@ -157,61 +124,86 @@
                             options={destinationOptions}
                             value={splitDestination}
                             onchange={handleDestinationChange}
-                            class="slds-var-m-top_small destination-choice"
+                            class="slds-var-m-top_x-small destination-choice"
                         ></lightning-radio-group>
 
-                        <template if:true={isSplittingToExisting}>
-                            <div class="slds-var-m-top_small split-target">
-                                <lightning-input
-                                    type="search"
-                                    label={label.searchLabel}
-                                    placeholder={label.searchPlaceholder}
-                                    value={splitSearchTerm}
-                                    onchange={handleSplitSearchChange}
-                                    onkeyup={handleSplitSearchChange}
-                                    class="split-search-input"
-                                ></lightning-input>
-                                <lightning-button
-                                    label={label.searchLabel}
-                                    onclick={handleSplitSearch}
-                                    class="slds-var-m-top_x-small split-search-button"
-                                ></lightning-button>
-
-                                <template if:true={showSplitNoResults}>
-                                    <p role="status" class="slds-text-color_weak slds-var-m-top_small split-no-results">
-                                        {label.noResults}
-                                    </p>
-                                </template>
-
-                                <template if:true={hasSplitSearchResults}>
-                                    <ul class="slds-has-dividers_bottom-space slds-var-m-top_small split-search-results">
-                                        <template for:each={splitSearchResults} for:item="option">
-                                            <li key={option.id} class="slds-item split-search-result">
-                                                <lightning-button
-                                                    variant="base"
-                                                    label={option.name}
-                                                    aria-label={option.accessibleName}
-                                                    data-household-id={option.id}
-                                                    onclick={handlePickSplitTarget}
-                                                    class="split-pick-button"
-                                                ></lightning-button>
-                                                <span class="slds-text-body_small slds-var-m-left_x-small">
-                                                    {option.location}
-                                                </span>
-                                            </li>
-                                        </template>
-                                    </ul>
-                                </template>
-
-                                <template if:true={splitTargetName}>
-                                    <p class="slds-var-m-top_x-small split-target-name">
-                                        {splitTargetName}
-                                    </p>
-                                </template>
-                            </div>
+                        <template lwc:if={isSplittingToExisting}>
+                            <lightning-record-picker
+                                label={label.searchLabel}
+                                object-api-name="Account"
+                                filter={householdFilter}
+                                display-info={householdDisplayInfo}
+                                matching-info={householdMatchingInfo}
+                                onchange={handleSplitTargetChange}
+                                class="slds-var-m-top_small split-picker"
+                            ></lightning-record-picker>
                         </template>
 
-                        <div class="slds-var-m-top_medium">
+                        <span id="split-drag-help" class="slds-assistive-text split-drag-help">{dragHelp}</span>
+                        <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-top_small split-board">
+                            <template for:each={splitBoard} for:item="column">
+                                <div key={column.id} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-var-m-bottom_x-small">
+                                    <section
+                                        class={column.zoneClass}
+                                        data-drop-zone={column.id}
+                                        data-drop-label={column.place}
+                                        aria-label={column.heading}
+                                    >
+                                        <h4 class="slds-text-title_bold slds-var-m-bottom_x-small split-column-heading">
+                                            {column.heading}
+                                        </h4>
+                                        <ul class="split-list">
+                                            <template for:each={column.tiles} for:item="member">
+                                                <li
+                                                    key={member.personId}
+                                                    class={member.tileClass}
+                                                    data-drag-id={member.personId}
+                                                    data-drag-label={member.name}
+                                                    tabindex="0"
+                                                    aria-describedby="split-drag-help"
+                                                    onpointerdown={handleDragPointerDown}
+                                                    onkeydown={handleDragKeyDown}
+                                                >
+                                                    <div class="slds-grid slds-grid_vertical-align-center">
+                                                        <lightning-icon
+                                                            icon-name="utility:drag_and_drop"
+                                                            size="x-small"
+                                                            class="slds-var-m-right_x-small split-handle"
+                                                        ></lightning-icon>
+                                                        <div class="slds-col">
+                                                            <lightning-input
+                                                                type="checkbox"
+                                                                label={member.name}
+                                                                checked={member.selected}
+                                                                data-person-id={member.personId}
+                                                                onchange={handleMemberToggle}
+                                                                class="member-checkbox"
+                                                            ></lightning-input>
+                                                        </div>
+                                                        <lightning-button-menu
+                                                            icon-size="x-small"
+                                                            alternative-text={member.moveLabel}
+                                                            menu-alignment="right"
+                                                            data-person-id={member.personId}
+                                                            onselect={handleMoveMenu}
+                                                            class="move-menu"
+                                                        >
+                                                            <lightning-menu-item
+                                                                value="move"
+                                                                label={member.moveLabel}
+                                                            ></lightning-menu-item>
+                                                        </lightning-button-menu>
+                                                    </div>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </section>
+                                </div>
+                            </template>
+                        </div>
+                        <div aria-live="polite" class="slds-assistive-text split-announcer">{liveText}</div>
+
+                        <div class="slds-var-m-top_small slds-var-m-bottom_small">
                             <lightning-button
                                 variant="brand"
                                 label={label.splitButton}
@@ -224,8 +216,8 @@
                 </lightning-tabset>
             </template>
 
-            <template if:true={errorMessage}>
-                <div class="slds-text-color_error slds-var-m-top_small" role="alert">{errorMessage}</div>
+            <template lwc:if={errorMessage}>
+                <c-barn-notice variant="error" message={errorMessage} class="slds-var-m-top_small merge-error"></c-barn-notice>
             </template>
         </div>
     </lightning-card>

@@ -4,6 +4,8 @@ import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Setti
 import canFind from '@salesforce/customPermission/Find_And_Export_Records';
 import canBulkUpdate from '@salesforce/customPermission/Bulk_Update_Records';
 import canBulkDelete from '@salesforce/customPermission/Bulk_Delete_Records';
+import canReviewDuplicates from '@salesforce/customPermission/Review_Duplicate_Suggestions';
+import canManageMetadata from '@salesforce/customPermission/Manage_BarnCRM_Metadata';
 import getMappings from '@salesforce/apex/DataManagerController.getMappings';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 import BarnConfirmModal from 'c/barnConfirmModal';
@@ -15,7 +17,9 @@ import GROUP_FIND_CHANGE from '@salesforce/label/c.Core_DataManager_GroupFindCha
 import GROUP_CHECK from '@salesforce/label/c.Core_DataManager_GroupCheck';
 import GROUP_CAREFUL from '@salesforce/label/c.Core_DataManager_GroupCareful';
 import IMPORT_TITLE from '@salesforce/label/c.Core_DataManager_ImportTitle';
-import FIND_TITLE from '@salesforce/label/c.Core_DataManager_FindTitle';
+import FIND_TITLE from '@salesforce/label/c.Core_Find_Title';
+import DUPLICATES_TITLE from '@salesforce/label/c.Core_DuplicateMatching_Title';
+import TASK_SEARCH from '@salesforce/label/c.Core_DataManager_TaskSearch';
 import UPDATE_TITLE from '@salesforce/label/c.Core_SuperTransform_Title';
 import DELETE_TITLE from '@salesforce/label/c.Core_DataManager_DeleteTitle';
 import DELETE_WARNING from '@salesforce/label/c.Core_DataManager_DeleteWarning';
@@ -35,6 +39,8 @@ import WEEKLY_EXPORT from '@salesforce/label/c.Core_DataManager_WeeklyExport';
 import RECYCLE_BIN from '@salesforce/label/c.Core_DataManager_RecycleBin';
 import DATA_IMPORT_WIZARD from '@salesforce/label/c.Core_DataManager_DataImportWizard';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { iconFor } from 'c/barnIcons';
+import { matchTasks } from 'c/dataManagerTasks';
 
 /** The tabs the tiles open, by API name (ADR-0103 org-optimizer-and-data-manager-pages). */
 const TABS = {
@@ -43,6 +49,7 @@ const TABS = {
   // Super Transformer (C-50) on the tab that kept the Bulk Update API name.
   update: 'Bulk_Update',
   optimizer: 'Data_Hygiene',
+  duplicates: 'Duplicate_Matching',
   delete: 'Find'
 };
 /** The tiles that open Find for a bulk tool, and the tool Find's note names. */
@@ -92,7 +99,9 @@ const SALESFORCE_TILES = [
  * permission check; the tiles only hide what the tool would refuse. Delete Many Records is last,
  * alone in the Careful group, and first shows in a confirmation box that the records go to the
  * Recycle Bin and can be undone; only Continue opens the tool (D-135). Find, Import and Bulk
- * Update are in no app's navigation, so these tiles are how they are reached.
+ * Update are in no app's navigation, so these tiles are how they are reached. Above the tiles,
+ * What Do You Want to Do? matches a typed task to the tile that does it (admin-23; the task
+ * table is the framework-free c/dataManagerTasks).
  */
 export default class DataManager extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
@@ -124,8 +133,18 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     get mappingsEmptyHint() {
       return helpText('Core', 'Core_DataManager_MappingsEmptyHint');
     },
-    createTemplate: CREATE_TEMPLATE
+    createTemplate: CREATE_TEMPLATE,
+    taskSearch: TASK_SEARCH,
+    get taskSearchPlaceholder() {
+      return helpText('Core', 'Core_DataManager_TaskSearchPlaceholder');
+    },
+    get taskSearchNone() {
+      return helpText('Core', 'Core_DataManager_TaskSearchNone');
+    }
   };
+
+  /** What was typed in What Do You Want to Do?. */
+  taskQuery = '';
 
   learnMoreUrl = LEARN_MORE_URL;
 
@@ -183,14 +202,14 @@ export default class DataManager extends NavigationMixin(LightningElement) {
           'import',
           IMPORT_TITLE,
           helpText('Core', 'Core_DataManager_ImportText'),
-          'standard:data_streams'
+          iconFor('Import')
         )
       );
     }
     const findChange = [];
     if (canFind) {
       findChange.push(
-        tile('find', FIND_TITLE, helpText('Core', 'Core_DataManager_FindText'), 'standard:search')
+        tile('find', FIND_TITLE, helpText('Core', 'Core_DataManager_FindText'), iconFor('Find'))
       );
     }
     if (canBulkUpdate) {
@@ -199,7 +218,7 @@ export default class DataManager extends NavigationMixin(LightningElement) {
           'update',
           UPDATE_TITLE,
           helpText('Core', 'Core_DataManager_UpdateText'),
-          'standard:record_update'
+          iconFor('Bulk_Update')
         )
       );
     }
@@ -210,7 +229,18 @@ export default class DataManager extends NavigationMixin(LightningElement) {
           'optimizer',
           OPTIMIZER_TITLE,
           helpText('Core', 'Core_DataManager_OptimizerText'),
-          'standard:data_integration_hub'
+          iconFor('Data_Hygiene')
+        )
+      );
+    }
+    // The permissions the Duplicate Matching tab itself shows to.
+    if (canManageSettings || canReviewDuplicates || canManageMetadata) {
+      check.push(
+        tile(
+          'duplicates',
+          DUPLICATES_TITLE,
+          helpText('Core', 'Core_DataManager_DuplicatesText'),
+          iconFor('Duplicate_Matching')
         )
       );
     }
@@ -232,6 +262,37 @@ export default class DataManager extends NavigationMixin(LightningElement) {
       { name: 'check', label: GROUP_CHECK, tiles: check },
       { name: 'careful', label: GROUP_CAREFUL, tiles: careful }
     ];
+  }
+
+  /** The tasks matching what was typed, each with the title of the tile it opens. */
+  get taskResults() {
+    const titles = {};
+    this.toolGroups.forEach((group) =>
+      group.tiles.forEach((item) => {
+        titles[item.name] = item.label;
+      })
+    );
+    return matchTasks(this.taskQuery, Object.keys(titles)).map((task) => ({
+      ...task,
+      toolLabel: titles[task.tool]
+    }));
+  }
+
+  get hasTaskResults() {
+    return this.taskResults.length > 0;
+  }
+
+  get showNoTasks() {
+    return this.taskQuery.trim().length > 0 && !this.hasTaskResults;
+  }
+
+  handleTaskInput(event) {
+    this.taskQuery = event.target.value || '';
+  }
+
+  /** A task opens its tool exactly as its tile does, the delete confirmation included. */
+  handleTaskSelect(event) {
+    this.handleSelect({ detail: { name: event.currentTarget.dataset.tool } });
   }
 
   get salesforceGroups() {

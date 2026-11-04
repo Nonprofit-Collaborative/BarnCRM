@@ -12,105 +12,126 @@
             <c-barn-help learn-more-url={learnMoreUrl}></c-barn-help>
         </div>
 
-        <lightning-tabset variant="vertical" active-tab-value={activeSection}>
-            <lightning-tab label={labels.overview} value="overview" onactive={handleActive} data-id="tab-overview">
-                <c-barn-tool-grid groups={overviewGroups} onselect={handleSelectTool} data-id="overview"></c-barn-tool-grid>
-            </lightning-tab>
+        <div class="slds-grid slds-wrap slds-gutters">
+            <!-- Under medium width the section list is a Show box at the top (admin-19). -->
+            <div class="slds-col slds-size_1-of-1 slds-hide_medium slds-var-m-bottom_small">
+                <lightning-combobox
+                    label={labels.show}
+                    options={sectionOptions}
+                    value={activeSection}
+                    onchange={handleShowChange}
+                    data-id="show"
+                ></lightning-combobox>
+            </div>
+            <!-- The same vertical navigation with icons as BarnCRM Settings (vis-core-14). -->
+            <div class="slds-col slds-show_medium slds-medium-size_1-of-4">
+                <lightning-vertical-navigation
+                    selected-item={activeSection}
+                    onselect={handleNavSelect}
+                    aria-label={labels.sections}
+                    data-id="nav"
+                >
+                    <template for:each={navigationGroups} for:item="group">
+                        <lightning-vertical-navigation-section key={group.name} label={group.label}>
+                            <template for:each={group.items} for:item="item">
+                                <lightning-vertical-navigation-item-icon
+                                    key={item.name}
+                                    label={item.label}
+                                    name={item.name}
+                                    icon-name={item.iconName}
+                                ></lightning-vertical-navigation-item-icon>
+                            </template>
+                        </lightning-vertical-navigation-section>
+                    </template>
+                </lightning-vertical-navigation>
+            </div>
 
-            <template lwc:if={canSeeQuality}>
-                <lightning-tab label={labels.quality} value="quality" onactive={handleActive} data-id="tab-quality">
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-4">
+                <section
+                    tabindex="-1"
+                    aria-label={activeSectionLabel}
+                    data-id="section-content"
+                >
+                    <div class={sectionClass.overview} data-id="tab-overview">
+                        <c-barn-tool-grid groups={overviewGroups} onselect={handleSelectTool} data-id="overview"></c-barn-tool-grid>
+                    </div>
+
                     <template lwc:if={qualityOpened}>
-                        <c-data-hygiene-console onsummary={handleQualitySummary}></c-data-hygiene-console>
+                        <div class={sectionClass.quality} data-id="tab-quality">
+                            <c-data-hygiene-console onsummary={handleQualitySummary}></c-data-hygiene-console>
+                        </div>
                     </template>
-                </lightning-tab>
-            </template>
 
-            <template lwc:if={isAdmin}>
-                <lightning-tab
-                    label={labels.fieldUtilization}
-                    value="fieldUtilization"
-                    onactive={handleActive}
-                    data-id="tab-fieldUtilization"
-                >
-                    <template lwc:if={fieldUtilizationOpened}>
-                        <c-field-utilization></c-field-utilization>
+                    <template lwc:if={isAdmin}>
+                        <template lwc:if={fieldUtilizationOpened}>
+                            <div class={sectionClass.fieldUtilization} data-id="tab-fieldUtilization">
+                                <c-field-utilization></c-field-utilization>
+                            </div>
+                        </template>
+                        <template lwc:if={dataDictionaryOpened}>
+                            <div class={sectionClass.dataDictionary} data-id="tab-dataDictionary">
+                                <c-data-dictionary></c-data-dictionary>
+                            </div>
+                        </template>
+                        <template lwc:if={aiExportOpened}>
+                            <div class={sectionClass.aiExport} data-id="tab-aiExport">
+                                <c-ai-readiness-export></c-ai-readiness-export>
+                            </div>
+                        </template>
+                        <template lwc:if={healthCheckOpened}>
+                            <div class={sectionClass.healthCheck} data-id="tab-healthCheck">
+                                <template lwc:if={showHealthCheck}>
+                                    <c-health-check-panel
+                                        last-result-first={healthCheckLastResultFirst}
+                                    ></c-health-check-panel>
+                                </template>
+                                <template lwc:else>
+                                    <c-barn-empty-state
+                                        illustration="setup"
+                                        heading={labels.healthCheckNotRun}
+                                        message={labels.healthCheckIntro}
+                                        heading-level="2"
+                                        data-id="health-check-empty"
+                                    >
+                                        <lightning-button
+                                            variant="brand"
+                                            label={labels.runHealthCheck}
+                                            onclick={handleRunHealthCheck}
+                                            data-id="run-health-check"
+                                        ></lightning-button>
+                                    </c-barn-empty-state>
+                                </template>
+                            </div>
+                        </template>
+                        <template lwc:if={errorsOpened}>
+                            <div class={sectionClass.errors} data-id="tab-errors">
+                                <c-error-log-tile></c-error-log-tile>
+                            </div>
+                        </template>
+                        <template lwc:if={storageOpened}>
+                            <div class={sectionClass.storage} data-id="tab-storage">
+                                <c-optimizer-storage onsummary={handleStorageSummary}></c-optimizer-storage>
+                            </div>
+                        </template>
+                        <template lwc:if={setupOpened}>
+                            <div class={sectionClass.setup} data-id="tab-setup">
+                                <c-optimizer-setup></c-optimizer-setup>
+                            </div>
+                        </template>
+                        <template lwc:if={setupChangesOpened}>
+                            <div class={sectionClass.setupChanges} data-id="tab-setupChanges">
+                                <c-setup-change-log></c-setup-change-log>
+                            </div>
+                        </template>
+                        <template lwc:if={accessExplorerOpened}>
+                            <div class={sectionClass.accessExplorer} data-id="tab-accessExplorer">
+                                <c-access-explorer></c-access-explorer>
+                            </div>
+                        </template>
                     </template>
-                </lightning-tab>
-                <lightning-tab
-                    label={labels.dataDictionary}
-                    value="dataDictionary"
-                    onactive={handleActive}
-                    data-id="tab-dataDictionary"
-                >
-                    <template lwc:if={dataDictionaryOpened}>
-                        <c-data-dictionary></c-data-dictionary>
-                    </template>
-                </lightning-tab>
-                <lightning-tab label={labels.aiExport} value="aiExport" onactive={handleActive} data-id="tab-aiExport">
-                    <template lwc:if={aiExportOpened}>
-                        <c-ai-readiness-export></c-ai-readiness-export>
-                    </template>
-                </lightning-tab>
-                <lightning-tab label={labels.healthCheck} value="healthCheck" onactive={handleActive} data-id="tab-healthCheck">
-                    <template lwc:if={showHealthCheck}>
-                        <c-health-check-panel
-                            last-result-first={healthCheckLastResultFirst}
-                        ></c-health-check-panel>
-                    </template>
-                    <template lwc:else>
-                        <c-barn-empty-state
-                            illustration="setup"
-                            heading={labels.healthCheckNotRun}
-                            message={labels.healthCheckIntro}
-                            heading-level="2"
-                            data-id="health-check-empty"
-                        >
-                            <lightning-button
-                                variant="brand"
-                                label={labels.runHealthCheck}
-                                onclick={handleRunHealthCheck}
-                                data-id="run-health-check"
-                            ></lightning-button>
-                        </c-barn-empty-state>
-                    </template>
-                </lightning-tab>
-                <lightning-tab label={labels.errors} value="errors" onactive={handleActive} data-id="tab-errors">
-                    <template lwc:if={errorsOpened}>
-                        <c-error-log-tile></c-error-log-tile>
-                    </template>
-                </lightning-tab>
-                <lightning-tab label={labels.storage} value="storage" onactive={handleActive} data-id="tab-storage">
-                    <template lwc:if={storageOpened}>
-                        <c-optimizer-storage onsummary={handleStorageSummary}></c-optimizer-storage>
-                    </template>
-                </lightning-tab>
-                <lightning-tab label={labels.setup} value="setup" onactive={handleActive} data-id="tab-setup">
-                    <template lwc:if={setupOpened}>
-                        <c-optimizer-setup></c-optimizer-setup>
-                    </template>
-                </lightning-tab>
-                <lightning-tab
-                    label={labels.setupChanges}
-                    value="setupChanges"
-                    onactive={handleActive}
-                    data-id="tab-setupChanges"
-                >
-                    <template lwc:if={setupChangesOpened}>
-                        <c-setup-change-log></c-setup-change-log>
-                    </template>
-                </lightning-tab>
-                <lightning-tab
-                    label={labels.accessExplorer}
-                    value="accessExplorer"
-                    onactive={handleActive}
-                    data-id="tab-accessExplorer"
-                >
-                    <template lwc:if={accessExplorerOpened}>
-                        <c-access-explorer></c-access-explorer>
-                    </template>
-                </lightning-tab>
-            </template>
-        </lightning-tabset>
+                </section>
+            </div>
+        </div>
     </c-barn-page-shell>
     </template>
 </template>

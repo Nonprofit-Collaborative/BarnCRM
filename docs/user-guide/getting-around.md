@@ -38,10 +38,12 @@ flows and Apex triggers that run on each kind of record) and downloads it as a C
 **AI-Readiness Export** section, which downloads a zip that explains your data to an AI tool of
 their choice, a **Setup Changes** section that shows who changed what in Setup, and when, and
 an **Access Explorer** section that shows who can see or change what, and why, compares two
-people side by side and lists who holds Modify All Data. Its **Field Utilization** section also
+people side by side and lists who holds Modify All Data. Its **Field Use** section also
 shows, for any picklist, how many records hold each value and when they were last changed, and
-its **Unused Setup** section lists Apex and flows on old API versions under **Technical Debt**.
-Each field row in the Data Dictionary, Field Utilization and the Record Inspector has a **Where
+its **Unused Setup** section lists Apex and flows on old API versions in a closed part titled
+**For Developers: Old Code and Flows**. Org Optimizer lists its sections on the left, like
+BarnCRM Settings; on a phone, choose a section in the **Show** box at the top.
+Each field row in the Data Dictionary, Field Use and the Record Inspector has a **Where
 Used** action, which lists the BarnCRM setup (saved queries, import mappings, rollups and more)
 that uses the field and walks an administrator through retiring it safely. If you import files, the
 **Check Columns** step shows a few example values beside each column, so you can see each
@@ -51,12 +53,20 @@ field before you go on. An Excel workbook can load several of its sheets at once
 its own kind of record if the template loads several. The
 Admin Guide's Importing page has the detail.
 
-The **BarnCRM Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,
-**Organizations**, **Gifts**, **Commitments**, **Gift Batches**, **Funds**, **Appeals**,
-**Tributes**, **Receipts**, **Stewardship Plans**, **Acknowledgment Queue**, **Receipt
-Letters**, **Dashboards** and **Reports** (an admin also sees **Donor Level Ladder** and
-**Stewardship Plan Setup**), plus **Quick Gift Entry** in the utility
-bar at the bottom of the screen.
+The **BarnCRM Fundraising** app opens on **Fundraising Home**, then has **Quick Gift Entry**,
+**Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Installments**
+(each pledge payment), **Ask Pipeline**, **Asks**, **Gift Batches**, **Funds**, **Appeals**,
+**Tributes**, **Receipts**, **Stewardship Plans**, **Acknowledgment Queue**, **Donor
+Segments**, **Dashboards** and **Reports**, plus **Quick Gift Entry** in the utility bar at the
+bottom of the screen.
+
+**Fundraising Home** shows five figures, each a link to its list: gifts waiting for a thank
+you, overdue pledge payments, your asks due this month, open gift batches and running
+stewardship plans. **Enter a Gift** opens Quick Gift Entry. Under **Fundraising Setup** are the
+setup pages that are no longer in the menu (**Donor Level Ladder**, **Stewardship Plan Setup**,
+**Pledge Reminders**, **Receipt Letters**), each shown only to people who may use it; they are
+also in the App Launcher. Below are two charts, **Giving by Month** and **Open Asks by Stage**;
+click a chart to open its report.
 
 The **BarnCRM Volunteers** app has **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer
 Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer
@@ -99,22 +109,25 @@ Open the **BarnCRM** app and choose **Home**. As a staff member you see:
 - **What's New in BarnCRM**: what changed in the latest upgrade, with a headline and a few
   lines for each change. Read it, then click **Dismiss**. It comes back only when a later
   upgrade brings something new. Dismissing hides it for you, not for your colleagues.
-- **Welcome to BarnCRM**: a short line saying "Your households, people and organizations are
-  in the tabs above."
+- **Welcome to BarnCRM**: a short line saying "Find someone, add someone new, or pick up
+  where you left off."
+- **New Person**: opens the new person form. Fill in the name and address and save; BarnCRM
+  makes the household for you. You see this button only if you can create contacts.
 - **New Household**: creates a household with a placeholder name and opens it. The name is
   replaced automatically once you add a member. You see this button only if you can create
   and edit accounts.
-- **Quick Links**: icon tiles for **Households**, **Organizations** and **BarnCRM Settings**,
-  each with a one-line description and the same icon as its tab, opened without going back to
-  the App Launcher.
+- **Quick Links**: icon tiles for **People**, **Households**, **Organizations** and **Find**,
+  plus **Quick Gift Entry** when Giving is installed and turned on, and **BarnCRM Settings**
+  for administrators. Each has a one-line description and the same icon as its tab, and opens
+  without going back to the App Launcher.
   **Households** opens the households list even on your first day, before the **Households**
   tab has been added for you.
 - **Files That Arrive Regularly**: shown only if you can read import templates and a file is
   marked as arriving regularly, with the date it was last imported.
 
-If someone has paused automation (for example during a large import), a banner under the
+If someone has paused automation (for example during a large import), a warning under the
 welcome says "BarnCRM automation is paused. Households and greetings are not being updated
-until it resumes." It goes away by itself. Admins also see **Resume Automation** in the banner.
+until it resumes." It goes away by itself. Admins also see **Resume Automation** in the warning.
 
 Admins also see the setup checklist, a Health Check summary and status tiles with a badge
 each (for example **All Clear**, **Not Run Yet** or **Overdue**). See
@@ -165,7 +178,7 @@ tool you may use, in short groups:
 
 | Group | Tile | Opens |
 |---|---|---|
-| **Find and Change** | **Find and Export Records** | The **Find** tab |
+| **Find and Change** | **Find** | The **Find** tab: find records, then save or export them |
 | **Find and Change** | **Super Transformer** | Change fields on many records at once, no file needed: choose the records and the changes, preview, then run (see [Changing many records at once](super-transform.md)) |
 | **Check and Tidy** | **Org Optimizer** | The **Org Optimizer** tab |
 | **Careful** (last) | **Delete Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Delete** (no file needed) |
@@ -174,12 +187,14 @@ Deleted records go to the Recycle Bin, not away for good: choosing **Delete Many
 first shows a box that says so. Choose **Continue** to go on to Find, or **Cancel** to stay on
 Data Manager. You can undo a bulk delete from **Data Jobs** for up to 15 days.
 
-1. Choose the tile you want: anywhere on it works.
+1. Choose the tile you want: anywhere on it works. Not sure which? Type the task in **What Do
+   You Want to Do?** above the tiles (for example "find people without email") and choose a
+   result to open its tool.
 2. Under **Data Jobs**, use **Show** to filter to **All**, **Super Transformer runs** or **Bulk
    deletes**, and press **Refresh** to see the latest.
 
 You should see: your recent jobs, newest first, each with its counts and an **Undo** while
-it can still be undone. **Bring Data In** (**Import a File**), **Import Templates** and
+it can still be undone. **Bring Data In** (**Super Importer**), **Duplicate Matching**, **Import Templates** and
 **Salesforce's Own Tools** are for admins. See
 [Data Manager](../admin-guide/data-manager.md).
 

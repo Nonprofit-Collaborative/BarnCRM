@@ -112,7 +112,7 @@ describe('c-match-source-modal', () => {
     await flush();
 
     expect(saveRow.mock.calls[0][0].input.developerName).toBe('Org_Mine_abcd');
-    expect(one(element, '[data-id="error"]').textContent).toContain(
+    expect(one(element, '[data-id="error"]').message).toContain(
       'An address source needs a postal code field.'
     );
     expect(closed).not.toHaveBeenCalled();
@@ -127,7 +127,7 @@ describe('c-match-source-modal', () => {
     change(element, 'form-object', 'Not_An_Object__c');
     one(element, '[data-id="find-fields"]').click();
     await flush();
-    expect(one(element, '[data-id="error"]').textContent).toContain('is not an object');
+    expect(one(element, '[data-id="error"]').message).toContain('is not an object');
 
     one(element, '[data-id="form-cancel"]').click();
     expect(closed).toHaveBeenCalledTimes(1);

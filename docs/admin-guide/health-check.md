@@ -23,26 +23,33 @@ install is off until you turn it on: choose **Turn On** in that row in **BarnCRM
 [BarnCRM Settings](barncrm-settings.md). Once it is on there is nothing else to enable and
 nothing to configure.
 
+Health Check's one home is **Org Optimizer**:
+
 1. Open the **BarnCRM Admin** app.
-2. Click the **BarnCRM Settings** tab.
-3. Choose **Health** in the left navigation. The report is there.
-4. Click **Re-Run** whenever you want a fresh look. On this page Health Check reads your
-   org each time it opens.
+2. Click the **Org Optimizer** tab and choose **Health Check** (in the list on the left, or
+   in the **Show** box on a phone).
+3. The section shows the last full run. Click **Run Health Check** the first time, and
+   **Run Again** whenever you want a fresh look.
+
+**BarnCRM Settings**, **Health** keeps Health Check's settings and an **Open Health Check**
+link that opens this section.
 
 An administrator also finds Health Check on the BarnCRM home page, under the setup
 checklist. Home does not run every check each time it opens, because a full run reads a lot
 of your org and Home is the page everyone opens first. Instead it shows a summary of the last
-result: a badge (**Errors: 2**, **Warnings: 3**, **Passed**, or **Not Run Yet**, the same
-badge as the Health Check tile in Org Optimizer), when Health Check last ran in full for an
+result: a badge (**Needs Fixing: 2**, **Worth Knowing: 3**, **All Clear**, or **Not Run
+Yet**, the same badge as the Health Check tile in Org Optimizer, in the same words as the
+report's findings), when Health Check last ran in full for an
 administrator, and how many findings it had to fix, to be aware of and for your information.
-Click **Run Now** to run it in full there and see the whole report, with each finding as a
-row (the same component, and the same rows, as Org Optimizer's Health Check tab). Until
-Health Check has run once, Home says so and offers **Run Now**. A run by
+Click **Run Health Check** to run it in full there and see the whole report, with each finding as a
+row (the same component, and the same rows, as Org Optimizer's Health Check section); after
+that the button reads **Run Again**. Until
+Health Check has run once, Home says so and offers **Run Health Check**. A run by
 someone without the **Manage BarnCRM Settings** permission is not kept as the last result,
 because it skips the access checks.
 
-The settings console is the way in that always works, including for staff who do not see
-the home page copy and for an org where someone removed it from the page.
+Org Optimizer is the way in that always works, including for an org where someone removed
+the home page copy from the page.
 
 To act on a finding you need the **Manage BarnCRM Settings** permission, which the
 BarnCRM Admin role includes. Without it you can still read most of the report: the page says
@@ -58,8 +65,8 @@ Maria has just installed BarnCRM into her organization's Salesforce org. Person 
 are on, and nothing else that keeps households is installed. She has not set anything up
 yet.
 
-1. Maria opens the **BarnCRM Admin** app, clicks **BarnCRM Settings**, and chooses
-   **Health**.
+1. Maria opens the **BarnCRM Admin** app, clicks **Org Optimizer**, chooses **Health
+   Check**, and clicks **Run Health Check**.
 2. The first card is **What We Found in Your Org**. It says Person Accounts are enabled.
    Under it, the card shows the mode this org is in now and the mode BarnCRM recommends:
    **Standalone**.
@@ -72,17 +79,19 @@ yet.
    say so before she loads data.
 5. The next finding is amber: **Coexistence Mode Is Not Confirmed Yet**. It explains which
    mode BarnCRM recommends for what it found. There is a button, **Use Recommended Mode**.
-6. Maria clicks **Use Recommended Mode**. The page saves Standalone and re-runs. The amber
+6. Maria clicks **Use Recommended Mode**. The confirm box says what changes, starting
+   **Coexistence mode (how BarnCRM shares people and households with NPSP or Nonprofit Cloud)
+   changes from**, and she clicks **Confirm**. The page saves Standalone and re-runs. The amber
    finding is replaced by a blue one: **Coexistence Mode Matches Your Org**. If household
    membership were still set to the person's account, the red finding **Household
    membership does not fit Person Accounts** would offer its own one-click fix.
 7. Under **Access** there is a red finding: **No One Is Assigned the BarnCRM Admin Role**.
    She clicks **Open the Access Page**, which takes her to the Access section of BarnCRM
-   Settings, adds herself, and comes back to Health.
+   Settings, adds herself, and comes back to Org Optimizer's Health Check.
 8. Another finding is amber: **4 Users Cannot See the App**. Four active users have a
    Salesforce license but none of the BarnCRM roles, so the BarnCRM app is invisible to
    them. She clicks **Open the Access Page** again and assigns roles.
-9. She clicks **Re-Run**. The red finding is gone, the amber ones are gone, and what is left
+9. She clicks **Run Again**. The red finding is gone, the amber ones are gone, and what is left
    is blue: her org shape, the mode, and **Automation Is Running Normally**.
 
 Total time: about five minutes, most of it assigning roles.

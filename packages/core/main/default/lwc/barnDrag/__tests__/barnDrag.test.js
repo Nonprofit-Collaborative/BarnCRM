@@ -1,4 +1,4 @@
-import { createDragController, formatDragMessage } from 'c/barnDrag';
+import { createDragController, formatDragMessage, moveItem, targetIndex } from 'c/barnDrag';
 import { dragMessages, dragInstructions } from 'c/barnDragText';
 
 // A board of two columns, each 100px wide; items are 20px tall, stacked from the top.
@@ -251,5 +251,26 @@ describe('c/barnDrag', () => {
     expect(typeof words.pickedUp).toBe('function');
     expect(typeof words.position).toBe('function');
     expect(typeof words.cancelled).toBe('function');
+  });
+});
+
+describe('c/barnDrag list helpers', () => {
+  it('moves an item to a new place without changing the list given', () => {
+    const list = ['a', 'b', 'c', 'd'];
+    expect(moveItem(list, 0, 2)).toEqual(['b', 'c', 'a', 'd']);
+    expect(moveItem(list, 3, 0)).toEqual(['d', 'a', 'b', 'c']);
+    expect(list).toEqual(['a', 'b', 'c', 'd']);
+  });
+
+  it('leaves the list as it is for a place outside it', () => {
+    expect(moveItem(['a', 'b'], 0, 5)).toEqual(['a', 'b']);
+    expect(moveItem(['a', 'b'], -1, 0)).toEqual(['a', 'b']);
+    expect(moveItem(null, 0, 1)).toEqual([]);
+  });
+
+  it('knows when Move Up or Move Down has nowhere to go', () => {
+    expect(targetIndex(0, -1, 3)).toBe(-1);
+    expect(targetIndex(2, 1, 3)).toBe(-1);
+    expect(targetIndex(1, 1, 3)).toBe(2);
   });
 });

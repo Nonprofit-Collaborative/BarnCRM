@@ -7,7 +7,6 @@ import NEVER from '@salesforce/label/c.Core_Rollups_FreshnessNever';
 import STALE from '@salesforce/label/c.Core_Rollups_FreshnessStale';
 import LINK from '@salesforce/label/c.Core_Rollups_FreshnessLink';
 import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
-import WARNING from '@salesforce/label/c.Core_HubHome_WarningAltText';
 import NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_BadgeNotRun';
 import OVERDUE from '@salesforce/label/c.Core_HubHome_BadgeOverdue';
 
@@ -24,7 +23,6 @@ export default class HubRollups extends NavigationMixin(LightningElement) {
     never: NEVER,
     stale: STALE,
     link: LINK,
-    warning: WARNING,
     notRun: NOT_RUN,
     overdue: OVERDUE
   };

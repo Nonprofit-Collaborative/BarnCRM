@@ -164,6 +164,27 @@ private class HubControllerTest {
         }
     }
 
+    /**
+     * Home (people-giving-7): New Person for someone who can create contacts, and Quick Gift
+     * Entry in Quick Links only while Giving is installed, read from the module catalog.
+     */
+    @IsTest
+    static void offersNewPersonAndGiftEntryOnlyWhenGivingIsThere() {
+        System.runAs(TestUsers.admin()) {
+            SetupAssistantTestExtension.useNone();
+            Test.startTest();
+            ModuleDetectionService.givingPresentOverride = false;
+            HubController.HomeModel withoutGiving = HubController.getHomeModel();
+            ModuleDetectionService.givingPresentOverride = true;
+            HubController.HomeModel withGiving = HubController.getHomeModel();
+            Test.stopTest();
+
+            Assert.isTrue(withoutGiving.canCreatePerson, 'The admin can create people');
+            Assert.isFalse(withoutGiving.giftEntryAvailable, 'No Giving, no Quick Gift Entry');
+            Assert.isTrue(withGiving.giftEntryAvailable, 'Giving installed and on offers it');
+        }
+    }
+
     @IsTest
     static void listsTheFilesThatArriveRegularly() {
         System.runAs(TestUsers.admin()) {

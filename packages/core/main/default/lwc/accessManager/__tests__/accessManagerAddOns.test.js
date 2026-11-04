@@ -134,7 +134,8 @@ describe('c-access-manager extra permissions', () => {
     expect(descriptions[0].textContent).toBe('Build, run, save and export Find queries.');
     const warnings = element.shadowRoot.querySelectorAll('[data-id="add-on-card-warning"]');
     expect(warnings.length).toBe(1);
-    expect(warnings[0].textContent).toBe(WARNING);
+    expect(warnings[0].message).toBe(WARNING);
+    expect(warnings[0].variant).toBe('warning');
     expect(element.shadowRoot.querySelector('[data-id="empty-add-on"]')).not.toBeNull();
     const remove = element.shadowRoot.querySelector('[data-id="add-on-remove-button"]');
     expect(remove.title).toBe('Remove Priya Nair');
