@@ -13,8 +13,9 @@
  * handler with no registry row, for tests and for a module's own trigger entry point.
  *
  * Before it invokes anything, the dispatcher asks three questions in order: is this handler
- * bypassed for this transaction, is all automation paused for the org, and is this automation
- * switched on. Any "no" and the handler simply does not run.
+ * bypassed for this transaction, is all automation paused (the timed pause for the org, or the
+ * BarnCRM Automation Control setting's Pause All or Bypass for the person saving), and is this
+ * automation switched on. Any "no" and the handler simply does not run.
  *
  * It asks none of them for an automation whose registry row carries `Always_Runs__c`. That row
  * enforces a rule rather than providing a convenience, so there is nothing an administrator, a
@@ -239,7 +240,10 @@ public with sharing class TriggerDispatcher {
 
         Boolean isPaused() {
             if (this.paused == null) {
-                this.paused = AutomationControl.isPaused();
+                // The timed pause, or the BarnCRM Automation Control setting that applies to the
+                // person saving (Pause All or Bypass), read alongside each other.
+                this.paused =
+                    AutomationControl.isOffForRunningUser() || AutomationControl.isPaused();
             }
             return this.paused;
         }
@@ -462,12 +466,16 @@ public with sharing class TriggerDispatcher {
                 if (!narrowing) {
                     continue;
                 }
+                String note = BarnHelp.text(
+                    'Core',
+                    'Core_Automation_RecordRefused',
+                    new List<Object>{ String.valueOf(row + 1) }
+                );
+                // A help catalog that cannot be read must not cost the entry its place in the log.
                 refusedMessages.add(
-                    BarnHelp.text(
-                        'Core',
-                        'Core_Automation_RecordRefused',
-                        new List<Object>{ String.valueOf(row + 1) }
-                    )
+                    String.isBlank(note)
+                        ? Label.Core_Automation_UnexpectedError + ' (' + (row + 1) + ')'
+                        : note
                 );
                 refusedIds.add(record.Id);
             }
