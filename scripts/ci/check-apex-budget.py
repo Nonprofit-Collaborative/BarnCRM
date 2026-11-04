@@ -34,7 +34,7 @@ from apex_source import is_test_class, without_comments  # noqa: E402
 
 ORG_LIMIT = 6_000_000
 CAPS = {
-    "core": 2_400_000,
+    "core": 2_420_000,  # raised for the nightly dispatcher and Automation Control; the Core trim pass lowers it
     "rollups": 470_000,
     "giving": 730_000,
     "volunteers": 210_000,
