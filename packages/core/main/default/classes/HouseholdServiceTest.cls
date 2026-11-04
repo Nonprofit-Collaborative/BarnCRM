@@ -1165,10 +1165,11 @@ private class HouseholdServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_Households_ErrorMoveNeedsJunction,
+                BarnHelp.text('Core', 'Core_Households_ErrorMoveNeedsJunction'),
                 message,
                 'Maria is told which setting has to change first'
             );
+            Assert.isTrue(String.isNotBlank(message), 'The refusal says why');
         }
     }
 
