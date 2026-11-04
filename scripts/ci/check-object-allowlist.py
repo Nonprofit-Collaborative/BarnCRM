@@ -115,6 +115,8 @@ ALLOWED = {
     "OrgWideEmailAddress": "the from address acknowledgments are sent as, ADR-0032.",
     "StaticResource": "packaged assets read by Apex.",
     "Task": "activity logging on constituents. Platform feature, not Sales Cloud.",
+    "ListView": "list view names for Fundraising Home figures. Platform metadata, every org.",
+    "TabDefinition": "tab labels for Fundraising Home setup tiles. Platform metadata, every org.",
     "TaskRelation": "the people a shared task names, counted by Erase a person (R-ER10). Platform feature, every edition.",
     "Event": "events about a person, counted by Erase a person (R-ER10). Platform feature, every edition.",
     "EventRelation": "the people an event names, counted by Erase a person (R-ER10). Platform feature, every edition.",

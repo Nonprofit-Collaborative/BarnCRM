@@ -3,6 +3,7 @@ import Toast from 'lightning/toast';
 import DataHygieneConsole from 'c/dataHygieneConsole';
 import getChecks from '@salesforce/apex/DataHygieneController.getChecks';
 import openInFind from '@salesforce/apex/DataHygieneController.openInFind';
+import { setHelpTextForTest } from 'c/barnHelpText';
 
 const mockNavigate = jest.fn();
 jest.mock(
@@ -26,11 +27,6 @@ jest.mock('@salesforce/apex/DataHygieneController.getChecks', () => ({ default: 
 jest.mock('@salesforce/apex/DataHygieneController.openInFind', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_DataHygiene_OpenedNotice',
-  () => ({ default: 'In Find, choose "{0}" from Saved queries.' }),
-  { virtual: true }
-);
 jest.mock(
   '@salesforce/label/c.Core_DataHygiene_NeedsAttention',
   () => ({ default: 'Needs Attention' }),
@@ -110,10 +106,13 @@ describe('c-data-hygiene-console', () => {
     expect(items.length).toBe(4);
     const people = row(element, 'people_without_household');
     expect(people.querySelector('h3').textContent).toBe('People with no household');
-    expect(people.querySelector('[data-id="count"]').textContent).toBe('214');
+    const count = people.querySelector('c-barn-stat-tile[data-id="count"]');
+    expect(count.value).toBe('214');
+    expect(count.label).toBe('c.Core_DataHygiene_RecordsFound');
+    expect(count.align).toBe('start');
     expect(people.querySelector('section').getAttribute('aria-labelledby')).toBeTruthy();
     expect(
-      row(element, 'households_without_members').querySelector('[data-id="count"]').textContent
+      row(element, 'households_without_members').querySelector('[data-id="count"]').value
     ).toBe('More than 2,000');
   });
 
@@ -124,9 +123,9 @@ describe('c-data-hygiene-console', () => {
     document.body.appendChild(element);
     await flush();
 
-    expect(row(element, 'people_without_household').querySelector('[data-id="badge"]').label).toBe(
-      'Needs Attention'
-    );
+    const tile = row(element, 'people_without_household').querySelector('[data-id="count"]');
+    expect(tile.badgeLabel).toBe('Needs Attention');
+    expect(tile.badgeVariant).toBe('warning');
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
     expect(element.shadowRoot.querySelector('c-barn-help[data-id="help"]')).not.toBeNull();
     // 214, more than 2,000 and 3 found records; the refused check has no count.
@@ -138,9 +137,9 @@ describe('c-data-hygiene-console', () => {
     getChecks.mockResolvedValue([{ ...CHECKS[0], count: 0, countLabel: '0' }]);
     const element = await render();
 
-    expect(row(element, 'people_without_household').querySelector('[data-id="badge"]').label).toBe(
-      'All Clear'
-    );
+    const tile = row(element, 'people_without_household').querySelector('[data-id="count"]');
+    expect(tile.badgeLabel).toBe('All Clear');
+    expect(tile.badgeVariant).toBe('success');
   });
 
   it('shows a refusal instead of a number, and no Find button', async () => {
@@ -148,9 +147,9 @@ describe('c-data-hygiene-console', () => {
 
     const ownerless = row(element, 'addresses_without_owner');
     expect(ownerless.querySelector('[data-id="count"]')).toBeNull();
-    expect(ownerless.querySelector('[data-id="check-error"]').textContent).toContain(
-      'You cannot see'
-    );
+    const refusal = ownerless.querySelector('c-barn-notice[data-id="check-error"]');
+    expect(refusal.variant).toBe('error');
+    expect(refusal.message).toContain('You cannot see');
     expect(ownerless.querySelector('[data-id="open"]')).toBeNull();
   });
 
@@ -159,7 +158,7 @@ describe('c-data-hygiene-console', () => {
 
     const memberships = row(element, 'memberships_without_person');
     expect(memberships.querySelector('[data-id="note"]').textContent).toContain('Find cannot');
-    expect(memberships.querySelector('[data-id="count"]').textContent).toBe('3');
+    expect(memberships.querySelector('[data-id="count"]').value).toBe('3');
     expect(memberships.querySelector('[data-id="open"]')).toBeNull();
   });
 
@@ -170,6 +169,7 @@ describe('c-data-hygiene-console', () => {
       findTabApiName: 'Find',
       stateKey: 'c__savedQueryId'
     });
+    setHelpTextForTest({ Core_DataHygiene_OpenedInFind: 'Opened {0} in Find.' });
     const element = await render();
     const toasts = jest.spyOn(Toast, 'show');
 
@@ -183,8 +183,9 @@ describe('c-data-hygiene-console', () => {
       state: { c__savedQueryId: 'a0X000000000001AAA' }
     });
     expect(toasts).toHaveBeenCalledTimes(1);
+    // admin-5: Find opens the query itself, so the toast says it is open.
     expect(toasts.mock.calls[0][0].label).toBe(
-      'In Find, choose "Data Quality: People with no household" from Saved queries.'
+      'Opened Data Quality: People with no household in Find.'
     );
   });
 
@@ -195,7 +196,7 @@ describe('c-data-hygiene-console', () => {
     row(element, 'people_without_household').querySelector('[data-id="open"]').click();
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toContain(
       'Find cannot list these yet.'
     );
     expect(mockNavigate).not.toHaveBeenCalled();
@@ -215,7 +216,7 @@ describe('c-data-hygiene-console', () => {
     getChecks.mockRejectedValue({ body: { message: 'Data Quality needs the permission.' } });
     const element = await render();
 
-    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toContain(
       'needs the permission'
     );
     expect(element.shadowRoot.querySelectorAll('li[data-key]').length).toBe(0);

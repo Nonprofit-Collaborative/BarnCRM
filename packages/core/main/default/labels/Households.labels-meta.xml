@@ -97,14 +97,6 @@
         <value>Choose both a person and a household before moving someone. Nothing was changed.</value>
     </labels>
     <labels>
-        <fullName>Core_Households_ErrorMoveNeedsJunction</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Move a person: the org stores this person as an account</shortDescription>
-        <value>This person is stored as an account, so they can only be moved when your org uses the flexible way of belonging to a household. Change that in BarnCRM Settings first.</value>
-    </labels>
-    <labels>
         <fullName>Core_Households_ErrorMoveNoEditAccess</fullName>
         <categories>Households</categories>
         <language>en_US</language>

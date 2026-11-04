@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+  <chart>
+    <chartSummaries>
+      <axisBinding>y</axisBinding>
+      <column>RowCount</column>
+    </chartSummaries>
+    <chartType>VerticalColumn</chartType>
+    <enableHoverLabels>true</enableHoverLabels>
+    <expandOthers>true</expandOthers>
+    <groupingColumn>Error_Log__c$Timestamp__c</groupingColumn>
+    <location>CHART_TOP</location>
+    <showAxisLabels>true</showAxisLabels>
+    <showPercentage>false</showPercentage>
+    <showTotal>false</showTotal>
+    <showValues>false</showValues>
+    <size>Medium</size>
+    <summaryAxisRange>Auto</summaryAxisRange>
+  </chart>
+  <columns>
+    <field>Error_Log__c$Name</field>
+  </columns>
+  <columns>
+    <field>Error_Log__c$Severity__c</field>
+  </columns>
+  <columns>
+    <field>Error_Log__c$Context__c</field>
+  </columns>
+  <columns>
+    <field>Error_Log__c$Status__c</field>
+  </columns>
+  <description>
+    Error Log entries of severity Error or Critical in each of the last 30 days, for the BarnCRM
+    home page.
+  </description>
+  <filter>
+    <criteriaItems>
+      <column>Error_Log__c$Severity__c</column>
+      <operator>equals</operator>
+      <value>Error,Critical</value>
+    </criteriaItems>
+  </filter>
+  <format>Summary</format>
+  <groupingsDown>
+    <dateGranularity>Day</dateGranularity>
+    <field>Error_Log__c$Timestamp__c</field>
+    <sortOrder>Asc</sortOrder>
+  </groupingsDown>
+  <name>Errors by Day</name>
+  <reportType>Error_Logs__c</reportType>
+  <scope>organization</scope>
+  <showDetails>false</showDetails>
+  <timeFrameFilter>
+    <dateColumn>Error_Log__c$Timestamp__c</dateColumn>
+    <interval>INTERVAL_LAST30</interval>
+  </timeFrameFilter>
+</Report>
