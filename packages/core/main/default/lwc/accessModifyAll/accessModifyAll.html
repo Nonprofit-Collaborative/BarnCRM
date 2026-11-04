@@ -4,14 +4,20 @@
         <p data-id="intro">{labels.intro}</p>
 
         <template lwc:if={errorMessage}>
-            <p class="slds-text-color_error slds-var-m-vertical_small" data-id="error" role="alert">
-                {errorMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-vertical_small"
+                data-id="error"
+                variant="error"
+                message={errorMessage}
+            ></c-barn-notice>
         </template>
         <template lwc:if={noticeMessage}>
-            <p class="slds-var-m-vertical_small" data-id="notice" role="status" aria-live="polite">
-                {noticeMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-vertical_small"
+                data-id="notice"
+                variant="success"
+                message={noticeMessage}
+            ></c-barn-notice>
         </template>
         <template lwc:if={loading}>
             <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
@@ -19,7 +25,12 @@
 
         <template lwc:if={report}>
             <template lwc:if={truncatedMessage}>
-                <p class="slds-var-m-top_small" data-id="truncated">{truncatedMessage}</p>
+                <c-barn-notice
+                    class="slds-var-m-top_small"
+                    data-id="truncated"
+                    variant="warning"
+                    message={truncatedMessage}
+                ></c-barn-notice>
             </template>
 
             <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.dataHeading}</h3>
@@ -40,7 +51,12 @@
                 ></lightning-button>
             </template>
             <template lwc:else>
-                <p data-id="data-empty">{labels.nothingToShow}</p>
+                <c-barn-empty-state
+                    data-id="data-empty"
+                    size="compact"
+                    illustration="all-clear"
+                    heading={labels.nothingToShow}
+                ></c-barn-empty-state>
             </template>
 
             <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.objectsHeading}</h3>
@@ -61,7 +77,12 @@
                 ></lightning-button>
             </template>
             <template lwc:else>
-                <p data-id="objects-empty">{labels.nothingToShow}</p>
+                <c-barn-empty-state
+                    data-id="objects-empty"
+                    size="compact"
+                    illustration="all-clear"
+                    heading={labels.nothingToShow}
+                ></c-barn-empty-state>
             </template>
         </template>
     </div>

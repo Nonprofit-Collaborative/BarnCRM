@@ -4,17 +4,23 @@
         <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
 
         <template lwc:if={refusal}>
-            <p class="slds-text-color_error" data-id="refusal" role="alert">{refusal}</p>
+            <c-barn-notice data-id="refusal" variant="error" message={refusal}></c-barn-notice>
         </template>
         <template lwc:if={errorMessage}>
-            <p class="slds-text-color_error slds-var-m-vertical_small" data-id="error" role="alert">
-                {errorMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-vertical_small"
+                data-id="error"
+                variant="error"
+                message={errorMessage}
+            ></c-barn-notice>
         </template>
         <template lwc:if={noticeMessage}>
-            <p class="slds-var-m-vertical_small" data-id="notice" role="status" aria-live="polite">
-                {noticeMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-vertical_small"
+                data-id="notice"
+                variant="success"
+                message={noticeMessage}
+            ></c-barn-notice>
         </template>
         <template lwc:if={loading}>
             <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
@@ -31,7 +37,7 @@
                 onchange={handleTerm}
             ></lightning-input>
             <template lwc:if={noResults}>
-                <p class="slds-var-m-top_x-small" data-id="no-matches">{labels.noMatches}</p>
+                <p class="slds-var-m-top_x-small slds-text-color_weak" data-id="no-matches">{labels.noMatches}</p>
             </template>
             <ul class="slds-var-m-top_x-small" data-id="set-results">
                 <template for:each={resultItems} for:item="choice">
@@ -120,9 +126,12 @@
                     onrowaction={handleItemAction}
                 ></lightning-datatable>
                 <template lwc:if={conflictMessage}>
-                    <p class="slds-text-color_error slds-var-m-top_x-small" data-id="conflict" role="alert">
-                        {conflictMessage}
-                    </p>
+                    <c-barn-notice
+                        class="slds-var-m-top_x-small"
+                        data-id="conflict"
+                        variant="error"
+                        message={conflictMessage}
+                    ></c-barn-notice>
                 </template>
                 <lightning-button
                     class="slds-var-m-top_x-small"
@@ -132,7 +141,11 @@
                 ></lightning-button>
             </template>
             <template lwc:else>
-                <p data-id="no-changes">{labels.noChanges}</p>
+                <c-barn-empty-state
+                    data-id="no-changes"
+                    size="compact"
+                    heading={labels.noChanges}
+                ></c-barn-empty-state>
             </template>
             <div class="slds-var-m-top_small">
                 <lightning-button
@@ -148,7 +161,12 @@
                 <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.preview}</h3>
                 <p class="slds-var-m-vertical_x-small" data-id="summary">{previewView.summary}</p>
                 <template lwc:if={previewView.tooMany}>
-                    <p class="slds-text-color_error" data-id="too-many" role="alert">{previewView.tooMany}</p>
+                    <c-barn-notice
+                        class="slds-var-m-bottom_x-small"
+                        data-id="too-many"
+                        variant="error"
+                        message={previewView.tooMany}
+                    ></c-barn-notice>
                 </template>
                 <lightning-datatable
                     data-id="preview-rows"
@@ -179,7 +197,11 @@
                 ></lightning-datatable>
             </template>
             <template lwc:else>
-                <p data-id="no-recent">{labels.noRecent}</p>
+                <c-barn-empty-state
+                    data-id="no-recent"
+                    size="compact"
+                    heading={labels.noRecent}
+                ></c-barn-empty-state>
             </template>
             <lightning-button
                 class="slds-var-m-top_x-small"

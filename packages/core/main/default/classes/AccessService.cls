@@ -523,10 +523,11 @@ public with sharing class AccessService {
 
     /**
      * The whole add-on allowlist, in the page's order: Core's add-ons, then each module's.
+     * Access Explorer reads it too, to name extra permissions as this page does.
      *
      * @return the API names, without a namespace prefix
      */
-    private static List<String> addOnNames() {
+    public static List<String> addOnNames() {
         List<String> names = new List<String>(ADD_ON_PERMISSION_SETS);
         names.addAll(moduleAddOns().keySet());
         return names;

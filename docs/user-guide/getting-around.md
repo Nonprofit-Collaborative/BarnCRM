@@ -38,10 +38,10 @@ flows and Apex triggers that run on each kind of record) and downloads it as a C
 **AI-Readiness Export** section, which downloads a zip that explains your data to an AI tool of
 their choice, a **Setup Changes** section that shows who changed what in Setup, and when, and
 an **Access Explorer** section that shows who can see or change what, and why, compares two
-people side by side and lists who holds Modify All Data. Its **Field Utilization** section also
+people side by side and lists who holds Modify All Data. Its **Field Use** section also
 shows, for any picklist, how many records hold each value and when they were last changed, and
 its **Unused Setup** section lists Apex and flows on old API versions under **Technical Debt**.
-Each field row in the Data Dictionary, Field Utilization and the Record Inspector has a **Where
+Each field row in the Data Dictionary, Field Use and the Record Inspector has a **Where
 Used** action, which lists the BarnCRM setup (saved queries, import mappings, rollups and more)
 that uses the field and walks an administrator through retiring it safely. If you import files, the
 **Check Columns** step shows a few example values beside each column, so you can see each
