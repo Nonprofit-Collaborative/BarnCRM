@@ -38,6 +38,7 @@ page, even if that puts it out of reading order.
 | Page | Area code | Scripts | Covers |
 |---|---|---|---|
 | [Before you test](before-you-test.md) | | | Test org, modules, sample data, test users, editions, recording and reporting results |
+| [Installing](installing.md) | INST | 3 | The install pre-check (edition, Apex, labels, objects, name collisions, test fit), the production test list, the release destructive manifest |
 | [People and households](people-and-households.md) | HH | 21 | Households, members, naming and greetings, merge and split, preferred phone, interactions, record pages, record types, adopting NPSP households |
 | [Addresses](addresses.md) | ADDR | 20 | Address records, primary address, the Address Updates setting, Use for Whole Household and Update Everyone's Address, seasonal addresses and the nightly swap, address history (status, dates, former addresses, undeliverable) and Address Card Fields |
 | [Relationships and affiliations](relationships-and-affiliations.md) | REL | 10 | Two-sided relationships, affiliations, primary affiliation |
