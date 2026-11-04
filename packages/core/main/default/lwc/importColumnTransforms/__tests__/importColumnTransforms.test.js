@@ -253,9 +253,9 @@ describe('the changes to one column', () => {
     });
     const element = render([{ op: 'ifBlank', value: '' }]);
     await flush();
-    expect(element.shadowRoot.querySelector('[data-id="problems"]').textContent).toContain(
-      'Value when empty needs a value.'
-    );
+    const notice = element.shadowRoot.querySelector('[data-id="problems"]');
+    expect(notice.variant).toBe('error');
+    expect(notice.message).toContain('Value when empty needs a value.');
     expect(element.shadowRoot.querySelectorAll('[data-id="sample"]')).toHaveLength(0);
   });
 
@@ -263,9 +263,55 @@ describe('the changes to one column', () => {
     previewChanges.mockRejectedValue({ body: { message: 'No access.' } });
     const element = render([{ op: 'trim' }]);
     await flush();
-    expect(element.shadowRoot.querySelector('[data-id="problems"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="problems"]').message).toContain(
       'No access.'
     );
+  });
+
+  it('moves a step up or down from the keyboard buttons and announces it', async () => {
+    const element = render([{ op: 'trim' }, { op: 'proper' }, { op: 'upper' }]);
+    listen(element);
+    await flush();
+    expect(steps(element)[0].querySelector('[data-id="move-up"]').disabled).toBe(true);
+    expect(steps(element)[2].querySelector('[data-id="move-down"]').disabled).toBe(true);
+
+    steps(element)[2].querySelector('[data-id="move-up"]').click();
+    await flush();
+    expect(changes[0].transforms.map((step) => step.op)).toEqual(['trim', 'upper', 'proper']);
+    expect(element.shadowRoot.querySelector('[data-id="announce"]').textContent).toBe(
+      'c.Core_Kit_MovedToPosition'
+    );
+
+    steps(element)[0].querySelector('[data-id="move-down"]').click();
+    await flush();
+    expect(changes[1].transforms.map((step) => step.op)).toEqual(['upper', 'trim', 'proper']);
+    expect(previewChanges).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        transformsJson: JSON.stringify([{ op: 'upper' }, { op: 'trim' }, { op: 'proper' }])
+      })
+    );
+  });
+
+  it('moves a step by dragging its handle', async () => {
+    const element = render([{ op: 'trim' }, { op: 'proper' }]);
+    listen(element);
+    await flush();
+    const rows = steps(element);
+    rows.forEach((row, index) => {
+      row.getBoundingClientRect = () => ({ top: index * 50, bottom: index * 50 + 50 });
+    });
+    const handle = rows[0].querySelector('[data-id="drag"]');
+    const event = (type, clientY) => {
+      const pointer = new CustomEvent(type, { bubbles: true, cancelable: true });
+      pointer.clientY = clientY;
+      pointer.button = 0;
+      return pointer;
+    };
+    handle.dispatchEvent(event('pointerdown', 10));
+    handle.dispatchEvent(event('pointermove', 90));
+    handle.dispatchEvent(event('pointerup', 90));
+    await flush();
+    expect(changes[0].transforms.map((step) => step.op)).toEqual(['proper', 'trim']);
   });
 
   it('keeps its steps when handed back what it sent, and previews another column afresh', async () => {

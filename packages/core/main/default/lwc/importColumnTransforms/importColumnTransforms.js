@@ -63,7 +63,11 @@ import whenBlankLabel from '@salesforce/label/c.Core_Import_StepsWhenBlank';
 import opDigits from '@salesforce/label/c.Core_Import_StepsOpDigits';
 import patternLabel from '@salesforce/label/c.Core_Import_StepsPattern';
 import countryLabel from '@salesforce/label/c.Core_Import_StepsCountry';
+import moveUpLabel from '@salesforce/label/c.Core_Shared_MoveUp';
+import moveDownLabel from '@salesforce/label/c.Core_Shared_MoveDown';
+import dragLabel from '@salesforce/label/c.Core_Kit_DragToMove';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { moveItem, startDrag, targetIndex } from 'c/barnReorder';
 
 /** The most changes one column may have, as DataTransform.MAX_STEPS says. */
 const MAX_STEPS = 10;
@@ -114,6 +118,8 @@ export default class ImportColumnTransforms extends LightningElement {
   counter = 0;
   samples = [];
   problems = [];
+  /** The last move, read out by the aria-live region. */
+  announcement = '';
 
   labels = {
     get help() {
@@ -152,7 +158,10 @@ export default class ImportColumnTransforms extends LightningElement {
     unitLabel,
     whenBlankLabel,
     patternLabel,
-    countryLabel
+    countryLabel,
+    moveUpLabel,
+    moveDownLabel,
+    dragLabel
   };
 
   /** The column's steps, as the mapping document holds them. */
@@ -247,8 +256,14 @@ export default class ImportColumnTransforms extends LightningElement {
 
   /** The steps as the template shows them, each with the inputs its kind needs. */
   get rows() {
-    return this.steps.map((step) => ({
+    const last = this.steps.length - 1;
+    return this.steps.map((step, position) => ({
       ...step,
+      index: position,
+      isFirst: position === 0,
+      isLast: position === last,
+      moveUpText: `${moveUpLabel}: ${this.stepName(step)}`,
+      moveDownText: `${moveDownLabel}: ${this.stepName(step)}`,
       isReplace: step.op === 'replace',
       isIfBlank: step.op === 'ifBlank',
       isAppend: step.op === 'append',
@@ -290,6 +305,51 @@ export default class ImportColumnTransforms extends LightningElement {
   handleAdd() {
     this.steps = this.steps.concat(this.keyed({ op: 'trim' }));
     this.changed();
+  }
+
+  // Order changes the result (trim before fixing capitals), so steps move without retyping:
+  // Move Up and Move Down for a keyboard or a screen reader, a drag from the handle for a mouse,
+  // a finger or a pen. Each move is announced.
+  handleMoveUp(event) {
+    this.moveBy(Number(event.currentTarget.dataset.index), -1);
+  }
+
+  handleMoveDown(event) {
+    this.moveBy(Number(event.currentTarget.dataset.index), 1);
+  }
+
+  handleDragStart(event) {
+    startDrag(event, {
+      from: Number(event.currentTarget.dataset.index),
+      items: () => [...this.template.querySelectorAll('[data-reorder-item]')],
+      onMove: (from, to) => this.move(from, to)
+    });
+  }
+
+  moveBy(index, delta) {
+    const to = targetIndex(index, delta, this.steps.length);
+    if (to >= 0) {
+      this.move(index, to);
+    }
+  }
+
+  move(from, to) {
+    const step = this.steps[from];
+    this.steps = moveItem(this.steps, from, to);
+    this.announcement = helpText(
+      'Core',
+      'Core_Kit_MovedToPosition',
+      this.stepName(step),
+      to + 1,
+      this.steps.length
+    );
+    this.changed();
+  }
+
+  /** A step's kind as the list names it, for the move buttons and announcements. */
+  stepName(step) {
+    const option = this.operationOptions.find((candidate) => candidate.value === step.op);
+    return option ? option.label : step.op;
   }
 
   handleRemove(event) {

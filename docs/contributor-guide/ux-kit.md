@@ -103,8 +103,18 @@ Each component has Jest tests written as stories (one case per variant a screen 
 | `c-barn-meter` | A share or progress: steps done, attendance rate, received against awarded, a funding mix row | `label`, `value`, `max` (100 by default), `value-text` (for example "3 of 5"; the percent when empty), `size` |
 | `c/barnStatus` (module) | The status vocabulary, for code that needs the tone without the badge | `statusFor(word)` returns `{ tone, themeClass, iconName }`; `TONES`, `ALIASES` |
 | `c/barnIcons` (module) | The icon for a tab or object | `iconFor(apiName, fallback)`; `ICONS` |
+| `c/barnReorder` (module) | Reordering a list: Move Up and Move Down, and a pointer drag from a handle | `moveItem(list, from, to)`, `targetIndex(index, delta, length)`, `startDrag(pointerdownEvent, { from, items, onMove, axis })`, `indexAt(rects, position)` |
 
-The two modules are framework free (no `lightning/*` or `@salesforce/*` imports), so they port to BarnCRM for WordPress (plan 9.9). `c-barn-empty-state` also takes `size="compact"` (below).
+The three modules are framework free (no `lightning/*` or `@salesforce/*` imports), so they port to BarnCRM for WordPress (plan 9.9). `c-barn-empty-state` also takes `size="compact"` (below).
+
+### Drag and Drop
+
+Drag and drop is always an extra on a list that already has another way to change it:
+
+- Each item keeps **Move Up** and **Move Down** buttons (`Core_Shared_MoveUp`, `Core_Shared_MoveDown`; the alternative text names the item), disabled at the ends. That is the keyboard, screen reader and fallback path.
+- The handle is a `span` with `title` `Core_Kit_DragToMove`, `aria-hidden="true"` (the buttons are the accessible path) and `touch-action: none` in CSS, so a finger drags instead of scrolling. Its `onpointerdown` calls `startDrag` with `items` returning the elements marked `data-reorder-item`; style `[data-reorder-dragging]` and `[data-reorder-over]` with hooks. Escape cancels.
+- Every move, from either path, sets the text of an `aria-live="polite"` `slds-assistive-text` region from the help key `Core_Kit_MovedToPosition` ("{0} moved to position {1} of {2}.").
+- Never for a destructive or single-choice action (a delete, a merge, a setting). `importColumnTransforms` is the reference use.
 
 ## Visual Standard
 

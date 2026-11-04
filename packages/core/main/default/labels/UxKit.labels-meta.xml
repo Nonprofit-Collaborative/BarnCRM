@@ -72,4 +72,12 @@
         <shortDescription>Save bar: count of unsaved changes. {0} the count</shortDescription>
         <value>{0} unsaved changes</value>
     </labels>
+    <labels>
+        <fullName>Core_Kit_DragToMove</fullName>
+        <categories>Core, UX kit</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reorder: tooltip on the handle that drags an item to a new place</shortDescription>
+        <value>Drag to move</value>
+    </labels>
 </CustomLabels>

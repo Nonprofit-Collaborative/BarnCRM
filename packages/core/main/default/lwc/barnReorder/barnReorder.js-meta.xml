@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    UX kit: reorder a list by Move Up and Move Down or by a pointer drag from a handle (mouse,
+    touch and pen). Framework free; exposed so every package can import it.
+  </description>
+  <isExposed>true</isExposed>
+</LightningComponentBundle>

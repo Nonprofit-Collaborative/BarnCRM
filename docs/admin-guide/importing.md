@@ -977,7 +977,9 @@ file of the same kind is fixed too.
 
 1. On the columns step, select **Change Values** beside a column.
 2. Select **Add a Change** and pick one. Changes run in the order listed, and you can add up
-   to ten to one column:
+   to ten to one column. To change the order, use the **Move Up** and **Move Down** arrows
+   beside a change, or drag it by its handle (mouse, finger or pen); the preview updates and a
+   screen reader hears the new position:
 
 | Change | What it does | Example |
 |---|---|---|
