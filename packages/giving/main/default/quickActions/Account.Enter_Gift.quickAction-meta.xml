@@ -5,7 +5,6 @@
     Enter a Gift: opens Quick Gift Entry with this household or organization already filled in as
     the donor.
   </description>
-  <height>640</height>
   <label>Enter a Gift</label>
   <lightningWebComponent>quickGiftEntryAction</lightningWebComponent>
   <optionsCreateFeedItem>false</optionsCreateFeedItem>
