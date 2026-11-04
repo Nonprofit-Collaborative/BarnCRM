@@ -46,7 +46,7 @@ page, even if that puts it out of reading order.
 | [Setup Assistant](setup-assistant.md) | SA | 11 | First-run setup, edition choice, Setup Assistant steps, sample data load and remove |
 | [Imports](imports.md) | IMP | 22 | Import wizard, templates, row rules, matching (including match sources), several sheets, two-part headings, best guesses for near spellings, several objects in one file, new fields from a column, undo, row retention, correcting and retrying rows |
 | [Find](find.md) | FIND | 10 | Query builder, typed queries, export, saved queries, summaries, Show More |
-| [Data Manager and job history](data-manager-and-job-history.md) | DM | 13 | Data Manager, data jobs and undo, data quality checks, field utilization, picklist value usage and its snapshot history |
+| [Data Manager and job history](data-manager-and-job-history.md) | DM | 13 | Data Manager, data jobs and undo, data quality checks, Field Use, picklist value usage and its snapshot history |
 | [Super Transformer and bulk delete](bulk-update-and-delete.md) | BULK | 15 | Super Transformer runs from Find, bulk delete, edit in Find, undo, the bulk path, Super Transformer, saved step lists, phone format |
 | [Duplicates](duplicates.md) | DUP | 17 | Duplicate scan, review and merge, match sources, similar names, merge rules, auto-merge and its undo |
 | [Record Inspector](record-inspector.md) | RI | 2 | Inspect a record, search fields, copy an API name, field security and permission |

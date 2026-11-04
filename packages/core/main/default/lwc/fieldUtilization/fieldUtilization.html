@@ -86,6 +86,16 @@
                         {labels.neverSaved}
                     </p>
                 </template>
+                <lightning-input
+                    class="slds-var-m-bottom_x-small"
+                    data-id="technical-names"
+                    type="toggle"
+                    label={labels.showTechnicalNames}
+                    message-toggle-active=""
+                    message-toggle-inactive=""
+                    checked={showTechnicalNames}
+                    onchange={handleTechnicalNames}
+                ></lightning-input>
                 <lightning-datatable
                     data-id="results"
                     key-field="key"

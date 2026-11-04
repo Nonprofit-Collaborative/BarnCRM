@@ -66,11 +66,9 @@ jest.mock(
   () => ({ default: 'Counted {0} of {1} fields.' }),
   { virtual: true }
 );
-jest.mock(
-  '@salesforce/label/c.Core_FieldUtilization_Save',
-  () => ({ default: 'Save Utilization Snapshot' }),
-  { virtual: true }
-);
+jest.mock('@salesforce/label/c.Core_FieldUtilization_Save', () => ({ default: 'Save Snapshot' }), {
+  virtual: true
+});
 jest.mock(
   '@salesforce/label/c.Core_FieldUtilization_Saved',
   () => ({ default: 'Saved {0} counts.' }),
@@ -157,11 +155,11 @@ describe('c-field-utilization', () => {
     expect(find(element, 'results')).toBeNull();
   });
 
-  it('names the save button Save Utilization Snapshot and explains it in small text', async () => {
+  it('names the save button Save Snapshot and explains it in small text', async () => {
     const element = render();
     await flush();
 
-    expect(find(element, 'save').label).toBe('Save Utilization Snapshot');
+    expect(find(element, 'save').label).toBe('Save Snapshot');
     const help = find(element, 'save-help');
     expect(help.textContent).toBe('Keeps this count so your next count shows what changed.');
     expect(help.classList.contains('slds-text-body_small')).toBe(true);
@@ -194,6 +192,15 @@ describe('c-field-utilization', () => {
     expect(find(element, 'not-counted').textContent).toContain('Not counted: Fax');
     expect(find(element, 'compared')).not.toBeNull();
     expect(find(element, 'save').disabled).toBe(false);
+
+    // admin-24: the API Name column shows only with Show technical names on.
+    const fieldNames = () => find(element, 'results').columns.map((c) => c.fieldName);
+    expect(fieldNames()).not.toContain('fieldName');
+    const toggle = find(element, 'technical-names');
+    toggle.checked = true;
+    toggle.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(fieldNames()[1]).toBe('fieldName');
   });
 
   it('says an object over the size limit is not counted, and counts nothing', async () => {

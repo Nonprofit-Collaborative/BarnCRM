@@ -81,7 +81,9 @@ called **Event Volunteers** (no license) if you do not have one to try this on.
    search box. Add more the same way, or remove one with its **x**.
 3. In **Kind of Record**, choose **Contact**. The **Fields** table lists every Contact field you
    can change, with **Now**: how many of the chosen permission sets give Read and Edit today.
-   Type in **Filter Fields** to narrow it.
+   Type in **Filter Fields** to narrow it. Its **API Name** column, and the API names in the
+   **Kind of Record** list, show only while **Show technical names** at the top of Access
+   Explorer is on (it starts off).
 4. Tick **Email** and **Phone**, choose **Read and Edit** in **Access for the Ticked Fields**,
    and press **Add to Changes**. Both appear under **Changes**.
 5. In **Kind of Record**, choose **Relationship**, set **Access to the Kind of Record** to

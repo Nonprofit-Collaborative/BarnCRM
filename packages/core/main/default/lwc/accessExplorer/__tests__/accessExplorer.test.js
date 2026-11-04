@@ -362,6 +362,48 @@ describe('c-access-explorer', () => {
     expect(getOverview).toHaveBeenCalledTimes(1);
   });
 
+  it('names roles and extra permissions as the Access page does, and hides API names until asked', async () => {
+    setHelpTextForTest({
+      Core_AccessExplorer_RoleName: '{0} (BarnCRM role)',
+      Core_AccessExplorer_ExtraPermissionName: '{0} (extra permission)'
+    });
+    getOverview.mockResolvedValue({
+      sets: [
+        { id: '0PS1', label: 'Team Member', name: 'Team', kind: 'group', barnKind: 'role' },
+        {
+          id: '0PS2',
+          label: 'BarnCRM Bulk Update',
+          name: 'BarnCRM_Bulk_Update',
+          kind: 'permissionSet',
+          barnKind: 'extraPermission'
+        },
+        { id: '0PS3', label: 'BarnCRM Staff', name: 'BarnCRM_Staff', kind: 'permissionSet' }
+      ],
+      tabAccessCheckScheduled: false
+    });
+    const element = await render();
+    await choose(element, 'view', 'barncrm');
+
+    const table = byId(element, 'barncrm');
+    expect(table.data.map((row) => row.label)).toEqual([
+      'Team Member (BarnCRM role)',
+      'BarnCRM Bulk Update (extra permission)',
+      'BarnCRM Staff'
+    ]);
+    expect(table.data[0].kindLabel).toBe('Group');
+    expect(table.columns.map((column) => column.fieldName)).not.toContain('name');
+    expect(table.columns.some((column) => 'technical' in column)).toBe(false);
+
+    const toggle = byId(element, 'technical-names');
+    toggle.checked = true;
+    toggle.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(byId(element, 'barncrm').columns.map((column) => column.fieldName)).toContain('name');
+
+    await choose(element, 'view', 'change');
+    expect(byId(element, 'change').showTechnicalNames).toBe(true);
+  });
+
   it('offers Compare Two and the Modify All Report as views', async () => {
     const element = await render();
 
