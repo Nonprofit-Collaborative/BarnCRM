@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: file chosen to suggest the object to load</shortDescription>
-        <value>Suggest the object from a file (optional)</value>
+        <value>Suggest the kind of record from a file (optional)</value>
     </labels>
     <labels>
         <fullName>Core_Import_DetectSuggested</fullName>

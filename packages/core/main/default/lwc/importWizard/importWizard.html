@@ -10,9 +10,12 @@
             </template>
 
             <template lwc:if={hasMessage}>
-                <div class="slds-box slds-theme_warning slds-var-m-bottom_small" role="alert">
-                    <p data-id="message">{message}</p>
-                </div>
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="warning"
+                    message={message}
+                    data-id="message"
+                ></c-barn-notice>
             </template>
 
             <template lwc:if={showWizard}>
@@ -132,23 +135,28 @@
                         </template>
                     </template>
                     <template lwc:if={choosingObject}>
-                        <lightning-input
-                            type="file"
-                            data-id="detect-file"
-                            label={labels.detectFileLabel}
-                            accept=".csv,text/csv,.tsv,.txt,text/tab-separated-values,text/plain,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                            onchange={handleDetectFile}
-                        ></lightning-input>
+                        <div class="drop-area" data-id="detect-drop-area">
+                            <lightning-input
+                                type="file"
+                                data-id="detect-file"
+                                label={labels.detectFileLabel}
+                                accept=".csv,text/csv,.tsv,.txt,text/tab-separated-values,text/plain,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                onchange={handleDetectFile}
+                            ></lightning-input>
+                        </div>
                         <template lwc:if={hasDetection}>
                             <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="detection">
                                 {detectionText}
                                 <template lwc:if={detectionGuessed}>
                                     <span
-                                        class="slds-badge slds-theme_warning slds-var-m-left_x-small"
+                                        class="slds-var-m-left_x-small"
                                         title={labels.guessBadgeHelp}
                                         data-id="detection-guess"
                                     >
-                                        {labels.guessBadge}
+                                        <c-barn-status-badge
+                                            status="attention"
+                                            label={labels.guessBadge}
+                                        ></c-barn-status-badge>
                                         <span class="slds-assistive-text">{labels.guessBadgeHelp}</span>
                                     </span>
                                 </template>
@@ -214,13 +222,15 @@
                 </template>
 
                 <template lwc:if={isStepUpload}>
-                    <lightning-input
-                        type="file"
-                        data-id="file"
-                        label={labels.uploadLabel}
-                        accept=".csv,text/csv,.tsv,.txt,text/tab-separated-values,text/plain,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                        onchange={handleFileChange}
-                    ></lightning-input>
+                    <div class="drop-area" data-id="drop-area">
+                        <lightning-input
+                            type="file"
+                            data-id="file"
+                            label={labels.uploadLabel}
+                            accept=".csv,text/csv,.tsv,.txt,text/tab-separated-values,text/plain,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            onchange={handleFileChange}
+                        ></lightning-input>
+                    </div>
                     <p class="slds-text-body_small slds-var-m-top_x-small">{labels.uploadHint}</p>
                     <template lwc:if={parsing}>
                         <p role="status" class="slds-text-body_small" data-id="parsing">
@@ -272,14 +282,18 @@
                         </div>
                     </template>
                     <template lwc:if={hasSheetConflict}>
-                        <div class="slds-var-m-bottom_small" role="alert" data-id="sheet-conflict">
-                            <p class="slds-text-color_error">{labels.sheetConflict}</p>
+                        <c-barn-notice
+                            class="slds-show slds-var-m-bottom_small"
+                            variant="error"
+                            message={labels.sheetConflict}
+                            data-id="sheet-conflict"
+                        >
                             <ul class="slds-list_dotted">
                                 <template for:each={sheetConflictLines} for:item="line">
                                     <li key={line.key}>{line.text}</li>
                                 </template>
                             </ul>
-                        </div>
+                        </c-barn-notice>
                     </template>
                     <template lwc:if={hasGuesses}>
                         <div
@@ -295,9 +309,9 @@
                             ></lightning-button>
                         </div>
                     </template>
-                    <div class="slds-scrollable_x">
+                    <div>
                         <table
-                            class="slds-table slds-table_bordered slds-table_cell-buffer"
+                            class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
                             aria-label={labels.stepColumns}
                             data-id="columns-table"
                         >
@@ -311,8 +325,8 @@
                             <tbody>
                                 <template for:each={columnRows} for:item="column">
                                     <tr key={column.key} data-id="column-row">
-                                        <td>{column.source}</td>
-                                        <td>
+                                        <td data-label={labels.columnHeader}>{column.source}</td>
+                                        <td data-label={labels.targetHeader}>
                                             <lightning-combobox
                                                 label={labels.targetHeader}
                                                 variant="label-hidden"
@@ -324,10 +338,13 @@
                                             <template lwc:if={column.guessed}>
                                                 <div class="slds-var-m-top_xx-small" data-id="guess">
                                                     <span
-                                                        class="slds-badge slds-theme_warning slds-var-m-right_x-small"
+                                                        class="slds-var-m-right_x-small"
                                                         title={labels.guessBadgeHelp}
                                                     >
-                                                        {labels.guessBadge}
+                                                        <c-barn-status-badge
+                                                            status="attention"
+                                                            label={labels.guessBadge}
+                                                        ></c-barn-status-badge>
                                                         <span class="slds-assistive-text">{labels.guessBadgeHelp}</span>
                                                     </span>
                                                     <lightning-button
@@ -369,7 +386,7 @@
                                                 ></lightning-input>
                                             </template>
                                         </td>
-                                        <td class="slds-text-body_small" data-id="examples">
+                                        <td class="slds-text-body_small" data-label={labels.sampleHeader} data-id="examples">
                                             <template for:each={column.examples} for:item="example">
                                                 <div key={example.key} class="slds-truncate">{example.text}</div>
                                             </template>
@@ -469,14 +486,22 @@
                                 options={personFieldOptions}
                                 onchange={handlePersonFieldChange}
                             ></lightning-combobox>
-                            <p class="slds-text-color_error slds-text-body_small" data-id="person-field-warning">
-                                {personFieldWarning}
-                            </p>
+                            <template lwc:if={personFieldWarning}>
+                                <c-barn-notice
+                                    class="slds-show slds-var-m-top_x-small"
+                                    variant="warning"
+                                    message={personFieldWarning}
+                                    data-id="person-field-warning"
+                                ></c-barn-notice>
+                            </template>
                         </template>
                         <template lwc:else>
-                            <p class="slds-text-color_error slds-text-body_small" data-id="no-person-fields">
-                                {labels.noMatchFields}
-                            </p>
+                            <c-barn-notice
+                                class="slds-show slds-var-m-top_x-small"
+                                variant="error"
+                                message={labels.noMatchFields}
+                                data-id="no-person-fields"
+                            ></c-barn-notice>
                         </template>
                     </template>
                     <template lwc:if={mapsOrganization}>
@@ -500,17 +525,22 @@
                                     options={organizationFieldOptions}
                                     onchange={handleOrganizationFieldChange}
                                 ></lightning-combobox>
-                                <p
-                                    class="slds-text-color_error slds-text-body_small"
-                                    data-id="organization-field-warning"
-                                >
-                                    {organizationFieldWarning}
-                                </p>
+                                <template lwc:if={organizationFieldWarning}>
+                                    <c-barn-notice
+                                        class="slds-show slds-var-m-top_x-small"
+                                        variant="warning"
+                                        message={organizationFieldWarning}
+                                        data-id="organization-field-warning"
+                                    ></c-barn-notice>
+                                </template>
                             </template>
                             <template lwc:else>
-                                <p class="slds-text-color_error slds-text-body_small" data-id="no-organization-fields">
-                                    {labels.noMatchFields}
-                                </p>
+                                <c-barn-notice
+                                    class="slds-show slds-var-m-top_x-small"
+                                    variant="error"
+                                    message={labels.noMatchFields}
+                                    data-id="no-organization-fields"
+                                ></c-barn-notice>
                             </template>
                         </template>
                     </template>
@@ -546,9 +576,12 @@
                             onchange={handleDuplicateRulesChange}
                         ></lightning-input>
                         <template lwc:if={duplicateRulesMissing}>
-                            <p class="slds-text-color_error slds-text-body_small" data-id="duplicate-rules-none">
-                                {labels.duplicateRulesNone}
-                            </p>
+                            <c-barn-notice
+                                class="slds-show slds-var-m-top_x-small"
+                                variant="warning"
+                                message={labels.duplicateRulesNone}
+                                data-id="duplicate-rules-none"
+                            ></c-barn-notice>
                         </template>
                     </template>
                     <lightning-accordion
@@ -694,7 +727,7 @@
                             ></lightning-input>
                             <lightning-button
                                 class="slds-var-m-top_x-small"
-                                label={labels.trialButton}
+                                label={trialButtonLabel}
                                 data-id="trial-button"
                                 disabled={cannotTrial}
                                 onclick={handleTrial}
@@ -720,13 +753,15 @@
                     <div class="slds-var-m-top_medium" data-id="retry">
                         <h3 class="slds-text-heading_small">{labels.retryHeading}</h3>
                         <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.retryHelp}</p>
-                        <lightning-input
-                            type="file"
-                            data-id="retry-file"
-                            label={labels.retryFileLabel}
-                            accept=".csv,text/csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                            onchange={handleRetryFile}
-                        ></lightning-input>
+                        <div class="drop-area" data-id="retry-drop-area">
+                            <lightning-input
+                                type="file"
+                                data-id="retry-file"
+                                label={labels.retryFileLabel}
+                                accept=".csv,text/csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                onchange={handleRetryFile}
+                            ></lightning-input>
+                        </div>
                     </div>
                 </template>
 
@@ -777,7 +812,7 @@
                             <lightning-button
                                 class="slds-var-m-left_x-small"
                                 variant="brand"
-                                label={labels.commitButton}
+                                label={commitButtonLabel}
                                 data-id="commit"
                                 disabled={cannotCommit}
                                 onclick={handleCommit}

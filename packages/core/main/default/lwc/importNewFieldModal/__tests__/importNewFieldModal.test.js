@@ -143,7 +143,7 @@ describe('c-import-new-field-modal', () => {
     one(element, 'create').click();
     await flush();
 
-    expect(one(element, 'error').textContent).toContain('already used');
+    expect(one(element, 'error').message).toContain('already used');
     expect(one(element, 'guidance')).toBeNull();
     expect(one(element, 'create').disabled).toBe(false);
     expect(checkField).not.toHaveBeenCalled();
@@ -157,7 +157,7 @@ describe('c-import-new-field-modal', () => {
     one(element, 'create').click();
     await flush();
 
-    expect(one(element, 'error').textContent).toContain('refused');
+    expect(one(element, 'error').message).toContain('refused');
     expect(one(element, 'guidance')).not.toBeNull();
     expect(one(element, 'refresh')).not.toBeNull();
   });

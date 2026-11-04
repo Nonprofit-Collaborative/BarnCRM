@@ -401,12 +401,20 @@
         <value>Row {0} of the file is too long to import (over 32,768 characters), usually from an unclosed quotation mark. Fix the row in your spreadsheet and upload the file again.</value>
     </labels>
     <labels>
+        <fullName>Core_Import_SeeEveryRow</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results: link that opens every row of this import</shortDescription>
+        <value>See Every Row</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_CardTitle</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import page: card heading</shortDescription>
-        <value>Import a Spreadsheet</value>
+        <value>Super Importer</value>
     </labels>
     <labels>
         <fullName>Core_Import_StepTemplate</fullName>
@@ -422,7 +430,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: step one name on the path</shortDescription>
-        <value>Choose File Type</value>
+        <value>What You Are Importing</value>
     </labels>
     <labels>
         <fullName>Core_Import_StepUpload</fullName>
@@ -481,14 +489,6 @@
         <value>Next</value>
     </labels>
     <labels>
-        <fullName>Core_Import_CommitButton</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: button that commits the import</shortDescription>
-        <value>Import These Rows</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_StartOverButton</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -503,14 +503,6 @@
         <protected>false</protected>
         <shortDescription>Import wizard: button that downloads the rejected rows</shortDescription>
         <value>Download Rejected Rows</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_UploadLabel</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: file upload control label</shortDescription>
-        <value>Upload file</value>
     </labels>
     <labels>
         <fullName>Core_Import_ColumnHeader</fullName>

@@ -1,4 +1,6 @@
 import { LightningElement, api } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
+import seeEveryRow from '@salesforce/label/c.Core_Import_SeeEveryRow';
 
 import previewWouldCreate from '@salesforce/label/c.Core_Import_PreviewWouldCreate';
 import previewWouldUpdate from '@salesforce/label/c.Core_Import_PreviewWouldUpdate';
@@ -30,7 +32,7 @@ import afterHeader from '@salesforce/label/c.Core_Import_ChangesAfter';
  * presentational: the wizard fetches and passes everything in.
  * See docs/admin-guide/importing.md.
  */
-export default class ImportResults extends LightningElement {
+export default class ImportResults extends NavigationMixin(LightningElement) {
   /** The batch view from ImportController. */
   @api batch;
   /** The rejected rows of that batch, already fetched. */
@@ -49,8 +51,26 @@ export default class ImportResults extends LightningElement {
     changedValuesHeading,
     columnHeader,
     beforeHeader,
-    afterHeader
+    afterHeader,
+    seeEveryRow
   };
+
+  /** Every row of this import is on the data job's Import Rows list (admin-22). */
+  get canSeeRows() {
+    return Boolean(this.batch && this.batch.id && this.batch.isFinished && this.batch.rowCount > 0);
+  }
+
+  handleSeeEveryRow() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__recordRelationshipPage',
+      attributes: {
+        recordId: this.batch.id,
+        objectApiName: 'Import_Batch__c',
+        relationshipApiName: 'Import_Rows',
+        actionName: 'view'
+      }
+    });
+  }
 
   get hasChangedValues() {
     return Array.isArray(this.changedValues) && this.changedValues.length > 0;

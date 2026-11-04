@@ -30,8 +30,9 @@ Manager**. **BarnCRM Console** has the same, plus **Addresses**, **Relationships
 **Affiliations** and **Household Members** just before **Data Manager**. The admin apps
 have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching** and
 **Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
-**Import** and **Super Transformer** are not in the navigation: open them from their cards on
-the **Data Manager** tab. Every tab, including those Giving, Volunteers and Programs add,
+**Super Importer** and **Super Transformer** are not in the navigation: open them from their
+cards on the **Data Manager** tab. A finished import's **See Every Row** link opens the list
+of its rows, which has no tab of its own in the admin apps. Every tab, including those Giving, Volunteers and Programs add,
 has its own icon, so a tab is easy to spot in the menu. Administrators also find a **Data
 Dictionary** section inside **Org Optimizer**, which lists every field (and, when asked, the
 flows and Apex triggers that run on each kind of record) and downloads it as a CSV, an

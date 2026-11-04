@@ -49,9 +49,7 @@ import stageRows from '@salesforce/apex/ImportController.stageRows';
 import startDryRun from '@salesforce/apex/ImportController.startDryRun';
 import startCommit from '@salesforce/apex/ImportController.startCommit';
 import startTrial from '@salesforce/apex/ImportController.startTrial';
-import trialHeading from '@salesforce/label/c.Core_Import_TrialHeading';
 import trialRowsLabel from '@salesforce/label/c.Core_Import_TrialRowsLabel';
-import trialButton from '@salesforce/label/c.Core_Import_TrialButton';
 import remainingButton from '@salesforce/label/c.Core_Import_RemainingButton';
 import trialDone from '@salesforce/label/c.Core_Import_TrialDone';
 import getBatch from '@salesforce/apex/ImportController.getBatch';
@@ -78,7 +76,6 @@ import stepPreview from '@salesforce/label/c.Core_Import_StepPreview';
 import stepResults from '@salesforce/label/c.Core_Find_Results';
 import nextButton from '@salesforce/label/c.Core_Import_NextButton';
 import dryRunButton from '@salesforce/label/c.Core_BulkUpdate_Preview';
-import commitButton from '@salesforce/label/c.Core_Import_CommitButton';
 import startOverButton from '@salesforce/label/c.Core_Import_StartOverButton';
 import downloadExceptionsButton from '@salesforce/label/c.Core_Import_DownloadExceptionsButton';
 import exceptionsCapped from '@salesforce/label/c.Core_Import_ExceptionsCapped';
@@ -93,7 +90,6 @@ import resultsSecondPersonId from '@salesforce/label/c.Core_Import_ResultsSecond
 import resultsHouseholdId from '@salesforce/label/c.Core_Import_ResultsHouseholdId';
 import resultsOrganizationId from '@salesforce/label/c.Core_Import_ResultsOrganizationId';
 import resultsModuleRecordId from '@salesforce/label/c.Core_Import_ResultsModuleRecordId';
-import uploadLabel from '@salesforce/label/c.Core_Import_UploadLabel';
 import columnHeader from '@salesforce/label/c.Core_Import_ColumnHeader';
 import targetHeader from '@salesforce/label/c.Core_Import_TargetHeader';
 import sampleHeader from '@salesforce/label/c.Core_Import_SampleHeader';
@@ -164,7 +160,7 @@ import {
   firstTemplateOfKind,
   createsText
 } from './importKinds';
-import loadObjectLabel from '@salesforce/label/c.Core_MatchLogic_Object';
+import loadObjectLabel from '@salesforce/label/c.Core_FieldUtilization_ChooseLabel';
 import loadObjectNameLabel from '@salesforce/label/c.Core_Import_LoadObjectNameLabel';
 import loadObjectCreateButton from '@salesforce/label/c.Core_Import_LoadObjectCreateButton';
 import lookupFieldLabel from '@salesforce/label/c.Core_Import_LookupFieldLabel';
@@ -482,11 +478,12 @@ export default class ImportWizard extends LightningElement {
     stepResults,
     nextButton,
     dryRunButton,
-    commitButton,
     startOverButton,
     downloadExceptionsButton,
     downloadResultsButton,
-    uploadLabel,
+    get uploadLabel() {
+      return helpText('Core', 'Core_Import_DropFileLabel');
+    },
     get uploadHint() {
       return helpText('Core', 'Core_Import_UploadHint');
     },
@@ -565,12 +562,13 @@ export default class ImportWizard extends LightningElement {
     get detectSheetsDiffer() {
       return helpText('Core', 'Core_Import_DetectSheetsDiffer');
     },
-    trialHeading,
+    get trialHeading() {
+      return helpText('Core', 'Core_Import_TrialIntro');
+    },
     get trialHelp() {
       return helpText('Core', 'Core_Import_TrialHelp');
     },
     trialRowsLabel,
-    trialButton,
     remainingButton,
     retryHeading,
     get retryHelp() {
@@ -2422,6 +2420,29 @@ export default class ImportWizard extends LightningElement {
       !this.deletesByFile &&
       (this.batch.rowCount || 0) > 1
     );
+  }
+
+  /** The trial button names how many rows it imports (admin-20). */
+  get trialButtonLabel() {
+    return helpText('Core', 'Core_Import_TrialButtonRows', this.trialRowCount || '0');
+  }
+
+  /**
+   * The commit button says how many rows it imports: all of the file's rows, or, when the
+   * preview rejects some, the rest of them (admin-20).
+   */
+  get commitButtonLabel() {
+    const batch = this.batch || {};
+    const total = batch.rowCount || 0;
+    const rejected = Math.min(batch.rejected || 0, total);
+    return rejected > 0
+      ? helpText(
+          'Core',
+          'Core_Import_CommitSomeButton',
+          (total - rejected).toLocaleString(),
+          total.toLocaleString()
+        )
+      : helpText('Core', 'Core_Import_CommitAllButton', total.toLocaleString());
   }
 
   get cannotTrial() {
