@@ -1,0 +1,4 @@
+/* Long notes stay on one line in the wide table, with the full text in the cell's title. */
+.notes {
+  max-width: calc(var(--slds-g-sizing-10, 3rem) * 5);
+}

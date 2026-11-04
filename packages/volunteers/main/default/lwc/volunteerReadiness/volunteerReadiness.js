@@ -11,10 +11,22 @@ import CURRENT from '@salesforce/label/c.Volunteers_Readiness_Current';
 import NOT_CURRENT from '@salesforce/label/c.Volunteers_Readiness_NotCurrent';
 import COMPLETED from '@salesforce/label/c.Core_Shared_Completed';
 import EXPIRES from '@salesforce/label/c.Volunteers_Readiness_Expires';
-import LOAD_FAILED from '@salesforce/label/c.Volunteers_Readiness_LoadFailed';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+
+/**
+ * A step's badge as a status word (ux-kit.md, Visual Standard): current is success; a step that
+ * has expired is an error; any other step that is not current (not started, not completed)
+ * needs attention, so the problem is never the quietest badge.
+ */
+function toneOf(step) {
+  if (step.isCurrent) {
+    return 'current';
+  }
+  const today = new Date().toISOString().slice(0, 10);
+  return step.expires && step.expires < today ? 'expired' : 'attention';
+}
 
 /**
  * Volunteer readiness on a person (canonical model R-VQ3): each requirement type's most recently
@@ -73,7 +85,7 @@ export default class VolunteerReadiness extends NavigationMixin(LightningElement
       // A short generic message, never the error's own text, and see showCard for who gets it.
       this.canSee = false;
       this.steps = [];
-      this.errorMessage = LOAD_FAILED;
+      this.errorMessage = true;
       this.failed = true;
       this.loaded = true;
     }
@@ -88,9 +100,7 @@ export default class VolunteerReadiness extends NavigationMixin(LightningElement
       url: started ? `/${step.requirementId}` : undefined,
       statusText: started ? step.statusLabel : NOT_STARTED,
       stateText: step.isCurrent ? CURRENT : NOT_CURRENT,
-      stateClass: step.isCurrent
-        ? 'slds-badge slds-theme_success state'
-        : 'slds-badge slds-badge_lightest state'
+      tone: toneOf(step)
     };
   }
 
@@ -111,6 +121,13 @@ export default class VolunteerReadiness extends NavigationMixin(LightningElement
    */
   get showLoading() {
     return !this.loaded && this.requirementInfo?.data?.queryable === true;
+  }
+
+  /** A short generic message, read when shown, so the help catalog has arrived. */
+  get errorText() {
+    return this.errorMessage
+      ? helpText('Volunteers', 'Volunteers_Readiness_LoadFailed')
+      : undefined;
   }
 
   get showEmpty() {

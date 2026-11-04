@@ -1,9 +1,24 @@
 {
   "languages": ["en"],
   "texts": {
+    "Volunteers_Approve_ActionFailed": "These hours were not loaded or changed. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Volunteers_Approve_Intro": "Approve the hours volunteers gave so they count in totals and letters, or reject them with a reason.",
+    "Volunteers_HealthCheck_PastShiftsDetail": "These shifts ended more than {0} days ago and nobody closed them. Attendance was probably never marked, so the people who came have no hours. Open each shift, mark who came on its Sign-Ups panel, then click Close Shift there, or set Status to Cancelled if it did not happen.",
+    "Volunteers_HealthCheck_PastShiftsDetailOne": "This shift ended more than {0} days ago and nobody closed it. Attendance was probably never marked, so the people who came have no hours. Open the shift, mark who came on its Sign-Ups panel, then click Close Shift there, or set Status to Cancelled if it did not happen.",
+    "Volunteers_JobNotice_LettersFailed": "Some letters were not made. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Volunteers_Letter_ActionFailed": "The letter was not made. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Volunteers_Readiness_Empty": "No requirement types are set up yet, so there is nothing to track. Ask your BarnCRM admin to add types to Volunteer Requirement.",
+    "Volunteers_Readiness_LoadFailed": "Readiness was not loaded. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Volunteers_Signups_ActionFailed": "The sign-ups were not loaded or saved. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Volunteers_Signups_CloseConfirm": "Close this shift? Its status becomes Completed.",
+    "Volunteers_Signups_CloseQuestion": "Close this shift? {0} people are still Signed up or Confirmed. Mark them No Show?",
+    "Volunteers_Signups_CloseQuestionOne": "Close this shift? 1 person is still Signed up or Confirmed. Mark them No Show?",
+    "Volunteers_Signups_Closed": "Shift closed.",
+    "Volunteers_Signups_ClosedNoShow": "Shift closed. Everyone still Signed up or Confirmed is now No Show.",
     "Volunteers_Signups_Empty": "Nobody is signed up for this shift yet.",
+    "Volunteers_Suggestions_BookFailed": "The sign-up was not saved. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Volunteers_Suggestions_Empty": "No volunteers to suggest. Suggestions come from people whose Volunteer Status is Active and who are not already signed up for this shift.",
+    "Volunteers_Suggestions_LoadFailed": "The suggestions were not loaded. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Volunteers_Suggestions_Subtitle": "Active volunteers not yet signed up, best match first by skills, availability, hours on this job and onboarding."
   }
 }

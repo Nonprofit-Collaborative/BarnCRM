@@ -381,8 +381,9 @@ and Lightning Experience Actions** section (click **override the predefined acti
 that section says its actions are predefined). If your people are held as person accounts, do
 the same under **Object Manager**, **Person Account**, **Page Layouts**.
 
-On a person, click **Volunteer Letter**, choose the template and the period, click **Preview**
-to read it, then **Generate**. The action offers the active template of each type, so make a
+On a person, click **Volunteer Letter**, choose the template and the **Period**: **This Year**
+(1 January to today, the default), **Last Year** (the whole year before) or **Custom**, which
+shows **From** and **To** dates to type. Click **Preview** to read it, then **Generate**. The action offers the active template of each type, so make a
 new template active to try it. A person with no approved hours in the period gets no letter,
 and the action says so. On a household or organization account the action says that letters
 are for people.
@@ -398,34 +399,43 @@ run as one job.
 
 **When it ends.** The person who started the job gets one notification (the bell, and the mobile
 app) with how many letters were made, how many people were skipped and why (for example no
-approved hours in the period), and how many failed; for failures it points to the
-[Error Log](error-log.md). It is the BarnCRM job notification, so the **Send long job notifications**
+approved hours in the period), and how many failed; for failures it says to try again and to
+ask a BarnCRM admin to check the [Error Log](error-log.md) if it happens again. It is the BarnCRM job notification, so the **Send Long Job Notifications**
 option in BarnCRM Settings turns it off.
 
 ## Signing People Up for a Shift
 
 Open a shift (from **Volunteer Shifts**, or from its job). The **Sign-Ups** panel at the top
 of the page shows how many **volunteers are needed**, how many **slots are filled** and how many
-**remain**, and lists who is signed up. A cancelled sign-up frees its slot; slots remaining goes
-below zero when more people are booked than were asked for, which is allowed.
+**remain** as three figures, with a bar for the share of places filled, and lists who is signed
+up. A cancelled sign-up frees its slot; slots remaining goes below zero when more people are
+booked than were asked for, which is allowed. With nobody booked yet, the panel says so and
+offers **Add Sign-Up**.
 
 - **Add Sign-Up** opens a short form: choose the **Person** (in an org where people are person
   accounts, only person accounts are offered), pick a **Status** if it is not **Signed up**, and
   click **Save**. Signing the same person up twice for one shift is refused, with a message
   naming the shift: change the sign-up that is there instead.
-- Change a sign-up's **Status** in its row: Signed up, Confirmed, Attended, No show or
-  Cancelled. The change saves at once.
-- **Attended** and **No Show** in each row mark attendance in one click. When **Attendance
-  creates hours** is on, marking someone Attended records their hours for the length of the
-  shift, waiting for approval like any other entry, and the panel says so. Marking attendance a
-  second time records nothing more, and changing it back deletes nothing.
+- Each row shows one control for the moment you are in. Before the shift starts, change a
+  sign-up's **Status** in its row: Signed up, Confirmed, Attended, No show or Cancelled. The
+  change saves at once.
+- Once the shift has started, each row leads with **Attended** and **No Show**, which mark
+  attendance in one click, and shows the status as a badge with a **Change** link that opens the
+  same status picker. When **Attendance creates hours** is on, marking someone Attended records
+  their hours for the length of the shift, waiting for approval like any other entry, and the
+  panel says so. Marking attendance a second time records nothing more, and changing it back
+  deletes nothing.
+- **Close Shift**, once the shift has started and while it is still Open, sets its **Status** to
+  **Completed**. When people are still Signed up or Confirmed, it asks whether to **Mark No Show
+  and Close** (the default) or **Close Without Changing Them**. It needs edit access to shifts,
+  which the Volunteers Admin, Coordinator and Staff sets give.
 - Click a person's name to open their sign-up record. The shift page also has a **Sign-Ups**
   related list below the details: use it to edit a sign-up's **Notes** (row menu, **Edit**) or to
   remove one (row menu, **Delete**, which asks you to confirm). To keep the record but free the
   slot, set its **Status** to Cancelled instead of deleting it.
 
 A message under the figures, also shown as a toast, says what changed. Read Only users see the
-panel without the button, pickers or attendance buttons.
+panel without the buttons, pickers or attendance buttons.
 
 ## Suggested Volunteers
 
@@ -467,7 +477,9 @@ say why, and the coordinator decides.
 
 Coordinators and admins (anyone holding **Manage Volunteers**) approve hours on the **Approve
 Hours** tab of the BarnCRM Volunteers app. It lists hours entries oldest first, 50 to a page,
-with the person, job, shift, date worked and hours of each.
+with the person, job, shift, date worked, hours and **Notes** of each (a long note is cut short;
+point at it to read it all). Click a person's name to open the hours entry itself, to check an
+odd one before deciding. With nothing waiting, the tab says so.
 
 - **Show** picks which entries are listed: **Submitted** (the default, the ones waiting for
   you), **Approved** or **Rejected**. **Job**, **From** and **To** narrow the list to one job and
@@ -577,8 +589,8 @@ is turned off. Counts stop at 1,000, and each finding about records links the fi
 | Finding | Why it matters | How to fix it |
 |---|---|---|
 | **Volunteer hours entries have waited more than 14 days for approval** (amber) | Hours count in no total and no letter until a coordinator approves them, so the volunteer looks as if they gave less time than they did. | **Open Approve Hours**, choose Submitted, and approve each entry, or reject it with a reason when it is wrong. |
-| **Past shifts are still Open** (blue) | Nothing closes a shift by itself. A shift that ended more than 7 days ago and is still Open usually means attendance was never marked, so the people who came have no hours. | **Open the shift list** opens the **Past Shifts Still Open** list view, which shows the same shifts the finding counts. Open each shift, mark who came on its Sign-ups panel, then set Status to Completed (or Cancelled if it did not happen). |
-| **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Weeks ahead to create shifts** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and save it. |
+| **Past shifts are still Open** (blue) | Nothing closes a shift by itself. A shift that ended more than 7 days ago and is still Open usually means attendance was never marked, so the people who came have no hours. | **Open the shift list** opens the **Past Shifts Still Open** list view, which shows the same shifts the finding counts. Open each shift, mark who came on its Sign-Ups panel, then click **Close Shift** there (or set Status to Cancelled if it did not happen). |
+| **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Weeks Ahead to Create Shifts** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and save it. |
 | **Volunteer coordinators do not have the Volunteers Coordinator permission set** (amber) | Someone with the Coordinator role cannot approve hours or work with shifts without it, or without Volunteers Admin, so people who hold Volunteers Admin are not listed. BarnCRM gives it every night, so this happens when the role was given in Setup today or the nightly access check failed. | **Give Volunteers Coordinator now** gives it within about a minute, after you confirm the names. Or assign the set in Setup. |
 | **Shipped volunteer totals are turned off** (blue) | The fields those totals fill stop updating, and the reports, list views and dashboard that use them go stale. | If you turned them off on purpose, nothing is wrong. Otherwise **Open Rollup Builder**, set each one Active, then choose **Recalculate**. A shipped total that is missing altogether is the Rollup Builder's own **Shipped totals are missing** finding, which can restore it. |
 

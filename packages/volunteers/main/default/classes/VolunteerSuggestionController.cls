@@ -98,10 +98,9 @@ public with sharing class VolunteerSuggestionController {
 			return result;
 		} catch (Exception failure) {
 			ErrorLogger.log(failure, CONTEXT, shiftId);
-			AuraHandledException refused = new AuraHandledException(
-				Label.Volunteers_Suggestions_LoadFailed
-			);
-			refused.setMessage(Label.Volunteers_Suggestions_LoadFailed);
+			String loadFailed = BarnHelp.text('Volunteers', 'Volunteers_Suggestions_LoadFailed');
+			AuraHandledException refused = new AuraHandledException(loadFailed);
+			refused.setMessage(loadFailed);
 			throw refused;
 		}
 	}

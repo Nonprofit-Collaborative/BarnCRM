@@ -1,4 +1,21 @@
 import { createElement } from 'lwc';
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, __esModule: true };
+  },
+  { virtual: true }
+);
 import VolunteerHoursApproval from 'c/volunteerHoursApproval';
 import getHours from '@salesforce/apex/VolunteerHoursApprovalController.getHours';
 import approveHours from '@salesforce/apex/VolunteerHoursApprovalController.approve';
@@ -191,7 +208,7 @@ describe('c-volunteer-hours-approval', () => {
     byId(element, 'confirm-reject').click();
     await flush();
 
-    expect(byId(element, 'error-message').textContent.trim()).toBe('Not allowed.');
+    expect(byId(element, 'error-message').message).toBe('Not allowed.');
     expect(byId(element, 'reject-form')).not.toBeNull();
     expect(byId(element, 'reason').value).toBe('Wrong date');
 
@@ -322,13 +339,40 @@ describe('c-volunteer-hours-approval', () => {
     getHours.mockResolvedValueOnce(pageOf([]));
     const element = build();
     await flush();
-    expect(byId(element, 'empty-state')).not.toBeNull();
+    // Nothing waiting for approval is a good empty.
+    expect(byId(element, 'empty-state').illustration).toBe('all-clear');
 
     getHours.mockRejectedValueOnce({ body: { message: 'Not allowed.' } });
     byId(element, 'job-filter').dispatchEvent(
       new CustomEvent('change', { detail: { recordId: 'a01000000000001AAA' } })
     );
     await flush();
-    expect(byId(element, 'error-message').textContent.trim()).toBe('Not allowed.');
+    expect(byId(element, 'error-message').message).toBe('Not allowed.');
+    expect(byId(element, 'error-message').variant).toBe('error');
+  });
+
+  it('links each entry to its record and shows its notes, with the field label as heading', async () => {
+    getHours.mockResolvedValue(
+      pageOf([{ ...ANA, notes: 'Stayed late to restock.' }], { notesLabel: 'Notes' })
+    );
+    const element = build();
+    await flush();
+
+    const link = byId(element, 'entry-link');
+    expect(link.getAttribute('href')).toBe(`/lightning/r/Volunteer_Hours__c/${ANA.recordId}/view`);
+    expect(link.textContent).toBe('Ana Rivera');
+    link.click();
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__recordPage',
+      attributes: {
+        recordId: ANA.recordId,
+        objectApiName: 'Volunteer_Hours__c',
+        actionName: 'view'
+      }
+    });
+    const notes = byId(element, 'notes');
+    expect(notes.textContent).toBe('Stayed late to restock.');
+    expect(notes.title).toBe('Stayed late to restock.');
+    expect(element.shadowRoot.textContent).toContain('Notes');
   });
 });

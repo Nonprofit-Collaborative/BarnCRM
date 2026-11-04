@@ -97,7 +97,12 @@ private class VolunteerLetterControllerTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(Label.Volunteers_Letter_ActionFailed, previewed, 'Plain preview message.');
+		Assert.areEqual(
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_ActionFailed'),
+			previewed,
+			'Plain preview message.'
+		);
+		Assert.isTrue(String.isNotBlank(previewed), 'The message comes from the help catalog.');
 		Assert.areEqual(
 			1,
 			[

@@ -1,33 +1,30 @@
 <template>
-  <div class="slds-p-around_medium">
-    <h2 class="slds-text-heading_small slds-m-bottom_small">{labels.heading}</h2>
+  <div class="slds-var-p-around_medium">
+    <h2 class="slds-text-heading_medium slds-var-m-bottom_small">{labels.heading}</h2>
 
     <template lwc:if={isLoading}>
-      <div class="slds-is-relative slds-p-around_large" data-id="loading">
+      <div class="slds-is-relative slds-var-p-around_large" data-id="loading">
         <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
       </div>
     </template>
     <template lwc:if={working}>
-      <div class="slds-is-relative slds-p-around_medium" data-id="working">
+      <div class="slds-is-relative slds-var-p-around_medium" data-id="working">
         <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
       </div>
     </template>
 
     <template lwc:if={blocker}>
-      <p role="alert" class="slds-text-color_error" data-id="blocker">{blocker}</p>
+      <c-barn-notice variant="error" message={blocker} data-id="blocker"></c-barn-notice>
     </template>
 
     <template lwc:if={showForm}>
       <template lwc:if={showLegalNameWarning}>
-        <p class="slds-text-color_weak slds-m-bottom_small" data-id="legal-name-warning">
-          <lightning-icon
-            icon-name="utility:warning"
-            size="x-small"
-            alternative-text=""
-            class="slds-m-right_x-small"
-          ></lightning-icon>
-          {labels.noLegalName}
-        </p>
+        <c-barn-notice
+          class="slds-var-m-bottom_small"
+          variant="warning"
+          message={labels.noLegalName}
+          data-id="legal-name-warning"
+        ></c-barn-notice>
       </template>
       <lightning-combobox
         data-id="template"
@@ -37,39 +34,47 @@
         required
         onchange={handleTemplateChange}
       ></lightning-combobox>
-      <div class="slds-grid slds-wrap slds-gutters_x-small">
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
-          <lightning-input
-            data-id="from"
-            type="date"
-            label={labels.fromDate}
-            value={fromDate}
-            required
-            onchange={handleFromChange}
-          ></lightning-input>
+      <lightning-combobox
+        data-id="period"
+        label={labels.period}
+        options={periodOptions}
+        value={period}
+        onchange={handlePeriodChange}
+      ></lightning-combobox>
+      <template lwc:if={isCustom}>
+        <div class="slds-grid slds-wrap slds-gutters_x-small">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-input
+              data-id="from"
+              type="date"
+              label={labels.fromDate}
+              value={fromDate}
+              required
+              onchange={handleFromChange}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-input
+              data-id="to"
+              type="date"
+              label={labels.toDate}
+              value={toDate}
+              required
+              onchange={handleToChange}
+            ></lightning-input>
+          </div>
         </div>
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
-          <lightning-input
-            data-id="to"
-            type="date"
-            label={labels.toDate}
-            value={toDate}
-            required
-            onchange={handleToChange}
-          ></lightning-input>
-        </div>
-      </div>
+      </template>
 
       <div aria-live="polite">
         <template lwc:if={notice}>
-          <p class="slds-text-color_error slds-m-top_small" data-id="notice">{notice}</p>
+          <c-barn-notice class="slds-var-m-top_small" variant="warning" message={notice} data-id="notice"></c-barn-notice>
         </template>
       </div>
 
       <template lwc:if={previewBody}>
         <section
-          class="slds-box slds-m-top_small slds-scrollable_y"
-          style="max-height: 20rem"
+          class="preview slds-box slds-var-m-top_small slds-scrollable_y"
           tabindex="0"
           aria-label={labels.preview}
           data-id="preview"
@@ -79,19 +84,19 @@
       </template>
     </template>
 
-    <div class="slds-m-top_medium slds-text-align_right">
+    <div class="slds-var-m-top_medium slds-text-align_right">
       <lightning-button
         data-id="cancel"
         label={labels.cancel}
         onclick={handleCancel}
-        class="slds-m-right_x-small"
+        class="slds-var-m-right_x-small"
       ></lightning-button>
       <lightning-button
         data-id="preview-button"
         label={labels.preview}
         disabled={buttonsDisabled}
         onclick={handlePreview}
-        class="slds-m-right_x-small"
+        class="slds-var-m-right_x-small"
       ></lightning-button>
       <lightning-button
         data-id="generate"

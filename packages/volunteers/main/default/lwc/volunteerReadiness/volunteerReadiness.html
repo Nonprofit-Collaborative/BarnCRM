@@ -20,10 +20,10 @@
             ></lightning-button-icon>
             <div class="slds-var-p-horizontal_medium">
                 <template lwc:if={errorMessage}>
-                    <p class="slds-text-color_error error" role="alert">{errorMessage}</p>
+                    <c-barn-notice class="error" variant="error" message={errorText}></c-barn-notice>
                 </template>
                 <template lwc:if={showEmpty}>
-                    <p class="slds-text-body_regular empty">{label.empty}</p>
+                    <c-barn-empty-state class="empty" size="compact" heading={label.empty}></c-barn-empty-state>
                 </template>
                 <ul class="slds-has-dividers_bottom-space">
                     <template for:each={steps} for:item="step">
@@ -32,15 +32,15 @@
                                 <template lwc:if={step.started}>
                                     <a
                                         href={step.url}
-                                        class="slds-text-heading_small step-type"
+                                        class="slds-text-title_bold step-type"
                                         data-record-id={step.requirementId}
                                         onclick={handleOpen}
                                     >{step.typeLabel}</a>
                                 </template>
                                 <template lwc:else>
-                                    <span class="slds-text-heading_small step-type">{step.typeLabel}</span>
+                                    <span class="slds-text-title_bold step-type">{step.typeLabel}</span>
                                 </template>
-                                <span class={step.stateClass}>{step.stateText}</span>
+                                <c-barn-status-badge class="state" status={step.tone} label={step.stateText}></c-barn-status-badge>
                             </div>
                             <p class="slds-text-body_regular status">{step.statusText}</p>
                             <template lwc:if={step.completedDate}>

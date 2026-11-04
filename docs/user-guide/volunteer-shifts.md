@@ -117,8 +117,9 @@ volunteer.
 ## To Change a Sign-Up's Status
 
 1. On the shift's **Sign-Ups** panel, find the person's row.
-2. Pick the new status in the **Status** column: **Signed up**, **Confirmed**, **Attended**,
-   **No show** or **Cancelled**.
+2. Before the shift starts, pick the new status in the **Status** column: **Signed up**,
+   **Confirmed**, **Attended**, **No show** or **Cancelled**. Once it has started, the status
+   shows as a badge: click **Change** beside it to open the same list.
 
 You should see: the change saved at once, and a message naming the person and the new status.
 A **Cancelled** sign-up frees its slot.
@@ -127,13 +128,15 @@ A **Cancelled** sign-up frees its slot.
 
 1. Open the shift.
 2. In each person's row, under **Attendance**, click **Attended** or **No Show**.
-3. When everyone is marked, click **Edit** on the shift, set **Status** to **Completed**, and
-   click **Save**.
+3. When everyone is marked, click **Close Shift** at the top of the **Sign-Ups** panel. If anyone
+   is still **Signed up** or **Confirmed**, choose **Mark No Show and Close** or **Close Without
+   Changing Them**, then click **Close Shift**.
 
 You should see: for each person marked **Attended**, the message "An hours entry was recorded
 for this attendance." BarnCRM creates their hours for the length of the shift, waiting for
 approval like any other entry (if your admin has this turned on). Marking someone **Attended**
-a second time records nothing more, and changing the status back deletes nothing.
+a second time records nothing more, and changing the status back deletes nothing. After
+**Close Shift**, the message "Shift closed." and the shift's **Status** is **Completed**.
 
 ## To Edit a Sign-Up's Notes or Remove a Sign-Up
 

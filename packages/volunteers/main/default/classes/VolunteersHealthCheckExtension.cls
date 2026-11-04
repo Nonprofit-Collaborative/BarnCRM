@@ -164,8 +164,8 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
 		String detail = String.format(
 			oneOrMany(
 				howMany,
-				Label.Volunteers_HealthCheck_PastShiftsDetailOne,
-				Label.Volunteers_HealthCheck_PastShiftsDetail
+				BarnHelp.text('Volunteers', 'Volunteers_HealthCheck_PastShiftsDetailOne'),
+				BarnHelp.text('Volunteers', 'Volunteers_HealthCheck_PastShiftsDetail')
 			),
 			new List<Object>{ PAST_SHIFT_DAYS.format() }
 		);

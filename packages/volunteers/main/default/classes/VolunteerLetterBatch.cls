@@ -199,7 +199,7 @@ public with sharing class VolunteerLetterBatch implements Database.Batchable<Vol
 			);
 		}
 		if (failed > 0) {
-			lines.add(Label.Volunteers_JobNotice_LettersFailed);
+			lines.add(BarnHelp.text('Volunteers', 'Volunteers_JobNotice_LettersFailed'));
 		}
 		return String.join(lines, ' ');
 	}

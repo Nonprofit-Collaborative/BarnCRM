@@ -5,8 +5,8 @@ import getActionContext from '@salesforce/apex/VolunteerLetterController.getActi
 import previewLetter from '@salesforce/apex/VolunteerLetterController.preview';
 import generateLetter from '@salesforce/apex/VolunteerLetterController.generate';
 import BAD_PERIOD from '@salesforce/label/c.Volunteers_Letter_BadPeriod';
-import ACTION_FAILED from '@salesforce/label/c.Volunteers_Letter_ActionFailed';
 import NO_ACTIVE_TEMPLATE from '@salesforce/label/c.Volunteers_Letter_NoActiveTemplate';
+import { periodDates, THIS_YEAR, LAST_YEAR } from 'c/volunteerPeriods';
 
 jest.mock(
   '@salesforce/apex/VolunteerLetterController.getActionContext',
@@ -50,6 +50,11 @@ async function flush() {
   }
 }
 
+async function choosePeriod(element, value) {
+  find(element, 'period').dispatchEvent(new CustomEvent('change', { detail: { value } }));
+  await flush();
+}
+
 describe('c-volunteer-letter', () => {
   afterEach(() => {
     while (document.body.firstChild) {
@@ -58,15 +63,45 @@ describe('c-volunteer-letter', () => {
     jest.clearAllMocks();
   });
 
-  it('offers the active template and a labelled period', async () => {
+  it('offers the active template and This Year, with the dates hidden', async () => {
     const element = build();
     getActionContext.emit(READY);
     await flush();
 
     expect(find(element, 'template').value).toBe(TEMPLATE_ID);
+    expect(find(element, 'period').value).toBe(THIS_YEAR);
+    expect(find(element, 'period').options.map((option) => option.value)).toEqual([
+      'thisYear',
+      'lastYear',
+      'custom'
+    ]);
+    expect(find(element, 'from')).toBeNull();
+    expect(find(element, 'generate').disabled).toBe(false);
+  });
+
+  it('makes a letter for last year without typing dates', async () => {
+    previewLetter.mockResolvedValue({ body: '<p>5 hours</p>', skipReason: null });
+    const element = build();
+    getActionContext.emit(READY);
+    await flush();
+    await choosePeriod(element, LAST_YEAR);
+
+    find(element, 'preview-button').click();
+    await flush();
+
+    expect(previewLetter).toHaveBeenCalledWith(
+      expect.objectContaining({ ...periodDates(LAST_YEAR), templateId: TEMPLATE_ID })
+    );
+  });
+
+  it('shows the dates for Custom, labelled', async () => {
+    const element = build();
+    getActionContext.emit(READY);
+    await flush();
+    await choosePeriod(element, 'custom');
+
     expect(find(element, 'from').label).toBeTruthy();
     expect(find(element, 'to').label).toBeTruthy();
-    expect(find(element, 'generate').disabled).toBe(false);
   });
 
   it('says why on an account that is not a person, and offers nothing', async () => {
@@ -74,7 +109,7 @@ describe('c-volunteer-letter', () => {
     getActionContext.emit({ canManage: true, isPerson: false, templates: [] });
     await flush();
 
-    expect(find(element, 'blocker')).not.toBeNull();
+    expect(find(element, 'blocker').variant).toBe('error');
     expect(find(element, 'template')).toBeNull();
     expect(find(element, 'generate').disabled).toBe(true);
   });
@@ -93,6 +128,7 @@ describe('c-volunteer-letter', () => {
     const element = build();
     getActionContext.emit(READY);
     await flush();
+    await choosePeriod(element, 'custom');
 
     find(element, 'from').dispatchEvent(
       new CustomEvent('change', { detail: { value: '2026-03-01' } })
@@ -119,7 +155,7 @@ describe('c-volunteer-letter', () => {
     find(element, 'generate').click();
     await flush();
 
-    expect(find(element, 'notice').textContent).toBe('No approved hours.');
+    expect(find(element, 'notice').message).toBe('No approved hours.');
   });
 
   it('saves the letter and confirms it', async () => {
@@ -148,6 +184,7 @@ describe('c-volunteer-letter', () => {
     const element = build();
     getActionContext.emit(READY);
     await flush();
+    await choosePeriod(element, 'custom');
 
     find(element, 'from').dispatchEvent(
       new CustomEvent('change', { detail: { value: '2026-04-01' } })
@@ -157,11 +194,11 @@ describe('c-volunteer-letter', () => {
     );
     find(element, 'preview-button').click();
     await flush();
-    expect(find(element, 'notice').textContent).toBe(BAD_PERIOD);
+    expect(find(element, 'notice').message).toBe(BAD_PERIOD);
 
     find(element, 'generate').click();
     await flush();
-    expect(find(element, 'notice').textContent).toBe(BAD_PERIOD);
+    expect(find(element, 'notice').message).toBe(BAD_PERIOD);
     expect(previewLetter).not.toHaveBeenCalled();
     expect(generateLetter).not.toHaveBeenCalled();
   });
@@ -171,14 +208,14 @@ describe('c-volunteer-letter', () => {
     getActionContext.emit({ canManage: true, isPerson: true, templates: [] });
     await flush();
 
-    expect(find(element, 'blocker').textContent).toBe(NO_ACTIVE_TEMPLATE);
+    expect(find(element, 'blocker').message).toBe(NO_ACTIVE_TEMPLATE);
   });
 
   it('warns before the letter when the organization legal name is blank', async () => {
     const element = build();
     getActionContext.emit({ ...READY, organizationNameBlank: true });
     await flush();
-    expect(find(element, 'legal-name-warning')).not.toBeNull();
+    expect(find(element, 'legal-name-warning').variant).toBe('warning');
   });
 
   it('does not warn when the legal name is filled in', async () => {
@@ -197,8 +234,7 @@ describe('c-volunteer-letter', () => {
     find(element, 'generate').click();
     await flush();
 
-    expect(find(element, 'notice').textContent).toBe(ACTION_FAILED);
-    expect(find(element, 'notice').textContent).not.toContain('[object Object]');
+    expect(find(element, 'notice').message).toBe('c.Volunteers_Letter_ActionFailed');
   });
 
   it('shows a refusal from the server', async () => {
@@ -210,6 +246,6 @@ describe('c-volunteer-letter', () => {
     find(element, 'generate').click();
     await flush();
 
-    expect(find(element, 'notice').textContent).toBe('Choose a From date.');
+    expect(find(element, 'notice').message).toBe('Choose a From date.');
   });
 });
