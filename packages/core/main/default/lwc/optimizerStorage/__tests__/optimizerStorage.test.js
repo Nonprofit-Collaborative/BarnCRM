@@ -92,7 +92,7 @@ describe('c-optimizer-storage', () => {
     getStorage.mockRejectedValue('boom');
     const element = await render();
 
-    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toBe(
       'c.Core_UnexpectedError'
     );
   });
@@ -101,7 +101,7 @@ describe('c-optimizer-storage', () => {
     getStorage.mockRejectedValue({ body: { message: 'Needs the permission.' } });
     const element = await render();
 
-    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toBe(
       'Needs the permission.'
     );
 

@@ -22,7 +22,12 @@ You will find it in three places:
   The tile shows the count only, not the entries. When some of those errors came from the
   install or an upgrade (including a package's setup steps), a line under the count says how many ("Of the new errors above, 3
   came from the install and upgrades"); that number is part of the count, not added to it.
-- **The Org Optimizer tab, Errors section.** The **Error Log** card shows the count of new
+  Below it, the **Errors by Day** report chart shows the Error and Critical entries of each of
+  the last 30 days, from the **BarnCRM Admin** report folder (the **BarnCRM Error Logs** report
+  type). Both show only to people with Manage BarnCRM Settings.
+- **The Org Optimizer tab, Errors section**, the home for working through errors (a link can
+  open it directly with `c__section=errors`; see [Org Optimizer](org-optimizer.md)). The
+  **Error Log** card shows the count of new
   entries and the five most recent, each with its message and where it came from, an
   **Open This Entry** button and a **Mark Acknowledged** button. The Errors section needs
   the Manage BarnCRM Settings permission (the BarnCRM Admin role).

@@ -69,6 +69,11 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
     return this.labels.newCount.replace('{0}', `${this.newCount}${more}`);
   }
 
+  /** Unread errors are a warning; none is a good state (the visual standard's vocabulary). */
+  get newCountStatus() {
+    return this.newCount > 0 ? 'warning' : 'success';
+  }
+
   get entries() {
     return this.tile && this.tile.recent ? this.tile.recent : [];
   }

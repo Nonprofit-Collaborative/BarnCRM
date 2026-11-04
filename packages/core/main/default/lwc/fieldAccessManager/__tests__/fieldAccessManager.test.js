@@ -161,7 +161,7 @@ describe('c-field-access-manager', () => {
   it('says why and offers nothing without the permissions', async () => {
     getStatus.mockResolvedValue({ canChange: false, reason: 'You need Manage Profiles.' });
     const element = await render();
-    expect(byId(element, 'refusal').textContent).toBe('You need Manage Profiles.');
+    expect(byId(element, 'refusal').message).toBe('You need Manage Profiles.');
     expect(byId(element, 'set-search')).toBeNull();
     expect(listChanges).not.toHaveBeenCalled();
   });
@@ -235,7 +235,7 @@ describe('c-field-access-manager', () => {
       changeJson: previewChange.mock.calls[0][0].changeJson,
       confirmedCount: 2
     });
-    expect(byId(element, 'notice').textContent).toBe('Changed 2 rows; 0 refused.');
+    expect(byId(element, 'notice').message).toBe('Changed 2 rows; 0 refused.');
     expect(byId(element, 'no-changes')).not.toBeNull();
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
@@ -254,7 +254,7 @@ describe('c-field-access-manager', () => {
     );
     await settle();
     expect(undoChange).toHaveBeenCalledWith({ jobId: 'a01' });
-    expect(byId(element, 'notice').textContent).toBe('c.Core_FieldAccess_Undone');
+    expect(byId(element, 'notice').message).toBe('c.Core_FieldAccess_Undone');
   });
 
   it('does not apply when the confirmation is cancelled', async () => {
@@ -285,7 +285,7 @@ describe('c-field-access-manager', () => {
     await settle();
     byId(element, 'add').click();
     await settle();
-    expect(byId(element, 'conflict').textContent).toBe('Contact is set to No Access.');
+    expect(byId(element, 'conflict').message).toBe('Contact is set to No Access.');
     expect(byId(element, 'preview').disabled).toBe(true);
     byId(element, 'items').dispatchEvent(
       new CustomEvent('rowaction', { detail: { row: { key: 'Contact.' } } })

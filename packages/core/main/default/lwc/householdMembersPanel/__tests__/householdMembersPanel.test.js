@@ -100,7 +100,7 @@ function choose(item) {
 }
 
 function badgeLabels(element) {
-  return Array.from(element.shadowRoot.querySelectorAll('lightning-badge')).map(
+  return Array.from(element.shadowRoot.querySelectorAll('c-barn-status-badge')).map(
     (badge) => badge.label
   );
 }
@@ -179,8 +179,8 @@ describe('c-household-members-panel', () => {
     await flush();
 
     const rows = element.shadowRoot.querySelectorAll('.member-row');
-    expect(rows[0].querySelector('lightning-badge')).toBeNull();
-    expect(rows[1].querySelector('lightning-badge').label).toBe(
+    expect(rows[0].querySelector('c-barn-status-badge')).toBeNull();
+    expect(rows[1].querySelector('c-barn-status-badge').label).toBe(
       'c.Core_HouseholdMembersPanel_Primary'
     );
     expect(rows[0].querySelector('.make-primary-button')).not.toBeNull();
@@ -206,7 +206,7 @@ describe('c-household-members-panel', () => {
     await flush();
 
     const rows = element.shadowRoot.querySelectorAll('.member-row');
-    expect(rows[0].querySelector('lightning-badge').label).toBe(
+    expect(rows[0].querySelector('c-barn-status-badge').label).toBe(
       'c.Core_HouseholdMembersPanel_Primary'
     );
     expect(rows[0].querySelector('.make-primary-button')).toBeNull();
@@ -258,8 +258,9 @@ describe('c-household-members-panel', () => {
     choose(element.shadowRoot.querySelector('.make-primary-button'));
     await flush();
 
-    const alert = element.shadowRoot.querySelector('[role="alert"]');
-    expect(alert.textContent).toBe('c.Core_HouseholdPanel_MakePrimaryFailed');
+    const alert = element.shadowRoot.querySelector('.error-message');
+    expect(alert.variant).toBe('error');
+    expect(alert.message).toBe('c.Core_HouseholdPanel_MakePrimaryFailed');
   });
 
   it('draws each member as a tile with initials and a menu named for the person', async () => {
@@ -494,6 +495,22 @@ describe('c-household-members-panel', () => {
     expect(picker.filter).toEqual({
       criteria: [{ fieldPath: 'RecordTypeId', operator: 'eq', value: HOUSEHOLD_RECORD_TYPE_ID }]
     });
+    // Each household shows its city, so two households of one name can be told apart.
+    expect(picker.displayInfo).toEqual({ primaryField: 'Name', additionalFields: ['BillingCity'] });
+  });
+
+  it('links each member to their record and marks the primary with a star', async () => {
+    const element = build();
+    getRecord.emit(recordOfType('Household', PERSON_ID));
+    getMembershipMode.emit('Contact');
+    getMembers.emit(MEMBERS);
+    await flush();
+
+    const link = element.shadowRoot.querySelector('.member-name');
+    expect(link.getAttribute('href')).toBe(`/${MEMBERS[0].personId}`);
+    const primary = element.shadowRoot.querySelector('.member-badge');
+    expect(primary.status).toBe('success');
+    expect(primary.iconName).toBe('utility:favorite');
   });
 
   it('moves a person the org stores as an account', async () => {
@@ -543,8 +560,8 @@ describe('c-household-members-panel', () => {
     element.shadowRoot.querySelector('.move-save-button').dispatchEvent(new CustomEvent('click'));
     await flush();
 
-    const alert = element.shadowRoot.querySelector('[role="alert"]');
+    const alert = element.shadowRoot.querySelector('.error-message');
     expect(alert).not.toBeNull();
-    expect(alert.textContent).toContain('That account is not a household.');
+    expect(alert.message).toBe('That account is not a household.');
   });
 });
