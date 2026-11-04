@@ -1318,7 +1318,7 @@ public with sharing class ImportController {
             BatchOptions options = (BatchOptions) JSON.deserialize(optionsJson, BatchOptions.class);
             return options == null ? new BatchOptions() : options;
         } catch (Exception unreadable) {
-            throw new ImportException(Label.Core_Import_ErrorOptionsUnreadable);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorOptionsUnreadable'));
         }
     }
 
@@ -1328,7 +1328,7 @@ public with sharing class ImportController {
 
     private static void enforcePermission() {
         if (!hasManagePermission()) {
-            throw new ImportException(Label.Core_Import_ErrorNoPermission);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorNoPermission'));
         }
     }
 

@@ -24,12 +24,9 @@ import severalObjectsAvailable from '@salesforce/label/c.Core_Import_SeveralObje
 import sheetObjectLabel from '@salesforce/label/c.Core_Import_SheetObjectLabel';
 import fileObjectLabel from '@salesforce/label/c.Core_Import_FileObjectLabel';
 import sheetOption from '@salesforce/label/c.Core_Import_SheetOption';
-import sheetConflict from '@salesforce/label/c.Core_Import_SheetConflict';
 import sheetObject from '@salesforce/label/c.Core_Format_Pair';
 import exampleBlank from '@salesforce/label/c.Core_Find_Blank';
 import detectFileLabel from '@salesforce/label/c.Core_Import_DetectFileLabel';
-import detectSuggested from '@salesforce/label/c.Core_Import_DetectSuggested';
-import detectNone from '@salesforce/label/c.Core_Import_DetectNone';
 import suggestObject from '@salesforce/apex/ImportController.suggestObject';
 import delimiterLabel from '@salesforce/label/c.Core_Import_DelimiterLabel';
 import delimiterComma from '@salesforce/label/c.Core_Import_DelimiterComma';
@@ -55,7 +52,6 @@ import startCommit from '@salesforce/apex/ImportController.startCommit';
 import startTrial from '@salesforce/apex/ImportController.startTrial';
 import trialRowsLabel from '@salesforce/label/c.Core_Import_TrialRowsLabel';
 import remainingButton from '@salesforce/label/c.Core_Import_RemainingButton';
-import trialDone from '@salesforce/label/c.Core_Import_TrialDone';
 import getBatch from '@salesforce/apex/ImportController.getBatch';
 import getRowPage from '@salesforce/apex/ImportController.getRowPage';
 import saveRecurring from '@salesforce/apex/ImportController.saveRecurring';
@@ -82,9 +78,7 @@ import nextButton from '@salesforce/label/c.Core_Import_NextButton';
 import dryRunButton from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import startOverButton from '@salesforce/label/c.Core_Import_StartOverButton';
 import downloadExceptionsButton from '@salesforce/label/c.Core_Import_DownloadExceptionsButton';
-import exceptionsCapped from '@salesforce/label/c.Core_Import_ExceptionsCapped';
 import downloadResultsButton from '@salesforce/label/c.Core_Import_DownloadResultsButton';
-import resultsCapped from '@salesforce/label/c.Core_Import_ResultsCapped';
 import resultsRow from '@salesforce/label/c.Core_Import_ResultsRow';
 import resultsOutcome from '@salesforce/label/c.Core_Import_ResultsOutcome';
 import resultsReason from '@salesforce/label/c.Core_Import_ResultsReason';
@@ -99,15 +93,7 @@ import targetHeader from '@salesforce/label/c.Core_Import_TargetHeader';
 import sampleHeader from '@salesforce/label/c.Core_Import_SampleHeader';
 import doNotLoad from '@salesforce/label/c.Core_Import_DoNotLoad';
 import matchingRuleLabel from '@salesforce/label/c.Core_Import_MatchingRuleLabel';
-import readOnlyMessage from '@salesforce/label/c.Core_Import_ErrorNoPermission';
 import loadingAltText from '@salesforce/label/c.Core_AccessExplorer_Loading';
-import parsingMessage from '@salesforce/label/c.Core_Import_ParsingMessage';
-import noHeaderRow from '@salesforce/label/c.Core_Import_NoHeaderRow';
-import xlsxUnreadable from '@salesforce/label/c.Core_Import_XlsxUnreadable';
-import xlsxUnsupportedBrowser from '@salesforce/label/c.Core_Import_XlsxUnsupportedBrowser';
-import xlsxTooLarge from '@salesforce/label/c.Core_Import_XlsxTooLarge';
-import originalTooLargeToKeep from '@salesforce/label/c.Core_Import_OriginalTooLargeToKeep';
-import originalNotKept from '@salesforce/label/c.Core_Import_OriginalNotKept';
 import recurringLabel from '@salesforce/label/c.Core_Import_RecurringLabel';
 import sourceNameLabel from '@salesforce/label/c.Core_Import_SourceNameLabel';
 import controlTotalsHeading from '@salesforce/label/c.Core_Import_ControlTotalsHeading';
@@ -124,8 +110,6 @@ import matchToleranceLabel from '@salesforce/label/c.Core_Import_MatchToleranceL
 import personMatchFieldLabel from '@salesforce/label/c.Core_Import_PersonMatchFieldLabel';
 import organizationRuleLabel from '@salesforce/label/c.Core_Import_OrganizationRuleLabel';
 import organizationMatchFieldLabel from '@salesforce/label/c.Core_Import_OrganizationMatchFieldLabel';
-import noMatchFields from '@salesforce/label/c.Core_Import_NoMatchFields';
-import matchFieldNotMapped from '@salesforce/label/c.Core_Import_MatchFieldNotMapped';
 import severalMatchesLabel from '@salesforce/label/c.Core_Import_SeveralMatchesLabel';
 import severalRejectOption from '@salesforce/label/c.Core_Import_LookupRejectOption';
 import severalRecentOption from '@salesforce/label/c.Core_Import_SeveralRecentOption';
@@ -146,7 +130,6 @@ import downloadMenu from '@salesforce/label/c.Core_Import_DownloadMenu';
 import useTemplate from '@salesforce/label/c.Core_Import_UseTemplate';
 import lastLoaded from '@salesforce/label/c.Core_Import_LastLoaded';
 import notLoadedYet from '@salesforce/label/c.Core_Import_NotLoadedYet';
-import noDeleteForObject from '@salesforce/label/c.Core_Import_NoDeleteForObject';
 import copyTemplateButton from '@salesforce/label/c.Core_Import_CopyTemplateButton';
 import copyTemplateNameLabel from '@salesforce/label/c.Core_Import_CopyTemplateNameLabel';
 import copyTemplateDefaultName from '@salesforce/label/c.Core_Import_CopyTemplateDefaultName';
@@ -172,7 +155,6 @@ import changesButton from '@salesforce/label/c.Core_Import_ChangesButton';
 import changesButtonCount from '@salesforce/label/c.Core_Import_ChangesButtonCount';
 import blankClearsLabel from '@salesforce/label/c.Core_Import_BlankClearsLabel';
 import duplicateRulesLabel from '@salesforce/label/c.Core_Import_DuplicateRulesLabel';
-import duplicateRulesNone from '@salesforce/label/c.Core_Import_DuplicateRulesNone';
 import ruleEmailExact from '@salesforce/label/c.Core_Import_RuleEmailExact';
 import ruleNamePostalCode from '@salesforce/label/c.Core_Import_RuleNamePostalCode';
 import ruleExternalId from '@salesforce/label/c.Core_DataDictionary_ColExternalId';
@@ -186,7 +168,6 @@ import guessBadge from '@salesforce/label/c.Core_Import_GuessBadge';
 import guessAccept from '@salesforce/label/c.Core_Import_GuessAccept';
 import guessAcceptColumn from '@salesforce/label/c.Core_Import_GuessAcceptColumn';
 import guessAcceptAll from '@salesforce/label/c.Core_Import_GuessAcceptAll';
-import guessPending from '@salesforce/label/c.Core_Import_GuessPending';
 import {
   INSERT,
   UPDATE,
@@ -503,9 +484,13 @@ export default class ImportWizard extends LightningElement {
     targetHeader,
     sampleHeader,
     matchingRuleLabel,
-    readOnlyMessage,
+    get readOnlyMessage() {
+      return helpText('Core', 'Core_Import_ErrorNoPermission');
+    },
     loadingAltText,
-    parsingMessage,
+    get parsingMessage() {
+      return helpText('Core', 'Core_Import_ParsingMessage');
+    },
     recurringLabel,
     get recurringHelp() {
       return helpText('Core', 'Core_Import_RecurringHelp');
@@ -527,7 +512,9 @@ export default class ImportWizard extends LightningElement {
     personMatchFieldLabel,
     organizationRuleLabel,
     organizationMatchFieldLabel,
-    noMatchFields,
+    get noMatchFields() {
+      return helpText('Core', 'Core_Import_NoMatchFields');
+    },
     severalMatchesLabel,
     fileValuesHeading,
     get fileValuesHelp() {
@@ -557,7 +544,9 @@ export default class ImportWizard extends LightningElement {
     get duplicateRulesHelp() {
       return helpText('Core', 'Core_Import_DuplicateRulesHelp');
     },
-    duplicateRulesNone,
+    get duplicateRulesNone() {
+      return helpText('Core', 'Core_Import_DuplicateRulesNone');
+    },
     get duplicateRulesObjectHelp() {
       return helpText('Core', 'Core_Import_DuplicateRulesObjectHelp');
     },
@@ -569,7 +558,9 @@ export default class ImportWizard extends LightningElement {
     get sheetHelp() {
       return helpText('Core', 'Core_Import_SheetHelp');
     },
-    sheetConflict,
+    get sheetConflict() {
+      return helpText('Core', 'Core_Import_SheetConflict');
+    },
     detectFileLabel,
     get detectSheetsDiffer() {
       return helpText('Core', 'Core_Import_DetectSheetsDiffer');
@@ -989,8 +980,11 @@ export default class ImportWizard extends LightningElement {
 
   get detectionText() {
     return this.detection && this.detection.objectName
-      ? format(detectSuggested, this.detection.objectLabel || this.detection.objectName)
-      : detectNone;
+      ? format(
+          helpText('Core', 'Core_Import_DetectSuggested'),
+          this.detection.objectLabel || this.detection.objectName
+        )
+      : helpText('Core', 'Core_Import_DetectNone');
   }
 
   /** Whether the suggested object is a best guess from a near spelling of a name (C-49e). */
@@ -1052,7 +1046,7 @@ export default class ImportWizard extends LightningElement {
       if (offered.includes(DELETE)) {
         this.loadOperation = DELETE;
       } else {
-        this.message = noDeleteForObject;
+        this.message = helpText('Core', 'Core_Import_NoDeleteForObject');
       }
     }
   }
@@ -1195,7 +1189,7 @@ export default class ImportWizard extends LightningElement {
       }
       const chosen = this.sheets.filter((sheet) => this.chosenSheets.includes(sheet.name));
       if (!chosen.some((sheet) => sheet.headers.length > 0 && sheet.records.length > 0)) {
-        this.message = noHeaderRow;
+        this.message = helpText('Core', 'Core_Import_NoHeaderRow');
         this.clearColumns();
         return;
       }
@@ -1261,10 +1255,10 @@ export default class ImportWizard extends LightningElement {
         throw error;
       }
       const sentences = {
-        [XLSX_ERRORS.unsupportedBrowser]: xlsxUnsupportedBrowser,
-        [XLSX_ERRORS.tooLarge]: xlsxTooLarge
+        [XLSX_ERRORS.unsupportedBrowser]: helpText('Core', 'Core_Import_XlsxUnsupportedBrowser'),
+        [XLSX_ERRORS.tooLarge]: helpText('Core', 'Core_Import_XlsxTooLarge')
       };
-      throw new Error(sentences[error.reason] || xlsxUnreadable);
+      throw new Error(sentences[error.reason] || helpText('Core', 'Core_Import_XlsxUnreadable'));
     }
   }
 
@@ -1751,7 +1745,7 @@ export default class ImportWizard extends LightningElement {
   }
 
   get guessPendingText() {
-    return format(guessPending, this.guessCount);
+    return format(helpText('Core', 'Core_Import_GuessPending'), this.guessCount);
   }
 
   /** Next on the column step: columns to load, and no best guess left unchecked (C-49e). */
@@ -2328,7 +2322,7 @@ export default class ImportWizard extends LightningElement {
     }
     const targets = entities.map((entity) => `${entity}.${field}`);
     const mapped = this.columns.some((column) => targets.includes(column.target));
-    return mapped ? '' : matchFieldNotMapped;
+    return mapped ? '' : helpText('Core', 'Core_Import_MatchFieldNotMapped');
   }
 
   get severalOptions() {
@@ -2450,7 +2444,7 @@ export default class ImportWizard extends LightningElement {
       return null;
     }
     if (file.size > MAX_STORED_FILE_BYTES) {
-      this.storeFileError = originalTooLargeToKeep;
+      this.storeFileError = helpText('Core', 'Core_Import_OriginalTooLargeToKeep');
       return null;
     }
     try {
@@ -2458,7 +2452,10 @@ export default class ImportWizard extends LightningElement {
     } catch (storeError) {
       // Keeping a copy of the file is not worth failing an import over: the import goes
       // ahead and the batch simply has no link back to the original.
-      this.storeFileError = format(originalNotKept, this.errorText(storeError));
+      this.storeFileError = format(
+        helpText('Core', 'Core_Import_OriginalNotKept'),
+        this.errorText(storeError)
+      );
       return null;
     }
   }
@@ -2568,7 +2565,7 @@ export default class ImportWizard extends LightningElement {
   get trialDoneText() {
     const tried = (this.batch && this.batch.trialRows) || 0;
     const remaining = Math.max(((this.batch && this.batch.rowCount) || 0) - tried, 0);
-    return trialDone
+    return helpText('Core', 'Core_Import_TrialDone')
       .replace('{0}', tried.toLocaleString())
       .replace('{1}', remaining.toLocaleString());
   }
@@ -2591,7 +2588,7 @@ export default class ImportWizard extends LightningElement {
       const { sheets } = await this.readSheets(file, undefined);
       const { headers, records } = toRecords(sheets.length > 0 ? sheets[0].rows : []);
       if (headers.length === 0 || records.length === 0) {
-        this.message = noHeaderRow;
+        this.message = helpText('Core', 'Core_Import_NoHeaderRow');
         return;
       }
       const missing = this.headers.filter((heading) => !headers.includes(heading));
@@ -2670,7 +2667,7 @@ export default class ImportWizard extends LightningElement {
       this.saveExceptions(rows);
       const rejected = this.batch.rejected || 0;
       if (rows.length < rejected) {
-        this.message = exceptionsCapped
+        this.message = helpText('Core', 'Core_Import_ExceptionsCapped')
           .replace('{0}', rows.length.toLocaleString())
           .replace('{1}', rejected.toLocaleString());
       }
@@ -2698,7 +2695,7 @@ export default class ImportWizard extends LightningElement {
       this.saveResults(rows);
       const total = this.batch.rowCount || 0;
       if (rows.length < total) {
-        this.message = resultsCapped
+        this.message = helpText('Core', 'Core_Import_ResultsCapped')
           .replace('{0}', rows.length.toLocaleString())
           .replace('{1}', total.toLocaleString());
       }

@@ -31,6 +31,12 @@ import getSeveralObjects from '@salesforce/apex/ImportController.getSeveralObjec
 import suggestSheetMapping from '@salesforce/apex/ImportController.suggestSheetMapping';
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
 import { readSheetNames, readXlsx } from '../xlsx';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_Import_CreatesSummary: 'This file can create: {0}.',
+  Core_Import_DetectSuggested: 'Suggested: {0}'
+});
 
 jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }), {
   virtual: true
@@ -48,11 +54,6 @@ jest.mock(
   { virtual: true }
 );
 // And for what a template creates (D-136).
-jest.mock(
-  '@salesforce/label/c.Core_Import_CreatesSummary',
-  () => ({ default: 'This file can create: {0}.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/label/c.Core_Import_LoadsSummary', () => ({ default: 'Loads: {0}' }), {
   virtual: true
 });
@@ -165,11 +166,6 @@ jest.mock('@salesforce/label/c.Core_Import_SheetOption', () => ({ default: '{0} 
 jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_Import_DetectSuggested',
-  () => ({ default: 'Suggested: {0}' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/apex/ImportController.copyTemplate', () => ({ default: jest.fn() }), {
   virtual: true
 });

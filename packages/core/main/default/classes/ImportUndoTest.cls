@@ -327,7 +327,7 @@ private class ImportUndoTest {
                 'An edit since the import keeps the record (R-IB9).'
             );
             Assert.isTrue(
-                undoJournal(batch).contains(Label.Core_Import_UndoKeptEdited),
+                undoJournal(batch).contains(BarnHelp.text('Core', 'Core_Import_UndoKeptEdited')),
                 'And the journal says why.'
             );
         }
@@ -399,7 +399,7 @@ private class ImportUndoTest {
             Assert.isTrue(exists(edited.Id), 'Jo\'s edit before the undo keeps Ana.');
             Assert.isFalse(exists(untouched.Id), 'The undo\'s own save keeps nobody.');
             Assert.isTrue(
-                undoJournal(batch).contains(Label.Core_Import_UndoKeptEdited),
+                undoJournal(batch).contains(BarnHelp.text('Core', 'Core_Import_UndoKeptEdited')),
                 'The journal says Ana was edited.'
             );
         }
@@ -677,7 +677,7 @@ private class ImportUndoTest {
             );
             Assert.isFalse(exists(other.AccountId), 'A household nothing is credited to goes.');
             Assert.isTrue(
-                undoJournal(batch).contains(Label.Core_Import_UndoKeptCredited),
+                undoJournal(batch).contains(BarnHelp.text('Core', 'Core_Import_UndoKeptCredited')),
                 'The reason is journaled (R-IB9).'
             );
         }
@@ -740,7 +740,7 @@ private class ImportUndoTest {
             batch.Is_Dry_Run__c = true;
             update batch;
             Assert.areEqual(
-                Label.Core_Import_UndoErrorDryRun,
+                BarnHelp.text('Core', 'Core_Import_UndoErrorDryRun'),
                 ImportUndoService.preview(batch.Id).reason,
                 'A dry run wrote nothing to undo.'
             );
@@ -778,7 +778,7 @@ private class ImportUndoTest {
                 Assert.fail('A second undo of the same import is refused, not queued.');
             } catch (ImportException expected) {
                 Assert.areEqual(
-                    Label.Core_Import_UndoErrorAlreadyUndone,
+                    BarnHelp.text('Core', 'Core_Import_UndoErrorAlreadyUndone'),
                     expected.getMessage(),
                     'Saying why.'
                 );
@@ -794,7 +794,7 @@ private class ImportUndoTest {
             ImportUndoService.Preview view = ImportUndoService.preview(batch.Id);
             Assert.isFalse(view.allowed, 'There is nothing to undo.');
             Assert.areEqual(
-                Label.Core_Import_UndoErrorNothingToUndo,
+                BarnHelp.text('Core', 'Core_Import_UndoErrorNothingToUndo'),
                 view.reason,
                 'And it says so.'
             );
@@ -1074,7 +1074,8 @@ private class ImportUndoTest {
 
             Assert.isTrue(exists(imported.Id), 'Not knowing is not knowing nothing depends on it.');
             Assert.isTrue(
-                undoJournal(batch).contains(Label.Core_Import_UndoKeptNotChecked),
+                undoJournal(batch)
+                    .contains(BarnHelp.text('Core', 'Core_Import_UndoKeptNotChecked')),
                 'And the journal says it could not be checked.'
             );
         }

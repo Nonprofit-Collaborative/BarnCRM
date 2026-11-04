@@ -114,7 +114,7 @@ private class ImportMatchingRulesTest {
             Import_Row__c row = rowsOf(batch.Id)[0];
             Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, row.Status__c, 'Not guessed at.');
             Assert.areEqual(
-                Label.Core_Import_ErrorSeveralPeopleMatch,
+                BarnHelp.text('Core', 'Core_Import_ErrorSeveralPeopleMatch'),
                 row.Error_Message__c,
                 'Says why.'
             );
@@ -166,7 +166,9 @@ private class ImportMatchingRulesTest {
             Assert.areEqual(jane.Id, row.Contact_1__c, 'The most recently changed, Jane.');
             Assert.isTrue(row.Several_Matches__c, 'Still ticked, so it can be checked.');
             Assert.isTrue(
-                committed.Run_Log__c.contains(Label.Core_Import_LogSeveralMatchesUsedRecent),
+                committed.Run_Log__c.contains(
+                    BarnHelp.text('Core', 'Core_Import_LogSeveralMatchesUsedRecent')
+                ),
                 'The run log says so.'
             );
             Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Nobody added.');
@@ -192,7 +194,7 @@ private class ImportMatchingRulesTest {
 
             Import_Row__c row = rowsOf(batch.Id)[0];
             Assert.areEqual(
-                Label.Core_Import_ErrorSeveralOrganizationsMatch,
+                BarnHelp.text('Core', 'Core_Import_ErrorSeveralOrganizationsMatch'),
                 row.Error_Message__c,
                 'Two organizations by that name: rejected.'
             );

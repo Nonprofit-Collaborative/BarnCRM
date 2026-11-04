@@ -265,13 +265,16 @@ private class BulkDeleteUndoTest {
             }
             ImportUndoService.Preview preview = ImportUndoService.preview(jobId);
             System.Assert.isFalse(preview.allowed, 'Refused');
-            System.Assert.areEqual(System.Label.Core_Import_UndoErrorBulkDelete, preview.reason);
+            System.Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Import_UndoErrorBulkDelete'),
+                preview.reason
+            );
             try {
                 ImportUndoService.start(jobId, 0);
                 System.Assert.fail('Refused');
             } catch (ImportException expected) {
                 System.Assert.areEqual(
-                    System.Label.Core_Import_UndoErrorBulkDelete,
+                    BarnHelp.text('Core', 'Core_Import_UndoErrorBulkDelete'),
                     expected.getMessage()
                 );
             }

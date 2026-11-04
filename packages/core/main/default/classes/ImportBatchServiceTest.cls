@@ -121,7 +121,11 @@ private class ImportBatchServiceTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_Import_ErrorStagingClosed, refused, 'Refused, and why.');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Import_ErrorStagingClosed'),
+                refused,
+                'Refused, and why.'
+            );
             Import_Batch__c after = ImportBatchSelector.selectById(batch.Id);
             Assert.areEqual(ImportBatchService.STATUS_COMPLETE, after.Status__c, 'Unchanged.');
             Assert.areEqual(0, ImportTestDataFactory.reload(batch.Id).size(), 'Nothing staged.');
@@ -148,7 +152,10 @@ private class ImportBatchServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                String.format(Label.Core_Import_ErrorRowTooLong, new List<String>{ '3' }),
+                String.format(
+                    BarnHelp.text('Core', 'Core_Import_ErrorRowTooLong'),
+                    new List<String>{ '3' }
+                ),
                 refused,
                 'The second row of the page is file row three.'
             );
@@ -180,7 +187,11 @@ private class ImportBatchServiceTest {
                 ImportBatchService.startDryRun(batch.Id);
                 Assert.fail('A file with no rows cannot be dry run.');
             } catch (ImportException e) {
-                Assert.areEqual(Label.Core_Import_ErrorNoRows, e.getMessage(), 'Said plainly.');
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_Import_ErrorNoRows'),
+                    e.getMessage(),
+                    'Said plainly.'
+                );
             }
             Test.stopTest();
         }
@@ -224,7 +235,7 @@ private class ImportBatchServiceTest {
                     );
                 } catch (ImportException e) {
                     Assert.areEqual(
-                        Label.Core_Import_ErrorDryRunAfterCommit,
+                        BarnHelp.text('Core', 'Core_Import_ErrorDryRunAfterCommit'),
                         e.getMessage(),
                         'Said plainly, for ' + batch.Status__c + '.'
                     );
@@ -259,7 +270,7 @@ private class ImportBatchServiceTest {
                 Assert.fail('R-IB1: a commit needs a completed dry run first.');
             } catch (ImportException e) {
                 Assert.areEqual(
-                    Label.Core_Import_ErrorDryRunFirst,
+                    BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'),
                     e.getMessage(),
                     'And says so in the words the admin guide uses.'
                 );
@@ -369,7 +380,7 @@ private class ImportBatchServiceTest {
                 Assert.fail('A mapping that identifies nobody is refused before the run.');
             } catch (ImportException e) {
                 Assert.areEqual(
-                    Label.Core_Import_ErrorMappingIdentifiesNobody,
+                    BarnHelp.text('Core', 'Core_Import_ErrorMappingIdentifiesNobody'),
                     e.getMessage(),
                     'With the message the admin guide quotes.'
                 );
@@ -468,7 +479,7 @@ private class ImportBatchServiceTest {
                 Assert.fail('R-IB13: one pass of a batch at a time.');
             } catch (ImportException e) {
                 Assert.areEqual(
-                    Label.Core_Import_ErrorRunInProgress,
+                    BarnHelp.text('Core', 'Core_Import_ErrorRunInProgress'),
                     e.getMessage(),
                     'Said plainly.'
                 );
@@ -565,7 +576,7 @@ private class ImportBatchServiceTest {
                 Assert.fail('A negative number of rows makes no sense.');
             } catch (ImportException e) {
                 Assert.areEqual(
-                    Label.Core_Import_ErrorControlCountNegative,
+                    BarnHelp.text('Core', 'Core_Import_ErrorControlCountNegative'),
                     e.getMessage(),
                     'And is refused in the words the admin guide uses.'
                 );
@@ -608,7 +619,10 @@ private class ImportBatchServiceTest {
             Assert.isTrue(ImportBatchService.controlTotalsAgree(after), 'Both totals agree.');
             Assert.isTrue(
                 after.Run_Log__c.contains(
-                    String.format(Label.Core_Import_LogControlCountAgrees, new List<String>{ '2' })
+                    String.format(
+                        BarnHelp.text('Core', 'Core_Import_LogControlCountAgrees'),
+                        new List<String>{ '2' }
+                    )
                 ),
                 'The run log says the count matched.'
             );
@@ -645,7 +659,7 @@ private class ImportBatchServiceTest {
                 );
             } catch (ImportException e) {
                 Assert.areEqual(
-                    Label.Core_Import_ErrorControlTotalsDiffer,
+                    BarnHelp.text('Core', 'Core_Import_ErrorControlTotalsDiffer'),
                     e.getMessage(),
                     'And says so.'
                 );
@@ -656,7 +670,7 @@ private class ImportBatchServiceTest {
             Assert.isTrue(
                 after.Run_Log__c.contains(
                     String.format(
-                        Label.Core_Import_LogControlCountDiffers,
+                        BarnHelp.text('Core', 'Core_Import_LogControlCountDiffers'),
                         new List<String>{ '1', '2' }
                     )
                 ),
@@ -688,7 +702,9 @@ private class ImportBatchServiceTest {
                 'Without a module that reads gift amounts the amount cannot be checked.'
             );
             Assert.isTrue(
-                after.Run_Log__c.contains(Label.Core_Import_LogControlAmountUnread),
+                after.Run_Log__c.contains(
+                    BarnHelp.text('Core', 'Core_Import_LogControlAmountUnread')
+                ),
                 'And the run log says why.'
             );
         }
@@ -867,7 +883,11 @@ private class ImportBatchServiceTest {
                 ImportBatchService.startDryRun(batchId);
                 Assert.fail('A deleted batch cannot be run.');
             } catch (ImportException e) {
-                Assert.areEqual(Label.Core_Import_ErrorBatchGone, e.getMessage(), 'Said plainly.');
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'),
+                    e.getMessage(),
+                    'Said plainly.'
+                );
             }
             Test.stopTest();
         }

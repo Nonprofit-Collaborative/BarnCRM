@@ -493,7 +493,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                             objectName,
                             recordId,
                             field,
-                            Label.Core_Import_UndoNotRestoredGone
+                            BarnHelp.text('Core', 'Core_Import_UndoNotRestoredGone')
                         )
                     );
                     continue;
@@ -508,7 +508,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                             objectName,
                             recordId,
                             field,
-                            Label.Core_Import_UndoNotRestoredChanged
+                            BarnHelp.text('Core', 'Core_Import_UndoNotRestoredChanged')
                         )
                     );
                     continue;
@@ -774,7 +774,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
         Schema.SObjectType type = records[0].getSObjectType();
         if (!type.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable()) {
             for (SObject record : tagged.values()) {
-                journal.add(kept(record, Label.Core_Import_UndoKeptNoAccess));
+                journal.add(kept(record, BarnHelp.text('Core', 'Core_Import_UndoKeptNoAccess')));
             }
             return;
         }
@@ -862,7 +862,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
         }
         if (!described.isDeletable()) {
             for (SObject record : created.values()) {
-                journal.add(kept(record, Label.Core_Import_UndoKeptNoAccess));
+                journal.add(kept(record, BarnHelp.text('Core', 'Core_Import_UndoKeptNoAccess')));
             }
             return;
         }
@@ -913,7 +913,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                 error.getStatusCode() == StatusCode.INSUFFICIENT_ACCESS_OR_READONLY ||
                 error.getStatusCode() == StatusCode.INSUFFICIENT_ACCESS_ON_CROSS_REFERENCE_ENTITY
             ) {
-                return Label.Core_Import_UndoKeptNoAccess;
+                return BarnHelp.text('Core', 'Core_Import_UndoKeptNoAccess');
             }
         }
         return message(errors);
@@ -944,17 +944,17 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                 keep,
                 'SELECT Id FROM Account WHERE Id IN :ids AND Id IN (SELECT AccountId FROM Contact)',
                 binds,
-                Label.Core_Import_UndoKeptHasPeople
+                BarnHelp.text('Core', 'Core_Import_UndoKeptHasPeople')
             );
             markKept(
                 keep,
                 'SELECT Id FROM Account WHERE Id IN :ids AND Id IN ' +
                 '(SELECT Household__c FROM Household_Member__c WHERE Contact__c != NULL OR Account__c != NULL)',
                 binds,
-                Label.Core_Import_UndoKeptHasPeople
+                BarnHelp.text('Core', 'Core_Import_UndoKeptHasPeople')
             );
             for (Id dependent : HouseholdSelector.getAccountsWithNativeDependents(ids)) {
-                keep.put(dependent, Label.Core_Import_UndoKeptNativeDependents);
+                keep.put(dependent, BarnHelp.text('Core', 'Core_Import_UndoKeptNativeDependents'));
             }
             markKeptByDependents(keep, ids);
         }
@@ -982,7 +982,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
         }
         for (Id credited : HouseholdDependentsExtensions.householdsWithDependents(open)) {
             if (open.contains(credited)) {
-                keep.put(credited, Label.Core_Import_UndoKeptCredited);
+                keep.put(credited, BarnHelp.text('Core', 'Core_Import_UndoKeptCredited'));
             }
         }
     }
@@ -1009,7 +1009,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                     keep.put(
                         recordId,
                         String.isBlank(reasons.get(recordId))
-                            ? Label.Core_Import_UndoKeptNotChecked
+                            ? BarnHelp.text('Core', 'Core_Import_UndoKeptNotChecked')
                             : reasons.get(recordId)
                     );
                 }
@@ -1083,7 +1083,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             }
             Boolean activity = hasActivities && row.get('LastActivityDate') != null;
             if (edited || activity) {
-                keep.put(row.Id, Label.Core_Import_UndoKeptEdited);
+                keep.put(row.Id, BarnHelp.text('Core', 'Core_Import_UndoKeptEdited'));
             }
         }
     }
@@ -1192,7 +1192,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             for (Object value : row.getPopulatedFieldsAsMap().values()) {
                 if (value instanceof List<SObject> && !((List<SObject>) value).isEmpty()) {
                     if (!keep.containsKey(row.Id)) {
-                        keep.put(row.Id, Label.Core_Import_UndoKeptGained);
+                        keep.put(row.Id, BarnHelp.text('Core', 'Core_Import_UndoKeptGained'));
                     }
                     break;
                 }
@@ -1352,7 +1352,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     private static void notChecked(Map<Id, String> keep, Set<Id> ids) {
         for (Id recordId : ids) {
             if (!keep.containsKey(recordId)) {
-                keep.put(recordId, Label.Core_Import_UndoKeptNotChecked);
+                keep.put(recordId, BarnHelp.text('Core', 'Core_Import_UndoKeptNotChecked'));
             }
         }
     }

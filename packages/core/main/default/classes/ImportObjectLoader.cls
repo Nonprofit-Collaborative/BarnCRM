@@ -146,7 +146,7 @@ public with sharing class ImportObjectLoader {
         }
         writeBack(lines, steps, outcome, several && !dryRun);
         if (!dryRun && !journal(batch.Id, outcome.journal, createdPages)) {
-            outcome.notes.add(Label.Core_Import_LogJournalFailed);
+            outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogJournalFailed'));
         }
         return outcome;
     }
@@ -233,7 +233,7 @@ public with sharing class ImportObjectLoader {
                 hasValues = hasValues || has;
             }
             if (String.isBlank(row.Raw_Values_JSON__c)) {
-                line.error = Label.Core_Import_ErrorRowUnreadable;
+                line.error = BarnHelp.text('Core', 'Core_Import_ErrorRowUnreadable');
             } else if (!hasValues) {
                 line.error = Label.Core_Import_ErrorRowEmpty;
             }
@@ -649,7 +649,7 @@ public with sharing class ImportObjectLoader {
             if (token == null) {
                 outcome.notes.add(
                     String.format(
-                        Label.Core_Import_LogAttributeUnknown,
+                        BarnHelp.text('Core', 'Core_Import_LogAttributeUnknown'),
                         new List<String>{ attribute }
                     )
                 );
@@ -1240,7 +1240,7 @@ public with sharing class ImportObjectLoader {
             Id candidate = ImportValues.idOrNull(value);
             if (candidate == null) {
                 item.error = String.format(
-                    Label.Core_Import_ErrorRecordIdInvalid,
+                    BarnHelp.text('Core', 'Core_Import_ErrorRecordIdInvalid'),
                     new List<String>{ String.isBlank(value) ? '' : value.abbreviate(40) }
                 );
             } else if (candidate.getSObjectType() != type) {
@@ -1830,7 +1830,7 @@ public with sharing class ImportObjectLoader {
 
     private static String noAccess(Schema.DescribeFieldResult field) {
         return String.format(
-            Label.Core_Import_LogAttributeNoAccess,
+            BarnHelp.text('Core', 'Core_Import_LogAttributeNoAccess'),
             new List<String>{ field.getLabel() }
         );
     }

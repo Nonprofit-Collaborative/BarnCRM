@@ -51,7 +51,7 @@ private class ImportProcessorBatchTest {
             Assert.areEqual(3, after.Rows_Created__c, 'Three rows would create somebody.');
             Assert.areEqual(0, [SELECT COUNT() FROM Contact], 'And nobody was actually created.');
             Assert.isTrue(
-                after.Run_Log__c.contains(Label.Core_Import_LogDryRunHeader),
+                after.Run_Log__c.contains(BarnHelp.text('Core', 'Core_Import_LogDryRunHeader')),
                 'The run log says plainly that nothing was written.'
             );
         }
@@ -594,7 +594,11 @@ private class ImportProcessorBatchTest {
 
             Import_Row__c row = ImportTestDataFactory.reload(batch.Id)[0];
             Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, row.Status__c, 'Not guessed at.');
-            Assert.areEqual(Label.Core_Import_ErrorTwoPeopleOneKey, row.Error_Message__c, 'Why.');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Import_ErrorTwoPeopleOneKey'),
+                row.Error_Message__c,
+                'Why.'
+            );
             Assert.areEqual(1, dryRun.Rows_Rejected__c, 'The dry run says so first.');
             Assert.areEqual(0, [SELECT COUNT() FROM Contact], 'Nobody is created.');
         }
@@ -643,7 +647,8 @@ private class ImportProcessorBatchTest {
             List<Import_Row__c> loaded = ImportTestDataFactory.reload(batch.Id);
             Assert.areEqual(0, [SELECT COUNT() FROM Contact], 'Ana could not be saved.');
             Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, loaded[0].Status__c, 'Her row.');
-            String prefix = Label.Core_Import_ErrorSamePersonNotSaved.substringBefore('{0}');
+            String prefix = BarnHelp.text('Core', 'Core_Import_ErrorSamePersonNotSaved')
+                .substringBefore('{0}');
             for (Integer index = 1; index < 3; index++) {
                 Assert.areEqual(
                     ImportRowProcessor.STATUS_REJECTED,
@@ -975,7 +980,10 @@ private class ImportProcessorBatchTest {
                 log.countMatches('Note number '),
                 'Notes past the cap are left out.'
             );
-            Assert.isTrue(log.contains(Label.Core_Import_LogNotesCut), 'And the run log says so.');
+            Assert.isTrue(
+                log.contains(BarnHelp.text('Core', 'Core_Import_LogNotesCut')),
+                'And the run log says so.'
+            );
         }
     }
 }

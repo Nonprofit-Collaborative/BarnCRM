@@ -158,7 +158,10 @@ private class ImportDuplicateRuleMatchTest {
 
             Import_Row__c rejected = rows()[0];
             Assert.areEqual(1, preview.rejected);
-            Assert.areEqual(Label.Core_Import_ErrorSeveralPeopleMatch, rejected.Error_Message__c);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Import_ErrorSeveralPeopleMatch'),
+                rejected.Error_Message__c
+            );
             Assert.isTrue(rejected.Several_Matches__c, 'Listed as a several-matches row.');
             Assert.isFalse(rejected.Duplicate_Rule_Match__c, 'Not loaded into either.');
         }

@@ -16,7 +16,8 @@ Help and guidance prose (an intro, a description, an explanation, an empty-state
 
 - **Where:** `packages/<dir>/main/default/staticresources/BarnHelp_<Package>.json` (`BarnHelp_Core`, `BarnHelp_Rollups`, `BarnHelp_Giving`, `BarnHelp_Volunteers`, `BarnHelp_Programs`, `BarnHelp_LogicModels`, `BarnHelp_Funders`, `BarnHelp_Mirror`), shaped `{ "languages": ["en"], "texts": { "<key>": "<text>" } }`. A package's first help text adds its catalog and a `.resource-meta.xml` copied from Core's. English only for now.
 - **Keys:** named like labels, `<Package>_<Area>_<What>` (`Core_OrgOptimizer_Intro`). Keep the keys sorted.
-- **What stays a label:** titles, buttons, tabs, column headers, field labels, short status words, every error, toast, confirmation, validation, notice, log line and run result, sentences with `{0}` about the current state, text written into records, emails and files, and anything named from FlexiPage, Flow or custom metadata.
+- **Messages too (D-172):** every error, toast, confirmation, validation message, notice, log line and run result, and any sentence with `{0}` about the current state, goes into the catalog the same way. Read it in a getter or handler with `helpText`, or in Apex with `BarnHelp.text` (an exception thrown from a trigger reads it like any other).
+- **What stays a label:** titles, buttons, tabs, column headers, field labels, short status words, text written into emails, notifications and files, and anything named from FlexiPage, Flow or custom metadata (a Flow's error message, for one).
 - **In a component:**
 
   ```js

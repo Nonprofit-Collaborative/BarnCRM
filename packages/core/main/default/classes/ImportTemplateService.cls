@@ -208,7 +208,7 @@ public with sharing class ImportTemplateService {
         }
         Import_Template__c source = existing(sourceId);
         if (String.isNotBlank(source.Target_Object__c)) {
-            throw new ImportException(Label.Core_Import_ErrorCopyOneObject);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorCopyOneObject'));
         }
         Import_Template__c copy = new Import_Template__c(
             Name = name.trim().abbreviate(80),
@@ -359,7 +359,7 @@ public with sharing class ImportTemplateService {
         if (field == null) {
             throw new ImportException(
                 String.format(
-                    Label.Core_Import_ErrorMatchFieldNotAllowed,
+                    BarnHelp.text('Core', 'Core_Import_ErrorMatchFieldNotAllowed'),
                     new List<String>{ chosen.trim().left(80) }
                 )
             );
@@ -715,7 +715,9 @@ public with sharing class ImportTemplateService {
         // A one-object template names no person; its own refusals are asked when its dry run
         // starts, once its load choices are saved too (R-IT12).
         if (!ImportObjectSchema.loadsOneObject(template) && !mapping.identifiesSomebody()) {
-            throw new ImportException(Label.Core_Import_ErrorMappingIdentifiesNobody);
+            throw new ImportException(
+                BarnHelp.text('Core', 'Core_Import_ErrorMappingIdentifiesNobody')
+            );
         }
         // The objects of an upload of several objects are checked when the mapping is saved.
         String severalProblem = ImportObjectSchema.severalObjectsProblem(mapping);
@@ -773,14 +775,18 @@ public with sharing class ImportTemplateService {
             }
         }
         if (String.isNotBlank(behaviour) && chosen == null) {
-            throw new ImportException(Label.Core_Import_ErrorPaymentMatchingUnknown);
+            throw new ImportException(
+                BarnHelp.text('Core', 'Core_Import_ErrorPaymentMatchingUnknown')
+            );
         }
         if (
             (windowDays != null && (windowDays < 0 || windowDays > 999)) ||
             (tolerance != null &&
             tolerance < 0)
         ) {
-            throw new ImportException(Label.Core_Import_ErrorPaymentMatchingRange);
+            throw new ImportException(
+                BarnHelp.text('Core', 'Core_Import_ErrorPaymentMatchingRange')
+            );
         }
         template.Payment_Matching__c = chosen;
         template.Match_Date_Window_Days__c = windowDays;
@@ -843,7 +849,7 @@ public with sharing class ImportTemplateService {
     private static Import_Template__c existing(Id templateId) {
         Import_Template__c template = ImportTemplateSelector.selectById(templateId);
         if (template == null) {
-            throw new ImportException(Label.Core_Import_ErrorTemplateGone);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorTemplateGone'));
         }
         return template;
     }
@@ -861,10 +867,10 @@ public with sharing class ImportTemplateService {
     ) {
         Import_Template__c template = ImportTemplateSelector.selectById(templateId);
         if (template == null) {
-            throw new ImportException(Label.Core_Import_ErrorTemplateGone);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorTemplateGone'));
         }
         if (isRecurring == true && String.isBlank(sourceName)) {
-            throw new ImportException(Label.Core_Import_ErrorSourceNameRequired);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorSourceNameRequired'));
         }
         template.Is_Recurring__c = isRecurring == true;
         if (String.isNotBlank(sourceName)) {

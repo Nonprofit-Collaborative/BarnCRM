@@ -5,8 +5,8 @@
  * { "languages": ["en"], "texts": { "<key>": "<text>" } }, keyed by the API name the text had as
  * a custom label. A translation is a second resource, BarnHelp_<Package>_<language>, listed in
  * the English file's "languages" and holding only the keys it translates. Custom labels count
- * toward an org's 5,000 when BarnCRM is installed from source or unmanaged, so help prose lives
- * here; buttons, titles and messages stay custom labels.
+ * toward an org's 5,000 when BarnCRM is installed from source or unmanaged, so help prose and
+ * messages (errors, confirmations, run results; D-172) live here; buttons and titles stay labels.
  *
  * A catalog is read once per transaction: one query for the package's resources (the English
  * file and the user's language), then cached. A missing key, resource or translation reads as

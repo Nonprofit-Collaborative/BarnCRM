@@ -166,7 +166,7 @@ public with sharing class ImportRowCorrectionController {
     /** Why this rejected row cannot be corrected or retried now, or null. */
     private static String refusal(Import_Row__c row) {
         if (!hasManagePermission()) {
-            return Label.Core_Import_ErrorNoPermission;
+            return BarnHelp.text('Core', 'Core_Import_ErrorNoPermission');
         }
         if (!canEdit(row.Id)) {
             return Label.Core_Import_ErrorNoRowEditAccess;
@@ -229,7 +229,7 @@ public with sharing class ImportRowCorrectionController {
 
     private static void enforcePermission() {
         if (!hasManagePermission()) {
-            throw new ImportException(Label.Core_Import_ErrorNoPermission);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorNoPermission'));
         }
     }
 

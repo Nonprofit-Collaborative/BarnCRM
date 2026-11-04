@@ -16,20 +16,4 @@
         <shortDescription>Import results: button that imports the rows after a trial</shortDescription>
         <value>Import the Remaining Rows</value>
     </labels>
-    <labels>
-        <fullName>Core_Import_TrialDone</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import results: a trial finished; {0} rows tried, {1} remain</shortDescription>
-        <value>The first {0} rows were imported. Check them above, then import the remaining {1} rows into the same import. If they are wrong, undo the import from Recent imports instead.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_ErrorRemainingOtherUser</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import: the rest of a trial refused to someone other than its runner</shortDescription>
-        <value>Only the person who imported the first rows can import the rest, so one undo can tell this import's records from others. Ask them, or undo the import and import the file again.</value>
-    </labels>
 </CustomLabels>

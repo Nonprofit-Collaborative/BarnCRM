@@ -164,7 +164,7 @@ private class ImportTemplateServiceTest {
                 Assert.fail('A mapping that identifies nobody must be refused.');
             } catch (ImportException e) {
                 Assert.areEqual(
-                    Label.Core_Import_ErrorMappingIdentifiesNobody,
+                    BarnHelp.text('Core', 'Core_Import_ErrorMappingIdentifiesNobody'),
                     e.getMessage(),
                     'And refused with the message the admin guide quotes.'
                 );
@@ -193,7 +193,7 @@ private class ImportTemplateServiceTest {
                 Assert.fail('A deleted template cannot be saved to.');
             } catch (ImportException e) {
                 Assert.areEqual(
-                    Label.Core_Import_ErrorTemplateGone,
+                    BarnHelp.text('Core', 'Core_Import_ErrorTemplateGone'),
                     e.getMessage(),
                     'Said plainly.'
                 );
@@ -287,7 +287,7 @@ private class ImportTemplateServiceTest {
                 Assert.fail('A recurring file with no name cannot be told apart on the Hub.');
             } catch (ImportException expected) {
                 Assert.areEqual(
-                    Label.Core_Import_ErrorSourceNameRequired,
+                    BarnHelp.text('Core', 'Core_Import_ErrorSourceNameRequired'),
                     expected.getMessage(),
                     'Saying so.'
                 );
@@ -373,9 +373,9 @@ private class ImportTemplateServiceTest {
             Assert.isTrue(saved.Match_Amount_Tolerance__c == 0.5, 'The tolerance.');
             Assert.areEqual(
                 new List<String>{
-                    Label.Core_Import_ErrorPaymentMatchingUnknown,
-                    Label.Core_Import_ErrorPaymentMatchingRange,
-                    Label.Core_Import_ErrorPaymentMatchingRange
+                    BarnHelp.text('Core', 'Core_Import_ErrorPaymentMatchingUnknown'),
+                    BarnHelp.text('Core', 'Core_Import_ErrorPaymentMatchingRange'),
+                    BarnHelp.text('Core', 'Core_Import_ErrorPaymentMatchingRange')
                 },
                 refusals,
                 'An unknown behaviour and a negative number are refused.'

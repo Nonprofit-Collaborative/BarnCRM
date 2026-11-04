@@ -300,7 +300,7 @@ private class ImportRowProcessorTest {
             );
             Assert.areEqual(
                 String.format(
-                    Label.Core_Import_ErrorOrganizationRecordTypeUnavailable,
+                    BarnHelp.text('Core', 'Core_Import_ErrorOrganizationRecordTypeUnavailable'),
                     new List<String>{ AccountKinds.organizationRecordTypeLabel() }
                 ),
                 rows[1].Error_Message__c,
@@ -336,7 +336,7 @@ private class ImportRowProcessorTest {
                 'The failing row is marked rejected.'
             );
             Assert.areEqual(
-                Label.Core_Import_ErrorLastNameMissing,
+                BarnHelp.text('Core', 'Core_Import_ErrorLastNameMissing'),
                 rows[1].Error_Message__c,
                 'With the reason the admin guide quotes word for word.'
             );
@@ -352,7 +352,7 @@ private class ImportRowProcessorTest {
             Test.stopTest();
             Assert.areEqual(1, outcome.rejected, 'A row with only an address creates nothing.');
             Assert.areEqual(
-                Label.Core_Import_ErrorRowIdentifiesNobody,
+                BarnHelp.text('Core', 'Core_Import_ErrorRowIdentifiesNobody'),
                 ImportTestDataFactory.reload(batch.Id)[0].Error_Message__c,
                 'And says why.'
             );
@@ -681,7 +681,7 @@ private class ImportRowProcessorTest {
 
             Assert.areEqual(1, outcome.rejected, 'The row is rejected.');
             Assert.areEqual(
-                Label.Core_Import_ErrorRowUnreadable,
+                BarnHelp.text('Core', 'Core_Import_ErrorRowUnreadable'),
                 ImportTestDataFactory.reload(batch.Id)[0].Error_Message__c,
                 'With a reason, rather than an unhandled exception.'
             );
@@ -1140,7 +1140,10 @@ private class ImportRowProcessorTest {
                 'None for the rejected row.'
             );
             Import_Row__c rejected = ImportTestDataFactory.reload(batch.Id)[199];
-            Assert.areEqual(Label.Core_Import_ErrorLastNameMissing, rejected.Error_Message__c);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Import_ErrorLastNameMissing'),
+                rejected.Error_Message__c
+            );
             Assert.isNull(rejected.Organization__c, 'Pointing at nothing it did not create.');
         }
     }
@@ -1356,7 +1359,7 @@ private class ImportRowProcessorTest {
             Assert.isFalse(
                 outcome.notes.contains(
                     String.format(
-                        Label.Core_Import_LogEntitiesNotLoaded,
+                        BarnHelp.text('Core', 'Core_Import_LogEntitiesNotLoaded'),
                         new List<String>{ 'Gift' }
                     )
                 ),
@@ -1412,7 +1415,7 @@ private class ImportRowProcessorTest {
                 'Core rejected the row before offering it.'
             );
             Assert.areEqual(
-                Label.Core_Import_ErrorRowIdentifiesNobody,
+                BarnHelp.text('Core', 'Core_Import_ErrorRowIdentifiesNobody'),
                 nobody.Error_Message__c,
                 'And its own reason stays.'
             );
@@ -1461,7 +1464,7 @@ private class ImportRowProcessorTest {
             Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, rejected.Status__c);
             Assert.areEqual(
                 String.format(
-                    Label.Core_Import_ErrorEntitiesNotLoaded,
+                    BarnHelp.text('Core', 'Core_Import_ErrorEntitiesNotLoaded'),
                     new List<String>{ 'Gift', 'stub failed' }
                 ),
                 rejected.Error_Message__c,

@@ -57,35 +57,11 @@
         <value>{0} ({1} rows)</value>
     </labels>
     <labels>
-        <fullName>Core_Import_SheetConflict</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: the chosen sheets point at different objects</shortDescription>
-        <value>The sheets you chose point at different objects, and one import loads one object. Clear the sheets for other objects, or go back and choose the object they point at.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_DetectFileLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: file chosen to suggest the object to load</shortDescription>
         <value>Suggest the kind of record from a file (optional)</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_DetectSuggested</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: the object suggested; {0} is the object's label</shortDescription>
-        <value>Suggested from your file: {0}. Change it if it is not right.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_DetectNone</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: nothing in the file names an object</shortDescription>
-        <value>Nothing in the file names an object you can load. Choose one from the list.</value>
     </labels>
 </CustomLabels>

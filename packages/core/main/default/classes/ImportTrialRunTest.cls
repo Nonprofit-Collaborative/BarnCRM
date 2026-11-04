@@ -135,7 +135,7 @@ private class ImportTrialRunTest {
             );
             Assert.areEqual(trialStart, after.Started_At__c, 'The import starts with its trial.');
             Assert.isTrue(
-                after.Run_Log__c.contains(Label.Core_Import_LogCommitHeader),
+                after.Run_Log__c.contains(BarnHelp.text('Core', 'Core_Import_LogCommitHeader')),
                 'The log keeps both parts.'
             );
             Assert.isNull(ImportUndoService.refusal(after), 'And can be undone as one.');
@@ -152,7 +152,11 @@ private class ImportTrialRunTest {
                 ImportBatchService.startDryRun(batch.Id);
                 Assert.fail('A preview over committed rows must be refused.');
             } catch (ImportException e) {
-                Assert.areEqual(Label.Core_Import_ErrorDryRunAfterCommit, e.getMessage(), 'Why.');
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_Import_ErrorDryRunAfterCommit'),
+                    e.getMessage(),
+                    'Why.'
+                );
             }
         }
     }
@@ -169,7 +173,11 @@ private class ImportTrialRunTest {
                 ImportBatchService.startTrial(draft.Id, TRIAL);
                 Assert.fail('No trial before a preview.');
             } catch (ImportException e) {
-                Assert.areEqual(Label.Core_Import_ErrorDryRunFirst, e.getMessage(), 'Why.');
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'),
+                    e.getMessage(),
+                    'Why.'
+                );
             }
 
             Import_Batch__c batch = previewed();
@@ -180,7 +188,11 @@ private class ImportTrialRunTest {
                 ImportBatchService.startCommit(batch.Id);
                 Assert.fail('The rest is refused to anyone but the trial runner.');
             } catch (ImportException e) {
-                Assert.areEqual(Label.Core_Import_ErrorRemainingOtherUser, e.getMessage(), 'Why.');
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_Import_ErrorRemainingOtherUser'),
+                    e.getMessage(),
+                    'Why.'
+                );
             }
         }
     }

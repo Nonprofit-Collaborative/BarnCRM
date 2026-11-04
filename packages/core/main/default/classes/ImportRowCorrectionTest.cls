@@ -243,7 +243,7 @@ private class ImportRowCorrectionTest {
                 rejected.Id
             );
             Assert.isFalse(view.canCorrect, 'Without the permission it is read only.');
-            Assert.areEqual(Label.Core_Import_ErrorNoPermission, view.refusal);
+            Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorNoPermission'), view.refusal);
             try {
                 ImportRowCorrectionController.saveCorrections(rejected.Id, lastNameFix('X'));
             } catch (AuraHandledException e) {
@@ -270,7 +270,7 @@ private class ImportRowCorrectionTest {
 
             Assert.areEqual(
                 new List<String>{
-                    Label.Core_Import_ErrorNoPermission,
+                    BarnHelp.text('Core', 'Core_Import_ErrorNoPermission'),
                     Label.Core_Import_ErrorCorrectOnlyRejected,
                     Label.Core_Import_ErrorNoFixedRows,
                     Label.Core_Import_ErrorRetryByFileOpen

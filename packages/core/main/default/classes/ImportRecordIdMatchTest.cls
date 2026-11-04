@@ -154,7 +154,7 @@ private class ImportRecordIdMatchTest {
             Import_Row__c staged = rowsOf(batch.Id)[0];
             Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, staged.Status__c, 'Rejected.');
             Assert.areEqual(
-                format(Label.Core_Import_ErrorRecordIdNotFound, goneId),
+                format(BarnHelp.text('Core', 'Core_Import_ErrorRecordIdNotFound'), goneId),
                 staged.Error_Message__c,
                 'Says the ID was not found.'
             );
@@ -197,22 +197,28 @@ private class ImportRecordIdMatchTest {
             List<Import_Row__c> staged = rowsOf(batch.Id);
             Assert.areEqual(4, committed.Rows_Rejected__c, 'Every row rejected.');
             Assert.areEqual(
-                format(Label.Core_Import_ErrorRecordIdNotPerson, organization.Id),
+                format(
+                    BarnHelp.text('Core', 'Core_Import_ErrorRecordIdNotPerson'),
+                    organization.Id
+                ),
                 staged[0].Error_Message__c,
                 'An account is not a person here.'
             );
             Assert.areEqual(
-                format(Label.Core_Import_ErrorRecordIdNotOrganization, ana.Id),
+                format(BarnHelp.text('Core', 'Core_Import_ErrorRecordIdNotOrganization'), ana.Id),
                 staged[1].Error_Message__c,
                 'A contact is not an organization.'
             );
             Assert.areEqual(
-                format(Label.Core_Import_ErrorRecordIdNotOrganization, household.Id),
+                format(
+                    BarnHelp.text('Core', 'Core_Import_ErrorRecordIdNotOrganization'),
+                    household.Id
+                ),
                 staged[2].Error_Message__c,
                 'Nor is a household.'
             );
             Assert.areEqual(
-                format(Label.Core_Import_ErrorRecordIdInvalid, 'not-an-id'),
+                format(BarnHelp.text('Core', 'Core_Import_ErrorRecordIdInvalid'), 'not-an-id'),
                 staged[3].Error_Message__c,
                 'Text that is no ID says so.'
             );
@@ -303,12 +309,12 @@ private class ImportRecordIdMatchTest {
             Assert.isTrue(committed.Match_Only__c, 'The batch is marked.');
             Assert.areEqual(ana.Id, staged[0].Contact_1__c, 'A matching row loads.');
             Assert.areEqual(
-                Label.Core_Import_ErrorMatchOnlyNoMatch,
+                BarnHelp.text('Core', 'Core_Import_ErrorMatchOnlyNoMatch'),
                 staged[1].Error_Message__c,
                 'A new person is rejected.'
             );
             Assert.areEqual(
-                Label.Core_Import_ErrorMatchOnlyNoMatch,
+                BarnHelp.text('Core', 'Core_Import_ErrorMatchOnlyNoMatch'),
                 staged[2].Error_Message__c,
                 'And a new organization.'
             );

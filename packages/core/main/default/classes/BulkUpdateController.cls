@@ -316,7 +316,7 @@ public with sharing class BulkUpdateController {
             if (confirmedUpdates != undoPreview.updates) {
                 throw new BulkUpdateFields.BulkUpdateException(
                     String.format(
-                        System.Label.Core_Import_UndoErrorCountChanged,
+                        BarnHelp.text('Core', 'Core_Import_UndoErrorCountChanged'),
                         new List<Object>{
                             String.valueOf(confirmedUpdates == null ? 0 : confirmedUpdates),
                             String.valueOf(undoPreview.updates)

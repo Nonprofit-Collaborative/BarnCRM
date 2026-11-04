@@ -161,7 +161,9 @@ private class ImportPersonAccountTest {
 
             Assert.areEqual(0, outcome.created, 'Nobody is created: ' + outcome.notes);
             Assert.isTrue(
-                outcome.notes.contains(Label.Core_Import_LogPersonRecordTypeMissing),
+                outcome.notes.contains(
+                    BarnHelp.text('Core', 'Core_Import_LogPersonRecordTypeMissing')
+                ),
                 'The run log says why: ' + outcome.notes
             );
         }

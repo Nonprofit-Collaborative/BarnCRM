@@ -200,7 +200,7 @@ private class ImportRetryRejectsTest {
             );
             Assert.areEqual(started, after.Started_At__c, 'The import keeps its start.');
             Assert.isTrue(
-                after.Run_Log__c.contains(Label.Core_Import_LogCommitHeader),
+                after.Run_Log__c.contains(BarnHelp.text('Core', 'Core_Import_LogCommitHeader')),
                 'The log keeps both runs.'
             );
             Assert.isNull(ImportUndoService.refusal(after), 'And it is undone as one.');
@@ -254,7 +254,10 @@ private class ImportRetryRejectsTest {
                 ImportBatchService.stageRows(batch.Id, fixedRows(), 2);
                 Assert.fail('A finished import takes rows only through a retry.');
             } catch (ImportException e) {
-                Assert.areEqual(Label.Core_Import_ErrorStagingClosed, e.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_Import_ErrorStagingClosed'),
+                    e.getMessage()
+                );
             }
         }
     }

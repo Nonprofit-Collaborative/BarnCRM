@@ -33,7 +33,6 @@ import IMPORT_CONFIRM_HOUSEHOLDS from '@salesforce/label/c.Core_Import_UndoConfi
 import IMPORT_CONFIRM_ORGANIZATIONS from '@salesforce/label/c.Core_Import_UndoConfirmOrganizations';
 import IMPORT_CONFIRM_UPDATES from '@salesforce/label/c.Core_Import_UndoConfirmUpdates';
 import IMPORT_CONFIRM_BUTTON from '@salesforce/label/c.Core_Import_UndoConfirmButton';
-import IMPORT_UNDO_STARTED from '@salesforce/label/c.Core_Import_UndoStarted';
 import UPDATE_SUMMARY from '@salesforce/label/c.Core_BulkUpdate_Summary';
 import UPDATE_UNDO_CONFIRM from '@salesforce/label/c.Core_BulkUpdate_UndoConfirm';
 import UPDATE_UNDO_BUTTON from '@salesforce/label/c.Core_BulkUpdate_UndoButton';
@@ -478,7 +477,7 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
         batchId: this.undoTarget.id,
         confirmedTotal: this.importPreview.total
       });
-      this.finishUndo(IMPORT_UNDO_STARTED);
+      this.finishUndo(helpText('Core', 'Core_Import_UndoStarted'));
       await this.load();
     });
   }

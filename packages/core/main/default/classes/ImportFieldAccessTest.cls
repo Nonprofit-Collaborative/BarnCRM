@@ -94,7 +94,7 @@ private class ImportFieldAccessTest {
 
     private static String noAccessNote(Schema.SObjectField field) {
         return String.format(
-            Label.Core_Import_LogAttributeNoAccess,
+            BarnHelp.text('Core', 'Core_Import_LogAttributeNoAccess'),
             new List<String>{ field.getDescribe().getLabel() }
         );
     }

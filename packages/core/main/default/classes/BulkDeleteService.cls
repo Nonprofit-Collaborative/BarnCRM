@@ -412,7 +412,7 @@ public with sharing class BulkDeleteService {
             FOR UPDATE
         ];
         if (!ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(locked.Status__c)) {
-            throw new BulkDeleteException(System.Label.Core_Import_ErrorDryRunFirst);
+            throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'));
         }
         Import_Batch__c job = jobFields(checked, count, count);
         job.Id = batch.Id;
@@ -446,10 +446,10 @@ public with sharing class BulkDeleteService {
     private static Import_Batch__c dryRunOfFile(Id batchId) {
         Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
         if (batch == null) {
-            throw new BulkDeleteException(System.Label.Core_Import_ErrorBatchGone);
+            throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'));
         }
         if (!ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(batch.Status__c)) {
-            throw new BulkDeleteException(System.Label.Core_Import_ErrorDryRunFirst);
+            throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'));
         }
         return batch;
     }
