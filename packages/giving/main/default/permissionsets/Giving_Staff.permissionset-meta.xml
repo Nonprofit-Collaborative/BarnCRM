@@ -24,6 +24,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>CommitmentEntryController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>DonorLevelController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
