@@ -11,14 +11,20 @@
         ></lightning-radio-group>
 
         <template lwc:if={errorMessage}>
-            <p class="slds-text-color_error slds-var-m-vertical_small" data-id="error" role="alert">
-                {errorMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-vertical_small"
+                data-id="error"
+                variant="error"
+                message={errorMessage}
+            ></c-barn-notice>
         </template>
         <template lwc:if={noticeMessage}>
-            <p class="slds-var-m-vertical_small" data-id="notice" role="status" aria-live="polite">
-                {noticeMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-vertical_small"
+                data-id="notice"
+                variant="success"
+                message={noticeMessage}
+            ></c-barn-notice>
         </template>
         <template lwc:if={loading}>
             <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
@@ -36,7 +42,7 @@
                     onchange={handleTerm}
                 ></lightning-input>
                 <template lwc:if={side.noResults}>
-                    <p class="slds-var-m-top_x-small" data-id="no-matches">{labels.noMatches}</p>
+                    <p class="slds-var-m-top_x-small slds-text-color_weak" data-id="no-matches">{labels.noMatches}</p>
                 </template>
                 <ul class="slds-var-m-top_x-small" data-id="results">
                     <template for:each={side.resultItems} for:item="choice">
@@ -52,7 +58,7 @@
                     </template>
                 </ul>
                 <template lwc:if={side.heading}>
-                    <p class="slds-text-heading_small slds-var-m-top_x-small" data-id="chosen">
+                    <p class="slds-text-title_bold slds-var-m-top_x-small" data-id="chosen">
                         {side.heading}
                     </p>
                 </template>
@@ -73,9 +79,14 @@
             ></lightning-input>
 
             <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.kindsHeading}</h3>
-            <p data-id="object-count">{objectTable.count}</p>
+            <p class="slds-text-body_small slds-text-color_weak" data-id="object-count">{objectTable.count}</p>
             <template lwc:if={objectTable.empty}>
-                <p data-id="object-empty">{labels.noDifferences}</p>
+                <c-barn-empty-state
+                    data-id="object-empty"
+                    size="compact"
+                    illustration="all-clear"
+                    heading={labels.noDifferences}
+                ></c-barn-empty-state>
             </template>
             <template lwc:else>
                 <lightning-datatable
@@ -105,9 +116,14 @@
             ></lightning-combobox>
             <template lwc:if={showFields}>
                 <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.fieldsHeading}</h3>
-                <p data-id="field-count">{fieldTable.count}</p>
+                <p class="slds-text-body_small slds-text-color_weak" data-id="field-count">{fieldTable.count}</p>
                 <template lwc:if={fieldTable.empty}>
-                    <p data-id="field-empty">{labels.noDifferences}</p>
+                    <c-barn-empty-state
+                        data-id="field-empty"
+                        size="compact"
+                        illustration="all-clear"
+                        heading={labels.noDifferences}
+                    ></c-barn-empty-state>
                 </template>
                 <template lwc:else>
                     <lightning-datatable
@@ -128,7 +144,12 @@
             </template>
         </template>
         <template lwc:else>
-            <p class="slds-var-m-top_small" data-id="choose">{labels.choose}</p>
+            <c-barn-empty-state
+                class="slds-var-m-top_small"
+                data-id="choose"
+                size="compact"
+                heading={labels.choose}
+            ></c-barn-empty-state>
         </template>
     </div>
 </template>

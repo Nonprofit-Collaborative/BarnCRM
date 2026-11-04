@@ -14,8 +14,6 @@ packages/core/main/default/lwc/importRowCorrection/importRowCorrection.html tabl
 packages/core/main/default/lwc/importWizard/importWizard.html solid-box 1
 packages/core/main/default/lwc/importWizard/importWizard.html table-stacked 1
 packages/core/main/default/lwc/npspHouseholdAdoption/npspHouseholdAdoption.html table-stacked 1
-packages/core/main/default/lwc/recordInspector/recordInspector.html solid-box 1
-packages/core/main/default/lwc/recordInspector/recordInspector.html table-stacked 1
 packages/core/main/default/lwc/sampleDataManager/sampleDataManager.html solid-box 1
 packages/core/main/default/lwc/setupStepModules/setupStepModules.js badge-inverse 1
 packages/core/main/default/lwc/superTransform/superTransform.html solid-box 1

@@ -407,6 +407,14 @@
         <value>Move Up</value>
     </labels>
     <labels>
+        <fullName>Core_Shared_ShowTechnicalNames</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: toggle that shows API name columns (Field Use, Access Explorer)</shortDescription>
+        <value>Show technical names</value>
+    </labels>
+    <labels>
         <fullName>Core_Shared_Program</fullName>
         <categories>Core, Shared</categories>
         <language>en_US</language>
