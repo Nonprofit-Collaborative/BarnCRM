@@ -51,12 +51,20 @@ field before you go on. An Excel workbook can load several of its sheets at once
 its own kind of record if the template loads several. The
 Admin Guide's Importing page has the detail.
 
-The **BarnCRM Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,
-**Organizations**, **Gifts**, **Commitments**, **Gift Batches**, **Funds**, **Appeals**,
-**Tributes**, **Receipts**, **Stewardship Plans**, **Acknowledgment Queue**, **Receipt
-Letters**, **Dashboards** and **Reports** (an admin also sees **Donor Level Ladder** and
-**Stewardship Plan Setup**), plus **Quick Gift Entry** in the utility
-bar at the bottom of the screen.
+The **BarnCRM Fundraising** app opens on **Fundraising Home**, then has **Quick Gift Entry**,
+**Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Installments**
+(each pledge payment), **Ask Pipeline**, **Asks**, **Gift Batches**, **Funds**, **Appeals**,
+**Tributes**, **Receipts**, **Stewardship Plans**, **Acknowledgment Queue**, **Donor
+Segments**, **Dashboards** and **Reports**, plus **Quick Gift Entry** in the utility bar at the
+bottom of the screen.
+
+**Fundraising Home** shows five figures, each a link to its list: gifts waiting for a thank
+you, overdue pledge payments, your asks due this month, open gift batches and running
+stewardship plans. **Enter a Gift** opens Quick Gift Entry. Under **Fundraising Setup** are the
+setup pages that are no longer in the menu (**Donor Level Ladder**, **Stewardship Plan Setup**,
+**Pledge Reminders**, **Receipt Letters**), each shown only to people who may use it; they are
+also in the App Launcher. Below are two charts, **Giving by Month** and **Open Asks by Stage**;
+click a chart to open its report.
 
 The **BarnCRM Volunteers** app has **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer
 Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer

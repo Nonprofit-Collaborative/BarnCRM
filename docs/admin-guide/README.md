@@ -201,6 +201,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving |
 | G-02, ADR-0064 A donor's giving on their record | [donor-records.md](donor-records.md) | Giving |
 | G-06 Giving dashboard | [giving-dashboard.md](giving-dashboard.md) | Giving |
+| pg-22, vis-core-18 Fundraising Home and report charts | [fundraising-home.md](fundraising-home.md) | Giving |
 | G-23, G-24 Importing gifts and donation matching | [gift-import.md](gift-import.md) | Giving |
 
 ### Mirror (Connections to Other Systems)
