@@ -146,7 +146,7 @@ To free the place but keep a record that the person had signed up, set the statu
 
 ## To Know Whether a Volunteer Was Reminded
 
-When your admin has turned on **Send Shift Reminders**, each person signed up for a shift gets one
+When your admin has turned on **Send shift reminders**, each person signed up for a shift gets one
 reminder email before it, early in the morning, so you do not have to chase them.
 
 1. Open the sign-up (click the person's name in the **Sign-Ups** panel).

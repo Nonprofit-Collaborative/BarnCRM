@@ -17,17 +17,17 @@ public with sharing class OpportunityMirrorTriggerHandler extends TriggerHandler
     }
 
     public override void beforeInsert() {
-        OpportunityMirrorService.syncBeforeSave((List<Gift__c>) Trigger.new, null);
+        OpportunityMirrorService.syncBeforeSave((List<Gift__c>) newRecords(), null);
     }
 
     public override void beforeUpdate() {
         OpportunityMirrorService.syncBeforeSave(
-            (List<Gift__c>) Trigger.new,
-            (Map<Id, Gift__c>) Trigger.oldMap
+            (List<Gift__c>) newRecords(),
+            (Map<Id, Gift__c>) oldRecordsById()
         );
     }
 
     public override void afterDelete() {
-        OpportunityMirrorService.warnDeleted((List<Gift__c>) Trigger.old);
+        OpportunityMirrorService.warnDeleted((List<Gift__c>) oldRecords());
     }
 }

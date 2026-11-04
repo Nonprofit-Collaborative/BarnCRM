@@ -92,7 +92,7 @@ describe('c-settings-search', () => {
     jest.runAllTimers();
     await settle();
 
-    expect(element.shadowRoot.querySelector('p[role="alert"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="error"]')).not.toBeNull();
     expect(element.shadowRoot.querySelector('p[role="status"]')).toBeNull();
   });
 

@@ -896,6 +896,25 @@ scheduled for, so it can never end a newer pause. A pause in effect that no job 
 scheduled to end, or that ends more than 24 hours ahead, is a Health Check warning. Neither
 the pause nor its end moves any automation's switch, and neither touches an Always Runs
 automation (R-A4).
+**R-A6 A failure refuses only its own records.** When a packaged automation fails during a
+save of several records, only the records the failure belongs to are refused, with the
+friendly message, and the rest of the save goes ahead, in before and after contexts. The
+dispatcher finds them by undoing the failed attempt to a savepoint and running the
+automations again over halves of the records; it refuses the records not yet cleared together
+when the transaction lacks the room to try again. A failure of an Always Runs automation still
+refuses every record in front of it. The failure is logged once, and each record refused while
+narrowing gets its own Error Log entry naming its row (ADR-NEXT dispatcher errors and
+Automation Control).
+**R-A7 Automation Control pauses or bypasses per org, profile or user.** The BarnCRM
+Automation Control setting holds Pause All and Bypass (both off by default) at the org default,
+a profile or a user; the value for a save is the running user's as the platform resolves a
+hierarchy setting. When either applies, every packaged automation that is not Always Runs is
+skipped, alongside the per-transaction bypass, the timed pause and the switch, which all stay.
+Every shipped flow template ends when either applies, and the Check BarnCRM Automation action
+answers an organization's own flow the same way, adding the timed pause and the switch of a
+flow listed as `Flow:` plus its API name. Resuming the timed pause queues the household
+catch-up and the waiting rollups; skipped saves are not replayed (ADR-NEXT dispatcher errors
+and Automation Control).
 
 ### Salesforce implementation
 
@@ -907,7 +926,11 @@ automation (R-A4).
   admin reads it.
 - **Shipped defaults:** `Automation_Registry__mdt` (Section 13).
 - **Org-level pause:** `BarnCRM_Settings__c.Automation_Paused_Until__c`.
-- **Service:** `AutomationControl`, `TriggerDispatcher`.
+- **Automation Control:** `BarnCRM_Automation_Control__c`, a public hierarchy custom setting
+  (public so that an organization's own formulas, validation rules and flows read it through
+  `$Setup`), with `Pause_All__c` (Checkbox, default false) and `Bypass__c` (Checkbox, default
+  false) (R-A7).
+- **Service:** `AutomationControl`, `TriggerDispatcher`, `CheckAutomationAction`.
 
 ---
 
@@ -12449,6 +12472,8 @@ mirrors the primary member).
 | 0.16 | 2026-11-02 | Logic Models L-06 (ADR-0163 `0163-funders-reporting-links.md`). `Grant_Requirement__c` (29ZI) gains Logic Model Outcome (`Outcome_Id__c`, Text(18)), a Logic Models element named by record identifier, with rule R-GQ6. Neither module references the other. |
 | 0.16 | 2026-11-02 | Funders F-06 (ADR-0163 `0163-funders-reporting-links.md`). New Section 29ZO Funder Report Template (`Funder_Report_Template__c` and the shipped `Funder_Report_Template_Default__mdt`), rules R-FT1 to R-FT3. |
 | 0.16 | 2026-11-02 | Funders F-07 (ADR-0163 `0163-funders-reporting-links.md`). Grant (29ZH) gains rule R-GN9, the board dashboard (revenue mix, concentration, restricted balances), read from grants and, by describe, Giving and the F-03 ledger; no new object or field. |
+| 0.17 | 2026-11-04 | Dispatcher error contract (RT-05, ADR-NEXT dispatcher errors and Automation Control). Section 10 gains rule R-A6: a failure refuses only its own records, the rest of the save goes ahead. No object or field added. |
+| 0.17 | 2026-11-04 | BarnCRM Automation Control (RT-13, same ADR). New hierarchy custom setting `BarnCRM_Automation_Control__c` with `Pause_All__c` and `Bypass__c` (Section 10, rule R-A7), read by the dispatcher, every shipped flow template and the Check BarnCRM Automation action. |
 
 ---
 ## 32. Entity ownership by package

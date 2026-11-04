@@ -40,7 +40,7 @@ long as an import can be undone.
    in place of the cards, and no error.
 2. The **Data Manager** feature must be on (BarnCRM Settings, **General**), because the tab is
    one of its tools.
-3. Optional: **Super Transformer run limit** and **Bulk chunk size** (BarnCRM Settings, **Import**)
+3. Optional: **Super Transformer run limit** and **Records per batch in background jobs** (BarnCRM Settings, **Import**)
    apply to every Super Transformer run, whether it starts here or in Find. There is no setting of its own.
 
 ## 3. A Five-Minute Walkthrough (as Maria)

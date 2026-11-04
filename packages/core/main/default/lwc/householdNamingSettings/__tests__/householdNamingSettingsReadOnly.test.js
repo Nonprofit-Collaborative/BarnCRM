@@ -60,10 +60,13 @@ describe('c-household-naming-settings without the settings permission', () => {
     document.body.appendChild(element);
     await flush();
 
-    const inputs = element.shadowRoot.querySelectorAll('lightning-input');
+    const inputs = element.shadowRoot.querySelectorAll('input[data-pattern]');
     expect(inputs.length).toBe(3);
     inputs.forEach((input) => expect(input.disabled).toBe(true));
+    expect(element.shadowRoot.querySelector('button[data-part]')).toBeNull();
     expect(element.shadowRoot.querySelector('.save-button').disabled).toBe(true);
-    expect(element.shadowRoot.textContent).toContain('c.Core_HouseholdNamingSettings_ReadOnly');
+    expect(element.shadowRoot.querySelector('[data-id="read-only"]').message).toBe(
+      'c.Core_HouseholdNamingSettings_ReadOnly'
+    );
   });
 });

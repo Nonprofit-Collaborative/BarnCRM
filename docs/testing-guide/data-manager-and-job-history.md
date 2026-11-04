@@ -79,7 +79,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-DM-03: A Super Transformer Run Appears in Data Jobs, with a Notification
 
 **Purpose:** Confirm a Super Transformer run is listed newest first with its counts, the filter works, and the starter gets one bell notification.
-**Prerequisites:** admin. In **BarnCRM Settings**, **General**, **Send Long Job Notifications** is ticked.
+**Prerequisites:** admin. In **BarnCRM Settings**, **General**, **Send long job notifications** is ticked.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -197,12 +197,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **General**, clear **Send Long Job Notifications** and click **Save**. | **Your settings are saved.** |
+| 1 | In **BarnCRM Settings**, **General**, clear **Send long job notifications** and click **Save**. | **Your settings are saved.** |
 | 2 | Run a Super Transformer run as in T-DM-03, steps 1 and 2, setting **Title** to `Quiet`. | The job completes and is listed in **Data Jobs**. |
 | 3 | Check the bell. | No new notification. |
 | 4 | Undo the job as in T-DM-04 (type `6`). | The job reaches undone; no notification. |
 
-**Cleanup:** Tick **Send Long Job Notifications** again and save.
+**Cleanup:** Tick **Send long job notifications** again and save.
 
 ## T-DM-11: Snapshot History Compares, Shows and Deletes Saved Counts
 

@@ -32,7 +32,7 @@
         <p class="slds-text-color_success slds-var-m-top_x-small" role="status" data-id="saved">{savedMessage}</p>
     </template>
     <template lwc:if={errorMessage}>
-        <p class="slds-text-color_error slds-var-m-top_x-small" role="alert" data-id="error">{errorMessage}</p>
+        <c-barn-notice class="slds-var-m-top_x-small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
     </template>
     </template>
 </template>

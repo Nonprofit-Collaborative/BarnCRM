@@ -22,11 +22,11 @@ public with sharing class VolunteerShiftTriggerHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        nameUnnamed((List<Volunteer_Shift__c>) Trigger.new);
+        nameUnnamed((List<Volunteer_Shift__c>) newRecords());
     }
 
     public override void beforeUpdate() {
-        nameUnnamed((List<Volunteer_Shift__c>) Trigger.new);
+        nameUnnamed((List<Volunteer_Shift__c>) newRecords());
     }
 
     private static void nameUnnamed(List<Volunteer_Shift__c> shifts) {
