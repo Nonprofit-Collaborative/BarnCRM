@@ -4550,7 +4550,8 @@ report a year later.
 **R-IN5 The nightly passes are switched on in the console and visible there.** Nothing in
 the Giving module marks an installment Overdue or extends a recurring schedule until an
 administrator schedules the nightly jobs from the Nightly Jobs page of the Nonprofit
-Settings console, and the same page stops them (ADR-0031). Each pass records when it last
+Settings console, and the same page stops them (ADR-0031). Since the nightly run (R-NJ1),
+Schedule and Stop turn the four Giving steps' switches on and off (R-NJ4). Each pass records when it last
 finished and one sentence saying what it did, whether or not it changed anything, so a
 pass that ran and found nothing overdue reads differently from a pass that never ran. The
 console warns that a pass is stale only when the jobs are scheduled: an org that has not
@@ -9968,11 +9969,11 @@ when?" long after Setup has forgotten. The copy is read only: BarnCRM never chan
 **R-SU1 Source.** Rows come only from `SetupAuditTrail`, read with SOQL. BarnCRM reads the
 trail and writes only its own copy; it never changes Setup.
 
-**R-SU2 Copy.** The nightly job "BarnCRM Setup Changes Copy" (1:30, listed among Health
-Check's nightly jobs) copies every trail row made at or after the newest kept row's Changed At,
+**R-SU2 Copy.** The nightly step "BarnCRM Setup Changes Copy" (1:30 in the nightly run,
+R-NJ2) copies every trail row made at or after the newest kept row's Changed At,
 or every row the trail holds when nothing is kept yet. A row already kept is found by its Audit
 Trail ID and not stored again. An administrator can also run the same copy from the page
-(**Copy New Changes Now**), which schedules the nightly job when it is not scheduled.
+(**Copy New Changes Now**), which schedules the nightly run when it is not scheduled.
 
 **R-SU3 Who can read the trail.** Salesforce lets a user read the trail only with View Setup
 and Configuration. The copy runs as the user who scheduled it, or who pressed Copy New Changes
@@ -12075,6 +12076,84 @@ adoption job in system mode (ADR-0021).
 
 ---
 
+## 29ZR. Nightly Job
+
+### Definition
+
+One step of BarnCRM's nightly run, or the run itself: its on/off switch where it has one, and
+what happened the last time it ran (architect review RT-10 and L-10, ADR-NEXT
+nightly-job-dispatcher). The steps themselves are code, registered by Core and by each module;
+a row exists only to remember a switch or a result.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Key | text(80) | yes | The step's key: the name its own scheduled job carried before the nightly run, such as `BarnCRM Import Row Cleanup`; `BarnCRM Nightly Jobs` for the run itself. One row per key. |
+| Switch | picklist(On, Off) | no | The step's on/off switch, for a step that has one; blank reads as the step's shipped value. |
+| Last Started | datetime | no | When the step (or run) last started. |
+| Last Finished | datetime | no | When it last finished, skipped or failed. |
+| Last Outcome | picklist(Running, Done, Done With Errors, Failed, Skipped, Gave Up Waiting) | no | How the last run of the step ended. |
+| Last Message | text(255) | no | The error of a failed step, or what the run waited for. |
+
+### Rules
+
+**R-NJ1 One schedule.** BarnCRM keeps two scheduled jobs for good: "BarnCRM Nightly Jobs"
+(every day at 00:00 in the scheduling user's time zone) and the hourly "BarnCRM Tab Access
+Check". The run schedules a one-time "BarnCRM Nightly Jobs Continue" only to resume after a long
+wait. No step has a scheduled job of its own.
+
+**R-NJ2 Steps and order.** A step is a key, a label, a time of day and the work it starts. Core
+registers its own; a module registers its steps through `NightlyStepProvider`, found by class
+name, so Core names no module. Steps run one at a time, ordered by time of day (ties in the
+order registered). Each starts at its time of day or when the step before has finished,
+whichever is later.
+
+**R-NJ3 When a step has finished.** When no batch, queueable or future job the run's user
+started since the step began is holding, queued, preparing or processing. Checked every two
+minutes; after six hours the step is recorded Gave Up Waiting and the run moves on. A step whose
+jobs failed or reported errors is Done With Errors; a step whose start threw is Failed, with the
+error logged and in Last Message.
+
+**R-NJ4 Switches.** A step whose on/off was its own schedule (Error Digest, Rollups, the four
+Giving jobs, Acknowledgments, Pledge Reminders, the Opportunity and Gift Transaction mirrors) has
+a switch, set by the Schedule and Stop buttons on its own page, org-wide. Shipped on, except
+Acknowledgments and Pledge Reminders (shipped off). A step whose on/off is a setting reads that
+setting. A step that is off is recorded Skipped.
+
+**R-NJ5 Adopting old schedules.** Every scheduled job named by a step's key is aborted; a step
+with a switch whose job was scheduled has its switch turned On; when anything was adopted, the
+nightly run is scheduled. Run at install, upgrade and Finish Setup by Core and by each module, at
+the start of each nightly run, by Health Check's fix, and when an old job fires. Never throws.
+
+**R-NJ6 A run still going at midnight.** The new run supersedes it: the old run stops at its
+next check, and the new run's first step waits for the work the old step started.
+
+**R-NJ7 Administrators only.** Only `BarnCRM_Admin` is granted the object, Read and View All.
+Rows are written only by BarnCRM code in system mode (ADR-0021); switches change through the
+pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
+
+### Salesforce implementation
+
+- **Object** `Nightly_Job__c`, Name is the key (Text 80), sharing Private, reports on, no
+  activities, feeds, history or search.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Switch | `Switch__c` | Picklist (On, Off), restricted |
+| Last Started | `Last_Started__c` | DateTime |
+| Last Finished | `Last_Finished__c` | DateTime |
+| Last Outcome | `Last_Outcome__c` | Picklist (Running, Done, Done With Errors, Failed, Skipped, Gave Up Waiting), restricted |
+| Last Message | `Last_Message__c` | Text(255) |
+
+- **Classes:** `NightlyStep` (one step), `NightlyStepProvider` (a module's steps),
+  `NightlyJobs` (the registry, switches, results, scheduling and adoption), `NightlyRun` (the
+  run: schedulable and queueable). Each former scheduler class keeps its `start`, `stop`,
+  `isScheduled` and `nextRunAt` for its page, now reading and writing its step's switch. The
+  panel is `nightlyJobsPanel`, on the General page of BarnCRM Settings.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -12416,6 +12495,7 @@ mirrors the primary member).
 | 0.16 | 2026-11-02 | Logic Models L-06 (ADR-0163 `0163-funders-reporting-links.md`). `Grant_Requirement__c` (29ZI) gains Logic Model Outcome (`Outcome_Id__c`, Text(18)), a Logic Models element named by record identifier, with rule R-GQ6. Neither module references the other. |
 | 0.16 | 2026-11-02 | Funders F-06 (ADR-0163 `0163-funders-reporting-links.md`). New Section 29ZO Funder Report Template (`Funder_Report_Template__c` and the shipped `Funder_Report_Template_Default__mdt`), rules R-FT1 to R-FT3. |
 | 0.16 | 2026-11-02 | Funders F-07 (ADR-0163 `0163-funders-reporting-links.md`). Grant (29ZH) gains rule R-GN9, the board dashboard (revenue mix, concentration, restricted balances), read from grants and, by describe, Giving and the F-03 ledger; no new object or field. |
+| v1.0 | 2026-11-04 | One nightly job dispatcher (architect review RT-10, L-10, ADR-NEXT nightly-job-dispatcher). New Core object Nightly Job (`Nightly_Job__c`, 29ZR) with rules R-NJ1 to R-NJ7: one nightly schedule runs every step in sequence, each step keeping its switch and last result; about 19 separate scheduled jobs are replaced and adopted on upgrade. R-SU2 and R-IN5 read the nightly run instead of their own jobs. |
 
 ---
 ## 32. Entity ownership by package
@@ -12522,6 +12602,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Indicator | Logic Models | 0.14 (L-02) | 29ZF |
 | Indicator Period | Logic Models | 0.14 (L-02) | 29ZG |
 | Household Adoption | Core | 0.17 (X-05) | 29ZQ |
+| Nightly Job | Core | v1.0 (architect review RT-10) | 29ZR |
 | Funders entities | Funders | v0.9 | 30 |
 | Grant | Funders | 0.16 (F-01) | 29ZH |
 | Grant Requirement | Funders | 0.16 (F-02) | 29ZI |

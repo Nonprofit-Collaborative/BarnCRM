@@ -308,15 +308,12 @@ private class ImportRowPurgeTest {
             Id second = ImportRowPurgeScheduler.start();
             Test.stopTest();
 
-            Assert.areEqual(first, second, 'Starting again finds the job already there.');
+            Assert.areEqual(first, second, 'Starting again finds the nightly run already there.');
             Assert.isTrue(ImportRowPurgeScheduler.isScheduled());
-            Boolean listed = false;
-            for (NightlyJob job : NightlyJobs.all()) {
-                if (job.label() == System.Label.Core_HealthCheck_JobImportRows) {
-                    listed = job.isScheduled();
-                }
-            }
-            Assert.isTrue(listed, 'Health Check sees it among the nightly jobs, scheduled.');
+            NightlyStep step = NightlyJobs.step(ImportRowPurgeScheduler.JOB_NAME);
+            Assert.isNotNull(step, 'The cleanup is a step of the nightly run.');
+            Assert.areEqual(75, step.minute, 'At a quarter past one.');
+            Assert.isTrue(NightlyJobs.isOn(step), 'And it runs tonight.');
         }
     }
 }

@@ -404,3 +404,20 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 4 | Open the **Programs Admin** permission set in Setup. | Its description names case notes and service deliveries. |
 
 **Cleanup:** leave the jobs scheduled as they were.
+
+## T-SET-23: One Nightly Run
+
+**Purpose:** confirm every nightly job runs from the one schedule, in order, and the panel shows each job's result.
+**Prerequisites:** the admin user. For step 1, an org upgraded from a version whose nightly jobs were scheduled one by one.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | After the upgrade, open Setup, **Scheduled Jobs**. | One **BarnCRM Nightly Jobs** job at midnight, plus **BarnCRM Tab Access Check**; none of the old BarnCRM nightly jobs remain. |
+| 2 | Open **BarnCRM Settings**, **General**, **Nightly Jobs**. | Says the run is scheduled; lists each job in time order with its time and On or Off. A job that was scheduled before the upgrade reads On. |
+| 3 | Delete **BarnCRM Nightly Jobs** in Setup, then reload the panel. | Says it is not scheduled and shows **Schedule Nightly Jobs**. Health Check lists **Nightly Jobs Are Not Scheduled**. |
+| 4 | Press **Schedule Nightly Jobs**. | The panel says it is scheduled. |
+| 5 | On the **Error Log** section, press **Stop Daily Run**; back on **Nightly Jobs**. | The Error Log digest reads Off; the run stays scheduled. |
+| 6 | The next morning, read the panel. | Each job shows a last run and a result (Done, Done With Errors, Skipped for jobs that are off). |
+| 7 | Sign in as a user without Manage BarnCRM Settings and open the panel. | The list shows; there is no Schedule button. |
+
+**Cleanup:** press **Schedule Daily Run** on the Error Log section again.
