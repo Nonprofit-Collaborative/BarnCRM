@@ -253,7 +253,7 @@ public with sharing class SettingsService {
             String localName = field.getLocalName();
             Setting_Definition__mdt definition = rows.get(localName.toLowerCase());
             if (requireDefinition && definition == null) {
-                throw new SettingsException(System.Label.Core_Settings_UnknownKeyError);
+                throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
             }
             Object oldValue = record.get(token);
             Object newValue = checkedValue(values.get(key), field, definition);
@@ -412,7 +412,9 @@ public with sharing class SettingsService {
             AccountKinds.NO_RECORD_TYPE.equalsIgnoreCase(newText) &&
             !AccountKinds.noRecordTypeAllowed()
         ) {
-            throw new SettingsException(System.Label.Core_Settings_NoRecordTypeNotAllowed);
+            throw new SettingsException(
+                BarnHelp.text('Core', 'Core_Settings_NoRecordTypeNotAllowed')
+            );
         }
     }
 
@@ -431,7 +433,7 @@ public with sharing class SettingsService {
             checkAllowedValue(definition, newValue);
             return newValue;
         } catch (SettingsException refused) {
-            if (refused.getMessage() != System.Label.Core_Settings_InvalidValueError) {
+            if (refused.getMessage() != BarnHelp.text('Core', 'Core_Settings_InvalidValueError')) {
                 throw refused;
             }
             String name = definition != null && String.isNotBlank(definition.MasterLabel)
@@ -492,7 +494,7 @@ public with sharing class SettingsService {
                 return;
             }
         }
-        throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+        throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_InvalidValueError'));
     }
 
     /**
@@ -504,14 +506,14 @@ public with sharing class SettingsService {
         try {
             candidate = Decimal.valueOf(String.valueOf(newValue));
         } catch (TypeException notANumber) {
-            throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+            throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_InvalidValueError'));
         }
         Decimal low = definition.Min_Value__c;
         Decimal high = definition.Max_Value__c;
         if ((low != null && candidate < low) || (high != null && candidate > high)) {
             throw new SettingsException(
                 String.format(
-                    System.Label.Core_Settings_NumberOutOfRange,
+                    BarnHelp.text('Core', 'Core_Settings_NumberOutOfRange'),
                     new List<Object>{
                         definition.MasterLabel,
                         low == null ? '' : low.stripTrailingZeros().toPlainString(),
@@ -529,10 +531,10 @@ public with sharing class SettingsService {
         try {
             recordId = Id.valueOf(candidate);
         } catch (Exception notAnId) {
-            throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+            throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_InvalidValueError'));
         }
         if (expected == null || recordId.getSObjectType() != expected) {
-            throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+            throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_InvalidValueError'));
         }
     }
 
@@ -551,7 +553,7 @@ public with sharing class SettingsService {
                 return;
             }
         }
-        throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+        throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_InvalidValueError'));
     }
 
     /**
@@ -574,7 +576,9 @@ public with sharing class SettingsService {
         }
         for (String name : candidate.split(',')) {
             if (String.isNotBlank(name) && !known.contains(name.trim())) {
-                throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+                throw new SettingsException(
+                    BarnHelp.text('Core', 'Core_Settings_InvalidValueError')
+                );
             }
         }
     }
@@ -587,7 +591,9 @@ public with sharing class SettingsService {
         }
         for (String name : candidate.split(',')) {
             if (String.isNotBlank(name) && !known.contains(name.trim().toLowerCase())) {
-                throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+                throw new SettingsException(
+                    BarnHelp.text('Core', 'Core_Settings_InvalidValueError')
+                );
             }
         }
     }
@@ -773,18 +779,18 @@ public with sharing class SettingsService {
             !CORE_SETTINGS_OBJECT.equalsIgnoreCase(name) &&
             !registeredObjects().contains(name.toLowerCase())
         ) {
-            throw new SettingsException(System.Label.Core_Settings_UnknownKeyError);
+            throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
         }
         Schema.SObjectType type = typeByName(name);
         if (type == null) {
-            throw new SettingsException(System.Label.Core_Settings_UnknownKeyError);
+            throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
         }
         if (checkedSettingsTypes.contains(type)) {
             return type;
         }
         Schema.DescribeSObjectResult describe = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         if (!describe.isCustomSetting() || !describe.fields.getMap().containsKey(SETUP_OWNER)) {
-            throw new SettingsException(System.Label.Core_Settings_UnknownKeyError);
+            throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
         }
         checkedSettingsTypes.add(type);
         return type;
@@ -848,7 +854,7 @@ public with sharing class SettingsService {
             ? null
             : fieldsByLocalName(type).get(key.trim().toLowerCase());
         if (token == null) {
-            throw new SettingsException(System.Label.Core_Settings_UnknownKeyError);
+            throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
         }
         return token;
     }
@@ -889,7 +895,7 @@ public with sharing class SettingsService {
         }
         Integer maximum = field.getLength();
         if (maximum > 0 && text.length() > maximum) {
-            throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+            throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_InvalidValueError'));
         }
         return text;
     }
@@ -936,7 +942,7 @@ public with sharing class SettingsService {
                 return (Date) JSON.deserialize('"' + text + '"', Date.class);
             }
         } catch (Exception e) {
-            throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+            throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_InvalidValueError'));
         }
         return null;
     }

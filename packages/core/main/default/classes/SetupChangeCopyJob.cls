@@ -160,7 +160,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
             // R-SU3: the trail is refused to this user. Copy nothing; the delete pass still runs.
             ErrorLogger.logMessage(
                 String.format(
-                    Label.Core_SetupChanges_LogCannotRead,
+                    BarnHelp.text('Core', 'Core_SetupChanges_LogCannotRead'),
                     new List<String>{ unreadable.getMessage() }
                 ),
                 LOG_CONTEXT,
@@ -232,7 +232,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
                 failures.add(result.getErrors()[0].getMessage());
             }
         }
-        logFailures(failures, Label.Core_SetupChanges_LogNotCopied);
+        logFailures(failures, BarnHelp.text('Core', 'Core_SetupChanges_LogNotCopied'));
     }
 
     private static void remove(List<SObject> rows) {
@@ -242,7 +242,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
                 failures.add(result.getId() + ': ' + result.getErrors()[0].getMessage());
             }
         }
-        logFailures(failures, Label.Core_SetupChanges_LogNotRemoved);
+        logFailures(failures, BarnHelp.text('Core', 'Core_SetupChanges_LogNotRemoved'));
     }
 
     /** One entry per chunk, so a run that cannot write does not flood the Error Log. */

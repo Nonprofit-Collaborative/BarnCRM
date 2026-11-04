@@ -14,9 +14,9 @@ public with sharing class IntegrationController {
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
             AuraHandledException error = new AuraHandledException(
-                System.Label.Core_Integrations_LoadErrorMessage
+                BarnHelp.text('Core', 'Core_Integrations_LoadErrorMessage')
             );
-            error.setMessage(System.Label.Core_Integrations_LoadErrorMessage);
+            error.setMessage(BarnHelp.text('Core', 'Core_Integrations_LoadErrorMessage'));
             throw error;
         }
     }

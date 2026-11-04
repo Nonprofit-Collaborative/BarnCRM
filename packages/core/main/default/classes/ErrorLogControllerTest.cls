@@ -96,7 +96,7 @@ private class ErrorLogControllerTest {
                     Assert.fail('The value "' + candidate + '" is not an Error Log entry.');
                 } catch (AuraHandledException expected) {
                     Assert.areEqual(
-                        Label.Core_ErrorLog_EntryNotFound,
+                        BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound'),
                         expected.getMessage(),
                         'Maria is told to refresh the page.'
                     );

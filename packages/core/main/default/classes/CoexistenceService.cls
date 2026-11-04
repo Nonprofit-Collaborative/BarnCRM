@@ -80,7 +80,7 @@ public with sharing class CoexistenceService {
         if (String.isBlank(mode) || !VALID_MODES.contains(mode)) {
             throw new CoexistenceException(
                 String.format(
-                    System.Label.Core_CoexistenceMode_InvalidMode,
+                    BarnHelp.text('Core', 'Core_CoexistenceMode_InvalidMode'),
                     new List<Object>{ mode }
                 )
             );

@@ -6,20 +6,16 @@ import describeObject from '@salesforce/apex/DataDictionaryController.describeOb
 import getAutomation from '@salesforce/apex/DataDictionaryController.getAutomation';
 import getPlan from '@salesforce/apex/FieldUtilizationController.getPlan';
 import countFields from '@salesforce/apex/FieldUtilizationController.countFields';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_DataDictionary_AutomationNotRead: 'Could not read all automation for: {0}.',
+  Core_DataDictionary_DownloadedAutomation: 'Downloaded {0} automation rows.'
+});
 
 jest.mock(
   '@salesforce/apex/DataDictionaryController.getAutomation',
   () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataDictionary_AutomationNotRead',
-  () => ({ default: 'Could not read all automation for: {0}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataDictionary_DownloadedAutomation',
-  () => ({ default: 'Downloaded {0} automation rows.' }),
   { virtual: true }
 );
 

@@ -764,7 +764,10 @@ public with sharing class MatchSourceService {
         Schema.SObjectType type = NamespaceUtil.objectType(objectName);
         if (type == null) {
             throw new CustomMetadataManagerService.CustomMetadataManagerException(
-                String.format(Label.Core_MatchSource_NoSuchObject, new List<Object>{ objectName })
+                String.format(
+                    BarnHelp.text('Core', 'Core_MatchSource_NoSuchObject'),
+                    new List<Object>{ objectName }
+                )
             );
         }
         Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
@@ -781,7 +784,7 @@ public with sharing class MatchSourceService {
         if (!isPersonOrHouseholdLookup(parent)) {
             throw new CustomMetadataManagerService.CustomMetadataManagerException(
                 String.format(
-                    Label.Core_MatchSource_NotALookup,
+                    BarnHelp.text('Core', 'Core_MatchSource_NotALookup'),
                     new List<Object>{ values.get('Parent_Field__c'), described.getLabel() }
                 )
             );
@@ -790,7 +793,7 @@ public with sharing class MatchSourceService {
             String postal = (String) values.get('Postal_Code_Field__c');
             if (String.isBlank(postal)) {
                 throw new CustomMetadataManagerService.CustomMetadataManagerException(
-                    Label.Core_MatchSource_PostalRequired
+                    BarnHelp.text('Core', 'Core_MatchSource_PostalRequired')
                 );
             }
             requireText(requireField(fields, postal, described.getLabel()), described.getLabel());
@@ -845,7 +848,7 @@ public with sharing class MatchSourceService {
         if (!isMatchableText(described)) {
             throw new CustomMetadataManagerService.CustomMetadataManagerException(
                 String.format(
-                    Label.Core_MatchSource_NotFilterableText,
+                    BarnHelp.text('Core', 'Core_MatchSource_NotFilterableText'),
                     new List<Object>{ described.getLabel(), objectLabel }
                 )
             );
@@ -861,7 +864,7 @@ public with sharing class MatchSourceService {
         if (found == null) {
             throw new CustomMetadataManagerService.CustomMetadataManagerException(
                 String.format(
-                    Label.Core_MatchSource_NoSuchField,
+                    BarnHelp.text('Core', 'Core_MatchSource_NoSuchField'),
                     new List<Object>{ name, objectLabel }
                 )
             );

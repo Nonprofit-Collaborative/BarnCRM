@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
   <lightning-modal-header label={label}></lightning-modal-header>
   <lightning-modal-body>
     <template lwc:if={errorMessage}>
@@ -84,4 +85,5 @@
       onclick={handleSave}
     ></lightning-button>
   </lightning-modal-footer>
+    </template>
 </template>

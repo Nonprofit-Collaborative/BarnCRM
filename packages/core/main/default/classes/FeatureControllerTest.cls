@@ -101,7 +101,7 @@ private class FeatureControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                System.Label.Core_Feature_SaveError,
+                BarnHelp.text('Core', 'Core_Feature_SaveError'),
                 refused.getMessage(),
                 'The page shows a message Maria can act on'
             );

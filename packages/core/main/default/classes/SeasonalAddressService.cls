@@ -65,7 +65,7 @@ public with sharing class SeasonalAddressService {
         /** One sentence, in the reader's language, for the Hub tile and the settings page. */
         public String text() {
             return String.format(
-                System.Label.Core_SeasonalAddress_RunSummaryFormat,
+                BarnHelp.text('Core', 'Core_SeasonalAddress_RunSummaryFormat'),
                 new List<String>{
                     String.valueOf(this.movedIn),
                     String.valueOf(this.movedBack),
@@ -196,7 +196,7 @@ public with sharing class SeasonalAddressService {
             Plan plan = planFor(byOwner.get(ownerId), today);
             if (plan.collidingAddressId != null) {
                 ErrorLogger.logMessage(
-                    System.Label.Core_SeasonalAddress_CollisionWarning,
+                    BarnHelp.text('Core', 'Core_SeasonalAddress_CollisionWarning'),
                     LOG_CONTEXT,
                     ErrorLogger.SEVERITY_WARNING,
                     plan.collidingAddressId

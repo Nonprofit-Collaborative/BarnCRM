@@ -123,7 +123,7 @@ private class SeasonalAddressControllerTest {
                     Assert.fail('Running the swap by hand must require Manage BarnCRM Settings.');
                 } catch (AuraHandledException expected) {
                     Assert.areEqual(
-                        System.Label.Core_SeasonalAddress_PermissionRequired,
+                        BarnHelp.text('Core', 'Core_SeasonalAddress_PermissionRequired'),
                         expected.getMessage(),
                         'The refusal must name the permission rather than show a stack trace.'
                     );

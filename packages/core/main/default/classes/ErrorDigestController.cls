@@ -91,7 +91,9 @@ public with sharing class ErrorDigestController {
 
     private static void requirePermission() {
         if (!canManage()) {
-            throw new ErrorDigestException(System.Label.Core_ErrorDigest_PermissionRequired);
+            throw new ErrorDigestException(
+                BarnHelp.text('Core', 'Core_ErrorDigest_PermissionRequired')
+            );
         }
     }
 
@@ -100,7 +102,7 @@ public with sharing class ErrorDigestController {
             caught,
             caught instanceof ErrorDigestException,
             context,
-            System.Label.Core_ErrorDigest_UnexpectedError
+            BarnHelp.text('Core', 'Core_ErrorDigest_UnexpectedError')
         );
     }
 }

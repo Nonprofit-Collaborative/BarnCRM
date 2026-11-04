@@ -3,18 +3,31 @@ import search from '@salesforce/apex/SettingsController.search';
 import INPUT_LABEL from '@salesforce/label/c.Core_SettingsSearch_InputLabel';
 import PLACEHOLDER from '@salesforce/label/c.Core_SettingsSearch_InputLabel';
 import RESULTS_HEADING from '@salesforce/label/c.Core_SettingsSearch_ResultsHeading';
-import NO_RESULTS from '@salesforce/label/c.Core_SettingsSearch_NoResultsMessage';
-import SEARCH_ERROR from '@salesforce/label/c.Core_SettingsSearch_ErrorMessage';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const DEBOUNCE_MS = 300;
 
 export default class SettingsSearch extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     inputLabel: INPUT_LABEL,
     placeholder: PLACEHOLDER,
     resultsHeading: RESULTS_HEADING,
-    noResults: NO_RESULTS,
-    searchError: SEARCH_ERROR
+    get noResults() {
+      return helpText('Core', 'Core_SettingsSearch_NoResultsMessage');
+    },
+    get searchError() {
+      return helpText('Core', 'Core_SettingsSearch_ErrorMessage');
+    }
   };
 
   results = [];

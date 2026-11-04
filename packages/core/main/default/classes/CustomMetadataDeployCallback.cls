@@ -51,7 +51,7 @@ public with sharing class CustomMetadataDeployCallback implements Metadata.Deplo
         }
         ErrorLogger.logMessage(
             String.format(
-                System.Label.Core_CmdtManager_DeployFailed,
+                BarnHelp.text('Core', 'Core_CmdtManager_DeployFailed'),
                 new List<Object>{ label, reasonOf(result) }
             ),
             ERROR_CONTEXT,
@@ -75,7 +75,7 @@ public with sharing class CustomMetadataDeployCallback implements Metadata.Deplo
             problems.add(result.errorMessage);
         }
         return problems.isEmpty()
-            ? System.Label.Core_CmdtManager_DeployFailedNoReason
+            ? BarnHelp.text('Core', 'Core_CmdtManager_DeployFailedNoReason')
             : String.join(problems, ' ');
     }
 }

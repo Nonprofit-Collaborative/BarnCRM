@@ -58,7 +58,7 @@ private class ErrorLoggerTest {
                 'And it names where it happened, so entries from different places differ.'
             );
             Assert.areEqual(
-                Label.Core_ErrorLog_UnexpectedFailure,
+                BarnHelp.text('Core', 'Core_ErrorLog_UnexpectedFailure'),
                 ErrorLogger.friendlyMessage(' '),
                 'With nowhere to name, the plain explanation stands alone.'
             );

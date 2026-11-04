@@ -199,7 +199,7 @@ public with sharing class ErrorLogger {
     @TestVisible
     private static String friendlyMessage(String context) {
         return String.isBlank(context)
-            ? Label.Core_ErrorLog_UnexpectedFailure
+            ? BarnHelp.text('Core', 'Core_ErrorLog_UnexpectedFailure')
             : String.format(
                   Label.Core_ErrorLog_UnexpectedFailureIn,
                   new List<Object>{ context.trim() }

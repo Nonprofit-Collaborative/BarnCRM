@@ -214,7 +214,7 @@ private class ModuleManagerServiceTest {
                     ModuleManagerService.turnOff(name);
                 } catch (ModuleManagerService.ModuleManagerException e) {
                     Assert.areEqual(
-                        System.Label.Core_ModuleManager_UnknownModuleError,
+                        BarnHelp.text('Core', 'Core_ModuleManager_UnknownModuleError'),
                         e.getMessage()
                     );
                     refused++;

@@ -30,7 +30,7 @@ public with sharing class FirstRunController {
             return state();
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw UserErrors.message(System.Label.Core_FirstRun_LoadError);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_FirstRun_LoadError'));
         }
     }
 
@@ -41,7 +41,9 @@ public with sharing class FirstRunController {
     @AuraEnabled
     public static FirstRunState finish(String suite, List<String> featureKeys) {
         if (!BarnCRMPermissions.canManageSettings()) {
-            throw UserErrors.message(System.Label.Core_Settings_PermissionRequiredError);
+            throw UserErrors.message(
+                BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
+            );
         }
         String chosen = knownSuite(suite);
         try {
@@ -54,7 +56,7 @@ public with sharing class FirstRunController {
             return state();
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw UserErrors.message(System.Label.Core_FirstRun_SaveError);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_FirstRun_SaveError'));
         }
     }
 
@@ -103,7 +105,7 @@ public with sharing class FirstRunController {
             chosen != ModuleDetectionService.SUITE_STANDARD &&
             chosen != ModuleDetectionService.SUITE_NONPROFIT
         ) {
-            throw UserErrors.message(System.Label.Core_SuiteChoice_UnknownSuiteError);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_SuiteChoice_UnknownSuiteError'));
         }
         return chosen;
     }

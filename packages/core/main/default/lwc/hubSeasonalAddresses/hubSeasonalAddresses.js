@@ -3,13 +3,10 @@ import { NavigationMixin } from 'lightning/navigation';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import HEADING from '@salesforce/label/c.Core_SeasonalAddress_HubTitle';
-import NEVER from '@salesforce/label/c.Core_SeasonalAddress_NeverRun';
-import NOT_SCHEDULED from '@salesforce/label/c.Core_SeasonalAddress_NotScheduled';
-import STALE from '@salesforce/label/c.Core_SeasonalAddress_Stale';
 import LINK from '@salesforce/label/c.Core_SeasonalAddress_HubLink';
-import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
 import NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_BadgeNotRun';
 import OVERDUE from '@salesforce/label/c.Core_HubHome_BadgeOverdue';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ADDRESSES_SECTION = 'Addresses';
 
@@ -18,11 +15,27 @@ const ADDRESSES_SECTION = 'Addresses';
  * whose last run nobody can see is a job nobody trusts.
  */
 export default class HubSeasonalAddresses extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     heading: HEADING,
-    never: NEVER,
-    notScheduled: NOT_SCHEDULED,
-    stale: STALE,
+    get never() {
+      return helpText('Core', 'Core_SeasonalAddress_NeverRun');
+    },
+    get notScheduled() {
+      return helpText('Core', 'Core_SeasonalAddress_NotScheduled');
+    },
+    get stale() {
+      return helpText('Core', 'Core_SeasonalAddress_Stale');
+    },
     link: LINK,
     notRun: NOT_RUN,
     overdue: OVERDUE
@@ -46,7 +59,7 @@ export default class HubSeasonalAddresses extends NavigationMixin(LightningEleme
       this.stale = Boolean(data.seasonalAddressStale && data.seasonalAddressLastRun);
       this.errorMessage = undefined;
     } else if (error) {
-      this.errorMessage = LOAD_ERROR;
+      this.errorMessage = helpText('Core', 'Core_HubHome_LoadErrorMessage');
     }
   }
 
@@ -68,7 +81,7 @@ export default class HubSeasonalAddresses extends NavigationMixin(LightningEleme
         state: { [link.sectionKey]: ADDRESSES_SECTION }
       });
     } catch {
-      this.errorMessage = LOAD_ERROR;
+      this.errorMessage = helpText('Core', 'Core_HubHome_LoadErrorMessage');
     }
   }
 }

@@ -107,7 +107,7 @@ public with sharing class OrganizationAddress {
             return null;
         }
         return String.format(
-            System.Label.Core_OrganizationAddress_IncompleteError,
+            BarnHelp.text('Core', 'Core_OrganizationAddress_IncompleteError'),
             new List<Object>{ String.join(missing, ', ') }
         );
     }

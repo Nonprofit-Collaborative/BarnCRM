@@ -74,7 +74,7 @@ public with sharing class SeasonalAddressController {
     private static void requirePermission() {
         if (!canManage()) {
             throw new SeasonalAddressException(
-                System.Label.Core_SeasonalAddress_PermissionRequired
+                BarnHelp.text('Core', 'Core_SeasonalAddress_PermissionRequired')
             );
         }
     }
@@ -84,7 +84,7 @@ public with sharing class SeasonalAddressController {
             caught,
             caught instanceof SeasonalAddressException,
             context,
-            System.Label.Core_SeasonalAddress_UnexpectedError
+            BarnHelp.text('Core', 'Core_SeasonalAddress_UnexpectedError')
         );
     }
 }

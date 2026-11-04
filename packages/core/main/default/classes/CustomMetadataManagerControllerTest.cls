@@ -130,9 +130,21 @@ private class CustomMetadataManagerControllerTest {
         }
         Test.stopTest();
 
-        Assert.areEqual(Label.Core_CmdtManager_NameRequired, saveMessage, 'Validation message');
-        Assert.areEqual(Label.Core_CmdtManager_RecordNotFound, archiveMessage, 'Unknown row');
-        Assert.areEqual(Label.Core_CmdtManager_LoadError, outcomeMessage, 'Bad Id');
+        Assert.areEqual(
+            BarnHelp.text('Core', 'Core_CmdtManager_NameRequired'),
+            saveMessage,
+            'Validation message'
+        );
+        Assert.areEqual(
+            BarnHelp.text('Core', 'Core_CmdtManager_RecordNotFound'),
+            archiveMessage,
+            'Unknown row'
+        );
+        Assert.areEqual(
+            BarnHelp.text('Core', 'Core_CmdtManager_LoadError'),
+            outcomeMessage,
+            'Bad Id'
+        );
     }
 
     @IsTest
@@ -152,7 +164,11 @@ private class CustomMetadataManagerControllerTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_CmdtManager_PermissionRequired, message, 'Refused first');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_CmdtManager_PermissionRequired'),
+                message,
+                'Refused first'
+            );
         }
     }
 }

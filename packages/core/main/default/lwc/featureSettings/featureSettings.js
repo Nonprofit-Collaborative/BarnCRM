@@ -3,14 +3,12 @@ import BarnConfirmModal from 'c/barnConfirmModal';
 import getFeatures from '@salesforce/apex/FeatureController.getFeatures';
 import turnOn from '@salesforce/apex/FeatureController.turnOn';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
-import WARNING from '@salesforce/label/c.Core_Feature_OneWayWarning';
 import TURN_ON from '@salesforce/label/c.Core_Feature_TurnOn';
 import ON from '@salesforce/label/c.Core_Feature_On';
 import OFF from '@salesforce/label/c.Core_Feature_Off';
 import CONFIRM_TITLE from '@salesforce/label/c.Core_Feature_ConfirmTitle';
-import CONFIRM_MESSAGE from '@salesforce/label/c.Core_Feature_ConfirmMessage';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import TURNED_ON from '@salesforce/label/c.Core_Feature_TurnedOn';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * BarnCRM Settings, General, Features (ADR-0124): each Core feature with its description and
@@ -18,7 +16,14 @@ import TURNED_ON from '@salesforce/label/c.Core_Feature_TurnedOn';
  * one-way, which the warning above the list says, so a feature that is on has no control.
  */
 export default class FeatureSettings extends LightningElement {
-  labels = { warning: WARNING, turnOn: TURN_ON };
+  helpReady = isHelpLoaded('Core');
+
+  labels = {
+    get warning() {
+      return helpText('Core', 'Core_Feature_OneWayWarning');
+    },
+    turnOn: TURN_ON
+  };
 
   features = [];
   canEdit = false;
@@ -28,6 +33,11 @@ export default class FeatureSettings extends LightningElement {
   savedMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -71,7 +81,10 @@ export default class FeatureSettings extends LightningElement {
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: format(CONFIRM_TITLE, feature.name),
-      message: [format(CONFIRM_MESSAGE, feature.name), feature.confirmNote]
+      message: [
+        format(helpText('Core', 'Core_Feature_ConfirmMessage'), feature.name),
+        feature.confirmNote
+      ]
         .filter(Boolean)
         .join(' '),
       confirmLabel: TURN_ON,
@@ -85,7 +98,7 @@ export default class FeatureSettings extends LightningElement {
     this.savedMessage = undefined;
     try {
       this.apply(await turnOn({ key }));
-      this.savedMessage = format(TURNED_ON, feature.name);
+      this.savedMessage = format(helpText('Core', 'Core_Feature_TurnedOn'), feature.name);
       // The settings rows the feature brings are shown by the console around this panel.
       this.dispatchEvent(new CustomEvent('featureturnedon', { detail: { key } }));
     } catch (error) {

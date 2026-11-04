@@ -347,10 +347,14 @@ public with sharing class CustomMetadataManagerService {
         Boolean active
     ) {
         if (input == null || String.isBlank(input.label)) {
-            throw new CustomMetadataManagerException(System.Label.Core_CmdtManager_NameRequired);
+            throw new CustomMetadataManagerException(
+                BarnHelp.text('Core', 'Core_CmdtManager_NameRequired')
+            );
         }
         if (input.label.trim().length() > NAME_LIMIT) {
-            throw new CustomMetadataManagerException(System.Label.Core_CmdtManager_NameTooLong);
+            throw new CustomMetadataManagerException(
+                BarnHelp.text('Core', 'Core_CmdtManager_NameTooLong')
+            );
         }
         Map<String, String> given = input.values == null ? new Map<String, String>() : input.values;
         Map<String, Object> values = new Map<String, Object>();
@@ -361,7 +365,7 @@ public with sharing class CustomMetadataManagerService {
             if (value == null && editable.required.contains(token)) {
                 throw new CustomMetadataManagerException(
                     String.format(
-                        System.Label.Core_CmdtManager_FieldRequired,
+                        BarnHelp.text('Core', 'Core_CmdtManager_FieldRequired'),
                         new List<Object>{ field.getLabel() }
                     )
                 );
@@ -369,7 +373,7 @@ public with sharing class CustomMetadataManagerService {
             if (value != null && value.length() > field.getLength()) {
                 throw new CustomMetadataManagerException(
                     String.format(
-                        System.Label.Core_CmdtManager_FieldTooLong,
+                        BarnHelp.text('Core', 'Core_CmdtManager_FieldTooLong'),
                         new List<Object>{ field.getLabel(), field.getLength() }
                     )
                 );
@@ -404,7 +408,7 @@ public with sharing class CustomMetadataManagerService {
         }
         throw new CustomMetadataManagerException(
             String.format(
-                System.Label.Core_CmdtManager_NotAChoice,
+                BarnHelp.text('Core', 'Core_CmdtManager_NotAChoice'),
                 new List<Object>{
                     value,
                     picklist.getDescribe().getLabel(),
@@ -434,7 +438,7 @@ public with sharing class CustomMetadataManagerService {
             ) {
                 throw new CustomMetadataManagerException(
                     String.format(
-                        System.Label.Core_CmdtManager_DuplicateActive,
+                        BarnHelp.text('Core', 'Core_CmdtManager_DuplicateActive'),
                         new List<Object>{ wanted, row.label }
                     )
                 );
@@ -500,7 +504,9 @@ public with sharing class CustomMetadataManagerService {
             return deployer.deploy(container, callback);
         } catch (Exception refused) {
             ErrorLogger.log(refused, CustomMetadataDeployCallback.ERROR_CONTEXT);
-            throw new CustomMetadataManagerException(System.Label.Core_CmdtManager_DeployRefused);
+            throw new CustomMetadataManagerException(
+                BarnHelp.text('Core', 'Core_CmdtManager_DeployRefused')
+            );
         }
     }
 
@@ -551,7 +557,9 @@ public with sharing class CustomMetadataManagerService {
     private static EditableType editableType(String typeName) {
         EditableType editable = String.isBlank(typeName) ? null : registry().get(typeName);
         if (editable == null) {
-            throw new CustomMetadataManagerException(System.Label.Core_CmdtManager_UnknownType);
+            throw new CustomMetadataManagerException(
+                BarnHelp.text('Core', 'Core_CmdtManager_UnknownType')
+            );
         }
         return editable;
     }
@@ -565,7 +573,7 @@ public with sharing class CustomMetadataManagerService {
         if (isShipped(row)) {
             throw new CustomMetadataManagerException(
                 String.format(
-                    System.Label.Core_CmdtManager_ShippedReadOnly,
+                    BarnHelp.text('Core', 'Core_CmdtManager_ShippedReadOnly'),
                     new List<Object>{ row.label }
                 )
             );
@@ -582,7 +590,9 @@ public with sharing class CustomMetadataManagerService {
                 return row;
             }
         }
-        throw new CustomMetadataManagerException(System.Label.Core_CmdtManager_RecordNotFound);
+        throw new CustomMetadataManagerException(
+            BarnHelp.text('Core', 'Core_CmdtManager_RecordNotFound')
+        );
     }
 
     private static List<CustomMetadataManagerSelector.StoredRow> rowsOf(EditableType editable) {

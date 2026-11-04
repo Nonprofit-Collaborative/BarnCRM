@@ -133,7 +133,7 @@ public without sharing class OrgSettingsSystemWriter {
     /** This class writes hierarchy custom settings and nothing else. */
     private static void requireSettingsType(Schema.SObjectType type) {
         if (type == null || !type.getDescribe(SObjectDescribeOptions.DEFERRED).isCustomSetting()) {
-            throw new OrgSettingsException(System.Label.Core_Settings_UnknownKeyError);
+            throw new OrgSettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
         }
     }
 

@@ -34,11 +34,7 @@ import ADD from '@salesforce/label/c.Core_CmdtManager_AddButton';
 import EDIT from '@salesforce/label/c.Core_CmdtManager_EditAction';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import EDIT_TITLE from '@salesforce/label/c.Core_CmdtManager_EditTitle';
-import SAVING from '@salesforce/label/c.Core_CmdtManager_Saving';
-import SAVED from '@salesforce/label/c.Core_CmdtManager_Saved';
-import STILL_SAVING from '@salesforce/label/c.Core_CmdtManager_StillSaving';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
-import LOAD_ERROR from '@salesforce/label/c.Core_CmdtManager_LoadError';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -117,7 +113,7 @@ export default class MatchSourceManager extends LightningElement {
       this.view = await getView();
       this.errorMessage = undefined;
     } catch (error) {
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError'));
     }
   }
 
@@ -288,7 +284,7 @@ export default class MatchSourceManager extends LightningElement {
       this.errorMessage = undefined;
     } catch (error) {
       this.tryResult = undefined;
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError'));
     }
   }
 
@@ -313,7 +309,7 @@ export default class MatchSourceManager extends LightningElement {
       this.track(await request, label);
     } catch (error) {
       this.busy = false;
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError'));
     }
   }
 
@@ -321,7 +317,7 @@ export default class MatchSourceManager extends LightningElement {
   track(jobId, label) {
     this.busy = true;
     this.pending = { jobId, label };
-    this.statusMessage = SAVING;
+    this.statusMessage = helpText('Core', 'Core_CmdtManager_Saving');
     this.poll(jobId, label, POLL_ATTEMPTS);
   }
 
@@ -334,11 +330,11 @@ export default class MatchSourceManager extends LightningElement {
       try {
         outcome = await getOutcome({ deploymentId: jobId });
       } catch (error) {
-        this.finish(undefined, bodyMessage(error, LOAD_ERROR));
+        this.finish(undefined, bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError')));
         return;
       }
       if (outcome.status === 'Succeeded') {
-        this.finish(SAVED.replace('{0}', label), undefined);
+        this.finish(helpText('Core', 'Core_CmdtManager_Saved').replace('{0}', label), undefined);
         this.load();
       } else if (outcome.status === 'Failed') {
         this.finish(undefined, outcome.message);
@@ -346,7 +342,7 @@ export default class MatchSourceManager extends LightningElement {
         this.poll(jobId, label, attemptsLeft - 1);
       } else {
         this.busy = false;
-        this.statusMessage = STILL_SAVING;
+        this.statusMessage = helpText('Core', 'Core_CmdtManager_StillSaving');
       }
     }, POLL_INTERVAL_MS);
   }

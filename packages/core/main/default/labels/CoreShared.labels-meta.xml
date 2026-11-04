@@ -65,14 +65,6 @@
         <value>Nonprofit Cloud coexistence</value>
     </labels>
     <labels>
-        <fullName>Core_CoexistenceMode_InvalidMode</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>A coexistence mode value is not one of the three; {0} is the value</shortDescription>
-        <value>{0} is not a coexistence mode. Choose one of the modes BarnCRM offers for this org.</value>
-    </labels>
-    <labels>
         <fullName>Core_CoexistenceMode_Npsp</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -95,30 +87,6 @@
         <protected>false</protected>
         <shortDescription>Shown where a coexistence mode is expected and none has been confirmed.</shortDescription>
         <value>not confirmed yet</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorLog_ActionFailed</fullName>
-        <categories>Core, Error Log</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error log action failed</shortDescription>
-        <value>That did not work. Refresh the page and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorLog_EntryNotFound</fullName>
-        <categories>Core, Error Log</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error log entry not found</shortDescription>
-        <value>That entry is no longer in the Error Log. Refresh the page.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorLog_UnexpectedFailure</fullName>
-        <categories>Core, Error Log</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error log default message</shortDescription>
-        <value>BarnCRM hit an unexpected problem. The technical detail on this entry says what failed and where. The admin guide page for the feature you were using says what to check.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorLog_UnexpectedFailureIn</fullName>
@@ -151,14 +119,6 @@
         <protected>false</protected>
         <shortDescription>Open an error log entry</shortDescription>
         <value>Open This Entry</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorLogTile_ReadOnly</fullName>
-        <categories>Core, Error Log</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error log tile read only notice</shortDescription>
-        <value>You can read these entries but not change them.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorLogTile_Title</fullName>
@@ -197,22 +157,6 @@
         <protected>true</protected>
         <shortDescription>Settings search: the accessible label of the search box</shortDescription>
         <value>Search settings</value>
-    </labels>
-    <labels>
-        <fullName>Core_SettingsSearch_ErrorMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings search: message shown when the search could not run</shortDescription>
-        <value>The search could not run. Try again in a moment.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SettingsSearch_NoResultsMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings search: message shown when nothing matches</shortDescription>
-        <value>No settings match that search. Try a shorter word, for example greeting.</value>
     </labels>
     <labels>
         <fullName>Core_UnexpectedError</fullName>

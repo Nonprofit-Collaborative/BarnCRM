@@ -8,7 +8,6 @@ import FEATURES_QUESTION from '@salesforce/label/c.Core_FirstRun_FeaturesQuestio
 import ALL_OPTION from '@salesforce/label/c.Core_FirstRun_AllOption';
 import CHOOSE_OPTION from '@salesforce/label/c.Core_FirstRun_ChooseOption';
 import FINISH from '@salesforce/label/c.Core_ModuleSetup_FinishButton';
-import ADMIN_NEEDED from '@salesforce/label/c.Core_FirstRun_AdminNeeded';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import STANDARD_NAME from '@salesforce/label/c.Core_SuiteChoice_StandardName';
 import NONPROFIT_NAME from '@salesforce/label/c.Core_SuiteChoice_NonprofitName';
@@ -47,7 +46,9 @@ export default class FirstRunModal extends LightningModal {
       return helpText('Core', 'Core_FirstRun_StaysOnWarning');
     },
     finish: FINISH,
-    adminNeeded: ADMIN_NEEDED,
+    get adminNeeded() {
+      return helpText('Core', 'Core_FirstRun_AdminNeeded');
+    },
     close: CLOSE
   };
 

@@ -19,13 +19,7 @@ import {
 } from './setupChangeModel';
 
 import TITLE from '@salesforce/label/c.Core_SetupChanges_Title';
-import KEPT from '@salesforce/label/c.Core_SetupChanges_Kept';
-import NOTHING_KEPT from '@salesforce/label/c.Core_SetupChanges_NothingKept';
-import SCHEDULED from '@salesforce/label/c.Core_SetupChanges_Scheduled';
-import NOT_SCHEDULED from '@salesforce/label/c.Core_SetupChanges_NotScheduled';
-import COPY_RUNNING from '@salesforce/label/c.Core_SetupChanges_CopyRunning';
 import COPY_NOW from '@salesforce/label/c.Core_SetupChanges_CopyNow';
-import COPY_STARTED from '@salesforce/label/c.Core_SetupChanges_CopyStarted';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import FROM_DATE from '@salesforce/label/c.Core_SetupChanges_From';
 import TO_DATE from '@salesforce/label/c.Core_SetupChanges_To';
@@ -34,10 +28,6 @@ import ALL_SECTIONS from '@salesforce/label/c.Core_SetupChanges_AllSections';
 import SEARCH from '@salesforce/label/c.Core_SetupChanges_Search';
 import RUN_SEARCH from '@salesforce/label/c.Core_SetupChanges_Search';
 import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';
-import DOWNLOADED from '@salesforce/label/c.Core_SetupChanges_Downloaded';
-import MORE from '@salesforce/label/c.Core_SetupChanges_More';
-import SCAN_STOPPED from '@salesforce/label/c.Core_SetupChanges_ScanStopped';
-import DATES_REVERSED from '@salesforce/label/c.Core_SetupChanges_DatesReversed';
 import CHANGED_AT from '@salesforce/label/c.Core_SetupChanges_ColChangedAt';
 import CHANGED_BY from '@salesforce/label/c.Core_SetupChanges_ColChangedBy';
 import LOGGED_IN_AS from '@salesforce/label/c.Core_SetupChanges_ColLoggedInAs';
@@ -110,15 +100,23 @@ export default class SetupChangeLog extends LightningElement {
 
   get keptLine() {
     return this.summary
-      ? keptText(this.summary, { kept: KEPT, nothingKept: NOTHING_KEPT }, LOCALE, TIME_ZONE)
+      ? keptText(
+          this.summary,
+          {
+            kept: helpText('Core', 'Core_SetupChanges_Kept'),
+            nothingKept: helpText('Core', 'Core_SetupChanges_NothingKept')
+          },
+          LOCALE,
+          TIME_ZONE
+        )
       : '';
   }
 
   get copyLine() {
     return copyText(this.summary, {
-      copyRunning: COPY_RUNNING,
-      scheduled: SCHEDULED,
-      notScheduled: NOT_SCHEDULED
+      copyRunning: helpText('Core', 'Core_SetupChanges_CopyRunning'),
+      scheduled: helpText('Core', 'Core_SetupChanges_Scheduled'),
+      notScheduled: helpText('Core', 'Core_SetupChanges_NotScheduled')
     });
   }
 
@@ -139,14 +137,16 @@ export default class SetupChangeLog extends LightningElement {
       return '';
     }
     return fill(
-      MORE,
+      helpText('Core', 'Core_SetupChanges_More'),
       countText(this.summary.pageRows, LOCALE),
       countText(this.summary.exportRows, LOCALE)
     );
   }
 
   get scanStoppedText() {
-    return this.scanStopped ? fill(SCAN_STOPPED, countText(this.scanCap, LOCALE)) : '';
+    return this.scanStopped
+      ? fill(helpText('Core', 'Core_SetupChanges_ScanStopped'), countText(this.scanCap, LOCALE))
+      : '';
   }
 
   get busy() {
@@ -172,7 +172,7 @@ export default class SetupChangeLog extends LightningElement {
 
   async search() {
     if (datesReversed(this.filters)) {
-      this.errorMessage = DATES_REVERSED;
+      this.errorMessage = helpText('Core', 'Core_SetupChanges_DatesReversed');
       this.rows = [];
       return;
     }
@@ -219,7 +219,10 @@ export default class SetupChangeLog extends LightningElement {
     this.errorMessage = undefined;
     try {
       const result = await copyNow();
-      this.noticeMessage = result && result.started ? COPY_STARTED : COPY_RUNNING;
+      this.noticeMessage =
+        result && result.started
+          ? helpText('Core', 'Core_SetupChanges_CopyStarted')
+          : helpText('Core', 'Core_SetupChanges_CopyRunning');
       this.summary = await getSummary();
     } catch (error) {
       this.errorMessage = messageFrom(error);
@@ -230,7 +233,7 @@ export default class SetupChangeLog extends LightningElement {
 
   async handleDownload() {
     if (datesReversed(this.filters)) {
-      this.errorMessage = DATES_REVERSED;
+      this.errorMessage = helpText('Core', 'Core_SetupChanges_DatesReversed');
       return;
     }
     this.downloading = true;
@@ -240,7 +243,10 @@ export default class SetupChangeLog extends LightningElement {
       const result = await getChanges(filterArgs(this.filters, exportRows));
       const rows = csvRows(result && result.rows, (value) => zonedDateTime(value, TIME_ZONE));
       downloadCsv(FILE_BASE, csvColumns(COLUMN_LABELS), rows);
-      this.noticeMessage = fill(DOWNLOADED, countText(rows.length, LOCALE));
+      this.noticeMessage = fill(
+        helpText('Core', 'Core_SetupChanges_Downloaded'),
+        countText(rows.length, LOCALE)
+      );
     } catch (error) {
       this.errorMessage = messageFrom(error);
     } finally {

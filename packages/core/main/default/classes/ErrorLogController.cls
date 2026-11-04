@@ -73,11 +73,15 @@ public with sharing class ErrorLogController {
     private static Error_Log__c validatedEntry(String errorLogId) {
         Id entryId = asRecordId(errorLogId);
         if (entryId == null || entryId.getSObjectType() != Error_Log__c.SObjectType) {
-            throw new ErrorLogControllerException(Label.Core_ErrorLog_EntryNotFound);
+            throw new ErrorLogControllerException(
+                BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound')
+            );
         }
         List<Error_Log__c> found = ErrorLogSelector.selectByIds(new Set<Id>{ entryId });
         if (found.isEmpty()) {
-            throw new ErrorLogControllerException(Label.Core_ErrorLog_EntryNotFound);
+            throw new ErrorLogControllerException(
+                BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound')
+            );
         }
         return found[0];
     }
@@ -121,7 +125,7 @@ public with sharing class ErrorLogController {
             caught,
             caught instanceof ErrorLogControllerException,
             context,
-            Label.Core_ErrorLog_ActionFailed
+            BarnHelp.text('Core', 'Core_ErrorLog_ActionFailed')
         );
     }
 

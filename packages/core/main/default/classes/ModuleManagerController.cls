@@ -32,7 +32,7 @@ public with sharing class ModuleManagerController {
         try {
             return buildState();
         } catch (Exception e) {
-            throw logged(e, System.Label.Core_ModuleManager_LoadErrorMessage);
+            throw logged(e, BarnHelp.text('Core', 'Core_ModuleManager_LoadErrorMessage'));
         }
     }
 
@@ -44,7 +44,7 @@ public with sharing class ModuleManagerController {
             ModuleManagerService.setShowNonprofitModules(show);
             return buildState();
         } catch (Exception e) {
-            throw logged(e, System.Label.Core_ModuleManager_SaveErrorMessage);
+            throw logged(e, BarnHelp.text('Core', 'Core_ModuleManager_SaveErrorMessage'));
         }
     }
 
@@ -55,7 +55,7 @@ public with sharing class ModuleManagerController {
             ModuleManagerService.turnOff(moduleName);
             return buildState();
         } catch (Exception e) {
-            throw logged(e, System.Label.Core_ModuleManager_SaveErrorMessage);
+            throw logged(e, BarnHelp.text('Core', 'Core_ModuleManager_SaveErrorMessage'));
         }
     }
 
@@ -67,7 +67,7 @@ public with sharing class ModuleManagerController {
             ModuleManagerService.turnOn(moduleName);
             return buildState();
         } catch (Exception e) {
-            throw logged(e, System.Label.Core_ModuleManager_SaveErrorMessage);
+            throw logged(e, BarnHelp.text('Core', 'Core_ModuleManager_SaveErrorMessage'));
         }
     }
 
@@ -87,7 +87,7 @@ public with sharing class ModuleManagerController {
             );
             return buildState();
         } catch (Exception e) {
-            throw logged(e, System.Label.Core_ModuleManager_SaveErrorMessage);
+            throw logged(e, BarnHelp.text('Core', 'Core_ModuleManager_SaveErrorMessage'));
         }
     }
 
@@ -97,7 +97,7 @@ public with sharing class ModuleManagerController {
         try {
             return ModuleManagerService.grantAdminAccess(moduleName);
         } catch (Exception e) {
-            throw logged(e, System.Label.Core_ModuleManager_AccessErrorMessage);
+            throw logged(e, BarnHelp.text('Core', 'Core_ModuleManager_AccessErrorMessage'));
         }
     }
 
@@ -107,7 +107,7 @@ public with sharing class ModuleManagerController {
         try {
             return ModuleManagerService.uninstallReport(moduleName);
         } catch (Exception e) {
-            throw logged(e, System.Label.Core_ModuleManager_LoadErrorMessage);
+            throw logged(e, BarnHelp.text('Core', 'Core_ModuleManager_LoadErrorMessage'));
         }
     }
 
@@ -138,7 +138,9 @@ public with sharing class ModuleManagerController {
 
     private static void requireEdit() {
         if (!BarnCRMPermissions.canManageSettings()) {
-            throw UserErrors.message(System.Label.Core_Settings_PermissionRequiredError);
+            throw UserErrors.message(
+                BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
+            );
         }
     }
 }

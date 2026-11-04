@@ -40,28 +40,4 @@
         <shortDescription>First-run setup: pick the features one by one</shortDescription>
         <value>Let me choose features</value>
     </labels>
-    <labels>
-        <fullName>Core_FirstRun_AdminNeeded</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>First-run setup: shown to someone who cannot finish it</shortDescription>
-        <value>An administrator needs to finish setting up BarnCRM.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FirstRun_LoadError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>First-run setup: the state could not be read</shortDescription>
-        <value>BarnCRM could not check whether setup is finished. Reload the page, and if it fails again, check the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FirstRun_SaveError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>First-run setup: finishing failed</shortDescription>
-        <value>Setup could not be finished. Nothing was changed. Try again, and if it fails again, check the Error Log.</value>
-    </labels>
 </CustomLabels>

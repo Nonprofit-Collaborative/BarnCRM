@@ -115,7 +115,10 @@ public with sharing class MatchSourceController {
         Schema.SObjectType type = NamespaceUtil.objectType(objectName);
         if (type == null) {
             throw UserErrors.message(
-                String.format(Label.Core_MatchSource_NoSuchObject, new List<Object>{ objectName })
+                String.format(
+                    BarnHelp.text('Core', 'Core_MatchSource_NoSuchObject'),
+                    new List<Object>{ objectName }
+                )
             );
         }
         try {
@@ -292,7 +295,7 @@ public with sharing class MatchSourceController {
             e,
             e instanceof CustomMetadataManagerService.CustomMetadataManagerException,
             'Duplicate Matching: matching logic',
-            Label.Core_CmdtManager_LoadError
+            BarnHelp.text('Core', 'Core_CmdtManager_LoadError')
         );
     }
 }

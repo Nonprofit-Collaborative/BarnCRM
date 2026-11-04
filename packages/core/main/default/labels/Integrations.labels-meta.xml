@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_Integrations_LoadErrorMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Integrations: the list could not be read</shortDescription>
-        <value>The list of other products could not be read. Reload the page, and if it fails again, check the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Core_Integrations_GroupComplement</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -103,14 +95,6 @@
         <protected>false</protected>
         <shortDescription>Integrations: where to find a migration. {0} is the migration note</shortDescription>
         <value>Migration: {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_Integrations_EmptyMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Integrations: the catalog holds no products</shortDescription>
-        <value>No other products are listed.</value>
     </labels>
     <labels>
         <fullName>Core_Integrations_RequestLink</fullName>

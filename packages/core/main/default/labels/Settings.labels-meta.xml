@@ -17,14 +17,6 @@
         <value>Setting</value>
     </labels>
     <labels>
-        <fullName>Core_Settings_ComponentNotInstalled</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: shown where a panel would be when its module is not installed</shortDescription>
-        <value>This part of the settings comes with a module that is not installed here yet. Turn that module on and it appears in this section.</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_KeepDefaultButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -57,14 +49,6 @@
         <value>Everyone with the Manage BarnCRM Settings permission</value>
     </labels>
     <labels>
-        <fullName>Core_Settings_CompanySuggestion</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: a blank row's Company Information value; {0} is it</shortDescription>
-        <value>Company Information in Salesforce Setup has {0}.</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_UseSuggestion</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -79,22 +63,6 @@
         <protected>true</protected>
         <shortDescription>Settings console: screen reader name of Use This Value; {0} is the setting</shortDescription>
         <value>Fill in {0} from Company Information</value>
-    </labels>
-    <labels>
-        <fullName>Core_Settings_EmptySectionMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: message shown when a section has no settings yet</shortDescription>
-        <value>This section has no settings yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Settings_InvalidValueError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: a value is not in the format the setting expects</shortDescription>
-        <value>That value is not in the format this setting expects, so nothing was saved. Check the value and save again.</value>
     </labels>
     <labels>
         <fullName>Core_Settings_FeaturesTurnedOn</fullName>
@@ -129,30 +97,6 @@
         <value>A record you cannot view</value>
     </labels>
     <labels>
-        <fullName>Core_Settings_NoRecordTypeNotAllowed</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: No record type refused while the org has Account record types</shortDescription>
-        <value>No record type can be chosen only when your org has no Account record type for organizations. Choose one of the record types listed, then save again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Settings_NumberOutOfRange</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings: a number outside its range. {0} setting, {1} lowest, {2} highest.</shortDescription>
-        <value>{0} takes a number from {1} to {2}, so nothing was saved. Change it and save again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Settings_NumberOutOfRangeOnPage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: a marked number is outside its range.</shortDescription>
-        <value>A number is outside the range its setting takes, so nothing was saved. Correct the marked value and save again.</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_FeedbackLink</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -177,14 +121,6 @@
         <value>https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/SUPPORT.md</value>
     </labels>
     <labels>
-        <fullName>Core_Settings_LoadErrorMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: message shown when the page could not load</shortDescription>
-        <value>The settings page could not load. The error is recorded in the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_OpenSectionButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -201,44 +137,12 @@
         <value>Open {0}</value>
     </labels>
     <labels>
-        <fullName>Core_Settings_PermissionRequiredError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: error when a user without the permission tries to save</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to change settings. Ask your BarnCRM admin to add it.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Settings_ReadOnlyNotice</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: notice shown to a user who may read but not change settings</shortDescription>
-        <value>You can read these settings but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_RecentChangesHeading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: heading above the audit list</shortDescription>
         <value>Recent Changes</value>
-    </labels>
-    <labels>
-        <fullName>Core_Settings_SaveErrorMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: message shown when a save did not go through</shortDescription>
-        <value>Your settings were not saved. Read the message below, fix the value, and save again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Settings_SavedMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: confirmation shown after a successful save</shortDescription>
-        <value>Your settings are saved.</value>
     </labels>
     <labels>
         <fullName>Core_Settings_SectionsHeading</fullName>
@@ -255,14 +159,6 @@
         <protected>true</protected>
         <shortDescription>Settings console: the page title</shortDescription>
         <value>BarnCRM Settings</value>
-    </labels>
-    <labels>
-        <fullName>Core_Settings_UnknownKeyError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console: a setting sent from the page does not exist in this org</shortDescription>
-        <value>That setting does not exist in this org, so nothing was saved. Refresh the page and try again.</value>
     </labels>
     <labels>
         <fullName>Core_Settings_HelpAria</fullName>

@@ -7,20 +7,13 @@ import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink
 import TITLE from '@salesforce/label/c.Core_Settings_Title';
 import NOT_SET from '@salesforce/label/c.Core_Settings_NotSet';
 import SECTIONS_HEADING from '@salesforce/label/c.Core_Settings_SectionsHeading';
-import SAVED_MESSAGE from '@salesforce/label/c.Core_Settings_SavedMessage';
-import SAVE_ERROR from '@salesforce/label/c.Core_Settings_SaveErrorMessage';
-import OUT_OF_RANGE from '@salesforce/label/c.Core_Settings_NumberOutOfRangeOnPage';
-import LOAD_ERROR from '@salesforce/label/c.Core_Settings_LoadErrorMessage';
-import READ_ONLY_NOTICE from '@salesforce/label/c.Core_Settings_ReadOnlyNotice';
 import HELP_ARIA from '@salesforce/label/c.Core_Settings_HelpAria';
-import EMPTY_SECTION from '@salesforce/label/c.Core_Settings_EmptySectionMessage';
 import RECENT_HEADING from '@salesforce/label/c.Core_Settings_RecentChangesHeading';
 import COLUMN_SETTING from '@salesforce/label/c.Core_Settings_ColumnSetting';
 import COLUMN_OLD from '@salesforce/label/c.Core_Settings_ColumnOldValue';
 import COLUMN_NEW from '@salesforce/label/c.Core_SuperTransform_NewValue';
 import COLUMN_BY from '@salesforce/label/c.Core_SetupChanges_ColChangedBy';
 import COLUMN_AT from '@salesforce/label/c.Core_SetupChanges_ColChangedAt';
-import NOT_INSTALLED from '@salesforce/label/c.Core_Settings_ComponentNotInstalled';
 import OPEN_IN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupValuePath } from 'c/setupLinks';
@@ -34,7 +27,6 @@ import DEFAULTS_TITLE from '@salesforce/label/c.Core_Settings_DefaultsBannerTitl
 import KEEP_ALL_DEFAULTS from '@salesforce/label/c.Core_Settings_KeepAllDefaults';
 import KEEP_DEFAULT from '@salesforce/label/c.Core_Settings_KeepDefaultButton';
 import KEEP_DEFAULT_ARIA from '@salesforce/label/c.Core_Settings_KeepDefaultAria';
-import SUGGESTION from '@salesforce/label/c.Core_Settings_CompanySuggestion';
 import USE_SUGGESTION from '@salesforce/label/c.Core_Settings_UseSuggestion';
 import USE_SUGGESTION_ARIA from '@salesforce/label/c.Core_Settings_UseSuggestionAria';
 import TAB_LABEL from '@salesforce/label/c.Core_Format_Pair';
@@ -165,17 +157,31 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     get purpose() {
       return helpText('Core', 'Core_Settings_Purpose');
     },
-    saved: SAVED_MESSAGE,
-    saveError: SAVE_ERROR,
-    outOfRange: OUT_OF_RANGE,
-    loadError: LOAD_ERROR,
-    readOnly: READ_ONLY_NOTICE,
-    emptySection: EMPTY_SECTION,
+    get saved() {
+      return helpText('Core', 'Core_Settings_SavedMessage');
+    },
+    get saveError() {
+      return helpText('Core', 'Core_Settings_SaveErrorMessage');
+    },
+    get outOfRange() {
+      return helpText('Core', 'Core_Settings_NumberOutOfRangeOnPage');
+    },
+    get loadError() {
+      return helpText('Core', 'Core_Settings_LoadErrorMessage');
+    },
+    get readOnly() {
+      return helpText('Core', 'Core_Settings_ReadOnlyNotice');
+    },
+    get emptySection() {
+      return helpText('Core', 'Core_Settings_EmptySectionMessage');
+    },
     recentHeading: RECENT_HEADING,
     get recentEmpty() {
       return helpText('Core', 'Core_Settings_RecentChangesEmpty');
     },
-    notInstalled: NOT_INSTALLED,
+    get notInstalled() {
+      return helpText('Core', 'Core_Settings_ComponentNotInstalled');
+    },
     get fromSetupHelp() {
       return helpText('Core', 'Core_Settings_FromSetupHelp');
     },
@@ -434,7 +440,10 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       placeholder: setting.defaultText || undefined,
       // Company Information's value for a blank row, offered to fill in until it is saved.
       showsSuggestion: Boolean(setting.suggestedValue) && this.canEdit && !hasPending,
-      suggestionText: SUGGESTION.replace('{0}', setting.suggestedValue || ''),
+      suggestionText: helpText('Core', 'Core_Settings_CompanySuggestion').replace(
+        '{0}',
+        setting.suggestedValue || ''
+      ),
       useSuggestionLabel: USE_SUGGESTION_ARIA.replace('{0}', setting.label),
       helpLabel: HELP_ARIA.replace('{0}', setting.label),
       disabled: !this.canEdit,

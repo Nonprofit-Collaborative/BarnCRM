@@ -70,7 +70,10 @@ private class ModuleManagerControllerTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(System.Label.Core_ModuleManager_UnknownModuleError, message);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_ModuleManager_UnknownModuleError'),
+                message
+            );
         }
     }
 
@@ -219,7 +222,7 @@ private class ModuleManagerControllerTest {
                 'Volunteers calculates no totals, so DLRS is mentioned only beside Rollup Builder'
             );
             Assert.areEqual(
-                new List<String>{ System.Label.Core_OtherRollupTools_Dlrs },
+                new List<String>{ BarnHelp.text('Core', 'Core_OtherRollupTools_Dlrs') },
                 withGiving.otherRollupTools,
                 'With Giving installed, the page says DLRS is a separate tool'
             );

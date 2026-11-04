@@ -5,7 +5,6 @@ import dismiss from '@salesforce/apex/WhatsNewController.dismiss';
 import TITLE from '@salesforce/label/c.Core_WhatsNew_Title';
 import VERSION from '@salesforce/label/c.Core_WhatsNew_Version';
 import DISMISS from '@salesforce/label/c.Core_WhatsNew_Dismiss';
-import FAILED from '@salesforce/label/c.Core_WhatsNew_Failed';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 export default class WhatsNew extends LightningElement {
@@ -54,7 +53,10 @@ export default class WhatsNew extends LightningElement {
         this.releases = [];
       })
       .catch((error) => {
-        this.errorMessage = error && error.body && error.body.message ? error.body.message : FAILED;
+        this.errorMessage =
+          error && error.body && error.body.message
+            ? error.body.message
+            : helpText('Core', 'Core_WhatsNew_Failed');
       })
       .finally(() => {
         this.busy = false;

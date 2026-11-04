@@ -28,7 +28,7 @@ public with sharing class CustomMetadataManagerController {
         try {
             return CustomMetadataManagerService.getTypes();
         } catch (Exception e) {
-            throw logged(e, System.Label.Core_CmdtManager_LoadError);
+            throw logged(e, BarnHelp.text('Core', 'Core_CmdtManager_LoadError'));
         }
     }
 
@@ -39,7 +39,7 @@ public with sharing class CustomMetadataManagerController {
         try {
             return CustomMetadataManagerService.save(typeName, input);
         } catch (Exception e) {
-            throw logged(e, System.Label.Core_CmdtManager_SaveError);
+            throw logged(e, BarnHelp.text('Core', 'Core_CmdtManager_SaveError'));
         }
     }
 
@@ -49,7 +49,7 @@ public with sharing class CustomMetadataManagerController {
         try {
             return CustomMetadataManagerService.setArchived(typeName, developerName, archived);
         } catch (Exception e) {
-            throw logged(e, System.Label.Core_CmdtManager_SaveError);
+            throw logged(e, BarnHelp.text('Core', 'Core_CmdtManager_SaveError'));
         }
     }
 
@@ -62,7 +62,7 @@ public with sharing class CustomMetadataManagerController {
         try {
             jobId = Id.valueOf(deploymentId);
         } catch (Exception notAnId) {
-            throw UserErrors.message(System.Label.Core_CmdtManager_LoadError);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_CmdtManager_LoadError'));
         }
         try {
             if (CustomMetadataManagerSelector.hasSucceeded(jobId)) {
@@ -76,7 +76,7 @@ public with sharing class CustomMetadataManagerController {
             }
             return outcome;
         } catch (Exception e) {
-            throw logged(e, System.Label.Core_CmdtManager_LoadError);
+            throw logged(e, BarnHelp.text('Core', 'Core_CmdtManager_LoadError'));
         }
     }
 
@@ -92,7 +92,7 @@ public with sharing class CustomMetadataManagerController {
 
     private static void requirePermission() {
         if (!FeatureManagement.checkPermission(PERMISSION)) {
-            throw UserErrors.message(System.Label.Core_CmdtManager_PermissionRequired);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_CmdtManager_PermissionRequired'));
         }
     }
 }

@@ -17,11 +17,7 @@ import COLUMN_NAME from '@salesforce/label/c.Core_HouseholdNamingSettings_Column
 import COLUMN_FORMAL from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnFormal';
 import COLUMN_INFORMAL from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnInformal';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
-import SAVED from '@salesforce/label/c.Core_HouseholdNamingSettings_Saved';
 import RECOMPUTE from '@salesforce/label/c.Core_HouseholdNamingSettings_Recompute';
-import RECOMPUTE_CONFIRM from '@salesforce/label/c.Core_HouseholdNamingSettings_RecomputeConfirm';
-import RECOMPUTE_STARTED from '@salesforce/label/c.Core_HouseholdNamingSettings_RecomputeStarted';
-import READ_ONLY from '@salesforce/label/c.Core_HouseholdNamingSettings_ReadOnly';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CONFIRM from '@salesforce/label/c.Core_HouseholdNamingSettings_Confirm';
 import SAVING from '@salesforce/label/c.Core_HouseholdScreens_Saving';
@@ -84,7 +80,9 @@ export default class HouseholdNamingSettings extends LightningElement {
     columnInformal: COLUMN_INFORMAL,
     save: SAVE,
     recompute: RECOMPUTE,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Core', 'Core_HouseholdNamingSettings_ReadOnly');
+    },
     saving: SAVING
   };
 
@@ -325,7 +323,7 @@ export default class HouseholdNamingSettings extends LightningElement {
     return saveSettings({ values })
       .then(() => {
         this.errorMessage = undefined;
-        this.toast(SAVED, 'success');
+        this.toast(helpText('Core', 'Core_HouseholdNamingSettings_Saved'), 'success');
         // The Setup Assistant embeds this panel and listens for "save" to tick its naming
         // step, the same event name setupStepFields dispatches for the same purpose.
         this.dispatchEvent(new CustomEvent('save', { detail: { values } }));
@@ -342,7 +340,7 @@ export default class HouseholdNamingSettings extends LightningElement {
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: RECOMPUTE,
-      message: RECOMPUTE_CONFIRM,
+      message: helpText('Core', 'Core_HouseholdNamingSettings_RecomputeConfirm'),
       confirmLabel: CONFIRM,
       cancelLabel: CANCEL
     });
@@ -352,7 +350,7 @@ export default class HouseholdNamingSettings extends LightningElement {
     return recomputeAll()
       .then(() => {
         this.errorMessage = undefined;
-        this.toast(RECOMPUTE_STARTED, 'success');
+        this.toast(helpText('Core', 'Core_HouseholdNamingSettings_RecomputeStarted'), 'success');
       })
       .catch((error) => {
         this.errorMessage = this.readError(error);

@@ -29,10 +29,7 @@ import FILL_PROGRESS from '@salesforce/label/c.Core_DataDictionary_FillProgress'
 import NOT_COUNTED from '@salesforce/label/c.Core_DataDictionary_NotCounted';
 import INCLUDE_AUTOMATION from '@salesforce/label/c.Core_DataDictionary_IncludeAutomation';
 import AUTOMATION_TITLE from '@salesforce/label/c.Core_DataDictionary_AutomationTitle';
-import AUTOMATION_NOT_READ from '@salesforce/label/c.Core_DataDictionary_AutomationNotRead';
-import AUTOMATION_TRUNCATED from '@salesforce/label/c.Core_DataDictionary_AutomationTruncated';
 import DOWNLOAD_AUTOMATION from '@salesforce/label/c.Core_DataDictionary_DownloadAutomation';
-import DOWNLOADED_AUTOMATION from '@salesforce/label/c.Core_DataDictionary_DownloadedAutomation';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 const FILE_BASE = 'Data_Dictionary';
 const AUTOMATION_FILE_BASE = 'Automation_Inventory';
@@ -196,13 +193,19 @@ export default class DataDictionary extends LightningElement {
 
   get automationNotReadMessage() {
     return this.automationNotRead.length
-      ? format(AUTOMATION_NOT_READ, this.automationNotRead.join(', '))
+      ? format(
+          helpText('Core', 'Core_DataDictionary_AutomationNotRead'),
+          this.automationNotRead.join(', ')
+        )
       : undefined;
   }
 
   get automationTruncatedMessage() {
     return this.automationTruncated.length
-      ? format(AUTOMATION_TRUNCATED, this.automationTruncated.join(', '))
+      ? format(
+          helpText('Core', 'Core_DataDictionary_AutomationTruncated'),
+          this.automationTruncated.join(', ')
+        )
       : undefined;
   }
 
@@ -296,7 +299,10 @@ export default class DataDictionary extends LightningElement {
       new Blob([automationCsv(this.automationRows)], { type: 'text/csv;charset=utf-8' }),
       fileName(AUTOMATION_FILE_BASE)
     );
-    this.noticeMessage = format(DOWNLOADED_AUTOMATION, String(this.automationRows.length));
+    this.noticeMessage = format(
+      helpText('Core', 'Core_DataDictionary_DownloadedAutomation'),
+      String(this.automationRows.length)
+    );
   }
 
   /** Fills one object's rows from Field Utilization's plan and counts, within its limits. */

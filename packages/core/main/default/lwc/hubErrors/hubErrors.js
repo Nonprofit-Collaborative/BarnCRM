@@ -7,8 +7,8 @@ import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
 import LINK from '@salesforce/label/c.Core_ErrorLogTile_ViewAll';
 import INSTALL_COMPLETED from '@salesforce/label/c.Core_HubHome_InstallCompleted';
 import INSTALL_PROBLEMS from '@salesforce/label/c.Core_HubHome_InstallProblems';
-import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
 import ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * Errors to review on the BarnCRM home page: how many new errors are waiting (capped, so a
@@ -16,6 +16,16 @@ import ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
  * whether the install itself logged any problems.
  */
 export default class HubErrors extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = { heading: HEADING, errors: ERRORS, link: LINK, allClear: ALL_CLEAR };
   iconName = iconFor('Error_Log__c');
   loaded = false;
@@ -37,7 +47,7 @@ export default class HubErrors extends NavigationMixin(LightningElement) {
       this.loaded = true;
       this.errorMessage = undefined;
     } else if (error) {
-      this.errorMessage = LOAD_ERROR;
+      this.errorMessage = helpText('Core', 'Core_HubHome_LoadErrorMessage');
     }
   }
 

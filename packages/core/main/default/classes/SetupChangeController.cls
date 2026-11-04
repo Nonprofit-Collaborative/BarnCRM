@@ -257,7 +257,10 @@ public with sharing class SetupChangeController {
             parsed = Date.valueOf(day.trim());
         } catch (Exception badDate) {
             throw UserErrors.message(
-                String.format(Label.Core_SetupChanges_ErrorBadDate, new List<String>{ day })
+                String.format(
+                    BarnHelp.text('Core', 'Core_SetupChanges_ErrorBadDate'),
+                    new List<String>{ day }
+                )
             );
         }
         return Datetime.newInstance(parsed.addDays(plusDays), Time.newInstance(0, 0, 0, 0));

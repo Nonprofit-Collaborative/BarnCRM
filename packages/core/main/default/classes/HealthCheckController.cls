@@ -182,7 +182,7 @@ public with sharing class HealthCheckController {
     private static String runFix(String fixKey, List<String> scope) {
         if (ModuleSetups.FIX_KEY.equals(fixKey)) {
             return String.format(
-                System.Label.Core_ModuleSetup_FixOutcome,
+                BarnHelp.text('Core', 'Core_ModuleSetup_FixOutcome'),
                 new List<Object>{ String.join(ModuleSetups.finishByLabel(scope), ', ') }
             );
         }

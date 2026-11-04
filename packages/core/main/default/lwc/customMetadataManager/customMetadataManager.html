@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <template lwc:if={errorMessage}>
         <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
     </template>
@@ -109,4 +110,5 @@
     </template>
 
     <lightning-button label={labels.checkAgain} data-id="check-again" onclick={handleCheckAgain}></lightning-button>
+    </template>
 </template>

@@ -174,7 +174,7 @@ private class OrganizationAddressTest {
                 System.Label.Core_OrganizationAddress_PostalCode;
             Assert.areEqual(
                 String.format(
-                    System.Label.Core_OrganizationAddress_IncompleteError,
+                    BarnHelp.text('Core', 'Core_OrganizationAddress_IncompleteError'),
                     new List<Object>{ missing }
                 ),
                 refusal,

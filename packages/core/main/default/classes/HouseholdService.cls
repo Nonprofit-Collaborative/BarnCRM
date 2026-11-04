@@ -2607,7 +2607,7 @@ public with sharing class HouseholdService {
         if (!created.isSuccess()) {
             throw new HouseholdException(
                 String.format(
-                    Label.Core_HubHomeActions_NewHouseholdFailed,
+                    BarnHelp.text('Core', 'Core_HubHomeActions_NewHouseholdFailed'),
                     new List<Object>{ HouseholdWriter.failureReason(created) }
                 )
             );
