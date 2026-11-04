@@ -737,6 +737,34 @@ Records, the settings saved in BarnCRM Settings, and components the organization
 are kept. The Admin Guide (Installing BarnCRM, Upgrading) tells administrators to clone a
 shipped component rather than edit it.
 
+### Tests survive an org's own customizations
+
+BarnCRM installs as source with no namespace, so its tests are the org's local tests: they run
+in a production install and in every later production deploy the organization makes, beside
+the org's own validation rules, required fields, duplicate rules, flows and other packages'
+triggers on Account and Contact (architect review RT-02). The shared test data
+(`TestDataFactory` and the household, address and relationship factories built on it) handles
+what a test can:
+
+- **Duplicate rules:** `TestDataFactory.pastDuplicateRules(record)` saves past them.
+- **Required fields:** the same call fills every custom field the org requires (not nillable,
+  createable, no default) that the test left empty, with a plain sample value by type, through
+  `TestDataFactory.fillOrgRequiredFields`. A value the test set is kept; standard fields and
+  person account (`__pc`) fields are left to the test.
+- **Access:** tests run as a user they create (below), so the org's profiles and permission
+  sets do not decide the result.
+
+So build Account and Contact records through the factories (`HouseholdTestDataFactory.newContact`,
+`newHousehold`, `RelationshipTestDataFactory`, `AddressTestDataFactory`), or pass a record built
+by hand through `TestDataFactory.pastDuplicateRules` before inserting it.
+
+What no test can handle, so the install guide and pre-check report it instead: an active
+validation rule (Apex cannot skip one), a required lookup field (no sample record to point
+at), and an org's own record-triggered flow or trigger that fails. About 760 test sites
+(344 `new Account(`, 414 `new Contact(` in test classes on 2026-11-04) still build records by
+hand without the factory; they get the duplicate-rule and required-field help only once moved
+onto it.
+
 ### Tests run as a user they create
 
 From API version 67.0 a query or DML statement with no access mode runs in user mode, and
