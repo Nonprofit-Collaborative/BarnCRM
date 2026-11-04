@@ -151,14 +151,10 @@ export default class IntegrationsPanel extends LightningElement {
     return {
       ...app,
       statusText: app.status === 'Available' ? STATUS_AVAILABLE : STATUS_IN_PROGRESS,
-      statusClass:
-        app.status === 'Available'
-          ? 'slds-badge slds-theme_success slds-var-m-left_x-small'
-          : 'slds-badge slds-theme_warning slds-var-m-left_x-small',
+      // The kit's status vocabulary: an available product is success, one in progress runs.
+      statusTone: app.status === 'Available' ? 'success' : 'in-progress',
       badgeText: app.installed ? INSTALLED : NOT_INSTALLED,
-      badgeClass: app.installed
-        ? 'slds-badge slds-theme_success slds-var-m-left_x-small'
-        : 'slds-badge slds-var-m-left_x-small',
+      badgeTone: app.installed ? 'success' : 'neutral',
       maintainerText: app.maintainer ? fill(MAINTAINER, app.maintainer) : null,
       licenseCostText: app.licenseCost ? fill(LICENSE_COST, app.licenseCost) : null,
       relatedModuleText: app.relatedModule ? fill(RELATED_MODULE, app.relatedModule) : null,

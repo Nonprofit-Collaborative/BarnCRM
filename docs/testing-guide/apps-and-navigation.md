@@ -19,7 +19,7 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | 3 | Open a household. | It replaces the page and shows the BarnCRM household page. |
 | 4 | Open **BarnCRM Console** and its navigation menu (the arrow next to the app name). | **Home**, **Contacts**, **Households**, **Organizations**, **Addresses**, **Relationships**, **Affiliations**, **Household Members**, **Data Manager**. |
 | 5 | Open a household, then one of its addresses. | The household opens in its own tab; the address opens as a subtab under it. |
-| 6 | Open **BarnCRM Admin**. | Standard navigation, with a navy header. Tabs: **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching**, **Error Log** (last). **Import** and **Super Transformer** are not in the navigation. It opens on **BarnCRM Settings**. |
+| 6 | Open **BarnCRM Admin**. | Standard navigation, with a navy header. Tabs: **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching**, **Error Log** (last). **Super Importer**, **Super Transformer** and **Import Rows** are not in the navigation. It opens on **BarnCRM Settings**. |
 | 7 | Open **BarnCRM Admin Console** and its navigation menu. | The same five tabs, opening as workspace tabs, with **Error Log** last. With a module deployed (for example the Rollup Builder), its admin tabs come before **Error Log**. |
 | 8 | As staff, open the App Launcher and type `BarnCRM`. | **BarnCRM** and **BarnCRM Console** are listed. **BarnCRM Admin** and **BarnCRM Admin Console** are not. |
 | 9 | As admin, on **BarnCRM Settings**, **Access**, remove the staff user's role. Wait a minute; as staff, reload and open the App Launcher. | No BarnCRM app is listed. |
@@ -70,8 +70,8 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 |---|---|---|
 | 1 | Open **BarnCRM Settings**. | The page header shows a gear, as do the console tab and the settings card. No airplane. |
 | 2 | Open **Data Manager**. | Building blocks in the page header. The name **Data Manager** shows once, in the page header; below it the first line is "Start a data task, or see and undo what changed." with no second **Data Manager** title. |
-| 3 | On **Data Manager**, click the **Import a File** tile. | The **Import** page header shows a form (a document), not an alarm clock. The page name shows once; the wizard starts straight under the header. |
-| 4 | Back on **Data Manager**, click the **Find and Export Records** tile, then go back and click the **Super Transformer** tile. | The first opens **Find**, with a telescope in the page header and the name **Find** once, followed by its purpose line. The second opens **Super Transformer**, its name once, followed by "Change many records at once, without a file, and undo it if needed." |
+| 3 | On **Data Manager**, click the **Super Importer** tile. | The **Super Importer** page header shows a form (a document), not an alarm clock. The page name shows once; the wizard starts straight under the header. |
+| 4 | Back on **Data Manager**, click the **Find** tile, then go back and click the **Super Transformer** tile. | The first opens **Find**, with a telescope in the page header and the name **Find** once, followed by its purpose line. The second opens **Super Transformer**, its name once, followed by "Change many records at once, without a file, and undo it if needed." |
 | 5 | Open **Org Optimizer**, then **Duplicate Matching**. | A stethoscope, then scales, in the page header. Each name shows once, followed by its purpose line and then the tabs. |
 | 6 | Open **Error Log**. | A bell in the page header, not a trophy. **Error Log** is the last tab in the navigation menu. |
 | 7 | Open **BarnCRM Console**, then **Households**, **Organizations** and an address. | People for households, a building for organizations, a map for the address. |

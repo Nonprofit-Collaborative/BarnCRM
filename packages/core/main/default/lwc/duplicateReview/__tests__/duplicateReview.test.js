@@ -6,6 +6,24 @@ import dismissSuggestion from '@salesforce/apex/DuplicateController.dismiss';
 import previewMerge from '@salesforce/apex/DuplicateController.previewMerge';
 import mergeHouseholds from '@salesforce/apex/DuplicateController.mergeHouseholds';
 import { EnclosingTabId, getTabInfo, openSubtab } from 'lightning/platformWorkspaceApi';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+  },
+  { virtual: true }
+);
 
 jest.mock('@salesforce/apex/DuplicateController.getView', () => ({ default: jest.fn() }), {
   virtual: true
@@ -124,9 +142,8 @@ describe('c-duplicate-review', () => {
 
   it('says so when the license gives no access to suggestions, and offers no action', async () => {
     const element = await mount(viewWith({ canReviewSuggestions: false }));
-    expect(q(element, 'no-access').textContent).toContain(
-      'c.Core_Duplicates_NoSuggestionAccessNotice'
-    );
+    expect(q(element, 'no-access').message).toBe('c.Core_Duplicates_NoAccessNotice');
+    expect(q(element, 'no-access').variant).toBe('info');
     expect(q(element, 'empty')).toBeNull();
     expect(q(element, 'scan-button').disabled).toBe(true);
   });
@@ -148,8 +165,25 @@ describe('c-duplicate-review', () => {
       })
     );
     const line = q(element, 'last-scan-summary');
-    expect(line.textContent).toBe('Scan finished: 1 chunk not checked.');
-    expect(line.classList.contains('slds-text-color_error')).toBe(true);
+    expect(line.message).toBe('Scan finished: 1 chunk not checked.');
+    expect(line.variant).toBe('warning');
+  });
+
+  it('shows a clean last scan line as plain text', async () => {
+    const element = await mount(viewWith({ lastScanSummary: 'Scan finished: 2 new.' }));
+    const line = q(element, 'last-scan-summary');
+    expect(line.tagName.toLowerCase()).toBe('p');
+    expect(line.textContent).toBe('Scan finished: 2 new.');
+  });
+
+  it('words the no-rules notice and scan messages with households and organizations', async () => {
+    setHelpTextForTest({
+      Core_Duplicates_NoRulesNotice:
+        'No duplicate rule for people, households or organizations is switched on.'
+    });
+    const element = await mount(viewWith({ anyRuleActive: false, rules: [] }));
+    expect(q(element, 'no-rules').message).toContain('people, households or organizations');
+    expect(q(element, 'no-rules').variant).toBe('warning');
   });
 
   it('shows the empty message when nothing is waiting', async () => {
@@ -158,12 +192,23 @@ describe('c-duplicate-review', () => {
     expect(qa(element, 'suggestion')).toHaveLength(0);
   });
 
-  it('offers a household merge for households and the platform merge note for people', async () => {
+  it('offers a household merge for households and Compare and Merge for people', async () => {
     const element = await mount(viewWith({ suggestions: [HOUSEHOLD_PAIR, PEOPLE_PAIR] }));
     expect(qa(element, 'suggestion')).toHaveLength(2);
     expect(qa(element, 'merge-button')).toHaveLength(1);
-    expect(qa(element, 'people-notice')).toHaveLength(1);
+    expect(qa(element, 'compare-button')).toHaveLength(1);
+    expect(q(element, 'compare-button').label).toBe('c.Core_Duplicates_CompareMerge');
     expect(qa(element, 'dismiss-button')).toHaveLength(2);
+  });
+
+  it('opens the first person of a pair on Compare and Merge, outside a console', async () => {
+    const element = await mount(viewWith({ suggestions: [PEOPLE_PAIR] }));
+    q(element, 'compare-button').click();
+    await flush();
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__recordPage',
+      attributes: { recordId: PEOPLE_PAIR.records[0].recordId, actionName: 'view' }
+    });
   });
 
   it('says why each pair is proposed when the reason is known', async () => {
@@ -186,8 +231,9 @@ describe('c-duplicate-review', () => {
     q(element, 'scan-button').click();
     await flush();
     expect(startScan).toHaveBeenCalled();
-    expect(q(element, 'notice').textContent).toContain('c.Core_Duplicates_ScanStarted');
-    expect(q(element, 'scan-running')).not.toBeNull();
+    expect(q(element, 'notice').message).toBe('c.Core_Duplicates_ScanStarted');
+    expect(q(element, 'notice').variant).toBe('success');
+    expect(q(element, 'scan-running').textContent).toContain('c.Core_Duplicates_ScanRunning');
   });
 
   it('shows the reason a scan was refused', async () => {
@@ -195,7 +241,7 @@ describe('c-duplicate-review', () => {
     startScan.mockRejectedValue({ body: { message: 'No duplicate rule is switched on.' } });
     q(element, 'scan-button').click();
     await flush();
-    expect(q(element, 'error').textContent).toContain('No duplicate rule is switched on.');
+    expect(q(element, 'error').message).toBe('No duplicate rule is switched on.');
   });
 
   it('dismisses a pair with the reason typed', async () => {
@@ -250,7 +296,7 @@ describe('c-duplicate-review', () => {
       fieldChoices: {}
     });
     expect(q(element, 'merge-dialog')).toBeNull();
-    expect(q(element, 'notice').textContent).toContain('c.Core_Duplicates_MergeSuccess');
+    expect(q(element, 'notice').message).toBe('c.Core_Duplicates_MergeSuccess');
   });
 
   it('keeps the other household when the person changes the choice', async () => {
@@ -359,16 +405,17 @@ describe('c-duplicate-review', () => {
       );
     });
 
-    it('gives the people merge note once, not on every pair', async () => {
+    it('gives each shown people pair its own Compare and Merge, and no note above the list', async () => {
       const element = await mount(
         viewWith({ suggestions: pairs(12, false), totalSuggestions: 12 })
       );
-      expect(qa(element, 'people-notice')).toHaveLength(1);
+      expect(qa(element, 'compare-button')).toHaveLength(10);
+      expect(q(element, 'people-notice')).toBeNull();
     });
 
-    it('leaves out the people merge note when every shown pair is households', async () => {
+    it('offers no Compare and Merge when every shown pair can merge here', async () => {
       const element = await mount(viewWith({ suggestions: pairs(3, true), totalSuggestions: 3 }));
-      expect(q(element, 'people-notice')).toBeNull();
+      expect(q(element, 'compare-button')).toBeNull();
     });
 
     it('opens the dismiss box inside the pair it is about', async () => {
@@ -498,7 +545,7 @@ describe('c-duplicate-review', () => {
     const element = createElement('c-duplicate-review', { is: DuplicateReview });
     document.body.appendChild(element);
     await flush();
-    expect(q(element, 'error').textContent).toContain('c.Core_Duplicates_ErrorUnexpected');
+    expect(q(element, 'error').message).toBe('c.Core_Duplicates_ErrorUnexpected');
   });
 
   it('lets the browser open a suggested record outside a console', async () => {

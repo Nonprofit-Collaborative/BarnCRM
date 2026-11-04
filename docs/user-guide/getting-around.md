@@ -178,7 +178,7 @@ tool you may use, in short groups:
 
 | Group | Tile | Opens |
 |---|---|---|
-| **Find and Change** | **Find and Export Records** | The **Find** tab |
+| **Find and Change** | **Find** | The **Find** tab: find records, then save or export them |
 | **Find and Change** | **Super Transformer** | Change fields on many records at once, no file needed: choose the records and the changes, preview, then run (see [Changing many records at once](super-transform.md)) |
 | **Check and Tidy** | **Org Optimizer** | The **Org Optimizer** tab |
 | **Careful** (last) | **Delete Many Records** | **Find**, with a note: run a query, then choose **Change Records**, **Bulk Delete** (no file needed) |
@@ -187,12 +187,14 @@ Deleted records go to the Recycle Bin, not away for good: choosing **Delete Many
 first shows a box that says so. Choose **Continue** to go on to Find, or **Cancel** to stay on
 Data Manager. You can undo a bulk delete from **Data Jobs** for up to 15 days.
 
-1. Choose the tile you want: anywhere on it works.
+1. Choose the tile you want: anywhere on it works. Not sure which? Type the task in **What Do
+   You Want to Do?** above the tiles (for example "find people without email") and choose a
+   result to open its tool.
 2. Under **Data Jobs**, use **Show** to filter to **All**, **Super Transformer runs** or **Bulk
    deletes**, and press **Refresh** to see the latest.
 
 You should see: your recent jobs, newest first, each with its counts and an **Undo** while
-it can still be undone. **Bring Data In** (**Import a File**), **Import Templates** and
+it can still be undone. **Bring Data In** (**Super Importer**), **Duplicate Matching**, **Import Templates** and
 **Salesforce's Own Tools** are for admins. See
 [Data Manager](../admin-guide/data-manager.md).
 

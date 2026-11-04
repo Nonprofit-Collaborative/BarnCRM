@@ -16,8 +16,10 @@ The everyday apps give you one home page that tells you what to do next, a setup
 that remembers how far you got, and the places you go most: your households, your people and
 your organizations. The admin apps hold every BarnCRM tool and setting in one place. Each
 tab shows only to the people whose access allows it, so a menu can be shorter than the list.
-**Import**, **Find** and **Super Transformer** are not in any app's navigation: open them from the
-tiles on the **Data Manager** tab. **Error Log** is always the last tab of an app that has it,
+**Super Importer**, **Find** and **Super Transformer** are not in any app's navigation: open them from the
+tiles on the **Data Manager** tab, which also has tiles for **Org Optimizer** and **Duplicate
+Matching**. The raw **Import Rows** tab is in no app's navigation either: open it from an
+import's results in Super Importer, or from the App Launcher. **Error Log** is always the last tab of an app that has it,
 after any pages a module adds. In the everyday apps, **Data Manager** is the last Core tab and
 a module's pages follow it.
 

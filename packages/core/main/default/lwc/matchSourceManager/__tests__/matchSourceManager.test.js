@@ -127,9 +127,7 @@ describe('c-match-source-manager', () => {
     );
     expect(sources[0].querySelector('[data-id="shipped"]')).not.toBeNull();
     expect(sources[1].querySelector('[data-id="shipped"]')).toBeNull();
-    expect(sources[0].querySelector('[data-id="status-badge"]').className).toContain(
-      'slds-theme_success'
-    );
+    expect(sources[0].querySelector('[data-id="status-badge"]').status).toBe('active');
     expect(one(element, '[data-id="help"]').content).toContain('c.Core_MatchLogic_Help');
     // The details stay folded until asked for.
     expect(sources[0].querySelector('[data-id="details"]')).toBeNull();
@@ -237,7 +235,7 @@ describe('c-match-source-manager', () => {
     one(element, '[data-id="toggle"]').dispatchEvent(new CustomEvent('change'));
     await flush();
 
-    expect(one(element, '[data-id="error"]').textContent).toContain('Deploy Metadata is off.');
+    expect(one(element, '[data-id="error"]').message).toContain('Deploy Metadata is off.');
     expect(one(element, '[data-id="status"]')).toBeNull();
   });
 
@@ -291,7 +289,7 @@ describe('c-match-source-manager', () => {
     getView.mockRejectedValue({ body: { message: 'Matching logic needs a permission.' } });
     const element = await render();
 
-    expect(one(element, '[data-id="error"]').textContent).toContain(
+    expect(one(element, '[data-id="error"]').message).toContain(
       'Matching logic needs a permission.'
     );
     expect(all(element, '[data-id="source"]')).toHaveLength(0);

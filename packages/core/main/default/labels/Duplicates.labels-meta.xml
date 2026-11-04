@@ -177,28 +177,12 @@
         <value>The two households are now one.</value>
     </labels>
     <labels>
-        <fullName>Core_Duplicates_NoRulesNotice</fullName>
+        <fullName>Core_Duplicates_CompareMerge</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Duplicates panel: no active rule notice</shortDescription>
-        <value>No duplicate rule for people or accounts is switched on, so nothing is being checked. Activate the standard rules in Setup to use this panel.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_NoSuggestionAccessNotice</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: why no suggestions are shown without the license bound access.</shortDescription>
-        <value>Suggestions need duplicate record set access, given only with Sales or Service Cloud licenses. Rules still run on save.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_PeopleMergeNotice</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: how to merge two people</shortDescription>
-        <value>To merge two people, open either one and use Compare and merge on the Potential Duplicates card.</value>
+        <shortDescription>Duplicates panel: button that opens a person pair's first record to merge</shortDescription>
+        <value>Compare and Merge</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_ReadOnlyNotice</fullName>
@@ -239,22 +223,6 @@
         <protected>false</protected>
         <shortDescription>Duplicates: scan finished with failures. {0} objects, {1} pairs, {2} failed.</shortDescription>
         <value>Duplicate scan of {0} finished: {1} new possible duplicates recorded, but {2} batches of up to 50 records could not be checked. See the Error Log, fix the cause, and scan again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ScanRunning</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: a scan is running</shortDescription>
-        <value>A scan is running. Refresh the page in a minute to see what it found.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ScanStarted</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: scan started message</shortDescription>
-        <value>Scan started. It runs in the background, and suggestions appear here as they are found.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_ShowingCount</fullName>
