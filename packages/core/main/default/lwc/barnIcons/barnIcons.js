@@ -51,6 +51,7 @@ const ICONS = Object.freeze({
   Donor_Levels: 'custom:custom65',
   Donor_Segments: 'custom:custom68',
   Fund__c: 'custom:custom42',
+  Fundraising_Home: 'custom:custom61',
   Gift_Allocation__c: 'custom:custom17',
   Gift_Batch__c: 'custom:custom13',
   Gift__c: 'custom:custom41',

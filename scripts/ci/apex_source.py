@@ -38,3 +38,40 @@ def strip(source):
             out.append(c)
             i += 1
     return "".join(out)
+
+
+def without_comments(source):
+    """The source with comments removed and string literals kept: what Salesforce measures.
+
+    Salesforce counts Apex code size as ApexClass.LengthWithoutComments: every character but
+    comments. A string literal is code, so it stays, and a // or /* inside one is not a comment.
+    """
+    out = []
+    i, n = 0, len(source)
+    while i < n:
+        if source[i] == "'":
+            j = i + 1
+            while j < n and source[j] != "'":
+                j += 2 if source[j] == "\\" else 1
+            out.append(source[i : j + 1])
+            i = j + 1
+        elif source.startswith("//", i):
+            j = source.find("\n", i)
+            i = n if j < 0 else j
+        elif source.startswith("/*", i):
+            j = source.find("*/", i + 2)
+            i = n if j < 0 else j + 2
+        else:
+            out.append(source[i])
+            i += 1
+    return "".join(out)
+
+
+TEST_CLASS = re.compile(r"@IsTest\b[^{;]*?\bclass\b", re.I)
+
+
+def is_test_class(source):
+    """True when the outer class carries @IsTest, so it does not count toward the code limit."""
+    code = strip(source)
+    first = re.search(r"\bclass\b", code)
+    return bool(first and TEST_CLASS.search(code[: first.end()]))

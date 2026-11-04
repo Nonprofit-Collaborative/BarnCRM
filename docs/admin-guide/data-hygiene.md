@@ -96,7 +96,7 @@ shows at once. Find's export reads every matching record.
 
 1. Press **Open in Find** next to a check. BarnCRM saves the check's query as one of your own
    saved queries, named **Data Quality:** followed by the check's name, not shared with anyone,
-   and opens the Find tab. (Queries saved before the rename, named **Data hygiene:**, are
+   and opens the Find tab with a short message, **Opened Data Quality: ... in Find.** (Queries saved before the rename, named **Data hygiene:**, are
    renamed **Data Quality:** when BarnCRM is upgraded. If you already have a **Data Quality:**
    query of the same name, that newer one is kept and the old one is left as it was, for you to
    delete in Find if you like.)
