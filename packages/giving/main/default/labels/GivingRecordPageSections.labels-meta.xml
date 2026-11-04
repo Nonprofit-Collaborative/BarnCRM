@@ -64,4 +64,20 @@
     <shortDescription>Record page section: Batch</shortDescription>
     <value>Batch</value>
   </labels>
+  <labels>
+    <fullName>Giving_Section_GivingDetails</fullName>
+    <categories>Giving, Record pages</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Record page section: Giving Details</shortDescription>
+    <value>Giving Details</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Section_CreditsAndTributes</fullName>
+    <categories>Giving, Record pages</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Record page tab: Credits and Tributes</shortDescription>
+    <value>Credits and Tributes</value>
+  </labels>
 </CustomLabels>

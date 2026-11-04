@@ -22,7 +22,7 @@ For every script on this page:
 | 1 | Open **BarnCRM Settings**, **Rollups**. On the **Rollups** row select **Open Rollup Builder**. | The Rollup Builder opens with one row per total, including **Household total giving**, **Account total giving**, **Contact total giving**, **Fund total raised** and **Appeal total raised**. Each shipped giving row shows mode **Both (recommended)** and is active. |
 | 2 | Select **Recalculate All**. | A box reads "About N records, roughly M minutes." with **Cancel**, **Start Now** and **Run Tonight**. |
 | 3 | Select **Start Now**. | "Recalculation started. This page updates as it finishes." When it finishes, **Rollups Last Completed** shows a time a moment ago. |
-| 4 | Open **The Garcia Family**. Read the Giving section. | **Total Giving** 385.00, **Gift Count** 3, **Largest Gift** 250.00. **First Gift Date** and **Last Gift Date** are filled in. **Rollups Last Calculated** is recent. |
+| 4 | Open **The Garcia Family**. Read the Giving and Giving Details sections. | **Total Giving** 385.00, **Gift Count** 3, **Largest Gift** 250.00. **First Gift Date** and **Last Gift Date** are filled in. **Totals Last Updated** is recent. |
 | 5 | Open **Harper Garcia**. | The same **Total Giving** 385.00 and **Gift Count** 3. |
 
 **Cleanup:** None.
@@ -38,7 +38,7 @@ For every script on this page:
 | 1 | Open **Sofia Ali** and her household. | **Total Giving** and **Gift Count** are empty or 0. |
 | 2 | Enter a gift from **Sofia Ali** for 500. | **Gift Saved**. |
 | 3 | Wait a few seconds and refresh Sofia Ali. | **Total Giving** 500.00, **Gift Count** 1, **Largest Gift** 500.00, **Giving This Year** 500.00, **First Gift Date** and **Last Gift Date** today. |
-| 4 | Refresh her household. | The same values. **Rollups Last Calculated** is a moment ago. |
+| 4 | Refresh her household. | The same values. **Totals Last Updated** is a moment ago. |
 | 5 | Enter a second gift from Sofia Ali for 200. Refresh her household. | **Total Giving** 700.00, **Gift Count** 2, **Largest Gift** still 500.00. |
 
 **Cleanup:** None. T-GRD-03 uses these gifts.

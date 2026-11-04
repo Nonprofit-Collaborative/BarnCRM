@@ -198,9 +198,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open The Garcia Family. | Sections **Details** and **Name and Greetings**; panels **Members** and **Addresses**; actions **Edit**, **Log an Interaction**, **Merge or Split**, **Delete**. |
-| 2 | Open **Bayview Hardware** from **Organizations**. | **Details** with Website; **Affiliations** and **Addresses** panels; no **Name and Greetings**, no **Members**, no **Merge or Split**. |
-| 3 | Open Harper Garcia. | Sections **Person**, **Household**, **Reaching This Person**; panels **Household**, **Relationships**, **Affiliations**, **Addresses**; no **Merge or Split**. |
+| 1 | Open The Garcia Family. | Tabs **Details**, **Connections**, **Related**, with **Details** open: sections **Details** and **Name and Greetings**. On **Connections**: panels **Members** and **Addresses**. Actions **Edit**, **Log an Interaction**, **Merge or Split**, **Delete**. |
+| 2 | Open **Bayview Hardware** from **Organizations**. | **Details** tab with Website; **Connections** tab with the **Affiliations** and **Addresses** panels; no **Name and Greetings**, no **Members**, no **Merge or Split**. |
+| 3 | Open Harper Garcia. | **Details** tab: sections **Person**, **Household**, **Reaching This Person**. **Connections** tab: panels **Household**, **Relationships**, **Affiliations**, **Addresses**. **Related** tab: the related lists. No **Merge or Split**. |
+| 4 | Narrow the browser to phone width and open Harper Garcia again. | The three tabs still show and switch; the sidebar cards stack below. |
 
 **Cleanup:** None.
 

@@ -12,7 +12,8 @@ admin has turned on the Addresses feature. Ask your admin; see
 
 ## To Add an Address
 
-1. Open the household, organization or person. Find the **Addresses** card.
+1. Open the household, organization or person and click the **Connections** tab. Find the
+   **Addresses** card.
 2. Click **Add Address**. The **New Address** form opens.
 3. Choose a **Type**: Home, Work, Mailing, Seasonal or Other.
 4. Fill in **Street**, **City**, **State**, **Postal Code** and **Country**.

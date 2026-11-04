@@ -6628,9 +6628,9 @@ numbers printed beside it and an organization can change what "recent" means wit
 | Days Since Last Gift | `Days_Since_Last_Gift__c` | Formula (Number) |
 | Recency Score | `RFM_Recency_Score__c` | Number |
 | Frequency Score | `RFM_Frequency_Score__c` | Number |
-| Monetary Score | `RFM_Monetary_Score__c` | Number |
-| RFM Score | `RFM_Score__c` | Number |
-| RFM Segment | `RFM_Segment__c` | Text (40) |
+| Amount Score | `RFM_Monetary_Score__c` | Number |
+| Donor Score | `RFM_Score__c` | Number |
+| Giving Pattern | `RFM_Segment__c` | Text (40) |
 
 - **Fields on `Giving_Settings__c`:** the three cutoff fields of R-DT3 (Text, with defaults).
 
@@ -6789,7 +6789,7 @@ why the definition keeps its own Last Calculated as well.
 | Soft Credit Count | `Soft_Credit_Count__c` | Number |
 | In-kind Value | `In_Kind_Value__c` | Currency |
 | In-kind Gift Count | `In_Kind_Gift_Count__c` | Number |
-| Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
+| Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 
 - **Fields on Contact** (shipped by Giving): the same fifteen API names, with the same
   types and the same definitions.
@@ -6802,7 +6802,7 @@ why the definition keeps its own Last Calculated as well.
 | Total Raised This Year | `Total_Raised_This_Year__c` | Currency |
 | Gift Count | `Gift_Count__c` | Number |
 | Last Gift Date | `Last_Gift_Date__c` | Date |
-| Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
+| Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 
 - **Fields on `Appeal__c`:**
 
@@ -6810,21 +6810,21 @@ why the definition keeps its own Last Calculated as well.
 |---|---|---|
 | Total Raised | `Total_Raised__c` | Currency |
 | Gift Count | `Gift_Count__c` | Number |
-| Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
+| Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 
 - **Fields on `Commitment__c`:**
 
 | Attribute | API name | Type |
 |---|---|---|
 | Paid To Date | `Paid_To_Date__c` | Currency |
-| Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
+| Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 
 - **Fields on `Installment__c`:**
 
 | Attribute | API name | Type |
 |---|---|---|
 | Paid Amount | `Paid_Amount__c` | Currency |
-| Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
+| Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 
 - **Shipped defaults:** one `Rollup_Definition_Default__mdt` row per line in the tables
   above, per scope.

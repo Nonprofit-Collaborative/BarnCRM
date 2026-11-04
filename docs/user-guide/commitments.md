@@ -49,7 +49,7 @@ When a payment arrives, enter it as a gift and link it to the payment.
 3. In **Pays a scheduled payment**, check the chosen payment, or pick the right one. Choose **None: a new gift on its own** if the gift is not for the pledge.
 4. Click **Save**.
 
-You should see: on the commitment, the payment's **Status** turns **Paid** (or **Partially paid** if less came in), **Paid To Date** goes up and **Balance** goes down. The gift appears in the commitment's **Gifts** list. For a stack of checks, use the **Pays** column in a [gift batch](gift-batches.md#to-mark-a-check-as-a-pledge-payment-pays).
+You should see: on the commitment, the payment's **Status** turns **Paid** (or **Partially paid** if less came in), **Paid To Date** goes up and **Balance** goes down. The gift appears in the commitment's **Gifts** list, on its **Related** tab. For a stack of checks, use the **Pays** column in a [gift batch](gift-batches.md#to-mark-a-check-as-a-pledge-payment-pays).
 
 On the **Gifts** tab's **New** form, set **Commitment** to the pledge and **Installment** to the payment instead. Leave **Installment** empty and BarnCRM links the gift to the oldest unpaid payment, if your admin left that setting on.
 

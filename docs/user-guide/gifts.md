@@ -79,7 +79,7 @@ A gift without a fund goes in full to your organization's default fund, as one l
 A soft credit recognizes someone who influenced a gift but did not give it, such as the board member who asked. It never changes the money.
 
 1. Open the gift.
-2. In the **Soft Credits** panel, click **Add Credit**.
+2. Click the **Credits and Tributes** tab. In the **Soft Credits** panel, click **Add Credit**.
 3. Choose the **Person to recognize**.
 4. Choose **Why they are recognized**: **Solicitor**, **Honoree**, **Influencer**, **Household Member**, **Matched Donor** or **Other**. With **Other**, type **Your own wording**.
 5. Check the **Amount** and click **Save**.
@@ -90,14 +90,14 @@ Credits marked **Automatic** are made by BarnCRM. When a household member gives,
 
 ## To Record a Tribute (in Honor or in Memory)
 
-The **Tribute** panel on the gift shows the tribute and whether the family has been told. The tribute itself is a separate record.
+The **Tribute** panel on the gift's **Credits and Tributes** tab shows the tribute and whether the family has been told. The tribute itself is a separate record.
 
-1. Open the gift. In its **Tributes** list, click **New**. The gift is filled in for you.
+1. Open the gift and click the **Related** tab. In its **Tributes** list, click **New**. The gift is filled in for you.
 2. Choose the **Type**: **In honor of** or **In memory of**.
 3. Type the **Honoree Name**, or choose **Honoree Contact** if the person is already in BarnCRM.
 4. Fill in who should be told: **Notification Recipient Contact**, or type **Notification Recipient Name** if they are not in BarnCRM.
 5. Type any **Message** from the donor and click **Save**.
-6. When the letter has gone out, open the gift and click **Mark Notification Sent** in the **Tribute** panel.
+6. When the letter has gone out, open the gift, click **Credits and Tributes**, and click **Mark Notification Sent** in the **Tribute** panel.
 
 You should see: the panel reads "In memory of ..., Notify ..." and then **Notification sent** with the date. BarnCRM does not send the letter; the button records that you did. The **Notifications to Send** list view on Tributes shows the ones still waiting.
 

@@ -12,7 +12,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **Funds** tab, list view **All Funds**. | **General Fund** to **Memorial Fund** show, 8 funds in all. On an org that started with a default fund (a new org's own starting **General Fund**, T-GIFT-14), that fund is the only **General Fund** and the other 7 are sample funds. |
-| 2 | Open **General Fund**. If **Is Default** is not ticked, click **Edit**, tick it, and save. | **Is Default** is ticked. **Total Raised**, **Gift Count**, **Last Gift Date** and **Rollups Last Calculated** are read only. |
+| 2 | Open **General Fund**. If **Is Default** is not ticked, click **Edit**, tick it, and save. | **Is Default** is ticked. **Total Raised**, **Gift Count**, **Last Gift Date** and **Totals Last Updated** are read only. |
 | 3 | Open **BarnCRM Settings**, **Giving**. | **Default fund** shows General Fund. |
 | 4 | On the **Funds** tab click **New**. Name `Test Fund`, tick **Active** and **Is Default**, and save. | Saved. |
 | 5 | Reopen **General Fund**. | **Is Default** is now unticked: only one default exists. |
@@ -33,11 +33,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | Open the **Gifts** tab and click **New**. | The new gift form shows **Donor Contact**, **Donor Account**, **Amount**, **Gift Date** (already today), **Payment Method**, **Status** (Received), **Appeal**, **Commitment** and **Installment**. |
 | 2 | Choose **Harper Garcia** in **Donor Contact**, **Amount** `250`, **Gift Date** today, **Payment Method** `Check`, **Appeal** `Spring Appeal`. Save. | The gift opens on the gift page, named `G-` and a number. |
 | 3 | Read the **Household** field. | It names Harper's household (The Garcia Family), filled in by BarnCRM. |
-| 4 | Look at the **Gift Allocations** list. | One allocation: **General Fund**, 250.00. |
+| 4 | Click the **Related** tab and look at the **Gift Allocations** list. | One allocation: **General Fund**, 250.00. |
 | 5 | Open the allocation, click **Edit**, set **Amount** to `100`, save. | Refused: "The allocations of this gift total 100.00, but the gift is 250.00. The difference is 150.00." |
 | 6 | Cancel the edit. | The allocation stays 250.00. |
 | 7 | Check the gift's action bar. | **Edit** and **Refund or Write Off** show. **Delete** does not (Giving Staff cannot delete). |
-| 8 | Open Harper Garcia from the **Donor Contact** link and refresh after a few seconds. | The **Giving** section shows **Total Giving** including the 250 and **Rollups Last Calculated** close to now. The **Gifts** list shows the new gift first. |
+| 8 | Open Harper Garcia from the **Donor Contact** link and refresh after a few seconds. | The **Giving** section shows **Total Giving** including the 250 and **Totals Last Updated** close to now (in **Giving Details**). On the **Related** tab, the **Gifts** list shows the new gift first. |
 
 **Cleanup:** none; T-GIFT-03 and other pages reuse the gift.
 
@@ -262,5 +262,19 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 3 | Open **General Fund** and its gifts. | Sample gifts are allocated to it. |
 | 4 | Select **Remove Sample Data** and confirm. | The removal finishes. |
 | 5 | Open **All Funds**. | **General Fund** is still there and still the default. The seven sample funds and the sample gifts are gone. |
+
+**Cleanup:** none.
+
+## T-GIFT-16: Gift and Commitment Pages Use Tabs
+
+**Purpose:** the gift and commitment pages group their parts in tabs, with the posting and receipt cards kept in the sidebar.
+**Prerequisites:** staff; sample data loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open any sample gift with a soft credit. | Tabs **Details**, **Credits and Tributes**, **Related**, with **Details** open: sections **Gift** and **Acknowledgment, Receipt and Recognition**. The sidebar shows **Posting**, **Receipt Actions** and the activity panel. |
+| 2 | Click **Credits and Tributes**. | The **Soft Credits** and **Tribute** cards. |
+| 3 | Click **Related**. | The **Gift Allocations**, **Refunds and Write-offs**, **Tributes** and **Acknowledgments** lists. |
+| 4 | Open a sample pledge from the **Commitments** tab. | The payment schedule at the top, then tabs **Details** (sections **Commitment**, **Schedule**, **Totals**) and **Related** (the **Gifts** list). |
 
 **Cleanup:** none.

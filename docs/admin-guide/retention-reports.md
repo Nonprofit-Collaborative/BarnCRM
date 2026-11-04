@@ -108,7 +108,7 @@ Do this after the sample data is loaded, or in an org with a couple of years of 
 1. Open **Reports**, folder **BarnCRM Giving**, and open **LYBUNT Donors**. Every row is a
    donor to call. The list is sorted by what they gave last year, largest first, so the first
    twenty rows are the twenty conversations worth having first.
-2. Look at the **Rollups Last Calculated** column on any row. That is when this donor's
+2. Look at the **Totals Last Updated** column on any row. That is when this donor's
    numbers were last worked out. If it says last month, the list is a month stale, and step 2
    of the setup above fixes it.
 3. Open **SYBUNT Donors**. It is grouped by the fiscal year of the donor's last gift, newest
@@ -140,7 +140,7 @@ retained or lapsed against. Find them through the In-kind value figure on their 
 the In-kind Gifts This Year report instead. See [In-kind gifts](in-kind-gifts.md).
 
 **A donor is on the LYBUNT list who gave last week.** Two causes. Either the rollups have not
-run since that gift, which the Rollups Last Calculated column on their row will show, or the
+run since that gift, which the Totals Last Updated column on their row will show, or the
 gift is dated in the future. Last Gift Date is the date on the gift, so a gift dated next
 month counts as next month, and until then the donor looks lapsed.
 

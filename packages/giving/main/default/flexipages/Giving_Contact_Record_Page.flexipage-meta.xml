@@ -238,6 +238,30 @@
   </flexiPageRegions>
   <flexiPageRegions>
     <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>Facet-giving-column1</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:column</componentName>
+        <identifier>givingColumn1</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>Facet-giving-column2</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:column</componentName>
+        <identifier>givingColumn2</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>Facet-giving</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
       <fieldInstance>
         <fieldInstanceProperties>
           <name>uiBehavior</name>
@@ -277,26 +301,6 @@
         <identifier>RecordField_LargestGift</identifier>
       </fieldInstance>
     </itemInstances>
-    <itemInstances>
-      <fieldInstance>
-        <fieldInstanceProperties>
-          <name>uiBehavior</name>
-          <value>readonly</value>
-        </fieldInstanceProperties>
-        <fieldItem>Record.Pledge_Balance__c</fieldItem>
-        <identifier>RecordField_PledgeBalance</identifier>
-      </fieldInstance>
-    </itemInstances>
-    <itemInstances>
-      <fieldInstance>
-        <fieldInstanceProperties>
-          <name>uiBehavior</name>
-          <value>readonly</value>
-        </fieldInstanceProperties>
-        <fieldItem>Record.Total_Soft_Credits__c</fieldItem>
-        <identifier>RecordField_TotalSoftCredits</identifier>
-      </fieldInstance>
-    </itemInstances>
     <name>Facet-giving-column1</name>
     <type>Facet</type>
   </flexiPageRegions>
@@ -317,18 +321,8 @@
           <name>uiBehavior</name>
           <value>readonly</value>
         </fieldInstanceProperties>
-        <fieldItem>Record.First_Gift_Date__c</fieldItem>
-        <identifier>RecordField_FirstGiftDate</identifier>
-      </fieldInstance>
-    </itemInstances>
-    <itemInstances>
-      <fieldInstance>
-        <fieldInstanceProperties>
-          <name>uiBehavior</name>
-          <value>readonly</value>
-        </fieldInstanceProperties>
-        <fieldItem>Record.Gift_Count__c</fieldItem>
-        <identifier>RecordField_GiftCount</identifier>
+        <fieldItem>Record.Pledge_Balance__c</fieldItem>
+        <identifier>RecordField_PledgeBalance</identifier>
       </fieldInstance>
     </itemInstances>
     <itemInstances>
@@ -351,6 +345,10 @@
         <identifier>RecordField_RFMSegment</identifier>
       </fieldInstance>
     </itemInstances>
+    <name>Facet-giving-column2</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <fieldInstance>
         <fieldInstanceProperties>
@@ -397,6 +395,40 @@
           <name>uiBehavior</name>
           <value>readonly</value>
         </fieldInstanceProperties>
+        <fieldItem>Record.Total_Soft_Credits__c</fieldItem>
+        <identifier>RecordField_TotalSoftCredits</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <name>Facet-givingDetails-column1</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <fieldInstance>
+        <fieldInstanceProperties>
+          <name>uiBehavior</name>
+          <value>readonly</value>
+        </fieldInstanceProperties>
+        <fieldItem>Record.First_Gift_Date__c</fieldItem>
+        <identifier>RecordField_FirstGiftDate</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldInstanceProperties>
+          <name>uiBehavior</name>
+          <value>readonly</value>
+        </fieldInstanceProperties>
+        <fieldItem>Record.Gift_Count__c</fieldItem>
+        <identifier>RecordField_GiftCount</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldInstanceProperties>
+          <name>uiBehavior</name>
+          <value>readonly</value>
+        </fieldInstanceProperties>
         <fieldItem>Record.Days_Since_Last_Gift__c</fieldItem>
         <identifier>RecordField_DaysSinceLastGift</identifier>
       </fieldInstance>
@@ -431,7 +463,7 @@
         <identifier>RecordField_RollupsLastCalculated</identifier>
       </fieldInstance>
     </itemInstances>
-    <name>Facet-giving-column2</name>
+    <name>Facet-givingDetails-column2</name>
     <type>Facet</type>
   </flexiPageRegions>
   <flexiPageRegions>
@@ -439,106 +471,26 @@
       <componentInstance>
         <componentInstanceProperties>
           <name>body</name>
-          <value>Facet-giving-column1</value>
+          <value>Facet-givingDetails-column1</value>
         </componentInstanceProperties>
         <componentName>flexipage:column</componentName>
-        <identifier>givingColumn1</identifier>
+        <identifier>givingDetailsColumn1</identifier>
       </componentInstance>
     </itemInstances>
     <itemInstances>
       <componentInstance>
         <componentInstanceProperties>
           <name>body</name>
-          <value>Facet-giving-column2</value>
+          <value>Facet-givingDetails-column2</value>
         </componentInstanceProperties>
         <componentName>flexipage:column</componentName>
-        <identifier>givingColumn2</identifier>
+        <identifier>givingDetailsColumn2</identifier>
       </componentInstance>
     </itemInstances>
-    <name>Facet-giving</name>
+    <name>Facet-givingDetails</name>
     <type>Facet</type>
   </flexiPageRegions>
   <flexiPageRegions>
-    <itemInstances>
-      <componentInstance>
-        <componentInstanceProperties>
-          <name>actionNames</name>
-          <valueList>
-            <valueListItems>
-              <value>Edit</value>
-            </valueListItems>
-            <valueListItems>
-              <value>Contact.Log_Interaction</value>
-            </valueListItems>
-            <valueListItems>
-              <value>Contact.New_Gift</value>
-            </valueListItems>
-            <valueListItems>
-              <value>Contact.Start_Stewardship_Plan</value>
-            </valueListItems>
-            <valueListItems>
-              <value>Contact.Erase_Person</value>
-              <visibilityRule>
-                <criteria>
-                  <leftValue>{!$Permission.CustomPermission.Erase_People}</leftValue>
-                  <operator>EQUAL</operator>
-                  <rightValue>true</rightValue>
-                </criteria>
-              </visibilityRule>
-            </valueListItems>
-            <valueListItems>
-              <value>Delete</value>
-            </valueListItems>
-          </valueList>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>collapsed</name>
-          <value>false</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>enableActionsConfiguration</name>
-          <value>true</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>enableActionsInNative</name>
-          <value>true</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>hideChatterActions</name>
-          <value>true</value>
-        </componentInstanceProperties>
-        <componentName>force:highlightsPanel</componentName>
-        <identifier>force_highlightsPanel</identifier>
-      </componentInstance>
-    </itemInstances>
-    <name>header</name>
-    <type>Region</type>
-  </flexiPageRegions>
-  <flexiPageRegions>
-    <itemInstances>
-      <componentInstance>
-        <componentName>householdOfPerson</componentName>
-        <identifier>householdOfPerson</identifier>
-      </componentInstance>
-    </itemInstances>
-    <itemInstances>
-      <componentInstance>
-        <componentName>relationshipPanel</componentName>
-        <identifier>relationshipPanel</identifier>
-      </componentInstance>
-    </itemInstances>
-    <itemInstances>
-      <componentInstance>
-        <componentName>affiliationPanel</componentName>
-        <identifier>affiliationPanel</identifier>
-      </componentInstance>
-    </itemInstances>
-    <itemInstances>
-      <componentInstance>
-        <componentName>addressPanel</componentName>
-        <identifier>addressPanel</identifier>
-      </componentInstance>
-    </itemInstances>
     <itemInstances>
       <componentInstance>
         <componentInstanceProperties>
@@ -595,6 +547,52 @@
         <identifier>givingSection</identifier>
       </componentInstance>
     </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>columns</name>
+          <value>Facet-givingDetails</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>label</name>
+          <value>{!$Label.Giving_Section_GivingDetails}</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:fieldSection</componentName>
+        <identifier>givingDetailsSection</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>Facet-detailsTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>householdOfPerson</componentName>
+        <identifier>householdOfPerson</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>relationshipPanel</componentName>
+        <identifier>relationshipPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>affiliationPanel</componentName>
+        <identifier>affiliationPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>addressPanel</componentName>
+        <identifier>addressPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>Facet-connectionsTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentInstanceProperties>
@@ -962,6 +960,126 @@
       <componentInstance>
         <componentName>force:relatedListContainer</componentName>
         <identifier>force_relatedListContainer</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>Facet-relatedTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>active</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>Facet-detailsTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Standard.Tab.detail</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>detailsTab</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>Facet-connectionsTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>{!$Label.Core_Section_Connections}</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>connectionsTab</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>Facet-relatedTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Standard.Tab.relatedLists</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>relatedTab</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>Facet-recordTabs</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>actionNames</name>
+          <valueList>
+            <valueListItems>
+              <value>Edit</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Contact.Log_Interaction</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Contact.New_Gift</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Contact.Start_Stewardship_Plan</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Contact.Erase_Person</value>
+              <visibilityRule>
+                <criteria>
+                  <leftValue>{!$Permission.CustomPermission.Erase_People}</leftValue>
+                  <operator>EQUAL</operator>
+                  <rightValue>true</rightValue>
+                </criteria>
+              </visibilityRule>
+            </valueListItems>
+            <valueListItems>
+              <value>Delete</value>
+            </valueListItems>
+          </valueList>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>collapsed</name>
+          <value>false</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>enableActionsConfiguration</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>enableActionsInNative</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>hideChatterActions</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentName>force:highlightsPanel</componentName>
+        <identifier>force_highlightsPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>header</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>tabs</name>
+          <value>Facet-recordTabs</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tabset</componentName>
+        <identifier>recordTabs</identifier>
       </componentInstance>
     </itemInstances>
     <name>main</name>
