@@ -116,6 +116,22 @@ Drag and drop is always an extra on a list that already has another way to chang
 - Every move, from either path, sets the text of an `aria-live="polite"` `slds-assistive-text` region from the help key `Core_Kit_MovedToPosition` ("{0} moved to position {1} of {2}.").
 - Never for a destructive or single-choice action (a delete, a merge, a setting). `importColumnTransforms` is the reference use.
 
+## Drag and Drop
+
+| Module | Use it for | Main exports |
+|---|---|---|
+| `c/barnDrag` | Moving an item between board columns, reordering a list, or dropping one part onto another (Grant Pipeline, Logic Model builder, Cohort Members, Eligibility Rules) | `createDragController(options)` returning `pointerDown(event)`, `keyDown(event)`, `cancel()`, `state`, `destroy()` |
+| `c/barnDragText` | The words the controller announces, from the Core help catalog | `dragMessages()`, `dragInstructions()` |
+
+`c/barnDrag` is framework free (plan 9.9). Rules:
+
+- Drag and drop is always an addition. The screen keeps its Move Up and Move Down buttons, card menu or form; on a phone, where columns stack, the menu stays the main way.
+- Markup: a drop zone is any element with `data-drop-zone` (its id) and `data-drop-label` (its name); an item inside it has `data-drag-id`, `data-drag-label`, `tabindex="0"`, `aria-describedby` pointing at a hidden element holding `dragInstructions()`, and `onpointerdown` and `onkeydown` handlers that call the controller. A zone can itself sit inside another zone (a part inside a column): the innermost zone under the pointer wins.
+- Options: `root` (the component's `this.template`), `layout` (`columns` when zones sit side by side, Left and Right change column; `list` for one list), `messages` (`dragMessages()`, after `loadHelp([<your package>, 'Core'])`), `announce(text)` (write it to the component's own `aria-live="polite"` region), `onChange(state)` (render the source and target highlight from `state.itemId`, `overZone` and `overIndex`), `onDrop({ itemId, fromZone, fromIndex, toZone, toIndex })` (apply the move; return `false` or reject to snap back, and show the reason the same way the existing control does), and optional `canDrop(itemId, fromZone, toZone)`.
+- Pointer: a mouse or pen drag starts after a few pixels of movement; touch starts after a 250 ms press and hold, so a swipe still scrolls. The click that ends a drag does not open the card under it. Uses pointer events, never HTML5 `draggable` (it does not fire on iOS Safari).
+- Keyboard: Space on the item picks it up, the arrow keys move it, Space or Enter drops, Escape or Tab cancels. Space on a button or link inside the item keeps its own job. Focus returns to the moved item after the drop.
+- Call `destroy()` in `disconnectedCallback`.
+
 ## Visual Standard
 
 One part per job. A reviewer checks a screen against this list, not against taste.
