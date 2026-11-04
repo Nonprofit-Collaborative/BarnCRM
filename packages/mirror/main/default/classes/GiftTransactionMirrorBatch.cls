@@ -36,6 +36,7 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
 
     private final Date fromDate;
     private final Date toDate;
+    @TestVisible
     private final GiftTransactionMirrorService.Result totals = new GiftTransactionMirrorService.Result();
     private Datetime startedAt;
     /** Why chunks were left, when automation was paused or switched off during the run. */
@@ -171,7 +172,9 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
             LOG_CONTEXT,
             SEVERITY_INFO
         );
-        if (fromDate == null && skipReason == null && totals.skipped == 0) {
+        // A run that left or failed a gift is not recorded, so the next run reads that gift again
+        // (only gifts changed since the last recorded run are reread).
+        if (fromDate == null && skipReason == null && totals.skipped == 0 && totals.failed == 0) {
             MirrorSettingsWriter.recordGiftTransactionMirrorRun(startedAt, summary);
         }
     }

@@ -15,6 +15,8 @@ Gift Transaction in its **Gift Transaction ID**, so nothing is ever copied twice
 The mirror works in runs: **Run Now**, and a nightly run at 1:35 AM in your organization's time
 zone. Saving a gift does not copy it at once. Nonprofit Cloud works out its donor summaries in
 its own scheduled runs, so a gift copied at once would not show on a donor page any sooner.
+A run in which a gift could not be copied is not counted as completed, so the next run tries that
+gift again; the Error Log says why it failed.
 
 A run copies each gift that is Received, has an amount above zero and is not in-kind, dated on
 or after the start date you set:

@@ -133,6 +133,26 @@ private class GiftTransactionMirrorRunTest {
     }
 
     @IsTest
+    static void aRunWithAFailedGiftIsNotRecordedSoTheGiftIsReadAgain() {
+        System.runAs(maria()) {
+            GiftTransactionMirrorSchema.useStandIns();
+            insertGift(100);
+            Test.startTest();
+            GiftTransactionMirrorBatch batch = new GiftTransactionMirrorBatch(null, null);
+            batch.start(null);
+            batch.totals.failed = 1;
+            batch.finish(null);
+            Test.stopTest();
+        }
+        Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+        Assert.isNull(
+            settings.Gift_Transaction_Mirror_Last_Run__c,
+            'The watermark stays, so the failed gift is read again.'
+        );
+        Assert.areEqual(1, logged('Info').size(), 'The run is still logged.');
+    }
+
+    @IsTest
     static void aRunThatIsNotReadyWarnsAndCopiesNothing() {
         Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
         settings.Gift_Transaction_Mirror_Start__c = null;
