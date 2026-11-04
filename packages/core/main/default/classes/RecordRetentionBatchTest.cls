@@ -76,6 +76,16 @@ private class RecordRetentionBatchTest {
             Import_Batch__c closed = ImportTestDataFactory.batch(template);
             Import_Batch__c undoOpen = ImportTestDataFactory.batch(template);
             Import_Batch__c running = ImportTestDataFactory.batch(template);
+            for (Import_Batch__c batch : new List<Import_Batch__c>{ closed, undoOpen, running }) {
+                Test.setCreatedDate(batch.Id, Datetime.now().addDays(-400));
+                ImportTestDataFactory.rows(
+                    batch,
+                    new List<Map<String, String>>{
+                        ImportTestDataFactory.donorRow('Ana', 'Row', 'row@example.org', null)
+                    }
+                );
+            }
+            // After the rows, which save each batch's in-memory status again.
             update as system new List<Import_Batch__c>{
                 new Import_Batch__c(
                     Id = closed.Id,
@@ -88,15 +98,6 @@ private class RecordRetentionBatchTest {
                     Undo_Deadline__c = Datetime.now().addDays(5)
                 )
             };
-            for (Import_Batch__c batch : new List<Import_Batch__c>{ closed, undoOpen, running }) {
-                Test.setCreatedDate(batch.Id, Datetime.now().addDays(-400));
-                ImportTestDataFactory.rows(
-                    batch,
-                    new List<Map<String, String>>{
-                        ImportTestDataFactory.donorRow('Ana', 'Row', 'row@example.org', null)
-                    }
-                );
-            }
             insert as system new Import_Journal__c(Import_Batch__c = closed.Id);
 
             Test.startTest();
