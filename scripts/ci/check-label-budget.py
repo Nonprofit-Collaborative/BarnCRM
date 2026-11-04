@@ -7,9 +7,18 @@ Salesforce Help, Custom Labels), but every unpackaged source deploy does: barn-s
 barn-npc and mwdbdevsb all receive BarnCRM as source, beside each org's own labels. barn-sales
 reached 4,996 on 2026-11-02 and a deploy failed with "custom label limit exceeded".
 
-BUDGET is the total across every package directory. It leaves 500 for an org's own labels
-and for labels a deploy has left behind (a source deploy never deletes a label). TARGET is
-where the total should settle; above it the check passes and says by how much.
+BUDGET is the total across every package directory: the count after help prose moved to the
+help catalogs (ADR-NEXT help-text-json, 4,120 on 2026-11-04) plus a small margin, so every
+label added is a choice. TARGET is where the total should settle; above it the check passes
+and says by how much.
+
+Help prose: help and guidance sentences live in the package's help catalog
+(BarnHelp_<Package>.json, docs/contributor-guide/ux-kit.md, Help Text), never in a label. A
+label is taken for help prose when its value is a sentence (six words or more, ending as a
+sentence does) and the last word of its name is a help word (Intro, Help, Description, Hint,
+Note, Notes, Empty, Why, What, Steps, Text, Tooltip, Explanation), unless the name says it is
+an error or log line or the value has a {0} placeholder (a message about the current state).
+PROSE_EXCEPTIONS lists the few that must stay labels, with the reason.
 
 Unused: a label whose name appears in no file under packages/ other than the label files
 (Markdown and code comments do not count). Apex, LWC, Aura, Visualforce, flows, FlexiPages
@@ -20,13 +29,48 @@ one is not allowed (write the full name so this check, and a reader, can find it
 """
 
 import glob
+import html
 import re
 import subprocess
 import sys
 
-BUDGET = 4500
+BUDGET = 4150
 TARGET = 4000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
+
+HELP_WORDS = {
+    "Intro", "Help", "Description", "Hint", "Note", "Notes", "Empty", "Why", "What", "Steps",
+    "Text", "Tooltip", "Explanation",
+}
+MESSAGE_WORDS = {"Error", "Errors", "Log"}
+SENTENCE = re.compile(r"[.?!:)]\s*$|[.?!]\s+[A-Z(\"]")
+PLACEHOLDER = re.compile(r"\{\d+\}")
+# Sentences named like help that are content or messages, so they stay labels.
+PROSE_EXCEPTIONS = {
+    "Core_AiExport_ReadmeIntro": "written into the AI readiness pack's readme file",
+    "Giving_AskReminder_Description": "written into the reminder task's description",
+    "Core_RollupEase_FieldDescription": "written into a generated field's description",
+    "Core_HealthCheck_OrphansNativeNote": "part of a Health Check finding",
+    "Core_HealthCheck_NightlyOffFixHint": "part of a Health Check finding",
+}
+
+
+def help_prose(path):
+    """Labels in a file that read as help prose, by the rule in the module docstring."""
+    found = []
+    for block in re.findall(r"<labels>(.*?)</labels>", open(path, encoding="utf-8").read(), re.S):
+        name = re.search(r"<fullName>\s*(\w+)\s*</fullName>", block)
+        value = re.search(r"<value>(.*?)</value>", block, re.S)
+        if not name or not value or name.group(1) in PROSE_EXCEPTIONS:
+            continue
+        name, value = name.group(1), html.unescape(value.group(1)).strip()
+        words = re.findall(r"[A-Z][a-z]*|[0-9]+", name.split("_")[-1])
+        if not words or words[-1] not in HELP_WORDS or set(words) & MESSAGE_WORDS:
+            continue
+        if PLACEHOLDER.search(value) or len(value.split()) < 6 or not SENTENCE.search(value):
+            continue
+        found.append(name)
+    return found
 
 
 def label_names():
@@ -69,11 +113,17 @@ def main():
     if total > BUDGET:
         problems.append(
             f"{total} custom labels, over the budget of {BUDGET} (the org limit is 5,000 and an org's own"
-            " labels need room). Remove unused labels, merge exact duplicates, or move long help text"
-            " into the guides before adding more."
+            " labels need room). Remove unused labels, merge exact duplicates, or move help text"
+            " into the package's help catalog before adding more."
         )
     for name in sorted(set(names) - referenced_names(names)):
         problems.append(f"{names[name]}: {name} is not referenced anywhere in packages/; remove it")
+    for path in sorted(glob.glob(LABEL_FILES)):
+        for name in help_prose(path):
+            problems.append(
+                f"{path}: {name} reads as help prose; put it in the package's help catalog"
+                " (BarnHelp_<Package>.json, docs/contributor-guide/ux-kit.md, Help Text), not a label"
+            )
 
     for problem in problems:
         print(problem, file=sys.stderr)
