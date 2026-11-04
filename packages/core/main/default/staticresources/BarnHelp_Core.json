@@ -41,6 +41,7 @@
     "Core_AutomationControl_Intro": "Everything BarnCRM does for you in the background. Switch one off if it is getting in your way, or pause all of it while you load a spreadsheet.",
     "Core_AutomationControl_ResumesItself": "It turns itself back on then.",
     "Core_AutomationControl_SwitchedOff": "{0} is off. Turn it back on here.",
+    "Core_Automation_RecordRefused": "Row {0} of this save was not saved, because BarnCRM automation failed for that record. The other records in the save went ahead. The Error Log entry for the failure itself has the details.",
     "Core_BulkDelete_BackupHelp": "Saves the records this delete would remove as a CSV, without related records.",
     "Core_BulkDelete_Cascades": "Salesforce also deletes these related records with them, and brings them back with an undo:",
     "Core_BulkDelete_FileIntro": "Deletes every record the dry run found. Nothing is deleted until you preview and confirm the count.",

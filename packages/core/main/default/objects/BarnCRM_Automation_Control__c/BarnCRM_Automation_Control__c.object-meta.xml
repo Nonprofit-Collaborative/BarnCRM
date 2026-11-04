@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customSettingsType>Hierarchy</customSettingsType>
+  <description>
+    Pauses or bypasses automation for the whole organization, a profile or a user. BarnCRM's
+    trigger dispatcher and every shipped flow template read it, and an organization's own flows,
+    triggers and validation rules can read it through $Setup. Public, not protected, so that
+    those can. Managed on the Automation page of BarnCRM Settings.
+  </description>
+  <enableFeeds>false</enableFeeds>
+  <label>BarnCRM Automation Control</label>
+  <visibility>Public</visibility>
+</CustomObject>
