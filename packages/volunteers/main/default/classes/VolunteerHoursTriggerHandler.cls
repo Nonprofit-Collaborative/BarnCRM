@@ -18,15 +18,15 @@ public with sharing class VolunteerHoursTriggerHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        List<Volunteer_Hours__c> entries = (List<Volunteer_Hours__c>) Trigger.new;
+        List<Volunteer_Hours__c> entries = (List<Volunteer_Hours__c>) newRecords();
         VolunteerHoursService.applyStartingStatus(entries);
         VolunteerHoursService.fillJobsFromShifts(entries);
         VolunteerHoursService.deriveHouseholds(entries);
     }
 
     public override void beforeUpdate() {
-        List<Volunteer_Hours__c> entries = (List<Volunteer_Hours__c>) Trigger.new;
-        Map<Id, Volunteer_Hours__c> previousById = (Map<Id, Volunteer_Hours__c>) Trigger.oldMap;
+        List<Volunteer_Hours__c> entries = (List<Volunteer_Hours__c>) newRecords();
+        Map<Id, Volunteer_Hours__c> previousById = (Map<Id, Volunteer_Hours__c>) oldRecordsById();
         VolunteerHoursService.refuseStatusChangesOutsideTheService(entries, previousById);
 
         List<Volunteer_Hours__c> shiftChanged = new List<Volunteer_Hours__c>();
@@ -55,6 +55,6 @@ public with sharing class VolunteerHoursTriggerHandler extends TriggerHandler {
 
     /** R-VU3: one attendance, one entry, also when an old entry is restored. */
     public override void afterUndelete() {
-        VolunteerSignupService.refuseRestoringASecondEntry((List<Volunteer_Hours__c>) Trigger.new);
+        VolunteerSignupService.refuseRestoringASecondEntry((List<Volunteer_Hours__c>) newRecords());
     }
 }

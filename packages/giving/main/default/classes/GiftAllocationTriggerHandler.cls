@@ -14,30 +14,30 @@ public with sharing class GiftAllocationTriggerHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        GiftService.applyAmountAndPercent((List<Gift_Allocation__c>) Trigger.new, null);
+        GiftService.applyAmountAndPercent((List<Gift_Allocation__c>) newRecords(), null);
     }
 
     public override void beforeUpdate() {
         GiftService.applyAmountAndPercent(
-            (List<Gift_Allocation__c>) Trigger.new,
-            (Map<Id, Gift_Allocation__c>) Trigger.oldMap
+            (List<Gift_Allocation__c>) newRecords(),
+            (Map<Id, Gift_Allocation__c>) oldRecordsById()
         );
     }
 
     public override void afterInsert() {
-        check((List<Gift_Allocation__c>) Trigger.new);
+        check((List<Gift_Allocation__c>) newRecords());
     }
 
     public override void afterUpdate() {
-        check((List<Gift_Allocation__c>) Trigger.new);
+        check((List<Gift_Allocation__c>) newRecords());
     }
 
     public override void afterDelete() {
-        check((List<Gift_Allocation__c>) Trigger.old);
+        check((List<Gift_Allocation__c>) oldRecords());
     }
 
     public override void afterUndelete() {
-        check((List<Gift_Allocation__c>) Trigger.new);
+        check((List<Gift_Allocation__c>) newRecords());
     }
 
     /**

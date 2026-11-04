@@ -114,6 +114,26 @@ not on this page. It is the Override Receipt Lock permission, described under "L
 receipt lock" on the [Gifts page](gifts.md). Every change made with it is written to the
 [Error Log](error-log.md).
 
+## When Automation Fails on One Record
+
+If BarnCRM's automation fails on one record of a larger save, only that record is refused. The
+rest of the save goes ahead. This matters most for the Data Loader, the BarnCRM importer and
+integrations, which save 200 records at a time: one record BarnCRM cannot handle no longer costs
+the other 199 their save.
+
+- The refused record carries the message "Something went wrong while BarnCRM was updating this
+  record, so it was not saved." In the Data Loader it is in the error file; in the importer it
+  is on the row.
+- The [Error Log](error-log.md) has one entry for the failure itself, with the technical
+  detail, and one entry per refused record naming its row in the save. Fix the value it names
+  and save that record again.
+- To find the record, BarnCRM undoes the failed attempt and runs its automation again over
+  smaller and smaller parts of the save. That takes a little longer than a clean save. If the
+  save has too little room left in Salesforce's limits to do it, the records not yet cleared are
+  refused together, still with the message and the log entries.
+- A rule that always runs (see above) is the exception: if it fails, every record in front of
+  it is refused, because a rule that could not be checked lets nothing through.
+
 ## Running Your Own Version Instead
 
 If an automation does almost what you want, do not change ours: an upgrade would undo your

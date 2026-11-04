@@ -17,11 +17,11 @@ public with sharing class AppealTriggerHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        preventCycles((List<Appeal__c>) Trigger.new);
+        preventCycles((List<Appeal__c>) newRecords());
     }
 
     public override void beforeUpdate() {
-        preventCycles((List<Appeal__c>) Trigger.new);
+        preventCycles((List<Appeal__c>) newRecords());
     }
 
     /**

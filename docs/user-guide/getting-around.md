@@ -194,6 +194,9 @@ it can still be undone. **Bring Data In** (**Import a File**), **Import Template
   recorded in the Error Log." Refresh the page. If it keeps happening, tell your admin.
 - Problem: "The home page could not load everything. The error is recorded in the Error
   Log." Refresh. If it keeps happening, tell your admin.
+- Problem: "Something went wrong while BarnCRM was updating this record, so it was not saved."
+  Only that record was refused; anything else you saved at the same time went ahead. Try
+  again; if it repeats, tell your admin, who will find the reason in the Error Log.
 - Problem: no notification arrived. Check that you have not muted notifications in your own
   Salesforce settings. The job still finished; open its record to check.
 - Problem: "An administrator needs to finish setting up BarnCRM." BarnCRM has not been set up

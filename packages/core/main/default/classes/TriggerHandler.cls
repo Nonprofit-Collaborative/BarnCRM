@@ -18,6 +18,10 @@
  *         }
  *     }
  *
+ * A handler never reads `Trigger.new` and its companions directly: when a handler fails, the
+ * dispatcher runs the handlers again over part of the records to find which record the failure
+ * belongs to, and only these accessors see that part (ADR-NEXT dispatcher error contract).
+ *
  * Outside a trigger there is no `Trigger.new` to read, so a unit test that wants to drive a
  * handler without inserting records sets the `testNew`, `testNewMap`, `testOld`, and `testOldMap`
  * overrides below, which those four accessors return in place of the trigger collections.
@@ -101,22 +105,124 @@ public virtual with sharing class TriggerHandler {
      */
     @NamespaceAccessible
     public List<SObject> newRecords() {
+        Scope narrowed = currentScope();
+        if (narrowed != null) {
+            return narrowed.newRecords;
+        }
         return useTestOverrides() && testNew != null ? testNew : Trigger.new;
     }
 
     @NamespaceAccessible
     public Map<Id, SObject> newRecordsById() {
+        Scope narrowed = currentScope();
+        if (narrowed != null) {
+            return narrowed.newRecordsById;
+        }
         return useTestOverrides() && testNewMap != null ? testNewMap : Trigger.newMap;
     }
 
     @NamespaceAccessible
     public List<SObject> oldRecords() {
+        Scope narrowed = currentScope();
+        if (narrowed != null) {
+            return narrowed.oldRecords;
+        }
         return useTestOverrides() && testOld != null ? testOld : Trigger.old;
     }
 
     @NamespaceAccessible
     public Map<Id, SObject> oldRecordsById() {
+        Scope narrowed = currentScope();
+        if (narrowed != null) {
+            return narrowed.oldRecordsById;
+        }
         return useTestOverrides() && testOldMap != null ? testOldMap : Trigger.oldMap;
+    }
+
+    /**
+     * Part of a trigger's records, which the dispatcher hands its handlers while it finds out
+     * which record a failure belongs to (ADR-NEXT dispatcher error contract). The four
+     * accessors above return it in place of the trigger collections. This is why a handler
+     * reads its records through them and never through `Trigger.new` itself: a handler that
+     * did would be handed all the records again, and the failure could never be pinned on one.
+     */
+    @NamespaceAccessible
+    public class Scope {
+        public List<SObject> newRecords { get; private set; }
+        public Map<Id, SObject> newRecordsById { get; private set; }
+        public List<SObject> oldRecords { get; private set; }
+        public Map<Id, SObject> oldRecordsById { get; private set; }
+
+        @NamespaceAccessible
+        public Scope(
+            List<SObject> newRecords,
+            Map<Id, SObject> newRecordsById,
+            List<SObject> oldRecords,
+            Map<Id, SObject> oldRecordsById
+        ) {
+            this.newRecords = newRecords;
+            this.newRecordsById = newRecordsById;
+            this.oldRecords = oldRecords;
+            this.oldRecordsById = oldRecordsById;
+        }
+    }
+
+    /**
+     * One entry per dispatcher run under way, the innermost last: the part of the records that
+     * run is narrowed to, or null for all of them. A save a handler makes fires its own trigger,
+     * whose run pushes its own entry, so a narrowed run never narrows the records of another
+     * trigger.
+     */
+    private static final List<Scope> SCOPES = new List<Scope>();
+
+    /** Called by the dispatcher as a trigger run starts: its handlers see every record. */
+    @NamespaceAccessible
+    public static void enterRun() {
+        SCOPES.add(null);
+    }
+
+    /** Called by the dispatcher as a trigger run ends, however it ends. */
+    @NamespaceAccessible
+    public static void leaveRun() {
+        if (!SCOPES.isEmpty()) {
+            SCOPES.remove(SCOPES.size() - 1);
+        }
+    }
+
+    /** Narrows the run under way to part of its records, or back to all of them with null. */
+    @NamespaceAccessible
+    public static void narrowRun(Scope narrowed) {
+        if (!SCOPES.isEmpty()) {
+            SCOPES[SCOPES.size() - 1] = narrowed;
+        }
+    }
+
+    private static Scope currentScope() {
+        return SCOPES.isEmpty() ? null : SCOPES[SCOPES.size() - 1];
+    }
+
+    /**
+     * Every claim, copied, so the dispatcher can put them back when it undoes a failed attempt:
+     * the records that attempt claimed were never processed for good.
+     */
+    @NamespaceAccessible
+    public static Map<String, Set<Id>> copyRunClaims() {
+        Map<String, Set<Id>> copied = new Map<String, Set<Id>>();
+        for (String key : CLAIMED_RECORDS.keySet()) {
+            copied.put(key, CLAIMED_RECORDS.get(key).clone());
+        }
+        return copied;
+    }
+
+    /** Puts back the claims `copyRunClaims` copied. */
+    @NamespaceAccessible
+    public static void restoreRunClaims(Map<String, Set<Id>> copied) {
+        CLAIMED_RECORDS.clear();
+        if (copied != null) {
+            for (String key : copied.keySet()) {
+                CLAIMED_RECORDS.put(key, copied.get(key).clone());
+            }
+        }
     }
 
     /**
