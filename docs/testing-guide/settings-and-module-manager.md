@@ -145,6 +145,20 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 **Cleanup:** delete the validation rule and the four test people and their households.
 
+## T-SET-07B: Bypass Automation for One User
+
+**Purpose:** confirm the BarnCRM Automation Control setting skips automation for one user only.
+**Prerequisites:** admin user, Household Upkeep on, **Create Households Automatically** on. A second user, Sam, with the BarnCRM Staff role.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In Setup, open **Custom Settings**, **Manage** next to **BarnCRM Automation Control**, and add a value for the user Sam with **Bypass** ticked. | The row lists Sam with Bypass checked. |
+| 2 | As Sam, create a person `Test Bypassed`. | The person saves with no household (the household automation was skipped for Sam). |
+| 3 | As the admin, create a person `Test Normal`. | The person gets a household as usual. |
+| 4 | Remove Sam's row. Open **BarnCRM Settings**, **Automation**, pause for **1 hour**, then click **Resume Automation**. Wait a minute and open `Test Bypassed`. | `Test Bypassed` now has a household: resuming caught up the people added without one. |
+
+**Cleanup:** delete both test people and their households.
+
 ## T-SET-08: Turn on a Feature Left Off
 
 **Purpose:** confirm a feature that is off can be turned on once, behind a confirmation, and its tabs appear.

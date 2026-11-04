@@ -139,6 +139,53 @@ the other 199 their save.
 - A rule that always runs (see above) is the exception: if it fails, every record in front of
   it is refused, because a rule that could not be checked lets nothing through.
 
+## Pausing or Bypassing for Some People
+
+The timed pause stops automation for everyone. When only some people's saves should skip it,
+use the **BarnCRM Automation Control** setting. It has two boxes, and each can be set for the
+whole organization, for a profile, or for one user. The value that applies to a save is the
+saving person's own, else their profile's, else the organization's.
+
+- **Bypass**: for an integration user (or its profile) and a migration consultant. Their saves
+  skip BarnCRM automation, while everyone else's run as normal.
+- **Pause All**: the long pause. Set for the whole organization, it stops automation for
+  everyone until you turn it off, for a migration that takes longer than the 24-hour pause.
+  Set for a profile or a user, BarnCRM treats it like Bypass.
+
+Rules that always run (see above) still run, whatever the setting says. The timed pause, the
+switches on this page and this setting all apply together: automation runs only when none of
+them stops it.
+
+Until the Automation page shows the setting, set it in Setup: search for **Custom Settings**,
+choose **Manage** next to **BarnCRM Automation Control**, then **New** for the organization
+default, or **New** under the list for a profile or a user.
+
+### Using It in Your Own Flows, Triggers and Validation Rules
+
+Your own automation can follow the same setting, so one place pauses or bypasses everything
+your organization has:
+
+- **A validation rule or formula:** add `NOT($Setup.BarnCRM_Automation_Control__c.Bypass__c) &&`
+  in front of the condition, or check `Pause_All__c` the same way.
+- **A flow:** start it with a **Decision** on
+  `{!$Setup.BarnCRM_Automation_Control__c.Pause_All__c}` or `Bypass__c` equals true, ending the
+  flow on that outcome, as every BarnCRM flow template does. To follow the timed pause and a
+  switch on this page as well, start it with the **Check BarnCRM Automation** action instead
+  and end the flow when **Run** is false.
+- **An Apex trigger:** read `BarnCRM_Automation_Control__c.getInstance()` and return early when
+  `Pause_All__c` or `Bypass__c` is true.
+
+### Catching Up After a Pause or a Bypassed Load
+
+BarnCRM does not record each save it skipped, so nothing is replayed record by record. When
+the timed pause ends, by itself or with **Resume Automation**, BarnCRM gives a household to
+every person added without one and works the rollup totals that waited. After a long Pause All
+or a bypassed load, do the same by resuming, then recompute household names on the **People
+and Households** page. Anything else that was skipped (a preferred email or phone copied to the
+standard field, an address copied to its household, the other side of a relationship) is caught
+up by saving those records again, for example with **Bulk Update** changing nothing but a
+harmless field.
+
 ## Running Your Own Version Instead
 
 If an automation does almost what you want, do not change ours: an upgrade would undo your

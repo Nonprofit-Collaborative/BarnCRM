@@ -142,3 +142,8 @@ own bypass checkbox. Work skipped during a pause is not replayed.
   in the same yellow box as the timed pause, with its own Turn Off.
 - Canonical model: Section 10 gains the setting and rules R-A6 (error contract) and R-A7
   (Automation Control); Section 12 is unchanged (the setting is its own object).
+- Built in order: the error contract, then the setting, the dispatcher read, the flow
+  templates, the Check BarnCRM Automation action and the catch-up on resume. Managing the
+  setting on the Automation page (2.6), listing an org's own flows there (2.7) and the **Catch
+  Up Now** action (2.8) follow in their own change; until then the admin guide says to set the
+  setting in Setup, Custom Settings.

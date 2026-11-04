@@ -37,6 +37,11 @@ offer it anywhere else.
 7. Open **BarnCRM Settings**, then **Automation**, and switch our version **Off**. Do this
    straight after step 6. While both are on, the same work is done twice.
 
+Every template starts with an **Automation control** step: it ends the flow when the BarnCRM
+Automation Control setting has **Pause All** or **Bypass** on for the person saving, so your
+copy pauses and bypasses exactly as BarnCRM's own automation does. Keep that step. See
+[Pausing or Bypassing for Some People](automation-control.md#pausing-or-bypassing-for-some-people).
+
 ### Which Automations Have a Template
 
 | On the Automation page | Template | Why there is no template |
