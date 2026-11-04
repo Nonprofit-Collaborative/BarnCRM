@@ -285,8 +285,16 @@
     <categories>Giving, Pledge Reminders</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Pledge reminders page: empty log</shortDescription>
-    <value>No reminders yet.</value>
+    <shortDescription>Pledge reminders page: heading of the empty log</shortDescription>
+    <value>No Reminders Yet</value>
+  </labels>
+  <labels>
+    <fullName>Giving_PledgeReminders_NoStepsHeading</fullName>
+    <categories>Giving, Pledge Reminders</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Pledge reminders page: heading when no step exists yet</shortDescription>
+    <value>No Steps Yet</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_ActionFailed</fullName>
@@ -334,7 +342,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Pledge reminders page: download link</shortDescription>
-    <value>Download letters</value>
+    <value>Download Letters</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_DaysBefore</fullName>

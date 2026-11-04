@@ -80,15 +80,16 @@ own **Recalculate Now** button on the Donor Levels page.)
 
 The same page is where you check on them afterwards. Each job shows when it last finished
 and what it did, for example "Marked 4 payments overdue." A job that ran and had nothing to
-do says so ("No payments were overdue.") rather than staying blank, so a blank line means
-the job has not run at all.
+do says so ("No payments were overdue.") rather than staying blank. A job that has not run
+at all reads **Never run**.
 
 Three things the page can tell you:
 
 - **Not scheduled.** Nobody has switched the jobs on in this org. Nothing is late, because
   nothing was ever going to run. The button under the line says **Schedule Nightly Run**.
 - **Scheduled, with a last run and a next run.** This is the normal state.
-- **Scheduled but has not run in more than 36 hours.** Something stopped the job. Open the
+- **Scheduled but has not run in more than 36 hours.** A yellow warning sits under the job.
+  Something stopped the job. Open the
   **Error Log** in BarnCRM Settings: a job that fails writes there and carries on with
   the rest of its work rather than stopping, so the log tells you which commitment or which
   payment is the problem.

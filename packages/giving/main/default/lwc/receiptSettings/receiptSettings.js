@@ -1,5 +1,4 @@
 import { LightningElement, wire } from 'lwc';
-import Toast from 'lightning/toast';
 import { refreshApex } from '@salesforce/apex';
 import getTemplates from '@salesforce/apex/ReceiptController.getTemplates';
 import getCanManageTemplates from '@salesforce/apex/ReceiptController.getCanManageTemplates';
@@ -24,7 +23,6 @@ import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import USE_LETTER from '@salesforce/label/c.Giving_Receipt_UseLetterButton';
 import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import PREVIEW_HEADING from '@salesforce/label/c.Giving_Receipt_PreviewHeading';
-import NO_PREVIEW_TITLE from '@salesforce/label/c.Giving_Receipt_NoPreviewTitle';
 import STATEMENT_YEAR from '@salesforce/label/c.Giving_Receipt_StatementYear';
 import GENERATE from '@salesforce/label/c.Core_Shared_Generate';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
@@ -35,18 +33,11 @@ import COLUMN_DONORS from '@salesforce/label/c.Giving_DonorLevels_ColumnDonors';
 import COLUMN_ISSUED from '@salesforce/label/c.Giving_Receipt_ColumnIssued';
 import COLUMN_ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
 import NO_RUNS from '@salesforce/label/c.Giving_Receipt_NoRuns';
-import RESTORED_TITLE from '@salesforce/label/c.Giving_Receipt_RestoredTitle';
+import NO_TEMPLATES_HEADING from '@salesforce/label/c.Giving_Receipt_NoTemplatesHeading';
 import RESTORED_MESSAGE from '@salesforce/label/c.Giving_Receipt_RestoredMessage';
-import NOT_RESTORED_TITLE from '@salesforce/label/c.Giving_Receipt_NotRestoredTitle';
-import SAVED_TITLE from '@salesforce/label/c.Giving_Receipt_SavedTitle';
 import SAVED_MESSAGE from '@salesforce/label/c.Giving_Receipt_SavedMessage';
-import NOT_SAVED_TITLE from '@salesforce/label/c.Giving_Receipt_NotSavedTitle';
-import ACTIVATED_TITLE from '@salesforce/label/c.Giving_Receipt_ActivatedTitle';
 import ACTIVATED_MESSAGE from '@salesforce/label/c.Giving_Receipt_ActivatedMessage';
-import NOT_ACTIVATED_TITLE from '@salesforce/label/c.Giving_Receipt_NotActivatedTitle';
-import STARTED_TITLE from '@salesforce/label/c.Giving_Receipt_StartedTitle';
 import STARTED_MESSAGE from '@salesforce/label/c.Giving_Receipt_StartedMessage';
-import NOT_STARTED_TITLE from '@salesforce/label/c.Giving_Receipt_NotStartedTitle';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Receipt_UnexpectedError';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -73,6 +64,15 @@ const TOKENS = [
  * the renderer accepts no web fonts and no `data:` images (ADR-0016).
  */
 const FORMATS = ['bold', 'italic', 'underline', 'list', 'indent', 'align', 'link', 'header'];
+
+/** A statement run's Status__c value as a word of the suite status vocabulary (c/barnStatus). */
+const TONE_BY_STATUS = {
+  Queued: 'queued',
+  Running: 'running',
+  Completed: 'completed',
+  'Completed with errors': 'warning',
+  Failed: 'failed'
+};
 
 /**
  * The Receipts panel in the settings console: the letters, and the year end run.
@@ -119,6 +119,7 @@ export default class ReceiptSettings extends LightningElement {
     templatesTab: TEMPLATES_TAB,
     statementsTab: STATEMENTS_TAB,
     noTemplates: NO_TEMPLATES,
+    noTemplatesHeading: NO_TEMPLATES_HEADING,
     restore: RESTORE,
     readOnly: READ_ONLY,
     letterPicker: LETTER_PICKER,
@@ -148,7 +149,10 @@ export default class ReceiptSettings extends LightningElement {
     columnDonors: COLUMN_DONORS,
     columnIssued: COLUMN_ISSUED,
     columnErrors: COLUMN_ERRORS,
-    noRuns: NO_RUNS
+    noRuns: NO_RUNS,
+    get noRunsMessage() {
+      return helpText('Giving', 'Giving_Receipt_NoRunsMessage');
+    }
   };
 
   templates = [];
@@ -161,6 +165,8 @@ export default class ReceiptSettings extends LightningElement {
   statementYear;
   working = false;
   loadError;
+  resultMessage;
+  resultVariant;
   canManage = false;
   permissionKnown = false;
 
@@ -244,6 +250,10 @@ export default class ReceiptSettings extends LightningElement {
     return this.runs.length > 0;
   }
 
+  get runRows() {
+    return this.runs.map((run) => ({ ...run, tone: TONE_BY_STATUS[run.status] || 'neutral' }));
+  }
+
   selectTemplate(template) {
     this.selectedTemplateId = template.id;
     this.draftBody = template.body;
@@ -270,19 +280,13 @@ export default class ReceiptSettings extends LightningElement {
    * install (ADR-0029); this is the button that says so out loud when they are not there.
    */
   async handleRestore() {
-    await this.act(
-      () => restoreDefaultTemplates(),
-      [RESTORED_TITLE, RESTORED_MESSAGE],
-      NOT_RESTORED_TITLE,
-      this.wiredTemplates
-    );
+    await this.act(() => restoreDefaultTemplates(), RESTORED_MESSAGE, this.wiredTemplates);
   }
 
   async handleSave() {
     await this.act(
       () => saveTemplate({ templateId: this.selectedTemplateId, body: this.draftBody }),
-      [SAVED_TITLE, SAVED_MESSAGE],
-      NOT_SAVED_TITLE,
+      SAVED_MESSAGE,
       this.wiredTemplates
     );
   }
@@ -291,6 +295,7 @@ export default class ReceiptSettings extends LightningElement {
   async handlePreview() {
     const template = this.selectedTemplate;
     this.working = true;
+    this.showResult();
     try {
       this.previewHtml = await previewTemplate({
         receiptType: template ? template.type : undefined,
@@ -298,7 +303,7 @@ export default class ReceiptSettings extends LightningElement {
       });
     } catch (error) {
       this.previewHtml = undefined;
-      this.toast(NO_PREVIEW_TITLE, this.messageOf(error), 'error');
+      this.showResult(this.messageOf(error), 'error');
     } finally {
       this.working = false;
     }
@@ -307,8 +312,7 @@ export default class ReceiptSettings extends LightningElement {
   async handleActivate() {
     await this.act(
       () => activateTemplate({ templateId: this.selectedTemplateId }),
-      [ACTIVATED_TITLE, ACTIVATED_MESSAGE],
-      NOT_ACTIVATED_TITLE,
+      ACTIVATED_MESSAGE,
       this.wiredTemplates
     );
   }
@@ -316,8 +320,7 @@ export default class ReceiptSettings extends LightningElement {
   async handleGenerate() {
     await this.act(
       () => startStatementRun({ statementYear: this.statementYear }),
-      [STARTED_TITLE, STARTED_MESSAGE],
-      NOT_STARTED_TITLE,
+      STARTED_MESSAGE,
       this.wiredRuns
     );
   }
@@ -326,18 +329,27 @@ export default class ReceiptSettings extends LightningElement {
     await refreshApex(this.wiredRuns);
   }
 
-  /** Every write is the same four steps, so they are written once. */
-  async act(call, [successTitle, successMessage], failureTitle, wired) {
+  /**
+   * Every write is the same four steps, so they are written once. The outcome stays on the page
+   * as a notice above the tabs rather than a toast that disappears.
+   */
+  async act(call, successMessage, wired) {
     this.working = true;
+    this.showResult();
     try {
       await call();
-      this.toast(successTitle, successMessage, 'success');
+      this.showResult(successMessage, 'success');
       await refreshApex(wired);
     } catch (error) {
-      this.toast(failureTitle, this.messageOf(error), 'error');
+      this.showResult(this.messageOf(error), 'error');
     } finally {
       this.working = false;
     }
+  }
+
+  showResult(message, variant) {
+    this.resultMessage = message;
+    this.resultVariant = variant;
   }
 
   messageOf(error) {
@@ -345,9 +357,5 @@ export default class ReceiptSettings extends LightningElement {
       return error.body.message;
     }
     return UNEXPECTED_ERROR;
-  }
-
-  toast(title, message, variant) {
-    Toast.show({ label: title, message, variant }, this);
   }
 }

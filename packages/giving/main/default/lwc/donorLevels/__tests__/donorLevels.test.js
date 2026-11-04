@@ -132,8 +132,10 @@ describe('c-donor-levels', () => {
     const rows = element.shadowRoot.querySelectorAll('[data-id="rung"]');
     expect(rows[1].textContent).toContain('and above');
     const activeCells = element.shadowRoot.querySelectorAll('[data-id="rung-active"]');
-    expect(activeCells[0].textContent.trim()).toBe('');
-    expect(activeCells[1].textContent.trim()).toBe('Inactive');
+    expect(activeCells[0].querySelector('c-barn-status-badge')).toBeNull();
+    const badge = activeCells[1].querySelector('c-barn-status-badge');
+    expect(badge.status).toBe('inactive');
+    expect(badge.label).toBe('Inactive');
   });
 
   it('stacks the ladder on a small screen, each cell naming its column', async () => {
@@ -147,7 +149,7 @@ describe('c-donor-levels', () => {
     const columns = [...firstRow.querySelectorAll('td')].map((cell) => cell.dataset.label);
     expect(columns).toEqual([
       'c.Giving_DonorLevels_ColumnLevel',
-      'c.Giving_DonorLevels_ColumnFrom',
+      'c.Core_SetupChanges_From',
       'c.Giving_DonorLevels_ColumnUpTo',
       'c.Giving_DonorLevels_ColumnDonors',
       'c.Core_MatchLogic_Active'
@@ -199,7 +201,7 @@ describe('c-donor-levels', () => {
     await flush();
 
     expect(recalculate).toHaveBeenCalled();
-    expect(element.shadowRoot.querySelector('[data-id="notice-message"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="notice-message"]').message).toContain(
       'Placing every donor on the ladder.'
     );
   });
@@ -215,7 +217,7 @@ describe('c-donor-levels', () => {
     element.shadowRoot.querySelector('[data-id="recalculate"]').click();
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent.trim()).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="error-message"]').message).toBe(
       'Turn Donor levels on in BarnCRM Settings under Giving first.'
     );
   });

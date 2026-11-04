@@ -90,7 +90,7 @@ describe('c-accounting-periods', () => {
     await flushPromises();
 
     expect(closeThrough).toHaveBeenCalledWith({ closeDate: '2026-09-15' });
-    expect(byId(element, 'notice').textContent).toContain('Saved.');
+    expect(byId(element, 'notice').message).toContain('Saved.');
     expect(byId(element, 'current').querySelector('lightning-formatted-date-time').value).toBe(
       '2026-09-15'
     );
@@ -109,15 +109,13 @@ describe('c-accounting-periods', () => {
     byId(element, 'save').click();
     await flushPromises();
 
-    expect(byId(element, 'error').textContent).toContain(
-      'A closed period cannot be reopened here.'
-    );
+    expect(byId(element, 'error').message).toContain('A closed period cannot be reopened here.');
   });
 
   it('shows the date without the field to someone who cannot change settings', async () => {
     const element = await render({ ...CLOSED, canManage: false });
     expect(byId(element, 'close-date')).toBeNull();
-    expect(byId(element, 'read-only')).not.toBeNull();
+    expect(byId(element, 'read-only').variant).toBe('info');
   });
 
   it('says something went wrong when the page cannot load', async () => {
@@ -125,6 +123,6 @@ describe('c-accounting-periods', () => {
     const element = createElement('c-accounting-periods', { is: AccountingPeriods });
     document.body.appendChild(element);
     await flushPromises();
-    expect(byId(element, 'error').textContent).toContain('Something went wrong.');
+    expect(byId(element, 'error').message).toContain('Something went wrong.');
   });
 });

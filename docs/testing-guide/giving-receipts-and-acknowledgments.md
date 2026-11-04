@@ -85,9 +85,9 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Receipts**, on **Receipt Letters and Year End Statements** select **Open Receipt Letters**, then the **Year End Statements** tab. | **Statement year** shows last year. The runs table, or "No statement run has been started yet." |
-| 2 | Select **Generate**. | Toast **Statements Started**: "Year end statements are being generated. Click Refresh to see the run's progress below." |
-| 3 | Select **Refresh** until the run's **Status** stops changing. | One row for last year with **Donors** and **Issued** above zero and **Errors** 0. |
+| 1 | In **BarnCRM Settings**, **Receipts**, on **Receipt Letters and Year End Statements** select **Open Receipt Letters**, then the **Year End Statements** tab. | **Statement year** shows last year. The runs table, or the **No Statement Runs Yet** empty state. |
+| 2 | Select **Generate**. | A success notice above the tabs: "Year end statements are being generated. Click Refresh to see the run's progress below." |
+| 3 | Select **Refresh** until the run's **Status** badge stops changing (Queued, then Running, then Completed in green). | One row for last year with **Donors** and **Issued** above zero and **Errors** 0. |
 | 4 | Open the **Receipts** tab in the BarnCRM Fundraising app, list view **Year End Statements**. Open one record. | **Type** Consolidated statement, **Statement Year** last year, **Status** Issued, a **Total Amount**, and no **Gift**. |
 | 5 | Open the record's file. | One line per gift in that year; the total at the bottom equals the sum of the lines. |
 | 6 | Back on **Year End Statements**, select **Generate** again, then **Refresh** until it finishes. | A second row with **Issued** 0: donors who already hold a statement for the year are skipped. |
@@ -103,9 +103,9 @@ For every script on this page:
 |---|---|---|
 | 1 | Open the **Receipt Letters** tab in the BarnCRM Fundraising app, **Receipt Templates** tab. Choose the per gift letter in **Letter**. | The editor **The letter donors read** shows the wording, with tokens such as `{{DonorName}}`. |
 | 2 | Add the sentence `Testing the letter editor.` at the end. Select **Preview**. | A **Preview for a Sample Gift** section shows the letter filled in for a sample donor, with your sentence and the tax sentences BarnCRM adds. |
-| 3 | Select **Save**. | Toast **Letter Saved**: "Your receipt letter has been saved." |
-| 4 | Remove the test sentence and select **Save**. | **Letter Saved** again. |
-| 5 | Log in as staff, then as read-only, and open the same tab. | Each sees "You do not have permission to change the receipt letters. Ask your BarnCRM admin for the BarnCRM Admin role, which carries Manage BarnCRM Settings." The editor and **Save** are disabled. |
+| 3 | Select **Save**. | A success notice above the tabs: "Your receipt letter has been saved." |
+| 4 | Remove the test sentence and select **Save**. | The same notice again. |
+| 5 | Log in as staff, then as read-only, and open the same tab. | Each sees an info notice: "You do not have permission to change the receipt letters. Ask your BarnCRM admin for the BarnCRM Admin role, which carries Manage BarnCRM Settings." The editor and **Save** are disabled. |
 
 **Cleanup:** Step 4 restores the wording.
 
@@ -169,7 +169,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, on the **Donor Levels** row select **Open Donor Level Ladder**. | The **Donor Levels** page. With no rungs: "You have not created any levels yet. Choose New level to add the first rung of your ladder." |
+| 1 | In **BarnCRM Settings**, **Giving**, on the **Donor Levels** row select **Open Donor Level Ladder**. | The **Donor Levels** page. With no rungs: the **No Levels Yet** empty state reading "You have not created any levels yet. Choose New Level to add the first rung of your ladder." An inactive level shows an **Inactive** badge. |
 | 2 | Select **New Level**: **Level Name** `Friend`, **Minimum Amount** 100, **Maximum Amount** 1000, **Active** on. Save. Repeat for `Sustainer` 1000 to 5000 and `Leadership Circle` 5000 with no maximum. | The page lists three rungs, lowest first; the top one reads "and above". |
 | 3 | Try a fourth level with **Minimum Amount** 500 and **Maximum Amount** 200. | Refused: "The maximum amount has to be greater than the minimum amount. Leave the maximum empty for the top level of your ladder." Cancel. |
 | 4 | In **BarnCRM Settings**, **Giving**, turn on **Turn on donor levels**, leave **Donor level source** at total giving, **Save**. Back on the page select **Recalculate Now**. | "Placing every donor on the ladder. This runs in the background and the counts below update when it finishes." After a refresh, **Donors** counts appear and **Donors last placed** shows a time. |

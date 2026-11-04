@@ -450,7 +450,8 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Rolling schedule horizon | Minor | Keeps a year of installments ahead of an open-ended recurring gift (horizon is a setting). | Shipped | G-07 |
 | Overdue after grace days | Minor | Marks payments overdue after a grace period set in the app. | Shipped | G-07 |
 | Nightly jobs page | Minor | One button switches on the installment top-up, overdue pass and donor level pass, steps of BarnCRM Nightly Jobs (scheduling that run if needed); shows each job's last run and result; "Run Now" available. | Shipped | G-07, ADR-0038 |
-| Schedule preview | Minor | Previews a commitment's payment schedule on the record: a Total Expected tile, a table that stacks on a phone, a status badge per payment (Skipped neutral, Overdue red) and a No Payments Yet empty state with Generate Now. | Shipped; UX kit: In review (v1.0) | G-07, vis-core-1, 3, 6, 7 |
+| Giving setup pages in the suite look | Minor | Pledge Reminders, Donor Levels, Donor Segments, Receipt Letters, Accounting Periods and Nightly Jobs use the shared kit: notices for errors, results and off states (Receipt Letters keeps each result on the page instead of a toast), empty states with a heading, status badges (reminder, run and inactive level), stat tiles for the reminder counts, and tables that stack on a phone. The reminder letter link reads **Download Letters**. | Built, not merged (feature/ux-people-5c) | vis-core-1, 2, 3, 5, 6, 7, 9, 13, people-giving-8 |
+| Schedule preview | Minor | Previews a commitment's payment schedule on the record: a Total Expected tile, a table that stacks on a phone, a status badge per payment (Skipped neutral, Overdue red) and a No Payments Yet empty state with Generate Now. | Shipped; UX kit: Built, not merged (feature/ux-people-5) | G-07, vis-core-1, 3, 6, 7 |
 
 ### 2.3 Soft Credits and Tributes
 

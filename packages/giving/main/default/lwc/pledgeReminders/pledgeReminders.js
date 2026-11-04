@@ -40,6 +40,7 @@ import CANCEL_STEP from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import STEP_SAVED from '@salesforce/label/c.Giving_PledgeReminders_StepSaved';
 import LOG_HEADING from '@salesforce/label/c.Giving_PledgeReminders_LogHeading';
 import NO_LOG from '@salesforce/label/c.Giving_PledgeReminders_NoLog';
+import NO_STEPS_HEADING from '@salesforce/label/c.Giving_PledgeReminders_NoStepsHeading';
 import TEMPLATE_MISSING from '@salesforce/label/c.Giving_Acknowledgments_TemplateNotFound';
 import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
 import ACTION_FAILED from '@salesforce/label/c.Giving_PledgeReminders_ActionFailed';
@@ -60,6 +61,8 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_DOWNLOAD_PATH = '/sfc/servlet.shepherd/document/download/';
 const CHANNEL_EMAIL = 'Email';
+/** Each reminder status in the suite's status vocabulary (c/barnStatus). */
+const TONE_BY_STATUS = { Sent: 'success', Queued: 'queued', Failed: 'failed' };
 
 /**
  * Pledge reminders, as the person running fundraising reads them: the steps of the ladder, what
@@ -92,6 +95,7 @@ export default class PledgeReminders extends NavigationMixin(LightningElement) {
     get noSteps() {
       return helpText('Giving', 'Giving_PledgeReminders_NoSteps');
     },
+    noStepsHeading: NO_STEPS_HEADING,
     queueHeading: QUEUE_HEADING,
     emailsDue: EMAILS_DUE,
     lettersDue: LETTERS_DUE,
@@ -254,6 +258,7 @@ export default class PledgeReminders extends NavigationMixin(LightningElement) {
     }
     return this.page.reminders.map((reminder) => ({
       ...reminder,
+      tone: TONE_BY_STATUS[reminder.status] || 'neutral',
       sentOnText: reminder.sentOn ? new Date(reminder.sentOn).toLocaleString() : '',
       hasFile: !!reminder.fileId,
       fileUrl: reminder.fileId ? FILE_DOWNLOAD_PATH + reminder.fileId : ''

@@ -10,7 +10,7 @@ import runNow from '@salesforce/apex/GivingJobsController.runNow';
 import TITLE from '@salesforce/label/c.Giving_NightlyJobs_Title';
 import LAST_RUN_HEADING from '@salesforce/label/c.Core_ErrorDigest_LastRunTitle';
 import NEXT_RUN_HEADING from '@salesforce/label/c.Giving_NightlyJobs_NextRunHeading';
-import NEVER_RUN from '@salesforce/label/c.Giving_NightlyJobs_NeverRun';
+import NEVER_RUN from '@salesforce/label/c.Giving_PledgeReminders_NeverRun';
 import NOT_SCHEDULED from '@salesforce/label/c.Giving_NightlyJobs_NotScheduled';
 import SCHEDULE_ACTIVE from '@salesforce/label/c.Giving_NightlyJobs_ScheduleActive';
 import SCHEDULE_BUTTON from '@salesforce/label/c.Giving_NightlyJobs_ScheduleButton';
