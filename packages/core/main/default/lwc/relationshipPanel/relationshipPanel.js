@@ -1,11 +1,22 @@
 import { LightningElement, api, wire } from 'lwc';
 import Toast from 'lightning/toast';
+import { NavigationMixin } from 'lightning/navigation';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { gql, graphql } from 'lightning/graphql';
-import { deleteRecord } from 'lightning/uiRecordApi';
+import { deleteRecord, updateRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import BarnConfirmModal from 'c/barnConfirmModal';
+import { iconFor } from 'c/barnIcons';
+import { localIsoDate } from 'c/findCsv';
+import { initialsOf, opensElsewhere, recordHref } from 'c/recordRows';
+import { followLinkInWorkspace } from 'c/workspaceTabs';
 
 import RELATIONSHIP_SCHEMA from '@salesforce/schema/Relationship__c';
+import END_DATE_FIELD from '@salesforce/schema/Relationship__c.End_Date__c';
 
+import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
+import EDIT_ACTION from '@salesforce/label/c.Core_CmdtManager_EditAction';
+import END_ACTION from '@salesforce/label/c.Core_Relationship_EndAction';
 import PANEL_TITLE from '@salesforce/label/c.Core_Feature_Relationships_Name';
 import ADD_BUTTON from '@salesforce/label/c.Core_Relationship_AddButton';
 import ADD_FORM_TITLE from '@salesforce/label/c.Core_Relationship_AddFormTitle';
@@ -102,8 +113,15 @@ function toView(node) {
  * account. It reads the record's object name once, to decide which pair of lookups a new
  * relationship should fill in; the query reads both lookups.
  */
-export default class RelationshipPanel extends LightningElement {
+export default class RelationshipPanel extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
+
+  @wire(EnclosingTabId) enclosingTabId;
+
+  icons = { relationship: iconFor('Relationship__c') };
+
+  /** True while a row action is being saved, so its menu cannot start a second one. */
+  busy = false;
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -127,7 +145,9 @@ export default class RelationshipPanel extends LightningElement {
     emptyHeading: EMPTY_HEADING,
     formerBadge: FORMER_BADGE,
     loading: LOADING,
-    removeButton: REMOVE_BUTTON
+    removeButton: REMOVE_BUTTON,
+    editAction: EDIT_ACTION,
+    endAction: END_ACTION
   };
 
   relationshipObject = RELATIONSHIP_OBJECT;
@@ -180,6 +200,36 @@ export default class RelationshipPanel extends LightningElement {
     return Boolean(this.relationshipInfo && this.relationshipInfo.deletable);
   }
 
+  /** Edit, only for someone who can edit relationships. */
+  get canEdit() {
+    return Boolean(this.relationshipInfo && this.relationshipInfo.updateable);
+  }
+
+  /** End It writes End Date, so it needs edit on relationships and on that field. */
+  get canEndRelationships() {
+    const info = this.relationshipInfo;
+    const field = info && info.fields && info.fields[END_DATE_FIELD.fieldApiName];
+    return Boolean(info && info.updateable && field && field.updateable);
+  }
+
+  /**
+   * The rows with the actions this user may take on each, worked out on the way to the
+   * screen because access arrives on its own wire, before or after the relationships.
+   */
+  get rows() {
+    const canEnd = this.canEndRelationships;
+    const canEdit = this.canEdit;
+    const canRemove = this.canRemove;
+    return this.relationships.map((relationship) => {
+      const rowCanEnd = canEnd && !relationship.isFormer;
+      return {
+        ...relationship,
+        canEnd: rowCanEnd,
+        hasActions: canEdit || rowCanEnd || canRemove
+      };
+    });
+  }
+
   get isLoading() {
     return !this.loaded;
   }
@@ -205,10 +255,74 @@ export default class RelationshipPanel extends LightningElement {
   decorate(relationship) {
     return {
       ...relationship,
-      cardClass: relationship.isFormer
-        ? 'slds-box slds-m-bottom_x-small slds-theme_shade'
-        : 'slds-box slds-m-bottom_x-small'
+      initials: initialsOf(relationship.relatedPersonName),
+      href: recordHref(relationship.id),
+      actionsLabel: ACTIONS_FOR.replace('{0}', relationship.relatedPersonName),
+      rowClass: relationship.isFormer ? 'slds-item slds-theme_shade' : 'slds-item'
     };
+  }
+
+  /** A row's name opens the relationship; in a console, as a subtab beside the person. */
+  handleOpenRecord(event) {
+    const recordId = event.currentTarget.dataset.recordId;
+    const pageReference = {
+      type: 'standard__recordPage',
+      attributes: { recordId, actionName: 'view' }
+    };
+    const navigate = () => this[NavigationMixin.Navigate](pageReference);
+    if (followLinkInWorkspace(this, event, { recordId }, navigate) || opensElsewhere(event)) {
+      return;
+    }
+    event.preventDefault();
+    navigate();
+  }
+
+  /** A choice from a row's menu: Edit, End It or Remove. */
+  handleRowAction(event) {
+    const relationshipId = event.target.dataset.recordId;
+    const action = event.detail.value;
+    if (action === 'edit') {
+      this[NavigationMixin.Navigate]({
+        type: 'standard__recordPage',
+        attributes: {
+          recordId: relationshipId,
+          objectApiName: RELATIONSHIP_OBJECT,
+          actionName: 'edit'
+        }
+      });
+      return undefined;
+    }
+    if (action === 'end') {
+      return this.endRelationship(relationshipId);
+    }
+    return this.removeRelationship(relationshipId);
+  }
+
+  /** Sets End Date to today after a confirm; the save makes it Former on both people. */
+  async endRelationship(relationshipId) {
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: helpText('Core', 'Core_Relationship_EndConfirmTitle'),
+      message: helpText('Core', 'Core_Relationship_EndConfirm'),
+      confirmLabel: END_ACTION,
+      cancelLabel: CANCEL_BUTTON
+    });
+    if (!confirmed) {
+      return;
+    }
+    this.busy = true;
+    try {
+      await updateRecord({
+        fields: { Id: relationshipId, [END_DATE_FIELD.fieldApiName]: localIsoDate(new Date()) }
+      });
+      this.errorMessage = undefined;
+      this.notify(helpText('Core', 'Core_Relationship_EndSuccess'), 'success');
+      this.refresh();
+    } catch {
+      this.errorMessage = helpText('Core', 'Core_Relationship_EndFailed');
+      this.notify(this.errorMessage, 'error');
+    }
+    this.busy = false;
   }
 
   handleAdd() {
@@ -229,8 +343,19 @@ export default class RelationshipPanel extends LightningElement {
     this.errorMessage = SAVE_FAILED;
   }
 
-  async handleRemove(event) {
-    const relationshipId = event.target.dataset.id;
+  /** Removes both sides, after a confirm that points to End It for a relationship that ended. */
+  async removeRelationship(relationshipId) {
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: helpText('Core', 'Core_Relationship_RemoveConfirmTitle'),
+      message: helpText('Core', 'Core_Relationship_RemoveConfirm'),
+      confirmLabel: REMOVE_BUTTON,
+      cancelLabel: CANCEL_BUTTON,
+      confirmVariant: 'destructive'
+    });
+    if (!confirmed) {
+      return;
+    }
     try {
       // Deleting the other person's side is the trigger's work.
       await deleteRecord(relationshipId);

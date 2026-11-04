@@ -49,7 +49,7 @@ The feature-by-feature list, with the status of each item, is the [feature catal
 
 Install Core and run the Setup Assistant, and you can:
 
-- Keep households and the people in them, with household names and greetings built for you, merge and split households, and record relationships, affiliations, addresses (including seasonal ones), several email addresses and a preferred phone.
+- Keep households and the people in them, with household names and greetings built for you, merge and split households, and record relationships, affiliations, addresses (including seasonal ones), several email addresses and a preferred phone. Each relationship, affiliation and address can be opened, edited or ended straight from its line on the person's page.
 - Bring in a spreadsheet (CSV or Excel) with a preview, matching rules and one-click undo, find and export records, change many records at once, and delete many records with a way back.
 - Review duplicates, check what needs attention in Org Optimizer (including Apex and flows on old API versions), document your fields, and the flows and Apex triggers that run on each kind of record, in a downloadable Data Dictionary, see which picklist values are still used, download an AI-Readiness Export pack for an AI tool you choose (BarnCRM never calls one itself), see who changed what in Setup long after Salesforce's 180 days, inspect every readable field of a record with the Record Inspector, see which BarnCRM setup uses a field before you retire it (Where Used), and run Health Check, with an Error Log that nothing fails silently into.
 - Load data in bulk safely: when BarnCRM's automation fails on one record of a Data Loader, integration or import save, only that record is refused and the rest are saved.

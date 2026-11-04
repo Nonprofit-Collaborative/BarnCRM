@@ -140,8 +140,9 @@ describe('c-household-of-person', () => {
     getHouseholdsForPerson.error({ body: { message: 'boom' } });
     await flush();
 
-    const alert = element.shadowRoot.querySelector('[role="alert"]');
-    expect(alert.textContent).toBe('c.Core_HouseholdPanel_OfPersonLoadFailed');
+    const alert = element.shadowRoot.querySelector('.error-message');
+    expect(alert.variant).toBe('error');
+    expect(alert.message).toBe('c.Core_HouseholdPanel_OfPersonLoadFailed');
     expect(element.shadowRoot.querySelector('.empty-message')).toBeNull();
   });
 });
