@@ -15,7 +15,6 @@ import TITLE from '@salesforce/label/c.Core_BulkDelete_Title';
 import PREVIEW_COUNT from '@salesforce/label/c.Core_BulkDelete_PreviewCount';
 import DELETE_BUTTON from '@salesforce/label/c.Core_BulkDelete_DeleteButton';
 import STARTED from '@salesforce/label/c.Core_BulkDelete_Started';
-import PROGRESS from '@salesforce/label/c.Core_BulkDelete_Progress';
 import SUMMARY from '@salesforce/label/c.Core_BulkDelete_Summary';
 import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import CONFIRM from '@salesforce/label/c.Core_BulkUpdate_Confirm';
@@ -43,8 +42,8 @@ const STEPS = [
  * and the confirmed count; BulkDeleteController checks both as the person (canonical model R-BD1
  * to R-BD6). Undo is in Data jobs on the Data Manager tab (dataJobHistory).
  *
- * The import wizard opens it over a delete by file's completed dry run instead (`batchId`,
- * R-BD7): the records are the dry run's Matched rows, and the page sends the batch and the count.
+ * The import wizard opens it over a delete by file's completed preview instead (`batchId`,
+ * R-BD7): the records are the preview's Matched rows, and the page sends the batch and the count.
  *
  * Before the count is typed, "Download these records first" reads the records the delete would
  * delete, every field the person may read, page by page, and saves them as CSV (R-BD8, R-SQ3).
@@ -77,6 +76,7 @@ export default class BulkDelete extends LightningElement {
       return helpText('Core', 'Core_BulkDelete_UndoFromTab');
     },
     close: CLOSE,
+    run: PATH_RUN,
     loading: LOADING,
     backup: BACKUP,
     get backupHelp() {
@@ -148,11 +148,12 @@ export default class BulkDelete extends LightningElement {
     }
     const job = this.job;
     const total = job.chunksTotal || 0;
+    const percent = total ? Math.round(((job.chunksDone || 0) * 100) / total) : 0;
     return {
       ...job,
       summary: format(SUMMARY, job.matched, job.deleted, job.failed),
-      progressLine: job.running ? format(PROGRESS, job.chunksDone || 0, total) : '',
-      progressValue: total ? Math.round(((job.chunksDone || 0) * 100) / total) : 0,
+      progressLine: job.running ? helpText('Core', 'Core_BulkDelete_Progress', percent) : '',
+      progressValue: percent,
       hasFailures: Boolean(job.failures && job.failures.length),
       showUndo: Boolean(job.canUndo && !job.running)
     };

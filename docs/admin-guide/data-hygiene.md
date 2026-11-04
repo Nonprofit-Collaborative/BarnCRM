@@ -102,7 +102,7 @@ shows at once. Find's export reads every matching record.
    delete in Find if you like.)
 2. Find opens that query with its object, columns, conditions and sort filled in, and runs it.
    The list is ready to read, **Export to CSV**, or change. The query also stays under
-   **Saved queries** for next time.
+   **Saved searches** for next time.
 3. Pressing **Open in Find** again later puts that saved query back to the check's own query,
    so your copy always matches what Data Quality counted. To keep a version you changed, use
    **Save as** in Find and give it another name.
