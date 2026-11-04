@@ -1,0 +1,139 @@
+<template>
+  <section data-id="model-periods" class="slds-var-m-bottom_medium">
+    <h3 class="slds-text-heading_small slds-var-m-vertical_small">{labels.periodsTitle}</h3>
+    <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_x-small">
+      {labels.periodsIntro}
+    </p>
+
+    <template lwc:if={hasPeriods}>
+      <table
+        class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
+        data-id="model-period-table"
+      >
+        <thead>
+          <tr class="slds-line-height_reset">
+            <th scope="col">{labels.period}</th>
+            <th scope="col">{labels.startDate}</th>
+            <th scope="col">{labels.endDate}</th>
+            <th scope="col">{labels.actions}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template for:each={periods} for:item="period">
+            <tr key={period.key} data-id="model-period">
+              <th scope="row" data-label={labels.period}>{period.name}</th>
+              <td data-label={labels.startDate}>
+                <lightning-formatted-date-time
+                  value={period.startDate}
+                  time-zone="UTC"
+                ></lightning-formatted-date-time>
+              </td>
+              <td data-label={labels.endDate}>
+                <lightning-formatted-date-time
+                  value={period.endDate}
+                  time-zone="UTC"
+                ></lightning-formatted-date-time>
+              </td>
+              <td data-label={labels.actions}>
+                <template lwc:if={canEdit}>
+                  <lightning-button
+                    data-id="add-to-every"
+                    data-key={period.key}
+                    variant="base"
+                    label={labels.addToEvery}
+                    disabled={busy}
+                    onclick={handleAddToEvery}
+                    class="slds-var-m-right_x-small"
+                  ></lightning-button>
+                </template>
+                <template lwc:if={canEditPeriods}>
+                  <lightning-button
+                    data-id="remove-model-period"
+                    data-key={period.key}
+                    variant="base"
+                    label={labels.remove}
+                    disabled={busy}
+                    onclick={handleRemove}
+                  ></lightning-button>
+                </template>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </template>
+    <template lwc:else>
+      <c-barn-empty-state
+        data-id="no-model-periods"
+        size="compact"
+        heading={labels.noPeriods}
+      ></c-barn-empty-state>
+    </template>
+
+    <template lwc:if={showAdd}>
+      <lightning-button
+        data-id="add-model-period"
+        label={labels.addPeriod}
+        icon-name="utility:add"
+        variant="base"
+        disabled={busy}
+        onclick={handleAdd}
+      ></lightning-button>
+    </template>
+
+    <template lwc:if={formOpen}>
+      <div class="slds-box slds-var-m-vertical_x-small" data-id="model-period-form">
+        <div class="slds-grid slds-wrap slds-gutters_x-small">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <lightning-input
+              data-id="model-period-name"
+              data-field="name"
+              label={labels.period}
+              value={draft.name}
+              max-length="80"
+              required
+              onchange={handleField}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <lightning-input
+              data-id="model-period-start"
+              data-field="startDate"
+              type="date"
+              label={labels.startDate}
+              value={draft.startDate}
+              required
+              onchange={handleField}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <lightning-input
+              data-id="model-period-end"
+              data-field="endDate"
+              type="date"
+              label={labels.endDate}
+              value={draft.endDate}
+              required
+              onchange={handleField}
+            ></lightning-input>
+          </div>
+        </div>
+        <div class="slds-var-m-top_small">
+          <lightning-button
+            data-id="model-period-save"
+            variant="brand"
+            label={labels.save}
+            disabled={saveDisabled}
+            onclick={handleSave}
+            class="slds-var-m-right_x-small"
+          ></lightning-button>
+          <lightning-button
+            data-id="model-period-cancel"
+            label={labels.cancel}
+            onclick={handleCancel}
+          ></lightning-button>
+        </div>
+      </div>
+    </template>
+  </section>
+</template>

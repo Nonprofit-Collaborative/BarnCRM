@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Matching Logic: the field whose value is compared</shortDescription>
-        <value>Field compared</value>
+        <value>Value compared</value>
     </labels>
     <labels>
         <fullName>Core_MatchLogic_PostalField</fullName>
@@ -158,7 +158,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Matching Logic: the lookup to the person or household</shortDescription>
-        <value>Through the lookup</value>
+        <value>Linked through the field</value>
     </labels>
     <labels>
         <fullName>Core_MatchLogic_Compare</fullName>

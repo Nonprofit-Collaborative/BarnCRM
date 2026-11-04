@@ -16,13 +16,13 @@ public with sharing class GrantRequirementDatesHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        GrantRequirementService.fillSubmittedDates((List<Grant_Requirement__c>) Trigger.new, null);
+        GrantRequirementService.fillSubmittedDates((List<Grant_Requirement__c>) newRecords(), null);
     }
 
     public override void beforeUpdate() {
         GrantRequirementService.fillSubmittedDates(
-            (List<Grant_Requirement__c>) Trigger.new,
-            (Map<Id, Grant_Requirement__c>) Trigger.oldMap
+            (List<Grant_Requirement__c>) newRecords(),
+            (Map<Id, Grant_Requirement__c>) oldRecordsById()
         );
     }
 }

@@ -41,13 +41,13 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
     private static final String MEMBER_HANDLER = 'HouseholdMemberTriggerHandler';
 
     public override void beforeInsert() {
-        HouseholdService.ensureHouseholds((List<Contact>) Trigger.new);
+        HouseholdService.ensureHouseholds((List<Contact>) newRecords());
     }
 
     public override void beforeUpdate() {
         HouseholdService.refuseLeavingHouseholdsForOrganizations(
-            (List<Contact>) Trigger.new,
-            (Map<Id, Contact>) Trigger.oldMap
+            (List<Contact>) newRecords(),
+            (Map<Id, Contact>) oldRecordsById()
         );
     }
 
@@ -57,20 +57,20 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
         // have before insert (R-H2, ADR-0037). Contact mode did its half before insert, and
         // names the person the new household's Primary Contact here. A person saved against
         // a household in junction mode joins it first, so creation then leaves them alone.
-        HouseholdService.joinHouseholdsNamedOnNewContacts((List<Contact>) Trigger.new);
-        HouseholdService.createHouseholdsForNewContacts((List<Contact>) Trigger.new);
-        HouseholdService.seedPrimaryContactsOfNewHouseholds((List<Contact>) Trigger.new);
-        refresh(householdIds((List<Contact>) Trigger.new), false);
+        HouseholdService.joinHouseholdsNamedOnNewContacts((List<Contact>) newRecords());
+        HouseholdService.createHouseholdsForNewContacts((List<Contact>) newRecords());
+        HouseholdService.seedPrimaryContactsOfNewHouseholds((List<Contact>) newRecords());
+        refresh(householdIds((List<Contact>) newRecords()), false);
     }
 
     public override void afterUpdate() {
-        Map<Id, Contact> previousById = (Map<Id, Contact>) Trigger.oldMap;
+        Map<Id, Contact> previousById = (Map<Id, Contact>) oldRecordsById();
         Set<Id> affected = new Set<Id>();
         Set<Id> renamed = new Set<Id>();
         // In junction mode the account a contact points at is an employer, not a household,
         // so a change of account is not a change of household and is not settled here.
         Boolean accountIsHousehold = !HouseholdService.isJunctionMode();
-        for (Contact record : (List<Contact>) Trigger.new) {
+        for (Contact record : (List<Contact>) newRecords()) {
             Contact previous = previousById.get(record.Id);
             if (accountIsHousehold && record.AccountId != previous.AccountId) {
                 add(affected, previous.AccountId);
@@ -97,7 +97,7 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
      * back. Does nothing in contact mode, where there are no membership rows.
      */
     public override void beforeDelete() {
-        Set<Id> personIds = personIdsOf((List<Contact>) Trigger.old);
+        Set<Id> personIds = personIdsOf((List<Contact>) oldRecords());
         departingMemberships = HouseholdService.membershipsFor(personIds);
         AutomationControl.bypass(MEMBER_HANDLER);
         try {
@@ -119,7 +119,7 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
      * the survivor's.
      */
     public override void afterDelete() {
-        List<Contact> gone = (List<Contact>) Trigger.old;
+        List<Contact> gone = (List<Contact>) oldRecords();
         Set<Id> affected = departingHouseholdIds;
         departingHouseholdIds = new Set<Id>();
         List<Household_Member__c> removed = departingMemberships;
@@ -157,10 +157,10 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
      * nobody has left.
      */
     public override void afterUndelete() {
-        Set<Id> personIds = personIdsOf((List<Contact>) Trigger.new);
+        Set<Id> personIds = personIdsOf((List<Contact>) newRecords());
         Set<Id> affected = HouseholdService.restoreMembershipsFor(personIds);
         affected.addAll(HouseholdService.householdIdsForPeople(personIds));
-        affected.addAll(householdIds((List<Contact>) Trigger.new));
+        affected.addAll(householdIds((List<Contact>) newRecords()));
         refresh(affected, false);
     }
 

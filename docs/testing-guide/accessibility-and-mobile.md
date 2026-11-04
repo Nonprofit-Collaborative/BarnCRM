@@ -16,7 +16,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Type `greeting`. | A **Search Results** list appears under the box as you type. |
 | 3 | Press Tab until focus is on the result **Formal greeting pattern**, then press Enter. | The **People and Households** section opens on the right, the page scrolls to the **Preview and Recompute** panel and focus is on its heading. |
 | 4 | Press Shift+Tab until focus is in the **Sections** list, then press Tab or Shift+Tab to reach **General** and press Enter. | The General section shows. Every section in the list can be reached with Tab and opened with Enter. |
-| 5 | Open **Households** again with the keyboard. Tab to the checkbox **Create Households Automatically** and press Space. | The checkbox changes state. A screen reader announces "1 unsaved change", and a save bar with **Discard** and **Save** docks to the bottom. |
+| 5 | Open **Households** again with the keyboard. Tab to the checkbox **Create households automatically** and press Space. | The checkbox changes state. A screen reader announces "1 unsaved change", and a save bar with **Discard** and **Save** docks to the bottom. |
 | 6 | Tab to **Discard** in the save bar and press Enter. | The checkbox returns to its original state, the bar goes away and nothing is saved. On **General**, **Recent Changes** has no new row. |
 | 7 | Tab to the info icon under the same setting and press Enter, then Tab to **Learn More** beside it and press Enter. | The description opens in a popover. The help page opens in a new browser tab. | The help page opens in a new browser tab. Close it; focus is back on the Settings page. |
 | 8 | Press Tab through the rest of the section. | Focus never lands on something invisible, and the order follows the page from top to bottom. |
@@ -110,8 +110,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **People and Households**, Tab to the info icon under **Create Households Automatically**. | Announced as **About Create a household automatically**, a button. Press Enter: the description is read. |
-| 2 | Tab to **Learn More** beside it. | Announced as **Learn More (opens in a new tab)**, inside the group **Create Households Automatically**. |
+| 1 | In **BarnCRM Settings**, **People and Households**, Tab to the info icon under **Create households automatically**. | Announced as **About Create a household automatically**, a button. Press Enter: the description is read. |
+| 2 | Tab to **Learn More** beside it. | Announced as **Learn More (opens in a new tab)**, inside the group **Create households automatically**. |
 | 3 | Open a Garcia household from the **Households** tab (for example **The Garcia Family**). In the **Members** panel, Tab to the first member's actions menu. | Announced as **Actions for** plus the member's own name (for example **Actions for Harper Garcia**), not just "Actions". |
 | 4 | Press Enter on the menu, then the arrow keys. | The menu opens and reads **Make Primary** and **Move to Another Household** where you may use them; Escape closes it and returns focus to the menu button. |
 | 5 | In Find, run any Households query. | The screen reader announces the **N rows found.** line without you moving focus to it. |

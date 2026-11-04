@@ -184,6 +184,39 @@ private class SettingsControllerTest {
         }
     }
 
+    @IsTest
+    static void healthAndErrorLogLinkToOrgOptimizerOnlyForThoseWhoCanOpenIt() {
+        System.runAs(TestUsers.admin()) {
+            TestSettings.newInstall();
+            FeatureSwitchService.turnOn(FeatureSwitchService.ORG_OPTIMIZER);
+
+            Test.startTest();
+            SettingsController.canOpenOptimizerOverride = true;
+            Set<String> withAccess = allKeys(SettingsController.getConsoleModel());
+            SettingsController.canOpenOptimizerOverride = false;
+            Set<String> withoutAccess = allKeys(SettingsController.getConsoleModel());
+            Test.stopTest();
+
+            Assert.isTrue(withAccess.contains('Health_Check_Optimizer_Link'), 'Health links out');
+            Assert.isTrue(withAccess.contains('Error_Log_Optimizer_Link'), 'Error Log links out');
+            Assert.isFalse(withAccess.contains('Health_Check'), 'The report itself is in Org Optimizer');
+            Assert.isTrue(
+                withoutAccess.contains('Health_Check'),
+                'Someone who cannot open Org Optimizer keeps the report in Settings'
+            );
+            Assert.isFalse(withoutAccess.contains('Health_Check_Optimizer_Link'), 'No dead link');
+            Assert.isFalse(withoutAccess.contains('Error_Log_Optimizer_Link'), 'No dead link');
+        }
+    }
+
+    private static Set<String> allKeys(SettingsController.ConsoleModel model) {
+        Set<String> keys = new Set<String>();
+        for (Set<String> inSection : keysBySection(model).values()) {
+            keys.addAll(inSection);
+        }
+        return keys;
+    }
+
     private static Map<String, Set<String>> keysBySection(SettingsController.ConsoleModel model) {
         Map<String, Set<String>> keys = new Map<String, Set<String>>();
         for (SettingsController.SectionModel section : model.sections) {

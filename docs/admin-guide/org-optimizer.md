@@ -7,19 +7,28 @@
 
 **Org Optimizer** is one page that answers "what in my org needs attention?" It brings
 together the checks that used to live in several places: the record checks (**Data
-Quality**), field utilization, and Health Check. (Duplicate review has its own tab,
+Quality**), Field Use, and Health Check. (Duplicate review has its own tab,
 **Duplicate Matching**; see [Duplicates](duplicates.md).) Each one
 is a section of the page, and nothing in a section runs until you open it, so the page itself
 opens quickly however large your database is.
+
+Org Optimizer is the one home of **Health Check** and **Errors**. **BarnCRM Settings**,
+**Health** and **Error Log** hold only their settings (the digest and how long entries are
+kept), with **Open Health Check** and **Open the Error Log** links that open those sections here.
+
+The sections are listed down the left, each with its icon, the same way **BarnCRM Settings**
+lists its sections. On a phone or a narrow window the list becomes a **Show** box at the top
+of the page: choose a section there. Either way, once you choose, the keyboard focus moves to
+the section, so a screen reader reads its name and you can Tab straight into it.
 
 | Section | What it answers | Who sees it |
 |---|---|---|
 | **Overview** | A tile for each section, grouped under **Check Your Data** and **Check Your Setup**. A tile's badge gives its state at a glance (see below). Select a tile to open its section. | Everyone who can open the page |
 | **Data Quality** | Which records need tidying up: people with no household, empty households, orphaned memberships and addresses, incomplete or failed primary addresses, people nobody can reach, deceased people who can still be emailed, and people not changed for years. Each check shows its count, a **Needs Attention** or **All Clear** badge, and **Open in Find**. See [Data Quality](data-hygiene.md). | Anyone with **Find and Export Records** |
-| **Field Utilization** | How often each field of a kind of record is filled in, by record type, with saved counts for trends. See [Field utilization](field-utilization.md). | Administrators |
+| **Field Use** | How often each field of a kind of record is filled in, by record type, with saved counts for trends (called Field Utilization before v1.0). See [Field Use](field-utilization.md). | Administrators |
 | **Data Dictionary** | Every field you can see on the kinds of record you choose, with type, length, required, unique, picklist values, help text and formula, and optionally a fill rate, as a table and a CSV download. See [Data Dictionary](data-dictionary.md). | Administrators |
 | **AI-Readiness Export** | One zip for an AI tool you choose: a plain-language README, a schema.json of your kinds of record, fields and relationships, the data dictionary, data quality notes and, if you want, record files with sensitive fields left out or masked. BarnCRM calls no AI service. See [AI-Readiness Export](ai-readiness-export.md). | Administrators |
-| **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you ask: opening it shows the last full run (when it ran and its counts, with **Run Now**), or **Run Health Check** when it has never run. See [Health Check](health-check.md). | Administrators |
+| **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you ask: opening it shows the last full run (when it ran and its counts, with **Run Again**), or **Run Health Check** when it has never run. See [Health Check](health-check.md). | Administrators |
 | **Errors** | How many Error Log entries nobody has read, the most recent ones, **Mark Acknowledged**, and a link to the full Error Log. See [Error Log](error-log.md). | Administrators |
 | **Storage and Limits** | How much of your org's data and file storage, daily API requests, background jobs and single emails are used, each as a bar with a **Near Limit** badge at 80% or more, and how many records BarnCRM keeps for imports, undo, errors, saved field counts and Setup changes, at about 2 KB a record. Read only. | Administrators |
 | **Unused Setup** | Setup nobody seems to use: active users who have not logged in for 90 days, permission sets nobody is assigned, reports not run for 365 days, email templates never used, flows left inactive, scheduled jobs owned by inactive users, objects near their custom field limit, and record types no record uses. Each line gives a count, up to five names and **Open in Setup**. Read only: you decide what to remove, in Setup. See section 5. | Administrators |
@@ -38,9 +47,18 @@ already known:
 | Tile | Badge |
 |---|---|
 | **Errors** | **{n} New** when Error Log entries are unread, **All Clear** when none are. Read as the page opens (one small count). |
-| **Health Check** | The last full run, from here or from **BarnCRM Settings**, **Health** (which runs Health Check as it opens): **{n} Errors**, **{n} Warnings**, **Passed**, or **Not Run Yet**. The **Health Check** section shows the same run with its date. Updated when you come back to **Overview** after a run. |
+| **Health Check** | The last full run: **Needs Fixing: {n}**, **Worth Knowing: {n}**, **All Clear**, or **Not Run Yet**, the same words the report uses for its findings. The **Health Check** section shows the same run with its date. Updated when you come back to **Overview** after a run. |
 | **Data Quality** | **{n} Need Attention** (checks that found records) or **All Clear**, once you have opened the section. |
 | **Storage and Limits** | **Data Storage {n}%** once you have opened the section, in warning colors from 80%. |
+
+**Opening a section from a link.** A link can open the page straight at a section by adding
+`c__section=` and the section's name to the page address, for example
+`/lightning/n/Data_Hygiene?c__section=healthCheck` (once BarnCRM has a namespace, the key and
+the tab carry its prefix instead of `c__`). The names are `overview`, `quality`,
+`fieldUtilization`, `dataDictionary`, `aiExport`, `healthCheck`, `errors`, `storage`, `setup`,
+`setupChanges` and `accessExplorer`. A name you cannot use, or one the page does not know,
+leaves the page on **Overview**. Opening **Health Check** this way shows the last run; it does
+not start a new one.
 
 **About This Tool**, under the page header, explains the page. It is open on your first visit
 and closed after that; open it again whenever you like. Your choice is kept in your browser
@@ -70,9 +88,9 @@ Start from the sample data (see [Sample data](sample-data.md)).
    The **Health Check** tile says **Not Run Yet** on a new org.
 2. Select the **Data Quality** tile. The ten checks count as the section opens. **People with
    No Household** says **0** on fresh sample data, with an **All Clear** badge.
-3. Choose **Field Utilization**. In **Kind of Record** choose **Account**, and watch the table
+3. Choose **Field Use**. In **Kind of record** choose **Account**, and watch the table
    fill. Sort by **Filled** to see the fields nobody uses.
-4. Choose **Health Check** and press **Run Health Check** (or **Run Now**, if it has run
+4. Choose **Health Check** and press **Run Health Check** (or **Run Again**, if it has run
    before: the section first shows that run). The findings appear, most serious first, each
    with what to do.
 5. Choose **Storage and Limits**. **Data Storage (MB)** shows how much of your allowance is
@@ -106,7 +124,7 @@ Each count stops at 1,000 and then says **More than 1000**.
 | Permission Sets Nobody Is Assigned | Your own permission sets with no user assigned. | Profile permission sets, permission sets from installed packages, and those inside a permission set group. |
 | Reports Not Run for 365 Days | Reports nobody has run for a year (or the days you set), or ever. Only reports you can see are counted. | Reports from installed packages. |
 | Email Templates Never Used | Templates that have never been sent and are more than 90 days old. | Templates from installed packages, and new ones. |
-| Inactive Flows (listed under **Technical Debt**) | Flows with no active version, last changed more than 90 days ago. | Flows from installed packages, and recent work. |
+| Inactive Flows (listed under **For Developers: Old Code and Flows**) | Flows with no active version, last changed more than 90 days ago. | Flows from installed packages, and recent work. |
 | Scheduled Jobs Owned by Inactive Users | Scheduled jobs still waiting to run whose owner is no longer active. These may stop working. | Finished and deleted jobs. |
 | Objects Near Their Custom Field Limit | Account, Contact and BarnCRM's own objects with 80% or more of the custom fields your edition allows (100 on Professional, 500 on Enterprise and Developer, 800 on Unlimited and Performance, 500 when the edition is not known). Each example says how many of how many. | Fields from installed packages, which do not count against the limit, and every other object. |
 | Record Types No Record Uses, or Inactive | Record types on Account, Contact and BarnCRM's own objects that are inactive, or that no record you can see uses. At most 50 active record types are looked at. | Record types on other objects. |
@@ -118,10 +136,12 @@ check's name shows the number in use. The 90 days that keep new email templates 
 Nothing here is deleted or changed for you:
 **Open in Setup** opens the Setup page where you can review and remove each item.
 
-### Technical Debt
+### For Developers: Old Code and Flows
 
-Under its own **Technical Debt** heading, the same section also lists the code and flows in your
-org that are old or undocumented. These checks read only what a Salesforce query can read, so
+Below the Unused Setup lines, a collapsed part titled **For Developers: Old Code and Flows**
+lists the code and flows in your org that are old or undocumented (technical debt). It is
+closed each time the section opens, because most admins never need it; select its title to
+open it, and again to close it. These checks read only what a Salesforce query can read, so
 they run without any extra access, and they list your own setup, not anything from an installed
 package.
 
@@ -138,7 +158,7 @@ Settings**. It starts at **50**; anything from 21 to 80 is accepted, and the set
 refuses a value outside that range. Each check's name shows the number in use. Counts stop at
 1,000, show up to five names, and each has an **Open in Setup** link, as above.
 
-**Not covered.** Technical Debt does not look at validation rules, workflow rules, process
+**Not covered.** These checks do not look at validation rules, workflow rules, process
 builders, Lightning web or Aura components, Visualforce pages, or anything inside an installed
 package, and it does not look inside a flow (for example, elements built on old versions).
 Reading those needs a Salesforce developer interface that BarnCRM does not use, so the page says
@@ -154,7 +174,8 @@ what it covers and leaves the rest to Setup. Open **Setup**, **Flows**, **Apex C
 - **Seeing only two sections.** The others are for administrators. Ask whoever set up your
   org for the **BarnCRM Admin** role on the **Access** page.
 - **Expecting Health Check to run as the page opens.** It runs when you press **Run Health
-  Check**, here, or on **BarnCRM Settings > Health**.
+  Check** (or **Run Again**) in its section. **Open Health Check** in **BarnCRM Settings >
+  Health** brings you here.
 - **Removing something Unused Setup lists without checking it.** A report nobody runs may be
   on a dashboard, and an inactive flow may be kept as a draft. Open it in Setup first.
 

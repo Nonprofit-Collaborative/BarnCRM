@@ -21,13 +21,13 @@ public with sharing class GiftAcknowledgmentHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        AcknowledgmentService.applyRules((List<Gift__c>) Trigger.new, null);
+        AcknowledgmentService.applyRules((List<Gift__c>) newRecords(), null);
     }
 
     public override void beforeUpdate() {
         AcknowledgmentService.applyRules(
-            (List<Gift__c>) Trigger.new,
-            (Map<Id, Gift__c>) Trigger.oldMap
+            (List<Gift__c>) newRecords(),
+            (Map<Id, Gift__c>) oldRecordsById()
         );
     }
 
@@ -38,8 +38,8 @@ public with sharing class GiftAcknowledgmentHandler extends TriggerHandler {
      */
     public override void afterUpdate() {
         AcknowledgmentService.releaseClaims(
-            (List<Gift__c>) Trigger.new,
-            (Map<Id, Gift__c>) Trigger.oldMap
+            (List<Gift__c>) newRecords(),
+            (Map<Id, Gift__c>) oldRecordsById()
         );
     }
 }

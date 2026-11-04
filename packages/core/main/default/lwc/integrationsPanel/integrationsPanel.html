@@ -1,12 +1,12 @@
 <template>
     <template lwc:if={helpReady}>
     <template lwc:if={errorMessage}>
-        <p class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">{errorMessage}</p>
+        <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
     </template>
     <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
 
     <template lwc:if={isEmpty}>
-        <p class="slds-text-body_small" data-id="empty">{labels.empty}</p>
+        <c-barn-empty-state data-id="empty" illustration="no-data" size="compact" heading={labels.empty}></c-barn-empty-state>
     </template>
 
     <template for:each={groups} for:item="group">
@@ -17,9 +17,14 @@
                 <template for:each={group.apps} for:item="app">
                     <li key={app.key} class="slds-item slds-var-p-vertical_small" data-app={app.key}>
                         <div>
-                            <span class="slds-text-heading_x-small" data-id="name">{app.name}</span>
-                            <span class={app.statusClass} data-id="status">{app.statusText}</span>
-                            <span class={app.badgeClass} data-id="badge">{app.badgeText}</span>
+                            <span class="slds-text-title_bold slds-var-m-right_x-small" data-id="name">{app.name}</span>
+                            <c-barn-status-badge
+                                class="slds-var-m-right_x-small"
+                                status={app.statusTone}
+                                label={app.statusText}
+                                data-id="status"
+                            ></c-barn-status-badge>
+                            <c-barn-status-badge status={app.badgeTone} label={app.badgeText} data-id="badge"></c-barn-status-badge>
                         </div>
                         <p data-id="description">{app.description}</p>
                         <p class="slds-text-body_small" data-id="facts">

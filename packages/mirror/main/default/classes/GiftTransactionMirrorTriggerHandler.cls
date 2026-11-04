@@ -17,17 +17,17 @@ public with sharing class GiftTransactionMirrorTriggerHandler extends TriggerHan
     }
 
     public override void beforeInsert() {
-        GiftTransactionMirrorService.checkLinks((List<Gift__c>) Trigger.new, null);
+        GiftTransactionMirrorService.checkLinks((List<Gift__c>) newRecords(), null);
     }
 
     public override void beforeUpdate() {
         GiftTransactionMirrorService.checkLinks(
-            (List<Gift__c>) Trigger.new,
-            (Map<Id, Gift__c>) Trigger.oldMap
+            (List<Gift__c>) newRecords(),
+            (Map<Id, Gift__c>) oldRecordsById()
         );
     }
 
     public override void afterDelete() {
-        GiftTransactionMirrorService.warnDeleted((List<Gift__c>) Trigger.old);
+        GiftTransactionMirrorService.warnDeleted((List<Gift__c>) oldRecords());
     }
 }

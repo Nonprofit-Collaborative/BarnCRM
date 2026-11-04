@@ -1,37 +1,38 @@
 <template>
-    <lightning-card title={labels.heading} icon-name="standard:incident">
+    <lightning-card title={labels.heading} icon-name={iconName}>
         <div class="slds-var-p-horizontal_medium">
             <template lwc:if={errorMessage}>
-                <p class="slds-text-color_error" data-id="load-error" role="alert">{errorMessage}</p>
+                <c-barn-notice variant="error" message={errorMessage} data-id="load-error"></c-barn-notice>
             </template>
             <template lwc:else>
-                <p class="slds-text-heading_large" data-id="error-count">{errorCountText}</p>
-                <template lwc:if={allClear}>
-                    <lightning-badge
-                        class="slds-theme_success"
-                        label={labels.allClear}
-                        data-id="all-clear"
-                    ></lightning-badge>
-                </template>
+                <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_x-small">
+                    <c-barn-stat-tile
+                        label={labels.errors}
+                        value={errorCountValue}
+                        align="start"
+                        data-id="error-count"
+                    ></c-barn-stat-tile>
+                    <template lwc:if={allClear}>
+                        <c-barn-status-badge
+                            status="success"
+                            label={labels.allClear}
+                            class="slds-var-m-left_small"
+                            data-id="all-clear"
+                        ></c-barn-status-badge>
+                    </template>
+                </div>
             </template>
             <template lwc:if={hasInstallStatus}>
                 <template lwc:if={installHadProblems}>
-                    <p
-                        class="slds-text-color_error slds-text-body_small"
+                    <c-barn-notice
+                        variant="warning"
+                        message={installStatusText}
                         data-id="install-status"
-                        role="status"
-                        aria-live="polite"
-                    >
-                        <lightning-icon
-                            icon-name="utility:warning"
-                            size="x-small"
-                            alternative-text={labels.warning}
-                        ></lightning-icon>
-                        {installStatusText}
-                    </p>
+                        class="slds-var-m-bottom_x-small"
+                    ></c-barn-notice>
                 </template>
                 <template lwc:else>
-                    <p class="slds-text-body_small" data-id="install-status">
+                    <p class="slds-text-body_small slds-text-color_weak" data-id="install-status">
                         {installStatusText}
                     </p>
                 </template>

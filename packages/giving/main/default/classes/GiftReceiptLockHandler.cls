@@ -21,21 +21,21 @@ public with sharing class GiftReceiptLockHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        GiftService.enforceReceiptNumberOnInsert((List<Gift__c>) Trigger.new);
+        GiftService.enforceReceiptNumberOnInsert((List<Gift__c>) newRecords());
     }
 
     public override void afterInsert() {
-        GiftService.recordReceiptNumberOverridesOnInsert((List<Gift__c>) Trigger.new);
+        GiftService.recordReceiptNumberOverridesOnInsert((List<Gift__c>) newRecords());
     }
 
     public override void beforeUpdate() {
         GiftService.enforceReceiptLock(
-            (List<Gift__c>) Trigger.new,
-            (Map<Id, Gift__c>) Trigger.oldMap
+            (List<Gift__c>) newRecords(),
+            (Map<Id, Gift__c>) oldRecordsById()
         );
     }
 
     public override void beforeDelete() {
-        GiftService.preventLossOfHistory((List<Gift__c>) Trigger.old);
+        GiftService.preventLossOfHistory((List<Gift__c>) oldRecords());
     }
 }

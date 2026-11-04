@@ -1,20 +1,17 @@
 <template>
     <template lwc:if={helpReady}>
     <template lwc:if={errorMessage}>
-        <p class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">{errorMessage}</p>
+        <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
     </template>
     <template lwc:if={isReadOnly}>
-        <p class="slds-text-body_small slds-var-m-bottom_small" role="status" data-id="read-only">
-            {labels.readOnly}
-        </p>
+        <c-barn-notice class="slds-var-m-bottom_small" message={labels.readOnly} data-id="read-only"></c-barn-notice>
     </template>
     <template lwc:if={hasOtherRollupTools}>
-        <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-bottom_small" role="status" data-id="other-rollup-tools">
-            <h3 class="slds-text-heading_x-small">{labels.otherRollupTools}</h3>
+        <c-barn-notice class="slds-var-m-bottom_small" title={labels.otherRollupTools} data-id="other-rollup-tools">
             <template for:each={otherRollupTools} for:item="notice">
                 <p key={notice} class="slds-text-body_small">{notice}</p>
             </template>
-        </div>
+        </c-barn-notice>
     </template>
 
     <template for:each={groups} for:item="group">
@@ -46,7 +43,12 @@
                         <li key={module.name} class="slds-item slds-var-p-vertical_x-small" data-module={module.name}>
                             <div>
                                 <span class="slds-text-heading_x-small" data-id="name">{module.displayName}</span>
-                                <span class={module.badgeClass} data-id="status">{module.statusText}</span>
+                                <c-barn-status-badge
+                                    class="slds-var-m-left_x-small"
+                                    status={module.badgeStatus}
+                                    label={module.statusText}
+                                    data-id="status"
+                                ></c-barn-status-badge>
                                 <template lwc:if={module.appUrl}>
                                     <a class="slds-var-m-left_small" href={module.appUrl} data-id="open-app"
                                         >{labels.openApp}<span class="slds-assistive-text">: {module.displayName}</span></a
@@ -63,9 +65,12 @@
                                 </p>
                             </template>
                             <template lwc:if={module.setupPending}>
-                                <p class="slds-text-body_small slds-text-color_error slds-var-m-top_xx-small" role="status" data-id="setup-not-run">
-                                    {labels.setupNotRun}
-                                </p>
+                                <c-barn-notice
+                                    class="slds-var-m-top_xx-small"
+                                    variant="warning"
+                                    message={labels.setupNotRun}
+                                    data-id="setup-not-run"
+                                ></c-barn-notice>
                             </template>
                             <template lwc:if={canEdit}>
                                 <div class="slds-var-m-top_x-small">

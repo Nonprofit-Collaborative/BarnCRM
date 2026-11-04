@@ -24,7 +24,6 @@ import STATUS_ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
 import STATUS_INACTIVE from '@salesforce/label/c.Core_PicklistUsage_StatusInactive';
 import STATUS_NEVER_USED from '@salesforce/label/c.Core_PicklistUsage_StatusNeverUsed';
 import STATUS_NO_VALUE from '@salesforce/label/c.Core_PicklistUsage_StatusNoValue';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_FieldUtilization_UnexpectedError';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const STATUS_LABELS = {
@@ -51,7 +50,7 @@ const COLUMNS = [
 ];
 
 /**
- * Picklist Value Usage, a part of the Field Utilization section (canonical model Section 29F,
+ * Picklist Value Usage, a part of the Field Use section (canonical model Section 29F,
  * R-FU9 to R-FU12): for every single-select picklist field of the chosen kind of record, how
  * many records hold each value and the newest Last Modified Date among them. On demand: nothing
  * is read until the button is pressed, then a chunk of fields at a time. On a large kind of
@@ -247,7 +246,10 @@ export default class PicklistUsage extends LightningElement {
       await this.readDates(run);
     } catch (error) {
       if (run === this.run) {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(
+          error,
+          helpText('Core', 'Core_FieldUtilization_UnexpectedError')
+        );
       }
     } finally {
       if (run === this.run) {

@@ -169,6 +169,47 @@ public with sharing class AutomationControl {
             : null;
     }
 
+    // ---------------------------------------------------- BarnCRM Automation Control setting
+
+    /**
+     * True when the BarnCRM Automation Control setting that applies to the running user (theirs,
+     * else their profile's, else the org default) has Pause All or Bypass on. The dispatcher
+     * then skips every automation that does not always run, alongside the timed pause and the
+     * switches (ADR-NEXT dispatcher errors and Automation Control). Costs no query.
+     */
+    @NamespaceAccessible
+    public static Boolean isOffForRunningUser() {
+        BarnCRM_Automation_Control__c control = BarnCRM_Automation_Control__c.getInstance();
+        return control != null && (control.Pause_All__c == true || control.Bypass__c == true);
+    }
+
+    /** True when the org default of the setting has Pause All on: paused for everyone. */
+    @NamespaceAccessible
+    public static Boolean isPausedForEveryone() {
+        BarnCRM_Automation_Control__c control = BarnCRM_Automation_Control__c.getOrgDefaults();
+        return control != null && control.Pause_All__c == true;
+    }
+
+    /**
+     * Catches up the work automation skipped while it was paused or bypassed, as far as it can
+     * without a record of the saves it skipped: a household for every person who has none
+     * (`HouseholdCatchUpBatch`, which follows the Household Upkeep settings), the totals waiting
+     * in the rollup queue and, when `recomputeNames` is true, every household's name and
+     * greetings. Never throws: each step logs its own failure.
+     */
+    @NamespaceAccessible
+    public static void catchUp(Boolean recomputeNames) {
+        HouseholdCatchUpBatch.enqueue();
+        startWaitingRollups();
+        if (recomputeNames == true) {
+            try {
+                Database.executeBatch(new HouseholdNamingBatch(), 200);
+            } catch (Exception failed) {
+                ErrorLogger.log(failed, RESUME_SCHEDULE_CONTEXT);
+            }
+        }
+    }
+
     /**
      * The permission that governs every write on this page. Checked here rather than only in the
      * controller, because the pause is written in system mode (`AutomationSettingsWriter` says
@@ -224,7 +265,8 @@ public with sharing class AutomationControl {
         } catch (Exception failed) {
             ErrorLogger.log(failed, RESUME_SCHEDULE_CONTEXT);
         }
-        startWaitingRollups();
+        // People added during the pause get their households, and waiting totals are worked.
+        catchUp(false);
     }
 
     /**
@@ -275,7 +317,7 @@ public with sharing class AutomationControl {
         AutomationSettingsWriter.savePausedUntil(locked, null);
         SettingsService.clearCaches();
         SettingsService.logChange(PAUSE_SETTING_NAME, SettingsService.asText(stored), '');
-        startWaitingRollups();
+        catchUp(false);
         return true;
     }
 

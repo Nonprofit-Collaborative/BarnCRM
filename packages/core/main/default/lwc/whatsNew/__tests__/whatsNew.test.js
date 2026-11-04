@@ -98,7 +98,7 @@ describe('c-whats-new', () => {
     await flush();
 
     expect(element.shadowRoot.querySelector('lightning-card')).not.toBeNull();
-    expect(element.shadowRoot.querySelector('[role="alert"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toContain(
       'Could not update.'
     );
     expect(element.shadowRoot.querySelector('[data-id="dismiss"]').disabled).toBe(false);

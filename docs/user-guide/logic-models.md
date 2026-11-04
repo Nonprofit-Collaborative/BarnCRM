@@ -33,8 +33,10 @@ To make the model the organization's again, choose **The whole organization**.
 
 ## To Add a Part
 
-The builder has seven columns: **Inputs**, **Activities**, **Outputs**, **Short Term Outcomes**,
-**Intermediate Term Outcomes**, **Long Term Outcomes** and **Impact**.
+The builder draws seven columns from left to right, with an arrow between each: **Inputs**,
+**Activities**, **Outputs**, **Short Term Outcomes**, **Intermediate Term Outcomes**, **Long Term
+Outcomes** and **Impact**. Each heading shows how many parts the column holds. On a phone the
+columns are stacked.
 
 1. Under a column, click **Add to** and the column's name (for example **Add to Inputs**).
 2. Type a short **Name** and click **Save**.
@@ -43,14 +45,16 @@ You should see: the part at the bottom of its column.
 
 ## To Change, Move or Delete a Part
 
-1. Click the part. Its details open below the columns.
+1. Click the part. Its details open below the columns and the page moves you to them. The parts
+   it has arrows to or from get a blue border; the rest are dimmed. **Back to the Model**, at the
+   top of the details, takes you back to the part in its column.
 2. Click **Edit** to change its **Name**, **Description** or **Column**, then **Save**. A part with
    indicators can only move to another output or outcome column. A part cannot move to a column
    that would make one of its arrows point backward; the message names those arrows ("From to
    To"), so delete them first or pick a column that keeps every arrow forward.
 3. Click **Move Up** or **Move Down** to change its place in its column.
-4. Click **Delete**, then **Delete** again to confirm. Its arrows, and its indicators with their
-   periods, are deleted too.
+4. Click **Delete**, then **Delete** again in the dialog to confirm. Its arrows, and its
+   indicators with their periods, are deleted too.
 
 ## To Draw an Arrow
 
@@ -62,7 +66,8 @@ An arrow says one part leads to another, and the assumption says why you believe
 4. Type the **Assumption**, for example "Students who attend twice a week read more at home", and
    click **Save**.
 
-To change an assumption, click **Edit** beside the arrow. To remove an arrow, click **Remove**.
+To change an assumption, click **Edit** beside the arrow. To remove an arrow, click **Remove**,
+then **Remove** in the dialog.
 Arrows into the part are listed under **Comes From**.
 
 ## To Measure an Output or Outcome
@@ -73,11 +78,24 @@ Arrows into the part are listed under **Comes From**.
 3. Under the indicator, click **Add Period**. Fill in **Period** (for example "2026 Q1"), **Start
    Date**, **End Date**, **Target** and, once you know it, **Result**. Click **Save**.
 
-You should see: the period in the indicator's table. **Progress** shows **Met** when the result
-reaches the target, or how far it got from the baseline, for example 50%.
+You should see: the period in the indicator's table. **Progress** is a bar with **Met** when the
+result reaches the target, or how far it got from the baseline, for example 50%.
 
 To record a result later, click **Edit** on the period's row. Each indicator has one row for the
 same start and end dates.
+
+## To Use the Same Periods for Every Indicator
+
+1. Under the columns, in **Reporting Periods**, click **Add Period**. Fill in **Period**, **Start
+   Date** and **End Date**, and click **Save**. Repeat for each period (for example four quarters).
+2. On a period's row, click **Add Period to Every Indicator**.
+3. For an indicator added later, select its part and click **Use the Model's Periods** under the
+   indicator.
+
+You should see: a note saying how many indicators or periods were added, and the periods in each
+indicator's table, ready for targets and results. An indicator that already had a period with the
+same dates keeps its own. Removing a period from **Reporting Periods** leaves the indicators'
+periods in place.
 
 ## To Fill In Results From a Spreadsheet
 
@@ -97,11 +115,14 @@ A computed indicator's results are worked out from other records every night, so
 box cannot be typed in. Under the indicator the builder says when they were last worked out, or
 what stopped them.
 
-1. Click **Refresh Results** under the indicator.
-2. Wait a few minutes and reload the page.
+1. Click **Refresh Results** under the indicator. It says "Working out results".
+2. Wait: the panel updates by itself when the results are in, usually within a few minutes. If it
+   takes longer, click **Check Again**.
 
-You should see: the periods that have started show new results. Only an admin can change what an
-indicator counts (its **Source**).
+You should see: the periods that have started show new results, and a note that they are worked
+out. Only an admin can change what an indicator counts (its **Source**). An admin can start a
+computed indicator from a template such as **Services Delivered** or **Approved Volunteer Hours**
+and the record it is about; BarnCRM builds the saved query in Find for them.
 
 ## To Compare Periods for a Funder
 

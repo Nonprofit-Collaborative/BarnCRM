@@ -1,10 +1,9 @@
 /**
- * The Rollup Builder module hands Health Check its nightly recalculation through the provider
- * Core finds by name (ADR-0075, ADR-0125 `0125-rollup-builder-module.md`), so "Schedule all
- * nightly jobs" counts and schedules it. The job runs under a name of its own, so the test does
- * not depend on what the org it runs in has scheduled.
+ * The Rollup Builder module adds its nightly recalculation to Core's nightly run through the
+ * provider Core finds by name (ADR-NEXT nightly-job-dispatcher, ADR-0125): one switched step at
+ * the hour the setting holds, which the Rollups page switches on and off.
  */
-@IsTest(testFor='ApexClass:RollupsNightlyJobProvider')
+@IsTest(testFor='ApexClass:RollupsNightlyJobProvider, ApexClass:RollupScheduler')
 private class RollupsNightlyJobProviderTest {
     @TestSetup
     static void createTestUser() {
@@ -12,24 +11,28 @@ private class RollupsNightlyJobProviderTest {
     }
 
     @IsTest
-    static void theNightlyRecalculationIsOfferedAndScheduledOnce() {
+    static void theNightlyRecalculationIsOneSwitchedStepAtTheNightlyHour() {
         System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
             RollupScheduler.jobNameInUse = 'BarnCRM Rollups (RollupsNightlyJobProviderTest)';
-            List<NightlyJob> jobs = new RollupsNightlyJobProvider().nightlyJobs();
+            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+            ScheduledJobSelector.forget();
+            List<NightlyStep> steps = new RollupsNightlyJobProvider().nightlySteps();
 
-            Assert.areEqual(1, jobs.size(), 'The module offers one nightly job.');
-            NightlyJob job = jobs[0];
-            Assert.areEqual(
-                System.Label.Core_JobNotice_Rollups,
-                job.label(),
-                'Named from a label.'
-            );
-            Assert.isFalse(job.isScheduled(), 'Not scheduled before the fix.');
+            Assert.areEqual(1, steps.size(), 'The module offers one step.');
+            Assert.areEqual(System.Label.Core_JobNotice_Rollups, steps[0].label, 'Its label.');
+            Assert.areEqual(RollupScheduler.nightlyHour() * 60, steps[0].minute, 'Its hour.');
+            Assert.isTrue(steps[0].switchDefault, 'Shipped on.');
+            Assert.isFalse(RollupScheduler.isScheduled(), 'Not before the run is scheduled.');
 
             // No startTest: the scheduled run must not execute inside the test.
-            job.schedule();
-
-            Assert.isTrue(job.isScheduled(), 'Scheduled by the fix.');
+            RollupScheduler.start();
+            ScheduledJobSelector.forget();
+            NightlyJobs.forget();
+            Assert.isTrue(RollupScheduler.isScheduled(), 'On, with the run scheduled.');
+            Assert.isNotNull(RollupScheduler.nextRunAt(), 'With its next run.');
+            RollupScheduler.stop();
+            NightlyJobs.forget();
+            Assert.isFalse(RollupScheduler.isScheduled(), 'Switched off.');
         }
     }
 }

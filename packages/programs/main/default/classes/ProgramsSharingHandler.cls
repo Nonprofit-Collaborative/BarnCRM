@@ -17,10 +17,10 @@ public with sharing class ProgramsSharingHandler extends TriggerHandler {
     }
 
     public override void afterInsert() {
-        ProgramsSharing.share(Trigger.new);
+        ProgramsSharing.share(newRecords());
     }
 
     public override void afterUndelete() {
-        ProgramsSharing.share(Trigger.new);
+        ProgramsSharing.share(newRecords());
     }
 }

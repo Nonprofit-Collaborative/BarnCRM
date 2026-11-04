@@ -12,6 +12,8 @@
  */
 public with sharing class HubController {
     private static final String ERROR_CONTEXT = 'BarnCRM home';
+    /** The Giving module's catalog name (BarnCRM_Module.Giving). */
+    private static final String GIVING_MODULE = 'Giving';
 
     /**
      * The tile counts this many new errors and then says "more", so a flooded Error Log costs
@@ -60,6 +62,16 @@ public with sharing class HubController {
         /** True when this person may create a household, so New household is shown. */
         @AuraEnabled
         public Boolean canCreateHousehold;
+        /** True when this person may create a contact, so New Person is shown. */
+        @AuraEnabled
+        public Boolean canCreatePerson;
+        /**
+         * True when the Giving module is installed and on, so Quick Links offers Quick Gift
+         * Entry. Read from the module catalog, never from Giving's code, so Core has no
+         * dependency on Giving.
+         */
+        @AuraEnabled
+        public Boolean giftEntryAvailable;
     }
 
     /** One file that arrives regularly, and when it was last imported (R-IT6). */
@@ -110,6 +122,8 @@ public with sharing class HubController {
     private static HomeModel buildModel() {
         HomeModel model = new HomeModel();
         model.canCreateHousehold = HouseholdWriter.canCreateHouseholds();
+        model.canCreatePerson = Schema.SObjectType.Contact.isCreateable();
+        model.giftEntryAvailable = readGiftEntryAvailable();
         model.canEdit = BarnCRMPermissions.canManageSettings();
         model.automationPaused = readAutomationPaused();
         model.recurringSources = readRecurringSources();
@@ -133,6 +147,16 @@ public with sharing class HubController {
             model.seasonalAddressStale = false;
         }
         return model;
+    }
+
+    private static Boolean readGiftEntryAvailable() {
+        try {
+            return ModuleDetectionService.isGivingPresent() &&
+                !ModuleManagerService.turnedOff().contains(GIVING_MODULE.toLowerCase());
+        } catch (Exception e) {
+            ErrorLogger.log(e, ERROR_CONTEXT);
+            return false;
+        }
     }
 
     private static Boolean readAutomationPaused() {

@@ -16,13 +16,13 @@ public with sharing class LogicModelScopeHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        LogicModelScope.apply((List<Logic_Model__c>) Trigger.new, null);
+        LogicModelScope.apply((List<Logic_Model__c>) newRecords(), null);
     }
 
     public override void beforeUpdate() {
         LogicModelScope.apply(
-            (List<Logic_Model__c>) Trigger.new,
-            (Map<Id, Logic_Model__c>) Trigger.oldMap
+            (List<Logic_Model__c>) newRecords(),
+            (Map<Id, Logic_Model__c>) oldRecordsById()
         );
     }
 }

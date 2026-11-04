@@ -15,13 +15,13 @@ public with sharing class VolunteerSignupTriggerHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        VolunteerSignupService.refuseSecondSignups((List<Volunteer_Signup__c>) Trigger.new);
+        VolunteerSignupService.refuseSecondSignups((List<Volunteer_Signup__c>) newRecords());
     }
 
     public override void beforeUpdate() {
-        Map<Id, Volunteer_Signup__c> previousById = (Map<Id, Volunteer_Signup__c>) Trigger.oldMap;
+        Map<Id, Volunteer_Signup__c> previousById = (Map<Id, Volunteer_Signup__c>) oldRecordsById();
         List<Volunteer_Signup__c> moved = new List<Volunteer_Signup__c>();
-        for (Volunteer_Signup__c signup : (List<Volunteer_Signup__c>) Trigger.new) {
+        for (Volunteer_Signup__c signup : (List<Volunteer_Signup__c>) newRecords()) {
             Volunteer_Signup__c previous = previousById.get(signup.Id);
             if (
                 signup.Volunteer_Shift__c != previous.Volunteer_Shift__c ||
@@ -38,7 +38,7 @@ public with sharing class VolunteerSignupTriggerHandler extends TriggerHandler {
 
     public override void afterInsert() {
         VolunteerSignupService.createHoursForAttendance(
-            (List<Volunteer_Signup__c>) Trigger.new,
+            (List<Volunteer_Signup__c>) newRecords(),
             null
         );
     }
@@ -48,13 +48,13 @@ public with sharing class VolunteerSignupTriggerHandler extends TriggerHandler {
      * same shift again is refused. Undeleting writes no attendance hours.
      */
     public override void afterUndelete() {
-        VolunteerSignupService.refuseSecondSignups((List<Volunteer_Signup__c>) Trigger.new);
+        VolunteerSignupService.refuseSecondSignups((List<Volunteer_Signup__c>) newRecords());
     }
 
     public override void afterUpdate() {
         VolunteerSignupService.createHoursForAttendance(
-            (List<Volunteer_Signup__c>) Trigger.new,
-            (Map<Id, Volunteer_Signup__c>) Trigger.oldMap
+            (List<Volunteer_Signup__c>) newRecords(),
+            (Map<Id, Volunteer_Signup__c>) oldRecordsById()
         );
     }
 }

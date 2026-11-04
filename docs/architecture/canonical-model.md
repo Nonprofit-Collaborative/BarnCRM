@@ -896,6 +896,25 @@ scheduled for, so it can never end a newer pause. A pause in effect that no job 
 scheduled to end, or that ends more than 24 hours ahead, is a Health Check warning. Neither
 the pause nor its end moves any automation's switch, and neither touches an Always Runs
 automation (R-A4).
+**R-A6 A failure refuses only its own records.** When a packaged automation fails during a
+save of several records, only the records the failure belongs to are refused, with the
+friendly message, and the rest of the save goes ahead, in before and after contexts. The
+dispatcher finds them by undoing the failed attempt to a savepoint and running the
+automations again over halves of the records; it refuses the records not yet cleared together
+when the transaction lacks the room to try again. A failure of an Always Runs automation still
+refuses every record in front of it. The failure is logged once, and each record refused while
+narrowing gets its own Error Log entry naming its row (ADR-NEXT dispatcher errors and
+Automation Control).
+**R-A7 Automation Control pauses or bypasses per org, profile or user.** The BarnCRM
+Automation Control setting holds Pause All and Bypass (both off by default) at the org default,
+a profile or a user; the value for a save is the running user's as the platform resolves a
+hierarchy setting. When either applies, every packaged automation that is not Always Runs is
+skipped, alongside the per-transaction bypass, the timed pause and the switch, which all stay.
+Every shipped flow template ends when either applies, and the Check BarnCRM Automation action
+answers an organization's own flow the same way, adding the timed pause and the switch of a
+flow listed as `Flow:` plus its API name. Resuming the timed pause queues the household
+catch-up and the waiting rollups; skipped saves are not replayed (ADR-NEXT dispatcher errors
+and Automation Control).
 
 ### Salesforce implementation
 
@@ -907,7 +926,11 @@ automation (R-A4).
   admin reads it.
 - **Shipped defaults:** `Automation_Registry__mdt` (Section 13).
 - **Org-level pause:** `BarnCRM_Settings__c.Automation_Paused_Until__c`.
-- **Service:** `AutomationControl`, `TriggerDispatcher`.
+- **Automation Control:** `BarnCRM_Automation_Control__c`, a public hierarchy custom setting
+  (public so that an organization's own formulas, validation rules and flows read it through
+  `$Setup`), with `Pause_All__c` (Checkbox, default false) and `Bypass__c` (Checkbox, default
+  false) (R-A7).
+- **Service:** `AutomationControl`, `TriggerDispatcher`, `CheckAutomationAction`.
 
 ---
 
@@ -9807,8 +9830,8 @@ Cancelled.
   applies R-SSC4 and R-SSC5 and queues `ShiftScheduleGenerator`; nightly job `ShiftScheduleBatch`,
   started at 3:00 AM by `VolunteersScheduler` (job name `BarnCRM Volunteer Schedules`; Health
   Check and the Nightly Jobs list call it "Volunteer Schedules, 3:00 AM"), which
-  `VolunteersNightlyJobProvider` (`NightlyJobProvider`) supplies, so Health Check's "Schedule all
-  nightly jobs" fix schedules it. The shift deletes of R-SSC4 and R-SSC5 and the writes to Created
+  `VolunteersNightlyJobProvider` (`NightlyStepProvider`) supplies as a step of the one nightly
+  run (Section 29ZR). The shift deletes of R-SSC4 and R-SSC5 and the writes to Created
   Through, Shifts Kept and Rebuild Pending run in system mode: they are the schedule's own bookkeeping, which a
   Coordinator or Staff user who may edit the schedule cannot do with their own delete and field
   access. Shifts are created in user mode.
@@ -11066,6 +11089,7 @@ per program.
 | Description | long text | no | What the model covers, for a funder or a new board member. |
 | Program | record identifier (text) | no | The program the model is for, when it is not the organization's. A record identifier, not a reference: Logic Models never depends on Programs (R-LM2). |
 | Scope Key | text | yes (set by BarnCRM) | `Organization`, or the program's identifier. Unique, so a scope has one model. |
+| Periods | long text (JSON) | no | The model's shared reporting periods (v1.0, modules-23, R-LM4): `{"version": 1, "periods": [{"name": "2026 Q1", "startDate": "2026-01-01", "endDate": "2026-03-31"}]}`. |
 
 ### Relationships
 
@@ -11088,6 +11112,17 @@ that is not a well-formed record identifier is refused. The 15-character form is
 **R-LM3 Deleting a model deletes its parts.** Its elements, links, indicators and periods go with
 it.
 
+**R-LM4 Shared reporting periods (v1.0, modules-23).** A model keeps a list of reporting periods
+(name, start date, end date; for example `2026 Q1` to `Q4` and `FY2026`) so its indicators line
+up in the report (R-IN7). Each needs a name of at most 80 characters and an end date not before
+its start; two periods with the same start and end dates are refused; the list is kept in start
+date order, at most 60. The list is a template, not a link: **Add Period to Every Indicator**
+creates that period (name and dates, no target or result) on every indicator of the model that
+has no period with the same dates, and **Use the Model's Periods** on one indicator creates every
+model period it lacks, both in user mode and keeping R-IP2. Changing or deleting a model period
+changes no indicator period, and an indicator's own typed periods stay possible. Stored as JSON
+in `Periods__c` (plan 9.9).
+
 ### Salesforce implementation
 
 - **Object:** `Logic_Model__c`, name field Text, label Logic Model Name, sharing Public Read/Write.
@@ -11097,6 +11132,7 @@ it.
 | Description | `Description__c` | Long Text Area(32768) |
 | Program | `Program_Id__c` | Text(18) |
 | Scope Key | `Scope_Key__c` | Text(18), unique, not case sensitive |
+| Periods | `Periods__c` | Long Text Area(32768) |
 
 - **Trigger:** `LogicModelTrigger`, through the Core dispatcher; handler `LogicModelScopeHandler`
   (R-LM1, R-LM2), reading every model without sharing through `LogicModelIntegritySelector`.
@@ -11271,8 +11307,26 @@ sum field is a number and a unique field is groupable, each resolved through the
 describe. A record belongs to every period whose start and end dates hold its date (a date-time
 read in the running user's time zone).
 
+**R-IN8 Computed starters (v1.0, modules-22).** Under Computed, a Logic Models Admin can pick a
+starter instead of a saved query; BarnCRM then writes the Find saved query for them (a private
+Saved Query they own, named after the starter and the record chosen, at most 80 characters) and
+saves the source from it, so R-IN4 applies unchanged. The starters are configuration in
+`IndicatorStarterService`, each naming objects and fields by API name only and offered only when
+its object exists in the org (`NamespaceUtil.packagedObjectType`; Logic Models never references
+another module's schema):
+
+| Starter | Object | Filter | Date field | Works out | Asks for |
+|---|---|---|---|---|---|
+| People served by a service | Service Delivery (Programs) | Service is the one chosen; Attendance is not an absence | Delivery Date | Count Unique of Contact | a Service (required) |
+| Services delivered | Service Delivery (Programs) | Service is the one chosen; Attendance is not an absence | Delivery Date | Count | a Service (required) |
+| Approved volunteer hours | Volunteer Hours (Volunteers) | Status is Approved; Volunteer Job is the one chosen, when chosen | Date Worked | Sum of Hours | a Volunteer Job (optional) |
+| Grants awarded | Grant (Funders) | Stage is Awarded; Program is the one chosen, when chosen and Programs is installed | Decision Date | Count | a Program (optional) |
+
+The record chosen is a record identifier written into the query's filter, so the saved query and
+the indicator keep working however the record is renamed.
+
 **R-IN5 Refresh.** A batch, one indicator at a time, started by Refresh Results, by saving a
-computed source, and nightly (job BarnCRM Indicator Results, a `NightlyJobProvider` job). The
+computed source, and nightly (step BarnCRM Indicator Results of the nightly run, Section 29ZR). The
 query compiles as the running user; its records are read in system mode, so the result is the
 organization's figure whatever the runner's sharing. Every period that has started gets its
 Result Value (zero when no record falls in it); a period not yet started is left alone; Computed
@@ -12517,6 +12571,8 @@ mirrors the primary member).
 | 0.16 | 2026-11-02 | Funders F-07 (ADR-0163 `0163-funders-reporting-links.md`). Grant (29ZH) gains rule R-GN9, the board dashboard (revenue mix, concentration, restricted balances), read from grants and, by describe, Giving and the F-03 ledger; no new object or field. |
 | v1.0 | 2026-11-04 | One nightly job dispatcher (architect review RT-10, L-10, ADR-NEXT nightly-job-dispatcher). New Core object Nightly Job (`Nightly_Job__c`, 29ZR) with rules R-NJ1 to R-NJ7: one nightly schedule runs every step in sequence, each step keeping its switch and last result; about 19 separate scheduled jobs are replaced and adopted on upgrade. R-SU2 and R-IN5 read the nightly run instead of their own jobs. |
 | v1.0 | 2026-11-04 | Record retention (architect review L-08). `BarnCRM_Settings__c` gains `Merge_Journal_Retention_Days__c` (365), `Setting_Change_Retention_Days__c` (730), `Import_History_Retention_Days__c` (365) and `Field_Utilization_Retention_Days__c` (730). New rule R-NJ8 (the Record Cleanup step); R-S2 and R-FU7 amended. No object added. |
+| 0.17 | 2026-11-04 | Dispatcher error contract (RT-05, ADR-NEXT dispatcher errors and Automation Control). Section 10 gains rule R-A6: a failure refuses only its own records, the rest of the save goes ahead. No object or field added. |
+| 0.17 | 2026-11-04 | BarnCRM Automation Control (RT-13, same ADR). New hierarchy custom setting `BarnCRM_Automation_Control__c` with `Pause_All__c` and `Bypass__c` (Section 10, rule R-A7), read by the dispatcher, every shipped flow template and the Check BarnCRM Automation action. |
 
 ---
 ## 32. Entity ownership by package

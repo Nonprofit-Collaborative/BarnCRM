@@ -16,19 +16,24 @@ public with sharing class GrantReminderScheduler implements Schedulable {
     @TestVisible
     private static String jobNameInUse = JOB_NAME;
 
-    /** Six in the morning, before the working day. */
-    private static final String MORNING_CRON = '0 0 6 * * ?';
-
     public void execute(SchedulableContext context) {
+        if (context != null) {
+            // Still scheduled on its own from before the nightly run (R-NJ5).
+            NightlyJobs.adoptOldSchedules();
+        }
         GrantReminderBatch.startMorning();
     }
 
-    /** The morning job as Health Check's nightly jobs list sees it (ADR-0075). */
-    public static NightlyJob nightlyJob() {
-        return new NamedNightlyJob(
-            System.Label.Funders_NightlyJobs_RemindersName,
+    /**
+     * The job as a step of the nightly run (ADR-NEXT nightly-job-dispatcher): six in the
+     * morning, before the working day.
+     */
+    public static NightlyStep step() {
+        return new NightlyStep(
             jobNameInUse,
-            MORNING_CRON,
+            System.Label.Funders_NightlyJobs_RemindersName,
+            6,
+            0,
             new GrantReminderScheduler()
         );
     }

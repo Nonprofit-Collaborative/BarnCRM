@@ -167,12 +167,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, **Commitments and Installments**. | **Send Pledge Reminders** is off, and **Pledge Reminders** is listed below it. |
+| 1 | Open **BarnCRM Settings**, **Giving**, **Commitments and Installments**. | **Send pledge reminders** is off, and **Pledge Reminders** is listed below it. |
 | 2 | Open **Pledge Reminders**. | A notice says reminders are off. **Send Reminders Now** is disabled. No steps are listed. |
 | 3 | Choose **New Step**. Name `Week late`, **Days From Due Date** `7`, **Channel** `Email`, choose **BarnCRM: pledge installment overdue**. Save. | The step is listed with timing `7 days after the due date` and its template name. |
 | 4 | Choose **New Step** again. Name `Final letter`, **Days From Due Date** `30`, **Channel** `Letter`. Save. | Listed with timing `30 days after the due date`; the template column is empty. |
 | 5 | Choose **New Step** a third time, **Channel** `Email`, and save without choosing a template. | The form asks for an email template and does not save. Cancel. |
-| 6 | In **BarnCRM Settings**, turn on **Send Pledge Reminders**. Return to **Pledge Reminders**. | The off notice is gone. **Emails** reads 1 and **Letters** reads 1. |
+| 6 | In **BarnCRM Settings**, turn on **Send pledge reminders**. Return to **Pledge Reminders**. | The off notice is gone. **Emails** reads 1 and **Letters** reads 1. |
 | 7 | Press **Send Reminders Now**. Wait a minute, then refresh. | Under **Recent Reminders**: `Week late` by Email for the first donor, status **Sent**; `Week late` by Letter for the opted-out donor, status **Queued**. |
 | 8 | Press **Send Reminders Now** again. | No new rows: the same step never reminds the same payment twice. |
 | 9 | Press **Produce Letter File**. | A **Download letters** link appears. The CSV has one row with the opted-out donor, amount, 7 days overdue and the step name. The row is still **Queued**. |
@@ -180,6 +180,6 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 11 | Open the **Pledge Reminders Log** tab, list view **All Pledge Reminders**. | Both rows are listed with their pledge, payment, step, channel and status. |
 | 11a | Repeat steps 7 to 10 for a donor whose email address is blank, and for one whose Email Bounced flag is set (one pledge each, Start Date seven days ago). | Each is reminded by a Queued letter, not an email. |
 | 11b | Add a step with **Days From Due Date** `-3`, **Channel** `Email`, and run reminders for a payment due today. | No reminder is made by that step: a heads-up step stops once the due date arrives. |
-| 12 | In **BarnCRM Settings**, turn **Send Pledge Reminders** off. Return to the page and press **Send Reminders Now**. | The button is disabled; if the page was open before the change, the error says reminders are turned off. |
+| 12 | In **BarnCRM Settings**, turn **Send pledge reminders** off. Return to the page and press **Send Reminders Now**. | The button is disabled; if the page was open before the change, the error says reminders are turned off. |
 
-**Cleanup:** turn **Send Pledge Reminders** off, and clear **Active** on both steps.
+**Cleanup:** turn **Send pledge reminders** off, and clear **Active** on both steps.

@@ -1,10 +1,10 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import searchPeople from '@salesforce/apex/AccessExplorerController.searchPeople';
 import searchPermissionSets from '@salesforce/apex/AccessExplorerController.searchPermissionSets';
 import getAccess from '@salesforce/apex/AccessExplorerController.getAccess';
 import getFieldAccess from '@salesforce/apex/AccessExplorerController.getFieldAccess';
 import { format, messageFrom, downloadCsv } from 'c/findCsv';
-import { withDetails } from 'c/accessExplorerRows';
+import { withDetails, barnName, shownColumns, nameOptions } from 'c/accessExplorerRows';
 import {
   OBJECT_FLAGS,
   FIELD_FLAGS,
@@ -48,8 +48,15 @@ import COL_MODIFY_ALL from '@salesforce/label/c.Core_AccessExplorer_ColModifyAll
 import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';
 import DOWNLOADED from '@salesforce/label/c.Core_AccessExplorer_Downloaded';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import { helpText } from 'c/barnHelpText';
 
 const FILE_BASE = 'Access_Explorer_Compare';
+/** A role or extra permission named as the Access page names it (admin-9); Access Explorer has loaded the help. */
+const nameOf = (choice) =>
+  barnName(choice.label, choice.barnKind, {
+    role: helpText('Core', 'Core_AccessExplorer_RoleName'),
+    extraPermission: helpText('Core', 'Core_AccessExplorer_ExtraPermissionName')
+  });
 const SEARCH_DELAY = 300;
 const KINDS = { profile: KIND_PROFILE, group: KIND_GROUP, permissionSet: KIND_SET };
 const FLAG_WORDS = {
@@ -78,6 +85,9 @@ const blankSide = (key, label) => ({
  * administrators reach.
  */
 export default class AccessCompare extends LightningElement {
+  /** Show the API Name column and API names in the picker (Access Explorer's toggle). */
+  @api showTechnicalNames = false;
+
   labels = {
     compare: COMPARE,
     choose: CHOOSE,
@@ -124,12 +134,16 @@ export default class AccessCompare extends LightningElement {
       noResults: Array.isArray(side.results) && side.results.length === 0,
       resultItems: (side.results || []).map((choice) => ({
         ...choice,
-        text: [choice.label, KINDS[choice.detail] || choice.detail, choice.isActive ? '' : INACTIVE]
+        text: [
+          nameOf(choice),
+          KINDS[choice.detail] || choice.detail,
+          choice.isActive ? '' : INACTIVE
+        ]
           .filter(Boolean)
           .join(', ')
       })),
       heading: side.subject
-        ? withDetails(side.subject.label, [
+        ? withDetails(nameOf(side.subject), [
             KINDS[side.subject.detail] || side.subject.detail,
             side.subject.isActive ? '' : INACTIVE
           ])
@@ -143,7 +157,7 @@ export default class AccessCompare extends LightningElement {
 
   /** Each side's name; two identical names fall back to First and Second. */
   get names() {
-    const [a, b] = this.sides.map((side) => (side.subject ? side.subject.label : side.label));
+    const [a, b] = this.sides.map((side) => (side.subject ? nameOf(side.subject) : side.label));
     return a === b ? [FIRST, SECOND] : [a, b];
   }
 
@@ -180,23 +194,30 @@ export default class AccessCompare extends LightningElement {
     const byName = new Map();
     for (const side of this.sides) {
       for (const row of side.subject ? side.subject.objects : []) {
-        byName.set(row.name, `${row.label} (${row.name})`);
+        byName.set(row.name, row.label);
       }
     }
-    return [...byName.entries()]
-      .map(([value, label]) => ({ value, label }))
-      .sort((x, y) => x.label.localeCompare(y.label));
+    return nameOptions(
+      [...byName.entries()]
+        .map(([value, label]) => ({ value, label }))
+        .sort((x, y) => x.label.localeCompare(y.label)),
+      this.showTechnicalNames
+    );
   }
 
   /** Both tables, by name: columns, the rows shown and a count line (the CSV uses the same). */
   get tables() {
-    const columns = (first) => [
-      { label: first, fieldName: 'label' },
-      { label: COL_API_NAME, fieldName: 'name' },
-      { label: this.names[0], fieldName: 'aText', wrapText: true },
-      { label: this.names[1], fieldName: 'bText', wrapText: true },
-      { label: COL_DIFFERENCE, fieldName: 'difference', wrapText: true }
-    ];
+    const columns = (first) =>
+      shownColumns(
+        [
+          { label: first, fieldName: 'label' },
+          { label: COL_API_NAME, fieldName: 'name', technical: true },
+          { label: this.names[0], fieldName: 'aText', wrapText: true },
+          { label: this.names[1], fieldName: 'bText', wrapText: true },
+          { label: COL_DIFFERENCE, fieldName: 'difference', wrapText: true }
+        ],
+        this.showTechnicalNames
+      );
     const shown = (diff) => {
       const rows = visibleRows(diff, this.differencesOnly);
       const count = format(COUNTS, String(countDifferences(diff)), String(diff.length));

@@ -16,6 +16,7 @@ import {
 } from 'c/logicModelRules';
 import { LABELS, format, messageFrom, stageLabel } from 'c/logicModelText';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import BarnConfirmModal from 'c/barnConfirmModal';
 
 /**
  * The selected part of a logic model (L-01): its name, description and column, its place in the
@@ -45,7 +46,6 @@ export default class LogicModelPart extends LightningElement {
   draftName = '';
   draftDescription = '';
   draftStage;
-  confirmingDelete = false;
   addingArrow = false;
   draftTargetId;
   draftAssumption = '';
@@ -70,7 +70,39 @@ export default class LogicModelPart extends LightningElement {
   }
 
   get showActions() {
-    return this.canEdit && !this.editing && !this.confirmingDelete;
+    return this.canEdit && !this.editing;
+  }
+
+  /**
+   * Takes the person to these details after they select a part in the columns: scrolls the
+   * panel into view and puts focus on its heading (modules-18).
+   */
+  @api
+  focusHeading() {
+    const heading = this.template.querySelector('[data-id="part-heading"]');
+    if (heading) {
+      if (heading.scrollIntoView) {
+        heading.scrollIntoView({ block: 'start' });
+      }
+      heading.focus();
+    }
+  }
+
+  /** Back to the Model: the builder moves focus to this part's tile in its column. */
+  handleBack() {
+    this.dispatchEvent(new CustomEvent('back'));
+  }
+
+  /** A delete asked in a platform modal with a red button, as in Core (vis-modules-12). */
+  confirmDelete(message, confirmLabel) {
+    return BarnConfirmModal.open({
+      size: 'small',
+      label: confirmLabel,
+      message,
+      confirmLabel,
+      cancelLabel: LABELS.cancel,
+      confirmVariant: 'destructive'
+    });
   }
 
   get measured() {
@@ -168,22 +200,12 @@ export default class LogicModelPart extends LightningElement {
 
   // ---------------------------------------------------------------------------- delete
 
-  handleDelete() {
-    this.confirmingDelete = true;
-  }
-
-  handleDeleteCancel() {
-    this.confirmingDelete = false;
-  }
-
-  handleDeleteConfirm() {
-    return this.run(
-      remove({ recordId: this.elementId }),
-      () => {
-        this.confirmingDelete = false;
-      },
-      LABELS.deleted
-    );
+  async handleDelete() {
+    const confirmed = await this.confirmDelete(LABELS.deletePartConfirm, LABELS.delete);
+    if (!confirmed) {
+      return undefined;
+    }
+    return this.run(remove({ recordId: this.elementId }), null, LABELS.deleted);
   }
 
   // ---------------------------------------------------------------------------- arrows
@@ -287,12 +309,19 @@ export default class LogicModelPart extends LightningElement {
     });
   }
 
-  handleRemoveArrow(event) {
-    return this.run(
-      remove({ recordId: event.currentTarget.dataset.recordId }),
-      null,
-      LABELS.deleted
+  async handleRemoveArrow(event) {
+    const id = event.currentTarget.dataset.recordId;
+    const link = liveLinks(this.model).find((item) => item.id === id);
+    const message = format(
+      LABELS.removeArrowConfirm,
+      link ? this.nameOf(link.fromId) : '',
+      link ? this.nameOf(link.toId) : ''
     );
+    const confirmed = await this.confirmDelete(message, LABELS.remove);
+    if (!confirmed) {
+      return undefined;
+    }
+    return this.run(remove({ recordId: id }), null, LABELS.deleted);
   }
 
   // ----------------------------------------------------------------------- indicators

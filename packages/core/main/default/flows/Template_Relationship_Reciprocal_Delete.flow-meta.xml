@@ -3,6 +3,36 @@
   <apiVersion>67.0</apiVersion>
   <description
   >Template for the delete half of the automation "Keep both sides of relationships in step" (registry row Relationship_Reciprocal). Copy it together with the save template. When a relationship whose Keep Both Sides In Step box is ticked is deleted, deletes its other side too. Deleting both sides in the same save can be refused: delete one side. Your copy does not read our switch or the pause: activating it is its switch. See the admin guide page flow-templates.md.</description>
+  <decisions>
+    <description>Ends the flow when the BarnCRM Automation Control setting has Pause All or Bypass on for the person saving, as BarnCRM's own automation does.</description>
+    <name>Automation_Control</name>
+    <label>Automation control</label>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <defaultConnector>
+      <targetReference>Release_Other_Side</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>Runs</defaultConnectorLabel>
+    <rules>
+      <name>Paused_Or_Bypassed</name>
+      <conditionLogic>or</conditionLogic>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Pause_All__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Bypass__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <label>Paused or bypassed</label>
+    </rules>
+  </decisions>
   <environments>Default</environments>
   <interviewLabel>BarnCRM template: Keep both sides of relationships in step (delete) {!$Flow.CurrentDateTime}</interviewLabel>
   <isTemplate>true</isTemplate>
@@ -85,7 +115,7 @@
     <locationX>50</locationX>
     <locationY>0</locationY>
     <connector>
-      <targetReference>Release_Other_Side</targetReference>
+      <targetReference>Automation_Control</targetReference>
     </connector>
     <filterFormula>AND({!$Record.Is_Reciprocal_Managed__c}, NOT(ISBLANK({!$Record.Reciprocal_Relationship__c})))</filterFormula>
     <object>Relationship__c</object>

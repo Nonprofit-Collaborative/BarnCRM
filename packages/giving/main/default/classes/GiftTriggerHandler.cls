@@ -23,15 +23,15 @@ public with sharing class GiftTriggerHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        List<Gift__c> gifts = (List<Gift__c>) Trigger.new;
+        List<Gift__c> gifts = (List<Gift__c>) newRecords();
         GiftService.defaultGiftDates(gifts);
         GiftService.deriveHouseholds(gifts);
         GiftStatusRules.unlinkCancelledOnInsert(gifts);
     }
 
     public override void beforeUpdate() {
-        List<Gift__c> gifts = (List<Gift__c>) Trigger.new;
-        Map<Id, Gift__c> oldGifts = (Map<Id, Gift__c>) Trigger.oldMap;
+        List<Gift__c> gifts = (List<Gift__c>) newRecords();
+        Map<Id, Gift__c> oldGifts = (Map<Id, Gift__c>) oldRecordsById();
         GiftService.defaultGiftDates(gifts);
         GiftStatusRules.enforceTransitions(gifts, oldGifts);
 
@@ -51,17 +51,17 @@ public with sharing class GiftTriggerHandler extends TriggerHandler {
     }
 
     public override void afterInsert() {
-        GiftService.applyDefaultAllocations((List<Gift__c>) Trigger.new);
+        GiftService.applyDefaultAllocations((List<Gift__c>) newRecords());
     }
 
     public override void afterUpdate() {
         GiftService.synchronizeAllocationsToAmount(
-            (List<Gift__c>) Trigger.new,
-            (Map<Id, Gift__c>) Trigger.oldMap
+            (List<Gift__c>) newRecords(),
+            (Map<Id, Gift__c>) oldRecordsById()
         );
         GiftStatusRules.logCancellations(
-            (List<Gift__c>) Trigger.new,
-            (Map<Id, Gift__c>) Trigger.oldMap
+            (List<Gift__c>) newRecords(),
+            (Map<Id, Gift__c>) oldRecordsById()
         );
     }
 }

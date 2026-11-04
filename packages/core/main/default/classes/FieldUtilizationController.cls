@@ -203,9 +203,7 @@ public with sharing class FieldUtilizationController {
                 return result;
             }
             if (fieldNames.size() > FieldUtilizationService.CHUNK_SIZE) {
-                throw new FieldUtilizationException(
-                    System.Label.Core_FieldUtilization_UnexpectedError
-                );
+                throw new FieldUtilizationException(unexpectedError());
             }
             Map<String, Integer> totals = FieldUtilizationService.totalsByRecordType(described);
             requireNotTooLarge(FieldUtilizationService.sum(totals));
@@ -506,9 +504,7 @@ public with sharing class FieldUtilizationController {
                 return result;
             }
             if (fieldNames.size() > PicklistUsageService.CHUNK_SIZE) {
-                throw new FieldUtilizationException(
-                    System.Label.Core_FieldUtilization_UnexpectedError
-                );
+                throw new FieldUtilizationException(unexpectedError());
             }
             Integer total = PicklistUsageService.total(described);
             requireNotTooLarge(total);
@@ -592,9 +588,7 @@ public with sharing class FieldUtilizationController {
                 return result;
             }
             if (fieldNames.size() > PicklistUsageService.CHUNK_SIZE) {
-                throw new FieldUtilizationException(
-                    System.Label.Core_FieldUtilization_UnexpectedError
-                );
+                throw new FieldUtilizationException(unexpectedError());
             }
             Id after = startAfter(described, afterId);
             requireNotTooLarge(PicklistUsageService.total(described));
@@ -644,7 +638,7 @@ public with sharing class FieldUtilizationController {
             after = null;
         }
         if (after == null || after.getSObjectType() != described.getSObjectType()) {
-            throw new FieldUtilizationException(System.Label.Core_FieldUtilization_UnexpectedError);
+            throw new FieldUtilizationException(unexpectedError());
         }
         return after;
     }
@@ -731,7 +725,13 @@ public with sharing class FieldUtilizationController {
             caught,
             caught instanceof FieldUtilizationException,
             context,
-            System.Label.Core_FieldUtilization_UnexpectedError
+            unexpectedError()
         );
+    }
+
+    /** The page's catch-all message, from the Core help catalog. */
+    @TestVisible
+    private static String unexpectedError() {
+        return BarnHelp.text('Core', 'Core_FieldUtilization_UnexpectedError');
     }
 }

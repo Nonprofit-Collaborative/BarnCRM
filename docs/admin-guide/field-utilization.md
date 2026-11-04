@@ -1,16 +1,18 @@
-# Field Utilization
+# Field Use
+
+Field Use was called Field Utilization until v1.0; its records keep that name (**Field
+Utilization Snapshot**).
 
 ## What It Does
 
-Field utilization shows, for the kind of record you choose (people, households and
+Field Use shows, for the kind of record you choose (people, households and
 organizations, gifts, or any other kind of record you can see), how many records have each field
 filled in. Where a kind of record has record types, such as households and organizations, each
 record type is counted on its own, because a field that matters for organizations may be
 meaningless for households.
 
-The count runs when you ask for it, in the **Field Utilization** section of the **Org
-Optimizer** tab. Choose **Save these
-counts** to keep a result; the next time you count, the page shows the saved result next to the
+The count runs when you ask for it, in the **Field Use** section of the **Org
+Optimizer** tab. Choose **Save Snapshot** to keep a result; the next time you count, the page shows the saved result next to the
 new one, so you can see the trend: a field that went from 40% to 70% filled since the last saved
 count is being adopted; a field that sits at 0% count after count is a field nobody uses, and a
 candidate to retire or hide. A field that is nearly always filled is a candidate to make
@@ -21,7 +23,7 @@ It only counts. It never changes a record, a field or a page.
 ## How to Turn It On
 
 You need the BarnCRM Admin role (the BarnCRM Admin permission set, which carries the Manage
-BarnCRM Settings permission). It shows you the **Field Utilization** section of the **Org
+BarnCRM Settings permission). It shows you the **Field Use** section of the **Org
 Optimizer** tab in the BarnCRM app. Nobody else sees the section. There is nothing to schedule
 and no setting to change.
 
@@ -29,19 +31,20 @@ and no setting to change.
 
 Start from the sample data (see [Sample data](sample-data.md)).
 
-1. In the BarnCRM app, open the **Org Optimizer** tab and choose **Field Utilization**.
-2. In **Kind of Record**, choose **Account**. The page counts the records, then fills the table
+1. In the BarnCRM app, open the **Org Optimizer** tab and choose **Field Use**.
+2. In **Kind of record**, choose **Account**. The page counts the records, then fills the table
    as it counts the fields, 40 at a time, with a progress bar. When it is done it reads, for
    example, "Counted 56 of 56 fields."
 3. The table lists every field it counted, once per record type: Household and Organization.
-   Each row shows the field's label and API name, how many records have it filled in, how many
-   records there are, and the percentage. Sort by **Filled** to put the least used fields first.
-4. Choose **Save Utilization Snapshot**. Small text under the button says "Keeps this count so
+   Each row shows the field's label, how many records have it filled in, how many records there
+   are, and the percentage. Sort by **Filled** to put the least used fields first. Turn on
+   **Show technical names** above the table to add the **API Name** column (it starts off).
+4. Choose **Save Snapshot**. Small text under the button says "Keeps this count so
    your next count shows what changed." The page reads, for example, "Saved 112 counts."
 5. Open any sample organization and fill in its **Website**. Go back to the section and choose
    **Count Again**. The Website row for Organization now shows a higher percentage, **Saved**
-   shows the percentage you saved in step 4, and **Change (Points)** shows how many percentage
-   points it moved since then.
+   shows the percentage you saved in step 4, and **Change Since Saved Count** shows how many
+   percentage points it moved since then.
 6. For a field almost nobody fills in, open the action menu at the end of its row and choose
    **Where Used** to see which BarnCRM setup still uses it before you retire it
    ([Where Used and Retire a Field](where-used.md)).
@@ -98,7 +101,7 @@ the Field Utilization Snapshot records, so reports see them.
 Each row has three actions:
 
 - **Compare with this one.** Until you choose, the page compares with the latest save. Choose
-  this on an older save and the **Saved** and **Change (Points)** columns, and the line above the
+  this on an older save and the **Saved** and **Change Since Saved Count** columns, and the line above the
   table, follow that save instead. It is a choice for what you are looking at: counting again,
   saving, deleting a save or choosing another kind of record puts the comparison back on the
   latest save.
@@ -114,7 +117,7 @@ kind of record yet."
 
 ## Picklist Value Usage
 
-Under the Field Utilization table, **Picklist Value Usage** answers a different question: which
+Under the Field Use table, **Picklist Value Usage** answers a different question: which
 values of a picklist are still used? Choose a kind of record, then click **Show Picklist Value
 Usage**. Nothing is read until you click.
 
@@ -163,7 +166,7 @@ percentages look low or a record type is missing, have an administrator who can 
 count and save instead.
 
 **Expecting a trend without saving.** A count you do not save is gone when you leave the page.
-Choose **Save Utilization Snapshot** after any count you want to compare against later.
+Choose **Save Snapshot** after any count you want to compare against later.
 
 **Expecting a field to be counted that is not in the table.** A field is left out when it is a
 formula, a checkbox, required on every record, or hidden from you (see **What Is Counted**). Give

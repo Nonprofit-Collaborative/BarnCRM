@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Fundraising Home: five figures that open their lists (gifts to thank, overdue pledge payments,
+    my asks due this month, open gift batches, running stewardship plans), Enter a Gift, and the
+    Fundraising Setup tiles (people-giving-22).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Fundraising Home</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

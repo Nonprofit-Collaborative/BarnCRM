@@ -230,6 +230,127 @@ public class TestDataFactory {
         Database.DMLOptions options = new Database.DMLOptions();
         options.DuplicateRuleHeader.allowSave = true;
         record.setOptions(options);
+        return fillOrgRequiredFields(record);
+    }
+
+    private static Map<Schema.SObjectType, List<Schema.DescribeFieldResult>> requiredByType = new Map<Schema.SObjectType, List<Schema.DescribeFieldResult>>();
+
+    /**
+     * Fills every custom field the org requires on this kind of record that the test left
+     * empty, so an organization's own required field (a "Region" every Contact must have) does
+     * not fail BarnCRM's tests during a production install (architect review RT-02; Admin
+     * Guide, Installing BarnCRM, If a Test Fails). A field is required when the platform needs
+     * a value on insert: not nillable, createable, and with no default. Text, number, date,
+     * email, phone, URL and picklist fields get a plain sample value; a required lookup cannot
+     * be filled and is left alone (the install pre-check reports it). A value the test set is
+     * never changed, and standard fields are the test's own business.
+     *
+     * @param record a record a test is about to save
+     * @return the same record
+     */
+    @NamespaceAccessible
+    public static SObject fillOrgRequiredFields(SObject record) {
+        for (Schema.DescribeFieldResult field : requiredCustomFields(record.getSObjectType())) {
+            if (record.get(field.getName()) != null) {
+                continue;
+            }
+            Object value = sampleValue(
+                field.getType(),
+                field.getLength(),
+                firstActiveValue(field.getPicklistValues())
+            );
+            if (value != null) {
+                record.put(field.getName(), value);
+            }
+        }
         return record;
+    }
+
+    private static List<Schema.DescribeFieldResult> requiredCustomFields(Schema.SObjectType kind) {
+        List<Schema.DescribeFieldResult> required = requiredByType.get(kind);
+        if (required == null) {
+            required = new List<Schema.DescribeFieldResult>();
+            for (Schema.SObjectField token : kind.getDescribe().fields.getMap().values()) {
+                Schema.DescribeFieldResult field = token.getDescribe();
+                // A person account field (__pc) belongs to the Contact side and is refused on a
+                // business account, so it is left to the test.
+                if (
+                    field.isCustom() &&
+                    !field.getName().endsWithIgnoreCase('__pc') &&
+                    !field.isNillable() &&
+                    field.isCreateable() &&
+                    !field.isDefaultedOnCreate()
+                ) {
+                    required.add(field);
+                }
+            }
+            requiredByType.put(kind, required);
+        }
+        return required;
+    }
+
+    /** The default active picklist value, else the first active one, else null. */
+    @TestVisible
+    private static String firstActiveValue(List<Schema.PicklistEntry> entries) {
+        String first;
+        for (Schema.PicklistEntry entry : entries) {
+            if (entry.isActive() && entry.isDefaultValue()) {
+                return entry.getValue();
+            }
+            if (entry.isActive() && first == null) {
+                first = entry.getValue();
+            }
+        }
+        return first;
+    }
+
+    /**
+     * A plain value for a required field of this type, or null when no sample value would be
+     * right (a lookup, a compound or binary field).
+     */
+    @TestVisible
+    private static Object sampleValue(
+        Schema.DisplayType type,
+        Integer length,
+        String picklistValue
+    ) {
+        switch on type {
+            when STRING, TEXTAREA, ENCRYPTEDSTRING {
+                return length != null && length > 0 && length < 4 ? 'Test'.left(length) : 'Test';
+            }
+            when EMAIL {
+                return 'barncrm.test@example.com';
+            }
+            when PHONE {
+                return '555-0100';
+            }
+            when URL {
+                return 'https://example.com';
+            }
+            when INTEGER {
+                return 0;
+            }
+            when DOUBLE, CURRENCY, PERCENT {
+                return 0.0;
+            }
+            when LONG {
+                return 0L;
+            }
+            when DATE {
+                return Date.today();
+            }
+            when DATETIME {
+                return System.now();
+            }
+            when TIME {
+                return Time.newInstance(9, 0, 0, 0);
+            }
+            when PICKLIST, MULTIPICKLIST {
+                return picklistValue;
+            }
+            when else {
+                return null;
+            }
+        }
     }
 }

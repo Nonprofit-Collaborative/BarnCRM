@@ -406,24 +406,24 @@ Dot,Zzshirt,dot.zzshirt@example.org,M,2026-10-04
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Import**. | **Delete Import Rows** shows **After 30 Days**, never a blank box, with the choices **Once Complete**, **After 30 Days**, **After 90 Days** and **Never**. |
+| 1 | Open **BarnCRM Settings**, **Import**. | **Delete import rows** shows **After 30 Days**, never a blank box, with the choices **Once Complete**, **After 30 Days**, **After 90 Days** and **Never**. |
 | 2 | Choose **Once Complete** and save. | Saved for the whole org. |
 | 3 | Import `import-test-1.csv` with **Generic contact list** as in T-IMP-01, steps 1 to 8. Open the import's **Data Job** record (from the **Data Jobs** list view). | **Created** 3, **Rejected** 1. Its **Import Rows** related list shows 4 rows. |
 | 4 | The next morning, open the same Data Job record. | **Import Rows** is empty; the counts and **Run Log** are unchanged. |
 | 5 | Open the Import tab and open the row menu beside the import and select **Undo**, then **Undo This Import**. Refresh until it reads **Undone**. | **Undone**. Testa Rivera, Ben Okoro and Cara Lind are gone: undo never needed the rows. |
-| 6 | Set **Delete Import Rows** back to **After 30 Days** and save. | Saved. |
+| 6 | Set **Delete import rows** back to **After 30 Days** and save. | Saved. |
 
 **Cleanup:** none.
 
 ## T-IMP-20: Browse Import Rows, Correct a Rejected Row and Retry It
 
 **Purpose:** confirm a rejected row can be found, corrected on screen beside its file values, and retried into the same import by anyone who runs imports, not only the person who committed it, and that one undo still covers it.
-**Prerequisites:** admin; a second user with BarnCRM Admin (the import permission); a third user with BarnCRM Staff only; **Delete Import Rows** is not **Once Complete**; `import-test-1.csv`.
+**Prerequisites:** admin; a second user with BarnCRM Admin (the import permission); a third user with BarnCRM Staff only; **Delete import rows** is not **Once Complete**; `import-test-1.csv`.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Import `import-test-1.csv` with **Generic contact list** as in T-IMP-01, steps 1 to 8. | **Created** 3, **Rejected** 1 (Dee, no last name). |
-| 2 | In the **BarnCRM Admin** app, open the **Import Rows** tab and choose each list view: **All Import Rows**, **Rejected Import Rows**, **Rejected Rows of Complete Imports**. | Each shows rows with **Import Batch**, **Row Number**, **Status** and **Data Job Status**; the rejected views show Dee's row with **Data Job Status** Complete. |
+| 2 | In the **BarnCRM Admin** app, open **Import Rows** from the App Launcher (it is not in the navigation bar) and choose each list view: **All Import Rows**, **Rejected Import Rows**, **Rejected Rows of Complete Imports**. | Each shows rows with **Import Batch**, **Row Number**, **Status** and **Data Job Status**; the rejected views show Dee's row with **Data Job Status** Complete. |
 | 3 | Log in as the Staff-only user and open Dee's row from the import's Data Job record (**Import Rows** list). | The card is read only and says you need the Manage BarnCRM Settings permission. |
 | 4 | Log in as the second user (not the one who committed the import) and open Dee's row. | A **Super Importer Row** card shows **Status** Rejected, a link to the import, **Why It Was Rejected**, and a table of **Column**, **File Value** and **Corrected Value** for every column of the file. |
 | 5 | Type `Nolast` in **Corrected Value** beside **Last Name** and select **Save Corrections**. | "Corrections saved. The file's values are kept beside them." **File Value** for Last Name is still empty; **Raw Values** in the details below is unchanged; "1 corrected rows in this import are ready to retry." |
@@ -496,3 +496,18 @@ ana.rowe@example.org,Rivergate Library,Volunteer,true,2026-03-01
 | 7 | In an org installed before this release, open the Import tab after the upgrade. | **Relationships** and **Affiliations** are added; existing templates are unchanged. |
 
 **Cleanup:** undo both imports from **Recent Imports** (see T-IMP-03); delete the test contacts and organization.
+
+## T-IMP-23: Reorder Value Changes
+
+**Purpose:** confirm the changes on a column can be reordered by button and by drag, on a desktop, a phone and with a screen reader.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Upload `import-test-2.csv` as in T-IMP-07. Beside **Last Name**, select **Change Values**, then add **Capitalize each word** and **Find and replace** (find `-TEST`, replace with nothing). | Two changes, in that order. The first one's **Move Up** arrow and the last one's **Move Down** arrow are greyed out. |
+| 2 | On the second change, select **Move Up** with the keyboard (Tab to it, press Enter). | **Find and replace** is now first; the before and after preview updates. A screen reader says "Find and replace, position 1 of 2." |
+| 3 | Drag the handle at the left of **Find and replace** below **Capitalize each word** with the mouse, then press Escape halfway through a second drag. | The first drag swaps them back; a blue line shows where the change lands. The cancelled drag changes nothing. |
+| 4 | Tab to a change's handle, press Space, press the down arrow, press Space. | A screen reader hears "Picked up", the new position, then "Moved". The change moves down one place. |
+| 5 | On a phone (or the browser's device view), press and hold a change's handle, then drag it. A quick swipe on the handle instead scrolls the page. | The change moves after the hold; the swipe only scrolls. |
+| 6 | Open **Super Transformer**, choose a text field and **Change With Steps**, add two steps and repeat step 2. | The steps move the same way. |
+
+**Cleanup:** leave the page without importing.

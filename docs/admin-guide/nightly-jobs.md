@@ -22,6 +22,24 @@ The jobs in the run, by time of night:
 | 1:45 | Empty household tidy-up | Core | **Delete Empty Households**, People and Households section |
 | 7:00 | Error Log digest and cleanup | Core | **Schedule Daily Run** and **Stop Daily Run**, Error Log section |
 
+With modules installed, these join the run (Schedule and Stop on each job's page now switch it
+on and off; a job without a switch runs whenever its module is on):
+
+| Time | Job | Module | Switched on and off |
+|---|---|---|---|
+| 1:15, 1:45, 3:00, 3:30 | Installment top up, installments overdue, donor levels, ask reminders | Giving | **Nightly Jobs** page, all four together (on unless switched off) |
+| 1:30 | Opportunity mirror | Mirror | Opportunity mirror page, while a direction is chosen |
+| 1:35 | Gift Transaction mirror | Mirror | Gift Transaction mirror page, while the mirror is on |
+| 2:00 (the **Time of the Nightly Run** setting) | Rollup recalculation | Rollup Builder | Rollups page |
+| 2:45 | Acknowledgment emails | Giving | Acknowledgments page (off until switched on) |
+| 3:00 | Volunteer schedules | Volunteers | No switch |
+| 3:15 | Pledge reminders | Giving | Pledge Reminders page (off until switched on) |
+| 3:30 | Indicator results | Logic Models | No switch |
+| 6:00 | Grant reminders | Funders | No switch |
+| 7:00 | Volunteer shift reminders | Volunteers | No switch |
+
+The donor levels pass writes a donor only when its level or scores changed.
+
 Modules add their own jobs to the same run when they are installed (Rollup Builder, Giving,
 Mirror, Volunteers, Logic Models, Funders). The Nightly Jobs panel lists every job your org has.
 

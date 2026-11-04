@@ -40,18 +40,18 @@ public with sharing class HouseholdMemberTriggerHandler extends TriggerHandler {
     };
 
     public override void beforeInsert() {
-        refuseSecondCurrentMemberships((List<Household_Member__c>) Trigger.new, null);
-        refuseSecondPrimary((List<Household_Member__c>) Trigger.new, null);
+        refuseSecondCurrentMemberships((List<Household_Member__c>) newRecords(), null);
+        refuseSecondPrimary((List<Household_Member__c>) newRecords(), null);
     }
 
     public override void beforeUpdate() {
         refuseSecondCurrentMemberships(
-            (List<Household_Member__c>) Trigger.new,
-            (Map<Id, Household_Member__c>) Trigger.oldMap
+            (List<Household_Member__c>) newRecords(),
+            (Map<Id, Household_Member__c>) oldRecordsById()
         );
         refuseSecondPrimary(
-            (List<Household_Member__c>) Trigger.new,
-            (Map<Id, Household_Member__c>) Trigger.oldMap
+            (List<Household_Member__c>) newRecords(),
+            (Map<Id, Household_Member__c>) oldRecordsById()
         );
     }
 

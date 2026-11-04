@@ -650,7 +650,9 @@ public with sharing class AddressService {
         for (Address__c source : sources) {
             Id personId = source.Contact__c != null ? source.Contact__c : source.Person_Account__c;
             if (personId == null) {
-                throw new AddressMoveException(System.Label.Core_Address_MoveNotAPersonsAddress);
+                throw new AddressMoveException(
+                    BarnHelp.text('Core', 'Core_Address_MoveNotAPersonsAddress')
+                );
             }
             personIds.add(personId);
         }

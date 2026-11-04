@@ -14,7 +14,7 @@ sides in step for them the same way it does for its own.
 
 The second list is **Merge Rules**: which value wins, field by field, when auto-merge merges
 two people (see [Duplicates](duplicates.md#merge-rules)). BarnCRM ships none; a field with no
-rule follows the **Merge Rule For Other Fields** setting.
+rule follows the **Merge rule for other fields** setting.
 
 Match sources, the related records the duplicate scan and imports compare, are custom
 metadata too, but they have their own editor: the **Matching Logic** area of the

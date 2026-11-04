@@ -56,7 +56,8 @@ describe('c-hub-errors', () => {
     getHomeModel.emit({ newErrorCount: 3 });
     await settle();
 
-    expect(byId(element, 'error-count').textContent).toBe('3');
+    expect(byId(element, 'error-count').value).toBe(3);
+    expect(element.shadowRoot.querySelector('lightning-card').iconName).toBe('custom:custom53');
     byId(element, 'open-error-log').click();
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__objectPage',
@@ -70,7 +71,7 @@ describe('c-hub-errors', () => {
     getHomeModel.emit({ newErrorCount: 999, newErrorCountCapped: true });
     await settle();
 
-    expect(byId(element, 'error-count').textContent).toBe('999+');
+    expect(byId(element, 'error-count').value).toBe('999+');
   });
 
   it('says the tile could not load rather than showing zero', async () => {
@@ -79,7 +80,7 @@ describe('c-hub-errors', () => {
     await settle();
 
     expect(byId(element, 'error-count')).toBeNull();
-    expect(byId(element, 'load-error').textContent).toContain('Core_HubHome_LoadErrorMessage');
+    expect(byId(element, 'load-error').message).toContain('Core_HubHome_LoadErrorMessage');
   });
 
   it('badges All Clear at no new errors, and only once the count has arrived', async () => {
@@ -112,10 +113,9 @@ describe('c-hub-errors', () => {
     await settle();
 
     const status = byId(element, 'install-status');
-    expect(status.textContent).toContain('Core_HubHome_InstallProblems');
-    expect(status.getAttribute('aria-live')).toBe('polite');
-    const icon = status.querySelector('lightning-icon');
-    expect(icon.alternativeText).toBe('c.Core_HubHome_WarningAltText');
+    // A warning notice carries its own icon and role, so it is never color alone.
+    expect(status.message).toContain('Core_HubHome_InstallProblems');
+    expect(status.variant).toBe('warning');
   });
 
   it('says nothing about the install to someone who cannot read the Error Log', async () => {
@@ -132,6 +132,6 @@ describe('c-hub-errors', () => {
     await settle();
 
     expect(byId(element, 'install-status')).toBeNull();
-    expect(byId(element, 'error-count').textContent).toBe('0');
+    expect(byId(element, 'error-count').value).toBe(0);
   });
 });

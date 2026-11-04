@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: Health Check tile badge; {0} errors in the last run</shortDescription>
-        <value>Errors: {0}</value>
+        <value>Needs Fixing: {0}</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_BadgeWarnings</fullName>
@@ -62,15 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: Health Check tile badge; {0} warnings in the last run</shortDescription>
-        <value>Warnings: {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_BadgePassed</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: Health Check tile badge when the last run found no problem</shortDescription>
-        <value>Passed</value>
+        <value>Worth Knowing: {0}</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_BadgeNotRun</fullName>

@@ -19,7 +19,7 @@
                 ></lightning-button>
             </lightning-button-group>
         </div>
-        <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+        <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
 
         <div class="slds-is-relative">
             <template lwc:if={busy}>
@@ -27,14 +27,20 @@
             </template>
 
             <template lwc:if={errorMessage}>
-                <p class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">
-                    {errorMessage}
-                </p>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    variant="error"
+                    message={errorMessage}
+                    data-id="error"
+                ></c-barn-notice>
             </template>
             <template lwc:if={noticeMessage}>
-                <p class="slds-var-m-bottom_small" role="status" aria-live="polite" data-id="notice">
-                    {noticeMessage}
-                </p>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    variant="success"
+                    message={noticeMessage}
+                    data-id="notice"
+                ></c-barn-notice>
             </template>
 
             <p class="slds-var-m-bottom_xx-small" data-id="kept">{keptLine}</p>

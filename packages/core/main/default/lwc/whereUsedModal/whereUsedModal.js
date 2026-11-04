@@ -11,7 +11,6 @@ import NOT_CHECKED from '@salesforce/label/c.Core_WhereUsed_NotChecked';
 import OPEN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
 import INCOMPLETE from '@salesforce/label/c.Core_WhereUsed_Incomplete';
 import NONE from '@salesforce/label/c.Core_WhereUsed_None';
-import NONE_OBJECT from '@salesforce/label/c.Core_WhereUsed_NoneObject';
 import COUNT from '@salesforce/label/c.Core_WhereUsed_Count';
 import COUNT_ONE from '@salesforce/label/c.Core_WhereUsed_CountOne';
 import NAMED_IN from '@salesforce/label/c.Core_WhereUsed_NamedIn';
@@ -144,7 +143,7 @@ export default class WhereUsedModal extends LightningModal {
   }
 
   get noneText() {
-    return this.wholeObject ? NONE_OBJECT : NONE;
+    return this.wholeObject ? helpText('Core', 'Core_WhereUsed_NoneObject') : NONE;
   }
 
   get showEmpty() {

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <baseObject>Error_Log__c</baseObject>
+  <category>other</category>
+  <deployed>true</deployed>
+  <description>
+    BarnCRM Error Log entries, with when, how serious, where and their status, for the Errors by
+    Day chart.
+  </description>
+  <label>BarnCRM Error Logs</label>
+  <sections>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Name</field>
+      <table>Error_Log__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Timestamp__c</field>
+      <table>Error_Log__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Severity__c</field>
+      <table>Error_Log__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Status__c</field>
+      <table>Error_Log__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Context__c</field>
+      <table>Error_Log__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Object_Name__c</field>
+      <table>Error_Log__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Record_Reference__c</field>
+      <table>Error_Log__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>User__c</field>
+      <table>Error_Log__c</table>
+    </columns>
+    <masterLabel>Error Log</masterLabel>
+  </sections>
+</ReportType>

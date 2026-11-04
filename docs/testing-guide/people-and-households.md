@@ -7,7 +7,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HH-01: A New Person Gets a Household
 
 **Purpose:** saving a person with no household creates and names one, and both panels show it.
-**Prerequisites:** admin. **Create Households Automatically** is on (ships on).
+**Prerequisites:** admin. **Create households automatically** is on (ships on).
 **Smoke:** yes
 
 | Step | Action | Expected result |
@@ -49,6 +49,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Open **Add Member** again, search `Diego`, and select **Diego Garcia**. | Diego joins The Testwell Family and stays in The Garcia Family. His **Household** panel lists both households. |
 | 6 | Open the **Household Members** tab, open Diego's new membership, set **End Date** to yesterday, and save. | Diego disappears from The Testwell Family's panel and its Member Count drops by one. The Garcia Family is unchanged. |
 | 7 | Create a second current membership for Ben in The Testwell Family from the **Household Members** tab. | Refused: **This person is already a current member of this household. Edit their existing membership instead of adding another.** |
+| 8 | Open **Add Member** on The Testwell Family and, under **Or Add Someone New**, type First Name `Diego` and Last Name `Garcia`. Wait a moment. | A note under the name reads **Already in BarnCRM: Diego Garcia**, his city if known and **(The Garcia Family)**, then **Use this person instead?** Typing `Ben` `Testwell` offers nobody, because Ben is already a member. |
+| 9 | Select **Use this person instead?** on Diego. | The dialog closes; Diego is listed as a member, and Contacts still holds one Diego Garcia. Remove this membership afterwards. |
 
 **Cleanup:** delete Diego's ended membership record.
 
@@ -70,7 +72,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HH-05: Greetings: Deceased, Preferred Name, Exclusions, Custom Name
 
 **Purpose:** person-level boxes change the greetings, and Custom Name locks the name and every greeting that has a value.
-**Prerequisites:** admin, The Testwell Family with Ada and Ben, **Include People Who Have Died in Names** off (ships off).
+**Prerequisites:** admin, The Testwell Family with Ada and Ben, **Include people who have died in names** off (ships off).
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -111,7 +113,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | Create a contact `Cara` `Testwell` with no account. | A second household named **The Testwell Family** is created for her. |
 | 2 | Open the first Testwell household (Ada's) and select **Merge or Split** in the action bar. | A window titled **Merge or Split Households** opens on the **Merge** tab with **Pick a household to see the two side by side.** |
-| 3 | Type `Testwell` in **Find the Other Household** and pick Cara's household. | The comparison shows **Field**, **This Household**, **The Other Household**; differing values offer **Keep this one** or **Keep the other one**. **Members After the Merge** lists Ada and Ben (**From this household**) and Cara (**From the other household**). |
+| 3 | Type `Testwell` in **Find the Other Household** and pick Cara's household. | The picker lists households only, never this one, each with its billing city. The comparison shows **Field**, **This Household**, **The Other Household**; differing values offer **Keep This One** or **Keep the Other One**. **Members After the Merge** lists Ada and Ben (**From this household**) and Cara (**From the other household**). |
+| 3a | Select **Keep the Other Household Instead**, then **Keep This Household Instead**. | The first swaps the roles: the columns stay put, the members' badges stay with their households, and the link reads **Keep This Household Instead**; the second swaps back. (Merging while swapped keeps Cara's household and the page goes to it.) |
 | 4 | Select **Merge**. | A dialog headed **This Cannot Be Undone** says Cara's household will be combined into this one. |
 | 5 | Select **Cancel**. | Nothing changes: both households still exist with their members. |
 | 6 | Select **Merge**, then **Merge Households**. | Toast **Merged. The household you kept now holds everyone from both.** The window closes and the page refreshes: Member Count **3**, Cara in **Members**. Cara's old household no longer exists. |
@@ -126,10 +129,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Select **Merge or Split**, then the **Split** tab. | **Choose Who Moves Out** lists the three members; **Split** is disabled until someone is ticked. |
-| 2 | Tick Cara, leave **A new household**, and select **Split**. | A dialog headed **Split This Household?** opens. |
+| 1 | Select **Merge or Split**, then the **Split** tab. | Under **Choose Who Moves Out**, two columns: **Stays in** the household's name, holding the three members as tiles with checkboxes, and an empty **Moves to a New Household**. **Split** is disabled until someone is in the Moves column. |
+| 1a | Drag Ben's tile into **Moves to a New Household** (on a tablet, press and hold first), then use **Move to** with the household's name in his tile's menu. | The drag moves Ben across and ticks his checkbox, and a screen reader hears **Moved Ben Testwell to a New Household.**; the menu moves him back and unticks it. With the keyboard: focus his tile, Space, Right Arrow, Space does the same. |
+| 2 | Tick Cara, leave **A new household**, and select **Split**. | Cara's tile moves to the Moves column. A dialog headed **Split This Household?** opens. |
 | 3 | Select **Split** in the dialog. | Toast **Moved. Both household names and member counts are up to date.** Cara's new household **The Testwell Family** has Member Count **1**; the original has **2**. |
-| 4 | Undo: on Cara's new household, **Merge or Split**, **Split**, tick Cara, choose **An existing household**, search `Testwell`, pick the original, and split. | Cara is back in the original (Member Count **3**). Her emptied household remains with Member Count **0** and keeps its name, because **Delete Empty Households** ships off. |
+| 4 | Undo: on Cara's new household, **Merge or Split**, **Split**, tick Cara, choose **An existing household**, pick the original in **Find the Other Household**, and split. | The Moves column heading changes to **Moves to** the original's name. Cara is back in the original (Member Count **3**). Her emptied household remains with Member Count **0** and keeps its name, because **Delete Empty Households** ships off. |
 
 **Cleanup:** delete the empty household.
 
@@ -142,9 +146,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | In an org without Person Accounts that has not changed it, open **BarnCRM Settings**, **People and Households**, and read **How people belong to a household** without touching it. | **One household per person (simple)** is selected, never an empty choice. (An org with Person Accounts, or one set up alongside Nonprofit Cloud, shows **A person can belong to more than one household (flexible)** instead.) |
 | 2 | Switch **How people belong to a household** to the other way and save. | Refused with a message starting **You cannot switch to the flexible way of belonging yet.** (or **...to the simple way...**) naming how many people it affects. The setting is unchanged. |
-| 3 | Tick **Delete Empty Households** and save. | Saved. |
+| 3 | Tick **Delete empty households** and save. | Saved. |
 | 4 | Create contact `Dee` `Testempty`, then move Dee into The Testwell Family with **Move to Another Household**. | Dee's own household is deleted (it is gone from the **Households** tab). |
-| 5 | Untick **Delete Empty Households** and save. | Saved. |
+| 5 | Untick **Delete empty households** and save. | Saved. |
 
 **Cleanup:** delete Dee Testempty.
 
