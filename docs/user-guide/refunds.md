@@ -45,7 +45,7 @@ You should see: the gift saved as `Cancelled`, with no negative gift. A Cancelle
 - **Matching gifts**: refunding the company's gift gives the employee a negative **Matched Donor** credit for what went back. You do not unlink the pair first. Refunding the employee's own gift does not change the match.
 - **Thank-yous** already sent stand. Refunds are never acknowledged.
 
-Totals are recalculated by BarnCRM, sometimes a little later. **Rollups Last Calculated** on a record says when its numbers were worked out.
+Totals are recalculated by BarnCRM, sometimes a little later. **Totals Last Updated** on a record says when its numbers were worked out.
 
 ## Common Problems
 

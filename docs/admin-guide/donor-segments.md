@@ -39,8 +39,8 @@ Each template saves a new segment you can change. The amounts and days are start
 | Upgraders | Gave last year and has already given more this year than all of last year. |
 | Level Movers | Moved from one donor level to another in the last 90 days. |
 | Major Gift Prospects | A largest gift of 1,000 or more or total giving of 5,000 or more, and a gift in the last two years. |
-| Champions | Donors whose RFM segment is Champion: recent, frequent and generous (see [Donor scoring](donor-scoring.md)). |
-| Slipping Donors | Donors whose RFM segment is At Risk: they gave often or generously before, but not lately. |
+| Champions | Donors whose giving pattern is Champion: recent, frequent and generous (see [Donor scoring](donor-scoring.md)). |
+| Slipping Donors | Donors whose giving pattern is At Risk: they gave often or generously before, but not lately. |
 
 Every template works for **people** or for **organizations**. People who have died are left
 out. For organizations, only accounts that are organizations count, never households.

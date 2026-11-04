@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Rollups_Last_Calculated__c</fullName>
     <description>When this installment's rollups last completed a calculation.</description>
-    <label>Rollups Last Calculated</label>
+    <label>Totals Last Updated</label>
     <required>false</required>
     <trackTrending>false</trackTrending>
     <type>DateTime</type>

@@ -129,5 +129,5 @@ made it.
   a refund or a write-off linked to it, so it cannot be deleted". If the refund itself was
   recorded in error, delete the refund first.
 - **Expecting totals to move immediately.** Donor, fund and appeal totals are calculated by
-  the rollup engine. Each record's **Rollups Last Calculated** tells you when its numbers
+  the rollup engine. Each record's **Totals Last Updated** tells you when its numbers
   were worked out.

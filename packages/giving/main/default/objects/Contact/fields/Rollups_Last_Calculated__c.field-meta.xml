@@ -5,7 +5,7 @@
   <inlineHelpText>
     When BarnCRM last worked out the giving numbers on this record.
   </inlineHelpText>
-  <label>Rollups Last Calculated</label>
+  <label>Totals Last Updated</label>
   <required>false</required>
   <trackTrending>false</trackTrending>
   <type>DateTime</type>

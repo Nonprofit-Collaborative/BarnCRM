@@ -141,7 +141,7 @@ Start from the sample data. The first part is David's work, the last step is Jen
     choose the first payment.
 11. Choose **Save**, then go back to the commitment. The first payment now reads **Paid**,
     paid to date reads 100, and the balance reads 1,100. The gift is at the top of the
-    commitment's **Gifts** list.
+    commitment's **Gifts** list on the **Related** tab.
 
 If David had left **Installment** empty, BarnCRM would have linked the gift to the
 oldest unpaid payment by itself, because the automatic setting is on.
