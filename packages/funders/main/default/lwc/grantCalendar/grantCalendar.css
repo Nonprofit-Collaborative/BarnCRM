@@ -122,3 +122,15 @@
     white-space: normal;
   }
 }
+
+/* modules-5: the printed month keeps its grid and drops the buttons. */
+@media print {
+  .barn-print-hide,
+  lightning-button-icon {
+    display: none;
+  }
+
+  .barn-day {
+    height: auto;
+  }
+}

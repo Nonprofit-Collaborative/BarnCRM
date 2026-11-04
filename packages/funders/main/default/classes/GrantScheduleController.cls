@@ -134,7 +134,7 @@ public with sharing class GrantScheduleController {
             return schedule;
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.getSchedule', grantId);
-            throw UserErrors.message(Label.Funders_Schedule_ErrorLoad);
+            throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Schedule_LoadFailed'));
         }
     }
 
@@ -147,6 +147,8 @@ public with sharing class GrantScheduleController {
             'scheduled' => grantFields.get('Amount_Scheduled__c'),
             'received' => grantFields.get('Amount_Received__c'),
             'frequency' => grantFields.get('Payment_Frequency__c'),
+            'startDate' => grantFields.get('Award_Start_Date__c'),
+            'endDate' => grantFields.get('Award_End_Date__c'),
             'dueDate' => paymentFields.get('Due_Date__c'),
             'amount' => paymentFields.get('Amount__c'),
             'status' => paymentFields.get('Status__c'),
@@ -194,23 +196,49 @@ public with sharing class GrantScheduleController {
             throw UserErrors.message(e.getDmlMessage(0));
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.saveSchedule', grantId);
-            throw UserErrors.message(Label.Funders_Pipeline_ErrorUnexpected);
+            throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Shared_NotSaved'));
         }
     }
 
-    /** Marks one payment Received; the received automation fills its date (R-GP3). */
+    /**
+     * Marks one payment Received; the received automation fills its date (R-GP3). Returns what it
+     * replaced, for Undo (modules-17).
+     */
     @AuraEnabled
-    public static void markReceived(Id paymentId) {
+    public static FundersUndoState markReceived(Id paymentId) {
         if (!Schema.SObjectType.Grant_Payment__c.isUpdateable()) {
             throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
         }
         try {
-            GrantPaymentService.markReceived(paymentId);
+            return GrantPaymentService.markReceived(paymentId);
         } catch (DmlException e) {
             throw UserErrors.message(e.getDmlMessage(0));
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.markReceived', paymentId);
-            throw UserErrors.message(Label.Funders_Pipeline_ErrorUnexpected);
+            throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Shared_NotSaved'));
+        }
+    }
+
+    /**
+     * modules-17: Undo for Mark Received, from what markReceived returned: the payment goes back
+     * to Expected and its Received ledger entry is removed.
+     */
+    @AuraEnabled
+    public static void undoReceived(Id paymentId, String status, Date receivedDate) {
+        if (!Schema.SObjectType.Grant_Payment__c.isUpdateable()) {
+            throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+        }
+        Boolean undone;
+        try {
+            undone = GrantPaymentService.undoReceived(paymentId, status, receivedDate);
+        } catch (DmlException e) {
+            throw UserErrors.message(e.getDmlMessage(0));
+        } catch (Exception e) {
+            ErrorLogger.log(e, CONTEXT + '.undoReceived', paymentId);
+            throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Shared_NotSaved'));
+        }
+        if (!undone) {
+            throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Undo_Changed'));
         }
     }
 }

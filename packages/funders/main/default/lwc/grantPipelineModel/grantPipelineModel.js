@@ -85,3 +85,33 @@ export function deadlineRows(grants, today) {
 export function moveTargets(allStages, current) {
   return (allStages || []).filter((stage) => stage !== current);
 }
+
+/** A deadline this many days away or fewer is due soon (vis-modules-17). */
+export const SOON_DAYS = 14;
+
+/**
+ * How urgent a deadline is, as a status word of the UX kit's vocabulary: `overdue` when past,
+ * `due soon` within SOON_DAYS (today included), otherwise null.
+ *
+ * @param {number|null} daysLeft days from today to the deadline
+ */
+export function urgencyOf(daysLeft) {
+  if (daysLeft === null || daysLeft === undefined) {
+    return null;
+  }
+  if (daysLeft < 0) {
+    return 'overdue';
+  }
+  return daysLeft <= SOON_DAYS ? 'due soon' : null;
+}
+
+/** Up to two initials from a person's name ("Ana Ruiz" is "AR"); empty for no name. */
+export function initialsOf(name) {
+  return String(name || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join('');
+}

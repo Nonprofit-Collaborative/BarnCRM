@@ -85,6 +85,49 @@ private class GrantRequirementTest {
     }
 
     @IsTest
+    static void undoPutsASubmittedRequirementBack() {
+        System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
+            Grant__c grant = grant();
+            Grant_Requirement__c report = GrantTestData.requirement(
+                'Report',
+                grant.Id,
+                Date.today().addDays(5)
+            );
+            report.Status__c = GrantRequirementService.STATUS_IN_PROGRESS;
+            insert report;
+
+            Test.startTest();
+            FundersUndoState previous = GrantPipelineController.markSubmitted(report.Id);
+            GrantPipelineController.undoSubmitted(previous.id, previous.status, previous.dateValue);
+            String again;
+            try {
+                GrantPipelineController.undoSubmitted(
+                    previous.id,
+                    previous.status,
+                    previous.dateValue
+                );
+            } catch (AuraHandledException e) {
+                again = e.getMessage();
+            }
+            Test.stopTest();
+
+            Grant_Requirement__c after = reread(report.Id);
+            Assert.areEqual(GrantRequirementService.STATUS_IN_PROGRESS, previous.status, 'Was');
+            Assert.areEqual(GrantRequirementService.STATUS_IN_PROGRESS, after.Status__c, 'Undone');
+            Assert.isNull(after.Submitted_Date__c, 'Its date cleared');
+            Assert.areEqual(
+                BarnHelp.text('Funders', 'Funders_Undo_Changed'),
+                again,
+                'A requirement no longer Submitted is left alone'
+            );
+            Assert.isFalse(
+                GrantRequirementService.undoSubmitted(report.Id, 'Accepted', null),
+                'Only back to an open status'
+            );
+        }
+    }
+
+    @IsTest
     static void thePipelineListsRequirementsComingDueAndMarksOneSubmitted() {
         System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
             Date today = Date.today();

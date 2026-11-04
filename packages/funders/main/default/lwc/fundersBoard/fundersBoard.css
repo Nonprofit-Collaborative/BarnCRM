@@ -1,0 +1,5 @@
+@media print {
+  .barn-print-hide {
+    display: none;
+  }
+}

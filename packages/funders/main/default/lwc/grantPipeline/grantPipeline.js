@@ -4,8 +4,18 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getBoard from '@salesforce/apex/GrantPipelineController.getBoard';
 import moveStage from '@salesforce/apex/GrantPipelineController.moveStage';
 import markSubmitted from '@salesforce/apex/GrantPipelineController.markSubmitted';
-import { buildColumns, deadlineRows, moveTargets } from 'c/grantPipelineModel';
+import undoSubmitted from '@salesforce/apex/GrantPipelineController.undoSubmitted';
+import {
+  buildColumns,
+  deadlineRows,
+  daysBetween,
+  initialsOf,
+  moveTargets,
+  urgencyOf
+} from 'c/grantPipelineModel';
 import { format, messageFrom } from 'c/findCsv';
+import { iconFor } from 'c/barnIcons';
+import GrantAwardModal from 'c/grantAwardModal';
 
 import TITLE from '@salesforce/label/c.Funders_Pipeline_Title';
 import SCOPE_EVERYONE from '@salesforce/label/c.Funders_Pipeline_ScopeEveryone';
@@ -19,6 +29,8 @@ import COLUMN_EMPTY from '@salesforce/label/c.Funders_Pipeline_ColumnEmpty';
 import TRUNCATED from '@salesforce/label/c.Funders_Pipeline_Truncated';
 import READ_ONLY from '@salesforce/label/c.Funders_Pipeline_ReadOnly';
 import NO_FUNDER from '@salesforce/label/c.Funders_Pipeline_NoFunder';
+import NO_GRANTS from '@salesforce/label/c.Funders_Pipeline_NoGrants';
+import NO_DEADLINES from '@salesforce/label/c.Funders_Pipeline_NoDeadlines';
 import MOVE_TO from '@salesforce/label/c.Core_Shared_MoveTo';
 import OPEN from '@salesforce/label/c.Core_Shared_Open';
 import CARD_ACTIONS from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
@@ -27,13 +39,10 @@ import DAYS_LEFT from '@salesforce/label/c.Funders_Pipeline_DaysLeft';
 import DUE_TODAY from '@salesforce/label/c.Funders_Pipeline_DueToday';
 import OVERDUE from '@salesforce/label/c.Funders_Pipeline_Overdue';
 import AWARD_TITLE from '@salesforce/label/c.Funders_Pipeline_AwardTitle';
-import AWARD_AMOUNT from '@salesforce/label/c.Funders_Pipeline_AwardAmount';
-import SAVE from '@salesforce/label/c.Core_Kit_Save';
-import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import MOVED from '@salesforce/label/c.Core_Shared_MovedTo';
-import ERROR_ACTION from '@salesforce/label/c.Funders_Pipeline_ErrorUnexpected';
 import MARK_SUBMITTED from '@salesforce/label/c.Funders_Pipeline_MarkSubmitted';
 import MARKED_SUBMITTED from '@salesforce/label/c.Funders_Pipeline_MarkedSubmitted';
+import UNDO from '@salesforce/label/c.Core_AutoMerge_Undo';
 import KIND_APPLICATION_LABEL from '@salesforce/label/c.Funders_Pipeline_KindApplication';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -42,16 +51,20 @@ const KIND_REQUIREMENT = 'requirement';
 const MOVE_PREFIX = 'move:';
 const STAGE_AWARDED = 'Awarded';
 
-const messageOf = (error) => messageFrom(error, ERROR_ACTION);
+const messageOf = (error) => messageFrom(error, helpText('Funders', 'Funders_Shared_NotSaved'));
+
+/** A record's page in Lightning, for a link's href; a click navigates in place instead. */
+const recordHref = (recordId) => `/lightning/r/${recordId}/view`;
 
 /**
  * The Grant Pipeline tab (F-01, canonical model 29ZH): the open grants by stage as a board, the
- * totals at the top, a menu on each card to open the grant or move it (moving to Awarded asks for
- * the amount awarded), and the application deadlines coming up (R-GN7).
+ * totals as tiles, each grant's name a link and a menu on each card to open it or move it (moving
+ * to Awarded opens Record the Award), and the deadlines coming up (R-GN7), each requirement with
+ * Mark Submitted and its Undo (modules-17).
  *
- * The columns and deadline rows are worked out by the framework-free `grantPipelineModel`; this
- * component only draws them and talks to `GrantPipelineController`. Moving is offered only to a
- * person who may edit grants.
+ * The columns, deadline rows and urgency are worked out by the framework-free
+ * `grantPipelineModel`; this component only draws them and talks to `GrantPipelineController`.
+ * Moving is offered only to a person who may edit grants.
  */
 export default class GrantPipeline extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Funders');
@@ -61,25 +74,28 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
     get intro() {
       return helpText('Funders', 'Funders_Pipeline_Intro');
     },
+    get empty() {
+      return helpText('Funders', 'Funders_Pipeline_Empty');
+    },
+    get deadlinesEmpty() {
+      return helpText('Funders', 'Funders_Pipeline_DeadlinesEmpty');
+    },
     scopeEveryone: SCOPE_EVERYONE,
     newGrant: NEW_GRANT,
     tileOpen: TILE_OPEN,
     tileRequested: TILE_REQUESTED,
     tileAwarded: TILE_AWARDED,
     columnEmpty: COLUMN_EMPTY,
-    get empty() {
-      return helpText('Funders', 'Funders_Pipeline_Empty');
-    },
+    noGrants: NO_GRANTS,
+    noDeadlines: NO_DEADLINES,
     readOnly: READ_ONLY,
     deadlines: DEADLINES,
-    get deadlinesEmpty() {
-      return helpText('Funders', 'Funders_Pipeline_DeadlinesEmpty');
-    },
-    awardAmount: AWARD_AMOUNT,
     markSubmitted: MARK_SUBMITTED,
-    save: SAVE,
-    cancel: CANCEL
+    markedSubmitted: MARKED_SUBMITTED,
+    undo: UNDO
   };
+
+  icon = iconFor('Grant_Pipeline');
 
   scopeOptions = [
     { label: SCOPE_EVERYONE, value: 'all' },
@@ -92,10 +108,8 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
   scope = 'all';
   isLoading = true;
   errorMessage;
-
-  awarding;
-  awardAmount;
-  isSaving = false;
+  /** What the last Mark Submitted replaced, while its Undo is offered. */
+  lastMarked;
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -119,18 +133,17 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
         const isRequirement = row.kind === KIND_REQUIREMENT;
         return {
           ...row,
+          ...this.urgency(row.daysLeft),
           objectApiName: isRequirement ? 'Grant_Requirement__c' : 'Grant__c',
           whatText: isRequirement
             ? `${row.requirementType || ''}: ${row.grantName || ''}`
             : KIND_APPLICATION_LABEL,
           showMark: isRequirement && canMark,
-          funderLabel: row.funderName || NO_FUNDER,
-          whenText: this.whenText(row.daysLeft),
-          whenClass: row.overdue ? 'slds-text-color_error' : 'slds-text-color_weak'
+          funderLabel: row.funderName || NO_FUNDER
         };
       });
     } catch (error) {
-      this.errorMessage = messageOf(error);
+      this.errorMessage = messageFrom(error, helpText('Funders', 'Funders_Pipeline_LoadFailed'));
       this.columns = [];
       this.deadlines = [];
     } finally {
@@ -148,16 +161,26 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
     return daysLeft < 0 ? format(OVERDUE, -daysLeft) : format(DAYS_LEFT, daysLeft);
   }
 
+  /** The days-left words and, when due soon or overdue, the status for its badge (vis-modules-17). */
+  urgency(daysLeft) {
+    const status = urgencyOf(daysLeft);
+    return { whenText: this.whenText(daysLeft), urgencyStatus: status, isUrgent: Boolean(status) };
+  }
+
   /** What the template needs on each column and card, which it cannot compute itself. */
   decorate(columns) {
     const allStages = this.board.allStages || [];
     const canEdit = this.canEdit;
+    const today = this.board.today;
     return columns.map((column) => ({
       ...column,
       isEmpty: column.cards.length === 0,
       cards: column.cards.map((card) => ({
         ...card,
+        ...this.urgency(card.deadline ? daysBetween(today, card.deadline) : null),
+        href: recordHref(card.id),
         funderLabel: card.funderName || NO_FUNDER,
+        ownerInitials: initialsOf(card.ownerName),
         menuLabel: format(CARD_ACTIONS, card.name),
         menuItems: this.menuFor(card, allStages, canEdit)
       }))
@@ -219,12 +242,8 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
     return this.board ? format(AWARDED_DETAIL, this.board.awardedCount) : '';
   }
 
-  get isAwarding() {
-    return Boolean(this.awarding);
-  }
-
-  get awardTitle() {
-    return this.awarding ? `${AWARD_TITLE}: ${this.awarding.name}` : AWARD_TITLE;
+  get showUndo() {
+    return Boolean(this.lastMarked);
   }
 
   handleScope(event) {
@@ -244,6 +263,12 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
     this.openRecord(id, object);
   }
 
+  /** A card's name is a link (modules-2); a plain click opens the grant in place. */
+  handleOpenCard(event) {
+    event.preventDefault();
+    this.openRecord(event.currentTarget.dataset.id);
+  }
+
   openRecord(recordId, objectApiName = 'Grant__c') {
     this[NavigationMixin.Navigate]({
       type: 'standard__recordPage',
@@ -254,10 +279,30 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
   async handleMarkSubmitted(event) {
     const requirementId = event.currentTarget.dataset.id;
     try {
-      await markSubmitted({ requirementId });
-      this.toast(MARKED_SUBMITTED, 'success');
+      const previous = await markSubmitted({ requirementId });
+      this.lastMarked = previous && previous.id ? previous : undefined;
       await this.load();
     } catch (error) {
+      this.toast(messageOf(error), 'error');
+    }
+  }
+
+  async handleUndoMarked() {
+    const previous = this.lastMarked;
+    if (!previous) {
+      return;
+    }
+    try {
+      await undoSubmitted({
+        requirementId: previous.id,
+        status: previous.status,
+        submittedDate: previous.dateValue || null
+      });
+      this.lastMarked = undefined;
+      this.toast(helpText('Funders', 'Funders_Undo_Done'), 'success');
+      await this.load();
+    } catch (error) {
+      this.lastMarked = undefined;
       this.toast(messageOf(error), 'error');
     }
   }
@@ -268,13 +313,16 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
     if (value === ACTION_OPEN) {
       this.openRecord(grantId);
     } else if (value.startsWith(MOVE_PREFIX)) {
-      const stage = value.substring(MOVE_PREFIX.length);
-      if (stage === STAGE_AWARDED) {
-        this.startAward(grantId);
-      } else {
-        this.move(grantId, stage, null);
-      }
+      this.moveTo(grantId, value.substring(MOVE_PREFIX.length));
     }
+  }
+
+  /** Moves a grant to a stage; Awarded opens Record the Award instead. */
+  moveTo(grantId, stage) {
+    if (stage === STAGE_AWARDED) {
+      return this.startAward(grantId);
+    }
+    return this.move(grantId, stage);
   }
 
   findCard(grantId) {
@@ -287,9 +335,9 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
     return undefined;
   }
 
-  async move(grantId, stage, amountAwarded) {
+  async move(grantId, stage) {
     try {
-      await moveStage({ grantId, stage, amountAwarded });
+      await moveStage({ grantId, stage, amountAwarded: null });
       this.toast(format(MOVED, stage), 'success');
       await this.load();
       return true;
@@ -301,38 +349,29 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
 
   // ---------------------------------------------------------------- Awarded
 
-  startAward(grantId) {
+  /** Record the Award (modules-16): the dialog saves; on save, a link to build the schedule. */
+  async startAward(grantId) {
     const card = this.findCard(grantId);
     if (!card) {
-      return;
+      return false;
     }
-    this.awarding = card;
-    this.awardAmount = card.amountRequested;
-  }
-
-  handleAwardAmount(event) {
-    this.awardAmount = event.detail ? event.detail.value : event.target.value;
-  }
-
-  handleCancelAward() {
-    this.awarding = undefined;
-  }
-
-  async handleSaveAward() {
-    const input = this.template.querySelector('[data-id="award-amount"]');
-    if (input && typeof input.reportValidity === 'function' && input.reportValidity() === false) {
-      return;
+    const result = await GrantAwardModal.open({
+      label: `${AWARD_TITLE}: ${card.name}`,
+      size: 'small',
+      grant: card
+    });
+    if (!result || !result.saved) {
+      return false;
     }
-    this.isSaving = true;
-    const amount =
-      this.awardAmount === '' || this.awardAmount === undefined || this.awardAmount === null
-        ? null
-        : Number(this.awardAmount);
-    const moved = await this.move(this.awarding.id, STAGE_AWARDED, amount);
-    this.isSaving = false;
-    if (moved) {
-      this.awarding = undefined;
-    }
+    this.dispatchEvent(
+      new ShowToastEvent({
+        message: helpText('Funders', 'Funders_Award_Saved'),
+        messageData: [{ url: recordHref(card.id), label: card.name }],
+        variant: 'success'
+      })
+    );
+    await this.load();
+    return true;
   }
 
   toast(message, variant) {

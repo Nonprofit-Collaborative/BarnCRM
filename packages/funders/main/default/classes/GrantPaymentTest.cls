@@ -230,4 +230,85 @@ private class GrantPaymentTest {
             'Deleted with the grant'
         );
     }
+
+    @IsTest
+    static void undoPutsAReceivedPaymentBackAndRemovesItsLedgerEntry() {
+        System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
+            Grant__c grant = award();
+            update new Grant__c(Id = grant.Id, Restricted__c = true);
+            Grant_Payment__c payment = new Grant_Payment__c(
+                Grant__c = grant.Id,
+                Due_Date__c = START,
+                Amount__c = 25000,
+                Status__c = GrantPaymentService.STATUS_EXPECTED
+            );
+            insert payment;
+
+            Test.startTest();
+            FundersUndoState previous = GrantScheduleController.markReceived(payment.Id);
+            Integer entriesAfterMark = [
+                SELECT COUNT()
+                FROM Grant_Fund_Entry__c
+                WHERE Grant_Payment__c = :payment.Id
+                WITH SYSTEM_MODE
+            ];
+            GrantScheduleController.undoReceived(previous.id, previous.status, previous.dateValue);
+            String again;
+            try {
+                GrantScheduleController.undoReceived(
+                    previous.id,
+                    previous.status,
+                    previous.dateValue
+                );
+            } catch (AuraHandledException e) {
+                again = e.getMessage();
+            }
+            Test.stopTest();
+
+            Grant_Payment__c after = [
+                SELECT Status__c, Received_Date__c
+                FROM Grant_Payment__c
+                WHERE Id = :payment.Id
+                WITH SYSTEM_MODE
+            ];
+            Assert.areEqual(GrantPaymentService.STATUS_EXPECTED, previous.status, 'Was expected');
+            Assert.isNull(previous.dateValue, 'With no received date');
+            Assert.areEqual(1, entriesAfterMark, 'Marking wrote the ledger entry');
+            Assert.areEqual(GrantPaymentService.STATUS_EXPECTED, after.Status__c, 'Undone');
+            Assert.isNull(after.Received_Date__c, 'Its date cleared');
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM Grant_Fund_Entry__c
+                    WHERE Grant_Payment__c = :payment.Id
+                    WITH SYSTEM_MODE
+                ],
+                'The ledger entry removed'
+            );
+            Assert.areEqual(
+                BarnHelp.text('Funders', 'Funders_Undo_Changed'),
+                again,
+                'A payment no longer Received is left alone'
+            );
+            Assert.isFalse(
+                GrantPaymentService.undoReceived(payment.Id, 'Cancelled', null),
+                'Only back to Expected'
+            );
+        }
+    }
+
+    @IsTest
+    static void aReaderCannotUndo() {
+        String refusal;
+        User reader = [SELECT Id FROM User WHERE LastName = 'Gpayreader' WITH SYSTEM_MODE LIMIT 1];
+        System.runAs(reader) {
+            try {
+                GrantScheduleController.undoReceived(null, 'Expected', null);
+            } catch (AuraHandledException e) {
+                refusal = e.getMessage();
+            }
+        }
+        Assert.areEqual(Label.Funders_Pipeline_ErrorNoPermission, refusal, 'Refused');
+    }
 }

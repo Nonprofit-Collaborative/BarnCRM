@@ -76,7 +76,9 @@ public with sharing class GrantOutcomeService {
                 (elementType != null &&
                 outcomeId.getSObjectType() != elementType)
             ) {
-                requirement.Outcome_Id__c.addError(Label.Funders_Outcomes_BadOutcome);
+                requirement.Outcome_Id__c.addError(
+                    BarnHelp.text('Funders', 'Funders_Outcomes_NotAnOutcome')
+                );
                 continue;
             }
             requirement.Outcome_Id__c = String.valueOf(outcomeId);
@@ -297,7 +299,9 @@ public with sharing class GrantOutcomeService {
                 : outcomes(new Set<String>{ String.valueOf(parsed) }, null, null);
             Map<String, Object> outcome = found.get(String.valueOf(parsed));
             if (outcome == null || !REPORTABLE_TYPES.contains((String) outcome.get('type'))) {
-                throw new GrantOutcomeException(Label.Funders_Outcomes_BadOutcome);
+                throw new GrantOutcomeException(
+                    BarnHelp.text('Funders', 'Funders_Outcomes_NotAnOutcome')
+                );
             }
             value = String.valueOf(parsed);
         }

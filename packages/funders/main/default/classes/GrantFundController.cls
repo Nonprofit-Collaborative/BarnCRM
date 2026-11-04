@@ -66,7 +66,7 @@ public with sharing class GrantFundController {
             return card;
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.getFund', grantId);
-            throw UserErrors.message(Label.Funders_Pipeline_ErrorUnexpected);
+            throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Fund_LoadFailed'));
         }
     }
 
@@ -84,7 +84,7 @@ public with sharing class GrantFundController {
             throw UserErrors.message(e.getDmlMessage(0));
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.setFund', grantId);
-            throw UserErrors.message(Label.Funders_Pipeline_ErrorUnexpected);
+            throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Shared_NotSaved'));
         }
     }
 }

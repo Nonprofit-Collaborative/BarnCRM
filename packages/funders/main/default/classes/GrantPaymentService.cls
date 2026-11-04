@@ -229,8 +229,65 @@ public with sharing class GrantPaymentService {
         return restricted;
     }
 
-    /** Marks one payment Received, as the person: the received automation fills the date. */
-    public static void markReceived(Id paymentId) {
+    /**
+     * Marks one payment Received, as the person: the received automation fills the date and
+     * writes the ledger entry. Returns what it replaced, for Undo (modules-17).
+     */
+    public static FundersUndoState markReceived(Id paymentId) {
+        FundersUndoState previous = new FundersUndoState();
+        for (Grant_Payment__c row : [
+            SELECT Id, Status__c, Received_Date__c
+            FROM Grant_Payment__c
+            WHERE Id = :paymentId
+            WITH USER_MODE
+            LIMIT 1
+        ]) {
+            previous.id = row.Id;
+            previous.status = row.Status__c;
+            previous.dateValue = row.Received_Date__c;
+        }
         update as user new Grant_Payment__c(Id = paymentId, Status__c = STATUS_RECEIVED);
+        return previous;
+    }
+
+    /**
+     * Undo for Mark Received (modules-17): puts back the Expected status and the Received Date the
+     * payment had, as the person, and removes the Received ledger entry the mark wrote. The
+     * received automation removes it when the payment leaves Received; it is removed here too in
+     * case that automation was switched off in between. Only a payment still Received goes back,
+     * and only to Expected.
+     *
+     * @return true when it was put back
+     */
+    public static Boolean undoReceived(Id paymentId, String status, Date receivedDate) {
+        if (paymentId == null || status != STATUS_EXPECTED) {
+            return false;
+        }
+        List<Grant_Payment__c> rows = [
+            SELECT Id, Status__c
+            FROM Grant_Payment__c
+            WHERE Id = :paymentId
+            WITH USER_MODE
+            LIMIT 1
+        ];
+        if (rows.isEmpty() || rows[0].Status__c != STATUS_RECEIVED) {
+            return false;
+        }
+        update as user new Grant_Payment__c(
+            Id = paymentId,
+            Status__c = status,
+            Received_Date__c = receivedDate
+        );
+        // System mode as in syncLedger: the entry's Payment field is set by BarnCRM only.
+        List<Grant_Fund_Entry__c> entries = [
+            SELECT Id
+            FROM Grant_Fund_Entry__c
+            WHERE Grant_Payment__c = :paymentId AND Type__c = :STATUS_RECEIVED
+            WITH SYSTEM_MODE
+        ];
+        if (!entries.isEmpty()) {
+            Database.delete(entries, AccessLevel.SYSTEM_MODE);
+        }
+        return true;
     }
 }

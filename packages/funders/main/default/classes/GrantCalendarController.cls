@@ -41,7 +41,7 @@ public with sharing class GrantCalendarController {
     @AuraEnabled
     public static Calendar getCalendar(Date fromDate, Date toDate, Boolean mineOnly) {
         if (fromDate == null || toDate == null || toDate < fromDate) {
-            throw UserErrors.message(Label.Funders_Calendar_ErrorLoad);
+            throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Calendar_LoadFailed'));
         }
         try {
             if (fromDate.daysBetween(toDate) >= MAX_DAYS) {
@@ -88,7 +88,7 @@ public with sharing class GrantCalendarController {
             return calendar;
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.getCalendar');
-            throw UserErrors.message(Label.Funders_Calendar_ErrorLoad);
+            throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Calendar_LoadFailed'));
         }
     }
 

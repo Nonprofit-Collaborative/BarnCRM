@@ -191,7 +191,7 @@ private class GrantOutcomeTest {
 
             Assert.isFalse(text.isSuccess(), 'Text that is not an identifier is refused');
             Assert.areEqual(
-                Label.Funders_Outcomes_BadOutcome,
+                BarnHelp.text('Funders', 'Funders_Outcomes_NotAnOutcome'),
                 text.getErrors()[0].getMessage(),
                 'With the rule message'
             );
@@ -199,7 +199,11 @@ private class GrantOutcomeTest {
                 return;
             }
             Assert.isFalse(grant.isSuccess(), 'A grant is not an outcome');
-            Assert.areEqual(Label.Funders_Outcomes_BadOutcome, activityRefusal, 'Nor an activity');
+            Assert.areEqual(
+                BarnHelp.text('Funders', 'Funders_Outcomes_NotAnOutcome'),
+                activityRefusal,
+                'Nor an activity'
+            );
             Assert.areEqual(
                 String.valueOf(ids.get('outcome')),
                 stored(requirement.Id),

@@ -1,6 +1,7 @@
 import { createElement } from 'lwc';
 import GrantCalendar from 'c/grantCalendar';
 import getCalendar from '@salesforce/apex/GrantCalendarController.getCalendar';
+import { loadStyle } from 'lightning/platformResourceLoader';
 
 const mockNavigate = jest.fn();
 jest.mock(
@@ -102,8 +103,10 @@ describe('c-grant-calendar', () => {
     expect(items.map((item) => item.textContent.trim())).toEqual([
       'Financial Report: Youth Award',
       'Application: Literacy',
-      'Grant Payment: Youth Award 17,500'
+      'Grant Payment: Youth Award $17,500.00'
     ]);
+    expect(one(element, '[data-id="shell"]').titleHidden).toBe(true);
+    expect(one(element, '[data-id="shell"]').iconName).toBe('custom:custom82');
     // Overdue is said with an icon and words, not red text alone (vis-modules-9).
     expect(items[0].className).toContain('barn-item_overdue');
     expect(items[0].className).not.toContain('slds-text-color_error');
@@ -160,7 +163,18 @@ describe('c-grant-calendar', () => {
   it('shows the reason when the calendar cannot load', async () => {
     getCalendar.mockRejectedValue({ body: { message: 'No access' } });
     const element = await render();
-    expect(one(element, '[data-id="error-message"]').textContent.trim()).toBe('No access');
+    expect(one(element, '[data-id="error-message"]').message).toBe('No access');
     expect(all(element, '[data-id="item"]')).toHaveLength(0);
+  });
+
+  it('prints the month with the print stylesheet', async () => {
+    getCalendar.mockResolvedValue(CALENDAR);
+    const element = await render();
+    loadStyle.mockResolvedValue();
+    window.print = jest.fn();
+    one(element, '[data-id="print"]').click();
+    await flush();
+    expect(loadStyle).toHaveBeenCalled();
+    expect(window.print).toHaveBeenCalled();
   });
 });

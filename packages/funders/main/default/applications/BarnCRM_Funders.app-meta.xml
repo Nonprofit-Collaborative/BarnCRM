@@ -32,8 +32,8 @@
   <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
   <label>BarnCRM Funders</label>
   <navType>Console</navType>
-  <tabs>Grant_Pipeline</tabs>
   <tabs>Funders_Board</tabs>
+  <tabs>Grant_Pipeline</tabs>
   <tabs>Grant_Calendar</tabs>
   <tabs>Grant__c</tabs>
   <tabs>Grant_Requirement__c</tabs>
