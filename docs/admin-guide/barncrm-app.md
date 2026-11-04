@@ -134,8 +134,10 @@ administrator tile to staff, it shows nothing to count.
 Every BarnCRM app shows a blue barn logo in the app launcher. The admin apps add a navy gear
 badge to it and have a navy header, so you can tell at a glance which app you are in; every other
 app, the module apps included, has the BarnCRM teal header (#007A9E). A module's
-app adds its own badge (a red heart for **BarnCRM Fundraising**, a green person for **BarnCRM
-Volunteers**).
+app adds its own badge (a berry heart for **BarnCRM Fundraising**, a green person for **BarnCRM
+Volunteers**, a purple sprout for **BarnCRM Programs**, a bronze award ribbon for **BarnCRM
+Funders** and indigo flow arrows for **BarnCRM Logic Models**). No badge uses red, orange or
+yellow, because those colors mean an error or a warning elsewhere in BarnCRM.
 **BarnCRM Console** and
 **BarnCRM Admin Console** are console apps: instead of replacing the page each time you click,
 they keep the records you are working on open side by side in tabs across the top. In

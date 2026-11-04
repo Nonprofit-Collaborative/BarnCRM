@@ -5,19 +5,31 @@
 
 The master is Core's ContentAsset `BarnCRM_Logo` (a 256 x 256 RGBA PNG, ADR-0102), which the
 BarnCRM and BarnCRM Console apps use as it is. Each variant is the same barn with a round badge
-in the bottom right corner, so the family reads as one product and the badge says which app:
+in the bottom right corner, so the family reads as one product and the badge says which app.
+Badge glyphs are white; every badge color is at least 4.5:1 against white, and none is a status
+color (no error red, warning orange or yellow), so a launcher tile never reads as an alert.
 
-  BarnCRM_Admin_Logo       (Core)        navy badge, white gear: BarnCRM Admin, BarnCRM Admin Console
-  Fundraising_Logo         (giving)      red badge, white heart: Fundraising
-  BarnCRM_Volunteers_Logo  (volunteers)  green badge, white person: BarnCRM Volunteers
+  Asset                     Package      Badge             Color    App
+  BarnCRM_Admin_Logo        core         gear              #032D60  BarnCRM Admin, Admin Console
+  BarnCRM_Fundraising_Logo  giving       heart             #A3175F  BarnCRM Fundraising
+  BarnCRM_Volunteers_Logo   volunteers   person            #2E844A  BarnCRM Volunteers
+  BarnCRM_Programs_Logo     programs     sprout            #7526A8  BarnCRM Programs
+  BarnCRM_Funders_Logo      funders      award ribbon      #7A5300  BarnCRM Funders
+  BarnCRM_Logic_Models_Logo logicmodels  flow arrows       #3B44B5  BarnCRM Logic Models
+
+Fundraising was red (#C23934) until 2026-11-04 (owner decision: red means error in the UI, the
+reason D-58 declined red for the brand). The asset was renamed from Fundraising_Logo then:
+redeploying a ContentAsset under its old name keeps the org's existing image, so a changed
+image needs a new asset name to reach orgs that already have the old one.
 
 Each package ships its own asset, because an app names a ContentAsset by its API name and a
 module may not depend on Core's asset being addressable once the packages are namespaced.
 
 Writes `<package>/main/default/contentassets/<Name>.asset` and its `.asset-meta.xml` under
-`--out` (default: the repository root), and with `--sheet` a contact sheet PNG showing every
-logo at 256, 64 and 32 pixels. Standard library only (zlib and struct), so it runs anywhere
-Python 3 does; the drawing is supersampled 4 x 4 so edges stay smooth.
+`--out` (default: the repository root), a copy of each as `docs/brand/barncrm-<slug>-logo.png`,
+and with `--sheet` a contact sheet PNG showing every logo at 256, 64 and 32 pixels. Standard
+library only (zlib and struct), so it runs anywhere Python 3 does; the drawing is supersampled
+4 x 4 so edges stay smooth. The output is deterministic: the same master gives the same bytes.
 """
 
 import argparse
@@ -34,11 +46,16 @@ BADGE_RADIUS = 62.0
 RING = 9.0  # white ring that separates the badge from the barn
 SAMPLES = 4
 
+# (package, asset name, docs/brand slug, badge color, glyph)
 VARIANTS = [
-    ("core", "BarnCRM_Admin_Logo", (0x03, 0x2D, 0x60), "gear"),
-    ("giving", "Fundraising_Logo", (0xC2, 0x39, 0x34), "heart"),
-    ("volunteers", "BarnCRM_Volunteers_Logo", (0x2E, 0x84, 0x4A), "person"),
+    ("core", "BarnCRM_Admin_Logo", "admin", (0x03, 0x2D, 0x60), "gear"),
+    ("giving", "BarnCRM_Fundraising_Logo", "giving", (0xA3, 0x17, 0x5F), "heart"),
+    ("volunteers", "BarnCRM_Volunteers_Logo", "volunteers", (0x2E, 0x84, 0x4A), "person"),
+    ("programs", "BarnCRM_Programs_Logo", "programs", (0x75, 0x26, 0xA8), "sprout"),
+    ("funders", "BarnCRM_Funders_Logo", "funders", (0x7A, 0x53, 0x00), "ribbon"),
+    ("logicmodels", "BarnCRM_Logic_Models_Logo", "logic-models", (0x3B, 0x44, 0xB5), "flow"),
 ]
+BRAND_DIR = "docs/brand"
 
 META = """<?xml version="1.0" encoding="UTF-8" ?>
 <ContentAsset xmlns="http://soap.sforce.com/2006/04/metadata">
@@ -140,7 +157,82 @@ def in_person(x, y):
     return head or shoulders
 
 
-GLYPHS = {"gear": in_gear, "heart": in_heart, "person": in_person}
+def near_segment(x, y, a, b, half_width):
+    """True when (x, y) is within half_width of the segment a-b."""
+    (ax, ay), (bx, by) = a, b
+    dx, dy = bx - ax, by - ay
+    t = max(0.0, min(1.0, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy)))
+    return math.hypot(x - ax - t * dx, y - ay - t * dy) <= half_width
+
+
+def in_polygon(x, y, points):
+    """Even-odd rule point in polygon."""
+    inside = False
+    j = len(points) - 1
+    for i, (xi, yi) in enumerate(points):
+        xj, yj = points[j]
+        if (yi > y) != (yj > y) and x < (xj - xi) * (y - yi) / (yj - yi) + xi:
+            inside = not inside
+        j = i
+    return inside
+
+
+def in_leaf(x, y, cx, cy, length, width, angle):
+    """A pointed leaf (two arcs) centred on (cx, cy), its long axis at angle radians."""
+    c, s = math.cos(angle), math.sin(angle)
+    u = (x - cx) * c + (y - cy) * s
+    v = -(x - cx) * s + (y - cy) * c
+    if abs(u) >= length:
+        return False
+    return abs(v) <= width * (1 - (u / length) ** 2)
+
+
+def in_sprout(x, y):
+    """Programs: a seedling, two leaves on a stem (growth through a program)."""
+    stem = abs(x) < 0.07 and -0.12 < y < 0.60
+    left = in_leaf(x, y, -0.27, -0.16, 0.30, 0.15, math.radians(28))
+    right = in_leaf(x, y, 0.25, -0.36, 0.34, 0.17, math.radians(-30))
+    return stem or left or right
+
+
+def in_ribbon(x, y):
+    """Funders: an award ribbon, a medallion with two tails (a grant awarded)."""
+    r = math.hypot(x, y + 0.20)
+    if r < 0.38:
+        return not 0.21 < r < 0.27  # medallion with an inner ring
+    left_tail = [(-0.26, 0.02), (-0.06, 0.12), (-0.18, 0.64), (-0.27, 0.52), (-0.40, 0.58)]
+    right_tail = [(0.26, 0.02), (0.06, 0.12), (0.18, 0.64), (0.27, 0.52), (0.40, 0.58)]
+    return in_polygon(x, y, left_tail) or in_polygon(x, y, right_tail)
+
+
+def in_flow(x, y):
+    """Logic Models: three steps rising left to right, each leading to the next by an elbow
+    arrow (inputs, outputs, outcomes)."""
+    half, line = 0.20, 0.06
+    boxes = [(-0.46, 0.42), (0.0, 0.0), (0.46, -0.42)]
+    for cx, cy in boxes:
+        if abs(x - cx) <= half and abs(y - cy) <= half:
+            return True
+    for (ax, ay), (bx, by) in zip(boxes, boxes[1:]):
+        corner = (ax, by)
+        if near_segment(x, y, (ax, ay - half), corner, line):
+            return True
+        if near_segment(x, y, corner, (bx - half - 0.10, by), line):
+            return True
+        tip = bx - half - 0.01
+        if in_polygon(x, y, [(tip - 0.14, by - 0.12), (tip, by), (tip - 0.14, by + 0.12)]):
+            return True
+    return False
+
+
+GLYPHS = {
+    "gear": in_gear,
+    "heart": in_heart,
+    "person": in_person,
+    "sprout": in_sprout,
+    "ribbon": in_ribbon,
+    "flow": in_flow,
+}
 
 
 def badge_pixel(px, py, color, glyph):
@@ -238,13 +330,22 @@ def main():
 
     _, _, master = read_png(MASTER)
     made = [master]
-    for package, name, color, glyph in VARIANTS:
+    brand = os.path.join(args.out, BRAND_DIR)
+    os.makedirs(brand, exist_ok=True)
+    with open(MASTER, "rb") as source, open(
+        os.path.join(brand, "barncrm-logo.png"), "wb"
+    ) as handle:
+        handle.write(source.read())
+    for package, name, slug, color, glyph in VARIANTS:
         rows = with_badge(master, color, glyph)
         made.append(rows)
+        image = png_bytes(rows)
         folder = os.path.join(args.out, "packages", package, "main/default/contentassets")
         os.makedirs(folder, exist_ok=True)
         with open(os.path.join(folder, name + ".asset"), "wb") as handle:
-            handle.write(png_bytes(rows))
+            handle.write(image)
+        with open(os.path.join(brand, f"barncrm-{slug}-logo.png"), "wb") as handle:
+            handle.write(image)
         with open(os.path.join(folder, name + ".asset-meta.xml"), "w", encoding="utf-8") as handle:
             handle.write(META.format(name=name))
         print(f"{package}: {name}")
