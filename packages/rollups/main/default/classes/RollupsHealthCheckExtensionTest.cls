@@ -339,8 +339,8 @@ private class RollupsHealthCheckExtensionTest {
                 );
                 Assert.areEqual(
                     1,
-                    [SELECT COUNT() FROM CronJobDetail WHERE Name = :TEST_JOB_NAME],
-                    'Pressing the fix twice schedules one run.'
+                    [SELECT COUNT() FROM CronJobDetail WHERE Name = :NightlyJobs.jobName()],
+                    'Pressing the fix twice schedules one nightly run.'
                 );
             }
         }
