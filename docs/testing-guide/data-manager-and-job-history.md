@@ -13,14 +13,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In the BarnCRM app, open the **Data Manager** tab. | The page name **Data Manager** shows once, in the page header with the tab icon, and no other icon or title repeats it. The line **Start a data task, or see and undo what changed.** is under it, then **About This Tool** (open on your first visit) with two short lines on which tool to use and a **Learn More** link. |
-| 2 | Look at the tiles. | Four groups in this order: **Bring Data In** (**Import a File**), **Find and Change** (**Find and Export Records**, **Update Many Records**), **Check and Tidy** (**Org Optimizer**), **Careful** (**Delete Many Records**, alone and last). Each tile has an icon, its name and one line of 12 words or fewer; there are no **Open** buttons. **Update Many Records** reads "Find records, then change up to five fields at once." |
+| 2 | Look at the tiles. | Four groups in this order: **Bring Data In** (**Import a File**), **Find and Change** (**Find and Export Records**, **Super Transformer**), **Check and Tidy** (**Org Optimizer**), **Careful** (**Delete Many Records**, alone and last). Each tile has an icon, its name and one line of 12 words or fewer; there are no **Open** buttons. **Super Transformer** reads "Change fields on many records at once, no file needed." |
 | 3 | Look around the tiles. | There is no warning box anywhere on the page. |
 | 4 | Look under **Import Templates**. | The line "A template remembers how a file's columns match fields." with a **Learn More** link, then a table with the columns **Template**, **Loads**, **Arrives Regularly As**, **Last Loaded**, listing the shipped import templates. **Loads** reads **People and organizations** for the people templates, **Gifts** for a gift template, and a plural object name (for example **Accounts**) for a one-object template; never an API name such as `Account`. With no template at all it shows an illustration, **No Import Templates Yet**, and a **Create a Template** button that opens **Import**. |
-| 5 | Look at the job list card. | It is headed **Data Jobs**, with a **Refresh** button, a **Show** list and a **Show everyone's jobs** checkbox. With no jobs run yet it shows an illustration, the heading **No Data Jobs Yet** and the line "Each import, bulk update and bulk delete is listed here, with its undo." |
+| 5 | Look at the job list card. | It is headed **Data Jobs**, with a **Refresh** button, a **Show** list and a **Show everyone's jobs** checkbox. With no jobs run yet it shows an illustration, the heading **No Data Jobs Yet** and the line "Each import, Super Transformer run and bulk delete is listed here, with its undo." |
 | 6 | Look under **Salesforce's Own Tools**. | Three tiles: **Weekly Data Export**, **Recycle Bin**, **Data Import Wizard**, each with a small new-window icon after its name. |
 | 7 | Click the **Recycle Bin** tile. | A new browser tab opens Salesforce's Recycle Bin. Close it. |
 | 8 | Close **About This Tool** and reload the page. | It stays closed. |
-| 9 | Check the app's navigation bar, in **BarnCRM** and in **BarnCRM Admin**. | **Data Manager** is there in both. **Find**, **Import** and **Bulk Update** are in neither. |
+| 9 | Check the app's navigation bar, in **BarnCRM** and in **BarnCRM Admin**. | **Data Manager** is there in both. **Find**, **Import** and **Super Transformer** are in neither. |
 | 10 | With Giving and Volunteers installed, look at the module tabs in the navigation (for example **Gifts**, **Donor Levels**, **Volunteer Hours**). | Each tab has its own icon, and no two BarnCRM tabs show the same one. |
 
 **Cleanup:** None.
@@ -34,7 +34,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | On **Data Manager**, click **Import a File**. | The **Import** tab opens. |
 | 2 | Go back to **Data Manager**. Press Tab until **Find and Export Records** has the focus ring, and press Enter. | The **Find** tab opens. |
-| 3 | Go back. Click **Update Many Records**. | The **Super Transformer** tab opens, with its five steps above **Data Jobs**. |
+| 3 | Go back. Click **Super Transformer**. | The **Super Transformer** tab opens, with its five steps above **Data Jobs**. |
 | 4 | Go back. Click **Org Optimizer**. | The **Org Optimizer** tab opens on **Overview**. |
 | 5 | Go back. Click **Delete Many Records**. | A box titled **Delete Many Records** opens, reading "Deleted records go to the Recycle Bin. You can undo a bulk delete from Data Jobs, on this page, for up to 15 days.", with **Cancel** and a red **Continue** button. Nothing else has opened yet. |
 | 6 | Click **Cancel**. | The box closes and **Data Manager** stays open. No tab opens. |
@@ -43,14 +43,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** None.
 
-## T-DM-12: Find, Import and Bulk Update Open From Data Manager Only
+## T-DM-12: Find, Import and Super Transformer Open From Data Manager Only
 
-**Purpose:** Confirm Find, Import and Bulk Update are not in any app's navigation, and open from their Data Manager tiles and from links elsewhere.
+**Purpose:** Confirm Find, Import and Super Transformer are not in any app's navigation, and open from their Data Manager tiles and from links elsewhere.
 **Prerequisites:** admin, and staff with the **BarnCRM Find and Export** permission set.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open **BarnCRM**, **BarnCRM Console**, **BarnCRM Admin** and **BarnCRM Admin Console** in turn, and check each navigation bar or menu. | **Data Manager** is in all four. **Find**, **Import** and **Bulk Update** are in none. |
+| 1 | As admin, open **BarnCRM**, **BarnCRM Console**, **BarnCRM Admin** and **BarnCRM Admin Console** in turn, and check each navigation bar or menu. | **Data Manager** is in all four. **Find**, **Import** and **Super Transformer** are in none. |
 | 2 | In **BarnCRM**, open **Data Manager** and click **Find and Export Records**. | The **Find** tab opens and works: choose **Contact** and run a query. |
 | 3 | In **BarnCRM Admin**, open **Data Manager** and click **Import a File**. | The **Import** tab opens on its first step. |
 | 4 | Open **Org Optimizer**, and press **Open in Find** next to any check. | The **Find** tab opens with that check's query. |
@@ -58,24 +58,24 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** None.
 
-## T-DM-03: A Bulk Update Appears in Data Jobs, with a Notification
+## T-DM-03: A Super Transformer Run Appears in Data Jobs, with a Notification
 
-**Purpose:** Confirm a bulk update is listed newest first with its counts, the filter works, and the starter gets one bell notification.
+**Purpose:** Confirm a Super Transformer run is listed newest first with its counts, the filter works, and the starter gets one bell notification.
 **Prerequisites:** admin. In **BarnCRM Settings**, **General**, **Send Long Job Notifications** is ticked.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **Find**. Query Contact where Last Name equals `Whitfield` and run it. | 6 rows: the members of the **Staff Household**. |
-| 2 | Press **Bulk Update** and set **Title** to `Test title` on all 6, confirming with the count (steps in [Bulk update](../admin-guide/bulk-update.md)). | The bulk update starts. |
-| 3 | When it finishes, check the bell at the top of the page. | One new notification titled **Bulk update finished**, reading **6 updated, 0 already right, 0 no longer matched, 0 could not be saved. Open the bulk update for the run log.** |
-| 4 | Click the notification. | The bulk update's **Data Job** record opens, with its run log. |
-| 5 | Open **Data Manager** and press **Refresh** on **Data Jobs**. | The bulk update is first. Its title names the job, **Bulk Update** and **Contact**, with its status as a badge beside it; the line under it reads **6 matched: 6 updated, 0 already held the new values, 0 failed.**, followed by **Started** and **Can be undone until** with dates, and a row menu holding **Undo**. |
-| 6 | In **Show**, choose **Imports**. | The bulk update is no longer listed. |
-| 7 | In **Show**, choose **Bulk updates**, then **All**. | The bulk update is listed again each time. |
+| 2 | Choose **Change Records**, **Super Transformer** and set **Title** to `Test title` on all 6, confirming with the count (steps in [Super Transformer runs and undo](../admin-guide/bulk-update.md)). | The Super Transformer run starts. |
+| 3 | When it finishes, check the bell at the top of the page. | One new notification titled **Super Transformer run finished**, reading **6 updated, 0 already right, 0 no longer matched, 0 could not be saved. Open the Super Transformer run for its log.** |
+| 4 | Click the notification. | The Super Transformer run's **Data Job** record opens, with its run log. |
+| 5 | Open **Data Manager** and press **Refresh** on **Data Jobs**. | The Super Transformer run is first. Its title names the job, **Super Transformer** and **Contact**, with its status as a badge beside it; the line under it reads **6 matched: 6 updated, 0 already held the new values, 0 failed.**, followed by **Started** and **Can be undone until** with dates, and a row menu holding **Undo**. |
+| 6 | In **Show**, choose **Imports**. | The Super Transformer run is no longer listed. |
+| 7 | In **Show**, choose **Super Transformer runs**, then **All**. | The Super Transformer run is listed again each time. |
 
 **Cleanup:** Leave the job for T-DM-04.
 
-## T-DM-04: Undo a Bulk Update From Data Jobs
+## T-DM-04: Undo a Super Transformer Run From Data Jobs
 
 **Purpose:** Confirm the typed-count confirmation guards the undo and the values go back.
 **Prerequisites:** admin; T-DM-03 done.
@@ -83,13 +83,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Data Manager**, under **Data Jobs**, press **Undo** beside the bulk update. | A box opens: **Undo puts back the values on 6 records, except any somebody changed since. Type 6 to confirm.**, with **Type the number of records to confirm**, **Cancel** and **Undo Bulk Update**. |
-| 2 | Type `5`. | **Undo Bulk Update** stays disabled. |
+| 1 | On **Data Manager**, under **Data Jobs**, press **Undo** beside the Super Transformer run. | A box opens: **Undo puts back the values on 6 records, except any somebody changed since. Type 6 to confirm.**, with **Type the number of records to confirm**, **Cancel** and **Undo Super Transformer Run**. |
+| 2 | Type `5`. | **Undo Super Transformer Run** stays disabled. |
 | 3 | Press **Cancel**. | The box closes. Nothing is undone; the job still shows **Undo**. |
-| 4 | Press **Undo** again, type `6`, press **Undo Bulk Update**. | A success message: **The undo started. Press Refresh to see when it has finished.** |
+| 4 | Press **Undo** again, type `6`, press **Undo Super Transformer Run**. | A success message: **The undo started. Press Refresh to see when it has finished.** |
 | 5 | Wait without pressing **Refresh**. | The job's status changes to undoing and then to undone on its own (the list refreshes while a job runs). **Undo** is no longer shown; the counts stay. |
 | 6 | Open any Whitfield person. | **Title** is empty again. |
-| 7 | Check the bell. | One notification titled **Bulk update undo finished**. |
+| 7 | Check the bell. | One notification titled **Super Transformer undo finished**. |
 
 **Cleanup:** None.
 
@@ -119,8 +119,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 2 | As admin, open **BarnCRM Settings**, **Access**. Under **Extra Permissions**, give the staff user **BarnCRM Find and Export** with **Give Permission**, and confirm. | A message says the staff user now has the permission. |
 | 3 | As staff, wait a minute and reload. Open **Data Manager**. | The tab is there. Only two tiles: **Find and Export Records** under **Find and Change** and **Org Optimizer** under **Check and Tidy**. There is no **Bring Data In** or **Careful** group. |
 | 4 | Look for **Import Templates**, **Data Jobs** and **Salesforce's Own Tools**. | None of them is shown. |
-| 5 | As admin, also give the staff user **BarnCRM Bulk Update**. As staff, reload **Data Manager**. | A third tile, **Update Many Records**, appears after **Find and Export Records**, and **Data Jobs** appears with the line **Start a bulk update from Find: run a query, then press Bulk update. Recent bulk updates are listed here, with their undo.** There is no **Show** list (one kind of job only) and no **Show everyone's jobs**. |
-| 6 | As staff, check whether the admin's bulk update from T-DM-03 is listed. | It is not: staff see their own jobs only. |
+| 5 | As admin, also give the staff user **BarnCRM Bulk Update**. As staff, reload **Data Manager**. | A third tile, **Super Transformer**, appears after **Find and Export Records**, and **Data Jobs** appears with the line **Start a change with Super Transformer above, or from a saved query in Find (Change Records, Super Transformer). Recent Super Transformer runs and their undo are listed here.** There is no **Show** list (one kind of job only) and no **Show everyone's jobs**. |
+| 6 | As staff, check whether the admin's Super Transformer run from T-DM-03 is listed. | It is not: staff see their own jobs only. |
 
 **Cleanup:** As admin, remove both extra permissions from the staff user on the **Access** page.
 
@@ -179,7 +179,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **General**, clear **Send Long Job Notifications** and click **Save**. | **Your settings are saved.** |
-| 2 | Run a bulk update as in T-DM-03, steps 1 and 2, setting **Title** to `Quiet`. | The job completes and is listed in **Data Jobs**. |
+| 2 | Run a Super Transformer run as in T-DM-03, steps 1 and 2, setting **Title** to `Quiet`. | The job completes and is listed in **Data Jobs**. |
 | 3 | Check the bell. | No new notification. |
 | 4 | Undo the job as in T-DM-04 (type `6`). | The job reaches undone; no notification. |
 

@@ -3,7 +3,7 @@
 ## What It Does
 
 BarnCRM is one suite of tools that comes in two editions. Both have the full core suite of
-tools: people, households, relationships, addresses, imports with undo, Find and bulk update,
+tools: people, households, relationships, addresses, imports with undo, Find and Super Transformer,
 duplicate review, Org Optimizer, Health Check, settings and the rest of BarnCRM Core.
 
 | Edition | For | What BarnCRM shows |

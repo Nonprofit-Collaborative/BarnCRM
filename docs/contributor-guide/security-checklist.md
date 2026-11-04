@@ -105,7 +105,7 @@ Closed since the v0.11 pass:
 | Finish Setup could grant BarnCRM Admin in system mode (C-L2) | Fixed (#654): outside an install, only to the running user, and only with Assign Permission Sets or Manage Users (ADR-0121) |
 | Inner queued job with no sharing keyword (C-L4) | Fixed (#654): `TabAccessService.Job` is `with sharing`, and `check-apex-access-modes.py` flags any Core inner async job without a keyword |
 | Read Only could read every role assignment (C-L7) | Fixed (#654): `getAccessOverview` refuses anyone without Manage BarnCRM Settings |
-| Find, export, Bulk Update and Bulk Delete trusted the picker's object list (C-L3) | Fixed: `QueryFieldCatalog.describeObject` refuses system objects, which covers every entry point and each parent a field path crosses |
+| Find, export, Super Transformer and Bulk Delete trusted the picker's object list (C-L3) | Fixed: `QueryFieldCatalog.describeObject` refuses system objects, which covers every entry point and each parent a field path crosses |
 | New-tab links without `rel` (C-L6) | Fixed in `findExportFiles`, `optimizerSetup` and `dataManager` |
 | View All and Modify All on Account and Contact for BarnCRM Admin (C-M2) | Kept, justified in ADR-0142, the permission set description and the submission notes |
 | BarnCRM Access Manager carries Assign Permission Sets (C-L5) | Kept (ADR-0121, D-91), justified in the submission notes |

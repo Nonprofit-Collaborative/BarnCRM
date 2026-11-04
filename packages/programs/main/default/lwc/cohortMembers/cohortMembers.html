@@ -1,5 +1,5 @@
 <template>
-  <lightning-card title={labels.title} icon-name="custom:custom15">
+  <lightning-card title={labels.title} icon-name="custom:custom50">
     <div class="slds-var-p-horizontal_medium slds-is-relative">
       <template lwc:if={showSpinner}>
         <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
@@ -25,7 +25,7 @@
       </template>
 
       <template lwc:if={loaded}>
-        <p data-id="member-count" class="slds-text-title_caps slds-var-m-bottom_x-small">{memberCount}</p>
+        <p data-id="member-count" class="slds-text-title_bold slds-var-m-bottom_x-small">{memberCount}</p>
         <template lwc:if={hasMembers}>
           <ul class="slds-has-dividers_bottom-space">
             <template for:each={members} for:item="member">
@@ -63,7 +63,7 @@
             <h3 class="slds-text-heading_small slds-var-m-bottom_small">{labels.addPeople}</h3>
 
             <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_x-small">
-              <p class="slds-col slds-text-title_caps">{labels.candidates}</p>
+              <p class="slds-col slds-text-title_bold">{labels.candidates}</p>
               <template lwc:if={hasCandidates}>
                 <lightning-button
                   data-id="select-all"
@@ -96,7 +96,7 @@
             </template>
 
             <template lwc:if={canEnroll}>
-              <p class="slds-text-title_caps slds-var-m-top_medium slds-var-m-bottom_x-small">{labels.someoneElse}</p>
+              <p class="slds-text-title_bold slds-var-m-top_medium slds-var-m-bottom_x-small">{labels.someoneElse}</p>
               <div class="slds-grid slds-wrap slds-grid_vertical-align-end slds-gutters_x-small">
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
                   <lightning-record-picker

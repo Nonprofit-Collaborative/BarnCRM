@@ -369,3 +369,36 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 13 | On the program, schedule a session in **Schedule Sessions** (no cohort). Open it. | The log lists everyone with an open enrollment in the program. |
 
 **Cleanup:** delete the sessions without deliveries and the cohort; delete the enrollments; remove the staff user's role.
+
+## T-PRG-22: Schedule Sessions Twice Adds No Duplicates
+
+**Purpose:** confirm running **Schedule Sessions** again skips days that already have a session of the same service for the same cohort, and does not skip Cancelled ones.
+**Prerequisites:** T-PRG-21 step 6 done (the cohort "Spring" has 4 Tutoring sessions on its Mondays and Wednesdays); the staff user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the cohort, in **Schedule Sessions**, pick Tutoring, keep the same dates and days, and look at the line under the form. | "0 sessions will be scheduled. Days that already have a session are skipped: 4." **Schedule** is disabled. |
+| 2 | Add Friday to the days. | The line reads for example "2 sessions will be scheduled. Days that already have a session are skipped: 4." **Schedule** is enabled. |
+| 3 | Click **Schedule**. | "2 sessions scheduled. Days that already have a session are skipped: 4." |
+| 4 | Open the cohort's **Sessions** list. | 6 sessions in all, one per day; no day has two Tutoring sessions. |
+| 5 | Set one session's **Status** to **Cancelled**, then repeat the same schedule. | That day is scheduled again (a Cancelled session does not count); the other days are skipped. |
+| 6 | On the program (no cohort), schedule Tutoring over the same dates, then again. | The first run creates sessions with no cohort even though the cohort has sessions on those days; the second run skips them all and **Schedule** is disabled. |
+
+**Cleanup:** delete the sessions without deliveries and the cohort.
+
+## T-PRG-23: Unsaved Attendance Question
+
+**Purpose:** confirm changing the **Service** or **Date** with unsaved attendance asks first, and each choice does what it says.
+**Prerequisites:** the staff user; an Active program with two Active services ("Tutoring" and "Meals") and two enrolled test people ("Ana" and "Ben").
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the program. In **Service Delivery Log**, pick Tutoring and today's date. Look beside **Save**. | No unsaved hint. |
+| 2 | Mark Ana **Present**. | A small hint beside **Save** reads "1 unsaved change". Mark Ben Present too: "2 unsaved changes". |
+| 3 | Change **Service** to Meals. | A dialog **Save Attendance First?** opens: "You have unsaved attendance for Tutoring on (today's date). Changing the service or date reloads the list, so save it first or discard it." **Save** is chosen by default; the buttons are **Continue** and **Cancel**. |
+| 4 | Click **Cancel**. | The dialog closes, **Service** goes back to Tutoring and both marks are still there, with the hint. |
+| 5 | Change **Service** to Meals, keep **Save**, and click **Continue**. | The Tutoring attendance is saved ("2 service deliveries saved." or similar), then the Meals list loads with nobody marked and no hint. Changing back to Tutoring shows Ana and Ben Present. |
+| 6 | On Meals, mark Ana Present, then change **Date** to yesterday. Choose **Discard** and click **Continue**. | The mark is dropped and yesterday's Meals list loads with nobody marked and no hint. Today's Meals list has no delivery for Ana. |
+| 7 | Mark Ben Present on yesterday's list and click **Save**, then change **Date**. | No dialog (nothing is unsaved). |
+
+**Cleanup:** delete the test deliveries.

@@ -50,7 +50,7 @@ is on, the **Import** tab is for anyone with the **Manage BarnCRM Settings** per
 (see [Data Manager](data-manager.md)). If you do not see the tile, ask whoever set up your org
 to give you the BarnCRM Admin role on the **Access** page.
 
-Every import, bulk update ([Bulk update](bulk-update.md)) and bulk delete
+Every import, Super Transformer run ([Super Transformer runs and undo](bulk-update.md)) and bulk delete
 ([Bulk delete](bulk-delete.md)) is saved as one **Data Job** record, with its counts, run log
 and undo deadline. In reports and list views look for **Data Jobs**; the object's API name,
 `Import_Batch__c`, has not changed.

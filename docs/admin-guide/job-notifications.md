@@ -2,7 +2,7 @@
 
 ## What It Does
 
-Some BarnCRM work takes longer than a page can wait for: an import, a bulk update or bulk
+Some BarnCRM work takes longer than a page can wait for: an import, a Super Transformer run or bulk
 delete, undoing one of those, loading the sample data, recalculating every rollup, the field
 utilization count, the seasonal address swap, a duplicate scan, or recomputing every household
 name. With Giving installed, the year end statement run, sending acknowledgment emails and
@@ -36,11 +36,11 @@ Start with no sample data loaded.
    **Sample data load finished**, with the number of households, people and organizations.
 4. Click the notification. The BarnCRM Settings console opens at the General section, where the
    sample data card shows the same counts.
-5. Open the **Find** tab, run a query that returns a few sample records, press **Bulk Update**
-   and set a field on them (the [bulk update](bulk-update.md) page has the steps). When it
-   finishes, the bell shows **Bulk update finished** with how many
-   records were updated, left as they were, and could not be saved. Click it to open the bulk
-   update's record, with the full run log.
+5. Open the **Find** tab, run a query that returns a few sample records, choose **Change Records**,
+   **Super Transformer** and set a field on them (the [Super Transformer runs and undo](bulk-update.md)
+   page has the steps). When it finishes, the bell shows **Super Transformer run finished** with how many
+   records were updated, left as they were, and could not be saved. Click it to open the
+   run's record, with the full run log.
 
 ## Who Gets a Notification
 
@@ -59,7 +59,7 @@ Start with no sample data loaded.
 | Job | Notification opens |
 |---|---|
 | Import, check before importing (dry run), import undo | The import's record |
-| Bulk update and its undo | The bulk update's record |
+| Super Transformer run and Super Transformer undo | The Super Transformer run's record |
 | Bulk delete and its undo | The bulk delete's record |
 | Sample data load, and removal if it stops part way | BarnCRM Settings, General |
 | Rollup recalculation (Recalculate, Recalculate all) | BarnCRM Settings, Rollups |

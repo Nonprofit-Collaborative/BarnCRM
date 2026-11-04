@@ -68,7 +68,7 @@ administrator would otherwise have to go looking for:
 
 - any org limit at 80 percent or more (data and file storage, daily API requests, daily
   asynchronous Apex runs and single emails), each with its percentage;
-- BarnCRM data jobs (imports, bulk updates, bulk deletes and their undos) that failed since the
+- BarnCRM data jobs (imports, Super Transformer runs, bulk deletes and their undos) that failed since the
   last digest, up to ten, each with a link that opens it;
 - how many duplicate suggestions are waiting for review (counted only when the person who
   scheduled the digest holds the BarnCRM Duplicate Review permission set);

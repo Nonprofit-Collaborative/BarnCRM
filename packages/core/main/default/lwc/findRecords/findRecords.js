@@ -63,7 +63,7 @@ import DELETED_NOTICE from '@salesforce/label/c.Core_Find_DeletedNotice';
 import FIX_CONDITIONS from '@salesforce/label/c.Core_Find_FixConditions';
 import CHOOSE_COLUMNS from '@salesforce/label/c.Core_Find_ChooseColumns';
 import LOADING from '@salesforce/label/c.Core_EraseAction_Working';
-import BULK_UPDATE from '@salesforce/label/c.Core_BulkUpdate_Title';
+import BULK_UPDATE from '@salesforce/label/c.Core_SuperTransform_Title';
 import BULK_DELETE from '@salesforce/label/c.Core_BulkDelete_Title';
 import EXPORT_EXCEL from '@salesforce/label/c.Core_Find_ExportExcel';
 import EXPORT_FILES from '@salesforce/label/c.Core_Find_ExportFiles';

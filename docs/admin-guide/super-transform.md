@@ -3,8 +3,7 @@
 ## 1. What It Does
 
 **Super Transformer** changes many records at once without a file and without building a Find
-query first. It is the top of the **Super Transformer** tab (the tab that used to be called
-**Bulk Update**), and it walks you down one page in five numbered cards:
+query first. It is the top of the **Super Transformer** tab, and it walks you down one page in five numbered cards:
 
 1. **Object**: search for and choose the kind of record to change, for example Contact. Only
    objects you may edit are offered.
@@ -12,11 +11,11 @@ query first. It is the top of the **Super Transformer** tab (the tab that used t
    example **Mailing City** **equals** `springfield`). The number of matching records
    updates by itself as you type. With no condition, a warning says the change would reach
    every record of that object, and how many that is. Another warning says when more records
-   match than one run may change (the **Bulk update run limit**).
+   match than one run may change (the **Super Transformer run limit**).
 3. **What to Change**: one row per field, up to five. For each field choose **Set To** (a
    value typed to the field: a dropdown for a picklist, a date picker for a date, a yes or no
    choice for a checkbox, a search for a lookup), **Clear**, **Copy From Another Field**, or
-   **Change With Steps** (the transform steps of [Bulk update](bulk-update.md), section 6).
+   **Change With Steps** (the transform steps of [Super Transformer runs and undo](bulk-update.md), section 6).
    Two ready-made step lists are offered on text fields: **Fix Name Capitals** and, on phone
    and short text fields, **Format Phone Number** (section 6).
 4. **Preview**: the first 25 matching records, each changed field shown as its old value and
@@ -27,22 +26,22 @@ query first. It is the top of the **Super Transformer** tab (the tab that used t
    then shows the progress and the result.
 
 Super Transformer is a new front for the same bulk update engine
-([Bulk update](bulk-update.md)): the preview is worked out by the code the run uses, the run
-is a bulk update job in the background with your own access, every change is journaled, and
+([Super Transformer runs and undo](bulk-update.md)): the preview is worked out by the code the run uses, the run
+is a Super Transformer job in the background with your own access, every change is journaled, and
 each run is listed under **Data Jobs** right below the cards with its **Undo**, for as
 long as an import can be undone.
 
 ## 2. How to Turn It On
 
-1. Super Transformer needs the same two permissions as a bulk update: **Bulk Update Records** and
+1. Super Transformer needs two permissions: **Bulk Update Records** and
    **Find and Export Records**. The **BarnCRM Admin** role has both. For anyone else, assign
    the **BarnCRM Bulk Update** and **BarnCRM Find and Export** extra permissions (BarnCRM
    Settings, **Access**, **Extra Permissions**). A person without both sees a short message
    in place of the cards, and no error.
 2. The **Data Manager** feature must be on (BarnCRM Settings, **General**), because the tab is
    one of its tools.
-3. Optional: **Bulk update run limit** and **Bulk chunk size** (BarnCRM Settings, **Import**)
-   apply to Super Transformer exactly as to a bulk update. There is no setting of its own.
+3. Optional: **Super Transformer run limit** and **Bulk chunk size** (BarnCRM Settings, **Import**)
+   apply to every Super Transformer run, whether it starts here or in Find. There is no setting of its own.
 
 ## 3. A Five-Minute Walkthrough (as Maria)
 
@@ -62,7 +61,7 @@ Maria wants every volunteer in Springfield whose **Title** is empty to read `Vol
    already held the value and how many failed, with each reason. To put it back, press
    **Undo** on the run under **Data Jobs**.
 
-## 4. How It Compares to a Bulk Update from Find
+## 4. How It Compares to a Super Transformer Run from Find
 
 Both make the same job. Start from **Find** when you already have the query open, want to see
 more columns, or want to save the query. Start from **Super Transformer** when you only want to
@@ -101,7 +100,7 @@ everything as the person running them.
 
 A list is stored as one JSON document in the **Saved Transform** object (**Definition**):
 `{ "version": 1, "object": "Contact", "filter": { ... }, "changes": [ ... ] }`. You do not edit
-it by hand; Super Transformer checks it whenever it is saved (an object a bulk update may not
+it by hand; Super Transformer checks it whenever it is saved (an object a Super Transformer run may not
 write, more than five changes, or steps with a problem refuse the save, with the reason).
 
 ## 6. Format Phone Number and the Format Digits Step
@@ -124,7 +123,7 @@ step, **Format digits**, with the pattern `(###) ###-####` and country code `1`.
 Try another pattern, for example `###-###-####`, by editing the step. The pattern may have
 1 to 15 `#` and at most 30 characters. **Format digits** is also offered in the import wizard
 (**Change Values**, [Importing](importing.md), section 10) and in
-[Bulk update](bulk-update.md), section 6.
+[Super Transformer runs and undo](bulk-update.md), section 6.
 
 ## 7. Common Mistakes
 
@@ -146,7 +145,7 @@ Try another pattern, for example `###-###-####`, by editing the step. The patter
 
 Super Transformer adds one object, **Saved Transform**, for saved step lists, and no setting. Its
 runs are Data Job records with **Operation** Update, described in
-[Bulk update](bulk-update.md#field-reference).
+[Super Transformer runs and undo](bulk-update.md#field-reference).
 
 | Field | What it holds |
 |---|---|

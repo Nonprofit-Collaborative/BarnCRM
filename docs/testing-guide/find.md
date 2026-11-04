@@ -2,7 +2,7 @@
 
 Scripts for the Find tab: building and running queries, conditions, related records, typed queries, summaries, exports and saved queries. Setup detail: [Find and export](../admin-guide/find.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. Run, save and export only queries whose conditions match the fixture (for example **Last Name equals Zztest**); an export of a broader query would copy real people. The **Data Manager** feature must be on (BarnCRM Settings, **General**). These scripts assume people are stored as contacts. Editing in the results table is tested in [Bulk update and delete](bulk-update-and-delete.md).
+Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. Run, save and export only queries whose conditions match the fixture (for example **Last Name equals Zztest**); an export of a broader query would copy real people. The **Data Manager** feature must be on (BarnCRM Settings, **General**). These scripts assume people are stored as contacts. Editing in the results table is tested in [Super Transformer and bulk delete](bulk-update-and-delete.md).
 
 ## T-FIND-01: Build and Run a Query
 
@@ -143,7 +143,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Log in as read-only. Search the App Launcher for "Find". | No BarnCRM **Find** tab. |
 | 2 | Log in as staff and repeat. | No **Find** tab. |
 | 3 | As admin, on BarnCRM Settings, **Access**, give staff **BarnCRM Find and Export** under **Extra Permissions**. Log in as staff again. | The **Find** and **Data Manager** tabs are available. |
-| 4 | As staff, run a Contact query. | Results show. **Run**, the **Export** menu (**Export to CSV**, **Export to Excel**, **Export to Files**) and **Summarize** are offered; there is no **Change Records** menu (no **Bulk Update** or **Bulk Delete**). Cells show no edit pencil. |
+| 4 | As staff, run a Contact query. | Results show. **Run**, the **Export** menu (**Export to CSV**, **Export to Excel**, **Export to Files**) and **Summarize** are offered; there is no **Change Records** menu (no **Super Transformer** or **Bulk Delete**). Cells show no edit pencil. |
 | 5 | As staff, open an object staff cannot read (if your org has one), or ask admin to note a field staff cannot see. | That object is not offered, and that field is not offered as a column or a condition. |
 | 6 | As admin, remove **BarnCRM Find and Export** from staff. Log in as staff. | **Find** is gone again. |
 
@@ -151,7 +151,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-FIND-10: Show More and the Change Records Menu
 
-**Purpose:** confirm long results show 25 rows at a time while exports keep every row, and that Bulk Update and Bulk Delete sit in one Change Records menu.
+**Purpose:** confirm long results show 25 rows at a time while exports keep every row, and that Super Transformer and Bulk Delete sit in one Change Records menu.
 **Prerequisites:** admin with **BarnCRM Bulk Delete** (BarnCRM Settings, **Access**, **Extra Permissions**); sample data loaded.
 
 | Step | Action | Expected result |
@@ -159,7 +159,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open **Find**, choose **Contact**, add **First Name** and **Last Name**, no conditions, leave **Rows to show** at 200, and select **Run**. | "Found the first 200 matching rows. Export to get every matching record." The table shows 25 rows, and under it "Showing 25 of 200 rows." with **Show More**. The page is not thousands of pixels long. |
 | 2 | Select **Show More** twice. | 75 rows; the line reads "Showing 75 of 200 rows." |
 | 3 | In the **Export** menu, choose **Export to CSV** and open the file. | Every contact (about 440 with sample data), not 75 or 200. |
-| 4 | Open the **Change Records** menu. | **Bulk Update** and, last, **Bulk Delete**. |
-| 5 | Choose **Bulk Update**. | The **Bulk Update** panel opens right under the buttons, above **Results**. Select **Close**; nothing changed. |
+| 4 | Open the **Change Records** menu. | **Super Transformer** and, last, **Bulk Delete**. |
+| 5 | Choose **Super Transformer**. | The **Super Transformer** panel opens right under the buttons, above **Results**. Select **Close**; nothing changed. |
 
 **Cleanup:** none (nothing was changed or deleted).

@@ -6,7 +6,7 @@ import startUpdate from '@salesforce/apex/BulkUpdateController.start';
 import getJob from '@salesforce/apex/BulkUpdateController.getJob';
 import { startPolling } from 'c/jobPoller';
 
-import TITLE from '@salesforce/label/c.Core_BulkUpdate_Title';
+import TITLE from '@salesforce/label/c.Core_SuperTransform_Title';
 import PANEL_INTRO from '@salesforce/label/c.Core_BulkUpdate_PanelIntro';
 import CHANGES from '@salesforce/label/c.Core_BulkUpdate_Changes';
 import FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';

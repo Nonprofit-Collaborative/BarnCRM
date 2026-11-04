@@ -1,5 +1,5 @@
 <template>
-  <lightning-card title={labels.title} icon-name="custom:custom14">
+  <lightning-card title={labels.title} icon-name="custom:custom16">
     <div class="slds-var-p-horizontal_medium slds-is-relative">
       <template lwc:if={showSpinner}>
         <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
@@ -56,7 +56,7 @@
         </template>
 
         <template lwc:if={showHeader}>
-          <div class="slds-grid slds-gutters_x-small slds-show_medium slds-text-title_caps" data-id="header">
+          <div class="slds-grid slds-gutters_x-small slds-show_medium slds-text-title_bold" data-id="header">
             <div class="slds-col slds-size_1-of-2"></div>
             <div class="slds-col slds-size_1-of-4">{labels.attendance}</div>
             <div class="slds-col slds-size_1-of-4">{quantityLabel}</div>
@@ -115,7 +115,12 @@
         <div role="status" data-id="result" class="slds-var-m-vertical_small">{resultMessage}</div>
 
         <template lwc:if={canEdit}>
-          <div class="slds-grid slds-wrap slds-grid_align-end slds-var-m-bottom_small">
+          <div class="slds-grid slds-wrap slds-grid_align-end slds-grid_vertical-align-center slds-var-m-bottom_small">
+            <template lwc:if={unsavedText}>
+              <p data-id="unsaved" class="slds-text-body_small slds-text-color_weak slds-var-m-right_small">
+                {unsavedText}
+              </p>
+            </template>
             <lightning-button
               data-id="mark-all-present"
               label={labels.markAllPresent}

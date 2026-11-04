@@ -2,9 +2,12 @@ import { createElement } from 'lwc';
 import SessionScheduler from 'c/sessionScheduler';
 import getSchedule from '@salesforce/apex/SessionScheduleController.getSchedule';
 import scheduleSessions from '@salesforce/apex/SessionScheduleController.scheduleSessions';
+import getTakenDays from '@salesforce/apex/SessionScheduleController.getTakenDays';
 import {
   MAX_SESSIONS,
+  countMessage,
   format,
+  newAndSkipped,
   parseIsoDate,
   previewMessage,
   sessionDates,
@@ -24,6 +27,14 @@ jest.mock(
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
+jest.mock(
+  '@salesforce/apex/SessionScheduleController.getTakenDays',
+  () => ({ default: jest.fn(() => Promise.resolve([])) }),
+  { virtual: true }
+);
+jest.mock('@salesforce/label/c.Programs_Schedule_Skipped', () => ({ default: 'skipped {0}' }), {
+  virtual: true
+});
 jest.mock('@salesforce/i18n/locale', () => ({ default: 'en-US' }), { virtual: true });
 jest.mock(
   '@salesforce/label/c.Programs_Schedule_PreviewMany',
@@ -123,6 +134,17 @@ describe('schedule (framework free)', () => {
     expect(previewMessage({ problem: null, dates: ['x'] }, labels)).toBe('one');
     expect(previewMessage({ problem: null, dates: ['x', 'y'] }, labels)).toBe('2 sessions');
   });
+
+  it('counts the days that already have a session as skipped', () => {
+    const labels = { one: 'one', many: '{0} sessions', skipped: 'skipped {0}' };
+    expect(newAndSkipped(['a', 'b', 'c'], ['b', 'z'])).toEqual({ toCreate: 2, skipped: 1 });
+    expect(newAndSkipped(['a'], undefined)).toEqual({ toCreate: 1, skipped: 0 });
+    expect(countMessage(2, 1, labels)).toBe('2 sessions skipped 1');
+    expect(countMessage(1, 0, labels)).toBe('one');
+    expect(
+      previewMessage({ problem: null, dates: ['a', 'b'] }, { ...labels, none: 'none' }, ['a', 'b'])
+    ).toBe('0 sessions skipped 2');
+  });
 });
 
 describe('c-session-scheduler', () => {
@@ -199,6 +221,40 @@ describe('c-session-scheduler', () => {
       startTime: null
     });
     expect(q(element, 'error-message').textContent).toContain('Choose an active service.');
+  });
+
+  it('skips days that already have a session, in the preview and the result', async () => {
+    getSchedule.mockResolvedValue(scheduleOf());
+    getTakenDays.mockResolvedValue(['2027-03-01', '2027-03-08']);
+    scheduleSessions.mockResolvedValue(scheduleOf({ created: 1, skipped: 2 }));
+    const element = await render();
+    expect(getTakenDays).toHaveBeenCalledWith({
+      recordId: COHORT_ID,
+      serviceId: SERVICE_ID,
+      fromDate: '2027-03-01',
+      toDate: '2027-03-14'
+    });
+
+    q(element, 'weekdays').dispatchEvent(
+      new CustomEvent('change', { detail: { value: ['1', '3'] } })
+    );
+    await flush();
+    expect(q(element, 'preview').textContent).toBe('2 sessions skipped 2');
+    expect(q(element, 'schedule').disabled).toBe(false);
+
+    q(element, 'schedule').click();
+    await flush();
+    expect(q(element, 'result').textContent).toContain('skipped 2');
+
+    // Every chosen day already has a session: nothing to schedule.
+    getTakenDays.mockResolvedValue(['2027-03-01', '2027-03-08', '2027-03-15']);
+    const to = q(element, 'to');
+    to.value = '2027-03-15';
+    to.dispatchEvent(new CustomEvent('change'));
+    q(element, 'weekdays').dispatchEvent(new CustomEvent('change', { detail: { value: ['1'] } }));
+    await flush();
+    expect(q(element, 'preview').textContent).toBe('0 sessions skipped 3');
+    expect(q(element, 'schedule').disabled).toBe(true);
   });
 
   it('says when the program has no active service, and when the load fails', async () => {
