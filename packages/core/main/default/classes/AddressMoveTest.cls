@@ -172,7 +172,12 @@ private class AddressMoveTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(System.Label.Core_Address_MoveNotAPersonsAddress, refusal, 'Refused.');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Address_MoveNotAPersonsAddress'),
+                refusal,
+                'Refused.'
+            );
+            Assert.isTrue(String.isNotBlank(refusal), 'The refusal says why.');
         }
     }
 
