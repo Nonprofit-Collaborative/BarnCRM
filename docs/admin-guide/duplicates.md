@@ -195,10 +195,10 @@ the card has an **Active** switch; without it, an **Active** or **Inactive** bad
 Details** on a card lists, in words:
 
 - **Object**: the related object, for example Contact Point Email.
-- **Field compared**: the field holding the value: the email, the phone number, or the street.
+- **Value compared**: the field holding the value: the email, the phone number, or the street.
 - **Postal code field**: address sources only; the postal code compared with the street.
 - **Belongs to**: a person, a household (or person account), or either.
-- **Through the lookup**: the field linking the value to its person or household.
+- **Linked through the field**: the field linking the value to its person or household.
 - **How values are compared**: Email, Phone or Address, with what is ignored.
 
 A source that cannot work in this org (its object
@@ -206,7 +206,7 @@ or a field is missing, or you cannot read it) says **Not used in this org** and 
 
 BarnCRM ships six sources, marked **Shipped with BarnCRM**:
 
-| Source | Object | Field compared | Through the lookup | Compared as |
+| Source | Object | Value compared | Linked through the field | Compared as |
 |---|---|---|---|---|
 | Contact Point Email | Contact Point Email | Email Address | Parent | Email |
 | Contact Point Phone | Contact Point Phone | Telephone Number | Parent | Phone |
@@ -238,7 +238,7 @@ person accounts too. A record that belongs to anything else is skipped.
 **Add a source.** Choose **Add**: the form opens in a window over the page (Escape or
 **Cancel** closes it). Fill in **Name**, then the object's API name under **Object** (for
 example `Volunteer_Profile__c`) and choose **Find Fields**: the
-**Field compared** and **Through the lookup** lists then offer only the fields that can
+**Value compared** and **Linked through the field** lists then offer only the fields that can
 work (text, email or phone fields Salesforce can search on, and lookups to a contact, an
 account or an Individual). Choose **How values are compared**; for **Address**, also choose
 the **Postal code field**. **Save** checks the source against the org and refuses anything
@@ -274,13 +274,15 @@ the same first name, last name and email. Salesforce warns you that a similar re
 choose to save anyway.
 
 1. Open the **Duplicate Matching** tab. The **Review** area opens.
-2. Choose **Scan for Duplicates**. You see "Scan started. It runs in the background, and
-   suggestions appear here as they are found."
-3. Wait a minute and refresh the page. Under **Possible Duplicates** you see the pair you made,
-   each person with their email address.
-4. Choose the person's name to open their record. On the right of the page the **Potential
-   Duplicates** card names the other record. Choose **View Duplicates**, then **Compare and
-   merge**, pick the values to keep, and confirm. Salesforce allows this only to people with
+2. Choose **Scan for Duplicates**. You see "Scan started. The bell tells you when it
+   finishes." While it runs, the panel says "A scan is running. The bell tells you when it
+   finishes."
+3. When the bell's **Duplicate scan finished** notification arrives, choose **Refresh**. Under
+   **Possible Duplicates** you see the pair you made, each person with their email address.
+4. Choose **Compare and Merge** on the pair. The first person's record opens (in a console, as
+   a subtab). On the right of the page the **Potential Duplicates** card names the other
+   record. Choose **View Duplicates**, then **Compare and merge**, pick the values to keep, and
+   confirm. (**Not a Duplicate** stays on the pair, in the list.) Salesforce allows this only to people with
    Delete on contacts (on accounts, for person accounts): BarnCRM Admin has it, and the staff
    roles deliberately do not, so staff ask an admin to merge two people. Merging two
    households needs no Delete permission (see

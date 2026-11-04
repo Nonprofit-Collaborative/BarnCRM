@@ -5,22 +5,31 @@
     <h2 class="slds-assistive-text" data-id="title">{labels.title}</h2>
 
     <template lwc:if={errorMessage}>
-      <p class="slds-text-color_error slds-var-m-vertical_small" data-id="error" role="alert">
-        {errorMessage}
-      </p>
+      <c-barn-notice
+        class="slds-show slds-var-m-vertical_small"
+        variant="error"
+        message={errorMessage}
+        data-id="error"
+      ></c-barn-notice>
     </template>
     <template lwc:if={noticeMessage}>
-      <p class="slds-var-m-vertical_small" data-id="notice" role="status" aria-live="polite">
-        {noticeMessage}
-      </p>
+      <c-barn-notice
+        class="slds-show slds-var-m-vertical_small"
+        variant="success"
+        message={noticeMessage}
+        data-id="notice"
+      ></c-barn-notice>
     </template>
 
     <div class="slds-box slds-box_x-small slds-var-m-bottom_small">
       <h3 class="slds-text-title_bold">{labels.rulesHeading}</h3>
       <template lwc:if={showNoRulesNotice}>
-        <p class="slds-var-m-vertical_x-small" data-id="no-rules" role="status">
-          {labels.noRulesNotice}
-        </p>
+        <c-barn-notice
+          class="slds-show slds-var-m-vertical_x-small"
+          variant="warning"
+          message={labels.noRulesNotice}
+          data-id="no-rules"
+        ></c-barn-notice>
       </template>
       <ul class="slds-var-m-vertical_x-small">
         <template for:each={rules} for:item="rule">
@@ -69,7 +78,17 @@
       </template>
 
       <template lwc:if={lastScanSummary}>
-        <p class={lastScanSummaryClass} data-id="last-scan-summary">{lastScanSummary}</p>
+        <template lwc:if={lastScanHadFailures}>
+          <c-barn-notice
+            class="slds-show slds-var-m-top_x-small"
+            variant="warning"
+            message={lastScanSummary}
+            data-id="last-scan-summary"
+          ></c-barn-notice>
+        </template>
+        <template lwc:else>
+          <p class="slds-text-body_small slds-var-m-top_x-small" data-id="last-scan-summary">{lastScanSummary}</p>
+        </template>
       </template>
 
       <p class="slds-text-body_small slds-var-m-top_x-small" data-id="dismissed-count">
@@ -96,20 +115,25 @@
       {labels.suggestionsHeading}
       <template lwc:if={hasCount}>
         <span aria-hidden="true">
-          <lightning-badge class="slds-var-m-left_x-small" label={countLabel} data-id="count-badge"></lightning-badge>
+          <c-barn-status-badge
+            class="slds-var-m-left_x-small"
+            status="neutral"
+            label={countLabel}
+            data-id="count-badge"
+          ></c-barn-status-badge>
         </span>
         <span class="slds-assistive-text">{countAlt}</span>
       </template>
     </h3>
     <template lwc:if={showNoAccessNotice}>
-      <p class="slds-var-m-top_x-small" data-id="no-access">{labels.noAccess}</p>
+      <c-barn-notice
+        class="slds-show slds-var-m-top_x-small"
+        variant="info"
+        message={labels.noAccess}
+        data-id="no-access"
+      ></c-barn-notice>
     </template>
     <template lwc:elseif={hasSuggestions}>
-      <template lwc:if={showAnyPeopleNotice}>
-        <p class="slds-text-body_small slds-var-m-top_x-small" data-id="people-notice">
-          {labels.peopleMergeNotice}
-        </p>
-      </template>
       <ul class="slds-var-m-top_x-small">
         <template for:each={visibleSuggestions} for:item="suggestion">
           <li
@@ -135,6 +159,16 @@
                     label={labels.merge}
                     disabled={controlsDisabled}
                     onclick={handleMergeClick}
+                  ></lightning-button>
+                </template>
+                <template lwc:if={suggestion.isPeople}>
+                  <lightning-button
+                    class="slds-var-m-right_x-small"
+                    variant="brand"
+                    data-id="compare-button"
+                    data-record-id={suggestion.firstRecordId}
+                    label={labels.compareMerge}
+                    onclick={handleCompareClick}
                   ></lightning-button>
                 </template>
                 <lightning-button
@@ -181,11 +215,12 @@
                           <dd data-id="value">
                             {field.text}
                             <template lwc:if={field.differs}>
-                              <lightning-badge
-                                class="slds-theme_warning slds-var-m-left_x-small"
+                              <c-barn-status-badge
+                                class="slds-var-m-left_x-small"
+                                status="warning"
                                 label={labels.different}
                                 data-id="differs"
-                              ></lightning-badge>
+                              ></c-barn-status-badge>
                               <span class="slds-assistive-text">{record.differentFrom}</span>
                             </template>
                           </dd>
@@ -208,7 +243,7 @@
                 class="slds-var-m-top_small slds-var-p-top_x-small slds-border_top"
                 data-id="dismiss-dialog"
               >
-                <h4 class="slds-text-heading_x-small" tabindex="-1" data-id="dismiss-heading">
+                <h4 class="slds-text-heading_small" tabindex="-1" data-id="dismiss-heading">
                   {labels.dismissHeading}
                 </h4>
                 <p class="slds-text-body_small">{labels.dismissBody}</p>
@@ -244,7 +279,7 @@
                 class="slds-var-m-top_small slds-var-p-top_x-small slds-border_top"
                 data-id="merge-dialog"
               >
-                <h4 class="slds-text-heading_x-small" tabindex="-1" data-id="merge-heading">
+                <h4 class="slds-text-heading_small" tabindex="-1" data-id="merge-heading">
                   {labels.mergeHeading}
                 </h4>
                 <p class="slds-text-body_small">{labels.mergeBody}</p>

@@ -48,18 +48,23 @@ the records in first and the automatic housekeeping to happen afterwards, so not
    automation BarnCRM ships, each with a plain-language description and a switch.
 3. At the top of the page, choose **2 hours** in the **How long** list, then click
    **Pause All Automation**. The page now shows a yellow bar: "Automation is paused until
-   3:40 PM. Paused by Maria Lopez. It turns itself back on then." Every switch in the list
-   is still where you left it: pausing does not change anything you have chosen.
+   3:40 PM. Paused by Maria Lopez. It turns itself back on then." with a **Resume
+   Automation** button inside it. **How long** and **Pause All Automation** are hidden while
+   automation is paused, and **Resume Automation** shows only in that bar, so only the button
+   that does something is ever offered. Every switch in the list is still where you left it:
+   pausing does not change anything you have chosen.
 4. Click **Home**. The same banner appears at the top of the Hub, so anyone else working
    today can see why records are not updating themselves.
 5. Load your spreadsheet. Nothing runs automatically while you do.
 6. Come back to **BarnCRM Settings**, then **Automation**, and click **Resume
-   automation**. The banner disappears and the automation starts running again on the next
+   Automation** in the yellow bar. The banner disappears, **Pause All Automation** is back, and the automation starts running again on the next
    record anyone saves. If you forget this step, nothing breaks: automation turns itself
    back on at the two hour mark, and the change is recorded like any other (see "How long
    a pause lasts" below).
 7. Now switch off a single automation instead. Find **Household upkeep when a person
-   changes** in the list and click its switch to **Off**. Only that one stops running.
+   changes** in the list and click its switch to **Off**. Only that one stops running. For a
+   few seconds a line next to the switch says "Household upkeep when a person changes is
+   off. Turn it back on here." (a screen reader announces it).
    Everything else carries on.
 8. Switch it back **On**. Every change you make here is recorded with your name, the time,
    and what the value was before, so you can always see who changed what.
