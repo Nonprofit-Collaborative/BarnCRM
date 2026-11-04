@@ -99,14 +99,19 @@ A `lightning-card` header shows the icon of the page or object the card belongs 
 - A card on a tab's own page, or about one object, uses that tab's `custom:customN`, with N the tab's motif number.
 - A card never uses another tab's number: a borrowed motif tells people the card is about something else.
 - Card headers use `standard:*` or `custom:*` icons only; a `utility:*` glyph renders small and grey beside colored icon tiles.
-- A card with no tab of its own (such as household or address panels) keeps a `standard:*` icon.
+- A card with no tab of its own keeps a `standard:*` icon. The people panels (Household, Members, Relationships, Affiliations, Addresses) each have a tab, so they use its icon; the rows inside them use `lightning-avatar` with initials or a `standard:*` object icon.
 
 Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_navigation.py` fails when a card uses a `custom:*` icon that is not listed, when the listed tab's motif number differs, when the component names neither the icon nor `iconFor('<Tab>')` (c/barnIcons), or when a card header uses a `utility:*` icon.
 
 | Package | Component | Card icon | Tab |
 |---|---|---|---|
+| core | addressPanel | custom:custom78 | Address__c |
+| core | affiliationPanel | custom:custom33 | Affiliation__c |
 | core | automationControl | custom:custom67 | BarnCRM_Settings |
 | core | errorLogTile | custom:custom53 | Error_Log__c |
+| core | householdMembersPanel | custom:custom15 | Households |
+| core | householdOfPerson | custom:custom15 | Households |
+| core | relationshipPanel | custom:custom37 | Relationship__c |
 | funders | fundersBoard | custom:custom100 | Funders_Board |
 | funders | grantAnswerLibrary | custom:custom87 | Grant_Answer__c |
 | funders | grantCalendar | custom:custom82 | Grant_Calendar |

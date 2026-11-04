@@ -7,7 +7,7 @@
 
 **Org Optimizer** is one page that answers "what in my org needs attention?" It brings
 together the checks that used to live in several places: the record checks (**Data
-Quality**), field utilization, and Health Check. (Duplicate review has its own tab,
+Quality**), Field Use, and Health Check. (Duplicate review has its own tab,
 **Duplicate Matching**; see [Duplicates](duplicates.md).) Each one
 is a section of the page, and nothing in a section runs until you open it, so the page itself
 opens quickly however large your database is.
@@ -16,7 +16,7 @@ opens quickly however large your database is.
 |---|---|---|
 | **Overview** | A tile for each section, grouped under **Check Your Data** and **Check Your Setup**. A tile's badge gives its state at a glance (see below). Select a tile to open its section. | Everyone who can open the page |
 | **Data Quality** | Which records need tidying up: people with no household, empty households, orphaned memberships and addresses, incomplete or failed primary addresses, people nobody can reach, deceased people who can still be emailed, and people not changed for years. Each check shows its count, a **Needs Attention** or **All Clear** badge, and **Open in Find**. See [Data Quality](data-hygiene.md). | Anyone with **Find and Export Records** |
-| **Field Utilization** | How often each field of a kind of record is filled in, by record type, with saved counts for trends. See [Field utilization](field-utilization.md). | Administrators |
+| **Field Use** | How often each field of a kind of record is filled in, by record type, with saved counts for trends (called Field Utilization before v1.0). See [Field Use](field-utilization.md). | Administrators |
 | **Data Dictionary** | Every field you can see on the kinds of record you choose, with type, length, required, unique, picklist values, help text and formula, and optionally a fill rate, as a table and a CSV download. See [Data Dictionary](data-dictionary.md). | Administrators |
 | **AI-Readiness Export** | One zip for an AI tool you choose: a plain-language README, a schema.json of your kinds of record, fields and relationships, the data dictionary, data quality notes and, if you want, record files with sensitive fields left out or masked. BarnCRM calls no AI service. See [AI-Readiness Export](ai-readiness-export.md). | Administrators |
 | **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you ask: opening it shows the last full run (when it ran and its counts, with **Run Now**), or **Run Health Check** when it has never run. See [Health Check](health-check.md). | Administrators |
@@ -70,7 +70,7 @@ Start from the sample data (see [Sample data](sample-data.md)).
    The **Health Check** tile says **Not Run Yet** on a new org.
 2. Select the **Data Quality** tile. The ten checks count as the section opens. **People with
    No Household** says **0** on fresh sample data, with an **All Clear** badge.
-3. Choose **Field Utilization**. In **Kind of Record** choose **Account**, and watch the table
+3. Choose **Field Use**. In **Kind of record** choose **Account**, and watch the table
    fill. Sort by **Filled** to see the fields nobody uses.
 4. Choose **Health Check** and press **Run Health Check** (or **Run Now**, if it has run
    before: the section first shows that run). The findings appear, most serious first, each

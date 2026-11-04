@@ -46,7 +46,9 @@ To let your team see and manage relationships, make sure they have one of the pa
 access levels (BarnCRM Admin, Team Member, or Coordinator, or Fundraising Staff
 with Giving) on the **Access** page
 in BarnCRM Settings. Read Only users see relationships and cannot change them: the
-Relationships card shows them no **Add Relationship** or **Remove** button.
+Relationships card shows them no **Add Relationship** button and no row menu. A line's menu
+offers **Edit** to people who can edit relationships, **End It** to people who can also edit
+**End Date**, and **Remove** (after a confirmation) to people who can delete them.
 
 Keeping the other side in step does not depend on what the person saving can see or edit.
 Someone who may save a relationship but cannot see or edit the other person's side of it (for
@@ -102,19 +104,19 @@ from the sample data.
    badge. Nothing else was asked of you.
 5. Open **Luis Garcia**. His **Relationships** card already shows Harper Garcia, Spouse.
    You did not enter it. BarnCRM wrote it when you saved Harper's.
-6. The card has no Edit action, so change a relationship on its own record: open the App
-   Launcher, search for **Relationships**, open Harper's relationship to Luis, and choose
-   **Edit**. Set **End date** to last month and choose **Save**. Back on Harper's record,
-   the Luis line now carries a **Former** badge.
+6. Open the menu at the right of the Luis line and choose **End It**, then **End It** in the
+   confirmation. Its **End date** becomes today, and the Luis line now carries a **Former**
+   badge on a shaded row. (**Edit** in the same menu opens the standard edit form; the name
+   opens the relationship record.)
 7. Open **Luis Garcia** again. His line carries **Former** too, and his record has the same
    end date. The two records can never disagree.
 8. Now add a second one from Harper: choose **Add Relationship**, pick **Diego Garcia**,
    type **Child**, and save. Harper's card reads "Diego Garcia, Child", because the type
    says what the other person is to the person whose record you are on. Open **Diego
    Garcia** and his card reads "Harper Garcia, Parent", the same fact from his side.
-9. Finally, choose **Remove** on the Luis line of Harper's card. It is deleted at once,
-   with no confirmation, so check the line before you click. Open Luis and the matching
-   line is gone from his card too.
+9. Finally, choose **Remove** from the menu of the Diego line. The confirmation asks
+   **Remove This Relationship?** and suggests ending it instead; choose **Remove**. Open
+   Diego and the matching line is gone from his card too.
 
 That is the whole feature: enter one side, get both, and never clean up after yourself.
 
@@ -150,7 +152,7 @@ person, use **Move to Another Household** on their household's Members panel, wh
 
 **Deleting one side and expecting the other to survive.** Deleting a relationship deletes
 both sides, because they are one connection. If you meant to keep the other person's
-record, edit the relationship and set an end date instead: it then reads Former on both
+record, choose **End It** from the line's menu instead: it then reads Former on both
 sides and stays on file, which is what you want for anything you may need to explain later.
 If you delete one by mistake, restore either side from the recycle bin: the other side comes
 back with it, paired as before, and no extra copy is made.

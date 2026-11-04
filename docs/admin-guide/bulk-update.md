@@ -140,7 +140,8 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
 
 **Change with steps** changes each record's own value rather than giving every record the same
 one. Choose the field, choose **Change with steps**, then **Add a Change** (up to ten). Steps run
-in the order listed:
+in the order listed; move one with its **Move Up** and **Move Down** arrows, or drag it by its
+handle (press and hold on a touch screen; Space and the arrow keys from the keyboard):
 
 | Step | What it does | Example |
 |---|---|---|
