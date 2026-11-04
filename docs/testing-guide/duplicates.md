@@ -14,8 +14,8 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 |---|---|---|
 | 1 | Open the **Duplicate Matching** tab. | The page header shows the merge icon and **Review possible duplicate people and households, and choose what pairs them.**, with no second **Duplicate Matching** title under the page name. The **Review** tab opens. Under **Duplicate Rules** each rule for people and accounts is listed with **On** or **Off**; at least two read **On**. A link **Open Duplicate Rules in Setup** is under them. |
 | 2 | Read the buttons and counts. | **Scan for Duplicates** and **Refresh** are enabled. **Dismissed suggestions** shows a number. |
-| 3 | Click **Scan for Duplicates**. | **Scan started. It runs in the background, and suggestions appear here as they are found.** **Scan for Duplicates** is disabled and **A scan is running. Refresh the page in a minute to see what it found.** shows. |
-| 4 | Wait a minute and click **Refresh**. | **Last scan finished** with a date and time, and a line **Duplicate scan of ... finished: N new possible duplicates recorded.** in normal (not red) text. **Scan for Duplicates** is enabled again. |
+| 3 | Click **Scan for Duplicates**. | A green notice **Scan started. The bell tells you when it finishes.** **Scan for Duplicates** is disabled and **A scan is running. The bell tells you when it finishes.** shows. Nothing asks you to refresh the page. |
+| 4 | When the bell shows **Duplicate scan finished**, click **Refresh**. | **Last scan finished** with a date and time, and a line **Duplicate scan of ... finished: N new possible duplicates recorded.** in normal (not red) text. **Scan for Duplicates** is enabled again. |
 | 5 | Check the bell. | One notification titled **Duplicate scan finished**. |
 
 **Cleanup:** None.
@@ -29,8 +29,8 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 |---|---|---|
 | 1 | Create a contact: First Name `Harper`, Last Name `Garcia`, Email `harper.garcia1@example.org`. | Salesforce warns that a similar record exists. Save anyway. |
 | 2 | On **Duplicate Matching**, **Review**, click **Scan for Duplicates**, wait, click **Refresh**. | Under **Possible Duplicates** a pair of two **Harper Garcia** records, each with **Person:** and its detail. A grey line under them names the duplicate rule that found the pair. |
-| 3 | Read the pair's buttons, and the line above the list. | The pair has a **Not a Duplicate** button on the right and no **Merge Households** button. The line **To merge two people, open either one and use Compare and merge on the Potential Duplicates card.** is shown once, above the list, not on the pair. |
-| 4 | Click the new **Harper Garcia**'s name. On the **Potential Duplicates** card choose **View Duplicates**, then **Compare and merge**, keep the sample record as the master, and confirm. | Salesforce merges the two. |
+| 3 | Read the pair's buttons. | The pair has **Compare and Merge** (the main button) and **Not a Duplicate** on the right, and no **Merge Households** button. There is no note above the list telling you to open a record. |
+| 4 | Click **Compare and Merge**. On the first **Harper Garcia**'s record page, which opens (a subtab in a console app), on the **Potential Duplicates** card choose **View Duplicates**, then **Compare and merge**, keep the sample record as the master, and confirm. | Salesforce merges the two. |
 | 5 | Open the kept **Harper Garcia** and the **The Garcia Family** household. | Harper is still a member of **The Garcia Family**. The household made for the new contact still exists, now empty. |
 | 6 | Back on **Duplicates**, click **Refresh**. | The pair is gone. |
 
@@ -93,7 +93,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **Duplicate Matching** tab and choose **Matching Logic**. | Under one intro line with a help icon, six cards, each with a **Shipped with BarnCRM** badge and its **Active** switch on: **Contact Point Email**, **Contact Point Phone**, **Contact Point Address**, **Address (person)**, **Address (household)**, **Address (person account)**. Each has one line such as **Email Address on Contact Point Email, compared as Email**. In an org without contact point objects, those three say **Not used in this org**. Shipped cards have **Show Details** and **Try a Value**, and no **Edit**. |
-| 2 | Choose **Show Details** on the **Address (household)** card. | **Object** Address, **Field compared** Street, **Postal code field** Postal Code, **Belongs to** a household or a person account, **Through the lookup** the household lookup, **How values are compared** starting **Address:**. The button now reads **Hide Details**. |
+| 2 | Choose **Show Details** on the **Address (household)** card. | **Object** Address, **Value compared** Street, **Postal code field** Postal Code, **Belongs to** a household or a person account, **Linked through the field** the household lookup, **How values are compared** starting **Address:**. The button now reads **Hide Details**. |
 | 3 | Turn off the **Active** switch on **Address (household)**. | The switch stays on while **Saving. Salesforce applies the change in the background, usually within a minute.** shows, then **Saved.** and the switch reads **Inactive**. |
 | 4 | Create a household `Pine Test Household` with a primary address **Street** `5616 Pine Dr`, **Postal Code** `78728` (the **Staff Household**'s address). | Both save. |
 | 5 | On **Review**, scan and refresh. | No pair with `Pine Test Household`. |
@@ -109,12 +109,12 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Matching Logic**, click **Add**. | A window **New Match Source** over the page, with focus inside it: **Name**, **Object**, **Find Fields**, **Field compared**, **Through the lookup**, **How values are compared**, and **Cancel** and **Save** at the bottom. Press Escape: the window closes and nothing is saved. |
+| 1 | On **Matching Logic**, click **Add**. | A window **New Match Source** over the page, with focus inside it: **Name**, **Object**, **Find Fields**, **Value compared**, **Linked through the field**, **How values are compared**, and **Cancel** and **Save** at the bottom. Press Escape: the window closes and nothing is saved. |
 | 2 | Click **Add** again. Enter **Object** `Not_An_Object__c` and choose **Find Fields**. | In the window: **Not_An_Object__c is not an object in this org. Check its API name.** |
-| 3 | Change **Object** to `Contact` and choose **Find Fields**. | **Field compared** offers text, email and phone fields such as **Email** and **Assistant Phone**, and no date or number field. **Through the lookup** offers lookups such as **Account ID** and **Reports To ID**, and not **Last Name**. |
+| 3 | Change **Object** to `Contact` and choose **Find Fields**. | **Value compared** offers text, email and phone fields such as **Email** and **Assistant Phone**, and no date or number field. **Linked through the field** offers lookups such as **Account ID** and **Reports To ID**, and not **Last Name**. |
 | 4 | Choose **How values are compared** **Address**. | A **Postal code field** list appears. |
-| 5 | Choose **Field compared** **Mailing Street**, **Through the lookup** **Account ID**, leave **Postal code field** empty, and **Save**. | Refused: **An address source needs a postal code field: the street is compared together with it.** in the window, which stays open. |
-| 6 | Enter **Name** `Test: assistant phone`, choose **How values are compared** **Phone**, **Field compared** **Assistant Phone**, **Through the lookup** **Reports To ID**, and **Save**. | The window closes. **Saving.**, then **Saved. Test: assistant phone is in the list.** Its card has **Edit**, the **Active** switch and **Try a Value**, no **Shipped with BarnCRM** badge, and **Show Details** says **Belongs to** a person. |
+| 5 | Choose **Value compared** **Mailing Street**, **Linked through the field** **Account ID**, leave **Postal code field** empty, and **Save**. | Refused: **An address source needs a postal code field: the street is compared together with it.** in the window, which stays open. |
+| 6 | Enter **Name** `Test: assistant phone`, choose **How values are compared** **Phone**, **Value compared** **Assistant Phone**, **Linked through the field** **Reports To ID**, and **Save**. | The window closes. **Saving.**, then **Saved. Test: assistant phone is in the list.** Its card has **Edit**, the **Active** switch and **Try a Value**, no **Shipped with BarnCRM** badge, and **Show Details** says **Belongs to** a person. |
 | 7 | Choose **Edit** on it. In the window, change **Name** to `Test: assistant phone 2`, and **Save**. | The window opens with the source's values and its object's fields filled in. **Saved.** The card has the new name. |
 
 **Cleanup:** Turn off the **Active** switch on `Test: assistant phone 2` (Salesforce does not let an app delete custom metadata; delete it in Setup, **Custom Metadata Types**, **Match Source**, **Manage Records**, if you want it gone).
@@ -127,7 +127,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **Access**, **Extra Permissions**, remove **BarnCRM Duplicate Review** from yourself and confirm. | A message says you no longer have it. |
-| 2 | Reload **Duplicate Matching**, **Review**. | Under **Possible Duplicates**: **Suggestions need access to duplicate record sets, which Salesforce gives only to Sales Cloud and Service Cloud licenses. ...** No pairs are listed. |
+| 2 | Reload **Duplicate Matching**, **Review**. | Under **Possible Duplicates**, an info notice: **Possible duplicates can be listed only for people with a Sales Cloud or Service Cloud license. Duplicate rules still check records as they are saved.** No pairs are listed. |
 | 3 | Look at **Scan for Duplicates**. | Disabled. |
 
 **Cleanup:** Give yourself **BarnCRM Duplicate Review** again on the **Access** page.
@@ -169,7 +169,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **Duplicate Matching**, **Review**. | The tab reads **Review (40)** (or **Review (50+)**), and **Possible Duplicates** has a badge with the same number. 10 pair cards, each with the reason and buttons at the top and the two records side by side under them. Under the cards **Showing 10 of 40 suggestions, newest first.** and **Show More**. |
-| 2 | Count the line **To merge two people, open either one and use Compare and merge on the Potential Duplicates card.** | Once, above the list (only when a shown pair is two people). |
+| 2 | Look at a pair of two people and a pair of two households. | The people pair has **Compare and Merge**; the household pair has **Merge Households**; both have **Not a Duplicate**. No note sits above the list. A value that differs carries an amber **Different** badge with a warning icon. |
 | 3 | With the keyboard, tab to **Show More** and press Enter. | 10 more pairs; focus is on the first new pair's first name; the line says **Showing 20 of 40**. Repeat until all show: **Show More** and the line go away (unless the badge reads **50+**). |
 | 4 | Click **Not a Duplicate** on the third pair, then **Cancel**. | The **Not a Duplicate** box opens inside the third pair's card, with focus on its heading; **Cancel** closes it. |
 | 5 | In the org with no pairs, open **Review**. | The tab reads **Review**, with no number, and there is no badge. An illustration with **No Possible Duplicates** and **No possible duplicates are waiting. Scan again after a large import.** |

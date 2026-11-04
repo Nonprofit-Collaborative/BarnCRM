@@ -84,6 +84,7 @@ describe('c-error-log-tile', () => {
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="new-count"]').label).toBe('3 new');
+    expect(element.shadowRoot.querySelector('[data-id="new-count"]').status).toBe('warning');
     const items = element.shadowRoot.querySelectorAll('[data-id="entry-list"] li');
     expect(items.length).toBe(2);
     expect(items[0].textContent).toContain('could not be renamed');
@@ -114,7 +115,7 @@ describe('c-error-log-tile', () => {
     element.shadowRoot.querySelectorAll('.acknowledge-button')[0].click();
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="error-message"]').message).toBe(
       'That entry is no longer in the Error Log. Refresh the page.'
     );
   });
@@ -126,6 +127,10 @@ describe('c-error-log-tile', () => {
 
     expect(element.shadowRoot.querySelector('[data-id="empty-state"]')).not.toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="new-count"]').label).toBe('0 new');
+    expect(element.shadowRoot.querySelector('[data-id="new-count"]').status).toBe('success');
+    expect(element.shadowRoot.querySelector('[data-id="empty-state"]').illustration).toBe(
+      'all-clear'
+    );
   });
 
   it('says there are more when the count stopped at its cap', async () => {
@@ -150,7 +155,7 @@ describe('c-error-log-tile', () => {
     getTile.error({ message: 'You do not have access to the Error Log.' });
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="error-message"]').message).toBe(
       'You do not have access to the Error Log.'
     );
   });
@@ -202,7 +207,10 @@ describe('c-error-log-tile', () => {
     getTile.error({ message: 'You do not have access to the Error Log.' });
     await flush();
 
-    expect(element.shadowRoot.querySelector('[role="alert"]')).not.toBeNull();
+    // An error notice is announced (role="alert", c-barn-notice) and carries an icon.
+    expect(element.shadowRoot.querySelector('c-barn-notice[data-id="error-message"]').variant).toBe(
+      'error'
+    );
   });
 
   it('opens the Error Log list', async () => {

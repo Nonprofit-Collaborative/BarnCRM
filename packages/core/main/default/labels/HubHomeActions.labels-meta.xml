@@ -16,4 +16,12 @@
         <shortDescription>Hub home: New household could not create the household; {0} reason</shortDescription>
         <value>The household could not be created: {0}</value>
     </labels>
+    <labels>
+        <fullName>Core_HubHomeActions_NewPerson</fullName>
+        <categories>Hub Home</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Hub home: button that opens the new contact form</shortDescription>
+        <value>New Person</value>
+    </labels>
 </CustomLabels>

@@ -712,7 +712,7 @@ fi
 # undeployed this way until 2026-10-13.
 CORE_DIR="packages/core/main/default"
 CORE_STAGED=(objects customMetadata labels staticresources customPermissions notificationtypes
-  externalCredentials classes triggers contentassets permissionsets permissionsetgroups layouts flexipages applications
+  externalCredentials classes triggers contentassets permissionsets permissionsetgroups layouts reportTypes reports flexipages applications
   tabs quickActions lwc prompts flows PlatformEventSubscriberConfigs)
 unstaged=()
 for dir in "$CORE_DIR"/*/; do
@@ -867,6 +867,8 @@ if ! package_skipped core; then
     "${CORE_DIR}/permissionsets" \
     "${CORE_DIR}/permissionsetgroups" \
     "${CORE_DIR}/layouts" \
+    "${CORE_DIR}/reportTypes" \
+    "${CORE_DIR}/reports" \
     "${CORE_DIR}/flexipages" \
     "${CORE_DIR}/applications" \
     "${CORE_DIR}/tabs" \

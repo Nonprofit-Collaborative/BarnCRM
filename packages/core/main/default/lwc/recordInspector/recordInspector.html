@@ -14,12 +14,12 @@
 
             <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
                 <template lwc:if={hasError}>
-                    <div
-                        class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small"
-                        role="alert"
-                    >
-                        <span data-id="error-message">{errorMessage}</span>
-                    </div>
+                    <c-barn-notice
+                        class="slds-var-m-bottom_small"
+                        data-id="error-message"
+                        variant="error"
+                        message={errorMessage}
+                    ></c-barn-notice>
                 </template>
 
                 <template lwc:if={showIntro}>
@@ -62,12 +62,16 @@
                         <p class="slds-text-body_small" data-id="fields-cut">{labels.fieldsCut}</p>
                     </template>
                     <template lwc:if={noMatch}>
-                        <p data-id="no-match">{labels.noMatch}</p>
+                        <c-barn-empty-state
+                            data-id="no-match"
+                            size="compact"
+                            heading={labels.noMatch}
+                        ></c-barn-empty-state>
                     </template>
                     <template lwc:else>
                         <div class="slds-scrollable" style="max-height: 30rem">
                             <table
-                                class="slds-table slds-table_bordered slds-table_header-fixed"
+                                class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
                                 data-id="field-table"
                             >
                                 <thead>
@@ -81,8 +85,10 @@
                                 <tbody>
                                     <template for:each={rows} for:item="row">
                                         <tr key={row.key} data-row={row.apiName}>
-                                            <th scope="row" class="slds-cell-wrap">{row.label}</th>
-                                            <td class="slds-cell-wrap">
+                                            <th scope="row" class="slds-cell-wrap" data-label={labels.columnField}>
+                                                {row.label}
+                                            </th>
+                                            <td class="slds-cell-wrap" data-label={labels.columnApiName}>
                                                 <code>{row.apiName}</code>
                                                 <lightning-button-icon
                                                     class="copy-button slds-var-m-left_xx-small"
@@ -115,15 +121,16 @@
                                                     onclick={handleWhereUsed}
                                                 ></lightning-button-icon>
                                             </td>
-                                            <td class="slds-cell-wrap">{row.type}</td>
-                                            <td class="slds-cell-wrap">
+                                            <td class="slds-cell-wrap" data-label={labels.columnType}>{row.type}</td>
+                                            <td class="slds-cell-wrap" data-label={labels.columnValue}>
                                                 <template lwc:if={row.hasValue}>
                                                     <span data-id="value">{row.value}</span>
                                                     <template lwc:if={row.truncated}>
-                                                        <lightning-badge
+                                                        <c-barn-status-badge
                                                             class="slds-var-m-left_xx-small"
+                                                            status="info"
                                                             label={labels.shortened}
-                                                        ></lightning-badge>
+                                                        ></c-barn-status-badge>
                                                     </template>
                                                 </template>
                                                 <template lwc:else>

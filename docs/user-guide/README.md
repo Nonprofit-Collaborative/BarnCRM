@@ -4,7 +4,7 @@ Applies to: BarnCRM landing/batch-b (v1.0 scope, releases 0.15 to 0.17), to be s
 
 ## Who This Is For
 
-This guide is for staff who use BarnCRM every day: you look people up, keep households and addresses current, enter gifts, sign volunteers up for shifts and log their hours. You are not the person who installs or configures BarnCRM.
+This guide is for staff who use BarnCRM every day: you look people up, keep households and addresses current, enter gifts, sign volunteers up for shifts and log their hours. You are not the person who installs or configures BarnCRM (installing is on [Installing BarnCRM](../admin-guide/installing.md) in the Admin Guide).
 
 Each page is a set of short recipes ("To do X: 1. 2. 3.") using the names you see on screen. Where a task needs an admin (a setting, a permission, a template), the page says so and links to the [Admin Guide](../admin-guide/README.md) instead of explaining it.
 

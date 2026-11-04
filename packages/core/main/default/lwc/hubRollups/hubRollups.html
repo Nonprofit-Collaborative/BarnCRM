@@ -3,10 +3,10 @@
         <lightning-card title={labels.heading} icon-name="standard:metrics" data-id="rollups-card">
             <div class="slds-var-p-horizontal_medium">
                 <template lwc:if={errorMessage}>
-                    <p class="slds-text-color_error" data-id="load-error" role="alert">{errorMessage}</p>
+                    <c-barn-notice variant="error" message={errorMessage} data-id="load-error"></c-barn-notice>
                 </template>
                 <template lwc:elseif={lastCalculated}>
-                    <p data-id="rollups-last-calculated">
+                    <p class="slds-var-m-bottom_x-small" data-id="rollups-last-calculated">
                         <lightning-formatted-date-time
                             value={lastCalculated}
                             year="numeric"
@@ -27,19 +27,17 @@
                     ></c-barn-empty-state>
                 </template>
                 <template lwc:if={stale}>
-                    <lightning-badge
-                        class="slds-theme_warning"
+                    <c-barn-status-badge
+                        status="overdue"
                         label={labels.overdue}
                         data-id="rollups-overdue"
-                    ></lightning-badge>
-                    <p data-id="rollups-stale" role="status" aria-live="polite">
-                        <lightning-icon
-                            icon-name="utility:warning"
-                            size="x-small"
-                            alternative-text={labels.warning}
-                        ></lightning-icon>
-                        {labels.stale}
-                    </p>
+                    ></c-barn-status-badge>
+                    <c-barn-notice
+                        variant="warning"
+                        message={labels.stale}
+                        data-id="rollups-stale"
+                        class="slds-var-m-vertical_x-small"
+                    ></c-barn-notice>
                 </template>
                 <lightning-button
                     variant="base"

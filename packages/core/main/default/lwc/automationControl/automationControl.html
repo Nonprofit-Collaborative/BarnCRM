@@ -52,37 +52,40 @@
                         </template>
                         {labels.resumesItself}
                     </p>
-                </div>
-            </template>
-
-            <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-align-end slds-var-m-bottom_medium">
-                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
-                    <lightning-combobox
-                        data-id="pause-hours"
-                        label={labels.pauseLength}
-                        value={selectedHours}
-                        options={hourOptions}
-                        disabled={controlsDisabled}
-                        onchange={handleHoursChange}
-                    ></lightning-combobox>
-                </div>
-                <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3 slds-var-m-top_x-small">
-                    <lightning-button
-                        data-id="pause-button"
-                        label={labels.pauseButton}
-                        variant="brand"
-                        disabled={controlsDisabled}
-                        onclick={handlePause}
-                    ></lightning-button>
+                    <!-- admin-12: while paused, Resume is the only pause control, inside the banner. -->
                     <lightning-button
                         data-id="resume-button"
-                        class="slds-var-m-left_x-small"
+                        class="slds-var-m-top_x-small slds-show"
                         label={labels.resumeButton}
                         disabled={controlsDisabled}
                         onclick={handleResume}
                     ></lightning-button>
                 </div>
-            </div>
+            </template>
+            <template lwc:else>
+                <!-- While running, only Pause and How long are offered. -->
+                <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-align-end slds-var-m-bottom_medium">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                        <lightning-combobox
+                            data-id="pause-hours"
+                            label={labels.pauseLength}
+                            value={selectedHours}
+                            options={hourOptions}
+                            disabled={controlsDisabled}
+                            onchange={handleHoursChange}
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3 slds-var-m-top_x-small">
+                        <lightning-button
+                            data-id="pause-button"
+                            label={labels.pauseButton}
+                            variant="brand"
+                            disabled={controlsDisabled}
+                            onclick={handlePause}
+                        ></lightning-button>
+                    </div>
+                </div>
+            </template>
 
             <template lwc:if={isEmpty}>
                 <p data-id="empty-state">{labels.empty}</p>
@@ -118,6 +121,13 @@
                                     disabled={automation.toggleDisabled}
                                     onchange={handleToggle}
                                 ></lightning-input>
+                                <!-- admin-12: says a switch just turned off, for a few seconds. -->
+                                <p
+                                    class="slds-text-body_small slds-var-m-top_xx-small"
+                                    data-id="switch-status"
+                                    data-automation={automation.automationName}
+                                    aria-live="polite"
+                                >{automation.statusLine}</p>
                             </div>
                         </div>
                     </li>

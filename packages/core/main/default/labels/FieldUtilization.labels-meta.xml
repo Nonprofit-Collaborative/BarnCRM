@@ -9,14 +9,6 @@
         <value>You need the Manage BarnCRM Settings permission to count field use.</value>
     </labels>
     <labels>
-        <fullName>Core_FieldUtilization_UnexpectedError</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: unexpected error</shortDescription>
-        <value>Something went wrong on the Field Utilization page. The Error Log has the details.</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldUtilization_UnknownObject</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>
@@ -61,8 +53,8 @@
         <categories>FieldUtilization</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Field utilization: page title</shortDescription>
-        <value>Field Utilization</value>
+        <shortDescription>Field Use: page title (formerly Field Utilization)</shortDescription>
+        <value>Field Use</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_ChooseLabel</fullName>
@@ -102,7 +94,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: save button</shortDescription>
-        <value>Save Utilization Snapshot</value>
+        <value>Save Snapshot</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_Saved</fullName>
@@ -182,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: Change column</shortDescription>
-        <value>Change (Points)</value>
+        <value>Change Since Saved Count</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_ColSampled</fullName>

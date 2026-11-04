@@ -121,14 +121,6 @@
         <value>Before This Fix Runs</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_ConfirmModeDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Confirm box text for Use recommended mode. {0} current, {1} new mode.</shortDescription>
-        <value>The coexistence mode changes from {0} to {1}.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_MirrorMissingDetail</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -654,7 +646,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that runs Health Check again.</shortDescription>
-        <value>Re-Run</value>
+        <value>Run Again</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_SalesObjectsDetected</fullName>
@@ -670,7 +662,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Screen reader text for a finding that needs fixing.</shortDescription>
-        <value>Needs fixing</value>
+        <value>Needs Fixing</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_SeverityInfo</fullName>
@@ -686,7 +678,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Screen reader text for a finding worth knowing about.</shortDescription>
-        <value>Worth knowing</value>
+        <value>Worth Knowing</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_SwitchesMissingDetail</fullName>
@@ -823,14 +815,6 @@
         <protected>false</protected>
         <shortDescription>Label before the time Health Check last ran in full.</shortDescription>
         <value>Last run</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_NeverRun</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown where the last result goes when Health Check has never run.</shortDescription>
-        <value>Health Check has not run yet. Click Run Now to check this org.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RunNowButton</fullName>

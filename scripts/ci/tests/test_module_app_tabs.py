@@ -215,7 +215,8 @@ class CoreAppsTest(unittest.TestCase):
     A console app maps every one of its tabs to a workspace. Find, Import and Bulk Update are in
     no app: they open from their Data Manager cards (D-135)."""
 
-    DATA_MANAGER_ONLY = {"Find", "Import", "Bulk_Update"}
+    # Import_Row__c opens from Super Importer's results (admin-22), not from an app's nav.
+    DATA_MANAGER_ONLY = {"Find", "Import", "Bulk_Update", "Import_Row__c"}
 
     def test_every_core_tab_is_in_a_core_app_and_every_app_tab_exists(self):
         root = os.path.join(HERE, "..", "..", "..")

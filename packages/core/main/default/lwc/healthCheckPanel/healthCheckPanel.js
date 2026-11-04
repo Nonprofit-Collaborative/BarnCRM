@@ -19,11 +19,9 @@ import CATEGORY_SETTINGS from '@salesforce/label/c.Core_HealthCheck_CategorySett
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CONFIRM from '@salesforce/label/c.Core_HealthCheck_ConfirmButton';
 import CONFIRM_HEADING from '@salesforce/label/c.Core_HealthCheck_ConfirmHeading';
-import CONFIRM_MODE_DETAIL from '@salesforce/label/c.Core_HealthCheck_ConfirmModeDetail';
 import CURRENT_MODE from '@salesforce/label/c.Core_HealthCheck_CurrentModeLabel';
 import LAST_RUN from '@salesforce/label/c.Core_HealthCheck_LastRunLabel';
-import NEVER_RUN from '@salesforce/label/c.Core_HealthCheck_NeverRun';
-import RUN_NOW from '@salesforce/label/c.Core_HealthCheck_RunNowButton';
+import RUN_HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_RunHealthCheck';
 import LOAD_FAILED from '@salesforce/label/c.Core_HealthCheck_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_HealthCheck_Loading';
 import NO_FINDINGS from '@salesforce/label/c.Core_HealthCheck_NoFindings';
@@ -52,12 +50,6 @@ const SEVERITY_DISPLAY = {
 
 const CATEGORY_ORDER = ['OrgShape', 'Licenses', 'Access', 'Settings'];
 
-const BADGE_THEMES = {
-  success: 'slds-theme_success',
-  warning: 'slds-theme_warning',
-  error: 'slds-theme_error'
-};
-
 /**
  * Health Check: what BarnCRM found in this org and what to do about it (feature C-11).
  *
@@ -77,8 +69,10 @@ const BADGE_THEMES = {
  * fix fails for any reason the panel runs Health Check again, so what it shows is current.
  *
  * With lastResultFirst set (BarnCRM Home sets it), the panel does not run Health Check when it
- * opens: it shows when Health Check last ran in full and how many findings it had, and its
- * button reads Run now (ADMIN-7). Any page that wants that behavior sets the same property.
+ * opens: it shows when Health Check last ran in full and how many findings it had (ADMIN-7).
+ * Any page that wants that behavior sets the same property. The button is Run Health Check
+ * before the first run and Run Again after it, and the badge uses the panel's own severity
+ * words (admin-6).
  */
 export default class HealthCheckPanel extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
@@ -108,7 +102,9 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
     currentMode: CURRENT_MODE,
     recommendedMode: RECOMMENDED_MODE,
     lastRun: LAST_RUN,
-    neverRun: NEVER_RUN
+    get neverRun() {
+      return helpText('Core', 'Core_HealthCheck_NeverRunText');
+    }
   };
 
   connectedCallback() {
@@ -160,13 +156,14 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
     return healthCheckBadge(this.lastRun);
   }
 
-  get lastRunBadgeClass() {
-    return BADGE_THEMES[this.lastRunBadge.badgeVariant] || '';
+  /** The badge's status word for c-barn-status-badge: Not Run Yet is neutral. */
+  get lastRunStatus() {
+    return this.lastRunBadge.badgeVariant || 'neutral';
   }
 
-  /** Run now before the first full run where the last result shows; Re-run after. */
+  /** Run Health Check until it has run once (no report here and no stored run); Run Again after. */
   get rerunLabel() {
-    return this.lastResultFirst && !this.hasReport ? RUN_NOW : RERUN;
+    return this.hasReport || this.hasLastRun ? RERUN : RUN_HEALTH_CHECK;
   }
 
   /** Run Health Check again. Also the Re-run button's handler. */
@@ -295,8 +292,11 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
     return this.confirmFix({
       target: ACTION_RECOMMENDED_MODE,
       title: USE_RECOMMENDED,
-      detail: CONFIRM_MODE_DETAIL.replace('{0}', this.currentModeLabel).replace(
-        '{1}',
+      // admin-6: the confirm box says in one line what coexistence mode means.
+      detail: helpText(
+        'Core',
+        'Core_HealthCheck_ConfirmModeChange',
+        this.currentModeLabel,
         this.recommendedModeLabel
       )
     });
