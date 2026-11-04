@@ -1,4 +1,5 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
+import { CurrentPageReference } from 'lightning/navigation';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { startPolling } from 'c/jobPoller';
 import getPage from '@salesforce/apex/BulkUpdateController.getPage';
@@ -20,7 +21,6 @@ import NO_PERMISSION from '@salesforce/label/c.Core_BulkUpdate_ErrorNoPermission
 import RECORD from '@salesforce/label/c.Core_BulkUpdate_Record';
 import REMOVE from '@salesforce/label/c.Core_BulkUpdate_Remove';
 import STARTED from '@salesforce/label/c.Core_BulkUpdate_Started';
-import PROGRESS from '@salesforce/label/c.Core_BulkUpdate_Progress';
 import SUMMARY from '@salesforce/label/c.Core_BulkUpdate_Summary';
 import FAILURES from '@salesforce/label/c.Core_BulkUpdate_Failures';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
@@ -31,9 +31,10 @@ import STEP_OBJECT from '@salesforce/label/c.Core_SuperTransform_StepObject';
 import STEP_RECORDS from '@salesforce/label/c.Core_SuperTransform_StepRecords';
 import STEP_CHANGES from '@salesforce/label/c.Core_SuperTransform_StepChanges';
 import STEP_PREVIEW from '@salesforce/label/c.Core_SuperTransform_StepPreview';
+import RUN_SHORT from '@salesforce/label/c.Core_BulkUpdate_PathRun';
 import STEP_RUN from '@salesforce/label/c.Core_SuperTransform_StepRun';
 import SEARCH_OBJECTS from '@salesforce/label/c.Core_SuperTransform_SearchObjects';
-import OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
+import OBJECT from '@salesforce/label/c.Core_FieldUtilization_ChooseLabel';
 import CHOOSE_OBJECT from '@salesforce/label/c.Core_Find_ChooseObject';
 import NO_OBJECTS from '@salesforce/label/c.Core_SuperTransform_NoObjects';
 import OBJECT_FIRST from '@salesforce/label/c.Core_SuperTransform_ObjectFirst';
@@ -116,6 +117,26 @@ const INPUT_TYPES = {
   datetime: 'datetime'
 };
 
+/** The page state key Find's Change Records uses to open this tool: `c__start`, or the namespace's. */
+const START_STATE = '__start';
+
+/**
+ * What Find handed over, read from the page state: the kind of record, its conditions, and the
+ * conditions on related records. Anything else (a bad link) is ignored.
+ */
+function startFrom(state) {
+  const key = Object.keys(state || {}).find((name) => name.endsWith(START_STATE));
+  if (!key || !state[key]) {
+    return undefined;
+  }
+  try {
+    const start = JSON.parse(state[key]);
+    return start && typeof start.object === 'string' && start.object ? start : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function shown(value) {
   return value === null || value === undefined || value === '' ? BLANK : String(value);
 }
@@ -149,6 +170,7 @@ export default class SuperTransform extends LightningElement {
     stepChanges: STEP_CHANGES,
     stepPreview: STEP_PREVIEW,
     stepRun: STEP_RUN,
+    runShort: RUN_SHORT,
     searchObjects: SEARCH_OBJECTS,
     object: OBJECT,
     chooseObject: CHOOSE_OBJECT,
@@ -217,6 +239,58 @@ export default class SuperTransform extends LightningElement {
   savedLists = [];
   savedListId;
   savedNameText = '';
+  /** Find's conditions on related records, kept as the document's `related` (admin-14). */
+  relatedJson = '';
+  /** What Find handed over, waiting for the page to load; and the last one used. */
+  pendingStart;
+  usedStart;
+
+  /** Find's Change Records opens this page with its object and conditions (admin-14). */
+  @wire(CurrentPageReference)
+  handlePageReference(pageReference) {
+    const start = startFrom(pageReference && pageReference.state);
+    const text = start ? JSON.stringify(start) : undefined;
+    if (start && text !== this.usedStart) {
+      this.usedStart = text;
+      this.pendingStart = start;
+      this.applyStart();
+    }
+  }
+
+  /**
+   * Fills in the object and conditions Find handed over, once the page has loaded. Nothing runs:
+   * the person still chooses the changes, then Preview and Run. An object they may not change
+   * says so instead of leaving the page half filled.
+   */
+  async applyStart() {
+    const start = this.pendingStart;
+    if (!start || !this.loaded || !this.allowed) {
+      return;
+    }
+    this.pendingStart = undefined;
+    if (!this.objects.some((option) => option.value === start.object)) {
+      this.errorMessage = helpText('Core', 'Core_SuperTransform_StartNoObject');
+      return;
+    }
+    this.noticeMessage = undefined;
+    await this.work(async () => {
+      const targets = await getTargets({ objectName: start.object });
+      this.stopPolling();
+      this.job = undefined;
+      this.objectApiName = start.object;
+      this.targets = targets;
+      this.filterJson = start.filter ? JSON.stringify(start.filter) : '';
+      this.filterValid = true;
+      this.relatedJson =
+        Array.isArray(start.related) && start.related.length ? JSON.stringify(start.related) : '';
+      this.changes = [this.newChange()];
+      this.invalidate();
+      this.noticeMessage = this.relatedJson
+        ? helpText('Core', 'Core_SuperTransform_FromFindRelated')
+        : helpText('Core', 'Core_SuperTransform_FromFind');
+    });
+    this.scheduleCount(0);
+  }
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -243,6 +317,7 @@ export default class SuperTransform extends LightningElement {
       }
     });
     this.loaded = true;
+    this.applyStart();
   }
 
   /* ---------- what the template reads ---------- */
@@ -508,11 +583,12 @@ export default class SuperTransform extends LightningElement {
     }
     const job = this.job;
     const total = job.chunksTotal || 0;
+    const percent = total ? Math.round(((job.chunksDone || 0) * 100) / total) : 0;
     return {
       ...job,
       summary: format(SUMMARY, job.matched, job.updated, job.unchanged, job.failed),
-      progressLine: job.running ? format(PROGRESS, job.chunksDone || 0, total) : '',
-      progressValue: total ? Math.round(((job.chunksDone || 0) * 100) / total) : 0,
+      progressLine: job.running ? helpText('Core', 'Core_SuperTransform_Progress', percent) : '',
+      progressValue: percent,
       hasFailures: Boolean(job.failures && job.failures.length),
       showUndo: Boolean(job.canUndo && !job.running)
     };
@@ -531,6 +607,7 @@ export default class SuperTransform extends LightningElement {
   async handleObjectChange(event) {
     this.objectApiName = event.detail.value;
     this.filterJson = '';
+    this.relatedJson = '';
     this.filterValid = true;
     this.targets = [];
     this.changes = [];
@@ -557,6 +634,9 @@ export default class SuperTransform extends LightningElement {
     const document = { version: 1, object: this.objectApiName, fields: ['Id'] };
     if (this.filterJson) {
       document.filter = JSON.parse(this.filterJson);
+    }
+    if (this.relatedJson) {
+      document.related = JSON.parse(this.relatedJson);
     }
     return JSON.stringify(document);
   }
@@ -877,6 +957,7 @@ export default class SuperTransform extends LightningElement {
       this.objectApiName = definition.object;
       this.targets = targets;
       this.filterJson = definition.filter ? JSON.stringify(definition.filter) : '';
+      this.relatedJson = '';
       this.filterValid = true;
       const wanted = definition.changes || [];
       const kept = wanted.filter((change) => this.targetOf(change.field));

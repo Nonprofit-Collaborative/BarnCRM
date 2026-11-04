@@ -33,14 +33,6 @@
         <value>Export to Files started. You can leave this page: BarnCRM tells you when the files are ready.</value>
     </labels>
     <labels>
-        <fullName>Core_Find_ExportFilesProgress</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Export to Files progress. {0} chunks done, {1} chunks in all.</shortDescription>
-        <value>Exporting: {0} of {1} chunks done.</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_ExportFilesDone</fullName>
         <categories>Find</categories>
         <language>en_US</language>

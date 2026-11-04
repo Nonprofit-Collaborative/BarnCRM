@@ -153,14 +153,6 @@
         <value>The bulk delete started. It keeps running if you leave this page.</value>
     </labels>
     <labels>
-        <fullName>Core_BulkDelete_Progress</fullName>
-        <categories>BulkDelete</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Bulk delete progress: {0} chunks done, {1} chunks in all</shortDescription>
-        <value>Deleting: {0} of {1} chunks done.</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkDelete_Summary</fullName>
         <categories>BulkDelete</categories>
         <language>en_US</language>

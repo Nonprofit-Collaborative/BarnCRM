@@ -20,9 +20,12 @@
             ></lightning-combobox>
         </template>
         <template lwc:else>
-            <p class="slds-text-color_error slds-text-body_small" data-id="no-key-fields">
-                {noFieldsText}
-            </p>
+            <c-barn-notice
+                class="slds-show slds-var-m-top_x-small"
+                variant="error"
+                message={noFieldsText}
+                data-id="no-key-fields"
+            ></c-barn-notice>
         </template>
     </template>
     <template lwc:if={readsLookups}>

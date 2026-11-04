@@ -2,9 +2,12 @@
     <template lwc:if={helpReady}>
   <p class="slds-var-m-bottom_x-small" data-id="intro">{labels.intro}</p>
   <template lwc:if={errorMessage}>
-    <p class="slds-text-color_error slds-var-m-bottom_x-small" data-id="error" role="alert">
-      {errorMessage}
-    </p>
+    <c-barn-notice
+      class="slds-show slds-var-m-bottom_x-small"
+      variant="error"
+      message={errorMessage}
+      data-id="error"
+    ></c-barn-notice>
   </template>
   <template lwc:if={connection}>
     <p class="slds-var-m-bottom_x-small" data-id="status" role="status">

@@ -1,251 +1,220 @@
 /**
- * Maria presses one button and every BarnCRM nightly job that is not scheduled gets scheduled:
- * Core's own and any a module registers (ADR-0075, health-check-schedules-every-nightly-job).
- * Every test supplies the jobs in memory, so none depends on what the org it runs in has
- * scheduled, and none schedules a real job.
+ * BarnCRM's nightly run as everything but the run itself sees it (ADR-NEXT
+ * nightly-job-dispatcher, R-NJ1 to R-NJ5): the steps in order, their switches, the one schedule,
+ * Health Check's view of it, and adopting the separate schedules of an earlier version. Every
+ * test supplies its module steps in memory and schedules under the test name of the run, so none
+ * depends on what the org it runs in has installed or scheduled.
  */
-@IsTest(testFor='ApexClass:NightlyJobs')
+@IsTest(testFor='ApexClass:NightlyJobs, ApexClass:NightlyStep')
 private class NightlyJobsTest {
+    private static final String OLD_A = 'BarnCRM Nightly Test Old A';
+    private static final String OLD_B = 'BarnCRM Nightly Test Old B';
+
     @TestSetup
     static void createTestUser() {
         TestUsers.admin();
     }
 
-    /** A job that only remembers whether it was scheduled. */
-    private class FakeJob implements NightlyJob {
-        private final String name;
-        private Boolean scheduled;
-        private Integer timesScheduled = 0;
-
-        FakeJob(String name, Boolean scheduled) {
-            this.name = name;
-            this.scheduled = scheduled;
-        }
-
-        public String label() {
-            return name;
-        }
-
-        public Boolean isScheduled() {
-            return scheduled;
-        }
-
-        public void schedule() {
-            if (!scheduled) {
-                timesScheduled++;
-            }
-            scheduled = true;
+    /** Work that only counts how often it ran. */
+    private class CountingWork implements Schedulable {
+        public Integer runs = 0;
+        public void execute(SchedulableContext context) {
+            runs++;
         }
     }
 
-    private class FakeProvider implements NightlyJobProvider {
-        private final List<NightlyJob> jobs;
-
-        FakeProvider(List<NightlyJob> jobs) {
-            this.jobs = jobs;
+    private class FakeProvider implements NightlyStepProvider {
+        private final List<NightlyStep> steps;
+        FakeProvider(List<NightlyStep> steps) {
+            this.steps = steps;
         }
-
-        public List<NightlyJob> nightlyJobs() {
-            return jobs;
+        public List<NightlyStep> nightlySteps() {
+            return steps;
         }
     }
 
-    private class BrokenProvider implements NightlyJobProvider {
-        public List<NightlyJob> nightlyJobs() {
+    private class BrokenProvider implements NightlyStepProvider {
+        public List<NightlyStep> nightlySteps() {
             throw new System.NullPointerException();
         }
     }
 
-    /**
-     * Seasonal Addresses on, written below the console's save so that no job is scheduled: the
-     * swap is listed only while the switch is on.
-     */
-    private static void seasonalAddressesOn() {
-        OrgSettingsSystemWriter.save(
-            new Map<Schema.SObjectField, Object>{
-                BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => true
-            }
-        );
-        SettingsService.clearCaches();
+    /** Every module provider replaced: the first gives `steps`, the second throws. */
+    private static void modulesGive(List<NightlyStep> steps) {
+        for (String className : NightlyJobs.PROVIDER_CLASSES) {
+            NightlyJobs.providerOverrides.put(className, new FakeProvider(new List<NightlyStep>()));
+        }
+        NightlyJobs.providerOverrides.put(NightlyJobs.PROVIDER_CLASSES[0], new FakeProvider(steps));
+        NightlyJobs.providerOverrides.put(NightlyJobs.PROVIDER_CLASSES[1], new BrokenProvider());
+        NightlyJobs.forget();
+    }
+
+    private static List<String> keys(List<NightlyStep> steps) {
+        List<String> found = new List<String>();
+        for (NightlyStep step : steps) {
+            found.add(step.key);
+        }
+        return found;
     }
 
     @IsTest
-    static void coreListsItsOwnJobsThenThoseAModuleRegisters() {
+    static void stepsRunInTimeOrderAndAModuleThatFailsIsSkipped() {
         System.runAs(TestUsers.admin()) {
-            seasonalAddressesOn();
-            FakeJob moduleJob = new FakeJob('Module nightly job', false);
-            // Every registered provider is stood in for, so the modules deployed in the test
-            // org do not change the count.
-            for (String className : NightlyJobs.PROVIDER_CLASSES) {
-                NightlyJobs.providerOverrides.put(
-                    className,
-                    new FakeProvider(new List<NightlyJob>())
-                );
-            }
-            NightlyJobs.providerOverrides.put(
-                NightlyJobs.PROVIDER_CLASSES[0],
-                new FakeProvider(new List<NightlyJob>{ moduleJob })
+            modulesGive(
+                new List<NightlyStep>{
+                    new NightlyStep('BarnCRM Late', 'Late', 3, 0, new CountingWork()),
+                    new NightlyStep('BarnCRM Early', 'Early', 0, 10, new CountingWork()),
+                    new NightlyStep('BarnCRM Late Too', 'Late too', 3, 0, new CountingWork())
+                }
             );
 
-            Test.startTest();
-            List<NightlyJob> jobs = NightlyJobs.all();
-            Test.stopTest();
+            List<String> order = keys(NightlyJobs.steps());
 
             Assert.isTrue(
-                jobs[0].label() == System.Label.Core_HealthCheck_JobSeasonalAddresses,
-                'Addresses first.'
+                order.indexOf('BarnCRM Early') < order.indexOf(SeasonalAddressScheduler.JOB_NAME),
+                'Ten past midnight comes before the seasonal swap at half past: ' + order
             );
             Assert.isTrue(
-                jobs[1].label() == System.Label.Core_HealthCheck_JobErrorDigest,
-                'Then the digest.'
+                order.indexOf(EmptyHouseholdTidyScheduler.JOB_NAME) < order.indexOf('BarnCRM Late'),
+                'A module step at 3:00 comes after Core\'s at 1:45'
             );
-            Assert.isTrue(
-                jobs[2].label() == System.Label.Core_HealthCheck_JobImportRows,
-                'Then the rows.'
-            );
-            Assert.isTrue(
-                jobs[3].label() == System.Label.Core_HealthCheck_JobEmptyHouseholds,
-                'Then the empty households.'
-            );
-            Assert.isTrue(
-                jobs[4].label() == System.Label.Core_HealthCheck_JobTabAccess,
-                'Then the tabs.'
-            );
-            Assert.isTrue(
-                jobs[5].label() == System.Label.Core_HealthCheck_JobSetupChanges,
-                'Then the Setup changes.'
-            );
-            Assert.areEqual(7, jobs.size(), 'Core has six of its own.');
-            Assert.areEqual(moduleJob, jobs[6], 'A registered job is counted after them.');
             Assert.areEqual(
-                System.Label.Core_HealthCheck_JobSeasonalAddresses,
-                jobs[0].label(),
-                'Each job is named from a label.'
+                order.indexOf('BarnCRM Late') + 1,
+                order.indexOf('BarnCRM Late Too'),
+                'Steps at the same time keep the order they were registered in'
+            );
+            Assert.isTrue(
+                order.indexOf(ErrorDigestScheduler.JOB_NAME) > order.indexOf('BarnCRM Late'),
+                'The digest is last'
+            );
+            Assert.areEqual('Early', NightlyJobs.step('barncrm  early').label, 'Found by key');
+        }
+    }
+
+    @IsTest
+    static void aSwitchReadsItsShippedValueUntilSavedAndSavingOnSchedulesTheRun() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+            ScheduledJobSelector.forget();
+
+            Boolean shippedOff = NightlyJobs.isSwitchedOn(OLD_A, false);
+            Boolean shippedOn = NightlyJobs.isSwitchedOn(OLD_A, true);
+            NightlyJobs.turnOn(OLD_A);
+            NightlyJobs.forget();
+            Boolean afterOn = NightlyJobs.isStepScheduled(OLD_A, false);
+            NightlyJobs.turnOff(OLD_A);
+            NightlyJobs.forget();
+
+            Assert.isFalse(shippedOff, 'Shipped off reads off');
+            Assert.isTrue(shippedOn, 'Shipped on reads on');
+            Assert.isTrue(afterOn, 'Switched on, with the run scheduled');
+            Assert.isTrue(NightlyJobs.isScheduled(), 'Switching on scheduled the run');
+            Assert.isFalse(NightlyJobs.isSwitchedOn(OLD_A, true), 'Saved off beats shipped on');
+            Assert.isTrue(NightlyJobs.isScheduled(), 'The run stays for the other steps');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Nightly_Job__c WHERE Name = :OLD_A],
+                'One row per step'
             );
         }
     }
 
     @IsTest
-    static void aModuleWhoseProviderFailsCostsOnlyItsOwnJobs() {
+    static void aStepIsInTonightsRunOnlyWhileItsSettingAndItsSwitchAllowIt() {
         System.runAs(TestUsers.admin()) {
-            seasonalAddressesOn();
-            for (String className : NightlyJobs.PROVIDER_CLASSES) {
-                NightlyJobs.providerOverrides.put(
-                    className,
-                    new FakeProvider(new List<NightlyJob>())
-                );
-            }
-            NightlyJobs.providerOverrides.put(
-                NightlyJobs.PROVIDER_CLASSES[0],
-                new BrokenProvider()
+            NightlyStep always = new NightlyStep(OLD_B, 'B', 1, 0, new CountingWork());
+            NightlyStep inactive = new NightlyStep(OLD_B, 'B', 1, 0, new CountingWork())
+                .activeWhen(false);
+            NightlyStep switchedOff = new NightlyStep(OLD_A, 'A', 1, 0, new CountingWork())
+                .withSwitch(false);
+
+            Assert.isTrue(NightlyJobs.isOn(always), 'No switch, no setting against it: it runs');
+            Assert.isFalse(NightlyJobs.isOn(inactive), 'A setting that has it off');
+            Assert.isFalse(NightlyJobs.isOn(switchedOff), 'A switch shipped off');
+            Assert.isFalse(NightlyJobs.isOn(null), 'No step');
+            Assert.isTrue(switchedOff.hasSwitch(), 'Has a switch');
+            Assert.areEqual(60, always.minute, 'One in the morning is minute 60');
+        }
+    }
+
+    @IsTest
+    static void oldSchedulesAreReplacedByTheRunAndKeepTheirSwitchOn() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+            NightlyJobs.overrideStepsForTest(
+                new List<NightlyStep>{
+                    new NightlyStep(OLD_A, 'A', 1, 0, new CountingWork()).withSwitch(false),
+                    new NightlyStep(OLD_B, 'B', 2, 0, new CountingWork())
+                }
             );
-            NightlyJobs.providerOverrides.put(
-                NightlyJobs.PROVIDER_CLASSES[1],
-                new FakeProvider(new List<NightlyJob>{ new FakeJob('Other module job', true) })
-            );
+            NightlyJobs.adoptInTests = true;
+            NightlyRun.chain = false;
+            ScheduledJobSelector.schedule(OLD_A, '0 0 1 * * ?', new ErrorDigestScheduler());
+            ScheduledJobSelector.schedule(OLD_B, '0 0 2 * * ?', new ErrorDigestScheduler());
 
             Test.startTest();
-            List<NightlyJob> jobs = NightlyJobs.all();
+            Boolean adopted = NightlyJobs.adoptOldSchedules();
+            Boolean again = NightlyJobs.adoptOldSchedules();
             Test.stopTest();
 
-            Assert.areEqual(7, jobs.size(), 'Core six, plus the module that answered.');
+            NightlyJobs.forget();
+            Assert.isTrue(adopted, 'Something was adopted');
+            Assert.isFalse(again, 'And nothing is left the second time');
+            Assert.isFalse(ScheduledJobSelector.isScheduled(OLD_A), 'The old job is gone');
+            Assert.isFalse(ScheduledJobSelector.isScheduled(OLD_B), 'So is the other');
+            Assert.isTrue(NightlyJobs.isScheduled(), 'The nightly run took their place');
+            Assert.isTrue(
+                NightlyJobs.isSwitchedOn(OLD_A, false),
+                'A step shipped off that was running stays on'
+            );
         }
     }
 
     @IsTest
-    static void scheduleAllSchedulesWhatIsWaitingAndOnlyOnce() {
+    static void adoptingDoesNothingInATestThatDidNotAskForIt() {
         System.runAs(TestUsers.admin()) {
-            FakeJob waiting = new FakeJob('Waiting job', false);
-            FakeJob running = new FakeJob('Running job', true);
-            NightlyJobs.jobsOverride = new List<NightlyJob>{ waiting, running };
+            Assert.isFalse(NightlyJobs.adoptOldSchedules(), 'The org\'s real jobs are left alone');
+        }
+    }
 
+    @IsTest
+    static void healthCheckNamesTheMissingRunAndItsFixSchedulesIt() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+            ScheduledJobSelector.forget();
+
+            NightlyRun.chain = false;
+            List<String> missing = NightlyJobs.unscheduledLabels();
             Test.startTest();
-            List<String> before = NightlyJobs.unscheduledLabels();
-            List<String> first = NightlyJobs.scheduleAll();
-            List<String> second = NightlyJobs.scheduleAll();
+            List<String> scheduled = NightlyJobs.scheduleAll();
             Test.stopTest();
+            ScheduledJobSelector.forget();
 
-            Assert.areEqual(new List<String>{ 'Waiting job' }, before, 'Only the waiting job.');
-            Assert.areEqual(new List<String>{ 'Waiting job' }, first, 'It is the one scheduled.');
-            Assert.isTrue(second.isEmpty(), 'Pressing again schedules nothing.');
-            Assert.areEqual(1, waiting.timesScheduled, 'Scheduled once.');
-            Assert.areEqual(0, running.timesScheduled, 'A running job is left alone.');
+            Assert.isTrue(
+                missing.contains(System.Label.Core_NightlyJobs_Title),
+                'Named: ' + missing
+            );
+            Assert.areEqual(missing, scheduled, 'The fix schedules what was named');
+            Assert.isTrue(NightlyJobs.unscheduledLabels().isEmpty(), 'Nothing is missing after');
         }
     }
 
     @IsTest
-    static void mariaSchedulesEveryWaitingJobFromOneFinding() {
+    static void aStepSaysWhenItRunsNextOnlyWhileTheRunIsScheduled() {
         System.runAs(TestUsers.admin()) {
-            User maria = HealthCheckTestHelper.mariaWithManageSettings();
-            FakeJob addresses = new FakeJob('Addresses', false);
-            FakeJob levels = new FakeJob('Donor levels', false);
-            NightlyJobs.jobsOverride = new List<NightlyJob>{ addresses, levels };
+            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+            ScheduledJobSelector.forget();
+            NightlyStep step = new NightlyStep(OLD_B, 'B', 1, 15, new CountingWork());
 
-            System.runAs(maria) {
-                HealthCheckService.Finding finding = findNightlyJobs(HealthCheckService.run());
-                Assert.isNotNull(finding, 'Unscheduled jobs are reported.');
-                Assert.isTrue(
-                    finding.detail.contains('Addresses; Donor levels'),
-                    'Each is named, apart by a semicolon, since a job name can hold a comma.'
-                );
-                Assert.areEqual(
-                    System.Label.Core_HealthCheck_NightlyJobsFix,
-                    finding.fixLabel,
-                    'With one button.'
-                );
+            Datetime before = NightlyJobs.nextRunAt(step);
+            NightlyJobs.start();
+            Datetime after = NightlyJobs.nextRunAt(step);
 
-                HealthCheckService.Report report = HealthCheckController.applyFix(
-                    HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS,
-                    finding.fixScope
-                );
-
-                Assert.isTrue(addresses.scheduled && levels.scheduled, 'Both are scheduled.');
-                Assert.isNull(findNightlyJobs(report.findings), 'The finding is gone.');
-            }
-            Integer recorded = 0;
-            for (Setting_Change__c change : [SELECT New_Value__c FROM Setting_Change__c]) {
-                if (
-                    change.New_Value__c ==
-                    'Addresses' + HealthCheckService.JOB_SEPARATOR + 'Donor levels'
-                ) {
-                    recorded++;
-                }
-            }
-            Assert.areEqual(1, recorded, 'The fix is recorded once, naming what it scheduled.');
+            Assert.isNull(before, 'Not scheduled, so no next run');
+            Assert.areEqual(1, after.hour(), 'At its time of day');
+            Assert.areEqual(15, after.minute(), 'To the minute');
+            Assert.isTrue(after > Datetime.now(), 'And in the future');
+            Assert.isNull(NightlyJobs.lastStarted(OLD_B), 'It has never started');
         }
-    }
-
-    @IsTest
-    static void staffAreNotShownTheFindingAndCannotPressTheFix() {
-        System.runAs(TestUsers.admin()) {
-            User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
-            FakeJob addresses = new FakeJob('Addresses', false);
-            NightlyJobs.jobsOverride = new List<NightlyJob>{ addresses };
-
-            System.runAs(priya) {
-                Assert.isNull(findNightlyJobs(HealthCheckService.run()), 'Not shown to staff.');
-                try {
-                    HealthCheckController.applyFix(
-                        HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS,
-                        new List<String>{ 'Addresses' }
-                    );
-                    Assert.fail('Without the permission the fix is refused.');
-                } catch (AuraHandledException expected) {
-                    Assert.isNotNull(expected.getMessage(), 'Refused with a sentence.');
-                }
-            }
-            Assert.isFalse(addresses.scheduled, 'Nothing was scheduled.');
-        }
-    }
-
-    private static HealthCheckService.Finding findNightlyJobs(
-        List<HealthCheckService.Finding> findings
-    ) {
-        for (HealthCheckService.Finding finding : findings) {
-            if (finding.key == 'nightly_jobs_not_scheduled') {
-                return finding;
-            }
-        }
-        return null;
     }
 }

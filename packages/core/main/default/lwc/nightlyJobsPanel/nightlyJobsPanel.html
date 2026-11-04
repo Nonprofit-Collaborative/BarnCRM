@@ -1,0 +1,93 @@
+<template>
+    <template lwc:if={helpReady}>
+    <div class="slds-var-p-around_medium">
+        <h2 class="slds-text-heading_small" data-id="title">{labels.title}</h2>
+        <p class="slds-text-body_small slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+
+        <template lwc:if={errorMessage}>
+            <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
+                {errorMessage}
+            </p>
+        </template>
+        <template lwc:if={noticeMessage}>
+            <p class="slds-var-m-bottom_small" data-id="notice" role="status" aria-live="polite">
+                {noticeMessage}
+            </p>
+        </template>
+
+        <template lwc:if={panel}>
+            <div class="slds-box slds-box_x-small slds-var-m-bottom_small">
+                <p data-id="schedule-message">{scheduleMessage}</p>
+                <template lwc:if={hasLastRun}>
+                    <p class="slds-text-body_small" data-id="last-run">
+                        <strong>{labels.lastRun}:</strong>
+                        <lightning-formatted-date-time
+                            value={panel.lastRunStarted}
+                            year="numeric"
+                            month="short"
+                            day="2-digit"
+                            hour="2-digit"
+                            minute="2-digit"
+                        ></lightning-formatted-date-time>
+                        <template lwc:if={panel.lastRunOutcome}>
+                            <span> ({panel.lastRunOutcome})</span>
+                        </template>
+                    </p>
+                </template>
+                <template lwc:if={showSchedule}>
+                    <div class="slds-var-m-top_x-small">
+                        <lightning-button
+                            data-id="schedule"
+                            label={labels.schedule}
+                            disabled={busy}
+                            onclick={handleSchedule}
+                        ></lightning-button>
+                    </div>
+                </template>
+            </div>
+
+            <table
+                class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
+                data-id="steps"
+            >
+                <caption class="slds-assistive-text">{labels.title}</caption>
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th scope="col">{labels.job}</th>
+                        <th scope="col">{labels.time}</th>
+                        <th scope="col">{labels.status}</th>
+                        <th scope="col">{labels.lastRun}</th>
+                        <th scope="col">{labels.result}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={rows} for:item="row">
+                        <tr key={row.key} data-key={row.key}>
+                            <th scope="row" class="slds-cell-wrap" data-label={labels.job}>{row.label}</th>
+                            <td data-label={labels.time}>{row.time}</td>
+                            <td data-id="state" data-label={labels.status}>{row.state}</td>
+                            <td data-label={labels.lastRun}>
+                                <template lwc:if={row.lastStarted}>
+                                    <lightning-formatted-date-time
+                                        value={row.lastStarted}
+                                        month="short"
+                                        day="2-digit"
+                                        hour="2-digit"
+                                        minute="2-digit"
+                                    ></lightning-formatted-date-time>
+                                </template>
+                            </td>
+                            <td class="slds-cell-wrap" data-id="outcome" data-label={labels.result}>
+                                {row.outcome}
+                                <template lwc:if={row.message}>
+                                    <span class="slds-text-body_small slds-text-color_weak"> {row.message}</span>
+                                </template>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </template>
+    </div>
+    </template>
+</template>

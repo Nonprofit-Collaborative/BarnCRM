@@ -84,6 +84,21 @@ describe('the import results view', () => {
     expect(element.shadowRoot.querySelector('[data-id="no-rejected"]')).not.toBeNull();
   });
 
+  it('opens every row of the import from See Every Row (admin-22)', () => {
+    const element = render({ batch: COMMITTED, rejectedRows: [] });
+    const link = element.shadowRoot.querySelector('[data-id="see-every-row"]');
+    expect(link).not.toBeNull();
+    link.click();
+    expect(element.shadowRoot.querySelector('[data-id="see-every-row"]')).not.toBeNull();
+  });
+
+  it('offers no See Every Row while the run is going or a file has no rows', () => {
+    const running = render({ batch: { ...DRY_RUN, isFinished: false }, rejectedRows: [] });
+    expect(running.shadowRoot.querySelector('[data-id="see-every-row"]')).toBeNull();
+    const empty = render({ batch: { ...COMMITTED, rowCount: 0 }, rejectedRows: [] });
+    expect(empty.shadowRoot.querySelector('[data-id="see-every-row"]')).toBeNull();
+  });
+
   it('shows the run log a line at a time', () => {
     const element = render({ batch: DRY_RUN, rejectedRows: [] });
     const lines = element.shadowRoot.querySelectorAll('[data-id="run-log"] li');

@@ -68,6 +68,11 @@ public with sharing class FindController {
         /** The query a save wrote, so the page keeps that one open; empty otherwise. */
         @AuraEnabled
         public String savedId;
+        /** Super Transformer's tab and the page state key that carries Find's conditions to it. */
+        @AuraEnabled
+        public String superTransformerTab;
+        @AuraEnabled
+        public String superTransformerStateKey;
     }
 
     /** The rows a query returned and the SOQL it ran, for display only. */
@@ -418,6 +423,8 @@ public with sharing class FindController {
         page.exportPageSize = QueryCompiler.EXPORT_PAGE_SIZE;
         page.canBulkUpdate = BulkUpdateController.hasPermission();
         page.canBulkDelete = BulkDeleteController.hasPermission();
+        page.superTransformerTab = NamespaceUtil.qualify('Bulk_Update');
+        page.superTransformerStateKey = NamespaceUtil.stateKey('start');
         // The person's own first, read on their own, so other people's shared queries never
         // push one of theirs past the cap; others fill what is left of it.
         Id me = UserInfo.getUserId();

@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: title of the several objects card</shortDescription>
-        <value>Several Objects in One File</value>
+        <value>Several Kinds of Record in One File</value>
     </labels>
     <labels>
         <fullName>Core_Import_SeveralObjectsLabel</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: label of the objects a several-object mapping loads</shortDescription>
-        <value>Objects to load</value>
+        <value>Kinds of record to load</value>
     </labels>
     <labels>
         <fullName>Core_Import_SeveralObjectsAvailable</fullName>
@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: the objects not chosen yet</shortDescription>
-        <value>Available objects</value>
+        <value>Available kinds of record</value>
     </labels>
     <labels>
         <fullName>Core_Import_SheetObjectLabel</fullName>
@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: the object one sheet loads; {0} is the sheet</shortDescription>
-        <value>Object for {0}</value>
+        <value>Kind of record for {0}</value>
     </labels>
     <labels>
         <fullName>Core_Import_FileObjectLabel</fullName>
@@ -102,6 +102,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: the object a text file loads</shortDescription>
-        <value>Object for this file</value>
+        <value>Kind of record for this file</value>
     </labels>
 </CustomLabels>

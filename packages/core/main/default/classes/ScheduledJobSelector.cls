@@ -57,6 +57,13 @@ public with sharing class ScheduledJobSelector {
         return found == null ? null : found.NextFireTime;
     }
 
+    /** When the named job was scheduled, or null when it is not. */
+    @NamespaceAccessible
+    public static Datetime startTime(String jobName) {
+        CronTrigger found = triggerByName(jobName);
+        return found == null ? null : found.StartTime;
+    }
+
     /**
      * The names of the package's scheduled jobs whose owner is no longer active. A scheduled
      * job runs as the person who scheduled it and stops when that user is deactivated, while
@@ -157,7 +164,7 @@ public with sharing class ScheduledJobSelector {
             byName = new Map<String, CronTrigger>();
             // At most 100 rows: an org may hold only 100 scheduled Apex jobs.
             for (CronTrigger job : [
-                SELECT Id, NextFireTime, OwnerId, CronExpression, CronJobDetail.Name
+                SELECT Id, NextFireTime, StartTime, OwnerId, CronExpression, CronJobDetail.Name
                 FROM CronTrigger
                 WHERE CronJobDetail.JobType = '7' AND CronJobDetail.Name LIKE :NAME_PATTERN
                 WITH SYSTEM_MODE

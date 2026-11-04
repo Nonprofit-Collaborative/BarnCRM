@@ -7,6 +7,12 @@ import getPage from '@salesforce/apex/AutomationControlController.getPage';
 import pauseAll from '@salesforce/apex/AutomationControlController.pauseAll';
 import resumeAll from '@salesforce/apex/AutomationControlController.resumeAll';
 import setEnabled from '@salesforce/apex/AutomationControlController.setEnabled';
+import saveControl from '@salesforce/apex/AutomationControlController.saveControl';
+import addControl from '@salesforce/apex/AutomationControlController.addControl';
+import removeControl from '@salesforce/apex/AutomationControlController.removeControl';
+import addFlow from '@salesforce/apex/AutomationControlController.addFlow';
+import removeFlow from '@salesforce/apex/AutomationControlController.removeFlow';
+import catchUpNow from '@salesforce/apex/AutomationControlController.catchUpNow';
 
 import TITLE from '@salesforce/label/c.Core_AutomationControl_Title';
 import PAUSE_BUTTON from '@salesforce/label/c.Core_AutomationControl_PauseButton';
@@ -25,6 +31,20 @@ import PAUSED_PREFIX from '@salesforce/label/c.Core_AutomationControl_PausedPref
 import PAUSED_BY from '@salesforce/label/c.Core_AutomationControl_PausedBy';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Automation_UnexpectedError';
 import ALWAYS_RUNS from '@salesforce/label/c.Core_Automation_AlwaysRuns';
+import PEOPLE_TITLE from '@salesforce/label/c.Core_AutomationControl_PeopleTitle';
+import FLOWS_TITLE from '@salesforce/label/c.Core_AutomationControl_FlowsTitle';
+import CATCH_UP_BUTTON from '@salesforce/label/c.Core_AutomationControl_CatchUpButton';
+import WHOLE_ORGANIZATION from '@salesforce/label/c.Core_AutomationControl_WholeOrganization';
+import KIND_USER from '@salesforce/label/c.Core_AutomationControl_KindUser';
+import ADD_FOR from '@salesforce/label/c.Core_AutomationControl_AddFor';
+import KIND_PROFILE from '@salesforce/label/c.Core_AccessExplorer_KindProfile';
+import KIND_ORGANIZATION from '@salesforce/label/c.Core_Settings_NavGroup_Organization';
+import ADD from '@salesforce/label/c.Core_CmdtManager_AddButton';
+import REMOVE from '@salesforce/label/c.Core_Find_Remove';
+import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
+import TYPE from '@salesforce/label/c.Core_DataDictionary_ColType';
+import FLOW from '@salesforce/label/c.Core_DataDictionary_TypeFlow';
+import TURN_OFF from '@salesforce/label/c.Core_ModuleManager_TurnOffButton';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -35,6 +55,15 @@ const HOUR_OPTIONS = [
   { label: EIGHT_HOURS, value: '8' },
   { label: TWENTY_FOUR_HOURS, value: '24' }
 ];
+
+const LEVEL_ORGANIZATION = 'Organization';
+const LEVEL_PROFILE = 'Profile';
+const LEVEL_USER = 'User';
+const LEVEL_LABELS = {
+  [LEVEL_ORGANIZATION]: KIND_ORGANIZATION,
+  [LEVEL_PROFILE]: KIND_PROFILE,
+  [LEVEL_USER]: KIND_USER
+};
 
 const DEFAULT_HOURS = '2';
 /** How long the "is off" line stays beside a switch just turned off (admin-12). */
@@ -70,8 +99,41 @@ export default class AutomationControl extends LightningElement {
     get resumesItself() {
       return helpText('Core', 'Core_AutomationControl_ResumesItself');
     },
-    alwaysRuns: ALWAYS_RUNS
+    alwaysRuns: ALWAYS_RUNS,
+    peopleTitle: PEOPLE_TITLE,
+    flowsTitle: FLOWS_TITLE,
+    catchUpButton: CATCH_UP_BUTTON,
+    addFor: ADD_FOR,
+    profile: KIND_PROFILE,
+    user: KIND_USER,
+    add: ADD,
+    remove: REMOVE,
+    name: NAME,
+    type: TYPE,
+    flow: FLOW,
+    get peopleHelp() {
+      return helpText('Core', 'Core_AutomationControl_PeopleHelp');
+    },
+    get flowsHelp() {
+      return helpText('Core', 'Core_AutomationControl_FlowsHelp');
+    },
+    get catchUpHelp() {
+      return helpText('Core', 'Core_AutomationControl_CatchUpHelp');
+    },
+    get noFlowsToAdd() {
+      return helpText('Core', 'Core_AutomationControl_NoFlowsToAdd');
+    },
+    get pausedForEveryone() {
+      return helpText('Core', 'Core_AutomationControl_PausedForEveryone');
+    }
   };
+
+  /** Profile or User: which picker adds the next row. */
+  addKind = LEVEL_USER;
+  addOwnerId;
+  flowToAdd;
+  /** Shown after Catch Up Now starts. */
+  catchUpMessage;
 
   page;
   errorMessage;
@@ -137,6 +199,8 @@ export default class AutomationControl extends LightningElement {
         ...automation,
         alwaysRuns: automation.alwaysRuns === true,
         toggleDisabled: this.controlsDisabled || automation.alwaysRuns === true,
+        removable: automation.removable === true,
+        removeTitle: `${REMOVE}: ${automation.label}`,
         statusLine:
           this.switchedOff === automation.automationName
             ? helpText('Core', 'Core_AutomationControl_SwitchedOff', automation.label)
@@ -159,6 +223,73 @@ export default class AutomationControl extends LightningElement {
 
   get hasError() {
     return !!this.errorMessage;
+  }
+
+  // ---------------------------------------------- BarnCRM Automation Control rows (R-A8)
+
+  get pauseAllLabel() {
+    return this.page ? this.page.pauseAllLabel : undefined;
+  }
+
+  get bypassLabel() {
+    return this.page ? this.page.bypassLabel : undefined;
+  }
+
+  /** The org default first (named Whole Organization), then profiles and users. */
+  get controlRows() {
+    const rows = (this.page && this.page.controlRows) || [];
+    return rows.map((row) => {
+      const name = row.level === LEVEL_ORGANIZATION ? WHOLE_ORGANIZATION : row.ownerName;
+      return {
+        ...row,
+        name,
+        typeLabel: LEVEL_LABELS[row.level] || row.level,
+        removable: row.level !== LEVEL_ORGANIZATION,
+        pauseAllTitle: `${this.pauseAllLabel}: ${name}`,
+        bypassTitle: `${this.bypassLabel}: ${name}`,
+        removeTitle: `${REMOVE}: ${name}`
+      };
+    });
+  }
+
+  get pausedForEveryone() {
+    return !!(this.page && this.page.pausedForEveryone);
+  }
+
+  /** Turn Off in the Pause All bar, offered only to someone who can use it. */
+  get turnOffLabel() {
+    return this.isReadOnly ? undefined : TURN_OFF;
+  }
+
+  get kindOptions() {
+    return [
+      { label: KIND_PROFILE, value: LEVEL_PROFILE },
+      { label: KIND_USER, value: LEVEL_USER }
+    ];
+  }
+
+  get addingProfile() {
+    return this.addKind === LEVEL_PROFILE;
+  }
+
+  get profileOptions() {
+    return (this.page && this.page.profileOptions) || [];
+  }
+
+  get addControlDisabled() {
+    return this.controlsDisabled || !this.addOwnerId;
+  }
+
+  get flowOptions() {
+    return (this.page && this.page.flowOptions) || [];
+  }
+
+  get hasFlowOptions() {
+    return this.flowOptions.length > 0;
+  }
+
+  get addFlowDisabled() {
+    return this.controlsDisabled || !this.flowToAdd;
   }
 
   handleHoursChange(event) {
@@ -205,6 +336,81 @@ export default class AutomationControl extends LightningElement {
         }
       }
     );
+  }
+
+  /** One box of an Automation Control row saves at once; a refused save puts the box back. */
+  handleControlChange(event) {
+    const input = event.target;
+    const ownerId = input.dataset.owner;
+    const row = this.controlRows.find((candidate) => candidate.ownerId === ownerId);
+    if (!row) {
+      return;
+    }
+    const pause = input.dataset.field === 'pauseAll' ? input.checked : row.pauseAll;
+    const bypass = input.dataset.field === 'bypass' ? input.checked : row.bypass;
+    const before = !input.checked;
+    this.runAction(saveControl({ ownerId, pauseAll: pause, bypass }), () => {
+      input.checked = before;
+    });
+  }
+
+  /** Turn Off in the Pause All bar: the Whole Organization row loses Pause All. */
+  handleTurnOffPauseAll() {
+    const org = this.controlRows.find((row) => row.level === LEVEL_ORGANIZATION);
+    if (!org) {
+      return;
+    }
+    this.runAction(saveControl({ ownerId: org.ownerId, pauseAll: false, bypass: org.bypass }));
+  }
+
+  handleRemoveControl(event) {
+    this.runAction(removeControl({ ownerId: event.target.dataset.owner }));
+  }
+
+  handleAddKind(event) {
+    this.addKind = event.detail.value;
+    this.addOwnerId = undefined;
+  }
+
+  handleAddOwner(event) {
+    this.addOwnerId = event.detail.value;
+  }
+
+  handleUserPicked(event) {
+    this.addOwnerId = event.detail ? event.detail.recordId : undefined;
+  }
+
+  handleAddControl() {
+    const ownerId = this.addOwnerId;
+    this.runAction(addControl({ ownerId }), undefined, () => {
+      this.addOwnerId = undefined;
+      const picker = this.template.querySelector('[data-id="add-user"]');
+      if (picker && typeof picker.clearSelection === 'function') {
+        picker.clearSelection();
+      }
+    });
+  }
+
+  handleFlowChoice(event) {
+    this.flowToAdd = event.detail.value;
+  }
+
+  handleAddFlow() {
+    const apiName = this.flowToAdd;
+    this.runAction(addFlow({ apiName }), undefined, () => {
+      this.flowToAdd = undefined;
+    });
+  }
+
+  handleRemoveFlow(event) {
+    this.runAction(removeFlow({ automationName: event.target.dataset.automation }));
+  }
+
+  handleCatchUp() {
+    this.catchUpMessage = undefined;
+    this.runAction(catchUpNow(), undefined, () => {
+      this.catchUpMessage = helpText('Core', 'Core_AutomationControl_CatchUpStarted');
+    });
   }
 
   /**

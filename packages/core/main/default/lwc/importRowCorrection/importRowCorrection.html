@@ -13,14 +13,20 @@
                 <lightning-spinner alternative-text={labels.LOADING} size="small"></lightning-spinner>
             </template>
             <template lwc:if={errorMessage}>
-                <div class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">
-                    {errorMessage}
-                </div>
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="error"
+                    message={errorMessage}
+                    data-id="error"
+                ></c-barn-notice>
             </template>
             <template lwc:if={message}>
-                <div class="slds-text-color_success slds-var-m-bottom_small" role="status" data-id="message">
-                    {message}
-                </div>
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="success"
+                    message={message}
+                    data-id="message"
+                ></c-barn-notice>
             </template>
             <template lwc:if={hasRow}>
                 <dl class="slds-list_horizontal slds-wrap slds-var-m-bottom_small">
@@ -43,7 +49,7 @@
                 </template>
                 <template lwc:if={hasColumns}>
                     <table
-                        class="slds-table slds-table_bordered slds-table_cell-buffer"
+                        class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
                         aria-label={labels.TITLE}
                         data-id="values"
                     >
@@ -57,9 +63,9 @@
                         <tbody>
                             <template for:each={columns} for:item="column">
                                 <tr key={column.column} class={column.rowClass} data-id="column">
-                                    <th scope="row" class="slds-cell-wrap">{column.column}</th>
-                                    <td class="slds-cell-wrap" data-id="file-value">{column.fileValue}</td>
-                                    <td class="slds-cell-wrap">
+                                    <th scope="row" class="slds-cell-wrap" data-label={labels.COLUMN_HEADER}>{column.column}</th>
+                                    <td class="slds-cell-wrap" data-label={labels.FILE_VALUE_HEADER} data-id="file-value">{column.fileValue}</td>
+                                    <td class="slds-cell-wrap" data-label={labels.CORRECTED_HEADER}>
                                         <template lwc:if={canCorrect}>
                                             <lightning-input
                                                 label={column.column}
