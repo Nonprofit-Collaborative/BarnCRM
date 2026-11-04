@@ -8,7 +8,43 @@ Rules for any screen:
 - Title Case for every title, heading, tab, tile and button; sentence case for body text and field labels.
 - One card level. Never a card inside a card.
 - No hard-coded colors or sizes. CSS uses SLDS 2 styling hooks (`--slds-g-*`) with a fallback, and `npm run lint:slds` must report no violations.
-- Every string comes from a custom label.
+- Every UI string and message comes from a custom label; every help and guidance sentence comes from the package's help catalog (see Help Text below). Never add help prose as a label.
+
+## Help Text
+
+Help and guidance prose (an intro, a description, an explanation, an empty-state explanation, a setup note, a tooltip longer than a short phrase) lives in the package's JSON help catalog, not in custom labels (ADR-NEXT `NEXT-help-text-json.md`). Custom labels of an unmanaged or source install count toward the org's 5,000, and BarnCRM installs that way for a long time.
+
+- **Where:** `packages/<dir>/main/default/staticresources/BarnHelp_<Package>.json` (`BarnHelp_Core`, `BarnHelp_Rollups`, `BarnHelp_Giving`, `BarnHelp_Volunteers`, `BarnHelp_Programs`, `BarnHelp_LogicModels`, `BarnHelp_Funders`, `BarnHelp_Mirror`), shaped `{ "languages": ["en"], "texts": { "<key>": "<text>" } }`. A package's first help text adds its catalog and a `.resource-meta.xml` copied from Core's. English only for now.
+- **Keys:** named like labels, `<Package>_<Area>_<What>` (`Core_OrgOptimizer_Intro`). Keep the keys sorted.
+- **What stays a label:** titles, buttons, tabs, column headers, field labels, short status words, every error, toast, confirmation, validation, notice, log line and run result, sentences with `{0}` about the current state, text written into records, emails and files, and anything named from FlexiPage, Flow or custom metadata.
+- **In a component:**
+
+  ```js
+  import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+
+  export default class Example extends LightningElement {
+    helpReady = isHelpLoaded('Core');
+
+    connectedCallback() {
+      if (!this.helpReady) {
+        loadHelp('Core').then(() => {
+          this.helpReady = true;
+        });
+      }
+    }
+
+    get intro() {
+      return helpText('Core', 'Core_Example_Intro');
+    }
+  }
+  ```
+
+  Wrap the template in `<template lwc:if={helpReady}>` so the first render has the text, and read help only in getters and handlers, never in a class field or module constant (those are read before the catalog arrives). Pass an array to `loadHelp` and `isHelpLoaded` when a component shows another package's help (its own package's and Core's only). `helpText(pkg, key, a, b)` fills `{0}` and `{1}`.
+- **A popover:** `<c-barn-help help-package="Core" help-key="Core_Example_Help"></c-barn-help>`.
+- **In Apex** (only where Apex returns help to the UI): `BarnHelp.text('Core', 'Core_Example_Help')`, or `BarnHelp.text('Core', 'Core_Example_Count', new List<Object>{ n })`.
+- **Keys are literals.** Write the package and key as quoted strings so `scripts/ci/check-help-text.py`, and a reader, can find them; it fails on a missing, unused or non-literal key, an em or en dash, and a key that is also a label.
+- **Jest:** `c/barnHelpText` is mapped to a stand-in that is always loaded and reads a key as `c.<key>`, like the label stub. For real wording, `import { setHelpTextForTest } from 'c/barnHelpText'` and set `{ key: 'text' }`.
+- **Accessibility:** help keeps its element: a paragraph stays a paragraph, and an `aria-describedby` still points at it. Only where the words come from changes.
 
 ## Part 1 Components
 
@@ -18,7 +54,7 @@ Rules for any screen:
 | `c-barn-tool-grid` | A hub of tools in groups (Data Manager, the Org Optimizer overview, Home) | `groups` (each with `name`, `label`, `tiles`), `heading-level`; fires `select` with `detail.name` |
 | `c-barn-tool-tile` | One tool on a hub; the whole tile is one link or button | `name`, `label`, `description`, `icon-name`, `href`, `new-tab`, `badge-label`, `badge-variant`, `disabled`, `disabled-reason`; fires `select` |
 | `c-barn-empty-state` | Any "nothing here yet" | `illustration` (`no-data`, `setup`, `all-clear`), `heading`, `message`, `size`, `heading-level`; default slot for the action |
-| `c-barn-help` | Help next to a field or section | `content` (popover), `learn-more-url`, `learn-more-label`, `alternative-text` |
+| `c-barn-help` | Help next to a field or section | `help-key` and `help-package` (popover text from the help catalog) or `content` (popover text given), `learn-more-url`, `learn-more-label`, `alternative-text` |
 
 Notes:
 

@@ -129,7 +129,14 @@ Salesforce org is needed for this job. Steps:
    never deletes a label. Reuse an existing label of the same text and meaning (Core's
    `Core_Kit_Save`, `Core_CmdtManager_CancelButton`, `Core_OrgOptimizer_Refresh`, the
    `Core_Shared_*` words and the `Core_Format_*` patterns such as `{0} ({1})`; modules may
-   use a Core label once it is unprotected) before adding one.
+   use a Core label once it is unprotected) before adding one. Help and guidance prose
+   is never a label: it goes in the package's help catalog (`docs/contributor-guide/ux-kit.md`,
+   Help Text; ADR-NEXT `NEXT-help-text-json.md`).
+   `scripts/ci/check-help-text.py` checks those catalogs (`BarnHelp_<Package>.json`): every
+   key a `helpText`, `BarnHelp.text` or `help-key` names is in its package's catalog and
+   written as a literal, every catalog key is used and is not also a label, translations are
+   listed and hold only English keys, no text holds an em or en dash, and code reads only its
+   own package's and Core's help.
    `scripts/ci/check-metadata-lengths.py` (`npm run check:metadata-lengths`) covers the
    other limits only an org reports: a description over 255 characters on a custom
    permission, permission set, permission set group, FlexiPage, Lightning web component

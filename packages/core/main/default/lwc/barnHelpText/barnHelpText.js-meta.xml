@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Help and guidance text from the BarnHelp_* JSON static resources, loaded once per page:
+    helpText, loadHelp and isHelpLoaded for every component that shows help.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
