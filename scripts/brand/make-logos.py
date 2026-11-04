@@ -11,14 +11,16 @@ color (no error red, warning orange or yellow), so a launcher tile never reads a
 
   Asset                     Package      Badge             Color    App
   BarnCRM_Admin_Logo        core         gear              #032D60  BarnCRM Admin, Admin Console
-  Fundraising_Logo          giving       heart             #A3175F  BarnCRM Fundraising
+  BarnCRM_Fundraising_Logo  giving       heart             #A3175F  BarnCRM Fundraising
   BarnCRM_Volunteers_Logo   volunteers   person            #2E844A  BarnCRM Volunteers
   BarnCRM_Programs_Logo     programs     sprout            #7526A8  BarnCRM Programs
   BarnCRM_Funders_Logo      funders      award ribbon      #7A5300  BarnCRM Funders
   BarnCRM_Logic_Models_Logo logicmodels  flow arrows       #3B44B5  BarnCRM Logic Models
 
 Fundraising was red (#C23934) until 2026-11-04 (owner decision: red means error in the UI, the
-reason D-58 declined red for the brand).
+reason D-58 declined red for the brand). The asset was renamed from Fundraising_Logo then:
+redeploying a ContentAsset under its old name keeps the org's existing image, so a changed
+image needs a new asset name to reach orgs that already have the old one.
 
 Each package ships its own asset, because an app names a ContentAsset by its API name and a
 module may not depend on Core's asset being addressable once the packages are namespaced.
@@ -47,7 +49,7 @@ SAMPLES = 4
 # (package, asset name, docs/brand slug, badge color, glyph)
 VARIANTS = [
     ("core", "BarnCRM_Admin_Logo", "admin", (0x03, 0x2D, 0x60), "gear"),
-    ("giving", "Fundraising_Logo", "giving", (0xA3, 0x17, 0x5F), "heart"),
+    ("giving", "BarnCRM_Fundraising_Logo", "giving", (0xA3, 0x17, 0x5F), "heart"),
     ("volunteers", "BarnCRM_Volunteers_Logo", "volunteers", (0x2E, 0x84, 0x4A), "person"),
     ("programs", "BarnCRM_Programs_Logo", "programs", (0x75, 0x26, 0xA8), "sprout"),
     ("funders", "BarnCRM_Funders_Logo", "funders", (0x7A, 0x53, 0x00), "ribbon"),
