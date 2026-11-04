@@ -140,5 +140,5 @@ You should see: the builder filled in from your text, ready to run.
 - [People and households](people-and-households.md)
 - [Duplicates](duplicates.md)
 - Admin Guide: [Find and export](../admin-guide/find.md),
-  [Bulk update](../admin-guide/bulk-update.md), [Bulk delete](../admin-guide/bulk-delete.md),
+  [Super Transformer](../admin-guide/bulk-update.md), [Bulk delete](../admin-guide/bulk-delete.md),
   [Access](../admin-guide/access.md)

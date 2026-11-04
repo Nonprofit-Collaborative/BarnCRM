@@ -2,6 +2,7 @@ import { LightningElement, api } from 'lwc';
 import { RefreshEvent } from 'lightning/refresh';
 import LOCALE from '@salesforce/i18n/locale';
 import getSchedule from '@salesforce/apex/SessionScheduleController.getSchedule';
+import getTakenDays from '@salesforce/apex/SessionScheduleController.getTakenDays';
 import scheduleSessions from '@salesforce/apex/SessionScheduleController.scheduleSessions';
 
 import TITLE from '@salesforce/label/c.Programs_Schedule_Title';
@@ -22,16 +23,25 @@ import PREVIEW_MANY from '@salesforce/label/c.Programs_Schedule_PreviewMany';
 import TOO_MANY from '@salesforce/label/c.Programs_Schedule_TooMany';
 import CREATED_ONE from '@salesforce/label/c.Programs_Schedule_CreatedOne';
 import CREATED_MANY from '@salesforce/label/c.Programs_Schedule_CreatedMany';
+import SKIPPED from '@salesforce/label/c.Programs_Schedule_Skipped';
 import ACTION_FAILED from '@salesforce/label/c.Programs_Schedule_ActionFailed';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
-import { format, previewMessage, sessionDates, weekdayOptions } from './schedule';
+import {
+  countMessage,
+  format,
+  newAndSkipped,
+  previewMessage,
+  sessionDates,
+  weekdayOptions
+} from './schedule';
 import { bodyMessage } from 'c/findCsv';
 
 /**
  * The Schedule Sessions panel on a cohort or a program (P-11, R-SE4): one Scheduled session of a
  * service for each chosen weekday between two dates. The dates are worked out in `schedule.js`;
- * the server checks the service and the count again.
+ * the server checks the service and the count again. Days that already have a session of the
+ * service for the same cohort are read from the server, counted in the preview and skipped.
  */
 export default class SessionScheduler extends LightningElement {
   @api recordId;
@@ -54,6 +64,9 @@ export default class SessionScheduler extends LightningElement {
   toDate;
   chosenWeekdays = [];
   startTime;
+  /** ISO dates in the chosen range that already have a session (R-SE4). */
+  takenDays = [];
+  takenRequest = 0;
   loading = true;
   busy = false;
   errorMessage;
@@ -74,12 +87,36 @@ export default class SessionScheduler extends LightningElement {
         this.serviceId = services.length === 1 ? services[0].value : undefined;
         this.fromDate = schedule.startDate || undefined;
         this.toDate = schedule.endDate || undefined;
+        return this.loadTaken();
       })
       .catch((error) => {
         this.errorMessage = bodyMessage(error, ACTION_FAILED);
       })
       .finally(() => {
         this.loading = false;
+      });
+  }
+
+  /** Reads the days of the range that already have a session; a later read wins. */
+  loadTaken() {
+    const request = ++this.takenRequest;
+    if (!this.serviceId || !this.fromDate || !this.toDate) {
+      this.takenDays = [];
+      return Promise.resolve();
+    }
+    return getTakenDays({
+      recordId: this.recordId,
+      serviceId: this.serviceId,
+      fromDate: this.fromDate,
+      toDate: this.toDate
+    })
+      .then((days) => {
+        if (request === this.takenRequest) {
+          this.takenDays = days || [];
+        }
+      })
+      .catch((error) => {
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
       });
   }
 
@@ -115,14 +152,19 @@ export default class SessionScheduler extends LightningElement {
   }
 
   get preview() {
-    return previewMessage(this.planned, {
-      chooseDates: CHOOSE_DATES,
-      chooseWeekdays: CHOOSE_WEEKDAYS,
-      tooMany: TOO_MANY,
-      none: PREVIEW_NONE,
-      one: PREVIEW_ONE,
-      many: PREVIEW_MANY
-    });
+    return previewMessage(
+      this.planned,
+      {
+        chooseDates: CHOOSE_DATES,
+        chooseWeekdays: CHOOSE_WEEKDAYS,
+        tooMany: TOO_MANY,
+        none: PREVIEW_NONE,
+        one: PREVIEW_ONE,
+        many: PREVIEW_MANY,
+        skipped: SKIPPED
+      },
+      this.takenDays
+    );
   }
 
   get scheduleDisabled() {
@@ -132,23 +174,26 @@ export default class SessionScheduler extends LightningElement {
       !this.serviceId ||
       planned.problem !== null ||
       planned.tooMany ||
-      planned.dates.length === 0
+      newAndSkipped(planned.dates, this.takenDays).toCreate === 0
     );
   }
 
   handleServiceChange(event) {
     this.clearMessages();
     this.serviceId = event.detail.value;
+    return this.loadTaken();
   }
 
   handleFromChange(event) {
     this.clearMessages();
     this.fromDate = event.target.value || undefined;
+    return this.loadTaken();
   }
 
   handleToChange(event) {
     this.clearMessages();
     this.toDate = event.target.value || undefined;
+    return this.loadTaken();
   }
 
   handleWeekdaysChange(event) {
@@ -176,10 +221,14 @@ export default class SessionScheduler extends LightningElement {
     })
       .then((schedule) => {
         this.schedule = schedule;
-        this.resultMessage =
-          schedule.created === 1 ? CREATED_ONE : format(CREATED_MANY, schedule.created);
+        this.resultMessage = countMessage(schedule.created, schedule.skipped || 0, {
+          one: CREATED_ONE,
+          many: CREATED_MANY,
+          skipped: SKIPPED
+        });
         this.chosenWeekdays = [];
         this.dispatchEvent(new RefreshEvent());
+        return this.loadTaken();
       })
       .catch((error) => {
         this.errorMessage = bodyMessage(error, ACTION_FAILED);

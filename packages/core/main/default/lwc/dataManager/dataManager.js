@@ -21,7 +21,7 @@ import IMPORT_TITLE from '@salesforce/label/c.Core_DataManager_ImportTitle';
 import IMPORT_TEXT from '@salesforce/label/c.Core_DataManager_ImportText';
 import FIND_TITLE from '@salesforce/label/c.Core_DataManager_FindTitle';
 import FIND_TEXT from '@salesforce/label/c.Core_DataManager_FindText';
-import UPDATE_TITLE from '@salesforce/label/c.Core_DataManager_UpdateTitle';
+import UPDATE_TITLE from '@salesforce/label/c.Core_SuperTransform_Title';
 import UPDATE_TEXT from '@salesforce/label/c.Core_DataManager_UpdateText';
 import DELETE_TITLE from '@salesforce/label/c.Core_DataManager_DeleteTitle';
 import DELETE_TEXT from '@salesforce/label/c.Core_DataManager_DeleteText';

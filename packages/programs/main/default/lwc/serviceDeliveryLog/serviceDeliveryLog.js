@@ -33,10 +33,19 @@ import QUANTITY_FOR from '@salesforce/label/c.Programs_Log_QuantityFor';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Log_MoreThanShown';
 import ACTION_FAILED from '@salesforce/label/c.Programs_Log_ActionFailed';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import UNSAVED_TITLE from '@salesforce/label/c.Programs_Log_UnsavedTitle';
+import UNSAVED_ASK from '@salesforce/label/c.Programs_Log_UnsavedAsk';
+import UNSAVED_CHANGES from '@salesforce/label/c.Core_Shared_UnsavedChanges';
+import UNSAVED_ONE from '@salesforce/label/c.Core_Kit_UnsavedOne';
+import UNSAVED_MANY from '@salesforce/label/c.Core_Kit_UnsavedMany';
+import DISCARD from '@salesforce/label/c.Core_Kit_Discard';
+import CONTINUE from '@salesforce/label/c.Core_DataManager_DeleteContinue';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 
 import {
   entriesToSave,
   format,
+  formatIsoDate,
   isSessionObject,
   logRows,
   markAllPresent,
@@ -45,6 +54,10 @@ import {
   withQuantity
 } from './logRows';
 import { bodyMessage } from 'c/findCsv';
+import BarnConfirmModal from 'c/barnConfirmModal';
+
+const SAVE_FIRST = 'save';
+const DISCARD_CHANGES = 'discard';
 
 /**
  * The Service Delivery Log panel on a program (P-02): for one active service and one day, the
@@ -222,18 +235,80 @@ export default class ServiceDeliveryLog extends LightningElement {
 
   // ------------------------------------------------------------------------- choosing
 
-  handleServiceChange(event) {
-    this.resultMessage = undefined;
-    this.errorMessage = undefined;
-    return this.load(event.detail.value, this.log.deliveryDate);
+  /** How many people have attendance marked but not saved. */
+  get unsavedCount() {
+    return entriesToSave(this.log, this.drafts).length;
   }
 
-  handleDateChange(event) {
-    const value = event.target.value;
+  /** "1 unsaved change" or "N unsaved changes" by the Save button, empty when all is saved. */
+  get unsavedText() {
+    const count = this.unsavedCount;
+    if (count === 0) {
+      return '';
+    }
+    return count === 1 ? UNSAVED_ONE : format(UNSAVED_MANY, count);
+  }
+
+  /**
+   * Changing the service or date reloads the list, so unsaved attendance would be lost: ask
+   * first (Save, Discard, or Cancel to stay). Resolves true when the change may go ahead.
+   */
+  async readyToReload() {
+    if (this.unsavedCount === 0) {
+      return true;
+    }
+    const service = (this.log.services || []).find((option) => option.value === this.log.serviceId);
+    const answer = await BarnConfirmModal.open({
+      size: 'small',
+      label: UNSAVED_TITLE,
+      message: format(
+        UNSAVED_ASK,
+        service ? service.label : '',
+        formatIsoDate(this.log.deliveryDate, LOCALE)
+      ),
+      choices: [
+        { label: SAVE, value: SAVE_FIRST },
+        { label: DISCARD, value: DISCARD_CHANGES }
+      ],
+      choicesLabel: UNSAVED_CHANGES,
+      choice: SAVE_FIRST,
+      confirmLabel: CONTINUE,
+      cancelLabel: CANCEL
+    });
+    if (!answer) {
+      return false;
+    }
+    if (answer.choice === SAVE_FIRST) {
+      await this.handleSave();
+      return !this.errorMessage;
+    }
+    return true;
+  }
+
+  async handleServiceChange(event) {
+    const picker = event.target;
+    const serviceId = event.detail.value;
+    this.resultMessage = undefined;
+    if (!(await this.readyToReload())) {
+      // Stay on the service whose attendance is still unsaved.
+      picker.value = this.log.serviceId;
+      return undefined;
+    }
+    this.errorMessage = undefined;
+    return this.load(serviceId, this.log.deliveryDate);
+  }
+
+  async handleDateChange(event) {
+    const picker = event.target;
+    const value = picker.value;
     if (!value) {
       return undefined;
     }
     this.resultMessage = undefined;
+    if (!(await this.readyToReload())) {
+      picker.value = this.log.deliveryDate;
+      return undefined;
+    }
     this.errorMessage = undefined;
     return this.load(this.log.serviceId, value);
   }

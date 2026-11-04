@@ -105,7 +105,14 @@ click the person's name to open the enrollment and edit it there.
 3. Everyone with an open enrollment is listed. Set each person's **Attendance** (Present,
    Excused Absence or Unexcused Absence) and **Quantity**, or click **Mark All Present** to set
    everyone not yet recorded to Present with a quantity of 1.
-4. Click **Save**.
+4. Click **Save**. While marks are not saved, a hint beside **Save** says "1 unsaved change" (or
+   "N unsaved changes").
+
+If you change the **Service** or the **Date** with marks not saved, **Save Attendance First?**
+asks: "You have unsaved attendance for (service) on (date). Changing the service or date
+reloads the list, so save it first or discard it." Choose **Save** (the default) or **Discard**,
+then **Continue**, to save or drop the marks and load the new service and day. **Cancel** keeps
+the marks and puts the **Service** and **Date** back.
 
 You should see: "(number) service deliveries saved." Anyone left at **Not Recorded** gets
 nothing. An absence always counts a quantity of 0. To correct a day, pick the same service and
@@ -243,7 +250,13 @@ the **Cohort** field on their enrollment.
 3. Check the line under the form, for example "12 sessions will be scheduled", and click
    **Schedule**.
 
-You should see: "12 sessions scheduled." The sessions are in the cohort's **Sessions** list and
+Running it twice does not duplicate: a day that already has a session of the same service for
+the same cohort (on a program, a session with no cohort), other than a **Cancelled** one, is
+skipped. The line says, for example, "2 sessions will be scheduled. Days that already have a
+session are skipped: 2." If every chosen day already has a session, **Schedule** is disabled.
+
+You should see: "12 sessions scheduled." (with the skipped count when there is one, for example
+"2 sessions scheduled. Days that already have a session are skipped: 2."). The sessions are in the cohort's **Sessions** list and
 on the **Sessions** tab. To move or call off one session, open it and edit its date or set its
 **Status** to **Cancelled**.
 

@@ -156,6 +156,34 @@ public with sharing class CohortSelector {
         return names;
     }
 
+    /**
+     * The days from `fromDate` to `toDate` that already have a session of this service for this
+     * cohort (no cohort: the program-wide sessions), other than cancelled ones (R-SE4).
+     */
+    public static Set<Date> selectSessionDays(
+        Id serviceId,
+        Id cohortId,
+        Date fromDate,
+        Date toDate
+    ) {
+        Set<Date> days = new Set<Date>();
+        for (Session__c session : [
+            SELECT Session_Date__c
+            FROM Session__c
+            WHERE
+                Service__c = :serviceId
+                AND Cohort__c = :cohortId
+                AND Session_Date__c >= :fromDate
+                AND Session_Date__c <= :toDate
+                AND Status__c != :SessionAttendance.CANCELLED
+            WITH USER_MODE
+            LIMIT 10000
+        ]) {
+            days.add(session.Session_Date__c);
+        }
+        return days;
+    }
+
     /** The program's active services, by name. */
     public static List<Service__c> selectActiveServices(Id programId) {
         return ServiceDeliverySelector.selectActiveServices(programId);

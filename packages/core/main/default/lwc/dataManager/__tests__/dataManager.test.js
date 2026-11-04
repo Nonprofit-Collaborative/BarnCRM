@@ -249,7 +249,6 @@ describe('c-data-manager', () => {
       'GroupCareful',
       'ImportTitle',
       'FindTitle',
-      'UpdateTitle',
       'DeleteTitle',
       'MappingsHeading',
       'MappingsEmpty',

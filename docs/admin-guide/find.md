@@ -17,7 +17,7 @@ rows to show, and press **Run**. The results appear in a table, 25 rows at a tim
 - **Save** the query under a name, to run it again next month.
 - **Share** a saved query, so everyone else who uses Find can open it.
 - **Summarize**: count, total, lowest or highest value, grouped by a field.
-- **Edit in the table**, if you may also bulk update: change values in the results and save
+- **Edit in the table**, if you may also use Super Transformer: change values in the results and save
   them, with an undo (section 7.6).
 
 Find changes a record only when you edit it in the table and press **Save**. Everything it
@@ -248,13 +248,13 @@ If you hold the **Bulk Update Records** permission as well as Find's, the column
 show a pencil after a query runs. Double-click a cell (or press Enter on it), change the value,
 and press **Save** at the foot of the table. Find saves up to 200 changed records at a time.
 
-- Only the query object's own fields that a bulk update may change can be edited: not fields
+- Only the query object's own fields that Super Transformer may change can be edited: not fields
   of a related record, not formula or system fields, and not the fields BarnCRM keeps itself
-  ([Bulk update](bulk-update.md), section 4).
+  ([Super Transformer runs and undo](bulk-update.md), section 4).
 - Each save runs with your access, and your organization's validation rules and automation
   run, as on any save. A record that is refused is marked in the table with the reason; the
   rest still save.
-- Each save is recorded like a bulk update. It appears on the **Data Manager** tab under
+- Each save is recorded like a Super Transformer run. It appears on the **Data Manager** tab under
   **Data Jobs**, and can be undone there within the same window as an import. The
   undo puts back each value nobody has changed since.
 
@@ -262,9 +262,9 @@ and press **Save** at the foot of the table. Find saves up to 200 changed record
 
 An export to Files runs once, when you press it: scheduled or recurring exports and sending a
 file elsewhere are planned for a later release (C-38). Totals are a summary table, not a chart. To change many records to the same
-value at once, run a query, open the **Change Records** menu and choose **Bulk Update**,
+value at once, run a query, open the **Change Records** menu and choose **Super Transformer**,
 shown to people who also hold the Bulk Update Records permission. See
-[Bulk update](bulk-update.md). To delete every record a query returns, choose **Bulk Delete**
+[Super Transformer runs and undo](bulk-update.md). To delete every record a query returns, choose **Bulk Delete**
 in the same menu, shown only to people who hold the Bulk Delete Records permission. See
 [Bulk delete](bulk-delete.md).
 
@@ -275,7 +275,7 @@ in the same menu, shown only to people who hold the Bulk Delete Records permissi
 - Until you choose an object or a saved query, the page shows only those two lists and a
   short prompt.
 - **Run** is the main button. **Export** holds the three exports, and **Change Records** holds
-  Bulk Update and Bulk Delete for people with those permissions. The bulk panel opens right
+  Super Transformer and Bulk Delete for people with those permissions. The bulk panel opens right
   under these buttons, above the results.
 - The table shows 25 rows at a time, with **Show More** for the next 25, so a long result does
   not run down the page. Every export still includes every matching record, up to the export

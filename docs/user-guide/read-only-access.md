@@ -22,7 +22,7 @@ module, your admin gives **Giving Read Only** separately, if you should see gift
 | Home tab | **What's New in BarnCRM**, the welcome and **Quick Links** | Use **New Household** (it is hidden) |
 | BarnCRM Settings | Read every setting and its **Learn More** link | Change anything |
 | Error Log | Read entries (open it from the navigation menu if it is not shown) | Change entries |
-| Find, Data Manager, Org Optimizer | Nothing, unless your admin also gives the **BarnCRM Find and Export** add-on | Bulk update or bulk delete |
+| Find, Data Manager, Org Optimizer | Nothing, unless your admin also gives the **BarnCRM Find and Export** add-on | Run Super Transformer or bulk delete |
 
 Tabs you see in the **BarnCRM** app: **Home**, **Households** and **Organizations**, plus
 **Contacts** if your Salesforce profile shows it. **BarnCRM Console** adds **Addresses**,

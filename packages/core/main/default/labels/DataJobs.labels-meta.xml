@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data job history: empty state line under the heading</shortDescription>
-        <value>Each import, bulk update and bulk delete is listed here, with its undo.</value>
+        <value>Each import, Super Transformer run and bulk delete is listed here, with its undo.</value>
     </labels>
     <labels>
         <fullName>Core_DataJobs_Show</fullName>
@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data job history: filter option for bulk updates</shortDescription>
-        <value>Bulk updates</value>
+        <value>Super Transformer runs</value>
     </labels>
     <labels>
         <fullName>Core_DataJobs_ShowDeletes</fullName>

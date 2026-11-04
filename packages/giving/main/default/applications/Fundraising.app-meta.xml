@@ -81,7 +81,7 @@
     <pageOrSobjectType>Account</pageOrSobjectType>
   </actionOverrides>
   <brand>
-    <headerColor>#0B5CAB</headerColor>
+    <headerColor>#007A9E</headerColor>
     <logo>BarnCRM_Fundraising_Logo</logo>
     <logoVersion>1</logoVersion>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>

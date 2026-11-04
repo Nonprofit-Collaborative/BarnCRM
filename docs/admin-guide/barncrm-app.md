@@ -16,7 +16,7 @@ The everyday apps give you one home page that tells you what to do next, a setup
 that remembers how far you got, and the places you go most: your households, your people and
 your organizations. The admin apps hold every BarnCRM tool and setting in one place. Each
 tab shows only to the people whose access allows it, so a menu can be shorter than the list.
-**Import**, **Find** and **Bulk Update** are not in any app's navigation: open them from the
+**Import**, **Find** and **Super Transformer** are not in any app's navigation: open them from the
 tiles on the **Data Manager** tab. **Error Log** is always the last tab of an app that has it,
 after any pages a module adds. In the everyday apps, **Data Manager** is the last Core tab and
 a module's pages follow it.
@@ -42,7 +42,7 @@ is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**
 | What you are looking for | Where it is |
 |---|---|
 | People, households, organizations | **BarnCRM** or **BarnCRM Console** |
-| Find, Import and Bulk Update | The **Data Manager** tab, in any BarnCRM app |
+| Find, Import and Super Transformer | The **Data Manager** tab, in any BarnCRM app |
 | Setup checklist, Health Check, What's new | The **Home** tab of **BarnCRM** or **BarnCRM Console** |
 | BarnCRM Settings, Access, Module Manager, Features | **BarnCRM Settings** tab in **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Org Optimizer, Duplicate Matching, Error Log | **BarnCRM Admin** or **BarnCRM Admin Console** |
@@ -132,7 +132,8 @@ administrator tile to staff, it shows nothing to count.
 ## How Records Open: Tabs in a Console
 
 Every BarnCRM app shows a blue barn logo in the app launcher. The admin apps add a navy gear
-badge to it and have a navy header, so you can tell at a glance which app you are in; a module's
+badge to it and have a navy header, so you can tell at a glance which app you are in; every other
+app, the module apps included, has the BarnCRM teal header (#007A9E). A module's
 app adds its own badge (a berry heart for **BarnCRM Fundraising**, a green person for **BarnCRM
 Volunteers**, a purple sprout for **BarnCRM Programs**, a bronze award ribbon for **BarnCRM
 Funders** and indigo flow arrows for **BarnCRM Logic Models**). No badge uses red, orange or
@@ -270,7 +271,7 @@ compare it with the page that came with the package.
   permission opens Org Optimizer or Duplicate Matching by typing its name in the app launcher.
 - **Looking for Find, Import or Super Transformer in the navigation.** None is in any app's
   navigation: open **Data Manager** and choose the **Find and Export Records**, **Import a
-  File** or **Update Many Records** (Super Transformer) card. Recent bulk updates and their undo are under **Data
+  File** or **Super Transformer** card. Recent Super Transformer runs and their undo are under **Data
   Jobs** on the same page.
 - **Hiding a style and wondering why a person still has it as their default.** **App
   Navigation Style** takes the other style's apps away; the next time that person opens

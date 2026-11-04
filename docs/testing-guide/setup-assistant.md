@@ -170,7 +170,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 2 | Minimize the panel and reload. | It does not come back. |
 | 3 | At least 24 hours later, open the **Find** tab. | A floating tip, **Find Exactly the Records You Need**, with **Got it**. |
 | 4 | Click **Got it** and reload. | The tip does not come back. |
-| 5 | In Setup, **In-App Guidance**, find the prompts. | Four start with "BarnCRM tips": BarnCRM Settings, Import, Find and Bulk Update. |
+| 5 | In Setup, **In-App Guidance**, find the prompts. | Four start with "BarnCRM tips": BarnCRM Settings, Import, Find and Super Transformer. |
 
 **Cleanup:** remove **BarnCRM Find and Export** from the staff user.
 

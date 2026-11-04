@@ -100,8 +100,8 @@
         <fullName>Core_HubHome_BadgeOverdue</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: badge on a nightly job tile that has run before and is now late</shortDescription>
+        <protected>false</protected>
+        <shortDescription>Overdue badge: a late nightly job tile; Funders Grant Calendar overdue mark</shortDescription>
         <value>Overdue</value>
     </labels>
     <labels>
