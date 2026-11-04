@@ -23,9 +23,6 @@ import title from '@salesforce/label/c.Giving_GiftBatch_Title';
 import controlTotalLabel from '@salesforce/label/c.Giving_GiftBatch_ControlTotalLabel';
 import enteredLabel from '@salesforce/label/c.Giving_GiftBatch_EnteredLabel';
 import balanced from '@salesforce/label/c.Giving_GiftBatch_Balanced';
-import shortBy from '@salesforce/label/c.Giving_GiftBatch_ErrorShortOfControlTotal';
-import overBy from '@salesforce/label/c.Giving_GiftBatch_ErrorOverControlTotal';
-import noControlTotal from '@salesforce/label/c.Giving_GiftBatch_ErrorNoControlTotal';
 import columnLine from '@salesforce/label/c.Giving_GiftBatch_ColumnLine';
 import columnDonor from '@salesforce/label/c.Giving_GiftBatch_ColumnDonor';
 import columnAmount from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
@@ -49,16 +46,21 @@ import working from '@salesforce/label/c.Core_EraseAction_Working';
 import noLines from '@salesforce/label/c.Giving_GiftBatch_NoLines';
 import unsaved from '@salesforce/label/c.Core_Shared_UnsavedChanges';
 import savedToast from '@salesforce/label/c.Giving_GiftBatch_Saved';
-import postedToast from '@salesforce/label/c.Giving_GiftBatch_PostedToast';
 import errorLoadBatch from '@salesforce/label/c.Giving_GiftBatch_ErrorLoadBatch';
-import noAccess from '@salesforce/label/c.Giving_GiftBatch_ErrorNoAccess';
 import errorSaveRows from '@salesforce/label/c.Giving_GiftBatch_ErrorSaveRows';
-import errorPostFailed from '@salesforce/label/c.Giving_GiftBatch_ErrorPostFailed';
+import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FIELDS = [CONTROL_TOTAL, STATUS];
 const PERSON = 'person';
 const ORGANIZATION = 'organization';
+/**
+ * Secondary fields under each name in the donor pickers (people-giving-1): email and city for
+ * a person, city for an organization, so two people with one name are told apart.
+ */
+const CONTACT_DISPLAY_INFO = { additionalFields: ['Email', 'MailingCity'] };
+const PERSON_ACCOUNT_DISPLAY_INFO = { additionalFields: ['PersonEmail', 'BillingCity'] };
+const ORGANIZATION_DISPLAY_INFO = { additionalFields: ['BillingCity'] };
 /** How long typing has to pause before the payments of the lines changed are looked up. */
 const PAYMENT_LOOKUP_DELAY_MS = 300;
 
@@ -87,10 +89,12 @@ export default class GiftBatchEntry extends LightningElement {
     title,
     controlTotalLabel,
     enteredLabel,
-    get postedNote() {
-      return helpText('Giving', 'Giving_GiftBatch_PostedNote');
+    get createdNote() {
+      return helpText('Giving', 'Giving_GiftBatch_CreatedNote');
     },
-    noAccess,
+    get noAccess() {
+      return helpText('Giving', 'Giving_GiftBatch_ErrorNoAccess');
+    },
     columnLine,
     columnDonor,
     columnAmount,
@@ -111,12 +115,16 @@ export default class GiftBatchEntry extends LightningElement {
     postButton,
     working,
     noLines,
+    get noLinesHelp() {
+      return helpText('Giving', 'Giving_GiftBatch_NoLinesHelp');
+    },
     unsaved,
     get useComputer() {
       return helpText('Giving', 'Giving_GiftBatch_UseComputer');
     }
   };
 
+  icons = { batch: iconFor('Gift_Batch__c') };
   fundObject = FUND_OBJECT.objectApiName;
   appealObject = APPEAL_OBJECT.objectApiName;
 
@@ -281,22 +289,33 @@ export default class GiftBatchEntry extends LightningElement {
   /** The balance, said in words, so it never depends on colour alone. */
   get balanceText() {
     if (this.controlTotal === null || this.controlTotal === undefined) {
-      return noControlTotal;
+      return helpText('Giving', 'Giving_GiftBatch_ErrorNoControlTotal');
     }
     const gap = Math.round((this.controlTotal - this.enteredTotal) * 100) / 100;
     if (gap === 0) {
       return balanced;
     }
     const amount = Math.abs(gap).toFixed(2);
-    return (gap > 0 ? shortBy : overBy).replace('{0}', amount);
+    return gap > 0
+      ? helpText('Giving', 'Giving_GiftBatch_ErrorShortOfControlTotal', amount)
+      : helpText('Giving', 'Giving_GiftBatch_ErrorOverControlTotal', amount);
   }
 
   get isBalanced() {
     return this.balanceText === balanced;
   }
 
-  get balanceClass() {
-    return this.isBalanced ? 'slds-text-color_success' : 'slds-text-color_error';
+  /** Balanced is done; anything else is something to check before the gifts are created. */
+  get balanceVariant() {
+    return this.isBalanced ? 'success' : 'warning';
+  }
+
+  get personDisplayInfo() {
+    return this.batch?.hasPersonAccounts ? PERSON_ACCOUNT_DISPLAY_INFO : CONTACT_DISPLAY_INFO;
+  }
+
+  get organizationDisplayInfo() {
+    return ORGANIZATION_DISPLAY_INFO;
   }
 
   get postDisabled() {
@@ -537,11 +556,11 @@ export default class GiftBatchEntry extends LightningElement {
         return;
       }
       this.formError = null;
-      this.toast(postedToast.replace('{0}', result.giftCount), 'success');
+      this.toast(helpText('Giving', 'Giving_GiftBatch_CreatedToast', result.giftCount), 'success');
       await notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
       await this.load();
     } catch (error) {
-      this.formError = messageOf(error, errorPostFailed);
+      this.formError = messageOf(error, helpText('Giving', 'Giving_GiftBatch_ErrorCreateFailed'));
     } finally {
       this.busy = false;
     }

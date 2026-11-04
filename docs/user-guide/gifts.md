@@ -10,7 +10,7 @@ Quick Gift Entry is the first tab of the BarnCRM Fundraising app. On a computer 
 
 1. Open the **Quick Gift Entry** tab, or click **Quick Gift Entry** in the utility bar.
 2. Under **Who gave this gift**, choose **Person** or **Organization**.
-3. Search for the donor in **Donor** (or **Organization**). If the person is not there, click **Not in the list? Add a new person**, create them, then come back and search again.
+3. Search for the donor in **Donor** (or **Organization**). Each name in the list shows the person's email and city (an organization's city), so you can tell two people with the same name apart. If the person is not there, click **Not in the list? Add a new person**, create them, then come back and search again.
 4. Type the **Amount**.
 5. Check the **Gift Date**. It starts at today.
 6. Choose the **Payment Method** (for example **Check**, **Card** or **Cash**).
@@ -18,7 +18,7 @@ Quick Gift Entry is the first tab of the BarnCRM Fundraising app. On a computer 
 8. Check **Appeal** and **Fund**. They start at your organization's defaults; change them if the donor said otherwise.
 9. Click **Save**, or **Save and New** to start the next gift straight away.
 
-You should see: a light notice with a green check icon saying "Gift G-000123 saved" and an **Open This Gift** link. **Save and New** keeps the date, the appeal and the fund, and clears the rest.
+You should see: a green notice with a check icon saying "Gift G-000123 saved" and an **Open This Gift** link. **Save and New** keeps the date, the appeal and the fund, and clears the rest.
 
 If the donor still owes a pledge or recurring payment, a **Pays a scheduled payment** list appears. See [To pay a scheduled payment](#to-pay-a-scheduled-payment) below.
 
@@ -43,16 +43,16 @@ You should see: the payment on the commitment turn **Paid** (or **Partially paid
 4. Type a **Fair market value** if you have one. It is for your reporting only, never printed on the receipt and never added to giving totals. Leave it empty if you do not know.
 5. Click **Save**.
 
-You should see: the gift page shows an **In-kind Gift** section with **In-kind Description** and **Fair Market Value**. A gift that was part money and part goods is two gifts. Use Quick Gift Entry for goods, not the New Gift action, which has no description box.
+You should see: the gift page shows an **In-kind Gift** section with **In-kind Description** and **Fair Market Value**. A gift that was part money and part goods is two gifts.
 
 ## To Add a Gift From a Person's or Organization's Page
 
 1. Open the person, household or organization in the BarnCRM Fundraising app.
-2. Click **New Gift** in the action bar. The donor is already filled in.
-3. Fill in **Amount**, **Payment Method**, **Status** and **Acknowledgment Status**, and choose an **Appeal** if there is one. **Gift Date** defaults to today; change it if the gift arrived on another day.
-4. Click **Save**.
+2. Click **Enter a Gift** in the action bar. Quick Gift Entry opens in a window with the donor already filled in.
+3. Fill in the gift as in [To enter a gift with Quick Gift Entry](#to-enter-a-gift-with-quick-gift-entry): amount, date, payment method, appeal and fund, a pledge payment, goods, a tribute or a match all work here.
+4. Click **Save** (the window closes) or **Save and New** (the window stays open for the next gift from this donor).
 
-You should see: the gift in the record's **Gifts** list. The gift goes to your default fund. Use **Status** `Pending` for money that is promised but has not arrived.
+You should see: the gift in the record's **Gifts** list. For money promised but not arrived yet, an admin can use **New** on the **Gifts** tab and set **Status** to `Pending`.
 
 ## To Read a Gift Page
 
@@ -99,6 +99,8 @@ The **Tribute** panel on the gift shows the tribute and whether the family has b
 5. Type any **Message** from the donor and click **Save**.
 6. When the letter has gone out, open the gift and click **Mark Notification Sent** in the **Tribute** panel.
 
+Quicker, while entering the gift in Quick Gift Entry: open **This Gift Honors Someone** under **Fund**, choose the **Type**, pick the **Honoree Contact** or type the **Honoree Name**, and fill in who to notify. The tribute is saved with the gift. Add a **Message** afterwards from the gift's **Tributes** list if there is one.
+
 You should see: the panel reads "In memory of ..., Notify ..." and then **Notification sent** with the date. BarnCRM does not send the letter; the button records that you did. The **Notifications to Send** list view on Tributes shows the ones still waiting.
 
 ## To Link a Matching Gift
@@ -112,13 +114,15 @@ When an employer matches an employee's gift, the employer is the donor of its ow
 
 You should see: on the employer's gift, the employee in **Soft Credits** as **Matched Donor**, marked **Automatic**. The employee's gift shows the link in its own **Matched Gift**. You enter the link once, from the employer's side. To undo it, clear **Matched Gift**.
 
+Quicker, when you enter the employer's gift in Quick Gift Entry: with the organization as donor, open **Matches an Employee's Gift** under **Fund** and choose the employee's gift from the list (gifts from people whose **Employer** is this organization, not matched yet, newest first). Saving the gift links both sides.
+
 ## Common Problems
 
 - "This gift has a receipt number, so its amount, date, donor and in-kind description cannot change. Void the receipt and reissue it, or record a refund." The donor holds a receipt for this gift. Use **Void and Reissue** ([Receipts and acknowledgments](receipts-and-acknowledgments.md)) or record a refund.
 - "This gift has been posted to accounting, so its date, amount, donor, payment method, reference and funds cannot change and it cannot be deleted." The bookkeeper has exported it. Record a refund, or ask whoever posts gifts to unpost it.
 - "This gift is dated in a closed accounting period (the books are closed through ...)" The books for that month are closed. Record a refund instead: it is dated today.
 - "The books are closed through ..., so a gift dated on or before that day cannot be added to them." Date the gift after the close date, or ask your admin.
-- "Enter a donor contact or a donor account, not both. A gift has exactly one donor." Clear one of the two donor fields.
+- "Choose one donor: a person or an organization, not both." Clear one of the two donor fields.
 - "A gift amount cannot be zero." Enter the amount received. For goods, set **Payment Method** to **In-kind**.
 - "The gift was saved, but it is already split across more than one fund, so the fund you chose was not applied." Open the gift to check its **Gift Allocations**.
 - "The donor's scheduled payments could not be loaded." You can still save the gift on its own and link it to the payment later.

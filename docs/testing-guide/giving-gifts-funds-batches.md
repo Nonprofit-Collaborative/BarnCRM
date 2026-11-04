@@ -48,7 +48,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Click **New** on the **Gifts** tab. Fill both **Donor Contact** (Harper Garcia) and **Donor Account** (any organization), **Amount** `10`, today, `Cash`. Save. | Refused: "Enter a donor contact or a donor account, not both. A gift has exactly one donor." |
+| 1 | Click **New** on the **Gifts** tab. Fill both **Donor Contact** (Harper Garcia) and **Donor Account** (any organization), **Amount** `10`, today, `Cash`. Save. | Refused: "Choose one donor: a person or an organization, not both." |
 | 2 | Clear **Donor Account**, set **Amount** `0`, save. | Refused: "A gift amount cannot be zero. Enter what was received; money going back is recorded with Refund or Write Off on the original gift..." |
 | 3 | Set **Amount** `-10`, save. | Refused: "A negative gift is a refund or a write-off, so it must name the original gift it reverses. Use the Refund or Write Off action on the original gift..." Cancel the form. |
 | 4 | On the **All Gifts** list view, filter **Status** equals Pending, and open one sample gift (for example from Charlotte Osei, 450). | **Status** is Pending. |
@@ -74,9 +74,29 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 5 | Change the amount to `30`. | **Save** and **Save and New** are enabled again. Do not save. |
 | 6 | Click **Open This Gift**. | The gift shows **Donor Account** Founders Consulting Group, 25.00, Cash, appeal Annual Fund, one allocation to General Fund. |
 | 7 | Open the utility bar at the bottom of any BarnCRM Fundraising page. | **Quick Gift Entry** opens there over the page. |
-| 8 | Save another gift and look at the saved message. | A light notice with a green success icon, not a solid green box: "Gift G-... saved" and the **Open This Gift** link are dark text on a light background, easy to read, and the link opens the gift. |
+| 8 | Save another gift and look at the saved message. | A green success notice with a check icon: "Gift G-... saved" and an underlined **Open This Gift** link in the notice's own text color, easy to read; the link opens the gift. |
+| 9 | Click **Save and New**, then type `Garc` in **Donor**. | Each name in the list shows the person's email and mailing city under it. Switch to **Organization** and type `Found`: each organization shows its billing city. |
+| 10 | Open **Luis Garcia**'s page in the BarnCRM Fundraising app and click **Enter a Gift** in the action bar. | A window titled **Enter a Gift** opens with Quick Gift Entry inside (no second Quick Gift Entry title), **Person** chosen and **Luis Garcia** in **Donor**. |
+| 11 | Enter **Amount** `15`, **Payment Method** `Cash`, click **Save**. | The window closes, a "Gift Saved" toast shows, and the gift is in the page's **Gifts** list. |
+| 12 | Open **Founders Consulting Group** and click **Enter a Gift**. | **Organization** is chosen with Founders Consulting Group as donor. Close the window. |
 
 **Cleanup:** set **Default appeal** back to empty if later scripts expect none.
+
+## T-GIFT-04b: Tribute and Matching Gift in Quick Gift Entry
+
+**Purpose:** confirm the collapsed honors section saves a tribute with the gift, and an organization's gift can match an employee's gift chosen from a list.
+**Prerequisites:** staff; General Fund is the default. As admin, set **Employer** on **Harper Garcia** to **Founders Consulting Group**, and enter one gift of `100` from Harper Garcia.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Quick Gift Entry**. | Under **Fund**, two collapsed sections: **This Gift Honors Someone** (and, once an organization donor is chosen, **Matches an Employee's Gift**). |
+| 2 | Pick **Luis Garcia**, **Amount** `40`, **Payment Method** `Check`. Open **This Gift Honors Someone** and type `Rosa Garcia` in **Honoree Name** only. Click **Save**. | Under **Type**: "Choose whether this gift is in honor of someone or in memory of them." Nothing is saved. |
+| 3 | Choose **Type** `In memory of` and click **Save**, then **Open This Gift**. | Saved. The gift's **Tribute** card reads In memory of Rosa Garcia. |
+| 4 | Back on Quick Gift Entry, switch to **Organization**, pick **Founders Consulting Group**, **Amount** `100`, **Payment Method** `Check`. Open **Matches an Employee's Gift**. | **Matched Gift** lists Harper Garcia's 100.00 gift with its date and gift number, after **None**. |
+| 5 | Choose that gift and click **Save**, then **Open This Gift**. | **Matched Gift** names Harper's gift, and **Soft Credits** shows Harper Garcia as **Matched Donor**. Harper's gift shows the link in its own **Matched Gift**. |
+| 6 | Pick an organization no one names as Employer and open **Matches an Employee's Gift**. | "No gift to match yet: nobody whose Employer is this organization has a gift that is not already matched." |
+
+**Cleanup:** none.
 
 ## T-GIFT-05: Quick Gift Entry Refusals and In-Kind Fields
 
@@ -132,15 +152,15 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Gift Batches** tab, click **New**. **Description** `Tuesday mail`, **Control Total** `350`, **Default Appeal** `Annual Fund`; leave **Default Fund** empty. Save. | **Default Gift Date** is today and **Default Payment Method** is Check. The batch opens with the **Lines** card: **Control total** $350.00, **Entered** $0.00, "No lines yet. Click Add line and type the first check." |
-| 2 | Click **Add line**. Pick **Harper Garcia**, **Amount** `100`, **Check Number** `1042`. | Status line: "This batch does not balance: the lines add up to 250.00 less than the control total..." **Post batch** is disabled. |
-| 3 | **Add line**, switch it to **Organization**, pick **The Summit Foundation**, **Amount** `200`, **Fund** `Building Fund`. | Other cells show **As the batch**. Status: 50.00 less. |
-| 4 | **Add line**, a person (Luis Garcia), **Amount** `75`. | Status: "...25.00 more than the control total..." |
-| 5 | Change that amount to `50`. | Status: "Balanced: the lines add up to the control total." |
+| 1 | Open the **Gift Batches** tab, click **New**. **Description** `Tuesday mail`, **Control Total** `350`, **Default Appeal** `Annual Fund`; leave **Default Fund** empty. Save. | **Default Gift Date** is today and **Default Payment Method** is Check. The batch opens with the **Lines** card: two figure tiles, **Control total** $350.00 and **Entered** $0.00, and an empty state **No Lines Yet**, "Choose Add Line and type the first check.", with an **Add Line** button. |
+| 2 | Click **Add Line**. Pick **Harper Garcia** (the list shows email and city under each name), **Amount** `100`, **Check Number** `1042`. | Amber notice: "This batch does not balance: the lines add up to 250.00 less than the control total..." **Create Gifts** is disabled. |
+| 3 | **Add Line**, switch it to **Organization**, pick **The Summit Foundation**, **Amount** `200`, **Fund** `Building Fund`. | Other cells show **As the batch**. Status: 50.00 less. |
+| 4 | **Add Line**, a person (Luis Garcia), **Amount** `75`. | Status: "...25.00 more than the control total..." |
+| 5 | Change that amount to `50`. | Green notice: "Balanced: the lines add up to the control total." |
 | 6 | Click **Save**, then reload the page. | "Lines saved." The three lines are still there. The **Open Batches** list view lists `Tuesday mail`. |
-| 7 | Click **Post batch**. | "Batch posted: 3 gifts created." The note "This batch is posted. Each line links to the gift it became..." shows; no **Add line**, **Save** or **Post batch**. |
+| 7 | Click **Create Gifts**. | "Gifts created: 3 from this batch." The green note "These gifts have been created. Each line links to its gift..." shows; no **Add Line**, **Save** or **Create Gifts**. |
 | 8 | Click the first line's gift link. | Gift dated today, Check, appeal Annual Fund, **Payment Reference** 1042, one allocation to General Fund. The Summit Foundation gift is allocated to Building Fund. |
-| 9 | Back on the batch, click **Edit**, change **Control Total**, save. | Refused: "This batch has been posted and can no longer be changed. To correct one of its gifts, refund or write off that gift." |
+| 9 | Back on the batch, click **Edit**, change **Control Total**, save. | Refused: "The gifts for this batch have been created, so it can no longer be changed. To correct one of its gifts, refund or write off that gift." |
 
 **Cleanup:** none.
 
@@ -151,12 +171,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff, create a batch `Bad lines`, **Control Total** `60`. **Add line** with **Amount** `60` and no donor. Save. | "Lines saved." Status: Balanced. |
-| 2 | Click **Post batch**. | "Some lines are not finished. Fix the lines marked below, then post again." Line 1 shows "This line has no donor. Find the person or organization that gave." No gift is created. |
-| 3 | Pick **Harper Garcia** on line 1 and set its **Amount** to `100`. **Add line** for **Luis Garcia** with **Amount** `-40`. | Status: Balanced (100 less 40 is 60). |
-| 4 | Click **Post batch**. | "Some lines are not finished..." Line 2 shows "This line needs an amount greater than zero. Money that went back is recorded as a refund on the gift, not here." No gift is created. |
-| 5 | Set line 2's **Amount** to `40` and line 1's to `20`, then click **Save**. Do not post. | "Lines saved." Status: Balanced. |
-| 6 | As read-only, open **Gift Batches**, list view **Open Batches**, open `Bad lines`. | "You can see this batch but not change or post it. Ask your BarnCRM admin for the Giving Staff permission set, or for edit access to this batch." No **Add line**, **Save** or **Post batch**. |
+| 1 | As staff, create a batch `Bad lines`, **Control Total** `60`. **Add Line** with **Amount** `60` and no donor. Save. | "Lines saved." Status: Balanced. |
+| 2 | Click **Create Gifts**. | Red notice: "Some lines are not finished. Fix the lines marked below, then choose Create Gifts again." Line 1 shows a red notice "This line has no donor. Find the person or organization that gave." No gift is created. |
+| 3 | Pick **Harper Garcia** on line 1 and set its **Amount** to `100`. **Add Line** for **Luis Garcia** with **Amount** `-40`. | Status: Balanced (100 less 40 is 60). |
+| 4 | Click **Create Gifts**. | "Some lines are not finished..." Line 2 shows "This line needs an amount greater than zero. Money that went back is recorded as a refund on the gift, not here." No gift is created. |
+| 5 | Set line 2's **Amount** to `40` and line 1's to `20`, then click **Save**. Do not create the gifts. | "Lines saved." Status: Balanced. |
+| 6 | As read-only, open **Gift Batches**, list view **Open Batches**, open `Bad lines`. | "You can see this batch but not change it or create its gifts. Ask your BarnCRM admin for the Giving Staff permission set, or for edit access to this batch." No **Add Line**, **Save** or **Create Gifts**. |
 | 7 | As read-only, look at the **Gift Batches** tab header. | No **New** button. |
 
 **Cleanup:** as admin, delete batch `Bad lines` (staff cannot delete a batch).
@@ -215,7 +235,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 2 | As staff, open a gift. | **Edit** and **Refund or Write Off** show; **Delete** does not. |
 | 3 | As read-only, open the **BarnCRM Fundraising** app. | No **Quick Gift Entry** tab. **Gifts**, **Funds** and **Appeals** show no **New** button. |
 | 4 | As read-only, open a gift. | No **Edit** or **Delete**. The **Soft Credits** panel's **Add Credit** is disabled. |
-| 5 | As read-only, open a person with gifts in the BarnCRM Fundraising app. | The **Giving** section and **Gifts** list show; there is no **New Gift** button. |
+| 5 | As read-only, open a person with gifts in the BarnCRM Fundraising app. | The **Giving** section and **Gifts** list show; there is no **Enter a Gift** button. |
 
 **Cleanup:** none.
 

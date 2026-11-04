@@ -1,34 +1,54 @@
 <template>
     <template lwc:if={helpReady}>
-  <lightning-card title={labels.title} icon-name="custom:custom13">
-    <div class="slds-p-horizontal_medium">
+  <lightning-card title={labels.title} icon-name={icons.batch}>
+    <div class="slds-var-p-horizontal_medium">
       <template lwc:if={loaded}>
-        <dl class="slds-list_horizontal slds-wrap slds-m-bottom_small">
-          <dt class="slds-item_label slds-text-color_weak">{labels.controlTotalLabel}</dt>
-          <dd class="slds-item_detail" data-id="control-total">
-            <lightning-formatted-number
+        <div class="slds-grid slds-wrap slds-gutters_x-small">
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+            <c-barn-stat-tile
+              label={labels.controlTotalLabel}
               value={controlTotal}
               format-style="currency"
-            ></lightning-formatted-number>
-          </dd>
-          <dt class="slds-item_label slds-text-color_weak">{labels.enteredLabel}</dt>
-          <dd class="slds-item_detail" data-id="entered-total">
-            <lightning-formatted-number
+              bordered
+              align="start"
+              data-id="control-total"
+            ></c-barn-stat-tile>
+          </div>
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+            <c-barn-stat-tile
+              label={labels.enteredLabel}
               value={enteredTotal}
               format-style="currency"
-            ></lightning-formatted-number>
-          </dd>
-        </dl>
+              bordered
+              align="start"
+              data-id="entered-total"
+            ></c-barn-stat-tile>
+          </div>
+        </div>
         <template lwc:if={posted}>
-          <p class="slds-m-bottom_small" data-id="posted-note">{labels.postedNote}</p>
+          <c-barn-notice
+            class="slds-show slds-var-m-bottom_small"
+            variant="success"
+            message={labels.createdNote}
+            data-id="posted-note"
+          ></c-barn-notice>
         </template>
         <template lwc:else>
-          <p class={balanceClass} role="status" data-id="balance">{balanceText}</p>
+          <c-barn-notice
+            class="slds-show slds-var-m-bottom_small"
+            variant={balanceVariant}
+            message={balanceText}
+            data-id="balance"
+          ></c-barn-notice>
           <template lwc:if={readOnly}>
-            <p class="slds-m-bottom_small" data-id="read-only-note">{labels.noAccess}</p>
+            <c-barn-notice
+              class="slds-show slds-var-m-bottom_small"
+              message={labels.noAccess}
+              data-id="read-only-note"
+            ></c-barn-notice>
           </template>
           <template lwc:else>
-            <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small">
               {labels.fromBatchHelp}
             </p>
           </template>
@@ -36,46 +56,67 @@
       </template>
 
       <template lwc:if={formError}>
-        <div class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_small" role="alert">
-          <span data-id="form-error">{formError}</span>
-        </div>
+        <c-barn-notice
+          class="slds-show slds-var-m-bottom_small"
+          variant="error"
+          message={formError}
+          data-id="form-error"
+        ></c-barn-notice>
       </template>
 
       <template lwc:if={paymentLoadFailed}>
-        <p class="slds-text-body_small slds-m-bottom_small" role="status" data-id="pays-error">{labels.paysErrorLoad}</p>
+        <c-barn-notice
+          class="slds-show slds-var-m-bottom_small"
+          variant="warning"
+          message={labels.paysErrorLoad}
+          data-id="pays-error"
+        ></c-barn-notice>
       </template>
 
       <template lwc:if={isPhone}>
-        <p class="slds-text-body_small slds-m-bottom_small" data-id="use-computer">{labels.useComputer}</p>
+        <c-barn-notice
+          class="slds-show slds-var-m-bottom_small"
+          message={labels.useComputer}
+          data-id="use-computer"
+        ></c-barn-notice>
       </template>
 
       <template lwc:if={hasLines}>
         <div class="slds-scrollable_x">
-          <table class="slds-table slds-table_bordered slds-table_cell-buffer" aria-label={labels.title}>
+          <table
+            class="slds-table slds-table_bordered slds-table_cell-buffer"
+            aria-label={labels.title}
+            data-wide-table
+          >
             <thead>
               <tr class="slds-line-height_reset">
-                <th scope="col">{labels.columnLine}</th>
-                <th scope="col">{labels.columnDonor}</th>
-                <th scope="col">{labels.columnAmount}</th>
-                <th scope="col">{labels.columnReference}</th>
-                <th scope="col">{labels.columnDate}</th>
-                <th scope="col">{labels.columnMethod}</th>
-                <th scope="col">{labels.columnFund}</th>
-                <th scope="col">{labels.columnAppeal}</th>
-                <th scope="col">{labels.columnPays}</th>
-                <th scope="col">{labels.columnGift}</th>
+                <th scope="col" data-label={labels.columnLine}>{labels.columnLine}</th>
+                <th scope="col" data-label={labels.columnDonor}>{labels.columnDonor}</th>
+                <th scope="col" data-label={labels.columnAmount}>{labels.columnAmount}</th>
+                <th scope="col" data-label={labels.columnReference}>{labels.columnReference}</th>
+                <th scope="col" data-label={labels.columnDate}>{labels.columnDate}</th>
+                <th scope="col" data-label={labels.columnMethod}>{labels.columnMethod}</th>
+                <th scope="col" data-label={labels.columnFund}>{labels.columnFund}</th>
+                <th scope="col" data-label={labels.columnAppeal}>{labels.columnAppeal}</th>
+                <th scope="col" data-label={labels.columnPays}>{labels.columnPays}</th>
+                <th scope="col" data-label={labels.columnGift}>{labels.columnGift}</th>
               </tr>
             </thead>
             <tbody>
               <template for:each={rows} for:item="row">
                 <tr key={row.key} data-id="line">
-                  <td>
+                  <td data-label={labels.columnLine}>
                     {row.number}
                     <template lwc:if={row.hasErrors}>
-                      <p class="slds-text-color_error" role="alert" data-id="line-error">{row.errors}</p>
+                      <c-barn-notice
+                        class="slds-show slds-var-m-top_xx-small"
+                        variant="error"
+                        message={row.errors}
+                        data-id="line-error"
+                      ></c-barn-notice>
                     </template>
                   </td>
-                  <td>
+                  <td data-label={labels.columnDonor}>
                     <template lwc:if={showKind}>
                       <lightning-combobox
                         label={row.cellLabels.kind}
@@ -94,6 +135,7 @@
                         variant="label-hidden"
                         placeholder={labels.donorPlaceholder}
                         object-api-name={row.donorObject}
+                        display-info={personDisplayInfo}
                         value={row.donorId}
                         disabled={locked}
                         data-key={row.key}
@@ -107,6 +149,7 @@
                         variant="label-hidden"
                         placeholder={labels.donorPlaceholder}
                         object-api-name="Account"
+                        display-info={organizationDisplayInfo}
                         value={row.donorId}
                         disabled={locked}
                         data-key={row.key}
@@ -115,7 +158,7 @@
                       ></lightning-record-picker>
                     </template>
                   </td>
-                  <td>
+                  <td data-label={labels.columnAmount}>
                     <lightning-input
                       type="number"
                       formatter="currency"
@@ -129,7 +172,7 @@
                       onchange={handleField}
                     ></lightning-input>
                   </td>
-                  <td>
+                  <td data-label={labels.columnReference}>
                     <lightning-input
                       label={row.cellLabels.reference}
                       variant="label-hidden"
@@ -141,7 +184,7 @@
                       onchange={handleField}
                     ></lightning-input>
                   </td>
-                  <td>
+                  <td data-label={labels.columnDate}>
                     <lightning-input
                       type="date"
                       label={row.cellLabels.date}
@@ -153,7 +196,7 @@
                       onchange={handleField}
                     ></lightning-input>
                   </td>
-                  <td>
+                  <td data-label={labels.columnMethod}>
                     <lightning-combobox
                       label={row.cellLabels.method}
                       variant="label-hidden"
@@ -165,7 +208,7 @@
                       onchange={handleField}
                     ></lightning-combobox>
                   </td>
-                  <td>
+                  <td data-label={labels.columnFund}>
                     <lightning-record-picker
                       label={row.cellLabels.fund}
                       variant="label-hidden"
@@ -177,7 +220,7 @@
                       onchange={handleField}
                     ></lightning-record-picker>
                   </td>
-                  <td>
+                  <td data-label={labels.columnAppeal}>
                     <lightning-record-picker
                       label={row.cellLabels.appeal}
                       variant="label-hidden"
@@ -189,7 +232,7 @@
                       onchange={handleField}
                     ></lightning-record-picker>
                   </td>
-                  <td>
+                  <td data-label={labels.columnPays}>
                     <template lwc:if={row.showPays}>
                       <lightning-combobox
                         label={row.cellLabels.pays}
@@ -206,7 +249,7 @@
                       </p>
                     </template>
                   </td>
-                  <td>
+                  <td data-label={labels.columnGift}>
                     <template lwc:if={row.giftUrl}>
                       <a href={row.giftUrl} data-id="gift-link">{row.giftName}</a>
                     </template>
@@ -228,7 +271,19 @@
         </div>
       </template>
       <template lwc:elseif={editable}>
-        <p class="slds-text-color_weak" data-id="no-lines">{labels.noLines}</p>
+        <c-barn-empty-state
+          heading={labels.noLines}
+          message={labels.noLinesHelp}
+          data-id="no-lines"
+        >
+          <lightning-button
+            label={labels.addLine}
+            icon-name="utility:add"
+            disabled={busy}
+            data-id="empty-add"
+            onclick={handleAdd}
+          ></lightning-button>
+        </c-barn-empty-state>
       </template>
     </div>
 
@@ -246,14 +301,14 @@
           <lightning-button
             label={labels.addLine}
             icon-name="utility:add"
-            class="slds-m-right_x-small"
+            class="slds-var-m-right_x-small"
             disabled={busy}
             data-id="add"
             onclick={handleAdd}
           ></lightning-button>
           <lightning-button
             label={labels.saveButton}
-            class="slds-m-right_x-small"
+            class="slds-var-m-right_x-small"
             disabled={busy}
             data-id="save"
             onclick={handleSave}

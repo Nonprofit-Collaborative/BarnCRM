@@ -138,9 +138,7 @@ describe('c-gift-batch-entry', () => {
 
     expect(getBatch).toHaveBeenCalledWith({ batchId: BATCH_ID });
     expect(pick(element, 'control-total').textContent).toBeDefined();
-    expect(pick(element, 'balance').textContent).toBe(
-      'c.Giving_GiftBatch_ErrorShortOfControlTotal'
-    );
+    expect(pick(element, 'balance').message).toBe('c.Giving_GiftBatch_ErrorShortOfControlTotal');
     expect(pick(element, 'no-lines')).not.toBeNull();
     expect(pick(element, 'post').disabled).toBe(true);
   });
@@ -152,19 +150,21 @@ describe('c-gift-batch-entry', () => {
     await settle();
     change(field(element, 'amount')[0], { value: '100' });
     await settle();
-    expect(pick(element, 'balance').textContent).toBe(
-      'c.Giving_GiftBatch_ErrorShortOfControlTotal'
-    );
+    expect(pick(element, 'balance').message).toBe('c.Giving_GiftBatch_ErrorShortOfControlTotal');
 
     pick(element, 'add').click();
     await settle();
     change(field(element, 'amount')[1], { value: '75' });
     await settle();
-    expect(pick(element, 'balance').textContent).toBe('c.Giving_GiftBatch_ErrorOverControlTotal');
+    expect(pick(element, 'balance').message).toBe('c.Giving_GiftBatch_ErrorOverControlTotal');
 
     change(field(element, 'amount')[1], { value: '50' });
     await settle();
-    expect(pick(element, 'balance').textContent).toBe('c.Giving_GiftBatch_Balanced');
+    expect(pick(element, 'balance').message).toBe('c.Giving_GiftBatch_Balanced');
+    expect(pick(element, 'balance').variant).toBe('success');
+    expect(all(element, 'donor')[0].displayInfo).toEqual({
+      additionalFields: ['Email', 'MailingCity']
+    });
     expect(pick(element, 'post').disabled).toBe(false);
     expect(pick(element, 'unsaved')).not.toBeNull();
   });
@@ -216,10 +216,11 @@ describe('c-gift-batch-entry', () => {
     await settle();
 
     expect(saveLines).not.toHaveBeenCalled();
-    expect(pick(element, 'form-error').textContent).toBe('Some lines are not finished.');
+    expect(pick(element, 'form-error').message).toBe('Some lines are not finished.');
     const errors = all(element, 'line-error');
     expect(errors).toHaveLength(1);
-    expect(errors[0].textContent).toBe('This line has no donor.');
+    expect(errors[0].message).toBe('This line has no donor.');
+    expect(errors[0].variant).toBe('error');
   });
 
   it('saves unsaved lines before posting, then shows the posted batch', async () => {
@@ -277,7 +278,7 @@ describe('c-gift-batch-entry', () => {
     getRecord.emit({ id: BATCH_ID, fields: {} });
     await settle();
 
-    expect(pick(element, 'form-error').textContent).toBe('This batch could not be found.');
+    expect(pick(element, 'form-error').message).toBe('This batch could not be found.');
   });
 
   describe('Pays column', () => {

@@ -11,7 +11,5 @@
   AND(NOT(ISBLANK(Donor_Contact__c)), NOT(ISBLANK(Donor_Account__c)))
 )
   </errorConditionFormula>
-  <errorMessage>
-    Enter a donor contact or a donor account, not both. A gift has exactly one donor.
-  </errorMessage>
+  <errorMessage>Choose one donor: a person or an organization, not both.</errorMessage>
 </ValidationRule>

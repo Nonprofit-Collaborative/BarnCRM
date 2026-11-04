@@ -143,10 +143,14 @@ public with sharing class GiftBatchController {
                 throw new GiftBatchException(Label.Giving_GiftBatch_ErrorBatchMissing);
             }
             if (GiftBatchService.STATUS_POSTED.equals(batch.Status__c)) {
-                throw new GiftBatchException(Label.Giving_GiftBatch_ErrorEditAfterPost);
+                throw new GiftBatchException(
+                    BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorEditAfterCreate')
+                );
             }
             if (!GiftBatchSelector.canEdit(batchId)) {
-                throw new GiftBatchException(Label.Giving_GiftBatch_ErrorNoAccess);
+                throw new GiftBatchException(
+                    BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoAccess')
+                );
             }
             Set<Id> existing = new Map<Id, Gift_Batch_Row__c>(GiftBatchSelector.selectRows(batchId))
                 .keySet();

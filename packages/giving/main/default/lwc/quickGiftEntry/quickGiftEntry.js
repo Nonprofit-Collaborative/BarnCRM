@@ -1,12 +1,16 @@
-import { LightningElement, api } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
+import { LightningElement, api, wire } from 'lwc';
+import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import Toast from 'lightning/toast';
+import LOCALE from '@salesforce/i18n/locale';
+import CURRENCY from '@salesforce/i18n/currency';
 
 import GIFT_OBJECT from '@salesforce/schema/Gift__c';
 import FUND_OBJECT from '@salesforce/schema/Fund__c';
 import APPEAL_OBJECT from '@salesforce/schema/Appeal__c';
 
 import getDefaults from '@salesforce/apex/QuickGiftEntryController.getDefaults';
+import getDonorKind from '@salesforce/apex/QuickGiftEntryController.getDonorKind';
+import getMatchableGifts from '@salesforce/apex/QuickGiftEntryController.getMatchableGifts';
 import saveGift from '@salesforce/apex/QuickGiftEntryController.saveGift';
 import getPaymentChoices from '@salesforce/apex/QuickGiftEntryController.getPaymentChoices';
 
@@ -37,12 +41,16 @@ import errorTitle from '@salesforce/label/c.Giving_QuickGiftEntry_ErrorTitle';
 import errorLoadDefaults from '@salesforce/label/c.Giving_QuickGiftEntry_ErrorLoadDefaults';
 import errorUnexpected from '@salesforce/label/c.Giving_QuickGiftEntry_ErrorUnexpected';
 import fundNotApplied from '@salesforce/label/c.Giving_QuickGiftEntry_FundNotApplied';
+import tributeSection from '@salesforce/label/c.Giving_QuickGiftEntry_TributeSection';
+import matchSection from '@salesforce/label/c.Giving_QuickGiftEntry_MatchSection';
+import matchNone from '@salesforce/label/c.Core_AccessCompare_None';
 import paysLabel from '@salesforce/label/c.Giving_GiftEntryPays_Label';
 import paysNone from '@salesforce/label/c.Giving_GiftEntryPays_None';
 import paysOneSuggested from '@salesforce/label/c.Giving_GiftEntryPays_OneSuggested';
 import paysSeveralSuggested from '@salesforce/label/c.Giving_GiftEntryPays_SeveralSuggested';
 import paysErrorLoad from '@salesforce/label/c.Giving_GiftEntryPays_ErrorLoad';
 import { messageFrom } from 'c/findCsv';
+import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const IN_KIND = 'In-kind';
@@ -52,6 +60,17 @@ const PERSON = 'person';
 const ORGANIZATION = 'organization';
 const ACCOUNT = 'Account';
 const CONTACT = 'Contact';
+/** The key prefix of a contact id, so a donor id with no object name still says what it is. */
+const CONTACT_PREFIX = '003';
+const TRIBUTE_FIELDS = ['tributeType', 'honoreeId', 'honoreeName', 'notifyId', 'notifyName'];
+
+/**
+ * Secondary fields shown under each name in the donor pickers (people-giving-1), so two people
+ * with the same name can be told apart: email and city for a person, city for an organization.
+ */
+const CONTACT_DISPLAY_INFO = { additionalFields: ['Email', 'MailingCity'] };
+const PERSON_ACCOUNT_DISPLAY_INFO = { additionalFields: ['PersonEmail', 'BillingCity'] };
+const ORGANIZATION_DISPLAY_INFO = { additionalFields: ['BillingCity'] };
 
 /** The order the fields appear in, so the first message is the first one to fix. */
 const FIELD_ORDER = [
@@ -63,22 +82,81 @@ const FIELD_ORDER = [
   ['inKindDescription', 'in-kind-description'],
   ['fairMarketValue', 'fair-market-value'],
   ['appealId', 'appeal'],
-  ['fundId', 'fund']
+  ['fundId', 'fund'],
+  ['tributeType', 'tribute-type'],
+  ['honoree', 'honoree', 'honoree-name'],
+  ['matchedGiftId', 'matched-gift']
 ];
+
+/** Which collapsed section holds the field a message is about, so it can be opened. */
+const SECTION_OF = { tributeType: 'tribute', honoree: 'tribute', matchedGiftId: 'match' };
+
+/**
+ * One line of the "Matches an Employee's Gift" list: who gave, how much and when, then the
+ * gift's own name. Framework free, so it ports with the rest of the form's logic (plan 9.9).
+ */
+export function matchChoiceLabel(choice, locale, currency) {
+  const parts = [];
+  if (choice.donorName) {
+    parts.push(choice.donorName);
+  }
+  if (choice.amount !== null && choice.amount !== undefined) {
+    try {
+      parts.push(
+        new Intl.NumberFormat(locale, { style: 'currency', currency }).format(choice.amount)
+      );
+    } catch {
+      parts.push(Number(choice.amount).toFixed(2));
+    }
+  }
+  if (choice.giftDate) {
+    try {
+      parts.push(
+        new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' }).format(
+          new Date(choice.giftDate)
+        )
+      );
+    } catch {
+      parts.push(choice.giftDate);
+    }
+  }
+  return `${parts.join(', ')} (${choice.name})`;
+}
 
 /**
  * Quick gift entry (G-03): one screen, built for a phone, for a gift that has just
  * arrived. Defaults come from BarnCRM Settings, validation messages come back from the
  * controller and are set on the field that caused them through the base components' own
  * validity, so each message is announced and tied to its field.
+ *
+ * The donor starts filled in when the form knows who gave: on a person's or an
+ * organization's page (recordId), from the Enter a Gift action there, or on the Quick Gift
+ * Entry tab opened with c__donorId in the page state (people-giving-12).
  */
 export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Giving');
 
-  /** Set when the component sits on a record page, so the donor can be filled in. */
-  @api recordId;
   /** The object of the record page the component sits on, when it sits on one. */
   @api objectApiName;
+  /** True inside the Enter a Gift action, whose window already carries the title. */
+  @api inAction = false;
+
+  /** Set when the component sits on a record page, so the donor can be filled in. */
+  @api
+  get recordId() {
+    return this.pageRecordId;
+  }
+  set recordId(value) {
+    this.pageRecordId = value;
+    if (this.connected && value) {
+      this.prefillDonor(value, this.objectApiName);
+    }
+  }
+
+  pageRecordId;
+  connected = false;
+  /** The donor named in the page state the last time it was read. */
+  stateDonorId;
 
   labels = {
     heading,
@@ -111,7 +189,15 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     get paysHelp() {
       return helpText('Giving', 'Giving_GiftEntryPays_Help');
     },
-    paysErrorLoad
+    paysErrorLoad,
+    tributeSection,
+    matchSection,
+    get matchHelp() {
+      return helpText('Giving', 'Giving_QuickGiftEntry_MatchHelp');
+    },
+    get matchEmpty() {
+      return helpText('Giving', 'Giving_QuickGiftEntry_MatchEmpty');
+    }
   };
 
   donorKind = PERSON;
@@ -135,7 +221,23 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
   paymentLookup = 0;
   paymentTimer;
 
+  /** The tribute this gift honors (people-giving-23); all empty means none. */
+  tributeType;
+  honoreeId;
+  honoreeName;
+  notifyId;
+  notifyName;
+  /** The employee's gift an organization's gift matches (R-G11). */
+  matchedGiftId = '';
+  matchChoices = [];
+  matchLoaded = false;
+  matchLookup = 0;
+  /** The collapsed sections the person has opened. */
+  openSections = [];
+
   giftTypeOptions = [];
+  tributeTypeOptions = [];
+  fieldLabels = {};
   hasPersonAccounts = false;
   fieldErrors = {};
   formError;
@@ -153,18 +255,43 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
   prefilledDonorId;
   prefilledDonorKind;
 
+  /** The Quick Gift Entry tab opened for a known donor: c__donorId in the page state. */
+  @wire(CurrentPageReference)
+  readPageState(pageRef) {
+    const donorId = pageRef && pageRef.state ? pageRef.state.c__donorId : undefined;
+    if (!donorId || donorId === this.stateDonorId) {
+      return;
+    }
+    this.stateDonorId = donorId;
+    if (!this.pageRecordId) {
+      this.prefillDonor(donorId);
+    }
+  }
+
   connectedCallback() {
+    this.connected = true;
     if (!this.helpReady) {
       loadHelp('Giving').then(() => {
         this.helpReady = true;
       });
     }
-    this.prefillFromRecordPage();
+    if (this.pageRecordId) {
+      this.prefillDonor(this.pageRecordId, this.objectApiName);
+    }
     this.loadDefaults();
   }
 
   disconnectedCallback() {
+    this.connected = false;
     clearTimeout(this.paymentTimer);
+  }
+
+  get cardTitle() {
+    return this.inAction ? undefined : heading;
+  }
+
+  get cardIcon() {
+    return this.inAction ? undefined : iconFor('Quick_Gift_Entry');
   }
 
   get donorKindOptions() {
@@ -196,6 +323,14 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     return this.hasPersonAccounts ? ACCOUNT : CONTACT;
   }
 
+  get personDisplayInfo() {
+    return this.hasPersonAccounts ? PERSON_ACCOUNT_DISPLAY_INFO : CONTACT_DISPLAY_INFO;
+  }
+
+  get organizationDisplayInfo() {
+    return ORGANIZATION_DISPLAY_INFO;
+  }
+
   get accountObjectApiName() {
     return ACCOUNT;
   }
@@ -206,6 +341,35 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
 
   get appealObjectApiName() {
     return APPEAL_OBJECT.objectApiName;
+  }
+
+  get honoreeLabel() {
+    return this.hasPersonAccounts
+      ? this.fieldLabels.honoreeAccount
+      : this.fieldLabels.honoreeContact;
+  }
+
+  get notifyLabel() {
+    return this.hasPersonAccounts ? this.fieldLabels.notifyAccount : this.fieldLabels.notifyContact;
+  }
+
+  /** An organization's gift can match an employee's; a person's cannot (R-G11). */
+  get showMatch() {
+    return this.donorKind === ORGANIZATION && Boolean(this.donorId) && this.isMoneyGift;
+  }
+
+  get hasMatchChoices() {
+    return this.matchChoices.length > 0;
+  }
+
+  get matchOptions() {
+    return [
+      { label: matchNone, value: '' },
+      ...this.matchChoices.map((choice) => ({
+        label: matchChoiceLabel(choice, LOCALE, CURRENCY),
+        value: choice.id
+      }))
+    ];
   }
 
   get savedMessage() {
@@ -237,6 +401,7 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     this.donorKind = event.detail.value;
     this.donorId = undefined;
     this.forgetPayment();
+    this.forgetMatch();
   }
 
   handleDonorChange(event) {
@@ -244,6 +409,8 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     this.donorId = event.detail ? event.detail.recordId : undefined;
     this.forgetPayment();
     this.schedulePaymentLookup();
+    this.forgetMatch();
+    this.lookUpMatches();
   }
 
   handleAmountChange(event) {
@@ -265,6 +432,27 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     this.paymentNote = undefined;
   }
 
+  handleSectionToggle(event) {
+    const open = event.detail ? event.detail.openSections : [];
+    this.openSections = Array.isArray(open) ? open : [open].filter(Boolean);
+  }
+
+  /** Any field of the tribute section: a record picker sends recordId, the rest value. */
+  handleTributeField(event) {
+    this.markChanged(event);
+    const field = event.target.dataset.field;
+    if (!TRIBUTE_FIELDS.includes(field)) {
+      return;
+    }
+    const detail = event.detail || {};
+    this[field] = detail.recordId !== undefined ? detail.recordId : detail.value;
+  }
+
+  handleMatchChange(event) {
+    this.markChanged(event);
+    this.matchedGiftId = event.detail.value || '';
+  }
+
   /** A new donor owes different payments: what was chosen for the last one goes. */
   forgetPayment() {
     this.paymentLookup += 1;
@@ -273,6 +461,38 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     this.paymentPicked = false;
     this.paymentNote = undefined;
     this.paymentLoadFailed = false;
+  }
+
+  /** Another donor has other employees: the gift matched for the last one goes. */
+  forgetMatch() {
+    this.matchLookup += 1;
+    this.matchChoices = [];
+    this.matchLoaded = false;
+    this.matchedGiftId = '';
+  }
+
+  /**
+   * Asks for the gifts this organization's gift can match. Only the latest answer is used, and
+   * a failure leaves the section empty: the gift still saves, and the match can be linked from
+   * the gift page later.
+   */
+  async lookUpMatches() {
+    if (this.donorKind !== ORGANIZATION || !this.donorId) {
+      return;
+    }
+    const lookup = ++this.matchLookup;
+    try {
+      const choices = await getMatchableGifts({ organizationId: this.donorId });
+      if (lookup === this.matchLookup) {
+        this.matchChoices = Array.isArray(choices) ? choices : [];
+        this.matchLoaded = true;
+      }
+    } catch {
+      if (lookup === this.matchLookup) {
+        this.matchChoices = [];
+        this.matchLoaded = true;
+      }
+    }
   }
 
   /** Waits for typing to pause, so a lookup is not made for every digit of an amount. */
@@ -352,6 +572,7 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     this.giftType = event.detail.value;
     if (this.isInKindGift) {
       this.amount = undefined;
+      this.matchedGiftId = '';
     } else {
       this.inKindDescription = undefined;
       this.fairMarketValue = undefined;
@@ -428,6 +649,11 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
         label: option.label,
         value: option.value
       }));
+      this.tributeTypeOptions = (this.defaults.tributeTypes || []).map((option) => ({
+        label: option.label,
+        value: option.value
+      }));
+      this.fieldLabels = this.defaults.fieldLabels || {};
       this.applyDefaults();
     } catch (error) {
       this.formError = messageFrom(error, errorLoadDefaults);
@@ -447,23 +673,44 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
   }
 
   /**
-   * On a person's or a household's page the donor is the record the person is looking
-   * at, so the form starts with it filled in.
+   * The donor is someone the person is already looking at: the record page the form sits on,
+   * the record the Enter a Gift action was started from, or the c__donorId the tab was opened
+   * with. A contact is a person straight away; for an account the controller says whether it
+   * is an organization or, where people are accounts, a person.
    */
-  prefillFromRecordPage() {
-    if (!this.recordId || !this.objectApiName) {
+  prefillDonor(donorId, objectApiName) {
+    const isContact =
+      objectApiName === CONTACT || (!objectApiName && String(donorId).startsWith(CONTACT_PREFIX));
+    if (objectApiName && objectApiName !== CONTACT && objectApiName !== ACCOUNT) {
       return;
     }
-    if (this.objectApiName === CONTACT) {
-      this.prefilledDonorKind = PERSON;
-    } else if (this.objectApiName === ACCOUNT) {
-      this.prefilledDonorKind = ORGANIZATION;
-    } else {
-      return;
-    }
-    this.prefilledDonorId = this.recordId;
+    this.prefilledDonorId = donorId;
+    this.prefilledDonorKind = isContact ? PERSON : ORGANIZATION;
     this.donorKind = this.prefilledDonorKind;
-    this.donorId = this.recordId;
+    this.donorId = donorId;
+    this.forgetMatch();
+    if (isContact) {
+      return;
+    }
+    this.confirmDonorKind(donorId);
+  }
+
+  async confirmDonorKind(donorId) {
+    let kind;
+    try {
+      kind = await getDonorKind({ donorId });
+    } catch {
+      // The guess stands: an account is an organization unless the controller says otherwise.
+      kind = undefined;
+    }
+    if (this.donorId !== donorId) {
+      return;
+    }
+    if (kind === PERSON || kind === ORGANIZATION) {
+      this.prefilledDonorKind = kind;
+      this.donorKind = kind;
+    }
+    this.lookUpMatches();
   }
 
   async save(startAnother) {
@@ -496,6 +743,11 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
           variant: 'success'
         },
         this
+      );
+      this.dispatchEvent(
+        new CustomEvent('giftsaved', {
+          detail: { giftId: result.giftId, startAnother: startAnother === true }
+        })
       );
       if (startAnother) {
         this.startAnotherGift();
@@ -533,7 +785,13 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
       paymentReference: this.paymentReference || null,
       inKindDescription: this.isInKindGift ? this.inKindDescription || null : null,
       fairMarketValue: this.isInKindGift ? this.numberOrNull(this.fairMarketValue) : null,
-      installmentId: this.isMoneyGift && this.installmentId ? this.installmentId : null
+      installmentId: this.isMoneyGift && this.installmentId ? this.installmentId : null,
+      tributeType: this.tributeType || null,
+      honoreeId: this.honoreeId || null,
+      honoreeName: this.honoreeName || null,
+      notifyId: this.notifyId || null,
+      notifyName: this.notifyName || null,
+      matchedGiftId: this.showMatch && this.matchedGiftId ? this.matchedGiftId : null
     };
   }
 
@@ -558,10 +816,21 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     fieldErrors.forEach((fieldError) => {
       errors[fieldError.field] = fieldError.message;
     });
+    this.openSectionsFor(errors);
     this.setFieldErrors(errors);
     this.formError = result && result.formError ? result.formError : undefined;
     if (!this.formError && fieldErrors.length === 0) {
       this.formError = errorUnexpected;
+    }
+  }
+
+  /** A message on a field inside a collapsed section opens that section, so it can be seen. */
+  openSectionsFor(errors) {
+    const wanted = Object.keys(errors)
+      .map((key) => SECTION_OF[key])
+      .filter((section) => section && !this.openSections.includes(section));
+    if (wanted.length > 0) {
+      this.openSections = [...this.openSections, ...new Set(wanted)];
     }
   }
 
@@ -616,9 +885,15 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     this.inKindDescription = undefined;
     this.fairMarketValue = undefined;
     this.paymentReference = undefined;
+    TRIBUTE_FIELDS.forEach((field) => {
+      this[field] = undefined;
+    });
+    this.openSections = [];
     this.forgetPayment();
+    this.forgetMatch();
     if (this.donorId) {
       this.schedulePaymentLookup();
+      this.lookUpMatches();
     }
     this.setFieldErrors({});
     const donor = this.template.querySelector('[data-id="donor-person"]')

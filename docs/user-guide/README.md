@@ -28,7 +28,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Gifts (Nonprofit Edition)
 
-- [Entering gifts](gifts.md): Quick Gift Entry, the New Gift action, funds, soft credits, tributes, in-kind and matching gifts.
+- [Entering gifts](gifts.md): Quick Gift Entry, the Enter a Gift action, funds, soft credits, tributes, in-kind and matching gifts.
 - [Gift batches](gift-batches.md): typing a stack of checks against a deposit total.
 - [Pledges and recurring gifts](commitments.md): commitments, installments and paying them.
 - [The Ask Pipeline](ask-pipeline.md): tracking asks by step on a board, and closing them as won, declined or withdrawn.

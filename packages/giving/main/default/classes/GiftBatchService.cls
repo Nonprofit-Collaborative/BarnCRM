@@ -79,7 +79,11 @@ public with sharing class GiftBatchService {
             Boolean hasAccount = row.Donor_Account__c != null;
             if (hasContact && hasAccount) {
                 problems.add(
-                    new LineProblem(row.Id, line, Label.Giving_GiftBatch_ErrorRowDonorBoth)
+                    new LineProblem(
+                        row.Id,
+                        line,
+                        BarnHelp.text('Giving', 'Giving_GiftEntry_ErrorOneDonor')
+                    )
                 );
             } else if (!hasContact && !hasAccount) {
                 problems.add(
@@ -174,14 +178,20 @@ public with sharing class GiftBatchService {
             if (outcome.formError == null) {
                 outcome.lineProblems = validateRows(batch, rows);
                 if (!outcome.lineProblems.isEmpty()) {
-                    outcome.formError = Label.Giving_GiftBatch_ErrorRowsIncomplete;
+                    outcome.formError = BarnHelp.text(
+                        'Giving',
+                        'Giving_GiftBatch_ErrorRowsIncomplete'
+                    );
                 }
             }
             if (outcome.formError == null) {
                 outcome.lineProblems = createGifts(batch, rows);
                 if (!outcome.lineProblems.isEmpty()) {
                     Database.rollback(before);
-                    outcome.formError = Label.Giving_GiftBatch_ErrorPostFailed;
+                    outcome.formError = BarnHelp.text(
+                        'Giving',
+                        'Giving_GiftBatch_ErrorCreateFailed'
+                    );
                     return outcome;
                 }
                 GiftBatchWriter.markPosted(batch.Id);
@@ -193,7 +203,7 @@ public with sharing class GiftBatchService {
             Database.rollback(before);
             ErrorLogger.log(e, CONTEXT, batchId);
             PostOutcome failed = new PostOutcome();
-            failed.formError = Label.Giving_GiftBatch_ErrorPostFailed;
+            failed.formError = BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorCreateFailed');
             return failed;
         }
     }
@@ -204,27 +214,27 @@ public with sharing class GiftBatchService {
             return Label.Giving_GiftBatch_ErrorBatchMissing;
         }
         if (STATUS_POSTED.equals(batch.Status__c)) {
-            return Label.Giving_GiftBatch_ErrorAlreadyPosted;
+            return BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorAlreadyCreated');
         }
         // Posting writes the batch and its lines. GiftBatchWriter does that in system mode but
         // with sharing, so someone who can only read this batch would reach it and fail there,
         // after the gifts: refuse them here, in words, before anything is created.
         if (!GiftBatchSelector.canEdit(batch.Id)) {
-            return Label.Giving_GiftBatch_ErrorNoAccess;
+            return BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoAccess');
         }
         if (rows.isEmpty()) {
-            return Label.Giving_GiftBatch_ErrorNoRows;
+            return BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoRows');
         }
         if (batch.Control_Total__c == null) {
-            return Label.Giving_GiftBatch_ErrorNoControlTotal;
+            return BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoControlTotal');
         }
         Decimal gap = batch.Control_Total__c - enteredTotal(rows);
         if (gap == 0) {
             return null;
         }
         String template = gap > 0
-            ? Label.Giving_GiftBatch_ErrorShortOfControlTotal
-            : Label.Giving_GiftBatch_ErrorOverControlTotal;
+            ? BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorShortOfControlTotal')
+            : BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorOverControlTotal');
         // Two decimals, no grouping, whatever the locale: the same text the grid shows for the
         // same gap (toFixed(2)), so the message a person searches for is the one on the screen.
         return template.replace('{0}', String.valueOf(gap.abs().setScale(2)));
@@ -298,7 +308,7 @@ public with sharing class GiftBatchService {
                     new LineProblem(
                         rows[index].Id,
                         index + 1,
-                        Label.Giving_GiftBatch_ErrorPostFailed
+                        BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorCreateFailed')
                     )
                 );
             }

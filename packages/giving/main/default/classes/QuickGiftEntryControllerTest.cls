@@ -291,7 +291,7 @@ private class QuickGiftEntryControllerTest {
 
             Assert.isFalse(result.success, 'A gift has one donor.');
             Assert.areEqual(
-                Label.Giving_QuickGiftEntry_ErrorDonorBoth,
+                'Choose one donor: a person or an organization, not both.',
                 messagesByField(result.fieldErrors).get('donor'),
                 'The message says to choose one.'
             );
@@ -500,6 +500,134 @@ private class QuickGiftEntryControllerTest {
                 Label.Giving_GiftEntryPays_ErrorInKind,
                 messagesByField(result.fieldErrors).get('installmentId'),
                 'A gift of goods pays no pledge.'
+            );
+        }
+    }
+
+    @IsTest
+    static void savesTheTributeWithTheGiftInOneSave() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            makeFund();
+            Contact donor = makeContact();
+            Contact widow = new Contact(FirstName = 'Elena', LastName = 'Ruiz');
+            insert widow;
+            QuickGiftEntryController.GiftInput input = baseInput();
+            input.donorContactId = donor.Id;
+            input.tributeType = 'In memory of';
+            input.honoreeName = 'Tomas Ruiz';
+            input.notifyId = widow.Id;
+
+            Test.startTest();
+            QuickGiftEntryController.SaveResult result = QuickGiftEntryController.saveGift(input);
+            Test.stopTest();
+
+            Assert.isTrue(result.success, 'Saved: ' + result.formError);
+            List<Tribute__c> tributes = [
+                SELECT Type__c, Honoree_Name__c, Notification_Recipient_Contact__c
+                FROM Tribute__c
+                WHERE Gift__c = :result.giftId
+                WITH SYSTEM_MODE
+            ];
+            Assert.areEqual(1, tributes.size(), 'One tribute, on the gift just saved.');
+            Assert.areEqual('In memory of', tributes[0].Type__c, 'Type.');
+            Assert.areEqual('Tomas Ruiz', tributes[0].Honoree_Name__c, 'Typed honoree.');
+            Assert.areEqual(widow.Id, tributes[0].Notification_Recipient_Contact__c, 'Notify.');
+        }
+    }
+
+    @IsTest
+    static void refusesATributeWithNoTypeOrHonoreeAndSavesNothing() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact donor = makeContact();
+            QuickGiftEntryController.GiftInput input = baseInput();
+            input.donorContactId = donor.Id;
+            input.notifyName = 'Elena Ruiz';
+
+            Test.startTest();
+            QuickGiftEntryController.SaveResult result = QuickGiftEntryController.saveGift(input);
+            Test.stopTest();
+
+            Map<String, String> messages = messagesByField(result.fieldErrors);
+            Assert.isFalse(result.success, 'Refused.');
+            Assert.isTrue(messages.containsKey('tributeType'), 'Asks for the type.');
+            Assert.areEqual(Label.Giving_Tribute_HonoreeRequired, messages.get('honoree'), 'Who.');
+            Assert.areEqual(0, [SELECT COUNT() FROM Gift__c WITH SYSTEM_MODE], 'No gift.');
+        }
+    }
+
+    @IsTest
+    static void saysWhetherADonorIsAPersonOrAnOrganization() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact person = makeContact();
+            Account organization = makeAccount();
+
+            Test.startTest();
+            String personKind = QuickGiftEntryController.getDonorKind(person.Id);
+            String organizationKind = QuickGiftEntryController.getDonorKind(organization.Id);
+            String nothing = QuickGiftEntryController.getDonorKind('not an id');
+            Test.stopTest();
+
+            Assert.areEqual('person', personKind, 'A contact is a person.');
+            Assert.areEqual('organization', organizationKind, 'A business account.');
+            Assert.isNull(nothing, 'Not a donor id.');
+        }
+    }
+
+    @IsTest
+    static void offersAnEmployeesGiftAndSavesTheMatch() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            makeFund();
+            RecognitionTestData.setAutomaticHouseholdCredits(false);
+            Account garcias = RecognitionTestData.household('The Garcia Family');
+            Account riverbend = RecognitionTestData.organization('Riverbend Manufacturing');
+            Contact ana = RecognitionTestData.person('Ana', 'Garcia', garcias.Id);
+            ana.Employer__c = riverbend.Id;
+            update ana;
+            Gift__c employeeGift = RecognitionTestData.gift(ana.Id, null, 500);
+            Contact stranger = RecognitionTestData.person('Lee', 'Park', garcias.Id);
+            RecognitionTestData.gift(stranger.Id, null, 75);
+
+            Test.startTest();
+            List<QuickGiftEntryController.GiftChoice> choices = QuickGiftEntryController.getMatchableGifts(
+                riverbend.Id
+            );
+            QuickGiftEntryController.GiftInput input = baseInput();
+            input.amount = 500;
+            input.donorAccountId = riverbend.Id;
+            input.matchedGiftId = choices.isEmpty() ? null : choices[0].id;
+            QuickGiftEntryController.SaveResult result = QuickGiftEntryController.saveGift(input);
+            Test.stopTest();
+
+            Assert.areEqual(1, choices.size(), 'Only the employee gift is offered.');
+            Assert.areEqual(employeeGift.Id, choices[0].id, 'Ana gift.');
+            Assert.areEqual('Ana Garcia', choices[0].donorName, 'Who gave it.');
+            Assert.isTrue(result.success, 'Saved: ' + result.formError);
+            Gift__c matched = [
+                SELECT Matched_Gift__c
+                FROM Gift__c
+                WHERE Id = :employeeGift.Id
+                WITH SYSTEM_MODE
+            ];
+            Assert.areEqual(result.giftId, matched.Matched_Gift__c, 'Both sides are linked.');
+        }
+    }
+
+    @IsTest
+    static void refusesAMatchOnAPersonsGift() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact donor = makeContact();
+            QuickGiftEntryController.GiftInput input = baseInput();
+            input.donorContactId = donor.Id;
+            input.matchedGiftId = donor.Id;
+
+            Test.startTest();
+            QuickGiftEntryController.SaveResult result = QuickGiftEntryController.saveGift(input);
+            Test.stopTest();
+
+            Assert.isFalse(result.success, 'Refused.');
+            Assert.isTrue(
+                messagesByField(result.fieldErrors).containsKey('matchedGiftId'),
+                'Says only an organization gift matches.'
             );
         }
     }

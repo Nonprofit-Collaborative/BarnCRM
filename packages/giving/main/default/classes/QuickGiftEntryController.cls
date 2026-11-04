@@ -2,9 +2,11 @@
  * Quick gift entry (G-03).
  *
  * Serves the `quickGiftEntry` component: the defaults a new gift starts from, and the save
- * of one gift with at most one allocation. Everything a gift needs beyond what this form
- * collects (the derived household, the default allocation, the auto-number name) is the
- * Giving domain's work, so this class stays a thin, validating entry point.
+ * of one gift with at most one allocation, and with the tribute it honors and the employee
+ * gift it matches when the person entered them (people-giving-23). Everything a gift needs
+ * beyond what this form collects (the derived household, the default allocation, the
+ * auto-number name, the other side of a matching pair) is the Giving domain's work, so this
+ * class stays a thin, validating entry point.
  *
  * Errors the person can act on are returned in the typed result and rendered beside the
  * field that caused them. Anything unexpected is logged to the Error Log and reported as
@@ -15,10 +17,15 @@ public with sharing class QuickGiftEntryController {
     private static final String STATUS_RECEIVED = 'Received';
     private static final String TYPE_IN_KIND = 'In-kind';
     private static final String CONTEXT = 'QuickGiftEntryController';
+    private static final String KIND_PERSON = 'person';
+    private static final String KIND_ORGANIZATION = 'organization';
+    /** How many employee gifts the "Matches an Employee's Gift" list offers, newest first. */
+    private static final Integer MATCHABLE_GIFT_LIMIT = 50;
 
     /**
      * The values a new gift starts from: today's date, the org's default fund and appeal,
-     * the gift types, and whether people in this org are accounts rather than contacts.
+     * the gift types, the tribute types, the field labels the form borrows from the org's
+     * describe, and whether people in this org are accounts rather than contacts.
      */
     @AuraEnabled(cacheable=true)
     public static EntryDefaults getDefaults() {
@@ -26,6 +33,8 @@ public with sharing class QuickGiftEntryController {
             EntryDefaults defaults = new EntryDefaults();
             defaults.giftDate = Date.today();
             defaults.giftTypes = giftTypeOptions();
+            defaults.tributeTypes = picklistOptions(Tribute__c.Type__c.getDescribe());
+            defaults.fieldLabels = fieldLabels();
             defaults.hasPersonAccounts = OrgShapeDetector.hasPersonAccounts();
             Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
             applyDefaultFund(defaults, settings);
@@ -34,6 +43,74 @@ public with sharing class QuickGiftEntryController {
         } catch (Exception e) {
             ErrorLogger.log(e, CONTEXT + '.getDefaults');
             throw UserErrors.message(Label.Giving_QuickGiftEntry_ErrorLoadDefaults);
+        }
+    }
+
+    /**
+     * Whether a donor named by id is a person or an organization, so a form opened for a known
+     * donor (a record page, the Enter a Gift action, or the Quick Gift Entry tab with
+     * c__donorId) starts on the right side of the Person and Organization choice. A contact is
+     * a person; an account is a person only where people are accounts and this one is a person
+     * account. Null for an id that names neither.
+     */
+    @AuraEnabled(cacheable=true)
+    public static String getDonorKind(String donorId) {
+        try {
+            if (asId(donorId, Contact.SObjectType) != null) {
+                return KIND_PERSON;
+            }
+            Id accountId = asId(donorId, Account.SObjectType);
+            if (accountId == null) {
+                return null;
+            }
+            return OrgShapeDetector.hasPersonAccounts() && isPersonAccount(accountId)
+                ? KIND_PERSON
+                : KIND_ORGANIZATION;
+        } catch (Exception e) {
+            ErrorLogger.log(e, CONTEXT + '.getDonorKind');
+            throw UserErrors.message(Label.Giving_QuickGiftEntry_ErrorLoadDefaults);
+        }
+    }
+
+    /**
+     * The gifts an organization's gift can match (people-giving-23): recent gifts of money from
+     * people whose Employer is this organization, not matched yet, and not refunds. The gift
+     * trigger still checks the pair when the gift is saved (R-G11); this list only narrows the
+     * choice to the gifts that can pass.
+     */
+    @AuraEnabled
+    public static List<GiftChoice> getMatchableGifts(String organizationId) {
+        Id employerId = asId(organizationId, Account.SObjectType);
+        List<GiftChoice> choices = new List<GiftChoice>();
+        if (employerId == null) {
+            return choices;
+        }
+        try {
+            for (Gift__c gift : [
+                SELECT
+                    Id,
+                    Name,
+                    Amount__c,
+                    Gift_Date__c,
+                    Donor_Contact__r.Name,
+                    Donor_Account__r.Name
+                FROM Gift__c
+                WHERE
+                    (Donor_Contact__r.Employer__c = :employerId
+                    OR Donor_Account__r.Employer__c = :employerId)
+                    AND Matched_Gift__c = NULL
+                    AND Original_Gift__c = NULL
+                    AND Amount__c > 0
+                WITH USER_MODE
+                ORDER BY Gift_Date__c DESC, Name DESC
+                LIMIT :MATCHABLE_GIFT_LIMIT
+            ]) {
+                choices.add(new GiftChoice(gift));
+            }
+            return choices;
+        } catch (Exception e) {
+            ErrorLogger.log(e, CONTEXT + '.getMatchableGifts');
+            throw UserErrors.message(Label.Giving_QuickGiftEntry_ErrorUnexpected);
         }
     }
 
@@ -66,9 +143,11 @@ public with sharing class QuickGiftEntryController {
     }
 
     /**
-     * Saves one gift and, when a fund was chosen, points the gift's single allocation at it.
-     * Returns a result the component can render: the saved gift's name and id, or the
-     * errors that stopped it.
+     * Saves one gift and, in the same transaction, what came with it: the fund chosen for its
+     * single allocation, the tribute it honors and the employee gift it matches. Returns a
+     * result the component can render: the saved gift's name and id, or the errors that
+     * stopped it. A failure in any part undoes the whole save, so a gift never lands without
+     * the tribute the person typed for it.
      */
     @AuraEnabled
     public static SaveResult saveGift(GiftInput input) {
@@ -81,6 +160,7 @@ public with sharing class QuickGiftEntryController {
         if (!result.fieldErrors.isEmpty()) {
             return result;
         }
+        Savepoint beforeSave = Database.setSavepoint();
         try {
             Gift__c gift = input.toGift();
             if (!applyChosenPayment(gift, input)) {
@@ -90,6 +170,10 @@ public with sharing class QuickGiftEntryController {
                 return result;
             }
             Database.insert(gift, true, AccessLevel.USER_MODE);
+            Tribute__c tribute = input.toTribute(gift.Id);
+            if (tribute != null) {
+                Database.insert(tribute, true, AccessLevel.USER_MODE);
+            }
             Boolean applyChosenFundWasApplied = applyChosenFund(
                 gift,
                 asId(input.fundId, Fund__c.SObjectType)
@@ -100,12 +184,14 @@ public with sharing class QuickGiftEntryController {
             result.fundNotApplied = !applyChosenFundWasApplied;
             return result;
         } catch (DmlException e) {
+            Database.rollback(beforeSave);
             ErrorLogger.log(e, CONTEXT + '.saveGift');
             result.formError = e.getNumDml() > 0
                 ? e.getDmlMessage(0)
                 : Label.Giving_QuickGiftEntry_ErrorUnexpected;
             return result;
         } catch (Exception e) {
+            Database.rollback(beforeSave);
             ErrorLogger.log(e, CONTEXT + '.saveGift');
             result.formError = Label.Giving_QuickGiftEntry_ErrorUnexpected;
             return result;
@@ -169,6 +255,39 @@ public with sharing class QuickGiftEntryController {
         return saved.isEmpty() ? null : saved[0].Name;
     }
 
+    private static Boolean isPersonAccount(Id accountId) {
+        // Dynamic, because the person account flag exists only where person accounts are turned
+        // on, and BarnCRM runs on orgs without them (ADR-0013).
+        List<SObject> rows = Database.queryWithBinds(
+            PERSON_ACCOUNT_QUERY,
+            new Map<String, Object>{ 'accountId' => accountId },
+            AccessLevel.USER_MODE
+        );
+        return !rows.isEmpty() && rows[0].get(PERSON_ACCOUNT_FIELD) == true;
+    }
+
+    private static final String PERSON_ACCOUNT_QUERY = 'SELECT IsPersonAccount FROM Account WHERE Id = :accountId LIMIT 1'; // detection-only: run only after the describe found person accounts
+    private static final String PERSON_ACCOUNT_FIELD = 'IsPersonAccount'; // detection-only: read from the row the person account query returned
+
+    /**
+     * The field labels the tribute and matching sections show, from the org's own describe
+     * rather than custom labels, keyed by the field's name without any namespace.
+     */
+    private static Map<String, String> fieldLabels() {
+        return new Map<String, String>{
+            'tributeType' => Tribute__c.Type__c.getDescribe().getLabel(),
+            'honoreeContact' => Tribute__c.Honoree_Contact__c.getDescribe().getLabel(),
+            'honoreeAccount' => Tribute__c.Honoree_Account__c.getDescribe().getLabel(),
+            'honoreeName' => Tribute__c.Honoree_Name__c.getDescribe().getLabel(),
+            'notifyContact' => Tribute__c.Notification_Recipient_Contact__c.getDescribe()
+                .getLabel(),
+            'notifyAccount' => Tribute__c.Notification_Recipient_Account__c.getDescribe()
+                .getLabel(),
+            'notifyName' => Tribute__c.Notification_Recipient_Name__c.getDescribe().getLabel(),
+            'matchedGift' => Gift__c.Matched_Gift__c.getDescribe().getLabel()
+        };
+    }
+
     /**
      * The form shows the fund the gift will actually land in. Where the settings key names
      * no usable fund, the save falls back to the fund carrying the default flag (R-F4,
@@ -221,9 +340,19 @@ public with sharing class QuickGiftEntryController {
         }
     }
 
+    /** A person picked for a tribute is a contact, or an account where people are accounts. */
+    private static Id asPersonId(String value) {
+        Id contactId = asId(value, Contact.SObjectType);
+        return contactId != null ? contactId : asId(value, Account.SObjectType);
+    }
+
     private static List<PicklistOption> giftTypeOptions() {
+        return picklistOptions(Gift__c.Type__c.getDescribe());
+    }
+
+    private static List<PicklistOption> picklistOptions(Schema.DescribeFieldResult field) {
         List<PicklistOption> options = new List<PicklistOption>();
-        for (Schema.PicklistEntry entry : Gift__c.Type__c.getDescribe().getPicklistValues()) {
+        for (Schema.PicklistEntry entry : field.getPicklistValues()) {
             if (entry.isActive()) {
                 options.add(new PicklistOption(entry.getLabel(), entry.getValue()));
             }
@@ -231,9 +360,9 @@ public with sharing class QuickGiftEntryController {
         return options;
     }
 
-    private static Set<String> giftTypeValues() {
+    private static Set<String> optionValues(List<PicklistOption> options) {
         Set<String> values = new Set<String>();
-        for (PicklistOption option : giftTypeOptions()) {
+        for (PicklistOption option : options) {
             values.add(option.value);
         }
         return values;
@@ -249,6 +378,30 @@ public with sharing class QuickGiftEntryController {
         public PicklistOption(String label, String value) {
             this.label = label;
             this.value = value;
+        }
+    }
+
+    /** One employee gift an organization's gift can match. */
+    public class GiftChoice {
+        @AuraEnabled
+        public String id;
+        @AuraEnabled
+        public String name;
+        @AuraEnabled
+        public String donorName;
+        @AuraEnabled
+        public Decimal amount;
+        @AuraEnabled
+        public Date giftDate;
+
+        public GiftChoice(Gift__c gift) {
+            this.id = gift.Id;
+            this.name = gift.Name;
+            this.amount = gift.Amount__c;
+            this.giftDate = gift.Gift_Date__c;
+            this.donorName = gift.Donor_Contact__r != null
+                ? gift.Donor_Contact__r.Name
+                : (gift.Donor_Account__r != null ? gift.Donor_Account__r.Name : null);
         }
     }
 
@@ -268,6 +421,10 @@ public with sharing class QuickGiftEntryController {
         public String defaultAppealName;
         @AuraEnabled
         public List<PicklistOption> giftTypes = new List<PicklistOption>();
+        @AuraEnabled
+        public List<PicklistOption> tributeTypes = new List<PicklistOption>();
+        @AuraEnabled
+        public Map<String, String> fieldLabels = new Map<String, String>();
     }
 
     /** One message the component shows beside one field. */
@@ -327,6 +484,24 @@ public with sharing class QuickGiftEntryController {
         /** The scheduled payment this gift pays, or empty for a gift on its own (R-DM8). */
         @AuraEnabled
         public String installmentId;
+        /** In honor of or In memory of; empty when the gift honors nobody. */
+        @AuraEnabled
+        public String tributeType;
+        /** The person honored, a contact or (where people are accounts) an account. */
+        @AuraEnabled
+        public String honoreeId;
+        /** The person honored, by name, when they are not a record. */
+        @AuraEnabled
+        public String honoreeName;
+        /** Who is told about the tribute, a contact or (where people are accounts) an account. */
+        @AuraEnabled
+        public String notifyId;
+        /** Who is told about the tribute, by name, when they are not a record. */
+        @AuraEnabled
+        public String notifyName;
+        /** The employee's gift an organization's gift matches (R-G11). */
+        @AuraEnabled
+        public String matchedGiftId;
 
         public List<FieldError> validate() {
             List<FieldError> errors = new List<FieldError>();
@@ -352,6 +527,8 @@ public with sharing class QuickGiftEntryController {
                 );
             }
             validatePayment(errors);
+            validateTribute(errors);
+            validateMatch(errors);
             return errors;
         }
 
@@ -402,9 +579,61 @@ public with sharing class QuickGiftEntryController {
             }
         }
 
+        /**
+         * A tribute needs its type and the person honored, as a record or a name (the Tribute
+         * validation rules say the same on save). Nothing typed in the section means no tribute.
+         */
+        private void validateTribute(List<FieldError> errors) {
+            if (!hasTribute()) {
+                return;
+            }
+            if (
+                String.isBlank(this.tributeType) ||
+                !optionValues(picklistOptions(Tribute__c.Type__c.getDescribe()))
+                    .contains(this.tributeType)
+            ) {
+                errors.add(
+                    new FieldError(
+                        'tributeType',
+                        BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorTributeType')
+                    )
+                );
+            }
+            if (asPersonId(this.honoreeId) == null && String.isBlank(this.honoreeName)) {
+                errors.add(new FieldError('honoree', Label.Giving_Tribute_HonoreeRequired));
+            }
+        }
+
+        /** Only an organization's gift matches an employee's (R-G11). */
+        private void validateMatch(List<FieldError> errors) {
+            if (String.isBlank(this.matchedGiftId)) {
+                return;
+            }
+            if (
+                asId(this.matchedGiftId, Gift__c.SObjectType) == null ||
+                asId(this.donorAccountId, Account.SObjectType) == null
+            ) {
+                errors.add(
+                    new FieldError(
+                        'matchedGiftId',
+                        BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorMatchedGift')
+                    )
+                );
+            }
+        }
+
         @TestVisible
         private Boolean isInKind() {
             return TYPE_IN_KIND.equalsIgnoreCase(this.giftType);
+        }
+
+        @TestVisible
+        private Boolean hasTribute() {
+            return String.isNotBlank(this.tributeType) ||
+                String.isNotBlank(this.honoreeId) ||
+                String.isNotBlank(this.honoreeName) ||
+                String.isNotBlank(this.notifyId) ||
+                String.isNotBlank(this.notifyName);
         }
 
         private void validateDonor(List<FieldError> errors) {
@@ -415,7 +644,12 @@ public with sharing class QuickGiftEntryController {
                 String.isNotBlank(this.donorAccountId) &&
                 asId(this.donorAccountId, Account.SObjectType) != null;
             if (hasContact && hasAccount) {
-                errors.add(new FieldError('donor', Label.Giving_QuickGiftEntry_ErrorDonorBoth));
+                errors.add(
+                    new FieldError(
+                        'donor',
+                        BarnHelp.text('Giving', 'Giving_GiftEntry_ErrorOneDonor')
+                    )
+                );
             } else if (!hasContact && !hasAccount) {
                 errors.add(new FieldError('donor', Label.Giving_QuickGiftEntry_ErrorDonorRequired));
             }
@@ -428,7 +662,7 @@ public with sharing class QuickGiftEntryController {
                 );
                 return;
             }
-            if (!giftTypeValues().contains(this.giftType)) {
+            if (!optionValues(giftTypeOptions()).contains(this.giftType)) {
                 errors.add(
                     new FieldError('giftType', Label.Giving_QuickGiftEntry_ErrorTypeInvalid)
                 );
@@ -453,7 +687,43 @@ public with sharing class QuickGiftEntryController {
                 Appeal__c = asId(this.appealId, Appeal__c.SObjectType),
                 Payment_Reference__c = this.paymentReference,
                 In_Kind_Description__c = inKind ? this.inKindDescription : null,
-                Fair_Market_Value__c = inKind ? this.fairMarketValue : null
+                Fair_Market_Value__c = inKind ? this.fairMarketValue : null,
+                Matched_Gift__c = asId(this.matchedGiftId, Gift__c.SObjectType)
+            );
+        }
+
+        /**
+         * The tribute the person typed for this gift, or null when they typed none. A person
+         * picked is a contact, or an account where people are accounts; one typed by name is
+         * kept as the name.
+         */
+        public Tribute__c toTribute(Id giftId) {
+            if (!hasTribute()) {
+                return null;
+            }
+            Id honoree = asPersonId(this.honoreeId);
+            Id notify = asPersonId(this.notifyId);
+            return new Tribute__c(
+                Gift__c = giftId,
+                Type__c = this.tributeType,
+                Honoree_Contact__c = honoree != null &&
+                    honoree.getSobjectType() == Contact.SObjectType
+                    ? honoree
+                    : null,
+                Honoree_Account__c = honoree != null &&
+                    honoree.getSobjectType() == Account.SObjectType
+                    ? honoree
+                    : null,
+                Honoree_Name__c = honoree == null ? this.honoreeName : null,
+                Notification_Recipient_Contact__c = notify != null &&
+                    notify.getSobjectType() == Contact.SObjectType
+                    ? notify
+                    : null,
+                Notification_Recipient_Account__c = notify != null &&
+                    notify.getSobjectType() == Account.SObjectType
+                    ? notify
+                    : null,
+                Notification_Recipient_Name__c = notify == null ? this.notifyName : null
             );
         }
     }

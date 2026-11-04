@@ -387,7 +387,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Gifts | Major | Records each transaction (money, stock or goods) from one donor on one date, credited to the right household automatically. | Shipped | G-01 |
 | Funds and allocations | Major | Designates each gift to one or more funds, by amount or percent, totalling the gift exactly. | Shipped | G-01 |
 | Quick Gift Entry | Major | A one-screen, phone-friendly form for entering a gift the moment it arrives, with defaults filled in. | Shipped | G-03 |
-| Gift batches | Major | Types a stack of checks against the deposit slip total and posts them as ordinary gifts, all or none, only when they balance. | Shipped | G-17, ADR-0045 |
+| Gift batches | Major | Types a stack of checks against the deposit slip total and creates them as ordinary gifts, all or none, only when they balance. | Shipped | G-17, ADR-0045 |
 | Refunds and write-offs | Major | Records money that went back as a linked negative gift with a reason, never editing the original. | Shipped | G-04 |
 | In-kind gifts | Major | Records gifts of goods or services with a description and fair market value, kept out of every money total. | Shipped | G-18, ADR-0030 |
 | Matching gifts | Major | Links an employer's matching gift to the employee's gift, visible from both, with the employee soft credited. | Shipped | G-10 |
@@ -409,6 +409,10 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Gift page polish | Minor | Gift page shows one donor field and shows refund, original gift and matched gift fields only when relevant. | Shipped | G-01 (UX pass) |
 | Quick Gift Entry messages and new donors | Minor | A problem is shown on the field it concerns, the donor picker offers the standard new person form, and batch lines name their line number for screen readers. | Shipped | G-03, G-17 (UX pass) |
 | Pay a scheduled pledge payment | Minor | Quick Gift Entry and the Gift Batches "Pays" column list the donor's open pledge payments, suggest the one a gift pays, and let staff pick it. | Shipped | G-03, G-17, G-24, ADR-0084 |
+| Enter a Gift from a donor's page | Major | The person and household or organization pages' gift action is now Enter a Gift: Quick Gift Entry in a window with the donor filled in (in-kind, Pays, Fund, tribute and match included); the Quick Gift Entry tab also takes a donor through `c__donorId`. | In review (v1.0) | people-giving-12 |
+| Tribute and matching gift at entry | Minor | Quick Gift Entry's collapsed "This Gift Honors Someone" section saves the tribute with the gift, and "Matches an Employee's Gift" links an organization's gift to an employee's gift chosen from a list. | In review (v1.0) | people-giving-23, G-10 |
+| Donor pickers show email and city | Minor | The Quick Gift Entry and Gift Batch donor lists show email and mailing city for a person and billing city for an organization, so namesakes are told apart. | In review (v1.0) | people-giving-1 |
+| Create Gifts and kit look for gift entry | Minor | The batch button is Create Gifts with plain wording (post means accounting only); Quick Gift Entry and Gift Batches use the kit notices, figures, empty state and table recipe. | In review (v1.0) | people-giving-3, people-giving-8, people-giving-10 |
 | Stock and planned gift types | Minor | Extra fields for stock and planned gifts. | Planned (1.x) | G-21 |
 
 ### 2.2 Pledges and Recurring
@@ -542,7 +546,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
 | BarnCRM Fundraising app | Major | An app with tabs for gifts, funds, appeals, commitments, batches, tributes, receipts, stewardship plans and Quick Gift Entry, plus the Acknowledgment Queue, Receipt Letters, Donor Level Ladder and Stewardship Plan Setup pages for whoever may open them. | Shipped | G-06, ADR-0018 |
-| Donor record pages with giving | Major | Giving ships person and household or organization pages with a Giving section, related lists for gifts, commitments, soft credits, receipts and stewardship plans, the person's Employer, and a New Gift action. | Shipped | ADR-0064 (UX pass) |
+| Donor record pages with giving | Major | Giving ships person and household or organization pages with a Giving section, related lists for gifts, commitments, soft credits, receipts and stewardship plans, the person's Employer, and an Enter a Gift action. | Shipped | ADR-0064 (UX pass) |
 | Gift, Commitment and Gift Batch record pages | Minor | Packaged record pages for Giving records, opened automatically in the BarnCRM Fundraising app. | Shipped | ADR-0043 |
 | Actions and lists placed on the Giving pages | Minor | Gift, commitment and batch pages carry their own actions (Refund or Write Off only on a received gift) and sorted lists of allocations, refunds and a commitment's gifts; donor pages gain Log an interaction; the gift's activity panel can log calls, tasks and events. | Shipped (#377) | Q-08, ADR-0097 |
 | Giving permission sets | Minor | Giving Admin, Giving Staff and Giving Read Only, given per person on the Access page under Extra Permissions; the Fundraising Staff role includes Giving Staff. | Shipped | C-06, ADR-0132 |

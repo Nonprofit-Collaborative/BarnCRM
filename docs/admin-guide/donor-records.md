@@ -6,8 +6,8 @@ When David opens a person, a household or an organization in the **BarnCRM Fundr
 record shows what they gave: a **Giving** section with their totals, their donor level and
 when those numbers were last calculated, and lists of their gifts, commitments, soft
 credits, receipts and stewardship plans. A person also shows their **Employer**, which
-[matching gifts](matching-gifts.md) check against. A **New Gift** button records a gift with
-the donor already filled in.
+[matching gifts](matching-gifts.md) check against. An **Enter a Gift** button opens
+[Quick Gift Entry](quick-gift-entry.md) with the donor already filled in.
 
 Nothing here is calculated on the page. The totals are the rollups BarnCRM keeps (see
 [Rollups](rollups.md)), and **Rollups Last Calculated** says how fresh they are.
@@ -40,8 +40,9 @@ Start with the sample data loaded (BarnCRM Settings, then Sample Data).
 2. Find the **Giving** section. **Total Giving**, **Last Gift Date** and the rest are filled,
    and **Rollups Last Calculated** shows a date and time.
 3. Scroll to **Gifts**. Each gift the person gave is listed, newest first.
-4. Click **New Gift** at the top of the page. The donor is already this person. Enter an
-   **Amount** of 50, choose a **Payment Method**, and save. The gift appears in the list.
+4. Click **Enter a Gift** at the top of the page. Quick Gift Entry opens in a window with
+   this person already the donor. Enter an **Amount** of 50, choose a **Payment Method**, and
+   click **Save**. The window closes and the gift appears in the list.
 5. Refresh the page. **Total Giving** has gone up by 50 and **Rollups Last Calculated** has
    moved to now.
 6. Open the person's household from the **Household** card. The household's **Giving**
@@ -56,6 +57,6 @@ Start with the sample data loaded (BarnCRM Settings, then Sample Data).
   first item under "How to turn it on".
 - **Totals that look out of date.** Look at **Rollups Last Calculated**. If it is days old,
   the nightly rollup is not scheduled: see [Rollups](rollups.md).
-- **A gift entered from a household that should have been from a person.** New Gift on a
+- **A gift entered from a household that should have been from a person.** Enter a Gift on a
   household records the household as the donor. When one person gave, open that person and
-  use New Gift there, so the gift is credited to them and still counts for the household.
+  use Enter a Gift there, so the gift is credited to them and still counts for the household.

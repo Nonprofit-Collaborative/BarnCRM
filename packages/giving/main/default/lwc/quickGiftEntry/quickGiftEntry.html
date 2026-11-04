@@ -1,44 +1,35 @@
 <template>
     <template lwc:if={helpReady}>
-    <lightning-card icon-name="custom:custom40" title={labels.heading}>
+    <lightning-card icon-name={cardIcon} title={cardTitle}>
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
             <template lwc:if={formError}>
-                <div
-                    class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small"
-                    role="alert"
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="error"
+                    title={labels.errorTitle}
+                    message={formError}
                     data-id="form-error"
-                >
-                    <p class="slds-text-title_bold">{labels.errorTitle}</p>
-                    <p>{formError}</p>
-                </div>
+                ></c-barn-notice>
             </template>
 
             <template lwc:if={saveWarning}>
-                <div
-                    class="slds-box slds-box_x-small slds-theme_warning slds-var-m-bottom_small"
-                    role="alert"
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="warning"
+                    message={saveWarning}
                     data-id="save-warning"
-                >
-                    <p>{saveWarning}</p>
-                </div>
+                ></c-barn-notice>
             </template>
 
             <template lwc:if={savedGift}>
-                <!-- A light notice with a success icon, not a solid green box: the link keeps
-                     its normal, readable colour (vis-core-2). -->
-                <div
-                    class="slds-scoped-notification slds-scoped-notification_light slds-media slds-media_center slds-var-m-bottom_small"
-                    aria-live="polite"
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="success"
+                    message={savedMessage}
+                    action-label={labels.openGiftLink}
+                    action-href={savedGift.url}
                     data-id="saved"
-                >
-                    <div class="slds-media__figure">
-                        <lightning-icon icon-name="utility:success" size="x-small" variant="success"></lightning-icon>
-                    </div>
-                    <div class="slds-media__body">
-                        <p>{savedMessage}</p>
-                        <a href={savedGift.url} data-id="saved-link">{labels.openGiftLink}</a>
-                    </div>
-                </div>
+                ></c-barn-notice>
             </template>
 
             <lightning-radio-group
@@ -57,6 +48,7 @@
                         label={labels.personLabel}
                         placeholder={labels.donorPlaceholder}
                         object-api-name={personObjectApiName}
+                        display-info={personDisplayInfo}
                         value={donorId}
                         required
                         onchange={handleDonorChange}
@@ -74,6 +66,7 @@
                         label={labels.organizationLabel}
                         placeholder={labels.donorPlaceholder}
                         object-api-name={accountObjectApiName}
+                        display-info={organizationDisplayInfo}
                         value={donorId}
                         required
                         onchange={handleDonorChange}
@@ -125,7 +118,11 @@
                 </div>
             </template>
             <template lwc:if={paymentLoadFailed}>
-                <p class="slds-var-m-top_small slds-text-color_weak" role="status" data-id="pays-error">
+                <p
+                    class="slds-var-m-top_small slds-text-body_small slds-text-color_weak"
+                    role="status"
+                    data-id="pays-error"
+                >
                     {labels.paysErrorLoad}
                 </p>
             </template>
@@ -204,6 +201,91 @@
                     data-id="fund"
                 ></lightning-record-picker>
             </div>
+
+            <lightning-accordion
+                class="slds-show slds-var-m-top_small"
+                allow-multiple-sections-open
+                active-section-name={openSections}
+                onsectiontoggle={handleSectionToggle}
+                data-id="more"
+            >
+                <lightning-accordion-section name="tribute" label={labels.tributeSection} data-id="tribute-section">
+                    <lightning-combobox
+                        label={fieldLabels.tributeType}
+                        placeholder={labels.typePlaceholder}
+                        options={tributeTypeOptions}
+                        value={tributeType}
+                        onchange={handleTributeField}
+                        data-field="tributeType"
+                        data-id="tribute-type"
+                    ></lightning-combobox>
+                    <div class="slds-var-m-top_small">
+                        <lightning-record-picker
+                            label={honoreeLabel}
+                            placeholder={labels.donorPlaceholder}
+                            object-api-name={personObjectApiName}
+                            display-info={personDisplayInfo}
+                            value={honoreeId}
+                            onchange={handleTributeField}
+                            data-field="honoreeId"
+                            data-id="honoree"
+                        ></lightning-record-picker>
+                    </div>
+                    <div class="slds-var-m-top_small">
+                        <lightning-input
+                            type="text"
+                            max-length="255"
+                            label={fieldLabels.honoreeName}
+                            value={honoreeName}
+                            onchange={handleTributeField}
+                            data-field="honoreeName"
+                            data-id="honoree-name"
+                        ></lightning-input>
+                    </div>
+                    <div class="slds-var-m-top_small">
+                        <lightning-record-picker
+                            label={notifyLabel}
+                            placeholder={labels.donorPlaceholder}
+                            object-api-name={personObjectApiName}
+                            display-info={personDisplayInfo}
+                            value={notifyId}
+                            onchange={handleTributeField}
+                            data-field="notifyId"
+                            data-id="notify"
+                        ></lightning-record-picker>
+                    </div>
+                    <div class="slds-var-m-top_small">
+                        <lightning-input
+                            type="text"
+                            max-length="255"
+                            label={fieldLabels.notifyName}
+                            value={notifyName}
+                            onchange={handleTributeField}
+                            data-field="notifyName"
+                            data-id="notify-name"
+                        ></lightning-input>
+                    </div>
+                </lightning-accordion-section>
+                <template lwc:if={showMatch}>
+                    <lightning-accordion-section name="match" label={labels.matchSection} data-id="match-section">
+                        <template lwc:if={hasMatchChoices}>
+                            <lightning-combobox
+                                label={fieldLabels.matchedGift}
+                                field-level-help={labels.matchHelp}
+                                options={matchOptions}
+                                value={matchedGiftId}
+                                onchange={handleMatchChange}
+                                data-id="matched-gift"
+                            ></lightning-combobox>
+                        </template>
+                        <template lwc:elseif={matchLoaded}>
+                            <p class="slds-text-body_small slds-text-color_weak" data-id="match-empty">
+                                {labels.matchEmpty}
+                            </p>
+                        </template>
+                    </lightning-accordion-section>
+                </template>
+            </lightning-accordion>
 
             <div class="slds-var-m-top_medium slds-grid slds-grid_vertical-align-center slds-wrap">
                 <lightning-button
