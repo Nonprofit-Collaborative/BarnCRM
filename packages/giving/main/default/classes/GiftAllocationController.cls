@@ -201,11 +201,19 @@ public with sharing class GiftAllocationController {
             if (!spare.isEmpty()) {
                 Gift_Allocation__c reused = spare.remove(0);
                 toUpdate.add(
-                    new Gift_Allocation__c(Id = reused.Id, Fund__c = input.fundId, Amount__c = amount)
+                    new Gift_Allocation__c(
+                        Id = reused.Id,
+                        Fund__c = input.fundId,
+                        Amount__c = amount
+                    )
                 );
             } else {
                 toInsert.add(
-                    new Gift_Allocation__c(Gift__c = giftId, Fund__c = input.fundId, Amount__c = amount)
+                    new Gift_Allocation__c(
+                        Gift__c = giftId,
+                        Fund__c = input.fundId,
+                        Amount__c = amount
+                    )
                 );
             }
         }
