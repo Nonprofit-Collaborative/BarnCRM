@@ -91,7 +91,7 @@ public with sharing class NightlyRun implements Schedulable {
      * enqueued, so the link carries the run.
      */
     @TestVisible
-    private class Link implements Queueable {
+    private with sharing class Link implements Queueable {
         private final NightlyRun run;
         Link(NightlyRun run) {
             this.run = run;
