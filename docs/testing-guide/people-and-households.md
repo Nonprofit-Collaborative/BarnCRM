@@ -334,3 +334,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 9 | As a user without **Manage BarnCRM Settings**, open **BarnCRM Settings**, **General**. | No **Adopt NPSP Households** section. |
 
 **Cleanup:** none after step 8.
+
+## T-HH-22: Household Upkeep Waits While NPSP Households Are in Use
+
+**Purpose:** BarnCRM and NPSP never both make a household for the same person ([Then Turn On Household Upkeep](../admin-guide/npsp-households.md#then-turn-on-household-upkeep)).
+**Prerequisites:** admin; Household Upkeep off. Step 1 runs in an org without NPSP; steps 2 to 5 need **an org with NPSP installed** whose Account Model is **Household Account**, with at least one NPSP household. BarnCRM's own tests use a stand-in for NPSP.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In an org without NPSP, open **BarnCRM Settings**, **General**, **Features**. | The **Household Upkeep** row has **Turn On** and no NPSP explanation. |
+| 2 | In the NPSP org, open the same row. | The row says NPSP households are still in use, with the steps, and offers no **Turn On**. In first-run setup the **Household Upkeep** box is unticked and cannot be ticked, and finishing turns the other ticked features on. |
+| 3 | Adopt every NPSP household (T-HH-21 steps 4 and 5) and return. | The row still shows the explanation: NPSP's Account Model is still Household Account. |
+| 4 | In NPSP Settings, set **Account Model** to **One-to-One** and save. Return to **Features**. | The explanation is gone and **Turn On** is offered. |
+| 5 | Choose **Turn On** and confirm. | Household Upkeep is on. Add a contact: it gets one BarnCRM household, and NPSP makes no household account for it. |
+
+**Cleanup:** none (Household Upkeep cannot be turned off).

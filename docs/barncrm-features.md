@@ -59,7 +59,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Households follow person changes | Minor | Renaming, deleting or restoring a person recounts and renames their households in both membership models. | Shipped | C-01 |
 | Member count | Minor | Keeps each household's member count correct as people join, move or leave. | Shipped | C-01 |
 | Nonprofit Cloud household guards | Minor | Detects households Nonprofit Cloud already manages and never renames, readdresses, deletes or duplicates them. | Shipped | X-09 (in Core) |
-| Adopt NPSP households | Minor | In an org with NPSP, turns NPSP's household accounts into BarnCRM households in place (same records, members and Opportunities), carrying over greetings, primary contact and hand-typed names, with a preview, a typed-count confirmation and undo per run. Shown only where NPSP is detected. | In review (release 0.17) | X-05 (in Core, ADR-0155) |
+| Adopt NPSP households | Minor | In an org with NPSP, turns NPSP's household accounts into BarnCRM households in place (same records, members and Opportunities), carrying over greetings, primary contact and hand-typed names, with a preview, a typed-count confirmation and undo per run. Shown only where NPSP is detected. Household Upkeep cannot be turned on while NPSP households are in use (NPSP's Account Model is Household Account, or households are not yet adopted); its row says why (RT-04, R-HA6). | In review (release 0.17) | X-05 (in Core, ADR-0155) |
 | Interaction notes | Minor | A "Log an Interaction" action on person and organization pages records a meeting or contact report as a completed activity, for major-gift work. | Shipped | C-39 |
 
 ### 1.2 Relationships and Affiliations

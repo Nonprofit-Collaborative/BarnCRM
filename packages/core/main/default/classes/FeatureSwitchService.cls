@@ -48,7 +48,11 @@ public with sharing class FeatureSwitchService {
     private static final String ON_KEY = 'Features_Turned_On__c';
 
     /** Raised for a key that is not a Core feature. */
-    public class FeatureSwitchException extends Exception {
+    public virtual class FeatureSwitchException extends Exception {
+    }
+
+    /** Raised for a feature that cannot be turned on yet; its message says why (RT-04). */
+    public class FeatureBlockedException extends FeatureSwitchException {
     }
 
     /** One feature: what it covers. */
@@ -236,8 +240,16 @@ public with sharing class FeatureSwitchService {
      * setup is done, as `NoneChosen` when nothing was ticked, so the window cannot loop.
      */
     public static void finishFirstRun(Set<String> keys) {
-        if (keys != null && !keys.isEmpty()) {
-            turnOn(keys);
+        Set<String> allowed = new Set<String>();
+        for (String key : keys == null ? new Set<String>() : keys) {
+            // A feature that cannot be turned on yet is left out rather than failing the save;
+            // its row says why (RT-04).
+            if (blockedReason(key) == null) {
+                allowed.add(key);
+            }
+        }
+        if (!allowed.isEmpty()) {
+            turnOn(allowed);
         }
         if (awaitingFirstRun()) {
             SettingsService.saveSystemValue(ON_KEY, NONE_CHOSEN);
@@ -247,6 +259,22 @@ public with sharing class FeatureSwitchService {
     /** Whether the feature is on. */
     public static Boolean isOn(String key) {
         return String.isNotBlank(key) && featuresOn().contains(key.toLowerCase());
+    }
+
+    /**
+     * Why the feature cannot be turned on now, or null. Household Upkeep waits while NPSP
+     * households are in use (RT-04, canonical model R-HA6), so NPSP and BarnCRM never both make
+     * a household for the same person.
+     */
+    public static String blockedReason(String key) {
+        if (
+            String.isNotBlank(key) &&
+            key.equalsIgnoreCase(HOUSEHOLD_UPKEEP) &&
+            NpspHouseholdSource.householdsInUse()
+        ) {
+            return BarnHelp.text('Core', 'Core_Feature_HouseholdUpkeep_NpspBlocked');
+        }
+        return null;
     }
 
     /** Turns one feature on, for good. Callers check Manage BarnCRM Settings first. */
@@ -269,6 +297,10 @@ public with sharing class FeatureSwitchService {
             }
             String lower = feature.key.toLowerCase();
             if (!current.contains(lower) && !newKeys.contains(lower)) {
+                String blocked = blockedReason(feature.key);
+                if (blocked != null) {
+                    throw new FeatureBlockedException(blocked);
+                }
                 newlyOn.add(feature);
                 newKeys.add(lower);
             }
