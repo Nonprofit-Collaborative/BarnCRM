@@ -435,9 +435,9 @@ private class AcknowledgmentRunCoverageTest {
                 [
                     SELECT COUNT()
                     FROM CronTrigger
-                    WHERE CronJobDetail.Name = :AcknowledgmentScheduler.JOB_NAME
+                    WHERE CronJobDetail.Name = :NightlyJobs.jobName()
                 ],
-                'And only one job'
+                'And only one nightly run'
             );
             AcknowledgmentController.PageView off = AcknowledgmentController.setSchedule(false);
             AcknowledgmentController.PageView offAgain = AcknowledgmentController.setSchedule(

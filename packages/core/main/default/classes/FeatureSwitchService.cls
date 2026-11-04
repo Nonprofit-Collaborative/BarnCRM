@@ -105,6 +105,7 @@ public with sharing class FeatureSwitchService {
                         'Import_Trial_Rows',
                         'Import_Row_Deletion',
                         'Import_Undo_Retention_Days',
+                        'Import_History_Retention_Days',
                         'Bulk_Chunk_Size',
                         'Bulk_Update_Run_Limit',
                         'Bulk_Delete_Run_Limit',
@@ -125,6 +126,7 @@ public with sharing class FeatureSwitchService {
                         'Unused_Login_Days',
                         'Unused_Report_Days',
                         'Setup_Change_Retention_Days',
+                        'Field_Utilization_Retention_Days',
                         'Old_Api_Version'
                     }
                 )

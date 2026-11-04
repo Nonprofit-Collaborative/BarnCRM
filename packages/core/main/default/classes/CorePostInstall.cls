@@ -204,6 +204,9 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
         TabAccessService.requestSync();
         scheduleTabAccessCheck();
         alignSeasonalAddresses(isUpgrade);
+        // R-NJ5: the separate nightly schedules of an earlier version become the nightly run.
+        // After the seasonal alignment, which reads the old seasonal job. Never throws.
+        NightlyJobs.adoptOldSchedules();
         renameDataQualityQueries();
         ShippedDefaultUpgrades.apply(
             ModuleSetups.CORE,

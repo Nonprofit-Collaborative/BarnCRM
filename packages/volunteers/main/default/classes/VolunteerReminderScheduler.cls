@@ -16,19 +16,24 @@ public with sharing class VolunteerReminderScheduler implements Schedulable {
     @TestVisible
     private static String jobNameInUse = JOB_NAME;
 
-    /** Seven in the morning: after the 3:00 AM shift run has created the day's shifts. */
-    private static final String MORNING_CRON = '0 0 7 * * ?';
-
     public void execute(SchedulableContext context) {
+        if (context != null) {
+            // Still scheduled on its own from before the nightly run (R-NJ5).
+            NightlyJobs.adoptOldSchedules();
+        }
         VolunteerReminderBatch.startMorning();
     }
 
-    /** The morning job as Health Check's nightly jobs list sees it (ADR-0075). */
-    public static NightlyJob nightlyJob() {
-        return new NamedNightlyJob(
-            System.Label.Volunteers_NightlyJobs_RemindersName,
+    /**
+     * The job as a step of the nightly run (ADR-NEXT nightly-job-dispatcher): seven in the
+     * morning, after the 3:00 AM shift run has created the day's shifts.
+     */
+    public static NightlyStep step() {
+        return new NightlyStep(
             jobNameInUse,
-            MORNING_CRON,
+            System.Label.Volunteers_NightlyJobs_RemindersName,
+            7,
+            0,
             new VolunteerReminderScheduler()
         );
     }

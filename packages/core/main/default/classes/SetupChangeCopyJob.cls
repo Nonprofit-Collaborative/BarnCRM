@@ -1,8 +1,8 @@
 /**
  * The nightly Setup Changes copy (C-56, canonical model Section 29W). Copies the Setup Audit
  * Trail rows made since the newest kept row into `Setup_Change__c` (R-SU2), then deletes kept
- * rows older than the org's Days to Keep Setup Changes (R-SU4). Health Check lists it among the
- * nightly jobs (`NightlyJobs`), and Org Optimizer's Setup Changes section runs it on demand.
+ * rows older than the org's Days to Keep Setup Changes (R-SU4). A step of the nightly run
+ * (`NightlyJobs`), and Org Optimizer's Setup Changes section runs it on demand.
  *
  * One class, two passes: the copy pass reads the trail, and its finish starts the delete pass.
  * The trail is read with dynamic SOQL, so the class compiles in any org (R-SU1); Salesforce
@@ -12,11 +12,8 @@
  * cannot see would keep them for ever. It changes nothing but `Setup_Change__c` rows.
  */
 public without sharing class SetupChangeCopyJob implements Schedulable, Database.Batchable<SObject> {
-    /** The name the scheduled job carries, so it is found again rather than doubled. */
+    /** The name the job was scheduled under, now its step's key (1:30 in the nightly run). */
     public static final String JOB_NAME = 'BarnCRM Setup Changes Copy';
-
-    /** Half past one: between the Import row cleanup at 1:15 and the household tidy at 1:45. */
-    private static final String NIGHTLY_CRON = '0 30 1 * * ?';
 
     /** Rows per chunk: one upsert or delete of bookkeeping rows nothing fires on. */
     public static final Integer CHUNK_SIZE = 2000;
@@ -56,29 +53,38 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
     // Schedule
     // -------------------------------------------------------------------------------------
 
-    /** The nightly start: skipped when a copy started by hand is still waiting or running. */
+    /**
+     * The nightly start, as a step of the nightly run (or, in an org upgraded from before it,
+     * from its own old schedule, which it adopts first: R-NJ5). Skipped when a copy started by
+     * hand is still waiting or running.
+     */
     public void execute(SchedulableContext context) {
+        if (context != null) {
+            NightlyJobs.adoptOldSchedules();
+        }
         runNow();
     }
 
-    /** Starts the nightly copy, or does nothing when it is already scheduled. */
+    /** Makes sure the nightly run, which does the copy, is scheduled. */
     public static Id start() {
-        return ScheduledJobSelector.ensure(JOB_NAME, NIGHTLY_CRON, new SetupChangeCopyJob());
+        return NightlyJobs.start();
     }
 
-    /** True when the nightly copy is scheduled. */
+    /** True when the nightly run, which does the copy, is scheduled. */
     public static Boolean isScheduled() {
-        return ScheduledJobSelector.isScheduled(JOB_NAME);
+        return NightlyJobs.isScheduled();
     }
 
-    /** The nightly copy as Health Check's nightly jobs list sees it. */
-    public static NightlyJob nightlyJob() {
-        return new NamedNightlyJob(
-            System.Label.Core_HealthCheck_JobSetupChanges,
-            JOB_NAME,
-            NIGHTLY_CRON,
-            new SetupChangeCopyJob()
-        );
+    /** The copy as a step of the nightly run, while Org Optimizer is on (R-SU8). */
+    public static NightlyStep step() {
+        return new NightlyStep(
+                JOB_NAME,
+                System.Label.Core_HealthCheck_JobSetupChanges,
+                1,
+                30,
+                new SetupChangeCopyJob()
+            )
+            .activeWhen(featureOn());
     }
 
     /**

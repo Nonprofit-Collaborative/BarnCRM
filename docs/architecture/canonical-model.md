@@ -968,7 +968,9 @@ what. Required by the C-03 acceptance criterion that every settings change is lo
 **R-S1** Every write through the settings service produces exactly one Setting Change
 record per setting actually changed. Saving a page without changing anything writes
 nothing.
-**R-S2** Setting Change records are never edited or deleted by packaged code.
+**R-S2** Setting Change records are never edited by packaged code. The nightly run's Record
+Cleanup step deletes those changed more than `Setting_Change_Retention_Days__c` days ago (default
+730, from 180 to 3,650; architect review L-08).
 **R-S3** Values are stored as text so that any setting type can be audited uniformly.
 **R-S4** A value that is not set is recorded as nothing, never as empty text. Unset and
 cleared are the same state on a hierarchy custom setting, the platform stores empty text
@@ -1218,6 +1220,18 @@ default; the two choices are stored as text (ADR-0019).
 | `Fuzzy_Match_Threshold__c` | integer | 90 | How alike two names must be, in percent, before the scan pairs two people by name (R-DP7). From 80 to 100; out of range reads as the nearest end. |
 | `Merge_Default_Rule__c` | picklist(Keep master, Not blank, Most recent, Oldest record, Most complete) | Not blank | The merge rule of every person field with no active Merge Rule row (R-DP8). |
 | `Auto_Merge_Exact_Match__c` | picklist(Name and email, Name and phone, Name, email and phone, Name and birthdate) | Name and email | What two people must share exactly before auto-merge takes them (R-DP9). |
+| `Merge_Journal_Retention_Days__c` | integer | 365 | Days a Merge Journal row is kept before the nightly Record Cleanup step deletes it (architect review L-08); an older merge can no longer be undone. From 30 to 3,650; empty reads as 365, out of range as the nearest end. |
+
+### Record retention keys
+
+Added by architect review L-08. Each is read by the nightly run's Record Cleanup step (Section
+29ZR); empty reads as the default, out of range as the nearest end.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Setting_Change_Retention_Days__c` | integer | 730 | Days a Setting Change row is kept (R-S2). From 180 to 3,650. General section. |
+| `Import_History_Retention_Days__c` | integer | 365 | Days a finished import or bulk job (`Import_Batch__c`, with its rows and journal) is kept once its undo window has closed. From 30 to 3,650. Import section. |
+| `Field_Utilization_Retention_Days__c` | integer | 730 | Days a saved Field Utilization Snapshot row is kept (R-FU7). From 90 to 3,650. Org Optimizer section. |
 
 ### Health Check keys
 
@@ -4583,7 +4597,8 @@ report a year later.
 **R-IN5 The nightly passes are switched on in the console and visible there.** Nothing in
 the Giving module marks an installment Overdue or extends a recurring schedule until an
 administrator schedules the nightly jobs from the Nightly Jobs page of the Nonprofit
-Settings console, and the same page stops them (ADR-0031). Each pass records when it last
+Settings console, and the same page stops them (ADR-0031). Since the nightly run (R-NJ1),
+Schedule and Stop turn the four Giving steps' switches on and off (R-NJ4). Each pass records when it last
 finished and one sentence saying what it did, whether or not it changed anything, so a
 pass that ran and found nothing overdue reads differently from a pass that never ran. The
 console warns that a pass is stale only when the jobs are scheduled: an org that has not
@@ -8534,8 +8549,9 @@ says so.
 call (10 when the object holds more than 100,000 records); each call reads the record totals
 again. Nothing is stored until the person chooses "Save Utilization Snapshot"; the save checks each
 row's object, field and record type against describe and caps Filled Count at Record Count.
-Rows are never edited and no job deletes them; old rows are cleared with Bulk delete or any
-standard delete.
+Rows are never edited. The nightly run's Record Cleanup step deletes rows taken more than
+`Field_Utilization_Retention_Days__c` days ago (default 730, from 90 to 3,650; architect review
+L-08); Bulk delete or any standard delete clears them sooner.
 **R-FU8 Previous count shown.** The page shows the object's latest saved count next to the
 current one, with the change in percentage points.
 **R-FU9 Picklist value usage (C-57).** On request, for each single-select picklist field the
@@ -9826,8 +9842,8 @@ Cancelled.
   applies R-SSC4 and R-SSC5 and queues `ShiftScheduleGenerator`; nightly job `ShiftScheduleBatch`,
   started at 3:00 AM by `VolunteersScheduler` (job name `BarnCRM Volunteer Schedules`; Health
   Check and the Nightly Jobs list call it "Volunteer Schedules, 3:00 AM"), which
-  `VolunteersNightlyJobProvider` (`NightlyJobProvider`) supplies, so Health Check's "Schedule all
-  nightly jobs" fix schedules it. The shift deletes of R-SSC4 and R-SSC5 and the writes to Created
+  `VolunteersNightlyJobProvider` (`NightlyStepProvider`) supplies as a step of the one nightly
+  run (Section 29ZR). The shift deletes of R-SSC4 and R-SSC5 and the writes to Created
   Through, Shifts Kept and Rebuild Pending run in system mode: they are the schedule's own bookkeeping, which a
   Coordinator or Staff user who may edit the schedule cannot do with their own delete and field
   access. Shifts are created in user mode.
@@ -10003,11 +10019,11 @@ when?" long after Setup has forgotten. The copy is read only: BarnCRM never chan
 **R-SU1 Source.** Rows come only from `SetupAuditTrail`, read with SOQL. BarnCRM reads the
 trail and writes only its own copy; it never changes Setup.
 
-**R-SU2 Copy.** The nightly job "BarnCRM Setup Changes Copy" (1:30, listed among Health
-Check's nightly jobs) copies every trail row made at or after the newest kept row's Changed At,
+**R-SU2 Copy.** The nightly step "BarnCRM Setup Changes Copy" (1:30 in the nightly run,
+R-NJ2) copies every trail row made at or after the newest kept row's Changed At,
 or every row the trail holds when nothing is kept yet. A row already kept is found by its Audit
 Trail ID and not stored again. An administrator can also run the same copy from the page
-(**Copy New Changes Now**), which schedules the nightly job when it is not scheduled.
+(**Copy New Changes Now**), which schedules the nightly run when it is not scheduled.
 
 **R-SU3 Who can read the trail.** Salesforce lets a user read the trail only with View Setup
 and Configuration. The copy runs as the user who scheduled it, or who pressed Copy New Changes
@@ -11322,7 +11338,7 @@ The record chosen is a record identifier written into the query's filter, so the
 the indicator keep working however the record is renamed.
 
 **R-IN5 Refresh.** A batch, one indicator at a time, started by Refresh Results, by saving a
-computed source, and nightly (job BarnCRM Indicator Results, a `NightlyJobProvider` job). The
+computed source, and nightly (step BarnCRM Indicator Results of the nightly run, Section 29ZR). The
 query compiles as the running user; its records are read in system mode, so the result is the
 organization's figure whatever the runner's sharing. Every period that has started gets its
 Result Value (zero when no record falls in it); a period not yet started is left alone; Computed
@@ -12141,6 +12157,89 @@ adoption job in system mode (ADR-0021).
 
 ---
 
+## 29ZR. Nightly Job
+
+### Definition
+
+One step of BarnCRM's nightly run, or the run itself: its on/off switch where it has one, and
+what happened the last time it ran (architect review RT-10 and L-10, ADR-NEXT
+nightly-job-dispatcher). The steps themselves are code, registered by Core and by each module;
+a row exists only to remember a switch or a result.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Key | text(80) | yes | The step's key: the name its own scheduled job carried before the nightly run, such as `BarnCRM Import Row Cleanup`; `BarnCRM Nightly Jobs` for the run itself. One row per key. |
+| Switch | picklist(On, Off) | no | The step's on/off switch, for a step that has one; blank reads as the step's shipped value. |
+| Last Started | datetime | no | When the step (or run) last started. |
+| Last Finished | datetime | no | When it last finished, skipped or failed. |
+| Last Outcome | picklist(Running, Done, Done With Errors, Failed, Skipped, Gave Up Waiting) | no | How the last run of the step ended. |
+| Last Message | text(255) | no | The error of a failed step, or what the run waited for. |
+
+### Rules
+
+**R-NJ1 One schedule.** BarnCRM keeps two scheduled jobs for good: "BarnCRM Nightly Jobs"
+(every day at 00:00 in the scheduling user's time zone) and the hourly "BarnCRM Tab Access
+Check". The run schedules a one-time "BarnCRM Nightly Jobs Continue" only to resume after a long
+wait. No step has a scheduled job of its own.
+
+**R-NJ2 Steps and order.** A step is a key, a label, a time of day and the work it starts. Core
+registers its own; a module registers its steps through `NightlyStepProvider`, found by class
+name, so Core names no module. Steps run one at a time, ordered by time of day (ties in the
+order registered). Each starts at its time of day or when the step before has finished,
+whichever is later.
+
+**R-NJ3 When a step has finished.** When no batch, queueable or future job the run's user
+started since the step began is holding, queued, preparing or processing. Checked every two
+minutes; after six hours the step is recorded Gave Up Waiting and the run moves on. A step whose
+jobs failed or reported errors is Done With Errors; a step whose start threw is Failed, with the
+error logged and in Last Message.
+
+**R-NJ4 Switches.** A step whose on/off was its own schedule (Error Digest, Rollups, the four
+Giving jobs, Acknowledgments, Pledge Reminders, the Opportunity and Gift Transaction mirrors) has
+a switch, set by the Schedule and Stop buttons on its own page, org-wide. Shipped on, except
+Acknowledgments and Pledge Reminders (shipped off). A step whose on/off is a setting reads that
+setting. A step that is off is recorded Skipped.
+
+**R-NJ5 Adopting old schedules.** Every scheduled job named by a step's key is aborted; a step
+with a switch whose job was scheduled has its switch turned On; when anything was adopted, the
+nightly run is scheduled. Run at install, upgrade and Finish Setup by Core and by each module, at
+the start of each nightly run, by Health Check's fix, and when an old job fires. Never throws.
+
+**R-NJ6 A run still going at midnight.** The new run supersedes it: the old run stops at its
+next check, and the new run's first step waits for the work the old step started.
+
+**R-NJ8 Record Cleanup.** A Core step at 1:20 deletes, oldest first and in system mode, the
+history rows past their retention (architect review L-08): Setting Change (R-S2), Merge Journal,
+finished imports and bulk jobs whose undo window has closed (journal and rows first, then the
+batch), and Field Utilization Snapshot (R-FU7), each by its key in Section 12 ("Record retention
+keys" and `Merge_Journal_Retention_Days__c`). A pass that fails is logged and the next pass runs.
+**R-NJ7 Administrators only.** Only `BarnCRM_Admin` is granted the object, Read and View All.
+Rows are written only by BarnCRM code in system mode (ADR-0021); switches change through the
+pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
+
+### Salesforce implementation
+
+- **Object** `Nightly_Job__c`, Name is the key (Text 80), sharing Private, reports on, no
+  activities, feeds, history or search.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Switch | `Switch__c` | Picklist (On, Off), restricted |
+| Last Started | `Last_Started__c` | DateTime |
+| Last Finished | `Last_Finished__c` | DateTime |
+| Last Outcome | `Last_Outcome__c` | Picklist (Running, Done, Done With Errors, Failed, Skipped, Gave Up Waiting), restricted |
+| Last Message | `Last_Message__c` | Text(255) |
+
+- **Classes:** `NightlyStep` (one step), `NightlyStepProvider` (a module's steps),
+  `NightlyJobs` (the registry, switches, results, scheduling and adoption), `NightlyRun` (the
+  run: schedulable and queueable). Each former scheduler class keeps its `start`, `stop`,
+  `isScheduled` and `nextRunAt` for its page, now reading and writing its step's switch. The
+  panel is `nightlyJobsPanel`, on the General page of BarnCRM Settings.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -12482,6 +12581,8 @@ mirrors the primary member).
 | 0.16 | 2026-11-02 | Logic Models L-06 (ADR-0163 `0163-funders-reporting-links.md`). `Grant_Requirement__c` (29ZI) gains Logic Model Outcome (`Outcome_Id__c`, Text(18)), a Logic Models element named by record identifier, with rule R-GQ6. Neither module references the other. |
 | 0.16 | 2026-11-02 | Funders F-06 (ADR-0163 `0163-funders-reporting-links.md`). New Section 29ZO Funder Report Template (`Funder_Report_Template__c` and the shipped `Funder_Report_Template_Default__mdt`), rules R-FT1 to R-FT3. |
 | 0.16 | 2026-11-02 | Funders F-07 (ADR-0163 `0163-funders-reporting-links.md`). Grant (29ZH) gains rule R-GN9, the board dashboard (revenue mix, concentration, restricted balances), read from grants and, by describe, Giving and the F-03 ledger; no new object or field. |
+| v1.0 | 2026-11-04 | One nightly job dispatcher (architect review RT-10, L-10, ADR-NEXT nightly-job-dispatcher). New Core object Nightly Job (`Nightly_Job__c`, 29ZR) with rules R-NJ1 to R-NJ7: one nightly schedule runs every step in sequence, each step keeping its switch and last result; about 19 separate scheduled jobs are replaced and adopted on upgrade. R-SU2 and R-IN5 read the nightly run instead of their own jobs. |
+| v1.0 | 2026-11-04 | Record retention (architect review L-08). `BarnCRM_Settings__c` gains `Merge_Journal_Retention_Days__c` (365), `Setting_Change_Retention_Days__c` (730), `Import_History_Retention_Days__c` (365) and `Field_Utilization_Retention_Days__c` (730). New rule R-NJ8 (the Record Cleanup step); R-S2 and R-FU7 amended. No object added. |
 | 0.17 | 2026-11-04 | Dispatcher error contract (RT-05, ADR-NEXT dispatcher errors and Automation Control). Section 10 gains rule R-A6: a failure refuses only its own records, the rest of the save goes ahead. No object or field added. |
 | 0.17 | 2026-11-04 | BarnCRM Automation Control (RT-13, same ADR). New hierarchy custom setting `BarnCRM_Automation_Control__c` with `Pause_All__c` and `Bypass__c` (Section 10, rule R-A7), read by the dispatcher, every shipped flow template and the Check BarnCRM Automation action. |
 | 0.17 | 2026-11-04 | Automation page manages Automation Control (RT-13, same ADR, decisions 2.6 to 2.8). Section 10 gains rule R-A8: org, profile and user rows edited in the console, an org's own flows listed as `Flow:` switch rows, and Catch Up Now. No object or field added. |
@@ -12591,6 +12692,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Indicator | Logic Models | 0.14 (L-02) | 29ZF |
 | Indicator Period | Logic Models | 0.14 (L-02) | 29ZG |
 | Household Adoption | Core | 0.17 (X-05) | 29ZQ |
+| Nightly Job | Core | v1.0 (architect review RT-10) | 29ZR |
 | Funders entities | Funders | v0.9 | 30 |
 | Grant | Funders | 0.16 (F-01) | 29ZH |
 | Grant Requirement | Funders | 0.16 (F-02) | 29ZI |

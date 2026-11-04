@@ -1,9 +1,10 @@
 /**
- * The Seasonal Addresses switch on the Addresses page of BarnCRM Settings: saving it on
- * schedules the nightly swap, saving it off stops it, and neither doubles or loses the job.
+ * The Seasonal Addresses switch on the Addresses page of BarnCRM Settings: saving it on makes
+ * sure the nightly run is scheduled and puts the swap in tonight's run, saving it off leaves the
+ * swap out (ADR-NEXT nightly-job-dispatcher), and neither doubles the schedule.
  *
  * An org may already have BarnCRM jobs scheduled, so every count is taken against what the org
- * held before the test changed anything, and the swap's own job is cleared first.
+ * held before the test changed anything, and the run's own test job is cleared first.
  */
 @IsTest(testFor='ApexClass:SeasonalAddressScheduler')
 private class SeasonalAddressSwitchTest {
@@ -14,19 +15,20 @@ private class SeasonalAddressSwitchTest {
         TestUsers.admin();
     }
 
-    /** The org with the switch off and the swap not scheduled, whatever it held before. */
+    /** The org with the switch off and the nightly run not scheduled, whatever it held before. */
     private static void startFromOff() {
         SettingsService.saveBookkeeping(new Map<String, Object>{ KEY => false });
-        TestDataFactory.clearScheduledJobs(new List<String>{ SeasonalAddressScheduler.JOB_NAME });
+        TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
         ScheduledJobSelector.forget();
         SettingsService.clearCaches();
+        NightlyJobs.forget();
     }
 
-    private static Integer swapJobs() {
+    private static Integer runJobs() {
         return [
             SELECT COUNT()
             FROM CronTrigger
-            WHERE CronJobDetail.Name = :SeasonalAddressScheduler.JOB_NAME
+            WHERE CronJobDetail.Name = :NightlyJobs.jobName()
         ];
     }
 
@@ -36,6 +38,11 @@ private class SeasonalAddressSwitchTest {
 
     private static void saveSwitch(Boolean enabled) {
         SettingsController.saveSettings(new Map<String, Object>{ KEY => enabled });
+        NightlyJobs.forget();
+    }
+
+    private static Boolean inTonightsRun() {
+        return NightlyJobs.isOn(NightlyJobs.step(SeasonalAddressScheduler.JOB_NAME));
     }
 
     @IsTest
@@ -43,10 +50,6 @@ private class SeasonalAddressSwitchTest {
         System.runAs(TestUsers.admin()) {
             delete [SELECT Id FROM BarnCRM_Settings__c];
             SettingsService.clearCaches();
-            TestDataFactory.clearScheduledJobs(
-                new List<String>{ SeasonalAddressScheduler.JOB_NAME }
-            );
-            ScheduledJobSelector.forget();
 
             Assert.isFalse(
                 SeasonalAddressScheduler.isEnabled(),
@@ -54,13 +57,14 @@ private class SeasonalAddressSwitchTest {
             );
             Assert.isFalse(
                 SeasonalAddressScheduler.isScheduled(),
-                'And nothing schedules the job behind its back'
+                'And nothing runs the swap behind its back'
             );
+            Assert.isFalse(inTonightsRun(), 'The nightly run leaves it out');
         }
     }
 
     @IsTest
-    static void turningItOnSchedulesTheNightlyJob() {
+    static void turningItOnSchedulesTheNightlyRun() {
         System.runAs(TestUsers.admin()) {
             startFromOff();
             Integer before = allApexJobs();
@@ -70,17 +74,18 @@ private class SeasonalAddressSwitchTest {
             Test.stopTest();
 
             Assert.isTrue(SeasonalAddressScheduler.isEnabled(), 'The switch is on');
-            Assert.areEqual(1, swapJobs(), 'One nightly swap is scheduled, under its usual name');
+            Assert.areEqual(1, runJobs(), 'The nightly run is scheduled, once');
             Assert.areEqual(before + 1, allApexJobs(), 'And nothing else was scheduled');
+            Assert.isTrue(inTonightsRun(), 'The swap is in tonight\'s run');
             Assert.isNotNull(
                 SeasonalAddressScheduler.nextRunAt(),
-                'The job shows when it runs next'
+                'The swap shows when it runs next'
             );
         }
     }
 
     @IsTest
-    static void turningItOffStopsTheNightlyJob() {
+    static void turningItOffLeavesTheSwapOutOfTheRun() {
         System.runAs(TestUsers.admin()) {
             startFromOff();
             saveSwitch(true);
@@ -91,17 +96,18 @@ private class SeasonalAddressSwitchTest {
             Test.stopTest();
 
             Assert.isFalse(SeasonalAddressScheduler.isEnabled(), 'The switch is off');
-            Assert.areEqual(0, swapJobs(), 'The nightly swap is no longer scheduled');
-            Assert.areEqual(scheduled - 1, allApexJobs(), 'Only the swap was stopped');
+            Assert.isFalse(SeasonalAddressScheduler.isScheduled(), 'The swap reads as stopped');
+            Assert.isFalse(inTonightsRun(), 'And the nightly run leaves it out');
+            Assert.areEqual(scheduled, allApexJobs(), 'The run itself stays, for the other jobs');
         }
     }
 
     @IsTest
-    static void turningItOnWhenTheJobIsAlreadyScheduledLeavesOneJob() {
+    static void turningItOnWhenTheRunIsAlreadyScheduledLeavesOneJob() {
         System.runAs(TestUsers.admin()) {
             startFromOff();
-            // The job already exists, as when Health Check scheduled it or an upgrade kept it.
-            Id existing = SeasonalAddressScheduler.start();
+            // The run already exists, as when Health Check or another page scheduled it.
+            Id existing = NightlyJobs.start();
             Integer before = allApexJobs();
 
             Test.startTest();
@@ -110,39 +116,22 @@ private class SeasonalAddressSwitchTest {
             SeasonalAddressScheduler.scheduleIfEnabled();
             Test.stopTest();
 
-            Assert.areEqual(1, swapJobs(), 'Never two jobs under the one name');
+            Assert.areEqual(1, runJobs(), 'Never two runs under the one name');
             Assert.areEqual(before, allApexJobs(), 'No extra job was scheduled');
             Assert.areEqual(
                 existing,
-                ScheduledJobSelector.triggerIdByName(SeasonalAddressScheduler.JOB_NAME),
-                'The job that was there is the one that stays'
+                ScheduledJobSelector.triggerIdByName(NightlyJobs.jobName()),
+                'The run that was there is the one that stays'
             );
         }
     }
 
     @IsTest
-    static void turningItOffWhenNoJobIsScheduledIsHarmless() {
+    static void savingAnotherSettingLeavesTheRunAlone() {
         System.runAs(TestUsers.admin()) {
             startFromOff();
             saveSwitch(true);
-            SeasonalAddressScheduler.stop();
-            Integer before = allApexJobs();
-
-            Test.startTest();
-            saveSwitch(false);
-            Test.stopTest();
-
-            Assert.areEqual(0, swapJobs(), 'Still not scheduled');
-            Assert.areEqual(before, allApexJobs(), 'Nothing else was touched');
-        }
-    }
-
-    @IsTest
-    static void savingAnotherSettingLeavesTheJobAlone() {
-        System.runAs(TestUsers.admin()) {
-            startFromOff();
-            saveSwitch(true);
-            Id scheduled = ScheduledJobSelector.triggerIdByName(SeasonalAddressScheduler.JOB_NAME);
+            Id scheduled = ScheduledJobSelector.triggerIdByName(NightlyJobs.jobName());
 
             Test.startTest();
             SettingsController.saveSettings(
@@ -154,14 +143,14 @@ private class SeasonalAddressSwitchTest {
 
             Assert.areEqual(
                 scheduled,
-                ScheduledJobSelector.triggerIdByName(SeasonalAddressScheduler.JOB_NAME),
-                'A save that does not touch the switch does not reschedule the job'
+                ScheduledJobSelector.triggerIdByName(NightlyJobs.jobName()),
+                'A save that does not touch the switch does not reschedule the run'
             );
         }
     }
 
     @IsTest
-    static void aPersonWithoutThePermissionCannotChangeTheSwitchOrTheJob() {
+    static void aPersonWithoutThePermissionCannotChangeTheSwitch() {
         System.runAs(TestUsers.admin()) {
             // The person is made before any settings write, which keeps setup and data writes apart.
             User reader = TestDataFactory.createUser('Reader', new List<String>());
@@ -184,7 +173,7 @@ private class SeasonalAddressSwitchTest {
 
             SettingsService.clearCaches();
             Assert.isFalse(SeasonalAddressScheduler.isEnabled(), 'The switch stayed off');
-            Assert.areEqual(0, swapJobs(), 'And no job was scheduled');
+            Assert.areEqual(0, runJobs(), 'And nothing was scheduled');
         }
     }
 
@@ -200,43 +189,6 @@ private class SeasonalAddressSwitchTest {
             Assert.isFalse(before.scheduled, 'And not scheduled');
             Assert.isTrue(after.enabled, 'On once saved');
             Assert.isTrue(after.scheduled, 'And scheduled by that save, with no button pressed');
-        }
-    }
-
-    @IsTest
-    static void healthCheckSchedulesTheSwapOnlyWhileTheSwitchIsOn() {
-        System.runAs(TestUsers.admin()) {
-            startFromOff();
-            for (String className : NightlyJobs.PROVIDER_CLASSES) {
-                NightlyJobs.providerOverrides.put(className, new EmptyProvider());
-            }
-
-            Boolean listedWhileOff = hasSeasonalJob(NightlyJobs.all());
-            saveSwitch(true);
-            SeasonalAddressScheduler.stop();
-            Boolean listedWhileOn = hasSeasonalJob(NightlyJobs.all());
-
-            Assert.isFalse(
-                listedWhileOff,
-                'An administrator who switched the swap off is not told to schedule it'
-            );
-            Assert.isTrue(listedWhileOn, 'With the switch on, a missing job is listed');
-        }
-    }
-
-    private static Boolean hasSeasonalJob(List<NightlyJob> jobs) {
-        for (NightlyJob job : jobs) {
-            if (job.label() == System.Label.Core_HealthCheck_JobSeasonalAddresses) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** A module provider that has no jobs, so the modules in the test org change nothing. */
-    private class EmptyProvider implements NightlyJobProvider {
-        public List<NightlyJob> nightlyJobs() {
-            return new List<NightlyJob>();
         }
     }
 }

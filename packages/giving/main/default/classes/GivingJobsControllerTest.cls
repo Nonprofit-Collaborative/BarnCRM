@@ -70,9 +70,9 @@ private class GivingJobsControllerTest {
                 'The page shows when the first of the three jobs is next due.'
             );
             Assert.areEqual(
-                4,
-                [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
-                'Choosing Schedule from the console schedules all three jobs, which is the whole fix.'
+                1,
+                [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name = :NightlyJobs.jobName()],
+                'Choosing Schedule from the console schedules the one nightly run that does them.'
             );
             for (GivingJobsController.JobView job : view.jobs) {
                 Assert.isTrue(
@@ -93,9 +93,9 @@ private class GivingJobsControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                4,
-                [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
-                'Pressing Schedule twice does not schedule a second copy of each job.'
+                1,
+                [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name = :NightlyJobs.jobName()],
+                'Pressing Schedule twice does not schedule a second nightly run.'
             );
             Assert.isTrue(view.scheduled, 'The page still reports the jobs as scheduled.');
         }
