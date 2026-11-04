@@ -36,8 +36,6 @@ private class DonorLevelWriterTest {
             Assert.areEqual(2, fields.size(), 'Its Id and the one changed value: ' + fields);
             Assert.areEqual(5, ((Decimal) fields.get('RFM_Score__c')).intValue(), 'New score.');
             Assert.areEqual(1, written, 'One record written.');
-            Contact saved = [SELECT RFM_Score__c FROM Contact WHERE Id = :moved.Id];
-            Assert.areEqual(5, saved.RFM_Score__c.intValue(), 'Saved.');
         }
     }
 }

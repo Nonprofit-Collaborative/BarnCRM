@@ -332,7 +332,7 @@ private class RollupsHealthCheckExtensionTest {
                 Assert.areEqual(
                     String.format(
                         System.Label.Core_HealthCheck_FixScheduled,
-                        new List<Object>{ System.Label.Core_JobNotice_Rollups }
+                        new List<Object>{ String.join(jobs.getFixScope(), ', ') }
                     ),
                     report.getFixOutcome(),
                     'The panel is told which jobs were scheduled.'
