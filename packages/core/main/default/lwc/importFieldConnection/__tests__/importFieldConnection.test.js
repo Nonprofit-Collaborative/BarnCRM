@@ -78,6 +78,6 @@ describe('c-import-field-connection', () => {
     const element = createElement('c-import-field-connection', { is: ImportFieldConnection });
     document.body.appendChild(element);
     await flush();
-    expect(one(element, 'error').textContent).toContain('No access.');
+    expect(one(element, 'error').message).toContain('No access.');
   });
 });

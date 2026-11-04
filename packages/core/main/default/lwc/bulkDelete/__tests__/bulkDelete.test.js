@@ -171,6 +171,9 @@ describe('c-bulk-delete', () => {
     expect(startDelete).toHaveBeenCalledWith({ queryJson: QUERY, confirmedCount: 200 });
     expect(one(element, 'preview-box')).toBeNull();
     expect(one(element, 'notice-message')).not.toBeNull();
+    // While it runs the bar says a percent, never parts of an internal batch.
+    expect(one(element, 'progress').value).toBe(0);
+    expect(one(element, 'progress').valueText).toBe('c.Core_BulkDelete_Progress');
 
     polls.next()();
     await flush();
@@ -201,7 +204,7 @@ describe('c-bulk-delete', () => {
     polls.next()();
     await flush();
     expect(getJob).toHaveBeenCalledTimes(2);
-    expect(one(element, 'error-message').textContent).toBe('Connection lost');
+    expect(one(element, 'error-message').message).toBe('Connection lost');
   });
 
   it('deletes what a delete by file dry run found, sending the batch and the count', async () => {
@@ -280,7 +283,7 @@ describe('c-bulk-delete', () => {
     });
     expect(text).toContain('Contact ID,Last Name\r\n003000000000001,Person 0\r\n');
     expect(text).toContain("003000000000002,'=Person 1");
-    expect(one(element, 'notice-message').textContent).toBe('Downloaded 2 records.');
+    expect(one(element, 'notice-message').message).toBe('Downloaded 2 records.');
     expect(startDelete).not.toHaveBeenCalled();
   });
 
@@ -290,7 +293,7 @@ describe('c-bulk-delete', () => {
     one(element, 'preview').click();
     await flush();
 
-    expect(one(element, 'error-message').textContent).toBe('More than 10000 records match.');
+    expect(one(element, 'error-message').message).toBe('More than 10000 records match.');
     expect(one(element, 'start')).toBeNull();
   });
 

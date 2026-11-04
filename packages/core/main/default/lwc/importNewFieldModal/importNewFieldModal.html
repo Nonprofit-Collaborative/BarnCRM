@@ -6,9 +6,12 @@
       <lightning-spinner alternative-text={labels.create} size="small"></lightning-spinner>
     </template>
     <template lwc:if={errorMessage}>
-      <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
-        {errorMessage}
-      </p>
+      <c-barn-notice
+        class="slds-show slds-var-m-bottom_small"
+        variant="error"
+        message={errorMessage}
+        data-id="error"
+      ></c-barn-notice>
     </template>
     <template lwc:if={status}>
       <p class="slds-var-m-bottom_small" data-id="status" role="status">{status}</p>

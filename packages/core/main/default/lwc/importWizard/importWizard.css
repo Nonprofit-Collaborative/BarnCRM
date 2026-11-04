@@ -1,0 +1,39 @@
+/* A visible place to drop a file (admin-1 drag and drop item 6): the file input already accepts a
+   dropped file; the dashed area makes that obvious. A phone keeps the file picker. */
+.drop-area {
+  padding: var(--slds-g-spacing-6, 1.5rem) var(--slds-g-spacing-4, 1rem);
+  border: var(--slds-g-sizing-border-2, 2px) dashed var(--slds-g-color-border-2, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  background-color: var(--slds-g-color-surface-container-1, #f3f3f3);
+}
+
+.drop-area:focus-within {
+  border-color: var(--slds-g-color-accent-1, #0176d3);
+}
+
+/* A suggested field to drag onto a column (drag and drop item 3). */
+.chip {
+  display: block;
+  margin-bottom: var(--slds-g-spacing-2, 0.5rem);
+  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-2, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  background-color: var(--slds-g-color-surface-container-1, #ffffff);
+  cursor: grab;
+  touch-action: none;
+}
+
+.chip:focus {
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-accent-1, #0176d3);
+  outline-offset: 1px;
+}
+
+.chip-lifted {
+  opacity: 0.5;
+}
+
+/* The column row a drag is over. */
+.drop-target {
+  outline: var(--slds-g-sizing-border-2, 2px) dashed var(--slds-g-color-accent-1, #0176d3);
+  outline-offset: -2px;
+}

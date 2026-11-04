@@ -8479,8 +8479,10 @@ platform deletes with a parent are not in it.
   chunk read; `ImportUndoService` and `ImportUndoBatch` handle the Update operation.
 - **Permission:** custom permission `Bulk_Update_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Bulk_Update`, assigned beside `BarnCRM_Find_And_Export`.
-- **UI:** component `bulkUpdate`, opened from Find's results with the query, and on the Super
-  Transformer tab (app page `Bulk_Update`) listing recent Super Transformer runs with their progress and undo.
+- **UI:** component `superTransform` on the Super Transformer tab (app page `Bulk_Update`),
+  listing recent Super Transformer runs with their progress and undo. Find's Change Records menu
+  opens that tab with the query's object, filter and `related` conditions in the page state key
+  `start` (the former `bulkUpdate` panel inside Find is gone; one change screen).
 
 ---
 

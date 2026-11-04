@@ -207,6 +207,27 @@ export function valueProblem(kind, inputValue) {
 }
 
 /**
+ * The condition logic after the condition at zero-based position `from` moves to position `to`
+ * among `count` conditions: every number follows its condition, so `1 AND (2 OR 3)` after
+ * moving condition 3 to the top reads `2 AND (3 OR 1)`. A number outside the conditions is left
+ * as typed (logicProblem still reports it).
+ */
+export function renumberLogic(logic, from, to, count) {
+  const order = Array.from({ length: count }, (unused, index) => index);
+  const [moved] = order.splice(from, 1);
+  order.splice(to, 0, moved);
+  // order[newPosition] is the condition's old position; each old number maps to its new one.
+  const newNumber = {};
+  order.forEach((oldPosition, newPosition) => {
+    newNumber[oldPosition + 1] = newPosition + 1;
+  });
+  return String(logic || '').replace(/\d+/g, (digits) => {
+    const renumbered = newNumber[Number(digits)];
+    return renumbered ? String(renumbered) : digits;
+  });
+}
+
+/**
  * Checks a condition logic string the way the server does, and a little more: only condition
  * numbers, AND, OR, NOT and brackets, in an order that reads, every bracket closed, every
  * number an existing condition, and every condition used.
