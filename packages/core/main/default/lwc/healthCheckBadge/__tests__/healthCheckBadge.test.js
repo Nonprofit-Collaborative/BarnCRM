@@ -9,12 +9,18 @@ describe('c/healthCheckBadge', () => {
     expect(healthCheckBadge({ ranAt: null }).badgeLabel).toBe('c.Core_OrgOptimizer_BadgeNotRun');
   });
 
-  it('puts errors before warnings, and passes a clean run', () => {
+  it('puts Needs Fixing before Worth Knowing, and says All Clear for a clean run', () => {
     const ranAt = '2026-10-28T10:00:00.000Z';
-    expect(healthCheckBadge({ ranAt, errors: 2, warnings: 3 }).badgeVariant).toBe('error');
-    expect(healthCheckBadge({ ranAt, errors: 0, warnings: 3 }).badgeVariant).toBe('warning');
+    expect(healthCheckBadge({ ranAt, errors: 2, warnings: 3 })).toEqual({
+      badgeLabel: 'c.Core_OrgOptimizer_BadgeErrors',
+      badgeVariant: 'error'
+    });
+    expect(healthCheckBadge({ ranAt, errors: 0, warnings: 3 })).toEqual({
+      badgeLabel: 'c.Core_OrgOptimizer_BadgeWarnings',
+      badgeVariant: 'warning'
+    });
     expect(healthCheckBadge({ ranAt, errors: 0, warnings: 0, infos: 4 })).toEqual({
-      badgeLabel: 'c.Core_OrgOptimizer_BadgePassed',
+      badgeLabel: 'c.Core_OrgOptimizer_BadgeAllClear',
       badgeVariant: 'success'
     });
   });

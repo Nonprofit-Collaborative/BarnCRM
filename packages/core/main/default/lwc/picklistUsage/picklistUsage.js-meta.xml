@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    Picklist Value Usage, a part of Field Utilization: how many records hold each picklist value
+    Picklist Value Usage, a part of Field Use: how many records hold each picklist value
     and when the newest of them was last changed.
   </description>
   <isExposed>false</isExposed>

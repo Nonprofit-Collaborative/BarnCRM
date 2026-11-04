@@ -11,6 +11,7 @@ import { toCsv } from 'c/findCsv';
 import YES from '@salesforce/label/c.Core_AccessExplorer_Yes';
 import NO from '@salesforce/label/c.Core_DataDictionary_No';
 import COL_OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
+import COL_KIND_OF_RECORD from '@salesforce/label/c.Core_AccessExplorer_KindOfRecord';
 import COL_OBJECT_API_NAME from '@salesforce/label/c.Core_DataDictionary_ColObjectApiName';
 import COL_FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import COL_API_NAME from '@salesforce/label/c.Core_AccessExplorer_ColApiName';
@@ -67,8 +68,9 @@ export function toRow(objectDictionary, field, share) {
   };
 }
 
+/** The on-screen tables say "Kind of Record"; the CSV files keep "Object" beside "Object API Name". */
 export const TABLE_COLUMNS = [
-  { label: COL_OBJECT, fieldName: 'objectLabel', initialWidth: 160 },
+  { label: COL_KIND_OF_RECORD, fieldName: 'objectLabel', initialWidth: 160 },
   { label: COL_FIELD, fieldName: 'fieldLabel', initialWidth: 200 },
   { label: COL_API_NAME, fieldName: 'fieldName', initialWidth: 200 },
   { label: COL_TYPE, fieldName: 'dataType', initialWidth: 120 },
@@ -124,7 +126,7 @@ export function toAutomationRow(row) {
 }
 
 export const AUTOMATION_COLUMNS = [
-  { label: COL_OBJECT, fieldName: 'objectLabel', initialWidth: 160 },
+  { label: COL_KIND_OF_RECORD, fieldName: 'objectLabel', initialWidth: 160 },
   { label: COL_AUTOMATION_TYPE, fieldName: 'typeLabel', initialWidth: 120 },
   { label: COL_AUTOMATION_NAME, fieldName: 'name', initialWidth: 260 },
   { label: COL_API_NAME, fieldName: 'apiName', initialWidth: 240 },
