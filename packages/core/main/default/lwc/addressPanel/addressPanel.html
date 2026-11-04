@@ -1,6 +1,6 @@
 <template>
     <template lwc:if={helpReady}>
-  <lightning-card title={labels.panelTitle} icon-name="standard:address">
+  <lightning-card title={labels.panelTitle} icon-name={icons.address}>
     <template lwc:if={canAdd}>
       <lightning-button
         slot="actions"
@@ -16,9 +16,12 @@
       </template>
 
       <template lwc:if={errorMessage}>
-        <div role="alert" class="slds-text-color_error slds-var-m-bottom_small" data-id="error">
-          {errorMessage}
-        </div>
+        <c-barn-notice
+          class="slds-var-m-bottom_small"
+          variant="error"
+          message={errorMessage}
+          data-id="error"
+        ></c-barn-notice>
       </template>
 
       <template lwc:if={isEmpty}>
@@ -48,49 +51,66 @@
               </button>
             </h3>
           </template>
+          <ul class="slds-has-dividers_bottom-space">
           <template for:each={group.cards} for:item="address">
-            <div key={address.id} class={address.cardClass} data-id="address-card">
+            <li key={address.id} class={address.rowClass} data-id="address-card">
               <template lwc:if={address.flagUndeliverable}>
-                <div
-                  role="alert"
-                  class="slds-text-color_error slds-var-m-bottom_x-small"
+                <c-barn-notice
+                  class="slds-var-m-bottom_x-small"
+                  variant="warning"
+                  message={labels.undeliverablePrimary}
                   data-id="undeliverable-primary"
-                >
-                  {labels.undeliverablePrimary}
-                </div>
+                ></c-barn-notice>
               </template>
               <div class="slds-media slds-media_small">
-                <div class="slds-media__figure">
-                  <lightning-icon icon-name="utility:location" size="small" data-id="address-icon"></lightning-icon>
+                <div class="slds-media__figure" aria-hidden="true">
+                  <lightning-avatar
+                    variant="circle"
+                    size="small"
+                    fallback-icon-name="standard:address"
+                    data-id="address-icon"
+                  ></lightning-avatar>
                 </div>
                 <div class="slds-media__body">
                   <div class="slds-grid slds-grid_vertical-align-start">
                     <div class="slds-col slds-grid slds-wrap slds-grid_vertical-align-center">
-                      <p class="slds-text-title_bold slds-var-m-right_x-small" data-id="address-type">
-                        {address.addressType}
-                      </p>
+                      <h3 class="slds-text-heading_small slds-var-m-right_x-small">
+                        <a
+                          href={address.href}
+                          data-record-id={address.id}
+                          onclick={handleOpenRecord}
+                          data-id="address-type"
+                        >{address.headline}</a>
+                      </h3>
                       <template lwc:if={address.isDefault}>
-                        <lightning-badge label={labels.defaultBadge} data-id="default-badge"></lightning-badge>
+                        <c-barn-status-badge
+                          class="slds-var-m-right_xx-small"
+                          status="success"
+                          icon-name="utility:favorite"
+                          label={labels.defaultBadge}
+                          data-id="default-badge"
+                        ></c-barn-status-badge>
                       </template>
                       <template lwc:if={address.isUndeliverable}>
-                        <lightning-badge
+                        <c-barn-status-badge
+                          status="error"
                           label={labels.undeliverableBadge}
-                          class="slds-theme_error"
                           data-id="undeliverable-badge"
-                        ></lightning-badge>
+                        ></c-barn-status-badge>
                       </template>
                     </div>
-                    <template lwc:if={address.showStatusMenu}>
+                    <template lwc:if={address.showMoreMenu}>
                       <lightning-button-menu
-                        alternative-text={labels.statusMenu}
-                        title={labels.statusMenu}
+                        alternative-text={labels.moreMenu}
+                        title={labels.moreMenu}
                         menu-alignment="auto"
                         icon-size="small"
                         data-id={address.id}
-                        onselect={handleStatusSelect}
+                        disabled={moveBusy}
+                        onselect={handleMoreSelect}
                         class="status-menu slds-no-flex"
                       >
-                        <template for:each={address.statusActions} for:item="action">
+                        <template for:each={address.menuActions} for:item="action">
                           <lightning-menu-item
                             key={action.value}
                             value={action.value}
@@ -104,12 +124,12 @@
                   <p data-id="address-city">{address.cityLine}</p>
                   <p data-id="address-country">{address.country}</p>
                   <template lwc:if={address.seasonalText}>
-                    <p class="slds-text-body_small" data-id="address-seasonal">
+                    <p class="slds-text-body_small slds-text-color_weak" data-id="address-seasonal">
                       {address.seasonalText}
                     </p>
                   </template>
                   <template lwc:if={address.dateText}>
-                    <p class="slds-text-body_small" data-id="address-dates">{address.dateText}</p>
+                    <p class="slds-text-body_small slds-text-color_weak" data-id="address-dates">{address.dateText}</p>
                   </template>
                   <template lwc:if={address.hasCardFields}>
                     <lightning-record-view-form
@@ -126,40 +146,21 @@
                       </template>
                     </lightning-record-view-form>
                   </template>
-                  <div class="slds-grid slds-wrap">
-                    <template lwc:if={canSetDefault}>
-                      <template lwc:if={address.showSetDefault}>
-                        <lightning-button
-                          label={labels.setDefaultButton}
-                          data-id={address.id}
-                          onclick={handleSetDefault}
-                          class="set-default slds-var-m-top_x-small slds-var-m-right_x-small"
-                        ></lightning-button>
-                      </template>
-                    </template>
-                    <template lwc:if={address.showUseForHousehold}>
+                  <template lwc:if={canSetDefault}>
+                    <template lwc:if={address.showSetDefault}>
                       <lightning-button
-                        label={labels.useForHouseholdButton}
+                        label={labels.setDefaultButton}
                         data-id={address.id}
-                        disabled={moveBusy}
-                        onclick={handleUseForHousehold}
-                        class="use-for-household slds-var-m-top_x-small slds-var-m-right_x-small"
+                        onclick={handleSetDefault}
+                        class="set-default slds-var-m-top_x-small"
                       ></lightning-button>
                     </template>
-                    <template lwc:if={address.showUpdateEveryone}>
-                      <lightning-button
-                        label={labels.updateEveryoneButton}
-                        data-id={address.id}
-                        disabled={moveBusy}
-                        onclick={handleUpdateEveryone}
-                        class="update-everyone slds-var-m-top_x-small slds-var-m-right_x-small"
-                      ></lightning-button>
-                    </template>
-                  </div>
+                  </template>
                 </div>
               </div>
-            </div>
+            </li>
           </template>
+          </ul>
         </div>
       </template>
 

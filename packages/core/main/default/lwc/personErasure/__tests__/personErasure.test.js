@@ -118,7 +118,8 @@ describe('c-person-erasure', () => {
     byId(element, 'preview').click();
     await flush();
 
-    expect(byId(element, 'error').value).toBe('You cannot change 3 Relationships');
+    expect(byId(element, 'error').message).toBe('You cannot change 3 Relationships');
+    expect(byId(element, 'error').variant).toBe('error');
     expect(byId(element, 'changes')).toBeNull();
   });
 });
