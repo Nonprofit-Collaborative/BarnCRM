@@ -169,7 +169,7 @@ private class PicklistUsageTest {
             List<String> names = new List<String>();
             for (
                 Schema.DescribeFieldResult field : PicklistUsageService.picklistFields(
-                    Error_Log__c.SObjectType.getDescribe()
+                    Error_Log__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
                 )
             ) {
                 if (names.size() < PicklistUsageService.CHUNK_SIZE) {
