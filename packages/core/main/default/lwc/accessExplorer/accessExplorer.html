@@ -25,14 +25,20 @@
         ></lightning-input>
 
         <template lwc:if={errorMessage}>
-            <p class="slds-text-color_error slds-var-m-vertical_small" data-id="error" role="alert">
-                {errorMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-vertical_small"
+                data-id="error"
+                variant="error"
+                message={errorMessage}
+            ></c-barn-notice>
         </template>
         <template lwc:if={noticeMessage}>
-            <p class="slds-var-m-vertical_small" data-id="notice" role="status" aria-live="polite">
-                {noticeMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-vertical_small"
+                data-id="notice"
+                variant="success"
+                message={noticeMessage}
+            ></c-barn-notice>
         </template>
         <template lwc:if={loading}>
             <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
@@ -60,7 +66,7 @@
                     onchange={handleTerm}
                 ></lightning-input>
                 <template lwc:if={noResults}>
-                    <p class="slds-var-m-top_x-small" data-id="no-matches">{labels.noMatches}</p>
+                    <p class="slds-var-m-top_x-small slds-text-color_weak" data-id="no-matches">{labels.noMatches}</p>
                 </template>
                 <ul class="slds-var-m-top_x-small" data-id="results">
                     <template for:each={resultItems} for:item="choice">
@@ -80,7 +86,13 @@
                         {subjectHeading}
                     </h3>
                     <template for:each={allDataNotes} for:item="note">
-                        <p key={note.key} class="slds-var-m-top_x-small" data-id="all-data">{note.text}</p>
+                        <c-barn-notice
+                            key={note.key}
+                            class="slds-var-m-top_x-small"
+                            data-id="all-data"
+                            variant="warning"
+                            message={note.text}
+                        ></c-barn-notice>
                     </template>
 
                     <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.sourcesHeading}</h3>
@@ -143,11 +155,20 @@
                         </template>
                     </template>
                     <template lwc:else>
-                        <p data-id="no-objects">{labels.nothingToShow}</p>
+                        <c-barn-empty-state
+                            data-id="no-objects"
+                            size="compact"
+                            heading={labels.nothingToShow}
+                        ></c-barn-empty-state>
                     </template>
                 </template>
                 <template lwc:else>
-                    <p class="slds-var-m-top_small" data-id="choose-subject">{labels.chooseSubject}</p>
+                    <c-barn-empty-state
+                        class="slds-var-m-top_small"
+                        data-id="choose-subject"
+                        size="compact"
+                        heading={labels.chooseSubject}
+                    ></c-barn-empty-state>
                 </template>
             </div>
         </template>
@@ -174,18 +195,32 @@
                     ></lightning-combobox>
                 </template>
                 <template lwc:else>
-                    <p class="slds-var-m-top_small" data-id="choose-object">{labels.chooseObject}</p>
+                    <c-barn-empty-state
+                        class="slds-var-m-top_small"
+                        data-id="choose-object"
+                        size="compact"
+                        heading={labels.chooseObject}
+                    ></c-barn-empty-state>
                 </template>
 
                 <template lwc:if={objectAccess}>
                     <template lwc:if={objectAccess.always}>
-                        <p class="slds-var-m-top_small" data-id="always">{labels.alwaysField}</p>
+                        <c-barn-notice
+                            class="slds-var-m-top_small"
+                            data-id="always"
+                            message={labels.alwaysField}
+                        ></c-barn-notice>
                     </template>
                 </template>
                 <template lwc:if={showGrants}>
                     <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.grantsHeading}</h3>
                     <template lwc:if={truncatedMessage}>
-                        <p data-id="truncated">{truncatedMessage}</p>
+                        <c-barn-notice
+                            class="slds-var-m-bottom_x-small"
+                            data-id="truncated"
+                            variant="warning"
+                            message={truncatedMessage}
+                        ></c-barn-notice>
                     </template>
                     <lightning-datatable
                         data-id="grants"
@@ -203,7 +238,11 @@
 
                     <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.peopleHeading}</h3>
                     <template lwc:if={objectAccess.mayMissPeople}>
-                        <p data-id="may-miss-people">{labels.mayMissPeople}</p>
+                        <c-barn-notice
+                            class="slds-var-m-bottom_x-small"
+                            data-id="may-miss-people"
+                            message={labels.mayMissPeople}
+                        ></c-barn-notice>
                     </template>
                     <lightning-datatable
                         data-id="people"
@@ -282,7 +321,12 @@
                         </p>
                     </template>
                     <template lwc:else>
-                        <p class="slds-var-m-top_small" data-id="tab-check">{labels.tabCheckNotScheduled}</p>
+                        <c-barn-notice
+                            class="slds-var-m-top_small"
+                            data-id="tab-check"
+                            variant="warning"
+                            message={labels.tabCheckNotScheduled}
+                        ></c-barn-notice>
                     </template>
                 </template>
             </div>

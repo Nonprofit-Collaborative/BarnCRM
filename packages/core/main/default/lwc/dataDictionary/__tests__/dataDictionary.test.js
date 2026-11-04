@@ -283,7 +283,7 @@ describe('c-data-dictionary', () => {
     expect(find(element, 'results').columns.map((column) => column.fieldName)).toContain(
       'fillRate'
     );
-    expect(find(element, 'not-counted').textContent).toBe('Fill rates not counted for: Contact.');
+    expect(find(element, 'not-counted').message).toBe('Fill rates not counted for: Contact.');
   });
 
   it('names an object whose fill rates failed and keeps its dictionary rows', async () => {
@@ -298,7 +298,7 @@ describe('c-data-dictionary', () => {
     await build(element);
 
     expect(find(element, 'results').data).toHaveLength(1);
-    expect(find(element, 'not-counted').textContent).toBe('Fill rates not counted for: Account.');
+    expect(find(element, 'not-counted').message).toBe('Fill rates not counted for: Account.');
     expect(find(element, 'error')).toBeNull();
   });
 
@@ -307,7 +307,7 @@ describe('c-data-dictionary', () => {
     const element = render();
     await build(element);
 
-    expect(find(element, 'error').textContent).toContain('You need the permission.');
+    expect(find(element, 'error').message).toContain('You need the permission.');
     expect(find(element, 'download').disabled).toBe(true);
   });
 
@@ -339,7 +339,7 @@ describe('c-data-dictionary', () => {
     expect(text).toContain('"Rating, ""Overall"""');
     expect(text).toContain('"Line one\nLine two"');
     expect(text).toContain('"\'=IF(A,""x"",""y"")"');
-    expect(find(element, 'notice').textContent).toBe('Downloaded 1 fields.');
+    expect(find(element, 'notice').message).toBe('Downloaded 1 fields.');
   });
 
   it('puts fill rates in the CSV as percentages, blank when not counted', async () => {
@@ -450,7 +450,7 @@ describe('c-data-dictionary', () => {
       await build(element);
 
       expect(find(element, 'automation-empty')).not.toBeNull();
-      expect(find(element, 'automation-not-read').textContent).toBe(
+      expect(find(element, 'automation-not-read').message).toBe(
         'Could not read all automation for: Account, Contact.'
       );
       expect(find(element, 'download-automation').disabled).toBe(true);
@@ -494,7 +494,7 @@ describe('c-data-dictionary', () => {
       expect(lines[0].split(',')[1]).toBe('Object API Name');
       expect(lines[1]).toContain('AccountTrigger');
       expect(lines[1]).toContain('Account,Account');
-      expect(find(element, 'notice').textContent).toBe('Downloaded 1 automation rows.');
+      expect(find(element, 'notice').message).toBe('Downloaded 1 automation rows.');
     });
   });
 });
