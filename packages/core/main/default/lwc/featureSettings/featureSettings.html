@@ -1,7 +1,10 @@
 <template>
-    <div class="slds-scoped-notification slds-theme_warning slds-var-m-bottom_small" role="note" data-id="one-way-warning">
-        <p class="slds-text-body_regular">{labels.warning}</p>
-    </div>
+    <c-barn-notice
+        class="slds-var-m-bottom_small"
+        variant="warning"
+        message={labels.warning}
+        data-id="one-way-warning"
+    ></c-barn-notice>
 
     <template lwc:if={loaded}>
         <ul class="slds-has-dividers_bottom-space" data-id="feature-list">
@@ -24,7 +27,7 @@
                                 ></lightning-button>
                             </template>
                             <template lwc:else>
-                                <span class={feature.stateClass} data-id="state">{feature.stateLabel}</span>
+                                <c-barn-status-badge status={feature.stateStatus} label={feature.stateLabel} data-id="state"></c-barn-status-badge>
                             </template>
                         </div>
                     </div>
@@ -37,6 +40,6 @@
         <p class="slds-text-color_success slds-var-m-top_x-small" role="status" data-id="saved">{savedMessage}</p>
     </template>
     <template lwc:if={errorMessage}>
-        <p class="slds-text-color_error slds-var-m-top_x-small" role="alert" data-id="error">{errorMessage}</p>
+        <c-barn-notice class="slds-var-m-top_x-small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
     </template>
 </template>

@@ -27,7 +27,7 @@ permission set). The **Import Rows** tab is not in any app's navigation: open it
 import's results, or type **Import Rows** in the App Launcher. It shows for the people who see
 the **Import** tab.
 
-**Delete Import Rows** in **BarnCRM Settings**, **Import**, says how long rows are kept after
+**Delete import rows** in **BarnCRM Settings**, **Import**, says how long rows are kept after
 an import is complete: **Once Complete**, **After 30 Days** (the default), **After 90 Days** or
 **Never**. A rejected row can be corrected and retried only while its row is kept.
 

@@ -64,6 +64,12 @@ describe('c-barn-save-bar', () => {
     expect(one(element, 'discard').disabled).toBe(true);
   });
 
+  it("story: the caller's own words replace the count (BarnCRM Settings)", () => {
+    const element = render({ dirtyCount: 2, message: '2 unsaved changes in this section' });
+    expect(one(element, 'count').textContent).toBe('2 unsaved changes in this section');
+    expect(one(element, 'save')).not.toBeNull();
+  });
+
   it('stops asking on leave once removed', () => {
     const element = render({ dirtyCount: 2 });
     document.body.removeChild(element);

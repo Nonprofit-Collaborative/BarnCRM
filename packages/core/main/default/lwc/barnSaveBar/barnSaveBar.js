@@ -17,6 +17,11 @@ export default class BarnSaveBar extends LightningElement {
   @api dirtyCount = 0;
   /** True while the caller saves; both buttons wait. */
   @api saving = false;
+  /**
+   * Optional: the caller's own words for what is unsaved, shown instead of the count (BarnCRM
+   * Settings says which section the changes are in). Left blank, the bar counts as before.
+   */
+  @api message;
 
   labels = { save: SAVE, discard: DISCARD };
 
@@ -45,6 +50,9 @@ export default class BarnSaveBar extends LightningElement {
   get countText() {
     if (!this.isDirty) {
       return '';
+    }
+    if (this.message) {
+      return this.message;
     }
     const count = Number(this.dirtyCount);
     return count === 1 ? UNSAVED_ONE : UNSAVED_MANY.replace('{0}', count);

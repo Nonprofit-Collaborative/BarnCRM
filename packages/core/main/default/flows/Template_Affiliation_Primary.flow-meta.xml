@@ -2,6 +2,36 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <decisions>
+    <description>Ends the flow when the BarnCRM Automation Control setting has Pause All or Bypass on for the person saving, as BarnCRM's own automation does.</description>
+    <name>Automation_Control</name>
+    <label>Automation control</label>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <defaultConnector>
+      <targetReference>Is_Current_Primary</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>Runs</defaultConnectorLabel>
+    <rules>
+      <name>Paused_Or_Bypassed</name>
+      <conditionLogic>or</conditionLogic>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Pause_All__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Bypass__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <label>Paused or bypassed</label>
+    </rules>
+  </decisions>
+  <decisions>
     <description>A current affiliation marked primary takes the primary flag from every other affiliation of the same person.</description>
     <name>Is_Current_Primary</name>
     <label>Is current primary</label>
@@ -233,7 +263,7 @@
     <locationX>50</locationX>
     <locationY>0</locationY>
     <connector>
-      <targetReference>Is_Current_Primary</targetReference>
+      <targetReference>Automation_Control</targetReference>
     </connector>
     <filterFormula>NOT(AND(ISBLANK({!$Record.Contact__c}), ISBLANK({!$Record.Person_Account__c})))</filterFormula>
     <object>Affiliation__c</object>

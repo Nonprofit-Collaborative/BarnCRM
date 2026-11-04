@@ -20,7 +20,7 @@ you choose one of:
 
 Before anything changes, BarnCRM counts the records that match and shows the first five, each
 with the value before and the value after. You type that number to confirm. The update then
-runs in the background, in chunks of up to 200 records (the **Bulk chunk size** setting), and
+runs in the background, in chunks of up to 200 records (the **Records per batch in background jobs** setting), and
 the page shows its progress.
 
 Every change is recorded in the import journal, so for as long as an import can be undone (30
@@ -196,4 +196,4 @@ Deleting the records a query returns is a separate tool with its own permission:
 | Data Job | Rows Matched | How many records already held the new values and were not saved. |
 | Data Job | Rows Rejected | How many records the platform refused, each with its reason in the journal. |
 | BarnCRM Settings, Import | Super Transformer run limit | The most records one Super Transformer run may change. Default 48,000, at most 48,000. |
-| BarnCRM Settings, Import | Bulk chunk size | Records each chunk of a Super Transformer run or bulk delete handles. Default and highest 200, lowest 10; a job keeps the size it started with. |
+| BarnCRM Settings, Import | Records per batch in background jobs | Records each chunk of a Super Transformer run or bulk delete handles. Default and highest 200, lowest 10; a job keeps the size it started with. |

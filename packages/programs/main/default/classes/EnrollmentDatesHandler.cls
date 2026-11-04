@@ -17,18 +17,18 @@ public with sharing class EnrollmentDatesHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        EnrollmentService.fillStageDates((List<Enrollment__c>) Trigger.new, null);
-        EnrollmentService.fillEligibilityDates((List<Enrollment__c>) Trigger.new, null);
+        EnrollmentService.fillStageDates((List<Enrollment__c>) newRecords(), null);
+        EnrollmentService.fillEligibilityDates((List<Enrollment__c>) newRecords(), null);
     }
 
     public override void beforeUpdate() {
         EnrollmentService.fillStageDates(
-            (List<Enrollment__c>) Trigger.new,
-            (Map<Id, Enrollment__c>) Trigger.oldMap
+            (List<Enrollment__c>) newRecords(),
+            (Map<Id, Enrollment__c>) oldRecordsById()
         );
         EnrollmentService.fillEligibilityDates(
-            (List<Enrollment__c>) Trigger.new,
-            (Map<Id, Enrollment__c>) Trigger.oldMap
+            (List<Enrollment__c>) newRecords(),
+            (Map<Id, Enrollment__c>) oldRecordsById()
         );
     }
 }

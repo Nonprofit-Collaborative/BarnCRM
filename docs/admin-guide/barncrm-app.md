@@ -211,7 +211,8 @@ Admin role.
    Automation** link to the Automation section of BarnCRM Settings. The warning disappears by
    itself when the pause expires.
 10. Look at **Modules**. It lists BarnCRM Core and each module installed in your org (with
-    Giving, that is Giving), and says for each whether it is on or installed and off. Click
+    Giving, that is Giving), each with its app's logo, and says for each whether it is on or
+    installed and off. Click
     **Open the Module Manager** to turn a module on or off.
 11. Use **Quick Links**, icon tiles, to open People, Households, Organizations, Find, Quick
     Gift Entry (with Giving) or BarnCRM Settings without going back to the app launcher.

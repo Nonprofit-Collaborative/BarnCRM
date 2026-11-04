@@ -12,6 +12,20 @@ import OPEN_APP from '@salesforce/label/c.Core_ModuleManager_OpenApp';
 const MODULES_SECTION = 'Modules';
 const NOT_INSTALLED = 'NotInstalled';
 
+// Each module app's logo, a content asset its own package ships (vis-core-12). A module with
+// no app of its own shows the avatar's fallback icon.
+const LOGOS = {
+  Giving: 'BarnCRM_Fundraising_Logo',
+  Volunteers: 'BarnCRM_Volunteers_Logo',
+  Programs: 'BarnCRM_Programs_Logo',
+  Funders: 'BarnCRM_Funders_Logo',
+  LogicModels: 'BarnCRM_Logic_Models_Logo'
+};
+
+function logoUrl(name) {
+  return LOGOS[name] ? `/file-asset/${LOGOS[name]}` : undefined;
+}
+
 /**
  * The installed BarnCRM modules and whether each is on, on the BarnCRM home page. It reads the
  * Module Manager's own list, so the two never disagree; turning a module on or off is done there.
@@ -33,6 +47,7 @@ export default class HubModules extends NavigationMixin(LightningElement) {
           name: module.name,
           displayName: module.label || module.name,
           appUrl: module.appUrl,
+          logoUrl: logoUrl(module.name),
           statusText: module.status === 'Off' ? STATUS_OFF : STATUS_ON,
           status: module.status === 'Off' ? 'off' : 'on'
         }));

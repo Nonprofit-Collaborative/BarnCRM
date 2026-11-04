@@ -30,6 +30,8 @@ import NONPROFIT_TITLE from '@salesforce/label/c.Core_ModuleManager_NonprofitTit
 import SHOW_NONPROFIT from '@salesforce/label/c.Core_ModuleManager_ShowNonprofit';
 import NONPROFIT_HIDDEN from '@salesforce/label/c.Core_ModuleManager_NonprofitHidden';
 import OTHER_ROLLUP_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import { setupPath } from 'c/setupLinks';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -128,10 +130,7 @@ export default class ModuleManager extends LightningElement {
         ...module,
         displayName: module.label || module.name,
         statusText: STATUS_TEXT[module.status] || module.status,
-        badgeClass:
-          module.status === 'On'
-            ? 'slds-badge slds-theme_success slds-var-m-left_x-small'
-            : 'slds-badge slds-var-m-left_x-small',
+        badgeStatus: module.status === 'On' ? 'on' : 'off',
         isOn: module.canSwitch && module.status === 'On',
         isOff: module.canSwitch && module.status === 'Off',
         setupPending: module.status !== 'NotInstalled' && module.setupPending === true,
@@ -200,8 +199,25 @@ export default class ModuleManager extends LightningElement {
     this.run(finishSetup, { moduleName: event.target.dataset.name });
   }
 
-  handleTurnOff(event) {
-    this.run(turnOff, { moduleName: event.target.dataset.name });
+  /** Turning a module off asks first (admin-11): what stops, what stays, and the tabs. */
+  async handleTurnOff(event) {
+    const moduleName = event.target.dataset.name;
+    const row = this.rows.find((candidate) => candidate.name === moduleName);
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: helpText(
+        'Core',
+        'Core_ModuleManager_TurnOffTitle',
+        row ? row.displayName : moduleName
+      ),
+      message: helpText('Core', 'Core_ModuleManager_TurnOffMessage'),
+      confirmLabel: TURN_OFF,
+      cancelLabel: CANCEL
+    });
+    if (!confirmed) {
+      return;
+    }
+    await this.run(turnOff, { moduleName });
   }
 
   // Turning on and giving the admin set are two calls: a permission set assignment cannot

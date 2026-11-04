@@ -29,7 +29,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **Giving**, open **Donor Levels and Scores**. | Three cutoff settings show `90,180,365,730`, `6,4,2,1` and `5000,1000,250,50`. None is blank. |
-| 2 | Set **Donor Score Monetary Amount** to `200,100,50,10` and save. | Saved. |
+| 2 | Set **Donor score monetary amount** to `200,100,50,10` and save. | Saved. |
 | 3 | Open **Nightly Jobs** and select **Run now** for the Donor Levels job; refresh Pat after a minute. | Pat's **Monetary Score** is 5 (300 reaches 200). **RFM Segment** is still Loyal (frequency is 3). |
 | 4 | Set the same setting to `abc` and save, then run the job again. | Saved. Pat's **Monetary Score** is back to 3, as with the default. |
 

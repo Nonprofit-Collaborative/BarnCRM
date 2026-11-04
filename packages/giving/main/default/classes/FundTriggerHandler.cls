@@ -14,19 +14,19 @@ public with sharing class FundTriggerHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        rejectSeveralDefaults((List<Fund__c>) Trigger.new);
+        rejectSeveralDefaults((List<Fund__c>) newRecords());
     }
 
     public override void beforeUpdate() {
-        rejectSeveralDefaults((List<Fund__c>) Trigger.new);
+        rejectSeveralDefaults((List<Fund__c>) newRecords());
     }
 
     public override void afterInsert() {
-        recordTheDefault((List<Fund__c>) Trigger.new, null);
+        recordTheDefault((List<Fund__c>) newRecords(), null);
     }
 
     public override void afterUpdate() {
-        recordTheDefault((List<Fund__c>) Trigger.new, (Map<Id, Fund__c>) Trigger.oldMap);
+        recordTheDefault((List<Fund__c>) newRecords(), (Map<Id, Fund__c>) oldRecordsById());
     }
 
     /**
@@ -35,7 +35,7 @@ public with sharing class FundTriggerHandler extends TriggerHandler {
      * rather than leaving the platform to report a foreign key.
      */
     public override void beforeDelete() {
-        List<Fund__c> funds = (List<Fund__c>) Trigger.old;
+        List<Fund__c> funds = (List<Fund__c>) oldRecords();
         Map<Id, Fund__c> byId = new Map<Id, Fund__c>(funds);
         Map<Id, Integer> allocationCounts = GiftAllocationSelector.countByFundIds(byId.keySet());
         for (Fund__c fund : funds) {
@@ -135,7 +135,7 @@ public with sharing class FundTriggerHandler extends TriggerHandler {
     }
 
     private void reportFailure() {
-        for (Fund__c fund : (List<Fund__c>) Trigger.new) {
+        for (Fund__c fund : (List<Fund__c>) newRecords()) {
             fund.addError(Label.Giving_Fund_DefaultNotSaved);
         }
     }

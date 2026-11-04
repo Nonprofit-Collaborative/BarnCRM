@@ -406,19 +406,19 @@ Dot,Zzshirt,dot.zzshirt@example.org,M,2026-10-04
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Import**. | **Delete Import Rows** shows **After 30 Days**, never a blank box, with the choices **Once Complete**, **After 30 Days**, **After 90 Days** and **Never**. |
+| 1 | Open **BarnCRM Settings**, **Import**. | **Delete import rows** shows **After 30 Days**, never a blank box, with the choices **Once Complete**, **After 30 Days**, **After 90 Days** and **Never**. |
 | 2 | Choose **Once Complete** and save. | Saved for the whole org. |
 | 3 | Import `import-test-1.csv` with **Generic contact list** as in T-IMP-01, steps 1 to 8. Open the import's **Data Job** record (from the **Data Jobs** list view). | **Created** 3, **Rejected** 1. Its **Import Rows** related list shows 4 rows. |
 | 4 | The next morning, open the same Data Job record. | **Import Rows** is empty; the counts and **Run Log** are unchanged. |
 | 5 | Open the Super Importer tab and open the row menu beside the import and select **Undo**, then **Undo This Import**. Refresh until it reads **Undone**. | **Undone**. Testa Rivera, Ben Okoro and Cara Lind are gone: undo never needed the rows. |
-| 6 | Set **Delete Import Rows** back to **After 30 Days** and save. | Saved. |
+| 6 | Set **Delete import rows** back to **After 30 Days** and save. | Saved. |
 
 **Cleanup:** none.
 
 ## T-IMP-20: Browse Import Rows, Correct a Rejected Row and Retry It
 
 **Purpose:** confirm a rejected row can be found, corrected on screen beside its file values, and retried into the same import by anyone who runs imports, not only the person who committed it, and that one undo still covers it.
-**Prerequisites:** admin; a second user with BarnCRM Admin (the import permission); a third user with BarnCRM Staff only; **Delete Import Rows** is not **Once Complete**; `import-test-1.csv`.
+**Prerequisites:** admin; a second user with BarnCRM Admin (the import permission); a third user with BarnCRM Staff only; **Delete import rows** is not **Once Complete**; `import-test-1.csv`.
 
 | Step | Action | Expected result |
 |---|---|---|

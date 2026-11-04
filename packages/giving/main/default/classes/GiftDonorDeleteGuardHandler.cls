@@ -21,12 +21,12 @@ public with sharing class GiftDonorDeleteGuardHandler extends TriggerHandler {
     }
 
     public override void beforeDelete() {
-        GiftPostingLock.noteDonorsNamed(Trigger.old);
-        CommitmentService.noteDonorsWithOpenCommitments(Trigger.old);
+        GiftPostingLock.noteDonorsNamed(oldRecords());
+        CommitmentService.noteDonorsWithOpenCommitments(oldRecords());
     }
 
     public override void afterDelete() {
-        GiftPostingLock.enforceOnDonorDelete(Trigger.old);
-        CommitmentService.refuseDeletingOpenCommitmentDonors(Trigger.old);
+        GiftPostingLock.enforceOnDonorDelete(oldRecords());
+        CommitmentService.refuseDeletingOpenCommitmentDonors(oldRecords());
     }
 }

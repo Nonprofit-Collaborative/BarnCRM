@@ -119,6 +119,73 @@ not on this page. It is the Override Receipt Lock permission, described under "L
 receipt lock" on the [Gifts page](gifts.md). Every change made with it is written to the
 [Error Log](error-log.md).
 
+## When Automation Fails on One Record
+
+If BarnCRM's automation fails on one record of a larger save, only that record is refused. The
+rest of the save goes ahead. This matters most for the Data Loader, the BarnCRM importer and
+integrations, which save 200 records at a time: one record BarnCRM cannot handle no longer costs
+the other 199 their save.
+
+- The refused record carries the message "Something went wrong while BarnCRM was updating this
+  record, so it was not saved." In the Data Loader it is in the error file; in the importer it
+  is on the row.
+- The [Error Log](error-log.md) has one entry for the failure itself, with the technical
+  detail, and one entry per refused record naming its row in the save. Fix the value it names
+  and save that record again.
+- To find the record, BarnCRM undoes the failed attempt and runs its automation again over
+  smaller and smaller parts of the save. That takes a little longer than a clean save. If the
+  save has too little room left in Salesforce's limits to do it, the records not yet cleared are
+  refused together, still with the message and the log entries.
+- A rule that always runs (see above) is the exception: if it fails, every record in front of
+  it is refused, because a rule that could not be checked lets nothing through.
+
+## Pausing or Bypassing for Some People
+
+The timed pause stops automation for everyone. When only some people's saves should skip it,
+use the **BarnCRM Automation Control** setting. It has two boxes, and each can be set for the
+whole organization, for a profile, or for one user. The value that applies to a save is the
+saving person's own, else their profile's, else the organization's.
+
+- **Bypass**: for an integration user (or its profile) and a migration consultant. Their saves
+  skip BarnCRM automation, while everyone else's run as normal.
+- **Pause All**: the long pause. Set for the whole organization, it stops automation for
+  everyone until you turn it off, for a migration that takes longer than the 24-hour pause.
+  Set for a profile or a user, BarnCRM treats it like Bypass.
+
+Rules that always run (see above) still run, whatever the setting says. The timed pause, the
+switches on this page and this setting all apply together: automation runs only when none of
+them stops it.
+
+Until the Automation page shows the setting, set it in Setup: search for **Custom Settings**,
+choose **Manage** next to **BarnCRM Automation Control**, then **New** for the organization
+default, or **New** under the list for a profile or a user.
+
+### Using It in Your Own Flows, Triggers and Validation Rules
+
+Your own automation can follow the same setting, so one place pauses or bypasses everything
+your organization has:
+
+- **A validation rule or formula:** add `NOT($Setup.BarnCRM_Automation_Control__c.Bypass__c) &&`
+  in front of the condition, or check `Pause_All__c` the same way.
+- **A flow:** start it with a **Decision** on
+  `{!$Setup.BarnCRM_Automation_Control__c.Pause_All__c}` or `Bypass__c` equals true, ending the
+  flow on that outcome, as every BarnCRM flow template does. To follow the timed pause and a
+  switch on this page as well, start it with the **Check BarnCRM Automation** action instead
+  and end the flow when **Run** is false.
+- **An Apex trigger:** read `BarnCRM_Automation_Control__c.getInstance()` and return early when
+  `Pause_All__c` or `Bypass__c` is true.
+
+### Catching Up After a Pause or a Bypassed Load
+
+BarnCRM does not record each save it skipped, so nothing is replayed record by record. When
+the timed pause ends, by itself or with **Resume Automation**, BarnCRM gives a household to
+every person added without one and works the rollup totals that waited. After a long Pause All
+or a bypassed load, do the same by resuming, then recompute household names on the **People
+and Households** page. Anything else that was skipped (a preferred email or phone copied to the
+standard field, an address copied to its household, the other side of a relationship) is caught
+up by saving those records again, for example with **Bulk Update** changing nothing but a
+harmless field.
+
 ## Running Your Own Version Instead
 
 If an automation does almost what you want, do not change ours: an upgrade would undo your

@@ -18,11 +18,11 @@ public with sharing class ServicePlanDatesHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        fill(Trigger.new, null);
+        fill(newRecords(), null);
     }
 
     public override void beforeUpdate() {
-        fill(Trigger.new, Trigger.oldMap);
+        fill(newRecords(), oldRecordsById());
     }
 
     private static void fill(List<SObject> records, Map<Id, SObject> oldById) {

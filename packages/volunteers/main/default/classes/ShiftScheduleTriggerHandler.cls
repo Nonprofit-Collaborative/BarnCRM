@@ -46,7 +46,7 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
 
     public override void afterInsert() {
         Set<Id> toRun = new Set<Id>();
-        for (Shift_Schedule__c schedule : (List<Shift_Schedule__c>) Trigger.new) {
+        for (Shift_Schedule__c schedule : (List<Shift_Schedule__c>) newRecords()) {
             if (schedule.Active__c == true) {
                 toRun.add(schedule.Id);
             }
@@ -55,10 +55,10 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
     }
 
     public override void beforeUpdate() {
-        Map<Id, Shift_Schedule__c> oldById = (Map<Id, Shift_Schedule__c>) Trigger.oldMap;
+        Map<Id, Shift_Schedule__c> oldById = (Map<Id, Shift_Schedule__c>) oldRecordsById();
         Map<Id, Date> keepThrough = new Map<Id, Date>();
         Set<Id> restart = new Set<Id>();
-        for (Shift_Schedule__c schedule : (List<Shift_Schedule__c>) Trigger.new) {
+        for (Shift_Schedule__c schedule : (List<Shift_Schedule__c>) newRecords()) {
             Shift_Schedule__c old = oldById.get(schedule.Id);
             Boolean ended = old.Active__c == true && schedule.Active__c != true;
             if (ended || patternChanged(schedule, old)) {
@@ -79,7 +79,7 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
             }
         }
         Map<Id, Integer> kept = ShiftScheduleService.removeFutureShifts(inline);
-        for (Shift_Schedule__c schedule : (List<Shift_Schedule__c>) Trigger.new) {
+        for (Shift_Schedule__c schedule : (List<Shift_Schedule__c>) newRecords()) {
             Shift_Schedule__c old = oldById.get(schedule.Id);
             if (kept.containsKey(schedule.Id)) {
                 schedule.Shifts_Kept__c = kept.get(schedule.Id);
@@ -117,10 +117,10 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
      * End Date, so it queues nothing.
      */
     public override void afterUpdate() {
-        Map<Id, Shift_Schedule__c> oldById = (Map<Id, Shift_Schedule__c>) Trigger.oldMap;
+        Map<Id, Shift_Schedule__c> oldById = (Map<Id, Shift_Schedule__c>) oldRecordsById();
         Set<Id> toRun = new Set<Id>();
         Date horizon = null;
-        for (Shift_Schedule__c schedule : (List<Shift_Schedule__c>) Trigger.new) {
+        for (Shift_Schedule__c schedule : (List<Shift_Schedule__c>) newRecords()) {
             Shift_Schedule__c old = oldById.get(schedule.Id);
             if (schedule.Rebuild_Pending__c == true) {
                 toRun.add(schedule.Id);
@@ -156,7 +156,7 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
         Map<Id, Date> inline = new Map<Id, Date>();
         Set<Id> deferred = new Set<Id>();
         Integer budget = ShiftScheduleService.inlineScheduleBudget();
-        for (Id scheduleId : Trigger.oldMap.keySet()) {
+        for (Id scheduleId : oldRecordsById().keySet()) {
             if (inline.size() < budget) {
                 inline.put(scheduleId, null);
             } else {

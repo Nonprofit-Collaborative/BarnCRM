@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Bypass__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>For an integration user, a migration consultant or their profile: their saves skip BarnCRM automation that can be paused, and any automation that checks it, while everyone else's run as normal. Rules that always run still run.</description>
+  <inlineHelpText>Saves by this profile or user skip automation that checks this setting.</inlineHelpText>
+  <label>Bypass</label>
+  <type>Checkbox</type>
+</CustomField>

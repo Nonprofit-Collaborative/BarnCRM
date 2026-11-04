@@ -17,25 +17,25 @@ public with sharing class GrantPaymentReceivedHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        GrantPaymentService.fillReceivedDates((List<Grant_Payment__c>) Trigger.new, null);
+        GrantPaymentService.fillReceivedDates((List<Grant_Payment__c>) newRecords(), null);
     }
 
     public override void beforeUpdate() {
         GrantPaymentService.fillReceivedDates(
-            (List<Grant_Payment__c>) Trigger.new,
-            (Map<Id, Grant_Payment__c>) Trigger.oldMap
+            (List<Grant_Payment__c>) newRecords(),
+            (Map<Id, Grant_Payment__c>) oldRecordsById()
         );
     }
 
     public override void afterInsert() {
-        GrantPaymentService.syncLedger((List<Grant_Payment__c>) Trigger.new, false);
+        GrantPaymentService.syncLedger((List<Grant_Payment__c>) newRecords(), false);
     }
 
     public override void afterUpdate() {
-        GrantPaymentService.syncLedger((List<Grant_Payment__c>) Trigger.new, false);
+        GrantPaymentService.syncLedger((List<Grant_Payment__c>) newRecords(), false);
     }
 
     public override void beforeDelete() {
-        GrantPaymentService.syncLedger((List<Grant_Payment__c>) Trigger.old, true);
+        GrantPaymentService.syncLedger((List<Grant_Payment__c>) oldRecords(), true);
     }
 }

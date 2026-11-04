@@ -19,7 +19,7 @@ public with sharing class VolunteerJobTriggerHandler extends TriggerHandler {
     }
 
     public override void beforeDelete() {
-        List<Volunteer_Job__c> jobs = (List<Volunteer_Job__c>) Trigger.old;
+        List<Volunteer_Job__c> jobs = (List<Volunteer_Job__c>) oldRecords();
         Set<Id> jobIds = new Map<Id, Volunteer_Job__c>(jobs).keySet();
         Set<Id> inUse = VolunteerIntegritySelector.selectJobIdsInUse(jobIds);
         for (Volunteer_Job__c job : jobs) {

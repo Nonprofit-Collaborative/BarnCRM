@@ -3,6 +3,36 @@
   <apiVersion>67.0</apiVersion>
   <description
   >Template for the automation "Keep the address an account started with" (registry row Account_Address_Capture). Save As a new flow, change your copy, activate it, then switch ours off on the Automation page of BarnCRM Settings. When a household or an organization is created with an address in its billing fields, keeps that address on file as its first address, marked primary. Your copy does not read our switch or the pause: activating it is its switch. See the admin guide page flow-templates.md.</description>
+  <decisions>
+    <description>Ends the flow when the BarnCRM Automation Control setting has Pause All or Bypass on for the person saving, as BarnCRM's own automation does.</description>
+    <name>Automation_Control</name>
+    <label>Automation control</label>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <defaultConnector>
+      <targetReference>Create_First_Address</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>Runs</defaultConnectorLabel>
+    <rules>
+      <name>Paused_Or_Bypassed</name>
+      <conditionLogic>or</conditionLogic>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Pause_All__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Bypass__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <label>Paused or bypassed</label>
+    </rules>
+  </decisions>
   <environments>Default</environments>
   <formulas>
     <description>Home for a household, Work for an organization, the same types BarnCRM gives a first address.</description>
@@ -93,7 +123,7 @@
     <locationX>50</locationX>
     <locationY>0</locationY>
     <connector>
-      <targetReference>Create_First_Address</targetReference>
+      <targetReference>Automation_Control</targetReference>
     </connector>
     <filterFormula>AND(OR({!$Record.RecordType.DeveloperName} = "Household", {!$Record.Is_Organization__c}), OR(NOT(ISBLANK({!$Record.BillingStreet})), NOT(ISBLANK({!$Record.BillingCity})), NOT(ISBLANK({!$Record.BillingState})), NOT(ISBLANK({!$Record.BillingPostalCode})), NOT(ISBLANK({!$Record.BillingCountry}))))</filterFormula>
     <object>Account</object>

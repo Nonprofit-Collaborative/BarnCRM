@@ -679,11 +679,46 @@ public with sharing class SettingsController {
             !NpspHouseholdAdoptionService.isOffered();
     }
 
+    /** Rows that open Org Optimizer, for those who can open it (admin-14). */
+    @TestVisible
+    private static final Set<String> OPTIMIZER_LINK_ROWS = new Set<String>{
+        'Health_Check_Optimizer_Link',
+        'Error_Log_Optimizer_Link'
+    };
+    /** The Health Check report itself, kept for those who cannot open Org Optimizer. */
+    @TestVisible
+    private static final String HEALTH_CHECK_PANEL_ROW = 'Health_Check';
+
+    @TestVisible
+    private static Boolean canOpenOptimizerOverride;
+    private static Boolean canOpenOptimizer;
+
+    /** Org Optimizer opens for Find and Export or Manage BarnCRM Settings. */
+    private static Boolean canOpenOptimizer() {
+        if (canOpenOptimizerOverride != null) {
+            return canOpenOptimizerOverride;
+        }
+        if (canOpenOptimizer == null) {
+            canOpenOptimizer =
+                FeatureManagement.checkPermission(EDIT_PERMISSION) ||
+                FeatureManagement.checkPermission(FindController.PERMISSION);
+        }
+        return canOpenOptimizer;
+    }
+
+    private static Boolean isHiddenByAccess(Setting_Definition__mdt definition) {
+        if (OPTIMIZER_LINK_ROWS.contains(definition.DeveloperName)) {
+            return !canOpenOptimizer();
+        }
+        return HEALTH_CHECK_PANEL_ROW.equals(definition.DeveloperName) && canOpenOptimizer();
+    }
+
     private static SettingModel toSetting(Setting_Definition__mdt definition) {
         if (
             !isVisible(definition) ||
             isHiddenByFeature(definition) ||
-            isHiddenByProduct(definition)
+            isHiddenByProduct(definition) ||
+            isHiddenByAccess(definition)
         ) {
             return null;
         }
