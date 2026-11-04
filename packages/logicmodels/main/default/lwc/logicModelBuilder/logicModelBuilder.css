@@ -33,11 +33,11 @@
 /* A part as a compact tile: two lines of its name, then an ellipsis. */
 .part {
   display: block;
-  width: 100%;
+  width: stretch;
   text-align: left;
   margin-bottom: var(--slds-g-spacing-1, 0.25rem);
   padding: var(--slds-g-spacing-2, 0.5rem);
-  border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-2, 0.25rem);
   background: var(--slds-g-color-surface-container-1, #ffffff);
   color: var(--slds-g-color-on-surface-2, #2e2e2e);
@@ -45,8 +45,8 @@
 }
 
 .part:focus-visible {
-  outline: 2px solid var(--slds-g-color-brand-base-50, #0176d3);
-  outline-offset: 2px;
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-brand-base-50, #0176d3);
+  outline-offset: var(--slds-g-sizing-border-2, 2px);
 }
 
 .part__name {
@@ -64,7 +64,7 @@
 }
 
 .part_linked {
-  border: 2px solid var(--slds-g-color-brand-base-50, #0176d3);
+  border: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-brand-base-50, #0176d3);
 }
 
 .part_dimmed {
@@ -80,7 +80,7 @@
   .diagram__step {
     flex: 1 1 0;
     flex-direction: row;
-    min-width: 9rem;
+    min-width: var(--barn-diagram-step-min-width, 9rem);
   }
 
   .diagram__column {
