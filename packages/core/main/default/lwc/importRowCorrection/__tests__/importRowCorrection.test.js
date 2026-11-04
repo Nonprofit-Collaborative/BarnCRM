@@ -98,7 +98,7 @@ describe('the Super Importer Row card', () => {
       rowId: REJECTED.id,
       correctionsJson: JSON.stringify({ 'First Name': 'Dee', 'Last Name': 'Nolast' })
     });
-    expect(query(element, 'message').textContent).toContain('c.Core_ImportRow_Saved');
+    expect(query(element, 'message').message).toContain('c.Core_ImportRow_Saved');
     expect(query(element, 'fixed-count')).not.toBeNull();
   });
 
@@ -115,7 +115,7 @@ describe('the Super Importer Row card', () => {
 
     expect(saveCorrections).toHaveBeenCalled();
     expect(retryRow).toHaveBeenCalledWith({ rowId: REJECTED.id });
-    expect(query(element, 'message').textContent).toContain('c.Core_ImportRow_RetryStarted');
+    expect(query(element, 'message').message).toContain('c.Core_ImportRow_RetryStarted');
   });
 
   it('retries every fixed row of the import', async () => {
@@ -161,7 +161,7 @@ describe('the Super Importer Row card', () => {
     query(element, 'retry-row').click();
     await flush();
 
-    expect(query(element, 'error').textContent).toContain('no corrected rejected rows');
+    expect(query(element, 'error').message).toContain('no corrected rejected rows');
     expect(query(element, 'message')).toBeNull();
   });
 });

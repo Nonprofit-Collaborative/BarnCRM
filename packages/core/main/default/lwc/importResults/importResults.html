@@ -12,17 +12,33 @@
             </p>
         </template>
 
-        <div class="slds-grid slds-wrap slds-gutters slds-var-m-bottom_medium" aria-live="polite" data-id="counts">
+        <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_medium" aria-live="polite" data-id="counts">
             <template for:each={counts} for:item="count">
-                <div key={count.key} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+                <div
+                    key={count.key}
+                    class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small"
+                >
                     <c-barn-stat-tile
                         label={count.label}
                         value={count.value}
+                        bordered
+                        align="start"
                         data-id={count.key}
                     ></c-barn-stat-tile>
                 </div>
             </template>
         </div>
+
+        <template lwc:if={canSeeRows}>
+            <p class="slds-var-m-bottom_medium">
+                <lightning-button
+                    variant="base"
+                    label={labels.seeEveryRow}
+                    data-id="see-every-row"
+                    onclick={handleSeeEveryRow}
+                ></lightning-button>
+            </p>
+        </template>
 
         <template lwc:if={hasRunLog}>
             <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">
@@ -39,9 +55,9 @@
             <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">
                 {labels.changedValuesHeading}
             </h3>
-            <div class="slds-scrollable_x slds-var-m-bottom_medium">
+            <div class="slds-var-m-bottom_medium">
                 <table
-                    class="slds-table slds-table_bordered slds-table_cell-buffer"
+                    class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
                     aria-label={labels.changedValuesHeading}
                     data-id="changed-values-table"
                 >
@@ -56,10 +72,10 @@
                     <tbody>
                         <template for:each={changedValueRows} for:item="changed">
                             <tr key={changed.key} data-id="changed-value">
-                                <td>{changed.rowNumber}</td>
-                                <td>{changed.column}</td>
-                                <td>{changed.before}</td>
-                                <td>{changed.after}</td>
+                                <td data-label={labels.rowNumberHeader}>{changed.rowNumber}</td>
+                                <td data-label={labels.columnHeader}>{changed.column}</td>
+                                <td data-label={labels.beforeHeader}>{changed.before}</td>
+                                <td data-label={labels.afterHeader}>{changed.after}</td>
                             </tr>
                         </template>
                     </tbody>
@@ -76,9 +92,9 @@
                     {rejectedShownNote}
                 </p>
             </template>
-            <div class="slds-scrollable_x">
+            <div>
                 <table
-                    class="slds-table slds-table_bordered slds-table_cell-buffer"
+                    class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
                     aria-label={labels.rejectedHeading}
                     data-id="rejected-table"
                 >
@@ -91,8 +107,8 @@
                     <tbody>
                         <template for:each={rejectedRows} for:item="row">
                             <tr key={row.id} data-id="rejected-row">
-                                <td>{row.rowNumber}</td>
-                                <td>{row.errorMessage}</td>
+                                <td data-label={labels.rowNumberHeader}>{row.rowNumber}</td>
+                                <td data-label={labels.reasonHeader}>{row.errorMessage}</td>
                             </tr>
                         </template>
                     </tbody>
@@ -100,7 +116,12 @@
             </div>
         </template>
         <template lwc:else>
-            <p class="slds-text-body_small" data-id="no-rejected">{labels.noRejectedRows}</p>
+            <c-barn-empty-state
+                illustration="all-clear"
+                size="compact"
+                message={labels.noRejectedRows}
+                data-id="no-rejected"
+            ></c-barn-empty-state>
         </template>
     </div>
 </template>

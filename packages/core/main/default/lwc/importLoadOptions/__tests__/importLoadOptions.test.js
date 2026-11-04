@@ -109,7 +109,7 @@ describe('what each row of a one-object mapping does', () => {
     const element = render({ operation: 'Update by a matching field', rowMatchFields: [] });
     await flush();
     expect(element.shadowRoot.querySelector('[data-id="match-field"]')).toBeNull();
-    expect(element.shadowRoot.querySelector('[data-id="no-key-fields"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="no-key-fields"]').message).toContain(
       'c.Core_Import_LoadNoMatchFields'
     );
   });

@@ -7,7 +7,7 @@ import checkField from '@salesforce/apex/ImportNewFieldController.checkField';
 import findField from '@salesforce/apex/ImportNewFieldController.findField';
 import { apiNameFrom, distinctValues, suggestField } from './fieldSuggestions';
 
-import OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
+import OBJECT from '@salesforce/label/c.Core_FieldUtilization_ChooseLabel';
 import LABEL from '@salesforce/label/c.Core_ImportNewField_LabelField';
 import API_NAME from '@salesforce/label/c.Core_AccessExplorer_ColApiName';
 import TYPE from '@salesforce/label/c.Core_ImportNewField_TypeField';
