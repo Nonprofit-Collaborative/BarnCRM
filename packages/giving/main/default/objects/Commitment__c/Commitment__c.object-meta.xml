@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionOverrides>
+    <actionName>New</actionName>
+    <comment>The New Commitment screen: a pledge entered as its total (people-giving-11).</comment>
+    <content>commitmentNewOverride</content>
+    <formFactor>Large</formFactor>
+    <skipRecordTypeSelect>false</skipRecordTypeSelect>
+    <type>LightningComponent</type>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>New</actionName>
+    <comment>The New Commitment screen: a pledge entered as its total (people-giving-11).</comment>
+    <content>commitmentNewOverride</content>
+    <formFactor>Small</formFactor>
+    <skipRecordTypeSelect>false</skipRecordTypeSelect>
+    <type>LightningComponent</type>
+  </actionOverrides>
   <compactLayoutAssignment>Commitment_Overview</compactLayoutAssignment>
   <deploymentStatus>Deployed</deploymentStatus>
   <description>A promise to give: a pledge or an open-ended recurring gift.</description>

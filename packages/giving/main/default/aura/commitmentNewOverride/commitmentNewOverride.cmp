@@ -1,0 +1,7 @@
+<!--
+  The New override on Commitment. The platform overrides a standard action only with an Aura
+  component, so this wrapper holds nothing but the New Commitment screen (commitmentNew).
+-->
+<aura:component implements="lightning:actionOverride,lightning:isUrlAddressable">
+    <c:commitmentNew />
+</aura:component>

@@ -9,13 +9,13 @@
   <enableReports>true</enableReports>
   <enableSearch>true</enableSearch>
   <enableStreamingApi>true</enableStreamingApi>
-  <label>Installment</label>
+  <label>Pledge Payment</label>
   <nameField>
     <displayFormat>IN-{000000}</displayFormat>
     <label>Installment Number</label>
     <type>AutoNumber</type>
   </nameField>
-  <pluralLabel>Installments</pluralLabel>
+  <pluralLabel>Pledge Payments</pluralLabel>
   <sharingModel>ControlledByParent</sharingModel>
   <visibility>Public</visibility>
 </CustomObject>

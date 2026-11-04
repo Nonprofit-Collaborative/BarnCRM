@@ -1,121 +1,141 @@
 <template>
-    <template lwc:if={helpReady}>
-  <lightning-card title={labels.title} icon-name="standard:timeslot">
-    <div class="slds-var-p-horizontal_medium">
-      <template lwc:if={loading}>
-        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
-      </template>
-
-      <template lwc:if={errorMessage}>
-        <p role="alert" class="slds-text-color_error" data-id="error">{errorMessage}</p>
-      </template>
-
-      <template lwc:if={noticeMessage}>
-        <p role="status" class="slds-text-color_success" data-id="notice">{noticeMessage}</p>
-      </template>
-
-      <template lwc:if={isEmpty}>
-        <p data-id="empty">{labels.empty}</p>
-        <template lwc:if={canGenerate}>
-          <lightning-button
-            label={labels.generateNow}
-            variant="brand"
-            data-id="generate"
-            class="slds-var-m-top_small"
-            onclick={handleGenerate}
-          ></lightning-button>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="standard:timeslot">
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={loading}>
+          <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
         </template>
-      </template>
 
-      <template lwc:if={hasActions}>
-        <div class="slds-var-m-bottom_small" data-id="actions">
-          <template lwc:if={canPause}>
-            <lightning-button
-              label={labels.pause}
-              data-id="pause"
-              data-action="pause"
-              class="slds-var-m-right_x-small"
-              onclick={handleStatusChange}
-            ></lightning-button>
-          </template>
-          <template lwc:if={canResume}>
-            <lightning-button
-              label={labels.resume}
-              data-id="resume"
-              data-action="resume"
-              class="slds-var-m-right_x-small"
-              onclick={handleStatusChange}
-            ></lightning-button>
-          </template>
-          <template lwc:if={canEnd}>
-            <lightning-button
-              label={labels.complete}
-              data-id="complete"
-              data-action="complete"
-              class="slds-var-m-right_x-small"
-              onclick={handleStatusChange}
-            ></lightning-button>
-            <lightning-button
-              label={labels.cancel}
-              data-id="cancel"
-              data-action="cancel"
-              onclick={handleStatusChange}
-            ></lightning-button>
-          </template>
-        </div>
-      </template>
+        <template lwc:if={errorMessage}>
+          <c-barn-notice
+            class="slds-show slds-var-m-bottom_small"
+            variant="error"
+            message={errorMessage}
+            data-id="error"
+          ></c-barn-notice>
+        </template>
 
-      <template lwc:if={hasInstallments}>
-        <table class="slds-table slds-table_cell-buffer slds-table_bordered" data-id="schedule">
-          <thead>
-            <tr class="slds-line-height_reset">
-              <th scope="col">{labels.sequence}</th>
-              <th scope="col">{labels.dueDate}</th>
-              <th scope="col">{labels.amount}</th>
-              <th scope="col">{labels.paid}</th>
-              <th scope="col">{labels.status}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <template for:each={installments} for:item="installment">
-              <tr key={installment.key} class="slds-hint-parent">
-                <td>{installment.sequence}</td>
-                <td>
-                  <lightning-formatted-date-time
-                    value={installment.dueDate}
-                  ></lightning-formatted-date-time>
-                </td>
-                <td>
-                  <lightning-formatted-number
-                    format-style="currency"
-                    value={installment.expectedAmount}
-                  ></lightning-formatted-number>
-                </td>
-                <td>
-                  <lightning-formatted-number
-                    format-style="currency"
-                    value={installment.paidAmount}
-                  ></lightning-formatted-number>
-                </td>
-                <td>
-                  <lightning-badge
-                    label={installment.status}
-                    class={installment.badgeClass}
-                  ></lightning-badge>
-                </td>
-              </tr>
+        <template lwc:if={noticeMessage}>
+          <c-barn-notice
+            class="slds-show slds-var-m-bottom_small"
+            variant="success"
+            message={noticeMessage}
+            data-id="notice"
+          ></c-barn-notice>
+        </template>
+
+        <template lwc:if={isEmpty}>
+          <c-barn-empty-state
+            size="compact"
+            heading={labels.emptyHeading}
+            message={labels.empty}
+            data-id="empty"
+          >
+            <template lwc:if={canGenerate}>
+              <lightning-button
+                label={labels.generateNow}
+                variant="brand"
+                data-id="generate"
+                onclick={handleGenerate}
+              ></lightning-button>
             </template>
-          </tbody>
-        </table>
-        <p class="slds-var-m-top_small slds-text-title_bold" data-id="total">
-          {labels.total}
-          <lightning-formatted-number
-            format-style="currency"
-            value={expectedTotal}
-          ></lightning-formatted-number>
-        </p>
-      </template>
-    </div>
-  </lightning-card>
-    </template>
+          </c-barn-empty-state>
+        </template>
+
+        <template lwc:if={hasActions}>
+          <div class="slds-var-m-bottom_small" data-id="actions">
+            <template lwc:if={canPause}>
+              <lightning-button
+                label={labels.pause}
+                data-id="pause"
+                data-action="pause"
+                class="slds-var-m-right_x-small"
+                onclick={handleStatusChange}
+              ></lightning-button>
+            </template>
+            <template lwc:if={canResume}>
+              <lightning-button
+                label={labels.resume}
+                data-id="resume"
+                data-action="resume"
+                class="slds-var-m-right_x-small"
+                onclick={handleStatusChange}
+              ></lightning-button>
+            </template>
+            <template lwc:if={canEnd}>
+              <lightning-button
+                label={labels.complete}
+                data-id="complete"
+                data-action="complete"
+                class="slds-var-m-right_x-small"
+                onclick={handleStatusChange}
+              ></lightning-button>
+              <lightning-button
+                label={labels.cancel}
+                variant="destructive-text"
+                data-id="cancel"
+                onclick={handleCancel}
+              ></lightning-button>
+            </template>
+          </div>
+        </template>
+
+        <template lwc:if={hasInstallments}>
+          <div class="slds-var-m-bottom_small" data-id="total">
+            <c-barn-stat-tile
+              label={labels.total}
+              value={expectedTotal}
+              format-style="currency"
+              align="start"
+            ></c-barn-stat-tile>
+          </div>
+          <table
+            class="slds-table slds-table_cell-buffer slds-table_bordered slds-max-medium-table_stacked"
+            data-id="schedule"
+          >
+            <thead>
+              <tr class="slds-line-height_reset">
+                <th scope="col" data-label={labels.sequence}>{labels.sequence}</th>
+                <th scope="col" data-label={labels.dueDate}>{labels.dueDate}</th>
+                <th scope="col" data-label={labels.amount}>{labels.amount}</th>
+                <th scope="col" data-label={labels.paid}>{labels.paid}</th>
+                <th scope="col" data-label={labels.status}>{labels.status}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={installments} for:item="installment">
+                <tr key={installment.key} class="slds-hint-parent">
+                  <td data-label={labels.sequence}>{installment.sequence}</td>
+                  <td data-label={labels.dueDate}>
+                    <lightning-formatted-date-time
+                      value={installment.dueDate}
+                      time-zone="UTC"
+                    ></lightning-formatted-date-time>
+                  </td>
+                  <td data-label={labels.amount}>
+                    <lightning-formatted-number
+                      format-style="currency"
+                      value={installment.expectedAmount}
+                    ></lightning-formatted-number>
+                  </td>
+                  <td data-label={labels.paid}>
+                    <lightning-formatted-number
+                      format-style="currency"
+                      value={installment.paidAmount}
+                    ></lightning-formatted-number>
+                  </td>
+                  <td data-label={labels.status}>
+                    <c-barn-status-badge
+                      status={installment.tone}
+                      label={installment.status}
+                    ></c-barn-status-badge>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
 </template>

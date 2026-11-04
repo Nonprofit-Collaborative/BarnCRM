@@ -127,6 +127,7 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | funders | grantReport | custom:custom99 | Funder_Report_Template__c |
 | giving | acknowledgments | custom:custom71 | Acknowledgments |
 | giving | askPipeline | custom:custom54 | Ask_Pipeline |
+| giving | commitmentNew | custom:custom46 | Commitment__c |
 | giving | donorLevels | custom:custom65 | Donor_Levels |
 | giving | donorSegments | custom:custom68 | Donor_Segments |
 | giving | giftAllocations | custom:custom17 | Gift_Allocation__c |
