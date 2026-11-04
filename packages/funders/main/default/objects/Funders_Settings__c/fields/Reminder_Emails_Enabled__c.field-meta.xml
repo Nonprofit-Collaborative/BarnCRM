@@ -6,7 +6,7 @@
   <inlineHelpText>
     Whether the morning job also emails the person reminded about a grant requirement coming due. Off by default.
   </inlineHelpText>
-  <label>Email Reminders</label>
+  <label>Email reminders</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>
 </CustomField>

@@ -11613,9 +11613,9 @@ The Funders module's org-wide settings (F-02), edited in the Funders section of 
 
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
-| Create Reminder Tasks | boolean | yes (defaults true) | Whether the morning job makes a task for each requirement coming due (R-GQ3). |
-| Email Reminders | boolean | yes (defaults false) | Whether the morning job also emails the person reminded. |
-| Days Before a Deadline to Remind | number | yes (defaults 14) | The lead time, from 1 to 90 days (R-FS1). |
+| Create reminder tasks | boolean | yes (defaults true) | Whether the morning job makes a task for each requirement coming due (R-GQ3). |
+| Email reminders | boolean | yes (defaults false) | Whether the morning job also emails the person reminded. |
+| Days before a deadline to remind | number | yes (defaults 14) | The lead time, from 1 to 90 days (R-FS1). |
 
 ### Rules
 
@@ -11629,9 +11629,9 @@ The Funders module's org-wide settings (F-02), edited in the Funders section of 
 
 | Attribute | API name | Type |
 |---|---|---|
-| Create Reminder Tasks | `Reminder_Tasks_Enabled__c` | Checkbox, default true |
-| Email Reminders | `Reminder_Emails_Enabled__c` | Checkbox, default false |
-| Days Before a Deadline to Remind | `Reminder_Lead_Days__c` | Number(2, 0), default 14 |
+| Create reminder tasks | `Reminder_Tasks_Enabled__c` | Checkbox, default true |
+| Email reminders | `Reminder_Emails_Enabled__c` | Checkbox, default false |
+| Days before a deadline to remind | `Reminder_Lead_Days__c` | Number(2, 0), default 14 |
 
 - **Setting Definitions:** `Funders_Reminder_Tasks_Enabled`, `Funders_Reminder_Emails_Enabled`,
   `Funders_Reminder_Lead_Days`, section Funders.

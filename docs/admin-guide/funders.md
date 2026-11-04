@@ -239,7 +239,7 @@ its current due date:
 
 - **A task** for the person in **Assigned To**, or the grant's owner when nobody is assigned or
   the person assigned is inactive. The task is on the grant, due on the requirement's due date.
-- **An email**, once you turn **Email Reminders** on, to the same person, with a link to the grant. It goes to their Salesforce user, so
+- **An email**, once you turn **Email reminders** on, to the same person, with a link to the grant. It goes to their Salesforce user, so
   it does not count against your org's daily limit for outside addresses.
 
 Each due date is reminded once. If the funder moves the date and you change **Due Date**, the new
@@ -317,9 +317,9 @@ organization.
 
 | Setting | Default | What it does |
 |---|---|---|
-| Create Reminder Tasks | On | Makes the reminder task. |
-| Email Reminders | Off | Also sends the reminder email. |
-| Days Before a Deadline to Remind | 14 | How many days before a requirement is due its reminder goes out, from 1 to 90. |
+| Create reminder tasks | On | Makes the reminder task. |
+| Email reminders | Off | Also sends the reminder email. |
+| Days before a deadline to remind | 14 | How many days before a requirement is due its reminder goes out, from 1 to 90. |
 
 Tasks ship on, because a missed funder report can cost the next award and a task goes only to the
 person doing the work. Emails ship off, like shift and pledge reminders: BarnCRM sends no email
@@ -430,7 +430,7 @@ Do this as Maria, who holds the Admin role, with a second user, Dana, who has no
 8. On the grant's **Requirements** list click **New**: "Year 1 report", due in 5 days, **Assigned
    To** Dana. On **Grant Pipeline** it shows under **Upcoming Deadlines** with **Mark Submitted**.
 9. The next morning Dana has a task "Year 1 report due for 2027 Literacy Grant" (and an
-   email, if you turned **Email Reminders** on).
+   email, if you turned **Email reminders** on).
    Click **Mark Submitted**: the row leaves the list and the requirement's **Submitted Date** is
    today.
 10. On the grant, set **Award Start Date** to January 1 next year and **Award End Date** to

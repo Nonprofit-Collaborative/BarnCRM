@@ -115,14 +115,14 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | **BarnCRM Settings**, **Funders** (under Fundraising). | **Create Reminder Tasks** on, **Email Reminders** off, **Days Before a Deadline to Remind** 14. Turn **Email Reminders** on and save. |
+| 1 | **BarnCRM Settings**, **Funders** (under Fundraising). | **Create reminder tasks** on, **Email reminders** off, **Days before a deadline to remind** 14. Turn **Email reminders** on and save. |
 | 2 | Health Check, nightly jobs list. | **Grant Requirement Reminders, 6:00 AM** is scheduled. |
 | 3 | In the Developer Console run `GrantReminderBatch.startMorning();`, or wait until the next morning. | The staff user has a task `Year 1 report due for Youth Grant` on the grant, due on the due date, and an email with a link to the grant. **Reminder Sent For** on the requirement shows the due date. |
 | 4 | Run it again. | No second task or email. |
 | 5 | Change the requirement's **Due Date** to 7 days from today and run it again. | A new task and email for the new date. |
 | 6 | Clear **Assigned To** and change the due date again; run it. | The task goes to the grant's owner. |
-| 7 | Set **Days Before a Deadline to Remind** to `120`. | Refused: from 1 to 90. |
-| 8 | Turn both reminder settings off and run it after changing the due date. | Nothing is made. Turn **Create Reminder Tasks** back on and leave **Email Reminders** off (the shipped values). |
+| 7 | Set **Days before a deadline to remind** to `120`. | Refused: from 1 to 90. |
+| 8 | Turn both reminder settings off and run it after changing the due date. | Nothing is made. Turn **Create reminder tasks** back on and leave **Email reminders** off (the shipped values). |
 
 **Cleanup:** Delete the test tasks.
 

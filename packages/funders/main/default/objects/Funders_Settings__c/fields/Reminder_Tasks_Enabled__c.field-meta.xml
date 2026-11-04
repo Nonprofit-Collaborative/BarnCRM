@@ -6,7 +6,7 @@
   <inlineHelpText>
     Whether the morning job makes a task for the person assigned to each grant requirement coming due. On by default.
   </inlineHelpText>
-  <label>Create Reminder Tasks</label>
+  <label>Create reminder tasks</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>
 </CustomField>
