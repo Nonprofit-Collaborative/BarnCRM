@@ -192,7 +192,7 @@ describe('c-error-digest-job', () => {
     byId(element, 'send-now').click();
     await flush();
 
-    expect(byId(element, 'error').textContent).toContain('Manage BarnCRM Settings');
+    expect(byId(element, 'error').message).toContain('Manage BarnCRM Settings');
   });
 
   it('shows the message the page could not load with', async () => {
@@ -200,6 +200,6 @@ describe('c-error-digest-job', () => {
     getDigest.error({ message: 'Something went wrong with the error digest.' });
     await flush();
 
-    expect(byId(element, 'error').textContent).toContain('Something went wrong');
+    expect(byId(element, 'error').message).toContain('Something went wrong');
   });
 });

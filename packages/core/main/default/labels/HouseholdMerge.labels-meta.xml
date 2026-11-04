@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Radio choice keeping the surviving household's value</shortDescription>
-        <value>Keep this one</value>
+        <value>Keep This One</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_KeepVictim</fullName>
@@ -142,7 +142,23 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Radio choice keeping the other household's value</shortDescription>
-        <value>Keep the other one</value>
+        <value>Keep the Other One</value>
+    </labels>
+    <labels>
+        <fullName>Core_HouseholdMerge_KeepOtherInstead</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link that keeps the other household and folds this one into it</shortDescription>
+        <value>Keep the Other Household Instead</value>
+    </labels>
+    <labels>
+        <fullName>Core_HouseholdMerge_KeepThisInstead</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link that swaps back to keeping this household</shortDescription>
+        <value>Keep This Household Instead</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_MemberFromOther</fullName>
@@ -177,14 +193,6 @@
         <value>Merge</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdMerge_NoResults</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The search found no households</shortDescription>
-        <value>No households match what you typed.</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdMerge_NotAHousehold</fullName>
         <categories>Households</categories>
         <language>en_US</language>
@@ -207,14 +215,6 @@
         <protected>true</protected>
         <shortDescription>Label of the household search box</shortDescription>
         <value>Find the Other Household</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_SearchPlaceholder</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Placeholder in the household search box</shortDescription>
-        <value>Type part of a household name</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_SplitButton</fullName>

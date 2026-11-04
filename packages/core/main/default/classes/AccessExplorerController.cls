@@ -37,10 +37,20 @@ public with sharing class AccessExplorerController {
     @TestVisible
     private static final String KIND_SET = 'permissionSet';
 
+    /** A BarnCRM role or extra permission, named as the Access page names it (admin-9). */
+    @TestVisible
+    private static final String BARN_ROLE = 'role';
+    @TestVisible
+    private static final String BARN_EXTRA_PERMISSION = 'extraPermission';
+
+    /** The packaged extra permissions by API name, read once per transaction. */
+    private static Set<String> extraPermissionNames;
+
     /** The PermissionSet fields every label, kind and source needs. */
     private static final String SET_FIELDS =
-        'SELECT Id, Label, Name, IsOwnedByProfile, Profile.Name, PermissionSetGroupId,' +
-        ' PermissionSetGroup.MasterLabel, PermissionsViewAllData, PermissionsModifyAllData,' +
+        'SELECT Id, Label, Name, NamespacePrefix, IsOwnedByProfile, Profile.Name,' +
+        ' PermissionSetGroupId, PermissionSetGroup.MasterLabel, PermissionSetGroup.DeveloperName,' +
+        ' PermissionSetGroup.NamespacePrefix, PermissionsViewAllData, PermissionsModifyAllData,' +
         ' PermissionsAuthorApex FROM PermissionSet WHERE ';
 
     /** Raised with a message the page shows as it is. */
@@ -58,6 +68,9 @@ public with sharing class AccessExplorerController {
         public String detail;
         @AuraEnabled
         public Boolean isActive = true;
+        /** 'role' or 'extraPermission' for a BarnCRM role or extra permission, else blank. */
+        @AuraEnabled
+        public String barnKind;
     }
 
     /** Object or field permissions, and what gives them. */
@@ -110,6 +123,9 @@ public with sharing class AccessExplorerController {
         public String name;
         @AuraEnabled
         public String kind;
+        /** 'role' or 'extraPermission' for a BarnCRM role or extra permission, else blank. */
+        @AuraEnabled
+        public String barnKind;
         /** A group's permission sets, separated by a comma and a space. */
         @AuraEnabled
         public String through;
@@ -148,6 +164,9 @@ public with sharing class AccessExplorerController {
         public String detail;
         @AuraEnabled
         public Boolean isActive = true;
+        /** 'role' or 'extraPermission' when the subject is a BarnCRM role or extra permission. */
+        @AuraEnabled
+        public String barnKind;
         @AuraEnabled
         public List<Grant> sources = new List<Grant>();
         @AuraEnabled
@@ -223,6 +242,9 @@ public with sharing class AccessExplorerController {
         public String holder;
         @AuraEnabled
         public String kind;
+        /** 'role' or 'extraPermission' when the holder is a BarnCRM role or extra permission. */
+        @AuraEnabled
+        public String barnKind;
         @AuraEnabled
         public String inGroups;
         @AuraEnabled
@@ -302,6 +324,7 @@ public with sharing class AccessExplorerController {
                 choice.id = permissionSet.Id;
                 choice.label = labelOf(permissionSet);
                 choice.detail = kindOf(permissionSet);
+                choice.barnKind = barnKindOf(permissionSet);
                 choices.add(choice);
             }
             return choices;
@@ -334,6 +357,7 @@ public with sharing class AccessExplorerController {
                 sources = new List<PermissionSet>{ permissionSet };
                 result.label = labelOf(permissionSet);
                 result.detail = kindOf(permissionSet);
+                result.barnKind = barnKindOf(permissionSet);
             }
             result.id = parsed;
             Map<Id, List<PermissionSet>> components = componentsOf(sources);
@@ -829,6 +853,7 @@ public with sharing class AccessExplorerController {
             row.holderId = holder.id;
             row.holder = holder.label;
             row.kind = holder.kind;
+            row.barnKind = holder.barnKind;
             row.inGroups = holder.inGroups;
             row.activePeople = holder.activePeople;
             row.modifyAll = permission.PermissionsModifyAllRecords;
@@ -994,6 +1019,7 @@ public with sharing class AccessExplorerController {
         row.label = labelOf(permissionSet);
         row.name = permissionSet.Name;
         row.kind = kindOf(permissionSet);
+        row.barnKind = barnKindOf(permissionSet);
         row.viewAllData = permissionSet.PermissionsViewAllData == true;
         row.modifyAllData = permissionSet.PermissionsModifyAllData == true;
         row.authorApex = permissionSet.PermissionsAuthorApex == true;
@@ -1032,6 +1058,48 @@ public with sharing class AccessExplorerController {
             return KIND_PROFILE;
         }
         return permissionSet.PermissionSetGroupId != null ? KIND_GROUP : KIND_SET;
+    }
+
+    /**
+     * Whether a set is one of BarnCRM's own roles (a packaged permission set group the Access
+     * page lists) or extra permissions (an add-on the Access page lists), in BarnCRM's own
+     * namespace; blank for anything else.
+     */
+    @TestVisible
+    private static String barnKindOf(PermissionSet permissionSet) {
+        if (permissionSet.IsOwnedByProfile) {
+            return null;
+        }
+        String namespace = NamespaceUtil.prefix().removeEnd('__');
+        PermissionSetGroup owner = permissionSet.PermissionSetGroupId == null
+            ? null
+            : permissionSet.PermissionSetGroup;
+        if (owner != null) {
+            return sameNamespace(owner.NamespacePrefix, namespace) &&
+                AccessService.ROLE_DEVELOPER_NAMES.contains(owner.DeveloperName)
+                ? BARN_ROLE
+                : null;
+        }
+        return sameNamespace(permissionSet.NamespacePrefix, namespace) &&
+            extraPermissions().contains(permissionSet.Name)
+            ? BARN_EXTRA_PERMISSION
+            : null;
+    }
+
+    private static Set<String> extraPermissions() {
+        if (extraPermissionNames == null) {
+            try {
+                extraPermissionNames = new Set<String>(AccessService.addOnNames());
+            } catch (Exception unreadable) {
+                // A module's add-on rows could not be read: name Core's own add-ons only.
+                extraPermissionNames = new Set<String>(AccessService.ADD_ON_PERMISSION_SETS);
+            }
+        }
+        return extraPermissionNames;
+    }
+
+    private static Boolean sameNamespace(String found, String namespace) {
+        return (String.isBlank(found) ? '' : found) == (String.isBlank(namespace) ? '' : namespace);
     }
 
     private static List<Grant> sortedGrants(List<Grant> grants) {

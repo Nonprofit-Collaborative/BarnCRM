@@ -25,6 +25,7 @@ import ROLLUP_BUILDER from '@salesforce/label/c.Core_SettingsGroup_RollupBuilder
 import HOURS_AND_SHIFTS from '@salesforce/label/c.Core_SettingsGroup_HoursAndShifts';
 import ERROR_DIGEST from '@salesforce/label/c.Core_ErrorDigest_PageTitle';
 import ERROR_LOG_RETENTION from '@salesforce/label/c.Core_SettingsGroup_ErrorLogRetention';
+import ERROR_LOG from '@salesforce/label/c.Core_ErrorLogTile_Title';
 import IMPORTING from '@salesforce/label/c.Core_SettingsGroup_Importing';
 import GIFT_MATCHING from '@salesforce/label/c.Core_SettingsGroup_GiftMatching';
 import FIND_AND_BULK from '@salesforce/label/c.Core_SettingsGroup_FindAndBulk';
@@ -240,6 +241,8 @@ const PAGE_GROUPS = {
     }
   ],
   'error log': [
+    // The list itself lives in Org Optimizer (admin-14); this box only links there.
+    { id: 'Error Log', label: ERROR_LOG, keys: ['Error_Log_Optimizer_Link'] },
     {
       id: 'Error Digest',
       label: ERROR_DIGEST,

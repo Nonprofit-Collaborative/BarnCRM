@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Periods__c</fullName>
+  <description>
+    The model's shared reporting periods as JSON (canonical model R-LM4), kept by the Logic Model
+    Builder's Reporting Periods section. Not edited by hand.
+  </description>
+  <externalId>false</externalId>
+  <label>Periods</label>
+  <length>32768</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

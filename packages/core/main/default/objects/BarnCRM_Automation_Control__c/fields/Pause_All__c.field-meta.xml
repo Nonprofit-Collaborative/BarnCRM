@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Pause_All__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>When it applies to the person saving, BarnCRM automation that can be paused does not run, and automation that checks it stops too. At the organization level it pauses everyone until it is turned off. Rules that always run still run.</description>
+  <inlineHelpText>Pause automation that checks this setting, until turned off.</inlineHelpText>
+  <label>Pause All</label>
+  <type>Checkbox</type>
+</CustomField>

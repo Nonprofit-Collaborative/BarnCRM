@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Fundraising Home (people-giving-22): the five figures, Enter a Gift and Fundraising Setup, then
+    two report charts (vis-core-18) an administrator can move or swap in the App Builder.
+  </description>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>fundraisingHome</componentName>
+        <identifier>fundraisingHome1</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>region1</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>reportName</name>
+          <value>Giving_by_Month</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>showRefreshButton</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:reportChart</componentName>
+        <identifier>givingByMonthChart</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>region2</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>reportName</name>
+          <value>Open_Asks_by_Stage</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>showRefreshButton</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:reportChart</componentName>
+        <identifier>openAsksByStageChart</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>region3</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <masterLabel>Fundraising Home</masterLabel>
+  <template>
+    <name>flexipage:appHomeTemplateHeaderTwoColumnsLeftSidebar</name>
+  </template>
+  <type>AppPage</type>
+</FlexiPage>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Fundraising Home's view logic in plain JavaScript: each figure's value and badge, and the page
+    it opens (people-giving-22). Imported by fundraisingHome.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

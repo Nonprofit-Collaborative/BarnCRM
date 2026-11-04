@@ -12,6 +12,7 @@ or Apex.
 |---|---|
 | `canonical-model.md` | The platform-neutral specification of every entity: attributes, types, relationships, business rules, and the Salesforce implementation each entity maps to. |
 | `../../scripts/ci/check-canonical-model.py` | The consistency gate for that file: no em dashes, no API name declared twice for one object, no API name used in prose that was never declared. |
+| `without-sharing-register.md` | Every Apex class that runs `without sharing`, what it reaches past sharing for and the ADR that allows it; kept in step with the code by `scripts/ci/check-without-sharing-register.py`. |
 | `decisions/` | Architecture Decision Records (ADRs), one file per decision, numbered `NNNN-kebab-title.md`. |
 | `decisions/README.md` | The ADR index and the procedure for adding one. |
 

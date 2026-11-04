@@ -13,6 +13,46 @@
             <c-barn-help learn-more-url={learnMoreUrl}></c-barn-help>
         </div>
 
+        <section class="slds-var-m-bottom_medium" data-id="task-search">
+            <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
+                <lightning-input
+                    type="search"
+                    data-id="task-input"
+                    label={labels.taskSearch}
+                    placeholder={labels.taskSearchPlaceholder}
+                    value={taskQuery}
+                    onchange={handleTaskInput}
+                ></lightning-input>
+            </div>
+            <div aria-live="polite">
+                <template lwc:if={hasTaskResults}>
+                    <ul class="slds-has-dividers_bottom-space slds-var-m-top_x-small" aria-label={labels.taskSearch}>
+                        <template for:each={taskResults} for:item="task">
+                            <li key={task.key} class="slds-item">
+                                <button
+                                    type="button"
+                                    class="slds-button slds-button_reset slds-text-link"
+                                    data-id="task-result"
+                                    data-tool={task.tool}
+                                    onclick={handleTaskSelect}
+                                >
+                                    {task.text}
+                                </button>
+                                <span class="slds-text-body_small slds-text-color_weak slds-var-m-left_x-small"
+                                    >{task.toolLabel}</span
+                                >
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+                <template lwc:if={showNoTasks}>
+                    <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small" data-id="task-none">
+                        {labels.taskSearchNone}
+                    </p>
+                </template>
+            </div>
+        </section>
+
         <c-barn-tool-grid groups={toolGroups} onselect={handleSelect} data-id="tools"></c-barn-tool-grid>
 
         <template lwc:if={isAdmin}>
@@ -23,7 +63,7 @@
                     <c-barn-help learn-more-url={learnMoreUrl} data-id="mappings-help"></c-barn-help>
                 </div>
                 <template lwc:if={mappingsError}>
-                    <p role="alert" class="slds-text-color_error" data-id="mappings-error">{mappingsError}</p>
+                    <c-barn-notice variant="error" message={mappingsError} data-id="mappings-error"></c-barn-notice>
                 </template>
                 <template lwc:elseif={hasMappings}>
                     <lightning-datatable

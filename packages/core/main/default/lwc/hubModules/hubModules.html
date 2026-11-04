@@ -2,19 +2,37 @@
     <lightning-card title={labels.heading} icon-name="standard:apps">
         <div class="slds-var-p-horizontal_medium">
             <template lwc:if={errorMessage}>
-                <p class="slds-text-color_error" data-id="load-error" role="alert">{errorMessage}</p>
+                <c-barn-notice variant="error" message={errorMessage} data-id="load-error"></c-barn-notice>
             </template>
             <template lwc:else>
-                <ul>
+                <ul class="slds-has-dividers_bottom-space">
                     <template for:each={rows} for:item="row">
-                        <li key={row.name} data-id="module-row">
-                            <span data-id="module-name">{row.displayName}</span>
-                            <span class={row.badgeClass} data-id="module-status">{row.statusText}</span>
-                            <template lwc:if={row.appUrl}>
-                                <a class="slds-var-m-left_small" href={row.appUrl} data-id="open-app"
-                                    >{labels.openApp}<span class="slds-assistive-text">: {row.displayName}</span></a
-                                >
-                            </template>
+                        <li key={row.name} class="slds-item" data-id="module-row">
+                            <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-wrap">
+                                <span class="slds-grid slds-grid_vertical-align-center">
+                                    <lightning-avatar
+                                        class="slds-var-m-right_x-small"
+                                        size="small"
+                                        src={row.logoUrl}
+                                        fallback-icon-name="standard:apps"
+                                        alternative-text=""
+                                        data-id="module-logo"
+                                    ></lightning-avatar>
+                                    <span class="slds-text-title_bold" data-id="module-name">{row.displayName}</span>
+                                </span>
+                                <span class="slds-grid slds-grid_vertical-align-center">
+                                    <c-barn-status-badge
+                                        status={row.status}
+                                        label={row.statusText}
+                                        data-id="module-status"
+                                    ></c-barn-status-badge>
+                                    <template lwc:if={row.appUrl}>
+                                        <a class="slds-var-m-left_small" href={row.appUrl} data-id="open-app"
+                                            >{labels.openApp}<span class="slds-assistive-text">: {row.displayName}</span></a
+                                        >
+                                    </template>
+                                </span>
+                            </div>
                         </li>
                     </template>
                 </ul>

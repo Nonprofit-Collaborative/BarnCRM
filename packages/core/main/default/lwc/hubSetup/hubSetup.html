@@ -1,7 +1,7 @@
 <template>
     <template lwc:if={shown}>
         <template lwc:if={showAssistant}>
-            <lightning-card title={labels.checklistHeading}>
+            <lightning-card title={labels.checklistHeading} icon-name="standard:task">
                 <div class="slds-var-p-horizontal_medium">
                     <c-setup-assistant
                         reopened={setupReopened}
@@ -11,9 +11,16 @@
             </lightning-card>
         </template>
         <template lwc:else>
-            <lightning-card title={labels.setupCompleteHeading}>
+            <lightning-card title={labels.setupCompleteHeading} icon-name="standard:task">
                 <div class="slds-var-p-horizontal_medium">
-                    <p class="slds-text-body_small" data-id="setup-progress">{setupProgressText}</p>
+                    <c-barn-meter
+                        label={labels.checklistHeading}
+                        value={stepsCompleted}
+                        max={stepsTotal}
+                        value-text={setupProgressText}
+                        size="small"
+                        data-id="setup-progress"
+                    ></c-barn-meter>
                     <lightning-button
                         class="slds-var-m-top_x-small"
                         label={labels.reopenSetup}

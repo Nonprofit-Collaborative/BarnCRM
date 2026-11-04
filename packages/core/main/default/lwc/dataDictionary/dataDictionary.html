@@ -5,14 +5,20 @@
         <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
 
         <template lwc:if={errorMessage}>
-            <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
-                {errorMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-bottom_small"
+                data-id="error"
+                variant="error"
+                message={errorMessage}
+            ></c-barn-notice>
         </template>
         <template lwc:if={noticeMessage}>
-            <p class="slds-var-m-bottom_small" data-id="notice" role="status" aria-live="polite">
-                {noticeMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-bottom_small"
+                data-id="notice"
+                variant="success"
+                message={noticeMessage}
+            ></c-barn-notice>
         </template>
 
         <lightning-dual-listbox
@@ -77,7 +83,7 @@
         </template>
 
         <template lwc:if={showEmpty}>
-            <p data-id="empty">{labels.empty}</p>
+            <c-barn-empty-state data-id="empty" illustration="no-data" heading={labels.empty}></c-barn-empty-state>
         </template>
 
         <template lwc:if={hasRows}>
@@ -93,7 +99,12 @@
         </template>
 
         <template lwc:if={notCountedMessage}>
-            <p class="slds-var-m-top_small" data-id="not-counted">{notCountedMessage}</p>
+            <c-barn-notice
+                class="slds-var-m-top_small"
+                data-id="not-counted"
+                variant="warning"
+                message={notCountedMessage}
+            ></c-barn-notice>
         </template>
 
         <template lwc:if={showAutomation}>
@@ -121,13 +132,27 @@
                     ></lightning-datatable>
                 </template>
                 <template lwc:if={showAutomationEmpty}>
-                    <p data-id="automation-empty">{labels.automationEmpty}</p>
+                    <c-barn-empty-state
+                        data-id="automation-empty"
+                        size="compact"
+                        illustration="all-clear"
+                        heading={labels.automationEmpty}
+                    ></c-barn-empty-state>
                 </template>
                 <template lwc:if={automationTruncatedMessage}>
-                    <p class="slds-var-m-top_x-small" data-id="automation-truncated">{automationTruncatedMessage}</p>
+                    <c-barn-notice
+                        class="slds-var-m-top_x-small"
+                        data-id="automation-truncated"
+                        message={automationTruncatedMessage}
+                    ></c-barn-notice>
                 </template>
                 <template lwc:if={automationNotReadMessage}>
-                    <p class="slds-var-m-top_x-small" data-id="automation-not-read">{automationNotReadMessage}</p>
+                    <c-barn-notice
+                        class="slds-var-m-top_x-small"
+                        data-id="automation-not-read"
+                        variant="warning"
+                        message={automationNotReadMessage}
+                    ></c-barn-notice>
                 </template>
             </div>
         </template>

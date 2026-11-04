@@ -27,8 +27,14 @@ describe('c-setup-step-modules', () => {
 
     const items = element.shadowRoot.querySelectorAll('li');
     expect(items).toHaveLength(2);
-    expect(items[0].textContent).toContain('Core_SetupAssistant_ModulePresent');
-    expect(items[1].textContent).toContain('Core_Integrations_NotInstalled');
+    expect(items[0].querySelector('[data-id="status"]').label).toContain(
+      'Core_SetupAssistant_ModulePresent'
+    );
+    expect(items[0].querySelector('[data-id="status"]').status).toBe('success');
+    expect(items[1].querySelector('[data-id="status"]').label).toContain(
+      'Core_Integrations_NotInstalled'
+    );
+    expect(items[1].querySelector('[data-id="status"]').status).toBe('neutral');
   });
 
   it('links each module to what it does', () => {

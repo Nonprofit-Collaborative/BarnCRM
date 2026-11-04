@@ -68,6 +68,27 @@ An **Add Member** button sits at the top right of the panel and opens the **Add 
   once it is added; a refusal shows in the dialog, which stays open.
   Where your org stores people as accounts (person accounts) and you can create one, the new
   person is created as a person account; otherwise as a contact.
+- In both ways, once a last name of two or more letters is typed, the dialog checks for people
+  already in BarnCRM with the same first and last name (case does not matter) and shows each
+  under the name fields: "Already in BarnCRM: Ana Garcia, Tampa (Garcia Household). Use this
+  person instead?" The city is the person's mailing city and the household their current
+  one; either is left out when unknown, and members of this household are never offered.
+  **Use this person instead?** adds that person in place of a new one, the same as choosing
+  them from the search (in the simple way that moves them out of their current household).
+  The check reads with your own access, so nobody you cannot see is shown, and a check that
+  fails shows nothing and never blocks the save.
+
+### New Person From Other Screens
+
+The same dialog, opened in its person mode, is how a screen that picks a person offers to
+create one in place (Quick Gift Entry's donor). It holds the contact form with First Name,
+Last Name, Email, Mailing Street, Mailing City and Mailing Postal Code (the field labels come
+from your org), saves the contact exactly as **New** on the Contacts tab does (so your
+duplicate and validation rules run, and the household is made automatically when the org
+creates households), and hands the new person back to the screen. The same-name hint shows
+here too; choosing **Use this person instead?** hands back the existing person and creates
+nothing. For developers: `HouseholdAddMemberModal.open({ label, size: 'small', mode:
+'person' })` resolves `{ id, name }`, or nothing when closed.
 
 ### The Primary Contact in the Simple Way of Belonging
 

@@ -19,13 +19,13 @@ public with sharing class ServiceDeliveryRulesHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        ProgramPersonRule.refuseNonPersonAccounts(Trigger.new, null);
-        apply((List<Service_Delivery__c>) Trigger.new);
+        ProgramPersonRule.refuseNonPersonAccounts(newRecords(), null);
+        apply((List<Service_Delivery__c>) newRecords());
     }
 
     public override void beforeUpdate() {
-        ProgramPersonRule.refuseNonPersonAccounts(Trigger.new, Trigger.oldMap);
-        apply((List<Service_Delivery__c>) Trigger.new);
+        ProgramPersonRule.refuseNonPersonAccounts(newRecords(), oldRecordsById());
+        apply((List<Service_Delivery__c>) newRecords());
     }
 
     @TestVisible

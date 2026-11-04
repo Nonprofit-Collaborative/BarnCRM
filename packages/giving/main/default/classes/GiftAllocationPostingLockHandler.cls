@@ -15,7 +15,7 @@ public with sharing class GiftAllocationPostingLockHandler extends TriggerHandle
 
     public override void beforeInsert() {
         GiftPostingLock.enforceOnAllocations(
-            (List<Gift_Allocation__c>) Trigger.new,
+            (List<Gift_Allocation__c>) newRecords(),
             null,
             Label.Giving_Posting_OverrideAllocationAdded
         );
@@ -23,15 +23,15 @@ public with sharing class GiftAllocationPostingLockHandler extends TriggerHandle
 
     public override void beforeUpdate() {
         GiftPostingLock.enforceOnAllocations(
-            (List<Gift_Allocation__c>) Trigger.new,
-            (Map<Id, Gift_Allocation__c>) Trigger.oldMap,
+            (List<Gift_Allocation__c>) newRecords(),
+            (Map<Id, Gift_Allocation__c>) oldRecordsById(),
             Label.Giving_Posting_OverrideAllocationChanged
         );
     }
 
     public override void beforeDelete() {
         GiftPostingLock.enforceOnAllocations(
-            (List<Gift_Allocation__c>) Trigger.old,
+            (List<Gift_Allocation__c>) oldRecords(),
             null,
             Label.Giving_Posting_OverrideAllocationDeleted
         );
@@ -40,7 +40,7 @@ public with sharing class GiftAllocationPostingLockHandler extends TriggerHandle
     /** A restored allocation is an allocation added to its gift. */
     public override void afterUndelete() {
         GiftPostingLock.enforceOnAllocations(
-            (List<Gift_Allocation__c>) Trigger.new,
+            (List<Gift_Allocation__c>) newRecords(),
             null,
             Label.Giving_Posting_OverrideAllocationRestored
         );

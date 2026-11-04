@@ -2,6 +2,36 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <decisions>
+    <description>Ends the flow when the BarnCRM Automation Control setting has Pause All or Bypass on for the person saving, as BarnCRM's own automation does.</description>
+    <name>Automation_Control</name>
+    <label>Automation control</label>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <defaultConnector>
+      <targetReference>Get_Type_Mapping</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>Runs</defaultConnectorLabel>
+    <rules>
+      <name>Paused_Or_Bypassed</name>
+      <conditionLogic>or</conditionLogic>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Pause_All__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Bypass__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <label>Paused or bypassed</label>
+    </rules>
+  </decisions>
+  <decisions>
     <description>A relationship that already points at its other side is kept in step with it. One that does not is given one.</description>
     <name>Has_Other_Side</name>
     <label>Has other side</label>
@@ -657,7 +687,7 @@
     <locationX>254</locationX>
     <locationY>0</locationY>
     <connector>
-      <targetReference>Get_Type_Mapping</targetReference>
+      <targetReference>Automation_Control</targetReference>
     </connector>
     <filterFormula>AND({!$Record.Is_Reciprocal_Managed__c}, NOT(ISBLANK(TEXT({!$Record.Type__c}))), NOT(AND(ISBLANK({!$Record.Contact__c}), ISBLANK({!$Record.Person_Account__c}))), NOT(AND(ISBLANK({!$Record.Related_Contact__c}), ISBLANK({!$Record.Related_Person_Account__c}))))</filterFormula>
     <object>Relationship__c</object>

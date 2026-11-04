@@ -118,6 +118,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Logic_Model__c.Periods__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Logic_Model__c.Program_Id__c</field>
     <readable>true</readable>
   </fieldPermissions>

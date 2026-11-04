@@ -1,11 +1,16 @@
 import { LightningElement, api, wire } from 'lwc';
 import Toast from 'lightning/toast';
+import { NavigationMixin } from 'lightning/navigation';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { gql, graphql } from 'lightning/graphql';
 import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import LOCALE from '@salesforce/i18n/locale';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import { iconFor } from 'c/barnIcons';
 import { localIsoDate } from 'c/findCsv';
+import { opensElsewhere, recordHref } from 'c/recordRows';
+import { followLinkInWorkspace } from 'c/workspaceTabs';
 
 import getCardContext from '@salesforce/apex/AddressMoveController.getCardContext';
 import getCardFields from '@salesforce/apex/AddressMoveController.getCardFields';
@@ -52,8 +57,8 @@ import DATE_RANGE from '@salesforce/label/c.Core_Address_DateRange';
 import DATE_SINCE from '@salesforce/label/c.Core_Address_DateSince';
 import DATE_UNTIL from '@salesforce/label/c.Core_Address_DateUntil';
 import UNDELIVERABLE_BADGE from '@salesforce/label/c.Core_Address_UndeliverableBadge';
-import UNDELIVERABLE_PRIMARY from '@salesforce/label/c.Core_Address_UndeliverablePrimary';
-import STATUS_MENU from '@salesforce/label/c.Core_Address_StatusMenu';
+import MORE_MENU from '@salesforce/label/c.Core_Settings_NavGroup_More';
+import EDIT_ACTION from '@salesforce/label/c.Core_CmdtManager_EditAction';
 import MARK_CURRENT from '@salesforce/label/c.Core_Address_MarkCurrent';
 import MARK_FORMER from '@salesforce/label/c.Core_Address_MarkFormer';
 import MARK_UNDELIVERABLE from '@salesforce/label/c.Core_Address_MarkUndeliverable';
@@ -80,6 +85,7 @@ const STATUS_FORMER = 'Former';
 const STATUS_UNDELIVERABLE = 'Undeliverable';
 const MOVE_FOR_HOUSEHOLD = 'household';
 const MOVE_FOR_EVERYONE = 'everyone';
+const EDIT = 'edit';
 
 /**
  * The record's addresses, read as the user through the platform, so field security and
@@ -261,11 +267,15 @@ function messageOf(error) {
 /**
  * Every address a household, an organization, or a person has on file, with the one in use
  * badged, a way to move that badge, a form to add another, and the two household moves
- * (R-AD9): Use for Whole Household on a person's own address, and Update Everyone's Address
- * on a household's primary address.
+ * (R-AD9) in each row's More menu: Move the Household Here on a person's own address, and
+ * Give This Address to Members on a household's primary address.
  */
-export default class AddressPanel extends LightningElement {
+export default class AddressPanel extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
+
+  @wire(EnclosingTabId) enclosingTabId;
+
+  icons = { address: iconFor('Address__c') };
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -290,11 +300,11 @@ export default class AddressPanel extends LightningElement {
     emptyHeading: EMPTY_HEADING,
     loading: LOADING,
     setDefaultButton: SET_DEFAULT_BUTTON,
-    updateEveryoneButton: UPDATE_EVERYONE_BUTTON,
-    useForHouseholdButton: USE_FOR_HOUSEHOLD_BUTTON,
     undeliverableBadge: UNDELIVERABLE_BADGE,
-    undeliverablePrimary: UNDELIVERABLE_PRIMARY,
-    statusMenu: STATUS_MENU
+    get undeliverablePrimary() {
+      return helpText('Core', 'Core_Address_UndeliverablePrimary');
+    },
+    moreMenu: MORE_MENU
   };
 
   addressObject = ADDRESS_OBJECT;
@@ -397,17 +407,37 @@ export default class AddressPanel extends LightningElement {
     const canMove = this.canSetDefault && Boolean(context);
     const households = context && context.households ? context.households : [];
     const canSetStatus = this.canSetStatus;
+    const canEdit = Boolean(this.addressInfo && this.addressInfo.updateable);
     const cardFields = this.cardFields;
-    return this.addresses.map((address) => ({
-      ...address,
-      showUseForHousehold:
-        canMove && address.isPersonal && !address.isSeasonal && households.length > 0,
-      showUpdateEveryone:
-        canMove && context.isHousehold && !address.isPersonal && address.isDefault,
-      showStatusMenu: canSetStatus,
-      cardFields,
-      hasCardFields: cardFields.length > 0
-    }));
+    return this.addresses.map((address) => {
+      const showUseForHousehold =
+        canMove && address.isPersonal && !address.isSeasonal && households.length > 0;
+      const showUpdateEveryone =
+        canMove && context.isHousehold && !address.isPersonal && address.isDefault;
+      // The row's More menu: Edit, the statuses, then the household move this row allows.
+      const menuActions = [];
+      if (canEdit) {
+        menuActions.push({ value: EDIT, label: EDIT_ACTION });
+      }
+      if (canSetStatus) {
+        menuActions.push(...address.statusActions);
+      }
+      if (showUseForHousehold) {
+        menuActions.push({ value: MOVE_FOR_HOUSEHOLD, label: USE_FOR_HOUSEHOLD_BUTTON });
+      }
+      if (showUpdateEveryone) {
+        menuActions.push({ value: MOVE_FOR_EVERYONE, label: UPDATE_EVERYONE_BUTTON });
+      }
+      return {
+        ...address,
+        showUseForHousehold,
+        showUpdateEveryone,
+        menuActions,
+        showMoreMenu: menuActions.length > 0,
+        cardFields,
+        hasCardFields: cardFields.length > 0
+      };
+    });
   }
 
   /**
@@ -485,10 +515,45 @@ export default class AddressPanel extends LightningElement {
       flagUndeliverable: isUndeliverable && address.isDefault,
       statusActions: statusActions(address, isFormer),
       showSetDefault: !address.isDefault,
-      cardClass: address.isDefault
-        ? 'slds-box slds-m-bottom_x-small slds-theme_shade'
-        : 'slds-box slds-m-bottom_x-small'
+      headline: address.addressType || address.street || PANEL_TITLE,
+      href: recordHref(address.id),
+      rowClass: isFormer ? 'slds-item slds-theme_shade' : 'slds-item'
     };
+  }
+
+  /** A row's type opens the address; in a console, as a subtab beside the record. */
+  handleOpenRecord(event) {
+    const recordId = event.currentTarget.dataset.recordId;
+    const pageReference = {
+      type: 'standard__recordPage',
+      attributes: { recordId, actionName: 'view' }
+    };
+    const navigate = () => this[NavigationMixin.Navigate](pageReference);
+    if (followLinkInWorkspace(this, event, { recordId }, navigate) || opensElsewhere(event)) {
+      return;
+    }
+    event.preventDefault();
+    navigate();
+  }
+
+  /** A choice from a row's More menu: Edit, a status, or a household move. */
+  handleMoreSelect(event) {
+    const addressId = event.target.dataset.id;
+    const value = event.detail.value;
+    if (value === EDIT) {
+      this[NavigationMixin.Navigate]({
+        type: 'standard__recordPage',
+        attributes: { recordId: addressId, objectApiName: ADDRESS_OBJECT, actionName: 'edit' }
+      });
+      return undefined;
+    }
+    if (value === MOVE_FOR_HOUSEHOLD) {
+      return this.handleUseForHousehold(addressId);
+    }
+    if (value === MOVE_FOR_EVERYONE) {
+      return this.handleUpdateEveryone();
+    }
+    return this.setStatus(addressId, value);
   }
 
   handleAdd() {
@@ -530,9 +595,7 @@ export default class AddressPanel extends LightningElement {
    * A person's status choice (R-AD10). Former keeps the end date given, else today's; Current
    * clears it, so the address is back with the ones in use. Undeliverable changes nothing else.
    */
-  async handleStatusSelect(event) {
-    const addressId = event.target.dataset.id;
-    const status = event.detail.value;
+  async setStatus(addressId, status) {
     const address = this.addresses.find((candidate) => candidate.id === addressId);
     const fields = { [ID_FIELD.fieldApiName]: addressId, [STATUS_FIELD.fieldApiName]: status };
     if (status === STATUS_FORMER && !(address && address.endDate)) {
@@ -563,8 +626,7 @@ export default class AddressPanel extends LightningElement {
   }
 
   /** Asks in the kit's confirm dialog, offering a choice only when there is more than one. */
-  async handleUseForHousehold(event) {
-    const addressId = event.target.dataset.id;
+  async handleUseForHousehold(addressId) {
     const options = this.householdOptions;
     const several = options.length > 1;
     const answer = await BarnConfirmModal.open({

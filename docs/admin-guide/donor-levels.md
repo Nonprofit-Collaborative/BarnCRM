@@ -44,7 +44,7 @@ Everything is in the app. You never open Setup.
    - **Giving last fiscal year**, the fiscal year before this one.
    - **Largest single gift**, the single biggest gift the donor has given, for a ladder
      built on one gift rather than on a total.
-6. Turn **Turn On Donor Levels** on in the same section.
+6. Turn **Turn on donor levels** on in the same section.
 7. Back on the **Donor Levels** page, choose **Recalculate Now**. Levels are assigned to
    everyone who already has giving. The page then shows how many donors are on each rung
    and the time the recalculation finished.
@@ -63,7 +63,7 @@ Start with the sample data loaded (BarnCRM Settings, then Sample Data).
 3. Choose **New Level** again. Name it `Sustainer`, minimum `1000`, maximum `5000`. Save.
 4. Choose **New Level** once more. Name it `Leadership Circle`, minimum `5000`, leave
    maximum empty. Save. You now have three rungs and the page lists them lowest first.
-5. Go back to **Giving** and turn **Turn On Donor Levels** on. Leave the source as **Total
+5. Go back to **Giving** and turn **Turn on donor levels** on. Leave the source as **Total
    giving, everything ever given**.
 6. Open **Donor Levels** again and choose **Recalculate Now**. Each rung now shows a donor
    count, and the page says when the recalculation finished.
@@ -93,7 +93,7 @@ recognizes goods, there is no setting for it: **Donor level source** offers the 
 totals and not in-kind value, so the honest way to do it is to recognize those donors
 alongside the ladder rather than on it. See [In-kind gifts](in-kind-gifts.md).
 
-**Nobody has a level after you build the ladder.** Two causes. Either **Turn On Donor Levels** is
+**Nobody has a level after you build the ladder.** Two causes. Either **Turn on donor levels** is
 still off in BarnCRM Settings, or you have not pressed **Recalculate Now**. Editing the
 ladder does not reassign anybody by itself: a donor moves when their giving changes, or
 when the nightly pass runs, or when you recalculate. Press the button after every change

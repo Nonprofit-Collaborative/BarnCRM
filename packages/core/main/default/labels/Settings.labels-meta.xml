@@ -281,6 +281,14 @@
         <value>Default</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_SavesOnItsOwn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: cue beside a panel that saves itself, not through the save bar</shortDescription>
+        <value>Saves on its own</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_DefaultsBannerTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>

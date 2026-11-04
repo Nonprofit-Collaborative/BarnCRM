@@ -7,8 +7,33 @@ import getCardContext from '@salesforce/apex/AffiliationController.getCardContex
 import { graphql } from 'lightning/graphql';
 import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import BarnConfirmModal from 'c/barnConfirmModal';
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+  },
+  { virtual: true }
+);
 
 const HARPER = '0031000000000001AA';
+
+/** Picks an action from one row's menu (Edit, Make Primary or End It). */
+function choose(element, recordId, value) {
+  element.shadowRoot
+    .querySelector(`.row-menu[data-record-id="${recordId}"]`)
+    .dispatchEvent(new CustomEvent('select', { detail: { value } }));
+}
 const FOUNDATION_ID = '0011000000000009AA';
 
 /** One affiliation as the GraphQL query returns it. */
@@ -171,9 +196,62 @@ describe('c-affiliation-panel', () => {
     await flush();
 
     expect(element.shadowRoot.querySelectorAll('[data-id="primary-badge"]').length).toBe(1);
+    expect(element.shadowRoot.querySelector('[data-id="primary-badge"]').iconName).toBe(
+      'utility:favorite'
+    );
     const buttons = element.shadowRoot.querySelectorAll('.make-primary');
     expect(buttons.length).toBe(1);
-    expect(buttons[0].dataset.id).toBe(CONGREGATION.Id);
+    expect(buttons[0].closest('.row-menu').dataset.recordId).toBe(CONGREGATION.Id);
+  });
+
+  it('links each row to its affiliation and opens the edit form from the row menu', async () => {
+    const element = build();
+    graphql.emit(response([FOUNDATION]));
+    await flush();
+
+    expect(
+      element.shadowRoot.querySelector('[data-id="affiliation-headline"]').getAttribute('href')
+    ).toBe(`/${FOUNDATION.Id}`);
+    choose(element, FOUNDATION.Id, 'edit');
+    await flush();
+    expect(mockNavigate.mock.calls[0][0]).toEqual({
+      type: 'standard__recordPage',
+      attributes: { recordId: FOUNDATION.Id, objectApiName: 'Affiliation__c', actionName: 'edit' }
+    });
+  });
+
+  it('ends a current affiliation today after a confirm, and tells the person page', async () => {
+    BarnConfirmModal.open.mockResolvedValueOnce(true);
+    const element = build('Contact', HARPER, {
+      ...STAFF_ACCESS,
+      fields: { ...STAFF_ACCESS.fields, End_Date__c: { updateable: true } }
+    });
+    graphql.emit(response([FOUNDATION]));
+    await flush();
+
+    choose(element, FOUNDATION.Id, 'end');
+    await flush();
+
+    expect(BarnConfirmModal.open.mock.calls[0][0].label).toBe('c.Core_Affiliation_EndConfirmTitle');
+    const fields = updateRecord.mock.calls[0][0].fields;
+    expect(fields.Id).toBe(FOUNDATION.Id);
+    expect(fields.End_Date__c).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(notifyRecordUpdateAvailable).toHaveBeenCalledWith([{ recordId: HARPER }]);
+  });
+
+  it('changes nothing when ending is cancelled, and never offers End It on a former one', async () => {
+    BarnConfirmModal.open.mockResolvedValueOnce(false);
+    const element = build('Contact', HARPER, {
+      ...STAFF_ACCESS,
+      fields: { ...STAFF_ACCESS.fields, End_Date__c: { updateable: true } }
+    });
+    graphql.emit(response([FOUNDATION, { ...CONGREGATION, Status__c: { value: 'Former' } }]));
+    await flush();
+
+    expect(element.shadowRoot.querySelectorAll('.end-affiliation').length).toBe(1);
+    choose(element, FOUNDATION.Id, 'end');
+    await flush();
+    expect(updateRecord).not.toHaveBeenCalled();
   });
 
   it('offers neither Add affiliation nor Make primary to someone who can only read affiliations', async () => {
@@ -239,7 +317,7 @@ describe('c-affiliation-panel', () => {
     );
     await flush();
 
-    element.shadowRoot.querySelector('.make-primary').click();
+    choose(element, FOUNDATION.Id, 'makePrimary');
     await flush();
 
     expect(updateRecord).toHaveBeenCalledWith({
@@ -258,10 +336,12 @@ describe('c-affiliation-panel', () => {
     graphql.emit(response([FOUNDATION, CONGREGATION]));
     await flush();
 
-    element.shadowRoot.querySelector('.make-primary').click();
+    choose(element, CONGREGATION.Id, 'makePrimary');
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="error"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toBe(
+      'c.Core_Affiliation_MakePrimaryFailed'
+    );
     expect(notifyRecordUpdateAvailable).not.toHaveBeenCalled();
   });
 

@@ -20,6 +20,6 @@ public with sharing class VolunteerHoursDeleteGuardHandler extends TriggerHandle
     }
 
     public override void beforeDelete() {
-        VolunteerHoursService.refuseDeletingApproved((List<Volunteer_Hours__c>) Trigger.old);
+        VolunteerHoursService.refuseDeletingApproved((List<Volunteer_Hours__c>) oldRecords());
     }
 }

@@ -209,7 +209,7 @@ describe('c-setup-change-log', () => {
     await flush();
 
     expect(getChanges).not.toHaveBeenCalled();
-    expect(find(element, 'error').textContent.trim()).toBe('Reversed.');
+    expect(find(element, 'error').message).toBe('Reversed.');
   });
 
   it('shows the empty state when nothing matches', async () => {
@@ -230,7 +230,7 @@ describe('c-setup-change-log', () => {
     await flush();
 
     expect(copyNow).toHaveBeenCalledTimes(1);
-    expect(find(element, 'notice').textContent.trim()).toBe('Started.');
+    expect(find(element, 'notice').message).toBe('Started.');
     expect(find(element, 'copy-status').textContent.trim()).toBe('Running.');
   });
 
@@ -238,7 +238,8 @@ describe('c-setup-change-log', () => {
     getSummary.mockRejectedValue({ body: { message: 'No access.' } });
     const element = await render();
 
-    expect(find(element, 'error').textContent.trim()).toBe('No access.');
+    expect(find(element, 'error').message).toBe('No access.');
+    expect(find(element, 'error').variant).toBe('error');
   });
 
   it('downloads every match up to the export size as a defused CSV', async () => {
@@ -272,7 +273,7 @@ describe('c-setup-change-log', () => {
       '2026-10-31 10:00:00,Pat Admin,,Customize Accounts,changedFieldLabel,"\'=Changed, the ""Phone"" label"'
     );
     expect(name).toMatch(/^Setup_Changes-\d{4}-\d{2}-\d{2}\.csv$/);
-    expect(find(element, 'notice').textContent.trim()).toBe('Saved 1.');
+    expect(find(element, 'notice').message).toBe('Saved 1.');
   });
 });
 

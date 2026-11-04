@@ -83,21 +83,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-ADDR-06: Turn on Seasonal Addresses and Run the Seasonal Swap
 
 **Purpose:** turning on Seasonal Addresses schedules the nightly swap with no other step, and the swap runs and swaps a seasonal address in.
-**Prerequisites:** admin, T-ADDR-01 done, **Turn On Seasonal Addresses** not ticked and the swap not scheduled.
+**Prerequisites:** admin, T-ADDR-01 done, **Turn on seasonal addresses** not ticked and the swap not scheduled.
 **Smoke:** yes
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Addresses**. | **Turn On Seasonal Addresses** is not ticked. The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** It has **Run the Swap Now** and no **Schedule Nightly Run** or **Stop Nightly Run** button. |
-| 2 | Tick **Turn On Seasonal Addresses** and choose **Save**. Do not refresh the page. | **Your settings are saved.** The section now reads **The swap runs every night at 12:30 AM, in your organization's time zone.** with the next run date below. |
-| 2a | Untick **Turn On Seasonal Addresses** and choose **Save**, then tick it and **Save** again. | After the untick the section reads **Seasonal Addresses is off...** with no next run date. After the second save it reads **The swap runs every night...** again, and **Health Check** does not list the swap as unscheduled. |
+| 1 | Open **BarnCRM Settings**, **Addresses**. | **Turn on seasonal addresses** is not ticked. The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** It has **Run the Swap Now** and no **Schedule Nightly Run** or **Stop Nightly Run** button. |
+| 2 | Tick **Turn on seasonal addresses** and choose **Save**. Do not refresh the page. | **Your settings are saved.** The section now reads **The swap runs every night at 12:30 AM, in your organization's time zone.** with the next run date below. |
+| 2a | Untick **Turn on seasonal addresses** and choose **Save**, then tick it and **Save** again. | After the untick the section reads **Seasonal Addresses is off...** with no next run date. After the second save it reads **The swap runs every night...** again, and **Health Check** does not list the swap as unscheduled. |
 | 3 | Edit the Phoenix address so its season runs from yesterday to a date next month. | Saved. |
 | 4 | Select **Run the Swap Now**. | **The swap has started. Refresh this page in a minute to see what it did.** |
 | 5 | Wait a minute and refresh. | **Seasonal Addresses Last Swapped** shows a time a minute ago and **1 moved to a seasonal address, 0 moved back, 0 could not be changed.** |
 | 6 | Open The Garcia Family. | **Primary** is on Phoenix; Billing Address reads Phoenix; the Home address record has **Replaced By Seasonal** ticked. |
 | 7 | Open **Home**. | The **Seasonal Addresses Last Swapped** tile shows the same time and sentence. |
 
-**Cleanup:** keep **Turn On Seasonal Addresses** on for T-ADDR-07.
+**Cleanup:** keep **Turn on seasonal addresses** on for T-ADDR-07.
 
 ## T-ADDR-07: The Season Ends and the Address Moves Back
 
@@ -109,7 +109,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Set the Phoenix address's end month and day to yesterday and save. | Saved. |
 | 2 | **BarnCRM Settings**, **Addresses**, **Run the Swap Now**, wait a minute, refresh. | **0 moved to a seasonal address, 1 moved back, 0 could not be changed.** |
 | 3 | Open The Garcia Family. | **Primary** is back on the Home address; Billing Address reads Springfield. |
-| 4 | Untick **Turn On Seasonal Addresses** and choose **Save**. | The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** |
+| 4 | Untick **Turn on seasonal addresses** and choose **Save**. | The **Seasonal Address Swap** section reads **Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.** |
 
 **Cleanup:** delete the Phoenix address.
 
@@ -137,7 +137,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open The Garcia Family. | The **Addresses** card lists the addresses. |
 | 2 | Look at a non-primary address. | It shows no **Set as Primary** button. The **Primary** badge still shows on the primary one. |
 | 3 | Look at the card header. | There is no **Add Address** button. |
-| 4 | Open **BarnCRM Settings**, **Addresses**. | The last run shows; **Turn On Seasonal Addresses** and **Run the Swap Now** are disabled, with **You can see when the swap last ran. Running it needs the Manage BarnCRM Settings permission.** |
+| 4 | Open **BarnCRM Settings**, **Addresses**. | The last run shows; **Turn on seasonal addresses** and **Run the Swap Now** are disabled, with **You can see when the swap last ran. Running it needs the Manage BarnCRM Settings permission.** |
 
 **Cleanup:** None.
 
@@ -200,38 +200,38 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** set **Address Updates** back to **Everyone in the household moves together** and save. Put the Phoenix dates back to January 1 to March 31 and run the swap again. On the household, **Set as Primary** on the Sunset Ln card, then delete the 27 Manual Billing Ave address. Delete Harper's 14 Manual Test Ct address and set her Mailing Street back to 6830 Sunset Ln.
 
-## T-ADDR-14: Use for Whole Household
+## T-ADDR-14: Move the Household Here
 
-**Purpose:** **Use for Whole Household** on a person's own address makes it the household's primary address, moves everyone without an address of their own, and returns the person to the household's address from then on. With several households, the card asks which.
+**Purpose:** **Move the Household Here** on a person's own address makes it the household's primary address, moves everyone without an address of their own, and returns the person to the household's address from then on. With several households, the card asks which.
 **Prerequisites:** staff user, the Garcia household on Sunset Ln, **Address Updates** set to **Everyone in the household moves together**, no member with an address of their own.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On Diego Garcia, select **Add Address** on his **Addresses** card: Type **Home**, Street `9 Dorm Test Hall`, City `Urbana`. Select **Add Address** in the form. | His card carries **Primary** and a **Use for Whole Household** button. A seasonal address of his own would show no such button. |
-| 2 | Select **Use for Whole Household**. | A confirmation opens: **Make This the Household's Primary Address?**, with **Cancel** and **Use for Whole Household**. With one household there is no **Which household?** choice. |
+| 1 | On Diego Garcia, select **Add Address** on his **Addresses** card: Type **Home**, Street `9 Dorm Test Hall`, City `Urbana`. Select **Add Address** in the form. | His card carries **Primary** (with a star); its **More** menu offers **Edit**, the status choices and **Move the Household Here**, and **Set as Primary** is not a menu item. A seasonal address of his own would not offer the move. |
+| 2 | From the address's **More** menu select **Move the Household Here**. | A confirmation opens: **Make This the Household's Primary Address?**, with **Cancel** and **Move the Household Here**. With one household there is no **Which household?** choice. |
 | 3 | Select **Cancel**. | The confirmation closes; nothing changed. |
-| 4 | Select **Use for Whole Household** again, then **Use for Whole Household** in the confirmation. | Toast **The household now uses this address.** |
+| 4 | Select **Move the Household Here** again, then **Move the Household Here** in the confirmation. | Toast **The household now uses this address.** |
 | 5 | Open The Garcia Family. | A new **Home** card, 9 Dorm Test Hall, carries **Primary**; Sunset Ln is still on the card. Billing Address reads 9 Dorm Test Hall. Harper and Luis read 9 Dorm Test Hall. |
 | 6 | Open Diego Garcia. | His own 9 Dorm Test Hall card is still there, without **Primary**. On the household, **Set as Primary** on the Sunset Ln card: Diego moves back to Sunset Ln with everyone. |
-| 7 | Flexible way of belonging only (junction mode): add Diego as a member (not primary) of another household, add him an address of his own again, and select **Use for Whole Household**. | The confirmation shows **Which household?** with The Garcia Family first. Pick the other household and confirm: that household moves to his address, and Diego keeps his own address. |
+| 7 | Flexible way of belonging only (junction mode): add Diego as a member (not primary) of another household, add him an address of his own again, and select **Move the Household Here**. | The confirmation shows **Which household?** with The Garcia Family first. Pick the other household and confirm: that household moves to his address, and Diego keeps his own address. |
 
 **Cleanup:** on The Garcia Family, **Set as Primary** on Sunset Ln if it is not already, then delete the 9 Dorm Test Hall addresses (household and Diego's). Remove Diego's second membership and that household's new address if you made them.
 
-## T-ADDR-15: Update Everyone's Address
+## T-ADDR-15: Give This Address to Members
 
-**Purpose:** **Update Everyone's Address** on a household's primary address lists who will move and who has an address of their own, and moves only the people ticked among the latter.
+**Purpose:** **Give This Address to Members** on a household's primary address lists who will move and who has an address of their own, and moves only the people ticked among the latter.
 **Prerequisites:** staff user, the Garcia household on Sunset Ln, **Address Updates** set to **Nobody moves until you choose**.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | On Diego Garcia, add a **Home** address `9 Dorm Test Hall`, City `Urbana`. On Harper Garcia, add a **Home** address `14 Manual Test Ct`. | Each carries **Primary** on their own card. |
 | 2 | On The Garcia Family's **Details**, change Billing Street to `27 Manual Billing Ave` and save. | The new card carries **Primary**. Luis still reads Sunset Ln: nobody moved. |
-| 3 | On the household's 27 Manual Billing Ave card, look at the buttons. | It shows **Update Everyone's Address**. The other household cards do not. |
-| 4 | Select **Update Everyone's Address**. | The confirmation lists **These people will get this address:** Luis Garcia, and under **These people have an address of their own and stay where they are unless you tick them:** a tick box for Diego Garcia and one for Harper Garcia, both unticked. |
-| 5 | Tick Harper only, then select **Update Everyone's Address** in the confirmation. | Toast **Everyone's address has been updated.** |
+| 3 | On the household's 27 Manual Billing Ave line, open the **More** menu. | It offers **Give This Address to Members**. The other household addresses' menus do not. |
+| 4 | Select **Give This Address to Members**. | The confirmation lists **These people will get this address:** Luis Garcia, and under **These people have an address of their own and stay where they are unless you tick them:** a tick box for Diego Garcia and one for Harper Garcia, both unticked. |
+| 5 | Tick Harper only, then select **Give This Address to Members** in the confirmation. | Toast **Everyone's address has been updated.** |
 | 6 | Open Luis, Harper and Diego. | Luis and Harper read 27 Manual Billing Ave; Harper's own card is still on file, under **Former Addresses**, ended today. Diego still reads 9 Dorm Test Hall. |
-| 7 | On the household, select **Update Everyone's Address** again. | Luis and Harper are listed as getting the address, and only Diego has a tick box. Select **Cancel**: nothing changes. |
-| 8 | As a read-only user, open The Garcia Family and Diego Garcia. | Neither **Update Everyone's Address** nor **Use for Whole Household** shows. |
+| 7 | On the household, select **Give This Address to Members** again. | Luis and Harper are listed as getting the address, and only Diego has a tick box. Select **Cancel**: nothing changes. |
+| 8 | As a read-only user, open The Garcia Family and Diego Garcia. | Neither **Give This Address to Members** nor **Move the Household Here** shows. |
 
 **Cleanup:** set **Address Updates** back to **Everyone in the household moves together** and save. On the household, **Set as Primary** on the Sunset Ln card and delete the 27 Manual Billing Ave address. Delete Diego's 9 Dorm Test Hall and Harper's 14 Manual Test Ct addresses, then **Set as Primary** on Sunset Ln once more so everyone reads it.
 
@@ -249,7 +249,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 4 | Select **Former Addresses (1)**. | The group opens and shows the Sunset Ln card, reading **Until** today's date (it has no start date: it was on file before statuses existed, or was added without one). Select the heading again: the group closes. |
 | 5 | Open the Sunset Ln address record (Addresses related list). | **Status** is **Former** and **End Date** is today, in the **History** section. |
 | 6 | Back on the household, open **Former Addresses** and select **Set as Primary** on Sunset Ln. | Sunset Ln is back with the addresses in use, with **Primary** and no end date. 55 Move Test Rd is still in use (no **Former Addresses** group): **Set as Primary** ends nothing. |
-| 7 | On Diego Garcia, add a **Home** address `9 Dorm Test Hall` (his first, so it is his primary), then select **Use for Whole Household** and confirm. | On The Garcia Family, 9 Dorm Test Hall is the primary and the previous primary is under **Former Addresses**. Diego's own 9 Dorm Test Hall card is still in use: the household moved to the place he already lives. |
+| 7 | On Diego Garcia, add a **Home** address `9 Dorm Test Hall` (his first, so it is his primary), then select **Move the Household Here** and confirm. | On The Garcia Family, 9 Dorm Test Hall is the primary and the previous primary is under **Former Addresses**. Diego's own 9 Dorm Test Hall card is still in use: the household moved to the place he already lives. |
 
 **Cleanup:** on the household, open **Former Addresses**, **Set as Primary** on Sunset Ln, then delete the 55 Move Test Rd and 9 Dorm Test Hall addresses (the household's and Diego's).
 
@@ -260,22 +260,23 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On The Garcia Family, open the status menu (the arrow) on the Sunset Ln card. | **Mark as Undeliverable** only: the primary cannot be marked Former. |
-| 2 | Choose **Mark as Undeliverable**. | Toast **The address status is saved.** The card has an **Undeliverable** badge and a red line: **Mail sent to this primary address comes back. Add the new address with Primary ticked, or set another address as primary.** |
+| 1 | On The Garcia Family, open the **More** menu (the arrow) on the Sunset Ln line. | **Edit** and **Mark as Undeliverable** only (plus **Give This Address to Members**): the primary cannot be marked Former. |
+| 2 | Choose **Mark as Undeliverable**. | Toast **The address status is saved.** The line has a red **Undeliverable** badge and a warning notice: **Mail sent to this primary address comes back. Add the new address with Primary ticked, or choose Set as Primary on another address.** |
 | 3 | As the admin, open **Org Optimizer**, **Data Quality**. | **Primary Addresses Marked Undeliverable** shows **1** or more. |
 | 4 | Select **Open in Find** on that check. | Find opens the saved query **Data Quality: Primary Addresses Marked Undeliverable**, already run, and the Garcia Sunset Ln address is listed. |
-| 5 | Back on the household, open the status menu on the Phoenix card and choose **Mark as Former**. | Phoenix moves into **Former Addresses**, reading **Until** today's date. |
+| 5 | Back on the household, open the **More** menu on the Phoenix line and choose **Mark as Former**. | Phoenix moves into **Former Addresses** on a shaded line, reading **Until** today's date. |
 | 6 | Open **Former Addresses** and choose **Mark as Current** on Phoenix. | Phoenix is back with the addresses in use, with no dates shown. |
-| 7 | On Sunset Ln choose **Mark as Current**. | The badge and the red line go. |
-| 8 | As a read-only user, open The Garcia Family. | No status menu on any card. |
+| 7 | On Sunset Ln choose **Mark as Current**. | The badge and the warning go. |
+| 8 | As a read-only user, open The Garcia Family. | No **More** menu and no **Set as Primary** on any line. |
 | 9 | As a user whose profile and permission sets give no read on the address **Status**, **Start Date** and **End Date** fields, open The Garcia Family. | The Addresses card still loads, every address shows with the addresses in use (none under **Former Addresses**), and no dates are shown. |
+| 10 | As staff, open **More** on the Sunset Ln line and choose **Edit**; then select the type at the top of the line. | **Edit** opens the standard edit form for Sunset Ln (close it with **Cancel**). The type opens the address record. |
 
 **Cleanup:** none (Sunset Ln and Phoenix are both Current again).
 
 ## T-ADDR-18: The Seasonal Swap Is Not a Move
 
 **Purpose:** the seasonal swap moves the primary without ending or starting anything, and a Former seasonal address is not swapped in.
-**Prerequisites:** admin, T-ADDR-01 done, **Turn On Seasonal Addresses** on.
+**Prerequisites:** admin, T-ADDR-01 done, **Turn on seasonal addresses** on.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -302,15 +303,15 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-ADDR-20: A Chosen Move Leaves Out the Deceased and Tells Same Names Apart
 
-**Purpose:** confirm Update Everyone's Address neither moves nor lists a deceased member, and
+**Purpose:** confirm Give This Address to Members neither moves nor lists a deceased member, and
 shows a birthdate or email beside people who share a name.
 **Prerequisites:** admin; the sample data loaded; **Address Updates** set to **Nobody moves until you choose**.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open a sample household with a deceased member (five have one). Give a living member an address of their own. | Saved. |
-| 2 | On the household's primary address card, select **Update Everyone's Address**. | The deceased member is in neither list. The living member with their own address has a tick box. |
-| 3 | Select **Cancel**. Add a contact to the household with the same first and last name as a member who has their own address, a different birthdate, and an address of their own. Select **Update Everyone's Address** again. | The two people who share a name each show their birthdate in brackets after the name. A person with no birthdate shows their email instead. |
-| 4 | Tick nobody and select **Update Everyone's Address**. | The living members without an address of their own read the household's address. The deceased member's address has not changed. |
+| 2 | On the household's primary address card, select **Give This Address to Members**. | The deceased member is in neither list. The living member with their own address has a tick box. |
+| 3 | Select **Cancel**. Add a contact to the household with the same first and last name as a member who has their own address, a different birthdate, and an address of their own. Select **Give This Address to Members** again. | The two people who share a name each show their birthdate in brackets after the name. A person with no birthdate shows their email instead. |
+| 4 | Tick nobody and select **Give This Address to Members**. | The living members without an address of their own read the household's address. The deceased member's address has not changed. |
 
 **Cleanup:** delete the contact added in step 3 and the address added in step 1, and set **Address Updates** back to **Everyone in the household moves together**.
