@@ -125,7 +125,7 @@ public with sharing class SessionAttendance {
                 continue;
             }
             if (!allowed.contains(entry.attendance)) {
-                throw UserErrors.message(Label.Programs_Log_ActionFailed);
+                throw UserErrors.message(ServiceDeliveryLogController.failed());
             }
             Decimal quantity = ServiceDeliveryService.isAbsence(entry.attendance)
                 ? 0

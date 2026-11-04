@@ -325,7 +325,7 @@ describe('c-eligibility-rules', () => {
     find(element, 'screen-all').click();
     await flush();
     expect(screen).toHaveBeenCalledTimes(2);
-    expect(find(element, 'error-message').textContent).toContain('Programs_Elig_SaveFirst');
+    expect(find(element, 'error-message').message).toContain('Programs_Elig_SaveFirst');
   });
 
   it('is read only without permission, and says so when there are no rules', async () => {
@@ -345,6 +345,6 @@ describe('c-eligibility-rules', () => {
   it('shows a failure to load in its own words', async () => {
     getState.mockRejectedValue({ body: { message: 'No access.' } });
     const element = await mount();
-    expect(find(element, 'error-message').textContent).toContain('No access.');
+    expect(find(element, 'error-message').message).toContain('No access.');
   });
 });

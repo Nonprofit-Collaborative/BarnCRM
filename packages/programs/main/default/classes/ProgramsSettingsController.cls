@@ -55,10 +55,9 @@ public with sharing class ProgramsSettingsController {
             ProgramsSharing.savePreset(privateParticipants);
         } catch (Exception failure) {
             ErrorLogger.log(failure, CONTEXT, null);
-            AuraHandledException refused = new AuraHandledException(
-                Label.Programs_Settings_SaveFailed
-            );
-            refused.setMessage(Label.Programs_Settings_SaveFailed);
+            String message = BarnHelp.text('Programs', 'Programs_Fail_SettingsSave');
+            AuraHandledException refused = new AuraHandledException(message);
+            refused.setMessage(message);
             throw refused;
         }
         return getSettings();
@@ -92,10 +91,9 @@ public with sharing class ProgramsSettingsController {
             return settings;
         } catch (Exception failure) {
             ErrorLogger.log(failure, CONTEXT, null);
-            AuraHandledException refused = new AuraHandledException(
-                Label.Programs_Settings_LoadFailed
-            );
-            refused.setMessage(Label.Programs_Settings_LoadFailed);
+            String message = BarnHelp.text('Programs', 'Programs_Fail_SettingsLoad');
+            AuraHandledException refused = new AuraHandledException(message);
+            refused.setMessage(message);
             throw refused;
         }
     }

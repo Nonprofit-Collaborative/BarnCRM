@@ -126,7 +126,7 @@ public with sharing class CohortController {
     @AuraEnabled
     public static Members removeMember(Id cohortId, Id enrollmentId) {
         if (enrollmentId == null) {
-            throw UserErrors.message(Label.Programs_Cohort_ActionFailed);
+            throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Fail_Cohort'));
         }
         try {
             Cohort__c cohort = checkedCohort(cohortId);
@@ -194,6 +194,6 @@ public with sharing class CohortController {
             return UserErrors.message(((DmlException) failure).getDmlMessage(0));
         }
         ErrorLogger.log(failure, CONTEXT, recordId);
-        return UserErrors.message(Label.Programs_Cohort_ActionFailed);
+        return UserErrors.message(BarnHelp.text('Programs', 'Programs_Fail_Cohort'));
     }
 }

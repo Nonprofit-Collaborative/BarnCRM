@@ -225,7 +225,7 @@ public with sharing class EligibilityController {
             LIMIT 1
         ];
         if (programs.isEmpty()) {
-            throw UserErrors.message(Label.Programs_Elig_ActionFailed);
+            throw UserErrors.message(failed());
         }
         return programs[0];
     }
@@ -322,6 +322,11 @@ public with sharing class EligibilityController {
         return values;
     }
 
+    /** What staff are told when the panel's work failed (modules-1). */
+    private static String failed() {
+        return BarnHelp.text('Programs', 'Programs_Fail_Elig');
+    }
+
     /** A refusal is passed on in its own words; a failed save says why; anything else is logged. */
     private static AuraHandledException report(Exception failure) {
         if (failure instanceof AuraHandledException) {
@@ -331,7 +336,7 @@ public with sharing class EligibilityController {
             return UserErrors.message(((DmlException) failure).getDmlMessage(0));
         }
         ErrorLogger.log(failure, CONTEXT);
-        return UserErrors.message(Label.Programs_Elig_ActionFailed);
+        return UserErrors.message(failed());
     }
 
     private static String personName(Enrollment__c enrollment) {

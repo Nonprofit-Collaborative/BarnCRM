@@ -327,7 +327,7 @@ private class SessionTest {
             Assert.areEqual(Label.Programs_Schedule_BadTime, refusals[3]);
             Assert.areEqual(Label.Programs_Schedule_NoDates, refusals[4]);
             Assert.areEqual(
-                Label.Programs_Schedule_ActionFailed,
+                BarnHelp.text('Programs', 'Programs_Fail_Schedule'),
                 refusals[5],
                 'Not a cohort or program.'
             );
@@ -615,8 +615,8 @@ private class SessionTest {
         }
         Assert.areEqual(
             new List<String>{
-                Label.Programs_Log_ActionFailed,
-                Label.Programs_Log_ActionFailed,
+                BarnHelp.text('Programs', 'Programs_Fail_Log'),
+                BarnHelp.text('Programs', 'Programs_Fail_Log'),
                 Label.Programs_Session_NotFound,
                 Label.Programs_Session_NotFound
             },

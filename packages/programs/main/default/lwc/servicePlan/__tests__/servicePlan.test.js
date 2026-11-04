@@ -10,6 +10,7 @@ import {
   formatDate,
   goalCards,
   goalDraft,
+  goalStatusWord,
   goalPayload,
   isReviewDue,
   newStep,
@@ -149,6 +150,13 @@ describe('plan.js', () => {
     expect(sorted.map((g) => g.name)).toEqual(['Sooner', 'Later', 'Undated', 'Closed']);
   });
 
+  it('gives each goal status its status word: never an error look for Not Achieved', () => {
+    expect(goalStatusWord('Achieved')).toBe('achieved');
+    expect(goalStatusWord('In Progress')).toBe('in-progress');
+    expect(goalStatusWord('Not Started')).toBe('neutral');
+    expect(goalStatusWord('Not Achieved')).toBe('neutral');
+  });
+
   it('labels each goal card', () => {
     const [card] = goalCards(
       plan({ outcomesAvailable: true, goals: [goal({ outcomeName: 'Housed (Pantry)' })] }),
@@ -157,6 +165,7 @@ describe('plan.js', () => {
       'en-US'
     );
     expect(card.progress).toBe('1 of 2 done');
+    expect(card.progressPercent).toBe(50);
     expect(card.facts).toBe('Target Mar 1, 2027');
     expect(card.reviewDue).toBe(true);
     expect(card.outcome).toBe('Toward Housed (Pantry)');
@@ -197,7 +206,8 @@ describe('c-service-plan', () => {
     expect(qa(element, 'goal')).toHaveLength(1);
     expect(q(element, 'goal-title').textContent).toBe('Find housing');
     expect(qa(element, 'step')).toHaveLength(2);
-    expect(q(element, 'review-due')).not.toBeNull();
+    expect(q(element, 'review-due').status).toBe('review');
+    expect(q(element, 'goal-status-badge').label).toBeTruthy();
     expect(qa(element, 'note')).toHaveLength(1);
     expect(q(element, 'empty')).toBeNull();
   });
@@ -281,7 +291,7 @@ describe('c-service-plan', () => {
     box.dispatchEvent(new CustomEvent('change'));
     await flush();
     await flush();
-    expect(q(element, 'error-message').textContent.trim()).toBe('No access.');
+    expect(q(element, 'error-message').message).toBe('No access.');
   });
 
   it('reports a failed load', async () => {
@@ -291,6 +301,6 @@ describe('c-service-plan', () => {
     document.body.appendChild(element);
     await flush();
     await flush();
-    expect(q(element, 'error-message').textContent.trim()).toBe('Gone.');
+    expect(q(element, 'error-message').message).toBe('Gone.');
   });
 });

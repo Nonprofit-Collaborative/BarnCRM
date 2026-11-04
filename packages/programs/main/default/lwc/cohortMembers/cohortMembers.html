@@ -7,22 +7,19 @@
       </template>
 
       <template lwc:if={errorMessage}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
-          {errorMessage}
-        </p>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-show slds-var-m-bottom_small"></c-barn-notice>
       </template>
 
       <div role="status" data-id="result" class="slds-var-m-bottom_small">{resultMessage}</div>
 
       <template lwc:if={hasFailures}>
-        <div data-id="failures" class="slds-box slds-theme_shade slds-var-m-bottom_small">
-          <p class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.notAdded}</p>
+        <c-barn-notice variant="warning" title={labels.notAdded} data-id="failures" class="slds-show slds-var-m-bottom_small">
           <ul class="slds-list_dotted">
             <template for:each={failures} for:item="failure">
               <li key={failure.key} data-id="failure">{failure.personName}: {failure.message}</li>
             </template>
           </ul>
-        </div>
+        </c-barn-notice>
       </template>
 
       <template lwc:if={loaded}>
@@ -53,7 +50,7 @@
           </ul>
         </template>
         <template lwc:else>
-          <p data-id="members-empty" class="slds-text-body_regular">{labels.membersEmpty}</p>
+          <c-barn-empty-state illustration="no-data" heading={labels.membersEmpty} data-id="members-empty"></c-barn-empty-state>
         </template>
         <template lwc:if={moreThanShown}>
           <p data-id="more" class="slds-text-body_small slds-text-color_weak">{labels.moreThanShown}</p>
@@ -93,7 +90,7 @@
               </ul>
             </template>
             <template lwc:else>
-              <p data-id="no-candidates" class="slds-text-body_small slds-text-color_weak">{labels.noCandidates}</p>
+              <c-barn-empty-state size="compact" heading={labels.noCandidates} data-id="no-candidates"></c-barn-empty-state>
             </template>
 
             <template lwc:if={canEnroll}>

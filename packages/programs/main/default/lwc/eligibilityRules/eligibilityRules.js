@@ -39,7 +39,6 @@ import SAVE_FIRST from '@salesforce/label/c.Programs_Elig_SaveFirst';
 import NO_RULE_MATCHED from '@salesforce/label/c.Programs_Elig_NoRuleMatched';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Elig_MoreThanShown';
 import READ_ONLY from '@salesforce/label/c.Programs_Elig_ReadOnly';
-import ACTION_FAILED from '@salesforce/label/c.Programs_Elig_ActionFailed';
 import OP_EQUALS from '@salesforce/label/c.Programs_Elig_OpEquals';
 import OP_NOT_EQUALS from '@salesforce/label/c.Programs_Elig_OpNotEquals';
 import OP_IN from '@salesforce/label/c.Programs_Elig_OpIn';
@@ -157,7 +156,7 @@ export default class EligibilityRules extends LightningElement {
         }
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Elig'));
       })
       .finally(() => {
         this.loading = false;
@@ -423,7 +422,7 @@ export default class EligibilityRules extends LightningElement {
         }
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Elig'));
       })
       .finally(() => {
         this.busy = false;
@@ -456,7 +455,7 @@ export default class EligibilityRules extends LightningElement {
         return this.load();
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Elig'));
       })
       .finally(() => {
         this.busy = false;

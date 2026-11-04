@@ -60,7 +60,9 @@ public with sharing class ServicePlanController {
     private static Map<String, Object> parse(String payload) {
         Object value = String.isBlank(payload) ? null : JSON.deserializeUntyped(payload);
         if (!(value instanceof Map<String, Object>)) {
-            throw new ServicePlanService.PlanException(Label.Programs_Plan_ActionFailed);
+            throw new ServicePlanService.PlanException(
+                BarnHelp.text('Programs', 'Programs_Fail_Plan')
+            );
         }
         return (Map<String, Object>) value;
     }
@@ -68,7 +70,7 @@ public with sharing class ServicePlanController {
     /** The message the panel shows: a refused save's own words, or the generic one. */
     @TestVisible
     private static AuraHandledException handled(Exception e, Id recordId) {
-        String message = Label.Programs_Plan_ActionFailed;
+        String message = BarnHelp.text('Programs', 'Programs_Fail_Plan');
         if (e instanceof AuraHandledException) {
             return (AuraHandledException) e;
         } else if (e instanceof DmlException) {

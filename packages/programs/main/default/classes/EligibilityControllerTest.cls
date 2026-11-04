@@ -251,7 +251,7 @@ private class EligibilityControllerTest {
                 Assert.fail('A missing program must be refused.');
             } catch (AuraHandledException refused) {
                 Assert.areEqual(
-                    Label.Programs_Elig_ActionFailed,
+                    BarnHelp.text('Programs', 'Programs_Fail_Elig'),
                     refused.getMessage(),
                     'Said in the label.'
                 );

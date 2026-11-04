@@ -87,10 +87,9 @@ public with sharing class ProgramDashboardController {
             return result;
         } catch (Exception failure) {
             ErrorLogger.log(failure, CONTEXT, null);
-            AuraHandledException refused = new AuraHandledException(
-                Label.Programs_Dashboard_LoadFailed
-            );
-            refused.setMessage(Label.Programs_Dashboard_LoadFailed);
+            String message = BarnHelp.text('Programs', 'Programs_Fail_Dashboard');
+            AuraHandledException refused = new AuraHandledException(message);
+            refused.setMessage(message);
             throw refused;
         }
     }

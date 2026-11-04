@@ -165,11 +165,11 @@ public with sharing class SessionScheduleController {
             schedule.endDate = cohort.End_Date__c;
         } else if (recordId != null && recordId.getSObjectType() == Program__c.SObjectType) {
             if (CohortSelector.selectProgram(recordId) == null) {
-                throw UserErrors.message(Label.Programs_Schedule_ActionFailed);
+                throw UserErrors.message(failed());
             }
             schedule.programId = recordId;
         } else {
-            throw UserErrors.message(Label.Programs_Schedule_ActionFailed);
+            throw UserErrors.message(failed());
         }
         for (Service__c service : CohortSelector.selectActiveServices(schedule.programId)) {
             Option option = new Option();
@@ -208,6 +208,11 @@ public with sharing class SessionScheduleController {
         return Time.newInstance(Integer.valueOf(parts[0]), Integer.valueOf(parts[1].left(2)), 0, 0);
     }
 
+    /** What staff are told when scheduling failed (modules-1). */
+    private static String failed() {
+        return BarnHelp.text('Programs', 'Programs_Fail_Schedule');
+    }
+
     /** A refusal is passed on in its own words; anything else is logged first. */
     private static AuraHandledException report(Exception failure, Id recordId) {
         if (failure instanceof AuraHandledException) {
@@ -217,6 +222,6 @@ public with sharing class SessionScheduleController {
             return UserErrors.message(((DmlException) failure).getDmlMessage(0));
         }
         ErrorLogger.log(failure, CONTEXT, recordId);
-        return UserErrors.message(Label.Programs_Schedule_ActionFailed);
+        return UserErrors.message(failed());
     }
 }

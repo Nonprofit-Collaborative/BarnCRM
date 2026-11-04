@@ -43,7 +43,6 @@ import NOTES from '@salesforce/label/c.Programs_Plan_Notes';
 import MORE_NOTES from '@salesforce/label/c.Programs_Plan_MoreNotes';
 import NEW_NOTE from '@salesforce/label/c.Programs_Plan_NewNote';
 import SAVED from '@salesforce/label/c.Core_Shared_Saved';
-import ACTION_FAILED from '@salesforce/label/c.Programs_Plan_ActionFailed';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import {
@@ -132,7 +131,7 @@ export default class ServicePlan extends NavigationMixin(LightningElement) {
         this.plan = plan;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Plan'));
       })
       .finally(() => {
         this.loading = false;
@@ -363,7 +362,7 @@ export default class ServicePlan extends NavigationMixin(LightningElement) {
         return true;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Plan'));
         return false;
       })
       .finally(() => {

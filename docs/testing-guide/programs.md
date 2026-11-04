@@ -206,10 +206,10 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As the admin, open **BarnCRM Settings**, the **Programs** section, then **Programs Settings**. | A **Participant Privacy** card with **Shared** chosen, "Default: Shared" under it, and **Save** greyed out. |
+| 1 | As the admin, open **BarnCRM Settings**, the **Programs** section, then **Programs Settings**. | A **Participant Privacy** section with **Shared** chosen, "Default: Shared" under it, and no save bar. |
 | 2 | As the first staff user, enroll a test person in the program on its **Program Roster** panel, then record one delivery for them in the **Service Delivery Log**. | Both saved. |
 | 3 | As the second staff user, open the program and the **Enrollments** and **Service Deliveries** tabs, **All** lists. | The enrollment and the delivery are listed. |
-| 4 | As the admin, choose **Private** on the Participant Privacy card and click **Save**. | "Saved. It applies to every enrollment and delivery within a minute." **Save** is greyed out again. |
+| 4 | As the admin, choose **Private** under Participant Privacy. A save bar with **Discard** and **Save** appears at the bottom; click **Save**. | A green notice: "Saved. It applies to every enrollment and delivery within a minute." The save bar goes away. (Choosing again and clicking **Discard** puts the saved choice back.) |
 | 5 | Wait a minute. As the second staff user, repeat step 3. | Neither record is listed, on the roster or the tabs. |
 | 6 | As the first staff user, repeat step 3. | Both are listed: they own them. |
 | 7 | As the admin, repeat step 3. | Both are listed. |
@@ -227,7 +227,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As the admin, open the **BarnCRM Programs** app. | **Programs Dashboard** is the first tab. |
-| 2 | Open **Programs Dashboard**. | Period **This Month**; seven tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Counted Without Names, Services Delivered, Attendance Rate) and a **By Program** table listing every Active program by name. |
+| 2 | Open **Programs Dashboard**. | Period **This Month**; seven tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Counted Without Names, Services Delivered, Attendance Rate), a **Tools** row with a tile for each Programs tab (each opens its list), and a **By Program** table listing every Active program by name, the rate shown as a bar and a percent. |
 | 3 | Compare the program's row with its **Program Roster** panel and today's log. | Open Enrollments matches the roster's Applied plus Enrolled; Services Delivered counts the Present delivery only; Attendance Rate is 50%; People Served is 1. |
 | 4 | Pick **Last Year**. | The figures reload for last year; a program with no activity then shows 0 and "None yet" for the rate. |
 | 5 | Click a program's name. | The program opens. |

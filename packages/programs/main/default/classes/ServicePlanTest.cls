@@ -523,7 +523,8 @@ private class ServicePlanTest {
             }
         }
         Test.stopTest();
-        Assert.areEqual(Label.Programs_Plan_ActionFailed, handled.getMessage());
-        Assert.areEqual(Label.Programs_Plan_ActionFailed, bad.getMessage());
+        String failed = BarnHelp.text('Programs', 'Programs_Fail_Plan');
+        Assert.areEqual(failed, handled.getMessage());
+        Assert.areEqual(failed, bad.getMessage());
     }
 }

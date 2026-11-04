@@ -7,13 +7,11 @@
       </template>
 
       <template lwc:if={errorMessage}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
-          {errorMessage}
-        </p>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-show slds-var-m-bottom_small"></c-barn-notice>
       </template>
 
       <template lwc:if={noServices}>
-        <p data-id="no-services" class="slds-text-body_regular">{labels.noServices}</p>
+        <c-barn-empty-state illustration="setup" heading={labels.noServices} data-id="no-services"></c-barn-empty-state>
       </template>
 
       <template lwc:if={session}>
@@ -21,9 +19,12 @@
           <p class="slds-text-heading_small" data-id="session-heading">{session.heading}</p>
           <p class="slds-text-body_small slds-text-color_weak" data-id="session-roster">{session.roster}</p>
           <template lwc:if={session.cancelled}>
-            <p class="slds-text-body_regular slds-var-m-top_x-small" data-id="session-cancelled">
-              {labels.sessionCancelled}
-            </p>
+            <c-barn-notice
+              variant="warning"
+              message={labels.sessionCancelled}
+              class="slds-show slds-var-m-top_x-small"
+              data-id="session-cancelled"
+            ></c-barn-notice>
           </template>
         </div>
       </template>
@@ -53,7 +54,7 @@
         </div>
 
         <template lwc:if={isEmpty}>
-          <p data-id="empty" class="slds-text-body_regular">{labels.empty}</p>
+          <c-barn-empty-state illustration="no-data" heading={labels.empty} data-id="empty"></c-barn-empty-state>
         </template>
 
         <template lwc:if={showHeader}>

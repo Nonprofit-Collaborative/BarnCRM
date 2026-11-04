@@ -1,12 +1,8 @@
 <template>
-    <template lwc:if={helpReady}>
-  <div class="slds-var-p-around_medium slds-is-relative">
-    <div class="slds-grid slds-wrap slds-grid_vertical-align-end slds-var-m-bottom_medium">
-      <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
-        <h1 class="slds-text-heading_medium" data-id="title">{labels.title}</h1>
-        <p class="slds-text-body_regular">{labels.intro}</p>
-      </div>
-      <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+  <template lwc:if={helpReady}>
+    <!-- The Programs app's home (vis-modules-19). The App Page prints the name above, so the shell's title is for screen readers only. -->
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icons.dashboard} title-hidden data-id="shell">
+      <div slot="actions">
         <lightning-combobox
           name="period"
           label={labels.period}
@@ -16,80 +12,103 @@
           data-id="period"
         ></lightning-combobox>
       </div>
-    </div>
 
-    <template lwc:if={loading}>
-      <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
-    </template>
+      <div class="slds-is-relative">
+        <template lwc:if={loading}>
+          <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </template>
 
-    <template lwc:if={errorMessage}>
-      <p class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">{errorMessage}</p>
-    </template>
+        <template lwc:if={errorMessage}>
+          <c-barn-notice variant="error" message={errorMessage} class="slds-show slds-var-m-bottom_small" data-id="error"></c-barn-notice>
+        </template>
 
-    <template lwc:if={noAccess}>
-      <p class="slds-text-body_regular" data-id="no-access">{labels.noAccess}</p>
-    </template>
+        <template lwc:if={noAccess}>
+          <c-barn-notice message={labels.noAccess} class="slds-show slds-var-m-bottom_small" data-id="no-access"></c-barn-notice>
+        </template>
 
-    <template lwc:if={canSee}>
-      <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_medium">
-        <template for:each={tiles} for:item="tile">
-          <div key={tile.key} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-3 slds-large-size_1-of-6 slds-var-p-bottom_x-small">
-            <div class="slds-box slds-theme_default slds-text-align_center" data-id="tile">
-              <p class="slds-text-heading_large" data-id={tile.key}>{tile.value}</p>
-              <p class="slds-text-body_small slds-text-color_weak">{tile.label}</p>
-            </div>
+        <template lwc:if={canSee}>
+          <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_medium">
+            <template for:each={tiles} for:item="tile">
+              <div key={tile.key} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+                <c-barn-stat-tile
+                  label={tile.label}
+                  value={tile.value}
+                  format-style={tile.formatStyle}
+                  bordered
+                  align="start"
+                  data-id="tile"
+                  data-key={tile.key}
+                ></c-barn-stat-tile>
+              </div>
+            </template>
           </div>
         </template>
-      </div>
 
-      <lightning-card title={labels.byProgram} icon-name="custom:custom9">
-        <div class="slds-var-p-horizontal_medium">
-          <template lwc:if={noRows}>
-            <p class="slds-text-body_regular" data-id="no-programs">{labels.noPrograms}</p>
-          </template>
-          <template lwc:else>
-            <table
-              class="slds-table slds-table_cell-buffer slds-table_bordered slds-max-medium-table_stacked"
-              aria-label={labels.byProgram}
-            >
-              <thead>
-                <tr class="slds-line-height_reset">
-                  <th scope="col">{labels.program}</th>
-                  <th scope="col">{labels.openEnrollments}</th>
-                  <th scope="col">{labels.newEnrollments}</th>
-                  <th scope="col">{labels.completed}</th>
-                  <th scope="col">{labels.peopleServed}</th>
-                  <th scope="col">{labels.peopleCounted}</th>
-                  <th scope="col">{labels.delivered}</th>
-                  <th scope="col">{labels.attendanceRate}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <template for:each={rows} for:item="row">
-                  <tr key={row.key} data-id="program-row">
-                    <th scope="row" data-label={labels.program}>
-                      <a href={row.href} data-record-id={row.key} onclick={handleOpen} data-id="program">{row.name}</a>
-                    </th>
-                    <td data-label={labels.openEnrollments}>{row.openEnrollments}</td>
-                    <td data-label={labels.newEnrollments}>{row.newEnrollments}</td>
-                    <td data-label={labels.completed}>{row.completedEnrollments}</td>
-                    <td data-label={labels.peopleServed}>{row.peopleServed}</td>
-                    <td data-label={labels.peopleCounted} data-id="row-counted">{row.peopleCounted}</td>
-                    <td data-label={labels.delivered}>{row.delivered}</td>
-                    <td data-label={labels.attendanceRate} data-id="rate">{row.rate}</td>
+        <c-barn-tool-grid groups={toolGroups} data-id="tools"></c-barn-tool-grid>
+
+        <template lwc:if={canSee}>
+          <section class="slds-var-m-top_medium" aria-labelledby="programs-by-program">
+            <h2 class="slds-text-heading_medium slds-var-m-bottom_small" id="programs-by-program">{labels.byProgram}</h2>
+            <template lwc:if={noRows}>
+              <c-barn-empty-state illustration="no-data" heading={labels.noPrograms} data-id="no-programs"></c-barn-empty-state>
+            </template>
+            <template lwc:else>
+              <table
+                class="slds-table slds-table_cell-buffer slds-table_bordered slds-max-medium-table_stacked"
+                aria-label={labels.byProgram}
+              >
+                <thead>
+                  <tr class="slds-line-height_reset">
+                    <th scope="col" data-label={labels.program}>{labels.program}</th>
+                    <th scope="col" class="slds-text-align_right" data-label={labels.openEnrollments}>{labels.openEnrollments}</th>
+                    <th scope="col" class="slds-text-align_right" data-label={labels.newEnrollments}>{labels.newEnrollments}</th>
+                    <th scope="col" class="slds-text-align_right" data-label={labels.completed}>{labels.completed}</th>
+                    <th scope="col" class="slds-text-align_right" data-label={labels.peopleServed}>{labels.peopleServed}</th>
+                    <th scope="col" class="slds-text-align_right" data-label={labels.peopleCounted}>{labels.peopleCounted}</th>
+                    <th scope="col" class="slds-text-align_right" data-label={labels.delivered}>{labels.delivered}</th>
+                    <th scope="col" data-label={labels.attendanceRate}>{labels.attendanceRate}</th>
                   </tr>
-                </template>
-              </tbody>
-            </table>
-          </template>
-          <template lwc:if={moreThanShown}>
-            <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_small" data-id="more">
-              {labels.moreThanShown}
-            </p>
-          </template>
-        </div>
-      </lightning-card>
-    </template>
-  </div>
-    </template>
+                </thead>
+                <tbody>
+                  <template for:each={rows} for:item="row">
+                    <tr key={row.key} data-id="program-row">
+                      <th scope="row" data-label={labels.program}>
+                        <a href={row.href} data-record-id={row.key} onclick={handleOpen} data-id="program">{row.name}</a>
+                      </th>
+                      <td class="slds-text-align_right" data-label={labels.openEnrollments}>
+                        <lightning-formatted-number value={row.openEnrollments}></lightning-formatted-number>
+                      </td>
+                      <td class="slds-text-align_right" data-label={labels.newEnrollments}>
+                        <lightning-formatted-number value={row.newEnrollments}></lightning-formatted-number>
+                      </td>
+                      <td class="slds-text-align_right" data-label={labels.completed}>
+                        <lightning-formatted-number value={row.completedEnrollments}></lightning-formatted-number>
+                      </td>
+                      <td class="slds-text-align_right" data-label={labels.peopleServed}>
+                        <lightning-formatted-number value={row.peopleServed}></lightning-formatted-number>
+                      </td>
+                      <td class="slds-text-align_right" data-label={labels.peopleCounted}>
+                        <lightning-formatted-number value={row.peopleCounted} data-id="row-counted"></lightning-formatted-number>
+                      </td>
+                      <td class="slds-text-align_right" data-label={labels.delivered}>
+                        <lightning-formatted-number value={row.delivered}></lightning-formatted-number>
+                      </td>
+                      <td data-label={labels.attendanceRate}>
+                        <c-barn-meter value={row.ratePercent} value-text={row.rate} size="small" data-id="rate"></c-barn-meter>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </template>
+            <template lwc:if={moreThanShown}>
+              <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_small" data-id="more">
+                {labels.moreThanShown}
+              </p>
+            </template>
+          </section>
+        </template>
+      </div>
+    </c-barn-page-shell>
+  </template>
 </template>

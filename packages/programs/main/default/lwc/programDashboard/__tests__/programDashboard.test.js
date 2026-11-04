@@ -1,7 +1,30 @@
 import { createElement } from 'lwc';
 import ProgramDashboard from 'c/programDashboard';
 import getDashboard from '@salesforce/apex/ProgramDashboardController.getDashboard';
-import { attendanceRate, isoDate, periodRange, programRows, tiles } from '../dashboardRows';
+import { getObjectInfos } from 'lightning/uiObjectInfoApi';
+import {
+  attendanceRate,
+  isoDate,
+  periodRange,
+  programRows,
+  rateFraction,
+  tiles,
+  toolTiles
+} from '../dashboardRows';
+
+const OBJECT_INFOS = {
+  results: [
+    {
+      statusCode: 200,
+      result: { apiName: 'Program__c', label: 'Program', labelPlural: 'Programs' }
+    },
+    { statusCode: 403, result: [] },
+    {
+      statusCode: 200,
+      result: { apiName: 'Session__c', label: 'Session', labelPlural: 'Sessions' }
+    }
+  ]
+};
 
 jest.mock(
   '@salesforce/apex/ProgramDashboardController.getDashboard',
@@ -98,15 +121,41 @@ describe('dashboardRows (framework free)', () => {
       'delivered',
       'rate'
     ]);
-    expect(shown[0].value).toBe('2');
-    expect(shown[4].value).toBe('25');
-    expect(shown[6].value).toBe('75%');
+    expect(shown[0]).toMatchObject({ value: 2, formatStyle: 'decimal' });
+    expect(shown[4].value).toBe(25);
+    expect(shown[6]).toMatchObject({ value: 0.75, formatStyle: 'percent' });
+    expect(tiles({ canSee: true, totals: {} }, labels)[6].value).toBe('None');
     expect(tiles({ canSee: false }, labels)).toEqual([]);
+    expect(rateFraction({ delivered: 1, deliveries: 4 })).toBe(0.25);
+    expect(rateFraction({})).toBeNull();
 
     const rows = programRows(DASHBOARD, 'None');
     expect(rows[0].href).toBe('/lightning/r/Program__c/a08000000000001AAA/view');
-    expect(rows[1]).toMatchObject({ openEnrollments: 0, delivered: 0, rate: 'None' });
+    expect(rows[0]).toMatchObject({ rate: '75%', ratePercent: 75 });
+    expect(rows[1]).toMatchObject({
+      openEnrollments: 0,
+      delivered: 0,
+      rate: 'None',
+      ratePercent: 0
+    });
     expect(programRows(undefined, 'None')).toEqual([]);
+  });
+
+  it('builds a tool tile for each Programs tab the person can read, in tab order', () => {
+    const shown = toolTiles(
+      OBJECT_INFOS,
+      ['Program__c', 'Cohort__c', 'Session__c'],
+      (apiName) => `line ${apiName}`,
+      () => 'custom:custom1'
+    );
+    expect(shown.map((tile) => tile.label)).toEqual(['Programs', 'Sessions']);
+    expect(shown[1]).toMatchObject({
+      name: 'Session__c',
+      description: 'line Session__c',
+      href: '/lightning/o/Session__c/home'
+    });
+    const none = () => '';
+    expect(toolTiles(undefined, ['Program__c'], none, none)).toEqual([]);
   });
 });
 
@@ -125,12 +174,21 @@ describe('c-program-dashboard', () => {
 
     const args = getDashboard.mock.calls[0][0];
     expect(args.fromDate).toMatch(/^\d{4}-\d{2}-01$/);
+    const tileOf = (key) => element.shadowRoot.querySelector(`[data-id="tile"][data-key="${key}"]`);
     expect(all(element, 'tile').length).toBe(7);
-    expect(one(element, 'rate').textContent).toBe('75%');
-    expect(one(element, 'counted').textContent).toBe('25');
-    expect(all(element, 'row-counted')[0].textContent).toBe('25');
+    expect(tileOf('rate').value).toBe(0.75);
+    expect(tileOf('rate').formatStyle).toBe('percent');
+    expect(tileOf('counted').value).toBe(25);
+    expect(all(element, 'row-counted')[0].value).toBe(25);
+    expect(all(element, 'rate')[0].valueText).toBe('75%');
     expect(all(element, 'program-row').length).toBe(2);
     expect(one(element, 'no-programs')).toBeNull();
+
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+    getObjectInfos.emit(OBJECT_INFOS);
+    await flush();
+    const groups = one(element, 'tools').groups;
+    expect(groups[0].tiles.map((tile) => tile.name)).toEqual(['Program__c', 'Session__c']);
   });
 
   it('loads again for another period', async () => {
@@ -164,6 +222,7 @@ describe('c-program-dashboard', () => {
     getDashboard.mockRejectedValue({});
     const third = mount();
     await flush();
-    expect(one(third, 'error').textContent).toContain('Programs_Dashboard_LoadFailed');
+    expect(one(third, 'error').message).toContain('Programs_Fail_Dashboard');
+    expect(one(third, 'error').variant).toBe('error');
   });
 });

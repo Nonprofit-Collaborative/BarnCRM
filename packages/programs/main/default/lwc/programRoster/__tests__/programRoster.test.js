@@ -100,7 +100,7 @@ describe('c-program-roster', () => {
 
     expect(getRoster).toHaveBeenCalledWith({ programId: PROGRAM_ID, showEnded: false });
     const figures = [...element.shadowRoot.querySelectorAll('[data-id="figure"]')];
-    expect(figures.map((figure) => figure.textContent)).toEqual(['1', '1', '3', '0']);
+    expect(figures.map((figure) => figure.value)).toEqual([1, 1, 3, 0]);
     const links = [...element.shadowRoot.querySelectorAll('[data-id="enrollment-link"]')];
     expect(links.map((link) => link.textContent)).toEqual(['Ana Rivera', 'EN-000002']);
     expect(one(element, 'caption').textContent).toContain('After-School Tutoring');
@@ -111,6 +111,7 @@ describe('c-program-roster', () => {
     const element = await render(rosterOf([]));
 
     expect(one(element, 'empty-state')).not.toBeNull();
+    expect(one(element, 'empty-enroll')).not.toBeNull();
     expect(one(element, 'caption')).toBeNull();
   });
 
@@ -184,7 +185,7 @@ describe('c-program-roster', () => {
       .dispatchEvent(new CustomEvent('change', { detail: { value: 'Applied' } }));
     await flush();
 
-    expect(one(element, 'error-message').textContent.trim()).toBe('Already open in Tutoring.');
+    expect(one(element, 'error-message').message).toBe('Already open in Tutoring.');
   });
 
   it('lists ended enrollments too when Show Ended is on', async () => {
