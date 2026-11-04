@@ -30,7 +30,6 @@ import COL_RECORDS from '@salesforce/label/c.Core_FieldUtilization_ColRecords';
 import COL_PREVIOUS from '@salesforce/label/c.Core_FieldUtilization_ColPrevious';
 import COL_CHANGE from '@salesforce/label/c.Core_FieldUtilization_ColChange';
 import COL_SAMPLED from '@salesforce/label/c.Core_FieldUtilization_ColSampled';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_FieldUtilization_UnexpectedError';
 import HISTORY_TITLE from '@salesforce/label/c.Core_FieldUtilization_HistoryTitle';
 import HISTORY_LIMIT from '@salesforce/label/c.Core_FieldUtilization_HistoryLimit';
 import HISTORY_COL_TAKEN_AT from '@salesforce/label/c.Core_FieldUtilization_HistoryColTakenAt';
@@ -52,13 +51,17 @@ import DELETED from '@salesforce/label/c.Core_FieldUtilization_Deleted';
 import { bodyMessage } from 'c/findCsv';
 import WhereUsedModal from 'c/whereUsedModal';
 import WHERE_USED from '@salesforce/label/c.Core_WhereUsed_Action';
+import SHOW_TECHNICAL_NAMES from '@salesforce/label/c.Core_Shared_ShowTechnicalNames';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { shownColumns } from 'c/accessExplorerRows';
 
 const PERCENT = { maximumFractionDigits: 1 };
+/** The catch-all message, read when it is needed (the help catalog loads after the module). */
+const unexpectedError = () => helpText('Core', 'Core_FieldUtilization_UnexpectedError');
 
 const COLUMNS = [
   { label: COL_FIELD, fieldName: 'fieldLabel', sortable: true },
-  { label: COL_API_NAME, fieldName: 'fieldName', sortable: true },
+  { label: COL_API_NAME, fieldName: 'fieldName', sortable: true, technical: true },
   { label: COL_RECORD_TYPE, fieldName: 'recordTypeLabel', sortable: true },
   {
     label: COL_FILLED,
@@ -118,9 +121,10 @@ const VIEW_COLUMNS = [
 const formatWhen = (value) => new Date(value).toLocaleString(undefined, WHEN);
 
 /**
- * The Field Utilization tab (canonical model Section 29F, ADR-0101 field-utilization-on-demand):
- * pick a kind of record, and the page counts its fields a chunk at a time, filling the table as
- * each chunk returns. Nothing is stored until Save Utilization Snapshot. The controller checks Manage
+ * The Field Use section, called Field Utilization before v1.0 (canonical model Section 29F,
+ * ADR-0101 field-utilization-on-demand, admin-24): pick a kind of record, and the page counts its
+ * fields a chunk at a time, filling the table as each chunk returns. Nothing is stored until Save
+ * Snapshot. API names show only with Show technical names on. The controller checks Manage
  * BarnCRM Settings on every call.
  */
 export default class FieldUtilization extends LightningElement {
@@ -149,10 +153,19 @@ export default class FieldUtilization extends LightningElement {
     comparedWith: COMPARED_WITH,
     neverSaved: NEVER_SAVED,
     noRecords: NO_RECORDS,
-    noFields: NO_FIELDS
+    noFields: NO_FIELDS,
+    showTechnicalNames: SHOW_TECHNICAL_NAMES
   };
 
-  columns = COLUMNS;
+  showTechnicalNames = false;
+
+  get columns() {
+    return shownColumns(COLUMNS, this.showTechnicalNames);
+  }
+
+  handleTechnicalNames(event) {
+    this.showTechnicalNames = event.target.checked;
+  }
   objectOptions = [];
   objectName;
   plan;
@@ -180,7 +193,7 @@ export default class FieldUtilization extends LightningElement {
     if (data) {
       this.objectOptions = data;
     } else if (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, unexpectedError());
     }
   }
 
@@ -354,7 +367,7 @@ export default class FieldUtilization extends LightningElement {
       await this.countChunk(run, objectName, names, plan.chunkSize || names.length || 1, 0);
     } catch (error) {
       if (run === this.run) {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, unexpectedError());
       }
     } finally {
       if (run === this.run) {
@@ -402,7 +415,7 @@ export default class FieldUtilization extends LightningElement {
         await this.loadHistory(run, this.objectName);
       }
     } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, unexpectedError());
     } finally {
       this.saving = false;
     }
@@ -474,7 +487,7 @@ export default class FieldUtilization extends LightningElement {
       }
     } catch (error) {
       if (run === this.run) {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, unexpectedError());
       }
     }
   }
@@ -508,11 +521,11 @@ export default class FieldUtilization extends LightningElement {
         await this.deleteSnapshot(row);
       }
     } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, unexpectedError());
     }
   }
 
-  /** Makes the Saved and Change (points) columns follow the chosen snapshot. */
+  /** Makes the Saved and Change Since Saved Count columns follow the chosen snapshot. */
   async compareWith(takenAt) {
     const run = this.run;
     const rows = await getSnapshotRows({ objectName: this.objectName, takenAt });

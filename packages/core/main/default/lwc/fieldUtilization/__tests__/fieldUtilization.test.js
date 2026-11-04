@@ -66,11 +66,9 @@ jest.mock(
   () => ({ default: 'Counted {0} of {1} fields.' }),
   { virtual: true }
 );
-jest.mock(
-  '@salesforce/label/c.Core_FieldUtilization_Save',
-  () => ({ default: 'Save Utilization Snapshot' }),
-  { virtual: true }
-);
+jest.mock('@salesforce/label/c.Core_FieldUtilization_Save', () => ({ default: 'Save Snapshot' }), {
+  virtual: true
+});
 jest.mock(
   '@salesforce/label/c.Core_FieldUtilization_Saved',
   () => ({ default: 'Saved {0} counts.' }),
@@ -157,11 +155,11 @@ describe('c-field-utilization', () => {
     expect(find(element, 'results')).toBeNull();
   });
 
-  it('names the save button Save Utilization Snapshot and explains it in small text', async () => {
+  it('names the save button Save Snapshot and explains it in small text', async () => {
     const element = render();
     await flush();
 
-    expect(find(element, 'save').label).toBe('Save Utilization Snapshot');
+    expect(find(element, 'save').label).toBe('Save Snapshot');
     const help = find(element, 'save-help');
     expect(help.textContent).toBe('Keeps this count so your next count shows what changed.');
     expect(help.classList.contains('slds-text-body_small')).toBe(true);
@@ -191,9 +189,18 @@ describe('c-field-utilization', () => {
     expect(rows[0].change).toBe(5);
     expect(rows[1].change).toBeNull();
     expect(element.shadowRoot.textContent).toContain('Counted 3 of 3 fields.');
-    expect(find(element, 'not-counted').textContent).toContain('Not counted: Fax');
+    expect(find(element, 'not-counted').message).toContain('Not counted: Fax');
     expect(find(element, 'compared')).not.toBeNull();
     expect(find(element, 'save').disabled).toBe(false);
+
+    // admin-24: the API Name column shows only with Show technical names on.
+    const fieldNames = () => find(element, 'results').columns.map((c) => c.fieldName);
+    expect(fieldNames()).not.toContain('fieldName');
+    const toggle = find(element, 'technical-names');
+    toggle.checked = true;
+    toggle.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(fieldNames()[1]).toBe('fieldName');
   });
 
   it('says an object over the size limit is not counted, and counts nothing', async () => {
@@ -201,7 +208,7 @@ describe('c-field-utilization', () => {
     const element = render();
     await choose(element, 'Account');
 
-    expect(find(element, 'too-large').textContent).toContain('More than');
+    expect(find(element, 'too-large').message).toContain('More than');
     expect(countFields).not.toHaveBeenCalled();
   });
 
@@ -227,7 +234,7 @@ describe('c-field-utilization', () => {
         { fieldName: 'Phone', recordType: 'Organization', filled: 80, total: 100, sampled: false }
       ]
     });
-    expect(find(element, 'notice').textContent).toContain('Saved 1 counts.');
+    expect(find(element, 'notice').message).toContain('Saved 1 counts.');
     expect(find(element, 'results').data[0].change).toBe(0);
   });
 
@@ -262,7 +269,7 @@ describe('c-field-utilization', () => {
     const element = render();
     await choose(element, 'Account');
 
-    expect(find(element, 'error').textContent).toContain('You need the permission.');
+    expect(find(element, 'error').message).toContain('You need the permission.');
   });
 });
 
@@ -315,7 +322,7 @@ describe('c-field-utilization snapshot history', () => {
     await choose(element, 'Account');
 
     expect(getHistory).toHaveBeenCalledWith({ objectName: 'Account' });
-    expect(find(element, 'history-empty').textContent).toContain('HistoryEmpty');
+    expect(find(element, 'history-empty').heading).toContain('HistoryEmpty');
     expect(find(element, 'history-table')).toBeNull();
   });
 
@@ -422,7 +429,7 @@ describe('c-field-utilization snapshot history', () => {
     expect(deleteSnapshot).toHaveBeenCalledWith({ objectName: 'Account', takenAt: OLDER });
     expect(getPlan).toHaveBeenCalledWith({ objectName: 'Account' });
     expect(getHistory).toHaveBeenCalledWith({ objectName: 'Account' });
-    expect(find(element, 'notice').textContent).toContain('Deleted');
+    expect(find(element, 'notice').message).toContain('Deleted');
   });
 
   it('shows the server message when a delete is refused', async () => {
@@ -432,6 +439,6 @@ describe('c-field-utilization snapshot history', () => {
 
     await act(element, 'delete', OLDER);
 
-    expect(find(element, 'error').textContent).toContain('No delete access.');
+    expect(find(element, 'error').message).toContain('No delete access.');
   });
 });

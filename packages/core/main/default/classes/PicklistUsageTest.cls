@@ -240,12 +240,12 @@ private class PicklistUsageTest {
                 }
             }
             Assert.areEqual(
-                System.Label.Core_FieldUtilization_UnexpectedError,
+                BarnHelp.text('Core', 'Core_FieldUtilization_UnexpectedError'),
                 foreign,
                 'A start Id of another kind of record is refused.'
             );
             Assert.areEqual(
-                System.Label.Core_FieldUtilization_UnexpectedError,
+                BarnHelp.text('Core', 'Core_FieldUtilization_UnexpectedError'),
                 garbage,
                 'Text that is not an Id is refused.'
             );

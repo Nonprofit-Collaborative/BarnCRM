@@ -19,7 +19,6 @@ import DESCRIPTION from '@salesforce/label/c.Core_Shared_Description';
 import COLUMN from '@salesforce/label/c.Core_ImportRow_ColumnHeader';
 import EMPTY_COLUMN from '@salesforce/label/c.LogicModels_Builder_EmptyColumn';
 import LOOK_AT from '@salesforce/label/c.LogicModels_Builder_LookAt';
-import LOOK_AT_NONE from '@salesforce/label/c.LogicModels_Builder_LookAtNone';
 import FINDING_EMPTY from '@salesforce/label/c.LogicModels_Builder_FindingEmptyStage';
 import FINDING_NO_IN from '@salesforce/label/c.LogicModels_Builder_FindingNoArrowIn';
 import FINDING_NO_OUT from '@salesforce/label/c.LogicModels_Builder_FindingNoArrowOut';
@@ -27,7 +26,6 @@ import FINDING_NO_INDICATOR from '@salesforce/label/c.LogicModels_Builder_Findin
 import OUTCOMES from '@salesforce/label/c.LogicModels_Builder_Outcomes';
 import SAVED from '@salesforce/label/c.Core_Shared_Saved';
 import DELETED from '@salesforce/label/c.LogicModels_Builder_Deleted';
-import ACTION_FAILED from '@salesforce/label/c.LogicModels_Builder_ActionFailed';
 import ARROW_PAIR from '@salesforce/label/c.Core_Address_DateRange';
 import BACKWARD_ARROWS from '@salesforce/label/c.LogicModels_Builder_BackwardArrows';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
@@ -48,7 +46,6 @@ import ADD_ARROW from '@salesforce/label/c.LogicModels_Part_AddArrow';
 import ARROW_TARGET from '@salesforce/label/c.LogicModels_Part_ArrowTarget';
 import ASSUMPTION from '@salesforce/label/c.LogicModels_Part_Assumption';
 import NO_ARROWS from '@salesforce/label/c.LogicModels_Part_NoArrows';
-import NO_TARGETS from '@salesforce/label/c.LogicModels_Part_NoTargets';
 import NO_ASSUMPTION from '@salesforce/label/c.LogicModels_Part_NoAssumption';
 import INDICATORS from '@salesforce/label/c.LogicModels_Indicator_Title';
 import ADD_INDICATOR from '@salesforce/label/c.LogicModels_Indicator_Add';
@@ -95,7 +92,6 @@ import SUM from '@salesforce/label/c.LogicModels_Source_Sum';
 import UNIQUE from '@salesforce/label/c.LogicModels_Source_Unique';
 import FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import REFRESH from '@salesforce/label/c.LogicModels_Source_Refresh';
-import REFRESHING from '@salesforce/label/c.LogicModels_Source_Refreshing';
 import RESULT_COMPUTED from '@salesforce/label/c.LogicModels_Source_ResultComputed';
 import COUNT_OF from '@salesforce/label/c.LogicModels_Source_CountOf';
 import SUM_OF from '@salesforce/label/c.LogicModels_Source_SumOf';
@@ -104,8 +100,6 @@ import DOWNLOAD_RESULTS from '@salesforce/label/c.LogicModels_Results_Download';
 import NO_RESULT_ROWS from '@salesforce/label/c.LogicModels_Results_None';
 import REPORT_TITLE from '@salesforce/label/c.LogicModels_Report_Title';
 import REPORT_PERIODS from '@salesforce/label/c.LogicModels_Report_Periods';
-import REPORT_NO_PERIODS from '@salesforce/label/c.LogicModels_Report_NoPeriods';
-import REPORT_NO_INDICATORS from '@salesforce/label/c.LogicModels_Report_NoIndicators';
 import REPORT_CHOOSE_ONE from '@salesforce/label/c.LogicModels_Report_ChooseOne';
 import REPORT_DOWNLOAD_CSV from '@salesforce/label/c.Core_AccessExplorer_Download';
 import REPORT_PRINTABLE from '@salesforce/label/c.LogicModels_Report_Printable';
@@ -114,6 +108,17 @@ import REPORT_INDICATOR from '@salesforce/label/c.LogicModels_Report_Indicator';
 import REPORT_META from '@salesforce/label/c.LogicModels_Report_Meta';
 import REPORT_PERIOD_DATES from '@salesforce/label/c.Core_Address_DateRange';
 import REPORT_DOWNLOADED from '@salesforce/label/c.Core_Shared_ReportDownloaded';
+import BACK_TO_MODEL from '@salesforce/label/c.LogicModels_Builder_BackToModel';
+import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
+import PERIODS_TITLE from '@salesforce/label/c.LogicModels_Periods_Title';
+import ADD_TO_EVERY from '@salesforce/label/c.LogicModels_Periods_AddToEvery';
+import USE_MODEL_PERIODS from '@salesforce/label/c.LogicModels_Periods_UseModel';
+import TEMPLATE from '@salesforce/label/c.Core_Import_StepTemplate';
+import ALL from '@salesforce/label/c.Core_DataJobs_ShowAll';
+import STARTER_PEOPLE_SERVED from '@salesforce/label/c.LogicModels_Starter_PeopleServed';
+import STARTER_SERVICES_DELIVERED from '@salesforce/label/c.LogicModels_Starter_ServicesDelivered';
+import STARTER_VOLUNTEER_HOURS from '@salesforce/label/c.LogicModels_Starter_VolunteerHours';
+import STARTER_GRANTS_AWARDED from '@salesforce/label/c.LogicModels_Starter_GrantsAwarded';
 import { helpText } from 'c/barnHelpText';
 
 export const LABELS = Object.freeze({
@@ -137,7 +142,9 @@ export const LABELS = Object.freeze({
     return helpText('LogicModels', 'LogicModels_Builder_SelectHint');
   },
   lookAt: LOOK_AT,
-  lookAtNone: LOOK_AT_NONE,
+  get lookAtNone() {
+    return helpText('LogicModels', 'LogicModels_Builder_LookAtNone');
+  },
   findingEmpty: FINDING_EMPTY,
   findingNoIn: FINDING_NO_IN,
   findingNoOut: FINDING_NO_OUT,
@@ -145,7 +152,23 @@ export const LABELS = Object.freeze({
   outcomes: OUTCOMES,
   saved: SAVED,
   deleted: DELETED,
-  actionFailed: ACTION_FAILED,
+  get actionFailed() {
+    return helpText('LogicModels', 'LogicModels_Builder_ActionFailed');
+  },
+  backToModel: BACK_TO_MODEL,
+  checkAgain: CHECK_AGAIN,
+  get deletePeriodConfirm() {
+    return helpText('LogicModels', 'LogicModels_Period_DeleteConfirm');
+  },
+  get removeArrowConfirm() {
+    return helpText('LogicModels', 'LogicModels_Part_RemoveArrowConfirm');
+  },
+  get resultsWorkedOut() {
+    return helpText('LogicModels', 'LogicModels_Source_WorkedOut');
+  },
+  get stillWorking() {
+    return helpText('LogicModels', 'LogicModels_Source_StillWorking');
+  },
   arrowPair: ARROW_PAIR,
   backwardArrows: BACKWARD_ARROWS,
   loading: LOADING,
@@ -159,7 +182,9 @@ export const LABELS = Object.freeze({
   arrowTarget: ARROW_TARGET,
   assumption: ASSUMPTION,
   noArrows: NO_ARROWS,
-  noTargets: NO_TARGETS,
+  get noTargets() {
+    return helpText('LogicModels', 'LogicModels_Part_NoTargets');
+  },
   noAssumption: NO_ASSUMPTION,
   indicators: INDICATORS,
   addIndicator: ADD_INDICATOR,
@@ -209,7 +234,9 @@ export const LABELS = Object.freeze({
   unique: UNIQUE,
   field: FIELD,
   refresh: REFRESH,
-  refreshing: REFRESHING,
+  get refreshing() {
+    return helpText('LogicModels', 'LogicModels_Source_Working');
+  },
   resultComputed: RESULT_COMPUTED,
   countOf: COUNT_OF,
   sumOf: SUM_OF,
@@ -218,8 +245,12 @@ export const LABELS = Object.freeze({
   noResultRows: NO_RESULT_ROWS,
   reportTitle: REPORT_TITLE,
   reportPeriods: REPORT_PERIODS,
-  reportNoPeriods: REPORT_NO_PERIODS,
-  reportNoIndicators: REPORT_NO_INDICATORS,
+  get reportNoPeriods() {
+    return helpText('LogicModels', 'LogicModels_Report_NoPeriods');
+  },
+  get reportNoIndicators() {
+    return helpText('LogicModels', 'LogicModels_Report_NoIndicators');
+  },
   reportChooseOne: REPORT_CHOOSE_ONE,
   reportDownloadCsv: REPORT_DOWNLOAD_CSV,
   reportPrintable: REPORT_PRINTABLE,
@@ -230,8 +261,40 @@ export const LABELS = Object.freeze({
   reportIndicator: REPORT_INDICATOR,
   reportMeta: REPORT_META,
   reportPeriodDates: REPORT_PERIOD_DATES,
-  reportDownloaded: REPORT_DOWNLOADED
+  reportDownloaded: REPORT_DOWNLOADED,
+  periodsTitle: PERIODS_TITLE,
+  addToEvery: ADD_TO_EVERY,
+  useModelPeriods: USE_MODEL_PERIODS,
+  get periodsIntro() {
+    return helpText('LogicModels', 'LogicModels_Periods_Intro');
+  },
+  get periodsAdded() {
+    return helpText('LogicModels', 'LogicModels_Periods_Added');
+  },
+  get periodsUsedAdded() {
+    return helpText('LogicModels', 'LogicModels_Periods_UsedAdded');
+  },
+  get periodsDeleteConfirm() {
+    return helpText('LogicModels', 'LogicModels_Periods_DeleteConfirm');
+  },
+  template: TEMPLATE,
+  all: ALL,
+  get starterHelp() {
+    return helpText('LogicModels', 'LogicModels_Starter_Help');
+  }
 });
+
+/** A computed indicator starter's name, by its key (R-IN8). */
+const STARTER_LABELS = Object.freeze({
+  peopleServed: STARTER_PEOPLE_SERVED,
+  servicesDelivered: STARTER_SERVICES_DELIVERED,
+  volunteerHours: STARTER_VOLUNTEER_HOURS,
+  grantsAwarded: STARTER_GRANTS_AWARDED
+});
+
+export function starterLabel(key) {
+  return STARTER_LABELS[key] || key;
+}
 
 const STAGE_LABELS = Object.freeze({
   Input: STAGE_INPUT,
@@ -261,5 +324,5 @@ export function messageFrom(error) {
   if (error && error.body && error.body.message) {
     return error.body.message;
   }
-  return ACTION_FAILED;
+  return LABELS.actionFailed;
 }

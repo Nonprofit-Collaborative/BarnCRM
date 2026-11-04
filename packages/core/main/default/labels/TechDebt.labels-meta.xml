@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: heading over the technical debt checks</shortDescription>
-        <value>Technical Debt</value>
+        <value>For Developers: Old Code and Flows</value>
     </labels>
     <labels>
         <fullName>Core_TechDebt_CheckApex</fullName>
