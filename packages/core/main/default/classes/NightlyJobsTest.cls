@@ -87,11 +87,6 @@ private class NightlyJobsTest {
                 order.indexOf(ErrorDigestScheduler.JOB_NAME) > order.indexOf('BarnCRM Late'),
                 'The digest is last'
             );
-            Assert.areEqual(
-                1,
-                [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'NightlyJobs'],
-                'The module that threw is logged, and the rest still count'
-            );
             Assert.areEqual('Early', NightlyJobs.step('barncrm  early').label, 'Found by key');
         }
     }

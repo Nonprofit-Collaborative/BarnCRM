@@ -26,6 +26,13 @@ private class NightlyRunTest {
         }
     }
 
+    /** Takes a place in the queue and does nothing. */
+    private class Filler implements Queueable {
+        public void execute(QueueableContext context) {
+            return;
+        }
+    }
+
     private static void only(List<NightlyStep> steps) {
         NightlyRun.chain = false;
         NightlyJobs.overrideStepsForTest(steps);
@@ -212,7 +219,7 @@ private class NightlyRunTest {
             Test.startTest();
             // Fill the queue, so the next link cannot be a queueable.
             while (Limits.getQueueableJobs() < Limits.getLimitQueueableJobs()) {
-                System.enqueueJob(new NightlyRun());
+                System.enqueueJob(new Filler());
             }
             run.advance();
             ScheduledJobSelector.forget();
