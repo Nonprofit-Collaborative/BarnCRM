@@ -96,7 +96,7 @@ describe('c-npsp-household-adoption', () => {
 
   it('disables Adopt and says why when a run is blocked', async () => {
     const element = await render({ ...READY, blockedReason: 'Set membership to Contact.' });
-    expect(find(element, 'blocked').textContent).toBe('Set membership to Contact.');
+    expect(find(element, 'blocked').message).toBe('Set membership to Contact.');
     expect(find(element, 'adopt').disabled).toBe(true);
   });
 
@@ -136,7 +136,7 @@ describe('c-npsp-household-adoption', () => {
     find(element, 'adopt').click();
     await flush();
     await flush();
-    expect(find(element, 'error').textContent).toBe('An adoption or undo is already running.');
+    expect(find(element, 'error').message).toBe('An adoption or undo is already running.');
   });
 
   it('shows a running run and refreshes on request', async () => {

@@ -59,9 +59,9 @@ households this way, never with Salesforce's own account merge. The full steps a
    badge. With three or more records, each is compared with the first one, and the card says
    so. The list shows 10 suggestions at a time; click **Show More** for the next 10. Press
    **Refresh** to see the latest.
-3. For two people, open either one and use **Compare and merge**, as above. The note above the
-   list reminds you: "To merge two people, open either one and use Compare and merge on the
-   Potential Duplicates card."
+3. For two people, click **Compare and Merge** on the pair. The first person's record opens;
+   on its **Potential Duplicates** card use **View Duplicates**, then **Compare and merge**, as
+   above. **Not a Duplicate** stays on the pair in the list.
 4. For two households, click **Merge Households**. In **Merge Two Households**, choose the
    **Household to keep** and click **Merge These Two**. To choose field by field, use **Merge
    or split** on the household instead.
@@ -105,8 +105,8 @@ any real duplicates in it first.
 
 ## Common Problems
 
-- Problem: "Suggestions need access to duplicate record sets, which Salesforce gives only to
-  Sales Cloud and Service Cloud licenses. ..." You do not have the BarnCRM Duplicate Review
+- Problem: "Possible duplicates can be listed only for people with a Sales Cloud or Service
+  Cloud license. Duplicate rules still check records as they are saved." You do not have the BarnCRM Duplicate Review
   add-on, or your license cannot have it. Ask a colleague with one of those licenses to
   review.
 - Problem: "You can see this list. Scanning, dismissing and merging here need the Manage

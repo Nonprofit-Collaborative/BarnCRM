@@ -93,6 +93,36 @@
     </customErrorMessages>
   </customErrors>
   <decisions>
+    <description>Ends the flow when the BarnCRM Automation Control setting has Pause All or Bypass on for the person saving, as BarnCRM's own automation does.</description>
+    <name>Automation_Control</name>
+    <label>Automation control</label>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <defaultConnector>
+      <targetReference>Settle_Status</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>Runs</defaultConnectorLabel>
+    <rules>
+      <name>Paused_Or_Bypassed</name>
+      <conditionLogic>or</conditionLogic>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Pause_All__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Bypass__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <label>Paused or bypassed</label>
+    </rules>
+  </decisions>
+  <decisions>
     <description>An affiliation names exactly one person (a contact or a person held as an account, not both), names an organization, and the person is not the organization.</description>
     <name>Check_People</name>
     <label>Check people</label>
@@ -350,7 +380,7 @@
     <locationX>50</locationX>
     <locationY>0</locationY>
     <connector>
-      <targetReference>Settle_Status</targetReference>
+      <targetReference>Automation_Control</targetReference>
     </connector>
     <filterFormula>OR(ISNEW(), ISCHANGED({!$Record.Contact__c}), ISCHANGED({!$Record.Person_Account__c}), ISCHANGED({!$Record.Organization__c}), ISCHANGED({!$Record.Role__c}), ISCHANGED({!$Record.Start_Date__c}), ISCHANGED({!$Record.End_Date__c}), ISCHANGED({!$Record.Status__c}), ISCHANGED({!$Record.Is_Primary__c}))</filterFormula>
     <object>Affiliation__c</object>

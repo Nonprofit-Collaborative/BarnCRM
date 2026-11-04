@@ -1,6 +1,7 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import getModifyAllReport from '@salesforce/apex/AccessExplorerController.getModifyAllReport';
 import { format, messageFrom, downloadCsv } from 'c/findCsv';
+import { barnName, shownColumns } from 'c/accessExplorerRows';
 
 import DATA_HEADING from '@salesforce/label/c.Core_AccessModifyAll_DataHeading';
 import OBJECTS_HEADING from '@salesforce/label/c.Core_AccessCompare_KindsHeading';
@@ -45,6 +46,9 @@ const yes = (value) => (value ? YES : '');
  * Read only; shown inside Access Explorer, which only administrators reach.
  */
 export default class AccessModifyAll extends LightningElement {
+  /** Show the API Name column (Access Explorer's toggle). */
+  @api showTechnicalNames = false;
+
   helpReady = isHelpLoaded('Core');
 
   labels = {
@@ -86,6 +90,10 @@ export default class AccessModifyAll extends LightningElement {
   get tables() {
     const grants = this.report ? this.report.dataGrants : [];
     const objects = this.report ? this.report.objects : [];
+    const patterns = {
+      role: helpText('Core', 'Core_AccessExplorer_RoleName'),
+      extraPermission: helpText('Core', 'Core_AccessExplorer_ExtraPermissionName')
+    };
     return {
       data: {
         columns: [
@@ -100,6 +108,7 @@ export default class AccessModifyAll extends LightningElement {
         rows: grants.map((grant) => ({
           ...grant,
           key: grant.id,
+          label: barnName(grant.label, grant.barnKind, patterns),
           kindLabel: KINDS[grant.kind] || '',
           modifyAllDataText: yes(grant.modifyAllData),
           viewAllDataText: yes(grant.viewAllData || grant.modifyAllData),
@@ -107,20 +116,24 @@ export default class AccessModifyAll extends LightningElement {
         }))
       },
       objects: {
-        columns: [
-          column('objectLabel', KIND_OF_RECORD),
-          column('objectName', COL_API_NAME),
-          column('scopeLabel', COL_SCOPE),
-          column('holder', COL_NAME),
-          column('kindLabel', COL_KIND),
-          column('modifyAllText', COL_MODIFY_ALL),
-          column('viewAllText', COL_VIEW_ALL),
-          column('inGroups', COL_IN_GROUPS, { wrapText: true }),
-          column('activePeople', COL_ACTIVE_PEOPLE, { type: 'number' })
-        ],
+        columns: shownColumns(
+          [
+            column('objectLabel', KIND_OF_RECORD),
+            column('objectName', COL_API_NAME, { technical: true }),
+            column('scopeLabel', COL_SCOPE),
+            column('holder', COL_NAME),
+            column('kindLabel', COL_KIND),
+            column('modifyAllText', COL_MODIFY_ALL),
+            column('viewAllText', COL_VIEW_ALL),
+            column('inGroups', COL_IN_GROUPS, { wrapText: true }),
+            column('activePeople', COL_ACTIVE_PEOPLE, { type: 'number' })
+          ],
+          this.showTechnicalNames
+        ),
         rows: objects.map((row) => ({
           ...row,
           key: `${row.objectName}:${row.holderId}`,
+          holder: barnName(row.holder, row.barnKind, patterns),
           scopeLabel: SCOPES[row.scope] || '',
           kindLabel: KINDS[row.kind] || '',
           modifyAllText: yes(row.modifyAll),

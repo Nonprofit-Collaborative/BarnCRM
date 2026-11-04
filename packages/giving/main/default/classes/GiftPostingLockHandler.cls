@@ -16,25 +16,25 @@ public with sharing class GiftPostingLockHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        GiftPostingLock.enforceOnInsert((List<Gift__c>) Trigger.new);
+        GiftPostingLock.enforceOnInsert((List<Gift__c>) newRecords());
     }
 
     public override void afterInsert() {
-        GiftPostingLock.enforceOnRestore((List<Gift__c>) Trigger.new, false);
+        GiftPostingLock.enforceOnRestore((List<Gift__c>) newRecords(), false);
     }
 
     public override void beforeUpdate() {
         GiftPostingLock.enforceOnUpdate(
-            (List<Gift__c>) Trigger.new,
-            (Map<Id, Gift__c>) Trigger.oldMap
+            (List<Gift__c>) newRecords(),
+            (Map<Id, Gift__c>) oldRecordsById()
         );
     }
 
     public override void beforeDelete() {
-        GiftPostingLock.enforceOnDelete((List<Gift__c>) Trigger.old);
+        GiftPostingLock.enforceOnDelete((List<Gift__c>) oldRecords());
     }
 
     public override void afterUndelete() {
-        GiftPostingLock.enforceOnRestore((List<Gift__c>) Trigger.new, true);
+        GiftPostingLock.enforceOnRestore((List<Gift__c>) newRecords(), true);
     }
 }

@@ -45,7 +45,7 @@ The admin user holds **BarnCRM Erase People** from the create script. It is in n
 ## T-ERASE-03: Erase the Only Member of a Household
 
 **Purpose:** Confirm a household left empty is kept and made anonymous when empty households are not deleted.
-**Prerequisites:** admin. **Delete Empty Households** off in **BarnCRM Settings**, **People and Households** (the default). Create a contact `Erin Erasetest` with an email, phone and mailing address; a household of its own is created for it.
+**Prerequisites:** admin. **Delete empty households** off in **BarnCRM Settings**, **People and Households** (the default). Create a contact `Erin Erasetest` with an email, phone and mailing address; a household of its own is created for it.
 
 | Step | Action | Expected result |
 |---|---|---|

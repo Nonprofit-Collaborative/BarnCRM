@@ -18,7 +18,7 @@ Notifications are on from the day BarnCRM is installed. There is nothing to set 
 To turn them off for everyone:
 
 1. Open the **BarnCRM Settings** tab and choose the **General** section.
-2. Clear **Send Long Job Notifications**.
+2. Clear **Send long job notifications**.
 3. Click **Save**.
 
 Jobs still run and still record what they did on their own page or record; only the
@@ -49,7 +49,7 @@ Start with no sample data loaded.
   swap run on a schedule and send nothing; their results
   are on the Hub and the settings pages as before. With Giving, the nightly acknowledgment
   send and the nightly donor level pass are quiet in the same way. Clicking **Run Now** or **Recalculate** on
-  those pages does send one, because you are waiting for it. A field utilization count runs on
+  those pages does send one, because you are waiting for it. A Field Use count runs on
   its own tab while you watch it, so it sends none.
 - **One notification per job**, when the whole job is over: an import undo that runs in several
   passes, or a rollup recalculation across several kinds of record, sends one at the end.

@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Where Used: the setup record works on this whole object.</shortDescription>
-        <value>Works on this object</value>
+        <value>Works on this kind of record</value>
     </labels>
     <labels>
         <fullName>Core_WhereUsed_PartFilter</fullName>
@@ -257,14 +257,6 @@
         <value>No BarnCRM setup uses this field.</value>
     </labels>
     <labels>
-        <fullName>Core_WhereUsed_NoneObject</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Where Used result when nothing works on the object.</shortDescription>
-        <value>No BarnCRM setup uses this object.</value>
-    </labels>
-    <labels>
         <fullName>Core_WhereUsed_Count</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -302,7 +294,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that switches Where Used to the whole object.</shortDescription>
-        <value>Show Uses of the Whole Object</value>
+        <value>Show Uses of the Whole Kind of Record</value>
     </labels>
     <labels>
         <fullName>Core_WhereUsed_ShowField</fullName>

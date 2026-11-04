@@ -58,7 +58,9 @@ and undo deadline. In reports and list views look for **Data Jobs**; the object'
 A few things are worth knowing before your first large file:
 
 1. Open **BarnCRM Settings** and choose **Import**.
-2. **Rows per chunk** controls how many rows are processed at a time. Leave it at 200.
+2. **Records per batch in imports** controls how many rows are processed at a time. Leave it at 200.
+   A row that BarnCRM's own automation cannot handle is rejected on its own; the other rows of its
+   batch still load ([When Automation Fails on One Record](automation-control.md#when-automation-fails-on-one-record)).
    Lower it to 50 if your org has a lot of custom automation and an import fails with a
    limit error; raise it only if a very large file is running slowly and nothing else
    fires on save.
@@ -67,7 +69,7 @@ A few things are worth knowing before your first large file:
    **Rows in a trial import** is how many of a file's first rows **Try the First Rows**
    imports before the rest (section 3, step 8). It is 25 unless you change it, from 1 to
    2,000, and the wizard lets you change it for one file.
-4. **Delete Import Rows** is **After 30 Days** unless you change it to **Once Complete**,
+4. **Delete import rows** is **After 30 Days** unless you change it to **Once Complete**,
    **After 90 Days** or **Never**. See [How long the rows are kept](#how-long-the-rows-are-kept).
 5. **Import** on the same page has an **Open Import** button, which is the same
    place the **Import** tab takes you.
@@ -330,7 +332,7 @@ affects imports you run afterwards.
 Every row of every file is kept as an Import Row so you can see what happened to it, correct
 and retry a rejected row ([Super Importer rows](import-rows.md)), download the rejected rows
 and check what a re-import changed. Rows take storage, so a nightly job deletes the rows of a
-complete import (Complete, Failed or undone) by **Delete Import Rows** in **BarnCRM
+complete import (Complete, Failed or undone) by **Delete import rows** in **BarnCRM
 Settings**, **Import**:
 
 | Choice | The rows of a complete import are deleted |
@@ -977,7 +979,11 @@ file of the same kind is fixed too.
 
 1. On the columns step, select **Change Values** beside a column.
 2. Select **Add a Change** and pick one. Changes run in the order listed, and you can add up
-   to ten to one column:
+   to ten to one column. To change the order, use the **Move Up** and **Move Down** arrows
+   beside a change, or drag it by its handle (mouse or pen; on a touch screen press and hold
+   the handle first). With the keyboard, focus the handle, press Space, use the arrow keys and
+   press Space again; Escape cancels. The preview updates and a screen reader hears the new
+   position:
 
 | Change | What it does | Example |
 |---|---|---|

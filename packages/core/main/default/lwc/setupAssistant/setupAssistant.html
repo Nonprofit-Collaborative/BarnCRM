@@ -1,7 +1,7 @@
 <template>
     <template lwc:if={helpReady}>
     <template lwc:if={errorMessage}>
-        <p class="slds-text-color_error slds-var-m-bottom_small" role="alert">{errorMessage}</p>
+        <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
     </template>
 
     <template lwc:if={isReadOnly}>
@@ -21,25 +21,19 @@
         <ul class="slds-has-dividers_bottom-space">
             <template for:each={stepRows} for:item="step">
                 <li key={step.key} class="slds-item slds-var-p-vertical_xx-small" data-id="summary-row">
-                    <lightning-badge class={step.badgeClass} label={step.badge}></lightning-badge>
+                    <c-barn-status-badge status={step.badgeStatus} label={step.badge}></c-barn-status-badge>
                     <span class="slds-var-m-left_x-small">{step.position}. {step.label}</span>
                 </li>
             </template>
         </ul>
+        <!-- Reopen Setup is the only button here (admin-16); Start Setup Again is in the
+             reopened checklist, behind a confirmation. -->
         <lightning-button
             class="slds-var-m-top_small"
             label={labels.reopen}
             data-id="reopen"
             onclick={handleReopen}
         ></lightning-button>
-        <template lwc:if={canEdit}>
-            <lightning-button
-                class="slds-var-m-top_small slds-var-m-left_x-small"
-                label={labels.startAgain}
-                data-id="start-again"
-                onclick={handleReset}
-            ></lightning-button>
-        </template>
     </template>
 
     <template lwc:if={showPanels}>
@@ -75,11 +69,11 @@
                                             {step.position}. {step.label}
                                         </button>
                                     </h3>
-                                    <lightning-badge
-                                        class={step.badgeClass}
+                                    <c-barn-status-badge
+                                        status={step.badgeStatus}
                                         label={step.badge}
                                         data-id="badge"
-                                    ></lightning-badge>
+                                    ></c-barn-status-badge>
                                 </div>
                             </div>
                         </div>
@@ -194,7 +188,7 @@
                                     </template>
                                     <template lwc:else>
                                         <p class="slds-text-body_small slds-var-m-top_x-small" data-id="import-missing">
-                                            {labels.importMissing}
+                                            {importMissing}
                                         </p>
                                     </template>
                                     <template lwc:if={showSampleDataPanel}>
@@ -252,6 +246,15 @@
                 </li>
             </template>
         </ol>
+        <template lwc:if={canStartAgain}>
+            <lightning-button
+                class="slds-var-m-top_small"
+                variant="base"
+                label={labels.startAgain}
+                data-id="start-again"
+                onclick={handleReset}
+            ></lightning-button>
+        </template>
     </template>
     </template>
 </template>

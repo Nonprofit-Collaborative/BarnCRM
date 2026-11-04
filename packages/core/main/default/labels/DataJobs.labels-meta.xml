@@ -61,8 +61,8 @@
         <categories>DataJobs</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data job history: the kind of a job that imported a file</shortDescription>
-        <value>Import</value>
+        <shortDescription>Data job history: kind of a job that imported a file (the import tool's name)</shortDescription>
+        <value>Super Importer</value>
     </labels>
     <labels>
         <fullName>Core_DataJobs_ImportSummary</fullName>

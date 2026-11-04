@@ -208,7 +208,7 @@ describe('c-access-explorer', () => {
     expect(byId(element, 'subject').textContent).toBe(
       'Pat Doe (Standard User, c.Core_MatchLogic_Inactive)'
     );
-    expect(all(element, '[data-id="all-data"]').map((note) => note.textContent)).toEqual([
+    expect(all(element, '[data-id="all-data"]').map((note) => note.message)).toEqual([
       'System Administrator gives Modify All Data.'
     ]);
     const sources = byId(element, 'sources').data;
@@ -277,12 +277,10 @@ describe('c-access-explorer', () => {
       '',
       'Description__c'
     ]);
-    expect(byId(element, 'truncated').textContent).toBe('More than 2,000 give access.');
+    expect(byId(element, 'truncated').message).toBe('More than 2,000 give access.');
     expect(byId(element, 'grants').data[0]).toMatchObject({ kindLabel: 'Group', activePeople: 3 });
     expect(byId(element, 'grants').columns).toHaveLength(9);
-    expect(byId(element, 'may-miss-people').textContent).toBe(
-      'c.Core_AccessExplorer_MayMissPeople'
-    );
+    expect(byId(element, 'may-miss-people').message).toBe('c.Core_AccessExplorer_MayMissPeople');
 
     byId(element, 'show-more').click();
     await flush();
@@ -347,19 +345,59 @@ describe('c-access-explorer', () => {
       label: 'BarnCRM Admin',
       activePeople: 2
     });
-    expect(byId(element, 'tab-check').textContent).toBe(
-      'c.Core_AccessExplorer_TabCheckNotScheduled'
-    );
+    expect(byId(element, 'tab-check').message).toBe('c.Core_AccessExplorer_TabCheckNotScheduled');
 
     one(element, 'lightning-button[data-table="barncrm"]').click();
     await flush();
     const text = await readCsv(csv);
     expect(text).toContain('BarnCRM Admin');
-    expect(byId(element, 'notice').textContent).toBe('Downloaded 1 rows.');
+    expect(byId(element, 'notice').message).toBe('Downloaded 1 rows.');
 
     await choose(element, 'view', 'subject');
     await choose(element, 'view', 'barncrm');
     expect(getOverview).toHaveBeenCalledTimes(1);
+  });
+
+  it('names roles and extra permissions as the Access page does, and hides API names until asked', async () => {
+    setHelpTextForTest({
+      Core_AccessExplorer_RoleName: '{0} (BarnCRM role)',
+      Core_AccessExplorer_ExtraPermissionName: '{0} (extra permission)'
+    });
+    getOverview.mockResolvedValue({
+      sets: [
+        { id: '0PS1', label: 'Team Member', name: 'Team', kind: 'group', barnKind: 'role' },
+        {
+          id: '0PS2',
+          label: 'BarnCRM Bulk Update',
+          name: 'BarnCRM_Bulk_Update',
+          kind: 'permissionSet',
+          barnKind: 'extraPermission'
+        },
+        { id: '0PS3', label: 'BarnCRM Staff', name: 'BarnCRM_Staff', kind: 'permissionSet' }
+      ],
+      tabAccessCheckScheduled: false
+    });
+    const element = await render();
+    await choose(element, 'view', 'barncrm');
+
+    const table = byId(element, 'barncrm');
+    expect(table.data.map((row) => row.label)).toEqual([
+      'Team Member (BarnCRM role)',
+      'BarnCRM Bulk Update (extra permission)',
+      'BarnCRM Staff'
+    ]);
+    expect(table.data[0].kindLabel).toBe('Group');
+    expect(table.columns.map((column) => column.fieldName)).not.toContain('name');
+    expect(table.columns.some((column) => 'technical' in column)).toBe(false);
+
+    const toggle = byId(element, 'technical-names');
+    toggle.checked = true;
+    toggle.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(byId(element, 'barncrm').columns.map((column) => column.fieldName)).toContain('name');
+
+    await choose(element, 'view', 'change');
+    expect(byId(element, 'change').showTechnicalNames).toBe(true);
   });
 
   it('offers Compare Two and the Modify All Report as views', async () => {
@@ -390,6 +428,6 @@ describe('c-access-explorer', () => {
     const element = await render();
     await choose(element, 'view', 'barncrm');
 
-    expect(byId(element, 'error').textContent).toBe('You need the permission.');
+    expect(byId(element, 'error').message).toBe('You need the permission.');
   });
 });

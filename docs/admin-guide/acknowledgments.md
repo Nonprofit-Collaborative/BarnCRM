@@ -22,7 +22,7 @@ the thank you is yours to write and rewrite, and the receipt is not.
 Everything is in the app, with one exception noted at step 3.
 
 1. Open **BarnCRM Settings**, then **Giving**, then **Acknowledgments**.
-2. Turn on **Send Gift Acknowledgments**. Nothing is queued until you do, because a thank you sent
+2. Turn on **Send gift acknowledgments**. Nothing is queued until you do, because a thank you sent
    with the wrong wording cannot be recalled.
 3. Decide what your emailed thank you says. The wording lives in a standard Salesforce email
    template, which means you get the normal editor, the preview, and the test send.
@@ -56,7 +56,7 @@ Everything is in the app, with one exception noted at step 3.
 Start with the sample data loaded (see [sample-data.md](sample-data.md)).
 
 1. Open **BarnCRM Settings**, then **Giving**, then **Acknowledgments**. Turn on
-   **Send Gift Acknowledgments**.
+   **Send gift acknowledgments**.
 2. Choose **New Rule**. Name it `Everything else`, order `100`, channel `Email`, and choose
    **BarnCRM: thank you for your gift** as the email template. Save.
 3. Choose **New Rule** again. Name it `Major gifts`, order `10`, channel `Letter`, minimum

@@ -1,6 +1,6 @@
 <template>
     <template lwc:if={errorMessage}>
-        <p class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">{errorMessage}</p>
+        <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
     </template>
     <p class="slds-var-m-bottom_small" role="status" aria-live="polite" data-id="status">{statusMessage}</p>
 

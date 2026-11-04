@@ -1,0 +1,102 @@
+/* The builder as a left-to-right diagram on a wide screen, stacked columns on a phone. */
+.diagram {
+  display: flex;
+  flex-direction: column;
+}
+
+.diagram__step {
+  display: flex;
+  flex-direction: column;
+}
+
+.diagram__column {
+  min-width: 0;
+  margin-bottom: var(--slds-g-spacing-3, 0.75rem);
+}
+
+.column__heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.separator {
+  display: flex;
+  justify-content: center;
+  padding: var(--slds-g-spacing-1, 0.25rem);
+}
+
+.separator__across {
+  display: none;
+}
+
+/* A part as a compact tile: two lines of its name, then an ellipsis. */
+.part {
+  display: block;
+  width: stretch;
+  text-align: left;
+  margin-bottom: var(--slds-g-spacing-1, 0.25rem);
+  padding: var(--slds-g-spacing-2, 0.5rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  background: var(--slds-g-color-surface-container-1, #ffffff);
+  color: var(--slds-g-color-on-surface-2, #2e2e2e);
+  cursor: pointer;
+}
+
+.part:focus-visible {
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-brand-base-50, #0176d3);
+  outline-offset: var(--slds-g-sizing-border-2, 2px);
+}
+
+.part__name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.part_selected {
+  background: var(--slds-g-color-brand-base-50, #0176d3);
+  border-color: var(--slds-g-color-brand-base-50, #0176d3);
+  color: var(--slds-g-color-on-accent-1, #ffffff);
+}
+
+.part_linked {
+  border: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.part_dimmed {
+  opacity: 0.6;
+}
+
+@media (min-width: 64em) {
+  .diagram {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .diagram__step {
+    flex: 1 1 0;
+    flex-direction: row;
+    min-width: var(--barn-diagram-step-min-width, 9rem);
+  }
+
+  .diagram__column {
+    flex: 1 1 0;
+  }
+
+  .separator {
+    align-items: flex-start;
+    padding-top: var(--slds-g-spacing-1, 0.25rem);
+  }
+
+  .separator__across {
+    display: block;
+  }
+
+  .separator__down {
+    display: none;
+  }
+}

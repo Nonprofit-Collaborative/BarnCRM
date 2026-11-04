@@ -75,7 +75,8 @@ describe('c-automation-control without the settings permission', () => {
     expect(notice).not.toBeNull();
     expect(notice.textContent).toContain('Manage BarnCRM Settings');
     expect(element.shadowRoot.querySelector('[data-id="pause-button"]').disabled).toBe(true);
-    expect(element.shadowRoot.querySelector('[data-id="resume-button"]').disabled).toBe(true);
+    // Running, so Resume is not offered at all (admin-12).
+    expect(element.shadowRoot.querySelector('[data-id="resume-button"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="pause-hours"]').disabled).toBe(true);
     expect(element.shadowRoot.querySelector('.automation-toggle').disabled).toBe(true);
   });

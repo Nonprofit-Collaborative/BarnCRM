@@ -41,7 +41,7 @@ The copy runs as the user who scheduled it, and Salesforce shows the trail only 
 the **View Setup and Configuration** permission (every System Administrator has it). If that
 user cannot read the trail, the run copies nothing and writes one entry in the Error Log.
 
-**Days to Keep Setup Changes** is in the **Org Optimizer** section of **BarnCRM Settings**: 730
+**Days to keep setup changes** is in the **Org Optimizer** section of **BarnCRM Settings**: 730
 (two years) unless you change it, from 180 to 3,650. Each night, after copying, the job deletes
 kept changes older than that. Each kept change uses about 2 KB of data storage, which **Storage
 and Limits** counts.

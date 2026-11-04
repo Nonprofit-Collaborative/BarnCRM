@@ -16,13 +16,13 @@ public with sharing class CampaignSyncTriggerHandler extends TriggerHandler {
     }
 
     public override void beforeInsert() {
-        CampaignSyncService.syncBeforeSave((List<Appeal__c>) Trigger.new, null);
+        CampaignSyncService.syncBeforeSave((List<Appeal__c>) newRecords(), null);
     }
 
     public override void beforeUpdate() {
         CampaignSyncService.syncBeforeSave(
-            (List<Appeal__c>) Trigger.new,
-            (Map<Id, Appeal__c>) Trigger.oldMap
+            (List<Appeal__c>) newRecords(),
+            (Map<Id, Appeal__c>) oldRecordsById()
         );
     }
 }
