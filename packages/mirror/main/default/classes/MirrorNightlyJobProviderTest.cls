@@ -1,9 +1,8 @@
 /**
- * Mirror's nightly job as Health Check sees it (ADR-0075, health-check-schedules-every-nightly-job):
- * the Opportunity mirror's run is listed only while a direction is chosen, and scheduling it
- * twice leaves one job.
+ * Mirror's steps of the nightly run (ADR-NEXT nightly-job-dispatcher): the Opportunity mirror's
+ * run is in tonight's run only while a direction is chosen, and its page switches it on and off.
  */
-@IsTest(testFor='ApexClass:MirrorNightlyJobProvider')
+@IsTest(testFor='ApexClass:MirrorNightlyJobProvider, ApexClass:OpportunityMirrorSchedulable')
 private class MirrorNightlyJobProviderTest {
     @TestSetup
     static void createTestUser() {
@@ -16,106 +15,75 @@ private class MirrorNightlyJobProviderTest {
         upsert settings;
     }
 
-    /** The org's own mirror job, if an administrator scheduled it, would be counted otherwise. */
-    private static void clearOrgMirrorJob() {
-        TestDataFactory.clearScheduledJobs(
-            new List<String>{ OpportunityMirrorSchedulable.JOB_NAME }
-        );
-        ScheduledJobSelector.forget();
-    }
-
-    private static Integer mirrorTriggerCount() {
-        return [
-            SELECT COUNT()
-            FROM CronTrigger
-            WHERE CronJobDetail.Name = :OpportunityMirrorSchedulable.JOB_NAME
-        ];
+    private static NightlyStep opportunityStep() {
+        for (NightlyStep step : new MirrorNightlyJobProvider().nightlySteps()) {
+            if (step.key == OpportunityMirrorSchedulable.JOB_NAME) {
+                return step;
+            }
+        }
+        return null;
     }
 
     @IsTest
-    static void listsNothingWhileTheMirrorIsOff() {
+    static void bothMirrorsAreStepsAtTheirTimes() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            List<NightlyStep> steps = new MirrorNightlyJobProvider().nightlySteps();
+
+            Assert.areEqual(2, steps.size(), 'The Opportunity and Gift Transaction mirrors.');
+            Assert.areEqual(90, steps[0].minute, '1:30');
+            Assert.areEqual(95, steps[1].minute, '1:35');
+            Assert.areEqual(System.Label.Mirror_NightlyJob_MirrorName, steps[0].label);
+            Assert.isTrue(steps[0].switchDefault, 'Shipped on.');
+        }
+    }
+
+    @IsTest
+    static void theMirrorRunIsLeftOutWhileTheMirrorIsOff() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             choose(OpportunityMirrorService.OFF);
 
-            Assert.isTrue(
-                new MirrorNightlyJobProvider().nightlyJobs().isEmpty(),
-                'A mirror that is Off has no run worth scheduling.'
+            Assert.isFalse(
+                NightlyJobs.isOn(opportunityStep()),
+                'A mirror that is Off has no run worth doing.'
             );
         }
     }
 
     @IsTest
-    static void listsNothingWhenNoDirectionHasEverBeenChosen() {
+    static void theMirrorRunIsInTonightsRunOnceADirectionIsChosen() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Assert.isTrue(new MirrorNightlyJobProvider().nightlyJobs().isEmpty());
-        }
-    }
-
-    @IsTest
-    static void listsTheMirrorRunOnceADirectionIsChosen() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            clearOrgMirrorJob();
-            if (!OpportunityMirrorService.isAvailable()) {
-                // No Opportunity in this org: the provider must skip, and says so by listing nothing.
-                choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
-                Assert.isTrue(new MirrorNightlyJobProvider().nightlyJobs().isEmpty());
-                return;
-            }
             choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
-
-            List<NightlyJob> jobs = new MirrorNightlyJobProvider().nightlyJobs();
-
-            Assert.areEqual(1, jobs.size());
-            Assert.areEqual(System.Label.Mirror_NightlyJob_MirrorName, jobs[0].label());
-            Assert.isFalse(jobs[0].isScheduled(), 'Nothing is scheduled yet.');
-        }
-    }
-
-    @IsTest
-    static void schedulingTwiceLeavesOneJobAndItCountsAsScheduled() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            clearOrgMirrorJob();
-            if (!OpportunityMirrorService.isAvailable()) {
-                return;
-            }
-            choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS);
-            NightlyJob job = new MirrorNightlyJobProvider().nightlyJobs()[0];
-
-            Test.startTest();
-            job.schedule();
-            job.schedule();
-            Test.stopTest();
 
             Assert.areEqual(
-                1,
-                mirrorTriggerCount(),
-                'A second press returns the job already there.'
+                OpportunityMirrorService.isAvailable(),
+                NightlyJobs.isOn(opportunityStep()),
+                'On wherever the org has Opportunities.'
             );
-            Assert.isTrue(job.isScheduled());
         }
     }
 
     @IsTest
-    static void aScheduledRunIsNoLongerWaiting() {
-        // The run reads in user mode as whoever scheduled it, so it is scheduled by someone
-        // who holds the mirror's permission set, as on the Opportunity mirror page.
-        User maria = TestUsers.withPermissionSets(
-            new List<String>{ TestUsers.CORE_ADMIN, 'Giving_Admin', 'Opportunity_Mirror' }
-        );
-        System.runAs(maria) {
-            if (!OpportunityMirrorService.isAvailable()) {
-                return;
-            }
-            choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
-            Test.startTest();
-            OpportunityMirrorSchedulable.schedule();
-            Test.stopTest();
+    static void thePageSwitchesTheRunOnAndOff() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+            ScheduledJobSelector.forget();
+            Boolean before = OpportunityMirrorSchedulable.isScheduled();
 
-            NightlyJob job = new MirrorNightlyJobProvider().nightlyJobs()[0];
-            Assert.isTrue(
-                job.isScheduled(),
-                'The job the Opportunity mirror page scheduled is seen.'
-            );
+            Id first = OpportunityMirrorSchedulable.schedule();
+            Id second = OpportunityMirrorSchedulable.schedule();
+            ScheduledJobSelector.forget();
+            NightlyJobs.forget();
+            Boolean switchedOn = OpportunityMirrorSchedulable.isScheduled();
+            Datetime scheduledAt = OpportunityMirrorSchedulable.scheduledAt();
+            OpportunityMirrorSchedulable.stop();
+            NightlyJobs.forget();
+
+            Assert.isFalse(before, 'Not before the run is scheduled.');
+            Assert.areEqual(first, second, 'A second press returns the run already there.');
+            Assert.isTrue(switchedOn, 'Switched on.');
+            Assert.isNotNull(scheduledAt, 'Health Check sees when.');
+            Assert.isFalse(OpportunityMirrorSchedulable.isScheduled(), 'Switched off.');
+            Assert.isNull(OpportunityMirrorSchedulable.nextRunAt(), 'With no next run.');
         }
     }
 }

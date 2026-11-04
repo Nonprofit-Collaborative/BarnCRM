@@ -288,7 +288,9 @@ private class RollupsHealthCheckExtensionTest {
             User maria = HealthCheckTestHelper.mariaWithManageSettings();
             shipOneRollup(RollupService.MODE_SCHEDULED);
             RollupScheduler.jobNameInUse = TEST_JOB_NAME;
-            NightlyJobs.overrideJobsForTest(new List<NightlyJob>{ RollupScheduler.nightlyJob() });
+            NightlyJobs.overrideStepsForTest(new List<NightlyStep>{ RollupScheduler.step() });
+            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+            ScheduledJobSelector.forget();
 
             System.runAs(maria) {
                 RollupService.ensureDefaults();
@@ -309,10 +311,9 @@ private class RollupsHealthCheckExtensionTest {
                 );
 
                 HealthCheckService.Finding jobs = find(found, 'nightly_jobs_not_scheduled');
-                Assert.areEqual(
-                    new List<String>{ System.Label.Core_JobNotice_Rollups },
-                    jobs.getFixScope(),
-                    'The nightly jobs finding names the rollup run.'
+                Assert.isTrue(
+                    jobs.getFixScope().contains(System.Label.Core_NightlyJobs_Title),
+                    'The nightly jobs finding names the nightly run, which does the rollups.'
                 );
 
                 // No startTest: the scheduled run must not execute inside the test.

@@ -16,11 +16,13 @@ public with sharing class IndicatorResultsScheduler implements Schedulable {
     @TestVisible
     private static String jobNameInUse = JOB_NAME;
 
-    /** Half past three in the morning: after the rollups and the volunteer schedules. */
-    private static final String NIGHTLY_CRON = '0 30 3 * * ?';
     private static final Integer MAX_INDICATORS = 10000;
 
     public void execute(SchedulableContext context) {
+        if (context != null) {
+            // Still scheduled on its own from before the nightly run (R-NJ5).
+            NightlyJobs.adoptOldSchedules();
+        }
         refreshAll();
     }
 
@@ -45,12 +47,16 @@ public with sharing class IndicatorResultsScheduler implements Schedulable {
         return IndicatorResultsBatch.run(computed);
     }
 
-    /** The nightly job as Health Check's nightly jobs list sees it (ADR-0075). */
-    public static NightlyJob nightlyJob() {
-        return new NamedNightlyJob(
-            System.Label.LogicModels_NightlyJobs_ResultsName,
+    /**
+     * The job as a step of the nightly run (ADR-NEXT nightly-job-dispatcher): half past three in
+     * the morning, after the rollups and the volunteer schedules.
+     */
+    public static NightlyStep step() {
+        return new NightlyStep(
             jobNameInUse,
-            NIGHTLY_CRON,
+            System.Label.LogicModels_NightlyJobs_ResultsName,
+            3,
+            30,
             new IndicatorResultsScheduler()
         );
     }

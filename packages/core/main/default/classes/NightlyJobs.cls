@@ -425,6 +425,7 @@ public with sharing class NightlyJobs {
     }
 
     /** Forgets the rows and steps read, so the next question reads them again. */
+    @NamespaceAccessible
     public static void forget() {
         rowsByKey = null;
         builtSteps = null;

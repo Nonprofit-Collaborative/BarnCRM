@@ -9792,8 +9792,8 @@ Cancelled.
   applies R-SSC4 and R-SSC5 and queues `ShiftScheduleGenerator`; nightly job `ShiftScheduleBatch`,
   started at 3:00 AM by `VolunteersScheduler` (job name `BarnCRM Volunteer Schedules`; Health
   Check and the Nightly Jobs list call it "Volunteer Schedules, 3:00 AM"), which
-  `VolunteersNightlyJobProvider` (`NightlyJobProvider`) supplies, so Health Check's "Schedule all
-  nightly jobs" fix schedules it. The shift deletes of R-SSC4 and R-SSC5 and the writes to Created
+  `VolunteersNightlyJobProvider` (`NightlyStepProvider`) supplies as a step of the one nightly
+  run (Section 29ZR). The shift deletes of R-SSC4 and R-SSC5 and the writes to Created
   Through, Shifts Kept and Rebuild Pending run in system mode: they are the schedule's own bookkeeping, which a
   Coordinator or Staff user who may edit the schedule cannot do with their own delete and field
   access. Shifts are created in user mode.
@@ -11257,7 +11257,7 @@ describe. A record belongs to every period whose start and end dates hold its da
 read in the running user's time zone).
 
 **R-IN5 Refresh.** A batch, one indicator at a time, started by Refresh Results, by saving a
-computed source, and nightly (job BarnCRM Indicator Results, a `NightlyJobProvider` job). The
+computed source, and nightly (step BarnCRM Indicator Results of the nightly run, Section 29ZR). The
 query compiles as the running user; its records are read in system mode, so the result is the
 organization's figure whatever the runner's sharing. Every period that has started gets its
 Result Value (zero when no record falls in it); a period not yet started is left alone; Computed
