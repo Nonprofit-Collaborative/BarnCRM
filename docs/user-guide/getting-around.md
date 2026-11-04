@@ -99,22 +99,25 @@ Open the **BarnCRM** app and choose **Home**. As a staff member you see:
 - **What's New in BarnCRM**: what changed in the latest upgrade, with a headline and a few
   lines for each change. Read it, then click **Dismiss**. It comes back only when a later
   upgrade brings something new. Dismissing hides it for you, not for your colleagues.
-- **Welcome to BarnCRM**: a short line saying "Your households, people and organizations are
-  in the tabs above."
+- **Welcome to BarnCRM**: a short line saying "Find someone, add someone new, or pick up
+  where you left off."
+- **New Person**: opens the new person form. Fill in the name and address and save; BarnCRM
+  makes the household for you. You see this button only if you can create contacts.
 - **New Household**: creates a household with a placeholder name and opens it. The name is
   replaced automatically once you add a member. You see this button only if you can create
   and edit accounts.
-- **Quick Links**: icon tiles for **Households**, **Organizations** and **BarnCRM Settings**,
-  each with a one-line description and the same icon as its tab, opened without going back to
-  the App Launcher.
+- **Quick Links**: icon tiles for **People**, **Households**, **Organizations** and **Find**,
+  plus **Quick Gift Entry** when Giving is installed and turned on, and **BarnCRM Settings**
+  for administrators. Each has a one-line description and the same icon as its tab, and opens
+  without going back to the App Launcher.
   **Households** opens the households list even on your first day, before the **Households**
   tab has been added for you.
 - **Files That Arrive Regularly**: shown only if you can read import templates and a file is
   marked as arriving regularly, with the date it was last imported.
 
-If someone has paused automation (for example during a large import), a banner under the
+If someone has paused automation (for example during a large import), a warning under the
 welcome says "BarnCRM automation is paused. Households and greetings are not being updated
-until it resumes." It goes away by itself. Admins also see **Resume Automation** in the banner.
+until it resumes." It goes away by itself. Admins also see **Resume Automation** in the warning.
 
 Admins also see the setup checklist, a Health Check summary and status tiles with a badge
 each (for example **All Clear**, **Not Run Yet** or **Overdue**). See

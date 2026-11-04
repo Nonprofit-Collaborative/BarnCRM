@@ -111,7 +111,8 @@ person what they can act on:
 | Part of the home page | Who sees it |
 |---|---|
 | **What's New in BarnCRM**: what changed in the latest release, until you click **Dismiss** | Everyone, each person once per release |
-| **Welcome to BarnCRM** and the paused automation banner | Everyone |
+| **Welcome to BarnCRM** and the paused automation warning | Everyone |
+| **New Person** button (opens the standard new contact form; the household is made automatically) | People who can create contacts |
 | **New Household** button | People who can create and edit accounts (BarnCRM makes the household for them; nobody needs the Household record type) |
 | **Setup Checklist** (or the **Setup Complete** tile once it is finished) | Administrators |
 | **Health Check** (a summary of its last run; the full list of findings after **Run Now**) | Administrators |
@@ -120,11 +121,13 @@ person what they can act on:
 | **Seasonal Addresses Last Swapped** | Administrators |
 | **Modules** | Administrators |
 | **Files That Arrive Regularly** | Anyone who can read import templates, and only when a file is marked as arriving regularly |
-| **Quick Links** | Everyone |
+| **Quick Links**: People, Households, Organizations and Find | Everyone |
+| **Quick Gift Entry** quick link | Everyone, when Giving is installed and turned on in the Module Manager |
+| **BarnCRM Settings** quick link | Administrators |
 
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
 **BarnCRM Admin** role carries. Staff without it see a shorter page: the welcome, the
-**New Household** button, and the quick links. They are not shown a checklist they cannot
+**New Person** and **New Household** buttons, and the quick links. They are not shown a checklist they cannot
 finish or an error count for a log they cannot open. The page does not work those numbers
 out for staff at all, so it loads faster for them; if you edit the page to show an
 administrator tile to staff, it shows nothing to count.
@@ -208,8 +211,11 @@ Admin role.
 10. Look at **Modules**. It lists BarnCRM Core and each module installed in your org (with
     Giving, that is Giving), and says for each whether it is on or installed and off. Click
     **Open the Module Manager** to turn a module on or off.
-11. Use **Quick Links**, three icon tiles, to open Households, Organizations, or BarnCRM
-    Settings without going back to the app launcher.
+11. Use **Quick Links**, icon tiles, to open People, Households, Organizations, Find, Quick
+    Gift Entry (with Giving) or BarnCRM Settings without going back to the app launcher.
+12. Click **New Person** under the welcome to add someone; the household is made for them.
+    Once setup is finished, the welcome reads "Find someone, add someone new, or pick up
+    where you left off."
 
 That is the whole home page. Five minutes, and you know what is done, what is next, and
 whether anything went wrong.

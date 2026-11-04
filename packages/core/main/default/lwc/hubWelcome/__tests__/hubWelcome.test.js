@@ -91,19 +91,19 @@ describe('c-hub-welcome', () => {
     getHomeModel.emit(model());
     await settle();
 
-    expect(element.shadowRoot.querySelector('h1').textContent).toContain(
-      'Core_HubHome_WelcomeHeading'
-    );
+    const card = element.shadowRoot.querySelector('lightning-card');
+    expect(card.title).toContain('Core_HubHome_WelcomeHeading');
+    expect(card.iconName).toBe('custom:custom1');
     expect(message(element)).toContain('Core_HubHome_WelcomeMessage');
-    expect(message(element)).not.toContain('Ready');
+    expect(message(element)).not.toContain('Everyday');
   });
 
-  it('points at the tabs once setup is done', async () => {
+  it('says what the page is for once setup is done', async () => {
     const element = build();
     getHomeModel.emit(model({ stepsCompleted: 2, stepsTotal: 2 }));
     await settle();
 
-    expect(message(element)).toContain('Core_HubHome_WelcomeMessageReady');
+    expect(message(element)).toContain('Core_HubHome_WelcomeEveryday');
   });
 
   it('never tells staff to start a checklist they cannot finish', async () => {
@@ -111,7 +111,32 @@ describe('c-hub-welcome', () => {
     getHomeModel.emit(model({ canEdit: false }));
     await settle();
 
-    expect(message(element)).toContain('Core_HubHome_WelcomeMessageReady');
+    expect(message(element)).toContain('Core_HubHome_WelcomeEveryday');
+  });
+
+  it('offers New Person, opening the standard Contact New form (people-giving-7)', async () => {
+    const element = build();
+    getHomeModel.emit(model({ canCreatePerson: true }));
+    await settle();
+
+    const newPerson = element.shadowRoot.querySelector('[data-id="new-person"]');
+    expect(newPerson.variant).toBe('brand');
+    expect(button(element).variant).toBe('neutral');
+    newPerson.click();
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Contact', actionName: 'new' }
+    });
+  });
+
+  it('hides New Person from someone who cannot create contacts', async () => {
+    const element = build();
+    getHomeModel.emit(model({ canCreatePerson: false }));
+    await settle();
+
+    expect(element.shadowRoot.querySelector('[data-id="new-person"]')).toBeNull();
+    expect(button(element).variant).toBe('brand');
   });
 
   it('says so while automation is paused', async () => {
@@ -120,8 +145,8 @@ describe('c-hub-welcome', () => {
     await settle();
 
     const banner = element.shadowRoot.querySelector('[data-id="paused-banner"]');
-    expect(banner.textContent).toContain('Core_HubHome_AutomationPausedBanner');
-    expect(banner.classList).toContain('slds-alert_warning');
+    expect(banner.message).toContain('Core_HubHome_AutomationPausedBanner');
+    expect(banner.variant).toBe('warning');
   });
 
   it('offers administrators Resume Automation, opening the Automation section', async () => {
@@ -129,7 +154,9 @@ describe('c-hub-welcome', () => {
     getHomeModel.emit(model({ automationPaused: true }));
     await settle();
 
-    element.shadowRoot.querySelector('[data-id="resume-link"]').click();
+    const banner = element.shadowRoot.querySelector('[data-id="paused-banner"]');
+    expect(banner.actionLabel).toContain('Core_AutomationControl_ResumeButton');
+    banner.dispatchEvent(new CustomEvent('action'));
     await settle();
 
     expect(mockNavigate).toHaveBeenCalledWith({
@@ -144,8 +171,9 @@ describe('c-hub-welcome', () => {
     getHomeModel.emit(model({ automationPaused: true, canEdit: false }));
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="paused-banner"]')).not.toBeNull();
-    expect(element.shadowRoot.querySelector('[data-id="resume-link"]')).toBeNull();
+    const banner = element.shadowRoot.querySelector('[data-id="paused-banner"]');
+    expect(banner).not.toBeNull();
+    expect(banner.actionLabel).toBeUndefined();
   });
 
   it('says the page could not load everything when the model fails', async () => {
@@ -153,7 +181,7 @@ describe('c-hub-welcome', () => {
     getHomeModel.error();
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="load-error"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="load-error"]').message).toContain(
       'Core_HubHome_LoadErrorMessage'
     );
   });
@@ -200,7 +228,7 @@ describe('c-hub-welcome', () => {
     await settle();
 
     expect(mockNavigate).not.toHaveBeenCalled();
-    expect(element.shadowRoot.querySelector('[data-id="create-error"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="create-error"]').message).toContain(
       'You need permission'
     );
     expect(button(element).disabled).toBe(false);
@@ -215,7 +243,7 @@ describe('c-hub-welcome', () => {
     button(element).click();
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="create-error"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="create-error"]').message).toContain(
       'Core_HubHomeActions_NewHouseholdFailed'
     );
   });

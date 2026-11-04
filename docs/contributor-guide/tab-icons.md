@@ -107,6 +107,8 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 |---|---|---|---|
 | core | automationControl | custom:custom67 | BarnCRM_Settings |
 | core | errorLogTile | custom:custom53 | Error_Log__c |
+| core | hubErrors | custom:custom53 | Error_Log__c |
+| core | hubWelcome | custom:custom1 | BarnCRM_Home |
 | funders | fundersBoard | custom:custom100 | Funders_Board |
 | funders | grantAnswerLibrary | custom:custom87 | Grant_Answer__c |
 | funders | grantCalendar | custom:custom82 | Grant_Calendar |
