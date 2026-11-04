@@ -133,6 +133,14 @@ Salesforce org is needed for this job. Steps:
    use a Core label once it is unprotected) before adding one. Help and guidance prose
    is never a label: it goes in the package's help catalog (`docs/contributor-guide/ux-kit.md`,
    Help Text; ADR-NEXT `NEXT-help-text-json.md`).
+   `scripts/ci/check-apex-budget.py` fails when a package's non-test Apex, measured as the
+   org measures it (every character but comments; `@IsTest` classes excluded), passes its cap
+   (`CAPS` in the script, a little above each package's size on 2026-11-04), or when a package
+   has no cap. An org allows 6,000,000 characters for its own code and every unmanaged
+   BarnCRM package together, and scratch orgs allow 10,000,000, so only this sees growth.
+   Raise a cap only in the pull request that needs it, and say why. The trim pass targets
+   3,600,000 for the full suite and 2,000,000 for Core (the check reports the gap);
+   `--report` prints each package's size and the largest classes.
    `scripts/ci/check-help-text.py` checks those catalogs (`BarnHelp_<Package>.json`): every
    key a `helpText`, `BarnHelp.text` or `help-key` names is in its package's catalog and
    written as a literal, every catalog key is used and is not also a label, translations are
@@ -685,6 +693,49 @@ including the gate, fails at once with `UNKNOWN_EXCEPTION` before any test start
 While you iterate, use `sf apex run test --class-names <Class> --target-org <alias>` for one
 class, or the relevant-tests run above for a branch; the full run is the final run before
 merge, not the inner loop.
+
+### Release destructive manifest
+
+A source deploy adds and updates components but never deletes one. A class, label, field or
+tab a release removes stays in every org that had it, keeps counting toward the org's Apex,
+label and object limits, and can break a later compile (`barn-npc` kept 77 stale components
+in October 2026). So every release to a long-lived org (`barn-npc`, `mwdbdevsb`, and every
+organization's own org) carries a destructive manifest for what was removed since the version
+that org has:
+
+```
+python3 scripts/org/build-destructive-manifest.py <org's version> <release> \
+  --packages core,rollups --out release-<version>/destructive
+```
+
+- `<org's version>` and `<release>` are git refs (tags, branches or commits). `--packages` names
+  the packages the org has. A component that moved to another package is not removed.
+- It writes `package.xml` (empty) and `destructiveChangesPost.xml`, and prints the count per
+  type. A removed record type is printed instead (the Metadata API cannot delete one:
+  deactivate and delete it in Setup), as is any removed file whose type the script does not
+  map; either makes the exit status 1.
+- Deploy it with the release: add `--post-destructive-changes <dir>/destructiveChangesPost.xml
+  --ignore-warnings` to the release's `sf project deploy start` (the warnings are members an
+  org never had).
+- Deploy it first, on its own, when removed labels must free room before the release adds
+  labels (the label limit is checked before the deletions run) or when a stale component would
+  fail to compile against the release: `sf project deploy start --manifest <dir>/package.xml
+  --post-destructive-changes <dir>/destructiveChangesPost.xml --ignore-warnings`. A removed
+  class that an old class the release changes still calls cannot go first; it stays in the
+  release deploy.
+- Abort BarnCRM's scheduled jobs before a manifest deletes a schedulable class, and schedule
+  them again after (`deploy-packages.sh` does this for its own deploys).
+- Record the member count with the release in the org's row in the root `architecture.md`.
+
+**What a redeploy overwrites.** A source deploy replaces each shipped component whole, so an
+administrator's edit to one is lost at the next release: an object's sharing setting (a change
+to or from Private also starts a sharing recalculation), record pages, page layouts, list
+views, permission sets and groups (record type access a set no longer names is removed),
+picklist values on shipped fields, validation rules, labels, flow templates, and shipped
+custom metadata records such as `Automation_Registry__mdt` and `Setting_Definition__mdt`.
+Records, the settings saved in BarnCRM Settings, and components the organization made itself
+are kept. The Admin Guide (Installing BarnCRM, Upgrading) tells administrators to clone a
+shipped component rather than edit it.
 
 ### Tests run as a user they create
 
