@@ -3,6 +3,7 @@ import { NavigationMixin, CurrentPageReference } from 'lightning/navigation';
 import getConsoleModel from '@salesforce/apex/SettingsController.getConsoleModel';
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
 import getRecentChanges from '@salesforce/apex/SettingsController.getRecentChanges';
+import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import TITLE from '@salesforce/label/c.Core_Settings_Title';
 import NOT_SET from '@salesforce/label/c.Core_Settings_NotSet';
 import SECTIONS_HEADING from '@salesforce/label/c.Core_Settings_SectionsHeading';
@@ -37,6 +38,8 @@ import SUGGESTION from '@salesforce/label/c.Core_Settings_CompanySuggestion';
 import USE_SUGGESTION from '@salesforce/label/c.Core_Settings_UseSuggestion';
 import USE_SUGGESTION_ARIA from '@salesforce/label/c.Core_Settings_UseSuggestionAria';
 import TAB_LABEL from '@salesforce/label/c.Core_Format_Pair';
+import SECTION from '@salesforce/label/c.Core_SetupChanges_ColSection';
+import SAVES_ON_ITS_OWN from '@salesforce/label/c.Core_Settings_SavesOnItsOwn';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
 import { groupRows, findBox } from './settingsGroups';
@@ -85,6 +88,18 @@ function isHiddenPanelSetting(section, setting) {
   return Boolean(panelRowFor(section, setting.key));
 }
 const TAB_ICON = 'standard:settings';
+
+/**
+ * Rows that open a tool's one home in Org Optimizer (admin-14), by setting key: the section of
+ * the Org Optimizer tab each opens, passed as page state.
+ */
+const OPTIMIZER_SECTIONS = {
+  Health_Check_Optimizer_Link: 'healthCheck',
+  Error_Log_Optimizer_Link: 'errors'
+};
+
+/** Panels that save nothing: they get no "Saves on its own" cue (admin-18). */
+const READ_ONLY_PANELS = ['integrationsPanel'];
 
 /** A Record Type List value, stored as developer names separated by commas, as a list. */
 function splitList(text) {
@@ -176,7 +191,9 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     },
     keepAllDefaults: KEEP_ALL_DEFAULTS,
     keepDefault: KEEP_DEFAULT,
-    useSuggestion: USE_SUGGESTION
+    useSuggestion: USE_SUGGESTION,
+    section: SECTION,
+    savesOnItsOwn: SAVES_ON_ITS_OWN
   };
 
   columns = [
@@ -222,6 +239,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   /** The box a link named (P1), scrolled to once its page has rendered. */
   focusBox;
   boxRequestHandled = false;
+  /** Set when a section is chosen in the Section box, so its heading takes focus. */
+  focusSectionHeading = false;
 
   @wire(CurrentPageReference)
   handlePageReference(pageReference) {
@@ -256,6 +275,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     this.nameTab();
     this.focusChosenSetting();
     this.scrollToChosenBox();
+    this.focusFirstHeading();
   }
 
   nameTab() {
@@ -268,6 +288,15 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   /** The section list in short groups, each section with its icon, Error Log last. */
   get navigationGroups() {
     return navigationGroups(this.sections.map((section) => section.name));
+  }
+
+  /** The same sections, in the same order, for the Section box on a narrow screen (admin-19). */
+  get sectionOptions() {
+    const options = [];
+    this.navigationGroups.forEach((group) => {
+      group.items.forEach((item) => options.push({ label: item.label, value: item.name }));
+    });
+    return options;
   }
 
   get currentSection() {
@@ -334,6 +363,24 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     return Object.keys(this.pending).length;
   }
 
+  /**
+   * What the save bar covers, in words (admin-18): the unsaved rows of the section on screen,
+   * and those left in other sections, which Save sends too. Panels never count.
+   */
+  get saveBarText() {
+    const section = this.currentSection;
+    const keys = section ? section.settings.map((setting) => setting.key) : [];
+    const pendingKeys = Object.keys(this.pending);
+    const here = pendingKeys.filter((key) => keys.includes(key)).length;
+    const elsewhere = pendingKeys.length - here;
+    if (elsewhere > 0) {
+      return helpText('Core', 'Core_Settings_UnsavedInSections', here, elsewhere);
+    }
+    return here === 1
+      ? helpText('Core', 'Core_Settings_UnsavedOneInSection')
+      : helpText('Core', 'Core_Settings_UnsavedInSection', here);
+  }
+
   /** The section's rows that show a default nobody saved. */
   get unsavedDefaultRows() {
     return this.currentSettings.filter((row) => row.showsUnsavedDefault);
@@ -393,6 +440,10 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       disabled: !this.canEdit,
       ctor: this.componentTypes[setting.component],
       navigatesAway: setting.dataType === 'Component' && !setting.component,
+      navigationSection: OPTIMIZER_SECTIONS[setting.key],
+      savesOnItsOwn:
+        Boolean(this.componentTypes[setting.component]) &&
+        !READ_ONLY_PANELS.includes(setting.component),
       // The button names its destination ("Open Rollup Builder"), else the generic wording.
       openLabel: setting.navigationLabel
         ? OPEN_NAMED.replace('{0}', setting.navigationLabel)
@@ -499,20 +550,50 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     }
   }
 
-  /** Opens a module's own settings page, which lives on its own tab (ADR-0020). */
-  handleOpenSection(event) {
-    const target = event.currentTarget.dataset.target;
+  /**
+   * Opens a module's own settings page, which lives on its own tab (ADR-0020), or a tool's one
+   * home in Org Optimizer at its section (admin-14), with the state key qualified in Apex.
+   */
+  async handleOpenSection(event) {
+    const { target, section } = event.currentTarget.dataset;
     if (!target) {
       return;
     }
-    this[NavigationMixin.Navigate]({
+    const pageReference = {
       type: 'standard__navItemPage',
       attributes: { apiName: target }
-    });
+    };
+    if (section) {
+      try {
+        const link = await getSettingsLink();
+        pageReference.state = { [link.sectionKey]: section };
+      } catch {
+        // Without the key the tab still opens, on its overview.
+      }
+    }
+    this[NavigationMixin.Navigate](pageReference);
   }
 
   handleSectionSelect(event) {
     this.selectedSection = event.detail.name;
+  }
+
+  /** A section chosen in the Section box: focus moves to its first heading (admin-19). */
+  handleSectionPick(event) {
+    this.selectedSection = event.detail.value;
+    this.focusSectionHeading = true;
+  }
+
+  /** Moves focus to the open section's first box heading once it has rendered. */
+  focusFirstHeading() {
+    if (!this.focusSectionHeading) {
+      return;
+    }
+    const heading = this.template.querySelector('section[data-box] h2');
+    if (heading && typeof heading.focus === 'function') {
+      this.focusSectionHeading = false;
+      heading.focus();
+    }
   }
 
   /** First-run setup finished (ADR-0124): the edition and features changed what shows. */

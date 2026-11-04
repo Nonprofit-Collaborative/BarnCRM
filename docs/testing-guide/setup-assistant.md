@@ -46,7 +46,7 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 ## T-SA-03: Walk the First Steps: Edition, Fit and Naming
 
 **Purpose:** confirm the step list, the edition shown read-only, the fit detected, and that clicking a step, Next and Skip for Now move between steps.
-**Prerequisites:** admin user, Person Accounts org, first-run setup finished with the Nonprofit Edition. If the home page shows **Setup Complete**, click **Start Setup Again** under **Reopen Setup** first (see T-SA-06).
+**Prerequisites:** admin user, Person Accounts org, first-run setup finished with the Nonprofit Edition. If the home page shows **Setup Complete**, click **Reopen Setup**, then **Start Setup Again** under the steps, and confirm (see T-SA-06).
 **Smoke:** yes
 
 | Step | Action | Expected result |
@@ -55,7 +55,7 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 | 2 | Click **1. Choose Your Edition** in the list. | Step 1 opens in place and step 2 closes. "Edition: **Nonprofit Edition**", "The edition is chosen once." and a **How to Change It Later** link. No edition choice and no **Confirm and Continue**. "Giving is installed. Its steps are part of this setup." |
 | 3 | Click **Next**. | Step 2, **Confirm How BarnCRM Fits Your Org**: "Your org uses Person Accounts. Household membership is tracked with one record per person, so a person can be in more than one household and everything you have keeps working." **Recommended for your org**, and **How BarnCRM fits this org** set to **Standalone**. (On the platform-only shape: "This looks like a fresh org, with no other household model and no Person Accounts. BarnCRM can run on its own.") |
 | 4 | Open **How BarnCRM fits this org**. | Only **Standalone** (no NPSP or Nonprofit Cloud is in this org). |
-| 5 | Click **Confirm and Continue**. | Step 3, **Confirm How Households Are Named**, opens with the household naming panel and its preview, and "This step finishes by itself once the setting it fills in has a value." **BarnCRM Settings**, **General**, **Coexistence mode** now reads **Standalone**. |
+| 5 | Click **Confirm and Continue**. | Step 3, **Confirm How Households Are Named**, opens with the household naming panel and its preview, and "This step is marked done as soon as you save an answer." **BarnCRM Settings**, **General**, **Coexistence mode** now reads **Standalone**. |
 | 6 | Click **Next**. | Step 4 (with Giving, the default fund and appeal step; with Core alone, the access step). |
 | 7 | Click **Skip for Now**. | The next step opens. The skipped step shows a warning ring and **Skipped**. |
 | 8 | Reload the page. | The assistant opens on the skipped step again (a skipped step is not finished). |
@@ -89,9 +89,9 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Go to step 7, **Choose Which Modules to Turn On**. | Core, BarnCRM Rollup Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM Funders and BarnCRM Mirror, each **Present** or **Not installed** with **What this module does**. Then "To turn an installed module off or on, or to see what uninstalling one would delete, open the Modules section of BarnCRM Settings." |
-| 2 | Click **Next**. | Step 8, **Bring In Your Data**, with **Load the Sample Data** and **Import a Spreadsheet**. Step 7 shows as done. |
+| 2 | Click **Next**. | Step 8, **Bring In Your Data**, with **Load the Sample Data** and **Open Super Importer**. Step 7 shows as done. |
 | 3 | Click **Load the Sample Data**. | The **Sample Data** card opens inside the step with status **Loaded** and **Load Sample Data** disabled. |
-| 4 | Click **Import a Spreadsheet**. | The **Import** tab opens. Go back to **Home**. |
+| 4 | Click **Open Super Importer**. | Super Importer opens. Go back to **Home**. |
 | 5 | Click **Next** on step 8. | Step 8 shows as done. Step 9, **Check That Everything Works**, opens. With Giving, an **Enter Your First Gift** control is offered. The forward button reads **Finish**. |
 
 **Cleanup:** None.
@@ -103,10 +103,11 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On step 9, click **Finish**. | A check illustration with **You Are Ready** and "Time taken: {n} minutes", each step with a **Done** badge, **Reopen Setup** and **Start Setup Again**. |
+| 1 | On step 9, click **Finish**. | A check illustration with **You Are Ready** and "Time taken: {n} minutes", each step with a **Done** badge, and **Reopen Setup** as the only button. |
 | 2 | Reload **Home**. | A **Setup Complete** tile shows "9 of 9 steps done" and **Reopen Setup**. The welcome reads "Your households, people and organizations are in the tabs above." |
-| 3 | Click **Reopen Setup**. | The assistant opens on step 1 with your answers intact. |
-| 4 | Finish again to the completion screen. Click **Start Setup Again**. | The checklist starts from step 1. Steps whose setting already has a value (for example the identity step) still show as done. No setting is emptied: **BarnCRM Settings**, **Organization** still shows Riverside Test Trust. |
+| 3 | Click **Reopen Setup**. | The assistant opens on step 1 with your answers intact, and a **Start Setup Again** link sits under the steps. |
+| 4 | Click **Start Setup Again**, then **Cancel**. | A window asked "Clear every step's Done and Skipped mark? Your settings stay as they are."; after **Cancel** nothing changed. |
+| 5 | Click **Start Setup Again** and confirm with **Start Setup Again**. | The checklist starts from step 1. Steps whose setting already has a value (for example the identity step) still show as done. No setting is emptied: **BarnCRM Settings**, **Organization** still shows Riverside Test Trust. |
 
 **Cleanup:** None.
 
@@ -131,7 +132,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 ## T-SA-08: Load Sample Data From the App
 
 **Purpose:** confirm the load runs in the background, reports its counts and sends one notification.
-**Prerequisites:** admin user. Sample data not loaded (after T-SA-07). **Send Long Job Notifications** ticked in **BarnCRM Settings**, **General**.
+**Prerequisites:** admin user. Sample data not loaded (after T-SA-07). **Send long job notifications** ticked in **BarnCRM Settings**, **General**.
 
 | Step | Action | Expected result |
 |---|---|---|

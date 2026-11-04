@@ -61,9 +61,7 @@ export default class SetupStepModules extends LightningElement {
         module.present && module.staffTabs ? STAFF_TABS.replace('{0}', module.staffTabs) : null,
       adminTabsText:
         module.present && module.adminTabs ? ADMIN_TABS.replace('{0}', module.adminTabs) : null,
-      statusClass: module.present
-        ? 'slds-badge slds-theme_success'
-        : 'slds-badge slds-badge_inverse'
+      statusTone: module.present ? 'success' : 'neutral'
     }));
   }
 }

@@ -43,6 +43,9 @@ export default class FirstRunModal extends LightningModal {
     get modulesNote() {
       return helpText('Core', 'Core_FirstRun_ModulesNote');
     },
+    get staysOn() {
+      return helpText('Core', 'Core_FirstRun_StaysOnWarning');
+    },
     finish: FINISH,
     adminNeeded: ADMIN_NEEDED,
     close: CLOSE
@@ -98,6 +101,10 @@ export default class FirstRunModal extends LightningModal {
 
   get isChoosing() {
     return this.mode === CHOOSE;
+  }
+
+  get isAll() {
+    return this.mode === ALL;
   }
 
   get features() {

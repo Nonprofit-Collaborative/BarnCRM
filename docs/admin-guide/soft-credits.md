@@ -16,7 +16,7 @@ surprise to him.
 ## How to Turn It On
 
 1. Open **BarnCRM Settings** and choose **Giving**.
-2. Find **Auto-Create Household Soft Credits**. It is on when you install BarnCRM.
+2. Find **Auto-create household soft credits**. It is on when you install BarnCRM.
 3. Leave it on if your organization thanks and reports on households. Turn it off if you
    want soft credits only where a person entered one by hand.
 

@@ -221,11 +221,12 @@ export default class SampleDataManager extends LightningElement {
     return this.loaded ? this.labels.statusLoaded : this.labels.statusNotLoaded;
   }
 
-  get statusBadgeClass() {
+  /** The status badge's tone (c/barnStatus): running, success or neutral. */
+  get statusTone() {
     if (this.loading || this.removing) {
-      return 'slds-theme_warning';
+      return 'running';
     }
-    return this.loaded ? 'slds-theme_success' : '';
+    return this.loaded ? 'success' : 'neutral';
   }
 
   get loadDisabled() {

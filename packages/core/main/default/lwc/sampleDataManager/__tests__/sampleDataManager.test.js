@@ -98,7 +98,7 @@ describe('c-sample-data-manager', () => {
     const element = createManager();
     await flushPromises();
 
-    const readOnly = element.shadowRoot.querySelector('.slds-text-color_weak');
+    const readOnly = element.shadowRoot.querySelector('[data-id="read-only"]');
     expect(readOnly).not.toBeNull();
     expect(buttons(element).length).toBe(0);
   });
@@ -189,8 +189,8 @@ describe('c-sample-data-manager', () => {
     const element = createManager();
     await flushPromises();
 
-    const headings = element.shadowRoot.querySelectorAll('.slds-text-heading_medium');
-    const values = Array.from(headings).map((el) => el.textContent);
+    const tiles = element.shadowRoot.querySelectorAll('[data-id="tile"]');
+    const values = Array.from(tiles).map((el) => String(el.value));
     expect(values).toEqual(['200', '440', '25', '60', '80', '709']);
   });
 
@@ -201,8 +201,8 @@ describe('c-sample-data-manager', () => {
     const element = createManager();
     await flushPromises();
 
-    const captions = Array.from(element.shadowRoot.querySelectorAll('.slds-text-body_small')).map(
-      (el) => el.textContent
+    const captions = Array.from(element.shadowRoot.querySelectorAll('[data-id="tile"]')).map(
+      (el) => el.label
     );
     expect(captions[captions.length - 1]).toBe('Gifts');
   });
@@ -214,8 +214,8 @@ describe('c-sample-data-manager', () => {
     const element = createManager();
     await flushPromises();
 
-    const headings = element.shadowRoot.querySelectorAll('.slds-text-heading_medium');
-    expect(Array.from(headings).map((el) => el.textContent)).toEqual([
+    const tiles = element.shadowRoot.querySelectorAll('[data-id="tile"]');
+    expect(Array.from(tiles).map((el) => String(el.value))).toEqual([
       '200',
       '440',
       '25',
@@ -353,8 +353,9 @@ describe('c-sample-data-manager', () => {
     buttons(element)[REMOVE_BUTTON_INDEX].click();
     await flushMicrotasks();
 
-    const badge = element.shadowRoot.querySelector('span[slot="actions"] span');
-    expect(badge.textContent).toBe('c.Core_SampleData_StatusRemoving');
+    const badge = element.shadowRoot.querySelector('[data-id="status"]');
+    expect(badge.label).toBe('c.Core_SampleData_StatusRemoving');
+    expect(badge.status).toBe('running');
     expect(buttons(element)[LOAD_BUTTON_INDEX].disabled).toBe(true);
     expect(buttons(element)[REMOVE_BUTTON_INDEX].disabled).toBe(true);
     expect(Toast.show).not.toHaveBeenCalled();
@@ -362,7 +363,7 @@ describe('c-sample-data-manager', () => {
     jest.advanceTimersByTime(3000);
     await flushMicrotasks();
 
-    expect(badge.textContent).toBe('c.Core_SampleData_StatusNotLoaded');
+    expect(badge.label).toBe('c.Core_SampleData_StatusNotLoaded');
     expect(Toast.show).toHaveBeenCalledTimes(1);
     expect(Toast.show).toHaveBeenCalledWith(
       { label: 'c.Core_SampleData_RemoveSuccess', message: '', variant: 'success' },

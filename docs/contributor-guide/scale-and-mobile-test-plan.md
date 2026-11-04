@@ -67,7 +67,7 @@ and a rule switched on earlier run in the gift triggers and change the load timi
 - **Donor levels.** The feature is off until the organization turns it on, and
   `DonorLevelController.recalculate()` refuses in two cases: the running user lacks the
   `Manage_BarnCRM_Settings` custom permission (in the BarnCRM Admin permission set; a plain
-  System Administrator does not have it), or **Turn On Donor Levels** is off in the Giving settings
+  System Administrator does not have it), or **Turn on donor levels** is off in the Giving settings
   (`Donor_Levels_Enabled__c`). The 2026-10-17 run hit one of these and ran the batch directly,
   which skips the ladder. Supported start: as a user with BarnCRM Admin, open BarnCRM Settings,
   Giving, **Donor Levels**, create three rungs (for example Friend 100 to 1,000, Sustainer 1,000
