@@ -243,16 +243,22 @@ private class DataTransformTest {
             );
             Assert.isTrue(
                 found.contains(
-                    String.format(Label.Core_Transform_ErrorUnknown, new List<String>{ 'evaluate' })
+                    String.format(
+                        BarnHelp.text('Core', 'Core_Transform_ErrorUnknown'),
+                        new List<String>{ 'evaluate' }
+                    )
                 )
             );
-            Assert.isTrue(found.contains(Label.Core_Transform_ErrorNeedsText));
-            Assert.isTrue(found.contains(Label.Core_Transform_ErrorNeedsValue));
-            Assert.isTrue(found.contains(Label.Core_Transform_ErrorDateOrder));
-            Assert.isTrue(found.contains(Label.Core_Transform_ErrorTooLong));
+            Assert.isTrue(found.contains(BarnHelp.text('Core', 'Core_Transform_ErrorNeedsText')));
+            Assert.isTrue(found.contains(BarnHelp.text('Core', 'Core_Transform_ErrorNeedsValue')));
+            Assert.isTrue(found.contains(BarnHelp.text('Core', 'Core_Transform_ErrorDateOrder')));
+            Assert.isTrue(found.contains(BarnHelp.text('Core', 'Core_Transform_ErrorTooLong')));
             Assert.isTrue(
                 found.contains(
-                    String.format(Label.Core_Transform_ErrorNeedsColumns, new List<String>{ '5' })
+                    String.format(
+                        BarnHelp.text('Core', 'Core_Transform_ErrorNeedsColumns'),
+                        new List<String>{ '5' }
+                    )
                 )
             );
             Assert.isTrue(
@@ -272,7 +278,10 @@ private class DataTransformTest {
             Assert.isTrue(
                 DataTransform.problems(steps)
                     .contains(
-                        String.format(Label.Core_Transform_ErrorTooMany, new List<String>{ '10' })
+                        String.format(
+                            BarnHelp.text('Core', 'Core_Transform_ErrorTooMany'),
+                            new List<String>{ '10' }
+                        )
                     )
             );
             steps.add(step('lower'));

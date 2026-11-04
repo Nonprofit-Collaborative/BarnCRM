@@ -1,62 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_Import_ErrorParentNotSaved</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import: a record is not saved because its parent on the row was not</shortDescription>
-        <value>Not saved, because a record it points at on this row was not saved. Fix that record, then load this row again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_ErrorKeyFirstRowFailed</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import: a later row of a key loads nothing because the key's first row failed</shortDescription>
-        <value>The first row with this key was not saved, so this row was not loaded. Fix that row, then load these rows again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_LogLookupLoadedHere</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Run log: a lookup to a record the file creates; {0} is the field</shortDescription>
-        <value>{0}: a value naming a record this file creates is found when the file loads, not in the dry run.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_ErrorSeveralObjectsNone</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import: a several-object mapping lists no object</shortDescription>
-        <value>Choose at least one object to load.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_ErrorSeveralObjectsRepeated</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import: an object is listed twice; {0} is the object</shortDescription>
-        <value>{0} is listed twice. List each object once.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_ErrorSeveralObjectsDelete</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import: a several-object upload cannot delete</shortDescription>
-        <value>A file of several objects cannot delete records. Delete records of one object at a time.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_ErrorSeveralObjectsColumn</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import: a column maps to an object not loaded; {0} column, {1} object</shortDescription>
-        <value>The column {0} is mapped to {1}, which this file does not load. Map the column again.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_SeveralLinkLine</fullName>
         <categories>Import</categories>
         <language>en_US</language>

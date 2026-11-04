@@ -152,7 +152,10 @@ private class ImportNewFieldServiceTest {
                 ImportNewFieldService.start(picklist('Shirt_Size'));
                 Assert.fail('Expected a refusal');
             } catch (ImportNewFieldService.NewFieldException e) {
-                Assert.areEqual(Label.Core_ImportNewField_NoPermission, e.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_ImportNewField_NoPermission'),
+                    e.getMessage()
+                );
             }
         }
         System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
@@ -161,7 +164,10 @@ private class ImportNewFieldServiceTest {
                 ImportNewFieldController.createField(JSON.serialize(picklist('Shirt_Size')));
                 Assert.fail('Expected a refusal');
             } catch (AuraHandledException e) {
-                Assert.areEqual(Label.Core_ImportNewField_NoPermission, e.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_ImportNewField_NoPermission'),
+                    e.getMessage()
+                );
             }
         }
     }
@@ -176,7 +182,10 @@ private class ImportNewFieldServiceTest {
                 ImportNewFieldService.start(picklist('Shirt_Size'));
                 Assert.fail('Expected a refusal');
             } catch (ImportNewFieldService.NewFieldException e) {
-                Assert.areEqual(Label.Core_ImportNewField_NotConnected, e.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_ImportNewField_NotConnected'),
+                    e.getMessage()
+                );
             }
             Assert.isTrue(ImportNewFieldController.setUpConnection().canCreate);
             // Refresh Fields after creating the field in Setup.
@@ -205,7 +214,10 @@ private class ImportNewFieldServiceTest {
                 ImportNewFieldService.start(picklist('Shirt_Size'));
                 Assert.fail('Expected a refusal');
             } catch (ImportNewFieldService.NewFieldException e) {
-                Assert.areEqual(Label.Core_ImportNewField_CalloutsOff, e.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_ImportNewField_CalloutsOff'),
+                    e.getMessage()
+                );
             }
             ImportNewFieldService.calloutStatusOverride = 'Enabled';
             connection = ImportNewFieldController.getConnection();
@@ -236,7 +248,10 @@ private class ImportNewFieldServiceTest {
                 ImportNewFieldService.start(picklist(alternateEmail()));
                 Assert.fail('Expected a refusal');
             } catch (ImportNewFieldService.NewFieldException e) {
-                Assert.areEqual(Label.Core_ImportNewField_NameTaken, e.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_ImportNewField_NameTaken'),
+                    e.getMessage()
+                );
             }
         }
     }
@@ -249,7 +264,7 @@ private class ImportNewFieldServiceTest {
         for (String bad : new List<String>{ '1st', 'Two__Bars', 'Ends_', 'Has Space', '' }) {
             request.apiName = bad;
             Assert.areEqual(
-                new List<String>{ Label.Core_ImportNewField_NameInvalid },
+                new List<String>{ BarnHelp.text('Core', 'Core_ImportNewField_NameInvalid') },
                 ImportNewFieldService.problems(request),
                 bad
             );
@@ -257,13 +272,13 @@ private class ImportNewFieldServiceTest {
         request.apiName = 'Shirt_Size';
         request.values = new List<String>{ 'S', 's' };
         Assert.areEqual(
-            new List<String>{ Label.Core_ImportNewField_PicklistInvalid },
+            new List<String>{ BarnHelp.text('Core', 'Core_ImportNewField_PicklistInvalid') },
             ImportNewFieldService.problems(request)
         );
         request.type = 'Text';
         request.length = 300;
         Assert.areEqual(
-            new List<String>{ Label.Core_ImportNewField_LengthInvalid },
+            new List<String>{ BarnHelp.text('Core', 'Core_ImportNewField_LengthInvalid') },
             ImportNewFieldService.problems(request)
         );
         request.type = 'Currency';

@@ -158,7 +158,7 @@ private class ImportRelatedSchemaTest {
                 template.Target_Object__c = 'Duplicate_Dismissal__c';
                 template.Load_Operation__c = ImportObjectSchema.OPERATION_INSERT;
                 Assert.areEqual(
-                    Label.Core_Import_ErrorRelatedNeedsKey,
+                    BarnHelp.text('Core', 'Core_Import_ErrorRelatedNeedsKey'),
                     refused(),
                     'Related records need a parent key.'
                 );

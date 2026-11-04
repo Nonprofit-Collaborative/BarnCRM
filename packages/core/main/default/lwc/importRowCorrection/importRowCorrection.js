@@ -14,11 +14,7 @@ import CORRECTED_HEADER from '@salesforce/label/c.Core_ImportRow_CorrectedHeader
 import SAVE from '@salesforce/label/c.Core_ImportRow_Save';
 import RETRY_ROW from '@salesforce/label/c.Core_ImportRow_RetryRow';
 import RETRY_ALL from '@salesforce/label/c.Core_ImportRow_RetryAll';
-import FIXED_COUNT from '@salesforce/label/c.Core_ImportRow_FixedCount';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
-import SAVED from '@salesforce/label/c.Core_ImportRow_Saved';
-import RETRY_STARTED from '@salesforce/label/c.Core_ImportRow_RetryStarted';
-import NO_VALUES from '@salesforce/label/c.Core_ImportRow_NoValues';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -68,7 +64,9 @@ export default class ImportRowCorrection extends LightningElement {
     RETRY_ROW,
     RETRY_ALL,
     REFRESH,
-    NO_VALUES,
+    get NO_VALUES() {
+      return helpText('Core', 'Core_ImportRow_NoValues');
+    },
     LOADING
   };
 
@@ -141,7 +139,9 @@ export default class ImportRowCorrection extends LightningElement {
 
   get fixedCountText() {
     const count = this.hasRow ? this.row.fixedCount || 0 : 0;
-    return count > 0 ? FIXED_COUNT.replace('{0}', count) : undefined;
+    return count > 0
+      ? helpText('Core', 'Core_ImportRow_FixedCount').replace('{0}', count)
+      : undefined;
   }
 
   get controlsDisabled() {
@@ -178,7 +178,7 @@ export default class ImportRowCorrection extends LightningElement {
   async handleSave() {
     await this.run(async () => {
       await this.save();
-      this.message = SAVED;
+      this.message = helpText('Core', 'Core_ImportRow_Saved');
     });
   }
 
@@ -189,7 +189,7 @@ export default class ImportRowCorrection extends LightningElement {
         await this.save();
       }
       await retryRow({ rowId: this.recordId });
-      this.message = RETRY_STARTED;
+      this.message = helpText('Core', 'Core_ImportRow_RetryStarted');
     });
   }
 
@@ -199,7 +199,7 @@ export default class ImportRowCorrection extends LightningElement {
         await this.save();
       }
       await retryAllFixed({ rowId: this.recordId });
-      this.message = RETRY_STARTED;
+      this.message = helpText('Core', 'Core_ImportRow_RetryStarted');
     });
   }
 

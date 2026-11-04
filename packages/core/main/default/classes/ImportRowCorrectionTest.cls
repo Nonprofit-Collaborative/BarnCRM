@@ -180,7 +180,10 @@ private class ImportRowCorrectionTest {
             );
             Assert.isTrue(
                 batch.Run_Log__c.contains(
-                    String.format(Label.Core_Import_LogCorrectedRetry, new List<String>{ '1' })
+                    String.format(
+                        BarnHelp.text('Core', 'Core_Import_LogCorrectedRetry'),
+                        new List<String>{ '1' }
+                    )
                 ),
                 'The run log says so, after the commit\'s: ' + batch.Run_Log__c
             );
@@ -271,9 +274,9 @@ private class ImportRowCorrectionTest {
             Assert.areEqual(
                 new List<String>{
                     BarnHelp.text('Core', 'Core_Import_ErrorNoPermission'),
-                    Label.Core_Import_ErrorCorrectOnlyRejected,
-                    Label.Core_Import_ErrorNoFixedRows,
-                    Label.Core_Import_ErrorRetryByFileOpen
+                    BarnHelp.text('Core', 'Core_Import_ErrorCorrectOnlyRejected'),
+                    BarnHelp.text('Core', 'Core_Import_ErrorNoFixedRows'),
+                    BarnHelp.text('Core', 'Core_Import_ErrorRetryByFileOpen')
                 },
                 said
             );
@@ -297,7 +300,7 @@ private class ImportRowCorrectionTest {
         System.runAs(importer) {
             Import_Row__c row = rejectedRows()[0];
             Assert.areEqual(
-                Label.Core_Import_ErrorRetryOtherUser,
+                BarnHelp.text('Core', 'Core_Import_ErrorRetryOtherUser'),
                 ImportBatchService.retryRefusal(committed()),
                 'Retry by file stays with the committer.'
             );
@@ -395,7 +398,10 @@ private class ImportRowCorrectionTest {
                 row.Id
             );
             Assert.isFalse(view.canCorrect, 'Sharing withholds the rows.');
-            Assert.areEqual(Label.Core_Import_ErrorNoRowEditAccess, view.refusal);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Import_ErrorNoRowEditAccess'),
+                view.refusal
+            );
             List<String> said = new List<String>();
             try {
                 ImportRowCorrectionController.saveCorrections(row.Id, lastNameFix('X'));
@@ -409,8 +415,8 @@ private class ImportRowCorrectionTest {
             }
             Assert.areEqual(
                 new List<String>{
-                    Label.Core_Import_ErrorNoRowEditAccess,
-                    Label.Core_Import_ErrorNoRowEditAccess
+                    BarnHelp.text('Core', 'Core_Import_ErrorNoRowEditAccess'),
+                    BarnHelp.text('Core', 'Core_Import_ErrorNoRowEditAccess')
                 },
                 said
             );

@@ -854,7 +854,9 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             if (createdByTheCommit(record)) {
                 created.put(record.Id, record);
             } else {
-                journal.add(kept(record, Label.Core_Import_UndoKeptNotCreatedByImport));
+                journal.add(
+                    kept(record, BarnHelp.text('Core', 'Core_Import_UndoKeptNotCreatedByImport'))
+                );
             }
         }
         if (created.isEmpty()) {

@@ -190,7 +190,7 @@ public with sharing class ImportNewFieldService {
 
     private static void enforce() {
         if (!canCreate()) {
-            throw new NewFieldException(Label.Core_ImportNewField_NoPermission);
+            throw new NewFieldException(BarnHelp.text('Core', 'Core_ImportNewField_NoPermission'));
         }
     }
 
@@ -203,45 +203,48 @@ public with sharing class ImportNewFieldService {
         List<String> found = new List<String>();
         Schema.SObjectType objectType = NamespaceUtil.objectType(request.objectApiName);
         if (objectType == null || !objectType.getDescribe().isCreateable()) {
-            found.add(Label.Core_ImportNewField_ObjectInvalid);
+            found.add(BarnHelp.text('Core', 'Core_ImportNewField_ObjectInvalid'));
         }
         if (String.isBlank(request.label) || request.label.trim().length() > NAME_LIMIT) {
-            found.add(Label.Core_ImportNewField_LabelRequired);
+            found.add(BarnHelp.text('Core', 'Core_ImportNewField_LabelRequired'));
         }
         String name = request.apiName == null ? '' : request.apiName.trim();
         if (
             name.length() > NAME_LIMIT ||
             !Pattern.matches('[A-Za-z][A-Za-z0-9]*(_[A-Za-z0-9]+)*', name)
         ) {
-            found.add(Label.Core_ImportNewField_NameInvalid);
+            found.add(BarnHelp.text('Core', 'Core_ImportNewField_NameInvalid'));
         } else if (RESERVED.contains(name.toLowerCase())) {
             found.add(
-                String.format(Label.Core_ImportNewField_NameReserved, new List<String>{ name })
+                String.format(
+                    BarnHelp.text('Core', 'Core_ImportNewField_NameReserved'),
+                    new List<String>{ name }
+                )
             );
         } else if (
             objectType != null &&
             objectType.getDescribe().fields.getMap().containsKey((name + '__c').toLowerCase())
         ) {
-            found.add(Label.Core_ImportNewField_NameTaken);
+            found.add(BarnHelp.text('Core', 'Core_ImportNewField_NameTaken'));
         }
         if (!TYPES.contains(request.type)) {
-            found.add(Label.Core_ImportNewField_TypeInvalid);
+            found.add(BarnHelp.text('Core', 'Core_ImportNewField_TypeInvalid'));
         } else if (
             request.type == 'Text' &&
             (request.length == null ||
             request.length < 1 ||
             request.length > 255)
         ) {
-            found.add(Label.Core_ImportNewField_LengthInvalid);
+            found.add(BarnHelp.text('Core', 'Core_ImportNewField_LengthInvalid'));
         } else if (
             DECIMAL_TYPES.contains(request.type) &&
             (request.scale == null ||
             request.scale < 0 ||
             request.scale > 8)
         ) {
-            found.add(Label.Core_ImportNewField_ScaleInvalid);
+            found.add(BarnHelp.text('Core', 'Core_ImportNewField_ScaleInvalid'));
         } else if (request.type == 'Picklist' && !validValues(request.values)) {
-            found.add(Label.Core_ImportNewField_PicklistInvalid);
+            found.add(BarnHelp.text('Core', 'Core_ImportNewField_PicklistInvalid'));
         }
         return found;
     }
@@ -267,10 +270,10 @@ public with sharing class ImportNewFieldService {
     public static Id start(FieldRequest request) {
         enforce();
         if (!isSetUp()) {
-            throw new NewFieldException(Label.Core_ImportNewField_NotConnected);
+            throw new NewFieldException(BarnHelp.text('Core', 'Core_ImportNewField_NotConnected'));
         }
         if (!calloutsEnabled()) {
-            throw new NewFieldException(Label.Core_ImportNewField_CalloutsOff);
+            throw new NewFieldException(BarnHelp.text('Core', 'Core_ImportNewField_CalloutsOff'));
         }
         List<String> found = problems(request);
         if (!found.isEmpty()) {
@@ -299,7 +302,7 @@ public with sharing class ImportNewFieldService {
                     e,
                     logContext,
                     String.format(
-                        Label.Core_ImportNewField_ConnectionRefused,
+                        BarnHelp.text('Core', 'Core_ImportNewField_ConnectionRefused'),
                         new List<String>{ e.getMessage() }
                     )
                 );
@@ -364,7 +367,7 @@ public with sharing class ImportNewFieldService {
         }
         List<String> messages = texts(root, 'message');
         return String.format(
-            Label.Core_ImportNewField_Refused,
+            BarnHelp.text('Core', 'Core_ImportNewField_Refused'),
             new List<String>{
                 messages.isEmpty() ? response.getStatus() : String.join(messages, ' ')
             }
@@ -498,12 +501,12 @@ public with sharing class ImportNewFieldService {
                 editById.remove(parentId);
                 skipped.add(
                     String.format(
-                        Label.Core_ImportNewField_AccessSkipped,
+                        BarnHelp.text('Core', 'Core_ImportNewField_AccessSkipped'),
                         new List<String>{
                             field,
                             labelById.get(parentId),
                             String.format(
-                                Label.Core_ImportNewField_NoObjectRead,
+                                BarnHelp.text('Core', 'Core_ImportNewField_NoObjectRead'),
                                 new List<String>{ objectLabel }
                             )
                         }
@@ -542,7 +545,7 @@ public with sharing class ImportNewFieldService {
             if (!results[i].isSuccess()) {
                 skipped.add(
                     String.format(
-                        Label.Core_ImportNewField_AccessSkipped,
+                        BarnHelp.text('Core', 'Core_ImportNewField_AccessSkipped'),
                         new List<String>{
                             field,
                             labelById.get(rows[i].ParentId),
@@ -575,7 +578,7 @@ public with sharing class ImportNewFieldService {
         ];
         if (jobs.isEmpty() || jobs[0].Status == 'Failed' || jobs[0].Status == 'Aborted') {
             result.state = FAILED;
-            result.message = Label.Core_ImportNewField_JobFailed;
+            result.message = BarnHelp.text('Core', 'Core_ImportNewField_JobFailed');
             return result;
         }
         if (jobs[0].Status != 'Completed') {
@@ -589,7 +592,7 @@ public with sharing class ImportNewFieldService {
         // The job's Error Log entry arrives through ErrorLogger's event, possibly after this poll;
         // until it does, the generic message stands in for it.
         result.state = FAILED;
-        result.message = Label.Core_ImportNewField_JobFailed;
+        result.message = BarnHelp.text('Core', 'Core_ImportNewField_JobFailed');
         // The job writes its 18-character Id; the Id passed here may print as 15 characters
         // (an enqueueJob result does), so match on the 15-character prefix.
         String logContext = LOG_CONTEXT + String.valueOf(jobId).left(15) + '%';

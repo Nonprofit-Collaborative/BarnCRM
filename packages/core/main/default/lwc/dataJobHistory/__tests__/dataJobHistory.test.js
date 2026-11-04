@@ -9,6 +9,12 @@ import getDeletePage from '@salesforce/apex/BulkDeleteController.getPage';
 import undoDelete from '@salesforce/apex/BulkDeleteController.undo';
 
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_DataJobs_ImportSummaryOne: '{0} row: {1} created, {2} updated, {3} matched, {4} rejected.',
+  Core_DataJobs_ImportSummary: '{0} rows: {1} created, {2} updated, {3} matched, {4} rejected.'
+});
 
 jest.mock(
   '@salesforce/apex/DataManagerController.findToolStateKey',
@@ -78,16 +84,6 @@ jest.mock(
   {
     virtual: true
   }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataJobs_ImportSummaryOne',
-  () => ({ default: '{0} row: {1} created, {2} updated, {3} matched, {4} rejected.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataJobs_ImportSummary',
-  () => ({ default: '{0} rows: {1} created, {2} updated, {3} matched, {4} rejected.' }),
-  { virtual: true }
 );
 
 const IMPORT_JOB = {

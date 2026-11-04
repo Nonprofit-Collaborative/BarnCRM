@@ -22,8 +22,6 @@ import SHOW_DELETES from '@salesforce/label/c.Core_DataJobs_ShowDeletes';
 import KIND_IMPORT from '@salesforce/label/c.Core_DataJobs_KindImport';
 import KIND_UPDATE from '@salesforce/label/c.Core_JobNotice_BulkUpdate';
 import KIND_DELETE from '@salesforce/label/c.Core_JobNotice_BulkDelete';
-import IMPORT_SUMMARY from '@salesforce/label/c.Core_DataJobs_ImportSummary';
-import IMPORT_SUMMARY_ONE from '@salesforce/label/c.Core_DataJobs_ImportSummaryOne';
 import STARTED from '@salesforce/label/c.Core_DataJobs_Started';
 import ROW_ACTIONS from '@salesforce/label/c.Core_DataJobs_RowActions';
 import IMPORT_HEADING from '@salesforce/label/c.Core_Import_HistoryHeading';
@@ -100,7 +98,9 @@ function fromImport(batch) {
     detail: batch.fileName,
     status: batch.status,
     summary: format(
-      batch.rowCount === 1 ? IMPORT_SUMMARY_ONE : IMPORT_SUMMARY,
+      batch.rowCount === 1
+        ? helpText('Core', 'Core_DataJobs_ImportSummaryOne')
+        : helpText('Core', 'Core_DataJobs_ImportSummary'),
       batch.rowCount || 0,
       batch.created || 0,
       batch.updated || 0,

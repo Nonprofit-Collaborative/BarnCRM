@@ -63,7 +63,7 @@ private class ImportNewFieldControllerTest {
             connected('Enabled');
             ImportNewFieldService.Connection status = ImportNewFieldController.getConnection();
             Assert.isFalse(status.canCreate || status.connected, 'no Metadata Admin');
-            String refused = Label.Core_ImportNewField_NoPermission;
+            String refused = BarnHelp.text('Core', 'Core_ImportNewField_NoPermission');
             try {
                 ImportNewFieldController.setUpConnection();
                 Assert.fail('setUpConnection');
@@ -106,14 +106,14 @@ private class ImportNewFieldControllerTest {
                 ImportNewFieldController.createField(request('Shirt_Size'));
                 Assert.fail('not set up');
             } catch (Exception e) {
-                assertRefused(Label.Core_ImportNewField_NotConnected, e);
+                assertRefused(BarnHelp.text('Core', 'Core_ImportNewField_NotConnected'), e);
             }
             connected('Disabled');
             try {
                 ImportNewFieldController.createField(request('Shirt_Size'));
                 Assert.fail('callouts off');
             } catch (Exception e) {
-                assertRefused(Label.Core_ImportNewField_CalloutsOff, e);
+                assertRefused(BarnHelp.text('Core', 'Core_ImportNewField_CalloutsOff'), e);
             }
         }
     }
@@ -126,7 +126,7 @@ private class ImportNewFieldControllerTest {
                 ImportNewFieldController.createField(request('1st'));
                 Assert.fail('invalid name');
             } catch (Exception e) {
-                assertRefused(Label.Core_ImportNewField_NameInvalid, e);
+                assertRefused(BarnHelp.text('Core', 'Core_ImportNewField_NameInvalid'), e);
             }
         }
     }
@@ -158,7 +158,10 @@ private class ImportNewFieldControllerTest {
                 'Shirt_Size'
             );
             Assert.areEqual(ImportNewFieldService.FAILED, outcome.state);
-            Assert.areEqual(Label.Core_ImportNewField_JobFailed, outcome.message);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_ImportNewField_JobFailed'),
+                outcome.message
+            );
 
             outcome = ImportNewFieldController.findField('Account', alternateEmail() + '__c');
             Assert.areEqual(ImportNewFieldService.CREATED, outcome.state);

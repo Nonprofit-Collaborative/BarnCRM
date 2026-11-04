@@ -298,7 +298,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             if (rowIds != null) {
                 lines.add(
                     String.format(
-                        Label.Core_Import_LogCorrectedRetry,
+                        BarnHelp.text('Core', 'Core_Import_LogCorrectedRetry'),
                         new List<String>{ String.valueOf(rowIds.size()) }
                     )
                 );
@@ -307,7 +307,9 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             if (cleared > 0) {
                 lines.add(
                     String.format(
-                        dryRun ? Label.Core_Import_LogWouldClear : Label.Core_Import_LogCleared,
+                        dryRun
+                            ? BarnHelp.text('Core', 'Core_Import_LogWouldClear')
+                            : BarnHelp.text('Core', 'Core_Import_LogCleared'),
                         new List<String>{ String.valueOf(cleared) }
                     )
                 );

@@ -164,7 +164,9 @@ private class ImportObjectDuplicateRuleTest {
                 Assert.areEqual(MANY / 2, allAfterPreview, 'The dry run writes nothing.');
                 Assert.areEqual(MANY / 2, ticked, 'The dry run ticks the rows the rules matched.');
                 Assert.isTrue(
-                    preview.notes.contains(Label.Core_Import_LogDuplicateRuleMatchesRecords),
+                    preview.notes.contains(
+                        BarnHelp.text('Core', 'Core_Import_LogDuplicateRuleMatchesRecords')
+                    ),
                     'And says so in the run log.'
                 );
                 Assert.areEqual(preview.updated, committed.updated, 'The commit decides the same.');
@@ -222,7 +224,7 @@ private class ImportObjectDuplicateRuleTest {
                 Assert.isFalse(loaded[0].Duplicate_Rule_Match__c, 'A key match is not ticked.');
                 Assert.areEqual(
                     String.format(
-                        Label.Core_Import_ErrorDuplicateRuleKeyDiffers,
+                        BarnHelp.text('Core', 'Core_Import_ErrorDuplicateRuleKeyDiffers'),
                         new List<String>{
                             Schema.SObjectType.Duplicate_Dismissal__c.fields.Pair_Key__c.getLabel()
                         }
@@ -305,7 +307,7 @@ private class ImportObjectDuplicateRuleTest {
 
                 Assert.areEqual(1, rejected.rejected, 'Several matches reject by default.');
                 Assert.areEqual(
-                    Label.Core_Import_ErrorSeveralDuplicateRuleRecords,
+                    BarnHelp.text('Core', 'Core_Import_ErrorSeveralDuplicateRuleRecords'),
                     first.Error_Message__c,
                     'Said in words.'
                 );
@@ -362,12 +364,12 @@ private class ImportObjectDuplicateRuleTest {
                 Assert.areEqual(1, first.updated, 'The first row takes the record.');
                 Assert.areEqual(1, first.created, 'The unmatched row creates.');
                 Assert.areEqual(
-                    Label.Core_Import_ErrorDuplicateRuleRecordRepeated,
+                    BarnHelp.text('Core', 'Core_Import_ErrorDuplicateRuleRecordRepeated'),
                     loaded[2].Error_Message__c,
                     'A second row of the chunk matched to it is rejected.'
                 );
                 Assert.areEqual(
-                    Label.Core_Import_ErrorDuplicateRuleRecordRepeated,
+                    BarnHelp.text('Core', 'Core_Import_ErrorDuplicateRuleRecordRepeated'),
                     loaded[3].Error_Message__c,
                     'And one in a later chunk.'
                 );
@@ -401,7 +403,9 @@ private class ImportObjectDuplicateRuleTest {
 
                 Assert.areEqual(2, committed.created, 'Nothing is rejected: ' + rowErrors());
                 Assert.isTrue(
-                    committed.notes.contains(Label.Core_Import_LogNoDuplicateRuleRecords),
+                    committed.notes.contains(
+                        BarnHelp.text('Core', 'Core_Import_LogNoDuplicateRuleRecords')
+                    ),
                     'The run log says the rules were not asked.'
                 );
             }
@@ -459,7 +463,7 @@ private class ImportObjectDuplicateRuleTest {
                 Assert.areEqual(1, committed.updated, 'The key row still loads.');
                 Assert.areEqual(1, committed.rejected, 'The row that would create does not.');
                 Assert.areEqual(
-                    Label.Core_Import_ErrorDuplicateRulesUnavailable,
+                    BarnHelp.text('Core', 'Core_Import_ErrorDuplicateRulesUnavailable'),
                     rows()[1].Error_Message__c,
                     'Said in words.'
                 );

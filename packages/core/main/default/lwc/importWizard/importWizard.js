@@ -163,7 +163,6 @@ import getChangedValues from '@salesforce/apex/ImportController.getChangedValues
 import openRetry from '@salesforce/apex/ImportController.openRetry';
 import retryHeading from '@salesforce/label/c.Core_Import_RetryHeading';
 import retryFileLabel from '@salesforce/label/c.Core_Import_RetryFileLabel';
-import retryColumnsMissing from '@salesforce/label/c.Core_Import_RetryColumnsMissing';
 import guessBadge from '@salesforce/label/c.Core_Import_GuessBadge';
 import guessAccept from '@salesforce/label/c.Core_Import_GuessAccept';
 import guessAcceptColumn from '@salesforce/label/c.Core_Import_GuessAcceptColumn';
@@ -2593,7 +2592,10 @@ export default class ImportWizard extends LightningElement {
       }
       const missing = this.headers.filter((heading) => !headers.includes(heading));
       if (missing.length > 0) {
-        this.message = format(retryColumnsMissing, missing.join(', '));
+        this.message = format(
+          helpText('Core', 'Core_Import_RetryColumnsMissing'),
+          missing.join(', ')
+        );
         return;
       }
       this.batch = await openRetry({ batchId: this.batch.id });

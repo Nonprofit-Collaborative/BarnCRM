@@ -276,7 +276,7 @@ public with sharing class DataTransform {
         if (steps.size() > MAX_STEPS) {
             result.add(
                 String.format(
-                    Label.Core_Transform_ErrorTooMany,
+                    BarnHelp.text('Core', 'Core_Transform_ErrorTooMany'),
                     new List<String>{ String.valueOf(MAX_STEPS) }
                 )
             );
@@ -296,7 +296,7 @@ public with sharing class DataTransform {
         String op = step == null ? null : step.op;
         if (op == null || !OPERATIONS.contains(op)) {
             return String.format(
-                Label.Core_Transform_ErrorUnknown,
+                BarnHelp.text('Core', 'Core_Transform_ErrorUnknown'),
                 new List<String>{ op == null ? '' : op.abbreviate(40) }
             );
         }
@@ -306,25 +306,25 @@ public with sharing class DataTransform {
             tooLong(step.value) ||
             tooLong(step.otherwise)
         ) {
-            return Label.Core_Transform_ErrorTooLong;
+            return BarnHelp.text('Core', 'Core_Transform_ErrorTooLong');
         }
         if (step.separator != null && step.separator.length() > MAX_SEPARATOR) {
-            return Label.Core_Transform_ErrorTooLong;
+            return BarnHelp.text('Core', 'Core_Transform_ErrorTooLong');
         }
         if (op == OP_REPLACE && String.isEmpty(step.text)) {
-            return Label.Core_Transform_ErrorNeedsText;
+            return BarnHelp.text('Core', 'Core_Transform_ErrorNeedsText');
         }
         if (op == OP_IF_BLANK && String.isBlank(step.value)) {
-            return Label.Core_Transform_ErrorNeedsValue;
+            return BarnHelp.text('Core', 'Core_Transform_ErrorNeedsValue');
         }
         if (op == OP_APPEND && !namesColumns(step.columns)) {
             return String.format(
-                Label.Core_Transform_ErrorNeedsColumns,
+                BarnHelp.text('Core', 'Core_Transform_ErrorNeedsColumns'),
                 new List<String>{ String.valueOf(MAX_COLUMNS) }
             );
         }
         if (op == OP_DATE && (step.dateOrder == null || !DATE_ORDERS.contains(step.dateOrder))) {
-            return Label.Core_Transform_ErrorDateOrder;
+            return BarnHelp.text('Core', 'Core_Transform_ErrorDateOrder');
         }
         return problemWithNewer(step);
     }
@@ -336,16 +336,16 @@ public with sharing class DataTransform {
                 return mapsValues(step.pairs)
                     ? null
                     : String.format(
-                          Label.Core_Transform_ErrorNeedsPairs,
+                          BarnHelp.text('Core', 'Core_Transform_ErrorNeedsPairs'),
                           new List<String>{ String.valueOf(MAX_PAIRS) }
                       );
             }
             when 'ifThen' {
                 if (step.test == null || !TESTS.contains(step.test)) {
-                    return Label.Core_Transform_ErrorNeedsTest;
+                    return BarnHelp.text('Core', 'Core_Transform_ErrorNeedsTest');
                 }
                 return step.test != 'blank' && String.isEmpty(step.text)
-                    ? Label.Core_Transform_ErrorNeedsText
+                    ? BarnHelp.text('Core', 'Core_Transform_ErrorNeedsText')
                     : null;
             }
             when 'part' {
@@ -354,7 +354,7 @@ public with sharing class DataTransform {
                 return hasSeparator && within(step.position, 1, MAX_POSITION)
                     ? null
                     : String.format(
-                          Label.Core_Transform_ErrorPart,
+                          BarnHelp.text('Core', 'Core_Transform_ErrorPart'),
                           new List<String>{ String.valueOf(MAX_POSITION) }
                       );
             }
@@ -362,7 +362,7 @@ public with sharing class DataTransform {
                 return within(step.count, 1, MAX_TEXT)
                     ? null
                     : String.format(
-                          Label.Core_Transform_ErrorCount,
+                          BarnHelp.text('Core', 'Core_Transform_ErrorCount'),
                           new List<String>{ String.valueOf(MAX_TEXT) }
                       );
             }
@@ -372,7 +372,7 @@ public with sharing class DataTransform {
                     UNITS.contains(step.unit) &&
                     within(step.amount, -limitFor, limitFor)
                     ? null
-                    : Label.Core_Transform_ErrorShift;
+                    : BarnHelp.text('Core', 'Core_Transform_ErrorShift');
             }
             when 'digits' {
                 return digitsPatternOk(step) ? null : Label.Core_Transform_ErrorDigits;

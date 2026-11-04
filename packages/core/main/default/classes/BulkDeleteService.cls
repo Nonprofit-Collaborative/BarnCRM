@@ -125,7 +125,9 @@ public with sharing class BulkDeleteService {
             throw new BulkDeleteException(refused.getMessage());
         }
         if (!FeatureManagement.checkPermission(BulkDeleteController.PERMISSION)) {
-            throw new BulkDeleteException(System.Label.Core_Import_ErrorDeleteNeedsPermission);
+            throw new BulkDeleteException(
+                BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsPermission')
+            );
         }
         Plan result = checked(described);
         result.fromFile = true;
@@ -397,7 +399,7 @@ public with sharing class BulkDeleteService {
         if (confirmedCount != count) {
             throw new BulkDeleteException(
                 String.format(
-                    System.Label.Core_Import_ErrorDeleteCountDiffers,
+                    BarnHelp.text('Core', 'Core_Import_ErrorDeleteCountDiffers'),
                     new List<Object>{ count.format() }
                 )
             );
@@ -462,7 +464,9 @@ public with sharing class BulkDeleteService {
             type == null ||
             ImportObjectSchema.operationOf(template) != ImportObjectSchema.OPERATION_DELETE
         ) {
-            throw new BulkDeleteException(System.Label.Core_Import_ErrorNotDeleteByFile);
+            throw new BulkDeleteException(
+                BarnHelp.text('Core', 'Core_Import_ErrorNotDeleteByFile')
+            );
         }
         return type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
     }

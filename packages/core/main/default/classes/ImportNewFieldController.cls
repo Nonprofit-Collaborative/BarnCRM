@@ -101,7 +101,7 @@ public with sharing class ImportNewFieldController {
     private static void requireCreate() {
         if (!ImportNewFieldService.canCreate()) {
             throw new ImportNewFieldService.NewFieldException(
-                Label.Core_ImportNewField_NoPermission
+                BarnHelp.text('Core', 'Core_ImportNewField_NoPermission')
             );
         }
     }

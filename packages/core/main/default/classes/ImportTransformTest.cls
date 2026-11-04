@@ -161,7 +161,10 @@ private class ImportTransformTest {
 
                 Assert.isNotNull(refusal, 'A replace with nothing to find is refused.');
                 Assert.isTrue(refusal.contains('Surname'), 'The column is named: ' + refusal);
-                Assert.isTrue(refusal.contains(Label.Core_Transform_ErrorNeedsText), refusal);
+                Assert.isTrue(
+                    refusal.contains(BarnHelp.text('Core', 'Core_Transform_ErrorNeedsText')),
+                    refusal
+                );
             }
 
         }
@@ -258,7 +261,9 @@ private class ImportTransformTest {
                 'Counted as the file counts, header first.'
             );
             Assert.isTrue(good.problems.isEmpty());
-            Assert.isTrue(broken.problems.contains(Label.Core_Transform_ErrorNeedsValue));
+            Assert.isTrue(
+                broken.problems.contains(BarnHelp.text('Core', 'Core_Transform_ErrorNeedsValue'))
+            );
         }
     }
 

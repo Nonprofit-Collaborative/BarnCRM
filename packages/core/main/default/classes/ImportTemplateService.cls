@@ -98,7 +98,7 @@ public with sharing class ImportTemplateService {
     @NamespaceAccessible
     public static Import_Template__c createObjectTemplate(String name, String objectName) {
         if (String.isBlank(name)) {
-            throw new ImportException(Label.Core_Import_ErrorObjectTemplateName);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorObjectTemplateName'));
         }
         Import_Template__c template = newObjectTemplate(name, loadableObject(objectName));
         Database.insert(template, AccessLevel.USER_MODE);
@@ -117,10 +117,10 @@ public with sharing class ImportTemplateService {
         List<String> objectNames
     ) {
         if (String.isBlank(name)) {
-            throw new ImportException(Label.Core_Import_ErrorObjectTemplateName);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorObjectTemplateName'));
         }
         if (objectNames == null || objectNames.isEmpty()) {
-            throw new ImportException(Label.Core_Import_ErrorSeveralObjectsNone);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorSeveralObjectsNone'));
         }
         ImportMapping mapping = new ImportMapping();
         mapping.objects = new List<ImportMapping.ObjectStep>();
@@ -157,7 +157,7 @@ public with sharing class ImportTemplateService {
         if (!described.isAccessible() || !(creates || described.isUpdateable())) {
             throw new ImportException(
                 String.format(
-                    Label.Core_Import_ErrorObjectNoAccess,
+                    BarnHelp.text('Core', 'Core_Import_ErrorObjectNoAccess'),
                     new List<String>{ described.getLabelPlural() }
                 )
             );
@@ -204,7 +204,7 @@ public with sharing class ImportTemplateService {
     @NamespaceAccessible
     public static Import_Template__c copyTemplate(Id sourceId, String name) {
         if (String.isBlank(name)) {
-            throw new ImportException(Label.Core_Import_ErrorObjectTemplateName);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorObjectTemplateName'));
         }
         Import_Template__c source = existing(sourceId);
         if (String.isNotBlank(source.Target_Object__c)) {
@@ -290,8 +290,8 @@ public with sharing class ImportTemplateService {
                 throw new ImportException(
                     String.format(
                         byKey
-                            ? Label.Core_Import_ErrorKeyFieldUnusable
-                            : Label.Core_Import_ErrorMatchFieldUnusable,
+                            ? BarnHelp.text('Core', 'Core_Import_ErrorKeyFieldUnusable')
+                            : BarnHelp.text('Core', 'Core_Import_ErrorMatchFieldUnusable'),
                         new List<String>{ given.matchField.trim().abbreviate(80) }
                     )
                 );
@@ -323,7 +323,7 @@ public with sharing class ImportTemplateService {
             return;
         }
         if (template.Load_Operation__c == ImportObjectSchema.OPERATION_INSERT) {
-            throw new ImportException(Label.Core_Import_ErrorRelatedNeedsKey);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorRelatedNeedsKey'));
         }
         Schema.SObjectType related = ImportObjectSchema.typeNamed(chosen.substringBefore('.'));
         String refused = ImportObjectSchema.insertRefusal(related);
@@ -338,7 +338,7 @@ public with sharing class ImportTemplateService {
         if (field == null) {
             throw new ImportException(
                 String.format(
-                    Label.Core_Import_ErrorRelatedFieldUnusable,
+                    BarnHelp.text('Core', 'Core_Import_ErrorRelatedFieldUnusable'),
                     new List<String>{
                         related.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel(),
                         type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()

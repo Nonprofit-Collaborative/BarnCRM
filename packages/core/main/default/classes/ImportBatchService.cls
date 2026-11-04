@@ -203,7 +203,7 @@ public with sharing class ImportBatchService {
             if (Math.max(start - 2, 0) + rows.size() > MAX_RETRY_ROWS) {
                 throw new ImportException(
                     String.format(
-                        Label.Core_Import_ErrorRetryTooLarge,
+                        BarnHelp.text('Core', 'Core_Import_ErrorRetryTooLarge'),
                         new List<String>{ MAX_RETRY_ROWS.format() }
                     )
                 );
@@ -327,10 +327,10 @@ public with sharing class ImportBatchService {
             BulkDeleteService.OPERATION_DELETE.equals(batch.Operation__c) ||
             FieldAccessService.OPERATION_ACCESS.equals(batch.Operation__c);
         if (dataJob || !(complete || open) || isRunning(batch)) {
-            return Label.Core_Import_ErrorRetryNotOpen;
+            return BarnHelp.text('Core', 'Core_Import_ErrorRetryNotOpen');
         }
         if (!anyImporter && batch.Committed_By__c != UserInfo.getUserId()) {
-            return Label.Core_Import_ErrorRetryOtherUser;
+            return BarnHelp.text('Core', 'Core_Import_ErrorRetryOtherUser');
         }
         String undo = ImportUndoService.refusal(batch);
         if (undo != null) {
@@ -403,7 +403,7 @@ public with sharing class ImportBatchService {
                 ImportTemplateSelector.selectById(batch.Import_Template__c)
             ) == ImportObjectSchema.OPERATION_DELETE
         ) {
-            throw new ImportException(Label.Core_Import_ErrorDeleteNeedsConfirm);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsConfirm'));
         }
     }
 
@@ -565,7 +565,7 @@ public with sharing class ImportBatchService {
         }
         Set<Id> fixed = fixedRowIds(batchId, rowIds);
         if (fixed.isEmpty()) {
-            throw new ImportException(Label.Core_Import_ErrorNoFixedRows);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorNoFixedRows'));
         }
         return start(batchId, false, null, null, fixed);
     }
@@ -575,7 +575,7 @@ public with sharing class ImportBatchService {
     public static String rowRetryRefusal(Import_Batch__c batch) {
         String refused = retryRefusal(batch, true);
         if (refused == null && isRetrying(batch)) {
-            refused = Label.Core_Import_ErrorRetryByFileOpen;
+            refused = BarnHelp.text('Core', 'Core_Import_ErrorRetryByFileOpen');
         }
         return refused;
     }
@@ -646,7 +646,7 @@ public with sharing class ImportBatchService {
         Id me = UserInfo.getUserId();
         // Corrected rows may be retried by anyone who runs imports, not only the committer.
         if (retrying && rowIds == null && batch.Committed_By__c != me) {
-            throw new ImportException(Label.Core_Import_ErrorRetryOtherUser);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorRetryOtherUser'));
         }
         if (dryRun && hasCommitted(batch) && !retrying) {
             throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorDryRunAfterCommit'));
@@ -1067,7 +1067,7 @@ public with sharing class ImportBatchService {
             // Skipped as staged (R-IT18): not rejected, and listed with the rows.
             lines.add(
                 String.format(
-                    Label.Core_Import_LogRowsSkipped,
+                    BarnHelp.text('Core', 'Core_Import_LogRowsSkipped'),
                     new List<String>{ String.valueOf(skipped) }
                 )
             );

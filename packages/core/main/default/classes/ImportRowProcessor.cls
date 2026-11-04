@@ -2675,7 +2675,7 @@ public with sharing class ImportRowProcessor {
         Set<Id> allowedTypes = personAccounts ? OrgShapeDetector.personRecordTypeIds() : null;
         List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(probes, allowedTypes);
         if (found == null) {
-            outcome.notes.add(Label.Core_Import_LogNoDuplicateRulePeople);
+            outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogNoDuplicateRulePeople'));
         }
         // The match sources answer for a person the rules found nobody for, or could not ask
         // about: values on related records the rules cannot see (ADR-0133). A person the rules
@@ -2709,7 +2709,7 @@ public with sharing class ImportRowProcessor {
                 item.person2Id = matched;
             }
             if (item.person1Id == item.person2Id) {
-                item.error = Label.Core_Import_ErrorDuplicateRuleOnePerson;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorDuplicateRuleOnePerson');
             }
         }
     }
@@ -2769,7 +2769,7 @@ public with sharing class ImportRowProcessor {
             new Set<Id>{ recordTypeId }
         );
         if (found == null) {
-            outcome.notes.add(Label.Core_Import_LogNoDuplicateRuleOrganizations);
+            outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogNoDuplicateRuleOrganizations'));
             return;
         }
         for (Integer i = 0; i < asked.size(); i++) {
@@ -2817,7 +2817,7 @@ public with sharing class ImportRowProcessor {
             // Ticked so the rows a looser rule matched can be read before a commit (R-IT16).
             row.Duplicate_Rule_Match__c = item.duplicateRuleMatch && item.error == null;
             if (row.Duplicate_Rule_Match__c) {
-                outcome.notes.add(Label.Core_Import_LogDuplicateRuleMatches);
+                outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogDuplicateRuleMatches'));
             }
             if (item.severalMatches && item.error == null) {
                 outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogSeveralMatchesUsedRecent'));
