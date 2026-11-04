@@ -53,7 +53,7 @@ page, even if that puts it out of reading order.
 | [Record Inspector](record-inspector.md) | RI | 3 | Inspect This Record button, the Record Inspector page, a pasted ID or link, search fields, copy an API name, field security and permission |
 | [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 20 | Health Check findings and fixes, Org Optimizer sections, technical debt checks, storage and limits, Data Dictionary and its automation inventory, Access Explorer, Access compare and Modify All report, Field Access Manager, weekly admin summary, Setup Changes, AI-Readiness Export, Where Used and Retire a Field |
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
-| [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 15 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import |
+| [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 16 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import, splitting a gift across funds |
 | [Giving: commitments](giving-commitments.md) | COM | 11 | Pledges, recurring gifts, payments, nightly jobs, pledge reminders |
 | [Giving: asks](giving-asks.md) | ASK | 9 | Ask stages, the Ask Pipeline board, moving and closing asks, gifts and pledges from won asks, reopening, history, read only access, the donor's Next Ask Date from open asks, a person account as one donor |
 | [Giving: soft credits, tributes and matching](giving-soft-credits-tributes-matching.md) | CRED | 10 | Soft credits, tributes, matching gifts |

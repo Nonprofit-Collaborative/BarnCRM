@@ -153,14 +153,6 @@
         <value>Unpost</value>
     </labels>
     <labels>
-        <fullName>Giving_PostingCard_Unposted</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Gift unposted notice</shortDescription>
-        <value>Unposted. The reason is in the Error Log. Mark it posted again after your next export.</value>
-    </labels>
-    <labels>
         <fullName>Giving_Posting_OverrideRestored</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

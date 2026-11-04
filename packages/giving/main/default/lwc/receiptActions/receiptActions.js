@@ -11,7 +11,6 @@ import COLUMN_NUMBER from '@salesforce/label/c.Giving_Receipt_ColumnNumber';
 import COLUMN_STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import COLUMN_AMOUNT from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
 import COLUMN_ISSUED from '@salesforce/label/c.Giving_Receipt_ColumnIssued';
-import COLUMN_VOID_REASON from '@salesforce/label/c.Giving_Receipt_ColumnVoidReason';
 import COLUMN_FILE from '@salesforce/label/c.Giving_Receipt_ColumnFile';
 import NONE_YET from '@salesforce/label/c.Giving_Receipt_NoneYet';
 import ISSUE from '@salesforce/label/c.Giving_Receipt_IssueButton';
@@ -28,7 +27,15 @@ import REISSUED_TITLE from '@salesforce/label/c.Giving_Receipt_ReissuedTitle';
 import REISSUED_MESSAGE from '@salesforce/label/c.Giving_Receipt_ReissuedMessage';
 import NOT_REISSUED_TITLE from '@salesforce/label/c.Giving_Receipt_NotReissuedTitle';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Receipt_UnexpectedError';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import RECEIPT_OBJECT from '@salesforce/schema/Receipt__c';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { iconFor } from 'c/barnIcons';
+
+/** Receipt statuses in the kit's vocabulary: an issued receipt is current, a void one is done with. */
+const STATUS_WORDS = { Issued: 'current', Void: 'neutral' };
 
 /**
  * Issuing, voiding and reissuing a receipt from the gift's own page.
@@ -52,13 +59,24 @@ export default class ReceiptActions extends NavigationMixin(LightningElement) {
 
   @api recordId;
 
+  icons = { receipt: iconFor('Receipt__c') };
+
+  @wire(getObjectInfo, { objectApiName: RECEIPT_OBJECT })
+  receiptInfo;
+
+  /** The Void Reason column is named by the field itself. */
+  get columnVoidReason() {
+    const info = this.receiptInfo && this.receiptInfo.data;
+    const field = info && info.fields && info.fields.Void_Reason__c;
+    return field ? field.label : 'Void Reason';
+  }
+
   labels = {
     title: TITLE,
     columnNumber: COLUMN_NUMBER,
     columnStatus: COLUMN_STATUS,
     columnAmount: COLUMN_AMOUNT,
     columnIssued: COLUMN_ISSUED,
-    columnVoidReason: COLUMN_VOID_REASON,
     columnFile: COLUMN_FILE,
     noneYet: NONE_YET,
     issue: ISSUE,
@@ -94,7 +112,8 @@ export default class ReceiptActions extends NavigationMixin(LightningElement) {
   get rows() {
     return this.receipts.map((receipt) => ({
       ...receipt,
-      viewPdfTitle: VIEW_PDF_OF.replace('{0}', receipt.receiptNumber)
+      viewPdfTitle: VIEW_PDF_OF.replace('{0}', receipt.receiptNumber),
+      statusWord: STATUS_WORDS[receipt.status] || receipt.status
     }));
   }
 
@@ -151,6 +170,18 @@ export default class ReceiptActions extends NavigationMixin(LightningElement) {
     }
     const current = this.issuedReceipt;
     if (!current) {
+      return;
+    }
+    // A void is permanent and uses up a receipt number, so it is asked first (people-giving-2).
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: helpText('Giving', 'Giving_Receipt_VoidConfirmTitle', current.receiptNumber),
+      message: helpText('Giving', 'Giving_Receipt_VoidConfirmMessage'),
+      confirmLabel: VOID_AND_REISSUE,
+      cancelLabel: CANCEL,
+      confirmVariant: 'destructive'
+    });
+    if (!confirmed) {
       return;
     }
     this.working = true;

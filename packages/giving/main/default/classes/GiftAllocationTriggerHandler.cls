@@ -46,6 +46,10 @@ public with sharing class GiftAllocationTriggerHandler extends TriggerHandler {
 	 * were editing.
 	 */
 	private void check(List<Gift_Allocation__c> allocations) {
+		// Edit Funds checks the finished split itself, after its last statement.
+		if (GiftService.deferAllocationTotalCheck) {
+			return;
+		}
 		Set<Id> giftIds = new Set<Id>();
 		for (Gift_Allocation__c allocation : allocations) {
 			if (allocation.Gift__c != null) {

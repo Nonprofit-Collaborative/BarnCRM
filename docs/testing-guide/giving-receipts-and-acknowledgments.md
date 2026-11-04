@@ -67,8 +67,10 @@ For every script on this page:
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | On the gift, leave **Why is this receipt being voided?** empty and select **Void and Reissue**. | Toast **Reason Needed**: "Say why this receipt is being voided. A void needs a reason and a date." Nothing changes in the panel. |
-| 2 | Type `Amount was entered wrongly` and select **Void and Reissue**. | Toast **Receipt Reissued**: "Receipt TEST-<this year>-000001 has been voided and reissued as TEST-<this year>-000002. The original file is unchanged." |
-| 3 | Read the panel. | Two rows: 000001 with **Status** Void and **Void Reason** "Amount was entered wrongly"; 000002 with **Status** Issued. Each row has **View PDF**. |
+| 2 | Type `Amount was entered wrongly` and select **Void and Reissue**. | A dialog **Void Receipt TEST-<this year>-000001?**: "The receipt stays on file as Void and a new one is issued with the next receipt number. This cannot be undone." with **Void and Reissue** (red) and **Cancel**. |
+| 2a | Select **Cancel**. | The dialog closes; nothing changes in the panel. |
+| 2b | Select **Void and Reissue** again, then **Void and Reissue** in the dialog. | Toast **Receipt Reissued**: "Receipt TEST-<this year>-000001 has been voided and reissued as TEST-<this year>-000002. The original file is unchanged." |
+| 3 | Read the panel. | Two rows: 000001 with a grey **Void** badge and **Void Reason** "Amount was entered wrongly"; 000002 with a green **Issued** badge. Each row has **View PDF**. On a phone the rows stack, each value under its column name. |
 | 4 | Open **View PDF** on each row. | Both files open; the first is the original PDF, unchanged. |
 | 5 | As admin, open the **Receipts** tab in the BarnCRM Fundraising app and choose the list view **Voided Receipts**. Open 000001. | **Replaced By** points at 000002, **Voided On** is today. Opening 000002 shows **Replaces** pointing back at 000001. |
 | 6 | On 000002 select **Edit**, change **Issue Date** to yesterday, select **Save**. | The save is refused: "A receipt cannot be changed once it exists. Void it and issue a new one instead." |

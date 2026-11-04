@@ -20,6 +20,7 @@ Use this when the receipt is wrong, for example the amount was entered wrongly.
 1. Open the gift.
 2. In the **Receipts** panel, type **Why is this receipt being voided?**
 3. Click **Void and Reissue**.
+4. Read the question "Void Receipt ...?" and click **Void and Reissue** again to go ahead, or **Cancel** to keep the receipt as it is.
 
 You should see: "Receipt ... has been voided and reissued as .... The original file is unchanged." The old receipt shows status Void with your reason, and a new receipt with the next number sits beside it. Nobody can delete a receipt or its file.
 

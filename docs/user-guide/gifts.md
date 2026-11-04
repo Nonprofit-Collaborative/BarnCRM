@@ -63,7 +63,8 @@ A gift opens on the gift record page. From top to bottom:
 - **Acknowledgment, Receipt and Recognition**: **Acknowledgment Status**, **Acknowledgment Date**, **Receipt Number**, **Matched Gift**, **Tribute**, and on a refund, **Original Gift** and **Refund Reason**.
 - **In-kind Gift**, only on an in-kind gift.
 - Side panels: **Posting**, **Receipts**, **Soft Credits**, **Tribute**, and **Activity**.
-- Lists: **Gift Allocations** (which funds the gift went to), **Refunds and Write-Offs**, **Tributes** and **Acknowledgments** (each thank-you sent for the gift).
+- **Gift Allocations**: which funds the gift went to, with **Edit Funds** (see [To split a gift across funds](#to-split-a-gift-across-funds)).
+- Lists: **Refunds and Write-Offs**, **Tributes** and **Acknowledgments** (each thank-you sent for the gift).
 
 Gift statuses:
 
@@ -72,7 +73,20 @@ Gift statuses:
 - **Refunded** and **Written off**: set for you when the whole gift has gone back. See [Refunds and write-offs](refunds.md).
 - **Cancelled**: a Pending gift that will never be paid. See [Refunds and write-offs](refunds.md#to-cancel-a-pending-gift).
 
-A gift without a fund goes in full to your organization's default fund, as one line in **Gift Allocations**. Allocations always add up to the gift. Quick Gift Entry designates one fund; to split a gift across several funds, ask your admin: a split has to arrive all at once, through the gift import, because changing one allocation row at a time is refused.
+A gift without a fund goes in full to your organization's default fund, as one line in **Gift Allocations**. Allocations always add up to the gift.
+
+## To Split a Gift Across Funds
+
+Use this when a donor asks for part of a gift to go to another fund, for example "half to the building fund".
+
+1. Open the gift.
+2. In the **Gift Allocations** card, click **Edit Funds**.
+3. Change the first row's **Amount** or **Percent**, click **Add a Fund**, and choose the other **Fund**. The new row starts with what is left.
+4. Check that the badge reads "Left to assign: $0.00", then click **Save**.
+
+You should see: "Funds saved. The gift's allocations now match the split." and one row per fund. With two or more funds you can also drag a divider on the bar under the rows, or select it and press the arrow keys, to move money between the two funds beside it.
+
+If **Edit Funds** is missing and the card says "This gift is in the books", the gift is posted to accounting or dated in a closed period: record a refund instead, or ask your bookkeeper. Removing a fund from a gift needs an admin unless you hold **Giving Admin**.
 
 ## To Add a Soft Credit
 
@@ -80,7 +94,7 @@ A soft credit recognizes someone who influenced a gift but did not give it, such
 
 1. Open the gift.
 2. In the **Soft Credits** panel, click **Add Credit**.
-3. Choose the **Person to recognize**.
+3. Choose the **Person to recognize**. Each name in the list shows the person's email and mailing city under it, so two people with the same name look different.
 4. Choose **Why they are recognized**: **Solicitor**, **Honoree**, **Influencer**, **Household Member**, **Matched Donor** or **Other**. With **Other**, type **Your own wording**.
 5. Check the **Amount** and click **Save**.
 

@@ -3,14 +3,14 @@
     <lightning-card title={labels.title} icon-name="standard:document">
         <div class="slds-var-p-horizontal_medium">
             <template lwc:if={errorMessage}>
-                <p class="slds-text-color_error slds-var-m-bottom_x-small" data-id="error" role="alert">
-                    {errorMessage}
-                </p>
+                <div class="slds-var-m-bottom_x-small">
+                    <c-barn-notice variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+                </div>
             </template>
             <template lwc:if={noticeMessage}>
-                <p class="slds-var-m-bottom_x-small" data-id="notice" role="status" aria-live="polite">
-                    {noticeMessage}
-                </p>
+                <div class="slds-var-m-bottom_x-small">
+                    <c-barn-notice variant="success" message={noticeMessage} data-id="notice"></c-barn-notice>
+                </div>
             </template>
 
             <template lwc:if={isPosted}>

@@ -1,0 +1,91 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={title} icon-name={icons.allocation}>
+      <template lwc:if={showEditButton}>
+        <lightning-button
+          slot="actions"
+          data-id="edit-funds"
+          label={labels.editFunds}
+          onclick={handleEdit}
+        ></lightning-button>
+      </template>
+
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={errorMessage}>
+          <div class="slds-var-m-bottom_small">
+            <c-barn-notice variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+          </div>
+        </template>
+        <template lwc:if={savedMessage}>
+          <div class="slds-var-m-bottom_small">
+            <c-barn-notice variant="success" message={savedMessage} data-id="saved"></c-barn-notice>
+          </div>
+        </template>
+        <template lwc:if={lockedMessage}>
+          <div class="slds-var-m-bottom_small">
+            <c-barn-notice variant="info" message={lockedMessage} data-id="locked"></c-barn-notice>
+          </div>
+        </template>
+
+        <template lwc:if={showEmpty}>
+          <c-barn-empty-state size="compact" heading={noneText} data-id="empty"></c-barn-empty-state>
+        </template>
+
+        <template lwc:if={showList}>
+          <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked" data-id="list">
+            <thead>
+              <tr class="slds-line-height_reset">
+                <th scope="col" data-label={columns.fund}>{columns.fund}</th>
+                <th scope="col" data-label={columns.amount}>{columns.amount}</th>
+                <th scope="col" data-label={columns.percent}>{columns.percent}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={rows} for:item="row">
+                <tr key={row.id} data-id="row">
+                  <td data-label={columns.fund}>
+                    <div class="slds-truncate" title={row.fundName}>{row.fundName}</div>
+                  </td>
+                  <td data-label={columns.amount}>
+                    <lightning-formatted-number value={row.amount} format-style="currency"></lightning-formatted-number>
+                  </td>
+                  <td data-label={columns.percent}>
+                    <lightning-formatted-number
+                      value={row.share}
+                      format-style="percent"
+                      maximum-fraction-digits="2"
+                    ></lightning-formatted-number>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </template>
+
+        <template lwc:if={editing}>
+          <c-gift-fund-split
+            data-id="editor"
+            total={giftAmount}
+            allocations={draft}
+            onchange={handleSplitChange}
+          ></c-gift-fund-split>
+          <div class="slds-var-m-top_small">
+            <lightning-button
+              data-id="save"
+              variant="brand"
+              label={labels.save}
+              disabled={saveDisabled}
+              onclick={handleSave}
+            ></lightning-button>
+            <lightning-button
+              data-id="cancel"
+              class="slds-var-m-left_x-small"
+              label={labels.cancel}
+              onclick={handleCancel}
+            ></lightning-button>
+          </div>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>
