@@ -1,6 +1,6 @@
 # Where Used and Retire a Field
 
-**Package:** Core (the Rollup Builder and Giving modules add their own records when installed)
+**Package:** Core (the Rollup Builder, Giving, Programs and Logic Models modules add their own records when installed)
 **Feature:** C-59 (plan Section 6.0a release 0.16, decision D-156; ADR-0159)
 
 ## What It Does
@@ -19,6 +19,8 @@ field, and BarnCRM lists every BarnCRM setup record that names it, grouped by ki
 | **Rollups** (Rollup Builder module) | The counted field, sort field, fiscal date field, both filters, the relationship path and the result field |
 | **BarnCRM Settings** (Giving module) | The Donor Level source total, on both people and organizations |
 | **Import Mappings** (Giving module) | Columns and default values that load gifts, allocations, soft credits and tributes |
+| **Programs** (Programs module) | The enrollment fields each program's eligibility rules read; the link opens the program |
+| **Indicators** (Logic Models module) | The date field a computed indicator counts by and the field it sums or counts distinct values of; the link opens its logic model (the saved Find query it reads is listed under Saved Find Queries) |
 
 For each record it shows its name, where in it the field is named (for example "Filter" or
 "Column "Donor Email""), what stops working if the field is deleted, and a link to the BarnCRM

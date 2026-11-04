@@ -346,6 +346,13 @@ public with sharing class WhereUsedService {
             return this;
         }
 
+        /** Edited on its own record page (a program's eligibility rules, a logic model). */
+        @NamespaceAccessible
+        public Reference withRecordEdit(Id pageRecordId) {
+            this.editUrl = pageRecordId == null ? null : '/lightning/r/' + pageRecordId + '/view';
+            return this;
+        }
+
         public Integer compareTo(Object other) {
             Reference that = (Reference) other;
             Integer byKind = (kindLabel == null ? '' : kindLabel)

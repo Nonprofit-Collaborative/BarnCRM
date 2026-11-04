@@ -201,6 +201,14 @@
         <value>The setting falls back to its default; choose another value before you delete the field.</value>
     </labels>
     <labels>
+        <fullName>Core_WhereUsed_BreaksModuleRecord</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What breaks for a module record (eligibility rules, a computed indicator) that names the field.</shortDescription>
+        <value>This record stops working as set up (screening reads the field as blank, a computed indicator stops updating) until the part that names the field is changed.</value>
+    </labels>
+    <labels>
         <fullName>Core_WhereUsed_Action</fullName>
         <categories>Core</categories>
         <language>en_US</language>

@@ -30,7 +30,8 @@ non-goals; competitive research 6.1.5 out-of-scope list).
   `MailingAddress` names `MailingStreet`).
 - A module adds its own records by implementing `WhereUsedExtension`, a `@NamespaceAccessible`
   interface Core defines. `WhereUsedExtensions` finds implementations by class name
-  (`RollupsWhereUsedExtension`, `GivingWhereUsedExtension`) with `NamespaceUtil.resolveType`,
+  (`RollupsWhereUsedExtension`, `GivingWhereUsedExtension`, `ProgramsWhereUsedExtension`,
+  `LogicModelsWhereUsedExtension`; Funders stores no field names) with `NamespaceUtil.resolveType`,
   exactly as `HealthCheckExtensions` does (ADR-0057). A module that is absent, cannot be built or
   throws is skipped, logged, and the answer is marked incomplete.
 - Modules read paths with the target's own `matchesPath`, `matchesFilter` and `matchesField`, so
