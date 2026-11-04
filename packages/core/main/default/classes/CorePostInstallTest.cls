@@ -266,6 +266,48 @@ private class CorePostInstallTest {
         }
     }
 
+    @IsTest
+    static void aNewInstallSchedulesTheNightlyRunOnceAndAnUpgradeLeavesItAlone() {
+        System.runAs(TestUsers.admin()) {
+            CorePostInstall.scheduleNightlyInTests = true;
+            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+            ScheduledJobSelector.forget();
+            Integer rowsBefore = [SELECT COUNT() FROM Nightly_Job__c];
+
+            new CorePostInstall().onInstall(new InstallBy(null, null, false));
+            Assert.isTrue(NightlyJobs.isScheduled(), 'A new install schedules the nightly run');
+            new CorePostInstall().onInstall(new InstallBy(null, null, false));
+            new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));
+
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM CronTrigger
+                    WHERE CronJobDetail.Name = :NightlyJobs.jobName()
+                ],
+                'Installing again or upgrading never makes a second schedule'
+            );
+            Assert.areEqual(
+                rowsBefore,
+                [SELECT COUNT() FROM Nightly_Job__c],
+                'No step switch was written or changed'
+            );
+        }
+    }
+
+    @IsTest
+    static void aNewInstallDoesNotScheduleTheNightlyRunInTestsUnlessAsked() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+            ScheduledJobSelector.forget();
+
+            new CorePostInstall().onInstall(new InstallBy(null, null, false));
+
+            Assert.isFalse(NightlyJobs.isScheduled(), 'The seam keeps other tests clean');
+        }
+    }
+
     /**
      * Removes the org's saved settings inside the test, so a test about an org that has never
      * saved them runs the same on an org that has (custom settings are visible to tests).

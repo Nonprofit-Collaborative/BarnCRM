@@ -12,7 +12,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **Giving**, open **Ask Reminders** under **Acknowledgments and Stewardship**. | The checkbox is on by default. |
-| 2 | Open **Nightly Jobs**. If it says the jobs are not scheduled, select **Schedule**. | Four jobs are listed, including **Ask Reminders, 3:30 AM**, each scheduled. |
+| 2 | Open **Nightly Jobs**. If it says the jobs are not scheduled, select **Schedule**. | Four jobs are listed, including **Ask Reminders, 3:30 AM**, each a switched-on step of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md). |
 | 3 | Open Valentina Singh, select **Edit**, set **Next Ask Date** to today and **Last Touch Date** to last week. **Save**. | Saved. **Ask Reminder For Date** is empty and read only. |
 | 4 | On **Nightly Jobs** select **Run now**, or wait for 3:30 AM. | The jobs start. After a minute, refresh: **Ask Reminders** shows a last run and "Created 1 ask reminders." |
 | 5 | Open the owner's tasks. | One task "Ask Valentina Singh: next ask is due", due today, assigned to the owner, related to Valentina Singh. |

@@ -62,6 +62,8 @@ some of its records failed: the [Error Log](error-log.md) has the details.
 
 The nightly run is scheduled for you when:
 
+- BarnCRM is installed new (the install schedules it; a schedule that already exists is kept and
+  no job's switch is changed), or you finish first-run setup;
 - you upgrade from a version that had any job scheduled on its own (the old schedules are
   replaced by the one run, and each job that was scheduled stays on);
 - you switch on a job that has its own switch, such as **Turn On Seasonal Addresses** or the

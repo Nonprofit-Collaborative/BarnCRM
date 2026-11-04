@@ -211,7 +211,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 ## T-VOL-14: Shift Reminders Go Out Once
 
 **Purpose:** confirm a signed-up volunteer gets one reminder email before their shift, and nobody is emailed twice or against their wishes.
-**Prerequisites:** admin user; a contact with your own email address; a second contact with **Email Opt Out** checked; Volunteers nightly jobs scheduled (Health Check, **Schedule all nightly jobs**).
+**Prerequisites:** admin user; a contact with your own email address; a second contact with **Email Opt Out** checked; the nightly run scheduled (Volunteers' jobs are steps of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md); Health Check, **Schedule all nightly jobs**).
 
 | Step | Action | Expected result |
 |---|---|---|

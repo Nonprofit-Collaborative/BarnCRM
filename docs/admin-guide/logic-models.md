@@ -38,8 +38,9 @@ finishes, BarnCRM does four things on its own:
 4. Gives everyone who already has a BarnCRM role their Logic Models permission set (see below).
 
 Logic Models also has one nightly job, **Indicator Results** (3:30 AM), which works out computed
-indicators. **Health Check** lists it with BarnCRM's other nightly jobs, and its **Schedule all
-nightly jobs** fix schedules it.
+indicators. It is a step of [BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run, and has
+no switch of its own. If **Health Check** says the nightly run is not scheduled, its **Schedule
+all nightly jobs** fix schedules it.
 
 Then open the **BarnCRM Logic Models** app from the App Launcher. Its tab is **Logic Models**,
 which also joins the BarnCRM apps.
