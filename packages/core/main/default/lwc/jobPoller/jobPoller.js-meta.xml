@@ -3,7 +3,7 @@
   <apiVersion>67.0</apiVersion>
   <description>
     Polls a running data job: every 3 seconds for the first minute, every 10 seconds after,
-    one retry before giving up. Imported by bulkUpdate, bulkDelete and dataJobHistory.
+    one retry before giving up. Imported by superTransform, bulkDelete and dataJobHistory.
   </description>
   <isExposed>false</isExposed>
 </LightningComponentBundle>

@@ -9,7 +9,7 @@ says Super Transformer is not turned on for you, ask your BarnCRM administrator 
 
 Open the **Super Transformer** tab and work down the five steps.
 
-1. **Object**: type part of the name in **Search Objects**, then choose it in **Object**.
+1. **Kind of Record**: type part of the name in **Search Kinds of Record**, then choose it in **Kind of record**.
 2. **Which Records**: add conditions, for example **Mailing City** **equals** `Springfield`.
    **Matching Records** shows how many records match and updates as you type. A yellow
    warning means there is no condition, so every record would change; a red **Over the

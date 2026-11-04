@@ -1,5 +1,5 @@
 import { LightningElement, wire } from 'lwc';
-import { CurrentPageReference } from 'lightning/navigation';
+import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
 import BarnConfirmModal from 'c/barnConfirmModal';
@@ -20,7 +20,7 @@ import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
 
 import TITLE from '@salesforce/label/c.Core_Find_Title';
 import TAB_LABEL from '@salesforce/label/c.Core_Format_Pair';
-import OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
+import OBJECT from '@salesforce/label/c.Core_FieldUtilization_ChooseLabel';
 import CHOOSE_OBJECT from '@salesforce/label/c.Core_Find_ChooseObject';
 import COLUMNS from '@salesforce/label/c.Core_Find_Columns';
 import AVAILABLE_FIELDS from '@salesforce/label/c.Core_Find_AvailableFields';
@@ -71,7 +71,6 @@ import EDIT_FAILED from '@salesforce/label/c.Core_Find_EditFailed';
 import HIDDEN_COLUMNS from '@salesforce/label/c.Core_Find_HiddenColumns';
 import GUIDE_URL from '@salesforce/label/c.Core_Find_GuideUrl';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Find_EmptyHeading';
-import EMPTY_MESSAGE from '@salesforce/label/c.Core_Find_EmptyMessage';
 import NO_RESULTS_HEADING from '@salesforce/label/c.Core_Find_NoResultsHeading';
 import SHOW_QUERY from '@salesforce/label/c.Core_Find_ShowQuery';
 import RESULTS from '@salesforce/label/c.Core_Find_Results';
@@ -160,7 +159,7 @@ const DATETIME_ATTRIBUTES = {
  * it in user mode. The SOQL shown is the server's display rendering. Conditions are the shared
  * filterBuilder; CSV export reads pages in Id order and writes the file in the browser (R-SQ3).
  */
-export default class FindRecords extends LightningElement {
+export default class FindRecords extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
 
   labels = {
@@ -205,7 +204,9 @@ export default class FindRecords extends LightningElement {
     },
     guideUrl: GUIDE_URL,
     emptyHeading: EMPTY_HEADING,
-    emptyMessage: EMPTY_MESSAGE,
+    get emptyMessage() {
+      return helpText('Core', 'Core_Find_EmptyMessage');
+    },
     noResultsHeading: NO_RESULTS_HEADING,
     showQuery: SHOW_QUERY,
     results: RESULTS,
@@ -238,7 +239,6 @@ export default class FindRecords extends LightningElement {
   queryName = '';
   shared = false;
   openQueryId;
-  bulkQueryJson;
   deleteQueryJson;
   busy = false;
   errorMessage;
@@ -575,10 +575,6 @@ export default class FindRecords extends LightningElement {
     return Boolean(this.page && this.page.canBulkUpdate);
   }
 
-  get showBulkUpdate() {
-    return Boolean(this.bulkQueryJson);
-  }
-
   get canBulkDelete() {
     return Boolean(this.page && this.page.canBulkDelete);
   }
@@ -647,7 +643,6 @@ export default class FindRecords extends LightningElement {
    * not eleven. The bulk panels close at once: the query they were opened with has changed.
    */
   schedulePreview() {
-    this.bulkQueryJson = undefined;
     this.deleteQueryJson = undefined;
     clearTimeout(this.previewTimer);
     // eslint-disable-next-line @lwc/lwc/no-async-operation
@@ -657,7 +652,6 @@ export default class FindRecords extends LightningElement {
   async refreshPreview() {
     clearTimeout(this.previewTimer);
     // A bulk panel acts on the query it was opened with; an edited query closes it.
-    this.bulkQueryJson = undefined;
     this.deleteQueryJson = undefined;
     if (
       !this.objectApiName ||
@@ -1019,19 +1013,32 @@ export default class FindRecords extends LightningElement {
     });
   }
 
-  /** Opens bulk update over the query as it is now (C-35); the panel keeps that query. */
+  /**
+   * Opens Super Transformer with this query's kind of record and conditions (admin-14): the one
+   * place a bulk change is built. The conditions on related records go too, so the records it
+   * counts are the ones Find found; the columns, sort and row count do not matter to a change.
+   */
   handleBulkUpdate() {
     this.noticeMessage = undefined;
     this.errorMessage = undefined;
     if (!this.checkReady()) {
       return;
     }
+    const document = JSON.parse(this.queryDocument());
+    // `at` makes each hand-over new, so a second one with the same conditions still applies.
+    const start = { object: document.object, at: Date.now() };
+    if (document.filter) {
+      start.filter = document.filter;
+    }
+    if (document.related) {
+      start.related = document.related;
+    }
     this.deleteQueryJson = undefined;
-    this.bulkQueryJson = this.queryDocument();
-  }
-
-  handleBulkClose() {
-    this.bulkQueryJson = undefined;
+    this[NavigationMixin.Navigate]({
+      type: 'standard__navItemPage',
+      attributes: { apiName: this.page.superTransformerTab },
+      state: { [this.page.superTransformerStateKey]: JSON.stringify(start) }
+    });
   }
 
   /** Opens bulk delete over the query as it is now (C-37); one bulk panel is open at a time. */
@@ -1041,7 +1048,6 @@ export default class FindRecords extends LightningElement {
     if (!this.checkReady()) {
       return;
     }
-    this.bulkQueryJson = undefined;
     this.deleteQueryJson = this.queryDocument();
   }
 
@@ -1125,7 +1131,6 @@ export default class FindRecords extends LightningElement {
     this.openQueryId = undefined;
     this.queryName = '';
     this.shared = false;
-    this.bulkQueryJson = undefined;
     this.deleteQueryJson = undefined;
     this.related = [];
     this.children = [];

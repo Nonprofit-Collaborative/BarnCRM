@@ -217,52 +217,12 @@
         <value>Choose a field</value>
     </labels>
     <labels>
-        <fullName>Core_BulkUpdate_Action</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Label: what a change does to its field.</shortDescription>
-        <value>What to do</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkUpdate_ActionSet</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Change action: set the field to a value.</shortDescription>
-        <value>Set to a value</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkUpdate_ActionClear</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Change action: empty the field.</shortDescription>
         <value>Clear</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkUpdate_ActionCopy</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Change action: copy another field of the same record.</shortDescription>
-        <value>Copy from another field</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkUpdate_NewValue</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Label: the value to set.</shortDescription>
-        <value>New value</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkUpdate_CopyFrom</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Label: the field whose value is copied.</shortDescription>
-        <value>Copy from</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_Remove</fullName>
@@ -289,14 +249,6 @@
         <value>Preview</value>
     </labels>
     <labels>
-        <fullName>Core_BulkUpdate_PreviewCount</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Preview line: how many records match; {0} is the count</shortDescription>
-        <value>{0} records match. The first ones, before and after:</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkUpdate_Record</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>
@@ -313,28 +265,12 @@
         <value>Type the number of records to confirm</value>
     </labels>
     <labels>
-        <fullName>Core_BulkUpdate_UpdateButton</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button: start the bulk update; {0} is the record count</shortDescription>
-        <value>Update {0} records</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkUpdate_Started</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Notice: the bulk update started.</shortDescription>
         <value>Super Transformer started. It keeps running if you leave this page.</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkUpdate_Progress</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Bulk update progress: {0} chunks done, {1} chunks in all</shortDescription>
-        <value>Updating: {0} of {1} chunks done.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_Summary</fullName>
@@ -417,14 +353,6 @@
         <value>False</value>
     </labels>
     <labels>
-        <fullName>Core_BulkUpdate_ActionTransform</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Change kind: change each record's own value with steps.</shortDescription>
-        <value>Change with steps</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkUpdate_ErrorCannotTransform</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>
@@ -487,14 +415,6 @@
         <protected>false</protected>
         <shortDescription>Step input: the fields of the same record to add.</shortDescription>
         <value>Fields to add</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkUpdate_PathChanges</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Bulk update path: the step where changes are chosen.</shortDescription>
-        <value>Choose Changes</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_PathConfirm</fullName>

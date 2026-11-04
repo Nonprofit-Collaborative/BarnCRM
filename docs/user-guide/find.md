@@ -34,7 +34,7 @@ You should see: the **Households** list with the household name, **Member Count*
 
 1. Open the **Data Manager** tab and choose the **Find and Export Records** tile.
    The **Find** tab opens.
-2. In **Object**, choose what to look for, for example **Contact** or **Account**.
+2. In **Kind of record**, choose what to look for, for example **Contact** or **Account**.
 3. In **Columns**, move the fields you want from **Available fields** to **Columns, in
    order**. To add a field from a related record, choose it in **Add fields from**.
 4. Under **Conditions**, press **Add Condition**. Choose a **Field**, an **Operator** (such as
@@ -49,7 +49,7 @@ You should see: a **Results** table and a line such as "200 rows found." If more
 match, the line says "Found the first 200 matching rows. Export to get every matching record."
 The table shows 25 rows at a time: press **Show More** under it for the next 25.
 
-Before you choose an object, the page shows only **Object** and **Saved queries** and a short
+Before you choose an object, the page shows only **Kind of record** and **Saved searches** and a short
 prompt. **Show Query**, closed at first, holds the query in SOQL. You never need to read it.
 
 ## To Keep Only Records That Have (or Lack) Related Records
@@ -75,7 +75,7 @@ You should see: a table with one line per group. Blank values show as "(blank)".
 
 ## To Save and Share a Query
 
-1. Run the query, type a **Query name**.
+1. Run the query, type a **Search name**.
 2. Optional: tick **Show to everyone who uses Find** to share it.
 3. Press **Save**. To make a copy under a new name, open the menu next to **Save** and choose
    **Save As**.
@@ -86,8 +86,8 @@ queries**. Queries shared with you show the sharer's name, for example "Springfi
 
 ## To Delete a Saved Query
 
-1. Open the query from **Saved queries**, open the menu next to **Save** and choose **Delete**.
-2. In "Delete This Saved Query?", press **Delete**, or **Keep It** to leave it.
+1. Open the query from **Saved searches**, open the menu next to **Save** and choose **Delete**.
+2. In "Delete This Saved Search?", press **Delete**, or **Keep It** to leave it.
 
 You should see: "Deleted" followed by the name. This cannot be undone. A shared query is
 removed for everyone.

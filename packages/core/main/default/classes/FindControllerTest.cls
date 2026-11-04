@@ -289,6 +289,17 @@ private class FindControllerTest {
                     FindController.getPage().exportLimit,
                     'The export limit reads as 50,000 until set'
                 );
+                FindController.FindPage page = FindController.getPage();
+                System.Assert.areEqual(
+                    NamespaceUtil.qualify('Bulk_Update'),
+                    page.superTransformerTab,
+                    'Change Records opens the Super Transformer tab'
+                );
+                System.Assert.areEqual(
+                    NamespaceUtil.stateKey('start'),
+                    page.superTransformerStateKey,
+                    'and hands it the conditions in this page state key'
+                );
             }
 
         }

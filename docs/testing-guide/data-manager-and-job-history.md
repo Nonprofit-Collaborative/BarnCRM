@@ -153,7 +153,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open **Org Optimizer** and choose **Data Quality**. | The **Data Quality** section (a heading with a help icon and **Recount**, no card of its own) shows a spinner (**Counting records**), then ten checks, each with a number, **records found** and a **Needs Attention** or **All Clear** badge, starting with **People with No Household** and ending with **People Not Changed in 5 Years**. |
 | 2 | Read **People with No Household**. | **0** on fresh sample data. |
 | 3 | Read **Deceased People Who Can Still Be Emailed**. | A number above 0 (sample data has deceased people with an email, for example Sung Silva). |
-| 4 | Click **Open in Find** on that check. | A message says to choose **Data Quality: Deceased People Who Can Still Be Emailed** from Saved queries, and the **Find** tab opens with that query already run. Sung Silva is in the list. |
+| 4 | Click **Open in Find** on that check. | A message reads "Opened Data Quality: Deceased People Who Can Still Be Emailed in Find." and the **Find** tab opens with that saved search already run, with no need to press **Run**. Sung Silva is in the list. |
 | 5 | Go back to **Data Quality** and click **Recount**. | The spinner shows, the buttons are disabled while it counts, and the same numbers come back. |
 
 **Cleanup:** Delete the saved query **Data Quality: Deceased People Who Can Still Be Emailed** in Find if you want a tidy org.
