@@ -2,6 +2,7 @@ import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { followLinkInWorkspace } from 'c/workspaceTabs';
+import { iconFor } from 'c/barnIcons';
 import getHouseholdsForPerson from '@salesforce/apex/HouseholdOfPersonController.getHouseholdsForPerson';
 
 import TITLE from '@salesforce/label/c.Core_Section_Household';
@@ -23,6 +24,8 @@ export default class HouseholdOfPerson extends NavigationMixin(LightningElement)
   @api recordId;
 
   @wire(EnclosingTabId) enclosingTabId;
+
+  icons = { household: iconFor('Households') };
 
   label = {
     title: TITLE,

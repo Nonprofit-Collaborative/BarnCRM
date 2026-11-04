@@ -65,14 +65,6 @@
         <value>This household has no primary address yet. Choose Set as Primary on one of its addresses first.</value>
     </labels>
     <labels>
-        <fullName>Core_Address_MoveNotAPersonsAddress</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: Use for Whole Household on an address that is not a person's</shortDescription>
-        <value>Use for Whole Household works on a person's own address. Open the person and choose it on one of their addresses.</value>
-    </labels>
-    <labels>
         <fullName>Core_Address_MoveNotFound</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
@@ -157,8 +149,8 @@
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Address panel: button on a household's primary address</shortDescription>
-        <value>Update Everyone's Address</value>
+        <shortDescription>Address panel: More menu item on a household's primary address</shortDescription>
+        <value>Give This Address to Members</value>
     </labels>
     <labels>
         <fullName>Core_Address_UpdateEveryoneMoving</fullName>
@@ -197,8 +189,8 @@
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Address panel: button on a person's own address</shortDescription>
-        <value>Use for Whole Household</value>
+        <shortDescription>Address panel: More menu item on a person's own address</shortDescription>
+        <value>Move the Household Here</value>
     </labels>
     <labels>
         <fullName>Core_Address_UseForHouseholdDetail</fullName>
@@ -271,22 +263,6 @@
         <protected>false</protected>
         <shortDescription>Address panel: badge on an address whose mail comes back</shortDescription>
         <value>Undeliverable</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_UndeliverablePrimary</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: warning on a primary address marked Undeliverable</shortDescription>
-        <value>Mail sent to this primary address comes back. Add the new address with Primary ticked, or set another address as primary.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_StatusMenu</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: name of the menu that changes an address status</shortDescription>
-        <value>Change Status</value>
     </labels>
     <labels>
         <fullName>Core_Address_MarkCurrent</fullName>

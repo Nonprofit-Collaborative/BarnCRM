@@ -29,10 +29,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Relationships** tab, open Harper's relationship to Luis, select **Edit**, set **End Date** to last month, and save. | Status reads **Former**. |
-| 2 | Open Harper. | The Luis line carries a **Former** badge. |
+| 1 | On Harper's **Relationships** card open the menu of the Luis line and select **End It**. | A confirmation asks **End This Relationship?**. Select **End It**. Toast **Relationship ended. Both people keep it as a former relationship.** |
+| 2 | Look at the Luis line. | It carries a **Former** badge on a shaded line, and its menu no longer offers **End It**. Selecting the name opens the relationship record with **End Date** today. |
 | 3 | Open Luis. | The Harper line carries **Former**; his record has the same End Date. |
-| 4 | Undo: clear **End Date** on either side and save. | Both sides return to **Current** and the badges disappear. |
+| 4 | Undo: on Harper, select **Edit** from the Luis line's menu, clear **End Date** and save. | The standard edit form opens. Both sides return to **Current** and the badges disappear. |
 
 **Cleanup:** None.
 
@@ -56,7 +56,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On Harper's card select **Remove** on the Luis line. | No confirmation. Toast **Relationship removed from both people.** The line is gone. |
+| 1 | On Harper's card select **Remove** from the Luis line's menu. | A confirmation asks **Remove This Relationship?** and suggests an End Date instead. Select **Cancel**: nothing changes. Select **Remove** again, then **Remove** in the confirmation. Toast **Relationship removed from both people.** The line is gone. |
 | 2 | Open Luis. | The Harper line is gone. |
 | 3 | Undo: open the **Recycle Bin**, find the Harper to Luis relationship, and restore it. | Restored. |
 | 4 | Open Harper and Luis. | Both cards show the Spouse line again, once each. |
@@ -86,7 +86,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open Harper Garcia. | The **Relationships** card lists Luis and Diego. |
-| 2 | Look at each line. | No line shows a **Remove** button. |
+| 2 | Look at each line. | No line shows an actions menu (no **Edit**, **End It** or **Remove**). |
 | 3 | Look at the card header. | There is no **Add Relationship** button. |
 
 **Cleanup:** as admin, remove Harper's relationships to Luis and Diego.
@@ -102,8 +102,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | Open Harper Garcia. | The **Affiliations** card shows **No Affiliations Yet** with an **Add Affiliation** button. |
 | 2 | Select **Add Affiliation**: Organization **Bayview Hardware**, Role `Store Manager`, tick **Primary**, Start Date January 1 last year. Save with **Add Affiliation** in the form. | Toast **Affiliation saved.** The line shows Bayview Hardware, the role Store Manager, and a **Primary** badge. **Primary Affiliation** on Harper reads **Bayview Hardware**. |
 | 3 | Open **Bayview Hardware** from **Organizations**. | Its **Affiliations** card shows Harper Garcia. |
-| 4 | On Harper, add **Heritage Rotary Club**, Role `Club president`, tick **Primary**. | The **Primary** badge moves to Heritage Rotary Club; Bayview Hardware shows **Make Primary**. **Primary Affiliation** reads Heritage Rotary Club. |
-| 5 | Select **Make Primary** on Bayview Hardware. | Toast **Primary affiliation updated.** The badge and **Primary Affiliation** move back to Bayview Hardware. |
+| 4 | On Harper, add **Heritage Rotary Club**, Role `Club president`, tick **Primary**. | The **Primary** badge (with a star) moves to Heritage Rotary Club; the Bayview Hardware line's menu offers **Make Primary**. **Primary Affiliation** reads Heritage Rotary Club. |
+| 5 | Select **Make Primary** from the Bayview Hardware line's menu. | Toast **Primary affiliation updated.** The badge and **Primary Affiliation** move back to Bayview Hardware. |
 | 6 | Open The Garcia Family. | Harper is still a member. |
 
 **Cleanup:** keep both affiliations for T-REL-08.
@@ -115,8 +115,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the **Affiliations** tab, edit Harper's Bayview Hardware affiliation, set End Date to last month, and save. | Status reads **Former**. On Harper the line carries **Former**, no **Primary**, and **Primary Affiliation** is empty. |
-| 2 | Select **Make Primary** on Heritage Rotary Club. | **Primary Affiliation** reads Heritage Rotary Club. |
+| 1 | On Harper's **Affiliations** card select **End It** from the Bayview Hardware line's menu, then **End It** in the confirmation **End This Affiliation?**. | Toast **Affiliation ended. It stays on file as a former affiliation.** The line carries **Former** on a shaded line, no **Primary**, and **Primary Affiliation** is empty. |
+| 2 | Select **Make Primary** from the Heritage Rotary Club line's menu. | **Primary Affiliation** reads Heritage Rotary Club. |
 | 3 | On Harper, add Heritage Rotary Club again with Role `Club president` and no dates. | Refused: **Harper Garcia already has an affiliation with Heritage Rotary Club as Club president covering those dates. Open AF-** followed by the record number **to change it.** |
 | 4 | On the **Affiliations** tab select **New**, choose Person **Harper Garcia**, leave Organization empty, and save. | Refused: **An affiliation needs an organization.** |
 
@@ -131,7 +131,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | As staff, open **Bayview Hardware** and select **Add Affiliation**. | The form asks for the person (Person) instead of the organization. |
 | 2 | Choose **Luis Garcia**, Role `Customer`, and save. | The line shows Luis Garcia. Luis's own **Affiliations** card shows Bayview Hardware. |
-| 3 | As read-only, open Luis and look at the Bayview Hardware line (Primary was not ticked). | The line shows, with no **Make Primary** button. |
+| 3 | As read-only, open Luis and look at the Bayview Hardware line (Primary was not ticked). | The line shows, with no actions menu. |
 | 4 | As read-only, look at the **Affiliations** card header. | There is no **Add Affiliation** button. |
 
 **Cleanup:** as admin, delete Luis's Bayview Hardware affiliation.

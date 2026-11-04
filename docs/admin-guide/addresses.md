@@ -49,8 +49,8 @@ install and no Setup step. Once it is on, two things are worth setting once.
    - **Nobody moves until you choose**: editing one person's address gives that person an
      address of their own, as above, and a change to the household's address (a new primary
      on its card, an edit to its billing address) changes the household only. Its people keep
-     their mailing address until you choose **Update Everyone's Address** on the household's
-     primary address card (see "Moving a household on purpose" below). The seasonal swap is
+     their mailing address until you choose **Give This Address to Members** from the **More**
+     menu of the household's primary address (see "Moving a household on purpose" below). The seasonal swap is
      the one exception: it still moves everyone in the household who has no address of their
      own, because the dates were chosen in advance. Choose this if your team checks every
      move before a mailing goes out.
@@ -162,23 +162,23 @@ own gets the new mailing address.
 
 ## Moving a Household on Purpose
 
-Two buttons on the **Addresses** card move a household when you decide to, whatever
-**Address Updates** is set to. They need the same access as **Set as Primary**: edit on
-addresses, and on the household and its people. Nothing is deleted: the address each one
-replaces stays on the card as history.
+Two choices in an address's **More** menu on the **Addresses** card move a household when you
+decide to, whatever **Address Updates** is set to. They need the same access as **Set as
+Primary**: edit on addresses, and on the household and its people. Nothing is deleted: the
+address each one replaces stays on the card as history.
 
-- **Use for Whole Household**, on a person's own address card (not a seasonal one). The
+- **Move the Household Here**, on a person's own address (not a seasonal one). The
   household gets a new primary address copied from this one, and everyone in it who has no
   address of their own moves to it. The person stops having an address of their own in use
   (their cards stay, as history), so from now on they move with the household. In the
   flexible way of belonging, if they are a current member of more than one household the
   confirmation asks which, their own household first; choosing another household moves that household
   and leaves the person's own address in use.
-- **Update Everyone's Address**, on the household's primary address card. A confirmation lists
+- **Give This Address to Members**, on the household's primary address. A confirmation lists
   who will get this address (everyone in the household with no address of their own) and who
   has an address of their own. Those are left where they are unless you tick them; a ticked
   person stops having an address of their own in use and gets the household's address. Choose
-  **Update Everyone's Address** in the confirmation to go ahead, or **Cancel**. In the flexible
+  **Give This Address to Members** in the confirmation to go ahead, or **Cancel**. In the flexible
   way of belonging, a person whose own household is another one is not listed.
 
 Neither move reaches someone marked **Deceased**: they are not moved and not listed. When
@@ -188,7 +188,7 @@ two people in the list share a name, each shows their birthdate, for example "Sa
 Both confirmations open in a dialog over the page, so nothing on the card moves while you
 decide; **Escape** or **Cancel** closes it with nothing changed.
 
-With **Nobody moves until you choose**, **Update Everyone's Address** is how a household's
+With **Nobody moves until you choose**, **Give This Address to Members** is how a household's
 new address reaches its people. In the other two settings it is how you bring someone with an
 address of their own back to the household's address.
 
@@ -201,8 +201,8 @@ and an **End Date**, so the card can tell where someone lives now from where the
 different place from the primary it replaces, the old one gets today as its **End Date** and
 becomes **Former**, and the new one gets today as its **Start Date**. That happens however the
 new primary arrives: added on the card with **Primary** ticked, typed into the household's
-billing address or a person's mailing address, **Use for Whole Household**, or an import. A
-person whose own address **Use for Whole Household** or **Update Everyone's Address** stops
+billing address or a person's mailing address, **Move the Household Here**, or an import. A
+person whose own address **Move the Household Here** or **Give This Address to Members** stops
 using is ended the same way, unless the household's address is the same place. BarnCRM keeps
 these dates and the status itself, so a person whose access to addresses does not include the
 three fields (for example access from a profile, without a BarnCRM permission set) still saves
@@ -242,10 +242,12 @@ included, and the address number. Nothing is ticked on a new install, so the car
 its usual fields. A field someone cannot see is left out for them, and a field the card
 already shows is not repeated.
 
-**How the card looks.** Each address is its own box with a map pin, its type and its badges
-(**Primary**, **Undeliverable**) at the top with the **Change Status** menu at the right, the
-address under them, and the buttons below. The buttons wrap onto a new line in a narrow sidebar or on a
-phone. A record with no address yet shows **No Addresses Yet** with an **Add Address** button.
+**How the card looks.** The addresses are a list divided by lines. Each line has the address
+icon, its type (a link to the address record) and its badges (**Primary** with a star,
+**Undeliverable** in red) at the top with the **More** menu at the right, the address under
+them, and **Set as Primary** below. **More** holds **Edit** (the standard edit form), the
+status choices, and the household move the address allows. Former addresses sit on shaded
+lines. A record with no address yet shows **No Addresses Yet** with an **Add Address** button.
 
 ## A Five-Minute Walkthrough for the Seasonal Swap
 
@@ -302,10 +304,10 @@ not their household (their household is the one they are the primary member of, 
 one they joined first). They stay put when the household's primary changes, when its billing
 address is edited, and when the seasonal swap moves it. This is how a student stays at their
 dorm, or an adult child at their own home, while the rest of the household moves. To bring a
-person back to the household's address, choose **Update Everyone's Address** on the
+person back to the household's address, choose **Give This Address to Members** on the
 household's primary address and tick them; see "Moving a household on purpose". With
 **Address Updates** set to **Nobody moves until you choose**, a household change reaches
-nobody until you choose that button, except the seasonal swap.
+nobody until you choose it, except the seasonal swap.
 
 **Typing a state or country as a code in an org with State and Country Picklists.** With the
 picklists on, the standard address boxes take a full name ("Illinois", "United States") as
