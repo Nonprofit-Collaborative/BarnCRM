@@ -59,6 +59,12 @@ export default class GiftFundSplit extends LightningElement {
 
   labels = { addFund: ADD_FUND };
 
+  hasRendered = false;
+
+  renderedCallback() {
+    this.hasRendered = true;
+  }
+
   connectedCallback() {
     if (!this.helpReady) {
       loadHelp('Giving').then(() => {
@@ -84,7 +90,11 @@ export default class GiftFundSplit extends LightningElement {
         toCents(previous) !== toCents(this._total)
       ) {
         this.rows = [{ ...only, amount: this._total, percentText: null }];
-        this.notify();
+        // Not while the host first renders the editor: its own allocations are about to arrive,
+        // and an event now would hand it this blank row to pass back in their place.
+        if (this.hasRendered) {
+          this.notify();
+        }
       }
     }
   }
