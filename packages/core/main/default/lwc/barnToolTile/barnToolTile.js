@@ -1,13 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 
-const BADGE_THEMES = {
-  success: 'slds-theme_success',
-  warning: 'slds-theme_warning',
-  error: 'slds-theme_error',
-  inverse: 'slds-badge_inverse'
-};
-
 /**
  * One tool on a hub: an icon, a title-style name, one line (12 words or fewer), and an optional
  * badge for a count or state. The whole tile is one control, so a keyboard or screen reader
@@ -28,7 +21,7 @@ export default class BarnToolTile extends LightningElement {
   @api href;
   /** Text of the badge, for example "3 Need Attention". No badge when empty. */
   @api badgeLabel;
-  /** "success", "warning", "error", "inverse", or empty for the neutral badge. */
+  /** A status word from the vocabulary (c/barnStatus); empty for the neutral badge. */
   @api badgeVariant;
   @api disabled = false;
   /** Shown in place of the description while the tile is disabled. */
@@ -55,10 +48,6 @@ export default class BarnToolTile extends LightningElement {
 
   get hasBadge() {
     return Boolean(this.badgeLabel);
-  }
-
-  get badgeClass() {
-    return BADGE_THEMES[this.badgeVariant] || '';
   }
 
   get lineText() {

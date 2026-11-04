@@ -5,5 +5,5 @@
     UX kit: an info popover plus an optional Learn More link that opens a new tab safely, in
     place of a visible paragraph of help.
   </description>
-  <isExposed>false</isExposed>
+  <isExposed>true</isExposed>
 </LightningComponentBundle>

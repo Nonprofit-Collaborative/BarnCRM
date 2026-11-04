@@ -1,12 +1,58 @@
+/* A column flex host stretches the tile (a div, link or button) to the full cell width. */
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
 .stat {
   display: flex;
+  box-sizing: border-box;
+  flex: auto;
   flex-direction: column;
   align-items: center;
   gap: var(--slds-g-spacing-1, 0.25rem);
   padding: var(--slds-g-spacing-3, 0.75rem);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
   text-align: center;
+  text-decoration: none;
+}
+
+.stat_start {
+  align-items: flex-start;
+  text-align: start;
+}
+
+.stat_bordered {
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #e5e5e5);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  background: var(--slds-g-color-surface-container-1, #ffffff);
+}
+
+.stat_action {
+  cursor: pointer;
+}
+
+.stat_action:hover {
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
+  text-decoration: none;
+}
+
+.stat_action:focus-visible {
+  outline: none;
+  box-shadow: var(--slds-g-shadow-outline-focus-1, 0 0 0 2px #0b5cab);
 }
 
 .stat__value {
+  display: block;
   color: var(--slds-g-color-on-surface-3, #181818);
+}
+
+.stat__label {
+  display: flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-1, 0.25rem);
+  color: var(--slds-g-color-on-surface-2, #2e2e2e);
 }

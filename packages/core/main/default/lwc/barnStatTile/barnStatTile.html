@@ -1,14 +1,71 @@
 <template>
-    <div class="stat" data-id="tile">
-        <p class="stat__value slds-text-heading_large" data-id="value">
-            <template lwc:if={isNumber}>
-                <lightning-formatted-number value={value}></lightning-formatted-number>
+    <template lwc:if={isLink}>
+        <a class={tileClass} href={href} data-id="tile">
+            <span class="stat__value slds-text-heading_large" data-id="value">
+                <template lwc:if={isNumber}>
+                    <lightning-formatted-number
+                        value={value}
+                        format-style={numberStyle}
+                        currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                </template>
+                <template lwc:else>{value}</template>
+            </span>
+            <span class="stat__label slds-text-body_small" data-id="label">
+                <template lwc:if={iconName}>
+                    <lightning-icon icon-name={iconName} size="x-small" data-id="icon"></lightning-icon>
+                </template>
+                <span>{label}</span>
+            </span>
+            <template lwc:if={hasBadge}>
+                <c-barn-status-badge status={badgeVariant} label={badgeLabel} data-id="badge"></c-barn-status-badge>
             </template>
-            <template lwc:else>{value}</template>
-        </p>
-        <p class="slds-text-body_small" data-id="label">{label}</p>
-        <template lwc:if={hasBadge}>
-            <lightning-badge class={badgeClass} label={badgeLabel} data-id="badge"></lightning-badge>
-        </template>
-    </div>
+        </a>
+    </template>
+    <template lwc:elseif={isButton}>
+        <button type="button" class={tileClass} onclick={handleSelect} data-id="tile">
+            <span class="stat__value slds-text-heading_large" data-id="value">
+                <template lwc:if={isNumber}>
+                    <lightning-formatted-number
+                        value={value}
+                        format-style={numberStyle}
+                        currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                </template>
+                <template lwc:else>{value}</template>
+            </span>
+            <span class="stat__label slds-text-body_small" data-id="label">
+                <template lwc:if={iconName}>
+                    <lightning-icon icon-name={iconName} size="x-small" data-id="icon"></lightning-icon>
+                </template>
+                <span>{label}</span>
+            </span>
+            <template lwc:if={hasBadge}>
+                <c-barn-status-badge status={badgeVariant} label={badgeLabel} data-id="badge"></c-barn-status-badge>
+            </template>
+        </button>
+    </template>
+    <template lwc:else>
+        <div class={tileClass} data-id="tile">
+            <span class="stat__value slds-text-heading_large" data-id="value">
+                <template lwc:if={isNumber}>
+                    <lightning-formatted-number
+                        value={value}
+                        format-style={numberStyle}
+                        currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                </template>
+                <template lwc:else>{value}</template>
+            </span>
+            <span class="stat__label slds-text-body_small" data-id="label">
+                <template lwc:if={iconName}>
+                    <lightning-icon icon-name={iconName} size="x-small" data-id="icon"></lightning-icon>
+                </template>
+                <span>{label}</span>
+            </span>
+            <template lwc:if={hasBadge}>
+                <c-barn-status-badge status={badgeVariant} label={badgeLabel} data-id="badge"></c-barn-status-badge>
+            </template>
+        </div>
+    </template>
 </template>

@@ -90,6 +90,9 @@ jobs:
       - name: Check every exposed component is reachable from something
         run: python3 scripts/ci/check-components-reachable.py
 
+      - name: Check components add no look the visual standard replaced
+        run: python3 scripts/ci/check-visual-standard.py
+
       - name: Check every packaged record page is actually assigned
         run: python3 scripts/ci/check-record-pages-assigned.py
 

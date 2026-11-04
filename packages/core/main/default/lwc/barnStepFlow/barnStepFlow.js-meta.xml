@@ -5,5 +5,5 @@
     UX kit: a multi-step flow with the SLDS path, the step body, and one footer with Back on the
     left and the step's actions on the right, used by Import and the bulk tools.
   </description>
-  <isExposed>false</isExposed>
+  <isExposed>true</isExposed>
 </LightningComponentBundle>

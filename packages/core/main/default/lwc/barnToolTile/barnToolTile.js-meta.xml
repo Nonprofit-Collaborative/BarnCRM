@@ -5,5 +5,5 @@
     UX kit: one clickable tool tile (icon, name, one line, optional badge), used on hubs such as
     Data Manager and the Org Optimizer overview.
   </description>
-  <isExposed>false</isExposed>
+  <isExposed>true</isExposed>
 </LightningComponentBundle>

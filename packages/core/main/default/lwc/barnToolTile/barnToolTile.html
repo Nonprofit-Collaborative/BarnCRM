@@ -19,7 +19,7 @@
                 </span>
                 <span class="tile__line slds-text-body_small" data-id="line">{lineText}</span>
                 <template lwc:if={hasBadge}>
-                    <lightning-badge class={badgeClass} label={badgeLabel} data-id="badge"></lightning-badge>
+                    <c-barn-status-badge status={badgeVariant} label={badgeLabel} data-id="badge"></c-barn-status-badge>
                 </template>
             </span>
         </a>
@@ -39,7 +39,7 @@
                 <span class="tile__name slds-text-heading_small" data-id="name">{label}</span>
                 <span class="tile__line slds-text-body_small" data-id="line">{lineText}</span>
                 <template lwc:if={hasBadge}>
-                    <lightning-badge class={badgeClass} label={badgeLabel} data-id="badge"></lightning-badge>
+                    <c-barn-status-badge status={badgeVariant} label={badgeLabel} data-id="badge"></c-barn-status-badge>
                 </template>
             </span>
         </button>

@@ -150,3 +150,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 5 | Record device, OS and app version as the [Mobile audit](../contributor-guide/scale-and-mobile-test-plan.md#mobile-audit) asks. For the full set of mobile screens, run that audit. | Results recorded per [Record results](before-you-test.md#record-results). |
 
 **Cleanup:** Clear **Payment Reference** on the gift from step 4.
+
+## T-A11Y-10: Status and Messages Never by Color Alone
+
+**Purpose:** Confirm the shared visual kit (status badges, notices, meters, stat tiles) carries each state in an icon or text as well as a color, in light and dark themes.
+**Prerequisites:** admin user; sample data loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Org Optimizer**, choose **Storage and Limits**. | Each limit shows its name, a bar, and **N of N (N%)** beside the bar. A limit at 80% or more has an amber **Near Limit** badge with a warning icon under it. |
+| 2 | Open **Org Optimizer**, **Overview**. | Each tile badge has an icon matching its state: a check for passed, a warning sign for needs attention, an error sign for errors; a neutral badge (**Not Run Yet**) has none and is never black. |
+| 3 | Open the BarnCRM home page. | The **Quick Links** tiles show the same icons as the **Households**, **Organizations** and **BarnCRM Settings** tabs in the navigation bar. |
+| 4 | If your Salesforce user settings offer a dark theme, switch to it and repeat steps 1 and 2. | Badges, bars and text stay readable; no white box or black text appears on a dark background. Switch the theme back. |
+
+**Cleanup:** None.

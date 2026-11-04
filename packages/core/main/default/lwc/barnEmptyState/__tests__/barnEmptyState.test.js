@@ -65,4 +65,20 @@ describe('c-barn-empty-state', () => {
     const element = render({ illustration: 'open-road', heading: 'Nothing Yet' });
     expect(one(element, 'art-no-data')).not.toBeNull();
   });
+
+  it.each([['no-data'], ['setup'], ['all-clear']])(
+    'story: compact %s, for a record sidebar',
+    (illustration) => {
+      const element = render({
+        illustration,
+        size: 'compact',
+        heading: 'No Soft Credits Yet',
+        message: 'Add one when someone else gets credit.'
+      });
+      expect(one(element, `art-${illustration}`)).toBeNull();
+      expect(one(element, 'empty-state').className).not.toContain('slds-illustration');
+      expect(one(element, 'heading').className).toBe('slds-text-heading_small');
+      expect(one(element, 'message').className).toContain('slds-text-body_small');
+    }
+  );
 });

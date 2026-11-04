@@ -7,6 +7,8 @@ Rules:
 - Write the motif as `CustomN: Name`, with the name the documented list gives for N.
 - No two BarnCRM tabs share a number, so each tab is recognizable in the navigation, the page header and a console tab.
 - A new tab takes a number no other BarnCRM tab uses. Add it to the table below; `scripts/ci/tests/test_core_navigation.py` fails if it is invalid or reused.
+- Add the tab to the icon registry, `packages/core/main/default/lwc/barnIcons/barnIcons.js`, keyed by the tab's API name, in the same PR. The same test fails when a tab is missing from the registry or listed with another number.
+- Navigation icon equals tab icon: a link or tile that opens a tab takes its icon from `iconFor('<tab API name>')` (c/barnIcons). See the [Visual Standard](ux-kit.md#visual-standard).
 - A card's header icon is its own page's or object's tab icon (`custom:customN` with that tab's number), never another tab's. See Card Icons below.
 
 | Package | Tab | Motif |
@@ -99,7 +101,7 @@ A `lightning-card` header shows the icon of the page or object the card belongs 
 - Card headers use `standard:*` or `custom:*` icons only; a `utility:*` glyph renders small and grey beside colored icon tiles.
 - A card with no tab of its own (such as household or address panels) keeps a `standard:*` icon.
 
-Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_navigation.py` fails when a card uses a `custom:*` icon that is not listed, when the listed tab's motif number differs, or when a card header uses a `utility:*` icon.
+Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_navigation.py` fails when a card uses a `custom:*` icon that is not listed, when the listed tab's motif number differs, when the component names neither the icon nor `iconFor('<Tab>')` (c/barnIcons), or when a card header uses a `utility:*` icon.
 
 | Package | Component | Card icon | Tab |
 |---|---|---|---|

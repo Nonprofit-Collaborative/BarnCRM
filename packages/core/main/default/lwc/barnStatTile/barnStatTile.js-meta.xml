@@ -2,8 +2,8 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    UX kit: one count as a big number over a label with an optional state badge, used by the
-    import preview and results and by Org Optimizer counts.
+    UX kit: one figure (number, currency or percent) over a label with an optional icon, link,
+    border and status badge, for every row of counts in the suite.
   </description>
-  <isExposed>false</isExposed>
+  <isExposed>true</isExposed>
 </LightningComponentBundle>
