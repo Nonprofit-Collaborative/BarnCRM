@@ -11,9 +11,12 @@
         ></lightning-button>
 
         <template lwc:if={errorMessage}>
-            <p class="slds-text-color_error slds-var-m-top_small" data-id="error" role="alert">
-                {errorMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-top_small"
+                data-id="error"
+                variant="error"
+                message={errorMessage}
+            ></c-barn-notice>
         </template>
         <template lwc:if={showProgress}>
             <div class="slds-var-m-vertical_small" data-id="progress">
@@ -38,19 +41,29 @@
             </div>
         </template>
         <template lwc:if={datesStoppedMessage}>
-            <div class="slds-var-m-vertical_small" data-id="dates-stopped">
-                <p class="slds-var-m-bottom_x-small" role="status">{datesStoppedMessage}</p>
+            <c-barn-notice
+                class="slds-var-m-vertical_small"
+                data-id="dates-stopped"
+                variant="warning"
+                message={datesStoppedMessage}
+            >
                 <template lwc:if={showRetry}>
                     <lightning-button
+                        class="slds-var-m-top_x-small"
                         data-id="retry"
                         label={labels.retry}
                         onclick={handleRetry}
                     ></lightning-button>
                 </template>
-            </div>
+            </c-barn-notice>
         </template>
         <template lwc:if={showEmpty}>
-            <p class="slds-var-m-top_small" data-id="no-fields">{labels.noFields}</p>
+            <c-barn-empty-state
+                class="slds-var-m-top_small"
+                data-id="no-fields"
+                size="compact"
+                heading={labels.noFields}
+            ></c-barn-empty-state>
         </template>
         <template lwc:if={hasRows}>
             <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="note">{labels.note}</p>
@@ -66,10 +79,19 @@
             ></lightning-datatable>
         </template>
         <template lwc:if={truncatedMessage}>
-            <p class="slds-var-m-top_x-small" data-id="truncated">{truncatedMessage}</p>
+            <c-barn-notice
+                class="slds-var-m-top_x-small"
+                data-id="truncated"
+                message={truncatedMessage}
+            ></c-barn-notice>
         </template>
         <template lwc:if={notCheckedMessage}>
-            <p class="slds-var-m-top_x-small" data-id="not-checked">{notCheckedMessage}</p>
+            <c-barn-notice
+                class="slds-var-m-top_x-small"
+                data-id="not-checked"
+                variant="warning"
+                message={notCheckedMessage}
+            ></c-barn-notice>
         </template>
     </div>
     </template>

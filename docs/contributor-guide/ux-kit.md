@@ -106,6 +106,24 @@ Each component has Jest tests written as stories (one case per variant a screen 
 
 The two modules are framework free (no `lightning/*` or `@salesforce/*` imports), so they port to BarnCRM for WordPress (plan 9.9). `c-barn-empty-state` also takes `size="compact"` (below).
 
+## Drag and Drop
+
+| Module | Use it for | Main exports |
+|---|---|---|
+| `c/barnDrag` | Moving an item between board columns, reordering a list, or dropping one part onto another (Grant Pipeline, Logic Model builder, Cohort Members, Eligibility Rules, import and Super Transformer steps) | `createDragController(options)` returning `pointerDown(event)`, `keyDown(event)`, `cancel()`, `state`, `destroy()`; list helpers `moveItem(list, from, to)` (a copy with one item moved; use it in `onDrop` with `toIndex`) and `targetIndex(index, delta, length)` (where Move Up or Move Down goes, -1 at an end) |
+| `c/barnDragText` | The words the controller announces, from the Core help catalog | `dragMessages()`, `dragInstructions()` |
+
+`c/barnDrag` is framework free (plan 9.9). Rules:
+
+- Drag and drop is always an addition. The screen keeps its Move Up and Move Down buttons, card menu or form; on a phone, where columns stack, the menu stays the main way.
+- Markup: a drop zone is any element with `data-drop-zone` (its id) and `data-drop-label` (its name); an item inside it has `data-drag-id`, `data-drag-label`, `tabindex="0"`, `aria-describedby` pointing at a hidden element holding `dragInstructions()`, and `onpointerdown` and `onkeydown` handlers that call the controller. A zone can itself sit inside another zone (a part inside a column): the innermost zone under the pointer wins.
+- Options: `root` (the component's `this.template`), `layout` (`columns` when zones sit side by side, Left and Right change column; `list` for one list), `messages` (`dragMessages()`, after `loadHelp([<your package>, 'Core'])`), `announce(text)` (write it to the component's own `aria-live="polite"` region), `onChange(state)` (render the source and target highlight from `state.itemId`, `overZone` and `overIndex`), `onDrop({ itemId, fromZone, fromIndex, toZone, toIndex })` (apply the move; return `false` or reject to snap back, and show the reason the same way the existing control does), and optional `canDrop(itemId, fromZone, toZone)`.
+- Pointer: a mouse or pen drag starts after a few pixels of movement; touch starts after a 250 ms press and hold, so a swipe still scrolls. The click that ends a drag does not open the card under it. Uses pointer events, never HTML5 `draggable` (it does not fire on iOS Safari).
+- Keyboard: Space on the item picks it up, the arrow keys move it, Space or Enter drops, Escape or Tab cancels. Space on a button or link inside the item keeps its own job. Focus returns to the moved item after the drop.
+- Call `destroy()` in `disconnectedCallback`.
+- A list whose rows hold inputs (import and Super Transformer steps, `importColumnTransforms`) puts `data-drag-id` and the handlers on a small handle `span` (`role="button"`, `tabindex="0"`, `aria-label` the item's name) rather than on the row, so typing and clicking in the row are untouched. Its Move Up and Move Down buttons announce through the same region with `Core_Drag_Position`.
+- Never for a destructive or single-choice action (a delete, a merge, a setting).
+
 ## Visual Standard
 
 One part per job. A reviewer checks a screen against this list, not against taste.
