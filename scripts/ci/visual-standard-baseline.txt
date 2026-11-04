@@ -9,7 +9,6 @@ packages/core/main/default/lwc/dataJobHistory/dataJobHistory.html solid-box 2
 packages/core/main/default/lwc/errorLogTile/errorLogTile.html solid-box 1
 packages/core/main/default/lwc/filterBuilder/filterBuilder.html solid-box 2
 packages/core/main/default/lwc/findRecords/findRecords.html solid-box 2
-packages/core/main/default/lwc/householdMergeSplit/householdMergeSplit.html table-stacked 1
 packages/core/main/default/lwc/householdNamingSettings/householdNamingSettings.html table-stacked 1
 packages/core/main/default/lwc/importResults/importResults.html table-stacked 2
 packages/core/main/default/lwc/importRowCorrection/importRowCorrection.html table-stacked 1

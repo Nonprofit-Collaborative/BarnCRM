@@ -92,9 +92,10 @@ You do not need permission to delete households.
 
 1. Open the household you want to keep and click **Merge or Split** in the action bar.
 2. Stay on the **Merge** tab. In **Find the Other Household**, type part of its name and pick
-   it.
-3. Read the **Household comparison**. Where the two disagree, choose **Keep this one** or **Keep
-   the other one**. Check **Members After the Merge**.
+   it. Each household shows its city.
+3. Read the **Household comparison**. Where the two disagree, choose **Keep This One** or **Keep
+   the Other One**. Check **Members After the Merge**. Opened the one you meant to remove?
+   Click **Keep the Other Household Instead** rather than starting again.
 4. Click **Merge**. Read "This Cannot Be Undone", then click **Merge Households**.
 
 You should see: "Merged. The household you kept now holds everyone from both." The other
@@ -104,8 +105,10 @@ cannot be undone, so check both households first.
 ## To Split Someone Out of a Household
 
 1. On the household, click **Merge or Split**, then the **Split** tab.
-2. Under **Choose Who Moves Out**, tick each person who is moving.
-3. Choose **A new household**, or **An existing household** and search for it.
+2. Choose **A new household**, or **An existing household** and pick it.
+3. Under **Choose Who Moves Out**, move each person who is leaving from **Stays in ...** to
+   **Moves to ...**: tick their checkbox, use **Move to ...** in their tile's menu, or drag
+   their tile across (on a phone or tablet, press and hold first).
 4. Click **Split**, then confirm **Split** in "Split This Household?".
 
 You should see: "Moved. Both household names and member counts are up to date."

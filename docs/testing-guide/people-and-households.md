@@ -113,7 +113,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | Create a contact `Cara` `Testwell` with no account. | A second household named **The Testwell Family** is created for her. |
 | 2 | Open the first Testwell household (Ada's) and select **Merge or Split** in the action bar. | A window titled **Merge or Split Households** opens on the **Merge** tab with **Pick a household to see the two side by side.** |
-| 3 | Type `Testwell` in **Find the Other Household** and pick Cara's household. | The comparison shows **Field**, **This Household**, **The Other Household**; differing values offer **Keep this one** or **Keep the other one**. **Members After the Merge** lists Ada and Ben (**From this household**) and Cara (**From the other household**). |
+| 3 | Type `Testwell` in **Find the Other Household** and pick Cara's household. | The picker lists households only, never this one, each with its billing city. The comparison shows **Field**, **This Household**, **The Other Household**; differing values offer **Keep This One** or **Keep the Other One**. **Members After the Merge** lists Ada and Ben (**From this household**) and Cara (**From the other household**). |
+| 3a | Select **Keep the Other Household Instead**, then **Keep This Household Instead**. | The first swaps the roles: the columns stay put, the members' badges stay with their households, and the link reads **Keep This Household Instead**; the second swaps back. (Merging while swapped keeps Cara's household and the page goes to it.) |
 | 4 | Select **Merge**. | A dialog headed **This Cannot Be Undone** says Cara's household will be combined into this one. |
 | 5 | Select **Cancel**. | Nothing changes: both households still exist with their members. |
 | 6 | Select **Merge**, then **Merge Households**. | Toast **Merged. The household you kept now holds everyone from both.** The window closes and the page refreshes: Member Count **3**, Cara in **Members**. Cara's old household no longer exists. |
@@ -128,10 +129,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Select **Merge or Split**, then the **Split** tab. | **Choose Who Moves Out** lists the three members; **Split** is disabled until someone is ticked. |
-| 2 | Tick Cara, leave **A new household**, and select **Split**. | A dialog headed **Split This Household?** opens. |
+| 1 | Select **Merge or Split**, then the **Split** tab. | Under **Choose Who Moves Out**, two columns: **Stays in** the household's name, holding the three members as tiles with checkboxes, and an empty **Moves to a New Household**. **Split** is disabled until someone is in the Moves column. |
+| 1a | Drag Ben's tile into **Moves to a New Household** (on a tablet, press and hold first), then use **Move to** with the household's name in his tile's menu. | The drag moves Ben across and ticks his checkbox, and a screen reader hears **Moved Ben Testwell to a New Household.**; the menu moves him back and unticks it. With the keyboard: focus his tile, Space, Right Arrow, Space does the same. |
+| 2 | Tick Cara, leave **A new household**, and select **Split**. | Cara's tile moves to the Moves column. A dialog headed **Split This Household?** opens. |
 | 3 | Select **Split** in the dialog. | Toast **Moved. Both household names and member counts are up to date.** Cara's new household **The Testwell Family** has Member Count **1**; the original has **2**. |
-| 4 | Undo: on Cara's new household, **Merge or Split**, **Split**, tick Cara, choose **An existing household**, search `Testwell`, pick the original, and split. | Cara is back in the original (Member Count **3**). Her emptied household remains with Member Count **0** and keeps its name, because **Delete Empty Households** ships off. |
+| 4 | Undo: on Cara's new household, **Merge or Split**, **Split**, tick Cara, choose **An existing household**, pick the original in **Find the Other Household**, and split. | The Moves column heading changes to **Moves to** the original's name. Cara is back in the original (Member Count **3**). Her emptied household remains with Member Count **0** and keeps its name, because **Delete Empty Households** ships off. |
 
 **Cleanup:** delete the empty household.
 
