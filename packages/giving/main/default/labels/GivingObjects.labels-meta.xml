@@ -193,6 +193,14 @@
         <value>Record It</value>
     </labels>
     <labels>
+        <fullName>Giving_FundSplit_AddFund</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Fund split editor: add a row button</shortDescription>
+        <value>Add a Fund</value>
+    </labels>
+    <labels>
         <fullName>Giving_RefundGift_Heading</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

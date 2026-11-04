@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The fund split arithmetic in plain JavaScript: amounts and percents in whole cents, what is
+    left to assign, whether a split can be saved, and the stacked bar's divider. Imported by
+    giftFundSplit.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

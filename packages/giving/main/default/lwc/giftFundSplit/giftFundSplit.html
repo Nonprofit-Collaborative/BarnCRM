@@ -1,0 +1,116 @@
+<template>
+  <template lwc:if={helpReady}>
+    <div data-id="fund-split">
+      <template for:each={rowViews} for:item="row">
+        <div key={row.key} class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end slds-var-m-bottom_x-small" data-id="split-row">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+            <lightning-record-picker
+              data-id="fund"
+              data-key={row.key}
+              label={fundLabel}
+              object-api-name="Fund__c"
+              filter={activeFunds}
+              value={row.fundId}
+              onchange={handleFundChange}
+            ></lightning-record-picker>
+          </div>
+          <div class="slds-col slds-size_5-of-12 slds-medium-size_3-of-12">
+            <lightning-input
+              data-id="amount"
+              data-key={row.key}
+              type="number"
+              formatter="currency"
+              step="0.01"
+              label={amountLabel}
+              value={row.amount}
+              onchange={handleAmountChange}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_5-of-12 slds-medium-size_2-of-12">
+            <lightning-input
+              data-id="percent"
+              data-key={row.key}
+              type="number"
+              formatter="percent-fixed"
+              step="0.01"
+              label={percentLabel}
+              value={row.percent}
+              onchange={handlePercentChange}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_2-of-12 slds-medium-size_1-of-12">
+            <lightning-button-icon
+              data-id="remove"
+              data-key={row.key}
+              icon-name="utility:delete"
+              variant="border-filled"
+              alternative-text={row.removeLabel}
+              title={row.removeLabel}
+              disabled={row.removeDisabled}
+              onclick={handleRemoveRow}
+            ></lightning-button-icon>
+          </div>
+        </div>
+      </template>
+
+      <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-grid_align-spread slds-var-m-top_x-small">
+        <lightning-button
+          data-id="add-row"
+          label={labels.addFund}
+          icon-name="utility:add"
+          onclick={handleAddRow}
+        ></lightning-button>
+        <div aria-live="polite" data-id="left">
+          <c-barn-status-badge status={leftStatus} label={leftText}></c-barn-status-badge>
+        </div>
+      </div>
+
+      <template lwc:if={hasProblems}>
+        <div class="slds-var-m-top_small">
+          <c-barn-notice variant="warning" data-id="problems">
+            <template for:each={problemLines} for:item="line">
+              <p key={line.key}>{line.text}</p>
+            </template>
+          </c-barn-notice>
+        </div>
+      </template>
+
+      <template lwc:if={showBar}>
+        <div class="slds-var-m-top_medium">
+          <div class="split-bar" data-id="bar">
+            <template for:each={segments} for:item="segment">
+              <div key={segment.key} class={segment.className} style={segment.style} title={segment.title} aria-hidden="true">
+                {segment.text}
+              </div>
+            </template>
+            <template for:each={dividers} for:item="divider">
+              <div
+                key={divider.key}
+                class="split-divider"
+                style={divider.style}
+                role="slider"
+                tabindex="0"
+                aria-orientation="horizontal"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow={divider.now}
+                aria-valuetext={divider.valueText}
+                aria-label={divider.label}
+                data-id="divider"
+                data-index={divider.index}
+                onpointerdown={handleDividerDown}
+                onpointermove={handleDividerMove}
+                onpointerup={handleDividerUp}
+                onpointercancel={handleDividerUp}
+                onkeydown={handleDividerKey}
+              ></div>
+            </template>
+          </div>
+          <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_xx-small" data-id="bar-hint">{barHint}</p>
+        </div>
+      </template>
+
+      <div class="slds-assistive-text" aria-live="polite" data-id="announce">{liveMessage}</div>
+    </div>
+  </template>
+</template>
