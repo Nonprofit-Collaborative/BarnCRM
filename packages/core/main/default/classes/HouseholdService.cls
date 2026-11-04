@@ -2129,7 +2129,9 @@ public with sharing class HouseholdService {
         if (!accountPeople.isEmpty() && !isJunctionMode()) {
             // A person stored as an account has no account reference of their own to move,
             // so this org has to be in the flexible membership mode to move them at all.
-            throw new HouseholdException(Label.Core_Households_ErrorMoveNeedsJunction);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_Households_ErrorMoveNeedsJunction')
+            );
         }
         // Everybody named is read through the object that holds them, and everybody named
         // has to exist. A merge or a split that names somebody who has since been deleted
@@ -2429,7 +2431,9 @@ public with sharing class HouseholdService {
         if (!accountPeople.isEmpty() && !isJunctionMode()) {
             // A person stored as an account has no account reference of their own, so only
             // the flexible membership mode can hold them.
-            throw new HouseholdException(Label.Core_Households_ErrorMoveNeedsJunction);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_Households_ErrorMoveNeedsJunction')
+            );
         }
         affected.addAll(householdIds);
         if (isJunctionMode()) {
