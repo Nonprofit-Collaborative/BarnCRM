@@ -247,7 +247,7 @@ describe('c-access-compare', () => {
     await flush();
     await flush();
 
-    expect(byId(element, 'error').textContent).toContain('No access.');
+    expect(byId(element, 'error').message).toContain('No access.');
   });
 
   it('downloads the table shown', async () => {
@@ -266,6 +266,6 @@ describe('c-access-compare', () => {
     });
     expect(text).toContain('Only Pat Doe: Edit.');
     expect(text).not.toContain('Fund__c');
-    expect(byId(element, 'notice').textContent).toBe('Downloaded 2 rows.');
+    expect(byId(element, 'notice').message).toBe('Downloaded 2 rows.');
   });
 });

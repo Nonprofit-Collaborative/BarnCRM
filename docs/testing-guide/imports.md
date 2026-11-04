@@ -496,3 +496,18 @@ ana.rowe@example.org,Rivergate Library,Volunteer,true,2026-03-01
 | 7 | In an org installed before this release, open the Import tab after the upgrade. | **Relationships** and **Affiliations** are added; existing templates are unchanged. |
 
 **Cleanup:** undo both imports from **Recent Imports** (see T-IMP-03); delete the test contacts and organization.
+
+## T-IMP-23: Reorder Value Changes
+
+**Purpose:** confirm the changes on a column can be reordered by button and by drag, on a desktop, a phone and with a screen reader.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Upload `import-test-2.csv` as in T-IMP-07. Beside **Last Name**, select **Change Values**, then add **Capitalize each word** and **Find and replace** (find `-TEST`, replace with nothing). | Two changes, in that order. The first one's **Move Up** arrow and the last one's **Move Down** arrow are greyed out. |
+| 2 | On the second change, select **Move Up** with the keyboard (Tab to it, press Enter). | **Find and replace** is now first; the before and after preview updates. A screen reader says "Find and replace, position 1 of 2." |
+| 3 | Drag the handle at the left of **Find and replace** below **Capitalize each word** with the mouse, then press Escape halfway through a second drag. | The first drag swaps them back; a blue line shows where the change lands. The cancelled drag changes nothing. |
+| 4 | Tab to a change's handle, press Space, press the down arrow, press Space. | A screen reader hears "Picked up", the new position, then "Moved". The change moves down one place. |
+| 5 | On a phone (or the browser's device view), press and hold a change's handle, then drag it. A quick swipe on the handle instead scrolls the page. | The change moves after the hold; the swipe only scrolls. |
+| 6 | Open **Super Transformer**, choose a text field and **Change With Steps**, add two steps and repeat step 2. | The steps move the same way. |
+
+**Cleanup:** leave the page without importing.

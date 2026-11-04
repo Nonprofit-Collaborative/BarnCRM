@@ -10,7 +10,7 @@ Choose one or more kinds of record, and it lists every field you can see, with:
 
 | Column | What it shows |
 |---|---|
-| **Object** | The kind of record's label (the CSV adds an **Object API Name** column) |
+| **Kind of Record** | The kind of record's label (the CSV heads it **Object** and adds an **Object API Name** column) |
 | **Field** and **API Name** | The field's label and its API name |
 | **Type** | The field type, such as text, picklist, currency or reference (a lookup) |
 | **Length** | The most characters a text field holds |
@@ -61,7 +61,7 @@ Start from the sample data (see [Sample data](sample-data.md)).
 
 ## What Is Listed
 
-- **Kinds of records.** The list offers the same kinds of record Field Utilization and Find do:
+- **Kinds of records.** The list offers the same kinds of record Field Use and Find do:
   everything you can open, with Salesforce's own system tables and settings left out.
 - **Fields.** Every field you have field-level security access to read. A field hidden from you
   is not listed, so an administrator who can see everything gets the full dictionary.
@@ -74,7 +74,7 @@ Start from the sample data (see [Sample data](sample-data.md)).
 
 ## Fill Rates
 
-**Include Fill Rates** reuses [Field utilization](field-utilization.md): the same counting, the
+**Include Fill Rates** reuses [Field Use](field-utilization.md): the same counting, the
 same limits, and the same wait. For each kind of record, the page counts the fields a chunk at a
 time, then shows one **Fill Rate** per field (across record types). It adds time in proportion to
 the number of records and fields, so leave it off when you only want the structure.
@@ -82,12 +82,10 @@ the number of records and fields, so leave it off when you only want the structu
 - A kind of record with more than 1,000,000 records is not counted. Its fill rates stay blank and
   the page names it.
 - A kind of record with no records has blank fill rates.
-- A field Field Utilization does not count (formulas, checkboxes, automatic numbers) has a blank
-  fill rate.
-- A long text field's fill rate is for the 200 most recently changed records, as in Field
-  Utilization.
-- Fill rates are not saved. To keep a count for trends, use **Save Utilization Snapshot** in
-  Field Utilization.
+- A field Field Use does not count (formulas, checkboxes, automatic numbers) has a blank fill
+  rate.
+- A long text field's fill rate is for the 200 most recently changed records, as in Field Use.
+- Fill rates are not saved. To keep a count for trends, use **Save Snapshot** in Field Use.
 
 ## Download CSV
 
@@ -107,7 +105,7 @@ what runs when a record of that kind is saved or deleted:
 
 | Column | What it shows |
 |---|---|
-| **Object** | The kind of record. |
+| **Kind of Record** | The kind of record. |
 | **Type** | **Apex Trigger** or **Flow**. |
 | **Name** and **API Name** | The trigger's name, or the flow's label and API name. |
 | **Status** | **Active** or **Inactive**. A flow with no active version is inactive. |
@@ -147,5 +145,5 @@ outside what this section reads. Use Setup for those. Flows and triggers are in 
 ## Related
 
 - [Org Optimizer](org-optimizer.md)
-- [Field utilization](field-utilization.md)
+- [Field Use](field-utilization.md)
 - [Find and export](find.md)

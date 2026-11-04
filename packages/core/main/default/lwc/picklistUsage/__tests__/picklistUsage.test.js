@@ -103,8 +103,8 @@ describe('c-picklist-usage', () => {
     const table = query(element, 'results');
     expect(table.data).toHaveLength(2);
     expect(table.data[0].statusLabel).toBe('c.Core_PicklistUsage_StatusInactive');
-    expect(query(element, 'truncated').textContent).toBe('Cut: A');
-    expect(query(element, 'not-checked').textContent).toBe('Failed: B');
+    expect(query(element, 'truncated').message).toBe('Cut: A');
+    expect(query(element, 'not-checked').message).toBe('Failed: B');
   });
 
   it('says so when there are no picklist fields', async () => {
@@ -123,7 +123,7 @@ describe('c-picklist-usage', () => {
     query(element, 'show').click();
     await flush();
     await flush();
-    expect(query(element, 'error').textContent).toBe('Refused.');
+    expect(query(element, 'error').message).toBe('Refused.');
   });
 
   it('clears the table when another object is chosen', async () => {
@@ -224,7 +224,7 @@ describe('c-picklist-usage', () => {
       const element = mount();
       query(element, 'show').click();
       await settle();
-      expect(query(element, 'dates-stopped').textContent).toContain('Stopped 2 of 3: A');
+      expect(query(element, 'dates-stopped').message).toContain('Stopped 2 of 3: A');
       query(element, 'retry').click();
       await settle();
       expect(getPicklistLastUsed.mock.calls[2][0].afterId).toBe('id2');
@@ -251,7 +251,7 @@ describe('c-picklist-usage', () => {
       release();
       await settle();
       expect(getPicklistLastUsed).toHaveBeenCalledTimes(1);
-      expect(query(element, 'dates-stopped').textContent).toContain('Stopped 1 of 3');
+      expect(query(element, 'dates-stopped').message).toContain('Stopped 1 of 3');
       expect(query(element, 'retry')).not.toBeNull();
     });
   });

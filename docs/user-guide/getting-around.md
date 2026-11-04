@@ -38,10 +38,12 @@ flows and Apex triggers that run on each kind of record) and downloads it as a C
 **AI-Readiness Export** section, which downloads a zip that explains your data to an AI tool of
 their choice, a **Setup Changes** section that shows who changed what in Setup, and when, and
 an **Access Explorer** section that shows who can see or change what, and why, compares two
-people side by side and lists who holds Modify All Data. Its **Field Utilization** section also
+people side by side and lists who holds Modify All Data. Its **Field Use** section also
 shows, for any picklist, how many records hold each value and when they were last changed, and
-its **Unused Setup** section lists Apex and flows on old API versions under **Technical Debt**.
-Each field row in the Data Dictionary, Field Utilization and the Record Inspector has a **Where
+its **Unused Setup** section lists Apex and flows on old API versions in a closed part titled
+**For Developers: Old Code and Flows**. Org Optimizer lists its sections on the left, like
+BarnCRM Settings; on a phone, choose a section in the **Show** box at the top.
+Each field row in the Data Dictionary, Field Use and the Record Inspector has a **Where
 Used** action, which lists the BarnCRM setup (saved queries, import mappings, rollups and more)
 that uses the field and walks an administrator through retiring it safely. If you import files, the
 **Check Columns** step shows a few example values beside each column, so you can see each
@@ -51,12 +53,20 @@ field before you go on. An Excel workbook can load several of its sheets at once
 its own kind of record if the template loads several. The
 Admin Guide's Importing page has the detail.
 
-The **BarnCRM Fundraising** app has **Quick Gift Entry**, **Contacts**, **Households**,
-**Organizations**, **Gifts**, **Commitments**, **Gift Batches**, **Funds**, **Appeals**,
-**Tributes**, **Receipts**, **Stewardship Plans**, **Acknowledgment Queue**, **Receipt
-Letters**, **Dashboards** and **Reports** (an admin also sees **Donor Level Ladder** and
-**Stewardship Plan Setup**), plus **Quick Gift Entry** in the utility
-bar at the bottom of the screen.
+The **BarnCRM Fundraising** app opens on **Fundraising Home**, then has **Quick Gift Entry**,
+**Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Installments**
+(each pledge payment), **Ask Pipeline**, **Asks**, **Gift Batches**, **Funds**, **Appeals**,
+**Tributes**, **Receipts**, **Stewardship Plans**, **Acknowledgment Queue**, **Donor
+Segments**, **Dashboards** and **Reports**, plus **Quick Gift Entry** in the utility bar at the
+bottom of the screen.
+
+**Fundraising Home** shows five figures, each a link to its list: gifts waiting for a thank
+you, overdue pledge payments, your asks due this month, open gift batches and running
+stewardship plans. **Enter a Gift** opens Quick Gift Entry. Under **Fundraising Setup** are the
+setup pages that are no longer in the menu (**Donor Level Ladder**, **Stewardship Plan Setup**,
+**Pledge Reminders**, **Receipt Letters**), each shown only to people who may use it; they are
+also in the App Launcher. Below are two charts, **Giving by Month** and **Open Asks by Stage**;
+click a chart to open its report.
 
 The **BarnCRM Volunteers** app has **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer
 Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer

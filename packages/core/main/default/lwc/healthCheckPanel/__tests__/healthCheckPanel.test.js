@@ -213,6 +213,10 @@ describe('c-health-check-panel', () => {
 
     expect(applyRecommendedMode).not.toHaveBeenCalled();
     expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
+    // admin-6: the change line says what coexistence mode means (help catalog, not a label).
+    expect(BarnConfirmModal.open.mock.calls[0][0].details[1]).toBe(
+      'c.Core_HealthCheck_ConfirmModeChange'
+    );
     answer(true);
     await flush();
     await flush();
@@ -288,7 +292,8 @@ describe('c-health-check-panel', () => {
     await flush();
 
     const outcome = element.shadowRoot.querySelector('[data-id="fix-outcome"]');
-    expect(outcome.textContent).toContain('Created: Total Gifts, Last Gift Date');
+    expect(outcome.variant).toBe('success');
+    expect(outcome.message).toContain('Created: Total Gifts, Last Gift Date');
   });
 
   it('runs Finish Setup for the packages whose setup never ran, once confirmed (FS1)', async () => {
@@ -325,7 +330,7 @@ describe('c-health-check-panel', () => {
       fixKey: 'finishModuleSetup',
       expectedScope: ['BarnCRM Giving']
     });
-    expect(element.shadowRoot.querySelector('[data-id="fix-outcome"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="fix-outcome"]').message).toContain(
       'Setup steps ran for: BarnCRM Giving'
     );
   });
@@ -399,7 +404,8 @@ describe('c-health-check-panel', () => {
     await flush();
 
     const error = element.shadowRoot.querySelector('[data-id="error"]');
-    expect(error.textContent).toBe('That did not work, and nothing was changed.');
+    expect(error.variant).toBe('error');
+    expect(error.message).toBe('That did not work, and nothing was changed.');
     expect(getReport).toHaveBeenCalledTimes(2);
   });
 
@@ -581,7 +587,7 @@ describe('c-health-check-panel', () => {
     await flush();
 
     const error = element.shadowRoot.querySelector('[data-id="error"]');
-    expect(error.textContent).toBe('Health Check could not read your org.');
+    expect(error.message).toBe('Health Check could not read your org.');
   });
 
   describe('with the last result first, as on BarnCRM Home (ADMIN-7)', () => {
@@ -610,13 +616,14 @@ describe('c-health-check-panel', () => {
       expect(element.shadowRoot.querySelector('[data-id="last-run-at"]').value).toBe(
         '2026-10-13T14:05:00.000Z'
       );
+      // It has run before, so the button reads Run Again (admin-6).
       expect(element.shadowRoot.querySelector('[data-id="rerun"]').label).toBe(
-        'c.Core_HealthCheck_RunNowButton'
+        'c.Core_HealthCheck_RerunButton'
       );
       // The same badge as the Health Check tile in Org Optimizer.
       const badge = element.shadowRoot.querySelector('[data-id="last-run-badge"]');
       expect(badge.label).toBe('c.Core_OrgOptimizer_BadgeErrors');
-      expect(badge.className).toContain('slds-theme_error');
+      expect(badge.status).toBe('error');
     });
 
     it('says when Health Check has never run', async () => {
@@ -624,8 +631,11 @@ describe('c-health-check-panel', () => {
       const element = createHomePanel();
       await flush();
 
-      expect(element.shadowRoot.querySelector('[data-id="last-run-badge"]').label).toBe(
-        'c.Core_OrgOptimizer_BadgeNotRun'
+      const badge = element.shadowRoot.querySelector('[data-id="last-run-badge"]');
+      expect(badge.label).toBe('c.Core_OrgOptimizer_BadgeNotRun');
+      expect(badge.status).toBe('neutral');
+      expect(element.shadowRoot.querySelector('[data-id="rerun"]').label).toBe(
+        'c.Core_OrgOptimizer_RunHealthCheck'
       );
 
       expect(element.shadowRoot.querySelector('[data-id="never-run"]')).not.toBeNull();
@@ -654,7 +664,7 @@ describe('c-health-check-panel', () => {
       const element = createHomePanel();
       await flush();
 
-      expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toBe(
+      expect(element.shadowRoot.querySelector('[data-id="error"]').message).toBe(
         'Health Check could not read your org.'
       );
       expect(getReport).not.toHaveBeenCalled();

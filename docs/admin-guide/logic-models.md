@@ -81,15 +81,22 @@ open the one that is there instead, or ask your admin.
 
 ### Parts
 
-The builder shows seven columns, in order: **Inputs**, **Activities**, **Outputs**, **Short Term
-Outcomes**, **Intermediate Term Outcomes**, **Long Term Outcomes** and **Impact**. On a phone the
-columns are stacked.
+The builder draws the model left to right as seven columns, in order: **Inputs**, **Activities**,
+**Outputs**, **Short Term Outcomes**, **Intermediate Term Outcomes**, **Long Term Outcomes** and
+**Impact**, with an arrow between each column and the next. Each column heading shows how many
+parts it holds, and each part is a small tile with up to two lines of its name (hover for the
+whole name). On a phone the columns are stacked, with a downward arrow between them; on a narrow
+desktop panel the diagram scrolls sideways.
 
 - Click **Add to** under a column (for example **Add to Inputs**), type a short name (for example "Two tutors" or "Weekly reading
   sessions"), and press **Save**. Add a longer **Description** if it helps.
-- Click a part to select it. Its details open below the columns: change its name, description or
-  column, or **Delete** it. Deleting a part removes its arrows and its indicators with their
-  periods; the builder asks first. Changing a part's column is refused when any arrow attached
+- Click a part to select it. Its details open below the columns and the page takes you there
+  (focus moves to the details heading); **Back to the Model** at the top of the details takes you
+  back to the part's tile. While a part is selected, the parts an arrow joins to it get a blue
+  border and the others are dimmed, so its chain from input to impact stands out. In the details,
+  change its name, description or column, or **Delete** it. Deleting a part removes its arrows
+  and its indicators with their periods; the builder asks first, in a dialog with a red
+  **Delete** button. Changing a part's column is refused when any arrow attached
   to it would then point backward (to the same or an earlier column). The message names each
   such arrow as "From to To" and says to delete those arrows first or pick a column that keeps
   every arrow forward. The builder checks before saving, and the server refuses the same move.
@@ -106,7 +113,7 @@ and two parts in the same column are never linked. The list only offers parts an
 and the same arrow cannot be added twice.
 
 Under **Comes From** the builder lists the arrows that point at the selected part. Click an
-arrow's assumption to change it, or **Remove** to delete the arrow.
+arrow's assumption to change it, or **Remove** to delete the arrow (the builder asks first).
 
 ### Things to Look At
 
@@ -117,7 +124,12 @@ Under the columns, the builder lists what usually needs attention in a model, as
   else both),
 - an outcome with no indicator.
 
-These are reminders, never errors: save as you go and come back.
+These are reminders, never errors: save as you go and come back. When nothing needs attention
+the list is replaced by a green all-clear note.
+
+When a save fails for a reason the builder cannot name, it says the logic model was not saved
+and to try again; if it happens again, ask your BarnCRM admin to check the Error Log (the admin
+finds the details there).
 
 ## Indicators, Baselines, Targets and Results
 
@@ -138,15 +150,40 @@ Under each indicator, **Add Period** records a target and a result for one stret
 - **Start Date** and **End Date** (an end before the start is refused).
 - **Target** and **Result**, typed in, and **Notes** on what explains the result.
 
-Each period row shows its **Progress**: **Met** when the result reaches the target (for a Lower
-indicator, when it is at or below the target), otherwise how far it has come from the baseline
-toward the target, as a percent. A row with no result yet shows nothing.
+Each period row shows its **Progress** as a bar with the words beside it: **Met** (a full bar)
+when the result reaches the target (for a Lower indicator, when it is at or below the target),
+otherwise how far it has come from the baseline toward the target, as a percent. A row with no
+result yet shows nothing. Targets and results are right-aligned and formatted as numbers. On a
+phone each period row is stacked, one labelled value per line. Deleting a period or an indicator
+asks first, in a dialog with a red **Delete** button.
 
 You can add as many periods as you need, and they may overlap (a year and its four quarters).
 The same start and end dates twice for one indicator are refused: change the row that is there.
 
 A part with indicators cannot be moved to the Inputs, Activities or Impact column; delete or
 move its indicators first.
+
+### Reporting Periods
+
+Most models report on the same stretches of time for every indicator (four quarters, a school
+year). **Reporting Periods**, under the columns of the builder, keeps that list once for the
+model so you do not type it into every indicator:
+
+- **Add Period** adds a period to the list: a name and its start and end dates. The list is kept
+  in start date order; a period with the same dates as another, or an end before its start, is
+  refused, and a model has at most 60.
+- **Add Period to Every Indicator** on a row gives that period (name and dates, no target or
+  result) to every indicator in the model that does not already have one with the same dates.
+  The note says how many indicators got it.
+- **Use the Model's Periods**, under an indicator, gives that one indicator every period on the
+  list it does not already have. Use it for an indicator added after the periods were shared.
+- **Remove** takes a period off the list after a confirm. Periods already given to indicators
+  stay, with their targets and results.
+
+The list is a template, not a link: each indicator gets its own ordinary periods, which you then
+fill in, change or delete one by one, and an indicator can still have periods of its own that are
+not on the list. Shared dates are what line indicators up in the **Logic Model Report**. A Logic
+Models Admin or Staff user changes the list; Read Only users see it.
 
 ## Where Results Come From
 
@@ -174,14 +211,35 @@ Admin can change one: click **Source** under the indicator.
 
 ### Computed Results
 
-A computed indicator counts records you already keep. You describe which records in **Find**,
-then tell the indicator how to count them.
+A computed indicator counts records you already keep. The quickest way is a starter; for anything
+else you describe the records in **Find** and tell the indicator how to count them.
+
+**Starters.** Click **Source** under the indicator and choose **Computed**. The **Template** box
+offers the starters your org can use, then **Saved Query**:
+
+| Template | Counts | Asks for | Offered when |
+|---|---|---|---|
+| **People Served by a Service** | Each person once (Count Unique of Contact), by Delivery Date, leaving out absences | The service (required) | Programs is installed |
+| **Services Delivered** | Service deliveries, by Delivery Date, leaving out absences | The service (required) | Programs is installed |
+| **Approved Volunteer Hours** | The total of Hours on approved volunteer hours, by Date Worked | A volunteer job, or **All** | Volunteers is installed |
+| **Grants Awarded** | Grants at the Awarded stage, by Decision Date | A program, or **All** (where Programs is installed) | Funders is installed |
+
+Pick the template and the record it is about, then **Save**. BarnCRM writes the saved query in
+**Find** for you, named after the template and the record (for example "Services Delivered:
+Tutoring"), as your own private query, then makes the indicator computed from it and works out its
+results as below. The query is an ordinary saved query: open it in Find to read, share or change
+it. A starter needs you to be able to save queries in Find and read its object and fields; if you
+cannot, the builder says so and **Saved Query** still works.
+
+**Your own query.** Choose **Saved Query** under **Template** (it is the only choice where no
+starter's module is installed, and the one shown for an indicator already built from a query):
 
 1. In **Find**, build and save a query of the records to count, for example service deliveries of
    the Reading service, or volunteer hours that were approved. Leave dates out of the filter: the
    indicator adds each period's dates itself. Share the query if other admins should be able to
    change it.
-2. In the builder, click **Source** under the indicator and choose **Computed**.
+2. In the builder, click **Source** under the indicator, choose **Computed**, then **Saved Query**
+   under **Template**.
 3. Pick the **Saved Query**, then the **Date Field** that places a record in a period (for example
    Delivery Date).
 4. Pick what to work out:
@@ -190,13 +248,17 @@ then tell the indicator how to count them.
    - **Count Unique**: how many different values of a field, for example the person on a service
      delivery, so a person served ten times counts once (an unduplicated count).
 5. Save. The results are worked out within a few minutes, then every night at 3:30 AM. Click
-   **Refresh Results** to work them out again now.
+   **Refresh Results** to work them out again now. While they are worked out the indicator says
+   "Working out results"; the panel looks every ten seconds and shows the new results, with a
+   note, as soon as they are in. If they take longer than three minutes it says so and offers
+   **Check Again**. No page reload is needed.
 
 Every period that has started gets a result, zero when no record falls in it; a period that has
 not started yet is left blank. A record counts in every period that holds its date, so a year and
 its quarters each get their own figure. Under the indicator the builder shows when the results
-were last worked out, or what stopped them (for example the saved query was deleted, or a field
-in it can no longer be read).
+were last worked out, or, in a red notice, what stopped them (for example the saved query was
+deleted, or a field in it can no longer be read). An unexpected failure says the results were not
+worked out and to try again; the details are in the Error Log.
 
 **Who sees what.** BarnCRM checks the query as the admin who saves the source: they must be able
 to open the saved query and read its object and fields. The count itself includes every matching
@@ -220,7 +282,9 @@ you choose, the target, the result and the progress (**Met** or a percent).
   different indicators with the same start and end dates count as one period, so name your
   periods the same way across indicators (for example "2026 Q1"). The latest four are chosen when
   the report opens.
-- An indicator without a chosen period shows an empty cell for it.
+- An indicator without a chosen period shows an empty cell for it. Numbers are right-aligned and
+  formatted. The table is wide by design: on a narrow screen it scrolls sideways rather than
+  stacking.
 - **Download CSV** saves the report as a spreadsheet: Column, Part, Indicator, Unit, Better When,
   Baseline and Baseline Date, then a Target, Result and Progress column for each period.
 - **Download Printable Report** saves one web page with the table and the model's name. Open it

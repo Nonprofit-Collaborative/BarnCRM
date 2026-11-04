@@ -2,7 +2,6 @@ import { createElement } from 'lwc';
 import * as navigation from 'lightning/navigation';
 import { createApexTestWireAdapter as mockCreateApexTestWireAdapter } from '@salesforce/sfdx-lwc-jest';
 import OrgOptimizer from 'c/orgOptimizer';
-import getOpenLink from '@salesforce/apex/AccessExplorerController.getOpenLink';
 import getReport from '@salesforce/apex/HealthCheckController.getReport';
 import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
 import getTile from '@salesforce/apex/ErrorLogController.getTile';
@@ -72,10 +71,10 @@ jest.mock(
 );
 jest.mock(
   '@salesforce/label/c.Core_OrgOptimizer_BadgeWarnings',
-  () => ({ default: 'Warnings: {0}' }),
+  () => ({ default: 'Worth Knowing: {0}' }),
   { virtual: true }
 );
-jest.mock('@salesforce/label/c.Core_OrgOptimizer_BadgePassed', () => ({ default: 'Passed' }), {
+jest.mock('@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear', () => ({ default: 'All Clear' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_OrgOptimizer_BadgeNotRun', () => ({ default: 'Not Run Yet' }), {
@@ -102,8 +101,20 @@ async function render() {
 }
 
 async function activate(element, name) {
-  one(element, `lightning-tab[data-id="tab-${name}"]`).dispatchEvent(new CustomEvent('active'));
+  one(element, 'lightning-vertical-navigation').dispatchEvent(
+    new CustomEvent('select', { detail: { name } })
+  );
   await flush();
+}
+
+function activeSection(element) {
+  return one(element, 'lightning-vertical-navigation').selectedItem;
+}
+
+function navigationItems(element) {
+  return Array.from(
+    element.shadowRoot.querySelectorAll('lightning-vertical-navigation-item-icon')
+  ).map((item) => ({ name: item.name, iconName: item.iconName }));
 }
 
 function tiles(element) {
@@ -145,7 +156,7 @@ describe('c-org-optimizer as an administrator', () => {
   it('opens on the Overview with a tile per section, in two groups, and runs no section', async () => {
     const element = await render();
 
-    expect(one(element, 'lightning-tabset').activeTabValue).toBe('overview');
+    expect(activeSection(element)).toBe('overview');
     expect(one(element, 'c-data-hygiene-console')).toBeNull();
     expect(one(element, 'c-field-utilization')).toBeNull();
     expect(one(element, 'c-health-check-panel')).toBeNull();
@@ -157,6 +168,57 @@ describe('c-org-optimizer as an administrator', () => {
       ['healthCheck', 'errors', 'storage', 'setup', 'setupChanges', 'accessExplorer']
     ]);
     tiles(element).forEach((tile) => expect(tile.iconName).toMatch(/^standard:/));
+  });
+
+  // vis-core-14 and admin-19: the same vertical navigation with icons as BarnCRM Settings, and
+  // a Show box with the same sections for narrow screens.
+  it('lists every section with the Overview tile icons, and the same sections in the Show box', async () => {
+    const element = await render();
+
+    const items = navigationItems(element);
+    expect(items.map((item) => item.name)).toEqual([
+      'overview',
+      'quality',
+      'fieldUtilization',
+      'dataDictionary',
+      'aiExport',
+      'healthCheck',
+      'errors',
+      'storage',
+      'setup',
+      'setupChanges',
+      'accessExplorer'
+    ]);
+    expect(items[0].iconName).toBe('custom:custom94');
+    items.slice(1).forEach((item) => {
+      expect(item.iconName).toBe(tileNamed(element, item.name).iconName);
+    });
+    const show = one(element, 'lightning-combobox[data-id="show"]');
+    expect(show.label).toBe('c.Core_DataJobs_Show');
+    expect(show.value).toBe('overview');
+    expect(show.options.map((option) => option.value)).toEqual(items.map((item) => item.name));
+    expect(one(element, '[data-id="show"]').parentElement.className).toContain('slds-hide_medium');
+    expect(one(element, 'lightning-vertical-navigation').parentElement.className).toContain(
+      'slds-show_medium'
+    );
+  });
+
+  it('opens a section from the Show box and moves the focus to it', async () => {
+    const element = await render();
+    const content = one(element, '[data-id="section-content"]');
+    const focus = jest.spyOn(content, 'focus');
+
+    one(element, 'lightning-combobox[data-id="show"]').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'quality' } })
+    );
+    await flush();
+
+    expect(activeSection(element)).toBe('quality');
+    expect(one(element, 'c-data-hygiene-console')).not.toBeNull();
+    expect(content.getAttribute('aria-label')).toBe('c.Core_DataHygiene_PageTitle');
+    expect(focus).toHaveBeenCalled();
+    expect(one(element, '[data-id="tab-overview"]').className).toContain('slds-hide');
+    expect(one(element, '[data-id="tab-quality"]').className).not.toContain('slds-hide');
   });
 
   it('uses only icon names that exist in the SLDS icon set', async () => {
@@ -189,7 +251,7 @@ describe('c-org-optimizer as an administrator', () => {
     const element = await render();
 
     expect(tileNamed(element, 'healthCheck')).toMatchObject({
-      badgeLabel: 'Warnings: 2',
+      badgeLabel: 'Worth Knowing: 2',
       badgeVariant: 'warning'
     });
   });
@@ -255,24 +317,48 @@ describe('c-org-optimizer as an administrator', () => {
 
   it('opens Access Explorer when the page is opened for it from the Access page', async () => {
     const element = await render();
-    navigation.CurrentPageReference.emit({ state: { c__section: 'accessExplorer' } });
-    await flush();
     expect(one(element, 'c-access-explorer')).toBeNull();
 
-    getOpenLink.emit({ url: '/x', stateKey: 'c__section', section: 'accessExplorer' });
+    navigation.CurrentPageReference.emit({ state: { c__section: 'accessExplorer' } });
     await flush();
 
-    expect(one(element, 'lightning-tabset').activeTabValue).toBe('accessExplorer');
+    expect(activeSection(element)).toBe('accessExplorer');
     expect(one(element, 'c-access-explorer')).not.toBeNull();
   });
 
-  it('stays on the Overview when the page names no section', async () => {
+  // admin-14: Settings > Health and Error Log, and Home, open Org Optimizer at its section.
+  it('opens Health Check by page state, showing the stored run without running it', async () => {
+    getLastRun.mockResolvedValue({ ranAt: '2026-10-28T10:00:00Z', errors: 1, warnings: 0 });
     const element = await render();
-    getOpenLink.emit({ url: '/x', stateKey: 'c__section', section: 'accessExplorer' });
-    navigation.CurrentPageReference.emit({ state: {} });
+
+    navigation.CurrentPageReference.emit({ state: { c__section: 'healthCheck' } });
     await flush();
 
-    expect(one(element, 'lightning-tabset').activeTabValue).toBe('overview');
+    expect(activeSection(element)).toBe('healthCheck');
+    expect(one(element, 'lightning-combobox[data-id="show"]').value).toBe('healthCheck');
+    expect(one(element, 'c-health-check-panel').lastResultFirst).toBe(true);
+    expect(getReport).not.toHaveBeenCalled();
+  });
+
+  it('opens Errors by a namespaced page state key', async () => {
+    const element = await render();
+
+    navigation.CurrentPageReference.emit({ state: { barn__section: 'errors' } });
+    await flush();
+
+    expect(activeSection(element)).toBe('errors');
+    expect(one(element, 'c-error-log-tile')).not.toBeNull();
+  });
+
+  it('stays on the Overview when the page names no section, or one it does not know', async () => {
+    const element = await render();
+    navigation.CurrentPageReference.emit({ state: {} });
+    await flush();
+    expect(activeSection(element)).toBe('overview');
+
+    navigation.CurrentPageReference.emit({ state: { c__section: 'nothingHere' } });
+    await flush();
+    expect(activeSection(element)).toBe('overview');
   });
 
   it('creates the AI-Readiness Export only when its tab is first opened', async () => {
@@ -292,7 +378,7 @@ describe('c-org-optimizer as an administrator', () => {
     );
     await flush();
 
-    expect(one(element, 'lightning-tabset').activeTabValue).toBe('fieldUtilization');
+    expect(activeSection(element)).toBe('fieldUtilization');
     expect(one(element, 'c-field-utilization')).not.toBeNull();
   });
 
@@ -362,7 +448,7 @@ describe('c-org-optimizer as an administrator', () => {
     getLastRun.mockResolvedValue({ ranAt: '2026-10-28T10:00:00Z', errors: 0, warnings: 0 });
     await activate(element, 'overview');
     expect(tileNamed(element, 'healthCheck')).toMatchObject({
-      badgeLabel: 'Passed',
+      badgeLabel: 'All Clear',
       badgeVariant: 'success'
     });
   });
