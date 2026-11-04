@@ -1,8 +1,8 @@
 /**
  * PicklistUsageService and the picklist methods of FieldUtilizationController: records per
  * picklist value and the newest Last Modified Date among them (canonical model Section 29F,
- * R-FU9 to R-FU11). Counting runs as Maria, a Standard User holding only BarnCRM Admin, on
- * Error Log's Status field (a restricted picklist Core owns). The unit tests of the join work on
+ * R-FU9 to R-FU12, Last Used read in chunks of records on a large object). Counting runs as
+ * Maria, a Standard User holding only BarnCRM Admin, on Error Log's Status field (a restricted picklist Core owns). The unit tests of the join work on
  * plain maps, since an inactive value cannot be saved into a restricted field.
  */
 @IsTest(testFor='ApexClass:PicklistUsageService')
@@ -83,6 +83,173 @@ private class PicklistUsageTest {
             Assert.areEqual('NeverUsed', rows.get('Resolved').status, 'Listed as never used.');
             Assert.isNull(rows.get('Resolved').lastUsed, 'Nothing to date.');
             Assert.isTrue(chunk.failed.isEmpty(), 'Nothing failed.');
+            Assert.isTrue(chunk.datesPending.isEmpty(), 'A small object is dated in one call.');
+        }
+    }
+
+    private static Map<String, Datetime> expectedNewest() {
+        Map<String, Datetime> newest = new Map<String, Datetime>();
+        for (
+            AggregateResult row : (List<AggregateResult>) Database.query(
+                'SELECT Status__c v, MAX(LastModifiedDate) d FROM Error_Log__c GROUP BY Status__c',
+                AccessLevel.SYSTEM_MODE
+            )
+        ) {
+            String value = (String) row.get('v');
+            newest.put(value == null ? '' : value, (Datetime) row.get('d'));
+        }
+        return newest;
+    }
+
+    @IsTest
+    static void chunkedLastUsedMatchesTheWholeAndCountsSumToTheTotal() {
+        System.runAs(TestUsers.admin()) {
+            insertLogs(1200, 'Acknowledged');
+            insertLogs(600, 'Ignored');
+            Map<String, Datetime> expected = expectedNewest();
+            // Small chunks and no room for dates in the count call, as on a large object.
+            PicklistUsageService.maxScanRows = 700;
+            PicklistUsageService.dateRowBudget = 0;
+            Integer total;
+            FieldUtilizationController.PicklistChunk counted;
+            Map<String, Datetime> newest = new Map<String, Datetime>();
+            Integer calls = 0;
+            Integer read = 0;
+            Integer mostRowsInOneCall = 0;
+            System.runAs(maria()) {
+                Test.startTest();
+                total = FieldUtilizationController.getPicklistPlan(LOG).total;
+                counted = FieldUtilizationController.getPicklistUsage(
+                    LOG,
+                    new List<String>{ STATUS }
+                );
+                String afterId;
+                Boolean done = false;
+                while (!done && calls < 10) {
+                    Integer before = Limits.getQueryRows();
+                    FieldUtilizationController.PicklistDates chunk = FieldUtilizationController.getPicklistLastUsed(
+                        LOG,
+                        new List<String>{ STATUS },
+                        afterId
+                    );
+                    mostRowsInOneCall = Math.max(mostRowsInOneCall, Limits.getQueryRows() - before);
+                    calls++;
+                    read += chunk.read;
+                    afterId = chunk.lastId;
+                    done = chunk.done;
+                    for (FieldUtilizationController.PicklistDate found : chunk.dates) {
+                        Datetime kept = newest.get(found.value);
+                        if (kept == null || found.lastUsed > kept) {
+                            newest.put(found.value, found.lastUsed);
+                        }
+                    }
+                }
+                Test.stopTest();
+            }
+
+            Assert.isTrue(total >= 1800, 'The seeded records are counted.');
+            Assert.isTrue(counted.datesPending.contains(STATUS), 'Dates are left for chunks.');
+            Integer counts = 0;
+            for (FieldUtilizationController.PicklistValueRow row : counted.rows) {
+                Assert.isNull(row.lastUsed, 'No date until the chunks are read.');
+                counts += row.records;
+            }
+            Assert.areEqual(total, counts, 'Records per value add up to the total.');
+            Assert.areEqual(total, read, 'The chunks read every record once.');
+            Assert.isTrue(calls >= 3, 'Read in several chunks: ' + calls);
+            Assert.isTrue(mostRowsInOneCall <= 710, 'One chunk reads ' + mostRowsInOneCall);
+            Assert.areEqual(expected, newest, 'The newest date per value matches the whole.');
+        }
+    }
+
+    @IsTest
+    static void oneFullChunkStaysWellUnderTheLimits() {
+        System.runAs(TestUsers.admin()) {
+            insertLogs(3000, 'Acknowledged');
+            List<String> names = new List<String>();
+            for (
+                Schema.DescribeFieldResult field : PicklistUsageService.picklistFields(
+                    Error_Log__c.SObjectType.getDescribe()
+                )
+            ) {
+                if (names.size() < PicklistUsageService.CHUNK_SIZE) {
+                    names.add(field.getName());
+                }
+            }
+            FieldUtilizationController.PicklistDates chunk;
+            Integer rows;
+            Integer cpu;
+            Integer heap;
+            System.runAs(maria()) {
+                Test.startTest();
+                Integer rowsBefore = Limits.getQueryRows();
+                Integer cpuBefore = Limits.getCpuTime();
+                chunk = FieldUtilizationController.getPicklistLastUsed(LOG, names, null);
+                rows = Limits.getQueryRows() - rowsBefore;
+                cpu = Limits.getCpuTime() - cpuBefore;
+                heap = Limits.getHeapSize();
+                Test.stopTest();
+            }
+            Assert.isTrue(chunk.done, 'Fewer records than one chunk.');
+            Assert.isTrue(chunk.read >= 3000, 'Every record read.');
+            Assert.isTrue(rows <= chunk.read + 5, 'Query rows: ' + rows);
+            Assert.isTrue(
+                PicklistUsageService.scanRows(names.size()) <= 20000,
+                'A chunk is at most 20,000 records, under the 50,000 query-row limit.'
+            );
+            Assert.isTrue(cpu < Limits.getLimitCpuTime() / 2, 'CPU time: ' + cpu);
+            Assert.isTrue(heap < Limits.getLimitHeapSize() / 2, 'Heap: ' + heap);
+        }
+    }
+
+    @IsTest
+    static void lastUsedRefusesAForeignStartAndATooLargeObject() {
+        System.runAs(TestUsers.admin()) {
+            insertLogs(2, 'Acknowledged');
+            String foreign;
+            String garbage;
+            String tooLarge;
+            System.runAs(maria()) {
+                try {
+                    FieldUtilizationController.getPicklistLastUsed(
+                        LOG,
+                        new List<String>{ STATUS },
+                        UserInfo.getUserId()
+                    );
+                } catch (AuraHandledException caught) {
+                    foreign = caught.getMessage();
+                }
+                try {
+                    FieldUtilizationController.getPicklistLastUsed(
+                        LOG,
+                        new List<String>{ STATUS },
+                        'not an id'
+                    );
+                } catch (AuraHandledException caught) {
+                    garbage = caught.getMessage();
+                }
+                FieldUtilizationService.sizeLimit = 1;
+                try {
+                    FieldUtilizationController.getPicklistLastUsed(
+                        LOG,
+                        new List<String>{ STATUS },
+                        null
+                    );
+                } catch (AuraHandledException caught) {
+                    tooLarge = caught.getMessage();
+                }
+            }
+            Assert.areEqual(
+                System.Label.Core_FieldUtilization_UnexpectedError,
+                foreign,
+                'A start Id of another kind of record is refused.'
+            );
+            Assert.areEqual(
+                System.Label.Core_FieldUtilization_UnexpectedError,
+                garbage,
+                'Text that is not an Id is refused.'
+            );
+            Assert.isNotNull(tooLarge, 'An object over the size limit is refused.');
         }
     }
 

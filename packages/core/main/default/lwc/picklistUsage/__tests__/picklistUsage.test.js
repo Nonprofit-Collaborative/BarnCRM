@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import PicklistUsage from 'c/picklistUsage';
 import getPicklistPlan from '@salesforce/apex/FieldUtilizationController.getPicklistPlan';
 import getPicklistUsage from '@salesforce/apex/FieldUtilizationController.getPicklistUsage';
+import getPicklistLastUsed from '@salesforce/apex/FieldUtilizationController.getPicklistLastUsed';
 
 jest.mock(
   '@salesforce/apex/FieldUtilizationController.getPicklistPlan',
@@ -13,9 +14,24 @@ jest.mock(
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
+jest.mock(
+  '@salesforce/apex/FieldUtilizationController.getPicklistLastUsed',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 jest.mock('@salesforce/label/c.Core_PicklistUsage_Progress', () => ({ default: '{0} of {1}' }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/label/c.Core_PicklistUsage_DatesProgress',
+  () => ({ default: 'Dates {0} of {1}' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_PicklistUsage_DatesStopped',
+  () => ({ default: 'Stopped {0} of {1}: {2}' }),
+  { virtual: true }
+);
 jest.mock('@salesforce/label/c.Core_PicklistUsage_Truncated', () => ({ default: 'Cut: {0}' }), {
   virtual: true
 });
@@ -125,5 +141,118 @@ describe('c-picklist-usage', () => {
     element.objectName = 'Contact';
     await flush();
     expect(query(element, 'results')).toBeNull();
+  });
+
+  describe('Last Used on a large kind of record', () => {
+    const plan = { fields: [{ fieldName: 'A__c' }], chunkSize: 20, total: 3, tooLarge: false };
+    const counts = {
+      rows: [
+        {
+          key: 'A__c|x',
+          fieldName: 'A__c',
+          fieldLabel: 'A',
+          value: 'x',
+          status: 'Active',
+          records: 2
+        },
+        {
+          key: 'A__c|',
+          fieldName: 'A__c',
+          fieldLabel: 'A',
+          value: '',
+          status: 'NoValue',
+          records: 1
+        }
+      ],
+      failed: [],
+      truncated: [],
+      datesPending: ['A__c']
+    };
+    const settle = async () => {
+      for (let i = 0; i < 8; i++) {
+        // eslint-disable-next-line no-await-in-loop
+        await flush();
+      }
+    };
+
+    it('reads the dates in chunks of records and keeps the newest per value', async () => {
+      getPicklistPlan.mockResolvedValue(plan);
+      getPicklistUsage.mockResolvedValue(counts);
+      getPicklistLastUsed
+        .mockResolvedValueOnce({
+          dates: [{ fieldName: 'A__c', value: 'x', lastUsed: '2024-01-01T00:00:00.000Z' }],
+          cut: [],
+          lastId: 'id2',
+          read: 2,
+          done: false
+        })
+        .mockResolvedValueOnce({
+          dates: [
+            { fieldName: 'A__c', value: 'x', lastUsed: '2025-01-01T00:00:00.000Z' },
+            { fieldName: 'A__c', value: '', lastUsed: '2023-01-01T00:00:00.000Z' }
+          ],
+          cut: [],
+          lastId: 'id3',
+          read: 1,
+          done: true
+        });
+      const element = mount();
+      query(element, 'show').click();
+      await settle();
+      expect(getPicklistLastUsed).toHaveBeenCalledTimes(2);
+      expect(getPicklistLastUsed.mock.calls[0][0].afterId).toBeNull();
+      expect(getPicklistLastUsed.mock.calls[1][0].afterId).toBe('id2');
+      const data = query(element, 'results').data;
+      expect(data.find((row) => row.value === 'x').lastUsed).toBe('2025-01-01T00:00:00.000Z');
+      expect(data.find((row) => row.value === '').lastUsed).toBe('2023-01-01T00:00:00.000Z');
+      expect(query(element, 'dates-stopped')).toBeNull();
+    });
+
+    it('keeps what was read when a chunk fails and retries from there', async () => {
+      getPicklistPlan.mockResolvedValue(plan);
+      getPicklistUsage.mockResolvedValue(counts);
+      getPicklistLastUsed
+        .mockResolvedValueOnce({
+          dates: [{ fieldName: 'A__c', value: 'x', lastUsed: '2024-01-01T00:00:00.000Z' }],
+          cut: [],
+          lastId: 'id2',
+          read: 2,
+          done: false
+        })
+        .mockRejectedValueOnce({ body: { message: 'Timed out.' } })
+        .mockResolvedValueOnce({ dates: [], cut: [], lastId: 'id3', read: 1, done: true });
+      const element = mount();
+      query(element, 'show').click();
+      await settle();
+      expect(query(element, 'dates-stopped').textContent).toContain('Stopped 2 of 3: A');
+      query(element, 'retry').click();
+      await settle();
+      expect(getPicklistLastUsed.mock.calls[2][0].afterId).toBe('id2');
+      expect(query(element, 'dates-stopped')).toBeNull();
+      const data = query(element, 'results').data;
+      expect(data.find((row) => row.value === 'x').lastUsed).toBe('2024-01-01T00:00:00.000Z');
+    });
+
+    it('stops after the chunk in flight when Cancel is pressed', async () => {
+      getPicklistPlan.mockResolvedValue(plan);
+      getPicklistUsage.mockResolvedValue(counts);
+      let release;
+      getPicklistLastUsed.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            release = () => resolve({ dates: [], cut: [], lastId: 'id1', read: 1, done: false });
+          })
+      );
+      const element = mount();
+      query(element, 'show').click();
+      await settle();
+      expect(query(element, 'dates-progress').textContent).toContain('Dates 0 of 3');
+      query(element, 'cancel').click();
+      release();
+      await settle();
+      expect(getPicklistLastUsed).toHaveBeenCalledTimes(1);
+      expect(query(element, 'dates-stopped').textContent).toContain('Stopped 1 of 3');
+      expect(query(element, 'retry')).not.toBeNull();
+    });
   });
 });
