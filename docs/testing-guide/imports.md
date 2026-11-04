@@ -504,9 +504,10 @@ ana.rowe@example.org,Rivergate Library,Volunteer,true,2026-03-01
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Upload `import-test-2.csv` as in T-IMP-07. Beside **Last Name**, select **Change Values**, then add **Capitalize each word** and **Find and replace** (find `-TEST`, replace with nothing). | Two changes, in that order. The first one's **Move Up** arrow and the last one's **Move Down** arrow are greyed out. |
-| 2 | On the second change, select **Move Up** with the keyboard (Tab to it, press Enter). | **Find and replace** is now first; the before and after preview updates. A screen reader says "Find and replace moved to position 1 of 2." |
-| 3 | Drag the handle at the left of **Find and replace** below **Capitalize each word** with the mouse, then press Escape halfway through a second drag. | The first drag swaps them back; the dashed outline shows where the change lands. The cancelled drag changes nothing. |
-| 4 | On a phone (or the browser's device view), drag a change by its handle with a finger. | The change moves; the page does not scroll while the handle is held. |
-| 5 | Open **Super Transformer**, choose a text field and **Change With Steps**, add two steps and repeat step 2. | The steps move the same way. |
+| 2 | On the second change, select **Move Up** with the keyboard (Tab to it, press Enter). | **Find and replace** is now first; the before and after preview updates. A screen reader says "Find and replace, position 1 of 2." |
+| 3 | Drag the handle at the left of **Find and replace** below **Capitalize each word** with the mouse, then press Escape halfway through a second drag. | The first drag swaps them back; a blue line shows where the change lands. The cancelled drag changes nothing. |
+| 4 | Tab to a change's handle, press Space, press the down arrow, press Space. | A screen reader hears "Picked up", the new position, then "Moved". The change moves down one place. |
+| 5 | On a phone (or the browser's device view), press and hold a change's handle, then drag it. A quick swipe on the handle instead scrolls the page. | The change moves after the hold; the swipe only scrolls. |
+| 6 | Open **Super Transformer**, choose a text field and **Change With Steps**, add two steps and repeat step 2. | The steps move the same way. |
 
 **Cleanup:** leave the page without importing.

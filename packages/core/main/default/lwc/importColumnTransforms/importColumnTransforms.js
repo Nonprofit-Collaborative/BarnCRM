@@ -65,9 +65,9 @@ import patternLabel from '@salesforce/label/c.Core_Import_StepsPattern';
 import countryLabel from '@salesforce/label/c.Core_Import_StepsCountry';
 import moveUpLabel from '@salesforce/label/c.Core_Shared_MoveUp';
 import moveDownLabel from '@salesforce/label/c.Core_Shared_MoveDown';
-import dragLabel from '@salesforce/label/c.Core_Kit_DragToMove';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
-import { moveItem, startDrag, targetIndex } from 'c/barnReorder';
+import { createDragController, moveItem, targetIndex } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
 
 /** The most changes one column may have, as DataTransform.MAX_STEPS says. */
 const MAX_STEPS = 10;
@@ -120,6 +120,8 @@ export default class ImportColumnTransforms extends LightningElement {
   problems = [];
   /** The last move, read out by the aria-live region. */
   announcement = '';
+  /** c/barnDrag's state while a step is dragged: which step, and where it would land. */
+  dragState;
 
   labels = {
     get help() {
@@ -160,8 +162,7 @@ export default class ImportColumnTransforms extends LightningElement {
     patternLabel,
     countryLabel,
     moveUpLabel,
-    moveDownLabel,
-    dragLabel
+    moveDownLabel
   };
 
   /** The column's steps, as the mapping document holds them. */
@@ -186,6 +187,38 @@ export default class ImportColumnTransforms extends LightningElement {
       });
     }
     this.refreshPreview();
+    // Drag a step by its handle (mouse, pen, or touch after a press and hold) or by keyboard
+    // (Space, the arrow keys, Space again); Move Up and Move Down stay as the plain path.
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'list',
+      messages: dragMessages(),
+      announce: (text) => {
+        this.announcement = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      onDrop: ({ itemId, toIndex }) => {
+        const from = this.steps.findIndex((step) => step.key === itemId);
+        if (from < 0 || from === toIndex) {
+          return false;
+        }
+        this.steps = moveItem(this.steps, from, toIndex);
+        this.changed();
+        return true;
+      }
+    });
+  }
+
+  disconnectedCallback() {
+    if (this.drag) {
+      this.drag.destroy();
+    }
+  }
+
+  get dragHelp() {
+    return dragInstructions();
   }
 
   get heading() {
@@ -257,9 +290,26 @@ export default class ImportColumnTransforms extends LightningElement {
   /** The steps as the template shows them, each with the inputs its kind needs. */
   get rows() {
     const last = this.steps.length - 1;
+    const drag = this.dragState && this.dragState.active ? this.dragState : null;
+    // While dragging, the step the dragged one would land before (or after, at the end).
+    const others = drag ? this.steps.filter((step) => step.key !== drag.itemId) : [];
+    const before = drag && drag.overIndex >= 0 ? others[drag.overIndex] : null;
+    const after =
+      drag && drag.overIndex >= 0 && drag.overIndex === others.length && others.length
+        ? others[others.length - 1]
+        : null;
     return this.steps.map((step, position) => ({
       ...step,
       index: position,
+      name: this.stepName(step),
+      rowClass: [
+        'step slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_x-small',
+        drag && drag.itemId === step.key ? 'step-dragging' : '',
+        before && before.key === step.key ? 'step-over-before' : '',
+        after && after.key === step.key ? 'step-over-after' : ''
+      ]
+        .filter(Boolean)
+        .join(' '),
       isFirst: position === 0,
       isLast: position === last,
       moveUpText: `${moveUpLabel}: ${this.stepName(step)}`,
@@ -308,8 +358,7 @@ export default class ImportColumnTransforms extends LightningElement {
   }
 
   // Order changes the result (trim before fixing capitals), so steps move without retyping:
-  // Move Up and Move Down for a keyboard or a screen reader, a drag from the handle for a mouse,
-  // a finger or a pen. Each move is announced.
+  // Move Up and Move Down, or a drag (c/barnDrag) from the handle. Each move is announced.
   handleMoveUp(event) {
     this.moveBy(Number(event.currentTarget.dataset.index), -1);
   }
@@ -318,27 +367,24 @@ export default class ImportColumnTransforms extends LightningElement {
     this.moveBy(Number(event.currentTarget.dataset.index), 1);
   }
 
-  handleDragStart(event) {
-    startDrag(event, {
-      from: Number(event.currentTarget.dataset.index),
-      items: () => [...this.template.querySelectorAll('[data-reorder-item]')],
-      onMove: (from, to) => this.move(from, to)
-    });
+  handlePointerDown(event) {
+    this.drag.pointerDown(event);
+  }
+
+  handleDragKey(event) {
+    this.drag.keyDown(event);
   }
 
   moveBy(index, delta) {
     const to = targetIndex(index, delta, this.steps.length);
-    if (to >= 0) {
-      this.move(index, to);
+    if (to < 0) {
+      return;
     }
-  }
-
-  move(from, to) {
-    const step = this.steps[from];
-    this.steps = moveItem(this.steps, from, to);
+    const step = this.steps[index];
+    this.steps = moveItem(this.steps, index, to);
     this.announcement = helpText(
       'Core',
-      'Core_Kit_MovedToPosition',
+      'Core_Drag_Position',
       this.stepName(step),
       to + 1,
       this.steps.length

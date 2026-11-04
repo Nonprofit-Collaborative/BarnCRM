@@ -168,7 +168,6 @@
     "Core_Integrations_Intro": "A roadmap, not a feature list: nothing listed is integrated yet, and BarnCRM depends on none of it.",
     "Core_Integrations_PartnerIntro": "Build or maintain a product? Propose an integration for it, and read how one is built.",
     "Core_Integrations_RequestIntro": "Requests shape the roadmap. BarnCRM is self-service, so a request is a public suggestion, not a ticket.",
-    "Core_Kit_MovedToPosition": "{0} moved to position {1} of {2}.",
     "Core_MatchLogic_Help": "Match sources see an email, phone or address on a related record, which duplicate rules cannot.",
     "Core_MatchLogic_Intro": "Match sources pair people or households that share a value kept on a related record.",
     "Core_MatchLogic_RulesNote": "Match sources work alongside your Salesforce duplicate rules. The rules are listed, read only, in Review, with a link to change them in Setup.",

@@ -5,16 +5,23 @@
             <h3 class="slds-text-heading_small">{heading}</h3>
             <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_x-small">{labels.help}</p>
         </template>
+        <p class="slds-assistive-text" id="drag-help">{dragHelp}</p>
+        <div data-drop-zone="steps" data-drop-label={heading} data-id="zone">
         <template for:each={rows} for:item="step">
-            <div key={step.key} class="step slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_x-small" data-id="step" data-reorder-item>
+            <div key={step.key} class={step.rowClass} data-id="step">
                 <div class="slds-col slds-grow-none slds-align-bottom">
                     <span
                         class="drag-handle"
-                        title={labels.dragLabel}
-                        aria-hidden="true"
-                        data-index={step.index}
+                        role="button"
+                        tabindex="0"
+                        title={dragHelp}
+                        aria-label={step.name}
+                        aria-describedby="drag-help"
+                        data-drag-id={step.key}
+                        data-drag-label={step.name}
                         data-id="drag"
-                        onpointerdown={handleDragStart}
+                        onpointerdown={handlePointerDown}
+                        onkeydown={handleDragKey}
                     >
                         <lightning-icon icon-name="utility:drag_and_drop" size="x-small"></lightning-icon>
                     </span>
@@ -125,6 +132,7 @@
                 </div>
             </div>
         </template>
+        </div>
         <lightning-button label={labels.addLabel} data-id="add" disabled={cannotAdd} onclick={handleAdd}></lightning-button>
         <div class="slds-assistive-text" aria-live="polite" data-id="announce">{announcement}</div>
         <template lwc:if={hasProblems}>

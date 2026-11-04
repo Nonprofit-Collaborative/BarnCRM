@@ -978,8 +978,10 @@ file of the same kind is fixed too.
 1. On the columns step, select **Change Values** beside a column.
 2. Select **Add a Change** and pick one. Changes run in the order listed, and you can add up
    to ten to one column. To change the order, use the **Move Up** and **Move Down** arrows
-   beside a change, or drag it by its handle (mouse, finger or pen); the preview updates and a
-   screen reader hears the new position:
+   beside a change, or drag it by its handle (mouse or pen; on a touch screen press and hold
+   the handle first). With the keyboard, focus the handle, press Space, use the arrow keys and
+   press Space again; Escape cancels. The preview updates and a screen reader hears the new
+   position:
 
 | Change | What it does | Example |
 |---|---|---|

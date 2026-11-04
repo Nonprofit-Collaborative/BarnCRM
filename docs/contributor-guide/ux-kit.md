@@ -103,24 +103,14 @@ Each component has Jest tests written as stories (one case per variant a screen 
 | `c-barn-meter` | A share or progress: steps done, attendance rate, received against awarded, a funding mix row | `label`, `value`, `max` (100 by default), `value-text` (for example "3 of 5"; the percent when empty), `size` |
 | `c/barnStatus` (module) | The status vocabulary, for code that needs the tone without the badge | `statusFor(word)` returns `{ tone, themeClass, iconName }`; `TONES`, `ALIASES` |
 | `c/barnIcons` (module) | The icon for a tab or object | `iconFor(apiName, fallback)`; `ICONS` |
-| `c/barnReorder` (module) | Reordering a list: Move Up and Move Down, and a pointer drag from a handle | `moveItem(list, from, to)`, `targetIndex(index, delta, length)`, `startDrag(pointerdownEvent, { from, items, onMove, axis })`, `indexAt(rects, position)` |
 
-The three modules are framework free (no `lightning/*` or `@salesforce/*` imports), so they port to BarnCRM for WordPress (plan 9.9). `c-barn-empty-state` also takes `size="compact"` (below).
-
-### Drag and Drop
-
-Drag and drop is always an extra on a list that already has another way to change it:
-
-- Each item keeps **Move Up** and **Move Down** buttons (`Core_Shared_MoveUp`, `Core_Shared_MoveDown`; the alternative text names the item), disabled at the ends. That is the keyboard, screen reader and fallback path.
-- The handle is a `span` with `title` `Core_Kit_DragToMove`, `aria-hidden="true"` (the buttons are the accessible path) and `touch-action: none` in CSS, so a finger drags instead of scrolling. Its `onpointerdown` calls `startDrag` with `items` returning the elements marked `data-reorder-item`; style `[data-reorder-dragging]` and `[data-reorder-over]` with hooks. Escape cancels.
-- Every move, from either path, sets the text of an `aria-live="polite"` `slds-assistive-text` region from the help key `Core_Kit_MovedToPosition` ("{0} moved to position {1} of {2}.").
-- Never for a destructive or single-choice action (a delete, a merge, a setting). `importColumnTransforms` is the reference use.
+The two modules are framework free (no `lightning/*` or `@salesforce/*` imports), so they port to BarnCRM for WordPress (plan 9.9). `c-barn-empty-state` also takes `size="compact"` (below).
 
 ## Drag and Drop
 
 | Module | Use it for | Main exports |
 |---|---|---|
-| `c/barnDrag` | Moving an item between board columns, reordering a list, or dropping one part onto another (Grant Pipeline, Logic Model builder, Cohort Members, Eligibility Rules) | `createDragController(options)` returning `pointerDown(event)`, `keyDown(event)`, `cancel()`, `state`, `destroy()` |
+| `c/barnDrag` | Moving an item between board columns, reordering a list, or dropping one part onto another (Grant Pipeline, Logic Model builder, Cohort Members, Eligibility Rules, import and Super Transformer steps) | `createDragController(options)` returning `pointerDown(event)`, `keyDown(event)`, `cancel()`, `state`, `destroy()`; list helpers `moveItem(list, from, to)` (a copy with one item moved; use it in `onDrop` with `toIndex`) and `targetIndex(index, delta, length)` (where Move Up or Move Down goes, -1 at an end) |
 | `c/barnDragText` | The words the controller announces, from the Core help catalog | `dragMessages()`, `dragInstructions()` |
 
 `c/barnDrag` is framework free (plan 9.9). Rules:
@@ -131,6 +121,8 @@ Drag and drop is always an extra on a list that already has another way to chang
 - Pointer: a mouse or pen drag starts after a few pixels of movement; touch starts after a 250 ms press and hold, so a swipe still scrolls. The click that ends a drag does not open the card under it. Uses pointer events, never HTML5 `draggable` (it does not fire on iOS Safari).
 - Keyboard: Space on the item picks it up, the arrow keys move it, Space or Enter drops, Escape or Tab cancels. Space on a button or link inside the item keeps its own job. Focus returns to the moved item after the drop.
 - Call `destroy()` in `disconnectedCallback`.
+- A list whose rows hold inputs (import and Super Transformer steps, `importColumnTransforms`) puts `data-drag-id` and the handlers on a small handle `span` (`role="button"`, `tabindex="0"`, `aria-label` the item's name) rather than on the row, so typing and clicking in the row are untouched. Its Move Up and Move Down buttons announce through the same region with `Core_Drag_Position`.
+- Never for a destructive or single-choice action (a delete, a merge, a setting).
 
 ## Visual Standard
 

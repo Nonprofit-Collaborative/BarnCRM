@@ -1,18 +1,27 @@
-/* The handle a step is dragged by: touch-action none lets a finger drag it instead of scrolling. */
+/* The handle a step is dragged by (c/barnDrag): a finger presses and holds it, a keyboard focuses it. */
 .drag-handle {
   display: inline-flex;
   align-items: center;
   min-height: var(--slds-g-sizing-9, 2rem);
   padding: 0 var(--slds-g-spacing-1, 0.25rem);
   cursor: grab;
-  touch-action: none;
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
 }
 
-.step[data-reorder-dragging] {
+.drag-handle:focus-visible {
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-border-accent-1, #0176d3);
+}
+
+.step-dragging {
   opacity: 0.6;
 }
 
-.step[data-reorder-over] {
-  outline: var(--slds-g-sizing-border-2, 2px) dashed var(--slds-g-color-border-accent-1, #0176d3);
-  outline-offset: var(--slds-g-spacing-1, 0.25rem);
+/* Where the dragged step would land: a line above (or below, at the end of) a step. */
+.step-over-before {
+  box-shadow: 0 calc(-1 * var(--slds-g-sizing-border-2, 2px)) 0 0
+    var(--slds-g-color-border-accent-1, #0176d3);
+}
+
+.step-over-after {
+  box-shadow: 0 var(--slds-g-sizing-border-2, 2px) 0 0 var(--slds-g-color-border-accent-1, #0176d3);
 }
