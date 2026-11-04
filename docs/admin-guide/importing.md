@@ -58,13 +58,9 @@ and undo deadline. In reports and list views look for **Data Jobs**; the object'
 A few things are worth knowing before your first large file:
 
 1. Open **BarnCRM Settings** and choose **Import**.
-<<<<<<< HEAD
-2. **Rows per chunk** controls how many rows are processed at a time. Leave it at 200. A row
-   that BarnCRM's own automation cannot handle is rejected on its own; the other rows of its
-   chunk still load ([When Automation Fails on One Record](automation-control.md#when-automation-fails-on-one-record)).
-=======
 2. **Records per batch in imports** controls how many rows are processed at a time. Leave it at 200.
->>>>>>> origin/landing/batch-b
+   A row that BarnCRM's own automation cannot handle is rejected on its own; the other rows of its
+   batch still load ([When Automation Fails on One Record](automation-control.md#when-automation-fails-on-one-record)).
    Lower it to 50 if your org has a lot of custom automation and an import fails with a
    limit error; raise it only if a very large file is running slowly and nothing else
    fires on save.
