@@ -57,7 +57,7 @@ Install Core and run the Setup Assistant, and you can:
 
 Add Giving and you can also record and receipt gifts, run appeals and stewardship, get a task when it is time to ask a donor again, import gifts from NPSP or Nonprofit Cloud exports, and watch the Giving dashboard. Add Volunteers and you can schedule shifts and approve hours. Add Mirror to keep Opportunities and Campaigns in step, accept gifts from a giving page, or export gifts for accounting.
 
-BarnCRM runs on Platform-only licenses, Sales and Service Cloud, an org with NPSP installed, and an org on Agentforce Nonprofit. In an org with NPSP, BarnCRM can adopt NPSP's existing households in place, with a preview and an undo, rather than create a second household for every family.
+BarnCRM runs on Platform-only licenses, Sales and Service Cloud, an org with NPSP installed, and an org on Agentforce Nonprofit. In an org with NPSP, BarnCRM can adopt NPSP's existing households in place, with a preview and an undo, rather than create a second household for every family. BarnCRM's own household upkeep waits until NPSP has stopped making households, so the two never both make one for the same person.
 Every tab in every BarnCRM app, Core and module, has its own icon.
 
 

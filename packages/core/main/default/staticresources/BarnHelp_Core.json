@@ -113,6 +113,7 @@
     "Core_Feature_DuplicateReview_Description": "Suggests people and households that look like duplicates, for you to review and merge, and lets you choose what pairs them.",
     "Core_Feature_HouseholdUpkeep_ConfirmNote": "It adds the Households tab. Create households with New Household on BarnCRM Home, not the standard New button.",
     "Core_Feature_HouseholdUpkeep_Description": "Creates, names and tidies households as people are added, changed and removed.",
+    "Core_Feature_HouseholdUpkeep_NpspBlocked": "NPSP households are still in use in this org. Adopt them on the NPSP Households page, set NPSP's Account Model to One-to-One or Individual, then turn this on, so NPSP and BarnCRM never both make a household for the same person. See NPSP Households in the Admin Guide.",
     "Core_Feature_OrgOptimizer_Description": "Checks your org's setup and data and suggests fixes, in Org Optimizer and Health Check.",
     "Core_Feature_PreferredEmail_Description": "Copies the email address and the phone number a person prefers into the standard Email and Phone fields.",
     "Core_Feature_Relationships_Description": "Keeps both sides of a relationship between two people in step.",

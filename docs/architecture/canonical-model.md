@@ -12131,6 +12131,16 @@ Restored with the reason in Note. Member Count is left as written.
 `BarnCRM_Admin` is granted the object, Read and View All. Rows are written only by the
 adoption job in system mode (ADR-0021).
 
+**R-HA6 Household Upkeep waits while NPSP households are in use (RT-04).** NPSP households are
+in use while NPSP still creates household accounts (the org default of
+`npe01__Contacts_And_Orgs_Settings__c` has `npe01__Account_Processor__c` = `Household Account`,
+or the setting has no org default row, NPSP's own default) or while any Account matches R-HA1.
+Both are read by describe in `NpspHouseholdSource.householdsInUse()` (system mode, once per
+transaction, a read failure answers not in use and is logged); with neither name in the org the
+answer is no. While in use, turning on Household Upkeep is refused with the reason, first-run
+setup leaves it out instead of failing, and its Features row shows the reason whether it is on
+or off. Nothing BarnCRM or NPSP stores is changed.
+
 ### Salesforce implementation
 
 - **Object** `Household_Adoption__c`, auto number Name `HA-{000000}`, sharing Private, reports
@@ -12148,7 +12158,8 @@ adoption job in system mode (ADR-0021).
 - **NPSP fields read, never written** (names built at run time, read only when describe finds
   them and the user may read them): `npe01__SYSTEM_AccountType__c`, `npo02__Formal_Greeting__c`,
   `npo02__Informal_Greeting__c`, `npe01__One2OneContact__c`, `npo02__SYSTEM_CUSTOM_NAMING__c`,
-  and the Account record type `HH_Account`.
+  and the Account record type `HH_Account`; for R-HA6, NPSP's hierarchy setting
+  `npe01__Contacts_And_Orgs_Settings__c` and its `npe01__Account_Processor__c` (org default only).
 - **Classes:** `NpspHouseholdSource` (describe-only reads of NPSP, the test seam),
   `NpspHouseholdAdoptionService` (preview, start, undo, status), `NpspHouseholdAdoptionBatch`
   (adopt and undo chunks), `NpspHouseholdAdoptionController` (thin, plain JSON shapes). The
@@ -12586,6 +12597,7 @@ mirrors the primary member).
 | 0.17 | 2026-11-04 | Dispatcher error contract (RT-05, ADR-NEXT dispatcher errors and Automation Control). Section 10 gains rule R-A6: a failure refuses only its own records, the rest of the save goes ahead. No object or field added. |
 | 0.17 | 2026-11-04 | BarnCRM Automation Control (RT-13, same ADR). New hierarchy custom setting `BarnCRM_Automation_Control__c` with `Pause_All__c` and `Bypass__c` (Section 10, rule R-A7), read by the dispatcher, every shipped flow template and the Check BarnCRM Automation action. |
 | 0.17 | 2026-11-04 | Automation page manages Automation Control (RT-13, same ADR, decisions 2.6 to 2.8). Section 10 gains rule R-A8: org, profile and user rows edited in the console, an org's own flows listed as `Flow:` switch rows, and Catch Up Now. No object or field added. |
+| 0.17 | 2026-11-04 | Household Upkeep and NPSP (RT-04). Household Adoption (Section 29ZQ) gains rule R-HA6: Household Upkeep cannot be turned on while NPSP households are in use, detected by describe. No object or field added. |
 
 ---
 ## 32. Entity ownership by package
