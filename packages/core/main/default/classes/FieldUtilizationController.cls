@@ -415,9 +415,15 @@ public with sharing class FieldUtilizationController {
         public Boolean tooLarge = false;
         @AuraEnabled
         public Integer largeObjectLimit;
+        /** The records the person can see, for the Last Used progress (R-FU12). */
+        @AuraEnabled
+        public Integer total = 0;
     }
 
-    /** One chunk of picklist usage: rows, fields that failed, fields cut at the value limit. */
+    /**
+     * One chunk of picklist usage: rows, fields that failed, fields cut at the value limit, and
+     * the API names of fields whose Last Used dates are read afterwards by getPicklistLastUsed.
+     */
     public class PicklistChunk {
         @AuraEnabled
         public List<PicklistValueRow> rows = new List<PicklistValueRow>();
@@ -425,6 +431,35 @@ public with sharing class FieldUtilizationController {
         public List<String> failed = new List<String>();
         @AuraEnabled
         public List<String> truncated = new List<String>();
+        @AuraEnabled
+        public List<String> datesPending = new List<String>();
+    }
+
+    /** The newest date found for one value of one field in a chunk of records. */
+    public class PicklistDate {
+        @AuraEnabled
+        public String fieldName;
+        /** The stored value; '' for records with no value. */
+        @AuraEnabled
+        public String value;
+        @AuraEnabled
+        public Datetime lastUsed;
+    }
+
+    /** One chunk of Last Used dates, and where the next chunk starts (R-FU12). */
+    public class PicklistDates {
+        @AuraEnabled
+        public List<PicklistDate> dates = new List<PicklistDate>();
+        /** API names of fields with too many distinct values to date. */
+        @AuraEnabled
+        public List<String> cut = new List<String>();
+        /** The Id to pass as afterId for the next chunk. */
+        @AuraEnabled
+        public String lastId;
+        @AuraEnabled
+        public Integer read = 0;
+        @AuraEnabled
+        public Boolean done = true;
     }
 
     /** The object's single-select picklist fields, and whether the object is too large (R-FU9). */
@@ -435,7 +470,8 @@ public with sharing class FieldUtilizationController {
             Schema.DescribeSObjectResult described = requireObject(objectName);
             PicklistPlan planned = new PicklistPlan();
             planned.largeObjectLimit = FieldUtilizationService.largeObjectLimit();
-            planned.tooLarge = PicklistUsageService.total(described) > planned.largeObjectLimit;
+            planned.total = PicklistUsageService.total(described);
+            planned.tooLarge = planned.total > planned.largeObjectLimit;
             if (!planned.tooLarge) {
                 for (
                     Schema.DescribeFieldResult field : PicklistUsageService.picklistFields(
@@ -457,7 +493,8 @@ public with sharing class FieldUtilizationController {
     /**
      * Groups up to one chunk of the object's picklist fields by value (R-FU9): one aggregate
      * query per field, in user mode. The size limit is enforced here too. Names that are not
-     * single-select picklist fields are ignored.
+     * single-select picklist fields are ignored. Last Used is read in the same query while the
+     * call's date budget allows; other fields are named in datesPending (R-FU12).
      */
     @AuraEnabled
     public static PicklistChunk getPicklistUsage(String objectName, List<String> fieldNames) {
@@ -478,24 +515,31 @@ public with sharing class FieldUtilizationController {
             Map<String, Schema.DescribeFieldResult> fields = PicklistUsageService.picklistFieldsByName(
                 described
             );
+            Boolean dated = PicklistUsageService.dateField(described) != null;
             Exception firstFailure;
             for (String fieldName : new Set<String>(fieldNames)) {
                 Schema.DescribeFieldResult field = fields.get(fieldName);
                 if (field == null) {
                     continue;
                 }
-                // Each grouped count reads every record toward the query-row limit, and running
-                // past that limit cannot be caught, so a field that would cross it is reported as
-                // failed instead.
-                if (Limits.getQueryRows() + total > Limits.getLimitQueryRows()) {
+                // COUNT grouped by value is charged one query row per value (at most
+                // MAX_VALUES + 1); MAX is charged one row per record, so dates are read here
+                // only while they fit the budget, and running past the limit cannot be caught.
+                Integer countRows = PicklistUsageService.MAX_VALUES + 1;
+                if (Limits.getQueryRows() + countRows > Limits.getLimitQueryRows()) {
                     result.failed.add(field.getLabel());
                     continue;
                 }
+                Boolean withDates = dated && PicklistUsageService.datesFit(total);
                 try {
                     PicklistUsageService.FieldResult usage = PicklistUsageService.usage(
                         described,
-                        field
+                        field,
+                        withDates
                     );
+                    if (dated && !withDates) {
+                        result.datesPending.add(field.getName());
+                    }
                     if (usage.truncated) {
                         result.truncated.add(field.getLabel());
                     }
@@ -505,7 +549,7 @@ public with sharing class FieldUtilizationController {
                         row.fieldLabel = field.getLabel();
                         row.value = value.value;
                         row.valueLabel = value.status == PicklistUsageService.NO_VALUE
-                            ? System.Label.Core_PicklistUsage_NoValue
+                            ? '(' + System.Label.Core_PicklistUsage_StatusNoValue + ')'
                             : value.valueLabel;
                         row.key = row.fieldName + '|' + value.value;
                         row.status = value.status;
@@ -525,6 +569,84 @@ public with sharing class FieldUtilizationController {
         } catch (Exception caught) {
             throw asUserError(caught, 'Picklist usage count');
         }
+    }
+
+    /**
+     * Reads one chunk of records in Id order, after afterId (from the first record when blank),
+     * and returns the newest Last Used date per value of up to one chunk of picklist fields
+     * (R-FU12). The page calls it again with lastId until done, and keeps the newest date per
+     * value across chunks. One query in user mode, at most MAX_SCAN_ROWS records. afterId must
+     * be an Id of the same kind of record; the size limit is enforced here too.
+     */
+    @AuraEnabled
+    public static PicklistDates getPicklistLastUsed(
+        String objectName,
+        List<String> fieldNames,
+        String afterId
+    ) {
+        try {
+            requirePermission();
+            Schema.DescribeSObjectResult described = requireObject(objectName);
+            PicklistDates result = new PicklistDates();
+            if (fieldNames == null || fieldNames.isEmpty()) {
+                return result;
+            }
+            if (fieldNames.size() > PicklistUsageService.CHUNK_SIZE) {
+                throw new FieldUtilizationException(
+                    System.Label.Core_FieldUtilization_UnexpectedError
+                );
+            }
+            Id after = startAfter(described, afterId);
+            requireNotTooLarge(PicklistUsageService.total(described));
+            Map<String, Schema.DescribeFieldResult> known = PicklistUsageService.picklistFieldsByName(
+                described
+            );
+            List<Schema.DescribeFieldResult> fields = new List<Schema.DescribeFieldResult>();
+            for (String fieldName : new Set<String>(fieldNames)) {
+                if (known.containsKey(fieldName)) {
+                    fields.add(known.get(fieldName));
+                }
+            }
+            PicklistUsageService.ScanResult scanned = PicklistUsageService.lastUsed(
+                described,
+                fields,
+                after
+            );
+            for (String fieldName : scanned.lastUsed.keySet()) {
+                Map<String, Datetime> newest = scanned.lastUsed.get(fieldName);
+                for (String value : newest.keySet()) {
+                    PicklistDate found = new PicklistDate();
+                    found.fieldName = fieldName;
+                    found.value = value;
+                    found.lastUsed = newest.get(value);
+                    result.dates.add(found);
+                }
+            }
+            result.cut.addAll(scanned.cut);
+            result.lastId = scanned.lastId == null ? afterId : String.valueOf(scanned.lastId);
+            result.read = scanned.read;
+            result.done = scanned.done;
+            return result;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Picklist usage last used');
+        }
+    }
+
+    /** The Id a Last Used chunk starts after: blank for the first record, else this object's Id. */
+    private static Id startAfter(Schema.DescribeSObjectResult described, String afterId) {
+        if (String.isBlank(afterId)) {
+            return null;
+        }
+        Id after;
+        try {
+            after = Id.valueOf(afterId);
+        } catch (Exception notAnId) {
+            after = null;
+        }
+        if (after == null || after.getSObjectType() != described.getSObjectType()) {
+            throw new FieldUtilizationException(System.Label.Core_FieldUtilization_UnexpectedError);
+        }
+        return after;
     }
 
     /** Record type developer names to the labels the page shows, for one object. */

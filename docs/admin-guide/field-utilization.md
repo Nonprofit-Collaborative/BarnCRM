@@ -141,6 +141,14 @@ you can see), 20 fields at a time with a progress bar. Only the 500 most used va
 the data are shown for a field; if a field has more, the page names it under the table. A kind
 of record with more than 1,000,000 records is not read, as for the field counts above.
 
+On a large kind of record (tens of thousands of records or more), the records per value come
+first and **Last Used** follows: the page reads the records in chunks of up to 20,000, one call
+at a time, and shows **Finding Last Used dates: read N of N records.** with a **Cancel** button.
+Last Used stays blank until a field's dates are complete. If you click **Cancel**, or a chunk
+fails (the Error Log has the detail), the page keeps what it read, names the fields still
+without dates, and offers **Continue**, which carries on from the last chunk that finished. A field
+with more than 1,000 different values in one chunk gets no Last Used dates.
+
 Not covered: multi-select picklists, and picklist values you cannot read because the field is
 hidden from you. Nothing is saved; the table is gone when you leave the page.
 

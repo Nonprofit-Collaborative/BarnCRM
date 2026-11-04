@@ -8504,17 +8504,29 @@ standard delete.
 current one, with the change in percentage points.
 **R-FU9 Picklist value usage (C-57).** On request, for each single-select picklist field the
 person can read and group by, one aggregate query in user mode groups the object's records by the
-field's value and returns `COUNT(Id)` and `MAX(LastModifiedDate)` (`MAX(CreatedDate)` on an
-object with no Last Modified Date). Fields are read 20 per call, one query each; at most 500
-distinct values in the data are kept per field, the field is named on the page when more were cut;
-the 1,000,000-record guard of R-FU5 applies. Multi-select picklists are not included. Nothing is
-stored: no object or field is added.
+field's value and returns `COUNT(Id)`, and `MAX(LastModifiedDate)` (`MAX(CreatedDate)` on an
+object with no Last Modified Date) while that fits the call (R-FU12). Fields are read 20 per call,
+one query each; at most 500 distinct values in the data are kept per field, the field is named on
+the page when more were cut; the 1,000,000-record guard of R-FU5 applies, as for field counts.
+Multi-select picklists are not included. Nothing is stored: no object or field is added.
 **R-FU10 Value status.** A value found in the data that is an active value of the picklist is
 Active; one that is not active (retired, or removed) is Inactive, Still in Data; an active value
 no record holds is Never Used (zero records, no date); records with no value are one No Value row.
 **R-FU11 What Last Used means.** The date is the newest Last Modified Date among the records that
 hold the value, so any later edit to such a record moves it: it is the latest time a record
 holding the value was touched, not the time the value was chosen. The page says so.
+**R-FU12 Large objects, in chunks (C-57).** `COUNT` grouped by value is charged one query row per
+value, so the counts of R-FU9 work up to the R-FU5 limit in the one call. `MAX` is charged one
+query row per record read, so the usage call reads dates with it only while the call's date
+budget allows (40,000 query rows); every other field is returned as dates pending. The page then
+reads their Last Used a chunk of records at a time, one Apex call per chunk: records in Id order
+after the last Id of the previous chunk, at most 20,000 records and 100,000 records times fields
+per call, up to 20 fields per call, one query in user mode, the page keeping the newest date per
+value across chunks. The page shows progress (records read of records to read) and a Cancel
+button; Cancel or a failed chunk stops the job and keeps what was read, the dates of fields not
+finished stay blank and are named, and Continue carries on from the last chunk that finished. A field
+with more than 1,000 distinct values in one chunk gets no Last Used dates (it is already named as
+cut at 500 values). No Batch Apex and nothing stored.
 
 ### Salesforce implementation
 
@@ -12386,6 +12398,7 @@ mirrors the primary member).
 | 0.15 | 2026-11-02 | Ship-on settings added in an upgrade (QA-F2, D-166). New field `Shipped_Defaults_Applied__c` on BarnCRM Settings (Section 12, v0.8 keys): how many of each package's ship-on checkboxes added in an upgrade have been turned on once, so Send Weekly Admin Summary (C-54) and Ask Reminders (G-29) start on in orgs that saved settings before them. No object added. |
 | 0.15 | 2026-11-02 | Person account and text fixes (QA-F3 to QA-F6, D-166). No field added. Volunteer reminders reach bookings on a person account and suggestions return the Account (R-VU6, R-VU7); an ask on the contact behind a person account names the Donor Account (R-SO1); an enrollment or service delivery Account must be a person account (R-EN1, R-SD1); Programs Health Check reports Nonprofit Cloud Program Management, also listed as an Integration App Alternative; `Ask__c` record number display format six digits (`ASK-{000000}`). |
 | 0.17 | 2026-11-02 | C-57 picklist value usage (plan 6.1.5). Section 29F: rules R-FU9 to R-FU11 (records per picklist value and last use, value status, what Last Used means). No object or field added. |
+| 0.17 | 2026-11-04 | C-57 picklist value usage on large objects (Brandon, 2026-11-04). Section 29F: R-FU9 amended and new R-FU12 (counts in one grouped COUNT per field, Last Used read in chunks of records with progress, Cancel and Continue). No object or field added. |
 | 0.17 | 2026-11-02 | C-58 technical debt checks in Org Optimizer (plan 6.1.5). `BarnCRM_Settings__c` gains `Old_Api_Version__c` (Org Optimizer keys, default 50); rules R-OO1 to R-OO3. No object added. |
 | 0.17 | 2026-11-02 | C-60 automation inventory in the Data Dictionary (plan 6.1.5). Section 29F: rules R-AI1 to R-AI4. No object or field added. |
 | 0.17 | 2026-11-02 | Field Access Manager (C-65, D-157, ADR-0156). New Section 29ZP, rules R-FA1 to R-FA7: a field access change is a data job; `Import_Batch__c.Operation__c` gains the value Access. No object or field added. |

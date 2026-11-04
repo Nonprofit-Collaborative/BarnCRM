@@ -22,6 +22,32 @@
                 </p>
             </div>
         </template>
+        <template lwc:if={scanning}>
+            <div class="slds-var-m-vertical_small" data-id="dates-progress">
+                <lightning-progress-bar value={scanState.percent} size="medium"></lightning-progress-bar>
+                <p class="slds-text-body_small slds-var-m-vertical_xx-small" role="status" aria-live="polite">
+                    {datesProgressText}
+                </p>
+                <lightning-button
+                    data-id="cancel"
+                    label={labels.cancel}
+                    disabled={cancelRequested}
+                    onclick={handleCancel}
+                ></lightning-button>
+            </div>
+        </template>
+        <template lwc:if={datesStoppedMessage}>
+            <div class="slds-var-m-vertical_small" data-id="dates-stopped">
+                <p class="slds-var-m-bottom_x-small" role="status">{datesStoppedMessage}</p>
+                <template lwc:if={showRetry}>
+                    <lightning-button
+                        data-id="retry"
+                        label={labels.retry}
+                        onclick={handleRetry}
+                    ></lightning-button>
+                </template>
+            </div>
+        </template>
         <template lwc:if={showEmpty}>
             <p class="slds-var-m-top_small" data-id="no-fields">{labels.noFields}</p>
         </template>

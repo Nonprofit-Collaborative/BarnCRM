@@ -218,5 +218,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | In **Setup**, **Object Manager**, **Address**, **Fields**, **Verification Status**, deactivate one value that addresses hold (a sandbox only), then click **Show Picklist Value Usage** again. | That value shows **Inactive, Still in Data** with its record count. Reactivate the value afterward. |
 | 6 | Read the small text above the table. | It explains that **Last Used** is the newest **Last Modified Date** among the records holding the value. |
 | 7 | Choose another kind of record. | The table is gone until you click the button again. |
+| 8 | On an org with a kind of record holding more than 40,000 records you can see (a full sandbox, or an object loaded for testing), choose it and click **Show Picklist Value Usage**. | The records per value appear first with **Last Used** blank, then a progress bar reads **Finding Last Used dates: read N of N records.** with a **Cancel** button, and Last Used fills in when it finishes. |
+| 9 | Click **Show Picklist Value Usage** again and click **Cancel** while the dates are read. | Reading stops after the chunk in flight. A message says the dates stopped after N of N records and names the fields without dates, with a **Continue** button. |
+| 10 | Click **Continue**. | Reading carries on from where it stopped (the count does not start from 0) and Last Used fills in. |
 
 **Cleanup:** Reactivate any value you deactivated in step 5.

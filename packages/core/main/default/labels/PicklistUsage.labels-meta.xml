@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_PicklistUsage_NoValue</fullName>
+        <fullName>Core_PicklistUsage_DatesProgress</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Picklist usage: records with no value</shortDescription>
-        <value>(No Value)</value>
+        <shortDescription>Picklist usage: Last Used progress; {0} read, {1} total</shortDescription>
+        <value>Finding Last Used dates: read {0} of {1} records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_PicklistUsage_DatesStopped</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Picklist usage: Last Used stopped; {0} read, {1} total, {2} fields</shortDescription>
+        <value>Finding Last Used dates stopped after {0} of {1} records, so Last Used is blank for: {2}. Select Continue to carry on from there.</value>
     </labels>
     <labels>
         <fullName>Core_PicklistUsage_Title</fullName>
