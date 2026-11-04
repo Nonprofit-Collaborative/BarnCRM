@@ -7,6 +7,7 @@ jest.mock('@salesforce/apex/GrantReportController.getReportData', () => ({ defau
   virtual: true
 });
 jest.mock('c/findCsv', () => ({
+  ...jest.requireActual('c/findCsv'),
   saveBlob: jest.fn(),
   fileName: jest.fn(() => 'Funder_Report.html')
 }));

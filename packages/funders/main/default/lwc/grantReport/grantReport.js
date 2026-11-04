@@ -1,6 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import getReportData from '@salesforce/apex/GrantReportController.getReportData';
-import { fileName, saveBlob } from 'c/findCsv';
+import { fileName, messageFrom as messageOf, saveBlob } from 'c/findCsv';
 import { mergeReport, reportDocument } from 'c/grantReportModel';
 
 import TITLE from '@salesforce/label/c.Funders_Report_Title';
@@ -14,9 +14,6 @@ import PERIOD_LINE from '@salesforce/label/c.Funders_Outcomes_PeriodLine';
 import NOT_SET from '@salesforce/label/c.Funders_Outcomes_NotSet';
 
 const FILE_BASE = 'Funder_Report';
-
-const messageOf = (error, fallback) =>
-  (error && error.body && error.body.message) || (error && error.message) || fallback;
 
 /**
  * The Funder Report card on a grant's page (F-06, canonical model 29ZO): choose a template and

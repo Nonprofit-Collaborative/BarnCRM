@@ -2,6 +2,7 @@ import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getCalendar from '@salesforce/apex/GrantCalendarController.getCalendar';
 import { monthRange, monthWeeks, shiftMonth, weekdayOrder } from 'c/grantCalendarModel';
+import { messageFrom } from 'c/findCsv';
 import LOCALE from '@salesforce/i18n/locale';
 import FIRST_DAY_OF_WEEK from '@salesforce/i18n/firstDayOfWeek';
 
@@ -26,8 +27,7 @@ const CLASS_BY_KIND = {
   payment: 'barn-item barn-item_payment slds-size_full'
 };
 
-const messageOf = (error) =>
-  (error && error.body && error.body.message) || (error && error.message) || ERROR_LOAD;
+const messageOf = (error) => messageFrom(error, ERROR_LOAD);
 
 /** Salesforce counts the first day of the week from 1 for Sunday; the model from 0. */
 const firstDay = () => {

@@ -2,6 +2,7 @@ import { LightningElement } from 'lwc';
 import getBoard from '@salesforce/apex/FundersBoardController.getBoard';
 import { concentration, fill, revenueMix, showShare } from 'c/fundersBoardModel';
 import { showMoney } from 'c/grantReportModel';
+import { messageFrom as messageOf } from 'c/findCsv';
 
 import TITLE from '@salesforce/label/c.Funders_Board_Title';
 import HELP from '@salesforce/label/c.Funders_Board_Help';
@@ -18,9 +19,6 @@ import FUNDS from '@salesforce/label/c.Funders_Board_Funds';
 import GRANTS from '@salesforce/label/c.Funders_Board_Grants';
 import EMPTY from '@salesforce/label/c.Funders_Board_Empty';
 import ERROR_LOAD from '@salesforce/label/c.Funders_Board_ErrorLoad';
-
-const messageOf = (error, fallback) =>
-  (error && error.body && error.body.message) || (error && error.message) || fallback;
 
 /**
  * The Board Dashboard tab (F-07, canonical model 29ZH R-GN9): this fiscal year's revenue mix,

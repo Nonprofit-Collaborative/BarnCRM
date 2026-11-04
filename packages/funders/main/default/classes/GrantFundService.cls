@@ -25,7 +25,7 @@ public with sharing class GrantFundService {
                 grant.Fund_Id__c = null;
                 continue;
             }
-            Id fundId = asId(grant.Fund_Id__c);
+            Id fundId = GrantService.asId(grant.Fund_Id__c);
             if (fundId != null && !looked) {
                 fundObject = NamespaceUtil.packagedObjectType(FUND_OBJECT);
                 looked = true;
@@ -117,16 +117,12 @@ public with sharing class GrantFundService {
         String value = null;
         if (String.isNotBlank(fundId)) {
             Schema.SObjectType type = fundType();
-            Id parsed = asId(fundId);
+            Id parsed = GrantService.asId(fundId);
             if (type == null || parsed == null || parsed.getSObjectType() != type) {
                 throw new GrantService.GrantException(Label.Funders_Grant_BadFund);
             }
             value = String.valueOf(parsed);
         }
         update as user new Grant__c(Id = grantId, Fund_Id__c = value);
-    }
-
-    private static Id asId(String text) {
-        return GrantService.asId(text);
     }
 }

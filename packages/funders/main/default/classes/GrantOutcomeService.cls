@@ -51,15 +51,6 @@ public with sharing class GrantOutcomeService {
             readable(PERIOD_OBJECT) != null;
     }
 
-    /** The text as a record identifier, or null when it is not one. */
-    private static Id asId(String text) {
-        try {
-            return Id.valueOf(text.trim());
-        } catch (StringException notAnId) {
-            return null;
-        }
-    }
-
     /**
      * R-GQ6: stores each requirement's outcome in its 18-character form and refuses text that is
      * not a record identifier, or, where Logic Models is installed, an identifier of another
@@ -75,7 +66,7 @@ public with sharing class GrantOutcomeService {
                 requirement.Outcome_Id__c = null;
                 continue;
             }
-            Id outcomeId = asId(requirement.Outcome_Id__c);
+            Id outcomeId = GrantService.asId(requirement.Outcome_Id__c);
             if (outcomeId != null && !looked) {
                 elementType = elementObject();
                 looked = true;
@@ -300,7 +291,7 @@ public with sharing class GrantOutcomeService {
     public static void setOutcome(Id requirementId, String outcomeId) {
         String value = null;
         if (String.isNotBlank(outcomeId)) {
-            Id parsed = asId(outcomeId);
+            Id parsed = GrantService.asId(outcomeId);
             Map<String, Map<String, Object>> found = parsed == null
                 ? new Map<String, Map<String, Object>>()
                 : outcomes(new Set<String>{ String.valueOf(parsed) }, null, null);

@@ -1,5 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { messageFrom } from 'c/findCsv';
 import getProgram from '@salesforce/apex/GrantProgramController.getProgram';
 import setProgram from '@salesforce/apex/GrantProgramController.setProgram';
 import getFund from '@salesforce/apex/GrantFundController.getFund';
@@ -19,8 +20,7 @@ import ERROR_ACTION from '@salesforce/label/c.Funders_Pipeline_ErrorUnexpected';
 
 const NONE_VALUE = '';
 
-const messageOf = (error) =>
-  (error && error.body && error.body.message) || (error && error.message) || ERROR_ACTION;
+const messageOf = (error) => messageFrom(error, ERROR_ACTION);
 
 /**
  * What each kind of linked record differs in. Program (F-01, canonical model 29ZH R-GN4): the

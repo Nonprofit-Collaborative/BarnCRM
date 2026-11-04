@@ -5,6 +5,7 @@ import getSchedule from '@salesforce/apex/GrantScheduleController.getSchedule';
 import saveSchedule from '@salesforce/apex/GrantScheduleController.saveSchedule';
 import markReceived from '@salesforce/apex/GrantScheduleController.markReceived';
 import { buildPayments } from 'c/grantScheduleModel';
+import { messageFrom } from 'c/findCsv';
 
 import TITLE from '@salesforce/label/c.Funders_Schedule_Title';
 import CANNOT_BUILD from '@salesforce/label/c.Funders_Schedule_CannotBuild';
@@ -16,8 +17,7 @@ import ERROR_ACTION from '@salesforce/label/c.Funders_Pipeline_ErrorUnexpected';
 const EXPECTED = 'Expected';
 const DEFAULT_FREQUENCY = 'Annual';
 
-const messageOf = (error) =>
-  (error && error.body && error.body.message) || (error && error.message) || ERROR_ACTION;
+const messageOf = (error) => messageFrom(error, ERROR_ACTION);
 
 /**
  * The Award Schedule card on a grant's page (F-05, canonical model 29ZM): the payments with the

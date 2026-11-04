@@ -167,6 +167,10 @@ function compare(a, b) {
 function holds(condition, values) {
   const actual = normalized(values[String(condition.field).toLowerCase()]);
   const operator = condition.operator;
+  // An operator the rules cannot hold (the server refuses it on save) never matches.
+  if (!OPERATORS.includes(operator)) {
+    return false;
+  }
   if (operator === 'isBlank') {
     return actual === '';
   }

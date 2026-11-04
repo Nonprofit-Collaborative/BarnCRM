@@ -4,6 +4,7 @@ import { CloseActionScreenEvent } from 'lightning/actions';
 import getActionContext from '@salesforce/apex/VolunteerLetterController.getActionContext';
 import previewLetter from '@salesforce/apex/VolunteerLetterController.preview';
 import generateLetter from '@salesforce/apex/VolunteerLetterController.generate';
+import { localIsoDate } from 'c/findCsv';
 
 import HEADING from '@salesforce/label/c.Volunteers_LetterAction_Heading';
 import TEMPLATE from '@salesforce/label/c.Core_Import_StepTemplate';
@@ -22,11 +23,7 @@ import NO_LEGAL_NAME from '@salesforce/label/c.Volunteers_LetterAction_NoLegalNa
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 /** A date as the lightning-input date value: yyyy-mm-dd, in the user's own day. */
-function isoDate(value) {
-  const month = String(value.getMonth() + 1).padStart(2, '0');
-  const day = String(value.getDate()).padStart(2, '0');
-  return `${value.getFullYear()}-${month}-${day}`;
-}
+const isoDate = localIsoDate;
 
 /**
  * The Volunteer letter action on a contact or person account (V-08): choose a template and a

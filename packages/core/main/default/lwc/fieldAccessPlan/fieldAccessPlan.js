@@ -11,9 +11,6 @@ export const EDIT = 'edit';
 export const NONE = 'none';
 export const DOCUMENT_VERSION = 1;
 
-/** Why the server says a row changes, in the order the words are passed. */
-export const REASONS = ['asked', 'neededForFields', 'removedWithObject'];
-
 const keyOf = (objectName, fieldName) => `${objectName}.${fieldName || ''}`;
 
 /**

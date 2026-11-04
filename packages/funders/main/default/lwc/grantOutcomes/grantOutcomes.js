@@ -3,6 +3,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getOutcomes from '@salesforce/apex/GrantOutcomeController.getOutcomes';
 import setOutcome from '@salesforce/apex/GrantOutcomeController.setOutcome';
 import { indicatorLines } from 'c/grantReportModel';
+import { messageFrom as messageOf } from 'c/findCsv';
 
 import TITLE from '@salesforce/label/c.Funders_Outcomes_Title';
 import NOT_INSTALLED from '@salesforce/label/c.Funders_Outcomes_NotInstalled';
@@ -17,9 +18,6 @@ import ERROR_LOAD from '@salesforce/label/c.Funders_Outcomes_ErrorLoad';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 
 const NONE_VALUE = '';
-
-const messageOf = (error, fallback) =>
-  (error && error.body && error.body.message) || (error && error.message) || fallback;
 
 /**
  * The Logic Model Outcomes card on a grant's page (L-06, canonical model 29ZI R-GQ6): each

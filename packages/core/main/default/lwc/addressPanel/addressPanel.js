@@ -5,6 +5,7 @@ import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import LOCALE from '@salesforce/i18n/locale';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import { localIsoDate } from 'c/findCsv';
 
 import getCardContext from '@salesforce/apex/AddressMoveController.getCardContext';
 import getCardFields from '@salesforce/apex/AddressMoveController.getCardFields';
@@ -207,10 +208,7 @@ function toView(node) {
 
 /** Today as YYYY-MM-DD in the reader's own time zone, to compare with a stored date. */
 function todayText() {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  return `${now.getFullYear()}-${month}-${day}`;
+  return localIsoDate(new Date());
 }
 
 /** "October 26, 2026", in the reader's own language, from a stored YYYY-MM-DD. */

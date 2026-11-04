@@ -5,6 +5,7 @@ import getBoard from '@salesforce/apex/GrantPipelineController.getBoard';
 import moveStage from '@salesforce/apex/GrantPipelineController.moveStage';
 import markSubmitted from '@salesforce/apex/GrantPipelineController.markSubmitted';
 import { buildColumns, deadlineRows, moveTargets } from 'c/grantPipelineModel';
+import { format, messageFrom } from 'c/findCsv';
 
 import TITLE from '@salesforce/label/c.Funders_Pipeline_Title';
 import INTRO from '@salesforce/label/c.Funders_Pipeline_Intro';
@@ -43,11 +44,7 @@ const KIND_REQUIREMENT = 'requirement';
 const MOVE_PREFIX = 'move:';
 const STAGE_AWARDED = 'Awarded';
 
-const format = (template, ...values) =>
-  values.reduce((text, value, index) => text.replace(`{${index}}`, value), template);
-
-const messageOf = (error) =>
-  (error && error.body && error.body.message) || (error && error.message) || ERROR_ACTION;
+const messageOf = (error) => messageFrom(error, ERROR_ACTION);
 
 /**
  * The Grant Pipeline tab (F-01, canonical model 29ZH): the open grants by stage as a board, the

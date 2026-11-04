@@ -4,6 +4,8 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getLibrary from '@salesforce/apex/GrantAnswerController.getLibrary';
 import markUsed from '@salesforce/apex/GrantAnswerController.markUsed';
 import { filterAnswers, preview, topicList } from 'c/grantAnswerModel';
+import { format, messageFrom as messageOf } from 'c/findCsv';
+import { showDate } from 'c/grantReportModel';
 
 import TITLE from '@salesforce/label/c.Funders_Answers_Title';
 import SEARCH from '@salesforce/label/c.Funders_Answers_Search';
@@ -23,16 +25,6 @@ import NEW_ANSWER from '@salesforce/label/c.Funders_Answers_New';
 import ERROR_LOAD from '@salesforce/label/c.Funders_Answers_ErrorLoad';
 
 const PREVIEW_LENGTH = 240;
-
-const format = (template, ...values) =>
-  values.reduce((text, value, index) => text.replace(`{${index}}`, value), template);
-
-const messageOf = (error, fallback) =>
-  (error && error.body && error.body.message) || (error && error.message) || fallback;
-
-/** An ISO date ("2026-11-02") in the person's locale, read as a calendar day. */
-const showDate = (iso) =>
-  new Date(`${iso}T00:00:00Z`).toLocaleDateString(undefined, { timeZone: 'UTC' });
 
 /**
  * The Answer Library card on a grant's page (F-14, canonical model 29ZN): search and filter the

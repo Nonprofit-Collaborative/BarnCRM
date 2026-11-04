@@ -8,6 +8,7 @@ import schedule from '@salesforce/apex/OpportunityMirrorController.schedule';
 import stop from '@salesforce/apex/OpportunityMirrorController.stop';
 import compare from '@salesforce/apex/OpportunityMirrorController.compare';
 import copyRangeAgain from '@salesforce/apex/OpportunityMirrorController.copyRangeAgain';
+import { localIsoDate } from 'c/findCsv';
 import title from '@salesforce/label/c.Mirror_OpportunityMirror_Title';
 import intro from '@salesforce/label/c.Mirror_OpportunityMirror_Intro';
 import unavailable from '@salesforce/label/c.Mirror_OpportunityMirror_Unavailable';
@@ -59,11 +60,7 @@ function fill(template, ...values) {
   return values.reduce((text, value, index) => text.replace(`{${index}}`, value), template);
 }
 
-function isoDate(date) {
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${date.getFullYear()}-${month}-${day}`;
-}
+const isoDate = localIsoDate;
 
 /**
  * The Opportunity mirror page (feature X-01). The controller decides what the org and the person
