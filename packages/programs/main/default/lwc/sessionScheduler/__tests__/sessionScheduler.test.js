@@ -220,7 +220,7 @@ describe('c-session-scheduler', () => {
       dates: ['2027-03-01'],
       startTime: null
     });
-    expect(q(element, 'error-message').textContent).toContain('Choose an active service.');
+    expect(q(element, 'error-message').message).toContain('Choose an active service.');
   });
 
   it('skips days that already have a session, in the preview and the result', async () => {
@@ -265,6 +265,6 @@ describe('c-session-scheduler', () => {
 
     getSchedule.mockRejectedValue({});
     const second = await render();
-    expect(q(second, 'error-message').textContent).toContain('Programs_Schedule_ActionFailed');
+    expect(q(second, 'error-message').message).toContain('Programs_Fail_Schedule');
   });
 });

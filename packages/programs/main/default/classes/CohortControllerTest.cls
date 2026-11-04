@@ -252,7 +252,7 @@ private class CohortControllerTest {
 					new List<Object>{ CohortController.MAX_SHOWN }
 				),
 				Label.Programs_Cohort_NotFound,
-				Label.Programs_Cohort_ActionFailed
+				BarnHelp.text('Programs', 'Programs_Fail_Cohort')
 			},
 			refusals
 		);

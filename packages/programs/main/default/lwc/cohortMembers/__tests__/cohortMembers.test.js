@@ -215,7 +215,7 @@ describe('c-cohort-members', () => {
 
     getMembers.mockRejectedValue({ body: { message: 'Not found.' } });
     const second = await render();
-    expect(q(second, 'error-message').textContent).toContain('Not found.');
+    expect(q(second, 'error-message').message).toContain('Not found.');
   });
 
   it('shows a refused add in its own words', async () => {
@@ -232,6 +232,6 @@ describe('c-cohort-members', () => {
     await flush();
     q(element, 'add').click();
     await flush();
-    expect(q(element, 'error-message').textContent).toContain('Programs_Cohort_ActionFailed');
+    expect(q(element, 'error-message').message).toContain('Programs_Fail_Cohort');
   });
 });

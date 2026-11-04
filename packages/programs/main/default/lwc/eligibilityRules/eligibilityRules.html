@@ -9,23 +9,25 @@
       <p class="slds-text-body_regular slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
 
       <template lwc:if={errorMessage}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">{errorMessage}</p>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-show slds-var-m-bottom_small"></c-barn-notice>
       </template>
 
       <template lwc:if={hasProblems}>
-        <ul role="alert" data-id="problems" class="slds-text-color_error slds-var-m-bottom_small">
-          <template for:each={problemItems} for:item="problem">
-            <li key={problem.key} data-id="problem">{problem.text}</li>
-          </template>
-        </ul>
+        <c-barn-notice variant="error" data-id="problems" class="slds-show slds-var-m-bottom_small">
+          <ul class="slds-list_dotted">
+            <template for:each={problemItems} for:item="problem">
+              <li key={problem.key} data-id="problem">{problem.text}</li>
+            </template>
+          </ul>
+        </c-barn-notice>
       </template>
 
       <template lwc:if={readOnly}>
-        <p class="slds-text-body_small slds-text-color_weak" data-id="read-only">{labels.readOnly}</p>
+        <c-barn-notice message={labels.readOnly} data-id="read-only" class="slds-show slds-var-m-bottom_small"></c-barn-notice>
       </template>
 
       <template lwc:if={noRules}>
-        <p class="slds-text-body_regular" data-id="no-rules">{labels.noRules}</p>
+        <c-barn-empty-state illustration="setup" heading={labels.noRules} data-id="no-rules"></c-barn-empty-state>
       </template>
 
       <template for:each={ruleViews} for:item="rule">
@@ -210,7 +212,7 @@
         <div class="slds-var-m-top_medium">
           <h3 class="slds-text-heading_small">{labels.previewTitle}</h3>
           <template lwc:if={noPeople}>
-            <p class="slds-text-body_regular" data-id="no-people">{labels.noPeople}</p>
+            <c-barn-empty-state size="compact" heading={labels.noPeople} data-id="no-people"></c-barn-empty-state>
           </template>
           <template lwc:if={hasPeople}>
             <lightning-combobox

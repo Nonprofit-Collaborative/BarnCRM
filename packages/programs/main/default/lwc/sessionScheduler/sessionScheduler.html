@@ -7,13 +7,11 @@
       </template>
 
       <template lwc:if={errorMessage}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
-          {errorMessage}
-        </p>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-show slds-var-m-bottom_small"></c-barn-notice>
       </template>
 
       <template lwc:if={noServices}>
-        <p data-id="no-services" class="slds-text-body_regular">{labels.noServices}</p>
+        <c-barn-empty-state illustration="setup" heading={labels.noServices} data-id="no-services"></c-barn-empty-state>
       </template>
 
       <template lwc:if={canSchedule}>

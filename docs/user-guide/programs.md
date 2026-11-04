@@ -291,8 +291,10 @@ there is no card.
    **Last Year** or **Last 12 Months**.
 
 You should see: tiles for active programs, open and new enrollments, people served, people
-counted without names, services delivered and the attendance rate, then a table with the same figures for each program. Click a
-program's name to open it. The figures count only the records you can see.
+counted without names, services delivered and the attendance rate, then a **Tools** tile for
+each Programs tab you can open, then a table with the same figures for each program (the
+attendance rate also as a bar). Click a program's name to open it. The figures count only the
+records you can see.
 
 ## To Enroll Someone Again
 

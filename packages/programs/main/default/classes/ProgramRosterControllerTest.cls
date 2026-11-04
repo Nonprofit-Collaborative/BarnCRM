@@ -180,9 +180,9 @@ private class ProgramRosterControllerTest {
 			Assert.areEqual(
 				new List<String>{
 					Label.Programs_Roster_PersonRequired,
-					Label.Programs_Roster_ActionFailed,
-					Label.Programs_Roster_ActionFailed,
-					Label.Programs_Roster_ActionFailed
+					BarnHelp.text('Programs', 'Programs_Fail_Roster'),
+					BarnHelp.text('Programs', 'Programs_Fail_Roster'),
+					BarnHelp.text('Programs', 'Programs_Fail_Roster')
 				},
 				messages,
 				'Each bad request is refused with a plain message.'

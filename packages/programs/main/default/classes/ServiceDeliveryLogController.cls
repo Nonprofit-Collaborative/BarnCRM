@@ -114,7 +114,7 @@ public with sharing class ServiceDeliveryLogController {
 			people == null ||
 			people < 0
 		) {
-			throw UserErrors.message(Label.Programs_Log_ActionFailed);
+			throw UserErrors.message(failed());
 		}
 		try {
 			Database.insert(
@@ -140,7 +140,7 @@ public with sharing class ServiceDeliveryLogController {
 	@AuraEnabled
 	public static Log getLog(Id programId, Id serviceId, Date deliveryDate) {
 		if (programId == null) {
-			throw UserErrors.message(Label.Programs_Log_ActionFailed);
+			throw UserErrors.message(failed());
 		}
 		try {
 			return logFor(programId, serviceId, deliveryDate);
@@ -153,7 +153,7 @@ public with sharing class ServiceDeliveryLogController {
 	@AuraEnabled
 	public static Log save(Id programId, Id serviceId, Date deliveryDate, List<Entry> entries) {
 		if (programId == null || serviceId == null || deliveryDate == null) {
-			throw UserErrors.message(Label.Programs_Log_ActionFailed);
+			throw UserErrors.message(failed());
 		}
 		try {
 			List<Service_Delivery__c> toInsert = new List<Service_Delivery__c>();
@@ -164,7 +164,7 @@ public with sharing class ServiceDeliveryLogController {
 					continue;
 				}
 				if (!allowed.contains(entry.attendance)) {
-					throw UserErrors.message(Label.Programs_Log_ActionFailed);
+					throw UserErrors.message(failed());
 				}
 				Decimal quantity = ServiceDeliveryService.isAbsence(entry.attendance)
 					? 0
@@ -211,7 +211,7 @@ public with sharing class ServiceDeliveryLogController {
 	@AuraEnabled
 	public static Log getSessionLog(Id sessionId) {
 		if (sessionId == null) {
-			throw UserErrors.message(Label.Programs_Log_ActionFailed);
+			throw UserErrors.message(failed());
 		}
 		try {
 			return SessionAttendance.logFor(sessionId);
@@ -228,7 +228,7 @@ public with sharing class ServiceDeliveryLogController {
 	@AuraEnabled
 	public static Log saveSession(Id sessionId, List<Entry> entries) {
 		if (sessionId == null) {
-			throw UserErrors.message(Label.Programs_Log_ActionFailed);
+			throw UserErrors.message(failed());
 		}
 		try {
 			Integer saved = SessionAttendance.save(sessionId, entries);
@@ -399,6 +399,11 @@ public with sharing class ServiceDeliveryLogController {
 		}
 	}
 
+	/** What staff are told when the log's work failed (modules-1); SessionAttendance uses it too. */
+	public static String failed() {
+		return BarnHelp.text('Programs', 'Programs_Fail_Log');
+	}
+
 	/** A refusal is passed on in its own words; anything else is logged first. */
 	private static AuraHandledException report(Exception failure, Id recordId) {
 		if (failure instanceof AuraHandledException) {
@@ -408,6 +413,6 @@ public with sharing class ServiceDeliveryLogController {
 			return UserErrors.message(((DmlException) failure).getDmlMessage(0));
 		}
 		ErrorLogger.log(failure, CONTEXT, recordId);
-		return UserErrors.message(Label.Programs_Log_ActionFailed);
+		return UserErrors.message(failed());
 	}
 }

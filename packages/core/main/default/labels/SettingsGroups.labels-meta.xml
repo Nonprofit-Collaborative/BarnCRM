@@ -212,7 +212,7 @@
         <fullName>Core_SettingsGroup_Tools</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Settings console, General page: box heading for metadata and sample data</shortDescription>
         <value>Tools</value>
     </labels>

@@ -139,7 +139,7 @@ private class PersonEnrollmentsControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(Label.Programs_PersonEnrollments_LoadFailed, refusal);
+			Assert.areEqual(BarnHelp.text('Programs', 'Programs_Fail_PersonCard'), refusal);
 			Assert.areEqual(
 				1,
 				[

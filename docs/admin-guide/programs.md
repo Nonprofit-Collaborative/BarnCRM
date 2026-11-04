@@ -89,7 +89,8 @@ group, a housing program), so you choose:
 | **Shared** (the default) | Everyone with a Programs permission set, as before this setting existed. |
 | **Private** | The person who created the record (its owner), the people above them in the role hierarchy, and Programs Admin. |
 
-Choose one under **Participant Privacy** and click **Save**. The change applies within a minute,
+Choose one under **Participant Privacy** and click **Save** on the bar that appears at the
+bottom of the page (**Discard** puts the saved choice back). The change applies within a minute,
 to every enrollment and delivery, old and new, and is listed under **Recent Changes** in BarnCRM
 Settings. Case notes are private whichever you choose (see Case Notes).
 
@@ -443,10 +444,13 @@ default, **Last Month**, **This Year**, **Last Year** or **Last 12 Months**). Ti
 | Services Delivered | Service deliveries marked Present in the period. |
 | Attendance Rate | Present deliveries as a share of all deliveries in the period, absences included. |
 
-Below the tiles, a table gives the same figures for each program (including **Counted Without
-Names**), plus **Completed** (enrollments
-completed in the period); click a program's name to open it. It lists every Active program and
-any other program with activity in the period.
+Below the tiles, **Tools** has a tile for each Programs tab the person can open (Programs,
+Cohorts, Sessions, Enrollments, Service Deliveries, Case Notes, Referrals, Service Counts and
+Goals), so the dashboard is the Programs app's home page. Then a **By Program** table gives the
+same figures for each program (including **Counted Without Names**), plus **Completed**
+(enrollments completed in the period), with each program's attendance rate drawn as a bar beside
+the percent; click a program's name to open it. It lists every Active program and any other
+program with activity in the period.
 
 Each person sees figures for the records they can see. With Participant Privacy set to Private,
 a staff member's dashboard counts only their own enrollments and deliveries, while Programs Admin

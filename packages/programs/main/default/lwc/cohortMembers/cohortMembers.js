@@ -26,7 +26,6 @@ import NOT_ADDED from '@salesforce/label/c.Programs_Cohort_NotAdded';
 import REMOVED from '@salesforce/label/c.Programs_Cohort_Removed';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Cohort_MoreThanShown';
 import TOO_MANY from '@salesforce/label/c.Programs_Cohort_TooMany';
-import ACTION_FAILED from '@salesforce/label/c.Programs_Cohort_ActionFailed';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import {
@@ -99,7 +98,7 @@ export default class CohortMembers extends LightningElement {
         this.data = data;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Cohort'));
       })
       .finally(() => {
         this.loading = false;
@@ -248,7 +247,7 @@ export default class CohortMembers extends LightningElement {
         this.picked = [];
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Cohort'));
       })
       .finally(() => {
         this.busy = false;
@@ -265,7 +264,7 @@ export default class CohortMembers extends LightningElement {
         this.resultMessage = REMOVED;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Cohort'));
       })
       .finally(() => {
         this.busy = false;

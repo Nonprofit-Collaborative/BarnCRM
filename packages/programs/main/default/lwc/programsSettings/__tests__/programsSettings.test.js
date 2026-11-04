@@ -105,20 +105,32 @@ describe('c-programs-settings', () => {
     savePrivacy.mockResolvedValue({ ...SETTINGS, participantPrivacy: 'Private' });
     const element = await render();
     const choice = find(element, 'privacy-choice');
-    const save = find(element, 'privacy-save');
+    const bar = find(element, 'save-bar');
     expect(choice.value).toBe('Shared');
-    expect(save.disabled).toBe(true);
+    expect(bar.dirtyCount).toBe(0);
     expect(find(element, 'privacy-default')).not.toBeNull();
 
     choice.dispatchEvent(new CustomEvent('change', { detail: { value: 'Private' } }));
     await flush();
-    expect(save.disabled).toBe(false);
+    expect(bar.dirtyCount).toBe(1);
 
-    save.click();
+    bar.dispatchEvent(new CustomEvent('save'));
     await flush();
     expect(savePrivacy).toHaveBeenCalledWith({ privateParticipants: true });
-    expect(find(element, 'saved')).not.toBeNull();
-    expect(save.disabled).toBe(true);
+    expect(find(element, 'saved').message).toBe('c.Programs_Settings_Saved');
+    expect(bar.dirtyCount).toBe(0);
+  });
+
+  it('puts the stored preset back on Discard', async () => {
+    getSettings.mockResolvedValue({ ...SETTINGS, participantPrivacy: 'Shared' });
+    const element = await render();
+    const choice = find(element, 'privacy-choice');
+    choice.dispatchEvent(new CustomEvent('change', { detail: { value: 'Private' } }));
+    await flush();
+    find(element, 'save-bar').dispatchEvent(new CustomEvent('discard'));
+    await flush();
+    expect(choice.value).toBe('Shared');
+    expect(find(element, 'save-bar').dirtyCount).toBe(0);
   });
 
   it('keeps the choice and says why when the save fails', async () => {
@@ -128,10 +140,10 @@ describe('c-programs-settings', () => {
     const choice = find(element, 'privacy-choice');
     choice.dispatchEvent(new CustomEvent('change', { detail: { value: 'Shared' } }));
     await flush();
-    find(element, 'privacy-save').click();
+    find(element, 'save-bar').dispatchEvent(new CustomEvent('save'));
     await flush();
     expect(savePrivacy).toHaveBeenCalledWith({ privateParticipants: false });
-    expect(find(element, 'error').textContent).toContain('Programs_Settings_SaveFailed');
+    expect(find(element, 'error').message).toContain('Programs_Fail_SettingsSave');
     expect(choice.value).toBe('Shared');
   });
 
@@ -145,12 +157,12 @@ describe('c-programs-settings', () => {
   it('shows a failure in its own words, or a general one', async () => {
     getSettings.mockRejectedValue({ body: { message: 'No.' } });
     const element = await render();
-    expect(find(element, 'error').textContent).toBe('No.');
+    expect(find(element, 'error').message).toBe('No.');
 
     getSettings.mockRejectedValue({});
     const second = await render();
-    expect(second.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
-      'Programs_Settings_LoadFailed'
+    expect(second.shadowRoot.querySelector('[data-id="error"]').message).toContain(
+      'Programs_Fail_SettingsLoad'
     );
   });
 });

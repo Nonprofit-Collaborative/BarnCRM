@@ -18,7 +18,6 @@ import STAGE_FOR from '@salesforce/label/c.Programs_Roster_StageFor';
 import ADDED from '@salesforce/label/c.Programs_Roster_Added';
 import CHANGED from '@salesforce/label/c.Programs_Roster_Changed';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Roster_MoreThanShown';
-import ACTION_FAILED from '@salesforce/label/c.Programs_Roster_ActionFailed';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import { format, rosterRows, stageFigures, stageLabel, stageOptions } from './roster';
@@ -91,7 +90,7 @@ export default class ProgramRoster extends NavigationMixin(LightningElement) {
         this.roster = roster;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Roster'));
       })
       .finally(() => {
         this.loading = false;
@@ -264,7 +263,7 @@ export default class ProgramRoster extends NavigationMixin(LightningElement) {
         this.focusTarget = 'result';
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Roster'));
         this.focusTarget = 'error-message';
       })
       .finally(() => {

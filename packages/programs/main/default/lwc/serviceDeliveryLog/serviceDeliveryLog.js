@@ -30,7 +30,6 @@ import NO_SERVICES from '@salesforce/label/c.Programs_Log_NoServices';
 import ATTENDANCE_FOR from '@salesforce/label/c.Programs_Log_AttendanceFor';
 import QUANTITY_FOR from '@salesforce/label/c.Programs_Log_QuantityFor';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Log_MoreThanShown';
-import ACTION_FAILED from '@salesforce/label/c.Programs_Log_ActionFailed';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import UNSAVED_TITLE from '@salesforce/label/c.Programs_Log_UnsavedTitle';
 import UNSAVED_ASK from '@salesforce/label/c.Programs_Log_UnsavedAsk';
@@ -122,7 +121,7 @@ export default class ServiceDeliveryLog extends LightningElement {
         this.drafts = {};
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Log'));
       })
       .finally(() => {
         this.loading = false;
@@ -218,7 +217,7 @@ export default class ServiceDeliveryLog extends LightningElement {
         this.resultMessage = format(COUNT_ADDED, people);
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Log'));
       })
       .finally(() => {
         this.busy = false;
@@ -371,7 +370,7 @@ export default class ServiceDeliveryLog extends LightningElement {
         }
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Log'));
       })
       .finally(() => {
         this.busy = false;

@@ -1,7 +1,7 @@
 import { createElement } from 'lwc';
 import PersonEnrollments from 'c/personEnrollments';
 import getEnrollments from '@salesforce/apex/PersonEnrollmentsController.getEnrollments';
-import { canShow, enrollmentRows, lastService } from '../enrollmentRows';
+import { canShow, enrollmentRows, lastService, stageStatusWord } from '../enrollmentRows';
 
 jest.mock(
   '@salesforce/apex/PersonEnrollmentsController.getEnrollments',
@@ -57,8 +57,9 @@ describe('enrollmentRows', () => {
       'After-School Tutoring',
       'Summer Reading'
     ]);
-    expect(rows[0].badgeClass).toContain('slds-theme_success');
-    expect(rows[1].badgeClass).toContain('slds-badge_lightest');
+    expect(rows[0].statusWord).toBe('active');
+    expect(rows[1].statusWord).toBe('complete');
+    expect(stageStatusWord({ isOpen: false, stage: 'Withdrawn' })).toBe('neutral');
     expect(rows[0].endDate).toBe('');
     expect(rows[1].enrollmentHref).toBe('/lightning/r/Enrollment__c/a09000000000002AAA/view');
   });
@@ -136,7 +137,7 @@ describe('c-person-enrollments', () => {
 
     const error = one(element, 'error');
     expect(error).not.toBeNull();
-    expect(error.textContent).not.toContain('internal detail');
+    expect(error.message).toBe('c.Programs_Fail_PersonCard');
 
     getEnrollments.mockResolvedValue({ canSee: true, enrollments: [OPEN], moreThanShown: true });
     one(element, 'refresh').click();

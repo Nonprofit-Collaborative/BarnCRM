@@ -4,6 +4,17 @@
  * and is tested anywhere.
  */
 
+/**
+ * The status word (the suite's status vocabulary, c/barnStatus) for an enrollment's stage badge:
+ * an open enrollment is active, a Completed one complete, and any other ended one neutral.
+ */
+export function stageStatusWord(row) {
+  if (row && row.isOpen) {
+    return 'active';
+  }
+  return row && row.stage === 'Completed' ? 'complete' : 'neutral';
+}
+
 /** The rows, in the server's order (open ones first), each with its links and badge. */
 export function enrollmentRows(result) {
   return (result && result.enrollments ? result.enrollments : []).map((row) => ({
@@ -11,9 +22,7 @@ export function enrollmentRows(result) {
     key: row.recordId,
     enrollmentHref: `/lightning/r/Enrollment__c/${row.recordId}/view`,
     programLabel: row.programName || '',
-    badgeClass: row.isOpen
-      ? 'slds-badge slds-theme_success stage'
-      : 'slds-badge slds-badge_lightest stage',
+    statusWord: stageStatusWord(row),
     startDate: row.startDate || '',
     endDate: row.endDate || ''
   }));

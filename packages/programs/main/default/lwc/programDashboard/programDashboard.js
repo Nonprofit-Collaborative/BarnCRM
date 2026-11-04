@@ -1,5 +1,6 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { getObjectInfos } from 'lightning/uiObjectInfoApi';
 import getDashboard from '@salesforce/apex/ProgramDashboardController.getDashboard';
 
 import TITLE from '@salesforce/label/c.Programs_Dashboard_Title';
@@ -22,12 +23,50 @@ import BY_PROGRAM from '@salesforce/label/c.Programs_Dashboard_ByProgram';
 import NO_RATE from '@salesforce/label/c.Programs_Dashboard_NoRate';
 import NO_PROGRAMS from '@salesforce/label/c.Programs_Dashboard_NoPrograms';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Dashboard_MoreThanShown';
-import LOAD_FAILED from '@salesforce/label/c.Programs_Dashboard_LoadFailed';
 import NO_ACCESS from '@salesforce/label/c.Programs_Dashboard_NoAccess';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import TOOLS from '@salesforce/label/c.Core_SettingsGroup_Tools';
 
-import { DEFAULT_PERIOD, periodRange, programRows, tiles } from './dashboardRows';
+import { DEFAULT_PERIOD, periodRange, programRows, tiles, toolTiles } from './dashboardRows';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { iconFor } from 'c/barnIcons';
+
+/** The Programs app's object tabs, in the app's order, as tiles on the module home. */
+const TOOL_OBJECTS = [
+  'Program__c',
+  'Cohort__c',
+  'Session__c',
+  'Enrollment__c',
+  'Service_Delivery__c',
+  'Case_Note__c',
+  'Referral__c',
+  'Service_Count__c',
+  'Goal__c'
+];
+
+/** The line under each tile, from the help catalog (keys are literals for the CI check). */
+function toolLine(apiName) {
+  switch (apiName) {
+    case 'Program__c':
+      return helpText('Programs', 'Programs_Home_ProgramTile');
+    case 'Cohort__c':
+      return helpText('Programs', 'Programs_Home_CohortTile');
+    case 'Session__c':
+      return helpText('Programs', 'Programs_Home_SessionTile');
+    case 'Enrollment__c':
+      return helpText('Programs', 'Programs_Home_EnrollmentTile');
+    case 'Service_Delivery__c':
+      return helpText('Programs', 'Programs_Home_DeliveryTile');
+    case 'Case_Note__c':
+      return helpText('Programs', 'Programs_Home_CaseNoteTile');
+    case 'Referral__c':
+      return helpText('Programs', 'Programs_Home_ReferralTile');
+    case 'Service_Count__c':
+      return helpText('Programs', 'Programs_Home_CountTile');
+    default:
+      return helpText('Programs', 'Programs_Home_GoalTile');
+  }
+}
 
 /**
  * The Programs Dashboard (P-05): for the period picked, tiles for the whole organization and a
@@ -66,10 +105,21 @@ export default class ProgramDashboard extends NavigationMixin(LightningElement) 
     { label: LAST_12_MONTHS, value: 'last12Months' }
   ];
 
+  icons = { dashboard: iconFor('Programs_Dashboard') };
+
   period = DEFAULT_PERIOD;
   dashboard;
+  objectInfos;
   loading = true;
   errorMessage;
+
+  /** The Programs objects the person can read; the rest get no tile. */
+  @wire(getObjectInfos, { objectApiNames: TOOL_OBJECTS })
+  wiredObjectInfos({ data }) {
+    if (data) {
+      this.objectInfos = data;
+    }
+  }
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -90,7 +140,9 @@ export default class ProgramDashboard extends NavigationMixin(LightningElement) 
       .catch((error) => {
         this.dashboard = undefined;
         this.errorMessage =
-          error && error.body && error.body.message ? error.body.message : LOAD_FAILED;
+          error && error.body && error.body.message
+            ? error.body.message
+            : helpText('Programs', 'Programs_Fail_Dashboard');
       })
       .finally(() => {
         this.loading = false;
@@ -120,6 +172,16 @@ export default class ProgramDashboard extends NavigationMixin(LightningElement) 
 
   get rows() {
     return programRows(this.dashboard, NO_RATE);
+  }
+
+  get toolGroups() {
+    return [
+      {
+        name: 'tabs',
+        label: TOOLS,
+        tiles: toolTiles(this.objectInfos, TOOL_OBJECTS, toolLine, (apiName) => iconFor(apiName))
+      }
+    ];
   }
 
   get noRows() {

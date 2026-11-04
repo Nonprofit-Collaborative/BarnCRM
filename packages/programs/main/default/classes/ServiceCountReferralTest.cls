@@ -83,7 +83,7 @@ private class ServiceCountReferralTest {
 				Assert.fail('A negative count must be refused.');
 			} catch (AuraHandledException refused) {
 				Assert.areEqual(
-					Label.Programs_Log_ActionFailed,
+					BarnHelp.text('Programs', 'Programs_Fail_Log'),
 					refused.getMessage(),
 					'Plain words.'
 				);
@@ -93,7 +93,7 @@ private class ServiceCountReferralTest {
 				Assert.fail('A count needs a service.');
 			} catch (AuraHandledException refused) {
 				Assert.areEqual(
-					Label.Programs_Log_ActionFailed,
+					BarnHelp.text('Programs', 'Programs_Fail_Log'),
 					refused.getMessage(),
 					'Plain words.'
 				);
