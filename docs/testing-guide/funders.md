@@ -111,12 +111,12 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 ## T-FUN-07: Reminders and Their Settings
 
 **Purpose:** confirm one task and one email per due date, to the right person, as the settings say.
-**Prerequisites:** admin and staff; `Year 1 report` from T-FUN-06; the nightly jobs scheduled (Health Check, **Schedule all nightly jobs**).
+**Prerequisites:** admin and staff; `Year 1 report` from T-FUN-06; the nightly run scheduled ([BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md); Health Check, **Schedule all nightly jobs**).
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | **BarnCRM Settings**, **Funders** (under Fundraising). | **Create reminder tasks** on, **Email reminders** off, **Days before a deadline to remind** 14. Turn **Email reminders** on and save. |
-| 2 | Health Check, nightly jobs list. | **Grant Requirement Reminders, 6:00 AM** is scheduled. |
+| 2 | BarnCRM Settings, General, Nightly Jobs panel. | **Grant Requirement Reminders, 6:00 AM** is listed as a step of the scheduled nightly run. |
 | 3 | In the Developer Console run `GrantReminderBatch.startMorning();`, or wait until the next morning. | The staff user has a task `Year 1 report due for Youth Grant` on the grant, due on the due date, and an email with a link to the grant. **Reminder Sent For** on the requirement shows the due date. |
 | 4 | Run it again. | No second task or email. |
 | 5 | Change the requirement's **Due Date** to 7 days from today and run it again. | A new task and email for the new date. |

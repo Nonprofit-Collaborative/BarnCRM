@@ -71,6 +71,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
     private static final String FEATURE_CONTEXT = 'CorePostInstall.markFeaturesOff';
     private static final String EDITION_CONTEXT = 'CorePostInstall.saveEditionOnAnUpgrade';
     private static final String TAB_CHECK_CONTEXT = 'CorePostInstall.scheduleTabAccessCheck';
+    private static final String NIGHTLY_CONTEXT = 'CorePostInstall.scheduleNightlyRun';
     private static final String SEASONAL_CONTEXT = 'CorePostInstall.alignSeasonalAddresses';
     private static final String ORGANIZATION_CONTEXT = 'CorePostInstall.storeOrganizationRecordType';
     private static final String SAVED_QUERY_CONTEXT = 'CorePostInstall.renameDataQualityQueries';
@@ -97,6 +98,10 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
      */
     @TestVisible
     private static Boolean adoptSeasonalScheduleInTests = false;
+
+    /** Test seam: true lets a test see the nightly run scheduled by a new install. */
+    @TestVisible
+    private static Boolean scheduleNightlyInTests = false;
 
     /**
      * What every Error Log entry written by an install or upgrade starts with, including the
@@ -207,6 +212,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
         // R-NJ5: the separate nightly schedules of an earlier version become the nightly run.
         // After the seasonal alignment, which reads the old seasonal job. Never throws.
         NightlyJobs.adoptOldSchedules();
+        scheduleNightlyRunOnANewInstall(isNewInstall);
         renameDataQualityQueries();
         ShippedDefaultUpgrades.apply(
             ModuleSetups.CORE,
@@ -289,6 +295,22 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
             TabAccessScheduler.start();
         } catch (Exception e) {
             ErrorLogger.log(e, TAB_CHECK_CONTEXT);
+        }
+    }
+
+    /**
+     * A new install schedules the nightly run, so its steps run once an admin switches them on
+     * without anyone scheduling it by hand. Idempotent (an existing schedule is kept) and it
+     * leaves every step switch as it is. An upgrade is left to `adoptOldSchedules`. Never throws.
+     */
+    private void scheduleNightlyRunOnANewInstall(Boolean isNewInstall) {
+        if (!isNewInstall || (Test.isRunningTest() && !scheduleNightlyInTests)) {
+            return;
+        }
+        try {
+            NightlyJobs.start();
+        } catch (Exception e) {
+            ErrorLogger.log(e, NIGHTLY_CONTEXT);
         }
     }
 
