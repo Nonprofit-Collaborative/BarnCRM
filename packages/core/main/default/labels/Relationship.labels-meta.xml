@@ -49,6 +49,14 @@
         <value>No Relationships Yet</value>
     </labels>
     <labels>
+        <fullName>Core_Relationship_EndAction</fullName>
+        <categories>Relationships</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Relationship and affiliation row menu: set the End Date to today</shortDescription>
+        <value>End It</value>
+    </labels>
+    <labels>
         <fullName>Core_Relationship_LoadFailed</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>
@@ -70,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Save refused: both contact and account lookup filled in for one person</shortDescription>
-        <value>A relationship names one record for each person. Fill in either the person or the person account on each side, not both.</value>
+        <value>Choose each person once: fill in one person field on each side of the relationship, not two.</value>
     </labels>
     <labels>
         <fullName>Core_Relationship_PersonRequired</fullName>

@@ -1,5 +1,10 @@
 import { LightningElement, api, wire, track } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import HouseholdAddMemberModal from 'c/householdAddMemberModal';
+import { iconFor } from 'c/barnIcons';
+import { initialsOf, opensElsewhere, recordHref } from 'c/recordRows';
+import { followLinkInWorkspace } from 'c/workspaceTabs';
 import { refreshApex } from '@salesforce/apex';
 import { getRecord, updateRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo, getObjectInfos } from 'lightning/uiObjectInfoApi';
@@ -36,22 +41,20 @@ const JUNCTION = 'Junction';
 const SOURCE_ACCOUNT = 'Account';
 const MAKE_PRIMARY_ACTION = 'makePrimary';
 
-/** "MG" for "Maria Garcia": the first letters of the first and last words of the name. */
-function initialsOf(name) {
-  const words = String(name || '')
-    .trim()
-    .split(/\s+/)
-    .filter((word) => word);
-  if (!words.length) {
-    return '';
-  }
-  const first = Array.from(words[0])[0];
-  const last = words.length > 1 ? Array.from(words[words.length - 1])[0] : '';
-  return `${first}${last}`.toUpperCase();
-}
+/** The move picker shows each household's city, so two households of one name differ. */
+const HOUSEHOLD_DISPLAY_INFO = Object.freeze({
+  primaryField: 'Name',
+  additionalFields: ['BillingCity']
+});
 
-export default class HouseholdMembersPanel extends LightningElement {
+export default class HouseholdMembersPanel extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
+
+  @wire(EnclosingTabId) enclosingTabId;
+
+  icons = { household: iconFor('Households') };
+
+  householdDisplayInfo = HOUSEHOLD_DISPLAY_INFO;
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -230,6 +233,7 @@ export default class HouseholdMembersPanel extends LightningElement {
         ...member,
         isPrimary,
         initials: initialsOf(member.name),
+        href: recordHref(member.personId),
         badges: this.badgesFor(member, isPrimary),
         canMove,
         canMakePrimary,
@@ -269,12 +273,32 @@ export default class HouseholdMembersPanel extends LightningElement {
   badgesFor(member, isPrimary) {
     const badges = [];
     if (isPrimary) {
-      badges.push({ key: `${member.personId}-primary`, text: PRIMARY });
+      badges.push({
+        key: `${member.personId}-primary`,
+        text: PRIMARY,
+        status: 'success',
+        iconName: 'utility:favorite'
+      });
     }
     if (member.isDeceased) {
-      badges.push({ key: `${member.personId}-deceased`, text: DECEASED });
+      badges.push({ key: `${member.personId}-deceased`, text: DECEASED, status: 'neutral' });
     }
     return badges;
+  }
+
+  /** A member's name opens their record; in a console, as a subtab beside the household. */
+  handleOpenRecord(event) {
+    const recordId = event.currentTarget.dataset.recordId;
+    const pageReference = {
+      type: 'standard__recordPage',
+      attributes: { recordId, actionName: 'view' }
+    };
+    const navigate = () => this[NavigationMixin.Navigate](pageReference);
+    if (followLinkInWorkspace(this, event, { recordId }, navigate) || opensElsewhere(event)) {
+      return;
+    }
+    event.preventDefault();
+    navigate();
   }
 
   /** Add Member opens its own dialog; the list refreshes once someone was added. */
