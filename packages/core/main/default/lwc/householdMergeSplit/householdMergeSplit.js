@@ -7,26 +7,34 @@ import Toast from 'lightning/toast';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { openInWorkspace, refreshEnclosingTab } from 'c/workspaceTabs';
-import searchHouseholds from '@salesforce/apex/HouseholdMergeController.searchHouseholds';
+import { createDragController } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
 import canEdit from '@salesforce/apex/HouseholdMergeController.canEdit';
 import getPreview from '@salesforce/apex/HouseholdMergeController.preview';
 import mergeHouseholds from '@salesforce/apex/HouseholdMergeController.mergeHouseholds';
 import splitHousehold from '@salesforce/apex/HouseholdMergeController.splitHousehold';
 import getMembers from '@salesforce/apex/HouseholdController.getMembers';
+import {
+  comparisonRows,
+  householdPickerFilter,
+  splitColumns,
+  STAYS,
+  MOVES
+} from './mergeSplitModel';
 
 import TITLE from '@salesforce/label/c.Core_HouseholdMerge_Title';
 import TAB_MERGE from '@salesforce/label/c.Core_HouseholdMerge_MergeButton';
 import TAB_SPLIT from '@salesforce/label/c.Core_HouseholdMerge_SplitButton';
 import SEARCH_LABEL from '@salesforce/label/c.Core_HouseholdMerge_SearchLabel';
-import SEARCH_PLACEHOLDER from '@salesforce/label/c.Core_HouseholdMerge_SearchPlaceholder';
-import NO_RESULTS from '@salesforce/label/c.Core_HouseholdMerge_NoResults';
 import COMPARISON_TABLE from '@salesforce/label/c.Core_HouseholdMerge_ComparisonTable';
 import COLUMN_FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import COLUMN_THIS from '@salesforce/label/c.Core_HouseholdMerge_ColumnThis';
 import COLUMN_OTHER from '@salesforce/label/c.Core_HouseholdMerge_ColumnOther';
 import MEMBERS_HEADING from '@salesforce/label/c.Core_HouseholdMerge_MembersHeading';
-import KEEP_SURVIVOR from '@salesforce/label/c.Core_HouseholdMerge_KeepSurvivor';
-import KEEP_VICTIM from '@salesforce/label/c.Core_HouseholdMerge_KeepVictim';
+import KEEP_THIS from '@salesforce/label/c.Core_HouseholdMerge_KeepSurvivor';
+import KEEP_OTHER from '@salesforce/label/c.Core_HouseholdMerge_KeepVictim';
+import KEEP_OTHER_INSTEAD from '@salesforce/label/c.Core_HouseholdMerge_KeepOtherInstead';
+import KEEP_THIS_INSTEAD from '@salesforce/label/c.Core_HouseholdMerge_KeepThisInstead';
 import MEMBER_FROM_THIS from '@salesforce/label/c.Core_HouseholdMerge_MemberFromThis';
 import MEMBER_FROM_OTHER from '@salesforce/label/c.Core_HouseholdMerge_MemberFromOther';
 import MERGE_BUTTON from '@salesforce/label/c.Core_HouseholdMerge_MergeButton';
@@ -45,27 +53,32 @@ import SPLIT_BUTTON from '@salesforce/label/c.Core_HouseholdMerge_SplitButton';
 import SPLIT_CONFIRM_BODY from '@salesforce/label/c.Core_HouseholdMerge_SplitConfirmBody';
 import SPLIT_CONFIRM_HEADING from '@salesforce/label/c.Core_HouseholdMerge_SplitConfirmHeading';
 import SPLIT_SUCCESS from '@salesforce/label/c.Core_HouseholdMerge_SplitSuccess';
-import RESULT_ACCESSIBLE_NAME from '@salesforce/label/c.Core_HouseholdScreens_ResultAccessibleName';
+import MOVE_TO from '@salesforce/label/c.Core_Shared_MoveTo';
 import LOADING_COMPARISON from '@salesforce/label/c.Core_HouseholdScreens_LoadingComparison';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const RECORD_TYPE_FIELD = 'Account.RecordType.DeveloperName';
+const RECORD_TYPE_ID_FIELD = 'Account.RecordTypeId';
+const NAME_FIELD = 'Account.Name';
 const HOUSEHOLD = 'Household';
-const SURVIVOR = 'Survivor';
-const VICTIM = 'Victim';
 const NEW_HOUSEHOLD = 'New';
 const EXISTING_HOUSEHOLD = 'Existing';
 
+/**
+ * Merge or Split Households, on a household page or as its quick action.
+ *
+ * Merge: the other household is chosen with a record picker limited to households, showing
+ * each one's city (people-giving-1, 17). This household is kept by default; Keep the Other
+ * Household Instead swaps the roles, so someone who opened the duplicate does not have to
+ * start over.
+ *
+ * Split: two columns, Stays in {household} and Moves to {new or chosen household}, with a
+ * tile per member (Drag and Drop 3). A tile moves by its checkbox (ticked = moves), by its
+ * Move menu, or by dragging it (c/barnDrag: pointer, touch press and hold, or keyboard), and
+ * every move is announced.
+ */
 export default class HouseholdMergeSplit extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
-
-  connectedCallback() {
-    if (!this.helpReady) {
-      loadHelp('Core').then(() => {
-        this.helpReady = true;
-      });
-    }
-  }
 
   @api recordId;
 
@@ -74,8 +87,6 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
     tabMerge: TAB_MERGE,
     tabSplit: TAB_SPLIT,
     searchLabel: SEARCH_LABEL,
-    searchPlaceholder: SEARCH_PLACEHOLDER,
-    noResults: NO_RESULTS,
     get selectOther() {
       return helpText('Core', 'Core_HouseholdMerge_SelectOther');
     },
@@ -95,15 +106,16 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
   };
 
   recordTypeName;
+  householdRecordTypeId;
+  householdName;
   canEditThis = false;
   errorMessage;
   busy = false;
 
-  @track searchResults = [];
-  searchTerm = '';
-  searchedOnce = false;
   otherHouseholdId;
-  otherHouseholdName;
+  /** True when the other household is the one kept (Keep the Other Household Instead). */
+  swapped = false;
+  preview;
 
   @track comparison = [];
   @track mergeMembers = [];
@@ -113,21 +125,72 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
   splitDestination = NEW_HOUSEHOLD;
   splitTargetId;
   splitTargetName;
-  @track splitSearchResults = [];
-  splitSearchTerm = '';
-  splitSearchedOnce = false;
+
+  liveText = '';
+  dragState;
+  drag;
 
   @wire(EnclosingTabId) enclosingTabId;
 
-  @wire(getRecord, { recordId: '$recordId', fields: [RECORD_TYPE_FIELD] })
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'columns',
+      // Read when spoken, not now: the help catalog may still be on its way.
+      messages: {
+        pickedUp: (name) => dragMessages().pickedUp(name),
+        position: (zone, position, count) => dragMessages().position(zone, position, count),
+        dropped: (name, zone) => dragMessages().dropped(name, zone),
+        cancelled: (name) => dragMessages().cancelled(name)
+      },
+      announce: (text) => {
+        this.liveText = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      onDrop: ({ itemId, fromZone, toZone }) => {
+        if (fromZone === toZone) {
+          return false;
+        }
+        this.setMoves(itemId, toZone === MOVES);
+        return true;
+      }
+    });
+  }
+
+  disconnectedCallback() {
+    if (this.drag) {
+      this.drag.destroy();
+    }
+  }
+
+  @wire(getRecord, {
+    recordId: '$recordId',
+    fields: [RECORD_TYPE_FIELD, RECORD_TYPE_ID_FIELD, NAME_FIELD]
+  })
   wiredAccount({ data, error }) {
     if (data) {
       const recordType = data.fields.RecordType;
       this.recordTypeName =
         recordType && recordType.value ? recordType.value.fields.DeveloperName.value : undefined;
+      this.householdRecordTypeId = data.fields.RecordTypeId
+        ? data.fields.RecordTypeId.value
+        : undefined;
+      this.householdName = data.fields.Name ? data.fields.Name.value : undefined;
     } else if (error) {
       this.errorMessage = this.readError(error);
     }
+  }
+
+  @wire(getRecord, { recordId: '$splitTargetId', fields: [NAME_FIELD] })
+  wiredSplitTarget({ data }) {
+    this.splitTargetName = data && data.fields.Name ? data.fields.Name.value : undefined;
   }
 
   @wire(canEdit, { householdId: '$recordId' })
@@ -162,26 +225,39 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
     return this.isHousehold && this.canEditThis;
   }
 
-  get hasSearchResults() {
-    return this.searchResults.length > 0;
+  /** Households only, never this one: the picker offers nothing else to merge with. */
+  get householdFilter() {
+    return householdPickerFilter(this.householdRecordTypeId, this.recordId);
   }
 
-  get showNoResults() {
-    return this.searchedOnce && !this.hasSearchResults && !this.otherHouseholdId;
+  /** Each household with its city, so two Garcia households are told apart (people-giving-1). */
+  get householdDisplayInfo() {
+    return { additionalFields: ['BillingCity'] };
+  }
+
+  get householdMatchingInfo() {
+    return {
+      primaryField: { fieldPath: 'Name' },
+      additionalFields: [{ fieldPath: 'BillingCity' }]
+    };
   }
 
   get hasComparison() {
     return this.comparison.length > 0;
   }
 
-  get confirmBody() {
-    return CONFIRM_BODY.replace('{0}', this.otherHouseholdName || '').replace(
-      '{1}',
-      this.survivorName || ''
-    );
+  get swapLabel() {
+    return this.swapped ? KEEP_THIS_INSTEAD : KEEP_OTHER_INSTEAD;
   }
 
-  survivorName;
+  /** What is kept and what is folded in, for the confirm dialog: the preview names both. */
+  get confirmBody() {
+    const preview = this.preview || {};
+    return CONFIRM_BODY.replace('{0}', preview.victimName || '').replace(
+      '{1}',
+      preview.survivorName || ''
+    );
+  }
 
   get selectedPersonIds() {
     return this.splitMembers.filter((member) => member.selected).map((member) => member.personId);
@@ -202,14 +278,6 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
     return this.busy || !this.canSplit;
   }
 
-  get hasSplitSearchResults() {
-    return this.splitSearchResults.length > 0;
-  }
-
-  get showSplitNoResults() {
-    return this.splitSearchedOnce && !this.hasSplitSearchResults && !this.splitTargetId;
-  }
-
   get destinationOptions() {
     return [
       { label: this.label.splitNew, value: NEW_HOUSEHOLD },
@@ -217,51 +285,102 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
     ];
   }
 
+  /** Where a tile in each column ends up: this household, or the new or chosen one. */
+  get placeNames() {
+    let moves;
+    if (!this.isSplittingToExisting) {
+      moves = helpText('Core', 'Core_HouseholdMerge_PlaceNew');
+    } else {
+      moves = this.splitTargetName || helpText('Core', 'Core_HouseholdMerge_PlaceChosen');
+    }
+    return { [STAYS]: this.householdName || '', [MOVES]: moves };
+  }
+
+  get staysHeading() {
+    return helpText('Core', 'Core_HouseholdMerge_StaysIn', this.placeNames[STAYS]);
+  }
+
+  get movesHeading() {
+    return helpText('Core', 'Core_HouseholdMerge_MovesTo', this.placeNames[MOVES]);
+  }
+
+  get dragHelp() {
+    return dragInstructions();
+  }
+
+  /** The two columns with their tiles, the drag highlight and each tile's Move menu item. */
+  get splitBoard() {
+    const columns = splitColumns(this.splitMembers, this.dragState);
+    const headings = { [STAYS]: this.staysHeading, [MOVES]: this.movesHeading };
+    const places = this.placeNames;
+    return columns.map((column) => {
+      const otherPlace = places[column.id === STAYS ? MOVES : STAYS];
+      return {
+        ...column,
+        heading: headings[column.id],
+        place: places[column.id],
+        headingId: `split-heading-${column.id}`,
+        zoneClass:
+          'split-column slds-box slds-box_x-small slds-var-p-around_small' +
+          (column.isTarget ? ' split-column_target' : ''),
+        tiles: column.tiles.map((tile) => ({
+          ...tile,
+          tileClass:
+            'slds-item split-member split-tile slds-var-m-bottom_x-small' +
+            (tile.isDragging ? ' split-tile_dragging' : ''),
+          moveLabel: MOVE_TO.replace('{0}', otherPlace)
+        }))
+      };
+    });
+  }
+
   // ---------------------------------------------------------------- merge
 
-  handleSearchChange(event) {
-    this.searchTerm = event.target.value;
-  }
-
-  handleSearch() {
-    this.searchedOnce = true;
-    return searchHouseholds({ term: this.searchTerm, excludeId: this.recordId })
-      .then((results) => {
-        this.searchResults = this.withAccessibleNames(results);
-        this.errorMessage = undefined;
-      })
-      .catch((error) => {
-        this.searchResults = [];
-        this.errorMessage = this.readError(error);
-      });
-  }
-
-  handlePickHousehold(event) {
-    const chosenId = event.target.dataset.householdId;
-    const chosen = this.searchResults.find((row) => row.id === chosenId);
-    this.otherHouseholdId = chosenId;
-    this.otherHouseholdName = chosen ? chosen.name : '';
+  handleOtherHouseholdChange(event) {
+    const chosenId = event.detail ? event.detail.recordId : undefined;
+    this.otherHouseholdId = chosenId || undefined;
+    this.swapped = false;
+    if (!this.otherHouseholdId) {
+      this.preview = undefined;
+      this.comparison = [];
+      this.mergeMembers = [];
+      return undefined;
+    }
     return this.loadPreview();
+  }
+
+  /** Keep the Other Household Instead, and back: the same two households, roles swapped. */
+  handleSwap() {
+    this.swapped = !this.swapped;
+    return this.loadPreview();
+  }
+
+  get survivorId() {
+    return this.swapped ? this.otherHouseholdId : this.recordId;
+  }
+
+  get victimId() {
+    return this.swapped ? this.recordId : this.otherHouseholdId;
   }
 
   loadPreview() {
     this.busy = true;
-    return getPreview({ survivorId: this.recordId, victimId: this.otherHouseholdId })
+    return getPreview({ survivorId: this.survivorId, victimId: this.victimId })
       .then((preview) => {
-        this.survivorName = preview.survivorName;
+        this.preview = preview;
         this.choices = {};
-        this.comparison = preview.fields.map((field) => ({
-          ...field,
-          options: [
-            { label: KEEP_SURVIVOR, value: SURVIVOR },
-            { label: KEEP_VICTIM, value: VICTIM }
-          ],
-          selected: SURVIVOR
-        }));
-        this.mergeMembers = preview.members.map((member) => ({
-          ...member,
-          origin: member.fromSurvivor ? MEMBER_FROM_THIS : MEMBER_FROM_OTHER
-        }));
+        this.comparison = comparisonRows(preview.fields, this.swapped, {
+          keepThis: KEEP_THIS,
+          keepOther: KEEP_OTHER
+        });
+        this.mergeMembers = preview.members.map((member) => {
+          const fromThis = member.fromSurvivor !== this.swapped;
+          return {
+            ...member,
+            origin: fromThis ? MEMBER_FROM_THIS : MEMBER_FROM_OTHER,
+            originStatus: fromThis ? 'neutral' : 'info'
+          };
+        });
         this.errorMessage = undefined;
       })
       .catch((error) => {
@@ -297,9 +416,10 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
 
   merge() {
     this.busy = true;
+    const swapped = this.swapped;
     return mergeHouseholds({
-      survivorId: this.recordId,
-      victimId: this.otherHouseholdId,
+      survivorId: this.survivorId,
+      victimId: this.victimId,
       fieldChoices: this.choices
     })
       .then((result) => {
@@ -310,6 +430,12 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
           ? `${MERGE_SUCCESS} ${CUSTOM_NAME_KEPT}`
           : MERGE_SUCCESS;
         this.toast(message, 'success');
+        if (swapped) {
+          // This household no longer exists: go straight to the one that was kept.
+          this.dispatchEvent(new CloseActionScreenEvent());
+          this.goTo(result.survivorId);
+          return undefined;
+        }
         return this.finish(result.survivorId);
       })
       .catch((error) => {
@@ -323,48 +449,52 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
   // ---------------------------------------------------------------- split
 
   handleMemberToggle(event) {
+    this.setMoves(event.target.dataset.personId, event.target.checked);
+  }
+
+  /** The tile's Move menu: the keyboard, screen reader and phone way to change column. */
+  handleMoveMenu(event) {
     const personId = event.target.dataset.personId;
-    const checked = event.target.checked;
+    const member = this.splitMembers.find((candidate) => candidate.personId === personId);
+    if (!member) {
+      return;
+    }
+    this.setMoves(personId, !member.selected);
+    const place = this.placeNames[member.selected ? STAYS : MOVES];
+    this.liveText = dragMessages().dropped(member.name, place);
+  }
+
+  setMoves(personId, moves) {
     this.splitMembers = this.splitMembers.map((member) => {
-      return member.personId === personId ? { ...member, selected: checked } : member;
+      return member.personId === personId ? { ...member, selected: moves } : member;
     });
+  }
+
+  handleDragPointerDown(event) {
+    this.drag.pointerDown(event);
+  }
+
+  handleDragKeyDown(event) {
+    this.drag.keyDown(event);
   }
 
   handleDestinationChange(event) {
     this.splitDestination = event.detail.value;
     this.splitTargetId = undefined;
     this.splitTargetName = undefined;
-    this.splitSearchResults = [];
-    this.splitSearchedOnce = false;
-  }
-
-  handleSplitSearchChange(event) {
-    this.splitSearchTerm = event.target.value;
   }
 
   /**
-   * The destination of a split is looked up the same way the other household in a merge
-   * is, so that only households are ever offered and an organization cannot be picked by
-   * accident. The household being split is left out of its own results.
+   * The destination of a split is chosen the same way the other household in a merge is, so
+   * that only households are ever offered and an organization cannot be picked by accident.
+   * The household being split is left out.
    */
-  handleSplitSearch() {
-    this.splitSearchedOnce = true;
-    return searchHouseholds({ term: this.splitSearchTerm, excludeId: this.recordId })
-      .then((results) => {
-        this.splitSearchResults = this.withAccessibleNames(results);
-        this.errorMessage = undefined;
-      })
-      .catch((error) => {
-        this.splitSearchResults = [];
-        this.errorMessage = this.readError(error);
-      });
-  }
-
-  handlePickSplitTarget(event) {
-    const chosenId = event.target.dataset.householdId;
-    const chosen = this.splitSearchResults.find((row) => row.id === chosenId);
-    this.splitTargetId = chosenId;
-    this.splitTargetName = chosen ? chosen.name : '';
+  handleSplitTargetChange(event) {
+    const chosenId = event.detail ? event.detail.recordId : undefined;
+    this.splitTargetId = chosenId || undefined;
+    if (!this.splitTargetId) {
+      this.splitTargetName = undefined;
+    }
   }
 
   async handleSplitClick() {
@@ -399,19 +529,6 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
   }
 
   // ---------------------------------------------------------------- helpers
-
-  // Duplicate households are the whole reason this panel exists, so two search results can
-  // read out identically ("The Garcia Family" twice) to a screen reader unless the location
-  // is folded into the name each result button announces.
-  withAccessibleNames(results) {
-    return (results || []).map((result) => ({
-      ...result,
-      accessibleName: RESULT_ACCESSIBLE_NAME.replace('{0}', result.name || '').replace(
-        '{1}',
-        result.location || ''
-      )
-    }));
-  }
 
   /**
    * After a merge or split: close the quick action if this runs in one (a no-op on a record

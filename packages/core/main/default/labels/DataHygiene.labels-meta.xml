@@ -49,14 +49,6 @@
         <value>records found</value>
     </labels>
     <labels>
-        <fullName>Core_DataHygiene_OpenedNotice</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Toast after a check opens, {0} is the saved query name.</shortDescription>
-        <value>In Find, choose "{0}" from Saved queries.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataHygiene_ErrorNoPermission</fullName>
         <categories>DataHygiene</categories>
         <language>en_US</language>

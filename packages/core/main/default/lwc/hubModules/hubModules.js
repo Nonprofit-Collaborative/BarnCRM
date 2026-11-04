@@ -43,29 +43,18 @@ export default class HubModules extends NavigationMixin(LightningElement) {
       const data = await getState();
       this.rows = ((data && data.modules) || [])
         .filter((module) => module.status !== NOT_INSTALLED)
-        .map((module) => {
-          const displayName = module.label || module.name;
-          return {
-            name: module.name,
-            displayName,
-            appUrl: module.appUrl,
-            logoUrl: logoUrl(module.name),
-            openAppLabel: `${OPEN_APP}: ${displayName}`,
-            status: module.status === 'Off' ? 'off' : 'on',
-            statusText: module.status === 'Off' ? STATUS_OFF : STATUS_ON
-          };
-        });
+        .map((module) => ({
+          name: module.name,
+          displayName: module.label || module.name,
+          appUrl: module.appUrl,
+          logoUrl: logoUrl(module.name),
+          statusText: module.status === 'Off' ? STATUS_OFF : STATUS_ON,
+          status: module.status === 'Off' ? 'off' : 'on'
+        }));
       this.errorMessage = undefined;
     } catch {
       this.errorMessage = LOAD_ERROR;
     }
-  }
-
-  handleOpenApp(event) {
-    this[NavigationMixin.Navigate]({
-      type: 'standard__webPage',
-      attributes: { url: event.currentTarget.dataset.url }
-    });
   }
 
   // The tab and the section key are qualified for the org's namespace in Apex.

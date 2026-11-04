@@ -123,7 +123,7 @@ describe('c-record-inspector', () => {
     const fax = q(element, 'tr[data-row="Fax"]');
     expect(fax.querySelector('[data-id="value"]')).toBeNull();
     const notes = q(element, 'tr[data-row="Notes__c"]');
-    expect(notes.querySelector('lightning-badge')).not.toBeNull();
+    expect(notes.querySelector('c-barn-status-badge')).not.toBeNull();
   });
 
   it('narrows the list by label, API name, type or value', async () => {
@@ -217,7 +217,7 @@ describe('c-record-inspector', () => {
     const element = mount();
     await open(element);
 
-    expect(q(element, '[data-id="error-message"]').textContent).toBe('Not for you.');
+    expect(q(element, '[data-id="error-message"]').message).toBe('Not for you.');
     expect(q(element, '[data-id="field-table"]')).toBeNull();
   });
 });

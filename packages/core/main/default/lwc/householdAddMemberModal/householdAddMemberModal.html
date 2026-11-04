@@ -2,7 +2,7 @@
     <lightning-modal-header label={label}></lightning-modal-header>
     <lightning-modal-body>
         <div class="slds-is-relative">
-            <template lwc:if={junctionMode}>
+            <template lwc:if={searchMode}>
                 <div class="add-existing-section">
                     <h2 class="slds-text-heading_small">{labels.addExistingHeading}</h2>
                     <lightning-input
@@ -32,7 +32,7 @@
                         </ul>
                     </template>
                     <template lwc:if={showNoSearchResults}>
-                        <p role="status" class="slds-var-m-top_x-small no-results-message">
+                        <p role="status" class="slds-var-m-top_x-small slds-text-color_weak no-results-message">
                             {labels.addExistingNoResults}
                         </p>
                     </template>
@@ -59,6 +59,21 @@
                         onchange={handleNewLastNameChange}
                         class="slds-var-m-top_x-small add-new-last-name"
                     ></lightning-input>
+                    <div aria-live="polite" class="same-name-region">
+                        <template lwc:if={hasSameName}>
+                            <template for:each={sameNameRows} for:item="match">
+                                <c-barn-notice
+                                    key={match.id}
+                                    variant="info"
+                                    message={match.message}
+                                    action-label={match.useLabel}
+                                    data-person-id={match.id}
+                                    onaction={handleUseSameName}
+                                    class="slds-var-m-top_x-small same-name-hint"
+                                ></c-barn-notice>
+                            </template>
+                        </template>
+                    </div>
                     <div class="slds-var-m-top_small">
                         <lightning-button
                             label={labels.cancel}
@@ -79,11 +94,42 @@
                 <lightning-record-edit-form object-api-name="Contact" onsuccess={handleFormSuccess}>
                     <lightning-messages></lightning-messages>
                     <lightning-input-field field-name="Salutation"></lightning-input-field>
-                    <lightning-input-field field-name="FirstName"></lightning-input-field>
-                    <lightning-input-field field-name="LastName"></lightning-input-field>
-                    <div class="slds-hide">
-                        <lightning-input-field field-name="AccountId" value={householdId}></lightning-input-field>
+                    <lightning-input-field
+                        field-name="FirstName"
+                        onchange={handleNewFirstNameChange}
+                        class="form-first-name"
+                    ></lightning-input-field>
+                    <lightning-input-field
+                        field-name="LastName"
+                        onchange={handleNewLastNameChange}
+                        class="form-last-name"
+                    ></lightning-input-field>
+                    <div aria-live="polite" class="same-name-region">
+                        <template lwc:if={hasSameName}>
+                            <template for:each={sameNameRows} for:item="match">
+                                <c-barn-notice
+                                    key={match.id}
+                                    variant="info"
+                                    message={match.message}
+                                    action-label={match.useLabel}
+                                    data-person-id={match.id}
+                                    onaction={handleUseSameName}
+                                    class="slds-var-m-vertical_x-small same-name-hint"
+                                ></c-barn-notice>
+                            </template>
+                        </template>
                     </div>
+                    <template lwc:if={personMode}>
+                        <lightning-input-field field-name="Email"></lightning-input-field>
+                        <lightning-input-field field-name="MailingStreet"></lightning-input-field>
+                        <lightning-input-field field-name="MailingCity"></lightning-input-field>
+                        <lightning-input-field field-name="MailingPostalCode"></lightning-input-field>
+                    </template>
+                    <template lwc:else>
+                        <div class="slds-hide">
+                            <lightning-input-field field-name="AccountId" value={householdId}></lightning-input-field>
+                        </div>
+                    </template>
                     <div class="slds-var-m-top_small">
                         <lightning-button
                             label={labels.cancel}
@@ -101,7 +147,11 @@
             </template>
 
             <template lwc:if={errorMessage}>
-                <div class="slds-text-color_error slds-var-m-top_small" role="alert">{errorMessage}</div>
+                <c-barn-notice
+                    variant="error"
+                    message={errorMessage}
+                    class="slds-var-m-top_small add-error"
+                ></c-barn-notice>
             </template>
         </div>
     </lightning-modal-body>

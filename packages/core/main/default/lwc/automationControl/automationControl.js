@@ -37,6 +37,8 @@ const HOUR_OPTIONS = [
 ];
 
 const DEFAULT_HOURS = '2';
+/** How long the "is off" line stays beside a switch just turned off (admin-12). */
+const STATUS_LINE_MS = 6000;
 
 export default class AutomationControl extends LightningElement {
   helpReady = isHelpLoaded('Core');
@@ -76,6 +78,13 @@ export default class AutomationControl extends LightningElement {
   selectedHours = DEFAULT_HOURS;
   busy = false;
   wiredPageResult;
+  /** The automation just switched off, whose row says so for a few seconds. */
+  switchedOff;
+  statusTimer;
+
+  disconnectedCallback() {
+    clearTimeout(this.statusTimer);
+  }
 
   @wire(getPage)
   wiredPage(result) {
@@ -127,7 +136,11 @@ export default class AutomationControl extends LightningElement {
       return {
         ...automation,
         alwaysRuns: automation.alwaysRuns === true,
-        toggleDisabled: this.controlsDisabled || automation.alwaysRuns === true
+        toggleDisabled: this.controlsDisabled || automation.alwaysRuns === true,
+        statusLine:
+          this.switchedOff === automation.automationName
+            ? helpText('Core', 'Core_AutomationControl_SwitchedOff', automation.label)
+            : ''
       };
     });
   }
@@ -177,12 +190,36 @@ export default class AutomationControl extends LightningElement {
     const before = this.enabledFor(automationName);
     const input = event.target;
     this.setEnabledOn(automationName, enabled);
-    this.runAction(setEnabled({ automationName, enabled }), () => {
-      this.setEnabledOn(automationName, before);
-      // The row is the truth the next render works from; the switch itself is put back here so
-      // that it is right whichever order the render and the rejection happen in.
-      input.checked = before;
-    });
+    this.showSwitchStatus(undefined);
+    this.runAction(
+      setEnabled({ automationName, enabled }),
+      () => {
+        this.setEnabledOn(automationName, before);
+        // The row is the truth the next render works from; the switch itself is put back here
+        // so that it is right whichever order the render and the rejection happen in.
+        input.checked = before;
+      },
+      () => {
+        if (!enabled) {
+          this.showSwitchStatus(automationName);
+        }
+      }
+    );
+  }
+
+  /**
+   * Shows "X is off. Turn it back on here." beside the switch just turned off, announced by its
+   * live region, and clears it after a few seconds (admin-12).
+   */
+  showSwitchStatus(automationName) {
+    clearTimeout(this.statusTimer);
+    this.switchedOff = automationName;
+    if (automationName) {
+      // eslint-disable-next-line @lwc/lwc/no-async-operation
+      this.statusTimer = setTimeout(() => {
+        this.switchedOff = undefined;
+      }, STATUS_LINE_MS);
+    }
   }
 
   enabledFor(automationName) {
@@ -209,12 +246,15 @@ export default class AutomationControl extends LightningElement {
     };
   }
 
-  runAction(promise, revert) {
+  runAction(promise, revert, onSuccess) {
     this.busy = true;
     this.errorMessage = undefined;
     return promise
       .then((page) => {
         this.page = page;
+        if (onSuccess) {
+          onSuccess();
+        }
       })
       .catch((error) => {
         this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);

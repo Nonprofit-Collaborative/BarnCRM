@@ -157,7 +157,7 @@ export default class MatchSourceManager extends LightningElement {
       return {
         ...source,
         statusText: source.active ? ACTIVE : INACTIVE,
-        statusClass: source.active ? 'slds-theme_success' : '',
+        statusTone: source.active ? 'active' : 'inactive',
         switchLabel: ACTIVE_SWITCH.replace('{0}', source.label),
         summary: SUMMARY.replace('{0}', valueText)
           .replace('{1}', objectText)

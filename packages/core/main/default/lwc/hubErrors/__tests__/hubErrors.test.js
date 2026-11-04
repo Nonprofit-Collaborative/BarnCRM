@@ -56,7 +56,8 @@ describe('c-hub-errors', () => {
     getHomeModel.emit({ newErrorCount: 3 });
     await settle();
 
-    expect(byId(element, 'error-count').value).toBe('3');
+    expect(byId(element, 'error-count').value).toBe(3);
+    expect(element.shadowRoot.querySelector('lightning-card').iconName).toBe('custom:custom53');
     byId(element, 'open-error-log').click();
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__objectPage',
@@ -85,16 +86,15 @@ describe('c-hub-errors', () => {
   it('badges All Clear at no new errors, and only once the count has arrived', async () => {
     const element = build();
     await settle();
-    expect(byId(element, 'error-count').badgeLabel).toBeUndefined();
+    expect(byId(element, 'all-clear')).toBeNull();
 
     getHomeModel.emit({ newErrorCount: 0 });
     await settle();
-    expect(byId(element, 'error-count').badgeLabel).toBe('c.Core_OrgOptimizer_BadgeAllClear');
-    expect(byId(element, 'error-count').badgeVariant).toBe('success');
+    expect(byId(element, 'all-clear').label).toBe('c.Core_OrgOptimizer_BadgeAllClear');
 
     getHomeModel.emit({ newErrorCount: 4 });
     await settle();
-    expect(byId(element, 'error-count').badgeLabel).toBeUndefined();
+    expect(byId(element, 'all-clear')).toBeNull();
   });
 
   it('says setup completed when the install logged nothing', async () => {
@@ -104,7 +104,7 @@ describe('c-hub-errors', () => {
 
     const status = byId(element, 'install-status');
     expect(status.textContent).toContain('Core_HubHome_InstallCompleted');
-    expect(status.tagName).toBe('P');
+    expect(status.querySelector('lightning-icon')).toBeNull();
   });
 
   it('says setup had problems when the install logged some, and not by color alone', async () => {
@@ -113,9 +113,9 @@ describe('c-hub-errors', () => {
     await settle();
 
     const status = byId(element, 'install-status');
+    // A warning notice carries its own icon and role, so it is never color alone.
     expect(status.message).toContain('Core_HubHome_InstallProblems');
     expect(status.variant).toBe('warning');
-    expect(status.alternativeText).toBe('c.Core_HubHome_WarningAltText');
   });
 
   it('says nothing about the install to someone who cannot read the Error Log', async () => {
@@ -132,6 +132,6 @@ describe('c-hub-errors', () => {
     await settle();
 
     expect(byId(element, 'install-status')).toBeNull();
-    expect(byId(element, 'error-count').value).toBe('0');
+    expect(byId(element, 'error-count').value).toBe(0);
   });
 });

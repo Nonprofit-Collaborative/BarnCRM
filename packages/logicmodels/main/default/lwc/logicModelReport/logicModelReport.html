@@ -43,11 +43,16 @@
         </div>
       </template>
       <template lwc:else>
-        <p data-id="report-no-periods" class="slds-text-color_weak">{labels.reportNoPeriods}</p>
+        <c-barn-empty-state
+          data-id="report-no-periods"
+          size="compact"
+          heading={labels.reportNoPeriods}
+        ></c-barn-empty-state>
       </template>
 
       <div class="slds-scrollable_x">
         <table
+          data-wide-table
           data-id="report-table"
           class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_col-bordered"
           aria-label={labels.reportTitle}
@@ -82,10 +87,20 @@
                     <span class="slds-text-color_weak"> ({row.unit})</span>
                   </template>
                 </th>
-                <td class="slds-text-align_right">{row.baseline}</td>
+                <td class="slds-text-align_right">
+                  <lightning-formatted-number
+                    value={row.baseline}
+                    maximum-fraction-digits="2"
+                  ></lightning-formatted-number>
+                </td>
                 <template for:each={row.cells} for:item="cell">
                   <template lwc:if={cell.number}>
-                    <td key={cell.key} class="slds-text-align_right">{cell.value}</td>
+                    <td key={cell.key} class="slds-text-align_right">
+                      <lightning-formatted-number
+                        value={cell.value}
+                        maximum-fraction-digits="2"
+                      ></lightning-formatted-number>
+                    </td>
                   </template>
                   <template lwc:else>
                     <td key={cell.key} data-id="report-progress">{cell.value}</td>
@@ -98,9 +113,12 @@
       </div>
     </template>
     <template lwc:else>
-      <p data-id="report-no-indicators" class="slds-text-color_weak">
-        {labels.reportNoIndicators}
-      </p>
+      <c-barn-empty-state
+        data-id="report-no-indicators"
+        size="small"
+        illustration="no-data"
+        heading={labels.reportNoIndicators}
+      ></c-barn-empty-state>
     </template>
   </section>
     </template>

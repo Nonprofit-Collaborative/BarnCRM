@@ -3,7 +3,7 @@
   <div class="slds-is-relative">
     <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
     <template lwc:if={error}>
-      <p class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">{error}</p>
+      <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" message={error} data-id="error"></c-barn-notice>
     </template>
     <template lwc:if={message}>
       <p class="slds-var-m-bottom_small" role="status" data-id="status">{message}</p>

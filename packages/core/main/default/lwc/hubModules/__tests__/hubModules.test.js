@@ -93,6 +93,7 @@ describe('c-hub-modules', () => {
       'c.Core_ModuleManager_StatusOff',
       'c.Core_ModuleManager_StatusOn'
     ]);
+    // On is success, Off is neutral: one status vocabulary (vis-core-1).
     expect(all(element, 'module-status').map((n) => n.status)).toEqual(['on', 'off', 'on']);
   });
 
@@ -133,12 +134,8 @@ describe('c-hub-modules', () => {
 
     const links = all(element, 'open-app');
     expect(links).toHaveLength(1);
-    expect(links[0].label).toBe('c.Core_ModuleManager_OpenApp');
-    links[0].click();
-    expect(mockNavigate).toHaveBeenCalledWith({
-      type: 'standard__webPage',
-      attributes: { url: '/lightning/app/06m000000000001' }
-    });
+    expect(links[0].getAttribute('href')).toBe('/lightning/app/06m000000000001');
+    expect(links[0].textContent).toContain('c.Core_ModuleManager_OpenApp');
     const logos = all(element, 'module-logo');
     expect(logos[1].src).toBe('/file-asset/BarnCRM_Fundraising_Logo');
     expect(logos[2].src).toBeUndefined();

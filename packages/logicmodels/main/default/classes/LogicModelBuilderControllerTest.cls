@@ -390,9 +390,11 @@ private class LogicModelBuilderControllerTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(Label.LogicModels_Builder_ActionFailed, shown.getMessage(), 'Plain');
+            String failed = LogicModelBuilderController.actionFailed();
+            Assert.isTrue(failed.contains('Error Log'), 'The generic failure says what to do');
+            Assert.areEqual(failed, shown.getMessage(), 'Plain');
             Assert.areEqual(Label.LogicModels_Builder_NotFound, missing, 'Not a model');
-            Assert.areEqual(Label.LogicModels_Builder_ActionFailed, unreadable, 'Not an object');
+            Assert.areEqual(failed, unreadable, 'Not an object');
         }
     }
 }

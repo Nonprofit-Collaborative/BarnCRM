@@ -516,4 +516,28 @@ export function createDragController(options = {}) {
   };
 }
 
+function isIndex(value, length) {
+  return Number.isInteger(value) && value >= 0 && value < length;
+}
+
+/**
+ * A copy of the list with the item at `from` moved to `to` (onDrop's toIndex, or a Move Up or
+ * Move Down target); the list itself is not changed, and a place outside it changes nothing.
+ */
+export function moveItem(list, from, to) {
+  const items = Array.isArray(list) ? list.slice() : [];
+  if (!isIndex(from, items.length) || !isIndex(to, items.length) || from === to) {
+    return items;
+  }
+  const [moved] = items.splice(from, 1);
+  items.splice(to, 0, moved);
+  return items;
+}
+
+/** Where Move Up (delta -1) or Move Down (1) takes the item at `index`, or -1 when it cannot. */
+export function targetIndex(index, delta, length) {
+  const to = index + delta;
+  return isIndex(index, length) && isIndex(to, length) ? to : -1;
+}
+
 export { format as formatDragMessage };

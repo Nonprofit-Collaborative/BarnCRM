@@ -253,9 +253,9 @@ describe('the changes to one column', () => {
     });
     const element = render([{ op: 'ifBlank', value: '' }]);
     await flush();
-    expect(element.shadowRoot.querySelector('[data-id="problems"]').textContent).toContain(
-      'Value when empty needs a value.'
-    );
+    const notice = element.shadowRoot.querySelector('[data-id="problems"]');
+    expect(notice.variant).toBe('error');
+    expect(notice.message).toContain('Value when empty needs a value.');
     expect(element.shadowRoot.querySelectorAll('[data-id="sample"]')).toHaveLength(0);
   });
 
@@ -263,9 +263,81 @@ describe('the changes to one column', () => {
     previewChanges.mockRejectedValue({ body: { message: 'No access.' } });
     const element = render([{ op: 'trim' }]);
     await flush();
-    expect(element.shadowRoot.querySelector('[data-id="problems"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="problems"]').message).toContain(
       'No access.'
     );
+  });
+
+  it('moves a step up or down from the keyboard buttons and announces it', async () => {
+    const element = render([{ op: 'trim' }, { op: 'proper' }, { op: 'upper' }]);
+    listen(element);
+    await flush();
+    expect(steps(element)[0].querySelector('[data-id="move-up"]').disabled).toBe(true);
+    expect(steps(element)[2].querySelector('[data-id="move-down"]').disabled).toBe(true);
+
+    steps(element)[2].querySelector('[data-id="move-up"]').click();
+    await flush();
+    expect(changes[0].transforms.map((step) => step.op)).toEqual(['trim', 'upper', 'proper']);
+    expect(element.shadowRoot.querySelector('[data-id="announce"]').textContent).toBe(
+      'c.Core_Drag_Position'
+    );
+
+    steps(element)[0].querySelector('[data-id="move-down"]').click();
+    await flush();
+    expect(changes[1].transforms.map((step) => step.op)).toEqual(['upper', 'trim', 'proper']);
+    expect(previewChanges).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        transformsJson: JSON.stringify([{ op: 'upper' }, { op: 'trim' }, { op: 'proper' }])
+      })
+    );
+  });
+
+  it('moves a step by dragging its handle with a mouse', async () => {
+    const element = render([{ op: 'trim' }, { op: 'proper' }]);
+    listen(element);
+    await flush();
+    const zone = element.shadowRoot.querySelector('[data-id="zone"]');
+    zone.getBoundingClientRect = () => ({ left: 0, right: 500, top: 0, bottom: 100, height: 100 });
+    const handles = element.shadowRoot.querySelectorAll('[data-id="drag"]');
+    handles.forEach((handle, index) => {
+      handle.getBoundingClientRect = () => ({
+        left: 0,
+        right: 20,
+        top: index * 50,
+        bottom: index * 50 + 50,
+        height: 50
+      });
+    });
+    const pointer = (type, clientY) => {
+      const event = new CustomEvent(type, { bubbles: true, cancelable: true });
+      Object.assign(event, { clientX: 10, clientY, button: 0, pointerType: 'mouse' });
+      return event;
+    };
+    handles[0].dispatchEvent(pointer('pointerdown', 10));
+    window.dispatchEvent(pointer('pointermove', 90));
+    window.dispatchEvent(pointer('pointerup', 90));
+    await flush();
+    // barnDrag swallows the one click after a drop until the next tick; let that pass.
+    await new Promise((resolve) => {
+      // eslint-disable-next-line @lwc/lwc/no-async-operation -- wait out barnDrag's click guard
+      setTimeout(resolve, 0);
+    });
+    expect(changes[0].transforms.map((step) => step.op)).toEqual(['proper', 'trim']);
+  });
+
+  it('moves a step by keyboard drag: Space, an arrow, Space', async () => {
+    const element = render([{ op: 'trim' }, { op: 'proper' }, { op: 'upper' }]);
+    listen(element);
+    await flush();
+    const handle = element.shadowRoot.querySelectorAll('[data-id="drag"]')[0];
+    expect(handle.getAttribute('tabindex')).toBe('0');
+    const key = (name) => new KeyboardEvent('keydown', { key: name, bubbles: true });
+    handle.dispatchEvent(key(' '));
+    handle.dispatchEvent(key('ArrowDown'));
+    handle.dispatchEvent(key('ArrowDown'));
+    handle.dispatchEvent(key(' '));
+    await flush();
+    expect(changes[0].transforms.map((step) => step.op)).toEqual(['proper', 'upper', 'trim']);
   });
 
   it('keeps its steps when handed back what it sent, and previews another column afresh', async () => {

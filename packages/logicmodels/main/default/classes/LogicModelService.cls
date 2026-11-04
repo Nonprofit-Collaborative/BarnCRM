@@ -27,7 +27,7 @@ public with sharing class LogicModelService {
      */
     public static Map<String, Object> read(Id modelId) {
         List<Logic_Model__c> models = [
-            SELECT Id, Name, Description__c, Program_Id__c
+            SELECT Id, Name, Description__c, Program_Id__c, Periods__c
             FROM Logic_Model__c
             WHERE Id = :modelId
             WITH USER_MODE
@@ -54,7 +54,9 @@ public with sharing class LogicModelService {
                 .isUpdateable(),
             'elements' => elementsOf(modelId),
             'links' => linksOf(modelId),
-            'indicators' => indicatorsOf(modelId)
+            'indicators' => indicatorsOf(modelId),
+            'periods' => LogicModelPeriodService.periodsOf(model.Periods__c),
+            'canEditPeriods' => Schema.SObjectType.Logic_Model__c.fields.Periods__c.isUpdateable()
         };
         String programName = programName(model.Program_Id__c);
         result.put('programName', programName);

@@ -72,19 +72,22 @@ function errorText(error) {
 // ImportBatchService.STATUS_UNDOING
 const IMPORT_UNDOING = 'Undoing';
 
-/** The SLDS badge theme for a job status: green when done, red when it failed, amber while it runs. */
-function badgeTheme(status) {
+/**
+ * The status badge tone for a job status (the kit's vocabulary): success when done, error when
+ * it failed, running while it runs, neutral otherwise.
+ */
+function statusTone(status) {
   const text = String(status || '').toLowerCase();
   if (text.includes('fail') || text.includes('error')) {
-    return 'slds-theme_error';
+    return 'error';
   }
   if (text.includes('ing') || text.startsWith('queued') || text.startsWith('pending')) {
-    return 'slds-theme_warning';
+    return 'running';
   }
   if (text.startsWith('complete') || text.startsWith('done') || text === 'undone') {
-    return 'slds-theme_success';
+    return 'success';
   }
-  return '';
+  return 'neutral';
 }
 
 /** One import, in the shape every row of the list shares. */
@@ -356,7 +359,7 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
       .map((job) => ({
         ...job,
         title: `${job.name}: ${[job.kindLabel, job.detail].filter(Boolean).join(', ')}`,
-        badgeClass: `slds-var-m-left_x-small ${badgeTheme(job.status)}`,
+        tone: statusTone(job.status),
         showDeadline: job.canUndo && Boolean(job.undoDeadline)
       }));
   }

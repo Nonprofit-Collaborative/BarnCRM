@@ -1,30 +1,38 @@
 <template>
-    <lightning-card title={labels.heading} icon-name="standard:incident">
+    <lightning-card title={labels.heading} icon-name={iconName}>
         <div class="slds-var-p-horizontal_medium">
             <template lwc:if={errorMessage}>
                 <c-barn-notice variant="error" message={errorMessage} data-id="load-error"></c-barn-notice>
             </template>
             <template lwc:else>
-                <c-barn-stat-tile
-                    label={labels.errors}
-                    value={errorCountText}
-                    badge-label={allClearLabel}
-                    badge-variant="success"
-                    data-id="error-count"
-                ></c-barn-stat-tile>
+                <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_x-small">
+                    <c-barn-stat-tile
+                        label={labels.errors}
+                        value={errorCountValue}
+                        align="start"
+                        data-id="error-count"
+                    ></c-barn-stat-tile>
+                    <template lwc:if={allClear}>
+                        <c-barn-status-badge
+                            status="success"
+                            label={labels.allClear}
+                            class="slds-var-m-left_small"
+                            data-id="all-clear"
+                        ></c-barn-status-badge>
+                    </template>
+                </div>
             </template>
             <template lwc:if={hasInstallStatus}>
                 <template lwc:if={installHadProblems}>
                     <c-barn-notice
-                        class="slds-var-m-top_x-small"
                         variant="warning"
                         message={installStatusText}
-                        alternative-text={labels.warning}
                         data-id="install-status"
+                        class="slds-var-m-bottom_x-small"
                     ></c-barn-notice>
                 </template>
                 <template lwc:else>
-                    <p class="slds-text-body_small slds-var-m-top_x-small" data-id="install-status">
+                    <p class="slds-text-body_small slds-text-color_weak" data-id="install-status">
                         {installStatusText}
                     </p>
                 </template>
