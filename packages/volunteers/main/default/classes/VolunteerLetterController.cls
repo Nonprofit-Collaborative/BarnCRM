@@ -107,7 +107,7 @@ public with sharing class VolunteerLetterController {
             failure instanceof VolunteerLetterService.VolunteerLetterException,
             CONTEXT,
             recordId,
-            Label.Volunteers_Letter_ActionFailed
+            BarnHelp.text('Volunteers', 'Volunteers_Letter_ActionFailed')
         );
     }
 }

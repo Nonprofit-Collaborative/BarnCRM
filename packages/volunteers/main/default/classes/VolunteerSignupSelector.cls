@@ -7,7 +7,7 @@ public with sharing class VolunteerSignupSelector {
     /** The shift with what the panel shows of it, or null when the user cannot see it. */
     public static Volunteer_Shift__c selectShift(Id shiftId) {
         List<Volunteer_Shift__c> found = [
-            SELECT Id, Name, Volunteers_Needed__c, Status__c
+            SELECT Id, Name, Volunteers_Needed__c, Status__c, Start_Time__c
             FROM Volunteer_Shift__c
             WHERE Id = :shiftId
             WITH USER_MODE
@@ -45,6 +45,27 @@ public with sharing class VolunteerSignupSelector {
                 Volunteer_Shift__c = :shiftId
                 AND Status__c != :VolunteerSignupService.STATUS_CANCELLED
             WITH USER_MODE
+        ];
+    }
+
+    /** How many of the shift's sign-ups have one of these statuses (modules-12). */
+    public static Integer countOpen(Id shiftId, Set<String> statuses) {
+        return [
+            SELECT COUNT()
+            FROM Volunteer_Signup__c
+            WHERE Volunteer_Shift__c = :shiftId AND Status__c IN :statuses
+            WITH USER_MODE
+        ];
+    }
+
+    /** The shift's sign-ups with one of these statuses, for closing the shift (modules-12). */
+    public static List<Volunteer_Signup__c> selectOpenForShift(Id shiftId, Set<String> statuses) {
+        return [
+            SELECT Id, Status__c
+            FROM Volunteer_Signup__c
+            WHERE Volunteer_Shift__c = :shiftId AND Status__c IN :statuses
+            WITH USER_MODE
+            LIMIT 10000
         ];
     }
 

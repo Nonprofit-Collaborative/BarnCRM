@@ -39,6 +39,8 @@ public with sharing class VolunteerHoursApprovalController {
         public String status;
         @AuraEnabled
         public String rejectionReason;
+        @AuraEnabled
+        public String notes;
     }
 
     /** One page of the list, and whether this user may act on it. */
@@ -51,6 +53,9 @@ public with sharing class VolunteerHoursApprovalController {
         public Boolean hasMore = false;
         @AuraEnabled
         public Integer pageSize = PAGE_SIZE;
+        /** The Notes column's heading: the field's own label, in the user's language. */
+        @AuraEnabled
+        public String notesLabel = Volunteer_Hours__c.Notes__c.getDescribe().getLabel();
     }
 
     /** What a verb did: how many moved, and each entry it could not move with the reason. */
@@ -84,7 +89,7 @@ public with sharing class VolunteerHoursApprovalController {
     ) {
         String wanted = String.isBlank(status) ? VolunteerHoursService.STATUS_SUBMITTED : status;
         if (!STATUSES.contains(wanted)) {
-            throw UserErrors.message(Label.Volunteers_Approve_ActionFailed);
+            throw UserErrors.message(actionFailed());
         }
         try {
             HoursPage page = new HoursPage();
@@ -176,6 +181,7 @@ public with sharing class VolunteerHoursApprovalController {
         row.hours = entry.Hours__c;
         row.status = entry.Status__c;
         row.rejectionReason = entry.Rejection_Reason__c;
+        row.notes = entry.Notes__c;
         return row;
     }
 
@@ -197,7 +203,12 @@ public with sharing class VolunteerHoursApprovalController {
             failure,
             failure instanceof VolunteerHoursService.VolunteerHoursException,
             CONTEXT,
-            Label.Volunteers_Approve_ActionFailed
+            actionFailed()
         );
+    }
+
+    /** The screen's failure message, from the Volunteers help catalog (modules-1). */
+    private static String actionFailed() {
+        return BarnHelp.text('Volunteers', 'Volunteers_Approve_ActionFailed');
     }
 }

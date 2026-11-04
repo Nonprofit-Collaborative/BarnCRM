@@ -1,14 +1,20 @@
 /**
  * What the Sign-ups panel on a shift calls (V-02, canonical model Section 29L).
  *
- * Shows how many places the shift has filled, lists its sign-ups, adds one for a person and
- * changes a sign-up's status, all in user mode. Saves go through the sign-up automation like any
- * other save, so one sign-up per person per shift (R-VU2) and attendance writing the hours
- * (R-VU3, when Attendance Creates Hours is on) apply here too. Anything unexpected is recorded
- * in the Error Log before it is reported (plan Section 7.2).
+ * Shows how many places the shift has filled, lists its sign-ups, adds one for a person,
+ * changes a sign-up's status and closes the shift once it has started, all in user mode. Saves
+ * go through the sign-up automation like any other save, so one sign-up per person per shift
+ * (R-VU2) and attendance writing the hours (R-VU3, when Attendance Creates Hours is on) apply
+ * here too. Anything unexpected is recorded in the Error Log before it is reported (plan
+ * Section 7.2).
  */
 public with sharing class VolunteerShiftSignupsController {
     private static final String CONTEXT = 'Shift sign-ups panel';
+    private static final String STATUS_SHIFT_OPEN = 'Open';
+    private static final String STATUS_SHIFT_COMPLETED = 'Completed';
+    private static final String STATUS_NO_SHOW = 'No show';
+    /** The sign-up statuses still waiting for attendance, which closing a shift can settle. */
+    private static final Set<String> OPEN_STATUSES = new Set<String>{ 'Signed up', 'Confirmed' };
     /** The most sign-ups listed: far more than a shift needs, and a bound on the read. */
     public static final Integer MAX_SHOWN = 200;
     /**
@@ -67,13 +73,25 @@ public with sharing class VolunteerShiftSignupsController {
         /** After a status change: whether the sign-up has any hours entry at all. */
         @AuraEnabled
         public Boolean hoursExist = false;
+        /** The shift has started: the panel leads with attendance, not the status picker. */
+        @AuraEnabled
+        public Boolean shiftStarted = false;
+        /** The shift is Completed or Cancelled. */
+        @AuraEnabled
+        public Boolean shiftClosed = false;
+        /** The user may close the shift: it has started, is still Open, and they may edit it. */
+        @AuraEnabled
+        public Boolean canClose = false;
+        /** Sign-ups still Signed up or Confirmed, which closing can mark No show. */
+        @AuraEnabled
+        public Integer openCount = 0;
     }
 
     /** Not cacheable: the panel changes with every sign-up. */
     @AuraEnabled
     public static Panel getPanel(Id shiftId) {
         if (shiftId == null) {
-            throw UserErrors.message(Label.Volunteers_Signups_ActionFailed);
+            throw UserErrors.message(actionFailed());
         }
         try {
             return panelFor(shiftId);
@@ -86,7 +104,7 @@ public with sharing class VolunteerShiftSignupsController {
     @AuraEnabled
     public static Panel addSignup(Id shiftId, Id personId, String status) {
         if (shiftId == null) {
-            throw UserErrors.message(Label.Volunteers_Signups_ActionFailed);
+            throw UserErrors.message(actionFailed());
         }
         if (personId == null) {
             throw UserErrors.message(Label.Volunteers_Signups_PersonRequired);
@@ -115,13 +133,13 @@ public with sharing class VolunteerShiftSignupsController {
     @AuraEnabled
     public static Panel setStatus(Id signupId, String status) {
         if (signupId == null || String.isBlank(status)) {
-            throw UserErrors.message(Label.Volunteers_Signups_ActionFailed);
+            throw UserErrors.message(actionFailed());
         }
         String wanted = checkedStatus(status);
         try {
             Volunteer_Signup__c signup = VolunteerSignupSelector.selectById(signupId);
             if (signup == null) {
-                throw UserErrors.message(Label.Volunteers_Signups_ActionFailed);
+                throw UserErrors.message(actionFailed());
             }
             Integer hoursBefore = VolunteerSignupSelector.countHoursFor(signupId);
             Database.update(
@@ -143,12 +161,58 @@ public with sharing class VolunteerShiftSignupsController {
         }
     }
 
+    /**
+     * Closes a shift that has started (modules-12): marks its sign-ups still Signed up or
+     * Confirmed as No show when asked, then sets the shift's Status to Completed. Both saves run
+     * in user mode through the usual automation, in one transaction, so a refusal changes
+     * nothing.
+     */
+    @AuraEnabled
+    public static Panel closeShift(Id shiftId, Boolean markNoShow) {
+        if (shiftId == null) {
+            throw UserErrors.message(actionFailed());
+        }
+        Savepoint before = Database.setSavepoint();
+        try {
+            Volunteer_Shift__c shift = VolunteerSignupSelector.selectShift(shiftId);
+            if (shift == null || shift.Status__c != STATUS_SHIFT_OPEN) {
+                throw UserErrors.message(actionFailed());
+            }
+            if (markNoShow == true) {
+                List<Volunteer_Signup__c> open = VolunteerSignupSelector.selectOpenForShift(
+                    shiftId,
+                    OPEN_STATUSES
+                );
+                for (Volunteer_Signup__c signup : open) {
+                    signup.Status__c = STATUS_NO_SHOW;
+                }
+                Database.update(open, true, AccessLevel.USER_MODE);
+            }
+            Database.update(
+                new List<Volunteer_Shift__c>{
+                    new Volunteer_Shift__c(Id = shiftId, Status__c = STATUS_SHIFT_COMPLETED)
+                },
+                true,
+                AccessLevel.USER_MODE
+            );
+            return panelFor(shiftId);
+        } catch (Exception failure) {
+            Database.rollback(before);
+            throw report(failure, shiftId);
+        }
+    }
+
     // ------------------------------------------------------------------------------ helpers
+
+    /** The panel's failure message, from the Volunteers help catalog (modules-1). */
+    private static String actionFailed() {
+        return BarnHelp.text('Volunteers', 'Volunteers_Signups_ActionFailed');
+    }
 
     private static Panel panelFor(Id shiftId) {
         Volunteer_Shift__c shift = VolunteerSignupSelector.selectShift(shiftId);
         if (shift == null) {
-            throw UserErrors.message(Label.Volunteers_Signups_ActionFailed);
+            throw UserErrors.message(actionFailed());
         }
         Panel panel = new Panel();
         panel.shiftName = shift.Name;
@@ -157,6 +221,8 @@ public with sharing class VolunteerShiftSignupsController {
         panel.slotsRemaining = shift.Volunteers_Needed__c == null
             ? null
             : shift.Volunteers_Needed__c - panel.slotsFilled;
+        panel.shiftStarted = shift.Start_Time__c != null && shift.Start_Time__c <= Datetime.now();
+        panel.shiftClosed = shift.Status__c != null && shift.Status__c != STATUS_SHIFT_OPEN;
 
         List<Volunteer_Signup__c> found = VolunteerSignupSelector.selectForShift(
             shiftId,
@@ -166,12 +232,18 @@ public with sharing class VolunteerShiftSignupsController {
         for (Integer i = 0; i < found.size() && i < MAX_SHOWN; i++) {
             panel.signups.add(rowFor(found[i]));
         }
+        panel.openCount = VolunteerSignupSelector.countOpen(shiftId, OPEN_STATUSES);
 
         Schema.DescribeSObjectResult describe = Volunteer_Signup__c.SObjectType.getDescribe(
             SObjectDescribeOptions.DEFERRED
         );
         panel.canAdd = describe.isCreateable();
         panel.canEdit = describe.isUpdateable();
+        panel.canClose =
+            panel.shiftStarted &&
+            !panel.shiftClosed &&
+            Volunteer_Shift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .isUpdateable();
         panel.hasPersonAccounts = HouseholdService.isPersonAccountOrg();
         panel.personFilterField = panel.hasPersonAccounts ? PERSON_ACCOUNT_FILTER_FIELD : null;
         for (Schema.PicklistEntry entry : statusEntries()) {
@@ -217,7 +289,7 @@ public with sharing class VolunteerShiftSignupsController {
                 return entry.getValue();
             }
         }
-        throw UserErrors.message(Label.Volunteers_Signups_ActionFailed);
+        throw UserErrors.message(actionFailed());
     }
 
     /**
@@ -232,6 +304,6 @@ public with sharing class VolunteerShiftSignupsController {
             return UserErrors.message(((DmlException) failure).getDmlMessage(0));
         }
         ErrorLogger.log(failure, CONTEXT, recordId);
-        return UserErrors.message(Label.Volunteers_Signups_ActionFailed);
+        return UserErrors.message(actionFailed());
     }
 }

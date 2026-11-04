@@ -1,4 +1,5 @@
 import { LightningElement } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import getHours from '@salesforce/apex/VolunteerHoursApprovalController.getHours';
 import approveHours from '@salesforce/apex/VolunteerHoursApprovalController.approve';
 import rejectHours from '@salesforce/apex/VolunteerHoursApprovalController.reject';
@@ -38,10 +39,10 @@ import DONE_REJECT from '@salesforce/label/c.Volunteers_Approve_DoneReject';
 import DONE_REOPEN from '@salesforce/label/c.Volunteers_Approve_DoneReopen';
 import REFUSED from '@salesforce/label/c.Volunteers_Approve_Refused';
 import REASON_REQUIRED from '@salesforce/label/c.Volunteers_Hours_RejectionReasonRequired';
-import ACTION_FAILED from '@salesforce/label/c.Volunteers_Approve_ActionFailed';
 import DATE_RANGE from '@salesforce/label/c.Volunteers_Approve_DateRange';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { bodyMessage, format } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const STATUS_SUBMITTED = 'Submitted';
 const STATUS_APPROVED = 'Approved';
@@ -66,9 +67,14 @@ function readableDate(value) {
  * Approve, Reject (with a reason) and Reopen. Every change goes through the server's hours
  * service; this screen only chooses which entries.
  */
-export default class VolunteerHoursApproval extends LightningElement {
+export default class VolunteerHoursApproval extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Volunteers');
+
   labels = {
     title: TITLE,
+    get intro() {
+      return helpText('Volunteers', 'Volunteers_Approve_Intro');
+    },
     readOnly: READ_ONLY,
     show: SHOW,
     job: JOB,
@@ -121,7 +127,16 @@ export default class VolunteerHoursApproval extends LightningElement {
   focusPaging;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Volunteers').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
+  }
+
+  get actionFailed() {
+    return helpText('Volunteers', 'Volunteers_Approve_ActionFailed');
   }
 
   renderedCallback() {
@@ -170,7 +185,7 @@ export default class VolunteerHoursApproval extends LightningElement {
         this.errorMessage = undefined;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, this.actionFailed);
       })
       .finally(() => {
         this.busy = false;
@@ -201,6 +216,8 @@ export default class VolunteerHoursApproval extends LightningElement {
     const rows = this.page && this.page.rows ? this.page.rows : [];
     return rows.map((row) => ({
       ...row,
+      displayName: row.personName || row.name,
+      href: `/lightning/r/Volunteer_Hours__c/${row.recordId}/view`,
       selected: this.selectedIds.includes(row.recordId),
       selectLabel: format(
         SELECT_ROW,
@@ -217,6 +234,29 @@ export default class VolunteerHoursApproval extends LightningElement {
 
   get isEmpty() {
     return this.loaded && !this.hasRows;
+  }
+
+  /** The Notes column's heading: the field's own label, from the server. */
+  get notesLabel() {
+    return this.page ? this.page.notesLabel : '';
+  }
+
+  /** Nothing waiting for approval is a good empty (ux-kit.md, Empty states). */
+  get emptyIllustration() {
+    return this.status === STATUS_SUBMITTED ? 'all-clear' : 'no-data';
+  }
+
+  /** A person's name opens the hours entry, to check it before approving (modules-3). */
+  handleOpenEntry(event) {
+    event.preventDefault();
+    this[NavigationMixin.Navigate]({
+      type: 'standard__recordPage',
+      attributes: {
+        recordId: event.currentTarget.dataset.recordId,
+        objectApiName: 'Volunteer_Hours__c',
+        actionName: 'view'
+      }
+    });
   }
 
   get showReasonColumn() {
@@ -434,7 +474,7 @@ export default class VolunteerHoursApproval extends LightningElement {
         return this.load();
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, this.actionFailed);
         this.busy = false;
         return false;
       });

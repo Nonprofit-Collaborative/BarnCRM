@@ -229,9 +229,93 @@ private class VolunteerShiftSignupsControllerTest {
 
         Assert.areEqual(Label.Volunteers_Signups_PersonRequired, noPerson, 'A person is needed.');
         Assert.areEqual(
-            Label.Volunteers_Signups_ActionFailed,
+            BarnHelp.text('Volunteers', 'Volunteers_Signups_ActionFailed'),
             badStatus,
             'A status the picklist does not offer is refused.'
         );
+    }
+
+    @IsTest
+    static void aCoordinatorClosesAStartedShiftMarkingThePeopleStillBookedNoShow() {
+        List<Contact> people = peopleOwnedBy(COORDINATOR, 3);
+        VolunteerShiftSignupsController.Panel before;
+        VolunteerShiftSignupsController.Panel closed;
+
+        Test.startTest();
+        System.runAs(user(COORDINATOR)) {
+            VolunteerShiftSignupsController.addSignup(shiftId(), people[0].Id, null);
+            VolunteerShiftSignupsController.addSignup(shiftId(), people[1].Id, 'Confirmed');
+            before = VolunteerShiftSignupsController.addSignup(shiftId(), people[2].Id, 'Attended');
+            closed = VolunteerShiftSignupsController.closeShift(shiftId(), true);
+        }
+        Test.stopTest();
+
+        Assert.isTrue(before.shiftStarted, 'The test shift is in the past.');
+        Assert.isTrue(before.canClose, 'A coordinator may close a started, open shift.');
+        Assert.areEqual(2, before.openCount, 'Signed up and Confirmed still wait.');
+        Assert.isTrue(closed.shiftClosed, 'The shift is closed.');
+        Assert.isFalse(closed.canClose, 'And cannot be closed twice.');
+        Assert.areEqual(0, closed.openCount, 'Nobody is left waiting.');
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            Assert.areEqual(
+                'Completed',
+                [SELECT Status__c FROM Volunteer_Shift__c WHERE Id = :shiftId()].Status__c,
+                'Status is Completed.'
+            );
+            Map<String, Integer> byStatus = new Map<String, Integer>();
+            for (Volunteer_Signup__c signup : [SELECT Status__c FROM Volunteer_Signup__c]) {
+                Integer seen = byStatus.get(signup.Status__c);
+                byStatus.put(signup.Status__c, seen == null ? 1 : seen + 1);
+            }
+            Assert.areEqual(2, byStatus.get('No show'), 'Both waiting are No show.');
+            Assert.areEqual(1, byStatus.get('Attended'), 'Attendance is kept.');
+        }
+    }
+
+    @IsTest
+    static void closingWithoutMarkingKeepsEveryStatusAndAClosedShiftIsRefused() {
+        List<Contact> people = peopleOwnedBy(COORDINATOR, 1);
+        String again = '';
+
+        Test.startTest();
+        System.runAs(user(COORDINATOR)) {
+            VolunteerShiftSignupsController.addSignup(shiftId(), people[0].Id, null);
+            VolunteerShiftSignupsController.closeShift(shiftId(), false);
+            try {
+                VolunteerShiftSignupsController.closeShift(shiftId(), false);
+            } catch (AuraHandledException refused) {
+                again = refused.getMessage();
+            }
+        }
+        Test.stopTest();
+
+        Assert.isTrue(String.isNotBlank(again), 'A closed shift is not closed again.');
+        System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+            Assert.areEqual(
+                'Signed up',
+                [SELECT Status__c FROM Volunteer_Signup__c LIMIT 1].Status__c,
+                'Nobody was changed.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aReadOnlyUserCannotCloseAShift() {
+        VolunteerShiftSignupsController.Panel panel;
+        Boolean refused = false;
+
+        Test.startTest();
+        System.runAs(user(READER)) {
+            panel = VolunteerShiftSignupsController.getPanel(shiftId());
+            try {
+                VolunteerShiftSignupsController.closeShift(shiftId(), true);
+            } catch (AuraHandledException denied) {
+                refused = true;
+            }
+        }
+        Test.stopTest();
+
+        Assert.isFalse(panel.canClose, 'No Close Shift button for Read Only.');
+        Assert.isTrue(refused, 'A crafted call is refused.');
     }
 }

@@ -46,8 +46,10 @@ Needs **Manage Volunteers**.
 1. Click the **Approve Hours** tab.
 2. Leave **Show** on **Submitted** to see the entries waiting. To narrow the list, choose a
    **Job**, or set **From** and **To** (dates worked).
-3. Tick the entries to approve, or tick the box in the heading row to select the whole page.
-4. Click **Approve**.
+3. Check odd entries first: the **Notes** column shows what the person wrote (point at a long
+   note to read it all), and clicking a person's name opens the entry itself.
+4. Tick the entries to approve, or tick the box in the heading row to select the whole page.
+5. Click **Approve**.
 
 You should see: "Entries approved: 3." (with your number), and the entries gone from the
 Submitted list. They count in totals from now on, and record you in **Reviewed By** and the time
@@ -128,7 +130,8 @@ Needs **Manage Volunteers**.
 1. Open the person in the **BarnCRM Volunteers** app.
 2. Click **Volunteer Letter** in the actions at the top of the record.
 3. Choose the **Template** (an hours letter or a certificate).
-4. Check **From** and **To**. They start at 1 January this year and today.
+4. Choose the **Period**: **This Year** (1 January to today, the default), **Last Year** (the
+   whole year before), or **Custom** to type **From** and **To** dates.
 5. Click **Preview** to read the letter, then **Generate**.
 
 You should see: "The letter is saved as a PDF in this person's Files." The letter counts only

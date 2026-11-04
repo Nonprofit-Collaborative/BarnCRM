@@ -280,7 +280,10 @@ private class VolunteerLetterBatchTest {
         );
         Assert.isTrue(body.contains('2 letters made, 1 skipped, 1 failed.'), body);
         Assert.isTrue(body.contains(Label.Volunteers_Letter_NoHours), body);
-        Assert.isTrue(body.contains(Label.Volunteers_JobNotice_LettersFailed), body);
+        Assert.isTrue(
+            body.contains(BarnHelp.text('Volunteers', 'Volunteers_JobNotice_LettersFailed')),
+            body
+        );
         Assert.areEqual(
             1,
             [
