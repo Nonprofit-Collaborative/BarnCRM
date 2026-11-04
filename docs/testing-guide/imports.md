@@ -525,3 +525,19 @@ ana.rowe@example.org,Rivergate Library,Volunteer,true,2026-03-01
 | 4 | Import the file. On **Results**, select **See Every Row**. | The data job's **Import Rows** list opens with one row per file row, including the rejected one. The **Import Rows** tab is not in the BarnCRM Admin app's navigation bar. |
 
 **Cleanup:** undo the import from **Recent Imports** (see T-IMP-03).
+
+## T-IMP-25: Search the Field Picker and Drag a Suggested Field
+
+**Purpose:** confirm the searchable field picker and the draggable suggestions, by mouse, keyboard and phone.
+**Prerequisites:** admin; a CSV with headings `Email`, `Nickname`, `Favorite Color` and one row.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Upload the file with **People and Organizations**. On **Check Columns**, select the picker beside **Email** and type `second`. | The list narrows to fields with **Second person**; **Do not load** stays at the top; a screen reader hears how many fields match. |
+| 2 | Clear the text, press the Down arrow, then Enter on a field. | The field is chosen and the list closes. The same field in another column's list is marked **In use**. |
+| 3 | Set **Nickname** to **Do not load**. Look beside the table. | **Suggested Fields** lists fields that look like the unmatched headings. **Favorite Color** adds none. |
+| 4 | Drag a suggested field onto the **Nickname** row. | The row shows a dashed outline while you drag; on drop the picker reads that field and the suggestion leaves the list. |
+| 5 | Press Space on another suggestion, press Right until a column is named, press Space. | A screen reader hears the pick up, each column, then the drop; the column is mapped. Escape instead cancels. |
+| 6 | On a phone, press and hold a suggestion, then drag it onto a column. | It maps after the hold; a quick swipe scrolls instead. |
+
+**Cleanup:** leave the page without importing.

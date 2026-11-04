@@ -309,7 +309,8 @@
                             ></lightning-button>
                         </div>
                     </template>
-                    <div>
+                    <div class="slds-grid slds-wrap slds-gutters_x-small">
+                        <div class={columnsTableClass}>
                         <table
                             class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
                             aria-label={labels.stepColumns}
@@ -324,17 +325,25 @@
                             </thead>
                             <tbody>
                                 <template for:each={columnRows} for:item="column">
-                                    <tr key={column.key} data-id="column-row">
+                                    <tr
+                                        key={column.key}
+                                        class={column.rowClass}
+                                        data-id="column-row"
+                                        data-drop-zone={column.dropZone}
+                                        data-drop-label={column.dropLabel}
+                                    >
                                         <td data-label={labels.columnHeader}>{column.source}</td>
                                         <td data-label={labels.targetHeader}>
-                                            <lightning-combobox
-                                                label={labels.targetHeader}
-                                                variant="label-hidden"
+                                            <c-import-field-picker
+                                                label={column.pickerLabel}
+                                                data-id="target"
                                                 data-source={column.source}
                                                 value={column.target}
                                                 options={targetOptions}
+                                                pinned-value={ignoreValue}
+                                                used-values={usedTargets}
                                                 onchange={handleTargetChange}
-                                            ></lightning-combobox>
+                                            ></c-import-field-picker>
                                             <template lwc:if={column.guessed}>
                                                 <div class="slds-var-m-top_xx-small" data-id="guess">
                                                     <span
@@ -395,6 +404,43 @@
                                 </template>
                             </tbody>
                         </table>
+                        </div>
+                        <template lwc:if={hasSuggestions}>
+                            <div
+                                class="slds-col slds-size_1-of-1 slds-large-size_3-of-12 slds-var-m-top_small"
+                                data-id="suggestions"
+                            >
+                                <h3 class="slds-text-heading_small">{labels.suggestedHeading}</h3>
+                                <p class="slds-text-body_small slds-text-color_weak" id="drag-help">
+                                    {suggestedHint}
+                                </p>
+                                <div
+                                    class="slds-var-m-top_x-small"
+                                    data-drop-zone="suggestions"
+                                    data-drop-label={labels.suggestedHeading}
+                                >
+                                    <template for:each={suggestedFields} for:item="field">
+                                        <div
+                                            key={field.value}
+                                            class={field.chipClass}
+                                            role="button"
+                                            tabindex="0"
+                                            aria-describedby="drag-help"
+                                            data-id="suggested-field"
+                                            data-drag-id={field.value}
+                                            data-drag-label={field.label}
+                                            onpointerdown={handleSuggestionPointerDown}
+                                            onkeydown={handleSuggestionKey}
+                                        >
+                                            {field.label}
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <div class="slds-assistive-text" aria-live="polite" data-id="drag-live">
+                            {liveText}
+                        </div>
                     </div>
                     <template lwc:if={editingColumn}>
                         <c-import-column-transforms

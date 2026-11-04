@@ -131,7 +131,15 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    across the chosen sheets.
 3. Check the columns. Each column shows what BarnCRM thinks it is, for example
    "Email" for a column headed `Email Address`. Change anything that is wrong from the
-   picker beside it. A column you do not want loaded is set to **Do not load**, and its
+   picker beside it: select it and type part of a field's name to search (an object such as
+   Contact has over 100 fields). **Do not load** stays at the top of the list, fields are
+   grouped under **Person**, **Second person** and **Organization** for a people file, and a
+   field another column already loads into is marked **In use**. The Down arrow moves into
+   the list, Enter chooses, Escape closes. When columns are still on **Do not load**, a
+   **Suggested Fields** list beside the table shows fields that look like their headings:
+   drag one onto a column to map it (press and hold on a phone; with the keyboard press Space
+   on a field, the Left and Right arrows pick a column, Space again drops). The picker does the
+   same job without dragging. A column you do not want loaded is set to **Do not load**, and its
    values are kept on the staged row but written nowhere. A column only a module could
    load (an amount or a date, for example) is offered only when that module is installed;
    without it, BarnCRM suggests **Do not load** for it. The template remembers your

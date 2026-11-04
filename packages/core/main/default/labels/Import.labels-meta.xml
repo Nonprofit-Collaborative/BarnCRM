@@ -401,6 +401,14 @@
         <value>Row {0} of the file is too long to import (over 32,768 characters), usually from an unclosed quotation mark. Fix the row in your spreadsheet and upload the file again.</value>
     </labels>
     <labels>
+        <fullName>Core_Import_SuggestedFields</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import columns step: heading of the fields suggested for columns not yet matched</shortDescription>
+        <value>Suggested Fields</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_SeeEveryRow</fullName>
         <categories>Import</categories>
         <language>en_US</language>

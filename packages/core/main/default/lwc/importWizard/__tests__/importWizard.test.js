@@ -855,7 +855,9 @@ describe('the import wizard', () => {
     click(element, 'next');
     await flush();
     await chooseFile(element);
-    const picker = element.shadowRoot.querySelectorAll('[data-id="column-row"] lightning-combobox');
+    const picker = element.shadowRoot.querySelectorAll(
+      '[data-id="column-row"] c-import-field-picker'
+    );
     picker[2].dispatchEvent(new CustomEvent('change', { detail: { value: 'Contact1.Phone' } }));
     await flush();
     click(element, 'next');
@@ -967,7 +969,7 @@ describe('the import wizard', () => {
     click(element, 'next');
     await flush();
     await chooseFile(element);
-    const picker = element.shadowRoot.querySelector('[data-id="column-row"] lightning-combobox');
+    const picker = element.shadowRoot.querySelector('[data-id="column-row"] c-import-field-picker');
     expect(picker.options).toEqual(
       expect.arrayContaining([
         { value: 'Contact1.LastName', label: 'Person: last name' },
@@ -1056,7 +1058,7 @@ describe('the import wizard', () => {
     click(element, 'next');
     await flush();
     await chooseFile(element);
-    const picker = element.shadowRoot.querySelector('[data-id="column-row"] lightning-combobox');
+    const picker = element.shadowRoot.querySelector('[data-id="column-row"] c-import-field-picker');
     const labels = picker.options.map((option) => option.label);
     expect(labels).toContain('Gift: amount');
     expect(labels).not.toContain('Gift: amount (kept with the row, not loaded yet)');
@@ -1085,7 +1087,7 @@ describe('the import wizard', () => {
     await flush();
     await chooseFile(element);
     const pickers = element.shadowRoot.querySelectorAll(
-      '[data-id="column-row"] lightning-combobox'
+      '[data-id="column-row"] c-import-field-picker'
     );
     const labels = pickers[0].options.map((option) => option.label);
     expect(labels.some((label) => label.startsWith('Gift'))).toBe(false);
@@ -1191,7 +1193,7 @@ describe('the import wizard', () => {
     click(element, 'next');
     await flush();
     await chooseFile(element);
-    const picker = element.shadowRoot.querySelector('[data-id="column-row"] lightning-combobox');
+    const picker = element.shadowRoot.querySelector('[data-id="column-row"] c-import-field-picker');
     const values = picker.options.map((option) => option.value);
     expect(values).toEqual(
       expect.arrayContaining([
@@ -1220,7 +1222,7 @@ describe('the import wizard', () => {
     click(element, 'next');
     await flush();
     await chooseFile(element);
-    const picker = element.shadowRoot.querySelector('[data-id="column-row"] lightning-combobox');
+    const picker = element.shadowRoot.querySelector('[data-id="column-row"] c-import-field-picker');
     const values = picker.options.map((option) => option.value);
     expect(values).toEqual(
       expect.arrayContaining([
@@ -1879,7 +1881,7 @@ describe('the import wizard', () => {
       expect(rows(element)[1].querySelector('[data-id="guess"]')).toBeNull();
       expect(element.shadowRoot.querySelector('[data-id="guess-pending"]')).toBeNull();
       expect(nextDisabled(element)).toBe(false);
-      expect(rows(element)[1].querySelector('lightning-combobox').value).toBe('Contact1.Email');
+      expect(rows(element)[1].querySelector('c-import-field-picker').value).toBe('Contact1.Email');
     });
 
     it('accepts every guess at once, and never sends the flag with the mapping', async () => {
@@ -1898,7 +1900,7 @@ describe('the import wizard', () => {
 
     it('treats choosing another field as checking the guess', async () => {
       const element = await toColumns();
-      const picker = rows(element)[1].querySelector('lightning-combobox');
+      const picker = rows(element)[1].querySelector('c-import-field-picker');
       picker.dispatchEvent(new CustomEvent('change', { detail: { value: 'Ignore' } }));
       await flush();
       expect(rows(element)[1].querySelector('[data-id="guess"]')).toBeNull();
@@ -2265,10 +2267,10 @@ describe('the import wizard loading one object', () => {
     const element = await toColumnsStep();
     expect(getObjectFields).toHaveBeenCalledWith({ templateId: 'a05' });
     const pickers = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
-    const values = pickers[0].querySelector('lightning-combobox').options.map((o) => o.value);
+    const values = pickers[0].querySelector('c-import-field-picker').options.map((o) => o.value);
     expect(values).toEqual(['Ignore', 'Record.Id', 'Record.Session_Key__c', 'Record.Program__c']);
     // A suggestion outside the object is not shown as chosen.
-    expect(pickers[2].querySelector('lightning-combobox').value).toBe('Ignore');
+    expect(pickers[2].querySelector('c-import-field-picker').value).toBe('Ignore');
     const lookups = element.shadowRoot.querySelectorAll('[data-id="lookup-field"]');
     expect(lookups).toHaveLength(1);
     expect(lookups[0].value).toBe('Name');
@@ -2414,7 +2416,7 @@ describe('the import wizard loading one object', () => {
     await flush();
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
     rows[2]
-      .querySelector('lightning-combobox')
+      .querySelector('c-import-field-picker')
       .dispatchEvent(new CustomEvent('change', { detail: { value: 'Record.Id' } }));
     await flush();
     click(element, 'next');
@@ -2447,7 +2449,7 @@ describe('the import wizard loading one object', () => {
     const element = await toColumnsStep();
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
     rows[2]
-      .querySelector('lightning-combobox')
+      .querySelector('c-import-field-picker')
       .dispatchEvent(new CustomEvent('change', { detail: { value: 'Record.Id' } }));
     await flush();
     click(element, 'next');
@@ -2552,7 +2554,7 @@ describe('the import wizard loading one object', () => {
       related: 'Attendance__c.Session__c'
     });
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
-    const picker = rows[2].querySelector('lightning-combobox');
+    const picker = rows[2].querySelector('c-import-field-picker');
     expect(picker.options.map((o) => o.value)).toContain('Related.Status__c');
     picker.dispatchEvent(new CustomEvent('change', { detail: { value: 'Related.Status__c' } }));
     await flush();
@@ -2872,7 +2874,7 @@ describe('the import wizard loading several objects from one upload (R-IT20)', (
       'Program',
       'Room'
     ]);
-    const targets = rows.map((row) => row.querySelector('lightning-combobox').value);
+    const targets = rows.map((row) => row.querySelector('c-import-field-picker').value);
     expect(targets).toEqual([
       'Program__c.Name',
       'Program__c.Code__c',
