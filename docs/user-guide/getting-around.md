@@ -40,7 +40,9 @@ their choice, a **Setup Changes** section that shows who changed what in Setup, 
 an **Access Explorer** section that shows who can see or change what, and why, compares two
 people side by side and lists who holds Modify All Data. Its **Field Use** section also
 shows, for any picklist, how many records hold each value and when they were last changed, and
-its **Unused Setup** section lists Apex and flows on old API versions under **Technical Debt**.
+its **Unused Setup** section lists Apex and flows on old API versions in a closed part titled
+**For Developers: Old Code and Flows**. Org Optimizer lists its sections on the left, like
+BarnCRM Settings; on a phone, choose a section in the **Show** box at the top.
 Each field row in the Data Dictionary, Field Use and the Record Inspector has a **Where
 Used** action, which lists the BarnCRM setup (saved queries, import mappings, rollups and more)
 that uses the field and walks an administrator through retiring it safely. If you import files, the

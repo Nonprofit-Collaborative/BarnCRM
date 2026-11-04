@@ -1,12 +1,10 @@
 # Screens built before the visual standard: path rule count (scripts/ci/check-visual-standard.py).
 # Lower a count, or delete a line, when a screen adopts the kit. Never raise one.
-packages/core/main/default/lwc/aiReadinessExport/aiReadinessExport.html table-stacked 1
 packages/core/main/default/lwc/automationControl/automationControl.html solid-box 2
 packages/core/main/default/lwc/bulkDelete/bulkDelete.html solid-box 3
 packages/core/main/default/lwc/bulkUpdate/bulkUpdate.html solid-box 2
 packages/core/main/default/lwc/bulkUpdate/bulkUpdate.html table-stacked 1
 packages/core/main/default/lwc/dataJobHistory/dataJobHistory.html solid-box 2
-packages/core/main/default/lwc/errorLogTile/errorLogTile.html solid-box 1
 packages/core/main/default/lwc/filterBuilder/filterBuilder.html solid-box 2
 packages/core/main/default/lwc/findRecords/findRecords.html solid-box 2
 packages/core/main/default/lwc/householdMergeSplit/householdMergeSplit.html table-stacked 1
