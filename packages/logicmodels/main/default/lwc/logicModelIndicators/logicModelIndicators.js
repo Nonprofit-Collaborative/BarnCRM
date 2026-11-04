@@ -6,10 +6,16 @@ import getSourceQueries from '@salesforce/apex/LogicModelBuilderController.getSo
 import getSourceFields from '@salesforce/apex/LogicModelBuilderController.getSourceFields';
 import saveSource from '@salesforce/apex/LogicModelBuilderController.saveSource';
 import refreshResults from '@salesforce/apex/LogicModelBuilderController.refreshResults';
+import getModel from '@salesforce/apex/LogicModelBuilderController.getModel';
 
 import { FUNCTIONS, SOURCES, isComputed, progress, sourceReady } from 'c/logicModelRules';
 import { LABELS, format, messageFrom } from 'c/logicModelText';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import BarnConfirmModal from 'c/barnConfirmModal';
+
+/** How often, and how many times, the panel looks for a refresh's results (modules-19). */
+const POLL_MS = 10000;
+const POLL_TRIES = 18;
 
 const HIGHER = 'Higher';
 const EMPTY_INDICATOR = Object.freeze({
@@ -108,6 +114,10 @@ export default class LogicModelIndicators extends LightningElement {
     }
   }
 
+  disconnectedCallback() {
+    this.stopWatching();
+  }
+
   @api model;
   @api elementId;
   @api canEdit = false;
@@ -122,7 +132,13 @@ export default class LogicModelIndicators extends LightningElement {
   periodFormId;
   periodIndicatorId;
   periodDraft = { ...EMPTY_PERIOD };
-  confirmingId;
+  /**
+   * A refresh being watched (modules-19): { id, computedAt, status, tries }, the indicator's
+   * stamp before the refresh. `stalled` once the panel has stopped looking.
+   */
+  watch;
+  stalled = false;
+  pollTimer;
   /** The indicator whose source is being chosen (L-03), or undefined. */
   sourceFormId;
   sourceDraft = { ...EMPTY_SOURCE };
@@ -218,13 +234,16 @@ export default class LogicModelIndicators extends LightningElement {
         status: isComputed(indicator) ? indicator.status : null,
         showRefresh: isComputed(indicator) && this.canRefresh,
         sourceFormOpen: this.sourceFormId === indicator.id,
-        confirming: this.confirmingId === indicator.id,
+        working: this.isWatching(indicator.id) && !this.stalled,
+        stalled: this.isWatching(indicator.id) && this.stalled,
         periodFormOpen: !!this.periodFormId && this.periodIndicatorId === indicator.id,
         hasPeriods: (indicator.periods || []).length > 0,
         periods: (indicator.periods || []).map((period) => {
           const state = progress(indicator, period);
           return {
             ...period,
+            hasProgress: state.state !== 'none',
+            progressValue: state.state === 'none' ? 0 : state.percent,
             progressText:
               state.state === 'met'
                 ? LABELS.met
@@ -301,22 +320,25 @@ export default class LogicModelIndicators extends LightningElement {
     });
   }
 
-  handleDeleteIndicator(event) {
-    this.confirmingId = event.currentTarget.dataset.recordId;
+  /** A delete asked in a platform modal with a red button, as in Core (vis-modules-12). */
+  confirmDelete(message) {
+    return BarnConfirmModal.open({
+      size: 'small',
+      label: LABELS.delete,
+      message,
+      confirmLabel: LABELS.delete,
+      cancelLabel: LABELS.cancel,
+      confirmVariant: 'destructive'
+    });
   }
 
-  handleDeleteCancel() {
-    this.confirmingId = undefined;
-  }
-
-  handleDeleteConfirm() {
-    return this.run(
-      remove({ recordId: this.confirmingId }),
-      () => {
-        this.confirmingId = undefined;
-      },
-      LABELS.deleted
-    );
+  async handleDeleteIndicator(event) {
+    const id = event.currentTarget.dataset.recordId;
+    const confirmed = await this.confirmDelete(LABELS.deleteIndicatorConfirm);
+    if (!confirmed) {
+      return undefined;
+    }
+    return this.run(remove({ recordId: id }), null, LABELS.deleted);
   }
 
   // -------------------------------------------------------------------- sources (L-03)
@@ -388,24 +410,117 @@ export default class LogicModelIndicators extends LightningElement {
 
   handleSourceSave() {
     const source = { ...this.sourceDraft, id: this.sourceFormId };
+    const computed = source.source === SOURCES.COMPUTED;
+    const stamp = this.stampOf(source.id);
     return this.run(
       saveSource({ modelId: this.model.id, sourceJson: JSON.stringify(source) }),
       () => {
         this.sourceFormId = undefined;
+        if (computed) {
+          this.startWatching(source.id, stamp);
+        }
       },
-      source.source === SOURCES.COMPUTED ? LABELS.refreshing : LABELS.saved
+      computed ? LABELS.refreshing : LABELS.saved
     );
   }
 
   handleRefresh(event) {
+    const indicatorId = event.currentTarget.dataset.recordId;
+    const stamp = this.stampOf(indicatorId);
     return this.run(
-      refreshResults({
-        modelId: this.model.id,
-        indicatorId: event.currentTarget.dataset.recordId
-      }),
-      null,
+      refreshResults({ modelId: this.model.id, indicatorId }),
+      () => this.startWatching(indicatorId, stamp),
       LABELS.refreshing
     );
+  }
+
+  // ----------------------------------------------------- watching a refresh (modules-19)
+
+  /** What a refresh changes: when the results were worked out and what stopped them. */
+  stampOf(indicatorId) {
+    const indicator = ((this.model && this.model.indicators) || []).find(
+      (item) => item.id === indicatorId
+    );
+    return {
+      computedAt: indicator ? indicator.computedAt || null : null,
+      status: indicator ? indicator.status || null : null
+    };
+  }
+
+  isWatching(indicatorId) {
+    return !!this.watch && this.watch.id === indicatorId;
+  }
+
+  startWatching(indicatorId, stamp) {
+    this.stopWatching();
+    this.watch = { id: indicatorId, ...stamp, tries: 0 };
+    this.stalled = false;
+    this.schedulePoll();
+  }
+
+  stopWatching() {
+    if (this.pollTimer) {
+      clearTimeout(this.pollTimer);
+      this.pollTimer = undefined;
+    }
+  }
+
+  schedulePoll() {
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    this.pollTimer = setTimeout(() => {
+      this.pollTimer = undefined;
+      this.poll();
+    }, POLL_MS);
+  }
+
+  /**
+   * Reads the model again: when the indicator's stamp has changed, the panel shows the new
+   * results and says so; otherwise it looks again, and after POLL_TRIES offers Check Again.
+   */
+  poll() {
+    const watch = this.watch;
+    if (!watch) {
+      return Promise.resolve();
+    }
+    return getModel({ modelId: this.model.id })
+      .then((model) => {
+        if (this.watch !== watch) {
+          return;
+        }
+        const indicator = ((model && model.indicators) || []).find((item) => item.id === watch.id);
+        const computedAt = indicator ? indicator.computedAt || null : null;
+        const status = indicator ? indicator.status || null : null;
+        if (!indicator || computedAt !== watch.computedAt || status !== watch.status) {
+          this.watch = undefined;
+          this.stalled = false;
+          this.dispatchEvent(
+            new CustomEvent('modelchange', {
+              detail: { model, message: status || LABELS.resultsWorkedOut }
+            })
+          );
+          return;
+        }
+        watch.tries += 1;
+        if (watch.tries >= POLL_TRIES) {
+          this.stalled = true;
+        } else {
+          this.schedulePoll();
+        }
+      })
+      .catch((error) => {
+        this.watch = undefined;
+        this.fail(error);
+      });
+  }
+
+  /** Check Again: one more look now, then the usual watching. */
+  handleCheckAgain() {
+    if (!this.watch) {
+      return Promise.resolve();
+    }
+    this.stalled = false;
+    this.watch = { ...this.watch, tries: 0 };
+    return this.poll();
   }
 
   fail(error) {
@@ -458,12 +573,18 @@ export default class LogicModelIndicators extends LightningElement {
     });
   }
 
-  handleDeletePeriod(event) {
-    return this.run(
-      remove({ recordId: event.currentTarget.dataset.recordId }),
-      null,
-      LABELS.deleted
+  async handleDeletePeriod(event) {
+    const id = event.currentTarget.dataset.recordId;
+    const period = ((this.model && this.model.indicators) || [])
+      .flatMap((item) => item.periods || [])
+      .find((item) => item.id === id);
+    const confirmed = await this.confirmDelete(
+      format(LABELS.deletePeriodConfirm, period ? period.name : '')
     );
+    if (!confirmed) {
+      return undefined;
+    }
+    return this.run(remove({ recordId: id }), null, LABELS.deleted);
   }
 
   // ---------------------------------------------------------------------------- saving

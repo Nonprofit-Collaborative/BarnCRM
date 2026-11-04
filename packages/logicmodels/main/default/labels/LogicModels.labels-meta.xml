@@ -89,14 +89,6 @@
         <value>Things to Look At</value>
     </labels>
     <labels>
-        <fullName>LogicModels_Builder_LookAtNone</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>No findings</shortDescription>
-        <value>Nothing to look at: every part is linked and every outcome is measured.</value>
-    </labels>
-    <labels>
         <fullName>LogicModels_Builder_FindingEmptyStage</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>
@@ -145,12 +137,12 @@
         <value>Deleted.</value>
     </labels>
     <labels>
-        <fullName>LogicModels_Builder_ActionFailed</fullName>
+        <fullName>LogicModels_Builder_BackToModel</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Generic failure</shortDescription>
-        <value>The logic model could not be saved. The details are in the Error Log.</value>
+        <shortDescription>Link from a part's details back to the columns</shortDescription>
+        <value>Back to the Model</value>
     </labels>
     <labels>
         <fullName>LogicModels_Builder_NotFound</fullName>
@@ -303,14 +295,6 @@
         <protected>true</protected>
         <shortDescription>No arrows in a list</shortDescription>
         <value>No arrows.</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Part_NoTargets</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>No later part to link to</shortDescription>
-        <value>No later part to link to yet. Add one in a column to the right.</value>
     </labels>
     <labels>
         <fullName>LogicModels_Part_NoAssumption</fullName>
@@ -561,14 +545,6 @@
         <value>Only a computed indicator's results can be refreshed.</value>
     </labels>
     <labels>
-        <fullName>LogicModels_Source_RefreshFailed</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Refresh failed</shortDescription>
-        <value>The results couldn't be worked out. The Error Log has the details.</value>
-    </labels>
-    <labels>
         <fullName>LogicModels_Source_TooManyUnique</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>
@@ -721,14 +697,6 @@
         <value>Refresh Results</value>
     </labels>
     <labels>
-        <fullName>LogicModels_Source_Refreshing</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Refresh started</shortDescription>
-        <value>Working out the results. They appear in a few minutes: reload the page to see them.</value>
-    </labels>
-    <labels>
         <fullName>LogicModels_Source_ResultComputed</fullName>
         <categories>LogicModels</categories>
         <language>en_US</language>
@@ -791,22 +759,6 @@
         <protected>true</protected>
         <shortDescription>Period chooser label</shortDescription>
         <value>Periods to Compare</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Report_NoPeriods</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>No periods to compare</shortDescription>
-        <value>No indicator has a period yet. Add periods to compare them here.</value>
-    </labels>
-    <labels>
-        <fullName>LogicModels_Report_NoIndicators</fullName>
-        <categories>LogicModels</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>No indicators to report</shortDescription>
-        <value>This model has no indicators yet. Add them to outputs and outcomes in the builder.</value>
     </labels>
     <labels>
         <fullName>LogicModels_Report_ChooseOne</fullName>

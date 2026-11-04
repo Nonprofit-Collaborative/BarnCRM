@@ -7,6 +7,16 @@ import getSourceQueries from '@salesforce/apex/LogicModelBuilderController.getSo
 import getSourceFields from '@salesforce/apex/LogicModelBuilderController.getSourceFields';
 import saveSource from '@salesforce/apex/LogicModelBuilderController.saveSource';
 import refreshResults from '@salesforce/apex/LogicModelBuilderController.refreshResults';
+import getModel from '@salesforce/apex/LogicModelBuilderController.getModel';
+import BarnConfirmModal from 'c/barnConfirmModal';
+
+// The component looks every ten seconds, eighteen times (three minutes).
+const POLL_MS = 10000;
+const POLL_TRIES = 18;
+
+jest.mock('@salesforce/apex/LogicModelBuilderController.getModel', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 
 jest.mock(
   '@salesforce/apex/LogicModelBuilderController.saveIndicator',
@@ -131,10 +141,11 @@ describe('c-logic-model-indicators', () => {
   it("lists the part's indicators with progress per period", async () => {
     const { element } = await render();
     expect(qa(element, 'indicator')).toHaveLength(1);
-    expect(Array.from(qa(element, 'progress')).map((cell) => cell.textContent)).toEqual([
-      '50%',
-      'Met'
-    ]);
+    const meters = Array.from(qa(element, 'progress')).map((cell) =>
+      cell.querySelector('c-barn-meter')
+    );
+    expect(meters.map((meter) => meter.valueText)).toEqual(['50%', 'Met']);
+    expect(meters.map((meter) => meter.value)).toEqual([50, 100]);
   });
 
   it('adds an indicator to the part', async () => {
@@ -202,17 +213,25 @@ describe('c-logic-model-indicators', () => {
       id: 'p2',
       resultValue: 40
     });
+    BarnConfirmModal.open.mockResolvedValue(true);
     qa(element, 'period-delete')[0].click();
     await flush();
+    expect(BarnConfirmModal.open.mock.calls[0][0]).toMatchObject({
+      confirmVariant: 'destructive',
+      message: 'c.LogicModels_Period_DeleteConfirm'
+    });
     expect(remove).toHaveBeenCalledWith({ recordId: 'p1' });
   });
 
-  it('deletes an indicator after a confirm', async () => {
+  it('deletes an indicator after a confirm in a modal, and not without one', async () => {
     const { element, changes } = await render();
     remove.mockResolvedValue(MODEL);
+    BarnConfirmModal.open.mockResolvedValue(false);
     q(element, 'indicator-delete').click();
     await flush();
-    q(element, 'indicator-delete-confirm-button').click();
+    expect(remove).not.toHaveBeenCalled();
+    BarnConfirmModal.open.mockResolvedValue(true);
+    q(element, 'indicator-delete').click();
     await flush();
     expect(remove).toHaveBeenCalledWith({ recordId: 'i1' });
     expect(changes).toHaveBeenCalledTimes(1);
@@ -282,7 +301,8 @@ describe('c-logic-model-indicators', () => {
         indicators: [{ ...COMPUTED.indicators[0], status: 'The saved query is gone.' }]
       };
       const { element } = await renderComputed(broken);
-      expect(q(element, 'source-status').textContent.trim()).toBe('The saved query is gone.');
+      expect(q(element, 'source-status').message).toBe('The saved query is gone.');
+      expect(q(element, 'source-status').variant).toBe('error');
       expect(q(element, 'source-run')).toBeNull();
     });
 
@@ -292,7 +312,85 @@ describe('c-logic-model-indicators', () => {
       q(element, 'indicator-refresh').click();
       await flush();
       expect(refreshResults).toHaveBeenCalledWith({ modelId: 'm1', indicatorId: 'i1' });
-      expect(changes.mock.calls[0][0].detail.message).toBe('c.LogicModels_Source_Refreshing');
+      expect(changes.mock.calls[0][0].detail.message).toBe('c.LogicModels_Source_Working');
+      expect(q(element, 'source-working').message).toBe('c.LogicModels_Source_Working');
+    });
+
+    describe('watching a refresh (modules-19)', () => {
+      beforeEach(() => {
+        jest.useFakeTimers();
+      });
+      afterEach(() => {
+        jest.useRealTimers();
+      });
+
+      const settle = async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+        await Promise.resolve();
+      };
+
+      async function startRefresh() {
+        const element = createElement('c-logic-model-indicators', {
+          is: LogicModelIndicators
+        });
+        element.model = COMPUTED;
+        element.elementId = 'c1';
+        element.canEdit = true;
+        element.canDelete = true;
+        const changes = jest.fn();
+        element.addEventListener('modelchange', changes);
+        document.body.appendChild(element);
+        await settle();
+        refreshResults.mockResolvedValue(COMPUTED);
+        q(element, 'indicator-refresh').click();
+        await settle();
+        return { element, changes };
+      }
+
+      it('shows the new results once the last-computed stamp changes', async () => {
+        const { element, changes } = await startRefresh();
+        const done = {
+          ...COMPUTED,
+          indicators: [{ ...COMPUTED.indicators[0], computedAt: '2026-11-04T10:00:00.000Z' }]
+        };
+        getModel.mockResolvedValueOnce(COMPUTED).mockResolvedValueOnce(done);
+        jest.advanceTimersByTime(POLL_MS);
+        await settle();
+        expect(getModel).toHaveBeenCalledTimes(1);
+        expect(changes).toHaveBeenCalledTimes(1);
+        jest.advanceTimersByTime(POLL_MS);
+        await settle();
+        expect(getModel).toHaveBeenCalledTimes(2);
+        expect(changes).toHaveBeenCalledTimes(2);
+        expect(changes.mock.calls[1][0].detail).toEqual({
+          model: done,
+          message: 'c.LogicModels_Source_WorkedOut'
+        });
+        await settle();
+        expect(q(element, 'source-working')).toBeNull();
+      });
+
+      it('offers Check Again when the results take longer', async () => {
+        const { element, changes } = await startRefresh();
+        getModel.mockResolvedValue(COMPUTED);
+        for (let i = 0; i < POLL_TRIES; i += 1) {
+          jest.advanceTimersByTime(POLL_MS);
+          // eslint-disable-next-line no-await-in-loop
+          await settle();
+        }
+        expect(getModel).toHaveBeenCalledTimes(POLL_TRIES);
+        const stalled = q(element, 'source-stalled');
+        expect(stalled.actionLabel).toBe('c.Core_SuiteChoice_CheckAgain');
+        const failed = {
+          ...COMPUTED,
+          indicators: [{ ...COMPUTED.indicators[0], status: 'Too many values.' }]
+        };
+        getModel.mockResolvedValue(failed);
+        stalled.dispatchEvent(new CustomEvent('action'));
+        await settle();
+        expect(changes.mock.calls[1][0].detail.message).toBe('Too many values.');
+      });
     });
 
     it('chooses a saved query, a date field and a sum, then saves', async () => {

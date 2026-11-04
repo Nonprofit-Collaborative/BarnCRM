@@ -18,12 +18,14 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Logic Models** app, **Logic Models** tab, **New**. Name `Reading Program Model`, save. | The record page shows the **Logic Model Builder** panel. **For** shows `The whole organization`. Seven columns each say `Nothing here yet.` |
+| 1 | Open the **BarnCRM Logic Models** app, **Logic Models** tab, **New**. Name `Reading Program Model`, save. | The record page shows the **Logic Model Builder** panel. **For** shows `The whole organization`. Seven columns run left to right with a chevron between each; each heading has a `0` count and says `Nothing here yet.` |
 | 2 | Click **Add to Inputs**, type `Two tutors`, **Save**. | `Two tutors` is under **Inputs**. |
 | 3 | Add `Weekly sessions` to **Activities**, `Sessions held` to **Outputs**, `Reads at home` to **Short Term Outcomes**, `Reads at grade level` to **Impact**. Add `Books` to **Inputs**. | Each part is in its column; `Books` is under `Two tutors`. |
 | 4 | Click `Books`, then **Move Up**. | `Books` is above `Two tutors`. **Move Up** is disabled. |
 | 5 | Click **Edit**, change **Column** to **Activities**, **Save**. | `Books` is under **Activities**. |
 | 6 | Reload the page. | Everything is as you left it. |
+| 7 | Click `Books`. | The page scrolls to its details and focus is on the `Selected Part` heading. |
+| 8 | Click **Back to the Model** at the top of the details. | Focus returns to the `Books` tile in its column. |
 
 **Cleanup:** None (T-LM-02 and T-LM-03 use this model).
 
@@ -40,8 +42,9 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 | 4 | Click **Add Arrow** again on `Two tutors`. | `Weekly sessions` is no longer offered. |
 | 5 | Click **Edit** beside the arrow, change the assumption, **Save**. | The new assumption shows. |
 | 6 | Link `Weekly sessions` to `Sessions held`, `Sessions held` to `Reads at home`, `Reads at home` to `Reads at grade level`. | Those parts drop out of the no-arrow findings. |
+| 6b | Click `Sessions held`. | `Weekly sessions` and `Reads at home` have a blue border; the other parts are dimmed. |
 | 6a | Click `Weekly sessions`, **Edit**, change **Column** to **Inputs**, **Save**. | Refused before saving: the message names the arrow `Two tutors to Weekly sessions` and says to delete those arrows first or pick a column that keeps every arrow forward. The part stays in **Activities**. |
-| 7 | Click `Books`, **Delete**, then confirm. | `Books` is gone; the status says `Deleted.` |
+| 7 | Click `Books`, **Delete**. Press **Cancel** in the dialog, then **Delete** again and confirm with the red **Delete**. | Cancel keeps `Books`. After confirming, `Books` is gone; the status says `Deleted.` |
 
 **Cleanup:** None.
 
@@ -54,8 +57,8 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 |---|---|---|
 | 1 | Click `Weekly sessions` (an activity). | No **Indicators** section shows. |
 | 2 | Click `Reads at home`. Click **Add Indicator**: name `Students reading daily`, unit `students`, baseline `10`, **Save**. | The indicator shows `Unit: students. Better when Higher. Baseline: 10.` `Reads at home has no indicator.` leaves **Things to Look At**. |
-| 3 | Under it click **Add Period**: `2026 Q1`, 1 January 2026 to 31 March 2026, target `30`, result `20`. **Save**. | **Progress** shows `50%`. |
-| 4 | Click **Edit** on the row, change the result to `30`, **Save**. | **Progress** shows `Met`. |
+| 3 | Under it click **Add Period**: `2026 Q1`, 1 January 2026 to 31 March 2026, target `30`, result `20`. **Save**. | **Progress** shows a half bar with `50%`. Target and result are right-aligned. |
+| 4 | Click **Edit** on the row, change the result to `30`, **Save**. | **Progress** shows a full bar with `Met`. |
 | 5 | Add another period with the same dates. | Refused: `This indicator already has a period with these dates. Change that row instead.` |
 | 6 | Add a period with an end date before its start date. | The save is refused with the end date message. |
 | 7 | Click **Edit** on `Reads at home` and open **Column**. | Only output and outcome columns are offered. |
@@ -99,7 +102,7 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 |---|---|---|
 | 1 | Tab through the builder. | Every part and button is reached in reading order, with a visible focus ring. A selected part is announced as pressed. |
 | 2 | Press Enter on a part, then save a change. | Focus moves to the status message, which a screen reader reads as `Saved.` |
-| 3 | Open the model in the Salesforce mobile app, or narrow the browser to phone width. | The columns stack, one above another, with no sideways scrolling. |
+| 3 | Open the model in the Salesforce mobile app, or narrow the browser to phone width. | The columns stack, one above another, with a downward chevron between them and no sideways scrolling. Select an output with periods: each period row is stacked, one labelled value per line. |
 
 **Cleanup:** None.
 
@@ -127,13 +130,13 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 |---|---|---|
 | 1 | As admin, in **Find**, query **Contacts** with no filter and save it as `All people`. | Saved. |
 | 2 | On `Sessions held` add the indicator `People in our records`. Add a period `This year` from 1 January to 31 December of this year, and `Next year` for next year. | Two rows; no results. |
-| 3 | Click **Source**, choose **Computed**, **Saved Query** `All people`, **Date Field** `Created Date`, **Work Out** `Count`, **Save**. | Status `Working out the results. They appear in a few minutes: reload the page to see them.` The line reads `Results: computed from All people, count of records by Created Date.` |
-| 4 | Wait two minutes and reload. | `This year` shows the number of contacts created this year; `Next year` stays blank. The line under the indicator says when it was last worked out. |
+| 3 | Click **Source**, choose **Computed**, **Saved Query** `All people`, **Date Field** `Created Date`, **Work Out** `Count`, **Save**. | The indicator shows `Working out results. This takes a few minutes; this panel updates when it is done.` The line reads `Results: computed from All people, count of records by Created Date.` |
+| 4 | Wait, without reloading. | Within a few minutes the notice goes and `This year` shows the number of contacts created this year; `Next year` stays blank. The line under the indicator says when it was last worked out. (If it takes over three minutes, the notice offers **Check Again**.) |
 | 5 | Click **Edit** on `This year`. | **Result** is disabled, with help saying it is worked out from the source. Change the target and save: the result does not change. |
-| 6 | Click **Source**, change **Work Out** to **Count Unique** with **Field** `Account ID`, save, wait and reload. | `This year` shows how many different accounts the new contacts belong to. |
+| 6 | Click **Source**, change **Work Out** to **Count Unique** with **Field** `Account ID`, save and wait. | `This year` shows how many different accounts the new contacts belong to. |
 | 7 | Choose **Sum** with **Date Field** `Created Date`: open **Field**. | Only number fields are offered. Cancel. |
 | 8 | As staff (Program Staff role, no Find access), open the model. | The indicator line reads `computed from a saved query`; there is no **Source** button; **Refresh Results** is there and works. |
-| 9 | As admin, delete `All people` in **Find**, then click **Refresh Results** and reload after a minute. | The indicator shows in red that the saved query can't be found; the results are unchanged. |
+| 9 | As admin, delete `All people` in **Find**, then click **Refresh Results** and wait. | The indicator shows a red notice that the saved query can't be found; the results are unchanged. |
 | 10 | In **Health Check**, look at nightly jobs. | `Indicator Results, 3:30 AM` is listed; **Schedule all nightly jobs** schedules it. |
 
 **Cleanup:** Delete `People in our records`.

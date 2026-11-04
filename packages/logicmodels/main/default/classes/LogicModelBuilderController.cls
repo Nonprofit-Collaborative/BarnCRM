@@ -215,15 +215,21 @@ public with sharing class LogicModelBuilderController {
     private static Map<String, Object> parse(String payload) {
         Object value = String.isBlank(payload) ? null : JSON.deserializeUntyped(payload);
         if (!(value instanceof Map<String, Object>)) {
-            throw new LogicModelService.BuilderException(Label.LogicModels_Builder_ActionFailed);
+            throw new LogicModelService.BuilderException(actionFailed());
         }
         return (Map<String, Object>) value;
+    }
+
+    /** The generic failure: what did not happen, then what to do (help catalog, a message). */
+    @TestVisible
+    private static String actionFailed() {
+        return BarnHelp.text('LogicModels', 'LogicModels_Builder_ActionFailed');
     }
 
     /** The message the panel shows: a refused save's own words, or the generic one. */
     @TestVisible
     private static AuraHandledException handled(Exception e) {
-        String message = Label.LogicModels_Builder_ActionFailed;
+        String message = actionFailed();
         if (e instanceof DmlException) {
             message = ((DmlException) e).getDmlMessage(0);
         } else if (e instanceof LogicModelService.BuilderException) {

@@ -1,8 +1,19 @@
 {
   "languages": ["en"],
   "texts": {
+    "LogicModels_Builder_ActionFailed": "The logic model was not saved. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "LogicModels_Builder_LookAtNone": "Nothing to look at: every part is linked and every outcome is measured.",
     "LogicModels_Builder_SelectHint": "Select a part to change it, link it or measure it.",
+    "LogicModels_Part_NoTargets": "No later part to link to yet. Add one in a column to the right.",
+    "LogicModels_Part_RemoveArrowConfirm": "Remove the arrow from {0} to {1}? Its assumption is deleted too.",
+    "LogicModels_Period_DeleteConfirm": "Delete the period {0} with its target and result?",
+    "LogicModels_Report_NoIndicators": "This model has no indicators yet. Add them to outputs and outcomes in the builder.",
+    "LogicModels_Report_NoPeriods": "No indicator has a period yet. Add periods to compare them here.",
     "LogicModels_Report_PrintHelp": "Open the printable report in your browser to print it or save it as a PDF.",
-    "LogicModels_Source_QueryHelp": "Build and save the query in Find. Leave dates out of it: each period adds its own."
+    "LogicModels_Source_QueryHelp": "Build and save the query in Find. Leave dates out of it: each period adds its own.",
+    "LogicModels_Source_RefreshFailed": "The results were not worked out. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "LogicModels_Source_StillWorking": "The results are still being worked out. Select Check Again in a minute.",
+    "LogicModels_Source_WorkedOut": "The results are worked out.",
+    "LogicModels_Source_Working": "Working out results. This takes a few minutes; this panel updates when it is done."
   }
 }
