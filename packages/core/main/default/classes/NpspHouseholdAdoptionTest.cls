@@ -256,17 +256,24 @@ private class NpspHouseholdAdoptionTest {
 
 			Account smith = accounts(f).get(f.smith.Id);
 			Account was = before.get(f.smith.Id);
-			// A blank record type saves as the user's default where the org has record types.
+			// A blank record type saves as whatever the org gives a blank on update (its default
+			// where it has record types), so a probe account saved the same way says what to expect.
 			Id expectedType = was.RecordTypeId;
-			for (
-				Schema.RecordTypeInfo info : Account.SObjectType.getDescribe(
-						SObjectDescribeOptions.DEFERRED
-					)
-					.getRecordTypeInfos()
-			) {
-				if (expectedType == null && info.isDefaultRecordTypeMapping() && !info.isMaster()) {
-					expectedType = info.getRecordTypeId();
-				}
+			if (expectedType == null) {
+				Account probe = new Account(Name = PREFIX + 'Probe');
+				insert probe;
+				Database.update(
+					new Account(Id = probe.Id, RecordTypeId = null),
+					true,
+					AccessLevel.SYSTEM_MODE
+				);
+				expectedType = [
+					SELECT RecordTypeId
+					FROM Account
+					WHERE Id = :probe.Id
+					WITH SYSTEM_MODE
+				]
+				.RecordTypeId;
 			}
 			Assert.areEqual(expectedType, smith.RecordTypeId, 'record type put back');
 			Assert.areEqual(was.Custom_Name__c, smith.Custom_Name__c, 'custom name put back');
