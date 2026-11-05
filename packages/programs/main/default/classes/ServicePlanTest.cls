@@ -128,7 +128,19 @@ private class ServicePlanTest {
 		Test.stopTest();
 
 		Assert.isTrue((Boolean) plan.get('canEdit'), 'Staff may add and change goals.');
-		Assert.areEqual('Pat Rivera', plan.get('personName'));
+		// The name as the planner may see the person: an org with private contacts hides it.
+		String seen;
+		System.runAs(planner()) {
+			seen = [
+					SELECT Contact__r.Name
+					FROM Enrollment__c
+					WHERE Id = :enrolled.Id
+					WITH USER_MODE
+				]
+				.Contact__r
+				?.Name;
+		}
+		Assert.areEqual(seen, plan.get('personName'));
 		Assert.areEqual('Pantry', plan.get('programName'));
 		Assert.areEqual(1, goalsOf(plan).size(), 'One goal, changed in place.');
 		Map<String, Object> goal = (Map<String, Object>) goalsOf(plan)[0];

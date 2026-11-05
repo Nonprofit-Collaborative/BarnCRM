@@ -534,7 +534,8 @@ private class AccessServiceTest {
 	@IsTest
 	static void aModuleAddOnIsListedAfterCoreAndCanBeGivenAndRemoved() {
 		AccessService.stubbedModuleAddOns = new List<Access_Add_On__mdt>{
-			addOnRow(null, MODULE_SET, 'Core_Access_AddOnBulkUpdate')
+			// Any label the package ships; add-on sentences moved to the help catalog.
+			addOnRow(null, MODULE_SET, 'Core_Section_Connections')
 		};
 		System.runAs(TestUsers.admin()) {
 			User david = insertUser('David', 'Okafor');
@@ -565,7 +566,10 @@ private class AccessServiceTest {
 			AccessService.AddOn moduleAddOn = addOns[addOns.size() - 1];
 			Assert.areEqual(MODULE_SET, moduleAddOn.developerName, 'It should come after Core.');
 			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Access_AddOnBulkUpdate'),
+				System.Label.get(
+					NamespaceUtil.prefix().removeEnd('__'),
+					'Core_Section_Connections'
+				),
 				moduleAddOn.description,
 				'Its sentence should be the label its row names.'
 			);
