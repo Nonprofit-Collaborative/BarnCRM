@@ -606,7 +606,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Nightly jobs: the shift schedule run and when it runs</shortDescription>
-        <value>Volunteer Schedules, 3:00 AM</value>
+        <value>Volunteer Schedules</value>
     </labels>
     <labels>
         <fullName>Volunteers_NightlyJobs_RemindersName</fullName>
@@ -614,7 +614,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Nightly jobs: the shift reminder run and when it runs</shortDescription>
-        <value>Volunteer Shift Reminders, 7:00 AM</value>
+        <value>Volunteer Shift Reminders</value>
     </labels>
     <labels>
         <fullName>Volunteers_Reminders_SendFailed</fullName>

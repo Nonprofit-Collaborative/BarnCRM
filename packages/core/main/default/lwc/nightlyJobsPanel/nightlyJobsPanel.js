@@ -78,8 +78,10 @@ export default class NightlyJobsPanel extends LightningElement {
       label: step.label,
       time: timeOfDay(step.minute),
       state: step.isOn ? ON : OFF,
+      stateStatus: step.isOn ? 'on' : 'off',
       lastStarted: step.lastStarted,
       outcome: step.outcome,
+      outcomeStatus: step.outcomeStatus,
       message: step.message
     }));
   }

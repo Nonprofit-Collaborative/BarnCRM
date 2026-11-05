@@ -13,15 +13,15 @@
                 data-id="production-warning"
             ></c-barn-notice>
 
-            <template if:true={isLoadingStatus}>
+            <template lwc:if={isLoadingStatus}>
                 <lightning-spinner
                     alternative-text={labels.loadingAltText}
                     size="small"
                 ></lightning-spinner>
             </template>
 
-            <template if:false={isLoadingStatus}>
-                <template if:true={statusFailed}>
+            <template lwc:else>
+                <template lwc:if={statusFailed}>
                     <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="status-error" role="status">
                         {labels.statusError}
                     </p>
@@ -40,7 +40,7 @@
                     </template>
                 </div>
 
-                <template if:true={junctionMembership}>
+                <template lwc:if={junctionMembership}>
                     <p
                         class="slds-text-color_weak slds-var-m-bottom_small"
                         data-id="junction-mode-note"
@@ -49,11 +49,7 @@
                     </p>
                 </template>
 
-                <template if:false={canManage}>
-                    <p class="slds-text-color_weak" data-id="read-only">{labels.readOnlyMessage}</p>
-                </template>
-
-                <template if:true={canManage}>
+                <template lwc:if={canManage}>
                     <lightning-button
                         variant="brand"
                         label={labels.loadButtonLabel}
@@ -67,6 +63,9 @@
                         onclick={handleRemoveClick}
                         disabled={removeDisabled}
                     ></lightning-button>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-color_weak" data-id="read-only">{labels.readOnlyMessage}</p>
                 </template>
             </template>
         </div>

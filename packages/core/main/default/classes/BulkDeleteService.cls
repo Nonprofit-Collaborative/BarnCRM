@@ -89,11 +89,17 @@ public with sharing class BulkDeleteService {
 		public Integer count;
 		@AuraEnabled
 		public String objectLabel;
+		/** The object's singular label, for a count of one ("1 Contact matches"). */
+		@AuraEnabled
+		public String objectLabelSingular;
 		@AuraEnabled
 		public List<SampleRecord> sample = new List<SampleRecord>();
 		/** The kinds of child record the platform deletes with each record (R-BD2). */
 		@AuraEnabled
 		public List<String> cascades = new List<String>();
+		/** How many more kinds there are than the list shows. */
+		@AuraEnabled
+		public Integer cascadesMore = 0;
 		/** The last moment an undo could run, if the job started now. */
 		@AuraEnabled
 		public Datetime undoDeadline;
@@ -198,8 +204,7 @@ public with sharing class BulkDeleteService {
 		Schema.DescribeSObjectResult described = checked.objectType.getDescribe(
 			SObjectDescribeOptions.DEFERRED
 		);
-		result.objectLabel = described.getLabelPlural();
-		result.cascades = cascades(described);
+		fillObjectAndCascades(result, described);
 		result.undoDeadline = undoDeadlineFrom(Datetime.now());
 		QueryCompiler.Compiled sample = QueryCompiler.compileSelection(
 			queryJson,
@@ -222,29 +227,76 @@ public with sharing class BulkDeleteService {
 		return result;
 	}
 
+	/** The object's labels and the kinds deleted with it, cut to what the preview shows. */
+	private static void fillObjectAndCascades(
+		Preview result,
+		Schema.DescribeSObjectResult described
+	) {
+		result.objectLabel = described.getLabelPlural();
+		result.objectLabelSingular = described.getLabel();
+		List<String> all = cascades(described);
+		result.cascadesMore = Math.max(0, all.size() - MAX_CASCADES);
+		while (all.size() > MAX_CASCADES) {
+			all.remove(all.size() - 1);
+		}
+		result.cascades = all;
+	}
+
+	/** Child objects the platform keeps for itself: a person has no use for them in the list. */
+	private static final List<String> SYSTEM_CHILD_SUFFIXES = new List<String>{
+		'Share',
+		'History',
+		'Feed',
+		'ChangeEvent'
+	};
+
+	/** True for a sharing, history, feed or change event child, which no one asks about. */
+	@TestVisible
+	private static Boolean isSystemChild(String apiName) {
+		for (String suffix : SYSTEM_CHILD_SUFFIXES) {
+			// A custom object's own are Name__Share, Name__History and the like.
+			if (apiName != null && apiName.endsWith(suffix)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
-	 * The kinds of child record the platform deletes with a record of this object, by plural
-	 * label, sorted: child relationships marked cascade delete whose object the person may read.
+	 * Every kind of child record the platform deletes with a record of this object, by plural
+	 * label: child relationships marked cascade delete whose object the person may read, less
+	 * the platform's own sharing, history and feed objects. BarnCRM's own objects (custom) come
+	 * first, then the standard ones, each in alphabetical order.
 	 */
 	@TestVisible
 	private static List<String> cascades(Schema.DescribeSObjectResult described) {
-		Set<String> labels = new Set<String>();
+		Set<String> custom = new Set<String>();
+		Set<String> standard = new Set<String>();
 		for (Schema.ChildRelationship child : described.getChildRelationships()) {
 			if (!child.isCascadeDelete() || child.getChildSObject() == null) {
 				continue;
 			}
 			Schema.DescribeSObjectResult childObject = child.getChildSObject()
 				.getDescribe(SObjectDescribeOptions.DEFERRED);
-			if (childObject.isAccessible() && childObject.isQueryable()) {
-				labels.add(childObject.getLabelPlural());
+			if (
+				!childObject.isAccessible() ||
+				!childObject.isQueryable() ||
+				isSystemChild(childObject.getName())
+			) {
+				continue;
+			}
+			if (childObject.isCustom()) {
+				custom.add(childObject.getLabelPlural());
+			} else {
+				standard.add(childObject.getLabelPlural());
 			}
 		}
-		List<String> sorted = new List<String>(labels);
-		sorted.sort();
-		while (sorted.size() > MAX_CASCADES) {
-			sorted.remove(sorted.size() - 1);
-		}
-		return sorted;
+		List<String> ordered = new List<String>(custom);
+		ordered.sort();
+		List<String> standardKinds = new List<String>(standard);
+		standardKinds.sort();
+		ordered.addAll(standardKinds);
+		return ordered;
 	}
 
 	/**
@@ -358,8 +410,7 @@ public with sharing class BulkDeleteService {
 		Schema.DescribeSObjectResult described = checked.objectType.getDescribe(
 			SObjectDescribeOptions.DEFERRED
 		);
-		result.objectLabel = described.getLabelPlural();
-		result.cascades = cascades(described);
+		fillObjectAndCascades(result, described);
 		result.undoDeadline = undoDeadlineFrom(Datetime.now());
 		Set<Id> firstIds = new Set<Id>();
 		for (Import_Row__c row : [

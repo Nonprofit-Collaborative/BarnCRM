@@ -41,6 +41,9 @@ public with sharing class NightlyJobsController {
 		public Datetime lastStarted;
 		@AuraEnabled
 		public String outcome;
+		/** The kit status word for the outcome (done, attention, failed, skipped, in-progress). */
+		@AuraEnabled
+		public String outcomeStatus;
 		@AuraEnabled
 		public String message;
 	}
@@ -91,11 +94,30 @@ public with sharing class NightlyJobsController {
 			if (row != null) {
 				item.lastStarted = row.Last_Started__c;
 				item.outcome = outcomeLabel(row.Last_Outcome__c);
+				item.outcomeStatus = outcomeStatus(row.Last_Outcome__c);
 				item.message = row.Last_Message__c;
 			}
 			view.steps.add(item);
 		}
 		return view;
+	}
+
+	/** The kit status word for a stored outcome: it picks the badge's tone, never its text. */
+	@TestVisible
+	private static String outcomeStatus(String value) {
+		if (value == 'Done') {
+			return 'done';
+		}
+		if (value == 'Failed') {
+			return 'failed';
+		}
+		if (value == 'Skipped') {
+			return 'skipped';
+		}
+		if (value == 'Running') {
+			return 'in-progress';
+		}
+		return String.isBlank(value) ? null : 'attention';
 	}
 
 	/** The outcome as the org's picklist labels it, so a translation shows. */

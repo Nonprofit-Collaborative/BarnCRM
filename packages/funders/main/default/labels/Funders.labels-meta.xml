@@ -262,7 +262,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check nightly jobs list: the grant reminder run</shortDescription>
-        <value>Grant Requirement Reminders, 6:00 AM</value>
+        <value>Grant Requirement Reminders</value>
     </labels>
     <labels>
         <fullName>Funders_Reminder_TaskSubject</fullName>

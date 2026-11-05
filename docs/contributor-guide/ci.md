@@ -708,6 +708,31 @@ While you iterate, use `sf apex run test --class-names <Class> --target-org <ali
 class, or the relevant-tests run above for a branch; the full run is the final run before
 merge, not the inner loop.
 
+**An org deployed by source is not an upgraded org until setup runs (QA-C-04).** A source
+deploy runs no install handler, and `run-org-tests.sh` passes `SOURCE_POST_INSTALL=0` on
+purpose: the Apex tests assume an org that has never saved BarnCRM Settings, and a test org
+marked as a new install has every feature off. So after a release gate, and before QA or UX
+testing on the same org, run Core's setup once, then each module's setup that the org has
+(`deploy-packages.sh` runs the same block when it is not told otherwise):
+
+```
+echo 'CorePostInstall.runAsSourceDeploy();' | sf apex run -o <alias>
+for m in Rollups Giving Volunteers Programs LogicModels Funders Mirror; do
+  echo "new ${m}PostInstall().runSetup(UserInfo.getUserId());" | sf apex run -o <alias>
+done
+```
+
+Until then shipped import template names keep their old casing, templates added by a later
+version (Relationships, Affiliations) are missing, shipped templates keep the people mode they
+were created with, and `Shipped_Defaults_Applied__c` is empty, so the upgrade scripts in the
+Testing Guide (T-SET-22, T-IMP-22, T-IMP-01) cannot pass. The nightly run is scheduled by setup
+only on a new install, or by adopting a schedule an earlier version had; an org with neither
+shows **Schedule Nightly Jobs** on the Nightly Jobs panel (T-SET-25 steps 3 and 4), so step 1
+of T-SET-25 needs an org that really was upgraded. The gate script does not run setup itself:
+it marks the org as set up and changes org state (it renames templates and realigns their
+people mode), which the next gate run's tests must not see. It is safe to run twice. Do the same
+after the `barn-npc` and `mwdbdevsb` deploys.
+
 ### Release destructive manifest
 
 A source deploy adds and updates components but never deletes one. A class, label, field or
@@ -724,6 +749,16 @@ python3 scripts/org/build-destructive-manifest.py <org's version> <release> \
 
 - `<org's version>` and `<release>` are git refs (tags, branches or commits). `--packages` names
   the packages the org has. A component that moved to another package is not removed.
+- Test orgs and long-lived orgs rarely sit on one version. Build the manifest from each version
+  in use and keep the union of the members (a member an org never had is only a warning, which
+  `--ignore-warnings` accepts). `release-0.17/destructive` is that union for releases 0.15 to
+  0.17: the removals since `19463c55` (before landing batch 8) and since `main` at `c06865c6`
+  (6 classes and the label and content asset removals of batch B; `Import_Row_Retention_Days`,
+  `ImportRowPurgeBatch`, `ErrorLogRetention`, `NightlyJob`, `NightlyJobProvider` and
+  `NamedNightlyJob` are in it).
+- Before QA on an org, compare its `Setting_Definition__mdt` names with the repo's: a definition
+  the repo lacks (QA-C-02: `Import_Row_Retention_Days`) shows a setting that nothing reads. The
+  Settings page already leaves out a definition whose field is missing.
 - It writes `package.xml` (empty) and `destructiveChangesPost.xml`, and prints the count per
   type. A removed record type is printed instead (the Metadata API cannot delete one:
   deactivate and delete it in Setup), as is any removed file whose type the script does not

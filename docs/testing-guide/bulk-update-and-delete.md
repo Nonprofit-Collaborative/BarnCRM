@@ -106,6 +106,8 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 8 | Open **Data Manager**, **Data Jobs**, choose **Bulk deletes** in **Show**, and select **Undo** beside the job. | "Undo brings back 3 records from the Recycle Bin, except any no longer there. Type 3 to confirm." |
 | 9 | Type `3`, select **Undo Bulk Delete**, and **Refresh** until **Undone**. | **Undone**. |
 | 10 | Run the Find query again. | Del1, Del2 and Del3 are back, each in their household. |
+| 11 | Change the query to match one contact (**First Name** equals `Del1`), **Run**, and select **Preview** in a new Bulk Delete panel. | The line reads "1 Contact matches. It is:". The related-records badges list BarnCRM's kinds first and no Share, History or Feed kinds; a long list ends with "and N more kinds". |
+| 12 | Change the query to match nobody (**First Name** equals `Nobodyhere`) and **Preview**. | **No Records Match** (or "No records match this query, so there is nothing to delete."), with no list, download, confirm box or **Delete** button. |
 
 **Cleanup:** keep the contacts for T-BULK-07 and T-BULK-08, then delete them and their households.
 

@@ -7,7 +7,9 @@
  * thing under test here is the placement, not the arithmetic of the total (which G-02 owns and
  * `GiftRollupRefundTest` already asserts).
  */
-@IsTest(testFor='ApexClass:DonorLevelBatch, ApexClass:DonorLevelService')
+@IsTest(
+	testFor='ApexClass:DonorLevelBatch, ApexClass:DonorLevelService, ApexClass:DonorLevelSchedulable'
+)
 private class DonorLevelAssignmentTest {
 	private static final String FRIEND = 'Friend';
 	private static final String SUSTAINER = 'Sustainer';
@@ -253,6 +255,30 @@ private class DonorLevelAssignmentTest {
 				200,
 				[SELECT COUNT() FROM Contact WHERE Donor_Level__c = :topLevel],
 				'A bulk load places every record, not the first chunk (plan Principle 2).'
+			);
+		}
+	}
+
+	@IsTest
+	static void theNightlyScheduleRunsTheDonorLevelBatch() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Test.startTest();
+			// A real schedule hands execute a context; stopTest fires it and its batch.
+			System.schedule(
+				'DonorLevelAssignmentTest nightly',
+				'0 0 3 * * ?',
+				new DonorLevelSchedulable()
+			);
+			Test.stopTest();
+
+			Assert.areEqual(
+				200,
+				DonorLevelSchedulable.CHUNK_SIZE,
+				'The pass works 200 donors a chunk'
+			);
+			Assert.isTrue(
+				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'DonorLevelBatch'] >= 1,
+				'The schedule starts the donor level batch'
 			);
 		}
 	}

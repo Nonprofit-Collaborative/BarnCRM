@@ -245,21 +245,73 @@ private class ImportTemplateServiceTest {
 	@IsTest
 	static void personModeFollowsTheOrgShape() {
 		System.runAs(TestUsers.admin()) {
-			// Asked of the org this test runs in, so that it holds on a Platform-only org and on
-			// one with person accounts alike (ADR-0013).
-			if (OrgShapeDetector.detect().hasPersonAccounts) {
-				Assert.areEqual(
-					ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS,
-					ImportTemplateService.defaultPersonMode(),
-					'An org with person accounts stores people as accounts.'
-				);
-			} else {
-				Assert.areEqual(
-					ImportTemplateService.PERSON_MODE_CONTACTS,
-					ImportTemplateService.defaultPersonMode(),
-					'A platform-only org stores people as contacts.'
-				);
-			}
+			// Person Accounts enabled and the junction model: people are person accounts.
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+			HouseholdService.personAccountOverride = true;
+			Assert.areEqual(
+				ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS,
+				ImportTemplateService.defaultPersonMode(),
+				'An org with person accounts that stores people as accounts imports accounts.'
+			);
+			// Person Accounts enabled but people stored as contacts in households (QA-C-01).
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			Assert.areEqual(
+				ImportTemplateService.PERSON_MODE_CONTACTS,
+				ImportTemplateService.defaultPersonMode(),
+				'Person Accounts being enabled is not how people are stored.'
+			);
+			// A Platform-only org has no person accounts whatever the household model says.
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+			HouseholdService.personAccountOverride = false;
+			Assert.areEqual(
+				ImportTemplateService.PERSON_MODE_CONTACTS,
+				ImportTemplateService.defaultPersonMode(),
+				'A platform-only org stores people as contacts.'
+			);
+		}
+	}
+
+	@IsTest
+	static void shippedTemplatesTakeTheOrgsPersonMode() {
+		System.runAs(TestUsers.admin()) {
+			ImportTemplateSelector.shippedOverride = new List<Import_Template_Default__mdt>{
+				oneObjectRow(
+					'Load_One',
+					'Error_Log__c',
+					ONE_OBJECT_MAPPING,
+					ImportObjectSchema.OPERATION_INSERT,
+					null,
+					null
+				)
+			};
+			// Created while Person Accounts being enabled decided the mode (before QA-C-01).
+			Import_Template__c wrong = new Import_Template__c(
+				Name = 'Load_One',
+				Template_Key__c = 'one_object_key',
+				Column_Mapping_JSON__c = ONE_OBJECT_MAPPING,
+				Default_Values_JSON__c = '{"version":1,"defaults":[]}',
+				Matching_Rule__c = ImportTemplateService.RULE_EMAIL,
+				Person_Mode__c = ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS,
+				Is_Package_Default__c = true,
+				Active__c = true
+			);
+			Database.insert(wrong, AccessLevel.SYSTEM_MODE);
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			HouseholdService.personAccountOverride = true;
+
+			ImportTemplateService.alignShippedPersonModes();
+
+			Assert.areEqual(
+				ImportTemplateService.PERSON_MODE_CONTACTS,
+				templatesWithKey()[0].Person_Mode__c,
+				'A shipped template follows how the org stores people.'
+			);
+			ImportTemplateService.alignShippedPersonModes();
+			Assert.areEqual(
+				ImportTemplateService.PERSON_MODE_CONTACTS,
+				templatesWithKey()[0].Person_Mode__c,
+				'A second run changes nothing.'
+			);
 		}
 	}
 

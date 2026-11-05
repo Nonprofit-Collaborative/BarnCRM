@@ -249,7 +249,7 @@ date is reminded again. When nobody active can be reminded, nothing is sent, and
 still lists the requirement once it is overdue.
 
 The job is a step of [BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run, and shows on
-the Nightly Jobs panel as **Grant Requirement Reminders, 6:00 AM**. It has no switch of its own;
+the Nightly Jobs panel as **Grant Requirement Reminders** (6:00 AM). It has no switch of its own;
 Health Check's **Schedule all nightly jobs** fix schedules the run if it is not. It does nothing while Funders is turned off or both reminder
 settings are off.
 

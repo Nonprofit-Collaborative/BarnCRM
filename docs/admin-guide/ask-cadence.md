@@ -17,7 +17,7 @@ Every night at 3:30 AM, BarnCRM finds donors whose Next Ask Date is today or ear
 Everything is in the app. You never open Setup.
 
 1. Open **BarnCRM Settings**, choose the **Giving** section, and find **Ask Reminders** under **Acknowledgments and Stewardship**. It is **on** by default, also in an org that saved its Giving settings before this setting existed (the upgrade that adds it turns it on once, and an administrator who turns it off afterwards keeps it off), and does nothing until somebody enters a Next Ask Date. Turn it off if you do not want tasks created. The dates and the list below keep working when it is off.
-2. Open **Nightly Jobs and Accounting Periods**, then **Nightly Jobs**, and choose **Schedule** if the jobs are not scheduled yet. **Ask Reminders, 3:30 AM** is the fourth job on the page, with its last run and a one sentence summary (how many reminders it created, how many it could not).
+2. Open **Nightly Jobs and Accounting Periods**, then **Nightly Jobs**, and choose **Schedule** if the jobs are not scheduled yet. **Ask Reminders** is the fourth job on the page, with its last run and a one sentence summary (how many reminders it created, how many it could not).
 3. Add **Next Ask Date** and **Last Touch Date** to the record pages your fundraisers use. They are on the Contact and Account objects, and the Giving permission sets already grant them: **Giving Staff** and **Giving Admin** can edit the two dates, **Giving Read Only** can read them. Nobody edits **Ask Reminder For Date**.
 
 ## Who Is Due

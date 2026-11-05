@@ -106,6 +106,42 @@ private class NpspHouseholdAdoptionTest {
 		);
 	}
 
+	/** A source that fails in a way no BarnCRM message covers, as a platform fault would. */
+	private class FailingSource extends NpspHouseholdSource {
+		public override Boolean available() {
+			throw new QueryException('The source could not be read');
+		}
+	}
+
+	@IsTest
+	static void anUnexpectedFailureIsLoggedAndShownAsTheUnexpectedError() {
+		System.runAs(TestUsers.admin()) {
+			NpspHouseholdSource.instance = new FailingSource();
+			String statusMessage;
+			String adoptMessage;
+
+			Test.startTest();
+			try {
+				NpspHouseholdAdoptionController.getStatus();
+			} catch (AuraHandledException e) {
+				statusMessage = e.getMessage();
+			}
+			try {
+				NpspHouseholdAdoptionController.adopt(true, 1);
+			} catch (AuraHandledException e) {
+				adoptMessage = e.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.areEqual(Label.Core_UnexpectedError, statusMessage, 'Status: the plain error');
+			Assert.areEqual(Label.Core_UnexpectedError, adoptMessage, 'Adopt: the plain error');
+			Assert.isTrue(
+				[SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE] >= 2,
+				'Both failures are written to the Error Log'
+			);
+		}
+	}
+
 	@IsTest
 	static void previewCountsAndSamplesCandidates() {
 		System.runAs(TestUsers.admin()) {

@@ -198,7 +198,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Name of the nightly job that emails the error digest.</shortDescription>
-        <value>Error digest email</value>
+        <value>Error Digest Email</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_JobSetupChanges</fullName>
@@ -206,7 +206,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Name of the nightly job that copies the Setup Audit Trail.</shortDescription>
-        <value>Setup changes copy</value>
+        <value>Setup Changes Copy</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_JobEmptyHouseholds</fullName>
@@ -214,7 +214,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Name of the nightly job that tidies households emptied by deleting people.</shortDescription>
-        <value>Empty household tidy-up</value>
+        <value>Empty Household Tidy-Up</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_JobTabAccess</fullName>
@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Name of the hourly job that keeps feature tabs with the right people.</shortDescription>
-        <value>Tab access check</value>
+        <value>Tab Access Check</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_JobSeasonalAddresses</fullName>
@@ -230,7 +230,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Name of the nightly job that swaps seasonal addresses.</shortDescription>
-        <value>Seasonal address swap</value>
+        <value>Seasonal Address Swap</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_Loading</fullName>

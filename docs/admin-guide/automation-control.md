@@ -213,6 +213,8 @@ every person added without one and works the rollup totals that waited. After a 
 or a bypassed load, select **Catch Up Now** on this page once automation runs again: it does
 the same, and also recomputes every household's name and greetings (a household marked as a
 custom name keeps its wording). It runs in the background, and the page says it has started.
+Selecting it again while a catch-up is still waiting or running does nothing but say "A
+catch-up is already running", so two runs never overlap.
 Anything else that was skipped (a preferred email or phone copied to the
 standard field, an address copied to its household, the other side of a relationship) is caught
 up by saving those records again, for example with **Bulk Update** changing nothing but a

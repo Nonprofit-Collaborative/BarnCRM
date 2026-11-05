@@ -432,6 +432,7 @@ public with sharing class ImportTemplateService {
 	public static Integer materializeDefaultsDuringInstall(String context) {
 		try {
 			recaseShippedNames();
+			alignShippedPersonModes();
 			List<Import_Template__c> toCreate = missingDefaults(true);
 			if (toCreate.isEmpty()) {
 				return 0;
@@ -475,6 +476,40 @@ public with sharing class ImportTemplateService {
 		}
 		if (!renamed.isEmpty()) {
 			Database.update(renamed, AccessLevel.SYSTEM_MODE);
+		}
+	}
+
+	/**
+	 * A shipped template created while the people mode followed Person Accounts being enabled
+	 * (before QA-C-01) keeps the wrong mode in an org that stores people as contacts. A shipped
+	 * template whose people mode differs from the org's takes the org's; the wizard never offers
+	 * the mode, so no administrator choice is lost. Finds nothing to do on a second run. System
+	 * mode, as the insert above.
+	 */
+	@TestVisible
+	private static void alignShippedPersonModes() {
+		Set<String> keys = new Set<String>();
+		for (Import_Template_Default__mdt row : ImportTemplateSelector.selectShippedDefaults()) {
+			// A one-object row that names its own people mode keeps it; every other template
+			// takes the org's mode when it is created, so it is realigned to that.
+			if (
+				String.isNotBlank(row.Template_Key__c) &&
+				(String.isBlank(row.Target_Object__c) || String.isBlank(row.Person_Mode__c))
+			) {
+				keys.add(row.Template_Key__c);
+			}
+		}
+		String personMode = defaultPersonMode();
+		List<Import_Template__c> realigned = new List<Import_Template__c>();
+		for (Import_Template__c template : ImportTemplateSelector.selectByKeys(keys).values()) {
+			if (template.Is_Package_Default__c == true && template.Person_Mode__c != personMode) {
+				realigned.add(
+					new Import_Template__c(Id = template.Id, Person_Mode__c = personMode)
+				);
+			}
+		}
+		if (!realigned.isEmpty()) {
+			Database.update(realigned, AccessLevel.SYSTEM_MODE);
 		}
 	}
 
@@ -923,10 +958,15 @@ public with sharing class ImportTemplateService {
 		Database.update(template, AccessLevel.SYSTEM_MODE);
 	}
 
-	/** The person mode a new template starts in, from the org shape the assistant detected. */
+	/**
+	 * The person mode a new template starts in, from how this org stores people: as person
+	 * accounts only when Person Accounts are enabled and the household model is the junction
+	 * model (the same test the household jobs use). An org that has Person Accounts enabled but
+	 * stores people as contacts in households imports contacts (QA-C-01).
+	 */
 	@NamespaceAccessible
 	public static String defaultPersonMode() {
-		return HouseholdService.isPersonAccountOrg()
+		return HouseholdService.isPersonAccountOrg() && HouseholdService.isJunctionMode()
 			? PERSON_MODE_PERSON_ACCOUNTS
 			: PERSON_MODE_CONTACTS;
 	}

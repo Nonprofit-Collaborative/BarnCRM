@@ -229,7 +229,7 @@ settings, and each saves as you change it.
 ## Shift Reminders
 
 When **Send shift reminders** is on, every volunteer signed up for a shift gets one email
-before it. A job named **Volunteer Shift Reminders, 7:00 AM** runs each morning and emails
+before it. A job named **Volunteer Shift Reminders** runs each morning and emails
 everyone **Signed up** or **Confirmed** on an open shift that starts within **Days before a
 shift to remind** days. With the default of 1 that is every shift starting today (later than
 now) or tomorrow. The email names the job, the day and time, and the place when the shift has

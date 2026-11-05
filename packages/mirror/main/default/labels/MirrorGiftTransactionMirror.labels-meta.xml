@@ -222,7 +222,7 @@
     <language>en_US</language>
     <protected>true</protected>
     <shortDescription>Nightly jobs list: Gift Transaction mirror</shortDescription>
-    <value>Gift Transaction Mirror, 1:35 AM</value>
+    <value>Gift Transaction Mirror</value>
   </labels>
   <labels>
     <fullName>Mirror_HealthCheck_GiftTransactionMirrorNotRunTitle</fullName>

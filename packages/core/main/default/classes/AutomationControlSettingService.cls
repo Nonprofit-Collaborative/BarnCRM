@@ -278,9 +278,45 @@ public with sharing class AutomationControlSettingService {
 
 	// ------------------------------------------------------------------------ catch up
 
-	/** Queues the household catch-up, the household names recompute and the waiting rollups. */
+	private static final Set<String> CATCH_UP_CLASSES = new Set<String>{
+		'HouseholdCatchUpBatch',
+		'HouseholdNamingBatch'
+	};
+
+	/** Test seam: pretends a catch-up is running, as one queued by an earlier press would be. */
+	@TestVisible
+	private static Boolean catchUpRunningForTest = false;
+
+	/** True while a catch-up job is waiting or running; a second run could double up households. */
+	@TestVisible
+	private static Boolean catchUpRunning() {
+		if (catchUpRunningForTest == true) {
+			return true;
+		}
+		List<AsyncApexJob> running = [
+			SELECT Id
+			FROM AsyncApexJob
+			WHERE
+				ApexClass.Name IN :CATCH_UP_CLASSES
+				AND Status IN ('Holding', 'Queued', 'Preparing', 'Processing')
+			WITH SYSTEM_MODE
+			LIMIT 1
+		];
+		return !running.isEmpty();
+	}
+
+	/**
+	 * Queues the household catch-up, the household names recompute and the waiting rollups. A
+	 * press while an earlier catch-up is still waiting or running is refused with a message,
+	 * because overlapping runs can give one person two households.
+	 */
 	public static void catchUpNow() {
 		requirePermission();
+		if (catchUpRunning()) {
+			throw new AutomationControl.AutomationControlException(
+				BarnHelp.text('Core', 'Core_AutomationControl_CatchUpRunning')
+			);
+		}
 		AutomationControl.catchUp(true);
 		SettingsService.logChange('Automation: Catch Up Now', null, 'Started');
 	}

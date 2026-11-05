@@ -227,7 +227,10 @@ Most contact lists give a couple one line: two names, one address. Map the secon
 person's columns to **Contact 2** and BarnCRM puts both people in the same household. The
 shipped **Couples and Households** template already maps columns headed "Contact 1 ..." and
 "Contact 2 ..." (section 2). You get one household with two members, not two households, and it works the same way
-whether your org keeps people as contacts or as person accounts.
+whether your org keeps people as contacts or as person accounts. The shipped templates follow
+how your org stores people: as person accounts only when Person Accounts are on and the
+household model is Junction; an org that has Person Accounts on but keeps people as contacts in
+households imports contacts. Upgrading an org that had them wrong fixes the shipped templates.
 
 Where your org keeps people as person accounts, map the columns exactly as you would for
 contacts (Email, Mailing Street, Email Opt Out and so on). BarnCRM writes each to the
@@ -367,7 +370,7 @@ row that was deleted cannot be retried: upload the file again.
 The nightly **Record Cleanup** job applies this choice (it runs at twenty past one in the
 morning, as part of the nightly run Health Check reports on). Record Cleanup also deletes an
 import you started and abandoned in Draft, Parsing or Preview, with its rows, once it is
-older than **Days to Keep Import History** (365 days by default; see [Nightly Jobs](nightly-jobs.md)).
+older than **Days to keep import history** (365 days by default; see [Nightly Jobs](nightly-jobs.md)).
 
 ## 6. Files That Arrive Every Month
 

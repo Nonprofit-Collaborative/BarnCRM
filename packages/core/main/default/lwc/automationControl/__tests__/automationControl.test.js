@@ -161,10 +161,10 @@ describe('c-automation-control', () => {
     expect(banner).not.toBeNull();
     expect(banner.textContent).toContain('Automation is paused until');
     // The state must not be carried by color alone (plan Section 4.14).
-    const region = element.shadowRoot.querySelector('[role="status"]');
-    expect(region).not.toBeNull();
-    expect(region.getAttribute('aria-live')).toBe('polite');
-    expect(banner.querySelector('lightning-icon')).not.toBeNull();
+    // The kit notice draws the icon and announces the state politely.
+    const notice = element.shadowRoot.querySelector('[data-id="paused-notice"]');
+    expect(notice).not.toBeNull();
+    expect(notice.variant).toBe('warning');
   });
 
   it('names who paused and says the pause ends by itself', async () => {
@@ -314,7 +314,7 @@ describe('c-automation-control', () => {
 
     const error = element.shadowRoot.querySelector('[data-id="error-message"]');
     expect(error.textContent).toBe('Choose how long to pause automation.');
-    expect(element.shadowRoot.querySelector('[role="alert"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="error-notice"]').variant).toBe('error');
   });
 
   it('says so when the page has nothing to list', async () => {
