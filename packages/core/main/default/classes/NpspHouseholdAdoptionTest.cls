@@ -256,7 +256,19 @@ private class NpspHouseholdAdoptionTest {
 
 			Account smith = accounts(f).get(f.smith.Id);
 			Account was = before.get(f.smith.Id);
-			Assert.areEqual(was.RecordTypeId, smith.RecordTypeId, 'record type put back');
+			// A blank record type saves as the user's default where the org has record types.
+			Id expectedType = was.RecordTypeId;
+			for (
+				Schema.RecordTypeInfo info : Account.SObjectType.getDescribe(
+						SObjectDescribeOptions.DEFERRED
+					)
+					.getRecordTypeInfos()
+			) {
+				if (expectedType == null && info.isDefaultRecordTypeMapping() && !info.isMaster()) {
+					expectedType = info.getRecordTypeId();
+				}
+			}
+			Assert.areEqual(expectedType, smith.RecordTypeId, 'record type put back');
 			Assert.areEqual(was.Custom_Name__c, smith.Custom_Name__c, 'custom name put back');
 			Assert.isNull(smith.Household_Formal_Greeting__c, 'greeting put back to blank');
 			Assert.isNull(smith.Primary_Contact__c, 'primary put back to blank');

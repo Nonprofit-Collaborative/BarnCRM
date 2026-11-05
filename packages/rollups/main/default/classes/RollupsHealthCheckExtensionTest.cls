@@ -332,7 +332,8 @@ private class RollupsHealthCheckExtensionTest {
 				Assert.areEqual(
 					String.format(
 						System.Label.Core_HealthCheck_FixScheduled,
-						new List<Object>{ String.join(jobs.getFixScope(), ', ') }
+						// HealthCheckService.JOB_SEPARATOR: names hold commas.
+						new List<Object>{ String.join(jobs.getFixScope(), '; ') }
 					),
 					report.getFixOutcome(),
 					'The panel is told which jobs were scheduled.'
